@@ -1,7 +1,11 @@
 import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
 import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
 import { noop } from "lodash";
-import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  waitFor,
+  waitForElementToBeRemoved,
+  screen
+} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import {
   MATERIAL_SAMPLE_SUMMARY_1,
@@ -152,7 +156,10 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
 
     // Run name should be in the textbox.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+    const sequencingRunNameInput = wrapper.container.querySelector(
+      'input[name="sequencingRunName"]'
+    );
+    expect(sequencingRunNameInput).toHaveDisplayValue("run-name-1");
 
     // Ensure Primary IDs are rendered in the table with links:
     expect(
@@ -192,6 +199,11 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A3" })).toBeInTheDocument();
 
+    // Ensure the run item names are shown:
+    expect(wrapper.getAllByRole("textbox")[1]).toHaveDisplayValue(
+      "Provided run item name"
+    );
+
     // Ensure attachment appears.
     expect(
       wrapper.getByRole("heading", {
@@ -226,7 +238,10 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     ).toBeInTheDocument();
 
     // Run name should be in the textbox for the first run found.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+    const sequencingRunNameInput = wrapper.container.querySelector(
+      'input[name="sequencingRunName"]'
+    );
+    expect(sequencingRunNameInput).toHaveDisplayValue("run-name-1");
 
     // Set edit mode should not be triggered in this test.
     expect(mockSetEditMode).toBeCalledTimes(0);
@@ -270,7 +285,10 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     });
 
     // Expect the Sequencing run to be empty since no run exists yet.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("");
+    const sequencingRunNameInput = wrapper.container.querySelector(
+      'input[name="sequencingRunName"]'
+    );
+    expect(sequencingRunNameInput).toHaveDisplayValue("");
 
     // Try saving with no sequencing run name, it should report an error.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -284,7 +302,11 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     ).toBeInTheDocument();
 
     // Type a name for the run to be created.
-    userEvent.type(wrapper.getByRole("textbox"), "My new run");
+    userEvent.type(sequencingRunNameInput!, "My new run");
+
+    // Enter in names for the run items:
+    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -319,6 +341,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         [
           {
             resource: {
+              name: "Run item name 1",
               relationships: {
                 run: {
                   data: {
@@ -334,6 +357,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
           },
           {
             resource: {
+              name: "Run item name 2",
               relationships: {
                 run: {
                   data: {
@@ -441,8 +465,15 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Change the sequencing run name to something different.
-    userEvent.clear(wrapper.getByRole("textbox"));
-    userEvent.type(wrapper.getByRole("textbox"), "Updated run name");
+    const sequencingRunNameInput = wrapper.container.querySelector(
+      'input[name="sequencingRunName"]'
+    );
+    userEvent.clear(sequencingRunNameInput!);
+    userEvent.type(sequencingRunNameInput!, "Updated run name");
+
+    // Update the two run iten name
+    userEvent.clear(wrapper.getAllByRole("textbox")[1]);
+    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -478,6 +509,23 @@ describe("Sanger Run Step from Sanger Workflow", () => {
               type: "molecular-analysis-run"
             },
             type: "molecular-analysis-run"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Update the run item names
+      [
+        [
+          {
+            resource: {
+              id: "cd8c4d28-586a-45c0-8f27-63030aba07cf",
+              name: "Run item name 1",
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
           }
         ],
         {

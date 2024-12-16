@@ -176,6 +176,7 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "cd8c4d28-586a-45c0-8f27-63030aba07cf",
         type: "molecular-analysis-run-item",
+        name: "Provided run item name",
         usageType: "seq-reaction",
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
