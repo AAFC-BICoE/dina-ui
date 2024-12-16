@@ -285,8 +285,11 @@ export function useMolecularAnalysisRun({
     []
   );
 
+  // Used to determine if the resource needs to be reloaded.
+  const [reloadResource, setReloadResource] = useState<number>(Date.now());
+
   // Network Requests, starting with the SeqReaction
-  useQuery<SeqReaction[]>(
+  const { loading: loadingSeqReactions } = useQuery<SeqReaction[]>(
     {
       filter: filterBy([], {
         extraFilters: [
@@ -303,6 +306,7 @@ export function useMolecularAnalysisRun({
         "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,pcrBatchItem,seqPrimer"
     },
     {
+      deps: [reloadResource],
       onSuccess: async ({ data: seqReactions }) => {
         /**
          * Go through each of the SeqReactions and retrieve the Molecular Analysis Run. There
@@ -579,6 +583,7 @@ export function useMolecularAnalysisRun({
       setPerformSave(false);
       setEditMode(false);
       setLoading(false);
+      setReloadResource(Date.now());
     } catch (error) {
       console.error("Error updating sequencing run: ", error);
       setPerformSave(false);
@@ -621,7 +626,7 @@ export function useMolecularAnalysisRun({
   }, [performSave, loading]);
 
   return {
-    loading,
+    loading: loading || loadingSeqReactions,
     errorMessage,
     multipleRunWarning,
     sequencingRunName,
