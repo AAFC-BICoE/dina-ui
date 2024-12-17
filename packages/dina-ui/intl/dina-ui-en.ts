@@ -1160,5 +1160,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   changingTheStorageUnitTypeWillDeleteWarningButtonText: "Proceed",
   seqdbManagedAttributeTitle: "Sequencing",
   genericMolecularAnalysis: "Generic Molecular Analysis",
-  molecularAnalysisRunItemName: "Run Item Name"
+  molecularAnalysisRunItemName: "Run Item Name",
+  qualityControlName: "Name:",
+  qualityControlType: "Type:"
 };
