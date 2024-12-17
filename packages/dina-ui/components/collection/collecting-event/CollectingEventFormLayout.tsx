@@ -32,7 +32,8 @@ import {
   NotPubliclyReleasableWarning,
   ParseVerbatimToRangeButton,
   PersonSelectField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  TagSelectReadOnly
 } from "../..";
 import { ManagedAttributesEditor } from "../../";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -602,6 +603,7 @@ export function CollectingEventFormLayout({
         sectionName="general-section"
       >
         <NotPubliclyReleasableWarning />
+        {readOnly && <TagSelectReadOnly />}
         <TagsAndRestrictionsSection
           resourcePath="collection-api/collecting-event"
           indexName="dina_material_sample_index"
