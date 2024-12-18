@@ -1450,6 +1450,11 @@ const expected = {
             },
             {
               defaultValue: undefined,
+              name: "organism[0].dwcVernacularName",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
               name: "organism[0].managedAttributes",
               visible: false
             }
