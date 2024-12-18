@@ -1162,5 +1162,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   genericMolecularAnalysis: "Generic Molecular Analysis",
   molecularAnalysisRunItemName: "Run Item Name",
   qualityControlName: "Name:",
-  qualityControlType: "Type:"
+  qualityControlType: "Type:",
+  collecting_event_tag_info:
+    "Suggestions are currently based on Material Sample tags."
 };

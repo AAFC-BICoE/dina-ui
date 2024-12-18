@@ -257,9 +257,15 @@ export function useMolecularAnalysisRun({
   const { bulkGet, save, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { compareByStringAndNumber } = useStringComparator();
+  // Map of MolecularAnalysisRunItem {id:name}
+  const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
+    useState<Record<string, string>>({});
+
   const columns = getMolecularAnalysisRunColumns(
     compareByStringAndNumber,
-    "seq-reaction"
+    "seq-reaction",
+    setMolecularAnalysisRunItemNames,
+    !editMode
   );
 
   // Used to display if the network calls are still in progress.
@@ -281,8 +287,11 @@ export function useMolecularAnalysisRun({
     []
   );
 
+  // Used to determine if the resource needs to be reloaded.
+  const [reloadResource, setReloadResource] = useState<number>(Date.now());
+
   // Network Requests, starting with the SeqReaction
-  useQuery<SeqReaction[]>(
+  const { loading: loadingSeqReactions } = useQuery<SeqReaction[]>(
     {
       filter: filterBy([], {
         extraFilters: [
@@ -299,6 +308,7 @@ export function useMolecularAnalysisRun({
         "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,pcrBatchItem,seqPrimer"
     },
     {
+      deps: [reloadResource],
       onSuccess: async ({ data: seqReactions }) => {
         /**
          * Go through each of the SeqReactions and retrieve the Molecular Analysis Run. There
@@ -441,21 +451,29 @@ export function useMolecularAnalysisRun({
 
       // Create a run item for each seq reaction.
       const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-        sequencingRunItems.map(() => ({
-          type: "molecular-analysis-run-item",
-          resource: {
+        sequencingRunItems.map((item) => {
+          const molecularAnalysisRunItemName = item.materialSampleSummary?.id
+            ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
+            : undefined;
+          return {
             type: "molecular-analysis-run-item",
-            usageType: "seq-reaction",
-            relationships: {
-              run: {
-                data: {
-                  id: savedMolecularAnalysisRun[0].id,
-                  type: "molecular-analysis-run"
+            resource: {
+              type: "molecular-analysis-run-item",
+              usageType: "seq-reaction",
+              ...(molecularAnalysisRunItemName && {
+                name: molecularAnalysisRunItemName
+              }),
+              relationships: {
+                run: {
+                  data: {
+                    id: savedMolecularAnalysisRun[0].id,
+                    type: "molecular-analysis-run"
+                  }
                 }
               }
-            }
-          } as any
-        }));
+            } as any
+          };
+        });
       const savedMolecularAnalysisRunItem = await save(
         molecularAnalysisRunItemSaveArgs,
         { apiBaseUrl: "/seqdb-api" }
@@ -537,10 +555,37 @@ export function useMolecularAnalysisRun({
         apiBaseUrl: "/seqdb-api"
       });
 
+      // Update existing MolecularAnalysisRunItem names
+      if (sequencingRunItems) {
+        const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+          [];
+        sequencingRunItems.forEach((item) => {
+          const molecularAnalysisRunItemName = item.materialSampleSummary?.id
+            ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
+            : undefined;
+          if (molecularAnalysisRunItemName) {
+            molecularAnalysisRunItemSaveArgs.push({
+              type: "molecular-analysis-run-item",
+              resource: {
+                id: item.molecularAnalysisRunItemId,
+                type: "molecular-analysis-run-item",
+                name: molecularAnalysisRunItemName
+              }
+            });
+          }
+        });
+        if (molecularAnalysisRunItemSaveArgs.length) {
+          await save(molecularAnalysisRunItemSaveArgs, {
+            apiBaseUrl: "/seqdb-api"
+          });
+        }
+      }
+
       // Go back to view mode once completed.
       setPerformSave(false);
       setEditMode(false);
       setLoading(false);
+      setReloadResource(Date.now());
     } catch (error) {
       console.error("Error updating sequencing run: ", error);
       setPerformSave(false);
@@ -583,7 +628,7 @@ export function useMolecularAnalysisRun({
   }, [performSave, loading]);
 
   return {
-    loading,
+    loading: loading || loadingSeqReactions,
     errorMessage,
     multipleRunWarning,
     sequencingRunName,
@@ -888,6 +933,45 @@ export function getMolecularAnalysisRunColumns(
           b?.original?.materialSampleSummary?.materialSampleName
         ),
       enableSorting: true
+    },
+    {
+      id: "molecularAnalysisRunItem.name",
+      cell: ({ row: { original } }) => {
+        return readOnly ? (
+          <>{original.molecularAnalysisRunItem?.name}</>
+        ) : (
+          <input
+            type="text"
+            className="w-100 form-control"
+            defaultValue={original.molecularAnalysisRunItem?.name}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setMolecularAnalysisRunItemNames?.(
+                (molecularAnalysisRunItemNames) => {
+                  const molecularAnalysisRunItemNamesMap =
+                    molecularAnalysisRunItemNames;
+                  if (
+                    original?.materialSampleSummary?.id &&
+                    event.target.value
+                  ) {
+                    molecularAnalysisRunItemNamesMap[
+                      original?.materialSampleSummary?.id
+                    ] = event.target.value;
+                  }
+                  return molecularAnalysisRunItemNamesMap;
+                }
+              );
+            }}
+          />
+        );
+      },
+      header: () => <DinaMessage id="molecularAnalysisRunItemName" />,
+      accessorKey: "molecularAnalysisRunItem.name",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleSummary?.materialSampleName,
+          b?.original?.materialSampleSummary?.materialSampleName
+        ),
+      enableSorting: true
     }
   ];
 
@@ -1069,6 +1153,45 @@ export function getMolecularAnalysisRunColumns(
       },
       header: () => <FieldHeader name="materialSampleName" />,
       accessorKey: "materialSampleSummary.materialSampleName",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleSummary?.materialSampleName,
+          b?.original?.materialSampleSummary?.materialSampleName
+        ),
+      enableSorting: true
+    },
+    {
+      id: "molecularAnalysisRunItem.name",
+      cell: ({ row: { original } }) => {
+        return readOnly ? (
+          <>{original.molecularAnalysisRunItem?.name}</>
+        ) : (
+          <input
+            type="text"
+            className="w-100 form-control"
+            defaultValue={original.molecularAnalysisRunItem?.name}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setMolecularAnalysisRunItemNames?.(
+                (molecularAnalysisRunItemNames) => {
+                  const molecularAnalysisRunItemNamesMap =
+                    molecularAnalysisRunItemNames;
+                  if (
+                    original?.materialSampleSummary?.id &&
+                    event.target.value
+                  ) {
+                    molecularAnalysisRunItemNamesMap[
+                      original?.materialSampleSummary?.id
+                    ] = event.target.value;
+                  }
+                  return molecularAnalysisRunItemNamesMap;
+                }
+              );
+            }}
+          />
+        );
+      },
+      header: () => <DinaMessage id="molecularAnalysisRunItemName" />,
+      accessorKey: "molecularAnalysisRunItem.name",
       sortingFn: (a: any, b: any): number =>
         compareByStringAndNumber(
           a?.original?.materialSampleSummary?.materialSampleName,

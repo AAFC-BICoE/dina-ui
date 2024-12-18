@@ -1,50 +1,57 @@
 import Bodybuilder from "bodybuilder";
-import { castArray } from "lodash";
+import { castArray, pick } from "lodash";
 import { useEffect, useState } from "react";
 import { useApiClient, useQueryBuilderContext } from "..";
-
 const TOTAL_SUGGESTIONS: number = 100;
 const FILTER_AGGREGATION_NAME: string = "included_type_filter";
 const AGGREGATION_NAME: string = "term_aggregation";
 const NEST_AGGREGATION_NAME: string = "included_aggregation";
-
 interface QuerySuggestionFieldProps {
   /** The string you want elastic search to use. */
   fieldName?: string;
-
   /** If the field is a relationship, we need to know the type to filter it. */
   relationshipType?: string;
-
   /** The index you want elastic search to perform the search on */
   indexName: string;
-
   /** Used to determine if ".keyword" should be appended to the field name.  */
   keywordMultiFieldSupport: boolean;
-}
 
+  /** Used to determine if field is an array in the back end.  */
+  isFieldArray?: boolean;
+
+  /** User input used to query against */
+  inputValue?: string;
+
+  /** Group to be queried to only show the users most used values. */
+  groupNames?: string[];
+
+  /** Number of suggestions */
+  size?: number;
+}
 export function useElasticSearchDistinctTerm({
   fieldName,
   relationshipType,
   indexName,
-  keywordMultiFieldSupport
+  keywordMultiFieldSupport,
+  isFieldArray = false,
+  inputValue,
+  groupNames,
+  size
 }: QuerySuggestionFieldProps) {
   const { apiClient } = useApiClient();
-
   const [suggestions, setSuggestions] = useState<string[]>([]);
-
-  const { groups } = useQueryBuilderContext();
-
+  const { groups } = groupNames
+    ? { groups: groupNames }
+    : useQueryBuilderContext();
   // Every time the textEntered has changed, perform a new request for new suggestions.
   useEffect(() => {
     if (!fieldName) return;
     queryElasticSearchForSuggestions();
-  }, [fieldName, relationshipType, groups]);
-
+  }, [fieldName, relationshipType, groups, inputValue]);
   async function queryElasticSearchForSuggestions() {
     // Use bodybuilder to generate the query to send to elastic search.
     const builder = Bodybuilder();
     builder.size(0);
-
     // Group needs to be queried to only show the users most used values.
     if (groups && groups.length !== 0) {
       // terms is used to be able to support multiple groups.
@@ -54,7 +61,6 @@ export function useElasticSearchDistinctTerm({
         castArray(groups)
       );
     }
-
     // If the field has a relationship type, we need to do a nested query to filter it.
     if (relationshipType) {
       builder.aggregation(
@@ -83,16 +89,27 @@ export function useElasticSearchDistinctTerm({
       );
     } else {
       // If it's an attribute, no need to use nested filters.
-      builder.aggregation(
-        "terms",
-        fieldName + (keywordMultiFieldSupport ? ".keyword" : ""),
-        {
-          size: TOTAL_SUGGESTIONS
-        },
-        AGGREGATION_NAME
-      );
+      if (isFieldArray) {
+        builder.aggregation(
+          "terms",
+          fieldName + (keywordMultiFieldSupport ? ".keyword" : ""),
+          {
+            size: size ?? TOTAL_SUGGESTIONS,
+            include: `.*${inputValue}.*`
+          },
+          AGGREGATION_NAME
+        );
+      } else {
+        builder.aggregation(
+          "terms",
+          fieldName + (keywordMultiFieldSupport ? ".keyword" : ""),
+          {
+            size: TOTAL_SUGGESTIONS
+          },
+          AGGREGATION_NAME
+        );
+      }
     }
-
     await apiClient.axios
       .post(`search-api/search-ws/search`, builder.build(), {
         params: {
@@ -115,9 +132,7 @@ export function useElasticSearchDistinctTerm({
           }
           return undefined;
         };
-
         let suggestionArray: string[] | undefined;
-
         // The path to the results in the response changes if it contains the nested aggregation.
         if (relationshipType) {
           suggestionArray = findTermAggregationKey(
@@ -136,7 +151,6 @@ export function useElasticSearchDistinctTerm({
             AGGREGATION_NAME
           )?.buckets?.map((bucket) => bucket.key);
         }
-
         if (suggestionArray !== undefined) {
           setSuggestions(suggestionArray);
         } else {
@@ -149,6 +163,5 @@ export function useElasticSearchDistinctTerm({
         setSuggestions([]);
       });
   }
-
   return suggestions;
 }

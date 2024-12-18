@@ -472,7 +472,10 @@ export function MaterialSampleForm({
                   <CollectionSelectSection resourcePath="collection-api/collection" />
                   <ProjectSelectSection resourcePath="collection-api/project" />
                   <AssemblageSelectSection resourcePath="collection-api/assemblage" />
-                  <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
+                  <TagsAndRestrictionsSection
+                    resourcePath="collection-api/material-sample"
+                    indexName="dina_material_sample_index"
+                  />
                 </div>
                 <div className="col-md-4">
                   <NotPubliclyReleasableSection />
