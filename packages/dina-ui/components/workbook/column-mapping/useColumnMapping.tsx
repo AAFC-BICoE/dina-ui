@@ -257,7 +257,7 @@ export function useColumnMapping() {
     newWorkbookColumnMap: WorkbookColumnMap
   ) {
     const originalColumnHeader = columnHeader;
-    columnHeader = columnHeader.replace(".", "_");
+    columnHeader = columnHeader.replaceAll(".", "_");
 
     const fieldPath = "managedAttributes";
     const targetManagedAttr = managedAttributes.find(
@@ -300,7 +300,7 @@ export function useColumnMapping() {
     newWorkbookColumnMap: WorkbookColumnMap
   ) {
     const originalColumnHeader = columnHeader;
-    columnHeader = columnHeader.replace(".", "_");
+    columnHeader = columnHeader.replaceAll(".", "_");
 
     const fieldPath = "organism.determination.scientificNameDetails";
     const targetTaxonomicRank = taxonomicRanks.find(
@@ -376,7 +376,7 @@ export function useColumnMapping() {
   ) {
     const columnHeaderValue = (
       columnHeader.originalColumn ?? columnHeader.columnHeader
-    ).replace(".", "_");
+    ).replaceAll(".", "_");
     const originalColumnHeader =
       columnHeader.originalColumn ?? columnHeader.columnHeader;
 
@@ -672,11 +672,11 @@ export function useColumnMapping() {
         // If relationship is found, set it. If not, reset it so it's empty.
         if (found) {
           if (PERSON_SELECT_FIELDS.has(fieldPath)) {
-            theRelationshipMapping[columnHeader][value.replace(".", "_")] = [
+            theRelationshipMapping[columnHeader][value.replaceAll(".", "_")] = [
               pick(found, ["id", "type"])
             ];
           } else {
-            theRelationshipMapping[columnHeader][value.replace(".", "_")] =
+            theRelationshipMapping[columnHeader][value.replaceAll(".", "_")] =
               pick(found, ["id", "type"]);
           }
         } else {
@@ -700,7 +700,7 @@ export function useColumnMapping() {
                 );
               }
             }
-            theRelationshipMapping[columnHeader][value.replace(".", "_")] =
+            theRelationshipMapping[columnHeader][value.replaceAll(".", "_")] =
               relationshipMappingDefaultValues;
           }
         }

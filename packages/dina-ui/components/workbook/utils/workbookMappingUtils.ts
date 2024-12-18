@@ -850,7 +850,7 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
           counts[value] = 1 + (counts[value] || 0);
         }
       }
-      columnUniqueValues[columnNames[colIndex].replace(".", "_")] = counts;
+      columnUniqueValues[columnNames[colIndex].replaceAll(".", "_")] = counts;
     }
     result[sheet] = columnUniqueValues;
   }
