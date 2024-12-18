@@ -15,6 +15,7 @@ import {
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
+  Tooltip,
   filterBy,
   useDinaFormContext,
   useInstanceContext
@@ -603,11 +604,20 @@ export function CollectingEventFormLayout({
         sectionName="general-section"
       >
         <NotPubliclyReleasableWarning />
-        {readOnly && <TagSelectReadOnly />}
-        <TagsAndRestrictionsSection
-          resourcePath="collection-api/collecting-event"
-          indexName="dina_material_sample_index"
-        />
+        {readOnly ? (
+          <TagSelectReadOnly />
+        ) : (
+          <Tooltip
+            id="collecting_event_tag_info"
+            disableSpanMargin={true}
+            visibleElement={
+              <TagsAndRestrictionsSection
+                resourcePath="collection-api/collecting-event"
+                indexName="dina_material_sample_index"
+              />
+            }
+          />
+        )}
       </DinaFormSection>
       <div className="row mb-3">
         <div className="col-md-12">
