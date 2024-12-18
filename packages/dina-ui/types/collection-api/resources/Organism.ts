@@ -7,6 +7,7 @@ export interface OrganismAttributes {
   lifeStage?: string | null;
   sex?: string | null;
   remarks?: string | null;
+  dwcVernacularName?: string | null;
   isTarget?: boolean | null;
   determination?: Determination[] | null;
   managedAttributes?: ManagedAttributeValues;

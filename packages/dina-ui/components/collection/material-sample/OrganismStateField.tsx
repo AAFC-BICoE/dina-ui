@@ -18,6 +18,7 @@ export const ORGANISM_FIELDS = [
   "lifeStage",
   "sex",
   "remarks",
+  "dwcVernacularName",
   "determination",
   "isTarget",
   "managedAttributes"
@@ -108,6 +109,11 @@ export function OrganismStateField({
             customName="organismRemarks"
             className="col-sm-12"
             multiLines={true}
+          />
+          <TextField
+            {...fieldProps("dwcVernacularName")}
+            customName="dwcVernacularName"
+            className="col-sm-12"
           />
         </div>
         <ManagedAttributesEditor
