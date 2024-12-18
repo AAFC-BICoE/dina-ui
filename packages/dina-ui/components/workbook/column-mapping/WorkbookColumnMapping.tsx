@@ -154,7 +154,7 @@ export function WorkbookColumnMapping({
         const mappedValues = Object.keys(relationshipMapping[columnName] || {});
 
         for (const value of values) {
-          if (mappedValues.indexOf(value.replace(".", "_")) === -1) {
+          if (mappedValues.indexOf(value.replaceAll(".", "_")) === -1) {
             unmappedColumnNames.push(
               workbookColumnMap[columnName].originalColumnName
             );
