@@ -3,15 +3,19 @@ import { AttachmentUploader } from "../AttachmentUploader";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-const mockPost = jest.fn(() => {
-  return {
-    data: {
-      dateTimeDigitized: "2003-12-14T12:01:44",
-      fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-      fileType: "text",
-      size: "500"
-    }
-  };
+const mockPost = jest.fn((path) => {
+  if (path === "search-api/search-ws/search") {
+    return new Promise((resolve) => resolve);
+  } else {
+    return {
+      data: {
+        dateTimeDigitized: "2003-12-14T12:01:44",
+        fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+        fileType: "text",
+        size: "500"
+      }
+    };
+  }
 });
 const mockGet = jest.fn((path) => {
   if (path === "objectstore-api/config/default-values") {

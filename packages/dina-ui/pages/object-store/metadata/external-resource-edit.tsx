@@ -200,6 +200,7 @@ function ExternalResourceMetadataForm({
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"
         groupSelectorName="bucket"
+        indexName="dina_object_store_index"
       />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">

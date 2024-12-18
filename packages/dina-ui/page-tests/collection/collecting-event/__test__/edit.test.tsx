@@ -82,9 +82,13 @@ const mockBulkGet = jest.fn(async (paths) => {
   }
   console.warn("No mock value for bulkGet paths: ", paths);
 });
-
+const mockPost = jest.fn((path) => {
+  if (path === "search-api/search-ws/search") {
+    return new Promise((resolve) => resolve);
+  }
+});
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } },
+  apiClient: { get: mockGet, axios: { patch: mockPatch, post: mockPost } },
   bulkGet: mockBulkGet
 };
 
