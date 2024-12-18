@@ -535,9 +535,13 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.clear(wrapper.getAllByRole("textbox")[0]);
     userEvent.type(wrapper.getAllByRole("textbox")[0], "Updated run name");
 
-    // Update the two run names.
+    // Add a new run name.
     userEvent.clear(wrapper.getAllByRole("textbox")[1]);
-    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    userEvent.type(
+      wrapper.getAllByRole("textbox")[1],
+      "Update run item name 1"
+    );
+    userEvent.type(wrapper.getAllByRole("textbox")[2], "Add a new one");
 
     // Edit Quality Control 1
     userEvent.clear(wrapper.getAllByRole("textbox")[3]);
@@ -607,7 +611,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
           {
             resource: {
               id: "f65ed036-eb92-40d9-af03-d027646e8948",
-              name: "Run item name 1",
+              name: "Update run item name 1",
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
+          },
+          {
+            resource: {
+              id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+              name: "Add a new one",
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
