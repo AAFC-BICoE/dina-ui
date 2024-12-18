@@ -1027,6 +1027,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "This molecular analysis workflow should only have one associated run. Please verify and correct it.",
   molecularAnalysisRunStep_sequencingRun: "Sequencing Run:",
   molecularAnalysisRunStep_sequencingRunContent: "Sequencing Run Content:",
+  molecularAnalysisRunStep_sequencingQualityControl:
+    "Sequencing Quality Control:",
   molecularAnalysisRunStep_missingSequencingRunID:
     "Unexpected error occurred. Sequencing Run ID should be set at this point.",
   molecularAnalysisRunStep_missingSequenceReactions:
@@ -1159,5 +1161,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   seqdbManagedAttributeTitle: "Sequencing",
   genericMolecularAnalysis: "Generic Molecular Analysis",
   collecting_event_tag_info:
-    "Suggestions are currently based on Material Sample tags."
+    "Suggestions are currently based on Material Sample tags.",
+  molecularAnalysisRunItemName: "Run Item Name"
 };

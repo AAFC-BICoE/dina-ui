@@ -18,7 +18,11 @@ import {
   TEST_MOLECULAR_ANALYSIS_RUN,
   TEST_MOLECULAR_ANALYSIS_RUN_ID,
   TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID,
-  TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID
+  TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID,
+  TEST_QUALITY_CONTROL_1,
+  TEST_QUALITY_CONTROL_2,
+  TEST_QUALITY_CONTROL_RUN_ITEMS,
+  TEST_QUALITY_CONTROL_TYPES
 } from "../__mocks__/MolecularAnalysisMocks";
 import {
   MolecularAnalysisRunStep,
@@ -42,6 +46,25 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 
     case "seqdb-api/molecular-analysis-run/" + TEST_MOLECULAR_ANALYSIS_RUN_ID:
       return { data: TEST_MOLECULAR_ANALYSIS_RUN };
+
+    case "seqdb-api/molecular-analysis-run-item":
+      switch (params.filter.rsql) {
+        case "run.uuid==" +
+          TEST_MOLECULAR_ANALYSIS_RUN_ID +
+          ";usageType==quality-control":
+          return { data: TEST_QUALITY_CONTROL_RUN_ITEMS };
+      }
+
+    case "seqdb-api/quality-control":
+      switch (params.filter.rsql) {
+        case "molecularAnalysisRunItem.uuid==2a3b15ce-6781-466b-bc1e-49e35af3df58":
+          return { data: TEST_QUALITY_CONTROL_1 };
+        case "molecularAnalysisRunItem.uuid==e9e39b72-ece7-454b-893a-2fc2d075e7b7":
+          return { data: TEST_QUALITY_CONTROL_2 };
+      }
+
+    case "seqdb-api/vocabulary/qualityControlType":
+      return { data: TEST_QUALITY_CONTROL_TYPES };
 
     case "objectstore-api/metadata":
     case "seqdb-api/molecular-analysis-run/" +
@@ -87,7 +110,7 @@ const mockBulkGet = jest.fn(async (paths) => {
 const mockSave = jest.fn((ops) =>
   ops.map((op) => ({
     ...op.resource,
-    id: op.resource.id ?? "123"
+    id: op?.resource?.id ?? "123"
   }))
 );
 
@@ -145,7 +168,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
 
     // Run name should be in the textbox.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+    expect(wrapper.getAllByRole("textbox")[0]).toHaveDisplayValue("run-name-1");
 
     // Ensure Primary IDs are rendered in the table with links:
     expect(
@@ -168,6 +191,21 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     // Ensure Well Coordinates is rendered:
     expect(wrapper.getByRole("cell", { name: "A1" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
+
+    // Ensure the run item names are shown:
+    expect(wrapper.getAllByRole("textbox")[1]).toHaveDisplayValue(
+      "Provided run item name"
+    );
+
+    // Ensure quality controls are being displayed:
+    expect(
+      wrapper.container.querySelector('input[name="qualityControl-name-0"]')
+    ).toHaveDisplayValue("test1");
+    expect(
+      wrapper.container.querySelector('input[name="qualityControl-name-1"]')
+    ).toHaveDisplayValue("test2");
+    expect(wrapper.getByText(/reserpine standard/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/acn blank/i)).toBeInTheDocument();
 
     // Ensure attachment appears.
     expect(
@@ -205,7 +243,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ).toBeInTheDocument();
 
     // Run name should be in the textbox for the first run found.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+    expect(wrapper.getAllByRole("textbox")[0]).toHaveDisplayValue("run-name-1");
 
     // Set edit mode should not be triggered in this test.
     expect(mockSetEditMode).toBeCalledTimes(0);
@@ -249,7 +287,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     });
 
     // Expect the Sequencing run to be empty since no run exists yet.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("");
+    const sequencingRunNameInput = wrapper.container.querySelector(
+      'input[name="sequencingRunName"]'
+    );
+    expect(sequencingRunNameInput).toHaveDisplayValue("");
 
     // Try saving with no sequencing run name, it should report an error.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -263,7 +304,24 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ).toBeInTheDocument();
 
     // Type a name for the run to be created.
-    userEvent.type(wrapper.getByRole("textbox"), "My new run");
+    userEvent.type(sequencingRunNameInput!, "My new run");
+
+    // Enter in names for the run items:
+    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
+
+    // Add new quality control.
+    userEvent.click(wrapper.getByRole("button", { name: "Add" }));
+
+    // Provide quality control
+    userEvent.type(
+      wrapper.getByTestId("qualityControl-name-0"),
+      "Quality Control Test Name 1"
+    );
+    userEvent.click(wrapper.getAllByRole("combobox")[0]);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /reserpine standard/i })
+    );
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -298,6 +356,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         [
           {
             resource: {
+              name: "Run item name 1",
               relationships: {
                 run: {
                   data: {
@@ -313,6 +372,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
           },
           {
             resource: {
+              name: "Run item name 2",
               relationships: {
                 run: {
                   data: {
@@ -399,6 +459,56 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         {
           apiBaseUrl: "/seqdb-api"
         }
+      ],
+
+      // Quality control run items creation
+      [
+        [
+          {
+            resource: {
+              relationships: {
+                run: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run"
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item",
+              usageType: "quality-control"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Quality control creation
+      [
+        [
+          {
+            resource: {
+              group: "aafc",
+              name: "Quality Control Test Name 1",
+              qcType: "reserpine_standard",
+              relationships: {
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              },
+              type: "quality-control"
+            },
+            type: "quality-control"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
       ]
     ]);
   });
@@ -422,8 +532,35 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Change the sequencing run name to something different.
-    userEvent.clear(wrapper.getByRole("textbox"));
-    userEvent.type(wrapper.getByRole("textbox"), "Updated run name");
+    userEvent.clear(wrapper.getAllByRole("textbox")[0]);
+    userEvent.type(wrapper.getAllByRole("textbox")[0], "Updated run name");
+
+    // Update the two run names.
+    userEvent.clear(wrapper.getAllByRole("textbox")[1]);
+    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+
+    // Edit Quality Control 1
+    userEvent.clear(wrapper.getAllByRole("textbox")[3]);
+    userEvent.type(
+      wrapper.getAllByRole("textbox")[3],
+      "Updated Quality Control"
+    );
+
+    // Delete Quality Control 2
+    expect(wrapper.queryByText(/acn blank/i)).toBeInTheDocument();
+    userEvent.click(wrapper.getByTestId("delete-quality-control-1"));
+    expect(wrapper.queryByText(/acn blank/i)).not.toBeInTheDocument();
+
+    // Add new Quality Control
+    userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+    userEvent.type(wrapper.getAllByRole("textbox")[4], "New Quality Control");
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /reserpine standard/i })
+    );
+
+    // Add blank quality control, should not be saved.
+    userEvent.click(wrapper.getByRole("button", { name: /add/i }));
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -435,11 +572,9 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
     expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
 
-    // Name should have not changed from edit mode true to false.
-    expect(wrapper.queryByText(/updated run name/i)).toBeInTheDocument();
-
     // Expect the network request to only contain the update of the run.
     expect(mockSave.mock.calls).toEqual([
+      // Updating the run
       [
         [
           {
@@ -464,8 +599,180 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         {
           apiBaseUrl: "/seqdb-api"
         }
+      ],
+
+      // Update the run item names
+      [
+        [
+          {
+            resource: {
+              id: "f65ed036-eb92-40d9-af03-d027646e8948",
+              name: "Run item name 1",
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Create the brand new quality control run item.
+      [
+        [
+          {
+            resource: {
+              relationships: {
+                run: {
+                  data: {
+                    id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
+                    type: "molecular-analysis-run"
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item",
+              usageType: "quality-control"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Create the new quality control attached to the run item above.
+      [
+        [
+          {
+            resource: {
+              group: "aafc",
+              name: "New Quality Control",
+              qcType: "reserpine_standard",
+              relationships: {
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              },
+              type: "quality-control"
+            },
+            type: "quality-control"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Update the existing quality control.
+      [
+        [
+          {
+            id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
+            resource: {
+              group: "aafc",
+              id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
+              name: "Updated Quality Control",
+              qcType: "reserpine_standard",
+              type: "quality-control"
+            },
+            type: "quality-control"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Now for the deleted quality control, first delete the quality control:
+      [
+        [
+          {
+            delete: {
+              id: "0193b77e-eb77-7a28-9a0f-a18549bf7df8",
+              type: "quality-control"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Delete the run item that was attached to the quality control.
+      [
+        [
+          {
+            delete: {
+              id: "e9e39b72-ece7-454b-893a-2fc2d075e7b7",
+              type: "molecular-analysis-run-item"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
       ]
     ]);
+  });
+
+  it("Create incomplete quality controls, report error message and remove completely empty quality controls", async () => {
+    const wrapper = mountWithAppContext2(
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Create 4 new quality controls.
+    for (let i = 0; i < 4; i++) {
+      userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+    }
+
+    // Quality Control 1 - Both provided.
+    userEvent.type(
+      wrapper.getByTestId("qualityControl-name-0"),
+      "both-provided"
+    );
+    userEvent.click(wrapper.getAllByRole("combobox")[0]);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /reserpine standard/i })
+    );
+
+    // Quality Control 2 - Name only provided.
+    userEvent.type(wrapper.getByTestId("qualityControl-name-1"), "name-only");
+
+    // Quality Control 3 - Type only provided.
+    userEvent.click(wrapper.getAllByRole("combobox")[2]);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /reserpine standard/i })
+    );
+
+    // Save and expect an error message.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).toBeInTheDocument();
+    });
+    expect(wrapper.getByRole("alert").textContent).toEqual(
+      "Please ensure all quality controls have both a name and type."
+    );
+
+    // Only 3 should exist, since 4 were created and one was blank and automatically removed.
+    expect(wrapper.getAllByRole("combobox").length).toBe(3);
   });
 
   it("Automatically switch to edit mode and be able to cancel", async () => {
