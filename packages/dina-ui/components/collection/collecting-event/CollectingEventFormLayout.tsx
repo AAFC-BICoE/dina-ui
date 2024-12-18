@@ -15,6 +15,7 @@ import {
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
+  Tooltip,
   filterBy,
   useDinaFormContext,
   useInstanceContext
@@ -32,7 +33,8 @@ import {
   NotPubliclyReleasableWarning,
   ParseVerbatimToRangeButton,
   PersonSelectField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  TagSelectReadOnly
 } from "../..";
 import { ManagedAttributesEditor } from "../../";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -602,10 +604,20 @@ export function CollectingEventFormLayout({
         sectionName="general-section"
       >
         <NotPubliclyReleasableWarning />
-        <TagsAndRestrictionsSection
-          resourcePath="collection-api/collecting-event"
-          indexName="dina_material_sample_index"
-        />
+        {readOnly ? (
+          <TagSelectReadOnly />
+        ) : (
+          <Tooltip
+            id="collecting_event_tag_info"
+            disableSpanMargin={true}
+            visibleElement={
+              <TagsAndRestrictionsSection
+                resourcePath="collection-api/collecting-event"
+                indexName="dina_material_sample_index"
+              />
+            }
+          />
+        )}
       </DinaFormSection>
       <div className="row mb-3">
         <div className="col-md-12">
