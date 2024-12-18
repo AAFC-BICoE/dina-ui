@@ -1,6 +1,6 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
 import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BulkGetOptions,
   FieldHeader,
@@ -237,12 +237,15 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
   // Map of MolecularAnalysisRunItem {id:name}
   const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
     useState<Record<string, string>>({});
-  const columns = getMolecularAnalysisRunColumns(
-    compareByStringAndNumber,
-    "metagenomics-batch-item",
-    setMolecularAnalysisRunItemNames,
-    !editMode
-  );
+
+  const columns = useMemo(() => {
+    return getMolecularAnalysisRunColumns(
+      compareByStringAndNumber,
+      "metagenomics-batch-item",
+      setMolecularAnalysisRunItemNames,
+      !editMode
+    );
+  }, [editMode]);
 
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);

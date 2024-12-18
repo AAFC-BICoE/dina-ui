@@ -4,6 +4,7 @@ import {
   Dispatch,
   SetStateAction,
   useEffect,
+  useMemo,
   useState
 } from "react";
 import {
@@ -261,12 +262,14 @@ export function useMolecularAnalysisRun({
   const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
     useState<Record<string, string>>({});
 
-  const columns = getMolecularAnalysisRunColumns(
-    compareByStringAndNumber,
-    "seq-reaction",
-    setMolecularAnalysisRunItemNames,
-    !editMode
-  );
+  const columns = useMemo(() => {
+    return getMolecularAnalysisRunColumns(
+      compareByStringAndNumber,
+      "seq-reaction",
+      setMolecularAnalysisRunItemNames,
+      !editMode
+    );
+  }, [editMode]);
 
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);

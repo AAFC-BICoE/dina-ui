@@ -1,10 +1,6 @@
 import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
 import { noop } from "lodash";
-import {
-  screen,
-  waitFor,
-  waitForElementToBeRemoved
-} from "@testing-library/react";
+import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -539,9 +535,13 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.clear(wrapper.getAllByRole("textbox")[0]);
     userEvent.type(wrapper.getAllByRole("textbox")[0], "Updated run name");
 
-    // Update the two run names.
+    // Add a new run name.
     userEvent.clear(wrapper.getAllByRole("textbox")[1]);
-    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    userEvent.type(
+      wrapper.getAllByRole("textbox")[1],
+      "Update run item name 1"
+    );
+    userEvent.type(wrapper.getAllByRole("textbox")[2], "Add a new one");
 
     // Edit Quality Control 1
     userEvent.clear(wrapper.getAllByRole("textbox")[3]);
@@ -611,7 +611,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
           {
             resource: {
               id: "f65ed036-eb92-40d9-af03-d027646e8948",
-              name: "Run item name 1",
+              name: "Update run item name 1",
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
+          },
+          {
+            resource: {
+              id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+              name: "Add a new one",
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
@@ -777,34 +785,6 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Only 3 should exist, since 4 were created and one was blank and automatically removed.
     expect(wrapper.getAllByRole("combobox").length).toBe(3);
-  });
-
-  it("Changing quality controls and run item names together", async () => {
-    const wrapper = mountWithAppContext2(
-      <TestComponent
-        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
-      />,
-      testCtx
-    );
-
-    // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
-
-    // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
-
-    // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
-
-    // Edit the run item name
-    userEvent.type(
-      wrapper.getByDisplayValue(/provided run item name/i),
-      "-update"
-    );
-
-    // Edit the Quality Control
-    userEvent.type(wrapper.getByDisplayValue(/test1/i), "-update");
   });
 
   it("Automatically switch to edit mode and be able to cancel", async () => {
