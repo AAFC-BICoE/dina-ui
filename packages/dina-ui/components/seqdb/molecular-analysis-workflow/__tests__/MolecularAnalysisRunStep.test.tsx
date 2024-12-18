@@ -1,6 +1,10 @@
 import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
 import { noop } from "lodash";
-import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  screen,
+  waitFor,
+  waitForElementToBeRemoved
+} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -773,6 +777,34 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Only 3 should exist, since 4 were created and one was blank and automatically removed.
     expect(wrapper.getAllByRole("combobox").length).toBe(3);
+  });
+
+  it("Changing quality controls and run item names together", async () => {
+    const wrapper = mountWithAppContext2(
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Edit the run item name
+    userEvent.type(
+      wrapper.getByDisplayValue(/provided run item name/i),
+      "-update"
+    );
+
+    // Edit the Quality Control
+    userEvent.type(wrapper.getByDisplayValue(/test1/i), "-update");
   });
 
   it("Automatically switch to edit mode and be able to cancel", async () => {
