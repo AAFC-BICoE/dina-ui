@@ -1160,7 +1160,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   changingTheStorageUnitTypeWillDeleteWarningButtonText: "Proceed",
   seqdbManagedAttributeTitle: "Sequencing",
   genericMolecularAnalysis: "Generic Molecular Analysis",
+  molecularAnalysisRunItemName: "Run Item Name",
+  qualityControlName: "Name:",
+  qualityControlType: "Type:",
   collecting_event_tag_info:
-    "Suggestions are currently based on Material Sample tags.",
-  molecularAnalysisRunItemName: "Run Item Name"
+    "Suggestions are currently based on Material Sample tags."
 };

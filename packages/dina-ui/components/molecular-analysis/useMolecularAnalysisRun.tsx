@@ -33,6 +33,8 @@ import {
   attachPcrBatchItemMetagenomics,
   attachStorageUnitUsageMetagenomics
 } from "./useMetagenomicsWorkflowMolecularAnalysisRun";
+import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
+import useVocabularyOptions from "../collection/useVocabularyOptions";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -652,9 +654,25 @@ export function useMolecularAnalysisRunView({
     useState<SequencingRunItem[]>();
   const [loading, setLoading] = useState<boolean>(true);
   const { compareByStringAndNumber } = useStringComparator();
+
+  // Quality control items
+  const [qualityControls, setQualityControls] = useState<QualityControl[]>([]);
+  const { loading: loadingVocabularyItems, vocabOptions: qualityControlTypes } =
+    useVocabularyOptions({
+      path: "seqdb-api/vocabulary/qualityControlType"
+    });
   const molecularAnalysisRunItemQuery = useQuery<MolecularAnalysisRunItem[]>(
     {
-      path: `seqdb-api/molecular-analysis-run-item?filter[rsql]=run.uuid==${molecularAnalysisRunId}`
+      path: `seqdb-api/molecular-analysis-run-item`,
+      filter: filterBy([], {
+        extraFilters: [
+          {
+            selector: "run.uuid",
+            comparison: "==",
+            arguments: molecularAnalysisRunId
+          }
+        ]
+      })("")
     },
     {
       onSuccess: async ({ data: molecularAnalysisRunItems }) => {
@@ -710,7 +728,12 @@ export function useMolecularAnalysisRunView({
           (runItem) => runItem.usageType !== "quality-control"
         )?.[0].usageType;
         setColumns(
-          getMolecularAnalysisRunColumns(compareByStringAndNumber, usageType)
+          getMolecularAnalysisRunColumns(
+            compareByStringAndNumber,
+            usageType,
+            undefined,
+            true
+          )
         );
 
         if (usageType === "seq-reaction") {
@@ -749,6 +772,42 @@ export function useMolecularAnalysisRunView({
             sequencingRunItemsChain,
             bulkGet
           );
+          const qualityControlRunItems = molecularAnalysisRunItems.filter(
+            (runItem) => runItem.usageType === "quality-control"
+          );
+          // Get quality controls
+          if (qualityControlRunItems && qualityControlRunItems?.length > 0) {
+            const newQualityControls: QualityControl[] = [];
+
+            // Go through each quality control run item and then we do a query for each quality control.
+            for (const item of qualityControlRunItems) {
+              const qualityControlQuery = await apiClient.get<QualityControl>(
+                `seqdb-api/quality-control`,
+                {
+                  filter: filterBy([], {
+                    extraFilters: [
+                      {
+                        selector: "molecularAnalysisRunItem.uuid",
+                        comparison: "==",
+                        arguments: item?.id
+                      }
+                    ]
+                  })(""),
+                  include: "molecularAnalysisRunItem"
+                }
+              );
+
+              const qualityControlFound = qualityControlQuery
+                ?.data?.[0] as QualityControl;
+              if (qualityControlFound) {
+                newQualityControls.push({
+                  ...qualityControlFound
+                });
+              }
+            }
+
+            setQualityControls(newQualityControls);
+          }
           // All finished loading.
           setSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
@@ -772,7 +831,6 @@ export function useMolecularAnalysisRunView({
               sequencingRunItemsChain,
               bulkGet
             );
-
           // All finished loading.
           setSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
@@ -781,9 +839,14 @@ export function useMolecularAnalysisRunView({
     }
   );
   return {
-    loading: molecularAnalysisRunItemQuery.loading || loading,
+    loading:
+      molecularAnalysisRunItemQuery.loading ||
+      loadingVocabularyItems ||
+      loading,
     sequencingRunItems,
-    columns
+    columns,
+    qualityControls,
+    qualityControlTypes
   };
 }
 
