@@ -13,6 +13,7 @@ import { generateColumnDefinition } from "./ColumnSelectorUtils";
 import { useApiClient } from "../api-client/ApiClientContext";
 import useLocalStorage from "@rehooks/local-storage";
 import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
+import useDynamicFieldSelector from "./useDynamicFieldSelector";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
 
@@ -103,6 +104,7 @@ export function ColumnSelector<TData extends KitsuResource>(
   props: ColumnSelectorProps<TData>
 ) {
   const { apiClient } = useApiClient();
+  const { getFormattedFunctionField } = useDynamicFieldSelector();
 
   const {
     exportMode,
@@ -182,20 +184,40 @@ export function ColumnSelector<TData extends KitsuResource>(
       }
 
       // Add UUID field as an additional field.
-      injectedMappings = injectedMappings.concat({
-        label: "id",
-        value: "id",
-        path: "id",
-        hideField: false,
-        type: "text",
-        containsSupport: false,
-        distinctTerm: false,
-        endsWithSupport: false,
-        keywordMultiFieldSupport: false,
-        keywordNumericSupport: false,
-        optimizedPrefix: false,
-        dynamicField: undefined
-      });
+      injectedMappings = injectedMappings.concat(
+        {
+          label: "id",
+          value: "id",
+          path: "id",
+          hideField: false,
+          type: "text",
+          containsSupport: false,
+          distinctTerm: false,
+          endsWithSupport: false,
+          keywordMultiFieldSupport: false,
+          keywordNumericSupport: false,
+          optimizedPrefix: false,
+          dynamicField: undefined
+        },
+        {
+          label: "columnFunction",
+          value: "columnFunction",
+          path: "columnFunction",
+          hideField: false,
+          type: "columnFunction",
+          dynamicField: {
+            type: "columnFunction",
+            label: "columnFunction",
+            path: ""
+          },
+          containsSupport: false,
+          distinctTerm: false,
+          keywordMultiFieldSupport: false,
+          keywordNumericSupport: false,
+          optimizedPrefix: false,
+          endsWithSupport: false
+        }
+      );
 
       // Finally, set it as the state.
       setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
@@ -218,6 +240,7 @@ export function ColumnSelector<TData extends KitsuResource>(
               indexMappings: injectedIndexMapping,
               dynamicFieldsMappingConfig,
               apiClient,
+              getFormattedFunctionField,
               defaultColumns,
               path: localColumn
             });
@@ -238,6 +261,7 @@ export function ColumnSelector<TData extends KitsuResource>(
               indexMappings: injectedIndexMapping,
               dynamicFieldsMappingConfig,
               apiClient,
+              getFormattedFunctionField,
               defaultColumns,
               path: localColumn
             });

@@ -1,4 +1,15 @@
+import Kitsu, { GetParams, KitsuResource } from "kitsu";
+import { get, startCase } from "lodash";
+import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
+import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { FieldHeader, dateCell } from "..";
+import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
+import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
+import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
+import { ColumnFunctionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryRowColumnFunctionInput";
 import {
   DynamicField,
   DynamicFieldsMappingConfig,
@@ -6,17 +17,6 @@ import {
   RelationshipDynamicField,
   TableColumn
 } from "../list-page/types";
-import Kitsu, { GetParams, KitsuResource } from "kitsu";
-import { get, startCase } from "lodash";
-import React from "react";
-import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
-import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
-import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
-import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
-import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
-import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
-import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
@@ -87,6 +87,24 @@ export function generateColumnPath({
           "/" +
           "presence" // In the future, other operators can be supported.
         );
+      // Column Functions (functionId/functionName/params)
+      case "columnFunction":
+        const columnFunctionStateValues: ColumnFunctionSearchStates =
+          JSON.parse(dynamicFieldValue);
+        const functionId = Object.keys(columnFunctionStateValues)[0];
+        return (
+          dynamicFieldTypeWithRelationship +
+          "/" +
+          functionId +
+          "/" +
+          columnFunctionStateValues[functionId].functionName +
+          (columnFunctionStateValues[functionId].params
+            ? "/" +
+              columnFunctionStateValues[functionId].params
+                .map((field) => field.value)
+                .join("+")
+            : "")
+        );
     }
   }
 
@@ -132,6 +150,11 @@ export interface GenerateColumnDefinitionProps<TData extends KitsuResource> {
    * API client to be used for generating the dynamic fields.
    */
   apiClient: Kitsu;
+
+  getFormattedFunctionField: (
+    functionFieldPath: string,
+    indexMappings?: ESIndexMapping[]
+  ) => string | undefined;
 }
 
 export async function generateColumnDefinition<TData extends KitsuResource>({
@@ -139,7 +162,8 @@ export async function generateColumnDefinition<TData extends KitsuResource>({
   dynamicFieldsMappingConfig,
   path,
   defaultColumns,
-  apiClient
+  apiClient,
+  getFormattedFunctionField
 }: GenerateColumnDefinitionProps<TData>): Promise<
   TableColumn<TData> | undefined
 > {
@@ -153,7 +177,9 @@ export async function generateColumnDefinition<TData extends KitsuResource>({
     return await getDynamicFieldColumn(
       path,
       apiClient,
-      dynamicFieldsMappingConfig
+      getFormattedFunctionField,
+      dynamicFieldsMappingConfig,
+      indexMappings
     );
   }
 
@@ -280,7 +306,12 @@ export function NestedColumnLabel({
 async function getDynamicFieldColumn<TData extends KitsuResource>(
   path: string,
   apiClient: Kitsu,
-  dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig
+  getFormattedFunctionField: (
+    functionFieldPath: string,
+    indexMappings?: ESIndexMapping[]
+  ) => string | undefined,
+  dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig,
+  indexMappings?: ESIndexMapping[]
 ): Promise<TableColumn<TData> | undefined> {
   const pathParts = path.split("/");
   if (pathParts.length > 0) {
@@ -349,6 +380,24 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
       const relationship = pathParts[1];
       const operator = pathParts[2];
       return getRelationshipPresenceFieldColumn(path, relationship, operator);
+    }
+
+    // Handle column functions paths
+    if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
+      const formattedFunctionField = getFormattedFunctionField(
+        path,
+        indexMappings
+      );
+      return {
+        columnSelectorString: path,
+        accessorKey: path,
+        id: formattedFunctionField,
+        header: () => {
+          return <span>{formattedFunctionField}</span>;
+        },
+        isKeyword: true,
+        isColumnVisible: true
+      };
     }
   }
 

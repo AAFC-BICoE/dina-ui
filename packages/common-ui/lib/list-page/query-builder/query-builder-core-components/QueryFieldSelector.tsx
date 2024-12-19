@@ -9,6 +9,8 @@ import { useSessionStorage } from "usehooks-ts";
 import { SHORTCUT_GLOBAL_SEARCH_QUERY } from "../query-builder-value-types/QueryBuilderGlobalSearch";
 
 interface QueryFieldSelectorProps {
+  /** The CSS classes of the div wrapper. */
+  className?: string;
   /**
    * Elastic search map loaded from the query builder. This is used to populate the options for
    * the query field selector.
@@ -42,6 +44,7 @@ interface QueryFieldSelectorProps {
 }
 
 export function QueryFieldSelector({
+  className,
   indexMap,
   currentField,
   setField,
@@ -213,7 +216,7 @@ export function QueryFieldSelector({
   };
 
   return (
-    <div style={{ width: "100%" }}>
+    <div className={className} style={{ width: "100%" }}>
       {/* Field Selection */}
       <CreatableSelect
         options={queryRowOptions as any}

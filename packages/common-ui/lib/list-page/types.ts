@@ -260,7 +260,8 @@ export type DynamicFieldType =
   | "fieldExtension"
   | "identifier"
   | "relationshipPresence"
-  | "scientificNameDetails";
+  | "scientificNameDetails"
+  | "columnFunction";
 
 export interface DynamicFieldsMappingConfig {
   /** Attribute level dynamic fields */
@@ -285,7 +286,7 @@ export interface DynamicField {
    *
    * Example: "collection-api/managed-attribute"
    */
-  apiEndpoint: string;
+  apiEndpoint?: string;
 
   /**
    * Optional field to indicate which Managed Attributes or Field Extensions should be listed.
