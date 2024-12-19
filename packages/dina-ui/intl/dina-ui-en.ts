@@ -412,6 +412,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_name: "Name",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
   field_organismRemarks: "Organism Remarks",
+  field_dwcVernacularName: "Vernacular Name",
   field_organismsIndividualEntry: "Individual Organism Entry",
   field_organismsIndividualEntry_tooltip:
     "Leave this OFF to copy the same data for every Organism. Toggle ON to enter different data for each Organism.",

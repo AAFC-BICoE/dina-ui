@@ -4,6 +4,7 @@ import {
   Dispatch,
   SetStateAction,
   useEffect,
+  useMemo,
   useState
 } from "react";
 import {
@@ -261,12 +262,14 @@ export function useMolecularAnalysisRun({
   const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
     useState<Record<string, string>>({});
 
-  const columns = getMolecularAnalysisRunColumns(
-    compareByStringAndNumber,
-    "seq-reaction",
-    setMolecularAnalysisRunItemNames,
-    !editMode
-  );
+  const columns = useMemo(() => {
+    return getMolecularAnalysisRunColumns(
+      compareByStringAndNumber,
+      "seq-reaction",
+      setMolecularAnalysisRunItemNames,
+      !editMode
+    );
+  }, [editMode]);
 
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);
@@ -861,53 +864,6 @@ export function getMolecularAnalysisRunColumns(
   // Table columns to display for the sequencing run.
   const SEQ_REACTION_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
-      id: "wellCoordinates",
-      cell: ({ row }) => {
-        return (
-          <>
-            {!row.original?.storageUnitUsage ||
-            row.original?.storageUnitUsage?.wellRow === null ||
-            row.original?.storageUnitUsage?.wellColumn === null
-              ? ""
-              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
-          </>
-        );
-      },
-      header: () => <FieldHeader name={"wellCoordinates"} />,
-      accessorKey: "wellCoordinates",
-      sortingFn: (a: any, b: any): number => {
-        const aString =
-          !a.original?.storageUnitUsage ||
-          a.original?.storageUnitUsage?.wellRow === null ||
-          a.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
-        const bString =
-          !b.original?.storageUnitUsage ||
-          b.original?.storageUnitUsage?.wellRow === null ||
-          b.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
-        return compareByStringAndNumber(aString, bString);
-      }
-    },
-    {
-      id: "tubeNumber",
-      cell: ({ row: { original } }) =>
-        original?.storageUnitUsage?.cellNumber === undefined ? (
-          <></>
-        ) : (
-          <>{original.storageUnitUsage?.cellNumber}</>
-        ),
-      header: () => <FieldHeader name={"tubeNumber"} />,
-      accessorKey: "tubeNumber",
-      sortingFn: (a: any, b: any): number =>
-        compareByStringAndNumber(
-          a?.original?.storageUnitUsage?.cellNumber?.toString(),
-          b?.original?.storageUnitUsage?.cellNumber?.toString()
-        )
-    },
-    {
       id: "materialSampleName",
       cell: ({ row: { original } }) => {
         const materialSampleName =
@@ -960,58 +916,58 @@ export function getMolecularAnalysisRunColumns(
           b?.original?.materialSampleSummary?.materialSampleName
         ),
       enableSorting: true
+    },
+    {
+      id: "wellCoordinates",
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          !a.original?.storageUnitUsage ||
+          a.original?.storageUnitUsage?.wellRow === null ||
+          a.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+        const bString =
+          !b.original?.storageUnitUsage ||
+          b.original?.storageUnitUsage?.wellRow === null ||
+          b.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      }
+    },
+    {
+      id: "tubeNumber",
+      cell: ({ row: { original } }) =>
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
     }
   ];
 
   const GENERIC_MOLECULAR_ANALYSIS_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
-      id: "wellCoordinates",
-      cell: ({ row }) => {
-        return (
-          <>
-            {!row.original?.storageUnitUsage ||
-            row.original?.storageUnitUsage?.wellRow === null ||
-            row.original?.storageUnitUsage?.wellColumn === null
-              ? ""
-              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
-          </>
-        );
-      },
-      header: () => <FieldHeader name={"wellCoordinates"} />,
-      accessorKey: "wellCoordinates",
-      sortingFn: (a: any, b: any): number => {
-        const aString =
-          !a.original?.storageUnitUsage ||
-          a.original?.storageUnitUsage?.wellRow === null ||
-          a.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
-        const bString =
-          !b.original?.storageUnitUsage ||
-          b.original?.storageUnitUsage?.wellRow === null ||
-          b.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
-        return compareByStringAndNumber(aString, bString);
-      }
-    },
-    {
-      id: "tubeNumber",
-      cell: ({ row: { original } }) =>
-        original?.storageUnitUsage?.cellNumber === undefined ? (
-          <></>
-        ) : (
-          <>{original.storageUnitUsage?.cellNumber}</>
-        ),
-      header: () => <FieldHeader name={"tubeNumber"} />,
-      accessorKey: "tubeNumber",
-      sortingFn: (a: any, b: any): number =>
-        compareByStringAndNumber(
-          a?.original?.storageUnitUsage?.cellNumber?.toString(),
-          b?.original?.storageUnitUsage?.cellNumber?.toString()
-        )
-    },
-    {
       id: "materialSampleName",
       cell: ({ row: { original } }) => {
         const materialSampleName =
@@ -1061,58 +1017,58 @@ export function getMolecularAnalysisRunColumns(
           b?.original?.materialSampleSummary?.materialSampleName
         ),
       enableSorting: true
+    },
+    {
+      id: "wellCoordinates",
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          !a.original?.storageUnitUsage ||
+          a.original?.storageUnitUsage?.wellRow === null ||
+          a.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+        const bString =
+          !b.original?.storageUnitUsage ||
+          b.original?.storageUnitUsage?.wellRow === null ||
+          b.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      }
+    },
+    {
+      id: "tubeNumber",
+      cell: ({ row: { original } }) =>
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
     }
   ];
 
   const METAGENOMICS_BATCH_ITEM_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
-      id: "wellCoordinates",
-      cell: ({ row }) => {
-        return (
-          <>
-            {!row.original?.storageUnitUsage ||
-            row.original?.storageUnitUsage?.wellRow === null ||
-            row.original?.storageUnitUsage?.wellColumn === null
-              ? ""
-              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
-          </>
-        );
-      },
-      header: () => <FieldHeader name={"wellCoordinates"} />,
-      accessorKey: "wellCoordinates",
-      sortingFn: (a: any, b: any): number => {
-        const aString =
-          !a.original?.storageUnitUsage ||
-          a.original?.storageUnitUsage?.wellRow === null ||
-          a.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
-        const bString =
-          !b.original?.storageUnitUsage ||
-          b.original?.storageUnitUsage?.wellRow === null ||
-          b.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
-        return compareByStringAndNumber(aString, bString);
-      }
-    },
-    {
-      id: "tubeNumber",
-      cell: ({ row: { original } }) =>
-        original?.storageUnitUsage?.cellNumber === undefined ? (
-          <></>
-        ) : (
-          <>{original.storageUnitUsage?.cellNumber}</>
-        ),
-      header: () => <FieldHeader name={"tubeNumber"} />,
-      accessorKey: "tubeNumber",
-      sortingFn: (a: any, b: any): number =>
-        compareByStringAndNumber(
-          a?.original?.storageUnitUsage?.cellNumber?.toString(),
-          b?.original?.storageUnitUsage?.cellNumber?.toString()
-        )
-    },
-    {
       id: "materialSampleName",
       cell: ({ row: { original } }) => {
         const materialSampleName =
@@ -1162,6 +1118,53 @@ export function getMolecularAnalysisRunColumns(
           b?.original?.materialSampleSummary?.materialSampleName
         ),
       enableSorting: true
+    },
+    {
+      id: "wellCoordinates",
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          !a.original?.storageUnitUsage ||
+          a.original?.storageUnitUsage?.wellRow === null ||
+          a.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+        const bString =
+          !b.original?.storageUnitUsage ||
+          b.original?.storageUnitUsage?.wellRow === null ||
+          b.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      }
+    },
+    {
+      id: "tubeNumber",
+      cell: ({ row: { original } }) =>
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
     }
   ];
   const MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP = {

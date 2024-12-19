@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   SequencingRunItem,
   useGenericMolecularAnalysisRun
@@ -10,18 +9,16 @@ import {
   ReactTable,
   useStringComparator
 } from "common-ui";
-import { Alert, Button } from "react-bootstrap";
+import { Alert } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { AttachmentsEditor } from "../../object-store/attachment-list/AttachmentsField";
 import { AttachmentReadOnlySection } from "../../object-store/attachment-list/AttachmentReadOnlySection";
 import { getMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
-import { FaTrash } from "react-icons/fa";
-import { VocabularyOption } from "../../collection/VocabularySelectField";
-import Select from "react-select";
 import { useIntl } from "react-intl";
 import { QualityControlSection } from "./QualityControlSection";
+import { useMemo } from "react";
 
 export interface MolecularAnalysisRunStepProps {
   molecularAnalysisId: string;
@@ -69,13 +66,16 @@ export function MolecularAnalysisRunStep({
   });
 
   // Table columns to display for the sequencing run.
-  const COLUMNS: ColumnDef<SequencingRunItem>[] =
-    getMolecularAnalysisRunColumns(
-      compareByStringAndNumber,
-      "generic-molecular-analysis-item",
-      setMolecularAnalysisRunItemNames,
-      !editMode
-    );
+  const COLUMNS: ColumnDef<SequencingRunItem>[] = useMemo(
+    () =>
+      getMolecularAnalysisRunColumns(
+        compareByStringAndNumber,
+        "generic-molecular-analysis-item",
+        setMolecularAnalysisRunItemNames,
+        !editMode
+      ),
+    [editMode]
+  );
 
   // Display loading if network requests from hook are still loading in...
   if (loading) {
