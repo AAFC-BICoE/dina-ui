@@ -10,6 +10,8 @@ import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
+import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 import { Group } from "packages/dina-ui/types/user-api";
 
 export const TEST_GROUP: PersistedResource<Group>[] = [
@@ -72,6 +74,7 @@ export const TEST_MOLECULAR_ANALYSIS_RUN: PersistedResource<MolecularAnalysisRun
     id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
     type: "molecular-analysis-run",
     name: "run-name-1",
+    group: "aafc",
     attachments: [
       {
         id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
@@ -133,6 +136,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN: PersistedResource<GenericMo
       molecularAnalysisRunItem: {
         id: "f65ed036-eb92-40d9-af03-d027646e8948",
         type: "molecular-analysis-run-item",
+        name: "Provided run item name",
         usageType: "hrms",
         run: TEST_MOLECULAR_ANALYSIS_RUN
       },
@@ -542,3 +546,102 @@ export const TEST_METADATA: PersistedResource<Metadata> = {
   publiclyReleasable: true,
   group: "aafc"
 };
+
+export const TEST_QUALITY_CONTROL_TYPES: PersistedResource<Vocabulary> = {
+  id: "qualityControlType",
+  type: "vocabulary",
+  vocabularyElements: [
+    {
+      key: "reserpine_standard",
+      name: "reserpine standard",
+      multilingualTitle: {
+        titles: [
+          {
+            lang: "en",
+            title: "Reserpine Standard"
+          },
+          {
+            lang: "fr",
+            title: "Standard Reserpine"
+          }
+        ]
+      }
+    },
+    {
+      key: "acn_blank",
+      name: "acn blank",
+      multilingualTitle: {
+        titles: [
+          {
+            lang: "en",
+            title: "ACN Blank"
+          },
+          {
+            lang: "fr",
+            title: "ACN Blank (fr)"
+          }
+        ]
+      }
+    },
+    {
+      key: "meoh_blank",
+      name: "meoh blank",
+      multilingualTitle: {
+        titles: [
+          {
+            lang: "en",
+            title: "MEOH Blank"
+          },
+          {
+            lang: "fr",
+            title: "MEOH Blank (fr)"
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const TEST_QUALITY_CONTROL_RUN_ITEMS: PersistedResource<MolecularAnalysisRunItem>[] =
+  [
+    {
+      id: "2a3b15ce-6781-466b-bc1e-49e35af3df58",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      usageType: "quality-control"
+    },
+    {
+      id: "e9e39b72-ece7-454b-893a-2fc2d075e7b7",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      usageType: "quality-control"
+    }
+  ];
+
+export const TEST_QUALITY_CONTROL_1: PersistedResource<QualityControl>[] = [
+  {
+    id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
+    type: "quality-control",
+    createdBy: "dina-admin",
+    createdOn: "2024-12-11T20:52:48.562429Z",
+    group: "aafc",
+    name: "test1",
+    qcType: "reserpine_standard",
+    molecularAnalysisRunItem: TEST_QUALITY_CONTROL_RUN_ITEMS[0]
+  }
+];
+
+export const TEST_QUALITY_CONTROL_2: PersistedResource<QualityControl>[] = [
+  {
+    id: "0193b77e-eb77-7a28-9a0f-a18549bf7df8",
+    type: "quality-control",
+    createdBy: "dina-admin",
+    createdOn: "2024-12-11T20:52:48.562429Z",
+    group: "aafc",
+    name: "test2",
+    qcType: "acn_blank",
+    molecularAnalysisRunItem: TEST_QUALITY_CONTROL_RUN_ITEMS[1]
+  }
+];

@@ -1,6 +1,6 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
 import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BulkGetOptions,
   FieldHeader,
@@ -234,10 +234,18 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
   const { bulkGet, save } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { compareByStringAndNumber } = useStringComparator();
-  const columns = getMolecularAnalysisRunColumns(
-    compareByStringAndNumber,
-    "metagenomics-batch-item"
-  );
+  // Map of MolecularAnalysisRunItem {id:name}
+  const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
+    useState<Record<string, string>>({});
+
+  const columns = useMemo(() => {
+    return getMolecularAnalysisRunColumns(
+      compareByStringAndNumber,
+      "metagenomics-batch-item",
+      setMolecularAnalysisRunItemNames,
+      !editMode
+    );
+  }, [editMode]);
 
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);
@@ -253,8 +261,13 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
   const [sequencingRunItems, setSequencingRunItems] =
     useState<SequencingRunItem[]>();
 
+  // Used to determine if the resource needs to be reloaded.
+  const [reloadResource, setReloadResource] = useState<number>(Date.now());
+
   // Network Requests, starting with the SeqReaction
-  useQuery<MetagenomicsBatchItem[]>(
+  const { loading: loadingMetagenomicsBatchItems } = useQuery<
+    MetagenomicsBatchItem[]
+  >(
     {
       filter: filterBy([], {
         extraFilters: [
@@ -271,6 +284,7 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
         "indexI5,indexI7,pcrBatchItem,molecularAnalysisRunItem,molecularAnalysisRunItem.run"
     },
     {
+      deps: [reloadResource],
       onSuccess: async ({ data: metagenomicsBatchItems }) => {
         /**
          * Go through each of the MetagenomicsBatchItems and retrieve the Molecular Analysis Run. There
@@ -390,21 +404,29 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
 
       // Create a MolecularAnalysisRunitem for each MetagenomicsBatchItem.
       const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-        sequencingRunItems.map(() => ({
-          type: "molecular-analysis-run-item",
-          resource: {
+        sequencingRunItems.map((item) => {
+          const molecularAnalysisRunItemName = item.materialSampleSummary?.id
+            ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
+            : undefined;
+          return {
             type: "molecular-analysis-run-item",
-            usageType: "metagenomics-batch-item",
-            relationships: {
-              run: {
-                data: {
-                  id: savedMolecularAnalysisRun[0].id,
-                  type: "molecular-analysis-run"
+            resource: {
+              type: "molecular-analysis-run-item",
+              usageType: "metagenomics-batch-item",
+              ...(molecularAnalysisRunItemName && {
+                name: molecularAnalysisRunItemName
+              }),
+              relationships: {
+                run: {
+                  data: {
+                    id: savedMolecularAnalysisRun[0].id,
+                    type: "molecular-analysis-run"
+                  }
                 }
               }
-            }
-          } as any
-        }));
+            } as any
+          };
+        });
       const savedMolecularAnalysisRunItem = await save(
         molecularAnalysisRunItemSaveArgs,
         { apiBaseUrl: "/seqdb-api" }
@@ -481,10 +503,37 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
         apiBaseUrl: "/seqdb-api"
       });
 
+      // Update existing MolecularAnalysisRunItem names
+      if (sequencingRunItems) {
+        const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+          [];
+        sequencingRunItems.forEach((item) => {
+          const molecularAnalysisRunItemName = item.materialSampleSummary?.id
+            ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
+            : undefined;
+          if (molecularAnalysisRunItemName) {
+            molecularAnalysisRunItemSaveArgs.push({
+              type: "molecular-analysis-run-item",
+              resource: {
+                id: item.molecularAnalysisRunItemId,
+                type: "molecular-analysis-run-item",
+                name: molecularAnalysisRunItemName
+              }
+            });
+          }
+        });
+        if (molecularAnalysisRunItemSaveArgs.length) {
+          await save(molecularAnalysisRunItemSaveArgs, {
+            apiBaseUrl: "/seqdb-api"
+          });
+        }
+      }
+
       // Go back to view mode once completed.
       setPerformSave(false);
       setEditMode(false);
       setLoading(false);
+      setReloadResource(Date.now());
     } catch (error) {
       console.error("Error updating sequencing run: ", error);
       setPerformSave(false);
@@ -527,7 +576,7 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
   }, [performSave, loading]);
 
   return {
-    loading,
+    loading: loading || loadingMetagenomicsBatchItems,
     errorMessage,
     multipleRunWarning,
     sequencingRunName,

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   SequencingRunItem,
   useGenericMolecularAnalysisRun
@@ -16,6 +15,10 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { AttachmentsEditor } from "../../object-store/attachment-list/AttachmentsField";
 import { AttachmentReadOnlySection } from "../../object-store/attachment-list/AttachmentReadOnlySection";
+import { getMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
+import { useIntl } from "react-intl";
+import { QualityControlSection } from "./QualityControlSection";
+import { useMemo } from "react";
 
 export interface MolecularAnalysisRunStepProps {
   molecularAnalysisId: string;
@@ -35,6 +38,7 @@ export function MolecularAnalysisRunStep({
   setPerformSave
 }: MolecularAnalysisRunStepProps) {
   const { compareByStringAndNumber } = useStringComparator();
+  const { formatMessage } = useIntl();
 
   const {
     loading,
@@ -43,9 +47,15 @@ export function MolecularAnalysisRunStep({
     setSequencingRunName,
     sequencingRunName,
     sequencingRunItems,
+    qualityControls,
+    qualityControlTypes,
+    createNewQualityControl,
+    deleteQualityControl,
+    updateQualityControl,
     attachments,
     setAttachments,
-    sequencingRunId
+    sequencingRunId,
+    setMolecularAnalysisRunItemNames
   } = useGenericMolecularAnalysisRun({
     editMode,
     setEditMode,
@@ -56,79 +66,16 @@ export function MolecularAnalysisRunStep({
   });
 
   // Table columns to display for the sequencing run.
-  const COLUMNS: ColumnDef<SequencingRunItem>[] = [
-    {
-      id: "wellCoordinates",
-      cell: ({ row }) => {
-        return (
-          <>
-            {!row.original?.storageUnitUsage ||
-            row.original?.storageUnitUsage?.wellRow === null ||
-            row.original?.storageUnitUsage?.wellColumn === null
-              ? ""
-              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
-          </>
-        );
-      },
-      header: () => <FieldHeader name={"wellCoordinates"} />,
-      accessorKey: "wellCoordinates",
-      sortingFn: (a: any, b: any): number => {
-        const aString =
-          !a.original?.storageUnitUsage ||
-          a.original?.storageUnitUsage?.wellRow === null ||
-          a.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
-        const bString =
-          !b.original?.storageUnitUsage ||
-          b.original?.storageUnitUsage?.wellRow === null ||
-          b.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
-        return compareByStringAndNumber(aString, bString);
-      }
-    },
-    {
-      id: "tubeNumber",
-      cell: ({ row: { original } }) =>
-        original?.storageUnitUsage?.cellNumber === undefined ? (
-          <></>
-        ) : (
-          <>{original.storageUnitUsage?.cellNumber}</>
-        ),
-      header: () => <FieldHeader name={"tubeNumber"} />,
-      accessorKey: "tubeNumber",
-      sortingFn: (a: any, b: any): number =>
-        compareByStringAndNumber(
-          a?.original?.storageUnitUsage?.cellNumber?.toString(),
-          b?.original?.storageUnitUsage?.cellNumber?.toString()
-        )
-    },
-    {
-      id: "materialSampleName",
-      cell: ({ row: { original } }) => {
-        const materialSampleName =
-          original?.materialSampleSummary?.materialSampleName;
-        return (
-          <>
-            <Link
-              href={`/collection/material-sample/view?id=${original.materialSampleId}`}
-            >
-              <a>{materialSampleName || original.materialSampleId}</a>
-            </Link>
-          </>
-        );
-      },
-      header: () => <FieldHeader name="materialSampleName" />,
-      accessorKey: "materialSampleSummary.materialSampleName",
-      sortingFn: (a: any, b: any): number =>
-        compareByStringAndNumber(
-          a?.original?.materialSampleSummary?.materialSampleName,
-          b?.original?.materialSampleSummary?.materialSampleName
-        ),
-      enableSorting: true
-    }
-  ];
+  const COLUMNS: ColumnDef<SequencingRunItem>[] = useMemo(
+    () =>
+      getMolecularAnalysisRunColumns(
+        compareByStringAndNumber,
+        "generic-molecular-analysis-item",
+        setMolecularAnalysisRunItemNames,
+        !editMode
+      ),
+    [editMode]
+  );
 
   // Display loading if network requests from hook are still loading in...
   if (loading) {
@@ -189,19 +136,33 @@ export function MolecularAnalysisRunStep({
               <p>{sequencingRunName}</p>
             )}
           </div>
-          <div className="col-12">
-            <strong>
-              <DinaMessage id="molecularAnalysisRunStep_sequencingRunContent" />
-            </strong>
-            <ReactTable<SequencingRunItem>
-              className="-striped mt-2"
-              columns={COLUMNS}
-              data={sequencingRunItems ?? []}
-              sort={[{ id: "wellCoordinates", desc: false }]}
-            />
-          </div>
           <div className="col-12 mt-3">
-            <DinaForm initialValues={{}}>
+            <DinaForm initialValues={{}} readOnly={!editMode}>
+              {/* Sequencing Run Content */}
+              <div className="col-12 mb-3">
+                <strong>
+                  <DinaMessage id="molecularAnalysisRunStep_sequencingRunContent" />
+                </strong>
+                <ReactTable<SequencingRunItem>
+                  className="-striped mt-2"
+                  columns={COLUMNS}
+                  data={sequencingRunItems ?? []}
+                  sort={[{ id: "wellCoordinates", desc: false }]}
+                />
+              </div>
+
+              {/* Sequencing Quality Control */}
+              <QualityControlSection
+                qualityControls={qualityControls}
+                qualityControlTypes={qualityControlTypes}
+                editMode={editMode}
+                loading={loading}
+                updateQualityControl={updateQualityControl}
+                createNewQualityControl={createNewQualityControl}
+                deleteQualityControl={deleteQualityControl}
+              />
+
+              {/* Attachments */}
               {editMode ? (
                 <AttachmentsEditor
                   attachmentPath={``}

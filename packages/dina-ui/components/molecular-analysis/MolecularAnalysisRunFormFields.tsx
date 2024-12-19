@@ -7,6 +7,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { GroupSelectField } from "../group-select/GroupSelectField";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
+import { QualityControlSection } from "../seqdb/molecular-analysis-workflow/QualityControlSection";
 import {
   SequencingRunItem,
   useMolecularAnalysisRunView
@@ -16,7 +17,13 @@ import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
 export function MolecularAnalysisRunFormFields() {
   const { initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
-  const { loading, sequencingRunItems, columns } = useMolecularAnalysisRunView({
+  const {
+    loading,
+    sequencingRunItems,
+    columns,
+    qualityControls,
+    qualityControlTypes
+  } = useMolecularAnalysisRunView({
     molecularAnalysisRunId: initialValues.id
   });
   return loading ? (
@@ -35,7 +42,7 @@ export function MolecularAnalysisRunFormFields() {
           className="col-md-6"
         />
       </div>
-      <div className="col-12">
+      <div className="col-12 mb-3">
         <strong>
           <SeqdbMessage id="molecularAnalysisRunItems" />
         </strong>
@@ -46,6 +53,13 @@ export function MolecularAnalysisRunFormFields() {
           sort={[{ id: "wellCoordinates", desc: false }]}
         />
       </div>
+      {/* Sequencing Quality Control */}
+      <QualityControlSection
+        qualityControls={qualityControls}
+        qualityControlTypes={qualityControlTypes}
+        editMode={false}
+        loading={loading}
+      />
       <div className="col-12 mt-3">
         <AttachmentReadOnlySection
           attachmentPath={`seqdb-api/molecular-analysis-run/${initialValues.id}/attachments`}

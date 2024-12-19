@@ -1,10 +1,16 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
-import { useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState
+} from "react";
 import {
   BulkGetOptions,
   FieldHeader,
   filterBy,
-  rsql,
   SaveArgs,
   useApiClient,
   useQuery,
@@ -13,7 +19,7 @@ import {
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "../../types/collection-api";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { attachGenericMolecularAnalysisItems } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
@@ -28,6 +34,8 @@ import {
   attachPcrBatchItemMetagenomics,
   attachStorageUnitUsageMetagenomics
 } from "./useMetagenomicsWorkflowMolecularAnalysisRun";
+import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
+import useVocabularyOptions from "../collection/useVocabularyOptions";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -250,10 +258,18 @@ export function useMolecularAnalysisRun({
   const { bulkGet, save, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { compareByStringAndNumber } = useStringComparator();
-  const columns = getMolecularAnalysisRunColumns(
-    compareByStringAndNumber,
-    "seq-reaction"
-  );
+  // Map of MolecularAnalysisRunItem {id:name}
+  const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
+    useState<Record<string, string>>({});
+
+  const columns = useMemo(() => {
+    return getMolecularAnalysisRunColumns(
+      compareByStringAndNumber,
+      "seq-reaction",
+      setMolecularAnalysisRunItemNames,
+      !editMode
+    );
+  }, [editMode]);
 
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);
@@ -274,8 +290,11 @@ export function useMolecularAnalysisRun({
     []
   );
 
+  // Used to determine if the resource needs to be reloaded.
+  const [reloadResource, setReloadResource] = useState<number>(Date.now());
+
   // Network Requests, starting with the SeqReaction
-  useQuery<SeqReaction[]>(
+  const { loading: loadingSeqReactions } = useQuery<SeqReaction[]>(
     {
       filter: filterBy([], {
         extraFilters: [
@@ -292,6 +311,7 @@ export function useMolecularAnalysisRun({
         "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,pcrBatchItem,seqPrimer"
     },
     {
+      deps: [reloadResource],
       onSuccess: async ({ data: seqReactions }) => {
         /**
          * Go through each of the SeqReactions and retrieve the Molecular Analysis Run. There
@@ -434,21 +454,29 @@ export function useMolecularAnalysisRun({
 
       // Create a run item for each seq reaction.
       const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-        sequencingRunItems.map(() => ({
-          type: "molecular-analysis-run-item",
-          resource: {
+        sequencingRunItems.map((item) => {
+          const molecularAnalysisRunItemName = item.materialSampleSummary?.id
+            ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
+            : undefined;
+          return {
             type: "molecular-analysis-run-item",
-            usageType: "seq-reaction",
-            relationships: {
-              run: {
-                data: {
-                  id: savedMolecularAnalysisRun[0].id,
-                  type: "molecular-analysis-run"
+            resource: {
+              type: "molecular-analysis-run-item",
+              usageType: "seq-reaction",
+              ...(molecularAnalysisRunItemName && {
+                name: molecularAnalysisRunItemName
+              }),
+              relationships: {
+                run: {
+                  data: {
+                    id: savedMolecularAnalysisRun[0].id,
+                    type: "molecular-analysis-run"
+                  }
                 }
               }
-            }
-          } as any
-        }));
+            } as any
+          };
+        });
       const savedMolecularAnalysisRunItem = await save(
         molecularAnalysisRunItemSaveArgs,
         { apiBaseUrl: "/seqdb-api" }
@@ -530,10 +558,37 @@ export function useMolecularAnalysisRun({
         apiBaseUrl: "/seqdb-api"
       });
 
+      // Update existing MolecularAnalysisRunItem names
+      if (sequencingRunItems) {
+        const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+          [];
+        sequencingRunItems.forEach((item) => {
+          const molecularAnalysisRunItemName = item.materialSampleSummary?.id
+            ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
+            : undefined;
+          if (molecularAnalysisRunItemName) {
+            molecularAnalysisRunItemSaveArgs.push({
+              type: "molecular-analysis-run-item",
+              resource: {
+                id: item.molecularAnalysisRunItemId,
+                type: "molecular-analysis-run-item",
+                name: molecularAnalysisRunItemName
+              }
+            });
+          }
+        });
+        if (molecularAnalysisRunItemSaveArgs.length) {
+          await save(molecularAnalysisRunItemSaveArgs, {
+            apiBaseUrl: "/seqdb-api"
+          });
+        }
+      }
+
       // Go back to view mode once completed.
       setPerformSave(false);
       setEditMode(false);
       setLoading(false);
+      setReloadResource(Date.now());
     } catch (error) {
       console.error("Error updating sequencing run: ", error);
       setPerformSave(false);
@@ -576,7 +631,7 @@ export function useMolecularAnalysisRun({
   }, [performSave, loading]);
 
   return {
-    loading,
+    loading: loading || loadingSeqReactions,
     errorMessage,
     multipleRunWarning,
     sequencingRunName,
@@ -602,9 +657,25 @@ export function useMolecularAnalysisRunView({
     useState<SequencingRunItem[]>();
   const [loading, setLoading] = useState<boolean>(true);
   const { compareByStringAndNumber } = useStringComparator();
+
+  // Quality control items
+  const [qualityControls, setQualityControls] = useState<QualityControl[]>([]);
+  const { loading: loadingVocabularyItems, vocabOptions: qualityControlTypes } =
+    useVocabularyOptions({
+      path: "seqdb-api/vocabulary/qualityControlType"
+    });
   const molecularAnalysisRunItemQuery = useQuery<MolecularAnalysisRunItem[]>(
     {
-      path: `seqdb-api/molecular-analysis-run-item?filter[rsql]=run.uuid==${molecularAnalysisRunId}`
+      path: `seqdb-api/molecular-analysis-run-item`,
+      filter: filterBy([], {
+        extraFilters: [
+          {
+            selector: "run.uuid",
+            comparison: "==",
+            arguments: molecularAnalysisRunId
+          }
+        ]
+      })("")
     },
     {
       onSuccess: async ({ data: molecularAnalysisRunItems }) => {
@@ -622,10 +693,12 @@ export function useMolecularAnalysisRunView({
         }
 
         async function fetchGenericMolecularAnalysisItems() {
-          const fetchPaths = molecularAnalysisRunItems.map(
-            (molecularAnalysisRunItem) =>
-              `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
-          );
+          const fetchPaths = molecularAnalysisRunItems
+            .filter((runItem) => runItem.usageType !== "quality-control")
+            .map(
+              (molecularAnalysisRunItem) =>
+                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+            );
           const genericMolecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
             [];
           for (const path of fetchPaths) {
@@ -654,10 +727,18 @@ export function useMolecularAnalysisRunView({
           return metagenomicsBatchItems;
         }
 
-        const usageType = molecularAnalysisRunItems?.[0].usageType;
+        const usageType = molecularAnalysisRunItems.filter(
+          (runItem) => runItem.usageType !== "quality-control"
+        )?.[0].usageType;
         setColumns(
-          getMolecularAnalysisRunColumns(compareByStringAndNumber, usageType)
+          getMolecularAnalysisRunColumns(
+            compareByStringAndNumber,
+            usageType,
+            undefined,
+            true
+          )
         );
+
         if (usageType === "seq-reaction") {
           const seqReactions = await fetchSeqReactions();
 
@@ -694,6 +775,42 @@ export function useMolecularAnalysisRunView({
             sequencingRunItemsChain,
             bulkGet
           );
+          const qualityControlRunItems = molecularAnalysisRunItems.filter(
+            (runItem) => runItem.usageType === "quality-control"
+          );
+          // Get quality controls
+          if (qualityControlRunItems && qualityControlRunItems?.length > 0) {
+            const newQualityControls: QualityControl[] = [];
+
+            // Go through each quality control run item and then we do a query for each quality control.
+            for (const item of qualityControlRunItems) {
+              const qualityControlQuery = await apiClient.get<QualityControl>(
+                `seqdb-api/quality-control`,
+                {
+                  filter: filterBy([], {
+                    extraFilters: [
+                      {
+                        selector: "molecularAnalysisRunItem.uuid",
+                        comparison: "==",
+                        arguments: item?.id
+                      }
+                    ]
+                  })(""),
+                  include: "molecularAnalysisRunItem"
+                }
+              );
+
+              const qualityControlFound = qualityControlQuery
+                ?.data?.[0] as QualityControl;
+              if (qualityControlFound) {
+                newQualityControls.push({
+                  ...qualityControlFound
+                });
+              }
+            }
+
+            setQualityControls(newQualityControls);
+          }
           // All finished loading.
           setSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
@@ -717,7 +834,6 @@ export function useMolecularAnalysisRunView({
               sequencingRunItemsChain,
               bulkGet
             );
-
           // All finished loading.
           setSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
@@ -726,62 +842,27 @@ export function useMolecularAnalysisRunView({
     }
   );
   return {
-    loading: molecularAnalysisRunItemQuery.loading || loading,
+    loading:
+      molecularAnalysisRunItemQuery.loading ||
+      loadingVocabularyItems ||
+      loading,
     sequencingRunItems,
-    columns
+    columns,
+    qualityControls,
+    qualityControlTypes
   };
 }
 
-export function getMolecularAnalysisRunColumns(compareByStringAndNumber, type) {
+export function getMolecularAnalysisRunColumns(
+  compareByStringAndNumber,
+  type,
+  setMolecularAnalysisRunItemNames?: Dispatch<
+    SetStateAction<Record<string, string>>
+  >,
+  readOnly?: boolean
+) {
   // Table columns to display for the sequencing run.
   const SEQ_REACTION_COLUMNS: ColumnDef<SequencingRunItem>[] = [
-    {
-      id: "wellCoordinates",
-      cell: ({ row }) => {
-        return (
-          <>
-            {!row.original?.storageUnitUsage ||
-            row.original?.storageUnitUsage?.wellRow === null ||
-            row.original?.storageUnitUsage?.wellColumn === null
-              ? ""
-              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
-          </>
-        );
-      },
-      header: () => <FieldHeader name={"wellCoordinates"} />,
-      accessorKey: "wellCoordinates",
-      sortingFn: (a: any, b: any): number => {
-        const aString =
-          !a.original?.storageUnitUsage ||
-          a.original?.storageUnitUsage?.wellRow === null ||
-          a.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
-        const bString =
-          !b.original?.storageUnitUsage ||
-          b.original?.storageUnitUsage?.wellRow === null ||
-          b.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
-        return compareByStringAndNumber(aString, bString);
-      }
-    },
-    {
-      id: "tubeNumber",
-      cell: ({ row: { original } }) =>
-        original?.storageUnitUsage?.cellNumber === undefined ? (
-          <></>
-        ) : (
-          <>{original.storageUnitUsage?.cellNumber}</>
-        ),
-      header: () => <FieldHeader name={"tubeNumber"} />,
-      accessorKey: "tubeNumber",
-      sortingFn: (a: any, b: any): number =>
-        compareByStringAndNumber(
-          a?.original?.storageUnitUsage?.cellNumber?.toString(),
-          b?.original?.storageUnitUsage?.cellNumber?.toString()
-        )
-    },
     {
       id: "materialSampleName",
       cell: ({ row: { original } }) => {
@@ -808,10 +889,46 @@ export function getMolecularAnalysisRunColumns(compareByStringAndNumber, type) {
           b?.original?.materialSampleSummary?.materialSampleName
         ),
       enableSorting: true
-    }
-  ];
-
-  const GENERIC_MOLECULAR_ANALYSIS_COLUMNS: ColumnDef<SequencingRunItem>[] = [
+    },
+    {
+      id: "molecularAnalysisRunItem.name",
+      cell: ({ row: { original } }) => {
+        return readOnly ? (
+          <>{original.molecularAnalysisRunItem?.name}</>
+        ) : (
+          <input
+            type="text"
+            className="w-100 form-control"
+            defaultValue={original.molecularAnalysisRunItem?.name}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setMolecularAnalysisRunItemNames?.(
+                (molecularAnalysisRunItemNames) => {
+                  const molecularAnalysisRunItemNamesMap =
+                    molecularAnalysisRunItemNames;
+                  if (
+                    original?.materialSampleSummary?.id &&
+                    event.target.value
+                  ) {
+                    molecularAnalysisRunItemNamesMap[
+                      original?.materialSampleSummary?.id
+                    ] = event.target.value;
+                  }
+                  return molecularAnalysisRunItemNamesMap;
+                }
+              );
+            }}
+          />
+        );
+      },
+      header: () => <DinaMessage id="molecularAnalysisRunItemName" />,
+      accessorKey: "molecularAnalysisRunItem.name",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleSummary?.materialSampleName,
+          b?.original?.materialSampleSummary?.materialSampleName
+        ),
+      enableSorting: true
+    },
     {
       id: "wellCoordinates",
       cell: ({ row }) => {
@@ -858,7 +975,10 @@ export function getMolecularAnalysisRunColumns(compareByStringAndNumber, type) {
           a?.original?.storageUnitUsage?.cellNumber?.toString(),
           b?.original?.storageUnitUsage?.cellNumber?.toString()
         )
-    },
+    }
+  ];
+
+  const GENERIC_MOLECULAR_ANALYSIS_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
       id: "materialSampleName",
       cell: ({ row: { original } }) => {
@@ -882,12 +1002,211 @@ export function getMolecularAnalysisRunColumns(compareByStringAndNumber, type) {
           b?.original?.materialSampleSummary?.materialSampleName
         ),
       enableSorting: true
+    },
+    {
+      id: "molecularAnalysisRunItem.name",
+      cell: ({ row: { original } }) => {
+        return readOnly ? (
+          <>{original.molecularAnalysisRunItem?.name}</>
+        ) : (
+          <input
+            type="text"
+            className="w-100 form-control"
+            defaultValue={original.molecularAnalysisRunItem?.name}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setMolecularAnalysisRunItemNames?.(
+                (molecularAnalysisRunItemNames) => {
+                  const molecularAnalysisRunItemNamesMap =
+                    molecularAnalysisRunItemNames;
+                  if (
+                    original?.materialSampleSummary?.id &&
+                    event.target.value
+                  ) {
+                    molecularAnalysisRunItemNamesMap[
+                      original?.materialSampleSummary?.id
+                    ] = event.target.value;
+                  }
+                  return molecularAnalysisRunItemNamesMap;
+                }
+              );
+            }}
+          />
+        );
+      },
+      header: () => <DinaMessage id="molecularAnalysisRunItemName" />,
+      accessorKey: "molecularAnalysisRunItem.name",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleSummary?.materialSampleName,
+          b?.original?.materialSampleSummary?.materialSampleName
+        ),
+      enableSorting: true
+    },
+    {
+      id: "wellCoordinates",
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          !a.original?.storageUnitUsage ||
+          a.original?.storageUnitUsage?.wellRow === null ||
+          a.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+        const bString =
+          !b.original?.storageUnitUsage ||
+          b.original?.storageUnitUsage?.wellRow === null ||
+          b.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      }
+    },
+    {
+      id: "tubeNumber",
+      cell: ({ row: { original } }) =>
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
+    }
+  ];
+
+  const METAGENOMICS_BATCH_ITEM_COLUMNS: ColumnDef<SequencingRunItem>[] = [
+    {
+      id: "materialSampleName",
+      cell: ({ row: { original } }) => {
+        const materialSampleName =
+          original?.materialSampleSummary?.materialSampleName;
+        return (
+          <>
+            <Link
+              href={`/collection/material-sample/view?id=${original.materialSampleId}`}
+            >
+              <a>{materialSampleName || original.materialSampleId}</a>
+            </Link>
+          </>
+        );
+      },
+      header: () => <FieldHeader name="materialSampleName" />,
+      accessorKey: "materialSampleSummary.materialSampleName",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleSummary?.materialSampleName,
+          b?.original?.materialSampleSummary?.materialSampleName
+        ),
+      enableSorting: true
+    },
+    {
+      id: "molecularAnalysisRunItem.name",
+      cell: ({ row: { original } }) => {
+        return readOnly ? (
+          <>{original.molecularAnalysisRunItem?.name}</>
+        ) : (
+          <input
+            type="text"
+            className="w-100 form-control"
+            defaultValue={original.molecularAnalysisRunItem?.name}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setMolecularAnalysisRunItemNames?.(
+                (molecularAnalysisRunItemNames) => {
+                  const molecularAnalysisRunItemNamesMap =
+                    molecularAnalysisRunItemNames;
+                  if (
+                    original?.materialSampleSummary?.id &&
+                    event.target.value
+                  ) {
+                    molecularAnalysisRunItemNamesMap[
+                      original?.materialSampleSummary?.id
+                    ] = event.target.value;
+                  }
+                  return molecularAnalysisRunItemNamesMap;
+                }
+              );
+            }}
+          />
+        );
+      },
+      header: () => <DinaMessage id="molecularAnalysisRunItemName" />,
+      accessorKey: "molecularAnalysisRunItem.name",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleSummary?.materialSampleName,
+          b?.original?.materialSampleSummary?.materialSampleName
+        ),
+      enableSorting: true
+    },
+    {
+      id: "wellCoordinates",
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          !a.original?.storageUnitUsage ||
+          a.original?.storageUnitUsage?.wellRow === null ||
+          a.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+        const bString =
+          !b.original?.storageUnitUsage ||
+          b.original?.storageUnitUsage?.wellRow === null ||
+          b.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      }
+    },
+    {
+      id: "tubeNumber",
+      cell: ({ row: { original } }) =>
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
     }
   ];
   const MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP = {
     "seq-reaction": SEQ_REACTION_COLUMNS,
     "generic-molecular-analysis-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS,
-    "metagenomics-batch-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS
+    "metagenomics-batch-item": METAGENOMICS_BATCH_ITEM_COLUMNS
   };
   return MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP[type];
 }

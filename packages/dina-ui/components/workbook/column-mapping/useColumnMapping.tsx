@@ -666,64 +666,9 @@ export function useColumnMapping() {
 
     if (values) {
       for (const value of Object.keys(values)) {
-        let found: PersistedResource<any> | undefined;
-        switch (fieldPath) {
-          case "assemblages.name":
-            found =
-              assemblages.find((item) => item.name === value) ??
-              assemblages.find((item) => compareAlphanumeric(item.name, value));
-            break;
-          case "collection.name":
-            found =
-              collections.find((item) => item.name === value) ??
-              collections.find((item) => compareAlphanumeric(item.name, value));
-            break;
-          case "preparationType.name":
-            found =
-              preparationTypes.find((item) => item.name === value) ??
-              preparationTypes.find((item) =>
-                compareAlphanumeric(item.name, value)
-              );
-            break;
-          case "preparationMethod.name":
-            found =
-              preparationMethods.find((item) => item.name === value) ??
-              preparationMethods.find((item) =>
-                compareAlphanumeric(item.name, value)
-              );
-            break;
-          case "preparationProtocol.name":
-            found =
-              protocols.find((item) => item.name === value) ??
-              protocols.find((item) => compareAlphanumeric(item.name, value));
-            break;
-          case "storageUnitUsage.storageUnit.name":
-            found =
-              storageUnits.find((item) => item.name === value) ??
-              storageUnits.find((item) =>
-                compareAlphanumeric(item.name, value)
-              );
-
-            break;
-          case "projects.name":
-            found =
-              projects.find((item) => item.name === value) ??
-              projects.find((item) => compareAlphanumeric(item.name, value));
-            break;
-          case "collectingEvent.collectors.displayName":
-          case "preparedBy.displayName":
-            found =
-              persons.find((item) => item.displayName === value) ??
-              persons.find((item) =>
-                compareAlphanumeric(item.displayName, value)
-              );
-            break;
-          case "attachment.name":
-            found =
-              metadatas.find((item) => item.name === value) ??
-              metadatas.find((item) => compareAlphanumeric(item.name, value));
-            break;
-        }
+        // Find initial relationship value without string splitting
+        const found: PersistedResource<any> | undefined =
+          getInitialRelationshipFieldValues(value);
         // If relationship is found, set it. If not, reset it so it's empty.
         if (found) {
           if (PERSON_SELECT_FIELDS.has(fieldPath)) {
@@ -734,8 +679,91 @@ export function useColumnMapping() {
             theRelationshipMapping[columnHeader][value.replace(".", "_")] =
               pick(found, ["id", "type"]);
           }
+        } else {
+          // No value was found without string splitting
+          // Now try to find values with string splitting
+          const relationshipMappingDefaultValues: {
+            id: string;
+            type: string;
+          }[] = [];
+          if (PERSON_SELECT_FIELDS.has(fieldPath)) {
+            const splitFieldValues = value
+              .split(";")
+              .map((item) => item.trim());
+            for (const fieldValue of splitFieldValues) {
+              const initialRelationshipFieldValue:
+                | PersistedResource<any>
+                | undefined = getInitialRelationshipFieldValues(fieldValue);
+              if (initialRelationshipFieldValue) {
+                relationshipMappingDefaultValues.push(
+                  pick(initialRelationshipFieldValue, ["id", "type"])
+                );
+              }
+            }
+            theRelationshipMapping[columnHeader][value.replace(".", "_")] =
+              relationshipMappingDefaultValues;
+          }
         }
       }
+    }
+
+    function getInitialRelationshipFieldValues(value: string) {
+      let found: PersistedResource<any> | undefined;
+      switch (fieldPath) {
+        case "assemblages.name":
+          found =
+            assemblages.find((item) => item.name === value) ??
+            assemblages.find((item) => compareAlphanumeric(item.name, value));
+          break;
+        case "collection.name":
+          found =
+            collections.find((item) => item.name === value) ??
+            collections.find((item) => compareAlphanumeric(item.name, value));
+          break;
+        case "preparationType.name":
+          found =
+            preparationTypes.find((item) => item.name === value) ??
+            preparationTypes.find((item) =>
+              compareAlphanumeric(item.name, value)
+            );
+          break;
+        case "preparationMethod.name":
+          found =
+            preparationMethods.find((item) => item.name === value) ??
+            preparationMethods.find((item) =>
+              compareAlphanumeric(item.name, value)
+            );
+          break;
+        case "preparationProtocol.name":
+          found =
+            protocols.find((item) => item.name === value) ??
+            protocols.find((item) => compareAlphanumeric(item.name, value));
+          break;
+        case "storageUnitUsage.storageUnit.name":
+          found =
+            storageUnits.find((item) => item.name === value) ??
+            storageUnits.find((item) => compareAlphanumeric(item.name, value));
+          break;
+        case "projects.name":
+          found =
+            projects.find((item) => item.name === value) ??
+            projects.find((item) => compareAlphanumeric(item.name, value));
+          break;
+        case "collectingEvent.collectors.displayName":
+        case "preparedBy.displayName":
+          found =
+            persons.find((item) => item.displayName === value) ??
+            persons.find((item) =>
+              compareAlphanumeric(item.displayName, value)
+            );
+          break;
+        case "attachment.name":
+          found =
+            metadatas.find((item) => item.name === value) ??
+            metadatas.find((item) => compareAlphanumeric(item.name, value));
+          break;
+      }
+      return found;
     }
   }
 

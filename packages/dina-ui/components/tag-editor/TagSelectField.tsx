@@ -3,18 +3,21 @@ import {
   FieldWrapperProps,
   Tooltip,
   filterBy,
+  rsql,
   useAccount,
   useQuery
 } from "common-ui";
 import { KitsuResource } from "kitsu";
 import { compact, last, uniq, get } from "lodash";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
 import { components as reactSelectComponents } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { useFormikContext } from "formik";
+import { useElasticSearchDistinctTerm } from "../../../common-ui/lib/list-page/useElasticSearchDistinctTerm";
+import { useDebounce } from "use-debounce";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
@@ -22,6 +25,7 @@ export interface TagSelectFieldProps extends FieldWrapperProps {
   groupSelectorName?: string;
   /** The field name to use when finding other tags via RSQL filter. */
   tagsFieldName?: string;
+  indexName?: string;
 }
 
 export interface TagSelectOption {
@@ -33,6 +37,7 @@ export interface TagSelectOption {
 export function TagSelectField({
   resourcePath,
   tagsFieldName,
+  indexName,
   ...props
 }: TagSelectFieldProps) {
   return (
@@ -70,6 +75,7 @@ export function TagSelectField({
           groupSelectorName={props.groupSelectorName}
           placeholder={placeholder}
           tagsFieldName={tagsFieldName}
+          indexName={indexName}
         />
       )}
     </FieldWrapper>
@@ -84,6 +90,7 @@ interface TagSelectProps {
   tagsFieldName?: string;
   groupSelectorName?: string;
   placeholder?: string;
+  indexName?: string;
 }
 
 /** Tag Select/Create field. */
@@ -94,55 +101,75 @@ function TagSelect({
   invalid,
   groupSelectorName = "group",
   tagsFieldName = "tags",
-  placeholder
+  placeholder,
+  indexName
 }: TagSelectProps) {
   const { formatMessage } = useDinaIntl();
   const { isAdmin, groupNames } = useAccount();
 
   /** The value of the input element. */
   const [inputValue, setInputValue] = useState("");
+  /** The debounced input value passed to the fetcher. */
+  const [debouncedInputValue] = useDebounce(inputValue, 250);
+  const tagOptions = useRef<TagSelectOption[]>([]);
+  const isLoading = useRef<boolean>(false);
 
   const typeName = last(resourcePath?.split("/"));
 
-  const filter = filterBy(
-    [tagsFieldName],
-    !isAdmin
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: groupSelectorName,
-              comparison: "=in=",
-              arguments: groupNames || []
-            }
-          ]
-        }
-      : undefined
-  );
-
-  const { loading, response } = useQuery<KitsuResource[]>(
-    {
-      path: resourcePath ?? "",
-      sort: "-createdOn",
-      fields: typeName ? { [typeName]: tagsFieldName } : undefined,
-      filter: {
-        tags: { NEQ: "null" },
-        ...filter("")
+  if (indexName) {
+    const suggestions = useElasticSearchDistinctTerm({
+      fieldName: `data.attributes.${tagsFieldName}`,
+      indexName,
+      keywordMultiFieldSupport: true,
+      isFieldArray: true,
+      inputValue: debouncedInputValue,
+      groupNames,
+      size: 10
+    });
+    tagOptions.current = suggestions.map((tag) => toOption(tag));
+  } else {
+    const filter = filterBy(
+      [tagsFieldName],
+      !isAdmin
+        ? {
+            extraFilters: [
+              // Restrict the list to just the user's groups:
+              {
+                selector: groupSelectorName,
+                comparison: "=in=",
+                arguments: groupNames || []
+              }
+            ]
+          }
+        : undefined
+    );
+    const { loading } = useQuery<KitsuResource[]>(
+      {
+        path: resourcePath ?? "",
+        sort: "-createdOn",
+        fields: typeName ? { [typeName]: tagsFieldName } : undefined,
+        filter: {
+          tags: { NEQ: "null" },
+          ...filter("")
+        },
+        page: { limit: 100 }
       },
-      page: { limit: 100 }
-    },
-    { disabled: !resourcePath }
-  );
-
-  const previousTagsOptions = useMemo(
-    () =>
-      uniq(
-        compact((response?.data ?? []).flatMap((it) => get(it, tagsFieldName)))
-      )
-        .filter((tag) => tag.includes(inputValue))
-        .map((tag) => ({ label: tag, value: tag })),
-    [response]
-  );
+      {
+        disabled: !resourcePath,
+        onSuccess(response) {
+          const tags = uniq(
+            compact(
+              (response?.data ?? []).flatMap((it) => get(it, tagsFieldName))
+            )
+          )
+            .filter((tag) => tag.includes(inputValue))
+            .map((tag) => toOption(tag));
+          tagOptions.current = tags;
+        }
+      }
+    );
+    isLoading.current = loading;
+  }
 
   function toOption(tagText: string): TagSelectOption {
     return { label: tagText, value: tagText };
@@ -182,14 +209,14 @@ function TagSelect({
       options={[
         {
           label: formatMessage("typeNewTagOrSearchPreviousTags"),
-          options: previousTagsOptions
+          options: tagOptions.current
         }
       ]}
+      isLoading={isLoading.current}
       // Select config:
       styles={customStyle}
       classNamePrefix="react-select"
       isMulti={true}
-      isLoading={loading}
       allowCreateWhileLoading={true}
       isClearable={true}
       placeholder={

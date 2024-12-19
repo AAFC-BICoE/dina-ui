@@ -412,6 +412,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_name: "Name",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
   field_organismRemarks: "Organism Remarks",
+  field_dwcVernacularName: "Vernacular Name",
   field_organismsIndividualEntry: "Individual Organism Entry",
   field_organismsIndividualEntry_tooltip:
     "Leave this OFF to copy the same data for every Organism. Toggle ON to enter different data for each Organism.",
@@ -1030,6 +1031,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "This molecular analysis workflow should only have one associated run. Please verify and correct it.",
   molecularAnalysisRunStep_sequencingRun: "Sequencing Run:",
   molecularAnalysisRunStep_sequencingRunContent: "Sequencing Run Content:",
+  molecularAnalysisRunStep_sequencingQualityControl:
+    "Sequencing Quality Control:",
   molecularAnalysisRunStep_missingSequencingRunID:
     "Unexpected error occurred. Sequencing Run ID should be set at this point.",
   molecularAnalysisRunStep_missingSequenceReactions:
@@ -1160,5 +1163,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Changing the storage unit type will clear the existing storage coordinates stored.",
   changingTheStorageUnitTypeWillDeleteWarningButtonText: "Proceed",
   seqdbManagedAttributeTitle: "Sequencing",
-  genericMolecularAnalysis: "Generic Molecular Analysis"
+  genericMolecularAnalysis: "Generic Molecular Analysis",
+  molecularAnalysisRunItemName: "Run Item Name",
+  qualityControlName: "Name:",
+  qualityControlType: "Type:",
+  collecting_event_tag_info:
+    "Suggestions are currently based on Material Sample tags."
 };
