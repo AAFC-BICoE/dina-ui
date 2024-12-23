@@ -124,9 +124,6 @@ export default function ExportPage<TData extends KitsuResource>() {
     }
     const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
 
-    const columns = columnsToExport.filter(
-      (c) => !c.columnSelectorString?.startsWith("columnFunction/")
-    );
     const columnFunctions = columnsToExport
       .filter((c) => c.columnSelectorString?.startsWith("columnFunction/"))
       .reduce((prev, curr) => {
@@ -151,8 +148,12 @@ export default function ExportPage<TData extends KitsuResource>() {
         type: "data-export",
         source: indexName,
         query: queryString,
-        columns: columns.map((item) => item.id),
-        columnAliases: columns.map((item) => item?.exportHeader ?? ""),
+        columns: columnsToExport.map((item) =>
+          item.columnSelectorString?.startsWith("columnFunction/")
+            ? item.columnSelectorString?.split("/")[1] // Get functionId
+            : item.id
+        ),
+        columnAliases: columnsToExport.map((item) => item?.exportHeader ?? ""),
         columnFunctions:
           Object.keys(columnFunctions ?? {}).length === 0
             ? undefined

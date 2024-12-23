@@ -15,7 +15,7 @@ describe("QueryBuilderBooleanSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const { queryByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider value={{ performSubmit: noop } as any}>
             <QueryBuilderBooleanSearch
               matchType="equals"
               value="test"
@@ -32,7 +32,9 @@ describe("QueryBuilderBooleanSearch", () => {
     it("Don't display field if match type is not equals", async () => {
       const { queryByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderBooleanSearch
               matchType="empty"
               value=""
@@ -51,7 +53,7 @@ describe("QueryBuilderBooleanSearch", () => {
       const { getByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: mockPerformSubmit }}
+            value={{ performSubmit: mockPerformSubmit, groups: [] }}
           >
             <QueryBuilderBooleanSearch
               matchType="equals"

@@ -20,7 +20,8 @@ const testIndexMap: ESIndexMapping[] = [
     path: "attributes",
     subType: undefined,
     type: "text",
-    value: "collectingEvent.dwcRecordNumber"
+    value: "collectingEvent.dwcRecordNumber",
+    hideField: false
   }
 ];
 
