@@ -9,7 +9,9 @@ import { fileUploadErrorHandler } from "../../../components/object-store/file-up
 import UploadPage, {
   BULK_ADD_IDS_KEY
 } from "../../../pages/object-store/upload";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { fireEvent, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockPush = jest.fn();
 const mockFormatMessage = jest.fn();
@@ -65,7 +67,7 @@ describe("Upload page", () => {
       save: mockSave
     };
 
-    const wrapper = mountWithAppContext(<UploadPage />, {
+    const wrapper = mountWithAppContext2(<UploadPage />, {
       accountContext: MOCK_ACCOUNT_CONTEXT,
       apiContext: mockApiCtx as any
     });
@@ -85,6 +87,8 @@ describe("Upload page", () => {
         meta: { lastModifiedDate: "2019-08-30T20:37:21.502Z" } as IMeta
       }
     ];
+
+    screen.logTestingPlaygroundURL();
 
     // Call the onSubmit function with uploaded files:
     wrapper.find(FileUploader).prop<OnFormikSubmit>("onSubmit")(
@@ -171,10 +175,12 @@ describe("Upload page", () => {
   });
 
   it("Only renders if the user belongs a group", () => {
-    const wrapper = mountWithAppContext(<UploadPage />, {
+    const wrapper = mountWithAppContext2(<UploadPage />, {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });
 
-    expect(wrapper.find(".no-group-alert")).toBeTruthy();
+    expect(
+      wrapper.getByText(/user must belong to a group/i)
+    ).toBeInTheDocument();
   });
 });
