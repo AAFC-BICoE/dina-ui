@@ -1,9 +1,7 @@
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import MetadataRevisionListPage from "../../../../pages/object-store/metadata/revisions";
 import { DefaultRow } from "../../../../../common-ui/lib";
-import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import userEvent from "@testing-library/user-event";
 
 const TEST_SNAPSHOTS = [
   {
@@ -55,8 +53,6 @@ describe("MetadataRevisionListPage", () => {
 
     // Await metadata query:
     await new Promise(setImmediate);
-
-    screen.logTestingPlaygroundURL();
 
     // Renders the title:
     expect(
