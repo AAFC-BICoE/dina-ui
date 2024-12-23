@@ -1,45 +1,42 @@
-import {
-  DinaForm,
-  CommonMessage,
-  BackButton,
-  DATA_EXPORT_TOTAL_RECORDS_KEY,
-  DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY,
-  useApiClient,
-  OBJECT_EXPORT_IDS_KEY,
-  downloadDataExport,
-  Tooltip,
-  DATA_EXPORT_QUERY_KEY,
-  TextField,
-  SubmitButton,
-  ColumnSelectorMemo
-} from "packages/common-ui/lib";
-import Link from "next/link";
-import { KitsuResource, PersistedResource } from "kitsu";
-import { useRouter } from "next/router";
-import { useIntl } from "react-intl";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
-import React, { useState } from "react";
+import { KitsuResource, PersistedResource } from "kitsu";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import {
-  DynamicFieldsMappingConfig,
-  TableColumn
-} from "packages/common-ui/lib/list-page/types";
+  BackButton,
+  ColumnSelectorMemo,
+  CommonMessage,
+  DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY,
+  DATA_EXPORT_QUERY_KEY,
+  DATA_EXPORT_TOTAL_RECORDS_KEY,
+  DinaForm,
+  downloadDataExport,
+  OBJECT_EXPORT_IDS_KEY,
+  SubmitButton,
+  TextField,
+  Tooltip,
+  useApiClient
+} from "packages/common-ui/lib";
+import { DynamicFieldsMappingConfig } from "packages/common-ui/lib/list-page/types";
 import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMapping";
-import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
-import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { useSessionStorage } from "usehooks-ts";
-import {
-  Card,
-  ButtonGroup,
-  ToggleButton,
-  Spinner,
-  Button
-} from "react-bootstrap";
-import Select from "react-select";
-import { FaTrash } from "react-icons/fa";
-import useSavedExports from "./useSavedExports";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
+import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
+import { useState } from "react";
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  Spinner,
+  ToggleButton
+} from "react-bootstrap";
+import { FaTrash } from "react-icons/fa";
+import { useIntl } from "react-intl";
+import Select from "react-select";
+import { useSessionStorage } from "usehooks-ts";
+import useSavedExports from "./useSavedExports";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
 const BASE_DELAY_EXPORT_FETCH_MS = 2000;
@@ -127,14 +124,39 @@ export default function ExportPage<TData extends KitsuResource>() {
     }
     const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
 
+    const columns = columnsToExport.filter(
+      (c) => !c.columnSelectorString?.startsWith("columnFunction/")
+    );
+    const columnFunctions = columnsToExport
+      .filter((c) => c.columnSelectorString?.startsWith("columnFunction/"))
+      .reduce((prev, curr) => {
+        const columnParts = curr.columnSelectorString?.split("/");
+        if (columnParts) {
+          return {
+            ...prev,
+            [columnParts[1]]: {
+              functionName: columnParts[2],
+              params:
+                columnParts[2] === "CONVERT_COORDINATES_DD"
+                  ? ["collectingEvent.eventGeom"]
+                  : columnParts[3].split("+")
+            }
+          };
+        }
+      }, {});
+
     // Make query to data-export
     const dataExportSaveArg = {
       resource: {
         type: "data-export",
         source: indexName,
         query: queryString,
-        columns: columnsToExport.map((item) => item.id),
-        columnAliases: columnsToExport.map((item) => item?.exportHeader ?? ""),
+        columns: columns.map((item) => item.id),
+        columnAliases: columns.map((item) => item?.exportHeader ?? ""),
+        columnFunctions:
+          Object.keys(columnFunctions ?? {}).length === 0
+            ? undefined
+            : columnFunctions,
         name: formik?.values?.name
       },
       type: "data-export"

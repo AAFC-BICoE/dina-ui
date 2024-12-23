@@ -1,5 +1,5 @@
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
-import { get, startCase } from "lodash";
+import { compact, get, startCase } from "lodash";
 import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { FieldHeader, dateCell } from "..";
@@ -101,7 +101,11 @@ export function generateColumnPath({
           (columnFunctionStateValues[functionId].params
             ? "/" +
               columnFunctionStateValues[functionId].params
-                .map((field) => field.value)
+                .map((field) =>
+                  field.parentName
+                    ? field.value
+                    : field.value.replace(field.path + ".", "")
+                )
                 .join("+")
             : "")
         );
@@ -150,11 +154,6 @@ export interface GenerateColumnDefinitionProps<TData extends KitsuResource> {
    * API client to be used for generating the dynamic fields.
    */
   apiClient: Kitsu;
-
-  getFormattedFunctionField: (
-    functionFieldPath: string,
-    indexMappings?: ESIndexMapping[]
-  ) => string | undefined;
 }
 
 export async function generateColumnDefinition<TData extends KitsuResource>({
@@ -162,8 +161,7 @@ export async function generateColumnDefinition<TData extends KitsuResource>({
   dynamicFieldsMappingConfig,
   path,
   defaultColumns,
-  apiClient,
-  getFormattedFunctionField
+  apiClient
 }: GenerateColumnDefinitionProps<TData>): Promise<
   TableColumn<TData> | undefined
 > {
@@ -177,7 +175,6 @@ export async function generateColumnDefinition<TData extends KitsuResource>({
     return await getDynamicFieldColumn(
       path,
       apiClient,
-      getFormattedFunctionField,
       dynamicFieldsMappingConfig,
       indexMappings
     );
@@ -306,10 +303,6 @@ export function NestedColumnLabel({
 async function getDynamicFieldColumn<TData extends KitsuResource>(
   path: string,
   apiClient: Kitsu,
-  getFormattedFunctionField: (
-    functionFieldPath: string,
-    indexMappings?: ESIndexMapping[]
-  ) => string | undefined,
   dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig,
   indexMappings?: ESIndexMapping[]
 ): Promise<TableColumn<TData> | undefined> {
@@ -384,16 +377,19 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
 
     // Handle column functions paths
     if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
-      const formattedFunctionField = getFormattedFunctionField(
-        path,
-        indexMappings
-      );
+      const paramStr = pathParts.length > 3 ? "(" + pathParts[3] + ")" : "";
+      const fieldId = pathParts[1] + "." + pathParts[2] + paramStr;
       return {
         columnSelectorString: path,
         accessorKey: path,
-        id: formattedFunctionField,
+        id: fieldId,
         header: () => {
-          return <span>{formattedFunctionField}</span>;
+          return (
+            <FunctionFieldLabel
+              functionFieldPath={path}
+              indexMappings={indexMappings}
+            />
+          );
         },
         isKeyword: true,
         isColumnVisible: true
@@ -1076,5 +1072,56 @@ async function fetchDynamicField(apiClient: Kitsu, path, params?: GetParams) {
     return data;
   } catch {
     return undefined;
+  }
+}
+
+export interface FunctionFieldLabelProps {
+  functionFieldPath: string;
+  indexMappings?: ESIndexMapping[];
+}
+export function FunctionFieldLabel({
+  functionFieldPath,
+  indexMappings
+}: FunctionFieldLabelProps) {
+  const { messages, formatMessage } = useDinaIntl();
+
+  const pathParts = functionFieldPath.split("/");
+  if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
+    const functionName = pathParts[2];
+    const paramStr = pathParts.length > 3 ? pathParts[3] : undefined;
+    const paramObjects = compact(
+      paramStr
+        ?.split("+")
+        .map((field) =>
+          indexMappings?.find((mapping) =>
+            mapping.parentName
+              ? mapping.value === field
+              : mapping.value === mapping.path + "." + field
+          )
+        )
+    );
+    const formattedParamStr =
+      paramObjects && paramObjects.length > 0
+        ? "(" +
+          paramObjects
+            ?.map(
+              (field) =>
+                (field.parentName
+                  ? (messages[field.parentName]
+                      ? formatMessage(field.parentName as any)
+                      : startCase(field.parentName)) + " "
+                  : "") +
+                (messages[field.label]
+                  ? formatMessage(field.label as any)
+                  : startCase(field.label))
+            )
+            .join(" + ") +
+          ")"
+        : "";
+    return (
+      <span>{formatMessage(functionName as any) + formattedParamStr}</span>
+    );
+  } else {
+    return <></>;
   }
 }

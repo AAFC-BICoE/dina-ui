@@ -104,7 +104,9 @@ export default function QueryRowColumnFunctionInput({
   const indexMappingFiltered = useMemo(() => {
     return (
       indexMapping?.filter(
-        (item) => item.dynamicField?.type !== "columnFunction"
+        (item) => !item.dynamicField
+        // TODO:  filter out columnFunction only like this item.dynamicField?.type !== "columnFunction",
+        // but we need to handle the dynamic column input
       ) ?? []
     );
   }, indexMapping);

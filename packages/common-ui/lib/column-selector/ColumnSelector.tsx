@@ -1,19 +1,17 @@
+import useLocalStorage from "@rehooks/local-storage";
 import { KitsuResource } from "kitsu";
-import { ColumnSelectorList } from "./ColumnSelectorList";
-import { useState, useEffect } from "react";
-import React from "react";
+import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
+import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { useApiClient } from "../api-client/ApiClientContext";
 import {
   DynamicFieldsMappingConfig,
   ESIndexMapping,
   TableColumn
 } from "../list-page/types";
+import { ColumnSelectorList } from "./ColumnSelectorList";
 import { generateColumnDefinition } from "./ColumnSelectorUtils";
-import { useApiClient } from "../api-client/ApiClientContext";
-import useLocalStorage from "@rehooks/local-storage";
-import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
-import useDynamicFieldSelector from "./useDynamicFieldSelector";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
 
@@ -104,7 +102,6 @@ export function ColumnSelector<TData extends KitsuResource>(
   props: ColumnSelectorProps<TData>
 ) {
   const { apiClient } = useApiClient();
-  const { getFormattedFunctionField } = useDynamicFieldSelector();
 
   const {
     exportMode,
@@ -240,7 +237,6 @@ export function ColumnSelector<TData extends KitsuResource>(
               indexMappings: injectedIndexMapping,
               dynamicFieldsMappingConfig,
               apiClient,
-              getFormattedFunctionField,
               defaultColumns,
               path: localColumn
             });
@@ -261,7 +257,6 @@ export function ColumnSelector<TData extends KitsuResource>(
               indexMappings: injectedIndexMapping,
               dynamicFieldsMappingConfig,
               apiClient,
-              getFormattedFunctionField,
               defaultColumns,
               path: localColumn
             });

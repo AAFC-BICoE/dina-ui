@@ -32,7 +32,6 @@ import {
   generateColumnDefinition,
   generateColumnPath
 } from "./ColumnSelectorUtils";
-import useDynamicFieldSelector from "./useDynamicFieldSelector";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -71,8 +70,6 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     );
 
   const [functionId, setFunctionId] = useState("function1");
-
-  const { getFormattedFunctionField } = useDynamicFieldSelector();
 
   // Handle what happens when the user selects an option from the Query Field Selector. If a dynamic
   // field is selected, verify we are at a point where it can be added.
@@ -235,8 +232,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
         dynamicFieldsMappingConfig,
         path: generatedColumnPath,
         defaultColumns,
-        apiClient,
-        getFormattedFunctionField
+        apiClient
       });
 
       if (newColumnDefinition) {
