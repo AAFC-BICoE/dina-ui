@@ -1,6 +1,9 @@
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import MetadataRevisionListPage from "../../../../pages/object-store/metadata/revisions";
 import { DefaultRow } from "../../../../../common-ui/lib";
+import { fireEvent, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 const TEST_SNAPSHOTS = [
   {
@@ -46,20 +49,22 @@ jest.mock("next/router", () => ({
 
 describe("MetadataRevisionListPage", () => {
   it("Renders the page.", async () => {
-    const wrapper = mountWithAppContext(<MetadataRevisionListPage />, {
+    const wrapper = mountWithAppContext2(<MetadataRevisionListPage />, {
       apiContext: { apiClient: { get: mockGet } as any }
     });
 
     // Await metadata query:
     await new Promise(setImmediate);
-    wrapper.update();
+
+    screen.logTestingPlaygroundURL();
 
     // Renders the title:
-    expect(wrapper.find("h1").first().text()).toEqual(
-      "Revisions for my-image.png"
-    );
+    expect(
+      wrapper.getByRole("heading", { name: /revisions for my\-image\.png/i })
+    ).toBeInTheDocument();
 
     // Renders the 2 revision rows:
-    expect(wrapper.find(DefaultRow).length).toEqual(2);
+    expect(wrapper.getByRole("cell", { name: "1" })).toBeInTheDocument();
+    expect(wrapper.getByRole("cell", { name: "2" })).toBeInTheDocument();
   });
 });
