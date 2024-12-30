@@ -726,10 +726,15 @@ export function useMolecularAnalysisRunView({
           }
           return metagenomicsBatchItems;
         }
-
         const usageType = molecularAnalysisRunItems.filter(
           (runItem) => runItem.usageType !== "quality-control"
-        )?.[0].usageType;
+        )?.[0]?.usageType;
+
+        if (!usageType) {
+          setLoading(false);
+          return;
+        }
+
         setColumns(
           getMolecularAnalysisRunColumns(
             compareByStringAndNumber,
