@@ -1091,6 +1091,122 @@ export function getMolecularAnalysisRunColumns(
     }
   ];
 
+  const GENERIC_MOLECULAR_ANALYSIS_RESULTS_COLUMNS: ColumnDef<SequencingRunItem>[] =
+    [
+      {
+        id: "materialSampleName",
+        cell: ({ row: { original } }) => {
+          const materialSampleName =
+            original?.materialSampleSummary?.materialSampleName;
+          return (
+            <>
+              <Link
+                href={`/collection/material-sample/view?id=${original.materialSampleId}`}
+              >
+                <a>{materialSampleName || original.materialSampleId}</a>
+              </Link>
+            </>
+          );
+        },
+        header: () => <FieldHeader name="materialSampleName" />,
+        accessorKey: "materialSampleSummary.materialSampleName",
+        sortingFn: (a: any, b: any): number =>
+          compareByStringAndNumber(
+            a?.original?.materialSampleSummary?.materialSampleName,
+            b?.original?.materialSampleSummary?.materialSampleName
+          ),
+        enableSorting: true
+      },
+      {
+        id: "molecularAnalysisRunItem.name",
+        cell: ({ row: { original } }) => {
+          return readOnly ? (
+            <>{original.molecularAnalysisRunItem?.name}</>
+          ) : (
+            <input
+              type="text"
+              className="w-100 form-control"
+              defaultValue={original.molecularAnalysisRunItem?.name}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                setMolecularAnalysisRunItemNames?.(
+                  (molecularAnalysisRunItemNames) => {
+                    const molecularAnalysisRunItemNamesMap =
+                      molecularAnalysisRunItemNames;
+                    if (
+                      original?.materialSampleSummary?.id &&
+                      event.target.value
+                    ) {
+                      molecularAnalysisRunItemNamesMap[
+                        original?.materialSampleSummary?.id
+                      ] = event.target.value;
+                    }
+                    return molecularAnalysisRunItemNamesMap;
+                  }
+                );
+              }}
+            />
+          );
+        },
+        header: () => <DinaMessage id="molecularAnalysisRunItemName" />,
+        accessorKey: "molecularAnalysisRunItem.name",
+        sortingFn: (a: any, b: any): number =>
+          compareByStringAndNumber(
+            a?.original?.materialSampleSummary?.materialSampleName,
+            b?.original?.materialSampleSummary?.materialSampleName
+          ),
+        enableSorting: true
+      },
+      {
+        id: "result",
+        cell: ({ row }) => {
+          return <></>;
+        },
+        header: () => <FieldHeader name={"result"} />,
+        accessorKey: "result",
+        sortingFn: (a: any, b: any): number => {
+          const aString =
+            !a.original?.storageUnitUsage ||
+            a.original?.storageUnitUsage?.wellRow === null ||
+            a.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+          const bString =
+            !b.original?.storageUnitUsage ||
+            b.original?.storageUnitUsage?.wellRow === null ||
+            b.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+          return compareByStringAndNumber(aString, bString);
+        }
+      },
+      {
+        id: "resultAttachment",
+        cell: ({ row: { original } }) => {
+          return <></>;
+        },
+        header: () => <FieldHeader name={"resultAttachment"} />,
+        accessorKey: "resultAttachment",
+        sortingFn: (a: any, b: any): number =>
+          compareByStringAndNumber(
+            a?.original?.storageUnitUsage?.cellNumber?.toString(),
+            b?.original?.storageUnitUsage?.cellNumber?.toString()
+          )
+      },
+      {
+        id: "action",
+        cell: ({ row: { original } }) => {
+          return <></>;
+        },
+        header: () => <FieldHeader name={"action"} />,
+        accessorKey: "action",
+        sortingFn: (a: any, b: any): number =>
+          compareByStringAndNumber(
+            a?.original?.storageUnitUsage?.cellNumber?.toString(),
+            b?.original?.storageUnitUsage?.cellNumber?.toString()
+          )
+      }
+    ];
+
   const METAGENOMICS_BATCH_ITEM_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
       id: "materialSampleName",
@@ -1206,7 +1322,9 @@ export function getMolecularAnalysisRunColumns(
   const MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP = {
     "seq-reaction": SEQ_REACTION_COLUMNS,
     "generic-molecular-analysis-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS,
-    "metagenomics-batch-item": METAGENOMICS_BATCH_ITEM_COLUMNS
+    "metagenomics-batch-item": METAGENOMICS_BATCH_ITEM_COLUMNS,
+    "generic-molecular-analysis-results":
+      GENERIC_MOLECULAR_ANALYSIS_RESULTS_COLUMNS
   };
   return MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP[type];
 }

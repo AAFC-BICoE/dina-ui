@@ -1165,5 +1165,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   qualityControlName: "Name:",
   qualityControlType: "Type:",
   collecting_event_tag_info:
-    "Suggestions are currently based on Material Sample tags."
+    "Suggestions are currently based on Material Sample tags.",
+  autoSelectButtonTitle: "Auto Select"
 };

@@ -9,9 +9,9 @@ import {
   ReactTable,
   useStringComparator
 } from "common-ui";
-import { Alert } from "react-bootstrap";
+import { Alert, DropdownButton } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { AttachmentsEditor } from "../../object-store/attachment-list/AttachmentsField";
 import { AttachmentReadOnlySection } from "../../object-store/attachment-list/AttachmentReadOnlySection";
@@ -19,32 +19,26 @@ import { getMolecularAnalysisRunColumns } from "../../molecular-analysis/useMole
 import { useIntl } from "react-intl";
 import { QualityControlSection } from "./QualityControlSection";
 import { useMemo } from "react";
-import { PersistedResource } from "kitsu";
 
-export interface MolecularAnalysisRunStepProps {
+export interface MolecularAnalysisResultsStepProps {
   molecularAnalysisId: string;
   molecularAnalysis: GenericMolecularAnalysis;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
-  onSaved: (
-    nextStep: number,
-    molecularAnalysisSaved?: PersistedResource<GenericMolecularAnalysis>
-  ) => Promise<void>;
 }
 
-export function MolecularAnalysisRunStep({
+export function MolecularAnalysisResultsStep({
   molecularAnalysisId,
   molecularAnalysis,
   editMode,
   setEditMode,
   performSave,
-  setPerformSave,
-  onSaved
-}: MolecularAnalysisRunStepProps) {
+  setPerformSave
+}: MolecularAnalysisResultsStepProps) {
   const { compareByStringAndNumber } = useStringComparator();
-  const { formatMessage } = useIntl();
+  const { formatMessage } = useDinaIntl();
 
   const {
     loading,
@@ -68,8 +62,7 @@ export function MolecularAnalysisRunStep({
     performSave,
     setPerformSave,
     molecularAnalysis,
-    molecularAnalysisId,
-    onSaved
+    molecularAnalysisId
   });
 
   // Table columns to display for the sequencing run.
@@ -77,9 +70,9 @@ export function MolecularAnalysisRunStep({
     () =>
       getMolecularAnalysisRunColumns(
         compareByStringAndNumber,
-        "generic-molecular-analysis-item",
-        setMolecularAnalysisRunItemNames,
-        !editMode
+        "generic-molecular-analysis-results",
+        undefined,
+        true
       ),
     [editMode]
   );
@@ -126,30 +119,16 @@ export function MolecularAnalysisRunStep({
       {editMode ||
       sequencingRunItems?.some((item) => item.molecularAnalysisRunItemId) ? (
         <div className="row mt-4">
-          <div className="col-4 mb-3">
-            <strong>
-              <DinaMessage id="molecularAnalysisRunStep_sequencingRun" />
-            </strong>
-            {editMode ? (
-              <input
-                className="form-control mt-1"
-                name="sequencingRunName"
-                value={sequencingRunName}
-                onChange={(newValue) =>
-                  setSequencingRunName(newValue.target.value ?? "")
-                }
-              />
-            ) : (
-              <p>{sequencingRunName}</p>
-            )}
+          <div className="col-12 d-flex justify-content-end">
+            <DropdownButton
+              title={formatMessage("autoSelectButtonTitle")}
+              children={undefined}
+            />
           </div>
           <div className="col-12 mt-3">
             <DinaForm initialValues={{}} readOnly={!editMode}>
               {/* Sequencing Run Content */}
               <div className="col-12 mb-3">
-                <strong>
-                  <DinaMessage id="molecularAnalysisRunStep_sequencingRunContent" />
-                </strong>
                 <ReactTable<SequencingRunItem>
                   className="-striped mt-2"
                   columns={COLUMNS}
@@ -157,41 +136,6 @@ export function MolecularAnalysisRunStep({
                   sort={[{ id: "wellCoordinates", desc: false }]}
                 />
               </div>
-
-              {/* Sequencing Quality Control */}
-              <QualityControlSection
-                qualityControls={qualityControls}
-                qualityControlTypes={qualityControlTypes}
-                editMode={editMode}
-                loading={loading}
-                updateQualityControl={updateQualityControl}
-                createNewQualityControl={createNewQualityControl}
-                deleteQualityControl={deleteQualityControl}
-              />
-
-              {/* Attachments */}
-              {editMode ? (
-                <AttachmentsEditor
-                  attachmentPath={``}
-                  name="attachments"
-                  onChange={setAttachments}
-                  value={attachments}
-                  title={
-                    <DinaMessage id="molecularAnalysisRunStep_attachments" />
-                  }
-                />
-              ) : (
-                <>
-                  {sequencingRunId && (
-                    <AttachmentReadOnlySection
-                      attachmentPath={`seqdb-api/molecular-analysis-run/${sequencingRunId}/attachments`}
-                      title={
-                        <DinaMessage id="molecularAnalysisRunStep_attachments" />
-                      }
-                    />
-                  )}
-                </>
-              )}
             </DinaForm>
           </div>
         </div>

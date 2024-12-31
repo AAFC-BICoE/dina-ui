@@ -21,6 +21,10 @@ export interface UseGenericMolecularAnalysisRunProps {
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
+  onSaved?: (
+    nextStep: number,
+    molecularAnalysisSaved?: PersistedResource<GenericMolecularAnalysis>
+  ) => Promise<void>;
 }
 
 /**
@@ -143,7 +147,8 @@ export function useGenericMolecularAnalysisRun({
   editMode,
   setEditMode,
   performSave,
-  setPerformSave
+  setPerformSave,
+  onSaved
 }: UseGenericMolecularAnalysisRunProps): UseGenericMolecularAnalysisRunReturn {
   const { bulkGet, save, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
@@ -910,6 +915,7 @@ export function useGenericMolecularAnalysisRun({
       } else {
         createNewRun();
       }
+      onSaved?.(4);
     }
   }, [performSave, loading]);
 

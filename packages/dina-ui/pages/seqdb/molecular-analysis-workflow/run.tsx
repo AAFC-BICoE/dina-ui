@@ -14,6 +14,7 @@ import { MolecularAnalysisDetailsStep } from "packages/dina-ui/components/seqdb/
 import { MolecularAnalysisSampleSelectionStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisSampleSelectionStep";
 import { MolecularAnalysisGridStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisGridStep";
 import { MolecularAnalysisRunStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisRunStep";
+import { MolecularAnalysisResultsStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisResultsStep";
 
 export default function MolecularAnalysisWorkflowRunPage() {
   const router = useRouter();
@@ -172,6 +173,9 @@ export default function MolecularAnalysisWorkflowRunPage() {
             {formatMessage("selectCoordinates")}
           </Tab>
           <Tab disabled={isDisabled(3, true)}>{formatMessage("runStep")}</Tab>
+          <Tab disabled={isDisabled(4, true)}>
+            {formatMessage("resultsStep")}
+          </Tab>
         </TabList>
         <TabPanel>
           <MolecularAnalysisDetailsStep
@@ -212,6 +216,19 @@ export default function MolecularAnalysisWorkflowRunPage() {
         <TabPanel>
           {molecularAnalysisId && molecularAnalysis.response?.data && (
             <MolecularAnalysisRunStep
+              molecularAnalysisId={molecularAnalysisId}
+              molecularAnalysis={molecularAnalysis.response.data}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+              onSaved={onSaved}
+            />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {molecularAnalysisId && molecularAnalysis.response?.data && (
+            <MolecularAnalysisResultsStep
               molecularAnalysisId={molecularAnalysisId}
               molecularAnalysis={molecularAnalysis.response.data}
               editMode={editMode}

@@ -201,5 +201,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   molecularAnalysis: "Molecular Analysis",
   metagenomicsWorkflowTitle: "Metagenomics Workflow",
   metagenomicsWorkflowName: "Metagenomics Workflow Name",
-  metagenomicsBatch: "Metagenomics Batch"
+  metagenomicsBatch: "Metagenomics Batch",
+  resultsStep: "Results"
 };
