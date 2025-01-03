@@ -9,9 +9,12 @@ import {
 } from "react";
 import {
   BulkGetOptions,
+  DeleteButton,
+  EditButton,
   FieldHeader,
   filterBy,
   SaveArgs,
+  SettingsButton,
   useApiClient,
   useQuery,
   useStringComparator
@@ -36,6 +39,7 @@ import {
 } from "./useMetagenomicsWorkflowMolecularAnalysisRun";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 import useVocabularyOptions from "../collection/useVocabularyOptions";
+import { SplitMaterialSampleDropdownButton } from "../collection/material-sample/SplitMaterialSampleDropdownButton";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -861,6 +865,7 @@ export function getMolecularAnalysisRunColumns(
   >,
   readOnly?: boolean
 ) {
+  const { save } = useApiClient();
   // Table columns to display for the sequencing run.
   const SEQ_REACTION_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
@@ -1195,7 +1200,54 @@ export function getMolecularAnalysisRunColumns(
       {
         id: "action",
         cell: ({ row: { original } }) => {
-          return <></>;
+          return (
+            <div className="settings-button-container">
+              <SettingsButton
+                menuItems={[
+                  <EditButton
+                    entityId={original.materialSampleId ?? ""}
+                    entityLink="collection/material-sample"
+                    style={{ width: "10rem" }}
+                    key={0}
+                  />,
+                  <SplitMaterialSampleDropdownButton
+                    ids={[original.materialSampleId ?? ""]}
+                    disabled={
+                      !original.materialSampleSummary?.materialSampleName
+                    }
+                    style={{ width: "10rem" }}
+                    key={1}
+                  />,
+                  <DeleteButton
+                    key={2}
+                    id={original.materialSampleId}
+                    options={{ apiBaseUrl: "/collection-api" }}
+                    postDeleteRedirect="/collection/material-sample/list"
+                    type="material-sample"
+                    style={{ width: "10rem" }}
+                    onDeleted={async () => {
+                      // Delete storageUnitUsage if there is one linked
+                      if (original.storageUnitUsage?.id) {
+                        await save<StorageUnitUsage>(
+                          [
+                            {
+                              delete: {
+                                id: original.storageUnitUsage?.id ?? null,
+                                type: "storage-unit-usage"
+                              }
+                            }
+                          ],
+                          {
+                            apiBaseUrl: "/collection-api"
+                          }
+                        );
+                      }
+                    }}
+                  />
+                ]}
+              />
+            </div>
+          );
         },
         header: () => <FieldHeader name={"action"} />,
         accessorKey: "action",

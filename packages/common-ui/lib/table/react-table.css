@@ -36,7 +36,6 @@
 .ReactTable td {
   text-overflow: ellipsis;
   padding: 7px 5px;
-  overflow: hidden;
   transition: 0.3s ease;
   transition-property: width, min-width, padding, opacity;
   white-space: normal;

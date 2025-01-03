@@ -4,7 +4,7 @@ import { writeStorage } from "@rehooks/local-storage";
 import { BULK_SPLIT_IDS, Tooltip, useAccount, useQuery } from "common-ui";
 import Dropdown from "react-bootstrap/Dropdown";
 import Select from "react-select";
-import React, { useState } from "react";
+import React, { CSSProperties, useState } from "react";
 import Button from "react-bootstrap/Button";
 import { SplitConfiguration } from "../../../types/collection-api/resources/SplitConfiguration";
 
@@ -26,13 +26,15 @@ interface SplitMaterialSampleDropdownButtonProps {
   disabled: boolean;
   materialSampleType?: string;
   className?: string;
+  style?: CSSProperties;
 }
 
 export function SplitMaterialSampleDropdownButton({
   ids,
   disabled,
   materialSampleType,
-  className
+  className,
+  style
 }: SplitMaterialSampleDropdownButtonProps) {
   const router = useRouter();
   const { groupNames, username } = useAccount();
@@ -157,7 +159,7 @@ export function SplitMaterialSampleDropdownButton({
     />
   ) : (
     <Dropdown>
-      <Dropdown.Toggle className={className ? className : "me-2"}>
+      <Dropdown.Toggle className={className ? className : "me-2"} style={style}>
         <DinaMessage id="splitButton" />
       </Dropdown.Toggle>
       <Dropdown.Menu as={CustomMenu} />
