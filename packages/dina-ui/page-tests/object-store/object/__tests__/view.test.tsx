@@ -2,9 +2,7 @@ import { PersistedResource } from "kitsu";
 import MetadataViewPage from "../../../../pages/object-store/object/view";
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
-import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import userEvent from "@testing-library/user-event";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2"],
