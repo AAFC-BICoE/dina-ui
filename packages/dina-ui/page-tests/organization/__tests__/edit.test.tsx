@@ -4,9 +4,8 @@ import OrganizationEditPage, {
 } from "../../../pages/organization/edit";
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { Organization } from "../../../types/agent-api/resources/Organization";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import userEvent from "@testing-library/user-event";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
