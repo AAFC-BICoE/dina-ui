@@ -1,8 +1,10 @@
 import { OperationsResponse } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import PersonEditPage from "../../../pages/person/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/agent-api/resources/Person";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -48,7 +50,7 @@ describe("person edit page", () => {
         {
           data: {
             attributes: {
-              displayName: "test agemt",
+              displayName: "test agent",
               email: "testperson@a.b"
             },
             id: "1",
@@ -61,13 +63,15 @@ describe("person edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<PersonEditPage />, { apiContext });
 
-    expect(wrapper.find(".displayName-field input")).toHaveLength(1);
+    // expect(wrapper.find(".displayName-field input")).toHaveLength(1);
+    expect(
+      wrapper.getAllByRole("textbox", { name: /display name/i })
+    ).toHaveLength(1);
 
     // Edit the displayName.
-
-    wrapper.find(".displayName-field input").simulate("change", {
+    fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
       target: {
         name: "person",
         value: "test person updated"
@@ -75,9 +79,10 @@ describe("person edit page", () => {
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
     await new Promise(setImmediate);
 
+    // Test expected response
     expect(mockPatch).lastCalledWith(
       "/agent-api/operations",
       [
@@ -116,27 +121,29 @@ describe("person edit page", () => {
 
     mockQuery = { id: 1 };
 
-    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<PersonEditPage />, { apiContext });
 
     // The page should load initially with a loading spinner.
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check that the existing displayName value is in the field.
-    expect(wrapper.find(".displayName-field input").prop("value")).toEqual(
-      "person a"
-    );
+    expect(
+      wrapper.getByRole("textbox", { name: /display name/i })
+    ).toHaveDisplayValue("person a");
 
     // Modify the displayName value.
-    wrapper.find(".displayName-field input").simulate("change", {
-      target: { name: "displayName", value: "new test person" }
+    fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
+      target: {
+        name: "displayName",
+        value: "new test person"
+      }
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
@@ -183,17 +190,19 @@ describe("person edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<PersonEditPage />, { apiContext });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
-    wrapper.update();
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: displayName and email combination should be unique"
-    );
+    // Test expected error
+    expect(
+      wrapper.getByText(
+        "Constraint violation: displayName and email combination should be unique"
+      )
+    ).toBeInTheDocument();
     expect(mockPush).toBeCalledTimes(0);
   });
 });
