@@ -863,7 +863,8 @@ export function getMolecularAnalysisRunColumns(
   setMolecularAnalysisRunItemNames?: Dispatch<
     SetStateAction<Record<string, string>>
   >,
-  readOnly?: boolean
+  readOnly?: boolean,
+  performAttachRunItemResult?: boolean
 ) {
   const { save } = useApiClient();
   // Table columns to display for the sequencing run.
@@ -1187,6 +1188,9 @@ export function getMolecularAnalysisRunColumns(
       {
         id: "resultAttachment",
         cell: ({ row: { original } }) => {
+          if (performAttachRunItemResult) {
+            // Make request to find object-store/metadata with originalFilename matching run item name
+          }
           return <></>;
         },
         header: () => <FieldHeader name={"resultAttachment"} />,

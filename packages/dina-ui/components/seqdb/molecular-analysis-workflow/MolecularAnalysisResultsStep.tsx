@@ -9,7 +9,7 @@ import {
   ReactTable,
   useStringComparator
 } from "common-ui";
-import { Alert, DropdownButton } from "react-bootstrap";
+import { Alert, Dropdown, DropdownButton } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
@@ -18,7 +18,7 @@ import { AttachmentReadOnlySection } from "../../object-store/attachment-list/At
 import { getMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
 import { useIntl } from "react-intl";
 import { QualityControlSection } from "./QualityControlSection";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export interface MolecularAnalysisResultsStepProps {
   molecularAnalysisId: string;
@@ -39,6 +39,8 @@ export function MolecularAnalysisResultsStep({
 }: MolecularAnalysisResultsStepProps) {
   const { compareByStringAndNumber } = useStringComparator();
   const { formatMessage } = useDinaIntl();
+  const [performAttachRunItemResult, setPerformAttachRunItemResult] =
+    useState<boolean>(false);
 
   const {
     loading,
@@ -72,9 +74,10 @@ export function MolecularAnalysisResultsStep({
         compareByStringAndNumber,
         "generic-molecular-analysis-results",
         undefined,
-        true
+        true,
+        performAttachRunItemResult
       ),
-    [editMode]
+    [editMode, performAttachRunItemResult]
   );
 
   // Display loading if network requests from hook are still loading in...
@@ -120,10 +123,15 @@ export function MolecularAnalysisResultsStep({
       sequencingRunItems?.some((item) => item.molecularAnalysisRunItemId) ? (
         <div className="row mt-4">
           <div className="col-12 d-flex justify-content-end">
-            <DropdownButton
-              title={formatMessage("autoSelectButtonTitle")}
-              children={undefined}
-            />
+            <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
+              <Dropdown.Item
+                onClick={() => {
+                  setPerformAttachRunItemResult(true);
+                }}
+              >
+                <DinaMessage id="attachmentsBasedOnItemNameButton" />
+              </Dropdown.Item>
+            </DropdownButton>
           </div>
           <div className="col-12 mt-3">
             <DinaForm initialValues={{}} readOnly={!editMode}>
