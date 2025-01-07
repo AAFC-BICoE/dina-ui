@@ -12,6 +12,7 @@ import UploadPage, {
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 const mockPush = jest.fn();
 const mockFormatMessage = jest.fn();
@@ -46,21 +47,37 @@ describe("Upload page", () => {
         data: {
           dateTimeDigitized: "2003-12-14T12:01:44",
           fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-          fileType: "image",
+          fileType: "text",
           size: "500"
         }
       };
     });
 
     const mockSave = jest.fn((ops) =>
-      ops.map((op) => ({
+      ops.map((op, index) => ({
         ...op.resource,
-        id: "11111111-1111-1111-1111-111111111111"
+        id: String(index)
       }))
     );
+    const mockGet = jest.fn((path) => {
+      if (path === "objectstore-api/config/file-upload") {
+        return {
+          data: {
+            id: "file-upload",
+            type: "config",
+            attributes: {
+              "max-request-size": "1000MB",
+              "max-file-size": "1000MB"
+            }
+          }
+        };
+      }
+    });
     const mockApiCtx = {
       apiClient: {
+        get: mockGet,
         axios: {
+          get: mockGet,
           post: mockPost
         }
       },
@@ -73,31 +90,29 @@ describe("Upload page", () => {
     });
 
     // Pretend the FileUploader is uploading these files:
-    const mockAcceptedFiles: Partial<IFileWithMeta>[] = [
-      {
-        file: { name: "file1.pdf", type: "application/pdf" } as File,
-        meta: { lastModifiedDate: "2019-08-28T20:37:21.502Z" } as IMeta
-      },
-      {
-        file: { name: "file2.pdf", type: "application/pdf" } as File,
-        meta: { lastModifiedDate: "2019-08-29T20:37:21.502Z" } as IMeta
-      },
-      {
-        file: { name: "file3.pdf", type: "application/pdf" } as File,
-        meta: { lastModifiedDate: "2019-08-30T20:37:21.502Z" } as IMeta
-      }
+    const mockAcceptedFiles = [
+      new File(["file content"], "file1.pdf", { type: "application/pdf" }),
+      new File(["file content"], "file2.pdf", { type: "application/pdf" }),
+      new File(["file content"], "file3.pdf", { type: "application/pdf" })
     ];
+    await new Promise(setImmediate);
 
-    screen.logTestingPlaygroundURL();
+    // Find the file input in the Dropzone component
+    const fileInput = screen.getByLabelText(/drag and drop files here/i);
 
-    // Call the onSubmit function with uploaded files:
-    wrapper.find(FileUploader).prop<OnFormikSubmit>("onSubmit")(
-      {
-        acceptedFiles: mockAcceptedFiles,
-        group: "example-group"
-      },
-      null as any
-    );
+    // Mock the `FileList` containing the files:
+    Object.defineProperty(fileInput, "files", {
+      value: mockAcceptedFiles
+    });
+
+    // Simulate the file selection
+    fireEvent.change(fileInput);
+
+    // Await the processing of the file uploads
+    await new Promise(setImmediate);
+
+    // Submit
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     await new Promise(setImmediate);
 
