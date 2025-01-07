@@ -33,9 +33,6 @@ export default function MolecularAnalysisWorkflowRunPage() {
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
 
-  // Request completion to be performed.
-  const [performComplete, setPerformComplete] = useState<boolean>(false);
-
   // Used to determine if the molecular analysis needs to be reloaded.
   const [reloadMolecularAnalysis, setReloadMolecularAnalysis] =
     useState<number>(Date.now());
@@ -125,14 +122,16 @@ export default function MolecularAnalysisWorkflowRunPage() {
           </Button>
         </>
       ) : (
-        <Button
-          variant={"primary"}
-          className="ms-auto"
-          onClick={() => setEditMode(true)}
-          style={{ width: "10rem", marginRight: "15px" }}
-        >
-          <SeqdbMessage id="editButtonText" />
-        </Button>
+        currentStep !== 4 && (
+          <Button
+            variant={"primary"}
+            className="ms-auto"
+            onClick={() => setEditMode(true)}
+            style={{ width: "10rem", marginRight: "15px" }}
+          >
+            <SeqdbMessage id="editButtonText" />
+          </Button>
+        )
       )}
     </>
   );

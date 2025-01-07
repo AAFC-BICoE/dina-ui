@@ -9,8 +9,8 @@ import {
 } from "react";
 import {
   BulkGetOptions,
-  DeleteButton,
-  EditButton,
+  DeleteArgs,
+  DoOperationsOptions,
   FieldHeader,
   filterBy,
   SaveArgs,
@@ -39,7 +39,6 @@ import {
 } from "./useMetagenomicsWorkflowMolecularAnalysisRun";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 import useVocabularyOptions from "../collection/useVocabularyOptions";
-import { SplitMaterialSampleDropdownButton } from "../collection/material-sample/SplitMaterialSampleDropdownButton";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -267,12 +266,12 @@ export function useMolecularAnalysisRun({
     useState<Record<string, string>>({});
 
   const columns = useMemo(() => {
-    return getMolecularAnalysisRunColumns(
+    return getMolecularAnalysisRunColumns({
       compareByStringAndNumber,
-      "seq-reaction",
+      type: "seq-reaction",
       setMolecularAnalysisRunItemNames,
-      !editMode
-    );
+      readOnly: !editMode
+    });
   }, [editMode]);
 
   // Used to display if the network calls are still in progress.
@@ -735,12 +734,11 @@ export function useMolecularAnalysisRunView({
           (runItem) => runItem.usageType !== "quality-control"
         )?.[0].usageType;
         setColumns(
-          getMolecularAnalysisRunColumns(
+          getMolecularAnalysisRunColumns({
             compareByStringAndNumber,
-            usageType,
-            undefined,
-            true
-          )
+            type: usageType,
+            readOnly: true
+          })
         );
 
         if (usageType === "seq-reaction") {
@@ -857,16 +855,26 @@ export function useMolecularAnalysisRunView({
   };
 }
 
-export function getMolecularAnalysisRunColumns(
-  compareByStringAndNumber,
-  type,
+interface GetMolecularAnalysisRunColumnsProps {
+  compareByStringAndNumber: (a?: string | null, b?: string | null) => number;
+  type: string;
   setMolecularAnalysisRunItemNames?: Dispatch<
     SetStateAction<Record<string, string>>
-  >,
-  readOnly?: boolean,
-  performAttachRunItemResult?: boolean
-) {
-  const { save } = useApiClient();
+  >;
+  readOnly?: boolean;
+  save?: <TData extends KitsuResource = KitsuResource>(
+    args: (SaveArgs | DeleteArgs)[],
+    options?: DoOperationsOptions
+  ) => Promise<PersistedResource<TData>[]>;
+}
+
+export function getMolecularAnalysisRunColumns({
+  compareByStringAndNumber,
+  type,
+  setMolecularAnalysisRunItemNames,
+  readOnly,
+  save
+}: GetMolecularAnalysisRunColumnsProps) {
   // Table columns to display for the sequencing run.
   const SEQ_REACTION_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
@@ -1188,9 +1196,6 @@ export function getMolecularAnalysisRunColumns(
       {
         id: "resultAttachment",
         cell: ({ row: { original } }) => {
-          if (performAttachRunItemResult) {
-            // Make request to find object-store/metadata with originalFilename matching run item name
-          }
           return <></>;
         },
         header: () => <FieldHeader name={"resultAttachment"} />,
@@ -1208,46 +1213,30 @@ export function getMolecularAnalysisRunColumns(
             <div className="settings-button-container">
               <SettingsButton
                 menuItems={[
-                  <EditButton
-                    entityId={original.materialSampleId ?? ""}
-                    entityLink="collection/material-sample"
-                    style={{ width: "10rem" }}
-                    key={0}
-                  />,
-                  <SplitMaterialSampleDropdownButton
-                    ids={[original.materialSampleId ?? ""]}
-                    disabled={
-                      !original.materialSampleSummary?.materialSampleName
-                    }
-                    style={{ width: "10rem" }}
-                    key={1}
-                  />,
-                  <DeleteButton
-                    key={2}
-                    id={original.materialSampleId}
-                    options={{ apiBaseUrl: "/collection-api" }}
-                    postDeleteRedirect="/collection/material-sample/list"
-                    type="material-sample"
-                    style={{ width: "10rem" }}
-                    onDeleted={async () => {
-                      // Delete storageUnitUsage if there is one linked
-                      if (original.storageUnitUsage?.id) {
-                        await save<StorageUnitUsage>(
-                          [
-                            {
-                              delete: {
-                                id: original.storageUnitUsage?.id ?? null,
-                                type: "storage-unit-usage"
-                              }
-                            }
-                          ],
-                          {
-                            apiBaseUrl: "/collection-api"
-                          }
-                        );
-                      }
+                  <button
+                    className={`btn btn-primary`}
+                    style={{
+                      paddingLeft: "15px",
+                      paddingRight: "15px",
+                      width: "6rem"
                     }}
-                  />
+                    type="button"
+                    key={0}
+                  >
+                    <DinaMessage id="addButtonText" />
+                  </button>,
+                  <button
+                    className={`btn btn-danger delete-button`}
+                    style={{
+                      paddingLeft: "15px",
+                      paddingRight: "15px",
+                      width: "6rem"
+                    }}
+                    type="button"
+                    key={1}
+                  >
+                    <DinaMessage id="removeButtonText" />
+                  </button>
                 ]}
               />
             </div>

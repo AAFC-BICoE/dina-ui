@@ -3,9 +3,7 @@ import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/molecu
 import { useEffect, useMemo, useState } from "react";
 import {
   BulkGetOptions,
-  FieldHeader,
   filterBy,
-  rsql,
   SaveArgs,
   useApiClient,
   useQuery,
@@ -239,12 +237,12 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
     useState<Record<string, string>>({});
 
   const columns = useMemo(() => {
-    return getMolecularAnalysisRunColumns(
+    return getMolecularAnalysisRunColumns({
       compareByStringAndNumber,
-      "metagenomics-batch-item",
+      type: "metagenomics-batch-item",
       setMolecularAnalysisRunItemNames,
-      !editMode
-    );
+      readOnly: !editMode
+    });
   }, [editMode]);
 
   // Used to display if the network calls are still in progress.

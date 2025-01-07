@@ -75,12 +75,12 @@ export function MolecularAnalysisRunStep({
   // Table columns to display for the sequencing run.
   const COLUMNS: ColumnDef<SequencingRunItem>[] = useMemo(
     () =>
-      getMolecularAnalysisRunColumns(
+      getMolecularAnalysisRunColumns({
         compareByStringAndNumber,
-        "generic-molecular-analysis-item",
+        type: "generic-molecular-analysis-item",
         setMolecularAnalysisRunItemNames,
-        !editMode
-      ),
+        readOnly: !editMode
+      }),
     [editMode]
   );
 

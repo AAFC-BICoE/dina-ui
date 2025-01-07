@@ -4,21 +4,17 @@ import {
 } from "./useGenericMolecularAnalysisRun";
 import {
   DinaForm,
-  FieldHeader,
   LoadingSpinner,
   ReactTable,
+  useApiClient,
   useStringComparator
 } from "common-ui";
 import { Alert, Dropdown, DropdownButton } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { AttachmentsEditor } from "../../object-store/attachment-list/AttachmentsField";
-import { AttachmentReadOnlySection } from "../../object-store/attachment-list/AttachmentReadOnlySection";
 import { getMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
-import { useIntl } from "react-intl";
-import { QualityControlSection } from "./QualityControlSection";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export interface MolecularAnalysisResultsStepProps {
   molecularAnalysisId: string;
@@ -39,45 +35,27 @@ export function MolecularAnalysisResultsStep({
 }: MolecularAnalysisResultsStepProps) {
   const { compareByStringAndNumber } = useStringComparator();
   const { formatMessage } = useDinaIntl();
-  const [performAttachRunItemResult, setPerformAttachRunItemResult] =
-    useState<boolean>(false);
-
-  const {
-    loading,
-    errorMessage,
-    multipleRunWarning,
-    setSequencingRunName,
-    sequencingRunName,
-    sequencingRunItems,
-    qualityControls,
-    qualityControlTypes,
-    createNewQualityControl,
-    deleteQualityControl,
-    updateQualityControl,
-    attachments,
-    setAttachments,
-    sequencingRunId,
-    setMolecularAnalysisRunItemNames
-  } = useGenericMolecularAnalysisRun({
-    editMode,
-    setEditMode,
-    performSave,
-    setPerformSave,
-    molecularAnalysis,
-    molecularAnalysisId
-  });
+  const { save } = useApiClient();
+  const { loading, errorMessage, multipleRunWarning, sequencingRunItems } =
+    useGenericMolecularAnalysisRun({
+      editMode,
+      setEditMode,
+      performSave,
+      setPerformSave,
+      molecularAnalysis,
+      molecularAnalysisId
+    });
 
   // Table columns to display for the sequencing run.
   const COLUMNS: ColumnDef<SequencingRunItem>[] = useMemo(
     () =>
-      getMolecularAnalysisRunColumns(
+      getMolecularAnalysisRunColumns({
         compareByStringAndNumber,
-        "generic-molecular-analysis-results",
-        undefined,
-        true,
-        performAttachRunItemResult
-      ),
-    [editMode, performAttachRunItemResult]
+        type: "generic-molecular-analysis-results",
+        readOnly: true,
+        save
+      }),
+    [editMode]
   );
 
   // Display loading if network requests from hook are still loading in...
@@ -124,11 +102,7 @@ export function MolecularAnalysisResultsStep({
         <div className="row mt-4">
           <div className="col-12 d-flex justify-content-end">
             <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
-              <Dropdown.Item
-                onClick={() => {
-                  setPerformAttachRunItemResult(true);
-                }}
-              >
+              <Dropdown.Item>
                 <DinaMessage id="attachmentsBasedOnItemNameButton" />
               </Dropdown.Item>
             </DropdownButton>
@@ -141,7 +115,7 @@ export function MolecularAnalysisResultsStep({
                   className="-striped mt-2"
                   columns={COLUMNS}
                   data={sequencingRunItems ?? []}
-                  sort={[{ id: "wellCoordinates", desc: false }]}
+                  sort={[{ id: "materialSampleName", desc: false }]}
                 />
               </div>
             </DinaForm>

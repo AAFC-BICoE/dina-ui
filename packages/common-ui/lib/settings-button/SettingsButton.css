@@ -39,15 +39,15 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 9500;
   margin-top: 4px; /* Slight gap below the button */
-  width: 12rem;
 }
 
 /* SettingsButton dropdown item*/
 .settings-dropdown-item {
-  display: block;
+  display: flex; /* Use flexbox for alignment */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
   width: 100%;
   padding: 8px 16px;
-  text-align: left;
   background: none;
   border: none;
   cursor: pointer;

@@ -670,6 +670,8 @@ export function useGenericMolecularAnalysisRun({
       setPerformSave(false);
       setEditMode(false);
       setLoading(false);
+
+      await onSaved?.(4);
     } catch (error) {
       console.error("Error creating a new sequencing run: ", error);
       setPerformSave(false);
@@ -862,6 +864,7 @@ export function useGenericMolecularAnalysisRun({
       setEditMode(false);
       setLoading(false);
       setReloadGenericMolecularAnalysisRun(Date.now());
+      await onSaved?.(4);
     } catch (error) {
       console.error("Error updating sequencing run: ", error);
       setPerformSave(false);
@@ -915,7 +918,6 @@ export function useGenericMolecularAnalysisRun({
       } else {
         createNewRun();
       }
-      onSaved?.(4);
     }
   }, [performSave, loading]);
 

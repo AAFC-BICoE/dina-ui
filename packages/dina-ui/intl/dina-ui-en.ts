@@ -1167,5 +1167,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collecting_event_tag_info:
     "Suggestions are currently based on Material Sample tags.",
   autoSelectButtonTitle: "Auto Select",
-  attachmentsBasedOnItemNameButton: "Attachments based on item name"
+  attachmentsBasedOnItemNameButton: "Attachments based on item name",
+  addButtonText: "Add",
+  removeButtonText: "Remove"
 };
