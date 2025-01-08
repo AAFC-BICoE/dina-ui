@@ -697,7 +697,7 @@ export function useMolecularAnalysisRunView({
             .filter((runItem) => runItem.usageType !== "quality-control")
             .map(
               (molecularAnalysisRunItem) =>
-                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
             );
           const genericMolecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
             [];
@@ -711,6 +711,7 @@ export function useMolecularAnalysisRunView({
           }
           return genericMolecularAnalysisItems;
         }
+
         async function fetchMetagenomicsBatchItems() {
           const fetchPaths = molecularAnalysisRunItems.map(
             (molecularAnalysisRunItem) =>
@@ -729,7 +730,13 @@ export function useMolecularAnalysisRunView({
 
         const usageType = molecularAnalysisRunItems.filter(
           (runItem) => runItem.usageType !== "quality-control"
-        )?.[0].usageType;
+        )?.[0]?.usageType;
+
+        if (!usageType) {
+          setLoading(false);
+          return;
+        }
+
         setColumns(
           getMolecularAnalysisRunColumns(
             compareByStringAndNumber,
@@ -740,7 +747,8 @@ export function useMolecularAnalysisRunView({
         );
 
         if (usageType === "seq-reaction") {
-          const seqReactions = await fetchSeqReactions();
+          let seqReactions = await fetchSeqReactions();
+          seqReactions = seqReactions.filter((item) => item !== undefined);
 
           // Chain it all together to create one object.
           let sequencingRunItemsChain = attachSeqReaction(seqReactions);
@@ -762,22 +770,30 @@ export function useMolecularAnalysisRunView({
           setSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
         } else if (usageType === "generic-molecular-analysis-item") {
-          const genericMolecularAnalysisItems =
+          let genericMolecularAnalysisItems =
             await fetchGenericMolecularAnalysisItems();
+          genericMolecularAnalysisItems = genericMolecularAnalysisItems.filter(
+            (item) => item !== undefined
+          );
+
           let sequencingRunItemsChain = attachGenericMolecularAnalysisItems(
             genericMolecularAnalysisItems
           );
+
           sequencingRunItemsChain = await attachStorageUnitUsage(
             sequencingRunItemsChain,
             bulkGet
           );
+
           sequencingRunItemsChain = await attachMaterialSampleSummary(
             sequencingRunItemsChain,
             bulkGet
           );
+
           const qualityControlRunItems = molecularAnalysisRunItems.filter(
             (runItem) => runItem.usageType === "quality-control"
           );
+
           // Get quality controls
           if (qualityControlRunItems && qualityControlRunItems?.length > 0) {
             const newQualityControls: QualityControl[] = [];
@@ -811,11 +827,15 @@ export function useMolecularAnalysisRunView({
 
             setQualityControls(newQualityControls);
           }
+
           // All finished loading.
           setSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
         } else if (usageType === "metagenomics-batch-item") {
-          const metagenomicsBatchItems = await fetchMetagenomicsBatchItems();
+          let metagenomicsBatchItems = await fetchMetagenomicsBatchItems();
+          metagenomicsBatchItems = metagenomicsBatchItems.filter(
+            (item) => item !== undefined
+          );
 
           // Chain it all together to create one object.
           let sequencingRunItemsChain = attachMetagenomicsBatchItem(
