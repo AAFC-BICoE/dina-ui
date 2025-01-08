@@ -902,19 +902,7 @@ export function getMolecularAnalysisRunColumns(
             defaultValue={original.molecularAnalysisRunItem?.name}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setMolecularAnalysisRunItemNames?.(
-                (molecularAnalysisRunItemNames) => {
-                  const molecularAnalysisRunItemNamesMap =
-                    molecularAnalysisRunItemNames;
-                  if (
-                    original?.materialSampleSummary?.id &&
-                    event.target.value
-                  ) {
-                    molecularAnalysisRunItemNamesMap[
-                      original?.materialSampleSummary?.id
-                    ] = event.target.value;
-                  }
-                  return molecularAnalysisRunItemNamesMap;
-                }
+                handleMolecularAnalysisRunItemNames(original, event)
               );
             }}
           />
@@ -1015,19 +1003,7 @@ export function getMolecularAnalysisRunColumns(
             defaultValue={original.molecularAnalysisRunItem?.name}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setMolecularAnalysisRunItemNames?.(
-                (molecularAnalysisRunItemNames) => {
-                  const molecularAnalysisRunItemNamesMap =
-                    molecularAnalysisRunItemNames;
-                  if (
-                    original?.materialSampleSummary?.id &&
-                    event.target.value
-                  ) {
-                    molecularAnalysisRunItemNamesMap[
-                      original?.materialSampleSummary?.id
-                    ] = event.target.value;
-                  }
-                  return molecularAnalysisRunItemNamesMap;
-                }
+                handleMolecularAnalysisRunItemNames(original, event)
               );
             }}
           />
@@ -1128,19 +1104,7 @@ export function getMolecularAnalysisRunColumns(
             defaultValue={original.molecularAnalysisRunItem?.name}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setMolecularAnalysisRunItemNames?.(
-                (molecularAnalysisRunItemNames) => {
-                  const molecularAnalysisRunItemNamesMap =
-                    molecularAnalysisRunItemNames;
-                  if (
-                    original?.materialSampleSummary?.id &&
-                    event.target.value
-                  ) {
-                    molecularAnalysisRunItemNamesMap[
-                      original?.materialSampleSummary?.id
-                    ] = event.target.value;
-                  }
-                  return molecularAnalysisRunItemNamesMap;
-                }
+                handleMolecularAnalysisRunItemNames(original, event)
               );
             }}
           />
@@ -1209,4 +1173,18 @@ export function getMolecularAnalysisRunColumns(
     "metagenomics-batch-item": METAGENOMICS_BATCH_ITEM_COLUMNS
   };
   return MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP[type];
+
+  function handleMolecularAnalysisRunItemNames(
+    original: SequencingRunItem,
+    event: ChangeEvent<HTMLInputElement>
+  ): SetStateAction<Record<string, string>> {
+    return (molecularAnalysisRunItemNames) => {
+      const molecularAnalysisRunItemNamesMap = molecularAnalysisRunItemNames;
+      if (original?.materialSampleSummary?.id) {
+        molecularAnalysisRunItemNamesMap[original?.materialSampleSummary?.id] =
+          event.target.value;
+      }
+      return molecularAnalysisRunItemNamesMap;
+    };
+  }
 }
