@@ -10,7 +10,9 @@ import { ReactNode } from "react";
 function MockInstanceContextProvider({ children }: { children: ReactNode }) {
   const instanceJson: InstanceContextI = {
     supportedLanguages: "en,fr",
-    instanceMode: "developer"
+    instanceMode: "developer",
+    instanceName: "",
+    supportedGeographicReferences: ""
   };
 
   return (

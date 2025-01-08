@@ -2,8 +2,11 @@ import { OperationsResponse } from "common-ui";
 import OrganizationEditPage, {
   trimAliases
 } from "../../../pages/organization/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { Organization } from "../../../types/agent-api/resources/Organization";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
+
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
@@ -67,16 +70,19 @@ describe("organization edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<OrganizationEditPage />, {
+    const wrapper = mountWithAppContext2(<OrganizationEditPage />, {
       apiContext
     });
 
-    expect(wrapper.find(".nameEN input")).toHaveLength(1);
-    expect(wrapper.find(".nameFR input")).toHaveLength(1);
+    expect(
+      wrapper.getAllByRole("textbox", { name: /english name/i })
+    ).toHaveLength(1);
+    expect(
+      wrapper.getAllByRole("textbox", { name: /french name/i })
+    ).toHaveLength(1);
 
     // Edit the name.
-
-    wrapper.find(".nameEN input").simulate("change", {
+    fireEvent.change(wrapper.getByRole("textbox", { name: /english name/i }), {
       target: {
         name: "name.EN",
         value: "test org new"
@@ -84,7 +90,7 @@ describe("organization edit page", () => {
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
     await new Promise(setImmediate);
 
     expect(mockPatch).lastCalledWith(
@@ -127,31 +133,31 @@ describe("organization edit page", () => {
 
     mockQuery = { id: 1 };
 
-    const wrapper = mountWithAppContext(<OrganizationEditPage />, {
+    const wrapper = mountWithAppContext2(<OrganizationEditPage />, {
       apiContext
     });
 
     // The page should load initially with a loading spinner.
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check that the existing aliases value is in the field.
-
-    expect(wrapper.find(".aliases-field input").prop("value")).toEqual([
-      "DEW",
-      "ACE"
-    ]);
+    expect(
+      wrapper.getByRole("textbox", { name: /aliases/i })
+    ).toHaveDisplayValue("DEW,ACE");
 
     // Modify the aliases value.
-    wrapper.find(".aliases-field input").simulate("change", {
-      target: { name: "aliases", value: "DEW" }
+    fireEvent.change(wrapper.getByRole("textbox", { name: /aliases/i }), {
+      target: {
+        name: "aliases",
+        value: "DEW"
+      }
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
@@ -198,18 +204,17 @@ describe("organization edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<OrganizationEditPage />, {
+    const wrapper = mountWithAppContext2(<OrganizationEditPage />, {
       apiContext
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: Name should not be blank"
-    );
+
+    // Test expected error
+    expect(wrapper.getByText("Constraint violation: Name should not be blank"));
     expect(mockPush).toBeCalledTimes(0);
   });
 });

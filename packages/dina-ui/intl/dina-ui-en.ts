@@ -855,6 +855,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   columnSelector_selectManagedAttribute: "Select managed attribute:",
   columnSelector_selectClassification: "Select classification:",
   columnSelector_addColumnButton: "Add Column",
+  field_columnFunction: "Functions",
+  CONCAT: "Concatenate",
+  CONVERT_COORDINATES_DD: "Coordinates to Decimal Degrees",
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
   selectRuleSet: "Select Rule Set",
@@ -1165,5 +1168,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   qualityControlName: "Name:",
   qualityControlType: "Type:",
   collecting_event_tag_info:
-    "Suggestions are currently based on Material Sample tags."
+    "Suggestions are currently based on Material Sample tags.",
+  selectFunctionToUse: "Select function to use",
+  selectFieldToUseWithFunction: "Select a field to use with the function"
 };

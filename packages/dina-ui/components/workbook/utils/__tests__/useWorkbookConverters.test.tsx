@@ -486,28 +486,36 @@ describe("useWorkbookConverters", () => {
         showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
-        numOfUniqueValues: 100
+        numOfUniqueValues: 100,
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       attr2: {
         fieldPath: "attr2",
         showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
-        numOfUniqueValues: 100
+        numOfUniqueValues: 100,
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       attr3: {
         fieldPath: "attr3",
         showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
-        numOfUniqueValues: 100
+        numOfUniqueValues: 100,
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       attr4: {
         fieldPath: "attr4",
         showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
-        numOfUniqueValues: 100
+        numOfUniqueValues: 100,
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       "objectAttr1.name1": {
         fieldPath: "objectAttr1.name1",
@@ -516,7 +524,9 @@ describe("useWorkbookConverters", () => {
         valueMapping: {
           name1: { id: "id-name1", type: "object-field" }
         },
-        numOfUniqueValues: 1
+        numOfUniqueValues: 1,
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       "objectArray1.name1": {
         fieldPath: "objectAttr1.name1",
@@ -525,7 +535,9 @@ describe("useWorkbookConverters", () => {
         valueMapping: {
           name1: { id: "id-name1", type: "object-field" }
         },
-        numOfUniqueValues: 1
+        numOfUniqueValues: 1,
+        originalColumnName: "",
+        multipleValueMappings: {}
       }
     };
 
@@ -621,28 +633,36 @@ describe("useWorkbookConverters", () => {
         showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
-        numOfUniqueValues: 100
+        numOfUniqueValues: 100,
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       attr2: {
         fieldPath: "attr2",
         showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
-        numOfUniqueValues: 100
+        numOfUniqueValues: 100,
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       attr3: {
         fieldPath: "attr3",
         showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
-        numOfUniqueValues: 100
+        numOfUniqueValues: 100,
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       attr4: {
         fieldPath: "attr4",
         showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
-        numOfUniqueValues: 100
+        numOfUniqueValues: 100,
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       "objectAttr1.name1": {
         fieldPath: "objectAttr1.name1",
@@ -651,7 +671,9 @@ describe("useWorkbookConverters", () => {
         valueMapping: {
           name1: { id: "id-name1", type: "object-field" }
         },
-        numOfUniqueValues: 1
+        numOfUniqueValues: 1,
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       "objectArray1.name1": {
         fieldPath: "objectAttr1.name1",
@@ -660,7 +682,9 @@ describe("useWorkbookConverters", () => {
         valueMapping: {
           name1: { id: "id-name1", type: "object-field" }
         },
-        numOfUniqueValues: 1
+        numOfUniqueValues: 1,
+        originalColumnName: "",
+        multipleValueMappings: {}
       }
     };
 
@@ -836,7 +860,9 @@ describe("useWorkbookConverters", () => {
             id: "86c65bc9-ff2d-440d-8c63-3b6f928b2b69",
             type: "person"
           }
-        }
+        },
+        originalColumnName: "",
+        multipleValueMappings: {}
       },
       name: {
         fieldPath: "collection.collectors.name",
@@ -856,7 +882,9 @@ describe("useWorkbookConverters", () => {
             id: "633dcb70-81c0-4c36-821b-4f5d8740615d",
             type: "collection"
           }
-        }
+        },
+        originalColumnName: "",
+        multipleValueMappings: {}
       }
     };
 

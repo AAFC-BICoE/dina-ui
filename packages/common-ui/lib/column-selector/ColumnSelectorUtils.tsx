@@ -1,4 +1,15 @@
+import Kitsu, { GetParams, KitsuResource } from "kitsu";
+import { compact, get, startCase } from "lodash";
+import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
+import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { FieldHeader, dateCell } from "..";
+import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
+import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
+import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
+import { ColumnFunctionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryRowColumnFunctionInput";
 import {
   DynamicField,
   DynamicFieldsMappingConfig,
@@ -6,17 +17,6 @@ import {
   RelationshipDynamicField,
   TableColumn
 } from "../list-page/types";
-import Kitsu, { GetParams, KitsuResource } from "kitsu";
-import { get, startCase } from "lodash";
-import React from "react";
-import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
-import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
-import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
-import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
-import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
-import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
-import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
@@ -87,6 +87,29 @@ export function generateColumnPath({
           "/" +
           "presence" // In the future, other operators can be supported.
         );
+
+      // Column Functions (functionId/functionName/params)
+      case "columnFunction":
+        const columnFunctionStateValues: ColumnFunctionSearchStates =
+          JSON.parse(dynamicFieldValue);
+        const functionId = Object.keys(columnFunctionStateValues)[0];
+        return (
+          dynamicFieldTypeWithRelationship +
+          "/" +
+          functionId +
+          "/" +
+          columnFunctionStateValues[functionId].functionName +
+          (columnFunctionStateValues[functionId].params
+            ? "/" +
+              columnFunctionStateValues[functionId].params
+                .map((field) =>
+                  field.parentName
+                    ? field.value
+                    : field.value.replace(field.path + ".", "")
+                )
+                .join("+")
+            : "")
+        );
     }
   }
 
@@ -153,7 +176,8 @@ export async function generateColumnDefinition<TData extends KitsuResource>({
     return await getDynamicFieldColumn(
       path,
       apiClient,
-      dynamicFieldsMappingConfig
+      dynamicFieldsMappingConfig,
+      indexMappings
     );
   }
 
@@ -280,7 +304,8 @@ export function NestedColumnLabel({
 async function getDynamicFieldColumn<TData extends KitsuResource>(
   path: string,
   apiClient: Kitsu,
-  dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig
+  dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig,
+  indexMappings?: ESIndexMapping[]
 ): Promise<TableColumn<TData> | undefined> {
   const pathParts = path.split("/");
   if (pathParts.length > 0) {
@@ -349,6 +374,27 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
       const relationship = pathParts[1];
       const operator = pathParts[2];
       return getRelationshipPresenceFieldColumn(path, relationship, operator);
+    }
+
+    // Handle column functions paths
+    if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
+      const paramStr = pathParts.length > 3 ? "(" + pathParts[3] + ")" : "";
+      const fieldId = pathParts[1] + "." + pathParts[2] + paramStr;
+      return {
+        columnSelectorString: path,
+        accessorKey: path,
+        id: fieldId,
+        header: () => {
+          return (
+            <FunctionFieldLabel
+              functionFieldPath={path}
+              indexMappings={indexMappings}
+            />
+          );
+        },
+        isKeyword: true,
+        isColumnVisible: true
+      };
     }
   }
 
@@ -1027,5 +1073,56 @@ async function fetchDynamicField(apiClient: Kitsu, path, params?: GetParams) {
     return data;
   } catch {
     return undefined;
+  }
+}
+
+export interface FunctionFieldLabelProps {
+  functionFieldPath: string;
+  indexMappings?: ESIndexMapping[];
+}
+export function FunctionFieldLabel({
+  functionFieldPath,
+  indexMappings
+}: FunctionFieldLabelProps) {
+  const { messages, formatMessage } = useDinaIntl();
+
+  const pathParts = functionFieldPath.split("/");
+  if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
+    const functionName = pathParts[2];
+    const paramStr = pathParts.length > 3 ? pathParts[3] : undefined;
+    const paramObjects = compact(
+      paramStr
+        ?.split("+")
+        .map((field) =>
+          indexMappings?.find((mapping) =>
+            mapping.parentName
+              ? mapping.value === field
+              : mapping.value === mapping.path + "." + field
+          )
+        )
+    );
+    const formattedParamStr =
+      paramObjects && paramObjects.length > 0
+        ? " (" +
+          paramObjects
+            ?.map(
+              (field) =>
+                (field.parentName
+                  ? (messages[field.parentName]
+                      ? formatMessage(field.parentName as any)
+                      : startCase(field.parentName)) + " "
+                  : "") +
+                (messages[field.label]
+                  ? formatMessage(field.label as any)
+                  : startCase(field.label))
+            )
+            .join(" + ") +
+          ")"
+        : "";
+    return (
+      <span>{formatMessage(functionName as any) + formattedParamStr}</span>
+    );
+  } else {
+    return <></>;
   }
 }

@@ -1,7 +1,8 @@
 import { PersistedResource } from "kitsu";
 import ExternalResourceMetadataViewPage from "../../../../dina-ui/pages/object-store/object/external-resource-view";
-import { mountWithAppContext } from "../../../../dina-ui/test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../dina-ui/test-util/mock-app-context";
 import { Metadata } from "../../../../dina-ui/types/objectstore-api/resources/Metadata";
+import "@testing-library/jest-dom";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acSubtype: "TEST_SUBTYPE",
@@ -55,20 +56,23 @@ jest.mock("next/router", () => ({
 
 describe("Stored Object external resource view page", () => {
   it("Renders the page.", async () => {
-    const wrapper = mountWithAppContext(<ExternalResourceMetadataViewPage />, {
+    const wrapper = mountWithAppContext2(<ExternalResourceMetadataViewPage />, {
       apiContext
     });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Shows the caption
-    expect(wrapper.contains("test caption")).toBeTruthy();
+    expect(
+      wrapper.getByRole("cell", { name: /test caption/i })
+    ).toBeInTheDocument();
 
     // Shows the resource URL
-    expect(wrapper.contains("http://agr.gc.ca")).toEqual(true);
+    expect(
+      wrapper.getByRole("cell", { name: /http:\/\/agr\.gc\.ca/i })
+    ).toBeInTheDocument();
 
     // Shows the media format:
-    expect(wrapper.contains("jpeg")).toEqual(true);
+    expect(wrapper.getByRole("cell", { name: /jpeg/i })).toBeInTheDocument();
   });
 });
