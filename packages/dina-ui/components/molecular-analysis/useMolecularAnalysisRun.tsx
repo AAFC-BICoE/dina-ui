@@ -697,7 +697,7 @@ export function useMolecularAnalysisRunView({
             .filter((runItem) => runItem.usageType !== "quality-control")
             .map(
               (molecularAnalysisRunItem) =>
-                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
             );
           const genericMolecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
             [];
@@ -711,6 +711,7 @@ export function useMolecularAnalysisRunView({
           }
           return genericMolecularAnalysisItems;
         }
+
         async function fetchMetagenomicsBatchItems() {
           const fetchPaths = molecularAnalysisRunItems.map(
             (molecularAnalysisRunItem) =>
@@ -726,6 +727,7 @@ export function useMolecularAnalysisRunView({
           }
           return metagenomicsBatchItems;
         }
+
         const usageType = molecularAnalysisRunItems.filter(
           (runItem) => runItem.usageType !== "quality-control"
         )?.[0]?.usageType;
