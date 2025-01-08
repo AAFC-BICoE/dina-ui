@@ -87,6 +87,7 @@ export function generateColumnPath({
           "/" +
           "presence" // In the future, other operators can be supported.
         );
+
       // Column Functions (functionId/functionName/params)
       case "columnFunction":
         const columnFunctionStateValues: ColumnFunctionSearchStates =
@@ -1102,7 +1103,7 @@ export function FunctionFieldLabel({
     );
     const formattedParamStr =
       paramObjects && paramObjects.length > 0
-        ? "(" +
+        ? " (" +
           paramObjects
             ?.map(
               (field) =>
