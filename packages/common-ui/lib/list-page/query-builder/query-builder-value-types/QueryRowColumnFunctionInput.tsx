@@ -144,24 +144,36 @@ export default function QueryRowColumnFunctionInput({
   return (
     <div className={isInColumnSelector ? "" : "row"}>
       {/* Formula Selector */}
-      <Select<FormulaOption>
+      <label
         className={isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"}
+      >
+        <strong>{formatMessage("selectFunctionToUse")}:</strong>
+      </label>
+      <Select<FormulaOption>
+        className={isInColumnSelector ? "ps-0" : "col me-1 ms-2 ps-0"}
         onChange={(newValue: FormulaOption) => onFormulaChanged(newValue.value)}
         value={selectedFunction}
         options={formulaOptions}
       />
-
       {/* Field Selector */}
       {selectedFunction && selectedFunction.value === "CONCAT" ? (
         functionParams.map((field, index) => (
-          <QueryFieldSelector
-            key={index}
-            className={isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"}
-            indexMap={indexMappingFiltered}
-            currentField={field?.value}
-            setField={(fieldPath) => setFunctionParam(fieldPath, index)}
-            isInColumnSelector={true}
-          />
+          <div key={index}>
+            <label
+              className={
+                isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"
+              }
+            >
+              <strong>{formatMessage("selectFieldToUseWithFunction")}:</strong>
+            </label>
+            <QueryFieldSelector
+              className={isInColumnSelector ? "ps-0" : "col me-1 ms-2 ps-0"}
+              indexMap={indexMappingFiltered}
+              currentField={field?.value}
+              setField={(fieldPath) => setFunctionParam(fieldPath, index)}
+              isInColumnSelector={true}
+            />
+          </div>
         ))
       ) : (
         <></>
