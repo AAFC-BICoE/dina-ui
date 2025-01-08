@@ -1,33 +1,37 @@
+import useLocalStorage from "@rehooks/local-storage";
+import Kitsu, { KitsuResource } from "kitsu";
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "react-bootstrap";
 import {
-  LoadingSpinner,
-  VISIBLE_INDEX_LOCAL_STORAGE_KEY,
   ColumnSelectorProps,
-  useApiClient
+  LoadingSpinner,
+  useApiClient,
+  VISIBLE_INDEX_LOCAL_STORAGE_KEY
 } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState, useEffect, useMemo } from "react";
-import { Button } from "react-bootstrap";
-import Kitsu, { KitsuResource } from "kitsu";
-import { ESIndexMapping, TableColumn } from "../list-page/types";
-import useLocalStorage from "@rehooks/local-storage";
 import { QueryFieldSelector } from "../list-page/query-builder/query-builder-core-components/QueryFieldSelector";
-import { ColumnItem } from "./ColumnItem";
-import QueryRowManagedAttributeSearch, {
-  ManagedAttributeSearchStates
-} from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import QueryRowFieldExtensionSearch, {
   FieldExtensionSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
+
+import QueryRowIdentifierSearch, {
+  IdentifierSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
+import QueryRowManagedAttributeSearch, {
+  ManagedAttributeSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import QueryRowRelationshipPresenceSearch, {
+  RelationshipPresenceSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
+import QueryRowColumnFunctionInput, {
+  ColumnFunctionSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryRowColumnFunctionInput";
+import { ESIndexMapping, TableColumn } from "../list-page/types";
+import { ColumnItem } from "./ColumnItem";
 import {
   generateColumnDefinition,
   generateColumnPath
 } from "./ColumnSelectorUtils";
-import QueryRowRelationshipPresenceSearch, {
-  RelationshipPresenceSearchStates
-} from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
-import QueryRowIdentifierSearch, {
-  IdentifierSearchStates
-} from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -64,6 +68,8 @@ export function ColumnSelectorList<TData extends KitsuResource>({
       `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
       []
     );
+
+  const [functionId, setFunctionId] = useState("function1");
 
   // Handle what happens when the user selects an option from the Query Field Selector. If a dynamic
   // field is selected, verify we are at a point where it can be added.
@@ -104,6 +110,20 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               const identifierValues: IdentifierSearchStates =
                 JSON.parse(dynamicFieldValue);
               if (identifierValues?.selectedIdentifier) {
+                setIsValidField(true);
+                return;
+              }
+              break;
+            case "columnFunction":
+              const parsedValue = JSON.parse(dynamicFieldValue);
+              const columnFunctionValues: ColumnFunctionSearchStates =
+                Object.values(parsedValue)[0] as any;
+              if (
+                columnFunctionValues.functionName ===
+                  "CONVERT_COORDINATES_DD" ||
+                (columnFunctionValues.functionName === "CONCAT" &&
+                  (columnFunctionValues.params?.length ?? 0) > 1)
+              ) {
                 setIsValidField(true);
                 return;
               }
@@ -236,7 +256,10 @@ export function ColumnSelectorList<TData extends KitsuResource>({
 
         setDisplayedColumns(newDisplayedColumns);
         setSelectedField(undefined);
-
+        // increase function ID
+        setFunctionId(
+          (functionId) => "function" + (parseInt(functionId.substring(8)) + 1)
+        );
         // Do not save when in export mode since manage fields that are mandatory to the list view.
         if (!exportMode) {
           setLocalStorageDisplayedColumns(
@@ -349,6 +372,15 @@ export function ColumnSelectorList<TData extends KitsuResource>({
           )}
           {selectedField?.dynamicField?.type === "relationshipPresence" && (
             <QueryRowRelationshipPresenceSearch
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
+              indexMapping={indexMapping}
+              isInColumnSelector={true}
+            />
+          )}
+          {selectedField?.dynamicField?.type === "columnFunction" && (
+            <QueryRowColumnFunctionInput
+              functionId={functionId}
               setValue={setDynamicFieldValue}
               value={dynamicFieldValue}
               indexMapping={indexMapping}

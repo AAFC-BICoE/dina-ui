@@ -249,6 +249,81 @@ describe("ColumnSelectorUtils", () => {
         })
       ).toEqual("assemblages.name");
     });
+
+    it("Generate column functions path", () => {
+      expect(
+        generateColumnPath({
+          indexMapping: {
+            label: "columnFunction",
+            value: "columnFunction",
+            path: "columnFunction",
+            hideField: false,
+            type: "columnFunction",
+            dynamicField: {
+              type: "columnFunction",
+              label: "columnFunction",
+              path: ""
+            },
+            containsSupport: false,
+            distinctTerm: false,
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            endsWithSupport: false
+          }
+        })
+      ).toEqual("columnFunction");
+
+      expect(
+        generateColumnPath({
+          indexMapping: {
+            label: "columnFunction",
+            value: "columnFunction",
+            path: "columnFunction",
+            hideField: false,
+            type: "columnFunction",
+            dynamicField: {
+              type: "columnFunction",
+              label: "columnFunction",
+              path: ""
+            },
+            containsSupport: false,
+            distinctTerm: false,
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            endsWithSupport: false
+          },
+          dynamicFieldValue:
+            '{"function1":{"functionName":"CONCAT","params":[{"label":"barcode","value":"data.attributes.barcode","hideField":false,"type":"text","path":"data.attributes","keywordMultiFieldSupport":true,"keywordNumericSupport":false,"optimizedPrefix":false,"containsSupport":false,"endsWithSupport":false},{"label":"createdBy","value":"data.attributes.createdBy","hideField":false,"type":"text","path":"data.attributes","keywordMultiFieldSupport":true,"keywordNumericSupport":false,"optimizedPrefix":false,"containsSupport":false,"endsWithSupport":false}]}}'
+        })
+      ).toEqual("columnFunction/function1/CONCAT/barcode+createdBy");
+
+      expect(
+        generateColumnPath({
+          indexMapping: {
+            label: "columnFunction",
+            value: "columnFunction",
+            path: "columnFunction",
+            hideField: false,
+            type: "columnFunction",
+            dynamicField: {
+              type: "columnFunction",
+              label: "columnFunction",
+              path: ""
+            },
+            containsSupport: false,
+            distinctTerm: false,
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            endsWithSupport: false
+          },
+          dynamicFieldValue:
+            '{"function2":{"functionName":"CONVERT_COORDINATES_DD"}}'
+        })
+      ).toEqual("columnFunction/function2/CONVERT_COORDINATES_DD");
+    });
   });
 
   describe("parseRelationshipNameFromType", () => {
