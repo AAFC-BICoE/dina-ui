@@ -15,6 +15,7 @@ import {
   filterBy,
   SaveArgs,
   SettingsButton,
+  useAccount,
   useApiClient,
   useQuery,
   useStringComparator
@@ -39,6 +40,10 @@ import {
 } from "./useMetagenomicsWorkflowMolecularAnalysisRun";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 import useVocabularyOptions from "../collection/useVocabularyOptions";
+import { AddAttachmentsButton } from "../object-store";
+import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import React from "react";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -260,14 +265,12 @@ export function useMolecularAnalysisRun({
 }: UseMolecularAnalysisRunProps): UseMolecularAnalysisRunReturn {
   const { bulkGet, save, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
-  const { compareByStringAndNumber } = useStringComparator();
   // Map of MolecularAnalysisRunItem {id:name}
   const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
     useState<Record<string, string>>({});
 
   const columns = useMemo(() => {
-    return getMolecularAnalysisRunColumns({
-      compareByStringAndNumber,
+    return useMolecularAnalysisRunColumns({
       type: "seq-reaction",
       setMolecularAnalysisRunItemNames,
       readOnly: !editMode
@@ -734,8 +737,7 @@ export function useMolecularAnalysisRunView({
           (runItem) => runItem.usageType !== "quality-control"
         )?.[0].usageType;
         setColumns(
-          getMolecularAnalysisRunColumns({
-            compareByStringAndNumber,
+          useMolecularAnalysisRunColumns({
             type: usageType,
             readOnly: true
           })
@@ -855,26 +857,25 @@ export function useMolecularAnalysisRunView({
   };
 }
 
-interface GetMolecularAnalysisRunColumnsProps {
-  compareByStringAndNumber: (a?: string | null, b?: string | null) => number;
+interface UseMolecularAnalysisRunColumnsProps {
   type: string;
   setMolecularAnalysisRunItemNames?: Dispatch<
     SetStateAction<Record<string, string>>
   >;
   readOnly?: boolean;
-  save?: <TData extends KitsuResource = KitsuResource>(
-    args: (SaveArgs | DeleteArgs)[],
-    options?: DoOperationsOptions
-  ) => Promise<PersistedResource<TData>[]>;
+  setReloadGenericMolecularAnalysisRun?: Dispatch<SetStateAction<number>>;
 }
 
-export function getMolecularAnalysisRunColumns({
-  compareByStringAndNumber,
+export function useMolecularAnalysisRunColumns({
   type,
   setMolecularAnalysisRunItemNames,
   readOnly,
-  save
-}: GetMolecularAnalysisRunColumnsProps) {
+  setReloadGenericMolecularAnalysisRun
+}: UseMolecularAnalysisRunColumnsProps) {
+  const { compareByStringAndNumber } = useStringComparator();
+  const { save, bulkGet } = useApiClient();
+  const { groupNames } = useAccount();
+
   // Table columns to display for the sequencing run.
   const SEQ_REACTION_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
@@ -1171,32 +1172,22 @@ export function getMolecularAnalysisRunColumns({
         enableSorting: true
       },
       {
-        id: "result",
-        cell: ({ row }) => {
-          return <></>;
-        },
-        header: () => <FieldHeader name={"result"} />,
-        accessorKey: "result",
-        sortingFn: (a: any, b: any): number => {
-          const aString =
-            !a.original?.storageUnitUsage ||
-            a.original?.storageUnitUsage?.wellRow === null ||
-            a.original?.storageUnitUsage?.wellColumn === null
-              ? ""
-              : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
-          const bString =
-            !b.original?.storageUnitUsage ||
-            b.original?.storageUnitUsage?.wellRow === null ||
-            b.original?.storageUnitUsage?.wellColumn === null
-              ? ""
-              : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
-          return compareByStringAndNumber(aString, bString);
-        }
-      },
-      {
         id: "resultAttachment",
         cell: ({ row: { original } }) => {
-          return <></>;
+          const attachments =
+            original.molecularAnalysisRunItem?.result?.attachments ?? [];
+          const attachmentElements = attachments.map((attachment, index) => (
+            <React.Fragment key={attachment.id}>
+              <Link href={`/object-store/object/view?id=${attachment.id}`}>
+                {attachment.originalFilename}
+              </Link>
+              {index < attachments.length - 1 && ", "}
+            </React.Fragment>
+          ));
+
+          return (
+            <>{attachmentElements.length > 0 ? attachmentElements : null}</>
+          );
         },
         header: () => <FieldHeader name={"resultAttachment"} />,
         accessorKey: "resultAttachment",
@@ -1213,18 +1204,73 @@ export function getMolecularAnalysisRunColumns({
             <div className="settings-button-container">
               <SettingsButton
                 menuItems={[
-                  <button
-                    className={`btn btn-primary`}
+                  <AddAttachmentsButton
+                    key={0}
+                    removeMargin={true}
                     style={{
                       paddingLeft: "15px",
                       paddingRight: "15px",
                       width: "6rem"
                     }}
-                    type="button"
-                    key={0}
-                  >
-                    <DinaMessage id="addButtonText" />
-                  </button>,
+                    buttonTextElement={<DinaMessage id="addButtonText" />}
+                    value={
+                      (original.molecularAnalysisRunItem?.result
+                        ?.attachments as ResourceIdentifierObject[]) ?? []
+                    }
+                    onChange={async (newMetadatas) => {
+                      if (original.molecularAnalysisRunItem) {
+                        const molecularAnalysisRunResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
+                          [
+                            {
+                              type: "molecular-analysis-result",
+                              resource: {
+                                type: "molecular-analysis-result",
+                                group: groupNames?.[0],
+                                relationships: {
+                                  attachments: {
+                                    data: newMetadatas as Metadata[]
+                                  }
+                                }
+                              }
+                            } as any
+                          ];
+
+                        const savedMolecularAnalysisResult =
+                          await save?.<MolecularAnalysisResult>(
+                            molecularAnalysisRunResultSaveArgs,
+                            {
+                              apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                            }
+                          );
+                        const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+                          [
+                            {
+                              type: "molecular-analysis-run-item",
+                              resource: {
+                                ...original.molecularAnalysisRunItem,
+                                relationships: {
+                                  result: {
+                                    data: {
+                                      id: savedMolecularAnalysisResult?.[0].id,
+                                      type: "molecular-analysis-result"
+                                    }
+                                  }
+                                }
+                              }
+                            } as any
+                          ];
+                        const molecularAnalysisRunItemWithResult =
+                          await save?.<MolecularAnalysisRunItem>(
+                            molecularAnalysisRunItemSaveArgs,
+                            {
+                              apiBaseUrl:
+                                "seqdb-api/molecular-analysis-run-item"
+                            }
+                          );
+                        setReloadGenericMolecularAnalysisRun?.(Date.now());
+                      }
+                    }}
+                  />,
                   <button
                     className={`btn btn-danger delete-button`}
                     style={{

@@ -2,19 +2,12 @@ import {
   SequencingRunItem,
   useGenericMolecularAnalysisRun
 } from "./useGenericMolecularAnalysisRun";
-import {
-  DinaForm,
-  LoadingSpinner,
-  ReactTable,
-  useApiClient,
-  useStringComparator
-} from "common-ui";
+import { DinaForm, LoadingSpinner, ReactTable } from "common-ui";
 import { Alert, Dropdown, DropdownButton } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { getMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
-import { useEffect, useMemo, useState } from "react";
+import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
 
 export interface MolecularAnalysisResultsStepProps {
   molecularAnalysisId: string;
@@ -33,30 +26,29 @@ export function MolecularAnalysisResultsStep({
   performSave,
   setPerformSave
 }: MolecularAnalysisResultsStepProps) {
-  const { compareByStringAndNumber } = useStringComparator();
   const { formatMessage } = useDinaIntl();
-  const { save } = useApiClient();
-  const { loading, errorMessage, multipleRunWarning, sequencingRunItems } =
-    useGenericMolecularAnalysisRun({
-      editMode,
-      setEditMode,
-      performSave,
-      setPerformSave,
-      molecularAnalysis,
-      molecularAnalysisId
-    });
+  const {
+    loading,
+    errorMessage,
+    multipleRunWarning,
+    sequencingRunItems,
+    setReloadGenericMolecularAnalysisRun
+  } = useGenericMolecularAnalysisRun({
+    editMode,
+    setEditMode,
+    performSave,
+    setPerformSave,
+    molecularAnalysis,
+    molecularAnalysisId
+  });
 
   // Table columns to display for the sequencing run.
-  const COLUMNS: ColumnDef<SequencingRunItem>[] = useMemo(
-    () =>
-      getMolecularAnalysisRunColumns({
-        compareByStringAndNumber,
-        type: "generic-molecular-analysis-results",
-        readOnly: true,
-        save
-      }),
-    [editMode]
-  );
+  const COLUMNS: ColumnDef<SequencingRunItem>[] =
+    useMolecularAnalysisRunColumns({
+      type: "generic-molecular-analysis-results",
+      readOnly: true,
+      setReloadGenericMolecularAnalysisRun
+    });
 
   // Display loading if network requests from hook are still loading in...
   if (loading) {

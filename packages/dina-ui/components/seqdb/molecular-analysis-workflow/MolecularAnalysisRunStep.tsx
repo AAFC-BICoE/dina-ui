@@ -2,23 +2,15 @@ import {
   SequencingRunItem,
   useGenericMolecularAnalysisRun
 } from "./useGenericMolecularAnalysisRun";
-import {
-  DinaForm,
-  FieldHeader,
-  LoadingSpinner,
-  ReactTable,
-  useStringComparator
-} from "common-ui";
+import { DinaForm, LoadingSpinner, ReactTable } from "common-ui";
 import { Alert } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { AttachmentsEditor } from "../../object-store/attachment-list/AttachmentsField";
 import { AttachmentReadOnlySection } from "../../object-store/attachment-list/AttachmentReadOnlySection";
-import { getMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
-import { useIntl } from "react-intl";
+import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
 import { QualityControlSection } from "./QualityControlSection";
-import { useMemo } from "react";
 import { PersistedResource } from "kitsu";
 
 export interface MolecularAnalysisRunStepProps {
@@ -43,9 +35,6 @@ export function MolecularAnalysisRunStep({
   setPerformSave,
   onSaved
 }: MolecularAnalysisRunStepProps) {
-  const { compareByStringAndNumber } = useStringComparator();
-  const { formatMessage } = useIntl();
-
   const {
     loading,
     errorMessage,
@@ -73,16 +62,12 @@ export function MolecularAnalysisRunStep({
   });
 
   // Table columns to display for the sequencing run.
-  const COLUMNS: ColumnDef<SequencingRunItem>[] = useMemo(
-    () =>
-      getMolecularAnalysisRunColumns({
-        compareByStringAndNumber,
-        type: "generic-molecular-analysis-item",
-        setMolecularAnalysisRunItemNames,
-        readOnly: !editMode
-      }),
-    [editMode]
-  );
+  const COLUMNS: ColumnDef<SequencingRunItem>[] =
+    useMolecularAnalysisRunColumns({
+      type: "generic-molecular-analysis-item",
+      setMolecularAnalysisRunItemNames,
+      readOnly: !editMode
+    });
 
   // Display loading if network requests from hook are still loading in...
   if (loading) {

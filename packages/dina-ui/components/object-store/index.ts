@@ -6,3 +6,4 @@ export * from "./stored-object-gallery/StoredObjectGallery";
 export * from "./metadata/MetadataDetails";
 export * from "./metadata/MetadataPreview";
 export * from "./metadata/MetadataBadges";
+export * from "./attachment-list/AttachmentsField";

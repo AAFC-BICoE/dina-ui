@@ -13,6 +13,8 @@ import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/Quali
 import useVocabularyOptions from "../../collection/useVocabularyOptions";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
 import { isEqual } from "lodash";
+import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
 
 export interface UseGenericMolecularAnalysisRunProps {
   molecularAnalysis: GenericMolecularAnalysis;
@@ -139,6 +141,8 @@ export interface UseGenericMolecularAnalysisRunReturn {
   setMolecularAnalysisRunItemNames?: Dispatch<
     SetStateAction<Record<string, string>>
   >;
+
+  setReloadGenericMolecularAnalysisRun: Dispatch<SetStateAction<number>>;
 }
 
 export function useGenericMolecularAnalysisRun({
@@ -207,7 +211,7 @@ export function useGenericMolecularAnalysisRun({
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
       include:
-        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run"
+        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result,molecularAnalysisRunItem.result"
     },
     {
       deps: [reloadGenericMolecularAnalysisRun],
@@ -264,6 +268,52 @@ export function useGenericMolecularAnalysisRun({
               ...runItem,
               materialSampleSummary:
                 queryMaterialSampleSummary as MaterialSampleSummary
+            };
+          });
+        }
+
+        async function attachMolecularAnalysisRunItemResult(
+          sequencingRunItem: SequencingRunItem[]
+        ): Promise<SequencingRunItem[]> {
+          const molecularAnalysisResultQuery =
+            await bulkGet<MolecularAnalysisResult>(
+              sequencingRunItem
+                .filter((item) => item?.molecularAnalysisRunItem?.result?.id)
+                .map(
+                  (item) =>
+                    `/molecular-analysis-result/${item?.molecularAnalysisRunItem?.result?.id}?include=attachments`
+                ),
+              { apiBaseUrl: "/seqdb-api" }
+            );
+          const resultAttachmentsQuery = await bulkGet<Metadata>(
+            molecularAnalysisResultQuery[0].attachments.map(
+              (attachment) => `/metadata/${attachment?.id}`
+            ),
+            { apiBaseUrl: "/objectstore-api" }
+          );
+          molecularAnalysisResultQuery.forEach((molecularAnalysisResult) => {
+            molecularAnalysisResult.attachments =
+              molecularAnalysisResult.attachments.map((resultAttachment) => {
+                return resultAttachmentsQuery.find(
+                  (queriedAttachment) =>
+                    resultAttachment.id === queriedAttachment.id
+                );
+              }) as any;
+          });
+          return sequencingRunItem.map((runItem) => {
+            const queryMolecularAnalysisResult =
+              molecularAnalysisResultQuery.find(
+                (molecularAnalysisResult) =>
+                  molecularAnalysisResult?.id ===
+                  runItem?.molecularAnalysisRunItem?.result?.id
+              );
+            if (runItem.molecularAnalysisRunItem?.result) {
+              runItem.molecularAnalysisRunItem.result =
+                queryMolecularAnalysisResult;
+            }
+
+            return {
+              ...runItem
             };
           });
         }
@@ -344,6 +394,9 @@ export function useGenericMolecularAnalysisRun({
           sequencingRunItemsChain
         );
 
+        sequencingRunItemsChain = await attachMolecularAnalysisRunItemResult(
+          sequencingRunItemsChain
+        );
         await findMolecularAnalysisRun(sequencingRunItemsChain);
 
         // All finished loading.
@@ -936,7 +989,8 @@ export function useGenericMolecularAnalysisRun({
     updateQualityControl,
     setAttachments,
     sequencingRunId: sequencingRun?.id,
-    setMolecularAnalysisRunItemNames
+    setMolecularAnalysisRunItemNames,
+    setReloadGenericMolecularAnalysisRun
   };
 }
 
