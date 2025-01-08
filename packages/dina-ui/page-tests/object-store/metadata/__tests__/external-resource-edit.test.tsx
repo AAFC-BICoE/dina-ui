@@ -5,10 +5,13 @@ import {
   Metadata,
   ObjectSubtype
 } from "../../../../types/objectstore-api";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import ExternalResourceMetadataPage from "../../../../pages/object-store/metadata/external-resource-edit";
 import Select from "react-select/base";
 import { ResourceSelectField } from "common-ui";
+import { fireEvent, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 const mockGet = jest.fn(async (path) => {
   switch (path) {
@@ -109,83 +112,56 @@ describe("Metadata external resource edit page.", () => {
       query: { id: undefined }
     });
 
-    const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
+    const wrapper = mountWithAppContext2(<ExternalResourceMetadataPage />, {
       apiContext
     });
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test initial values
+    expect(wrapper.getByRole("combobox", { name: /tags/i })).toHaveDisplayValue(
+      ""
+    );
     expect(
-      wrapper.find(".dcFormat-field input").first().prop("value")
-    ).toBeFalsy();
-
+      wrapper.getByRole("textbox", { name: /file extension/i })
+    ).toHaveDisplayValue("");
     expect(
-      wrapper.find(".fileExtension-field input").first().prop("value")
-    ).toBeFalsy();
-
+      wrapper.getByRole("textbox", { name: /resource external url/i })
+    ).toHaveDisplayValue("");
     expect(
-      wrapper.find(".resourceExternalURL-field input").first().prop("value")
-    ).toBeFalsy();
+      wrapper.getByRole("textbox", { name: /caption/i })
+    ).toHaveDisplayValue("");
 
-    expect(
-      wrapper.find(".acCaption-field input").first().prop("value")
-    ).toBeFalsy();
-
-    // Type a search into the media format search.
-    wrapper
-      .find(".dcFormat-field input")
-      .first()
-      .simulate("change", {
-        target: {
-          value: "image/jpeg"
-        }
-      });
+    // Select an option in the media format search.
+    userEvent.click(wrapper.getByRole("combobox", { name: /media format/i }));
+    userEvent.click(wrapper.getByRole("option", { name: /image\/jpeg/i }));
 
     await new Promise(setImmediate);
-    wrapper.update();
-
-    // Open the dropdown menu.
-    wrapper
-      .find(".dcFormat-field input")
-      .first()
-      .simulate("mouseDown", { button: 0 });
-
-    // Select the first result in the list. Should only be one result.
-    wrapper.find(".react-select__option").first().simulate("click");
 
     // Set values:
-    wrapper
-      .find(".fileExtension-field input")
-      .first()
-      .simulate("change", {
-        target: {
-          value: ".jpg"
-        }
-      });
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /file extension/i }),
+      {
+        target: { value: ".jpg" }
+      }
+    );
 
-    wrapper
-      .find(".resourceExternalURL-field input")
-      .first()
-      .simulate("change", {
-        target: {
-          value: "http://agr.gc.ca"
-        }
-      });
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /resource external url/i }),
+      {
+        target: { value: "http://agr.gc.ca" }
+      }
+    );
 
-    wrapper
-      .find(".acCaption-field input")
-      .first()
-      .simulate("change", {
-        target: {
-          value: "test caption"
-        }
-      });
+    fireEvent.change(wrapper.getByRole("textbox", { name: /caption/i }), {
+      target: { value: "test caption" }
+    });
 
-    wrapper.find("form").simulate("submit");
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test response
     expect(mockSave).toBeCalledWith(
       [
         {
@@ -212,42 +188,41 @@ describe("Metadata external resource edit page.", () => {
         id: "25f81de5-bbee-430c-b5fa-71986b70e612"
       }
     });
-    const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
+    const wrapper = mountWithAppContext2(<ExternalResourceMetadataPage />, {
       apiContext
     });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check for the right initial values:
-    expect(wrapper.find(".acSubtype-field Select").prop<any>("value")).toEqual({
-      label: "TEST_SUBTYPE",
-      resource: {
-        acSubtype: "TEST_SUBTYPE",
-        id: "id-unavailable",
-        type: "object-subtype"
-      },
-      value: "id-unavailable"
-    });
+    expect(
+      wrapper.getByRole("combobox", {
+        name: /object subtype test_subtype/i
+      })
+    ).toBeInTheDocument();
 
-    expect(wrapper.find(".dcType-field Select").prop("value")).toEqual({
-      label: "Image",
-      value: "IMAGE"
-    });
+    expect(
+      wrapper.getByRole("combobox", {
+        name: /stored object type image/i
+      })
+    ).toBeInTheDocument();
 
     // Set new values:
-    wrapper.find(".dcType-field Select").prop<any>("onChange")({
-      value: "MOVING_IMAGE"
-    });
+    userEvent.click(
+      wrapper.getByRole("combobox", {
+        name: /stored object type image/i
+      })
+    );
+    await new Promise(setImmediate);
+    userEvent.click(wrapper.getByRole("option", { name: /moving image/i }));
+    await new Promise(setImmediate);
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
+    // Test response
     expect(mockSave).lastCalledWith(
       [
         {
