@@ -1,5 +1,5 @@
 import * as ApiClientContext from "common-ui/lib/api-client/ApiClientContext";
-import { mount } from "enzyme";
+import { render } from "@testing-library/react";
 import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
@@ -117,7 +117,7 @@ function getWorkbookConverter(
     Object.assign(returnVal, useWorkbookConverter(mappingConfig, entityName));
     return <></>;
   }
-  mount(
+  render(
     <DinaIntlProvider>
       <TestComponent />
     </DinaIntlProvider>

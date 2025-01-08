@@ -1,5 +1,4 @@
 import { SaveArgs } from "common-ui";
-import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
 import ReactSwitch from "react-switch";
 import { getComponentOrderFromTemplate } from "../../../../components/form-template/formTemplateUtils";

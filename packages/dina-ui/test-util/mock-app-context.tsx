@@ -9,7 +9,6 @@ import {
   InstanceContextProvider,
   ModalProvider
 } from "common-ui";
-import { mount } from "enzyme";
 import { merge, noop } from "lodash";
 import { useMemo, useRef } from "react";
 import { DndProvider } from "react-dnd";
@@ -121,21 +120,6 @@ export function MockAppContextProvider({
         </ApiClientProvider>
       </AccountProvider>
     </SWRConfig>
-  );
-}
-
-/**
- * Helper function to get a test wrapper with the required context providers using Enzyme.
- * @deprecated Please mountWithAppContext2, which use React-testing library.  It is compatiple with React 18.
- */
-export function mountWithAppContext(
-  element: React.ReactNode,
-  mockAppContextProviderProps?: MockAppContextProviderProps
-) {
-  return mount(
-    <MockAppContextProvider {...mockAppContextProviderProps}>
-      {element}
-    </MockAppContextProvider>
   );
 }
 

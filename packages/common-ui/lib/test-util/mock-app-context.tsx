@@ -1,7 +1,6 @@
 import { render } from "@testing-library/react";
-import { mount } from "enzyme";
 import { merge, noop } from "lodash";
-import { ReactNode, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { SWRConfig } from "swr";
 import { PartialDeep } from "type-fest";
 import { AccountContextI, AccountProvider } from "../account/AccountProvider";
@@ -117,21 +116,6 @@ export function MockAppContextProvider({
         </ApiClientProvider>
       </AccountProvider>
     </SWRConfig>
-  );
-}
-
-/**
- * Helper function to get a test wrapper with the required context providers using Enzyme.
- * @deprecated Please mountWithAppContext2, which use React-testing library.  It is compatiple with React 18.
- */
-export function mountWithAppContext(
-  element: React.ReactNode,
-  mockAppContextProviderProps?: MockAppContextProviderProps
-) {
-  return mount(
-    <MockAppContextProvider {...mockAppContextProviderProps}>
-      {element}
-    </MockAppContextProvider>
   );
 }
 
