@@ -25,7 +25,7 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
       />
       <input
         class="form-control"
-        placeholder="queryBuilder_value_text_placeholder"
+        placeholder="Enter text search value..."
         type="text"
         value="test"
       />
@@ -45,7 +45,7 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
       />
       <input
         class="form-control"
-        placeholder="queryBuilder_value_in_placeholder"
+        placeholder="Enter comma-separated values..."
         type="text"
         value="test1, test2, test3"
       />
@@ -65,7 +65,7 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
       />
       <input
         class="form-control"
-        placeholder="queryBuilder_value_in_placeholder"
+        placeholder="Enter comma-separated values..."
         type="text"
         value="test1, test2, test3"
       />
