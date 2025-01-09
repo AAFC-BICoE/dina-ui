@@ -10,7 +10,6 @@ import {
 import {
   BulkGetOptions,
   DeleteArgs,
-  DoOperationsOptions,
   FieldHeader,
   filterBy,
   SaveArgs,
@@ -873,7 +872,7 @@ export function useMolecularAnalysisRunColumns({
   setReloadGenericMolecularAnalysisRun
 }: UseMolecularAnalysisRunColumnsProps) {
   const { compareByStringAndNumber } = useStringComparator();
-  const { save, bulkGet } = useApiClient();
+  const { save } = useApiClient();
   const { groupNames } = useAccount();
 
   // Table columns to display for the sequencing run.
@@ -1176,17 +1175,19 @@ export function useMolecularAnalysisRunColumns({
         cell: ({ row: { original } }) => {
           const attachments =
             original.molecularAnalysisRunItem?.result?.attachments ?? [];
-          const attachmentElements = attachments.map((attachment, index) => (
-            <React.Fragment key={attachment.id}>
-              <Link href={`/object-store/object/view?id=${attachment.id}`}>
-                {attachment.originalFilename}
-              </Link>
-              {index < attachments.length - 1 && ", "}
-            </React.Fragment>
-          ));
+          const attachmentElements = attachments?.map((attachment, index) =>
+            attachment ? (
+              <React.Fragment key={attachment?.id}>
+                <Link href={`/object-store/object/view?id=${attachment?.id}`}>
+                  {attachment?.originalFilename}
+                </Link>
+                {index < attachments?.length - 1 && ", "}
+              </React.Fragment>
+            ) : null
+          );
 
           return (
-            <>{attachmentElements.length > 0 ? attachmentElements : null}</>
+            <>{attachmentElements?.length > 0 ? attachmentElements : null}</>
           );
         },
         header: () => <FieldHeader name={"resultAttachment"} />,
@@ -1259,14 +1260,12 @@ export function useMolecularAnalysisRunColumns({
                               }
                             } as any
                           ];
-                        const molecularAnalysisRunItemWithResult =
-                          await save?.<MolecularAnalysisRunItem>(
-                            molecularAnalysisRunItemSaveArgs,
-                            {
-                              apiBaseUrl:
-                                "seqdb-api/molecular-analysis-run-item"
-                            }
-                          );
+                        await save?.<MolecularAnalysisRunItem>(
+                          molecularAnalysisRunItemSaveArgs,
+                          {
+                            apiBaseUrl: "seqdb-api/molecular-analysis-run-item"
+                          }
+                        );
                         setReloadGenericMolecularAnalysisRun?.(Date.now());
                       }
                     }}
@@ -1280,6 +1279,55 @@ export function useMolecularAnalysisRunColumns({
                     }}
                     type="button"
                     key={1}
+                    onClick={async () => {
+                      if (
+                        original.molecularAnalysisRunItem &&
+                        original.molecularAnalysisRunItem.result
+                      ) {
+                        try {
+                          const molecularAnalysisRunItemSaveArgs = [
+                            {
+                              resource: {
+                                id: original.molecularAnalysisRunItem.id,
+                                type: original.molecularAnalysisRunItem.type,
+                                relationships: {
+                                  result: {
+                                    data: null
+                                  }
+                                }
+                              },
+                              type: original.molecularAnalysisRunItem.type
+                            }
+                          ];
+                          await save?.<MolecularAnalysisRunItem>(
+                            molecularAnalysisRunItemSaveArgs,
+                            {
+                              apiBaseUrl:
+                                "seqdb-api/molecular-analysis-run-item"
+                            }
+                          );
+                          if (original.molecularAnalysisRunItem.result.id) {
+                            const molecularAnalysisRunResultDeleteArgs: DeleteArgs[] =
+                              [
+                                {
+                                  delete: {
+                                    id: original.molecularAnalysisRunItem.result
+                                      .id,
+                                    type: original.molecularAnalysisRunItem
+                                      .result.type
+                                  }
+                                }
+                              ];
+                            await save?.(molecularAnalysisRunResultDeleteArgs, {
+                              apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                            });
+                          }
+                          setReloadGenericMolecularAnalysisRun?.(Date.now());
+                        } catch (error) {
+                          console.error(error);
+                        }
+                      }
+                    }}
                   >
                     <DinaMessage id="removeButtonText" />
                   </button>

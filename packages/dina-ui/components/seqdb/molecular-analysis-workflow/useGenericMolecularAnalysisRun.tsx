@@ -275,31 +275,35 @@ export function useGenericMolecularAnalysisRun({
         async function attachMolecularAnalysisRunItemResult(
           sequencingRunItem: SequencingRunItem[]
         ): Promise<SequencingRunItem[]> {
+          const molecularAnalysisResultPaths = sequencingRunItem
+            .filter((item) => item?.molecularAnalysisRunItem?.result?.id)
+            .map(
+              (item) =>
+                `/molecular-analysis-result/${item?.molecularAnalysisRunItem?.result?.id}?include=attachments`
+            );
           const molecularAnalysisResultQuery =
             await bulkGet<MolecularAnalysisResult>(
-              sequencingRunItem
-                .filter((item) => item?.molecularAnalysisRunItem?.result?.id)
-                .map(
-                  (item) =>
-                    `/molecular-analysis-result/${item?.molecularAnalysisRunItem?.result?.id}?include=attachments`
-                ),
+              molecularAnalysisResultPaths,
               { apiBaseUrl: "/seqdb-api" }
             );
-          const resultAttachmentsQuery = await bulkGet<Metadata>(
-            molecularAnalysisResultQuery[0].attachments.map(
-              (attachment) => `/metadata/${attachment?.id}`
-            ),
-            { apiBaseUrl: "/objectstore-api" }
-          );
-          molecularAnalysisResultQuery.forEach((molecularAnalysisResult) => {
-            molecularAnalysisResult.attachments =
-              molecularAnalysisResult.attachments.map((resultAttachment) => {
-                return resultAttachmentsQuery.find(
-                  (queriedAttachment) =>
-                    resultAttachment.id === queriedAttachment.id
-                );
-              }) as any;
-          });
+          if (molecularAnalysisResultQuery.length > 0) {
+            const resultAttachmentsQuery = await bulkGet<Metadata>(
+              molecularAnalysisResultQuery?.[0]?.attachments.map(
+                (attachment) => `/metadata/${attachment?.id}`
+              ),
+              { apiBaseUrl: "/objectstore-api" }
+            );
+            molecularAnalysisResultQuery.forEach((molecularAnalysisResult) => {
+              molecularAnalysisResult.attachments =
+                molecularAnalysisResult.attachments.map((resultAttachment) => {
+                  return resultAttachmentsQuery.find(
+                    (queriedAttachment) =>
+                      resultAttachment.id === queriedAttachment.id
+                  );
+                }) as any;
+            });
+          }
+
           return sequencingRunItem.map((runItem) => {
             const queryMolecularAnalysisResult =
               molecularAnalysisResultQuery.find(
@@ -383,25 +387,30 @@ export function useGenericMolecularAnalysisRun({
           }
         }
 
-        // Chain it all together to create one object.
-        let sequencingRunItemsChain = attachGenericMolecularAnalysisItems(
-          genericMolecularAnalysisItems
-        );
-        sequencingRunItemsChain = await attachStorageUnitUsage(
-          sequencingRunItemsChain
-        );
-        sequencingRunItemsChain = await attachMaterialSampleSummary(
-          sequencingRunItemsChain
-        );
+        try {
+          // Chain it all together to create one object.
+          let sequencingRunItemsChain = attachGenericMolecularAnalysisItems(
+            genericMolecularAnalysisItems
+          );
+          sequencingRunItemsChain = await attachStorageUnitUsage(
+            sequencingRunItemsChain
+          );
+          sequencingRunItemsChain = await attachMaterialSampleSummary(
+            sequencingRunItemsChain
+          );
+          sequencingRunItemsChain = await attachMolecularAnalysisRunItemResult(
+            sequencingRunItemsChain
+          );
+          await findMolecularAnalysisRun(sequencingRunItemsChain);
 
-        sequencingRunItemsChain = await attachMolecularAnalysisRunItemResult(
-          sequencingRunItemsChain
-        );
-        await findMolecularAnalysisRun(sequencingRunItemsChain);
-
-        // All finished loading.
-        setSequencingRunItems(sequencingRunItemsChain);
-        setLoading(false);
+          // All finished loading.
+          setSequencingRunItems(sequencingRunItemsChain);
+          setLoading(false);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
       }
     }
   );

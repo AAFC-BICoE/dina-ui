@@ -2,12 +2,22 @@ import {
   SequencingRunItem,
   useGenericMolecularAnalysisRun
 } from "./useGenericMolecularAnalysisRun";
-import { DinaForm, LoadingSpinner, ReactTable } from "common-ui";
+import {
+  DinaForm,
+  LoadingSpinner,
+  ReactTable,
+  SaveArgs,
+  useAccount,
+  useApiClient
+} from "common-ui";
 import { Alert, Dropdown, DropdownButton } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysis } from "../../../types/seqdb-api/resources/GenericMolecularAnalysis";
 import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
+import { Metadata } from "../../../types/objectstore-api";
+import { MolecularAnalysisResult } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { MolecularAnalysisRunItem } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 export interface MolecularAnalysisResultsStepProps {
   molecularAnalysisId: string;
@@ -27,6 +37,8 @@ export function MolecularAnalysisResultsStep({
   setPerformSave
 }: MolecularAnalysisResultsStepProps) {
   const { formatMessage } = useDinaIntl();
+  const { apiClient, save } = useApiClient();
+  const { groupNames } = useAccount();
   const {
     loading,
     errorMessage,
@@ -94,7 +106,82 @@ export function MolecularAnalysisResultsStep({
         <div className="row mt-4">
           <div className="col-12 d-flex justify-content-end">
             <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
-              <Dropdown.Item>
+              <Dropdown.Item
+                onClick={async () => {
+                  if (sequencingRunItems) {
+                    try {
+                      for (const sequencingRunItem of sequencingRunItems) {
+                        if (sequencingRunItem.molecularAnalysisRunItem?.name) {
+                          const metadataResp = await apiClient.get<Metadata[]>(
+                            `objectstore-api/metadata`,
+                            {
+                              filter: {
+                                rsql: `originalFilename==${sequencingRunItem.molecularAnalysisRunItem?.name}*`
+                              }
+                            }
+                          );
+                          if (metadataResp.data.length > 0) {
+                            const molecularAnalysisRunResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
+                              [
+                                {
+                                  type: "molecular-analysis-result",
+                                  resource: {
+                                    type: "molecular-analysis-result",
+                                    group: groupNames?.[0],
+                                    relationships: {
+                                      attachments: {
+                                        data: metadataResp.data as Metadata[]
+                                      }
+                                    }
+                                  }
+                                } as any
+                              ];
+
+                            const savedMolecularAnalysisResult =
+                              await save?.<MolecularAnalysisResult>(
+                                molecularAnalysisRunResultSaveArgs,
+                                {
+                                  apiBaseUrl:
+                                    "seqdb-api/molecular-analysis-result"
+                                }
+                              );
+                            const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+                              [
+                                {
+                                  type: "molecular-analysis-run-item",
+                                  resource: {
+                                    ...sequencingRunItem.molecularAnalysisRunItem,
+                                    relationships: {
+                                      result: {
+                                        data: {
+                                          id: savedMolecularAnalysisResult?.[0]
+                                            .id,
+                                          type: "molecular-analysis-result"
+                                        }
+                                      }
+                                    }
+                                  }
+                                } as any
+                              ];
+                            const savedRunItem =
+                              await save?.<MolecularAnalysisRunItem>(
+                                molecularAnalysisRunItemSaveArgs,
+                                {
+                                  apiBaseUrl:
+                                    "seqdb-api/molecular-analysis-run-item"
+                                }
+                              );
+                          }
+                        }
+                      }
+
+                      setReloadGenericMolecularAnalysisRun(Date.now());
+                    } catch (error) {
+                      console.error(error);
+                    }
+                  }
+                }}
+              >
                 <DinaMessage id="attachmentsBasedOnItemNameButton" />
               </Dropdown.Item>
             </DropdownButton>
