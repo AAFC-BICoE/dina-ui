@@ -1,6 +1,6 @@
 import { AccountContextI } from "common-ui";
 import { noop } from "lodash";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import { ExifView } from "../ExifView";
 

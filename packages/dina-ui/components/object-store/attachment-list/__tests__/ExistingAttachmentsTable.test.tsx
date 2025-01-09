@@ -1,5 +1,5 @@
 import { DinaForm, FormikButton, ReactTable } from "common-ui";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ExistingMetadataBulkEditor } from "../../../bulk-metadata/ExistingMetadataBulkEditor";
 import { ExistingAttachmentsTable } from "../ExistingAttachmentsTable";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";

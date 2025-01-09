@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitBreadCrumb } from "../StorageUnitBreadCrumb";
 import userEvent from "@testing-library/user-event";

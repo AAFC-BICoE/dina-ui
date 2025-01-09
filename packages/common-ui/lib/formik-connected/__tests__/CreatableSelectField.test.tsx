@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { CreatableSelectField } from "../CreatableSelectField";
 import { fireEvent } from "@testing-library/react";

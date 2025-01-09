@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { AutoSuggestTextField } from "../AutoSuggestTextField";
 import { DinaForm } from "../DinaForm";
 import { fireEvent } from "@testing-library/react";

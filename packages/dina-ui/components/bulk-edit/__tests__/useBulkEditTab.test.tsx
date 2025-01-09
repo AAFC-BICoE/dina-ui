@@ -1,7 +1,7 @@
 import { ResourceWithHooks } from "common-ui";
 import { InputResource } from "kitsu";
 import { useState } from "react";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   getSampleBulkOverrider,

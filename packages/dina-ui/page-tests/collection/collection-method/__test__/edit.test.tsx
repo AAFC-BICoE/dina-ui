@@ -2,7 +2,7 @@ import { OperationsResponse } from "common-ui";
 import CollectionMethodEditPage, {
   CollectionMethodForm
 } from "../../../../pages/collection/collection-method/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";

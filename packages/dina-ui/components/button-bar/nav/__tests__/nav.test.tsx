@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { fireEvent } from "@testing-library/react";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Nav } from "../nav";
 
 describe("Nav component", () => {

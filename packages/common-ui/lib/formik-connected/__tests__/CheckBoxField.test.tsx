@@ -1,5 +1,5 @@
 import React from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { CheckBoxField } from "../CheckBoxField";
 import { DinaForm } from "../DinaForm";
 import { fireEvent } from "@testing-library/react";

@@ -1,6 +1,6 @@
 import { Formik } from "formik";
 import { noop } from "lodash";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { ErrorViewer } from "../ErrorViewer";
 import { SubmitButton } from "../SubmitButton";

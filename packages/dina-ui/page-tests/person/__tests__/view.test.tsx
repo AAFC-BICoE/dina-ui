@@ -1,5 +1,5 @@
 import PersonDetailsPage from "../../../pages/person/view";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/agent-api/resources/Person";
 import "@testing-library/jest-dom";
 

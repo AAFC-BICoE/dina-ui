@@ -1,6 +1,6 @@
 import { waitFor } from "@testing-library/react";
 import { WorkbookTemplateGenerator } from "../../../pages/workbook/generator";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import {

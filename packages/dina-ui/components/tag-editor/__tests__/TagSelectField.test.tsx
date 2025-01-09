@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { TagSelectField } from "../TagSelectField";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

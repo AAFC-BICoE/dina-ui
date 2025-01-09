@@ -1,5 +1,5 @@
 import React from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { FieldExtensionSelectField } from "../FieldExtensionSelectField";
 import Select from "react-select/base";

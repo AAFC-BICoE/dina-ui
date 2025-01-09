@@ -1,5 +1,5 @@
 import ProtocolDetailsPage from "../../../../pages/collection/protocol/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Protocol } from "../../../../types/collection-api/resources/Protocol";
 import "@testing-library/jest-dom";
 

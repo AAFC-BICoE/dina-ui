@@ -1,6 +1,6 @@
 import React from "react";
 import { DinaForm } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PlaceSectionsSelectionField } from "../PlaceSectionsSelectionField";
 import "@testing-library/jest-dom";
 import { screen, waitFor } from "@testing-library/react";

@@ -5,7 +5,7 @@ import Switch from "react-switch";
 import TransactionEditPage, {
   TransactionForm
 } from "../../../../pages/loan-transaction/transaction/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Transaction } from "../../../../types/loan-transaction-api";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

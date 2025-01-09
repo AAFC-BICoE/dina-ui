@@ -1,5 +1,5 @@
 import { DinaForm, SubmitButton } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { GroupSelectField } from "../GroupSelectField";
 import { deleteFromStorage, writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../useStoredDefaultGroup";

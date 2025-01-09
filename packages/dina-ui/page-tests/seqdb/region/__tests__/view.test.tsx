@@ -1,5 +1,5 @@
 import RegionDetailsPage from "../../../../pages/seqdb/region/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
 import "@testing-library/jest-dom";
 

@@ -1,6 +1,6 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import "@testing-library/jest-dom";
 
 describe("WorkbookWarningDialog", () => {

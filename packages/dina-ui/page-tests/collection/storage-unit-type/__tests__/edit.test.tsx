@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { StorageUnitTypeForm } from "../../../../pages/collection/storage-unit-type/edit";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

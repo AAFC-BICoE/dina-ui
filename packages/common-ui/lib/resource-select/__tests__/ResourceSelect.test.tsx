@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { ResourceSelect, ResourceSelectProps } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { AsyncOption } from "../ResourceSelect";
 import "@testing-library/jest-dom";
 import { fireEvent } from "@testing-library/react";

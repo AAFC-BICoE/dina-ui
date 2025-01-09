@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/objectstore-api";
 import { ReferenceLink } from "../ReferenceLink";
 import "@testing-library/jest-dom";

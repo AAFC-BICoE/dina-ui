@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import MaterialSampleListPage from "../../../../pages/collection/material-sample/list";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {

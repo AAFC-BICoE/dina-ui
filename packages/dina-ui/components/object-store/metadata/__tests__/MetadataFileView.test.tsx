@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataFileView } from "../MetadataFileView";
 import "@testing-library/jest-dom";

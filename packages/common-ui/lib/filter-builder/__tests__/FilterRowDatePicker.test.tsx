@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { FilterRowDatePicker } from "../FilterRowDatePicker";
 import { fireEvent } from "@testing-library/react";
 

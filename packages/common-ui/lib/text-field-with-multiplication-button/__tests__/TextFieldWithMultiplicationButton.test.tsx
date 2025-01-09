@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { DinaForm } from "../../formik-connected/DinaForm";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { TextFieldWithMultiplicationButton } from "../TextFieldWithMultiplicationButton";
 
 describe("TextFieldWithMultiplicationButton component", () => {

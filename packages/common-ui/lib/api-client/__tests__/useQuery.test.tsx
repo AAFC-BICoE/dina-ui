@@ -1,7 +1,7 @@
 import { DocWithErrors } from "jsonapi-typescript";
 import { KitsuResource, KitsuResponse, KitsuResponseData } from "kitsu";
 import { last } from "lodash";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ClientSideJoinSpec } from "../client-side-join";
 import { MetaWithTotal } from "../operations-types";
 import {

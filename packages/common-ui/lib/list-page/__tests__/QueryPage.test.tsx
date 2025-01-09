@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { QueryPage } from "../QueryPage";
 import { Row } from "@tanstack/react-table";
 import { TableColumn } from "../types";

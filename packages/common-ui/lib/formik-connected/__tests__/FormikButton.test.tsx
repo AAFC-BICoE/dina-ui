@@ -1,5 +1,5 @@
 import { FormikButton } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";

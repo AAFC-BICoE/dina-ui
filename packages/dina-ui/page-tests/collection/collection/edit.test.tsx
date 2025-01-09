@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { CollectionForm } from "../../../pages/collection/collection/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Collection } from "../../../types/collection-api";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

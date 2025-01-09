@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { DoOperationsError } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { SubmitButton } from "../SubmitButton";
 import { TextField } from "../TextField";

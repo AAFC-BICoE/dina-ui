@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { SangerPcrBatchStep } from "../SangerPcrBatchStep";
 import { noop } from "lodash";
 import { PcrBatch } from "../../../../types/seqdb-api";

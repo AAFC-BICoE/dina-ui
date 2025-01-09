@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import ExternalResourceMetadataViewPage from "../../../../dina-ui/pages/object-store/object/external-resource-view";
-import { mountWithAppContext } from "../../../../dina-ui/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../dina-ui/types/objectstore-api/resources/Metadata";
 import "@testing-library/jest-dom";
 

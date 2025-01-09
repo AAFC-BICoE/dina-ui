@@ -1,5 +1,5 @@
 import { fireEvent } from "@testing-library/react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { useModal } from "../modal";
 import "@testing-library/jest-dom";
 

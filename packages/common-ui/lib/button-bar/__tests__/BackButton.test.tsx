@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { BackButton } from "../BackButton";
 
 const ENTITY_ID = "108559ed-e000-49c4-95e0-03dee7bfce9b";

@@ -1,5 +1,5 @@
 import { titleCell, descriptionCell, ListPageLayout } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ColumnDefinition } from "../QueryTable";
 import "@testing-library/jest-dom";
 

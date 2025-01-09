@@ -1,5 +1,5 @@
 import { Person } from "packages/dina-ui/types/agent-api";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../useAutocompleteSearchButFallbackToRsqlApiSearch";
 import "@testing-library/jest-dom";
 

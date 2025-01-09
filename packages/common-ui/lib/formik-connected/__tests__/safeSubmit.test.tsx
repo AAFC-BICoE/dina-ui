@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import { DoOperationsError } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ErrorViewer } from "../ErrorViewer";
 import { OnFormikSubmit, safeSubmit } from "../safeSubmit";
 import "@testing-library/jest-dom";

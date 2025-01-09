@@ -1,7 +1,7 @@
 import { QueryTable } from "common-ui";
 import { PersistedResource } from "kitsu";
 import ObjectSubtypeListPage from "../../../pages/object-store/object-subtype/list";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 import "@testing-library/jest-dom";
 

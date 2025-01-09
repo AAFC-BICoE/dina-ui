@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { VocabularyElement } from "packages/dina-ui/types/collection-api";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import {
   VocabularyOption,
   VocabularySelectField

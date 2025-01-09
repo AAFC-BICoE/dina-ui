@@ -1,5 +1,5 @@
 import { AddPersonButton, PersonForm } from "../PersonForm";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/objectstore-api";
 import { fireEvent } from "@testing-library/react";
 

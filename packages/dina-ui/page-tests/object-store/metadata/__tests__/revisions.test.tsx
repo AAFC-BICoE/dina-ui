@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import MetadataRevisionListPage from "../../../../pages/object-store/metadata/revisions";
 import { DefaultRow } from "../../../../../common-ui/lib";
 import "@testing-library/jest-dom";

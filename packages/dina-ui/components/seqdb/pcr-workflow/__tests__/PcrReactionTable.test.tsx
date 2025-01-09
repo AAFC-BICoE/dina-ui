@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PcrReactionTable } from "../PcrReactionTable";
 import {
   MATERIAL_SAMPLES,

@@ -1,5 +1,5 @@
 import OrganizationDetailsPage from "../../../pages/organization/view";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import "@testing-library/jest-dom";
 

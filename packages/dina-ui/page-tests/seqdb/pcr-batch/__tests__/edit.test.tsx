@@ -1,7 +1,7 @@
 import { waitFor, fireEvent } from "@testing-library/react";
 import { PersistedResource } from "kitsu";
 import { PcrBatchForm } from "../../../../pages/seqdb/pcr-batch/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PcrBatch, PcrPrimer } from "../../../../types/seqdb-api";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";

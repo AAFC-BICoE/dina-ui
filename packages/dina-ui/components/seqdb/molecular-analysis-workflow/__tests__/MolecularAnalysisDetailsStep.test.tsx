@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import {
   MolecularAnalysisDetailsStep,
   MolecularAnalysisDetailsStepProps

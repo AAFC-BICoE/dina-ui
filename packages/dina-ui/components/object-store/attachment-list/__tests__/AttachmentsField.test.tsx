@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { AttachmentSection } from "../AttachmentSection";
 import { AttachmentsField } from "../AttachmentsField";

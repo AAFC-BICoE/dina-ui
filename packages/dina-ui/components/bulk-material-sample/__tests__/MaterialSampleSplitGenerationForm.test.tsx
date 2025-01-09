@@ -1,5 +1,5 @@
 import { SEPARATORS_DASH } from "../../../types/collection-api/resources/SplitConfiguration";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { MaterialSampleSplitGenerationForm } from "../MaterialSampleSplitGenerationForm";
 import { waitForElementToBeRemoved } from "@testing-library/react";
 

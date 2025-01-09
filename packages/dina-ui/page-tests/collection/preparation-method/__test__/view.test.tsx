@@ -1,5 +1,5 @@
 import PreparationMethodDetailsPage from "../../../../pages/collection/preparation-method/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PreparationMethod } from "../../../../types/collection-api/resources/PreparationMethod";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

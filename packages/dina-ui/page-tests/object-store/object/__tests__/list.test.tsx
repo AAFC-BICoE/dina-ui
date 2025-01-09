@@ -10,7 +10,7 @@ import { PersistedResource } from "kitsu";
 import { Group } from "../../../../types/user-api";
 import { StoredObjectGallery } from "../../../../components/object-store";
 import MetadataListPage from "../../../../pages/object-store/object/list";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Metadata, Person } from "../../../../types/objectstore-api";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import "@testing-library/jest-dom";

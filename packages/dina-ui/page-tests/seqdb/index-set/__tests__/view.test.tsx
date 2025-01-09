@@ -1,5 +1,5 @@
 import IndexSetViewPage from "../../../../pages/seqdb/index-set/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { IndexSet, NgsIndex } from "../../../../types/seqdb-api";
 import "@testing-library/jest-dom";
 

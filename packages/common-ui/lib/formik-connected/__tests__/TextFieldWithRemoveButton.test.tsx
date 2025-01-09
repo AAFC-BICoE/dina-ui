@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { DinaForm } from "../../formik-connected/DinaForm";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { TextFieldWithRemoveButton } from "../TextFieldWithRemoveButton";
 import "@testing-library/jest-dom";
 

@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { MaterialSampleViewPage } from "../../../../pages/collection/material-sample/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import {
   CollectingEvent,
   MaterialSample

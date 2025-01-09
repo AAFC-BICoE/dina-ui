@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { useElasticSearchDistinctTerm } from "../useElasticSearchDistinctTerm";
 import { isEmpty, noop } from "lodash";
 import { QueryBuilderContextProvider } from "../query-builder/QueryBuilder";

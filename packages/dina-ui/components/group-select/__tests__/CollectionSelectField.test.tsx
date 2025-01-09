@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { CollectionSelectField } from "../../resource-select-fields/resource-select-fields";
 import Select from "react-select/base";
 import { screen, waitFor, fireEvent } from "@testing-library/react";

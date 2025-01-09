@@ -1,6 +1,6 @@
 import { IntlProvider } from "react-intl";
 import { DinaForm } from "../../formik-connected/DinaForm";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { FilterBuilderField } from "../FilterBuilderField";
 import { fireEvent } from "@testing-library/react";
 

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
 

@@ -1,5 +1,5 @@
 import ProductDetailsPage from "../../../../pages/seqdb/product/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
 import "@testing-library/jest-dom";
 

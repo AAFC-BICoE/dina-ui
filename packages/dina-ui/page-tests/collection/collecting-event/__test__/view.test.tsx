@@ -1,6 +1,6 @@
 import { Person } from "../../../../types/agent-api/resources/Person";
 import CollectingEventDetailsPage from "../../../../pages/collection/collecting-event/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 import "@testing-library/jest-dom";
 

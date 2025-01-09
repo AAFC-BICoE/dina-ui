@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { CatalogueOfLifeNameField } from "../CatalogueOfLifeNameField";
 import { NameUsageSearchResult } from "../nameusage-types";
 import { screen, waitFor, fireEvent } from "@testing-library/react";

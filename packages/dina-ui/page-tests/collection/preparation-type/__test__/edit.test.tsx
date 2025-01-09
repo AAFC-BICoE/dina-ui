@@ -2,7 +2,7 @@ import { OperationsResponse } from "common-ui";
 import PreparationTypeEditPage, {
   PreparationTypeForm
 } from "../../../../pages/collection/preparation-type/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

@@ -1,5 +1,5 @@
 import { DinaForm } from "../DinaForm";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DataEntryField } from "../data-entry/DataEntryField";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";

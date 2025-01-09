@@ -1,7 +1,7 @@
 import { OperationsResponse } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import PersonEditPage from "../../../pages/person/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

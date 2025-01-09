@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DateField } from "../DateField";
 import { DinaForm } from "../DinaForm";
 import { fireEvent } from "@testing-library/react";

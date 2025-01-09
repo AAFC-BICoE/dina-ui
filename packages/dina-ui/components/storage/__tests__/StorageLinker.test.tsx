@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "common-ui";
 import { StorageLinkerField } from "../StorageLinker";
 import userEvent from "@testing-library/user-event";

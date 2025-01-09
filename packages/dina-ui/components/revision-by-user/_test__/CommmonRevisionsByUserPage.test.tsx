@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { OBJECT_STORE_MODULE_REVISION_ROW_CONFIG } from "../../revisions/revision-modules";
 import RevisionsByUserPage, {
   AuthorFilterForm

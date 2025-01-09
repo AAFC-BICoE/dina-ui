@@ -2,7 +2,7 @@ import { deleteFromStorage } from "@rehooks/local-storage";
 import { DoOperationsError } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { SAMPLE_FORM_TEMPLATE_KEY } from "../..";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,

@@ -9,7 +9,7 @@ import { fileUploadErrorHandler } from "../../../components/object-store/file-up
 import UploadPage, {
   BULK_ADD_IDS_KEY
 } from "../../../pages/object-store/upload";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";

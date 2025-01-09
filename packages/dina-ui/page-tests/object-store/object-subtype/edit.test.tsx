@@ -1,6 +1,6 @@
 import { OperationsResponse } from "common-ui";
 import { ObjectSubtypeEditPage } from "../../../pages/object-store/object-subtype/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

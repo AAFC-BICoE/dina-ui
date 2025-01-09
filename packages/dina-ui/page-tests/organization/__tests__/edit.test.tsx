@@ -2,7 +2,7 @@ import { OperationsResponse } from "common-ui";
 import OrganizationEditPage, {
   trimAliases
 } from "../../../pages/organization/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

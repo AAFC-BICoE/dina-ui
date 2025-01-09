@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { FieldView } from "../FieldView";
 import "@testing-library/jest-dom";

@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { NotPubliclyReleasableWarning } from "../NotPubliclyReleasableWarning";
 import "@testing-library/jest-dom";
 

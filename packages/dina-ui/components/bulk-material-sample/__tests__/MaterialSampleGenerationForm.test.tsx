@@ -1,5 +1,5 @@
 import { writeStorage } from "@rehooks/local-storage";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../group-select/useStoredDefaultGroup";
 import { MaterialSampleGenerationForm } from "../MaterialSampleGenerationForm";
 import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";

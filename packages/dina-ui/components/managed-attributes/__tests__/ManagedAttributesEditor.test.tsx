@@ -1,7 +1,7 @@
 import { DinaForm, ResourceSelect } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { FormTemplate } from "../../../types/collection-api";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ManagedAttributesEditor } from "../ManagedAttributesEditor";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

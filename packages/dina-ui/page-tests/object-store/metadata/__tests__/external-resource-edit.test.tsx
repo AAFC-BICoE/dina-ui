@@ -5,7 +5,7 @@ import {
   Metadata,
   ObjectSubtype
 } from "../../../../types/objectstore-api";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import ExternalResourceMetadataPage from "../../../../pages/object-store/metadata/external-resource-edit";
 import Select from "react-select/base";
 import { ResourceSelectField } from "common-ui";

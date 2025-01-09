@@ -1,5 +1,5 @@
 import { ProjectForm } from "../../../../pages/collection/project/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 

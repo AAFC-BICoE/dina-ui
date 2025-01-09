@@ -1,5 +1,5 @@
 import { waitForElementToBeRemoved } from "@testing-library/react";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { FileView } from "../FileView";
 import "@testing-library/jest-dom";
 

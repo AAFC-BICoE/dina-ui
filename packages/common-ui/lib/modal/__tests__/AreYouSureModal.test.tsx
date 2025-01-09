@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { AreYouSureModal } from "../AreYouSureModal";
 import { useModal } from "../modal";
 import { fireEvent } from "@testing-library/react";

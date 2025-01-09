@@ -1,5 +1,5 @@
 import CollectionDetailsPage from "../../../pages/collection/collection/view";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Collection } from "../../../types/collection-api";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";

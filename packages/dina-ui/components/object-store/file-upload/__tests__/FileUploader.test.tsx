@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { noop } from "lodash";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { FileUploader } from "../FileUploader";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";

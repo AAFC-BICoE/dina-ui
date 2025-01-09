@@ -1,5 +1,5 @@
 import PcrPrimerDetailsPage from "../../../../pages/seqdb/pcr-primer/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 import "@testing-library/jest-dom";
 

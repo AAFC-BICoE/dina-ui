@@ -1,5 +1,5 @@
 import { InputResource } from "kitsu";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import {
   blankMaterialSample,
   MaterialSample

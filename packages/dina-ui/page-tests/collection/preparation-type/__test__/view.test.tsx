@@ -1,5 +1,5 @@
 import PreparationTypeDetailsPage from "../../../../pages/collection/preparation-type/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
 import "@testing-library/jest-dom";
 

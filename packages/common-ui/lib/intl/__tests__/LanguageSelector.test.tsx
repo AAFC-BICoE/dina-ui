@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { fireEvent, waitFor } from "@testing-library/react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { LanguageSelector } from "../LanguageSelector";
 
 const INSTANCE_DATA = {

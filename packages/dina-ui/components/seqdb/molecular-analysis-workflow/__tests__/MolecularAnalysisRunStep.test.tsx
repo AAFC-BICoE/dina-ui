@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../../../../dina-ui/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { noop } from "lodash";
 import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";

@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import React from "react";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { GlobalNamesSearchResult } from "../global-names-search-result-type";
 import { GlobalNamesField } from "../GlobalNamesField";
 import { screen, waitFor, fireEvent } from "@testing-library/react";

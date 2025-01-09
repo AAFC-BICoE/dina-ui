@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { useEffect } from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { useGroupedCheckBoxes } from "../GroupedCheckBoxFields";
 import { fireEvent, screen, waitFor } from "@testing-library/react";

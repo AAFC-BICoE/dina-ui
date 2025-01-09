@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "../../../../../dina-ui/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
 import { noop } from "lodash";
 import {

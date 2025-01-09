@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { FilterBuilder, FilterBuilderProps } from "../FilterBuilder";
 import { FilterGroupModel } from "../FilterGroup";
 import "@testing-library/jest-dom";

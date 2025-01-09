@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 import lodash from "lodash";
 import Select from "react-select/base";
 import { ResourceSelectField } from "../../";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import "@testing-library/jest-dom";
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
