@@ -1,6 +1,5 @@
 import { SaveArgs } from "common-ui";
 import { PersistedResource } from "kitsu";
-import ReactSwitch from "react-switch";
 import { getComponentOrderFromTemplate } from "../../../../components/form-template/formTemplateUtils";
 import { FormTemplateEditPageLoaded } from "../../../../pages/collection/form-template/edit";
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
