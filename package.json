@@ -50,8 +50,6 @@
     "minimatch": "^3.0.5",
     "loader-utils": "^1.4.2",
     "json5": "^2.2.2",
-    "@types/react": "17.0.2",
-    "@types/react-dom": "17.0.2",
     "mammoth": "1.6.0",
     "underscore": "1.13.1",
     "@babel/traverse": "7.23.2",
