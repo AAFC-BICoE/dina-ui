@@ -11,7 +11,7 @@ exports[`QueryConjunctionSwitch component Snapshot Test 1`] = `
         type="button"
       >
         <span>
-           
+          AND
         </span>
       </button>
       <button
@@ -19,7 +19,7 @@ exports[`QueryConjunctionSwitch component Snapshot Test 1`] = `
         type="button"
       >
         <span>
-           
+          OR
         </span>
       </button>
     </div>
@@ -38,7 +38,7 @@ exports[`QueryConjunctionSwitch component Snapshot Test 2`] = `
         type="button"
       >
         <span>
-           
+          AND
         </span>
       </button>
       <button
@@ -46,7 +46,7 @@ exports[`QueryConjunctionSwitch component Snapshot Test 2`] = `
         type="button"
       >
         <span>
-           
+          OR
         </span>
       </button>
     </div>

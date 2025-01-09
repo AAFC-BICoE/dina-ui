@@ -1,26 +1,7 @@
-import { SUPER_USER, USER } from "common-ui/types/DinaRoles";
-import DinaUserDetailsPage from "../../../pages/dina-user/view";
-import {
-  mountWithAppContext,
-  mountWithAppContext
-} from "../../../test-util/mock-app-context";
-import { Person } from "../../../types/objectstore-api";
-import { DinaUser } from "../../../types/user-api/resources/DinaUser";
+import { mountWithAppContext } from "common-ui";
 import GroupDetailsPage from "../../../pages/group/view";
 import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-
-/** Test dina user with all fields defined. */
-const TEST_DINAUSER: DinaUser = {
-  username: "cnc-cm",
-  emailAddress: "a.b@c.d",
-  groups: ["dao", "cnc"],
-  roles: ["/dao/" + USER, "/cnc/" + SUPER_USER],
-  agentId: "e3a18289-4a9d-4ad6-ad06-3c7f1837406e",
-  id: "1",
-  type: "user",
-  rolesPerGroup: { cnc: [SUPER_USER] }
-};
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async () => {
