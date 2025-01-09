@@ -1,7 +1,7 @@
 import { ResourceWithHooks } from "common-ui";
 import { InputResource } from "kitsu";
 import { useState } from "react";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   getSampleBulkOverrider,
@@ -192,7 +192,7 @@ describe("Material sample bulk edit tab", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Without changing any fields, overrides nothing", async () => {
-    const wrapper = mountWithAppContext2(<BulkEditTab />, testCtx);
+    const wrapper = mountWithAppContext(<BulkEditTab />, testCtx);
     await new Promise(setImmediate);
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
@@ -205,7 +205,7 @@ describe("Material sample bulk edit tab", () => {
   });
 
   it("Overrides the barcode field", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <BulkEditTab
         baseSample={{
           type: "material-sample",
@@ -234,7 +234,7 @@ describe("Material sample bulk edit tab", () => {
   });
 
   it("Overrides only the linked resources after enabling all data components", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <BulkEditTab
         baseSample={{
           type: "material-sample",
@@ -273,7 +273,7 @@ describe("Material sample bulk edit tab", () => {
   });
 
   it("Combines managed attribute values from the original and the bulk override.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <BulkEditTab
         baseSample={{
           type: "material-sample",

@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { MaterialSampleViewPage } from "../../../../pages/collection/material-sample/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   CollectingEvent,
   MaterialSample
@@ -89,7 +89,7 @@ const testCtx = {
 
 describe("Material Sample View Page", () => {
   it("Renders the Material Sample with the linked Collecting Event", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleViewPage router={{ query: { id: "1" } } as any} />,
       testCtx
     );
@@ -102,7 +102,7 @@ describe("Material Sample View Page", () => {
   });
 
   it("Renders the organisms expanded by default.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleViewPage
         router={{ query: { id: "ms-with-organisms" } } as any}
       />,

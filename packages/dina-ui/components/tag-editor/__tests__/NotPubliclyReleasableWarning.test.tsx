@@ -1,11 +1,11 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { NotPubliclyReleasableWarning } from "../NotPubliclyReleasableWarning";
 import "@testing-library/jest-dom";
 
 describe("NotPubliclyReleasableWarning component", () => {
   it("Renders when Not Publicly Releasable and read-only.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ publiclyReleasable: false }} readOnly={true}>
         <NotPubliclyReleasableWarning />
       </DinaForm>
@@ -18,7 +18,7 @@ describe("NotPubliclyReleasableWarning component", () => {
   });
 
   it("Doesn't render when Publicly Releasable is true.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ publiclyReleasable: true }} readOnly={true}>
         <NotPubliclyReleasableWarning />
       </DinaForm>
@@ -32,7 +32,7 @@ describe("NotPubliclyReleasableWarning component", () => {
   });
 
   it("Doesn't render when in an editable form.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ publiclyReleasable: false }}>
         <NotPubliclyReleasableWarning />
       </DinaForm>

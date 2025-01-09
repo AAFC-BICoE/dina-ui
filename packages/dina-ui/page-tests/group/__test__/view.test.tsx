@@ -2,7 +2,7 @@ import { SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
 import {
   mountWithAppContext,
-  mountWithAppContext2
+  mountWithAppContext
 } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/objectstore-api";
 import { DinaUser } from "../../../types/user-api/resources/DinaUser";
@@ -63,7 +63,7 @@ const apiContext: any = {
 
 describe("Group view page", () => {
   it("Render the group details", async () => {
-    const wrapper = mountWithAppContext2(<GroupDetailsPage />, {
+    const wrapper = mountWithAppContext(<GroupDetailsPage />, {
       apiContext
     });
 

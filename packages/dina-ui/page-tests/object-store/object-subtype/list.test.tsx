@@ -1,7 +1,7 @@
 import { QueryTable } from "common-ui";
 import { PersistedResource } from "kitsu";
 import ObjectSubtypeListPage from "../../../pages/object-store/object-subtype/list";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 import "@testing-library/jest-dom";
 
@@ -42,7 +42,7 @@ describe("Object subtype list page", () => {
   });
 
   it("Renders the object subtype list page table", async () => {
-    const wrapper = mountWithAppContext2(<ObjectSubtypeListPage />, {
+    const wrapper = mountWithAppContext(<ObjectSubtypeListPage />, {
       apiContext
     });
 

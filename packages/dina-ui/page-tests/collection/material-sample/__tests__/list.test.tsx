@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import MaterialSampleListPage from "../../../../pages/collection/material-sample/list";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -270,7 +270,7 @@ const testCtx = {
 
 describe("Material Sample List Page", () => {
   it("Render the material-sample list page", async () => {
-    const component = mountWithAppContext2(<MaterialSampleListPage />, testCtx);
+    const component = mountWithAppContext(<MaterialSampleListPage />, testCtx);
     expect(await component.findByTestId("ReactTable")).toBeInTheDocument();
 
     const reactTable = await component.findByTestId("ReactTable");

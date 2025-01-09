@@ -1,6 +1,6 @@
 import { OperationsResponse } from "common-ui";
 import { ProductEditPage } from "../../../../pages/seqdb/product/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
 import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
@@ -55,7 +55,7 @@ describe("Product edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ProductEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
@@ -115,7 +115,7 @@ describe("Product edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ProductEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
@@ -156,7 +156,7 @@ describe("Product edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ProductEditPage router={{ query: { id: 10 }, push: mockPush } as any} />,
       { apiContext }
     );

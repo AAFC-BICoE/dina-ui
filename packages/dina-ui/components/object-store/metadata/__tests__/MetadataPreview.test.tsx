@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataPreview } from "../MetadataPreview";
 import { waitFor } from "@testing-library/react";
@@ -60,7 +60,7 @@ const apiContext: any = { apiClient: { get: mockGet }, bulkGet: mockBulkGet };
 
 describe("MetadataPreview component", () => {
   it("Renders the metadata preview", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MetadataPreview metadataId="232eda40-dc97-4255-91c4-f30485e2c707" />,
       { apiContext }
     );

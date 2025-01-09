@@ -1,5 +1,5 @@
 import { fireEvent } from "@testing-library/react";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ListPageLayout } from "../ListPageLayout";
 
 /** Mock Kitsu "get" method. */
@@ -14,7 +14,7 @@ describe("ListPageLayout component", () => {
   });
 
   it("Has a reset button to clear the filter form.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"
         filterAttributes={["name"]}
@@ -57,7 +57,7 @@ describe("ListPageLayout component", () => {
   });
 
   it("Stores the table's sort in localstorage.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"
         filterAttributes={["name"]}
@@ -89,7 +89,7 @@ describe("ListPageLayout component", () => {
   });
 
   it("Allows a passed additionalFilters prop.", async () => {
-    mountWithAppContext2(
+    mountWithAppContext(
       <ListPageLayout
         id="test-layout"
         additionalFilters={{

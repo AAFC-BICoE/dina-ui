@@ -1,5 +1,5 @@
 import { SEPARATORS_DASH } from "../../../types/collection-api/resources/SplitConfiguration";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { MaterialSampleSplitGenerationForm } from "../MaterialSampleSplitGenerationForm";
 import { waitForElementToBeRemoved } from "@testing-library/react";
 
@@ -65,7 +65,7 @@ describe("MaterialSampleSplitGenerationForm", () => {
   beforeEach(() => jest.clearAllMocks);
 
   it("Layout snapshot with matching material sample types.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleSplitGenerationForm
         onGenerate={mockOnGenerate}
         ids={[NO_CHILDREN_MATERIAL_SAMPLE_UUID]}
@@ -94,7 +94,7 @@ describe("MaterialSampleSplitGenerationForm", () => {
   });
 
   it("Layout snapshot without matching material sample types.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleSplitGenerationForm
         onGenerate={mockOnGenerate}
         ids={[NO_CHILDREN_MATERIAL_SAMPLE_UUID]}

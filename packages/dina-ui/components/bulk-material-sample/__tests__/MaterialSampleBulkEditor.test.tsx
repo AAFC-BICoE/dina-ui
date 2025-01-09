@@ -2,7 +2,7 @@ import { deleteFromStorage } from "@rehooks/local-storage";
 import { DoOperationsError } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { SAMPLE_FORM_TEMPLATE_KEY } from "../..";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
@@ -1078,7 +1078,7 @@ describe("MaterialSampleBulkEditor", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Bulk creates material samples.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1163,7 +1163,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Bulk creates material samples using other catalogue and other identifiers", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1258,7 +1258,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Bulk edit all material samples using other catalogue and other identifiers", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={
@@ -1316,7 +1316,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1376,7 +1376,7 @@ describe("MaterialSampleBulkEditor", () => {
       );
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1456,7 +1456,7 @@ describe("MaterialSampleBulkEditor", () => {
       );
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1531,7 +1531,7 @@ describe("MaterialSampleBulkEditor", () => {
       ]);
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1571,7 +1571,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1615,7 +1615,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Doesnt override the values when the Override All button is not clicked.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_ARRAY_VALUES}
@@ -1696,7 +1696,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Overrides the values when the Override All buttons are clicked.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_ARRAY_VALUES}
@@ -1872,7 +1872,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows the Multiple Values placeholder in bulk editable fields", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES}
@@ -1905,7 +1905,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows the common value when multiple fields have the same value.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
@@ -1979,7 +1979,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Ignores the submitted value if the field is re-edited to the common value.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
@@ -2068,7 +2068,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Renders blank values without the has-bulk-edit-value indicator when there is a common field value.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
@@ -2101,7 +2101,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Adds the has-bulk-edit-value classname when the field is edited.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -2126,7 +2126,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows the managed attributes for all edited samples.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_MANAGED_ATTRIBUTES}
@@ -2165,7 +2165,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Creates and links a unique Collecting Event to all samples", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -2352,7 +2352,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows the common Collecting Event when all samples are linked to the same one.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
@@ -2445,7 +2445,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Lets you bulk reassign the linked storage", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_STORAGE_UNIT}
@@ -2598,7 +2598,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Edits the nested hostOrganism field.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_HOST_ORGANISM}
@@ -2666,7 +2666,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Allows adding NEW nested Collecting the individual sample tabs.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -2758,7 +2758,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Allows selecting a Form Template to show/hide fields in the bulk and single tabs for material sample section.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -2778,7 +2778,7 @@ describe("MaterialSampleBulkEditor", () => {
     wrapper.unmount();
 
     // Select a form template:
-    const wrapper2 = mountWithAppContext2(
+    const wrapper2 = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -2816,7 +2816,7 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Allows selecting a Form Template to provide default values for bulk material sample edit all tab.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -2836,7 +2836,7 @@ describe("MaterialSampleBulkEditor", () => {
     wrapper.unmount();
 
     // Select a form template:
-    const wrapper2 = mountWithAppContext2(
+    const wrapper2 = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}

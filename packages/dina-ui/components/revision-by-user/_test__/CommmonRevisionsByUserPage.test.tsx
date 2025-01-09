@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { OBJECT_STORE_MODULE_REVISION_ROW_CONFIG } from "../../revisions/revision-modules";
 import RevisionsByUserPage, {
   AuthorFilterForm
@@ -43,7 +43,7 @@ describe("MetadataRevisionListPage", () => {
   it("Renders the page.", async () => {
     mockUseRouter.mockReturnValue({ query: { author: "MatPoff" } });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <RevisionsByUserPage
         snapshotPath="objectstore-api/audit-snapshot"
         revisionRowConfigsByType={OBJECT_STORE_MODULE_REVISION_ROW_CONFIG}
@@ -85,7 +85,7 @@ describe("MetadataRevisionListPage", () => {
       query: {}
     });
 
-    const wrapper = mountWithAppContext2(<AuthorFilterForm />);
+    const wrapper = mountWithAppContext(<AuthorFilterForm />);
 
     userEvent.type(
       wrapper.getByRole("textbox", { name: /author/i }),

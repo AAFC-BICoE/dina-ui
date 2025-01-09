@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../../dina-ui/test-util/mock-app-context";
 import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
 import { noop } from "lodash";
 import {
@@ -121,7 +121,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Loading spinner is displayed on first load", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <SangerRunStep
         editMode={false}
         performSave={false}
@@ -137,7 +137,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
   });
 
   it("Display the sequencing run in the UI", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <SangerRunStep
         editMode={true}
         performSave={false}
@@ -216,7 +216,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
   });
 
   it("Multiple runs exist for one seq-batch, display warning to user", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <SangerRunStep
         editMode={true}
         performSave={false}
@@ -277,7 +277,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
   }
 
   it("No run exists, in edit mode, create a new run", async () => {
-    const wrapper = mountWithAppContext2(<TestComponent />, testCtx);
+    const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
     // Automatically go into edit mode if no sequencing runs exist.
     await waitFor(() => {
@@ -449,7 +449,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
   });
 
   it("Run exists, in edit mode, update the existing run", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponent seqBatchId={SEQ_BATCH_ID} />,
       testCtx
     );
@@ -533,7 +533,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
   });
 
   it("Automatically switch to edit mode and be able to cancel", async () => {
-    const wrapper = mountWithAppContext2(<TestComponent />, testCtx);
+    const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));

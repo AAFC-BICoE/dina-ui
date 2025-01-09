@@ -1,5 +1,5 @@
 import PreparationMethodDetailsPage from "../../../../pages/collection/preparation-method/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PreparationMethod } from "../../../../types/collection-api/resources/PreparationMethod";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -33,7 +33,7 @@ jest.mock("next/router", () => ({
 
 describe("PreparationMethod details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<PreparationMethodDetailsPage />, {
+    const wrapper = mountWithAppContext(<PreparationMethodDetailsPage />, {
       apiContext
     });
 
@@ -42,7 +42,7 @@ describe("PreparationMethod details page", () => {
   });
 
   it("Render the PreparationMethod details", async () => {
-    const wrapper = mountWithAppContext2(<PreparationMethodDetailsPage />, {
+    const wrapper = mountWithAppContext(<PreparationMethodDetailsPage />, {
       apiContext
     });
 

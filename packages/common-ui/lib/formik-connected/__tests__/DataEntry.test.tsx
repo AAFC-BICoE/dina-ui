@@ -1,5 +1,5 @@
 import { DinaForm } from "../DinaForm";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DataEntryField } from "../data-entry/DataEntryField";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
@@ -78,7 +78,7 @@ describe("DataEntry", () => {
 
   it("Tests correct number of data blocks and data block fields entered", async () => {
     const name = "extensionValues";
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={async ({ submittedValues }) => mockSubmit(submittedValues)}

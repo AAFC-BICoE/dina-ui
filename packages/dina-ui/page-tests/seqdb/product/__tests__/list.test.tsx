@@ -1,5 +1,5 @@
 import ProductListPage from "../../../../pages/seqdb/product/list";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -33,7 +33,7 @@ const apiContext: any = {
 
 describe("Product list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext2(<ProductListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
 
     await new Promise(setImmediate);
 
@@ -43,7 +43,7 @@ describe("Product list page", () => {
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithAppContext2(<ProductListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);

@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { ThumbnailCell } from "../thumbnail-cell";
 import "@testing-library/jest-dom";
 
@@ -34,7 +34,7 @@ describe("Thumbnail cell component", () => {
   window.URL.createObjectURL = jest.fn(() => MOCK_AXIOS_REPONSE);
 
   it("Using data from the API, display the thumbnail", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       (
         ThumbnailCell({
           bucketField: "data.attributes.bucket"

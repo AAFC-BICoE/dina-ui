@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 import lodash from "lodash";
 import Select from "react-select/base";
 import { ResourceSelectField } from "../../";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import "@testing-library/jest-dom";
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
@@ -59,7 +59,7 @@ jest.mock("use-debounce", () => ({
 
 describe("ResourceSelectField component", () => {
   it("Displays the Formik field's value.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ group: { id: "3", groupName: "Mat's Group" } }}
       >
@@ -85,7 +85,7 @@ describe("ResourceSelectField component", () => {
       group: { groupName?: string } | null;
     }
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm<TestForm> initialValues={{ group: null }}>
         {({ values: { group } }) => (
           <div>
@@ -134,7 +134,7 @@ describe("ResourceSelectField component", () => {
   it("Provides an onChange callback prop.", async () => {
     const mockOnChange = jest.fn();
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}>
         <ResourceSelectField<TestGroup>
           name="group"
@@ -166,7 +166,7 @@ describe("ResourceSelectField component", () => {
   });
 
   it("Renders the read-only view.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{
           singleGroup: { id: "1", groupName: "Group 1" },
@@ -232,7 +232,7 @@ describe("ResourceSelectField component", () => {
   });
 
   it("Renders the read-only view for a shallow reference by fetching the full object", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{
           singleGroup: { id: "100", type: "group" },

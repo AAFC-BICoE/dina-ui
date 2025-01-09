@@ -1,5 +1,5 @@
 import React from "react";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { QueryLogicSwitchField } from "../QueryLogicSwitchField";
 import "@testing-library/jest-dom";
@@ -8,7 +8,7 @@ import userEvent from "@testing-library/user-event";
 
 describe("QueryLogicSwitchField component", () => {
   it("Displays the field's label value.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: "and" } }}>
         <QueryLogicSwitchField name="testObject.testField" />
       </DinaForm>
@@ -19,7 +19,7 @@ describe("QueryLogicSwitchField component", () => {
   });
 
   it("Changes the selected query logic will update the submitted value.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: "and" } }}>
         <QueryLogicSwitchField name="testObject.testField" />
       </DinaForm>

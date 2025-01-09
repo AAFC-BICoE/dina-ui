@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import { DoOperationsError } from "../..";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ErrorViewer } from "../ErrorViewer";
 import { OnFormikSubmit, safeSubmit } from "../safeSubmit";
 import "@testing-library/jest-dom";
@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 function getWrapper(customOnSubmit: OnFormikSubmit) {
   const onSubmit = safeSubmit(customOnSubmit);
 
-  return mountWithAppContext2(
+  return mountWithAppContext(
     <Formik initialValues={{ testProperty: "testValue" }} onSubmit={onSubmit}>
       <Form translate={undefined}>
         <ErrorViewer />

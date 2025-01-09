@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { SetDefaultSampleName } from "../SetDefaultSampleName";
 import { CollectionSelectSection } from "../../CollectionSelectSection";
 import { MaterialSampleIdentifiersSection } from "../MaterialSampleIdentifiersSection";
@@ -31,7 +31,7 @@ const testCtx = {
 
 describe("SetDefaultSampleName", () => {
   it("Sets the sample name based on the selected Collection.", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm
         initialValues={{
           materialSampleName: "",
@@ -76,7 +76,7 @@ describe("SetDefaultSampleName", () => {
   });
 
   it("Doesn't change the sample name when it already starts with the prefix.", async () => {
-    mountWithAppContext2(
+    mountWithAppContext(
       <DinaForm
         initialValues={{
           materialSampleName: "INITIAL-CODE-100",

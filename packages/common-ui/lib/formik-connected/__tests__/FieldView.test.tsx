@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FieldView } from "../FieldView";
 import "@testing-library/jest-dom";
@@ -6,7 +6,7 @@ import "@testing-library/jest-dom";
 describe("FieldView component", () => {
   it("Renders the label and field value. (minimal use case)", () => {
     // Render the component using the provided RTL wrapper function
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { name: "testName" } }}>
         <FieldView name="testObject.name" />
       </DinaForm>
@@ -27,7 +27,7 @@ describe("FieldView component", () => {
   });
 
   it("Renders with a custom label.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { name: "testName" } }}>
         <FieldView label="Custom Label" name="testObject.name" />
       </DinaForm>
@@ -43,7 +43,7 @@ describe("FieldView component", () => {
 
   it("Allows an optional link prop.", () => {
     // Render the component with the context wrapper
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { name: "testName" } }}>
         <FieldView link="/linked-page" name="testObject.name" />
       </DinaForm>
@@ -56,7 +56,7 @@ describe("FieldView component", () => {
   });
 
   it("Renders field value as comma seperated string when it is string array object", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{
           testObject: { aliases: ["alias1", "alias2"] }

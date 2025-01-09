@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import {
   GeoSuggestSearchBox,
@@ -46,7 +46,7 @@ describe("GeoSuggestTextField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Fetches the suggestions from the Nominatim API.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GeoSuggestSearchBox fetchJson={mockFetchJson} />
       </DinaForm>

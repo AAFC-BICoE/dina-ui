@@ -1,5 +1,5 @@
 import CollectionDetailsPage from "../../../pages/collection/collection/view";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Collection } from "../../../types/collection-api";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -33,7 +33,7 @@ jest.mock("next/router", () => ({
 
 describe("Collection view page", () => {
   it("Renders the Collection details", async () => {
-    const wrapper = mountWithAppContext2(<CollectionDetailsPage />, {
+    const wrapper = mountWithAppContext(<CollectionDetailsPage />, {
       apiContext
     });
 

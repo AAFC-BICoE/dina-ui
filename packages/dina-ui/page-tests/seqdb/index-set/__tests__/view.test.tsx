@@ -1,5 +1,5 @@
 import IndexSetViewPage from "../../../../pages/seqdb/index-set/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { IndexSet, NgsIndex } from "../../../../types/seqdb-api";
 import "@testing-library/jest-dom";
 
@@ -56,7 +56,7 @@ const mockCtx = {
 };
 
 function getWrapper() {
-  return mountWithAppContext2(<IndexSetViewPage />, {
+  return mountWithAppContext(<IndexSetViewPage />, {
     apiContext: mockCtx as any
   });
 }

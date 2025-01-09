@@ -1,7 +1,7 @@
 import { DocWithErrors } from "jsonapi-typescript";
 import { KitsuResource, KitsuResponse, KitsuResponseData } from "kitsu";
 import { last } from "lodash";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ClientSideJoinSpec } from "../client-side-join";
 import { MetaWithTotal } from "../operations-types";
 import {
@@ -147,7 +147,7 @@ describe("useQuery hook", () => {
 
   it("Provides an onSuccess callback arg", async () => {
     mockGet.mockImplementationOnce(async () => MOCK_TODO_RESPONSE);
-    mountWithAppContext2(<TestComponent />, testCtx);
+    mountWithAppContext(<TestComponent />, testCtx);
 
     await new Promise(setImmediate);
 
@@ -159,7 +159,7 @@ describe("useQuery hook", () => {
     mockGet.mockImplementation(async () => MOCK_TODO_RESPONSE);
 
     // Render with an initial 'deps' prop.
-    const { rerender } = mountWithAppContext2(
+    const { rerender } = mountWithAppContext(
       <TestComponent deps={[1]} />,
       testCtx
     );
@@ -178,7 +178,7 @@ describe("useQuery hook", () => {
     mockGet.mockImplementation(async () => MOCK_TODO_RESPONSE);
 
     // Render with an initial 'deps' prop.
-    const { rerender } = mountWithAppContext2(
+    const { rerender } = mountWithAppContext(
       <TestComponent deps={[1]} />,
       testCtx
     );
@@ -200,7 +200,7 @@ describe("useQuery hook", () => {
     ]);
 
     // Render with a joinSpec to a "people-api".
-    mountWithAppContext2(
+    mountWithAppContext(
       <TestComponent
         joinSpecs={[
           {
@@ -242,7 +242,7 @@ describe("useQuery hook", () => {
 
   it("Lets you disable the query.", async () => {
     // Render with an initial 'deps' prop.
-    mountWithAppContext2(<TestComponent disabled={true} />, testCtx);
+    mountWithAppContext(<TestComponent disabled={true} />, testCtx);
     await new Promise(setImmediate);
 
     expect(mockGet).toHaveBeenCalledTimes(0);
@@ -250,7 +250,7 @@ describe("useQuery hook", () => {
 
   it("Renders with loading as true before sending a request", (done) => {
     let renderCount = 0;
-    mountWithAppContext2(
+    mountWithAppContext(
       <Query<Todo[]> query={{ path: "todo" }}>
         {({ loading }) => {
           // Query should be rendered once with loading as true.
@@ -267,7 +267,7 @@ describe("useQuery hook", () => {
   });
 
   it("Passes single-resource data from the mocked API to child components", (done) => {
-    mountWithAppContext2(
+    mountWithAppContext(
       <Query<Todo> query={{ path: "todo/25" }}>
         {({ loading, response }) => {
           if (response) {
@@ -285,7 +285,7 @@ describe("useQuery hook", () => {
   });
 
   it("Passes list data from the mocked API to child components", (done) => {
-    mountWithAppContext2(
+    mountWithAppContext(
       <Query<Todo[], MetaWithTotal> query={{ path: "todo" }}>
         {({ loading, response }) => {
           if (response) {
@@ -318,7 +318,7 @@ describe("useQuery hook", () => {
   });
 
   it("Supports JSONAPI GET params", () => {
-    mountWithAppContext2(
+    mountWithAppContext(
       <Query<Todo[]>
         query={{
           fields: { todo: "name,description" },
@@ -352,7 +352,7 @@ describe("useQuery hook", () => {
 
   it("Renders an error to child components", (done) => {
     // Get an error by requesting an attribute that the resource doesn't have.
-    mountWithAppContext2(
+    mountWithAppContext(
       <Query<Todo[]>
         query={{ path: "todo", fields: { todo: "unknownAttribute" } }}
       >
@@ -373,7 +373,7 @@ describe("useQuery hook", () => {
     const mockChild = jest.fn(() => null);
 
     // The first render will fetch the data once.
-    const { rerender } = mountWithAppContext2(
+    const { rerender } = mountWithAppContext(
       pagedQuery({ offset: 0, limit: 3 }, mockChild),
       testCtx
     );
@@ -417,7 +417,7 @@ describe("useQuery hook", () => {
     const mockChild = jest.fn(() => null);
 
     // Initial render.
-    const { rerender } = mountWithAppContext2(
+    const { rerender } = mountWithAppContext(
       pagedQuery({ offset: 0, limit: 3 }, mockChild),
       testCtx
     );
@@ -457,7 +457,7 @@ describe("useQuery hook", () => {
     const pageSpec = { offset: 0, limit: 3 };
 
     // The first render will fetch the data once.
-    const { rerender } = mountWithAppContext2(pagedQuery(pageSpec), testCtx);
+    const { rerender } = mountWithAppContext(pagedQuery(pageSpec), testCtx);
     expect(mockGet).toHaveBeenCalledTimes(1);
 
     // The second render with the same props will not fetch again.

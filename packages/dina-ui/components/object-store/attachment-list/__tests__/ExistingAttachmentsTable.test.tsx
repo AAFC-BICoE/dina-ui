@@ -1,5 +1,5 @@
 import { DinaForm, FormikButton, ReactTable } from "common-ui";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ExistingMetadataBulkEditor } from "../../../bulk-metadata/ExistingMetadataBulkEditor";
 import { ExistingAttachmentsTable } from "../ExistingAttachmentsTable";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
@@ -126,7 +126,7 @@ describe("ExistingAttachmentsTable component", () => {
   });
 
   it("Renders the attachments in a table", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <ExistingAttachmentsTable
         attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
         onDetachMetadataIds={mockOnDetachMetadataIds}
@@ -145,7 +145,7 @@ describe("ExistingAttachmentsTable component", () => {
   });
 
   it("Lets you bulk edit attachment Metadatas.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <ExistingAttachmentsTable
           attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
@@ -192,7 +192,7 @@ describe("ExistingAttachmentsTable component", () => {
   });
 
   it("Lets you detach attachment Metadatas.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ExistingAttachmentsTable
         attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
         onDetachMetadataIds={mockOnDetachMetadataIds}

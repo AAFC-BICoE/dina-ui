@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { VocabularyElement } from "packages/dina-ui/types/collection-api";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   VocabularyOption,
   VocabularySelectField
@@ -38,7 +38,7 @@ const testCtx = { apiContext: { apiClient: {} } };
 
 describe("VocabularySelectField component", () => {
   it("Renders and sets values correctly (multi-select)", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ fieldName: ["val1", "val2", "val3"] }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -111,7 +111,7 @@ describe("VocabularySelectField component", () => {
   });
 
   it("Renders and sets values correctly (single-select)", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -157,7 +157,7 @@ describe("VocabularySelectField component", () => {
   });
 
   it("Sets the value to null (single-select)", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}

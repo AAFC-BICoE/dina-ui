@@ -1,5 +1,5 @@
 import { IntlProvider } from "react-intl";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { FilterAttribute } from "../FilterBuilder";
 import { FilterBuilderContextProvider } from "../FilterBuilderContext";
 import { FilterRow, FilterRowProps } from "../FilterRow";
@@ -38,7 +38,7 @@ describe("FilterRow component", () => {
     propsOverride: Partial<FilterRowProps> = {},
     filterAttributes?: FilterAttribute[]
   ) {
-    return mountWithAppContext2(
+    return mountWithAppContext(
       <IntlProvider
         locale="en"
         messages={{ "field_group.groupName": "Group Name" }}

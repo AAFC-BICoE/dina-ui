@@ -1,5 +1,5 @@
 import { InputResource } from "kitsu";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   blankMaterialSample,
   MaterialSample
@@ -186,7 +186,7 @@ describe("BulkEditTabWarning", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Shows the warning when there are multiple determination values in the individual samples.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={SAMPLES_WITH_DIFFERENT_DETERMINATIONS}
@@ -303,7 +303,7 @@ describe("BulkEditTabWarning", () => {
   });
 
   it("Keeps the original multiple values if you decide not to click the Override All button.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={SAMPLES_WITH_DIFFERENT_DETERMINATIONS}
@@ -359,7 +359,7 @@ describe("BulkEditTabWarning", () => {
   });
 
   it("Lets you set the values without a warning when there are no organisms in the samples.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={SAMPLES_WITHOUT_ORGANISMS}
@@ -441,7 +441,7 @@ describe("BulkEditTabWarning", () => {
   });
 
   it("Shows the Override button on the Organisms section, even when the Organisms are the same.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={SAMPLES_WITH_SAME_DETERMINATIONS}

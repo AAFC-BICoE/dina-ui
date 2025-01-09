@@ -1,6 +1,6 @@
 import { IntlProvider } from "react-intl";
 import { DinaForm } from "../../formik-connected/DinaForm";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { FilterBuilderField } from "../FilterBuilderField";
 import { fireEvent } from "@testing-library/react";
 
@@ -8,7 +8,7 @@ describe("FilterBuilderField component", () => {
   const mockSubmit = jest.fn();
 
   function mountForm() {
-    return mountWithAppContext2(
+    return mountWithAppContext(
       <IntlProvider
         locale="en"
         messages={{ "field_group.groupName": "Group Name" }}

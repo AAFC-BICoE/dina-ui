@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { FilterRowDatePicker } from "../FilterRowDatePicker";
 import { fireEvent } from "@testing-library/react";
 
@@ -16,7 +16,7 @@ const TEST_DEFAULT_DATE = new Date(
 describe("FilterRowDatePicker", () => {
   it("Renders the single date picker.", async () => {
     const mockOnChanged = jest.fn();
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <FilterRowDatePicker
         defaultDate={() => TEST_DEFAULT_DATE}
         isRange={false}
@@ -39,7 +39,7 @@ describe("FilterRowDatePicker", () => {
 
   it("Renders the date range picker.", async () => {
     const mockOnChanged = jest.fn();
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <FilterRowDatePicker
         defaultDate={() => TEST_DEFAULT_DATE}
         isRange={true}

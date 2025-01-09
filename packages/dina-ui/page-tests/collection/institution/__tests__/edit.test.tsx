@@ -1,5 +1,5 @@
 import { InstitutionForm } from "../../../../pages/collection/institution/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
@@ -63,7 +63,7 @@ describe("InstitutionForm.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new Institution", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <InstitutionForm onSaved={mockOnSaved} />,
       { apiContext }
     );
@@ -128,7 +128,7 @@ describe("InstitutionForm.", () => {
   });
 
   it("Lets you edit a Institution", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <InstitutionForm
         onSaved={mockOnSaved}
         institution={{

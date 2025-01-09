@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { SangerPcrBatchStep } from "../SangerPcrBatchStep";
 import { noop } from "lodash";
 import { PcrBatch } from "../../../../types/seqdb-api";
@@ -59,7 +59,7 @@ describe("SangerPcrBatchStep component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Creates a new PcrBatch", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <SangerPcrBatchStep
         onSaved={mockOnSaved}
         editMode={true}
@@ -97,7 +97,7 @@ describe("SangerPcrBatchStep component", () => {
   });
 
   it("Edits an existing PcrBatch", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <SangerPcrBatchStep
         onSaved={mockOnSaved}
         pcrBatchId={PCR_BATCH_ID}
@@ -116,7 +116,7 @@ describe("SangerPcrBatchStep component", () => {
     wrapper.unmount();
 
     // Go to edit mode:
-    const wrapper2 = mountWithAppContext2(
+    const wrapper2 = mountWithAppContext(
       <SangerPcrBatchStep
         onSaved={mockOnSaved}
         pcrBatchId={PCR_BATCH_ID}

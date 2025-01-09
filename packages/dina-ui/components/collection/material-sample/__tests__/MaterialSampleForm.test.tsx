@@ -1,6 +1,6 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   blankMaterialSample,
   CollectingEvent,
@@ -140,7 +140,7 @@ describe("Material Sample Edit Page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Submits a new material-sample with a new CollectingEvent.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
@@ -264,7 +264,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Submits a new material-sample linked to an existing CollectingEvent.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
@@ -373,7 +373,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Edits an existing material-sample", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={testMaterialSample()}
         onSaved={mockOnSaved}
@@ -436,7 +436,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you remove the attached Collecting Event.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={testMaterialSample()}
         onSaved={mockOnSaved}
@@ -521,7 +521,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Renders an existing Material Sample with the Preparations section enabled.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -546,7 +546,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Renders an existing Material Sample with the Storage section enabled.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -573,7 +573,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Renders an existing Material Sample with the Organisms section enabled.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -604,7 +604,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Renders an existing Material Sample with the Association section enabled.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -630,7 +630,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Save association with uuid mapped correctly for saving.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           ...testMaterialSample(),
@@ -697,7 +697,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Renders an existing Material Sample with all toggleable data components disabled.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -734,7 +734,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Renders an existing Material Sample with the managed attribute when there is selected attribute with assinged value", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           ...testMaterialSample(),
@@ -792,7 +792,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Submits a new Material Sample with 3 Determinations.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
@@ -1058,7 +1058,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Submits a new Material Sample with a duplicate sample name: Shows an error", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
@@ -1105,7 +1105,7 @@ describe("Material Sample Edit Page", () => {
 
   it("Add the associated sample selected from search result list to a new association.", async () => {
     // Mount a new material sample with no values
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
@@ -1141,7 +1141,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you add an organism to an existing Material Sample", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1218,7 +1218,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Removes linked organisms when you decrease the Organism Quantity and then submit.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1341,7 +1341,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you remove an organism with the Remove button.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1436,7 +1436,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you remove all organisms by setting the quantity to 0.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1494,7 +1494,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you remove all organisms by clearing the Quantity field.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1551,7 +1551,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you add multiple of the SAME Organism by leaving the 'Organisms Individual Entry' toggle off and increasing the Quantity.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1667,7 +1667,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you edit one of multiple DIFFERENT existing attached organisms.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1802,7 +1802,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you switch from multiple DIFFERENT organisms to multiple SAME organisms.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1926,7 +1926,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Changing the target organism should unset all the other organisms as the target", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -2054,7 +2054,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Converts the Sample's determiners from object (front-end format) to UUID (back-end format).", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -2162,7 +2162,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you set a Custom managed attributes view via prop.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -2224,7 +2224,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you set a Custom Collecting Event managed attributes view via prop.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -2257,7 +2257,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you set a Custom Determination managed attributes view via prop.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",

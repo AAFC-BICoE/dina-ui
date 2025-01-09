@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { FilterBuilder, FilterBuilderProps } from "../FilterBuilder";
 import { FilterGroupModel } from "../FilterGroup";
 import "@testing-library/jest-dom";
@@ -9,7 +9,7 @@ describe("FilterBuilder component", () => {
   const filterAttributes = ["name", "description"];
 
   function mountFilterBuilder(propsOverride: Partial<FilterBuilderProps> = {}) {
-    return mountWithAppContext2(
+    return mountWithAppContext(
       <FilterBuilder filterAttributes={filterAttributes} {...propsOverride} />
     );
   }
@@ -362,7 +362,7 @@ describe("FilterBuilder component", () => {
       );
     }
 
-    const wrapper = mountWithAppContext2(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
     expect(callback).lastCalledWith(null);
 
     await new Promise(setImmediate);

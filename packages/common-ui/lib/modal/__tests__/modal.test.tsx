@@ -1,5 +1,5 @@
 import { fireEvent } from "@testing-library/react";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { useModal } from "../modal";
 import "@testing-library/jest-dom";
 
@@ -46,7 +46,7 @@ function TestComponentNestedModals() {
 
 describe("Modal", () => {
   it("Lets you open a modal.", () => {
-    const wrapper = mountWithAppContext2(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     // Closed initially:
     expect(
@@ -68,7 +68,7 @@ describe("Modal", () => {
   });
 
   it("Lets you open multiple modals in first-in-last-out order.", async () => {
-    const wrapper = mountWithAppContext2(<TestComponentNestedModals />);
+    const wrapper = mountWithAppContext(<TestComponentNestedModals />);
 
     // Closed initially:
     expect(

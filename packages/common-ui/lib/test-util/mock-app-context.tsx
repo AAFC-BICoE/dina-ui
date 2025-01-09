@@ -122,7 +122,7 @@ export function MockAppContextProvider({
 /**
  * Helper function to get a test wrapper with the required context providers using React-Testing library.
  */
-export function mountWithAppContext2(
+export function mountWithAppContext(
   element: React.ReactNode,
   mockAppContextProviderProps?: MockAppContextProviderProps
 ) {

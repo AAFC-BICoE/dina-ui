@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FormattedTextField } from "../FormattedTextField";
 import { fireEvent, screen } from "@testing-library/react";
@@ -6,7 +6,7 @@ import "@testing-library/jest-dom";
 
 describe("FormattedTextField component", () => {
   it("Displays the field's label and value.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: "2020" } }}>
         <FormattedTextField name="testObject.testField" />
       </DinaForm>
@@ -20,7 +20,7 @@ describe("FormattedTextField component", () => {
   });
 
   it("Changes the field's value.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: "2020" } }}>
         {({
           values: {

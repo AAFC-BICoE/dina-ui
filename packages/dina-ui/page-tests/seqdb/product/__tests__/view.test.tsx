@@ -1,5 +1,5 @@
 import ProductDetailsPage from "../../../../pages/seqdb/product/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
 import "@testing-library/jest-dom";
 
@@ -28,7 +28,7 @@ jest.mock("next/router", () => ({
 
 describe("Product details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<ProductDetailsPage />, {
+    const wrapper = mountWithAppContext(<ProductDetailsPage />, {
       apiContext
     });
 
@@ -36,7 +36,7 @@ describe("Product details page", () => {
   });
 
   it("Render the Product details", async () => {
-    const wrapper = mountWithAppContext2(<ProductDetailsPage />, {
+    const wrapper = mountWithAppContext(<ProductDetailsPage />, {
       apiContext
     });
 

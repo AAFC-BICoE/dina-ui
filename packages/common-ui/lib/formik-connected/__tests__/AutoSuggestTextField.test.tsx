@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { AutoSuggestTextField } from "../AutoSuggestTextField";
 import { DinaForm } from "../DinaForm";
 import { fireEvent } from "@testing-library/react";
@@ -129,7 +129,7 @@ describe("AutoSuggestTextField", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Snapshot test", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
@@ -171,7 +171,7 @@ describe("AutoSuggestTextField", () => {
   });
 
   it("JSON API only provided, results are fetched from JSON API", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
@@ -238,7 +238,7 @@ describe("AutoSuggestTextField", () => {
   });
 
   it("Elastic Search only provided, results are fetched from elastic search.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
@@ -322,7 +322,7 @@ describe("AutoSuggestTextField", () => {
   });
 
   it("Custom options only provided, results come from custom options.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
@@ -355,7 +355,7 @@ describe("AutoSuggestTextField", () => {
   });
 
   it("Both backend providers are used, preferred backend is used.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
@@ -413,7 +413,7 @@ describe("AutoSuggestTextField", () => {
 
   describe("Both backend providers are supplied, test what happens when a backend fails", () => {
     it("JSON-API is preferred, but fails, elastic search should be used instead.", async () => {
-      const wrapper = mountWithAppContext2(
+      const wrapper = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>
             name="examplePersonNameField"
@@ -477,7 +477,7 @@ describe("AutoSuggestTextField", () => {
     });
 
     it("Elastic-search is preferred, but fails, JSON-API should be used instead.", async () => {
-      const wrapper = mountWithAppContext2(
+      const wrapper = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>
             name="examplePersonNameField"
@@ -538,7 +538,7 @@ describe("AutoSuggestTextField", () => {
 
   describe("Blank search provider tests", () => {
     it("Blank search provider not supplied, options do not appear when empty search.", async () => {
-      const wrapper = mountWithAppContext2(
+      const wrapper = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>
             name="examplePersonNameField"
@@ -566,7 +566,7 @@ describe("AutoSuggestTextField", () => {
     });
 
     it("Blank search provider supplied, options should appear when empty search is focused.", async () => {
-      const wrapper = mountWithAppContext2(
+      const wrapper = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>
             name="examplePersonNameField"

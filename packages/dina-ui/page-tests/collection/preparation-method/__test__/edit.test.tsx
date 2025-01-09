@@ -2,7 +2,7 @@ import { OperationsResponse } from "common-ui";
 import PreparationMethodEditPage, {
   PreparationMethodForm
 } from "../../../../pages/collection/preparation-method/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PreparationMethod } from "../../../../types/collection-api/resources/PreparationMethod";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -97,7 +97,7 @@ describe("preparation-method edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext2(<PreparationMethodEditPage />, {
+    const wrapper = mountWithAppContext(<PreparationMethodEditPage />, {
       apiContext
     });
 
@@ -153,7 +153,7 @@ describe("preparation-method edit page", () => {
   it("Edits an existing prep method.", async () => {
     const mockOnSaved = jest.fn();
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <PreparationMethodForm
         onSaved={mockOnSaved}
         fetchedPrepMethod={{
@@ -247,7 +247,7 @@ describe("preparation-method edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext2(<PreparationMethodEditPage />, {
+    const wrapper = mountWithAppContext(<PreparationMethodEditPage />, {
       apiContext
     });
 

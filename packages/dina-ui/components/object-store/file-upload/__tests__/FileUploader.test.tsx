@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { noop } from "lodash";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { FileUploader } from "../FileUploader";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -23,7 +23,7 @@ const mockCtx = {
 
 describe("FileUploader component", () => {
   it("Converts the API's max file size from a gigabytes string to bytes.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <FileUploader onSubmit={noop} />
       </DinaForm>,

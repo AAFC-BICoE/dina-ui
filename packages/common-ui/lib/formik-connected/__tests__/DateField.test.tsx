@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DateField } from "../DateField";
 import { DinaForm } from "../DinaForm";
 import { fireEvent } from "@testing-library/react";
@@ -9,7 +9,7 @@ describe("DateField component", () => {
   const mockOnSubmit = jest.fn();
 
   function getWrapper(testDate: string | null = "2019-02-02") {
-    return mountWithAppContext2(
+    return mountWithAppContext(
       <DinaForm
         initialValues={{
           testField: testDate
@@ -23,7 +23,7 @@ describe("DateField component", () => {
   }
 
   function getPartialDateWrapper(testDate: string | null = "2019-02-02") {
-    return mountWithAppContext2(
+    return mountWithAppContext(
       <DinaForm
         initialValues={{
           testField: testDate

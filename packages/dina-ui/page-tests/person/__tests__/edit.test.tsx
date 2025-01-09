@@ -1,7 +1,7 @@
 import { OperationsResponse } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import PersonEditPage from "../../../pages/person/edit";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -63,7 +63,7 @@ describe("person edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext2(<PersonEditPage />, { apiContext });
+    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
 
     // expect(wrapper.find(".displayName-field input")).toHaveLength(1);
     expect(
@@ -121,7 +121,7 @@ describe("person edit page", () => {
 
     mockQuery = { id: 1 };
 
-    const wrapper = mountWithAppContext2(<PersonEditPage />, { apiContext });
+    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
 
     // The page should load initially with a loading spinner.
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
@@ -190,7 +190,7 @@ describe("person edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext2(<PersonEditPage />, { apiContext });
+    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);

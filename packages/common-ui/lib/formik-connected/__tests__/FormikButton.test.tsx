@@ -1,5 +1,5 @@
 import { FormikButton } from "../..";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -8,7 +8,7 @@ const mockOnClick = jest.fn();
 const mockOnSubmit = jest.fn();
 
 function getWrapper() {
-  return mountWithAppContext2(
+  return mountWithAppContext(
     <DinaForm
       initialValues={{ testProperty: "testValue" }}
       onSubmit={async ({ submittedValues }) => mockOnSubmit(submittedValues)}

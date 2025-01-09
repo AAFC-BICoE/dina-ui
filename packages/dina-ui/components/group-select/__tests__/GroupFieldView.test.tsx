@@ -1,12 +1,12 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { GroupFieldView } from "../GroupFieldView";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 describe("GroupFieldView component.", () => {
   it("Renders the default group name without accessing the user API.", async () => {
-    const { getByText } = mountWithAppContext2(
+    const { getByText } = mountWithAppContext(
       <DinaForm initialValues={{ group: "mygroup" }}>
         <GroupFieldView name="group" />
       </DinaForm>
@@ -28,7 +28,7 @@ describe("GroupFieldView component.", () => {
       ]
     }));
 
-    const { getByText } = mountWithAppContext2(
+    const { getByText } = mountWithAppContext(
       <DinaForm initialValues={{ group: "mygroup" }}>
         <GroupFieldView name="group" />
       </DinaForm>,

@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   MolecularAnalysisSampleSelectionStep,
   MolecularAnalysisSampleSelectionStepProps
@@ -125,7 +125,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
   }
 
   it("New workflow, attach material samples", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponentWrapper
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_EMPTY_ID}
       />,
@@ -215,7 +215,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
   });
 
   it("Existing workflow, attach new and remove existing material samples", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponentWrapper
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
       />,

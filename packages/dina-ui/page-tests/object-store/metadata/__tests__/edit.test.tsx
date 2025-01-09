@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import { ManagedAttribute } from "../../../../types/collection-api";
 import CreatableSelect from "react-select/creatable";
 import MetadataEditPage from "../../../../pages/object-store/metadata/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -116,7 +116,7 @@ describe("Metadata single record edit page.", () => {
   });
 
   it("Lets you edit the Metadata.", async () => {
-    const wrapper = mountWithAppContext2(<MetadataEditPage />, { apiContext });
+    const wrapper = mountWithAppContext(<MetadataEditPage />, { apiContext });
 
     await new Promise(setImmediate);
 

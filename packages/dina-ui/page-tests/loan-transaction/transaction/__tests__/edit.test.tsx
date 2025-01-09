@@ -5,7 +5,7 @@ import Switch from "react-switch";
 import TransactionEditPage, {
   TransactionForm
 } from "../../../../pages/loan-transaction/transaction/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Transaction } from "../../../../types/loan-transaction-api";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -124,7 +124,7 @@ describe("Transaction Form", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Submits a Transaction", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TransactionForm onSaved={mockOnSaved} />,
       testCtx as any
     );
@@ -384,7 +384,7 @@ describe("Transaction Form", () => {
 
   it("Edits an existing Transaction", async () => {
     // The Next.js router is mocked to provide the existing Transaction's ID
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TransactionEditPage />,
       testCtx as any
     );

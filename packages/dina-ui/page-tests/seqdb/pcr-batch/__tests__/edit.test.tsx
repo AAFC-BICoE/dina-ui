@@ -1,7 +1,7 @@
 import { waitFor, fireEvent } from "@testing-library/react";
 import { PersistedResource } from "kitsu";
 import { PcrBatchForm } from "../../../../pages/seqdb/pcr-batch/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrBatch, PcrPrimer } from "../../../../types/seqdb-api";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
@@ -132,7 +132,7 @@ describe("PcrBatch edit page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Adds a new pcr batch", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <PcrBatchForm onSaved={mockOnSaved} />,
       { apiContext }
     );
@@ -193,7 +193,7 @@ describe("PcrBatch edit page", () => {
   });
 
   it("Edits an existing PCR Batch", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <PcrBatchForm pcrBatch={TEST_PCRBATCH} onSaved={mockOnSaved} />,
       { apiContext }
     );
@@ -249,7 +249,7 @@ describe("PcrBatch edit page", () => {
   });
 
   it("Create a PcrBatch with a storage unit type", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <PcrBatchForm onSaved={mockOnSaved} />,
       { apiContext }
     );
@@ -301,7 +301,7 @@ describe("PcrBatch edit page", () => {
   });
 
   it("Create a PcrBatch with a storage unit", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <PcrBatchForm onSaved={mockOnSaved} />,
       { apiContext }
     );

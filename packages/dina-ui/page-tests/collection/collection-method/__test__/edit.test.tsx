@@ -2,7 +2,7 @@ import { OperationsResponse } from "common-ui";
 import CollectionMethodEditPage, {
   CollectionMethodForm
 } from "../../../../pages/collection/collection-method/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -81,7 +81,7 @@ describe("collection-method edit page", () => {
     mockQuery = {};
   });
   it("Provides a form to add a collection-method.", async () => {
-    const { container, getByLabelText } = mountWithAppContext2(
+    const { container, getByLabelText } = mountWithAppContext(
       <CollectionMethodEditPage />,
       {
         apiContext
@@ -135,7 +135,7 @@ describe("collection-method edit page", () => {
   });
 
   it("Edits an existing collection method.", async () => {
-    const { container, getByLabelText, getByRole } = mountWithAppContext2(
+    const { container, getByLabelText, getByRole } = mountWithAppContext(
       <CollectionMethodForm
         onSaved={mockOnSaved}
         fetchedCollectionMethod={{
@@ -229,7 +229,7 @@ describe("collection-method edit page", () => {
 
     mockQuery = {};
 
-    const { container, getByText } = mountWithAppContext2(
+    const { container, getByText } = mountWithAppContext(
       <CollectionMethodEditPage />,
       { apiContext }
     );

@@ -1,5 +1,5 @@
 import { fireEvent } from "@testing-library/react";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FormikButton } from "../FormikButton";
 import { StringArrayField } from "../StringArrayField";
@@ -12,7 +12,7 @@ describe("StringArrayField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Edits the array field using a textarea.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ lines: ["line1", "line2", "line3"] }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -37,7 +37,7 @@ describe("StringArrayField component", () => {
   });
 
   it("Displays the right value when the form state changes.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ lines: ["line1", "line2", "line3"] }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}

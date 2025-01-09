@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { fireEvent, waitFor } from "@testing-library/react";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { LanguageSelector } from "../LanguageSelector";
 
 const INSTANCE_DATA = {
@@ -53,7 +53,7 @@ describe("LanguageSelector component", () => {
   });
 
   it("Renders the language selector.", async () => {
-    const component = mountWithAppContext2(<LanguageSelector />, {
+    const component = mountWithAppContext(<LanguageSelector />, {
       apiContext
     });
 
@@ -62,7 +62,7 @@ describe("LanguageSelector component", () => {
   });
 
   it("Lets you change the locale.", async () => {
-    const component = mountWithAppContext2(<LanguageSelector />, {
+    const component = mountWithAppContext(<LanguageSelector />, {
       apiContext
     });
 
@@ -83,7 +83,7 @@ describe("LanguageSelector component", () => {
     // Pretend this test is not running in the browser:
     (process as any).browser = false;
 
-    const component = mountWithAppContext2(<LanguageSelector />);
+    const component = mountWithAppContext(<LanguageSelector />);
     expect(await component.queryByTestId("languageSelector")).toBeNull();
   });
 });

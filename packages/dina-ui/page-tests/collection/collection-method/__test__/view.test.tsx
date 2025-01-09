@@ -1,5 +1,5 @@
 import CollectionMethodDetailsPage from "../../../../pages/collection/collection-method/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -33,14 +33,14 @@ jest.mock("next/router", () => ({
 
 describe("CollectionMethod details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<CollectionMethodDetailsPage />, {
+    const wrapper = mountWithAppContext(<CollectionMethodDetailsPage />, {
       apiContext
     });
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("Render the CollectionMethod details", async () => {
-    const wrapper = mountWithAppContext2(<CollectionMethodDetailsPage />, {
+    const wrapper = mountWithAppContext(<CollectionMethodDetailsPage />, {
       apiContext
     });
 

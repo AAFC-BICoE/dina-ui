@@ -1,5 +1,5 @@
 import ProtocolDetailsPage from "../../../../pages/collection/protocol/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Protocol } from "../../../../types/collection-api/resources/Protocol";
 import "@testing-library/jest-dom";
 
@@ -65,7 +65,7 @@ jest.mock("next/router", () => ({
 
 describe("Protocol details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<ProtocolDetailsPage />, {
+    const wrapper = mountWithAppContext(<ProtocolDetailsPage />, {
       apiContext
     });
 
@@ -74,7 +74,7 @@ describe("Protocol details page", () => {
   });
 
   it("Render the Protocol details", async () => {
-    const wrapper = mountWithAppContext2(<ProtocolDetailsPage />, {
+    const wrapper = mountWithAppContext(<ProtocolDetailsPage />, {
       apiContext
     });
 

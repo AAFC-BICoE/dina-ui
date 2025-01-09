@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import MetadataRevisionListPage from "../../../../pages/object-store/metadata/revisions";
 import { DefaultRow } from "../../../../../common-ui/lib";
 import "@testing-library/jest-dom";
@@ -47,7 +47,7 @@ jest.mock("next/router", () => ({
 
 describe("MetadataRevisionListPage", () => {
   it("Renders the page.", async () => {
-    const wrapper = mountWithAppContext2(<MetadataRevisionListPage />, {
+    const wrapper = mountWithAppContext(<MetadataRevisionListPage />, {
       apiContext: { apiClient: { get: mockGet } as any }
     });
 

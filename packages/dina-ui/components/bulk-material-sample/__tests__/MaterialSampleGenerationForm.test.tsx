@@ -1,5 +1,5 @@
 import { writeStorage } from "@rehooks/local-storage";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../group-select/useStoredDefaultGroup";
 import { MaterialSampleGenerationForm } from "../MaterialSampleGenerationForm";
 import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
@@ -51,7 +51,7 @@ describe("MaterialSampleGenerationForm", () => {
   });
 
   it("Generates the initial values for the new samples in series mode.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleGenerationForm onGenerate={mockOnGenerate} />,
       testCtx
     );

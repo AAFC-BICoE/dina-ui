@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { DoOperationsError } from "../..";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { SubmitButton } from "../SubmitButton";
 import { TextField } from "../TextField";
@@ -9,7 +9,7 @@ import "@testing-library/jest-dom";
 describe("DinaForm component.", () => {
   it("Calls the onSubmit prop.", async () => {
     const mockOnSubmit = jest.fn();
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ testAttr: "test-value" }}
         onSubmit={mockOnSubmit}
@@ -40,7 +40,7 @@ describe("DinaForm component.", () => {
   });
 
   it("Shows the field-level error messages on nested dot-path fields.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={() => {

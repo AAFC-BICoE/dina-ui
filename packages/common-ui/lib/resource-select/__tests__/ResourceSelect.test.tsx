@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { ResourceSelect, ResourceSelectProps } from "../..";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { AsyncOption } from "../ResourceSelect";
 import "@testing-library/jest-dom";
 import { fireEvent } from "@testing-library/react";
@@ -59,7 +59,7 @@ describe("ResourceSelect component", () => {
   };
 
   function mountWithContext(element: JSX.Element) {
-    return mountWithAppContext2(element, { apiContext });
+    return mountWithAppContext(element, { apiContext });
   }
 
   beforeEach(() => {

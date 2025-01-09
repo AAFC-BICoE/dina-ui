@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CatalogueOfLifeNameField } from "../CatalogueOfLifeNameField";
 import { NameUsageSearchResult } from "../nameusage-types";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
@@ -19,7 +19,7 @@ describe("CatalogueOfLifeNameField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Sets a value from the Catalogue of Life API.", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm
         initialValues={{ scientificName: "", scientificNameSource: null }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}

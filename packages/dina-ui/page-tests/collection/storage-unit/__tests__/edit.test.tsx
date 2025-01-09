@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { StorageUnitForm } from "../../../../components";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../../types/collection-api";
 import { fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -61,7 +61,7 @@ describe("Storage Unit edit page.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Adds a new Storage Unit with a pre-linked parent", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <StorageUnitForm
         onSaved={mockOnSaved}
         initialParent={PARENT_STORAGE_UNIT}

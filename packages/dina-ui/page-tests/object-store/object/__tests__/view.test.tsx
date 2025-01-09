@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import MetadataViewPage from "../../../../pages/object-store/object/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
 import "@testing-library/jest-dom";
 
@@ -103,7 +103,7 @@ describe("Single Stored Object details page", () => {
   // });
 
   it("Renders the page.", async () => {
-    const wrapper = mountWithAppContext2(<MetadataViewPage />, { apiContext });
+    const wrapper = mountWithAppContext(<MetadataViewPage />, { apiContext });
 
     await new Promise(setImmediate);
     await new Promise(setImmediate);

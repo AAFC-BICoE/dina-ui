@@ -1,5 +1,5 @@
 import { DinaForm, SubmitButton } from "common-ui";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { GroupSelectField } from "../GroupSelectField";
 import { deleteFromStorage, writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../useStoredDefaultGroup";
@@ -23,7 +23,7 @@ describe("GroupSelectField component", () => {
   afterEach(() => deleteFromStorage(DEFAULT_GROUP_STORAGE_KEY));
 
   it("Renders the default group list without accessing the user API.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GroupSelectField name="group" />
       </DinaForm>,
@@ -55,7 +55,7 @@ describe("GroupSelectField component", () => {
       ]
     }));
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GroupSelectField name="group" />
       </DinaForm>,
@@ -80,7 +80,7 @@ describe("GroupSelectField component", () => {
   it("By default doesn't set the default group from local storage.", async () => {
     writeStorage(DEFAULT_GROUP_STORAGE_KEY, "cnc");
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GroupSelectField name="group" />
       </DinaForm>,
@@ -95,7 +95,7 @@ describe("GroupSelectField component", () => {
   it("Sets the default group from local storage when this feature is enabled.", async () => {
     writeStorage(DEFAULT_GROUP_STORAGE_KEY, "cnc");
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GroupSelectField name="group" enableStoredDefaultGroup={true} />
       </DinaForm>,
@@ -109,7 +109,7 @@ describe("GroupSelectField component", () => {
   it("Doesn't set the default group if a group is passed using initialValues.", async () => {
     writeStorage(DEFAULT_GROUP_STORAGE_KEY, "cnc");
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ group: "aafc" }}>
         <GroupSelectField name="group" enableStoredDefaultGroup={true} />
       </DinaForm>,
@@ -122,7 +122,7 @@ describe("GroupSelectField component", () => {
   });
 
   it("Hides the field and sets the only option when the default option is the only option.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -147,7 +147,7 @@ describe("GroupSelectField component", () => {
   it("Doesn't set the default value when the initial value is null.", async () => {
     writeStorage(DEFAULT_GROUP_STORAGE_KEY, "cnc");
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ group: null }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}

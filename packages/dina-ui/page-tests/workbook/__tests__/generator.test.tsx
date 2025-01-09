@@ -1,6 +1,6 @@
 import { waitFor } from "@testing-library/react";
 import { WorkbookTemplateGenerator } from "../../../pages/workbook/generator";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import {
@@ -38,7 +38,7 @@ describe("Workbook Template Generator", () => {
   it("Page Layout", async () => {
     // Generates a snapshot of the generator page. This is used to ensure the design of the page
     // does not change unless intented.
-    const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
+    const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
 
@@ -46,7 +46,7 @@ describe("Workbook Template Generator", () => {
   });
 
   it("Select multiple columns and set aliases", async () => {
-    const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
+    const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
 
@@ -119,7 +119,7 @@ describe("Workbook Template Generator", () => {
   });
 
   it("Delete and moving functionality in the generator", async () => {
-    const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
+    const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
 
@@ -200,7 +200,7 @@ describe("Workbook Template Generator", () => {
   });
 
   it("Select multiple columns and do not set aliases", async () => {
-    const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
+    const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
 
@@ -263,7 +263,7 @@ describe("Workbook Template Generator", () => {
   });
 
   it("Selected managed attribute fields and generate template", async () => {
-    const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
+    const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
     await new Promise(setImmediate);
@@ -386,7 +386,7 @@ describe("Workbook Template Generator", () => {
   });
 
   it("Selected scientificNameDetails fields and generate template", async () => {
-    const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
+    const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
     await new Promise(setImmediate);
@@ -474,7 +474,7 @@ describe("Workbook Template Generator", () => {
   });
 
   it("Template name validation", async () => {
-    const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
+    const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
 

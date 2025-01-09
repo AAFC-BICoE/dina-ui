@@ -1,5 +1,5 @@
 import RegionListPage from "../../../../pages/seqdb/region/list";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -37,7 +37,7 @@ const apiContext: any = {
 
 describe("Region list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext2(<RegionListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
 
     await new Promise(setImmediate);
 
@@ -47,7 +47,7 @@ describe("Region list page", () => {
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithAppContext2(<RegionListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);

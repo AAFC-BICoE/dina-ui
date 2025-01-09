@@ -1,5 +1,5 @@
 import PcrPrimerListPage from "../../../../pages/seqdb/pcr-primer/list";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -37,7 +37,7 @@ const apiContext: any = {
 
 describe("PcrPrimer list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext2(<PcrPrimerListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<PcrPrimerListPage />, { apiContext });
 
     await new Promise(setImmediate);
 
@@ -47,7 +47,7 @@ describe("PcrPrimer list page", () => {
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithAppContext2(<PcrPrimerListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<PcrPrimerListPage />, { apiContext });
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);

@@ -1,12 +1,12 @@
 import { fireEvent } from "@testing-library/react";
 import { DinaForm } from "../../formik-connected/DinaForm";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { TextFieldWithCoordButtons } from "../TextFieldWithCoordButtons";
 import "@testing-library/jest-dom";
 
 describe("TextFieldWithCoordButtons component", () => {
   it("Inserts the symbol at the cursor's position.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <TextFieldWithCoordButtons name="myField" />
       </DinaForm>

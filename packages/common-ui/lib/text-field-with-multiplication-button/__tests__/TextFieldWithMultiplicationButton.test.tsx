@@ -1,11 +1,11 @@
 import { fireEvent } from "@testing-library/react";
 import { DinaForm } from "../../formik-connected/DinaForm";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { TextFieldWithMultiplicationButton } from "../TextFieldWithMultiplicationButton";
 
 describe("TextFieldWithMultiplicationButton component", () => {
   it("appends the symbol at the end.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <TextFieldWithMultiplicationButton name="myField" />
       </DinaForm>

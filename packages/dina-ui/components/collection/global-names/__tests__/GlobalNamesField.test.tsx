@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import React from "react";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { GlobalNamesSearchResult } from "../global-names-search-result-type";
 import { GlobalNamesField } from "../GlobalNamesField";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
@@ -19,7 +19,7 @@ const mockOnSubmit = jest.fn();
 describe("GlobalNamesField component", () => {
   beforeEach(jest.clearAllMocks);
   it("Sets a value from the global name API.", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm
         initialValues={{ scientificName: "", scientificNameSource: null }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}

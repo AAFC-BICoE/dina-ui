@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ParseVerbatimToRangeButton } from "../ParseVerbatimToRangeButton";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -8,7 +8,7 @@ const mockSubmit = jest.fn();
 
 describe("ParseVerbatimToRangeButton component", () => {
   it("Sets the range from two detected values when there is no current min value.", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm
         initialValues={{ verbatim: "1m to 20m " }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -41,7 +41,7 @@ describe("ParseVerbatimToRangeButton component", () => {
   });
 
   it("Only sets the min when there is one detected value.", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm
         initialValues={{ verbatim: "1m " }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}

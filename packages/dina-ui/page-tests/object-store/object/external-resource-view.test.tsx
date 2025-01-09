@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import ExternalResourceMetadataViewPage from "../../../../dina-ui/pages/object-store/object/external-resource-view";
-import { mountWithAppContext2 } from "../../../../dina-ui/test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../dina-ui/test-util/mock-app-context";
 import { Metadata } from "../../../../dina-ui/types/objectstore-api/resources/Metadata";
 import "@testing-library/jest-dom";
 
@@ -56,7 +56,7 @@ jest.mock("next/router", () => ({
 
 describe("Stored Object external resource view page", () => {
   it("Renders the page.", async () => {
-    const wrapper = mountWithAppContext2(<ExternalResourceMetadataViewPage />, {
+    const wrapper = mountWithAppContext(<ExternalResourceMetadataViewPage />, {
       apiContext
     });
 
