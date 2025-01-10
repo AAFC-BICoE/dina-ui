@@ -8,13 +8,14 @@
   },
   "scripts": {
     "docs": "asciidoctor -a copycss -a toc=left --safe-mode unsafe --destination-dir ./generated-docs ./docs/index.adoc",
-    "lint": "tslint --project tsconfig.json",
-    "lint:fix": "tslint --project tsconfig.json --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "tsc && jest",
     "test:coverage": "tsc && jest --coverage",
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
     "@phenomnomnominal/tsquery": "^4.1.1",
     "@testing-library/jest-dom": "^6.1.3",
     "@testing-library/react": "^12.0.0",
@@ -37,8 +38,12 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.3.0",
     "tslint-react": "^5.0.0",
-    "typescript": "^4.5.5",
-    "xlsx": "npm:@e965/xlsx@0.20.0"
+    "typescript": "^4.8.4",
+    "xlsx": "npm:@e965/xlsx@0.20.0",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react": "^7.37.3",
+    "globals": "^15.14.0",
+    "typescript-eslint": "^8.19.1"
   },
   "resolutions": {
     "kitsu/axios": "^0.21.1",
