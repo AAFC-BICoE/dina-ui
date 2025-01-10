@@ -2,7 +2,7 @@ import globals from "globals";
 import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from "eslint-config-prettier";
 
-export default tseslint.config(
+const config = tseslint.config(
   // Files to be scanned by the linter.
   {files: ["**/*.{js,ts,jsx,tsx}"]},
 
@@ -40,3 +40,5 @@ export default tseslint.config(
     }
   }
 );
+
+export default config;

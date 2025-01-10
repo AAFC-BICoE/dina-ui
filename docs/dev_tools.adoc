@@ -6,9 +6,16 @@ https://code.visualstudio.com/[Visual Studio Code] is recommended for developmen
 
 ### Recommended Extensions
 
-- https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode[Prettier - Code formatter]: Formats your code when you press shift+alt+f.
-- https://marketplace.visualstudio.com/items?itemName=joaompinto.asciidoctor-vscode[AsciiDoc]: AsciiDoc rich language support.
-- https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner[Jest Runner]: Adds Run/Debug buttons to your test files.
+The following extensions are recommended for a better development experience. You can install them using the following terminal commands:
+
+```sh
+code --install-extension esbenp.prettier-vscode
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension firsttris.vscode-jest-runner
+code --install-extension joaompinto.asciidoctor-vscode
+```
+
+These extensions are also included in the `.vscode/extensions.json` file. They will appear in the Extensions view when you open the project in Visual Studio Code under the `Recommended` section.
 
 ## Browser Extensions
 
