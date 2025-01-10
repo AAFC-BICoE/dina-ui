@@ -287,21 +287,15 @@ export function useGenericMolecularAnalysisRun({
               { apiBaseUrl: "/seqdb-api" }
             );
           if (molecularAnalysisResultQuery.length > 0) {
-            const resultAttachmentsQuery = await bulkGet<Metadata>(
-              molecularAnalysisResultQuery?.[0]?.attachments.map(
-                (attachment) => `/metadata/${attachment?.id}`
-              ),
-              { apiBaseUrl: "/objectstore-api" }
-            );
-            molecularAnalysisResultQuery.forEach((molecularAnalysisResult) => {
-              molecularAnalysisResult.attachments =
-                molecularAnalysisResult.attachments.map((resultAttachment) => {
-                  return resultAttachmentsQuery.find(
-                    (queriedAttachment) =>
-                      resultAttachment.id === queriedAttachment.id
-                  );
-                }) as any;
-            });
+            for (const molecularAnalysisResult of molecularAnalysisResultQuery) {
+              const resultAttachmentsQuery = await bulkGet<Metadata>(
+                molecularAnalysisResult?.attachments.map(
+                  (attachment) => `/metadata/${attachment?.id}`
+                ),
+                { apiBaseUrl: "/objectstore-api" }
+              );
+              molecularAnalysisResult.attachments = resultAttachmentsQuery;
+            }
           }
 
           return sequencingRunItem.map((runItem) => {
