@@ -20,7 +20,8 @@
       "kitsu": [
         "./packages/common-ui/types/kitsu",
         "./packages/common-ui/types/react-table"
-      ]
+      ],
+      "react": ["./node_modules/@types/react"]
     },
     "allowJs": true,
     "strict": false,
