@@ -10,7 +10,7 @@ import { PersistedResource } from "kitsu";
 import { Group } from "../../../../types/user-api";
 import { StoredObjectGallery } from "../../../../components/object-store";
 import MetadataListPage from "../../../../pages/object-store/object/list";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Metadata, Person } from "../../../../types/objectstore-api";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import "@testing-library/jest-dom";
@@ -250,7 +250,7 @@ describe("Metadata List Page", () => {
   });
 
   it("Renders the metadata table by default.", async () => {
-    const wrapper = mountWithAppContext2(<MetadataListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
     await new Promise(setImmediate);
 
@@ -259,7 +259,7 @@ describe("Metadata List Page", () => {
   });
 
   it("Provides a toggle to see the gallery view.", async () => {
-    const wrapper = mountWithAppContext2(<MetadataListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
     // Renders initially with the table view:
     expect(wrapper.getByRole("radio", { name: /table/i })).toBeChecked();
@@ -279,7 +279,7 @@ describe("Metadata List Page", () => {
   });
 
   it("Lets you select a list of metadatas and route to the edit page.", async () => {
-    const wrapper = mountWithAppContext2(<MetadataListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
     await new Promise(setImmediate);
 
@@ -308,7 +308,7 @@ describe("Metadata List Page", () => {
   });
 
   it("Shows a metadata preview when you click the 'Preview' button.", async () => {
-    const wrapper = mountWithAppContext2(<MetadataListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
     await new Promise(setImmediate);
 
@@ -325,7 +325,7 @@ describe("Metadata List Page", () => {
   });
 
   it("Disables the bulk edit button when no Metadatas are selected.", async () => {
-    const wrapper = mountWithAppContext2(<MetadataListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
     await new Promise(setImmediate);
 
@@ -354,7 +354,7 @@ describe("Metadata List Page", () => {
   });
 
   it("Lets you bulk-delete metadata.", async () => {
-    const pageWrapper = mountWithAppContext2(<MetadataListPage />, {
+    const pageWrapper = mountWithAppContext(<MetadataListPage />, {
       apiContext
     });
     expect(
@@ -362,7 +362,7 @@ describe("Metadata List Page", () => {
     ).toBeInTheDocument();
 
     // Pretend two metadatas are already selected:
-    const buttonWrapper = mountWithAppContext2(
+    const buttonWrapper = mountWithAppContext(
       <DinaForm<BulkSelectableFormValues>
         initialValues={{
           itemIdsToSelect: {

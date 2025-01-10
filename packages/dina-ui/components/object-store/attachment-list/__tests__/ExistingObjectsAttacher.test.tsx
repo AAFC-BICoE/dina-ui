@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { ExistingObjectsAttacher } from "../ExistingObjectsAttacher";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
@@ -54,7 +54,7 @@ describe("ExistingObjectsAttacher component", () => {
   });
 
   it("Provides the callback with the existing Metadatas", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ExistingObjectsAttacher onMetadataIdsSubmitted={mockSubmit} />,
       { apiContext }
     );

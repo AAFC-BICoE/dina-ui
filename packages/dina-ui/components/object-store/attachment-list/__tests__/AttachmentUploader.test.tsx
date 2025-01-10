@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { AttachmentUploader } from "../AttachmentUploader";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -86,7 +86,7 @@ describe("AttachmentUploader component", () => {
   });
 
   it("Uploads the files and opens the Metadata editor.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <AttachmentUploader afterMetadatasSaved={mockAfterMetadatasSaved} />,
       { apiContext }
     );

@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/objectstore-api";
 import { ReferenceLink } from "../ReferenceLink";
 import "@testing-library/jest-dom";
@@ -13,7 +13,7 @@ const mockGet = jest.fn(async () => ({
 
 describe("ReferenceLink component", () => {
   it("Renders the link to a resource.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ReferenceLink<Person>
         baseApiPath="agent-api"
         type="person"

@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { RevisionsPageLayout } from "../RevisionsPageLayout";
 
 const TEST_SNAPSHOTS = [
@@ -30,7 +30,7 @@ const mockGet = jest.fn(async (path) => {
 
 describe("RevisionsPageLayout component", () => {
   it("Renders the revisions.", async () => {
-    mountWithAppContext2(
+    mountWithAppContext(
       <RevisionsPageLayout
         auditSnapshotPath="objectstore-api/audit-snapshots"
         instanceId={`metadata/471bf855-f5da-492a-a58e-922238e5a257`}

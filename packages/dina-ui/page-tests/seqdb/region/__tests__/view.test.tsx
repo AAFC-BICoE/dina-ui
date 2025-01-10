@@ -1,5 +1,5 @@
 import RegionDetailsPage from "../../../../pages/seqdb/region/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
 import "@testing-library/jest-dom";
 
@@ -30,7 +30,7 @@ jest.mock("next/router", () => ({
 
 describe("Region details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<RegionDetailsPage />, {
+    const wrapper = mountWithAppContext(<RegionDetailsPage />, {
       apiContext
     });
 
@@ -39,7 +39,7 @@ describe("Region details page", () => {
   });
 
   it("Render the gene region details", async () => {
-    const wrapper = mountWithAppContext2(<RegionDetailsPage />, {
+    const wrapper = mountWithAppContext(<RegionDetailsPage />, {
       apiContext
     });
 

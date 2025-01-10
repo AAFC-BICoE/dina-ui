@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { QueryPage } from "../QueryPage";
 import { Row } from "@tanstack/react-table";
 import { TableColumn } from "../types";
@@ -361,7 +361,7 @@ describe("QueryPage test", () => {
       dateCell("createdOn", "data.attributes.createdOn")
     ];
 
-    const component = mountWithAppContext2(
+    const component = mountWithAppContext(
       <QueryPage
         rowStyling={rowStyling}
         indexName={"dina_material_sample_index"}

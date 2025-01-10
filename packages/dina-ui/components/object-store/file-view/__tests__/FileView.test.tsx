@@ -1,5 +1,5 @@
 import { waitForElementToBeRemoved } from "@testing-library/react";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { FileView } from "../FileView";
 import "@testing-library/jest-dom";
 
@@ -19,7 +19,7 @@ const apiContext: any = {
 
 describe("FileView component", () => {
   it("Renders an image.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <FileView filePath="image.png" fileType="png" />,
       { apiContext }
     );
@@ -47,7 +47,7 @@ describe("FileView component", () => {
   test.each(noPreviewFileTypes)(
     "No preview available for %s files",
     async (fileType) => {
-      const wrapper = mountWithAppContext2(
+      const wrapper = mountWithAppContext(
         <FileView filePath={`testFile.${fileType}`} fileType={fileType} />,
         { apiContext }
       );

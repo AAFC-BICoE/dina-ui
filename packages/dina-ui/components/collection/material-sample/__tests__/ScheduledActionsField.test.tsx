@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ScheduledActionsField } from "../ScheduledActionsField";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -30,7 +30,7 @@ const testCtx = {
 describe("ScheduledActionsField", () => {
   it("Edits the scheduled actions.", async () => {
     const { container, getByRole, getByText, getAllByRole } =
-      mountWithAppContext2(
+      mountWithAppContext(
         <DinaForm
           initialValues={{}}
           onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}

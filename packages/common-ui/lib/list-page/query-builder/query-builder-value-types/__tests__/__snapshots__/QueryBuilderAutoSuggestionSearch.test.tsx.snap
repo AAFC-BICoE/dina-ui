@@ -11,7 +11,7 @@ exports[`QueryBuilderAutoSuggestionSearch QueryBuilderAutoSuggestionSearch Compo
       />
       <input
         class="form-control"
-        placeholder="queryBuilder_value_in_placeholder"
+        placeholder="Enter comma-separated values..."
         type="text"
         value="test"
       />
@@ -31,7 +31,7 @@ exports[`QueryBuilderAutoSuggestionSearch QueryBuilderAutoSuggestionSearch Compo
       />
       <input
         class="form-control"
-        placeholder="queryBuilder_value_in_placeholder"
+        placeholder="Enter comma-separated values..."
         type="text"
         value="test"
       />

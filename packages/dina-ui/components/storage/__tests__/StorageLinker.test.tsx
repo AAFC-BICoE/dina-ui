@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "common-ui";
 import { StorageLinkerField } from "../StorageLinker";
 import userEvent from "@testing-library/user-event";
@@ -30,7 +30,7 @@ const testCtx = {
 
 describe("StorageLinker", () => {
   it("Prompts to remove the empty Storage when the stored Material Sample has no ID. e.g. creation form.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{
           storageUnit: { id: "A", type: "storage-unit", name: "A" }
@@ -63,7 +63,7 @@ describe("StorageLinker", () => {
   });
 
   it("Prompts to remove the empty Storage when the stored Material Sample has an ID. e.g. edit form.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{
           id: "123",

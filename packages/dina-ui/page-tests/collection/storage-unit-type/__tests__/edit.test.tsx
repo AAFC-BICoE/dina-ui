@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { StorageUnitTypeForm } from "../../../../pages/collection/storage-unit-type/edit";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -30,7 +30,7 @@ describe("Storage Unit Type form.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new Storage Type", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <StorageUnitTypeForm onSaved={mockOnSaved} />,
       { apiContext }
     );
@@ -67,7 +67,7 @@ describe("Storage Unit Type form.", () => {
   });
 
   it("Lets you edit a Storage Type", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <StorageUnitTypeForm
         onSaved={mockOnSaved}
         storageUnitType={{

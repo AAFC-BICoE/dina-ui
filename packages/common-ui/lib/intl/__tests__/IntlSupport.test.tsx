@@ -1,5 +1,6 @@
-import { mount } from "enzyme";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { getIntlSupport } from "../..";
+import "@testing-library/jest-dom";
 
 const TEST_MESSAGES_EN = {
   testId: "test message"
@@ -22,23 +23,23 @@ function MessageDisplayer() {
 
 describe("IntlSupport", () => {
   it("Provides a 'useIntl' hook to get messages.", () => {
-    const wrapper = mount(
+    render(
       <IntlProvider>
         <MessageDisplayer />
       </IntlProvider>
     );
 
-    expect(wrapper.contains("test message")).toEqual(true);
+    expect(screen.getByText("test message")).toBeInTheDocument();
   });
 
   it("Provides a 'FormattedMessage' component to render messages.", () => {
-    const wrapper = mount(
+    render(
       <IntlProvider>
         <FormattedMessage id="testId" />
       </IntlProvider>
     );
 
-    expect(wrapper.contains("test message")).toEqual(true);
+    expect(screen.getByText("test message")).toBeInTheDocument();
   });
 
   it("Provides a 'useIntl' hook to change the locale.", () => {
@@ -56,20 +57,18 @@ describe("IntlSupport", () => {
       );
     }
 
-    const wrapper = mount(
+    render(
       <IntlProvider>
         <LocaleSelector />
       </IntlProvider>
     );
 
-    expect(wrapper.contains("Current locale: en")).toEqual(true);
-    expect(wrapper.contains("test message")).toEqual(true);
+    expect(screen.getByText("Current locale: en")).toBeInTheDocument();
+    expect(screen.getByText("test message")).toBeInTheDocument();
 
-    wrapper.find("button[children='Change To French']").simulate("click");
+    fireEvent.click(screen.getByText("Change To French"));
 
-    wrapper.update();
-
-    expect(wrapper.contains("Current locale: fr")).toEqual(true);
-    expect(wrapper.contains("message dans test")).toEqual(true);
+    expect(screen.getByText("Current locale: fr")).toBeInTheDocument();
+    expect(screen.getByText("message dans test")).toBeInTheDocument();
   });
 });

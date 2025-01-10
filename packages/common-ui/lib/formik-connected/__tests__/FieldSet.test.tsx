@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { FieldSet } from "../FieldSet";
 import { FieldWrapper } from "../FieldWrapper";
@@ -7,7 +7,7 @@ import "@testing-library/jest-dom";
 const mockSubmit = jest.fn();
 
 it("Properly hide a section when all fields are hidden inside of it.", async () => {
-  const wrapper = mountWithAppContext2(
+  const wrapper = mountWithAppContext(
     <DinaForm
       initialValues={{ myField1: "my value", templateCheckboxes: {} }}
       formTemplate={{

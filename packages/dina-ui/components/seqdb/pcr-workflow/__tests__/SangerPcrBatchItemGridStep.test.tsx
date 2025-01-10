@@ -1,5 +1,5 @@
 import { StorageUnit } from "../../../../types/collection-api";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { SangerPcrBatchItemGridStep } from "../pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { noop } from "lodash";
@@ -344,7 +344,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
   }
 
   it("Display material samples in selection list", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
@@ -385,7 +385,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
   });
 
   it("Switch between view and edit mode", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
@@ -406,7 +406,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     wrapper.unmount();
 
     // Switch to edit mode.
-    const wrapper2 = mountWithAppContext2(
+    const wrapper2 = mountWithAppContext(
       <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
@@ -427,7 +427,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
   });
 
   it("Pre-populate fill by and grid row and columns", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
@@ -454,7 +454,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
   });
 
   it("Move all functionality", async () => {
-    const wrapper = mountWithAppContext2(<TestContainer />, testCtx);
+    const wrapper = mountWithAppContext(<TestContainer />, testCtx);
     await new Promise(setImmediate);
 
     // Switch to edit mode.
@@ -569,7 +569,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
   });
 
   it("Load existing records and clear grid", async () => {
-    const wrapper = mountWithAppContext2(<TestContainer />, testCtx);
+    const wrapper = mountWithAppContext(<TestContainer />, testCtx);
     await new Promise(setImmediate);
 
     // Expect material samples already saved to the grid to be rendered on it.
@@ -613,7 +613,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
   });
 
   it("Display message if no storage unit is provided on PcrBatch", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH_NO_STORAGE}
         pcrBatchId={PCR_BATCH_ID}

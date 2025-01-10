@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
 } from "../QueryBuilderBooleanSearch";
@@ -13,7 +13,7 @@ describe("QueryBuilderBooleanSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const { queryByRole } = mountWithAppContext2(
+      const { queryByRole } = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider value={{ performSubmit: noop } as any}>
             <QueryBuilderBooleanSearch
@@ -30,7 +30,7 @@ describe("QueryBuilderBooleanSearch", () => {
     });
 
     it("Don't display field if match type is not equals", async () => {
-      const { queryByRole } = mountWithAppContext2(
+      const { queryByRole } = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -50,7 +50,7 @@ describe("QueryBuilderBooleanSearch", () => {
 
     it("Should call performSubmit on enter key press in combobox", async () => {
       const mockPerformSubmit = jest.fn();
-      const { getByRole } = mountWithAppContext2(
+      const { getByRole } = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: mockPerformSubmit, groups: [] }}

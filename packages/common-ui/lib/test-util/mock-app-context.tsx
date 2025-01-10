@@ -1,22 +1,22 @@
 import { render } from "@testing-library/react";
-import { mount } from "enzyme";
-import { merge, noop } from "lodash";
-import { ReactNode, useMemo, useRef } from "react";
-import { SWRConfig } from "swr";
-import { PartialDeep } from "type-fest";
-import { AccountContextI, AccountProvider } from "../account/AccountProvider";
 import {
+  AccountContextI,
+  AccountProvider,
   ApiClientI,
   ApiClientImpl,
-  ApiClientProvider
-} from "../api-client/ApiClientContext";
-import {
-  InstanceContext,
+  ApiClientProvider,
   InstanceContextI,
-  InstanceContextProvider
-} from "../instance/InstanceContextProvider";
-import { CommonUIIntlProvider } from "../intl/common-ui-intl";
-import { ModalProvider } from "../modal/modal";
+  InstanceContextProvider,
+  ModalProvider
+} from "common-ui";
+import { merge, noop } from "lodash";
+import { FileUploadProviderImpl } from "../../../dina-ui/components/object-store/file-upload/FileUploadProvider";
+import { DinaIntlProvider } from "../../../dina-ui/intl/dina-ui-intl";
+import { useMemo, useRef } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { SWRConfig } from "swr";
+import { PartialDeep } from "type-fest";
 
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
@@ -24,7 +24,6 @@ interface MockAppContextProviderProps {
   instanceContext?: Partial<InstanceContextI>;
   children?: React.ReactNode;
 }
-
 /**
  * Wraps a test-rendered component to provide the contexts that would be available in
  * the application.
@@ -43,19 +42,10 @@ export function MockAppContextProvider({
       login: noop,
       logout: noop,
       roles: ["user"],
-      // Mock for a successful token update.
       getCurrentToken: () => Promise.resolve("test-token"),
       username: "test-user",
       isAdmin: false
     }),
-    []
-  );
-
-  const DEFAULT_API_CONTEXT_VALUE = useMemo(
-    () =>
-      new ApiClientImpl({
-        newId: () => "00000000-0000-0000-0000-000000000000"
-      }),
     []
   );
 
@@ -66,6 +56,14 @@ export function MockAppContextProvider({
       instanceName: "AAFC",
       supportedGeographicReferences: "OSM"
     }),
+    []
+  );
+
+  const DEFAULT_API_CONTEXT_VALUE = useMemo(
+    () =>
+      new ApiClientImpl({
+        newId: () => "00000000-0000-0000-0000-000000000000"
+      }),
     []
   );
 
@@ -103,17 +101,21 @@ export function MockAppContextProvider({
         <ApiClientProvider
           value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
-          <InstanceContextProvider
-            value={{ ...DEFAULT_INSTANCE_CONTEXT_VALUE, ...instanceContext }}
-          >
-            <CommonUIIntlProvider>
-              <div ref={modalWrapperRef}>
-                <ModalProvider appElement={modalWrapperRef.current}>
-                  {children}
-                </ModalProvider>
-              </div>
-            </CommonUIIntlProvider>
-          </InstanceContextProvider>
+          <DinaIntlProvider>
+            <InstanceContextProvider
+              value={{ ...DEFAULT_INSTANCE_CONTEXT_VALUE, ...instanceContext }}
+            >
+              <FileUploadProviderImpl>
+                <DndProvider backend={HTML5Backend}>
+                  <div ref={modalWrapperRef}>
+                    <ModalProvider appElement={modalWrapperRef.current}>
+                      {children}
+                    </ModalProvider>
+                  </div>
+                </DndProvider>
+              </FileUploadProviderImpl>
+            </InstanceContextProvider>
+          </DinaIntlProvider>
         </ApiClientProvider>
       </AccountProvider>
     </SWRConfig>
@@ -121,24 +123,9 @@ export function MockAppContextProvider({
 }
 
 /**
- * Helper function to get a test wrapper with the required context providers using Enzyme.
- * @deprecated Please mountWithAppContext2, which use React-testing library.  It is compatiple with React 18.
- */
-export function mountWithAppContext(
-  element: React.ReactNode,
-  mockAppContextProviderProps?: MockAppContextProviderProps
-) {
-  return mount(
-    <MockAppContextProvider {...mockAppContextProviderProps}>
-      {element}
-    </MockAppContextProvider>
-  );
-}
-
-/**
  * Helper function to get a test wrapper with the required context providers using React-Testing library.
  */
-export function mountWithAppContext2(
+export function mountWithAppContext(
   element: React.ReactNode,
   mockAppContextProviderProps?: MockAppContextProviderProps
 ) {

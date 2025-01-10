@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DeterminationField } from "../DeterminationField";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -10,7 +10,7 @@ describe("DeterminationField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Doesn't try to save what the user types into the name search box.", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm
         initialValues={{ determination: [{ isPrimary: true }] }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}

@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { KeyValueTable } from "../KeyValueTable";
 import "@testing-library/jest-dom";
 
@@ -9,7 +9,7 @@ describe("KeyValueTable component", () => {
       keyB: "value B"
     };
 
-    const wrapper = mountWithAppContext2(<KeyValueTable data={object} />);
+    const wrapper = mountWithAppContext(<KeyValueTable data={object} />);
 
     expect(wrapper.queryByText("Key A")).toBeInTheDocument();
     expect(wrapper.queryByText("Key B")).toBeInTheDocument();
@@ -24,7 +24,7 @@ describe("KeyValueTable component", () => {
       keyB: "value B"
     };
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <KeyValueTable
         customValueCells={{
           keyB: ({ getValue }) => getValue().toUpperCase()

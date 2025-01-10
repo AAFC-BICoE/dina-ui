@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { RolesPerGroupEditor } from "../../../pages/dina-user/edit";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import Select from "react-select";
 import { SUPER_USER, USER, GUEST } from "common-ui/types/DinaRoles";
 import { fireEvent } from "@testing-library/react";
@@ -40,7 +40,7 @@ describe("User edit page", () => {
       }
     };
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={testUserToEdit}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}

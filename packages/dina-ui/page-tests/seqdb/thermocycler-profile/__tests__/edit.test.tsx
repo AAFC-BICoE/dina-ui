@@ -2,7 +2,7 @@ import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { ThermocyclerProfileEditPage } from "../../../../pages/seqdb/thermocycler-profile/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -52,7 +52,7 @@ describe("ThermocyclerProfile edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ThermocyclerProfileEditPage
         router={{ query: {}, push: mockPush } as any}
       />,
@@ -111,7 +111,7 @@ describe("ThermocyclerProfile edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ThermocyclerProfileEditPage
         router={{ query: {}, push: mockPush } as any}
       />,
@@ -146,7 +146,7 @@ describe("ThermocyclerProfile edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ThermocyclerProfileEditPage
         router={{ query: { id: 100 }, push: mockPush } as any}
       />,

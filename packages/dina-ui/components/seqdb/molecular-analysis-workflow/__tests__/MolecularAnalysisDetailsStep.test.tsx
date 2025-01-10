@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import {
   MolecularAnalysisDetailsStep,
   MolecularAnalysisDetailsStepProps
@@ -77,7 +77,7 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
   }
 
   it("Create a new molecular analysis", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponentWrapper
         genericMolecularAnalysis={undefined}
         genericMolecularAnalysisId={undefined}
@@ -145,7 +145,7 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
   });
 
   it("Edit a existing molecular analysis", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponentWrapper
         genericMolecularAnalysis={{
           id: "be4a1145-377d-42c4-8ff3-93f2bc6db97b",

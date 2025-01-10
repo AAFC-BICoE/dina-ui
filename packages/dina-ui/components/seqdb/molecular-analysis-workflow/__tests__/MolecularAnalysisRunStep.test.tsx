@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { noop } from "lodash";
 import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -133,7 +133,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
   beforeEach(jest.clearAllMocks);
 
   it("Loading spinner is displayed on first load", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MolecularAnalysisRunStep
         editMode={false}
         performSave={false}
@@ -149,7 +149,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
   });
 
   it("Display the sequencing run in the UI", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MolecularAnalysisRunStep
         editMode={true}
         performSave={false}
@@ -219,7 +219,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
   });
 
   it("Multiple runs exist for one seq-batch, display warning to user", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MolecularAnalysisRunStep
         editMode={true}
         performSave={false}
@@ -279,7 +279,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
   }
 
   it("No run exists, in edit mode, create a new run", async () => {
-    const wrapper = mountWithAppContext2(<TestComponent />, testCtx);
+    const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
     // Automatically go into edit mode if no sequencing runs exist.
     await waitFor(() => {
@@ -514,7 +514,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
   });
 
   it("Run exists, in edit mode, update the existing run", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponent
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
       />,
@@ -733,7 +733,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
   });
 
   it("Create incomplete quality controls, report error message and remove completely empty quality controls", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponent
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
       />,
@@ -788,7 +788,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
   });
 
   it("Automatically switch to edit mode and be able to cancel", async () => {
-    const wrapper = mountWithAppContext2(<TestComponent />, testCtx);
+    const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));

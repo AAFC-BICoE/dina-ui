@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { DinaForm } from "../../../../../common-ui/lib";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { MaterialSample } from "../../../../types/collection-api";
 import { MaterialSampleBreadCrumb } from "../MaterialSampleBreadCrumb";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
@@ -20,7 +20,7 @@ const materialSampleWithHierarchy: PersistedResource<MaterialSample> = {
 
 describe("MaterialSampleBreadCrumb component", () => {
   it("Renders the breadcrumb path from the hierarchy, lastLink disabled", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <MaterialSampleBreadCrumb
           materialSample={materialSampleWithHierarchy}
@@ -49,7 +49,7 @@ describe("MaterialSampleBreadCrumb component", () => {
   });
 
   it("Renders the breadcrumb path from the hierarchy, lastLink enabled", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <MaterialSampleBreadCrumb
           materialSample={materialSampleWithHierarchy}

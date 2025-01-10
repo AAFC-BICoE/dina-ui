@@ -11,7 +11,7 @@ exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display dif
       />
       <input
         class="form-control"
-        placeholder="queryBuilder_value_in_placeholder"
+        placeholder="Enter comma-separated values..."
         type="text"
         value="test"
       />
@@ -31,7 +31,7 @@ exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display dif
       />
       <input
         class="form-control"
-        placeholder="queryBuilder_value_in_placeholder"
+        placeholder="Enter comma-separated values..."
         type="text"
         value="test"
       />
@@ -65,7 +65,7 @@ exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display fie
       />
       <input
         class="form-control"
-        placeholder="queryBuilder_value_number_placeholder"
+        placeholder="Enter number search value..."
         type="number"
         value="test"
       />

@@ -1,10 +1,8 @@
 import { SaveArgs } from "common-ui";
-import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
-import ReactSwitch from "react-switch";
 import { getComponentOrderFromTemplate } from "../../../../components/form-template/formTemplateUtils";
 import { FormTemplateEditPageLoaded } from "../../../../pages/collection/form-template/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
@@ -117,7 +115,7 @@ const apiContext = {
 async function mountForm(
   existingActionDefinition?: PersistedResource<FormTemplate>
 ) {
-  const wrapper = mountWithAppContext2(
+  const wrapper = mountWithAppContext(
     <FormTemplateEditPageLoaded
       id={existingActionDefinition?.id}
       fetchedFormTemplate={existingActionDefinition}

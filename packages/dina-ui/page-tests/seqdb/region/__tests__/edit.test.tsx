@@ -1,6 +1,6 @@
 import { OperationsResponse } from "common-ui";
 import { RegionEditPage } from "../../../../pages/seqdb/region/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
 import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
@@ -51,7 +51,7 @@ describe("Region edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <RegionEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
@@ -106,7 +106,7 @@ describe("Region edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <RegionEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
@@ -144,7 +144,7 @@ describe("Region edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <RegionEditPage router={{ query: { id: 100 }, push: mockPush } as any} />,
       { apiContext }
     );

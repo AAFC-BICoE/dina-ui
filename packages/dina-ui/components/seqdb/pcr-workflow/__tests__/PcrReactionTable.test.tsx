@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PcrReactionTable } from "../PcrReactionTable";
 import {
   MATERIAL_SAMPLES,
@@ -11,7 +11,7 @@ describe("PcrReactionTable component", () => {
   beforeEach(jest.clearAllMocks);
 
   test("Table renders correctly with mocked API calls", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
         <PcrReactionTable
           materialSamples={MATERIAL_SAMPLES as any}

@@ -1,6 +1,6 @@
 import { SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/objectstore-api";
 import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import "@testing-library/jest-dom";
@@ -55,7 +55,7 @@ const apiContext: any = {
 
 describe("Dina user who am i page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<DinaUserDetailsPage />, {
+    const wrapper = mountWithAppContext(<DinaUserDetailsPage />, {
       apiContext
     });
 
@@ -64,7 +64,7 @@ describe("Dina user who am i page", () => {
   });
 
   it("Render the dina user details", async () => {
-    const wrapper = mountWithAppContext2(<DinaUserDetailsPage />, {
+    const wrapper = mountWithAppContext(<DinaUserDetailsPage />, {
       apiContext
     });
 

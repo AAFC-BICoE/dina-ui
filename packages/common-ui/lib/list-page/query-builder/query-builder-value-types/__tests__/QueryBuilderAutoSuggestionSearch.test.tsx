@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import { QueryBuilderAutoSuggestionTextSearchMemo } from "../QueryBuilderAutoSuggestionSearch";
 import { waitFor } from "@testing-library/react";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
@@ -88,7 +88,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const autoSuggestionEquals = mountWithAppContext2(
+      const autoSuggestionEquals = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
@@ -111,7 +111,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
         "Expect date field to be displayed since match type is equals"
       );
 
-      const autoSuggestionEmpty = mountWithAppContext2(
+      const autoSuggestionEmpty = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
@@ -138,7 +138,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
     it("Display different placeholder on IN operators", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const autoSuggestionIn = mountWithAppContext2(
+      const autoSuggestionIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
@@ -161,7 +161,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
         "Expect auto-suggestion field to be displayed with a different placeholder."
       );
 
-      const autoSuggestionNotIn = mountWithAppContext2(
+      const autoSuggestionNotIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
@@ -186,7 +186,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
     });
 
     it("Display suggestions on equals or not equals operators", async () => {
-      const autoSuggestionComponent = mountWithAppContext2(
+      const autoSuggestionComponent = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
@@ -255,7 +255,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
 
     it("Should call performSubmit on enter key press in textfield", async () => {
       const mockPerformSubmit = jest.fn();
-      const { getByRole } = mountWithAppContext2(
+      const { getByRole } = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{

@@ -5,7 +5,7 @@ import {
   Metadata,
   ObjectSubtype
 } from "../../../../types/objectstore-api";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import ExternalResourceMetadataPage from "../../../../pages/object-store/metadata/external-resource-edit";
 import Select from "react-select/base";
 import { ResourceSelectField } from "common-ui";
@@ -112,7 +112,7 @@ describe("Metadata external resource edit page.", () => {
       query: { id: undefined }
     });
 
-    const wrapper = mountWithAppContext2(<ExternalResourceMetadataPage />, {
+    const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
       apiContext
     });
     await new Promise(setImmediate);
@@ -188,7 +188,7 @@ describe("Metadata external resource edit page.", () => {
         id: "25f81de5-bbee-430c-b5fa-71986b70e612"
       }
     });
-    const wrapper = mountWithAppContext2(<ExternalResourceMetadataPage />, {
+    const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
       apiContext
     });
 

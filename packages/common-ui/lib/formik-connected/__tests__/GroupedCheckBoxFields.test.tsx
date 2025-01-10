@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { useEffect } from "react";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { useGroupedCheckBoxes } from "../GroupedCheckBoxFields";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
@@ -50,7 +50,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Renders checkboxes.", () => {
-    const wrapper = mountWithAppContext2(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
     // Find all checkbox inputs
     const checkboxes = screen.getAllByRole("checkbox", { name: /select/i });
     // Assert that 5 checkboxes are rendered
@@ -58,7 +58,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Sets the checked ID in the formik state.", async () => {
-    const wrapper = mountWithAppContext2(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     const checkboxes = screen.getAllByRole("checkbox");
     await userEvent.click(checkboxes[2]);
@@ -80,7 +80,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Lets you shift+click to toggle multiple check boxes at a time.", async () => {
-    const wrapper = mountWithAppContext2(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     const checkboxes = screen.getAllByRole("checkbox", { name: /select/i });
 
@@ -109,7 +109,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Multi-toggles checkboxes even when they are in reverse order.", async () => {
-    const wrapper = mountWithAppContext2(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     const checkboxes = screen.getAllByRole("checkbox", { name: /select/i });
 
@@ -138,7 +138,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Provides a checkbox to check all boxes.", async () => {
-    const wrapper = mountWithAppContext2(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     // The header should show the total checked count initially (0 selected).
     expect(screen.getByText("(0 selected)")).toBeInTheDocument();

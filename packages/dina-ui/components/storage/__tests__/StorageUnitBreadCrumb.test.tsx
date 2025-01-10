@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitBreadCrumb } from "../StorageUnitBreadCrumb";
 import userEvent from "@testing-library/user-event";
@@ -50,7 +50,7 @@ const storageUnitWithParentHierarchy: PersistedResource<StorageUnit> = {
 
 describe("StorageUnitBreadCrumb component", () => {
   it("Renders the breadcrumb path from the hierarchy", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <StorageUnitBreadCrumb storageUnit={storageUnitWithHierarchy} />
     );
 
@@ -78,7 +78,7 @@ describe("StorageUnitBreadCrumb component", () => {
     ).toHaveAttribute("href", "/collection/storage-unit/view?id=A");
   });
   it("Renders the breadcrumb path from the parent's hierarchy", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <StorageUnitBreadCrumb storageUnit={storageUnitWithParentHierarchy} />
     );
 

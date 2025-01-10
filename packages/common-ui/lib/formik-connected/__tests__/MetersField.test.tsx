@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { FormikButton } from "../FormikButton";
 import { MetersField, toMeters } from "../MetersField";
@@ -92,7 +92,7 @@ describe("MetersField component", () => {
   });
 
   it("Does the unit conversion onBlur.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <MetersField name="length" />
       </DinaForm>
@@ -121,7 +121,7 @@ describe("MetersField component", () => {
   it("Shows an error message on invalid input.", async () => {
     const mockOnSubmit = jest.fn();
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -163,7 +163,7 @@ describe("MetersField component", () => {
   });
 
   it("Does the unit conversion onSubmit.", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -189,7 +189,7 @@ describe("MetersField component", () => {
   });
 
   it("Renders the initial value.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ length: "10.00" }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -202,7 +202,7 @@ describe("MetersField component", () => {
   });
 
   it("Updates the input value when the form state changes.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ length: "10.00" }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}

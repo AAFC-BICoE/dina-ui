@@ -1,6 +1,6 @@
 import { Formik } from "formik";
 import { noop } from "lodash";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { ErrorViewer } from "../ErrorViewer";
 import { SubmitButton } from "../SubmitButton";
@@ -10,7 +10,7 @@ import "@testing-library/jest-dom";
 describe("ErrorViewer component", () => {
   it("Renders nothing when Formik has no status.", () => {
     // Render the component with React Testing Library
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <Formik initialValues={{}} onSubmit={noop}>
         <ErrorViewer />
       </Formik>
@@ -24,7 +24,7 @@ describe("ErrorViewer component", () => {
 
   it("Renders the Formik status as an error message.", async () => {
     // Render the component using React Testing Library
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ formik }) => formik.setStatus("Test error")}
@@ -40,7 +40,7 @@ describe("ErrorViewer component", () => {
   });
 
   it("Renders field-level errors.", async () => {
-    mountWithAppContext2(
+    mountWithAppContext(
       <DinaForm
         initialValues={{}}
         initialErrors={{

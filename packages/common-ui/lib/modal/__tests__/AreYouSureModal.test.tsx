@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { AreYouSureModal } from "../AreYouSureModal";
 import { useModal } from "../modal";
 import { fireEvent } from "@testing-library/react";
@@ -37,7 +37,7 @@ describe("AreYouSureModal", () => {
   });
 
   it("Closes when you click 'No'", async () => {
-    const wrapper = mountWithAppContext2(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     // Should not be open by default on initial load.
     expect(wrapper.queryByText(/test message/i)).not.toBeInTheDocument();
@@ -56,7 +56,7 @@ describe("AreYouSureModal", () => {
   });
 
   it("Runs the passed function and closes when you click 'Yes'", async () => {
-    const wrapper = mountWithAppContext2(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     // Open modal:
     fireEvent.click(wrapper.getByRole("button", { name: /open/i }));

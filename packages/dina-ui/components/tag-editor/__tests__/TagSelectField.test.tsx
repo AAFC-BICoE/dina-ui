@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { TagSelectField } from "../TagSelectField";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -38,7 +38,7 @@ const testCtx = {
 
 describe("TagSelectField", () => {
   it("Lets you select tags from previous values.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <TagSelectField
           name="tags"
@@ -83,7 +83,7 @@ describe("TagSelectField", () => {
   });
 
   it("Lets you type in new tags.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <TagSelectField
           name="tags"

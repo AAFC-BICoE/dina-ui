@@ -1,6 +1,6 @@
 import { OperationsResponse } from "common-ui";
 import { ObjectSubtypeEditPage } from "../../../pages/object-store/object-subtype/edit";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -48,7 +48,7 @@ describe("Object subtype edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
@@ -109,7 +109,7 @@ describe("Object subtype edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ObjectSubtypeEditPage
         router={{ query: { id: 1 }, push: mockPush } as any}
       />,
@@ -184,7 +184,7 @@ describe("Object subtype edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
