@@ -1,7 +1,8 @@
 import { PersistedResource } from "kitsu";
 import MetadataViewPage from "../../../../pages/object-store/object/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
+import "@testing-library/jest-dom";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2"],
@@ -102,16 +103,15 @@ describe("Single Stored Object details page", () => {
   // });
 
   it("Renders the page.", async () => {
-    const wrapper = mountWithAppContext(<MetadataViewPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<MetadataViewPage />, { apiContext });
 
     await new Promise(setImmediate);
-    wrapper.update();
     await new Promise(setImmediate);
-    expect(wrapper.find(".metadata-caption").text()).toEqual(
-      "Caption: Test Caption"
-    );
+
+    expect(wrapper.getAllByText("Caption:")[0]).toBeInTheDocument();
+    expect(wrapper.getAllByText("Test Caption")[0]).toBeInTheDocument();
 
     // Shows the EXIF data:
-    expect(wrapper.contains("Flash did not fire")).toEqual(true);
+    expect(wrapper.getByText(/flash did not fire/i)).toBeInTheDocument();
   });
 });

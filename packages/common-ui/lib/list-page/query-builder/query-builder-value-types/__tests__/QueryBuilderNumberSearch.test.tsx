@@ -15,7 +15,9 @@ describe("QueryBuilderNumberSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const numberSearchEquals = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderNumberSearch
               matchType="equals"
               value="test"
@@ -32,7 +34,9 @@ describe("QueryBuilderNumberSearch", () => {
 
       const numberSearchEmpty = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderNumberSearch
               matchType="empty"
               value="test"
@@ -53,7 +57,9 @@ describe("QueryBuilderNumberSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const numberSearchIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderNumberSearch
               matchType="in"
               value="test"
@@ -70,7 +76,9 @@ describe("QueryBuilderNumberSearch", () => {
 
       const numberSearchNotIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderNumberSearch
               matchType="notIn"
               value="test"
@@ -91,7 +99,7 @@ describe("QueryBuilderNumberSearch", () => {
       const { getByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: mockPerformSubmit }}
+            value={{ performSubmit: mockPerformSubmit, groups: [] }}
           >
             <QueryBuilderNumberSearch
               matchType="equals"

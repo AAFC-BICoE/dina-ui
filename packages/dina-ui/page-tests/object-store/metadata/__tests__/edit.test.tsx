@@ -2,8 +2,11 @@ import { PersistedResource } from "kitsu";
 import { ManagedAttribute } from "../../../../types/collection-api";
 import CreatableSelect from "react-select/creatable";
 import MetadataEditPage from "../../../../pages/object-store/metadata/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 const mockGet = jest.fn(async (path) => {
   switch (path) {
@@ -113,47 +116,50 @@ describe("Metadata single record edit page.", () => {
   });
 
   it("Lets you edit the Metadata.", async () => {
-    const wrapper = mountWithAppContext(<MetadataEditPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<MetadataEditPage />, { apiContext });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check for the right initial values:
-    expect(wrapper.find(".originalFilename-field input").prop("value")).toEqual(
-      "test-file.png"
-    );
     expect(
-      wrapper.find(".acTags-field").find(CreatableSelect).prop("value")
-    ).toEqual([
-      { label: "tag1", value: "tag1" },
-      { label: "tag2", value: "tag2" },
-      { label: "tag3", value: "tag3" }
-    ]);
+      wrapper.getByRole("textbox", { name: /original filename/i })
+    ).toHaveDisplayValue("test-file.png");
+
+    expect(wrapper.getByText(/tag1/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/tag2/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/tag3/i)).toBeInTheDocument();
+
     expect(
-      wrapper.find(".test_managed_attribute-field input").prop("value")
-    ).toEqual("test-managed-attribute-value");
+      wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i)
+    ).toBeInTheDocument();
 
     // Set new values:
-    wrapper.find(".acTags-field").find(CreatableSelect).prop<any>("onChange")([
-      { label: "new tag 1", value: "new tag 1" },
-      { label: "new tag 2", value: "new tag 2" }
-    ]);
-    wrapper
-      .find(".managed-attributes-editor input")
-      .first()
-      .simulate("change", {
-        target: {
-          value: "new-managed-attribute-value"
-        }
-      });
+    userEvent.click(wrapper.getByRole("button", { name: /remove tag1/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /remove tag2/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /remove tag3/i }));
+
+    fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
+      target: { value: "new tag 1" }
+    });
+    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 1"/i }));
+    fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
+      target: { value: "new tag 2" }
+    });
+    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
+
+    fireEvent.change(
+      wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i),
+      {
+        target: { value: "new-managed-attribute-value" }
+      }
+    );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("form").simulate("submit");
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check only the changed values
     expect(mockSave).lastCalledWith(

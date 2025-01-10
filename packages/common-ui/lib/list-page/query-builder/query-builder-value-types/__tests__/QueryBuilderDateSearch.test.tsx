@@ -15,7 +15,9 @@ describe("QueryBuilderDateSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const dateSearchEquals = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderDateSearch
               matchType="equals"
               value="test"
@@ -32,7 +34,9 @@ describe("QueryBuilderDateSearch", () => {
 
       const dateSearchEmpty = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderDateSearch
               matchType="empty"
               value="test"
@@ -53,7 +57,7 @@ describe("QueryBuilderDateSearch", () => {
       const { getByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: mockPerformSubmit }}
+            value={{ performSubmit: mockPerformSubmit, groups: [] }}
           >
             <QueryBuilderDateSearch
               matchType="equals"

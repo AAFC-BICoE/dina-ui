@@ -10,9 +10,12 @@ import { PersistedResource } from "kitsu";
 import { Group } from "../../../../types/user-api";
 import { StoredObjectGallery } from "../../../../components/object-store";
 import MetadataListPage from "../../../../pages/object-store/object/list";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Metadata, Person } from "../../../../types/objectstore-api";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
+import { within } from "@testing-library/dom";
 
 const TEST_PERSON: PersistedResource<Person> = {
   id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
@@ -247,56 +250,46 @@ describe("Metadata List Page", () => {
   });
 
   it("Renders the metadata table by default.", async () => {
-    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<MetadataListPage />, { apiContext });
 
     await new Promise(setImmediate);
-    await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(QueryPage).find("td").exists()).toEqual(true);
+    // Tests that 1 table renders on the page by default
+    expect(wrapper.getByRole("table")).toBeInTheDocument();
   });
 
   it("Provides a toggle to see the gallery view.", async () => {
-    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<MetadataListPage />, { apiContext });
 
     // Renders initially with the table view:
-    expect(
-      wrapper
-        .find(".list-layout-selector .list-inline-item")
-        .findWhere((node) => node.text().includes("Table"))
-        .find("input")
-        .prop("checked")
-    ).toEqual(true);
+    expect(wrapper.getByRole("radio", { name: /table/i })).toBeChecked();
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Switch to gallery view.
-    wrapper
-      .find(".list-layout-selector .list-inline-item")
-      .findWhere((node) => node.text().includes("Gallery"))
-      .find("input")
-      .prop<any>("onChange")();
+    userEvent.click(wrapper.getByRole("radio", { name: /gallery/i }));
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(StoredObjectGallery).exists()).toEqual(true);
+    // Get the cell that contains the list
+    const CELL = wrapper.getByRole("cell", { name: /no thumbnail available/i });
+
+    // Tests gallery view as a list in the table
+    expect(within(CELL).getByRole("list")).toBeInTheDocument();
   });
 
   it("Lets you select a list of metadatas and route to the edit page.", async () => {
-    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<MetadataListPage />, { apiContext });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Select all 3 metadatas to edit.
-    wrapper.find(".grouped-checkbox-header input").prop<any>("onClick")({
-      target: { checked: true }
-    });
+    userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[0]);
+    userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[1]);
+    userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[2]);
 
     // Click the bulk edit button:
-    wrapper.find("button.bulk-edit-button").simulate("click");
+    userEvent.click(wrapper.getByRole("button", { name: /edit selected/i }));
 
     // Router push should have been called with the 3 IDs.
     expect(mockPush).lastCalledWith({
@@ -315,68 +308,61 @@ describe("Metadata List Page", () => {
   });
 
   it("Shows a metadata preview when you click the 'Preview' button.", async () => {
-    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<MetadataListPage />, { apiContext });
+
+    await new Promise(setImmediate);
 
     // Preview section is initially hidden:
-    expect(wrapper.find(".offcanvas").exists()).toEqual(false);
-
-    await new Promise(setImmediate);
-    wrapper.update();
+    expect(wrapper.getAllByText(/preview/i)).toHaveLength(4);
 
     // Click the preview button:
-    wrapper.find("button.preview-button").first().simulate("click");
+    userEvent.click(wrapper.getAllByRole("button", { name: /preview/i })[0]);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Preview section is visible:
-    expect(wrapper.find(".offcanvas").hasClass("show")).toEqual(true);
+    // Preview section is visible: (5th preview element)
+    expect(wrapper.getAllByText(/preview/i)).toHaveLength(5);
   });
 
   it("Disables the bulk edit button when no Metadatas are selected.", async () => {
-    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<MetadataListPage />, { apiContext });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Disabled initially because none are selected:
-    expect(wrapper.find("button.bulk-edit-button").prop("disabled")).toEqual(
-      true
-    );
+    expect(
+      wrapper.getByRole("button", { name: /edit selected/i })
+    ).toBeDisabled();
 
     // Select all 3 Metadatas to edit.
-    wrapper.find(".grouped-checkbox-header input").prop<any>("onClick")({
-      target: { checked: true }
-    });
+    userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The button should now be enabled:
-    expect(wrapper.find("button.bulk-edit-button").prop("disabled")).toEqual(
-      false
-    );
+    expect(
+      wrapper.getByRole("button", { name: /edit selected/i })
+    ).toBeEnabled();
 
     // Deselect all 3 Metadatas.
-    wrapper.find(".grouped-checkbox-header input").prop<any>("onClick")({
-      target: { checked: false }
-    });
+    userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The button should now be disabled again:
-    expect(wrapper.find("button.bulk-edit-button").prop("disabled")).toEqual(
-      true
-    );
+    expect(
+      wrapper.getByRole("button", { name: /edit selected/i })
+    ).toBeDisabled();
   });
 
   it("Lets you bulk-delete metadata.", async () => {
-    const pageWrapper = mountWithAppContext(<MetadataListPage />, {
+    const pageWrapper = mountWithAppContext2(<MetadataListPage />, {
       apiContext
     });
-    expect(pageWrapper.find("bulk-delete-button").exists());
+    expect(
+      pageWrapper.getByRole("button", { name: /delete selected/i })
+    ).toBeInTheDocument();
 
     // Pretend two metadatas are already selected:
-    const buttonWrapper = mountWithAppContext(
+    const buttonWrapper = mountWithAppContext2(
       <DinaForm<BulkSelectableFormValues>
         initialValues={{
           itemIdsToSelect: {
@@ -391,20 +377,21 @@ describe("Metadata List Page", () => {
     );
 
     // Click the bulk-delete button:
-    buttonWrapper.find("button").simulate("click");
+    userEvent.click(
+      buttonWrapper.getAllByRole("button", { name: /delete selected/i })[1]
+    );
 
-    buttonWrapper.update();
+    await new Promise(setImmediate);
 
     // Shows how many will be deleted:
     expect(
-      buttonWrapper.find(AreYouSureModal).find(".modal-header").text()
-    ).toEqual("Delete Selected (2)");
+      buttonWrapper.getByText(/delete selected \(2\)/i)
+    ).toBeInTheDocument();
 
     // Click 'yes' on the "Are you sure" modal:
-    buttonWrapper.find(AreYouSureModal).find("form").simulate("submit");
+    userEvent.click(buttonWrapper.getByRole("button", { name: /yes/i }));
 
     await new Promise(setImmediate);
-    buttonWrapper.update();
 
     expect(mockDelete).toHaveBeenCalledTimes(2);
     expect(mockDelete).lastCalledWith(

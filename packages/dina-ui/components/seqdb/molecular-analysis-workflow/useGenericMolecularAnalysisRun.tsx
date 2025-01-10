@@ -778,16 +778,14 @@ export function useGenericMolecularAnalysisRun({
           const molecularAnalysisRunItemName = item.materialSampleSummary?.id
             ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
             : undefined;
-          if (molecularAnalysisRunItemName) {
-            molecularAnalysisRunItemSaveArgs.push({
+          molecularAnalysisRunItemSaveArgs.push({
+            type: "molecular-analysis-run-item",
+            resource: {
+              id: item.molecularAnalysisRunItemId,
               type: "molecular-analysis-run-item",
-              resource: {
-                id: item.molecularAnalysisRunItemId,
-                type: "molecular-analysis-run-item",
-                name: molecularAnalysisRunItemName
-              }
-            });
-          }
+              name: molecularAnalysisRunItemName
+            }
+          });
         });
         if (molecularAnalysisRunItemSaveArgs.length) {
           await save(molecularAnalysisRunItemSaveArgs, {

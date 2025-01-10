@@ -1,7 +1,9 @@
 import { OperationsResponse } from "common-ui";
 import { ObjectSubtypeEditPage } from "../../../pages/object-store/object-subtype/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -46,26 +48,31 @@ describe("Object subtype edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
 
-    expect(wrapper.find(".acSubtype-field input")).toHaveLength(1);
+    expect(
+      wrapper.getAllByRole("textbox", { name: /object subtype/i })
+    ).toHaveLength(1);
 
     // Edit the subtype name.
-
-    wrapper.find(".acSubtype-field input").simulate("change", {
-      target: {
-        name: "acSubtype",
-        value: "libre office word"
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /object subtype/i }),
+      {
+        target: {
+          name: "acSubtype",
+          value: "libre office word"
+        }
       }
-    });
+    );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
     await new Promise(setImmediate);
 
+    // Test expected response
     expect(mockPatch).lastCalledWith(
       "/objectstore-api/operations",
       [
@@ -102,7 +109,7 @@ describe("Object subtype edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ObjectSubtypeEditPage
         router={{ query: { id: 1 }, push: mockPush } as any}
       />,
@@ -110,24 +117,29 @@ describe("Object subtype edit page", () => {
     );
 
     // The page should load initially with a loading spinner.
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check that the existing existing subtype value is in the field.
-    expect(wrapper.find(".acSubtype-field input").prop("value")).toEqual(
-      "word file"
-    );
+    expect(
+      wrapper.getByRole("textbox", { name: /object subtype/i })
+    ).toHaveValue("word file");
 
     // Modify the acSubtype value.
-    wrapper.find(".acSubtype-field input").simulate("change", {
-      target: { name: "acSubtype", value: "new subtype value" }
-    });
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /object subtype/i }),
+      {
+        target: {
+          name: "acSubtype",
+          value: "new subtype value"
+        }
+      }
+    );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
@@ -172,20 +184,22 @@ describe("Object subtype edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
-    wrapper.update();
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: DcType and subtype combination should be unique"
-    );
+    // Test expected error
+    expect(
+      wrapper.getByText(
+        "Constraint violation: DcType and subtype combination should be unique"
+      )
+    ).toBeInTheDocument();
     expect(mockPush).toBeCalledTimes(0);
   });
 });

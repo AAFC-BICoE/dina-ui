@@ -14,7 +14,9 @@ describe("QueryBuilderTextSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const textSearchEquals = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderTextSearch
               matchType="equals"
               value="test"
@@ -31,7 +33,9 @@ describe("QueryBuilderTextSearch", () => {
 
       const textSearchEmpty = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderTextSearch
               matchType="empty"
               value="test"
@@ -52,7 +56,9 @@ describe("QueryBuilderTextSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const textSearchIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderTextSearch
               matchType="in"
               value="test1, test2, test3"
@@ -69,7 +75,9 @@ describe("QueryBuilderTextSearch", () => {
 
       const textSearchNotIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: [] }}
+          >
             <QueryBuilderTextSearch
               matchType="notIn"
               value="test1, test2, test3"
@@ -90,7 +98,7 @@ describe("QueryBuilderTextSearch", () => {
       const { getByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: mockPerformSubmit }}
+            value={{ performSubmit: mockPerformSubmit, groups: [] }}
           >
             <QueryBuilderTextSearch
               matchType="equals"
