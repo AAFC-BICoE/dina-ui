@@ -614,6 +614,7 @@ export function CollectingEventFormLayout({
               <TagsAndRestrictionsSection
                 resourcePath="collection-api/collecting-event"
                 indexName="dina_material_sample_index"
+                tagIncludedType="collecting-event"
               />
             }
           />
