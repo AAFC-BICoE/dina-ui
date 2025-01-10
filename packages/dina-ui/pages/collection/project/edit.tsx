@@ -65,7 +65,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
     );
   }
 
-console.error("Test");
+  console.error("Test");
 
   const initialValues: ProjectFormValues = fetchedProject
     ? {

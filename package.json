@@ -62,13 +62,11 @@
     "pdfjs-dist": "4.2.67"
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint . --fix --quiet",
-      "git add"
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix --max-warnings=0 "
     ],
-    "*.{js,jsx,css,json,md}": [
-      "prettier --write",
-      "git add"
+    "*.{js,jsx,ts,tsx,css,json,md}": [
+      "prettier --write "
     ]
   },
   "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72",
