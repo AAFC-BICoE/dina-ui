@@ -51,14 +51,16 @@ export default function OrganizationEditPage() {
 
 export const trimAliases = (aliases, isArray) => {
   let trimmedAliases;
-  isArray
-    ? (trimmedAliases = aliases
-        .filter((a) => a.trim().length > 0)
-        .map((a) => a.trim()))
-    : (trimmedAliases = aliases
-        .split(",")
-        .filter((a) => a.trim().length > 0)
-        .map((a) => a.trim()));
+  if (isArray) {
+    trimmedAliases = aliases
+      .filter((a: string) => a.trim().length > 0)
+      .map((a: string) => a.trim());
+  } else {
+    trimmedAliases = aliases
+      .split(",")
+      .filter((a: string) => a.trim().length > 0)
+      .map((a: string) => a.trim());
+  }
   return trimmedAliases;
 };
 
@@ -81,9 +83,11 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
   }) => {
     const aliases = submittedValues.aliases;
     if (Array.isArray(aliases)) {
-      aliases.length === 1
-        ? (submittedValues.aliases = trimAliases(aliases[0], false))
-        : (submittedValues.aliases = trimAliases(aliases, true));
+      if (aliases.length === 1) {
+        submittedValues.aliases = trimAliases(aliases[0], false);
+      } else {
+        submittedValues.aliases = trimAliases(aliases, true);
+      }
     } else if (aliases !== null && aliases !== undefined) {
       submittedValues.aliases = trimAliases(aliases, false);
     }

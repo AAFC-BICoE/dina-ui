@@ -2,6 +2,7 @@ import { KitsuResource } from "kitsu";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { MultilingualDescription } from "../../common";
 
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum ProtocolDataUnitEnum {
   MM = "millimolar",
   UG_ML = "microgram_per_millilitre",
@@ -10,6 +11,7 @@ export enum ProtocolDataUnitEnum {
   UL_RXN = "microliter_per_reaction",
   UM = "micromole_per_liter"
 }
+/* eslint-enable @typescript-eslint/no-duplicate-enum-values */
 
 export interface ProtocolData {
   key?: string;

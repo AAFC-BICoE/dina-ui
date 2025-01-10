@@ -7,7 +7,6 @@ import "@testing-library/jest-dom";
 describe("SubmitButton component", () => {
   it("Shows a submit button when the form is not submitting.", () => {
     const wrapper = mountWithAppContext(
-      /* tslint:disable:no-empty */
       <DinaForm initialValues={{}}>
         <SubmitButton />
       </DinaForm>
@@ -21,7 +20,6 @@ describe("SubmitButton component", () => {
 
   it("Shows a loading spinner when the form is submitting.", () => {
     const wrapper = mountWithAppContext(
-      /* tslint:disable:no-empty */
       <DinaForm initialValues={{}}>
         <SubmitButton />
       </DinaForm>

@@ -1,4 +1,3 @@
-// tslint:disable: no-string-literal
 import { FormikContextType } from "formik";
 import { find, isArray, castArray, compact } from "lodash";
 import { RefObject, useState } from "react";

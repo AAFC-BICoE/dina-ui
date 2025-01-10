@@ -121,7 +121,6 @@ export function ListPageLayout<TData extends KitsuResource>({
       filterBuilderRsql = rsql(filterForm.filterBuilderModel);
     } catch (error) {
       // If there is an error, ignore the filter form rsql instead of crashing the page.
-      // tslint:disable-next-line
       console.error(error);
       setImmediate(() => setFilterForm({}));
     }

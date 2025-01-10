@@ -76,9 +76,7 @@ export function SangerPcrReactionStep({
         });
         const newItems = [...pcrBatchItems];
         for (const rst of savedResult) {
-          /* tslint:disable-next-line */
           const id = rst.data["id"];
-          /* tslint:disable-next-line */
           const result = rst.data["attributes"].result;
           const found = newItems.find((itm) => itm.id === id);
           if (found) {

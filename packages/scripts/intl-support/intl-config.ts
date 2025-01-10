@@ -1,6 +1,6 @@
 import { join } from "path";
 
-// tslint:disable: no-var-requires
+/* eslint-disable @typescript-eslint/no-require-imports */
 const {
   COMMON_UI_MESSAGES_ENGLISH
 } = require("../../common-ui/lib/intl/common-ui-en");
