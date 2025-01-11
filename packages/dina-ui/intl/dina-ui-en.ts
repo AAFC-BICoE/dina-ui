@@ -540,6 +540,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   goToThePreviousStep: "Go to the previous step",
   governmentOfCanada: "Government of Canada",
   governmentOfCanadaSymbol: "Symbol of the Government of Canada",
+  groupListTitle: "Groups",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
   hostOrganismLegend: "Host Organism",

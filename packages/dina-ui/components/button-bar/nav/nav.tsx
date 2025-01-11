@@ -537,6 +537,11 @@ function NavDinaManagementDropdown({ formatMessage }) {
       menuRole="menu"
       style={{ marginLeft: "auto" }}
     >
+      <Link href="/group/list" onKeyDown={onKeyDown} passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="groupListTitle" />
+        </NavDropdown.Item>
+      </Link>
       {/* Admins only can view users. */}
       {isAdmin && (
         <>

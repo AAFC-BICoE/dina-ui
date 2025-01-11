@@ -385,6 +385,11 @@ export function Home() {
                 </h2>
 
                 <Stack style={{ display: "inline-flex" }}>
+                  <Link href="/group/list">
+                    <a>
+                      <DinaMessage id="groupListTitle" />
+                    </a>
+                  </Link>
                   {isAdmin && (
                     <>
                       <Link href="/dina-user/list">
