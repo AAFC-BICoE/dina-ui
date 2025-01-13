@@ -14,6 +14,7 @@ export const TAG_SECTION_FIELDS: (keyof MaterialSample)[] = [
 export interface TagsAndRestrictionsSection {
   resourcePath?: string;
   tagsFieldName?: string;
+  tagIncludedType?: string;
   groupSelectorName?: string;
   indexName?: string;
 }
@@ -22,6 +23,7 @@ export function TagsAndRestrictionsSection({
   resourcePath,
   groupSelectorName = "group",
   tagsFieldName = "tags",
+  tagIncludedType,
   indexName
 }: TagsAndRestrictionsSection) {
   const { readOnly, initialValues } = useDinaFormContext();
@@ -53,6 +55,7 @@ export function TagsAndRestrictionsSection({
           name={tagsFieldName}
           groupSelectorName={groupSelectorName}
           tagsFieldName={tagsFieldName}
+          tagIncludedType={tagIncludedType}
           removeBottomMargin={true}
           label={
             <span>

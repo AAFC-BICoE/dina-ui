@@ -1168,7 +1168,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   qualityControlName: "Name:",
   qualityControlType: "Type:",
   collecting_event_tag_info:
-    "Suggestions are currently based on Material Sample tags.",
+    "Tag suggestions are currently based on collecting event tags associated with Material Samples.",
   selectFunctionToUse: "Select function to use",
   selectFieldToUseWithFunction: "Select a field to use with the function"
 };

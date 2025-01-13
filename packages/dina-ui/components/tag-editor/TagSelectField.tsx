@@ -25,6 +25,10 @@ export interface TagSelectFieldProps extends FieldWrapperProps {
   groupSelectorName?: string;
   /** The field name to use when finding other tags via RSQL filter. */
   tagsFieldName?: string;
+
+  /** The relationship type of the tag to include in the search. Only available with elasticsearch. */
+  tagIncludedType?: string;
+
   indexName?: string;
 }
 
@@ -75,6 +79,7 @@ export function TagSelectField({
           groupSelectorName={props.groupSelectorName}
           placeholder={placeholder}
           tagsFieldName={tagsFieldName}
+          tagIncludedType={props.tagIncludedType}
           indexName={indexName}
         />
       )}
@@ -88,6 +93,7 @@ interface TagSelectProps {
   resourcePath?: string;
   invalid?: boolean;
   tagsFieldName?: string;
+  tagIncludedType?: string;
   groupSelectorName?: string;
   placeholder?: string;
   indexName?: string;
@@ -101,6 +107,7 @@ function TagSelect({
   invalid,
   groupSelectorName = "group",
   tagsFieldName = "tags",
+  tagIncludedType,
   placeholder,
   indexName
 }: TagSelectProps) {
@@ -118,13 +125,16 @@ function TagSelect({
 
   if (indexName) {
     const suggestions = useElasticSearchDistinctTerm({
-      fieldName: `data.attributes.${tagsFieldName}`,
+      fieldName: tagIncludedType
+        ? `included.attributes.${tagsFieldName}`
+        : `data.attributes.${tagsFieldName}`,
       indexName,
       keywordMultiFieldSupport: true,
       isFieldArray: true,
       inputValue: debouncedInputValue,
       groupNames,
-      size: 10
+      size: 10,
+      relationshipType: tagIncludedType
     });
     tagOptions.current = suggestions.map((tag) => toOption(tag));
   } else {
