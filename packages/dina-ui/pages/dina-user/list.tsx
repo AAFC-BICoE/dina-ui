@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { RolesPerGroupTable } from "./view";
-import { DinaUser } from "packages/dina-ui/types/user-api";
 
 const USER_TABLE_COLUMNS: ColumnDefinition<any>[] = [
   {

@@ -11,7 +11,6 @@ import {
   SubmitButton,
   TextField,
   useAccount,
-  useApiClient,
   useDinaFormContext,
   useQuery,
   withResponse
@@ -114,7 +113,6 @@ export function LibraryPrepBatchForm({
   readOnlyOverride
 }: LibraryPrepBatchFormProps) {
   const { username } = useAccount();
-  const { doOperations } = useApiClient();
 
   const initialValues = libraryPrepBatch || {
     createdBy: username,

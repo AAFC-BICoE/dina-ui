@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { isArray, noop } from "lodash";
+import { noop } from "lodash";
 import { LoadingSpinner } from "../../../../common-ui/lib";
 import { ContainerGrid } from "../../seqdb/container-grid/ContainerGrid";
 import { DraggableItemList } from "../../seqdb/container-grid/DraggableItemList";

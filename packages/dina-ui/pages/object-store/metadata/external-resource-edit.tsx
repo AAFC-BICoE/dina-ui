@@ -133,13 +133,7 @@ function ExternalResourceMetadataForm({
     submittedValues,
     api: { apiClient, save }
   }) => {
-    const {
-      // Don't include derivatives in the form submission:
-      derivatives,
-      license,
-      acSubtype,
-      ...metadataValues
-    } = submittedValues;
+    const { license, acSubtype, ...metadataValues } = submittedValues;
 
     if (license) {
       const selectedLicense = license?.id

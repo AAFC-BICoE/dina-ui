@@ -1,4 +1,4 @@
-import { BackButton, useQuery, withResponse } from "common-ui";
+import { useQuery, withResponse } from "common-ui";
 import { useRouter } from "next/router";
 import { PersonForm } from "../../components";
 import { Person } from "../../types/agent-api/resources/Person";

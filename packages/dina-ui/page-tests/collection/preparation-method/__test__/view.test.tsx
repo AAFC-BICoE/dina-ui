@@ -1,7 +1,6 @@
 import PreparationMethodDetailsPage from "../../../../pages/collection/preparation-method/view";
 import { mountWithAppContext } from "common-ui";
 import { PreparationMethod } from "../../../../types/collection-api/resources/PreparationMethod";
-import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 /** Test preparation-type with all fields defined. */

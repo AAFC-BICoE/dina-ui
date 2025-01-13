@@ -1,5 +1,3 @@
-import { ColumnSelector } from "packages/common-ui/lib";
-
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */

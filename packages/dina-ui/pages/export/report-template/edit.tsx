@@ -10,8 +10,7 @@ import {
   StringArrayField,
   useQuery,
   withResponse,
-  SelectField,
-  SelectOption
+  SelectField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";

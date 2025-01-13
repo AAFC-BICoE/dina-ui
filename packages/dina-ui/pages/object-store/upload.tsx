@@ -1,6 +1,5 @@
 import {
   DinaForm,
-  FormikButton,
   useAccount,
   useModal,
   AreYouSureModal,
@@ -160,14 +159,6 @@ export default function UploadPage() {
       }
     }
   }
-
-  // Fix the place holder text ...Select has not enough contrast ratio to the background issue
-  const customStyles = {
-    placeholder: (provided, _) => ({
-      ...provided,
-      color: "rgb(51,51,51)"
-    })
-  };
 
   return (
     <div>
