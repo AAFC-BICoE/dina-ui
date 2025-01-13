@@ -677,18 +677,19 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="sect3">
 <h4 id="_recommended_extensions">3.1.1. Recommended Extensions</h4>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">Prettier - Code formatter</a>: Formats your code when you press shift+alt+f.</p>
-</li>
-<li>
-<p><a href="https://marketplace.visualstudio.com/items?itemName=joaompinto.asciidoctor-vscode">AsciiDoc</a>: AsciiDoc rich language support.</p>
-</li>
-<li>
-<p><a href="https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner">Jest Runner</a>: Adds Run/Debug buttons to your test files.</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>The following extensions are recommended for a better development experience. You can install them using the following terminal commands:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">code --install-extension esbenp.prettier-vscode
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension firsttris.vscode-jest-runner
+code --install-extension joaompinto.asciidoctor-vscode</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These extensions are also included in the <code>.vscode/extensions.json</code> file. They will appear in the Extensions view when you open the project in Visual Studio Code under the <code>Recommended</code> section.</p>
 </div>
 </div>
 </div>
@@ -2171,7 +2172,7 @@ CSVFILE=messages.csv yarn import-intl-csv</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-12-18 21:09:57 UTC
+Last updated 2025-01-13 20:27:27 UTC
 </div>
 </div>
 </body>
