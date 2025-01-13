@@ -1,5 +1,5 @@
 import React from "react";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { FieldExtensionSelectField } from "../FieldExtensionSelectField";
 import Select from "react-select/base";
@@ -43,7 +43,7 @@ const apiContext: any = {
 describe("FieldExtensionSelectField component", () => {
   it("Renders the FieldExtensionSelectField's options correctly.", async () => {
     // Render the component using the provided RTL wrapper function
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ cfia_ppc: undefined }}>
         {({ values: { cfia_ppc } }) => (
           <>

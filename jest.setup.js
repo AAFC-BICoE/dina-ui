@@ -4,12 +4,6 @@
 // Manually polyfill here:
 global.setImmediate = (fn) => global.setTimeout(fn, 0);
 
-// Setup Enzyme
-const Enzyme = require("enzyme");
-const Adapter = require("@wojtekmaj/enzyme-adapter-react-17");
-
-Enzyme.configure({ adapter: new Adapter() });
-
 // Let tests pretend they are running in the browser:
 process.browser = true;
 

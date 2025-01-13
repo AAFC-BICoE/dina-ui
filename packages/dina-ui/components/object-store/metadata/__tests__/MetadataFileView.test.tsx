@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataFileView } from "../MetadataFileView";
 import "@testing-library/jest-dom";
@@ -54,7 +54,7 @@ describe("MetadataFileView component", () => {
       () =>
         "/objectstore-api/file/dao/derivative/529755e1-7d36-478c-b29b-679385de155b"
     );
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MetadataFileView
         metadata={TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE as Metadata}
       />,
@@ -74,7 +74,7 @@ describe("MetadataFileView component", () => {
     window.URL.createObjectURL = jest.fn(
       () => "/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7"
     );
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MetadataFileView metadata={TEST_METADATA as Metadata} />,
       { apiContext }
     );
@@ -89,7 +89,7 @@ describe("MetadataFileView component", () => {
   });
 
   it("Displays the shown file's type and caption.", async () => {
-    const wrapper1 = mountWithAppContext2(
+    const wrapper1 = mountWithAppContext(
       <MetadataFileView metadata={TEST_METADATA as Metadata} />,
       { apiContext }
     );
@@ -102,7 +102,7 @@ describe("MetadataFileView component", () => {
       wrapper1.container.querySelector(".metadata-caption")?.textContent
     ).toEqual("Caption: test caption 1");
 
-    const wrapper2 = mountWithAppContext2(
+    const wrapper2 = mountWithAppContext(
       <MetadataFileView
         metadata={TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE as Metadata}
       />,

@@ -1,5 +1,5 @@
 import PreparationTypeDetailsPage from "../../../../pages/collection/preparation-type/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
 import "@testing-library/jest-dom";
 
@@ -32,7 +32,7 @@ jest.mock("next/router", () => ({
 
 describe("PreparationType details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<PreparationTypeDetailsPage />, {
+    const wrapper = mountWithAppContext(<PreparationTypeDetailsPage />, {
       apiContext
     });
 
@@ -41,7 +41,7 @@ describe("PreparationType details page", () => {
   });
 
   it("Render the PreparationType details", async () => {
-    const wrapper = mountWithAppContext2(<PreparationTypeDetailsPage />, {
+    const wrapper = mountWithAppContext(<PreparationTypeDetailsPage />, {
       apiContext
     });
 

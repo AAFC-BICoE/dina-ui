@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { CollectionForm } from "../../../pages/collection/collection/edit";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Collection } from "../../../types/collection-api";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -49,7 +49,7 @@ describe("Collection edit page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new Collection", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <CollectionForm router={mockRouter as any} />,
       { apiContext }
     );
@@ -92,7 +92,7 @@ describe("Collection edit page", () => {
   });
 
   it("Lets you edit an existing Collection", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <CollectionForm
         collection={TEST_COLLECTION}
         router={mockRouter as any}

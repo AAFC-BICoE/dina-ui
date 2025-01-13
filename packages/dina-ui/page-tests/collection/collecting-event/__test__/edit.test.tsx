@@ -1,6 +1,6 @@
 import { OperationsResponse } from "common-ui";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../../types/agent-api/resources/Person";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
@@ -117,7 +117,7 @@ describe("collecting-event edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
     });
 
@@ -215,7 +215,7 @@ describe("collecting-event edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
     });
 
@@ -314,7 +314,7 @@ describe("collecting-event edit page", () => {
 
     mockQuery = { id: 1 };
 
-    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
     });
 
@@ -410,7 +410,7 @@ describe("collecting-event edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
     });
 
@@ -443,7 +443,7 @@ describe("collecting-event edit page", () => {
 
   it("Lets you set the primary GeoReferenceAssertion.", async () => {
     mockQuery = {};
-    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
     });
 
@@ -486,7 +486,7 @@ describe("collecting-event edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
     });
 

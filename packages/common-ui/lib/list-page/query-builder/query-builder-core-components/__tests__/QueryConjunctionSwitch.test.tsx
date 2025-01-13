@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import { useState } from "react";
 import { QueryConjunctionSwitch } from "../QueryConjunctionSwitch";
 import { fireEvent } from "@testing-library/react";
@@ -6,14 +6,14 @@ import "@testing-library/jest-dom";
 
 describe("QueryConjunctionSwitch component", () => {
   test("Snapshot Test", async () => {
-    const andToggled = mountWithAppContext2(
+    const andToggled = mountWithAppContext(
       <>
         <QueryConjunctionSwitch currentConjunction="AND" />
       </>
     );
     expect(andToggled.asFragment()).toMatchSnapshot();
 
-    const orToggled = mountWithAppContext2(
+    const orToggled = mountWithAppContext(
       <>
         <QueryConjunctionSwitch currentConjunction="OR" />
       </>
@@ -38,7 +38,7 @@ describe("QueryConjunctionSwitch component", () => {
       );
     }
 
-    const toggle = mountWithAppContext2(
+    const toggle = mountWithAppContext(
       <>
         <TestToggle />
       </>

@@ -2,7 +2,7 @@ import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { PcrPrimerEditPage } from "../../../../pages/seqdb/pcr-primer/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -51,7 +51,7 @@ describe("PcrPrimer edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
@@ -114,7 +114,7 @@ describe("PcrPrimer edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
@@ -148,7 +148,7 @@ describe("PcrPrimer edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <PcrPrimerEditPage
         router={{ query: { id: 100 }, push: mockPush } as any}
       />,

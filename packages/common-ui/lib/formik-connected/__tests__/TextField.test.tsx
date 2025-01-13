@@ -1,5 +1,5 @@
 import { fireEvent } from "@testing-library/react";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { SubmitButton } from "../SubmitButton";
 import { TextField } from "../TextField";
@@ -8,7 +8,7 @@ import "@testing-library/jest-dom";
 
 describe("TextField component", () => {
   it("Displays the field's label and value.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: "initial value" } }}>
         <TextField name="testObject.testField" />
       </DinaForm>
@@ -25,7 +25,7 @@ describe("TextField component", () => {
   });
 
   it("Changes the field's value.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: "initial value" } }}>
         {({
           values: {
@@ -53,7 +53,7 @@ describe("TextField component", () => {
   });
 
   it("Shows a field-level error message.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ testField: "initial value" }}
         validationSchema={object({

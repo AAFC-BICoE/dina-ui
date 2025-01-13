@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitChildrenViewer } from "../StorageUnitChildrenViewer";
 import userEvent from "@testing-library/user-event";
@@ -151,7 +151,7 @@ describe("StorageUnitChildrenViewer component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Shows the storage units children.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer
           storageUnit={storageUnitA}
@@ -182,7 +182,7 @@ describe("StorageUnitChildrenViewer component", () => {
   });
 
   it("Lets you move all stored samples and storages to another storage unit.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer
           storageUnit={storageUnitA}
@@ -238,7 +238,7 @@ describe("StorageUnitChildrenViewer component", () => {
 
   it("Lets you move an existing Storage Unit into this Storage Unit", async () => {
     // Render a storage unit with no children:
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer
           storageUnit={storageUnitX}

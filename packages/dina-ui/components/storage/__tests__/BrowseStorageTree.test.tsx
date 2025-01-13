@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../types/collection-api";
 import { BrowseStorageTree } from "../BrowseStorageTree";
 import { within } from "@testing-library/react";
@@ -115,7 +115,7 @@ describe("BrowseStorageTree component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you navigate the tree and select a Storage Unit.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <BrowseStorageTree onSelect={mockOnSelect} />
       </DinaForm>,
@@ -144,7 +144,7 @@ describe("BrowseStorageTree component", () => {
   });
 
   it("Filters the list based on a text filter.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <BrowseStorageTree onSelect={mockOnSelect} />
       </DinaForm>,

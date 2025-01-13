@@ -1,5 +1,5 @@
 import ThermocyclerProfileListPage from "../../../../pages/seqdb/thermocycler-profile/list";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
 import "@testing-library/jest-dom";
 
@@ -32,7 +32,7 @@ const apiContext: any = {
 
 describe("PcrProfile list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext2(<ThermocyclerProfileListPage />, {
+    const wrapper = mountWithAppContext(<ThermocyclerProfileListPage />, {
       apiContext
     });
 

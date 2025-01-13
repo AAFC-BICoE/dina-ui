@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { NumberField } from "../NumberField";
 import "@testing-library/jest-dom";
@@ -7,7 +7,7 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 const mockOnSubmit = jest.fn();
 
 function getWrapper({ initialValues }) {
-  return mountWithAppContext2(
+  return mountWithAppContext(
     <DinaForm
       initialValues={initialValues}
       onSubmit={async ({ submittedValues }) => mockOnSubmit(submittedValues)}

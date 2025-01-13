@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { SelectField } from "../SelectField";
 import { fireEvent } from "@testing-library/react";
@@ -37,7 +37,7 @@ const PRIMER_TYPE_OPTIONS = [
 ];
 
 function getWrapper(propsOverride = {}) {
-  return mountWithAppContext2(
+  return mountWithAppContext(
     <DinaForm
       initialValues={{
         testField: "ITRU_PRIMER"
@@ -117,7 +117,7 @@ describe("SelectField component", () => {
     );
   });
   it("Renders the read-only view.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{
           singleValue: "ITRU_PRIMER",

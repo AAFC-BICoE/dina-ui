@@ -1,6 +1,6 @@
 import React from "react";
 import { DinaForm } from "../..";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { PlaceSectionsSelectionField } from "../PlaceSectionsSelectionField";
 import "@testing-library/jest-dom";
 import { screen, waitFor } from "@testing-library/react";
@@ -36,7 +36,7 @@ describe("PlaceSectionSelectionField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Display Src Admin Levels to table.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ srcAdminLevels: TEST_SRC_ADMIN_LEVELS }}>
         <PlaceSectionsSelectionField
           name="srcAdminLevels"

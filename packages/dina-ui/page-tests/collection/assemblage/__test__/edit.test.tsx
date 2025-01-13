@@ -1,5 +1,5 @@
 import { AssemblageForm } from "../../../../pages/collection/assemblage/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
@@ -79,7 +79,7 @@ describe("AssemblageForm.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new assemblage", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <AssemblageForm onSaved={mockOnSaved} />,
       {
         apiContext
@@ -209,7 +209,7 @@ describe("AssemblageForm.", () => {
   });
 
   it("Lets you edit a assemblage", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <AssemblageForm
         onSaved={mockOnSaved}
         fetchedAssemblage={{

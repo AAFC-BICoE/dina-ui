@@ -9,7 +9,7 @@ import { fileUploadErrorHandler } from "../../../components/object-store/file-up
 import UploadPage, {
   BULK_ADD_IDS_KEY
 } from "../../../pages/object-store/upload";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
@@ -84,7 +84,7 @@ describe("Upload page", () => {
       save: mockSave
     };
 
-    const wrapper = mountWithAppContext2(<UploadPage />, {
+    const wrapper = mountWithAppContext(<UploadPage />, {
       accountContext: MOCK_ACCOUNT_CONTEXT,
       apiContext: mockApiCtx as any
     });
@@ -190,7 +190,7 @@ describe("Upload page", () => {
   });
 
   it("Only renders if the user belongs a group", () => {
-    const wrapper = mountWithAppContext2(<UploadPage />, {
+    const wrapper = mountWithAppContext(<UploadPage />, {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });
 

@@ -1,9 +1,9 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { MultiSortTooltip } from "../MultiSortTooltip";
 
 describe("MultiSortTooltip", () => {
   test("Snapshot test", async () => {
-    const wrapper = mountWithAppContext2(<MultiSortTooltip />);
+    const wrapper = mountWithAppContext(<MultiSortTooltip />);
     expect(wrapper.asFragment()).toMatchSnapshot();
   });
 });

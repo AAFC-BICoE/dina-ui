@@ -1,12 +1,12 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import "@testing-library/jest-dom";
 
 describe("WorkbookWarningDialog", () => {
   it("renders skipped columns warning with show all button", () => {
     const skippedColumns = ["Column1", "Column2", "Column3"];
-    mountWithAppContext2(
+    mountWithAppContext(
       <WorkbookWarningDialog
         skippedColumns={skippedColumns}
         unmappedRelationshipsError={[]}
@@ -31,7 +31,7 @@ describe("WorkbookWarningDialog", () => {
 
   it("renders skipped columns warning under the maximum amount, don't display show more button", () => {
     const skippedColumns = ["Column1", "Column2"];
-    mountWithAppContext2(
+    mountWithAppContext(
       <WorkbookWarningDialog
         skippedColumns={skippedColumns}
         unmappedRelationshipsError={[]}
@@ -56,7 +56,7 @@ describe("WorkbookWarningDialog", () => {
 
   it("expands skipped columns on button click", () => {
     const skippedColumns = ["Column1", "Column2", "Column3"];
-    mountWithAppContext2(
+    mountWithAppContext(
       <WorkbookWarningDialog
         skippedColumns={skippedColumns}
         unmappedRelationshipsError={[]}
@@ -84,7 +84,7 @@ describe("WorkbookWarningDialog", () => {
       "Relationship2",
       "Relationship3"
     ];
-    mountWithAppContext2(
+    mountWithAppContext(
       <WorkbookWarningDialog
         skippedColumns={[]}
         unmappedRelationshipsError={unmappedRelationshipsError}
@@ -109,7 +109,7 @@ describe("WorkbookWarningDialog", () => {
 
   it("renders unmapped relationships warning under the maximum amount, don't display show more button", () => {
     const unmappedRelationshipsError = ["Relationship1", "Relationship2"];
-    mountWithAppContext2(
+    mountWithAppContext(
       <WorkbookWarningDialog
         skippedColumns={[]}
         unmappedRelationshipsError={unmappedRelationshipsError}
@@ -138,7 +138,7 @@ describe("WorkbookWarningDialog", () => {
       "Relationship2",
       "Relationship3"
     ];
-    mountWithAppContext2(
+    mountWithAppContext(
       <WorkbookWarningDialog
         skippedColumns={[]}
         unmappedRelationshipsError={unmappedRelationshipsError}
@@ -167,7 +167,7 @@ describe("WorkbookWarningDialog", () => {
       "Relationship2",
       "Relationship3"
     ];
-    mountWithAppContext2(
+    mountWithAppContext(
       <WorkbookWarningDialog
         skippedColumns={skippedColumns}
         unmappedRelationshipsError={unmappedRelationshipsError}

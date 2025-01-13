@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../types/collection-api";
 import { AssignedStorage } from "../AssignedStorage";
 import userEvent from "@testing-library/user-event";
@@ -79,7 +79,7 @@ describe("AssignedStorage component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Renders the storage unit path", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <AssignedStorage onChange={mockOnChange} value={STORAGE_A_SHALLOW} />
       </DinaForm>,
@@ -96,7 +96,7 @@ describe("AssignedStorage component", () => {
   });
 
   it("Lets you remove the storage unit", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <AssignedStorage onChange={mockOnChange} value={STORAGE_A_SHALLOW} />
       </DinaForm>,

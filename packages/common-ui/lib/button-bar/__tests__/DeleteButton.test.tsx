@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DeleteButton } from "../DeleteButton";
 import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -19,7 +19,7 @@ describe("DeleteButton", () => {
   });
 
   it("Deletes the resource and then redirects to another page.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DeleteButton
         id="100"
         type="metadata"
@@ -54,7 +54,7 @@ describe("DeleteButton", () => {
   });
 
   it("Renders blank if the passed ID is undefined.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DeleteButton type="metadata" postDeleteRedirect="/metadata/list" />,
       { apiContext }
     );

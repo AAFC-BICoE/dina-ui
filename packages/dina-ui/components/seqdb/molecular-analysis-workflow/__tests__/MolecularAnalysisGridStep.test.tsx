@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import {
   MolecularAnalysisGridStep,
   MolecularAnalysisGridStepProps
@@ -134,13 +134,13 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
   }
 
   it("Loading spinner is displayed on first load", async () => {
-    const wrapper = mountWithAppContext2(<TestComponentWrapper />, testCtx);
+    const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
 
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Storage units exist, display them in view mode", async () => {
-    const wrapper = mountWithAppContext2(<TestComponentWrapper />, testCtx);
+    const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
@@ -188,7 +188,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
   });
 
   it("Storage units don't exist, switch automatically into edit mode", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponentWrapper
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID}
       />,
@@ -230,7 +230,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
   });
 
   it("Storage units don't exist, add storage coordinates for all material samples", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponentWrapper
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID}
       />,
@@ -370,7 +370,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
   });
 
   it("Storage units exist, remove existing storage unit usage", async () => {
-    const wrapper = mountWithAppContext2(<TestComponentWrapper />, testCtx);
+    const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
@@ -468,7 +468,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
   });
 
   it("Storage units exist, changing the storage unit type should clear the grid", async () => {
-    const wrapper = mountWithAppContext2(<TestComponentWrapper />, testCtx);
+    const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
@@ -506,7 +506,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
   });
 
   it("Storage units exist, and multiple storage units are found, warning expected", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponentWrapper
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_MULTIPLE_STORAGE_ID}
       />,
@@ -535,7 +535,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
   });
 
   it("Storage units don't exist, attempt to use a storage unit type without grid support", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <TestComponentWrapper
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID}
       />,

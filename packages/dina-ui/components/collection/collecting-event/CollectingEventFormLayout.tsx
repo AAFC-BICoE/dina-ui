@@ -334,15 +334,21 @@ export function CollectingEventFormLayout({
 
   function onSuggestionSelected(_, formik) {
     /* To bring the effect as if the field's value is changed to reflect the placeholder change */
-    formik.values.dwcVerbatimLatitude === null
-      ? formik.setFieldValue("dwcVerbatimLatitude", "")
-      : formik.setFieldValue("dwcVerbatimLatitude", null);
-    formik.values.dwcVerbatimLongitude === null
-      ? formik.setFieldValue("dwcVerbatimLongitude", "")
-      : formik.setFieldValue("dwcVerbatimLongitude", null);
-    formik.values.dwcVerbatimCoordinates === null
-      ? formik.setFieldValue("dwcVerbatimCoordinates", "")
-      : formik.setFieldValue("dwcVerbatimCoordinates", null);
+    if (formik.values.dwcVerbatimLatitude === null) {
+      formik.setFieldValue("dwcVerbatimLatitude", "");
+    } else {
+      formik.setFieldValue("dwcVerbatimLatitude", null);
+    }
+    if (formik.values.dwcVerbatimLongitude === null) {
+      formik.setFieldValue("dwcVerbatimLongitude", "");
+    } else {
+      formik.setFieldValue("dwcVerbatimLongitude", null);
+    }
+    if (formik.values.dwcVerbatimCoordinates === null) {
+      formik.setFieldValue("dwcVerbatimCoordinates", "");
+    } else {
+      formik.setFieldValue("dwcVerbatimCoordinates", null);
+    }
   }
 
   const onChangeExternal = (form, name, value) => {
@@ -356,9 +362,11 @@ export function CollectingEventFormLayout({
         value !== CoordinateSystemEnum.DEGREE_MINUTES_SECONDS &&
         value !== CoordinateSystemEnum.UTM
       ) {
-        form.values.dwcVerbatimCoordinates === null
-          ? form.setFieldValue("dwcVerbatimCoordinates", "")
-          : form.setFieldValue("dwcVerbatimCoordinates", null);
+        if (form.values.dwcVerbatimCoordinates === null) {
+          form.setFieldValue("dwcVerbatimCoordinates", "");
+        } else {
+          form.setFieldValue("dwcVerbatimCoordinates", null);
+        }
       }
     } else if (name === "dwcVerbatimSRS") {
       setDefaultVerbatimSRS?.(value);
@@ -398,7 +406,6 @@ export function CollectingEventFormLayout({
     layoutWrapperRef.current
       ?.querySelectorAll(`#${id} .templateCheckBox`)
       ?.forEach((field) => {
-        // tslint:disable-next-line
         form.setFieldValue(field.attributes["name"]?.value, e.target.checked);
       });
   }
@@ -614,6 +621,7 @@ export function CollectingEventFormLayout({
               <TagsAndRestrictionsSection
                 resourcePath="collection-api/collecting-event"
                 indexName="dina_material_sample_index"
+                tagIncludedType="collecting-event"
               />
             }
           />

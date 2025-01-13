@@ -64,6 +64,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
       fetchedProject.extensionValues
     );
   }
+
   const initialValues: ProjectFormValues = fetchedProject
     ? {
         ...fetchedProject,

@@ -1,7 +1,7 @@
 import { OperationsResponse } from "common-ui";
 import { ProtocolForm } from "../../../../../dina-ui/components/collection/protocol/ProtocolForm";
 import ProtocolEditPage from "../../../../pages/collection/protocol/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
@@ -216,7 +216,7 @@ describe("protocol edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext2(<ProtocolEditPage />, {
+    const wrapper = mountWithAppContext(<ProtocolEditPage />, {
       apiContext
     });
 
@@ -277,7 +277,7 @@ describe("protocol edit page", () => {
   it("Edits an existing protocol.", async () => {
     const mockOnSaved = jest.fn();
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ProtocolForm
         onSaved={mockOnSaved}
         fetchedProtocol={{
@@ -369,7 +369,7 @@ describe("protocol edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext2(<ProtocolEditPage />, {
+    const wrapper = mountWithAppContext(<ProtocolEditPage />, {
       apiContext
     });
 

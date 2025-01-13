@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { AttachmentSection } from "../AttachmentSection";
 import { AttachmentsField } from "../AttachmentsField";
@@ -55,7 +55,7 @@ describe("AttachmentsField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Adds the selected Metadatas to the array.", async () => {
-    const { container, getByRole } = mountWithAppContext2(
+    const { container, getByRole } = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -124,7 +124,7 @@ describe("AttachmentsField component", () => {
   });
 
   it("Prevents duplicate attachments from being attached.", async () => {
-    const { container, getByRole } = mountWithAppContext2(
+    const { container, getByRole } = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -223,7 +223,7 @@ describe("AttachmentsField component", () => {
   });
 
   it("Removes selected Metadatas from the array.", async () => {
-    const { container, getByRole } = mountWithAppContext2(
+    const { container, getByRole } = mountWithAppContext(
       <DinaForm
         initialValues={{
           attachment: [

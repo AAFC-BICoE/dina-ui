@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "../QueryBuilderTextSearch";
@@ -12,7 +12,7 @@ describe("QueryBuilderTextSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const textSearchEquals = mountWithAppContext2(
+      const textSearchEquals = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -31,7 +31,7 @@ describe("QueryBuilderTextSearch", () => {
         "Expect text field to be displayed since match type is equals"
       );
 
-      const textSearchEmpty = mountWithAppContext2(
+      const textSearchEmpty = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -54,7 +54,7 @@ describe("QueryBuilderTextSearch", () => {
     it("Display field if match type is in or not in", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const textSearchIn = mountWithAppContext2(
+      const textSearchIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -73,7 +73,7 @@ describe("QueryBuilderTextSearch", () => {
         "Expect text field to be displayed with a different placeholder."
       );
 
-      const textSearchNotIn = mountWithAppContext2(
+      const textSearchNotIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -95,7 +95,7 @@ describe("QueryBuilderTextSearch", () => {
 
     it("Should call performSubmit on enter key press in textfield", async () => {
       const mockPerformSubmit = jest.fn();
-      const { getByRole } = mountWithAppContext2(
+      const { getByRole } = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: mockPerformSubmit, groups: [] }}

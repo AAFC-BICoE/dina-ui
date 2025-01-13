@@ -1,12 +1,12 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ViewInMapButton } from "../GeoReferenceAssertionRow";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 describe("ViewInMapButton component", () => {
   it("Shows the map link.", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm
         initialValues={{
           assertion: {
@@ -35,7 +35,7 @@ describe("ViewInMapButton component", () => {
   });
 
   it("Shows nothing when a lat or lon is blank.", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm
         initialValues={{
           assertion: {

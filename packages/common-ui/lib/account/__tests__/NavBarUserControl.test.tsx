@@ -1,12 +1,12 @@
 import { NavbarUserControl } from "../NavBarUserControl";
 import "@testing-library/jest-dom";
 import { fireEvent } from "@testing-library/react";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 
 describe("NavBarUserControl component", () => {
   it("Shows the logout button when logged in.", () => {
     const mockLogout = jest.fn();
-    const wrapper = mountWithAppContext2(<NavbarUserControl />, {
+    const wrapper = mountWithAppContext(<NavbarUserControl />, {
       accountContext: { authenticated: true, logout: mockLogout }
     });
 
@@ -18,7 +18,7 @@ describe("NavBarUserControl component", () => {
   });
 
   it("Shows neither the login or logout button when the account context is not initialized.", () => {
-    const wrapper = mountWithAppContext2(<NavbarUserControl />, {
+    const wrapper = mountWithAppContext(<NavbarUserControl />, {
       accountContext: { initialized: false }
     });
 

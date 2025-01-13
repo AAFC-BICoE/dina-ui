@@ -1,5 +1,5 @@
 import { AddPersonButton, PersonForm } from "../PersonForm";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/objectstore-api";
 import { fireEvent } from "@testing-library/react";
 
@@ -21,7 +21,7 @@ const TEST_PERSON_WITH_ALIASES: Person = {
 
 describe("PersonForm", () => {
   it("AddPersonButton opens the PersonForm modal", async () => {
-    const wrapper = mountWithAppContext2(<AddPersonButton />, {
+    const wrapper = mountWithAppContext(<AddPersonButton />, {
       apiContext: { apiClient: { get: mockGet } as any, save: mockSave }
     });
 
@@ -58,7 +58,7 @@ describe("PersonForm", () => {
   });
 
   it("Submits the aliases as any array.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <PersonForm person={TEST_PERSON_WITH_ALIASES} />,
       { apiContext: { apiClient: { get: mockGet } as any, save: mockSave } }
     );

@@ -1,7 +1,7 @@
 import { DinaForm, ResourceSelect } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { FormTemplate } from "../../../types/collection-api";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ManagedAttributesEditor } from "../ManagedAttributesEditor";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -109,7 +109,7 @@ describe("ManagedAttributesEditor component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Renders the current values.", async () => {
-    const { container } = mountWithAppContext2(
+    const { container } = mountWithAppContext(
       <DinaForm initialValues={{ managedAttributes: exampleValues }}>
         <ManagedAttributesEditor
           valuesPath="managedAttributes"
@@ -150,7 +150,7 @@ describe("ManagedAttributesEditor component", () => {
   it("Lets you remove an attribute value with the remove button", async () => {
     const mockSubmit = jest.fn();
 
-    const { container, findByText, queryByText } = mountWithAppContext2(
+    const { container, findByText, queryByText } = mountWithAppContext(
       <DinaForm
         initialValues={{ managedAttributes: exampleValues }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}

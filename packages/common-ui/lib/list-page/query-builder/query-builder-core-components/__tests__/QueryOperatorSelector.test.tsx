@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import { useState } from "react";
 import { FieldItems } from "react-awesome-query-builder";
 import { QueryOperatorSelector } from "../QueryOperatorSelector";
@@ -31,7 +31,7 @@ const OPERATOR_OPTIONS: FieldItems = [
 
 describe("QueryOperatorSelector component", () => {
   test("Snapshot Test", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <QueryOperatorSelector
           options={OPERATOR_OPTIONS}
@@ -69,7 +69,7 @@ describe("QueryOperatorSelector component", () => {
       );
     }
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <>
         <TestSelector />
       </>

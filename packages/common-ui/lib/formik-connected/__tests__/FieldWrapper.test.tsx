@@ -1,5 +1,5 @@
 import { IntlProvider } from "react-intl";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { DinaForm, DinaFormSection } from "../DinaForm";
 import { FieldWrapper } from "../FieldWrapper";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
@@ -11,7 +11,7 @@ describe("FieldWrapper component.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Adds a generated title-case label to the wrapped component.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <FieldWrapper name="fieldName">{() => <div />}</FieldWrapper>
       </DinaForm>
@@ -23,7 +23,7 @@ describe("FieldWrapper component.", () => {
   });
 
   it("Accepts a className which is applied to a surrounding div.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <FieldWrapper className="col-6" name="fieldName">
           {() => <div />}
@@ -35,7 +35,7 @@ describe("FieldWrapper component.", () => {
   });
 
   it("Displays the intl message (if there is one) in the label.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <IntlProvider
         locale="en"
         messages={{ field_testField: "My Field Label" }}
@@ -52,7 +52,7 @@ describe("FieldWrapper component.", () => {
   });
 
   it("Displays a custom label.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <FieldWrapper label="The Group's Name" name="group.groupName">
           {() => <div />}
@@ -66,7 +66,7 @@ describe("FieldWrapper component.", () => {
   });
 
   it("Displays the readOnly value when the form is read-only.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ myField: "my value" }} readOnly={true}>
         <FieldWrapper name="myField" />
       </DinaForm>
@@ -79,7 +79,7 @@ describe("FieldWrapper component.", () => {
   });
 
   it("Can display a custom read-only view.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ myField: "my value" }} readOnly={true}>
         <FieldWrapper
           name="myField"
@@ -95,7 +95,7 @@ describe("FieldWrapper component.", () => {
 
   it("Accepts a custom field name for the template checkbox.", async () => {
     // Render the component with the context wrapper
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ myField: "my value", templateCheckboxes: {} }}
         isTemplate={true}
@@ -145,7 +145,7 @@ describe("FieldWrapper component.", () => {
   });
 
   it("Properly hides the field when the form template has disabled it.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ myField1: "my value", templateCheckboxes: {} }}
         formTemplate={{

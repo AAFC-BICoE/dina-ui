@@ -13,7 +13,7 @@ import {
   QueryTable,
   QueryTableProps
 } from "../..";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import {
   fireEvent,
   screen,
@@ -66,7 +66,7 @@ describe("QueryTable component", () => {
   });
 
   it("Renders loading state initially.", () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -75,7 +75,7 @@ describe("QueryTable component", () => {
   });
 
   it("Renders the data from the mocked backend.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -96,7 +96,7 @@ describe("QueryTable component", () => {
 
   it("Renders the headers defined in the columns prop.", () => {
     // Create the table with headers
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -108,7 +108,7 @@ describe("QueryTable component", () => {
   });
 
   it("Renders the total number of pages when no custom pageSize is specified.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
@@ -130,7 +130,7 @@ describe("QueryTable component", () => {
   });
 
   it("Renders the total number of pages when a custom pageSize is specified.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         defaultPageSize={40}
@@ -154,7 +154,7 @@ describe("QueryTable component", () => {
   });
 
   it("Fetches the next page when the Next button is pressed.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         defaultPageSize={25}
@@ -191,7 +191,7 @@ describe("QueryTable component", () => {
   });
 
   it("Fetches the previous page when the previous button is pressed.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         defaultPageSize={25}
@@ -224,7 +224,7 @@ describe("QueryTable component", () => {
   });
 
   it("Fetches sorted data when the defaultSort prop is passed.", async () => {
-    mountWithAppContext2(
+    mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
@@ -244,7 +244,7 @@ describe("QueryTable component", () => {
   });
 
   it("Fetches sorted data when the header is clicked.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -278,7 +278,7 @@ describe("QueryTable component", () => {
   });
 
   it("Fetches multi-sorted data when a second header is shift-clicked.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -312,7 +312,7 @@ describe("QueryTable component", () => {
 
   it("Provides a dropdown to change the page size.", async () => {
     // Initial pageSize is 5.
-    const component = mountWithAppContext2(
+    const component = mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         defaultPageSize={5}
@@ -344,7 +344,7 @@ describe("QueryTable component", () => {
       path: "todo"
     };
 
-    const wrapper = mountWithAppContext2(<QueryTable<Todo> {...firstProps} />, {
+    const wrapper = mountWithAppContext(<QueryTable<Todo> {...firstProps} />, {
       apiContext
     });
 
@@ -372,7 +372,7 @@ describe("QueryTable component", () => {
   });
 
   it("Sends a request for included resources when the include prop is passed.", async () => {
-    mountWithAppContext2(
+    mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
@@ -392,7 +392,7 @@ describe("QueryTable component", () => {
   });
 
   it("Is a striped table.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -416,7 +416,7 @@ describe("QueryTable component", () => {
     ];
 
     // Create the table with headers
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={columns} />,
       { apiContext }
     );
@@ -442,7 +442,7 @@ describe("QueryTable component", () => {
       Object.defineProperty(window, "scrollY", { value: y, writable: true });
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         defaultPageSize={10}
         path="todo"
@@ -465,7 +465,7 @@ describe("QueryTable component", () => {
   });
 
   it("Has the paginator at the top and bottom of the table.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -484,7 +484,7 @@ describe("QueryTable component", () => {
   it("Provides an 'onSortedChange' callback prop.", async () => {
     const mockOnSortedChange = jest.fn();
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
@@ -500,7 +500,7 @@ describe("QueryTable component", () => {
   });
 
   it("Shows the total records count.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -521,7 +521,7 @@ describe("QueryTable component", () => {
       };
     });
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -536,7 +536,7 @@ describe("QueryTable component", () => {
   });
 
   it("Lets you pass in a 'loading' prop that overrides the internal loading state if true.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         loading={true}
         path="todo"
@@ -553,7 +553,7 @@ describe("QueryTable component", () => {
   });
 
   it("Displays the intl message (if there is one) as a header.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <IntlProvider
         locale="en"
         messages={{ field_testField: "My Field Label" }}
@@ -573,7 +573,7 @@ describe("QueryTable component", () => {
   });
 
   it("Provides a 'reactTableProps' prop that passes in the query state.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         columns={[
@@ -603,7 +603,7 @@ describe("QueryTable component", () => {
   it("Allow user to type the pagination number", async () => {
     const onPageChangeMock = jest.fn();
 
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}

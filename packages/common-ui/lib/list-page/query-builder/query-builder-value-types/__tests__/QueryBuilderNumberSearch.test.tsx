@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL,
   validateNumber
@@ -13,7 +13,7 @@ describe("QueryBuilderNumberSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const numberSearchEquals = mountWithAppContext2(
+      const numberSearchEquals = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -32,7 +32,7 @@ describe("QueryBuilderNumberSearch", () => {
         "Expect number field to be displayed since match type is equals"
       );
 
-      const numberSearchEmpty = mountWithAppContext2(
+      const numberSearchEmpty = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -55,7 +55,7 @@ describe("QueryBuilderNumberSearch", () => {
     it("Display different placeholder for in/not in operators", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const numberSearchIn = mountWithAppContext2(
+      const numberSearchIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -74,7 +74,7 @@ describe("QueryBuilderNumberSearch", () => {
         "Placeholder expected to be different for in operator."
       );
 
-      const numberSearchNotIn = mountWithAppContext2(
+      const numberSearchNotIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -96,7 +96,7 @@ describe("QueryBuilderNumberSearch", () => {
 
     it("Should call performSubmit on enter key press in textfield", async () => {
       const mockPerformSubmit = jest.fn();
-      const { getByRole } = mountWithAppContext2(
+      const { getByRole } = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: mockPerformSubmit, groups: [] }}

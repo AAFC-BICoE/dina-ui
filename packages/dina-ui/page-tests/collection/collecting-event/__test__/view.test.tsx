@@ -1,6 +1,6 @@
 import { Person } from "../../../../types/agent-api/resources/Person";
 import CollectingEventDetailsPage from "../../../../pages/collection/collecting-event/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 import "@testing-library/jest-dom";
 
@@ -64,7 +64,7 @@ jest.mock("next/router", () => ({
 
 describe("CollectingEvent details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<CollectingEventDetailsPage />, {
+    const wrapper = mountWithAppContext(<CollectingEventDetailsPage />, {
       apiContext
     });
 
@@ -72,7 +72,7 @@ describe("CollectingEvent details page", () => {
   });
 
   it("Render the CollectingEvent details", async () => {
-    const wrapper = mountWithAppContext2(<CollectingEventDetailsPage />, {
+    const wrapper = mountWithAppContext(<CollectingEventDetailsPage />, {
       apiContext
     });
 

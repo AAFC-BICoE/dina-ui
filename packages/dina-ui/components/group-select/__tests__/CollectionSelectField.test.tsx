@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { CollectionSelectField } from "../../resource-select-fields/resource-select-fields";
 import Select from "react-select/base";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
@@ -68,7 +68,7 @@ describe("CollectionSelectField", () => {
 
   it("Shows admins all collections to choose from.", async () => {
     // Mount the component with the context
-    mountWithAppContext2(
+    mountWithAppContext(
       <DinaForm initialValues={{}}>
         <CollectionSelectField name="collection" />
       </DinaForm>,
@@ -95,7 +95,7 @@ describe("CollectionSelectField", () => {
   });
 
   it("Shows non-admin users with one group/collection just their collection", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ collection: COLL1 }}>
         <CollectionSelectField name="collection" />
       </DinaForm>,
@@ -125,7 +125,7 @@ describe("CollectionSelectField", () => {
   });
 
   it("Shows non-admin users with multiple groups/collections all available collections", async () => {
-    const { getByRole } = mountWithAppContext2(
+    const { getByRole } = mountWithAppContext(
       <DinaForm initialValues={{ collection: COLL1 }}>
         <CollectionSelectField name="collection" />
       </DinaForm>,

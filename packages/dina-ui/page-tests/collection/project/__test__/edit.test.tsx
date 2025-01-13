@@ -1,5 +1,5 @@
 import { ProjectForm } from "../../../../pages/collection/project/edit";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
@@ -78,12 +78,9 @@ describe("ProjectForm.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new project", async () => {
-    const wrapper = mountWithAppContext2(
-      <ProjectForm onSaved={mockOnSaved} />,
-      {
-        apiContext
-      }
-    );
+    const wrapper = mountWithAppContext(<ProjectForm onSaved={mockOnSaved} />, {
+      apiContext
+    });
     await new Promise(setImmediate);
 
     // Change Name field value
@@ -156,7 +153,7 @@ describe("ProjectForm.", () => {
   });
 
   it("Lets you edit a project", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <ProjectForm
         onSaved={mockOnSaved}
         fetchedProject={{

@@ -1,5 +1,5 @@
 import { titleCell, descriptionCell, ListPageLayout } from "../..";
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ColumnDefinition } from "../QueryTable";
 import "@testing-library/jest-dom";
 
@@ -72,7 +72,7 @@ describe("Multilingual-Cell components", () => {
       descriptionCell(false, false, "multilingualDescription")
     ];
 
-    const englishRender = mountWithAppContext2(
+    const englishRender = mountWithAppContext(
       <ListPageLayout
         filterAttributes={["name"]}
         id="multilingual-cell-list-test"

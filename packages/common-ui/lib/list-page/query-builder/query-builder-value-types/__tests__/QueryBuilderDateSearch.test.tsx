@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderDateSearch, {
   transformDateSearchToDSL,
   validateDate
@@ -13,7 +13,7 @@ describe("QueryBuilderDateSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const dateSearchEquals = mountWithAppContext2(
+      const dateSearchEquals = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -32,7 +32,7 @@ describe("QueryBuilderDateSearch", () => {
         "Expect date field to be displayed since match type is equals"
       );
 
-      const dateSearchEmpty = mountWithAppContext2(
+      const dateSearchEmpty = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
@@ -54,7 +54,7 @@ describe("QueryBuilderDateSearch", () => {
 
     it("Should call performSubmit on enter key press in textfield", async () => {
       const mockPerformSubmit = jest.fn();
-      const { getByRole } = mountWithAppContext2(
+      const { getByRole } = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: mockPerformSubmit, groups: [] }}

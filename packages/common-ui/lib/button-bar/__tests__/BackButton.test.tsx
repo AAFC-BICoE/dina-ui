@@ -1,4 +1,4 @@
-import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { BackButton } from "../BackButton";
 
 const ENTITY_ID = "108559ed-e000-49c4-95e0-03dee7bfce9b";
@@ -11,14 +11,14 @@ describe("BackButton", () => {
 
   it("Back to entity button", () => {
     // Simple back to list button snapshot test.
-    const backToEntityButtonWrapper = mountWithAppContext2(
+    const backToEntityButtonWrapper = mountWithAppContext(
       <BackButton entityLink={ENTITY_LINK} entityId={ENTITY_ID} />
     );
 
     expect(backToEntityButtonWrapper.container).toMatchSnapshot();
 
     // Try adding a custom className to ensure it's added.
-    const classNameTest = mountWithAppContext2(
+    const classNameTest = mountWithAppContext(
       <BackButton
         entityLink={ENTITY_LINK}
         entityId={ENTITY_ID}
@@ -31,14 +31,14 @@ describe("BackButton", () => {
 
   it("Back to list button", () => {
     // Simple back to list button snapshot test.
-    const backToListButtonWrapper = mountWithAppContext2(
+    const backToListButtonWrapper = mountWithAppContext(
       <BackButton entityLink={ENTITY_LINK} />
     );
 
     expect(backToListButtonWrapper.container).toMatchSnapshot();
 
     // Back to entity but with bypass view option enabled, should point to list.
-    const backToEntityButtonWrapper = mountWithAppContext2(
+    const backToEntityButtonWrapper = mountWithAppContext(
       <BackButton
         entityLink={ENTITY_LINK}
         entityId={ENTITY_ID}
@@ -49,7 +49,7 @@ describe("BackButton", () => {
     expect(backToEntityButtonWrapper.container).toMatchSnapshot();
 
     // Test with reload last search option snapshot test.
-    const reloadLastSearchWrapper = mountWithAppContext2(
+    const reloadLastSearchWrapper = mountWithAppContext(
       <BackButton entityLink={ENTITY_LINK} />
     );
 

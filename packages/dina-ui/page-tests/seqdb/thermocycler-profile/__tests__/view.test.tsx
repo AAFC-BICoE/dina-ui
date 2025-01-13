@@ -1,5 +1,5 @@
 import ThermocyclerProfileDetailsPage from "../../../../pages/seqdb/thermocycler-profile/view";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
 import "@testing-library/jest-dom";
 
@@ -28,7 +28,7 @@ jest.mock("next/router", () => ({
 
 describe("PcrProfile details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<ThermocyclerProfileDetailsPage />, {
+    const wrapper = mountWithAppContext(<ThermocyclerProfileDetailsPage />, {
       apiContext
     });
 
@@ -37,7 +37,7 @@ describe("PcrProfile details page", () => {
   });
 
   it("Renders the PCR profile details", async () => {
-    const wrapper = mountWithAppContext2(<ThermocyclerProfileDetailsPage />, {
+    const wrapper = mountWithAppContext(<ThermocyclerProfileDetailsPage />, {
       apiContext
     });
 

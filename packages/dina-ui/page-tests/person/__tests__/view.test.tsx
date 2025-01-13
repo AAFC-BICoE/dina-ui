@@ -1,5 +1,5 @@
 import PersonDetailsPage from "../../../pages/person/view";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/agent-api/resources/Person";
 import "@testing-library/jest-dom";
 
@@ -31,13 +31,13 @@ jest.mock("next/router", () => ({
 
 describe("Person details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<PersonDetailsPage />, { apiContext });
+    const wrapper = mountWithAppContext(<PersonDetailsPage />, { apiContext });
 
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Render the Person details", async () => {
-    const wrapper = mountWithAppContext2(<PersonDetailsPage />, { apiContext });
+    const wrapper = mountWithAppContext(<PersonDetailsPage />, { apiContext });
 
     // Wait for the page to load.
     await new Promise(setImmediate);

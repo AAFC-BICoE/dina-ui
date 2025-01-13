@@ -1,5 +1,5 @@
 import OrganizationDetailsPage from "../../../pages/organization/view";
-import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import "@testing-library/jest-dom";
 
@@ -36,7 +36,7 @@ jest.mock("next/router", () => ({
 
 describe("Organization details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext2(<OrganizationDetailsPage />, {
+    const wrapper = mountWithAppContext(<OrganizationDetailsPage />, {
       apiContext
     });
 
@@ -44,7 +44,7 @@ describe("Organization details page", () => {
   });
 
   it("Render the Organization details", async () => {
-    const wrapper = mountWithAppContext2(<OrganizationDetailsPage />, {
+    const wrapper = mountWithAppContext(<OrganizationDetailsPage />, {
       apiContext
     });
 

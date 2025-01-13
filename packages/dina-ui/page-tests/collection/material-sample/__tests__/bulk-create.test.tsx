@@ -2,7 +2,7 @@ import { writeStorage } from "@rehooks/local-storage";
 import { ResourceSelect } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
-import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "common-ui";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
@@ -55,7 +55,7 @@ describe("MaterialSampleBulkCreatePage", () => {
   });
 
   it("Can click the 'previous' button to go back to the previous step", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleBulkCreatePage router={mockRouter as any} />,
       testCtx
     );
