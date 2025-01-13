@@ -122,7 +122,6 @@ export function RolesPerGroupTable({
 }: RolesPerGroupTableProps) {
   // Convert the rolesPerGroup to an object with comma-separated strings instead of arrays:
   const stringRolesPerGroup: Record<string, string> = {};
-  // tslint:disable-next-line
   for (const key in rolesPerGroup) {
     stringRolesPerGroup[key] = rolesPerGroup[key]?.join(", ") ?? "";
   }

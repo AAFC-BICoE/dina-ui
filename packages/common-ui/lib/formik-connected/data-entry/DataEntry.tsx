@@ -27,7 +27,6 @@ import { DataBlock } from "./DataBlock";
 import { DataEntryFieldProps } from "./DataEntryField";
 import { forOwn, groupBy } from "lodash";
 
-/* tslint:disable-next-line */
 export interface DataEntryProps extends DataEntryFieldProps {}
 
 export function DataEntry({

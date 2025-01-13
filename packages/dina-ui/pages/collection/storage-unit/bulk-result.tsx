@@ -1,4 +1,3 @@
-// tslint:disable: no-string-literal
 import { BULK_EDIT_IDS_KEY, useBulkGet, withResponse } from "common-ui";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { PersistedResource } from "kitsu";

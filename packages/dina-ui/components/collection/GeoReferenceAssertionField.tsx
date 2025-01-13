@@ -32,7 +32,6 @@ export function GeoReferenceAssertionField({
     wrapperRef.current
       ?.querySelectorAll(`#${id} .templateCheckBox`)
       ?.forEach((field) => {
-        // tslint:disable-next-line
         form.setFieldValue(field.attributes["name"]?.value, e.target.checked);
       });
   }

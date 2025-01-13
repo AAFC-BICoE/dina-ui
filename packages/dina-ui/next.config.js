@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+
 // SSR polyfills:
 require("setimmediate");
 CustomEvent = require("custom-event");
@@ -13,5 +15,7 @@ const appVersion = `${require("./package.json").version}${
 }`;
 
 module.exports = withTM({
-  env: { UI_APP_VERSION: appVersion },
+  env: { UI_APP_VERSION: appVersion }
 });
+
+/* eslint-enable @typescript-eslint/no-require-imports */
