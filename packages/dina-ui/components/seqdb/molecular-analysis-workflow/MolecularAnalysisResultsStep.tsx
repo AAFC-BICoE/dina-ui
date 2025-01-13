@@ -116,7 +116,7 @@ export function MolecularAnalysisResultsStep({
                             `objectstore-api/metadata`,
                             {
                               filter: {
-                                rsql: `originalFilename==${sequencingRunItem.molecularAnalysisRunItem?.name}*`
+                                rsql: `originalFilename=="${sequencingRunItem.molecularAnalysisRunItem?.name}*"`
                               }
                             }
                           );
