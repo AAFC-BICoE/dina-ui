@@ -1,15 +1,12 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
 import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BulkGetOptions,
-  FieldHeader,
   filterBy,
-  rsql,
   SaveArgs,
   useApiClient,
-  useQuery,
-  useStringComparator
+  useQuery
 } from "common-ui";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
 import { MolecularAnalysisRun } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
@@ -19,7 +16,7 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
-import { getMolecularAnalysisRunColumns } from "./useMolecularAnalysisRun";
+import { useMolecularAnalysisRunColumns } from "./useMolecularAnalysisRun";
 
 export interface UseMetagenomicsWorkflowMolecularAnalysisRunProps {
   metagenomicsBatchId: string;
@@ -233,19 +230,15 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
 }: UseMetagenomicsWorkflowMolecularAnalysisRunProps): UseMolecularAnalysisRunReturn {
   const { bulkGet, save } = useApiClient();
   const { formatMessage } = useDinaIntl();
-  const { compareByStringAndNumber } = useStringComparator();
   // Map of MolecularAnalysisRunItem {id:name}
   const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
     useState<Record<string, string>>({});
 
-  const columns = useMemo(() => {
-    return getMolecularAnalysisRunColumns(
-      compareByStringAndNumber,
-      "metagenomics-batch-item",
-      setMolecularAnalysisRunItemNames,
-      !editMode
-    );
-  }, [editMode]);
+  const columns = useMolecularAnalysisRunColumns({
+    type: "metagenomics-batch-item",
+    setMolecularAnalysisRunItemNames,
+    readOnly: !editMode
+  });
 
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);
