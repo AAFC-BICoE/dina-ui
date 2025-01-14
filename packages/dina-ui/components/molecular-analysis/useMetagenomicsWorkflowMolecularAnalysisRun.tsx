@@ -1,5 +1,8 @@
 import { PcrBatchItem } from "../../types/seqdb-api";
-import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useEffect, useState } from "react";
 import {
   BulkGetOptions,
@@ -405,7 +408,8 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
             type: "molecular-analysis-run-item",
             resource: {
               type: "molecular-analysis-run-item",
-              usageType: "metagenomics-batch-item",
+              usageType:
+                MolecularAnalysisRunItemUsageType.METAGENOMICS_BATCH_ITEM,
               ...(molecularAnalysisRunItemName && {
                 name: molecularAnalysisRunItemName
               }),

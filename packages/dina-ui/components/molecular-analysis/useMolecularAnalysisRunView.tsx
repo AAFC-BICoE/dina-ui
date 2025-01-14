@@ -4,7 +4,10 @@ import { filterBy, useApiClient, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { attachGenericMolecularAnalysisItems } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import {
   attachMaterialSampleSummaryMetagenomics,
@@ -35,18 +38,24 @@ export function useMolecularAnalysisRunView({
   molecularAnalysisRunId
 }: UseMolecularAnalysisRunViewProps) {
   const { apiClient, bulkGet } = useApiClient();
+
   const [columns, setColumns] = useState<any[]>([]);
+
   // Run Items
   const [sequencingRunItems, setSequencingRunItems] =
     useState<SequencingRunItem[]>();
+
   const [loading, setLoading] = useState<boolean>(true);
 
   // Quality control items
   const [qualityControls, setQualityControls] = useState<QualityControl[]>([]);
+
+  // Quality control type vocabulary options, mainly used for localization.
   const { loading: loadingVocabularyItems, vocabOptions: qualityControlTypes } =
     useVocabularyOptions({
       path: "seqdb-api/vocabulary/qualityControlType"
     });
+
   const molecularAnalysisRunItemQuery = useQuery<MolecularAnalysisRunItem[]>(
     {
       path: `seqdb-api/molecular-analysis-run-item`,
@@ -77,7 +86,11 @@ export function useMolecularAnalysisRunView({
 
         async function fetchGenericMolecularAnalysisItems() {
           const fetchPaths = molecularAnalysisRunItems
-            .filter((runItem) => runItem.usageType !== "quality-control")
+            .filter(
+              (runItem) =>
+                runItem.usageType !==
+                MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+            )
             .map(
               (molecularAnalysisRunItem) =>
                 `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
@@ -111,14 +124,13 @@ export function useMolecularAnalysisRunView({
           return metagenomicsBatchItems;
         }
 
-        const usageType = molecularAnalysisRunItems.filter(
-          (runItem) => runItem.usageType !== "quality-control"
-        )?.[0]?.usageType;
-
-        if (!usageType) {
-          setLoading(false);
-          return;
-        }
+        const usageType =
+          molecularAnalysisRunItems.filter(
+            (runItem) =>
+              runItem.usageType !==
+              MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+          )?.[0]?.usageType ??
+          MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM;
 
         setColumns(
           useMolecularAnalysisRunColumns({
@@ -127,7 +139,7 @@ export function useMolecularAnalysisRunView({
           })
         );
 
-        if (usageType === "seq-reaction") {
+        if (usageType === MolecularAnalysisRunItemUsageType.SEQ_REACTION) {
           let seqReactions = await fetchSeqReactions();
           seqReactions = seqReactions.filter((item) => item !== undefined);
 
@@ -150,7 +162,10 @@ export function useMolecularAnalysisRunView({
           // All finished loading.
           setSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
-        } else if (usageType === "generic-molecular-analysis-item") {
+        } else if (
+          usageType ===
+          MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM
+        ) {
           let genericMolecularAnalysisItems =
             await fetchGenericMolecularAnalysisItems();
           genericMolecularAnalysisItems = genericMolecularAnalysisItems.filter(
@@ -172,7 +187,9 @@ export function useMolecularAnalysisRunView({
           );
 
           const qualityControlRunItems = molecularAnalysisRunItems.filter(
-            (runItem) => runItem.usageType === "quality-control"
+            (runItem) =>
+              runItem.usageType ===
+              MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
           );
 
           // Get quality controls
@@ -212,7 +229,10 @@ export function useMolecularAnalysisRunView({
           // All finished loading.
           setSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
-        } else if (usageType === "metagenomics-batch-item") {
+        } else if (
+          usageType ===
+          MolecularAnalysisRunItemUsageType.METAGENOMICS_BATCH_ITEM
+        ) {
           let metagenomicsBatchItems = await fetchMetagenomicsBatchItems();
           metagenomicsBatchItems = metagenomicsBatchItems.filter(
             (item) => item !== undefined
@@ -242,6 +262,7 @@ export function useMolecularAnalysisRunView({
       }
     }
   );
+
   return {
     loading:
       molecularAnalysisRunItemQuery.loading ||

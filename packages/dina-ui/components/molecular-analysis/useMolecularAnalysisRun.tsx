@@ -12,7 +12,10 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "../../types/collection-api";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { useMolecularAnalysisRunColumns } from "./useMolecularAnalysisRunColumns";
@@ -440,7 +443,7 @@ export function useMolecularAnalysisRun({
             type: "molecular-analysis-run-item",
             resource: {
               type: "molecular-analysis-run-item",
-              usageType: "seq-reaction",
+              usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
               ...(molecularAnalysisRunItemName && {
                 name: molecularAnalysisRunItemName
               }),
