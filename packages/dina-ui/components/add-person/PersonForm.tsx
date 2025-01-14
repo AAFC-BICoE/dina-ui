@@ -1,5 +1,4 @@
 import {
-  DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
   filterBy,
@@ -12,7 +11,6 @@ import {
   OperationError,
   SaveArgs,
   useApiClient,
-  DeleteArgs,
   BackButton,
   ButtonBar
 } from "common-ui";

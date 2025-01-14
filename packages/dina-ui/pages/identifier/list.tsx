@@ -1,10 +1,10 @@
 import {
   ColumnDefinition,
   dateCell,
-  descriptionCell,
   intlContext,
   ListLayoutFilterType,
-  ListPageLayout
+  ListPageLayout,
+  titleCell
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -16,39 +16,38 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 import { groupCell, GroupSelectField } from "../../components";
 import PageLayout from "../../components/page/PageLayout";
-import { ManagedAttribute } from "../../types/collection-api";
-import { Identifier } from "../../types/agent-api/resources/Identifier";
+import { AgentIdentifierType } from "packages/dina-ui/types/agent-api/resources/AgentIdentifierType";
 
-export function useFilterManagedAttribute() {
+export function useFilterIdentifierType() {
   const { locale: language } = useContext(intlContext);
-  const filterManagedAttributes = (
+  const filterIdentifierType = (
     filterForm: any,
-    value: ManagedAttribute
+    value: AgentIdentifierType
   ) => {
     let result = true;
-    if (filterForm?.group) {
-      result = result && value.group === filterForm.group;
-    }
     if (filterForm?.filterBuilderModel?.value) {
-      result =
-        result &&
-        (value.name
-          .toLowerCase()
-          .indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
-          (
-            value.multilingualDescription?.descriptions?.filter(
-              (item) =>
-                item.lang === language &&
-                (item.desc ?? "")
-                  .toLowerCase()
-                  .indexOf(filterForm.filterBuilderModel.value.toLowerCase()) >
-                  -1
-            ) ?? []
-          ).length > 0);
+      if (value.name) {
+        result =
+          result &&
+          (value.name
+            .toLowerCase()
+            .indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
+            (
+              value.multilingualTitle?.titles?.filter(
+                (item) =>
+                  item.lang === language &&
+                  (item.title ?? "")
+                    .toLowerCase()
+                    .indexOf(
+                      filterForm.filterBuilderModel.value.toLowerCase()
+                    ) > -1
+              ) ?? []
+            ).length > 0);
+      }
     }
     return result;
   };
-  return { filterManagedAttributes };
+  return { filterIdentifierType };
 }
 
 export default function IdentifiersListPage() {
@@ -97,26 +96,27 @@ function CreateNewSection({ href }: CreateButtonProps) {
 }
 
 function AgentIdentifiersListView() {
-  const COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES = [
-    "name",
-    "multilingualDescription"
-  ];
+  const AGENT_IDENTIFIERS_FILTER_ATTRIBUTES = ["name", "multilingualTitle"];
+  const { filterIdentifierType } = useFilterIdentifierType();
 
-  const AGENT_IDENTIFIERS_LIST_COLUMNS: ColumnDefinition<Identifier>[] = [
-    {
-      cell: ({
-        row: {
-          original: { id }
-        }
-      }) => <Link href={`/collection/managed-attribute/view?id=${id}`}></Link>,
-      header: "Name",
-      accessorKey: "name"
-    },
-    descriptionCell(false, false, "multilingualDescription"),
-    groupCell("group"),
-    "createdBy",
-    dateCell("createdOn")
-  ];
+  const AGENT_IDENTIFIERS_LIST_COLUMNS: ColumnDefinition<AgentIdentifierType>[] =
+    [
+      {
+        cell: ({ row: { original } }) => {
+          return (
+            <Link href={`/identifier/view?id=${original.id}`}>
+              {original.name}
+            </Link>
+          );
+        },
+        header: "Name",
+        accessorKey: "name"
+      },
+      titleCell(false, false, "multilingualTitle"),
+      groupCell("group"),
+      "createdBy",
+      dateCell("createdOn")
+    ];
 
   return (
     <>
@@ -125,17 +125,17 @@ function AgentIdentifiersListView() {
       </h3>
 
       {/* Quick create menu */}
-      <CreateNewSection href="/collection/managed-attribute/edit" />
+      <CreateNewSection href="/identifier/edit" />
 
-      <ListPageLayout<Identifier>
+      <ListPageLayout<AgentIdentifierType>
         enableInMemoryFilter={true}
-        // filterFn={filterManagedAttributes}
+        filterFn={filterIdentifierType}
         filterType={ListLayoutFilterType.FREE_TEXT}
-        filterAttributes={COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES}
-        id="collections-module-managed-attribute-list"
+        filterAttributes={AGENT_IDENTIFIERS_FILTER_ATTRIBUTES}
+        id="agent-identifiers-list"
         queryTableProps={{
           columns: AGENT_IDENTIFIERS_LIST_COLUMNS,
-          path: "collection-api/managed-attribute?page[limit]=1000"
+          path: "agent-api/identifier-type?page[limit]=1000"
         }}
         additionalFilters={(filterForm) => ({
           isCompleted: false,
