@@ -12,7 +12,7 @@ import {
   SequencingRunItem,
   useMolecularAnalysisRunView
 } from "./useMolecularAnalysisRun";
-import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
+import { SeqdbMessage } from "../../intl/seqdb-intl";
 
 export function MolecularAnalysisRunFormFields() {
   const { initialValues } = useDinaFormContext();
