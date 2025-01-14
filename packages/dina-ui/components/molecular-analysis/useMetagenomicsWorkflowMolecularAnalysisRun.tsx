@@ -1,4 +1,4 @@
-import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
+import { PcrBatchItem } from "../../types/seqdb-api";
 import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useEffect, useState } from "react";
 import {
@@ -16,7 +16,7 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
-import { useMolecularAnalysisRunColumns } from "./useMolecularAnalysisRun";
+import { useMolecularAnalysisRunColumns } from "./useMolecularAnalysisRunColumns";
 
 export interface UseMetagenomicsWorkflowMolecularAnalysisRunProps {
   metagenomicsBatchId: string;
