@@ -1,6 +1,6 @@
 import { FormikContextType } from "formik";
 import { find, isArray, castArray, compact } from "lodash";
-import { RefObject, useState } from "react";
+import { RefObject } from "react";
 import { StylesConfig } from "react-select";
 import { ReadOnlyValue } from "./FieldView";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";

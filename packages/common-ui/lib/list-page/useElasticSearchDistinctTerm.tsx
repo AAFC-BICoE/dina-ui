@@ -1,5 +1,5 @@
 import Bodybuilder from "bodybuilder";
-import { castArray, pick } from "lodash";
+import { castArray } from "lodash";
 import { useEffect, useState } from "react";
 import { useApiClient, useQueryBuilderContext } from "..";
 const TOTAL_SUGGESTIONS: number = 100;

@@ -40,7 +40,6 @@ export function ResourceSelectField<TData extends KitsuResource>(
   resourceSelectFieldProps: ResourceSelectFieldProps<TData>
 ) {
   const {
-    name,
     onChange,
     readOnlyRender,
     showGroupCategary = false,

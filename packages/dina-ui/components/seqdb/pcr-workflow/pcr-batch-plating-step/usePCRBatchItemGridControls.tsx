@@ -50,9 +50,9 @@ export function usePCRBatchItemGridControls({
 
   const [isStorage, setIsStorage] = useState<boolean>(false);
 
-  const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
-    string[]
-  >(`pcrWorkflowMaterialSampleSortOrder-${pcrBatchId}`);
+  const [materialSampleSortOrder] = useLocalStorage<string[]>(
+    `pcrWorkflowMaterialSampleSortOrder-${pcrBatchId}`
+  );
 
   const [gridState, setGridState] = useState({
     // Available PcrBatchItems with no well coordinates.

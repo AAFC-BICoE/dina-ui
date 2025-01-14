@@ -2,9 +2,8 @@ import { DinaForm } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
-import { AttachmentSection } from "../AttachmentSection";
 import { AttachmentsField } from "../AttachmentsField";
-import { screen, waitFor, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
@@ -223,7 +222,7 @@ describe("AttachmentsField component", () => {
   });
 
   it("Removes selected Metadatas from the array.", async () => {
-    const { container, getByRole } = mountWithAppContext(
+    const { container } = mountWithAppContext(
       <DinaForm
         initialValues={{
           attachment: [

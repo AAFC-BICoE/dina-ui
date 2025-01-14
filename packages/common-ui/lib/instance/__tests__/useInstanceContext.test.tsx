@@ -1,8 +1,6 @@
 import { InstanceContext, InstanceContextI } from "../InstanceContextProvider";
 
 import { render } from "@testing-library/react";
-import { ApiClientProvider } from "../../api-client/ApiClientContext";
-import { InstanceContextProvider } from "../InstanceContextProvider";
 import { useInstanceContext } from "../useInstanceContext";
 import "@testing-library/jest-dom";
 import { ReactNode } from "react";

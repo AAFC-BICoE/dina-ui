@@ -886,8 +886,7 @@ export function useMaterialSampleSave({
           type: "organism" as const
         };
 
-        const { id: firstOrganismId, ...firstOrganismValues } =
-          sample.organism?.[0] ?? {};
+        const { ...firstOrganismValues } = sample.organism?.[0] ?? {};
 
         return {
           ...sample.organism?.[index],

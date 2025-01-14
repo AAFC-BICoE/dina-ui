@@ -1,4 +1,3 @@
-import { useLocalStorage } from "@rehooks/local-storage";
 import {
   DinaForm,
   FieldHeader,
@@ -11,7 +10,6 @@ import {
   useAccount,
   useApiClient,
   useGroupedCheckBoxes,
-  useIsMounted,
   useQuery,
   useStringComparator
 } from "common-ui";
@@ -59,7 +57,7 @@ export function SangerSeqReactionStep({
   setPerformSave,
   onSaved
 }: SangerSeqReactionStepProps) {
-  const { apiClient, save, bulkGet } = useApiClient();
+  const { save, bulkGet } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { isAdmin, groupNames, username } = useAccount();
   const [searchResult, setSearchResults] = useState<PcrBatchItem[]>([]);
@@ -70,12 +68,10 @@ export function SangerSeqReactionStep({
   );
   const [selectedPcrBatch, setSelectedPcrBatch] = useState<PcrBatch>();
   const [selectedRegion, setSelectedRegion] = useState<Region>();
-  const isMounted = useIsMounted();
   const { compareByStringAndNumber } = useStringComparator();
   const {
     selectedResources,
     setSelectedResources,
-    seqReactionSortOrder,
     setSeqReactionSortOrder,
     previouslySelectedResourcesIDMap,
     setPreviouslySelectedResourcesIDMap,

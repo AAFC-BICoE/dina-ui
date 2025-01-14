@@ -59,9 +59,9 @@ export function useNsgSelectCoordinatesControls({
 
   const [isStorage, setIsStorage] = useState<boolean>(false);
 
-  const [ngsSamplesSortOrder, setNgsSamplesSortOrder] = useLocalStorage<
-    string[]
-  >(`ngsMaterialSampleSortOrder-${libraryPrepBatch?.id}`);
+  const [ngsSamplesSortOrder] = useLocalStorage<string[]>(
+    `ngsMaterialSampleSortOrder-${libraryPrepBatch?.id}`
+  );
 
   const [gridState, setGridState] = useState({
     // Available NsgSample with no well coordinates.

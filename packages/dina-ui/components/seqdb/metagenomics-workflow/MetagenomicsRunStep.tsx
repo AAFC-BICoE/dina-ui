@@ -1,9 +1,4 @@
-import Link from "next/link";
-import { SeqBatch } from "../../../types/seqdb-api";
-import {
-  SequencingRunItem,
-  useMolecularAnalysisRun
-} from "../../molecular-analysis/useMolecularAnalysisRun";
+import { SequencingRunItem } from "../../molecular-analysis/useMolecularAnalysisRun";
 import { LoadingSpinner, ReactTable } from "common-ui";
 import { Alert } from "react-bootstrap";
 import { DinaMessage } from "../../../intl/dina-ui-intl";

@@ -16,9 +16,7 @@ export interface FormattedTextFieldProps extends FieldWrapperProps {
  */
 export function FormattedTextField(props: FormattedTextFieldProps) {
   const {
-    initialValue,
     readOnly,
-    multiLines,
     inputProps: inputPropsExternal,
     placeholder,
     ...labelWrapperProps

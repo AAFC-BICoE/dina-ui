@@ -23,7 +23,7 @@ describe("NumberField component", () => {
   });
 
   it("Displays the field's label and value.", async () => {
-    const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
+    getWrapper({ initialValues: { testField: 123.23 } });
 
     // Assert the label text
     expect(screen.getByLabelText("Test Field")).toBeInTheDocument();
@@ -70,7 +70,7 @@ describe("NumberField component", () => {
   });
 
   it("Shows a blank input when the formik value is undefined.", async () => {
-    const wrapper = getWrapper({ initialValues: {} });
+    getWrapper({ initialValues: {} });
     // Assert the input value
     const input = screen.getByRole("textbox");
     expect(input).toHaveValue("");

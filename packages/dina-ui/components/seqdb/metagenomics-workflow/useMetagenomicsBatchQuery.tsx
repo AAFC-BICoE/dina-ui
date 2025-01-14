@@ -3,7 +3,7 @@ import { MetagenomicsBatch } from "../../../types/seqdb-api/resources/metagenomi
 import { PcrBatchItem } from "../../../types/seqdb-api";
 import { MetagenomicsBatchItem } from "../../../types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import { PersistedResource } from "kitsu";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export function useMetagenomicsBatchQuery(
   metagenomicsBatchId?: string,

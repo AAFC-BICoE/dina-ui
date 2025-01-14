@@ -11,11 +11,7 @@ import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-
 import { MaterialSampleFormProps } from "../../collection/material-sample/MaterialSampleForm";
 import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
-import {
-  fireEvent,
-  waitForElementToBeRemoved,
-  screen
-} from "@testing-library/react";
+import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
 
 const mockSubmitOverride = jest.fn();
 
@@ -33,9 +29,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     collectingEventInitialValues
   } = useMaterialSampleFormTemplateSelectState({});
 
-  const [selectedTab, setSelectedTab] = useState<
-    BulkNavigatorTab | ResourceWithHooks
-  >();
+  const [selectedTab] = useState<BulkNavigatorTab | ResourceWithHooks>();
 
   const {
     bulkEditFormRef,

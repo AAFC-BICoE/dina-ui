@@ -52,7 +52,7 @@ export function CatalogueOfLifeSearchBox({
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
-  const [dataSet, setDataSet] = useState<DataSetResult>({
+  const [dataSet] = useState<DataSetResult>({
     title: "Catalogue of Life Checklist",
     key: 2328
   });

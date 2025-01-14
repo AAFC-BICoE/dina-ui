@@ -661,7 +661,6 @@ export function useMolecularAnalysisRunView({
   const [sequencingRunItems, setSequencingRunItems] =
     useState<SequencingRunItem[]>();
   const [loading, setLoading] = useState<boolean>(true);
-  const { compareByStringAndNumber } = useStringComparator();
 
   // Quality control items
   const [qualityControls, setQualityControls] = useState<QualityControl[]>([]);

@@ -1,6 +1,6 @@
 import { useFormikContext } from "formik";
 import { find } from "lodash";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import {
   CheckBoxField,

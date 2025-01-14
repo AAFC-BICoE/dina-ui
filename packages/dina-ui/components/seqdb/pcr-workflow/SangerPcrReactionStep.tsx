@@ -6,7 +6,7 @@ import { PcrReactionTable, usePcrReactionData } from "./PcrReactionTable";
 import Link from "next/link";
 import { AttachmentsField } from "../../object-store/attachment-list/AttachmentsField";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { InputResource, KitsuResource, PersistedResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;

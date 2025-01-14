@@ -34,15 +34,7 @@ export function nextSampleInitialValues(
   originalSample: PersistedResource<MaterialSample>
 ) {
   // Use the copied sample as a base, omitting some fields that shouldn't be copied:
-  const {
-    id,
-    createdOn,
-    createdBy,
-    materialSampleName,
-    allowDuplicateName,
-    organism,
-    ...copiedValues
-  } = originalSample;
+  const { materialSampleName, organism, ...copiedValues } = originalSample;
 
   let notCopiedOverWarnings: NotCopiedOverWarning[] = [];
 

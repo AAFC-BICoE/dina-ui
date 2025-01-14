@@ -1,11 +1,7 @@
 import { mountWithAppContext } from "common-ui";
 import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
 import { noop } from "lodash";
-import {
-  waitFor,
-  waitForElementToBeRemoved,
-  screen
-} from "@testing-library/react";
+import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import {
   MATERIAL_SAMPLE_SUMMARY_1,

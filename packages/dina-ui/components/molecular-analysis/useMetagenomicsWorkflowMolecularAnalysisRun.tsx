@@ -1,4 +1,4 @@
-import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
+import { PcrBatchItem } from "../../types/seqdb-api";
 import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useEffect, useState } from "react";
 import {

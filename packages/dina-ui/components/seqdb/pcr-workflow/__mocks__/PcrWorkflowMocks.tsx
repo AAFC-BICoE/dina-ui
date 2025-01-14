@@ -1,7 +1,4 @@
-import {
-  MaterialSample,
-  MaterialSampleSummary
-} from "../../../../types/collection-api";
+import { MaterialSampleSummary } from "../../../../types/collection-api";
 import { PcrBatchItem } from "../../../../types/seqdb-api";
 
 /**

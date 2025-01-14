@@ -5,8 +5,6 @@ import {
   BackButton,
   SubmitButton
 } from "packages/common-ui/lib";
-import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
-import { ProductFormFields } from "packages/dina-ui/pages/seqdb/product/edit";
 import { SeqSubmission } from "packages/dina-ui/types/seqdb-api/resources/SeqSubmission";
 import { useRouter } from "next/router";
 import { SeqSubmissionFields } from "./SeqSubmissionFields";

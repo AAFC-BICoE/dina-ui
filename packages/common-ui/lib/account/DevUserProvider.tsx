@@ -26,7 +26,7 @@ export function DevUserAccountProvider({
         setDevModeEnabled(response.data["devUserEnabled"]);
         setKeycloakEnabled(response.data["keycloakEnabled"]);
         setGroupRole(response.data["groupRole"]);
-      } catch (error) {
+      } catch {
         setDevModeEnabled(false);
         setKeycloakEnabled(true);
       }

@@ -1,11 +1,9 @@
 import { KitsuResource } from "kitsu";
-import lodash from "lodash";
-import Select from "react-select/base";
 import { ResourceSelectField } from "../../";
 import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import "@testing-library/jest-dom";
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 interface TestGroup extends KitsuResource {
@@ -59,7 +57,7 @@ jest.mock("use-debounce", () => ({
 
 describe("ResourceSelectField component", () => {
   it("Displays the Formik field's value.", () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm
         initialValues={{ group: { id: "3", groupName: "Mat's Group" } }}
       >
@@ -133,7 +131,7 @@ describe("ResourceSelectField component", () => {
   it("Provides an onChange callback prop.", async () => {
     const mockOnChange = jest.fn();
 
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}>
         <ResourceSelectField<TestGroup>
           name="group"

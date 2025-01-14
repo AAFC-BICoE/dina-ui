@@ -1,6 +1,5 @@
 import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
-import Link from "next/link";
 import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
 import { useEffect } from "react";
 import {

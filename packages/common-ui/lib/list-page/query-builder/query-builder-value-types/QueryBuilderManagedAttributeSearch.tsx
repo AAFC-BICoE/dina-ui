@@ -3,7 +3,7 @@ import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
-import { filterBy, ResourceSelect, SelectOption, useQuery } from "common-ui";
+import { filterBy, ResourceSelect, SelectOption } from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL,
