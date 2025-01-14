@@ -131,7 +131,8 @@ export function FormTemplateEditPageLoaded({
   const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
 
   // Initial values do not need to contain the components object.
-  const { ...fetchedFormTemplateWithoutComponents } = fetchedFormTemplate || {};
+  const { components: _components, ...fetchedFormTemplateWithoutComponents } =
+    fetchedFormTemplate || {};
 
   // Provide initial values for the material sample form.
   const initialValues: any = {

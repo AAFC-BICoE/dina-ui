@@ -30,7 +30,7 @@ const config = tseslint.config(
       "no-console": ["error", { allow: ["warn", "error"] }],
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": [
-        "warn",
+        "error",
         {
           "argsIgnorePattern": "^_[^_].*$|^_$",
           "varsIgnorePattern": "^_[^_].*$|^_$",

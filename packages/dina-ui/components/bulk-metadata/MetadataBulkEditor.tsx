@@ -257,7 +257,9 @@ function useBulkMetadataSave({
 
         try {
           const submittedValues = formik.values;
-          const { ...metadataValues } = submittedValues;
+          // Don't include derivatives in the form submission:
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { derivatives, ...metadataValues } = submittedValues;
 
           const saveOp = await saveHook.prepareMetadataSaveOperation({
             submittedValues: metadataValues,

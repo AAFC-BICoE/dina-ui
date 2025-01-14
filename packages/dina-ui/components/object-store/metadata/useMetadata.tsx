@@ -104,6 +104,9 @@ export function useMetadataSave({
   const { save } = useApiClient();
   const {
     // Don't include derivatives in the form submission:
+    derivatives: _initialDerivatives,
+    license: _initialLicense,
+    acSubtype: _initialAcSubtype,
     ...initialMetadataValues
   } = initialValues;
 
