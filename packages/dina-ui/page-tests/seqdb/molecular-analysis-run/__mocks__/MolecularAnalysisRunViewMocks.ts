@@ -14,7 +14,7 @@ import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resou
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
-import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
+import { PcrBatchItem, SeqReaction } from "packages/dina-ui/types/seqdb-api";
 
 export const TEST_MOLECULAR_ANALYSIS_RUN_GENRIC_ID =
   "b4c78082-61a8-4784-a116-8601f76c85d7";
@@ -27,6 +27,8 @@ export const TEST_MOLECULAR_ANALYSIS_RUN_NO_ITEMS_ID =
 
 export const TEST_METAGENOMICS_BATCH_RUN_ID =
   "cdd1335c-d4f0-4fdf-a55a-0590484444b6";
+
+export const TEST_SEQ_REACTIONS_RUN_ID = "9b4a3e04-1aed-42a4-8982-155cbf093312";
 
 export const TEST_MOLECULAR_ANALYSIS_RUN: PersistedResource<MolecularAnalysisRun> =
   {
@@ -61,6 +63,12 @@ export const TEST_METAGENOMICS_BATCH_RUN: PersistedResource<MolecularAnalysisRun
     type: "molecular-analysis-run",
     name: "Metagenomics Batch Run"
   };
+
+export const TEST_SEQ_REACTION_RUN: PersistedResource<MolecularAnalysisRun> = {
+  id: TEST_SEQ_REACTIONS_RUN_ID,
+  type: "molecular-analysis-run",
+  name: "Seq Reactions Run"
+};
 
 export const TEST_MATERIAL_SAMPLE_SUMMARY: PersistedResource<MaterialSampleSummary>[] =
   [
@@ -243,6 +251,34 @@ export const TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS: PersistedResource<M
     }
   ];
 
+export const TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS: PersistedResource<MolecularAnalysisRunItem>[] =
+  [
+    {
+      id: "70106e74-1218-41a7-bb51-8b0b41d31197",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      name: "Seq Reaction Run Item 1",
+      usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION
+    },
+    {
+      id: "41d6ec20-f81f-4b4f-a37f-71265544484e",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      name: "Seq Reaction Run Item 2",
+      usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION
+    },
+    {
+      id: "6c1a6afe-6ad8-4dfc-9a2f-26a23cda108a",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      name: "Seq Reaction Run Item 3",
+      usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION
+    }
+  ];
+
 export const QUALITY_CONTROL_1: PersistedResource<QualityControl> = {
   id: "5c07075e-e686-4546-8545-20cf7e867c61",
   type: "quality-control",
@@ -386,6 +422,34 @@ export const TEST_METAGENOMIC_MOLECULAR_ANALYSIS_ITEMS: PersistedResource<Metage
       molecularAnalysisRunItem:
         TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[2],
       pcrBatchItem: TEST_PCR_BATCH_ITEMS[2] as any
+    }
+  ];
+
+export const TEST_SEQ_REACTION_MOLECULAR_ANALYSIS_ITEMS: PersistedResource<SeqReaction>[] =
+  [
+    {
+      id: "f8a95f23-e004-422d-8a2a-5d1cc8160371",
+      type: "seq-reaction",
+      molecularAnalysisRunItem:
+        TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS[0],
+      pcrBatchItem: TEST_PCR_BATCH_ITEMS[0] as any,
+      storageUnitUsage: STORAGE_UNIT_USAGE_1 as any
+    },
+    {
+      id: "cd73c561-098f-4068-84f8-48b5bc9e5300",
+      type: "seq-reaction",
+      molecularAnalysisRunItem:
+        TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS[1],
+      pcrBatchItem: TEST_PCR_BATCH_ITEMS[1] as any,
+      storageUnitUsage: STORAGE_UNIT_USAGE_2 as any
+    },
+    {
+      id: "e0f49fe6-aa2c-4265-b4f7-88724ed7802f",
+      type: "seq-reaction",
+      molecularAnalysisRunItem:
+        TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS[2],
+      pcrBatchItem: TEST_PCR_BATCH_ITEMS[2] as any,
+      storageUnitUsage: STORAGE_UNIT_USAGE_3 as any
     }
   ];
 
