@@ -14,12 +14,13 @@ import {
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { uniqBy } from "lodash";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import { AllowAttachmentsConfig, AttachmentSection } from "..";
 import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
+import classNames from "classnames";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -92,45 +93,10 @@ export function AttachmentsEditor({
     ids: value.map((it) => it.id),
     listPath: "objectstore-api/metadata?include=derivatives"
   });
-  async function addAttachedMetadatas(newIds: string[]) {
-    onChange(
-      uniqBy(
-        [...value, ...newIds.map((it) => ({ id: it, type: "metadata" }))],
-        (val) => val.id
-      )
-    );
-    closeModal();
-  }
 
   function removeMetadata(removedId: string) {
     const newMetadatas = value.filter((it) => it.id !== removedId);
     onChange(newMetadatas);
-  }
-
-  function openAttachmentsModal() {
-    openModal(
-      <div className="modal-content">
-        <style>{`
-          .modal-dialog {
-            max-width: calc(100vw - 3rem);
-          }
-          .ht_master .wtHolder {
-            height: 0% !important;
-          }
-        `}</style>
-        <div className="modal-header">
-          <button className="btn btn-dark" onClick={closeModal}>
-            <DinaMessage id="cancelButtonText" />
-          </button>
-        </div>
-        <div className="modal-body">
-          <AttachmentSection
-            allowAttachmentsConfig={allowAttachmentsConfig}
-            afterMetadatasSaved={addAttachedMetadatas}
-          />
-        </div>
-      </div>
-    );
   }
 
   // Whether to disable the "Add Attachments" button:
@@ -229,20 +195,21 @@ export function AttachmentsEditor({
                 </div>
               ) : null}
               {!hideAddAttchmentBtn ? (
-                <button
-                  className="btn btn-primary add-attachments mb-3"
-                  type="button"
-                  onClick={openAttachmentsModal}
-                  style={{ width: "10rem" }}
-                  disabled={addingAttachmentsDisabled}
-                >
-                  <DinaMessage id="addAttachments" />
-                </button>
+                <AddAttachmentsButton
+                  onChange={onChange}
+                  value={value}
+                  addingAttachmentsDisabled={addingAttachmentsDisabled}
+                  allowAttachmentsConfig={allowAttachmentsConfig}
+                />
               ) : (
                 <>
                   <AttachmentSection
                     allowAttachmentsConfig={allowAttachmentsConfig}
-                    afterMetadatasSaved={addAttachedMetadatas}
+                    afterMetadatasSaved={addAttachedMetadatas(
+                      onChange,
+                      value,
+                      closeModal
+                    )}
                   />
                 </>
               )}
@@ -269,4 +236,88 @@ export function AttachmentsEditor({
       )}
     </FieldSet>
   );
+}
+
+interface AddAttachmentsButtonProps {
+  allowAttachmentsConfig?: AllowAttachmentsConfig;
+  addingAttachmentsDisabled?: boolean;
+  value: ResourceIdentifierObject[];
+  onChange: (newMetadatas: ResourceIdentifierObject[]) => void;
+  buttonTextElement?: JSX.Element;
+  style?: CSSProperties;
+  className?: string;
+  removeMargin?: boolean;
+}
+
+export function AddAttachmentsButton({
+  value,
+  onChange,
+  allowAttachmentsConfig,
+  addingAttachmentsDisabled,
+  buttonTextElement,
+  style,
+  className,
+  removeMargin
+}: AddAttachmentsButtonProps) {
+  const { closeModal, openModal } = useModal();
+  function openAttachmentsModal() {
+    openModal(
+      <div className="modal-content">
+        <style>{`
+          .modal-dialog {
+            max-width: calc(100vw - 3rem);
+          }
+          .ht_master .wtHolder {
+            height: 0% !important;
+          }
+        `}</style>
+        <div className="modal-header">
+          <button className="btn btn-dark" onClick={closeModal}>
+            <DinaMessage id="cancelButtonText" />
+          </button>
+        </div>
+        <div className="modal-body">
+          <AttachmentSection
+            allowAttachmentsConfig={allowAttachmentsConfig}
+            afterMetadatasSaved={addAttachedMetadatas(
+              onChange,
+              value,
+              closeModal
+            )}
+          />
+        </div>
+      </div>
+    );
+  }
+  return (
+    <button
+      className={classNames(
+        `btn btn-primary add-attachments`,
+        !removeMargin && "mb-3",
+        className
+      )}
+      type="button"
+      onClick={openAttachmentsModal}
+      style={style ?? { width: "10rem" }}
+      disabled={addingAttachmentsDisabled}
+    >
+      {buttonTextElement ?? <DinaMessage id={"addAttachments"} />}
+    </button>
+  );
+}
+
+function addAttachedMetadatas(
+  onChange: (newMetadatas: ResourceIdentifierObject[]) => void,
+  value: ResourceIdentifierObject[],
+  closeModal: () => void
+): (metadataIds: string[]) => Promise<void> {
+  return async (newIds) => {
+    onChange(
+      uniqBy(
+        [...value, ...newIds.map((it) => ({ id: it, type: "metadata" }))],
+        (val) => val.id
+      )
+    );
+    closeModal();
+  };
 }

@@ -258,7 +258,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
         setSelectedField(undefined);
         // increase function ID
         setFunctionId(
-          (functionId) => "function" + (parseInt(functionId.substring(8)) + 1)
+          (funcId) => "function" + (parseInt(funcId.substring(8), 10) + 1)
         );
         // Do not save when in export mode since manage fields that are mandatory to the list view.
         if (!exportMode) {

@@ -13,6 +13,8 @@ import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/Quali
 import useVocabularyOptions from "../../collection/useVocabularyOptions";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
 import { isEqual } from "lodash";
+import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
 
 export interface UseGenericMolecularAnalysisRunProps {
   molecularAnalysis: GenericMolecularAnalysis;
@@ -21,6 +23,10 @@ export interface UseGenericMolecularAnalysisRunProps {
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
+  onSaved?: (
+    nextStep: number,
+    molecularAnalysisSaved?: PersistedResource<GenericMolecularAnalysis>
+  ) => Promise<void>;
 }
 
 /**
@@ -135,6 +141,8 @@ export interface UseGenericMolecularAnalysisRunReturn {
   setMolecularAnalysisRunItemNames?: Dispatch<
     SetStateAction<Record<string, string>>
   >;
+
+  setReloadGenericMolecularAnalysisRun: Dispatch<SetStateAction<number>>;
 }
 
 export function useGenericMolecularAnalysisRun({
@@ -143,7 +151,8 @@ export function useGenericMolecularAnalysisRun({
   editMode,
   setEditMode,
   performSave,
-  setPerformSave
+  setPerformSave,
+  onSaved
 }: UseGenericMolecularAnalysisRunProps): UseGenericMolecularAnalysisRunReturn {
   const { bulkGet, save, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
@@ -202,7 +211,7 @@ export function useGenericMolecularAnalysisRun({
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
       include:
-        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run"
+        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result,molecularAnalysisRunItem.result"
     },
     {
       deps: [reloadGenericMolecularAnalysisRun],
@@ -259,6 +268,50 @@ export function useGenericMolecularAnalysisRun({
               ...runItem,
               materialSampleSummary:
                 queryMaterialSampleSummary as MaterialSampleSummary
+            };
+          });
+        }
+
+        async function attachMolecularAnalysisRunItemResult(
+          sequencingRunItem: SequencingRunItem[]
+        ): Promise<SequencingRunItem[]> {
+          const molecularAnalysisResultPaths = sequencingRunItem
+            .filter((item) => item?.molecularAnalysisRunItem?.result?.id)
+            .map(
+              (item) =>
+                `/molecular-analysis-result/${item?.molecularAnalysisRunItem?.result?.id}?include=attachments`
+            );
+          const molecularAnalysisResultQuery =
+            await bulkGet<MolecularAnalysisResult>(
+              molecularAnalysisResultPaths,
+              { apiBaseUrl: "/seqdb-api" }
+            );
+          if (molecularAnalysisResultQuery.length > 0) {
+            for (const molecularAnalysisResult of molecularAnalysisResultQuery) {
+              const resultAttachmentsQuery = await bulkGet<Metadata>(
+                molecularAnalysisResult?.attachments.map(
+                  (attachment) => `/metadata/${attachment?.id}`
+                ),
+                { apiBaseUrl: "/objectstore-api" }
+              );
+              molecularAnalysisResult.attachments = resultAttachmentsQuery;
+            }
+          }
+
+          return sequencingRunItem.map((runItem) => {
+            const queryMolecularAnalysisResult =
+              molecularAnalysisResultQuery.find(
+                (molecularAnalysisResult) =>
+                  molecularAnalysisResult?.id ===
+                  runItem?.molecularAnalysisRunItem?.result?.id
+              );
+            if (runItem.molecularAnalysisRunItem?.result) {
+              runItem.molecularAnalysisRunItem.result =
+                queryMolecularAnalysisResult;
+            }
+
+            return {
+              ...runItem
             };
           });
         }
@@ -328,22 +381,30 @@ export function useGenericMolecularAnalysisRun({
           }
         }
 
-        // Chain it all together to create one object.
-        let sequencingRunItemsChain = attachGenericMolecularAnalysisItems(
-          genericMolecularAnalysisItems
-        );
-        sequencingRunItemsChain = await attachStorageUnitUsage(
-          sequencingRunItemsChain
-        );
-        sequencingRunItemsChain = await attachMaterialSampleSummary(
-          sequencingRunItemsChain
-        );
+        try {
+          // Chain it all together to create one object.
+          let sequencingRunItemsChain = attachGenericMolecularAnalysisItems(
+            genericMolecularAnalysisItems
+          );
+          sequencingRunItemsChain = await attachStorageUnitUsage(
+            sequencingRunItemsChain
+          );
+          sequencingRunItemsChain = await attachMaterialSampleSummary(
+            sequencingRunItemsChain
+          );
+          sequencingRunItemsChain = await attachMolecularAnalysisRunItemResult(
+            sequencingRunItemsChain
+          );
+          await findMolecularAnalysisRun(sequencingRunItemsChain);
 
-        await findMolecularAnalysisRun(sequencingRunItemsChain);
-
-        // All finished loading.
-        setSequencingRunItems(sequencingRunItemsChain);
-        setLoading(false);
+          // All finished loading.
+          setSequencingRunItems(sequencingRunItemsChain);
+          setLoading(false);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
       }
     }
   );
@@ -665,6 +726,8 @@ export function useGenericMolecularAnalysisRun({
       setPerformSave(false);
       setEditMode(false);
       setLoading(false);
+
+      await onSaved?.(4);
     } catch (error) {
       console.error("Error creating a new sequencing run: ", error);
       setPerformSave(false);
@@ -855,6 +918,7 @@ export function useGenericMolecularAnalysisRun({
       setEditMode(false);
       setLoading(false);
       setReloadGenericMolecularAnalysisRun(Date.now());
+      await onSaved?.(4);
     } catch (error) {
       console.error("Error updating sequencing run: ", error);
       setPerformSave(false);
@@ -926,7 +990,8 @@ export function useGenericMolecularAnalysisRun({
     updateQualityControl,
     setAttachments,
     sequencingRunId: sequencingRun?.id,
-    setMolecularAnalysisRunItemNames
+    setMolecularAnalysisRunItemNames,
+    setReloadGenericMolecularAnalysisRun
   };
 }
 
