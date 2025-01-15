@@ -9,7 +9,7 @@ import {
   useQuery,
   withResponse,
   MultilingualTitle,
-  StringArrayField
+  SelectField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -19,6 +19,11 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { AgentIdentifierType } from "../../types/agent-api/resources/AgentIdentifierType";
 import { Head, Nav, Footer } from "../../components";
 import Link from "next/link";
+import {
+  CollectionModuleType,
+  COLLECTION_MODULE_TYPES,
+  COLLECTION_MODULE_TYPE_LABELS
+} from "packages/dina-ui/types/collection-api";
 
 interface IdentifierFormProps {
   fetchedIdentifierType?: AgentIdentifierType;
@@ -178,6 +183,15 @@ export function IdentifierTypeForm({
 }
 
 export function IdentifierTypeFormLayout() {
+  const { formatMessage } = useDinaIntl();
+
+  const DINA_COMPONENT_OPTIONS: {
+    label: string;
+    value: CollectionModuleType;
+  }[] = COLLECTION_MODULE_TYPES.map((dataType) => ({
+    label: formatMessage(COLLECTION_MODULE_TYPE_LABELS[dataType] as any),
+    value: dataType
+  }));
   return (
     <div>
       <div className="row">
@@ -207,10 +221,15 @@ export function IdentifierTypeFormLayout() {
           }}
         />
       </div>
-      <MultilingualTitle />
       <div className="row">
-        <StringArrayField name="dinaComponents" className="col-md-6" />
+        <SelectField
+          className="col-md-6"
+          name="dinaComponents"
+          options={DINA_COMPONENT_OPTIONS}
+          isMulti={true}
+        />
       </div>
+      <MultilingualTitle />
     </div>
   );
 }
