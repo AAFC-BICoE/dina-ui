@@ -18,7 +18,7 @@
     "cleave.js": "^1.6.0",
     "common-ui": "link:../common-ui",
     "coordinate-parser": "^1.0.7",
-    "dexie": "^3.2.4",
+    "dexie": "^4.0.10",
     "dexie-react-hooks": "^1.1.6",
     "esri-loader": "^3.3.0",
     "esri-loader-hooks": "^0.4.0",

@@ -47,7 +47,7 @@
     "type-fest": "^2.5.4",
     "use-debounce": "^7.0.1",
     "usehooks-ts": "^2.13.0",
-    "uuid": "^8.3.2",
+    "uuid": "^11.0.5",
     "yup": "^0.32.11"
   },
   "devDependencies": {

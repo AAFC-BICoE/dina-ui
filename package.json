@@ -17,9 +17,10 @@
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@phenomnomnominal/tsquery": "^4.1.1",
-    "@testing-library/jest-dom": "^6.1.3",
-    "@testing-library/react": "^12.0.0",
-    "@testing-library/user-event": "^12.0.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/jest": "29.5.14",
     "@types/node": "^18.17.1",
     "@types/react-test-renderer": "^17.0.1",

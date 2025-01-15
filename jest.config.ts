@@ -30,8 +30,10 @@ const config: Config.InitialOptions = {
     "^.+\\.tsx?$": ["babel-jest", { presets: ["next/babel"] }],
     "^.+\\.js?$": ["babel-jest", { presets: ["next/babel"] }]
   },
-  // Transform our local common-ui package
-  transformIgnorePatterns: [`/node_modules/(?!common-ui|axios)`],
+  // Transform our local common-ui package, react-dnd, and axios packages from typescript to js.
+  transformIgnorePatterns: [
+    `/node_modules/(?!common-ui|axios|react-dnd|dnd-core|@react-dnd)`
+  ],
   globalSetup: "./jest-global-setup.js"
 };
 
