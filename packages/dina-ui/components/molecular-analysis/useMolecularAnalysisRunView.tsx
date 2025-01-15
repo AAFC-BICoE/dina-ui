@@ -39,13 +39,20 @@ export function useMolecularAnalysisRunView({
 }: UseMolecularAnalysisRunViewProps) {
   const { apiClient, bulkGet } = useApiClient();
 
-  const [columns, setColumns] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const [usageType, setUsageType] = useState<string>(
+    MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM
+  );
+
+  const columns = useMolecularAnalysisRunColumns({
+    type: usageType,
+    readOnly: true
+  });
 
   // Run Items
   const [sequencingRunItems, setSequencingRunItems] =
     useState<SequencingRunItem[]>();
-
-  const [loading, setLoading] = useState<boolean>(true);
 
   // Quality control items
   const [qualityControls, setQualityControls] = useState<QualityControl[]>([]);
@@ -132,12 +139,7 @@ export function useMolecularAnalysisRunView({
           )?.[0]?.usageType ??
           MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM;
 
-        setColumns(
-          useMolecularAnalysisRunColumns({
-            type: usageType,
-            readOnly: true
-          })
-        );
+        setUsageType(usageType);
 
         if (usageType === MolecularAnalysisRunItemUsageType.SEQ_REACTION) {
           let seqReactions = await fetchSeqReactions();

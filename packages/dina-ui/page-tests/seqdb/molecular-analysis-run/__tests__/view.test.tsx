@@ -3,6 +3,11 @@ import MolecularAnalysisRunViewPage from "../../../../pages/seqdb/molecular-anal
 import "@testing-library/jest-dom";
 import { waitForElementToBeRemoved } from "@testing-library/react";
 import {
+  STORAGE_UNIT_USAGE_1,
+  STORAGE_UNIT_USAGE_2,
+  STORAGE_UNIT_USAGE_3,
+  TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS,
+  TEST_MATERIAL_SAMPLE_SUMMARY,
   TEST_METADATA,
   TEST_MOLECULAR_ANALYSIS_RUN,
   TEST_MOLECULAR_ANALYSIS_RUN_ID,
@@ -29,6 +34,17 @@ const mockGet = jest.fn(async (path, params) => {
           };
       }
 
+    // Generic Molecular Analysis Items
+    case "seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
+      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC[0].id:
+      return { data: [TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS[0]] };
+    case "seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
+      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC[1].id:
+      return { data: [TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS[1]] };
+    case "seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
+      TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC[2].id:
+      return { data: [TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS[2]] };
+
     // Attachments
     case "objectstore-api/metadata":
     case "seqdb-api/molecular-analysis-run/" +
@@ -50,6 +66,22 @@ const mockGet = jest.fn(async (path, params) => {
 const mockBulkGet = jest.fn(async (paths) => {
   return paths.map((path: string) => {
     switch (path) {
+      // Material Sample Summary
+      case "/material-sample-summary/" + TEST_MATERIAL_SAMPLE_SUMMARY[0].id:
+        return TEST_MATERIAL_SAMPLE_SUMMARY[0];
+      case "/material-sample-summary/" + TEST_MATERIAL_SAMPLE_SUMMARY[1].id:
+        return TEST_MATERIAL_SAMPLE_SUMMARY[1];
+      case "/material-sample-summary/" + TEST_MATERIAL_SAMPLE_SUMMARY[2].id:
+        return TEST_MATERIAL_SAMPLE_SUMMARY[2];
+
+      // Storage Unit Usages
+      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_1.id:
+        return STORAGE_UNIT_USAGE_1;
+      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_2.id:
+        return STORAGE_UNIT_USAGE_2;
+      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_3.id:
+        return STORAGE_UNIT_USAGE_3;
+
       // Attachments
       case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=derivatives":
       case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=acMetadataCreator,derivatives":
@@ -87,14 +119,26 @@ describe("Molecular Analysis Run View", () => {
     // Ensure the title is displayed of the run.
     expect(wrapper.getAllByText(/run name 1/i)[0]).toBeInTheDocument();
 
-    // Wait for the inner loading bar to be completed.
-    // await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    // Ensure Molecular Analysis Run Items are displayed:
+    expect(wrapper.getByRole("link", { name: "Sample 1" })).toBeInTheDocument();
+    expect(wrapper.getByRole("link", { name: "Sample 2" })).toBeInTheDocument();
+    expect(wrapper.getByRole("link", { name: "Sample 3" })).toBeInTheDocument();
+
+    // Ensure Run Item Names are displayed:
+    expect(wrapper.getByText("Run Item 1")).toBeInTheDocument();
+    expect(wrapper.getByText("Run Item 2")).toBeInTheDocument();
+    expect(wrapper.getByText("Run Item 3")).toBeInTheDocument();
+
+    // Ensure Well Coordinates are displayed:
+    expect(wrapper.getByText("A1")).toBeInTheDocument();
+    expect(wrapper.getByText("A2")).toBeInTheDocument();
+    expect(wrapper.getByText("A3")).toBeInTheDocument();
 
     // Ensure the attachment appears.
-    // expect(
-    //   wrapper.getByRole("heading", {
-    //     name: /sequencing run attachments \(1\)/i
-    //   })
-    // ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("heading", {
+        name: /sequencing run attachments \(1\)/i
+      })
+    ).toBeInTheDocument();
   });
 });
