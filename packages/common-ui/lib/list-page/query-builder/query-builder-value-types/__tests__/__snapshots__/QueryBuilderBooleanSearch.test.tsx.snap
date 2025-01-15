@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Edge cases If no field value is provided, nothing should be generated. 1`] = `Object {}`;
+exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Edge cases If no field value is provided, nothing should be generated. 1`] = `{}`;
 
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Empty operation Normal field 1`] = `
-Object {
-  "bool": Object {
-    "must_not": Object {
-      "exists": Object {
+{
+  "bool": {
+    "must_not": {
+      "exists": {
         "field": "data.attributes.booleanField",
       },
     },
@@ -15,24 +15,24 @@ Object {
 `;
 
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Empty operation With relationship as field 1`] = `
-Object {
-  "bool": Object {
+{
+  "bool": {
     "should": Array [
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
+      {
+        "bool": {
+          "must_not": {
+            "nested": {
               "path": "included",
-              "query": Object {
-                "bool": Object {
+              "query": {
+                "bool": {
                   "must": Array [
-                    Object {
-                      "exists": Object {
+                    {
+                      "exists": {
                         "field": "includes.name",
                       },
                     },
-                    Object {
-                      "term": Object {
+                    {
+                      "term": {
                         "included.type": "collection",
                       },
                     },
@@ -43,10 +43,10 @@ Object {
           },
         },
       },
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "exists": Object {
+      {
+        "bool": {
+          "must_not": {
+            "exists": {
               "field": "data.relationships.collection.data.id",
             },
           },
@@ -58,27 +58,27 @@ Object {
 `;
 
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Equals operation Normal field 1`] = `
-Object {
-  "term": Object {
+{
+  "term": {
     "data.attributes.booleanField": "true",
   },
 }
 `;
 
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Equals operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
+    "query": {
+      "bool": {
         "must": Array [
-          Object {
-            "term": Object {
+          {
+            "term": {
               "includes.name": "false",
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collection",
             },
           },
@@ -90,27 +90,27 @@ Object {
 `;
 
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Not empty operation Normal field 1`] = `
-Object {
-  "exists": Object {
+{
+  "exists": {
     "field": "data.attributes.booleanField",
   },
 }
 `;
 
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Not empty operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
+    "query": {
+      "bool": {
         "must": Array [
-          Object {
-            "exists": Object {
+          {
+            "exists": {
               "field": "includes.name",
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collection",
             },
           },

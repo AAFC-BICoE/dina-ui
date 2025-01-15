@@ -5,7 +5,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
   "calls": Array [
     Array [
       Array [
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": true,
           "endsWithSupport": false,
@@ -19,7 +19,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "data.attributes.materialSampleType",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -33,7 +33,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "date",
           "value": "data.attributes.createdOn",
         },
-        Object {
+        {
           "containsSupport": true,
           "distinctTerm": undefined,
           "endsWithSupport": true,
@@ -47,7 +47,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "data.attributes.materialSampleName",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -61,7 +61,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "data.attributes.materialSampleRemarks",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -75,7 +75,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "keyword",
           "value": "data.attributes.bucket",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -89,7 +89,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "date",
           "value": "data.attributes.preparationDate",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -103,7 +103,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "data.attributes.tags",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -117,7 +117,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "data.attributes.createdBy",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -134,7 +134,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "collectingEvent.createdBy",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -151,7 +151,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "date",
           "value": "collectingEvent.createdOn",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -168,7 +168,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "collectingEvent.tags",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -185,7 +185,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "collectingEvent.habitat",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -202,7 +202,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "collectingEvent.substrate",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -219,7 +219,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "collectingEvent.dwcOtherRecordNumbers",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -236,7 +236,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "collectingEvent.dwcRecordNumber",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -253,7 +253,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "date",
           "value": "collectingEvent.startEventDateTime",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -270,7 +270,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "date",
           "value": "collectingEvent.endEventDateTime",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": true,
           "endsWithSupport": false,
@@ -287,7 +287,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "preparationMethod.name",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -304,7 +304,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "storageUnit.name",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -321,7 +321,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "organism.determination.verbatimScientificName",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -338,7 +338,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "organism.determination.scientificName",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -355,7 +355,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "organism.determination.typeStatus",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": true,
           "endsWithSupport": false,
@@ -372,7 +372,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "collection.name",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": true,
           "endsWithSupport": false,
@@ -389,7 +389,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "collection.code",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": undefined,
           "endsWithSupport": false,
@@ -406,7 +406,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "type": "text",
           "value": "assemblages.name",
         },
-        Object {
+        {
           "containsSupport": false,
           "distinctTerm": true,
           "endsWithSupport": false,
@@ -427,7 +427,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
     ],
   ],
   "results": Array [
-    Object {
+    {
       "type": "return",
       "value": undefined,
     },

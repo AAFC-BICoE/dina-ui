@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions infixQuery attribute 1`] = `
-Object {
-  "match": Object {
-    "data.attribute.materialSampleName.infix": Object {
+{
+  "match": {
+    "data.attribute.materialSampleName.infix": {
       "query": "searchValue",
     },
   },
@@ -11,21 +11,21 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions infixQuery relationship 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
+    "query": {
+      "bool": {
         "must": Array [
-          Object {
-            "match": Object {
-              "included.attributes.dwcRecordNumber.infix": Object {
+          {
+            "match": {
+              "included.attributes.dwcRecordNumber.infix": {
                 "query": "searchValue",
               },
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collecting-event",
             },
           },
@@ -37,9 +37,9 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (not optimized) 1`] = `
-Object {
-  "prefix": Object {
-    "data.attribute.materialSampleName": Object {
+{
+  "prefix": {
+    "data.attribute.materialSampleName": {
       "case_insensitive": true,
       "value": "searchValue",
     },
@@ -48,9 +48,9 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (not optimized, keyword support) 1`] = `
-Object {
-  "prefix": Object {
-    "data.attribute.materialSampleName.keyword": Object {
+{
+  "prefix": {
+    "data.attribute.materialSampleName.keyword": {
       "case_insensitive": true,
       "value": "searchValue",
     },
@@ -59,9 +59,9 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (optimized) 1`] = `
-Object {
-  "prefix": Object {
-    "data.attribute.materialSampleName.prefix": Object {
+{
+  "prefix": {
+    "data.attribute.materialSampleName.prefix": {
       "case_insensitive": true,
       "value": "searchValue",
     },
@@ -70,22 +70,22 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery relationship (not optimized) 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
+    "query": {
+      "bool": {
         "must": Array [
-          Object {
-            "prefix": Object {
-              "included.attributes.dwcRecordNumber": Object {
+          {
+            "prefix": {
+              "included.attributes.dwcRecordNumber": {
                 "case_insensitive": true,
                 "value": "searchValue",
               },
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collecting-event",
             },
           },
@@ -97,22 +97,22 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery relationship (not optimized, keyword support) 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
+    "query": {
+      "bool": {
         "must": Array [
-          Object {
-            "prefix": Object {
-              "included.attributes.dwcRecordNumber.keyword": Object {
+          {
+            "prefix": {
+              "included.attributes.dwcRecordNumber.keyword": {
                 "case_insensitive": true,
                 "value": "searchValue",
               },
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collecting-event",
             },
           },
@@ -124,22 +124,22 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery relationship (optimized) 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
+    "query": {
+      "bool": {
         "must": Array [
-          Object {
-            "prefix": Object {
-              "included.attributes.dwcRecordNumber.prefix": Object {
+          {
+            "prefix": {
+              "included.attributes.dwcRecordNumber.prefix": {
                 "case_insensitive": true,
                 "value": "searchValue",
               },
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collecting-event",
             },
           },
@@ -151,27 +151,27 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions suffixQuery attribute 1`] = `
-Object {
-  "prefix": Object {
+{
+  "prefix": {
     "data.attribute.materialSampleName.prefix_reverse": "eulavhcraes",
   },
 }
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions suffixQuery relationship 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
+    "query": {
+      "bool": {
         "must": Array [
-          Object {
-            "prefix": Object {
+          {
+            "prefix": {
               "included.attributes.dwcRecordNumber.prefix_reverse": "eulavhcraes",
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collecting-event",
             },
           },
@@ -183,9 +183,9 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions betweenQuery tests 1`] = `
-Object {
-  "range": Object {
-    "data.attribute.numberExample": Object {
+{
+  "range": {
+    "data.attribute.numberExample": {
       "gte": 2,
       "lte": 5,
     },
@@ -194,9 +194,9 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions betweenQuery tests 2`] = `
-Object {
-  "range": Object {
-    "data.attribute.materialSampleName.keyword_numeric": Object {
+{
+  "range": {
+    "data.attribute.materialSampleName.keyword_numeric": {
       "gte": "Test100",
       "lte": "Test200",
     },
@@ -205,22 +205,22 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions betweenQuery tests 3`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
+    "query": {
+      "bool": {
         "must": Array [
-          Object {
-            "range": Object {
-              "included.attributes.dwcRecordNumber": Object {
+          {
+            "range": {
+              "included.attributes.dwcRecordNumber": {
                 "gte": 10.5,
                 "lte": 293,
               },
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collecting-event",
             },
           },
@@ -232,23 +232,23 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions existsQuery 1`] = `
-Object {
-  "exists": Object {
+{
+  "exists": {
     "field": "fieldTest",
   },
 }
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 1`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
@@ -256,9 +256,9 @@ Object {
               },
             },
           },
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "2005-09-23",
                 "lte": "2005-09-23",
@@ -266,9 +266,9 @@ Object {
               },
             },
           },
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "2023-01-01",
                 "lte": "2023-01-01",
@@ -284,15 +284,15 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 2`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
@@ -300,9 +300,9 @@ Object {
               },
             },
           },
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "2005-09-23",
                 "lte": "2005-09-23",
@@ -310,9 +310,9 @@ Object {
               },
             },
           },
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "2023-01-01",
                 "lte": "2023-01-01",
@@ -328,15 +328,15 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 3`] = `
-Object {
-  "bool": Object {
-    "must_not": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must_not": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
@@ -344,9 +344,9 @@ Object {
               },
             },
           },
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "2005-09-23",
                 "lte": "2005-09-23",
@@ -362,15 +362,15 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 4`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
@@ -378,9 +378,9 @@ Object {
               },
             },
           },
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "2005-09-23",
                 "lte": "2005-09-23",
@@ -388,9 +388,9 @@ Object {
               },
             },
           },
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "2023-01-01",
                 "lte": "2023-01-01",
@@ -406,15 +406,15 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 5`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
@@ -422,9 +422,9 @@ Object {
               },
             },
           },
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "2005-09-23",
                 "lte": "2005-09-23",
@@ -432,9 +432,9 @@ Object {
               },
             },
           },
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "2023-01-01",
                 "lte": "2023-01-01",
@@ -450,15 +450,15 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 6`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
@@ -473,18 +473,18 @@ Object {
 }
 `;
 
-exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 7`] = `Object {}`;
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 7`] = `{}`;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 8`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
@@ -492,9 +492,9 @@ Object {
               },
             },
           },
-          Object {
-            "range": Object {
-              "fieldTest": Object {
+          {
+            "range": {
+              "fieldTest": {
                 "format": "yyyy-MM-dd",
                 "gte": "2005-09-23",
                 "lte": "2005-09-23",
@@ -510,10 +510,10 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 1`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "terms": Object {
+{
+  "bool": {
+    "must": {
+      "terms": {
         "fieldTest.keyword": Array [
           "test1",
           "test2",
@@ -526,10 +526,10 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 2`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "terms": Object {
+{
+  "bool": {
+    "must": {
+      "terms": {
         "fieldTest": Array [
           "test1",
           "test2",
@@ -542,10 +542,10 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 3`] = `
-Object {
-  "bool": Object {
-    "must_not": Object {
-      "terms": Object {
+{
+  "bool": {
+    "must_not": {
+      "terms": {
         "fieldTest.keyword": Array [
           "test1",
           "test2",
@@ -557,10 +557,10 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 4`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "terms": Object {
+{
+  "bool": {
+    "must": {
+      "terms": {
         "fieldTest.keyword": Array [
           "test1",
           "test2",
@@ -573,10 +573,10 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 5`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "terms": Object {
+{
+  "bool": {
+    "must": {
+      "terms": {
         "fieldTest.keyword": Array [
           "test1",
           "test2",
@@ -589,10 +589,10 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 6`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "terms": Object {
+{
+  "bool": {
+    "must": {
+      "terms": {
         "fieldTest.keyword": Array [
           "TEST1",
         ],
@@ -602,13 +602,13 @@ Object {
 }
 `;
 
-exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 7`] = `Object {}`;
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 7`] = `{}`;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 8`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "terms": Object {
+{
+  "bool": {
+    "must": {
+      "terms": {
         "fieldTest.keyword": Array [
           "test1",
           "test2",
@@ -620,20 +620,20 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inRangeQuery 1`] = `
-Object {
-  "bool": Object {
+{
+  "bool": {
     "should": Array [
-      Object {
-        "range": Object {
-          "fieldTest": Object {
+      {
+        "range": {
+          "fieldTest": {
             "gte": "1998-05-19",
             "lte": "1998-05-19",
           },
         },
       },
-      Object {
-        "range": Object {
-          "fieldTest": Object {
+      {
+        "range": {
+          "fieldTest": {
             "gte": "2023-03-02",
             "lte": "2023-03-02",
           },
@@ -645,31 +645,31 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 1`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test1",
               },
             },
           },
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test2",
               },
             },
           },
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "TEST3",
               },
@@ -683,31 +683,31 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 2`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "term": Object {
-              "fieldTest": Object {
+          {
+            "term": {
+              "fieldTest": {
                 "case_insensitive": true,
                 "value": "test1",
               },
             },
           },
-          Object {
-            "term": Object {
-              "fieldTest": Object {
+          {
+            "term": {
+              "fieldTest": {
                 "case_insensitive": true,
                 "value": "test2",
               },
             },
           },
-          Object {
-            "term": Object {
-              "fieldTest": Object {
+          {
+            "term": {
+              "fieldTest": {
                 "case_insensitive": true,
                 "value": "TEST3",
               },
@@ -721,23 +721,23 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 3`] = `
-Object {
-  "bool": Object {
-    "must_not": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must_not": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test1",
               },
             },
           },
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test2",
               },
@@ -751,31 +751,31 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 4`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test1",
               },
             },
           },
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test2",
               },
             },
           },
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test3",
               },
@@ -789,31 +789,31 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 5`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test1",
               },
             },
           },
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test2",
               },
             },
           },
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test3",
               },
@@ -827,15 +827,15 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 6`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "TEST1",
               },
@@ -848,26 +848,26 @@ Object {
 }
 `;
 
-exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 7`] = `Object {}`;
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 7`] = `{}`;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 8`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "bool": Object {
+{
+  "bool": {
+    "must": {
+      "bool": {
         "minimum_should_match": 1,
         "should": Array [
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test1",
               },
             },
           },
-          Object {
-            "term": Object {
-              "fieldTest.keyword": Object {
+          {
+            "term": {
+              "fieldTest.keyword": {
                 "case_insensitive": true,
                 "value": "test2",
               },
@@ -881,17 +881,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions includedTypeQuery 1`] = `
-Object {
-  "term": Object {
+{
+  "term": {
     "included.type": "parentTest",
   },
 }
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions rangeQuery 1`] = `
-Object {
-  "range": Object {
-    "fieldTest": Object {
+{
+  "range": {
+    "fieldTest": {
       "lt": 500,
     },
   },
@@ -899,25 +899,25 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions termQuery 1`] = `
-Object {
-  "term": Object {
+{
+  "term": {
     "fieldTest.keyword": "valueToMatch",
   },
 }
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions termQuery 2`] = `
-Object {
-  "term": Object {
+{
+  "term": {
     "fieldTest": "valueToMatch",
   },
 }
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions wildcard 1`] = `
-Object {
-  "wildcard": Object {
-    "fieldTest": Object {
+{
+  "wildcard": {
+    "fieldTest": {
       "case_insensitive": true,
       "value": "*valueToMatch*",
     },
@@ -926,9 +926,9 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions wildcard 2`] = `
-Object {
-  "wildcard": Object {
-    "fieldTest.keyword": Object {
+{
+  "wildcard": {
+    "fieldTest.keyword": {
       "case_insensitive": true,
       "value": "*valueToMatch*",
     },
@@ -937,22 +937,22 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters Multiple groups 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
-        Object {
-          "terms": Object {
+        {
+          "terms": {
             "data.attributes.group.keyword": Array [
               "aafc",
               "cnc",
@@ -967,17 +967,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters No groups 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -988,22 +988,22 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters Single group 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.group.keyword": "aafc",
           },
         },
@@ -1014,18 +1014,18 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applyPagination Pagination is correctly applied to query 1`] = `
-Object {
+{
   "from": 0,
-  "query": Object {
-    "bool": Object {
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1037,18 +1037,18 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applyPagination Pagination is correctly applied to query 2`] = `
-Object {
+{
   "from": 100,
-  "query": Object {
-    "bool": Object {
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1060,30 +1060,30 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applyRootQuery Boolean logic exists, also contains should logic, include the must match minimum. 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "minimum_should_match": 1,
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
       ],
       "should": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1094,17 +1094,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applyRootQuery Boolean logic exists, move it properly to it's own boolean section. 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1115,23 +1115,23 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applyRootQuery No boolean logic exists, just return the query as is. 1`] = `
-Object {
-  "query": Object {},
+{
+  "query": {},
 }
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Attempting to sort on a column that does not exist 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1142,17 +1142,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic sorting is correctly applied to the query 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1160,8 +1160,8 @@ Object {
     },
   },
   "sort": Array [
-    Object {
-      "data.attributes.testColumn1.keyword": Object {
+    {
+      "data.attributes.testColumn1.keyword": {
         "order": "desc",
       },
     },
@@ -1170,17 +1170,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic sorting is correctly applied to the query 2`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1188,8 +1188,8 @@ Object {
     },
   },
   "sort": Array [
-    Object {
-      "data.attributes.testColumn1.keyword": Object {
+    {
+      "data.attributes.testColumn1.keyword": {
         "order": "asc",
       },
     },
@@ -1198,17 +1198,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic sorting is correctly applied to the query 3`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1216,13 +1216,13 @@ Object {
     },
   },
   "sort": Array [
-    Object {
-      "data.attributes.testColumn1.keyword": Object {
+    {
+      "data.attributes.testColumn1.keyword": {
         "order": "asc",
       },
     },
-    Object {
-      "data.attributes.testColumn2": Object {
+    {
+      "data.attributes.testColumn2": {
         "order": "desc",
       },
     },
@@ -1231,17 +1231,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules No sorting to be performed, leave query the same without adding anything. 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1252,17 +1252,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relationship sorting query generation 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1270,11 +1270,11 @@ Object {
     },
   },
   "sort": Array [
-    Object {
-      "data.attributes.testColumn4": Object {
-        "nested": Object {
-          "filter": Object {
-            "term": Object {
+    {
+      "data.attributes.testColumn4": {
+        "nested": {
+          "filter": {
+            "term": {
               "included.type": "relationshipType1",
             },
           },
@@ -1288,17 +1288,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relationship sorting query generation 2`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1306,11 +1306,11 @@ Object {
     },
   },
   "sort": Array [
-    Object {
-      "data.attributes.testColumn4": Object {
-        "nested": Object {
-          "filter": Object {
-            "term": Object {
+    {
+      "data.attributes.testColumn4": {
+        "nested": {
+          "filter": {
+            "term": {
               "included.type": "relationshipType1",
             },
           },
@@ -1319,11 +1319,11 @@ Object {
         "order": "desc",
       },
     },
-    Object {
-      "data.attributes.testColumn5.keyword": Object {
-        "nested": Object {
-          "filter": Object {
-            "term": Object {
+    {
+      "data.attributes.testColumn5.keyword": {
+        "nested": {
+          "filter": {
+            "term": {
               "included.type": "relationshipType2",
             },
           },
@@ -1337,17 +1337,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relationship sorting query generation 3`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1355,21 +1355,21 @@ Object {
     },
   },
   "sort": Array [
-    Object {
-      "data.attributes.testColumn1.keyword": Object {
+    {
+      "data.attributes.testColumn1.keyword": {
         "order": "asc",
       },
     },
-    Object {
-      "data.attributes.testColumn2": Object {
+    {
+      "data.attributes.testColumn2": {
         "order": "desc",
       },
     },
-    Object {
-      "data.attributes.testColumn4": Object {
-        "nested": Object {
-          "filter": Object {
-            "term": Object {
+    {
+      "data.attributes.testColumn4": {
+        "nested": {
+          "filter": {
+            "term": {
               "included.type": "relationshipType1",
             },
           },
@@ -1378,11 +1378,11 @@ Object {
         "order": "desc",
       },
     },
-    Object {
-      "data.attributes.testColumn5.keyword": Object {
-        "nested": Object {
-          "filter": Object {
-            "term": Object {
+    {
+      "data.attributes.testColumn5.keyword": {
+        "nested": {
+          "filter": {
+            "term": {
               "included.type": "relationshipType2",
             },
           },
@@ -1396,17 +1396,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Sorting on columns without id 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1414,11 +1414,11 @@ Object {
     },
   },
   "sort": Array [
-    Object {
-      "data.attributes.testColumn6.keyword": Object {
-        "nested": Object {
-          "filter": Object {
-            "term": Object {
+    {
+      "data.attributes.testColumn6.keyword": {
+        "nested": {
+          "filter": {
+            "term": {
               "included.type": "relationshipType2",
             },
           },
@@ -1432,17 +1432,17 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Strings as column definitions 1`] = `
-Object {
-  "query": Object {
-    "bool": Object {
+{
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1450,8 +1450,8 @@ Object {
     },
   },
   "sort": Array [
-    Object {
-      "testColumn3": Object {
+    {
+      "testColumn3": {
         "order": "asc",
       },
     },
@@ -1460,8 +1460,8 @@ Object {
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality applySourceFiltering Ensure all source filtering are being applied to the query 1`] = `
-Object {
-  "_source": Object {
+{
+  "_source": {
     "includes": Array [
       "data.id",
       "data.type",
@@ -1478,16 +1478,16 @@ Object {
       "included.type",
     ],
   },
-  "query": Object {
-    "bool": Object {
+  "query": {
+    "bool": {
       "must": Array [
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.materialSampleName.keyword": "Test",
           },
         },
-        Object {
-          "term": Object {
+        {
+          "term": {
             "data.attributes.preparationDate": "2022-11-30",
           },
         },
@@ -1499,9 +1499,9 @@ Object {
 
 exports[`QueryBuilderElasticSearchExport functionality processResults Entity attributes only 1`] = `
 Array [
-  Object {
-    "data": Object {
-      "attributes": Object {
+  {
+    "data": {
+      "attributes": {
         "createdBy": "dina-admin",
         "createdOn": "2024-08-29T14:25:55.864404Z",
         "dwcOtherCatalogNumbers": null,
@@ -1510,46 +1510,46 @@ Array [
         "materialSampleState": null,
         "materialSampleType": "CULTURE_STRAIN",
       },
-      "relationships": Object {
-        "assemblages": Object {
+      "relationships": {
+        "assemblages": {
           "data": Array [],
         },
-        "attachment": Object {
+        "attachment": {
           "data": Array [],
         },
-        "collectingEvent": Object {
+        "collectingEvent": {
           "data": null,
         },
-        "collection": Object {
+        "collection": {
           "data": null,
         },
-        "organism": Object {
+        "organism": {
           "data": Array [],
         },
-        "parentMaterialSample": Object {},
-        "preparationMethod": Object {
+        "parentMaterialSample": {},
+        "preparationMethod": {
           "data": null,
         },
-        "preparationProtocol": Object {},
-        "preparationType": Object {
+        "preparationProtocol": {},
+        "preparationType": {
           "data": null,
         },
-        "preparedBy": Object {
+        "preparedBy": {
           "data": Array [],
         },
-        "projects": Object {
+        "projects": {
           "data": Array [],
         },
-        "storageUnitUsage": Object {},
+        "storageUnitUsage": {},
       },
     },
     "id": "01919e87-58ef-7712-b32f-4ae08321e7e3",
     "included": undefined,
     "type": "material-sample",
   },
-  Object {
-    "data": Object {
-      "attributes": Object {
+  {
+    "data": {
+      "attributes": {
         "createdBy": "dina-admin",
         "createdOn": "2024-08-29T14:25:55.864404Z",
         "dwcOtherCatalogNumbers": null,
@@ -1558,46 +1558,46 @@ Array [
         "materialSampleState": null,
         "materialSampleType": "CULTURE_STRAIN",
       },
-      "relationships": Object {
-        "assemblages": Object {
+      "relationships": {
+        "assemblages": {
           "data": Array [],
         },
-        "attachment": Object {
+        "attachment": {
           "data": Array [],
         },
-        "collectingEvent": Object {
+        "collectingEvent": {
           "data": null,
         },
-        "collection": Object {
+        "collection": {
           "data": null,
         },
-        "organism": Object {
+        "organism": {
           "data": Array [],
         },
-        "parentMaterialSample": Object {},
-        "preparationMethod": Object {
+        "parentMaterialSample": {},
+        "preparationMethod": {
           "data": null,
         },
-        "preparationProtocol": Object {},
-        "preparationType": Object {
+        "preparationProtocol": {},
+        "preparationType": {
           "data": null,
         },
-        "preparedBy": Object {
+        "preparedBy": {
           "data": Array [],
         },
-        "projects": Object {
+        "projects": {
           "data": Array [],
         },
-        "storageUnitUsage": Object {},
+        "storageUnitUsage": {},
       },
     },
     "id": "01919e87-59a3-7c07-a4b9-a10f4ddd4a80",
     "included": undefined,
     "type": "material-sample",
   },
-  Object {
-    "data": Object {
-      "attributes": Object {
+  {
+    "data": {
+      "attributes": {
         "createdBy": "dina-admin",
         "createdOn": "2024-08-29T14:25:55.864404Z",
         "dwcOtherCatalogNumbers": null,
@@ -1606,37 +1606,37 @@ Array [
         "materialSampleState": null,
         "materialSampleType": "CULTURE_STRAIN",
       },
-      "relationships": Object {
-        "assemblages": Object {
+      "relationships": {
+        "assemblages": {
           "data": Array [],
         },
-        "attachment": Object {
+        "attachment": {
           "data": Array [],
         },
-        "collectingEvent": Object {
+        "collectingEvent": {
           "data": null,
         },
-        "collection": Object {
+        "collection": {
           "data": null,
         },
-        "organism": Object {
+        "organism": {
           "data": Array [],
         },
-        "parentMaterialSample": Object {},
-        "preparationMethod": Object {
+        "parentMaterialSample": {},
+        "preparationMethod": {
           "data": null,
         },
-        "preparationProtocol": Object {},
-        "preparationType": Object {
+        "preparationProtocol": {},
+        "preparationType": {
           "data": null,
         },
-        "preparedBy": Object {
+        "preparedBy": {
           "data": Array [],
         },
-        "projects": Object {
+        "projects": {
           "data": Array [],
         },
-        "storageUnitUsage": Object {},
+        "storageUnitUsage": {},
       },
     },
     "id": "01919e87-5a16-7653-83db-530af5cb4b7d",
@@ -1648,9 +1648,9 @@ Array [
 
 exports[`QueryBuilderElasticSearchExport functionality processResults Relationships 1`] = `
 Array [
-  Object {
-    "data": Object {
-      "attributes": Object {
+  {
+    "data": {
+      "attributes": {
         "createdBy": "dina-admin",
         "createdOn": "2024-08-29T14:25:55.864404Z",
         "dwcOtherCatalogNumbers": null,
@@ -1659,46 +1659,46 @@ Array [
         "materialSampleState": null,
         "materialSampleType": "CULTURE_STRAIN",
       },
-      "relationships": Object {
-        "assemblages": Object {
+      "relationships": {
+        "assemblages": {
           "data": Array [],
         },
-        "attachment": Object {
+        "attachment": {
           "data": Array [],
         },
-        "collectingEvent": Object {
+        "collectingEvent": {
           "data": null,
         },
-        "collection": Object {
+        "collection": {
           "data": null,
         },
-        "organism": Object {
+        "organism": {
           "data": Array [],
         },
-        "parentMaterialSample": Object {},
-        "preparationMethod": Object {
+        "parentMaterialSample": {},
+        "preparationMethod": {
           "data": null,
         },
-        "preparationProtocol": Object {},
-        "preparationType": Object {
+        "preparationProtocol": {},
+        "preparationType": {
           "data": null,
         },
-        "preparedBy": Object {
+        "preparedBy": {
           "data": Array [],
         },
-        "projects": Object {
+        "projects": {
           "data": Array [],
         },
-        "storageUnitUsage": Object {},
+        "storageUnitUsage": {},
       },
     },
     "id": "01919e87-5b71-7dff-921b-16c1ed4f011a",
     "included": undefined,
     "type": "material-sample",
   },
-  Object {
-    "data": Object {
-      "attributes": Object {
+  {
+    "data": {
+      "attributes": {
         "createdBy": "dina-admin",
         "createdOn": "2024-08-29T14:25:55.864404Z",
         "dwcOtherCatalogNumbers": null,
@@ -1707,50 +1707,50 @@ Array [
         "materialSampleState": null,
         "materialSampleType": "CULTURE_STRAIN",
       },
-      "relationships": Object {
-        "assemblages": Object {
+      "relationships": {
+        "assemblages": {
           "data": Array [],
         },
-        "attachment": Object {
+        "attachment": {
           "data": Array [],
         },
-        "collectingEvent": Object {
+        "collectingEvent": {
           "data": null,
         },
-        "collection": Object {
-          "data": Object {
+        "collection": {
+          "data": {
             "id": "2b349356-3ffb-46be-81f5-cb0d6ae9b4ef",
             "type": "collection",
           },
-          "links": Object {
+          "links": {
             "related": "/api/v1/material-sample/01919e87-58a0-70bd-8846-453100ccecb9/collection",
             "self": "/api/v1/material-sample/01919e87-58a0-70bd-8846-453100ccecb9/relationships/collection",
           },
         },
-        "organism": Object {
+        "organism": {
           "data": Array [],
         },
-        "parentMaterialSample": Object {},
-        "preparationMethod": Object {
+        "parentMaterialSample": {},
+        "preparationMethod": {
           "data": null,
         },
-        "preparationProtocol": Object {},
-        "preparationType": Object {
+        "preparationProtocol": {},
+        "preparationType": {
           "data": null,
         },
-        "preparedBy": Object {
+        "preparedBy": {
           "data": Array [],
         },
-        "projects": Object {
+        "projects": {
           "data": Array [],
         },
-        "storageUnitUsage": Object {},
+        "storageUnitUsage": {},
       },
     },
     "id": "01919e87-58a0-70bd-8846-453100ccecb9",
-    "included": Object {
-      "collection": Object {
-        "attributes": Object {
+    "included": {
+      "collection": {
+        "attributes": {
           "code": "SeqDB",
           "name": "Sequence Database",
         },
@@ -1760,9 +1760,9 @@ Array [
     },
     "type": "material-sample",
   },
-  Object {
-    "data": Object {
-      "attributes": Object {
+  {
+    "data": {
+      "attributes": {
         "createdBy": "dina-admin",
         "createdOn": "2024-08-29T14:25:55.864404Z",
         "dwcOtherCatalogNumbers": null,
@@ -1771,59 +1771,59 @@ Array [
         "materialSampleState": null,
         "materialSampleType": "CULTURE_STRAIN",
       },
-      "relationships": Object {
-        "assemblages": Object {
+      "relationships": {
+        "assemblages": {
           "data": Array [],
         },
-        "attachment": Object {
+        "attachment": {
           "data": Array [],
         },
-        "collectingEvent": Object {
+        "collectingEvent": {
           "data": null,
         },
-        "collection": Object {
-          "data": Object {
+        "collection": {
+          "data": {
             "id": "01919f58-a9ea-7838-9737-7a0e54cdc41b",
             "type": "collection",
           },
-          "links": Object {
+          "links": {
             "related": "/api/v1/material-sample/01919e87-59a3-7c07-a4b9-a10f4ddd4a80/collection",
             "self": "/api/v1/material-sample/01919e87-59a3-7c07-a4b9-a10f4ddd4a80/relationships/collection",
           },
         },
-        "organism": Object {
+        "organism": {
           "data": Array [
-            Object {
+            {
               "id": "6f8908fd-64c7-4524-8375-965d5c4573a4",
               "type": "organism",
             },
           ],
-          "links": Object {
+          "links": {
             "related": "/api/v1/material-sample/0192da0b-b7b2-7840-a902-a5d26ee7edea/organism",
             "self": "/api/v1/material-sample/0192da0b-b7b2-7840-a902-a5d26ee7edea/relationships/organism",
           },
         },
-        "parentMaterialSample": Object {},
-        "preparationMethod": Object {
+        "parentMaterialSample": {},
+        "preparationMethod": {
           "data": null,
         },
-        "preparationProtocol": Object {},
-        "preparationType": Object {
+        "preparationProtocol": {},
+        "preparationType": {
           "data": null,
         },
-        "preparedBy": Object {
+        "preparedBy": {
           "data": Array [],
         },
-        "projects": Object {
+        "projects": {
           "data": Array [],
         },
-        "storageUnitUsage": Object {},
+        "storageUnitUsage": {},
       },
     },
     "id": "01919e87-59a3-7c07-a4b9-a10f4ddd4a80",
-    "included": Object {
-      "collection": Object {
-        "attributes": Object {
+    "included": {
+      "collection": {
+        "attributes": {
           "code": "CNC",
           "name": "Canadian National Collection",
         },
@@ -1838,9 +1838,9 @@ Array [
 
 exports[`QueryBuilderElasticSearchExport functionality processResults To-many relationships 1`] = `
 Array [
-  Object {
-    "data": Object {
-      "attributes": Object {
+  {
+    "data": {
+      "attributes": {
         "createdBy": "dina-admin",
         "createdOn": "2024-08-26T14:41:00.656734Z",
         "dwcOtherCatalogNumbers": null,
@@ -1849,55 +1849,55 @@ Array [
         "materialSampleState": null,
         "materialSampleType": "WHOLE_ORGANISM",
       },
-      "relationships": Object {
-        "assemblages": Object {
+      "relationships": {
+        "assemblages": {
           "data": Array [],
         },
-        "attachment": Object {
+        "attachment": {
           "data": Array [],
         },
-        "collectingEvent": Object {
+        "collectingEvent": {
           "data": null,
         },
-        "collection": Object {
+        "collection": {
           "data": null,
         },
-        "organism": Object {
+        "organism": {
           "data": Array [],
         },
-        "parentMaterialSample": Object {},
-        "preparationMethod": Object {
+        "parentMaterialSample": {},
+        "preparationMethod": {
           "data": null,
         },
-        "preparationProtocol": Object {},
-        "preparationType": Object {
+        "preparationProtocol": {},
+        "preparationType": {
           "data": null,
         },
-        "preparedBy": Object {
+        "preparedBy": {
           "data": Array [],
         },
-        "projects": Object {
+        "projects": {
           "data": Array [
-            Object {
+            {
               "id": "01919485-ed65-7a79-9080-91445b897ef4",
               "type": "project",
             },
           ],
-          "links": Object {
+          "links": {
             "related": "/api/v1/material-sample/01918f22-13a4-7f6d-894e-974bc1e14d23/projects",
             "self": "/api/v1/material-sample/01918f22-13a4-7f6d-894e-974bc1e14d23/relationships/projects",
           },
         },
-        "storageUnitUsage": Object {
+        "storageUnitUsage": {
           "data": null,
         },
       },
     },
     "id": "01918f22-13a4-7f6d-894e-974bc1e14d23",
-    "included": Object {
+    "included": {
       "projects": Array [
-        Object {
-          "attributes": Object {
+        {
+          "attributes": {
             "name": "Project A",
           },
           "id": "01919485-ed65-7a79-9080-91445b897ef4",
@@ -1907,9 +1907,9 @@ Array [
     },
     "type": "material-sample",
   },
-  Object {
-    "data": Object {
-      "attributes": Object {
+  {
+    "data": {
+      "attributes": {
         "createdBy": "dina-admin",
         "createdOn": "2024-08-26T14:41:00.656734Z",
         "dwcOtherCatalogNumbers": null,
@@ -1918,66 +1918,66 @@ Array [
         "materialSampleState": null,
         "materialSampleType": "WHOLE_ORGANISM",
       },
-      "relationships": Object {
-        "assemblages": Object {
+      "relationships": {
+        "assemblages": {
           "data": Array [],
         },
-        "attachment": Object {
+        "attachment": {
           "data": Array [],
         },
-        "collectingEvent": Object {
+        "collectingEvent": {
           "data": null,
         },
-        "collection": Object {
+        "collection": {
           "data": null,
         },
-        "organism": Object {
+        "organism": {
           "data": Array [],
         },
-        "parentMaterialSample": Object {},
-        "preparationMethod": Object {
+        "parentMaterialSample": {},
+        "preparationMethod": {
           "data": null,
         },
-        "preparationProtocol": Object {},
-        "preparationType": Object {
+        "preparationProtocol": {},
+        "preparationType": {
           "data": null,
         },
-        "preparedBy": Object {
+        "preparedBy": {
           "data": Array [],
         },
-        "projects": Object {
+        "projects": {
           "data": Array [
-            Object {
+            {
               "id": "01919485-ed65-7a79-9080-91445b897ef4",
               "type": "project",
             },
-            Object {
+            {
               "id": "01919486-2f9a-7d1c-92f3-05a2542e2eea",
               "type": "project",
             },
           ],
-          "links": Object {
+          "links": {
             "related": "/api/v1/material-sample/01918f22-1687-7634-bcd3-cd56d493bf27/projects",
             "self": "/api/v1/material-sample/01918f22-1687-7634-bcd3-cd56d493bf27/relationships/projects",
           },
         },
-        "storageUnitUsage": Object {
+        "storageUnitUsage": {
           "data": null,
         },
       },
     },
     "id": "01918f22-1687-7634-bcd3-cd56d493bf27",
-    "included": Object {
+    "included": {
       "projects": Array [
-        Object {
-          "attributes": Object {
+        {
+          "attributes": {
             "name": "Project A",
           },
           "id": "01919485-ed65-7a79-9080-91445b897ef4",
           "type": "project",
         },
-        Object {
-          "attributes": Object {
+        {
+          "attributes": {
             "name": "Project B",
           },
           "id": "01919486-2f9a-7d1c-92f3-05a2542e2eea",

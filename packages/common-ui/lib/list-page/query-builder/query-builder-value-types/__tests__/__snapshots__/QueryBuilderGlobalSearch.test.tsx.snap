@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`QueryBuilderGlobalSearch transformGlobalSearchToDSL function Empty global search provided 1`] = `Object {}`;
+exports[`QueryBuilderGlobalSearch transformGlobalSearchToDSL function Empty global search provided 1`] = `{}`;
 
 exports[`QueryBuilderGlobalSearch transformGlobalSearchToDSL function Global search provided 1`] = `
-Object {
-  "simple_query_string": Object {
+{
+  "simple_query_string": {
     "fields": Array [
       "*",
     ],
