@@ -7,13 +7,13 @@ React based user interface for AAFC-DINA.
 ## Required
 
 - NodeJS (18)
-- Yarn (1.22)
+- Yarn (1.22.22)
 
 ## Dependencies
 
-- React (17)
+- React (18)
 - NextJS (12)
-- Typescript (4.5)
+- Typescript (4.8.4)
 
 Other dependency versions can be found here: https://github.com/AAFC-BICoE/dina-ui/network/dependencies
 
