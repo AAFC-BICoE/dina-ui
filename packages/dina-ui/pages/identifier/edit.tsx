@@ -8,7 +8,8 @@ import {
   TextField,
   useQuery,
   withResponse,
-  MultilingualTitle
+  MultilingualTitle,
+  StringArrayField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -104,24 +105,54 @@ export function IdentifierTypeForm({
         )
       }
     };
-    delete (input as any).type;
-    const savedIdentifierType = await apiClient.axios.post(
-      `agent-api/identifier-type`,
-      {
-        data: {
-          type: "identifier-type",
-          attributes: {
-            ...input,
-            ...(input.uriTemplate && { uriTemplate: `${input.uriTemplate}$1` })
+    const { id, type, ...resource } = input;
+
+    let savedIdentifierType;
+    if (fetchedIdentifierType) {
+      savedIdentifierType = await apiClient.axios.patch(
+        `agent-api/identifier-type/${fetchedIdentifierType.id}`,
+        {
+          data: {
+            id: id,
+            type: type,
+            attributes: {
+              ...resource,
+              ...(resource.uriTemplate && {
+                uriTemplate: resource.uriTemplate.endsWith("$1")
+                  ? resource.uriTemplate
+                  : `${resource.uriTemplate}$1`
+              })
+            }
+          }
+        },
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json"
           }
         }
-      },
-      {
-        headers: {
-          "Content-Type": "application/vnd.api+json"
+      );
+    } else {
+      savedIdentifierType = await apiClient.axios.post(
+        `agent-api/identifier-type`,
+        {
+          data: {
+            type: type,
+            attributes: {
+              ...resource,
+              ...(resource.uriTemplate && {
+                uriTemplate: `${resource.uriTemplate}$1`
+              })
+            }
+          }
+        },
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json"
+          }
         }
-      }
-    );
+      );
+    }
+
     await onSaved(savedIdentifierType?.data?.data);
   };
 
@@ -151,9 +182,10 @@ export function IdentifierTypeFormLayout() {
     <div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="term" />
+        <TextField className="col-md-6" name="key" disabled={true} />
       </div>
       <div className="row">
+        <TextField className="col-md-6" name="term" />
         <TextField
           className="col-md-6"
           name={"uriTemplate"}
@@ -176,6 +208,9 @@ export function IdentifierTypeFormLayout() {
         />
       </div>
       <MultilingualTitle />
+      <div className="row">
+        <StringArrayField name="dinaComponents" className="col-md-6" />
+      </div>
     </div>
   );
 }

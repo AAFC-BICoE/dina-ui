@@ -1169,5 +1169,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Tag suggestions are currently based on collecting event tags associated with Material Samples.",
   selectFunctionToUse: "Select function to use",
   selectFieldToUseWithFunction: "Select a field to use with the function",
-  editIdentifierTitle: "Edit Identifier"
+  editIdentifierTitle: "Edit Identifier",
+  field_uriTemplate: "URI Template"
 };

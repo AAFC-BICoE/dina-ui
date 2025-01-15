@@ -112,6 +112,13 @@ function AgentIdentifiersListView() {
         header: "Name",
         accessorKey: "name"
       },
+      {
+        cell: ({ row: { original } }) => {
+          return original.term;
+        },
+        header: "Term",
+        accessorKey: "name"
+      },
       titleCell(false, false, "multilingualTitle"),
       groupCell("group"),
       "createdBy",
