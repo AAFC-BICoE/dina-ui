@@ -12,13 +12,25 @@ import {
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
+import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
+import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
 
-export const TEST_MOLECULAR_ANALYSIS_RUN_ID =
+export const TEST_MOLECULAR_ANALYSIS_RUN_GENRIC_ID =
   "b4c78082-61a8-4784-a116-8601f76c85d7";
+
+export const TEST_MOLECULAR_ANALYSIS_RUN_QUALITY_CONTROL_ID =
+  "47260760-21ef-4a2b-a31a-5dd3a0f9edf1";
+
+export const TEST_MOLECULAR_ANALYSIS_RUN_NO_ITEMS_ID =
+  "628c1636-f6f4-4a77-ad2f-c9314c3a2575";
+
+export const TEST_METAGENOMICS_BATCH_RUN_ID =
+  "cdd1335c-d4f0-4fdf-a55a-0590484444b6";
 
 export const TEST_MOLECULAR_ANALYSIS_RUN: PersistedResource<MolecularAnalysisRun> =
   {
-    id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
+    id: TEST_MOLECULAR_ANALYSIS_RUN_GENRIC_ID,
     type: "molecular-analysis-run",
     name: "Run Name 1",
     attachments: [
@@ -27,6 +39,27 @@ export const TEST_MOLECULAR_ANALYSIS_RUN: PersistedResource<MolecularAnalysisRun
         type: "metadata"
       }
     ]
+  };
+
+export const TEST_MOLECULAR_ANALYSIS_RUN_QUALITY_CONTROL: PersistedResource<MolecularAnalysisRun> =
+  {
+    id: TEST_MOLECULAR_ANALYSIS_RUN_QUALITY_CONTROL_ID,
+    type: "molecular-analysis-run",
+    name: "Quality Control Run Name 1"
+  };
+
+export const TEST_MOLECULAR_ANALYSIS_RUN_NO_ITEMS: PersistedResource<MolecularAnalysisRun> =
+  {
+    id: TEST_MOLECULAR_ANALYSIS_RUN_NO_ITEMS_ID,
+    type: "molecular-analysis-run",
+    name: "No run items"
+  };
+
+export const TEST_METAGENOMICS_BATCH_RUN: PersistedResource<MolecularAnalysisRun> =
+  {
+    id: TEST_METAGENOMICS_BATCH_RUN_ID,
+    type: "molecular-analysis-run",
+    name: "Metagenomics Batch Run"
   };
 
 export const TEST_MATERIAL_SAMPLE_SUMMARY: PersistedResource<MaterialSampleSummary>[] =
@@ -154,6 +187,92 @@ export const TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC: PersistedResource<Molecu
     }
   ];
 
+export const TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL: PersistedResource<MolecularAnalysisRunItem>[] =
+  [
+    {
+      id: "b6b32dce-9cce-4d0b-9992-4a11d1698a02",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      name: "Quality Control Run Item 1",
+      usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+    },
+    {
+      id: "bb595f7b-996f-440e-91ae-682efafd65e1",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      name: "Quality Control Run Item 2",
+      usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+    },
+    {
+      id: "668fa5c1-8c9f-4802-a133-21c34fc2a664",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      name: "Quality Control Run Item 3",
+      usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+    }
+  ];
+
+export const TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS: PersistedResource<MolecularAnalysisRunItem>[] =
+  [
+    {
+      id: "82927bad-da28-4736-8dcd-36fb515b28fe",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      name: "Metagenomic Run Item 1",
+      usageType: MolecularAnalysisRunItemUsageType.METAGENOMICS_BATCH_ITEM
+    },
+    {
+      id: "882de68c-b1fd-4f7a-95dd-00d8ad9aef28",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      name: "Metagenomic Run Item 2",
+      usageType: MolecularAnalysisRunItemUsageType.METAGENOMICS_BATCH_ITEM
+    },
+    {
+      id: "e8a1df84-846a-4bca-86c4-570273dd1c53",
+      type: "molecular-analysis-run-item",
+      createdBy: "dina-admin",
+      createdOn: "2024-12-11T20:52:48.43824Z",
+      name: "Metagenomic Run Item 3",
+      usageType: MolecularAnalysisRunItemUsageType.METAGENOMICS_BATCH_ITEM
+    }
+  ];
+
+export const QUALITY_CONTROL_1: PersistedResource<QualityControl> = {
+  id: "5c07075e-e686-4546-8545-20cf7e867c61",
+  type: "quality-control",
+  group: "aafc",
+  name: "Quality Control 1",
+  qcType: "reserpine_standard",
+  molecularAnalysisRunItem:
+    TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[0]
+};
+
+export const QUALITY_CONTROL_2: PersistedResource<QualityControl> = {
+  id: "10d2dc14-9726-4943-84ad-817d8e93f124",
+  type: "quality-control",
+  group: "aafc",
+  name: "Quality Control 2",
+  qcType: "acn_blank",
+  molecularAnalysisRunItem:
+    TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[1]
+};
+
+export const QUALITY_CONTROL_3: PersistedResource<QualityControl> = {
+  id: "f6c92ce3-6f35-4c62-ad21-8c06dd74ad69",
+  type: "quality-control",
+  group: "aafc",
+  name: "Quality Control 3",
+  qcType: "meoh_blank",
+  molecularAnalysisRunItem:
+    TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[2]
+};
+
 export const TEST_MOLECULAR_ANALYSIS: PersistedResource<GenericMolecularAnalysis> =
   {
     id: "d1e4a8b0-c6d5-4e23-9b30-0ae8d8763f2b",
@@ -197,6 +316,76 @@ export const TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS: PersistedResource<GenericMol
         id: STORAGE_UNIT_USAGE_3.id ?? "",
         type: "storage-unit-usage"
       }
+    }
+  ];
+
+export const TEST_PCR_BATCH_ITEMS: PcrBatchItem[] = [
+  {
+    id: "562fa9f6-25d9-48a1-ae1d-7e862ae4aed7",
+    type: "pcr-batch-item",
+    group: "aafc",
+    result: "Good Band",
+    materialSample: {
+      id: TEST_MATERIAL_SAMPLE_SUMMARY[0].id,
+      type: "material-sample"
+    },
+    storageUnitUsage: {
+      id: STORAGE_UNIT_USAGE_1.id ?? "",
+      type: "storage-unit-usage"
+    }
+  },
+  {
+    id: "6e2c1099-2c27-4f62-94e1-9129d34e6d3a",
+    type: "pcr-batch-item",
+    group: "aafc",
+    result: "Good Band",
+    materialSample: {
+      id: TEST_MATERIAL_SAMPLE_SUMMARY[1].id,
+      type: "material-sample"
+    },
+    storageUnitUsage: {
+      id: STORAGE_UNIT_USAGE_2.id ?? "",
+      type: "storage-unit-usage"
+    }
+  },
+  {
+    id: "d1388a53-27ec-4df3-945c-abb7058d383a",
+    type: "pcr-batch-item",
+    group: "aafc",
+    result: "Good Band",
+    materialSample: {
+      id: TEST_MATERIAL_SAMPLE_SUMMARY[2].id,
+      type: "material-sample"
+    },
+    storageUnitUsage: {
+      id: STORAGE_UNIT_USAGE_3.id ?? "",
+      type: "storage-unit-usage"
+    }
+  }
+];
+
+export const TEST_METAGENOMIC_MOLECULAR_ANALYSIS_ITEMS: PersistedResource<MetagenomicsBatchItem>[] =
+  [
+    {
+      id: "7de1c19c-6016-4e51-973c-f76e21385f72",
+      type: "metagenomics-batch-item",
+      molecularAnalysisRunItem:
+        TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[0],
+      pcrBatchItem: TEST_PCR_BATCH_ITEMS[0] as any
+    },
+    {
+      id: "120cf8dd-9009-4a1b-b27a-c766095418f9",
+      type: "metagenomics-batch-item",
+      molecularAnalysisRunItem:
+        TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[1],
+      pcrBatchItem: TEST_PCR_BATCH_ITEMS[1] as any
+    },
+    {
+      id: "f3152f83-4aa9-40d5-a88f-099dad53dd76",
+      type: "metagenomics-batch-item",
+      molecularAnalysisRunItem:
+        TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[2],
+      pcrBatchItem: TEST_PCR_BATCH_ITEMS[2] as any
     }
   ];
 
