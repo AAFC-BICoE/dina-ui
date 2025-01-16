@@ -2,9 +2,9 @@
 
 exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] = `
 [MockFunction] {
-  "calls": Array [
-    Array [
-      Array [
+  "calls": [
+    [
+      [
         {
           "containsSupport": false,
           "distinctTerm": true,
@@ -426,7 +426,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
       ],
     ],
   ],
-  "results": Array [
+  "results": [
     {
       "type": "return",
       "value": undefined,

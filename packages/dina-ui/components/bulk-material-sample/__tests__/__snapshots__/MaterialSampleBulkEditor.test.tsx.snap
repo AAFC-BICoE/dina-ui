@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`MaterialSampleBulkEditor Bulk edit all material samples using other catalogue and other identifiers 1`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       {
         "resource": {
           "assemblages": undefined,
-          "associations": Array [],
+          "associations": [],
           "attachment": undefined,
           "collectingEvent": {
             "id": null,
@@ -42,10 +42,10 @@ Array [
           "projects": undefined,
           "relationships": {
             "organism": {
-              "data": Array [],
+              "data": [],
             },
             "preparedBy": {
-              "data": Array [],
+              "data": [],
             },
             "storageUnitUsage": {
               "data": null,
@@ -64,15 +64,15 @@ Array [
       "apiBaseUrl": "/collection-api",
     },
   ],
-  Array [
-    Array [
+  [
+    [
       {
         "resource": {
           "assemblages": undefined,
-          "associations": Array [],
+          "associations": [],
           "attachment": undefined,
           "dwcDegreeOfEstablishment": null,
-          "dwcOtherCatalogNumbers": Array [
+          "dwcOtherCatalogNumbers": [
             "otherCatalogAll",
           ],
           "hostOrganism": null,
@@ -92,10 +92,10 @@ Array [
           "projects": undefined,
           "relationships": {
             "organism": {
-              "data": Array [],
+              "data": [],
             },
             "preparedBy": {
-              "data": Array [],
+              "data": [],
             },
           },
           "restrictionFieldsExtension": null,
@@ -109,10 +109,10 @@ Array [
       {
         "resource": {
           "assemblages": undefined,
-          "associations": Array [],
+          "associations": [],
           "attachment": undefined,
           "dwcDegreeOfEstablishment": null,
-          "dwcOtherCatalogNumbers": Array [
+          "dwcOtherCatalogNumbers": [
             "otherCatalogAll",
           ],
           "hostOrganism": null,
@@ -132,10 +132,10 @@ Array [
           "projects": undefined,
           "relationships": {
             "organism": {
-              "data": Array [],
+              "data": [],
             },
             "preparedBy": {
-              "data": Array [],
+              "data": [],
             },
           },
           "restrictionFieldsExtension": null,
@@ -149,10 +149,10 @@ Array [
       {
         "resource": {
           "assemblages": undefined,
-          "associations": Array [],
+          "associations": [],
           "attachment": undefined,
           "dwcDegreeOfEstablishment": null,
-          "dwcOtherCatalogNumbers": Array [
+          "dwcOtherCatalogNumbers": [
             "otherCatalogAll",
           ],
           "hostOrganism": null,
@@ -172,10 +172,10 @@ Array [
           "projects": undefined,
           "relationships": {
             "organism": {
-              "data": Array [],
+              "data": [],
             },
             "preparedBy": {
-              "data": Array [],
+              "data": [],
             },
           },
           "restrictionFieldsExtension": null,

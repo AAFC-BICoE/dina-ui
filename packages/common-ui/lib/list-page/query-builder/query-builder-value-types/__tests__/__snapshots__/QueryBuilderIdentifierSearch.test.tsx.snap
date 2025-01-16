@@ -3,7 +3,7 @@
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function BOOL based identifier tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -55,10 +55,10 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function BOOL base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function BOOL based identifier tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
-          "should": Array [
+          "should": [
             {
               "bool": {
                 "must_not": {
@@ -66,7 +66,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function BOOL base
                     "path": "included",
                     "query": {
                       "bool": {
-                        "must": Array [
+                        "must": [
                           {
                             "exists": {
                               "field": "included.attributes.identifiers.seqdb_id",
@@ -89,7 +89,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function BOOL base
                 "path": "included",
                 "query": {
                   "bool": {
-                    "must": Array [
+                    "must": [
                       {
                         "term": {
                           "included.attributes.identifiers.seqdb_id.keyword": "",
@@ -128,7 +128,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function BOOL base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.identifiers.seqdb_id.keyword": "true",
@@ -152,7 +152,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function BOOL base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.type": "material-sample",
@@ -523,7 +523,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.identifiers.seqdb_id": {
@@ -567,7 +567,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.identifiers.seqdb_id": {
@@ -608,7 +608,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.identifiers.seqdb_id": {
@@ -649,7 +649,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.identifiers.seqdb_id": {
@@ -690,7 +690,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.identifiers.seqdb_id": {
@@ -870,7 +870,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Attribute level tests Using the notEquals operator, date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -902,7 +902,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Attribute level tests Using the notEquals operator, date_time_optional_tz subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -933,7 +933,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Attribute level tests Using the notEquals operator, local_date subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -964,7 +964,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Attribute level tests Using the notEquals operator, local_date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -995,7 +995,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1029,7 +1029,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.identifiers.seqdb_id": {
@@ -1073,7 +1073,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.identifiers.seqdb_id": {
@@ -1114,7 +1114,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.identifiers.seqdb_id": {
@@ -1155,7 +1155,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.identifiers.seqdb_id": {
@@ -1196,7 +1196,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.identifiers.seqdb_id": {
@@ -1237,7 +1237,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1265,7 +1265,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1293,7 +1293,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1320,7 +1320,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1347,7 +1347,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1375,7 +1375,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1404,7 +1404,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1432,7 +1432,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1460,7 +1460,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1488,7 +1488,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1513,7 +1513,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the empty operator, date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1521,7 +1521,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.identifiers.seqdb_id",
@@ -1556,7 +1556,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the empty operator, date_time_optional_tz subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1564,7 +1564,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.identifiers.seqdb_id",
@@ -1599,7 +1599,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the empty operator, local_date subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1607,7 +1607,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.identifiers.seqdb_id",
@@ -1642,7 +1642,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the empty operator, local_date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1650,7 +1650,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.identifiers.seqdb_id",
@@ -1685,7 +1685,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1693,7 +1693,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.identifiers.seqdb_id",
@@ -1731,7 +1731,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1760,7 +1760,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1788,7 +1788,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1816,7 +1816,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1844,7 +1844,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1872,7 +1872,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1899,7 +1899,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1925,7 +1925,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1951,7 +1951,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -1977,7 +1977,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2003,7 +2003,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2030,7 +2030,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2056,7 +2056,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2082,7 +2082,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2108,7 +2108,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2134,17 +2134,17 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must": Array [
+              "must": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2165,7 +2165,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2186,7 +2186,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2229,17 +2229,17 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must": Array [
+              "must": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2259,7 +2259,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2279,7 +2279,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2321,17 +2321,17 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must": Array [
+              "must": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2351,7 +2351,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2371,7 +2371,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2413,17 +2413,17 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must": Array [
+              "must": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2443,7 +2443,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2463,7 +2463,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2505,17 +2505,17 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must": Array [
+              "must": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2535,7 +2535,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2555,7 +2555,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -2597,7 +2597,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2624,7 +2624,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2650,7 +2650,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2676,7 +2676,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2702,7 +2702,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2728,7 +2728,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2755,7 +2755,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2781,7 +2781,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2807,7 +2807,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2833,7 +2833,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -2859,7 +2859,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.identifiers.seqdb_id",
@@ -2883,7 +2883,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.identifiers.seqdb_id",
@@ -2907,7 +2907,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.identifiers.seqdb_id",
@@ -2931,7 +2931,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.identifiers.seqdb_id",
@@ -2955,7 +2955,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.identifiers.seqdb_id",
@@ -2976,7 +2976,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the notEquals operator, date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -3037,7 +3037,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the notEquals operator, date_time_optional_tz subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -3097,7 +3097,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the notEquals operator, local_date subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -3157,7 +3157,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the notEquals operator, local_date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -3217,7 +3217,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -3280,17 +3280,17 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must_not": Array [
+              "must_not": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3311,7 +3311,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3332,7 +3332,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3375,17 +3375,17 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must_not": Array [
+              "must_not": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3405,7 +3405,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3425,7 +3425,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3467,17 +3467,17 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must_not": Array [
+              "must_not": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3497,7 +3497,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3517,7 +3517,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3559,17 +3559,17 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must_not": Array [
+              "must_not": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3589,7 +3589,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3609,7 +3609,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3651,17 +3651,17 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must_not": Array [
+              "must_not": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3681,7 +3681,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3701,7 +3701,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE base
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.identifiers.seqdb_id": {
@@ -3793,7 +3793,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
   "bool": {
     "must": {
       "terms": {
-        "data.attributes.identifiers.seqdb_id": Array [
+        "data.attributes.identifiers.seqdb_id": [
           "3",
           "3.1",
           "12.5",
@@ -3835,7 +3835,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL based identifier tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -3864,7 +3864,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
   "bool": {
     "must_not": {
       "terms": {
-        "data.attributes.identifiers.seqdb_id": Array [
+        "data.attributes.identifiers.seqdb_id": [
           "3",
           "3.1",
           "12.5",
@@ -3881,7 +3881,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -3905,7 +3905,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL based identifier tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -3913,7 +3913,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.identifiers.seqdb_id",
@@ -3951,7 +3951,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.identifiers.seqdb_id": "3.5",
@@ -3975,7 +3975,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -4001,7 +4001,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -4027,12 +4027,12 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must": {
                 "terms": {
-                  "included.attributes.identifiers.seqdb_id": Array [
+                  "included.attributes.identifiers.seqdb_id": [
                     "3",
                     "3.1",
                     "12.5",
@@ -4059,7 +4059,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -4085,7 +4085,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -4111,7 +4111,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.identifiers.seqdb_id",
@@ -4132,7 +4132,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL based identifier tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -4191,12 +4191,12 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must_not": {
                 "terms": {
-                  "included.attributes.identifiers.seqdb_id": Array [
+                  "included.attributes.identifiers.seqdb_id": [
                     "3",
                     "3.1",
                     "12.5",
@@ -4273,7 +4273,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
   "bool": {
     "must": {
       "terms": {
-        "data.attributes.identifiers.seqdb_id": Array [
+        "data.attributes.identifiers.seqdb_id": [
           "1",
           "2",
           "4",
@@ -4315,7 +4315,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -4344,7 +4344,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
   "bool": {
     "must_not": {
       "terms": {
-        "data.attributes.identifiers.seqdb_id": Array [
+        "data.attributes.identifiers.seqdb_id": [
           "1",
           "2",
           "4",
@@ -4361,7 +4361,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -4385,7 +4385,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -4393,7 +4393,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.identifiers.seqdb_id",
@@ -4431,7 +4431,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.identifiers.seqdb_id": "42",
@@ -4455,7 +4455,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -4481,7 +4481,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -4507,12 +4507,12 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must": {
                 "terms": {
-                  "included.attributes.identifiers.seqdb_id": Array [
+                  "included.attributes.identifiers.seqdb_id": [
                     "1",
                     "2",
                     "4",
@@ -4539,7 +4539,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -4565,7 +4565,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id": {
@@ -4591,7 +4591,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.identifiers.seqdb_id",
@@ -4612,7 +4612,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -4671,12 +4671,12 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER b
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must_not": {
                 "terms": {
-                  "included.attributes.identifiers.seqdb_id": Array [
+                  "included.attributes.identifiers.seqdb_id": [
                     "1",
                     "2",
                     "4",
@@ -4711,7 +4711,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -4749,7 +4749,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "data.attributes.identifiers.seqdb_id.keyword": {
@@ -4801,7 +4801,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -4831,7 +4831,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "data.attributes.identifiers.seqdb_id.keyword": {
@@ -4891,7 +4891,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.identifiers.seqdb_id.keyword_numeric": {
@@ -4915,10 +4915,10 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
-          "should": Array [
+          "should": [
             {
               "bool": {
                 "must_not": {
@@ -4926,7 +4926,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
                     "path": "included",
                     "query": {
                       "bool": {
-                        "must": Array [
+                        "must": [
                           {
                             "exists": {
                               "field": "included.attributes.identifiers.seqdb_id",
@@ -4949,7 +4949,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
                 "path": "included",
                 "query": {
                   "bool": {
-                    "must": Array [
+                    "must": [
                       {
                         "term": {
                           "included.attributes.identifiers.seqdb_id.keyword": "",
@@ -4988,7 +4988,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.identifiers.seqdb_id.keyword": "stringValue",
@@ -5012,13 +5012,13 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must": {
                 "bool": {
                   "minimum_should_match": 1,
-                  "should": Array [
+                  "should": [
                     {
                       "term": {
                         "included.attributes.identifiers.seqdb_id.keyword": {
@@ -5066,7 +5066,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.type": "material-sample",
@@ -5092,7 +5092,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -5151,13 +5151,13 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must_not": {
                 "bool": {
                   "minimum_should_match": 1,
-                  "should": Array [
+                  "should": [
                     {
                       "term": {
                         "included.attributes.identifiers.seqdb_id.keyword": {
@@ -5205,7 +5205,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.identifiers.seqdb_id.keyword": {
@@ -5232,7 +5232,7 @@ exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING ba
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "wildcard": {
               "included.attributes.identifiers.seqdb_id.keyword": {

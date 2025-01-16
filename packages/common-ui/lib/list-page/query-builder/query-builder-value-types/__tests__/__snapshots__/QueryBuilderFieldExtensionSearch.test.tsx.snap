@@ -3,7 +3,7 @@
 exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function Attribute level tests Using the empty operator. 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -41,7 +41,7 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "data.attributes.extensionValues.extension.field.keyword": {
@@ -93,7 +93,7 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
 exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function Attribute level tests Using the notEquals operator. 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -123,7 +123,7 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "data.attributes.extensionValues.extension.field.keyword": {
@@ -180,10 +180,10 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
 exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function Relationship level tests Using the empty operator. 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
-          "should": Array [
+          "should": [
             {
               "bool": {
                 "must_not": {
@@ -191,7 +191,7 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
                     "path": "included",
                     "query": {
                       "bool": {
-                        "must": Array [
+                        "must": [
                           {
                             "exists": {
                               "field": "included.attributes.extensionValues.extension.field",
@@ -214,7 +214,7 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
                 "path": "included",
                 "query": {
                   "bool": {
-                    "must": Array [
+                    "must": [
                       {
                         "term": {
                           "included.attributes.extensionValues.extension.field.keyword": "",
@@ -253,7 +253,7 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.extensionValues.extension.field.keyword": "test123",
@@ -277,13 +277,13 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must": {
                 "bool": {
                   "minimum_should_match": 1,
-                  "should": Array [
+                  "should": [
                     {
                       "term": {
                         "included.attributes.extensionValues.extension.field.keyword": {
@@ -331,7 +331,7 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.type": "collecting-event",
@@ -357,7 +357,7 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
 exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function Relationship level tests Using the notEquals operator. 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -416,13 +416,13 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must_not": {
                 "bool": {
                   "minimum_should_match": 1,
-                  "should": Array [
+                  "should": [
                     {
                       "term": {
                         "included.attributes.extensionValues.extension.field.keyword": {
@@ -470,7 +470,7 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.extensionValues.extension.field.keyword": {
@@ -497,7 +497,7 @@ exports[`QueryBuilderFieldExtensionSearch transformFieldExtensionToDSL function 
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "wildcard": {
               "included.attributes.extensionValues.extension.field.keyword": {

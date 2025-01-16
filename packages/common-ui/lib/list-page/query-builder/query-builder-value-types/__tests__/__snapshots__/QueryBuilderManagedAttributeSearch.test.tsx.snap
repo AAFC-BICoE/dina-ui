@@ -3,7 +3,7 @@
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -55,10 +55,10 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
-          "should": Array [
+          "should": [
             {
               "bool": {
                 "must_not": {
@@ -66,7 +66,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                     "path": "included",
                     "query": {
                       "bool": {
-                        "must": Array [
+                        "must": [
                           {
                             "exists": {
                               "field": "included.attributes.managedAttributes.attributeName",
@@ -89,7 +89,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                 "path": "included",
                 "query": {
                   "bool": {
-                    "must": Array [
+                    "must": [
                       {
                         "term": {
                           "included.attributes.managedAttributes.attributeName.keyword": "",
@@ -128,7 +128,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.managedAttributes.attributeName.keyword": "true",
@@ -152,7 +152,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.type": "collecting-event",
@@ -523,7 +523,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.managedAttributes.attributeName": {
@@ -567,7 +567,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.managedAttributes.attributeName": {
@@ -608,7 +608,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.managedAttributes.attributeName": {
@@ -649,7 +649,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.managedAttributes.attributeName": {
@@ -690,7 +690,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.managedAttributes.attributeName": {
@@ -870,7 +870,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEquals operator, date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -902,7 +902,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEquals operator, date_time_optional_tz subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -933,7 +933,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEquals operator, local_date subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -964,7 +964,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEquals operator, local_date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -995,7 +995,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1029,7 +1029,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.managedAttributes.attributeName": {
@@ -1073,7 +1073,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.managedAttributes.attributeName": {
@@ -1114,7 +1114,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.managedAttributes.attributeName": {
@@ -1155,7 +1155,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.managedAttributes.attributeName": {
@@ -1196,7 +1196,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "data.attributes.managedAttributes.attributeName": {
@@ -1237,7 +1237,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1265,7 +1265,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1293,7 +1293,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1320,7 +1320,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1347,7 +1347,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1375,7 +1375,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1404,7 +1404,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1432,7 +1432,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1460,7 +1460,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1488,7 +1488,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1513,7 +1513,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1521,7 +1521,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.managedAttributes.attributeName",
@@ -1556,7 +1556,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, date_time_optional_tz subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1564,7 +1564,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.managedAttributes.attributeName",
@@ -1599,7 +1599,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, local_date subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1607,7 +1607,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.managedAttributes.attributeName",
@@ -1642,7 +1642,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, local_date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1650,7 +1650,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.managedAttributes.attributeName",
@@ -1685,7 +1685,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -1693,7 +1693,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.managedAttributes.attributeName",
@@ -1731,7 +1731,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1760,7 +1760,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1788,7 +1788,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1816,7 +1816,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1844,7 +1844,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1872,7 +1872,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1899,7 +1899,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1925,7 +1925,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1951,7 +1951,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -1977,7 +1977,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2003,7 +2003,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2030,7 +2030,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2056,7 +2056,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2082,7 +2082,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2108,7 +2108,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2134,17 +2134,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must": Array [
+              "must": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2165,7 +2165,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2186,7 +2186,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2229,17 +2229,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must": Array [
+              "must": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2259,7 +2259,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2279,7 +2279,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2321,17 +2321,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must": Array [
+              "must": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2351,7 +2351,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2371,7 +2371,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2413,17 +2413,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must": Array [
+              "must": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2443,7 +2443,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2463,7 +2463,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2505,17 +2505,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must": Array [
+              "must": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2535,7 +2535,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2555,7 +2555,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -2597,7 +2597,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2624,7 +2624,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2650,7 +2650,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2676,7 +2676,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2702,7 +2702,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2728,7 +2728,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2755,7 +2755,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2781,7 +2781,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2807,7 +2807,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2833,7 +2833,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -2859,7 +2859,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.managedAttributes.attributeName",
@@ -2883,7 +2883,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.managedAttributes.attributeName",
@@ -2907,7 +2907,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.managedAttributes.attributeName",
@@ -2931,7 +2931,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.managedAttributes.attributeName",
@@ -2955,7 +2955,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.managedAttributes.attributeName",
@@ -2976,7 +2976,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEquals operator, date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -3037,7 +3037,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEquals operator, date_time_optional_tz subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -3097,7 +3097,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEquals operator, local_date subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -3157,7 +3157,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEquals operator, local_date_time subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -3217,7 +3217,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -3280,17 +3280,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must_not": Array [
+              "must_not": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3311,7 +3311,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3332,7 +3332,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3375,17 +3375,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must_not": Array [
+              "must_not": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3405,7 +3405,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3425,7 +3425,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3467,17 +3467,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must_not": Array [
+              "must_not": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3497,7 +3497,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3517,7 +3517,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3559,17 +3559,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must_not": Array [
+              "must_not": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3589,7 +3589,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3609,7 +3609,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3651,17 +3651,17 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
-              "must_not": Array [
+              "must_not": [
                 {
                   "bool": {
                     "minimum_should_match": 1,
-                    "should": Array [
+                    "should": [
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3681,7 +3681,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3701,7 +3701,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                       },
                       {
                         "bool": {
-                          "must": Array [
+                          "must": [
                             {
                               "range": {
                                 "included.attributes.managedAttributes.attributeName": {
@@ -3793,7 +3793,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
   "bool": {
     "must": {
       "terms": {
-        "data.attributes.managedAttributes.attributeName": Array [
+        "data.attributes.managedAttributes.attributeName": [
           "3",
           "3.1",
           "12.5",
@@ -3835,7 +3835,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -3864,7 +3864,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
   "bool": {
     "must_not": {
       "terms": {
-        "data.attributes.managedAttributes.attributeName": Array [
+        "data.attributes.managedAttributes.attributeName": [
           "3",
           "3.1",
           "12.5",
@@ -3881,7 +3881,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -3905,7 +3905,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -3913,7 +3913,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.managedAttributes.attributeName",
@@ -3951,7 +3951,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.managedAttributes.attributeName": "3.5",
@@ -3975,7 +3975,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -4001,7 +4001,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -4027,12 +4027,12 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must": {
                 "terms": {
-                  "included.attributes.managedAttributes.attributeName": Array [
+                  "included.attributes.managedAttributes.attributeName": [
                     "3",
                     "3.1",
                     "12.5",
@@ -4059,7 +4059,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -4085,7 +4085,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -4111,7 +4111,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.managedAttributes.attributeName",
@@ -4132,7 +4132,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -4191,12 +4191,12 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must_not": {
                 "terms": {
-                  "included.attributes.managedAttributes.attributeName": Array [
+                  "included.attributes.managedAttributes.attributeName": [
                     "3",
                     "3.1",
                     "12.5",
@@ -4273,7 +4273,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
   "bool": {
     "must": {
       "terms": {
-        "data.attributes.managedAttributes.attributeName": Array [
+        "data.attributes.managedAttributes.attributeName": [
           "1",
           "2",
           "4",
@@ -4315,7 +4315,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -4344,7 +4344,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
   "bool": {
     "must_not": {
       "terms": {
-        "data.attributes.managedAttributes.attributeName": Array [
+        "data.attributes.managedAttributes.attributeName": [
           "1",
           "2",
           "4",
@@ -4361,7 +4361,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -4385,7 +4385,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -4393,7 +4393,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "included.attributes.managedAttributes.attributeName",
@@ -4431,7 +4431,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.managedAttributes.attributeName": "42",
@@ -4455,7 +4455,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -4481,7 +4481,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -4507,12 +4507,12 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must": {
                 "terms": {
-                  "included.attributes.managedAttributes.attributeName": Array [
+                  "included.attributes.managedAttributes.attributeName": [
                     "1",
                     "2",
                     "4",
@@ -4539,7 +4539,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -4565,7 +4565,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName": {
@@ -4591,7 +4591,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "included.attributes.managedAttributes.attributeName",
@@ -4612,7 +4612,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -4671,12 +4671,12 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must_not": {
                 "terms": {
-                  "included.attributes.managedAttributes.attributeName": Array [
+                  "included.attributes.managedAttributes.attributeName": [
                     "1",
                     "2",
                     "4",
@@ -4700,7 +4700,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -4738,7 +4738,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "data.attributes.managedAttributes.attributeName.keyword": {
@@ -4790,7 +4790,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -4820,7 +4820,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "data.attributes.managedAttributes.attributeName.keyword": {
@@ -4855,10 +4855,10 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
-          "should": Array [
+          "should": [
             {
               "bool": {
                 "must_not": {
@@ -4866,7 +4866,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                     "path": "included",
                     "query": {
                       "bool": {
-                        "must": Array [
+                        "must": [
                           {
                             "exists": {
                               "field": "included.attributes.managedAttributes.attributeName",
@@ -4889,7 +4889,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                 "path": "included",
                 "query": {
                   "bool": {
-                    "must": Array [
+                    "must": [
                       {
                         "term": {
                           "included.attributes.managedAttributes.attributeName.keyword": "",
@@ -4928,7 +4928,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.managedAttributes.attributeName.keyword": "option1",
@@ -4952,13 +4952,13 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must": {
                 "bool": {
                   "minimum_should_match": 1,
-                  "should": Array [
+                  "should": [
                     {
                       "term": {
                         "included.attributes.managedAttributes.attributeName.keyword": {
@@ -5006,7 +5006,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.type": "collecting-event",
@@ -5032,7 +5032,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -5091,13 +5091,13 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must_not": {
                 "bool": {
                   "minimum_should_match": 1,
-                  "should": Array [
+                  "should": [
                     {
                       "term": {
                         "included.attributes.managedAttributes.attributeName.keyword": {
@@ -5153,7 +5153,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -5191,7 +5191,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "data.attributes.managedAttributes.attributeName.keyword": {
@@ -5243,7 +5243,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -5273,7 +5273,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "data.attributes.managedAttributes.attributeName.keyword": {
@@ -5333,7 +5333,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.managedAttributes.attributeName.keyword_numeric": {
@@ -5357,10 +5357,10 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
-          "should": Array [
+          "should": [
             {
               "bool": {
                 "must_not": {
@@ -5368,7 +5368,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                     "path": "included",
                     "query": {
                       "bool": {
-                        "must": Array [
+                        "must": [
                           {
                             "exists": {
                               "field": "included.attributes.managedAttributes.attributeName",
@@ -5391,7 +5391,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
                 "path": "included",
                 "query": {
                   "bool": {
-                    "must": Array [
+                    "must": [
                       {
                         "term": {
                           "included.attributes.managedAttributes.attributeName.keyword": "",
@@ -5430,7 +5430,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.managedAttributes.attributeName.keyword": "stringValue",
@@ -5454,13 +5454,13 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must": {
                 "bool": {
                   "minimum_should_match": 1,
-                  "should": Array [
+                  "should": [
                     {
                       "term": {
                         "included.attributes.managedAttributes.attributeName.keyword": {
@@ -5508,7 +5508,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.type": "collecting-event",
@@ -5534,7 +5534,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -5593,13 +5593,13 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "bool": {
               "must_not": {
                 "bool": {
                   "minimum_should_match": 1,
-                  "should": Array [
+                  "should": [
                     {
                       "term": {
                         "included.attributes.managedAttributes.attributeName.keyword": {
@@ -5647,7 +5647,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.managedAttributes.attributeName.keyword": {
@@ -5674,7 +5674,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "wildcard": {
               "included.attributes.managedAttributes.attributeName.keyword": {

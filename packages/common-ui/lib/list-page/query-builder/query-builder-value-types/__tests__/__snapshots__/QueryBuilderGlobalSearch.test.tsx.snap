@@ -5,7 +5,7 @@ exports[`QueryBuilderGlobalSearch transformGlobalSearchToDSL function Empty glob
 exports[`QueryBuilderGlobalSearch transformGlobalSearchToDSL function Global search provided 1`] = `
 {
   "simple_query_string": {
-    "fields": Array [
+    "fields": [
       "*",
     ],
     "query": "test value",

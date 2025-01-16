@@ -91,7 +91,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Empty oper
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Empty operation With relationship as field 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -99,7 +99,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Empty oper
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "includes.name",
@@ -145,7 +145,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Equals ope
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "includes.name": "123",
@@ -177,7 +177,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Exact Matc
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "includes.name": "123",
@@ -211,7 +211,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Greater Th
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "includes.name": {
@@ -247,7 +247,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Greater Th
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "includes.name": {
@@ -272,7 +272,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function In operati
   "bool": {
     "must": {
       "terms": {
-        "data.attributes.numberField": Array [
+        "data.attributes.numberField": [
           "1",
           "2",
           "3.5",
@@ -300,7 +300,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Less Than 
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "includes.name": {
@@ -323,7 +323,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Less Than 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not Equals operation Normal field 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -350,7 +350,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not Equals
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not Equals operation With relationship as field 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -417,7 +417,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not empty 
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "includes.name",
@@ -440,7 +440,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not in ope
   "bool": {
     "must_not": {
       "terms": {
-        "data.attributes.numberField": Array [
+        "data.attributes.numberField": [
           "1",
           "2",
           "3.5",
@@ -468,7 +468,7 @@ exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function lessThanOr
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "includes.name": {

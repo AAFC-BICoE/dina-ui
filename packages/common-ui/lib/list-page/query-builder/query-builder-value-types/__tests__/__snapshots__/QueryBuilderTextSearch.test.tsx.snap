@@ -90,7 +90,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function ContainsText (
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "match": {
               "included.attributes.name.infix": {
@@ -116,7 +116,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function ContainsText (
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "match": {
               "included.attributes.determination.scientificName.infix": {
@@ -141,7 +141,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Edge cases If 
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Empty operation Normal field 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -168,10 +168,10 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Empty operatio
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Empty operation With relationship as field 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
-          "should": Array [
+          "should": [
             {
               "bool": {
                 "must_not": {
@@ -179,7 +179,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Empty operatio
                     "path": "included",
                     "query": {
                       "bool": {
-                        "must": Array [
+                        "must": [
                           {
                             "exists": {
                               "field": "includes.name",
@@ -202,7 +202,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Empty operatio
                 "path": "included",
                 "query": {
                   "bool": {
-                    "must": Array [
+                    "must": [
                       {
                         "term": {
                           "includes.name.keyword": "",
@@ -249,7 +249,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function EndsWith opera
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.name.prefix_reverse": "hcraes txet",
@@ -273,7 +273,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function EndsWith opera
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.determination.scientificName.prefix_reverse": "txet",
@@ -313,7 +313,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.name.keyword": "text search",
@@ -337,7 +337,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "includes.name.keyword": "false",
@@ -361,7 +361,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operati
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.attributes.determination.scientificName.keyword": "text search",
@@ -393,7 +393,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Exact Match op
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "includes.name.keyword": "text search",
@@ -414,7 +414,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Exact Match op
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Not Equals operation Normal field 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -441,7 +441,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Not Equals ope
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Not Equals operation With relationship as field 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "nested": {
           "path": "included",
@@ -517,7 +517,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Not empty oper
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "included.type": "collection",
@@ -557,7 +557,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function contains (wild
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "wildcard": {
               "included.attributes.name.keyword": {
@@ -584,7 +584,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function contains (wild
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "wildcard": {
               "included.attributes.determination.scientificName": {
@@ -611,7 +611,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function in operator No
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "data.attributes.textField": {
@@ -649,7 +649,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function not in operato
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "data.attributes.textField": {
@@ -698,7 +698,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (pr
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.name": {
@@ -725,7 +725,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (pr
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.determination.scientificName": {
@@ -763,7 +763,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (pr
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.name.prefix": {
@@ -790,7 +790,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (pr
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.determination.scientificName.prefix": {

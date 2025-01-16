@@ -16,7 +16,7 @@ exports[`QueryBuilderElasticSearchExport functionality Partial matching query he
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "match": {
               "included.attributes.dwcRecordNumber.infix": {
@@ -75,7 +75,7 @@ exports[`QueryBuilderElasticSearchExport functionality Partial matching query he
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.dwcRecordNumber": {
@@ -102,7 +102,7 @@ exports[`QueryBuilderElasticSearchExport functionality Partial matching query he
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.dwcRecordNumber.keyword": {
@@ -129,7 +129,7 @@ exports[`QueryBuilderElasticSearchExport functionality Partial matching query he
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.dwcRecordNumber.prefix": {
@@ -164,7 +164,7 @@ exports[`QueryBuilderElasticSearchExport functionality Partial matching query he
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "prefix": {
               "included.attributes.dwcRecordNumber.prefix_reverse": "eulavhcraes",
@@ -210,7 +210,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions be
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "range": {
               "included.attributes.dwcRecordNumber": {
@@ -245,7 +245,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "fieldTest": {
@@ -289,7 +289,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "fieldTest": {
@@ -333,7 +333,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "fieldTest": {
@@ -367,7 +367,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "fieldTest": {
@@ -411,7 +411,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "fieldTest": {
@@ -455,7 +455,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "fieldTest": {
@@ -481,7 +481,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "range": {
               "fieldTest": {
@@ -514,7 +514,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
   "bool": {
     "must": {
       "terms": {
-        "fieldTest.keyword": Array [
+        "fieldTest.keyword": [
           "test1",
           "test2",
           "TEST3",
@@ -530,7 +530,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
   "bool": {
     "must": {
       "terms": {
-        "fieldTest": Array [
+        "fieldTest": [
           "test1",
           "test2",
           "TEST3",
@@ -546,7 +546,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
   "bool": {
     "must_not": {
       "terms": {
-        "fieldTest.keyword": Array [
+        "fieldTest.keyword": [
           "test1",
           "test2",
         ],
@@ -561,7 +561,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
   "bool": {
     "must": {
       "terms": {
-        "fieldTest.keyword": Array [
+        "fieldTest.keyword": [
           "test1",
           "test2",
           "test3",
@@ -577,7 +577,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
   "bool": {
     "must": {
       "terms": {
-        "fieldTest.keyword": Array [
+        "fieldTest.keyword": [
           "test1",
           "test2",
           "test3",
@@ -593,7 +593,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
   "bool": {
     "must": {
       "terms": {
-        "fieldTest.keyword": Array [
+        "fieldTest.keyword": [
           "TEST1",
         ],
       },
@@ -609,7 +609,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
   "bool": {
     "must": {
       "terms": {
-        "fieldTest.keyword": Array [
+        "fieldTest.keyword": [
           "test1",
           "test2",
         ],
@@ -622,7 +622,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inRangeQuery 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "range": {
           "fieldTest": {
@@ -650,7 +650,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "fieldTest.keyword": {
@@ -688,7 +688,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "fieldTest": {
@@ -726,7 +726,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must_not": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "fieldTest.keyword": {
@@ -756,7 +756,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "fieldTest.keyword": {
@@ -794,7 +794,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "fieldTest.keyword": {
@@ -832,7 +832,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "fieldTest.keyword": {
@@ -856,7 +856,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
     "must": {
       "bool": {
         "minimum_should_match": 1,
-        "should": Array [
+        "should": [
           {
             "term": {
               "fieldTest.keyword": {
@@ -940,7 +940,7 @@ exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters Multipl
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -953,7 +953,7 @@ exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters Multipl
         },
         {
           "terms": {
-            "data.attributes.group.keyword": Array [
+            "data.attributes.group.keyword": [
               "aafc",
               "cnc",
               "seqdb",
@@ -970,7 +970,7 @@ exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters No grou
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -991,7 +991,7 @@ exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters Single 
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1018,7 +1018,7 @@ exports[`QueryBuilderElasticSearchExport functionality applyPagination Paginatio
   "from": 0,
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1041,7 +1041,7 @@ exports[`QueryBuilderElasticSearchExport functionality applyPagination Paginatio
   "from": 100,
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1064,7 +1064,7 @@ exports[`QueryBuilderElasticSearchExport functionality applyRootQuery Boolean lo
   "query": {
     "bool": {
       "minimum_should_match": 1,
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1076,7 +1076,7 @@ exports[`QueryBuilderElasticSearchExport functionality applyRootQuery Boolean lo
           },
         },
       ],
-      "should": Array [
+      "should": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1097,7 +1097,7 @@ exports[`QueryBuilderElasticSearchExport functionality applyRootQuery Boolean lo
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1124,7 +1124,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Attempt
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1145,7 +1145,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic s
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1159,7 +1159,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic s
       ],
     },
   },
-  "sort": Array [
+  "sort": [
     {
       "data.attributes.testColumn1.keyword": {
         "order": "desc",
@@ -1173,7 +1173,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic s
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1187,7 +1187,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic s
       ],
     },
   },
-  "sort": Array [
+  "sort": [
     {
       "data.attributes.testColumn1.keyword": {
         "order": "asc",
@@ -1201,7 +1201,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic s
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1215,7 +1215,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic s
       ],
     },
   },
-  "sort": Array [
+  "sort": [
     {
       "data.attributes.testColumn1.keyword": {
         "order": "asc",
@@ -1234,7 +1234,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules No sort
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1255,7 +1255,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relatio
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1269,7 +1269,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relatio
       ],
     },
   },
-  "sort": Array [
+  "sort": [
     {
       "data.attributes.testColumn4": {
         "nested": {
@@ -1291,7 +1291,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relatio
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1305,7 +1305,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relatio
       ],
     },
   },
-  "sort": Array [
+  "sort": [
     {
       "data.attributes.testColumn4": {
         "nested": {
@@ -1340,7 +1340,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relatio
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1354,7 +1354,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relatio
       ],
     },
   },
-  "sort": Array [
+  "sort": [
     {
       "data.attributes.testColumn1.keyword": {
         "order": "asc",
@@ -1399,7 +1399,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Sorting
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1413,7 +1413,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Sorting
       ],
     },
   },
-  "sort": Array [
+  "sort": [
     {
       "data.attributes.testColumn6.keyword": {
         "nested": {
@@ -1435,7 +1435,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Strings
 {
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1449,7 +1449,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Strings
       ],
     },
   },
-  "sort": Array [
+  "sort": [
     {
       "testColumn3": {
         "order": "asc",
@@ -1462,7 +1462,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySortingRules Strings
 exports[`QueryBuilderElasticSearchExport functionality applySourceFiltering Ensure all source filtering are being applied to the query 1`] = `
 {
   "_source": {
-    "includes": Array [
+    "includes": [
       "data.id",
       "data.type",
       "data.relationships",
@@ -1480,7 +1480,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySourceFiltering Ensu
   },
   "query": {
     "bool": {
-      "must": Array [
+      "must": [
         {
           "term": {
             "data.attributes.materialSampleName.keyword": "Test",
@@ -1498,7 +1498,7 @@ exports[`QueryBuilderElasticSearchExport functionality applySourceFiltering Ensu
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality processResults Entity attributes only 1`] = `
-Array [
+[
   {
     "data": {
       "attributes": {
@@ -1512,10 +1512,10 @@ Array [
       },
       "relationships": {
         "assemblages": {
-          "data": Array [],
+          "data": [],
         },
         "attachment": {
-          "data": Array [],
+          "data": [],
         },
         "collectingEvent": {
           "data": null,
@@ -1524,7 +1524,7 @@ Array [
           "data": null,
         },
         "organism": {
-          "data": Array [],
+          "data": [],
         },
         "parentMaterialSample": {},
         "preparationMethod": {
@@ -1535,10 +1535,10 @@ Array [
           "data": null,
         },
         "preparedBy": {
-          "data": Array [],
+          "data": [],
         },
         "projects": {
-          "data": Array [],
+          "data": [],
         },
         "storageUnitUsage": {},
       },
@@ -1560,10 +1560,10 @@ Array [
       },
       "relationships": {
         "assemblages": {
-          "data": Array [],
+          "data": [],
         },
         "attachment": {
-          "data": Array [],
+          "data": [],
         },
         "collectingEvent": {
           "data": null,
@@ -1572,7 +1572,7 @@ Array [
           "data": null,
         },
         "organism": {
-          "data": Array [],
+          "data": [],
         },
         "parentMaterialSample": {},
         "preparationMethod": {
@@ -1583,10 +1583,10 @@ Array [
           "data": null,
         },
         "preparedBy": {
-          "data": Array [],
+          "data": [],
         },
         "projects": {
-          "data": Array [],
+          "data": [],
         },
         "storageUnitUsage": {},
       },
@@ -1608,10 +1608,10 @@ Array [
       },
       "relationships": {
         "assemblages": {
-          "data": Array [],
+          "data": [],
         },
         "attachment": {
-          "data": Array [],
+          "data": [],
         },
         "collectingEvent": {
           "data": null,
@@ -1620,7 +1620,7 @@ Array [
           "data": null,
         },
         "organism": {
-          "data": Array [],
+          "data": [],
         },
         "parentMaterialSample": {},
         "preparationMethod": {
@@ -1631,10 +1631,10 @@ Array [
           "data": null,
         },
         "preparedBy": {
-          "data": Array [],
+          "data": [],
         },
         "projects": {
-          "data": Array [],
+          "data": [],
         },
         "storageUnitUsage": {},
       },
@@ -1647,7 +1647,7 @@ Array [
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality processResults Relationships 1`] = `
-Array [
+[
   {
     "data": {
       "attributes": {
@@ -1661,10 +1661,10 @@ Array [
       },
       "relationships": {
         "assemblages": {
-          "data": Array [],
+          "data": [],
         },
         "attachment": {
-          "data": Array [],
+          "data": [],
         },
         "collectingEvent": {
           "data": null,
@@ -1673,7 +1673,7 @@ Array [
           "data": null,
         },
         "organism": {
-          "data": Array [],
+          "data": [],
         },
         "parentMaterialSample": {},
         "preparationMethod": {
@@ -1684,10 +1684,10 @@ Array [
           "data": null,
         },
         "preparedBy": {
-          "data": Array [],
+          "data": [],
         },
         "projects": {
-          "data": Array [],
+          "data": [],
         },
         "storageUnitUsage": {},
       },
@@ -1709,10 +1709,10 @@ Array [
       },
       "relationships": {
         "assemblages": {
-          "data": Array [],
+          "data": [],
         },
         "attachment": {
-          "data": Array [],
+          "data": [],
         },
         "collectingEvent": {
           "data": null,
@@ -1728,7 +1728,7 @@ Array [
           },
         },
         "organism": {
-          "data": Array [],
+          "data": [],
         },
         "parentMaterialSample": {},
         "preparationMethod": {
@@ -1739,10 +1739,10 @@ Array [
           "data": null,
         },
         "preparedBy": {
-          "data": Array [],
+          "data": [],
         },
         "projects": {
-          "data": Array [],
+          "data": [],
         },
         "storageUnitUsage": {},
       },
@@ -1773,10 +1773,10 @@ Array [
       },
       "relationships": {
         "assemblages": {
-          "data": Array [],
+          "data": [],
         },
         "attachment": {
-          "data": Array [],
+          "data": [],
         },
         "collectingEvent": {
           "data": null,
@@ -1792,7 +1792,7 @@ Array [
           },
         },
         "organism": {
-          "data": Array [
+          "data": [
             {
               "id": "6f8908fd-64c7-4524-8375-965d5c4573a4",
               "type": "organism",
@@ -1812,10 +1812,10 @@ Array [
           "data": null,
         },
         "preparedBy": {
-          "data": Array [],
+          "data": [],
         },
         "projects": {
-          "data": Array [],
+          "data": [],
         },
         "storageUnitUsage": {},
       },
@@ -1837,7 +1837,7 @@ Array [
 `;
 
 exports[`QueryBuilderElasticSearchExport functionality processResults To-many relationships 1`] = `
-Array [
+[
   {
     "data": {
       "attributes": {
@@ -1851,10 +1851,10 @@ Array [
       },
       "relationships": {
         "assemblages": {
-          "data": Array [],
+          "data": [],
         },
         "attachment": {
-          "data": Array [],
+          "data": [],
         },
         "collectingEvent": {
           "data": null,
@@ -1863,7 +1863,7 @@ Array [
           "data": null,
         },
         "organism": {
-          "data": Array [],
+          "data": [],
         },
         "parentMaterialSample": {},
         "preparationMethod": {
@@ -1874,10 +1874,10 @@ Array [
           "data": null,
         },
         "preparedBy": {
-          "data": Array [],
+          "data": [],
         },
         "projects": {
-          "data": Array [
+          "data": [
             {
               "id": "01919485-ed65-7a79-9080-91445b897ef4",
               "type": "project",
@@ -1895,7 +1895,7 @@ Array [
     },
     "id": "01918f22-13a4-7f6d-894e-974bc1e14d23",
     "included": {
-      "projects": Array [
+      "projects": [
         {
           "attributes": {
             "name": "Project A",
@@ -1920,10 +1920,10 @@ Array [
       },
       "relationships": {
         "assemblages": {
-          "data": Array [],
+          "data": [],
         },
         "attachment": {
-          "data": Array [],
+          "data": [],
         },
         "collectingEvent": {
           "data": null,
@@ -1932,7 +1932,7 @@ Array [
           "data": null,
         },
         "organism": {
-          "data": Array [],
+          "data": [],
         },
         "parentMaterialSample": {},
         "preparationMethod": {
@@ -1943,10 +1943,10 @@ Array [
           "data": null,
         },
         "preparedBy": {
-          "data": Array [],
+          "data": [],
         },
         "projects": {
-          "data": Array [
+          "data": [
             {
               "id": "01919485-ed65-7a79-9080-91445b897ef4",
               "type": "project",
@@ -1968,7 +1968,7 @@ Array [
     },
     "id": "01918f22-1687-7634-bcd3-cd56d493bf27",
     "included": {
-      "projects": Array [
+      "projects": [
         {
           "attributes": {
             "name": "Project A",

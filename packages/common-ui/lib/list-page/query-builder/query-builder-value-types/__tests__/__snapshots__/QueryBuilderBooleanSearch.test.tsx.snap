@@ -17,7 +17,7 @@ exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Empty op
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Empty operation With relationship as field 1`] = `
 {
   "bool": {
-    "should": Array [
+    "should": [
       {
         "bool": {
           "must_not": {
@@ -25,7 +25,7 @@ exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Empty op
               "path": "included",
               "query": {
                 "bool": {
-                  "must": Array [
+                  "must": [
                     {
                       "exists": {
                         "field": "includes.name",
@@ -71,7 +71,7 @@ exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Equals o
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "term": {
               "includes.name": "false",
@@ -103,7 +103,7 @@ exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Not empt
     "path": "included",
     "query": {
       "bool": {
-        "must": Array [
+        "must": [
           {
             "exists": {
               "field": "includes.name",
