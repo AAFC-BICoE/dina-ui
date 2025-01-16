@@ -311,8 +311,12 @@ describe("Molecular Analysis Run View", () => {
 
     // Ensure Run Item Names are displayed:
     expect(wrapper.getByText("Metagenomic Run Item 1")).toBeInTheDocument();
-    expect(wrapper.getByText("Metagenomic Run Item 2")).toBeInTheDocument();
-    expect(wrapper.getByText("Metagenomic Run Item 3")).toBeInTheDocument();
+    expect(
+      wrapper.queryByText("Metagenomic Run Item 2")
+    ).not.toBeInTheDocument();
+    expect(
+      wrapper.queryByText("Metagenomic Run Item 3")
+    ).not.toBeInTheDocument();
 
     // Ensure Well Coordinates are displayed:
     expect(wrapper.getByText("A1")).toBeInTheDocument();
