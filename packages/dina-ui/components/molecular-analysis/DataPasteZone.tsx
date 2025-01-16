@@ -33,7 +33,7 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
           resize: "none"
         }}
       />
-      {tableData.length > 0 && (
+      {tableData.length > 1 && (
         <table
           style={{
             width: "100%",
@@ -43,7 +43,7 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
         >
           <thead>
             <tr>
-              {tableData[0].map((_, index) => (
+              {tableData[0].map((header, index) => (
                 <th
                   key={index}
                   style={{
@@ -52,13 +52,13 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
                     backgroundColor: "#f4f4f4"
                   }}
                 >
-                  Column {index + 1}
+                  {header}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {tableData.map((row, rowIndex) => (
+            {tableData.slice(1).map((row, rowIndex) => (
               <tr key={rowIndex}>
                 {row.map((cell, cellIndex) => (
                   <td
