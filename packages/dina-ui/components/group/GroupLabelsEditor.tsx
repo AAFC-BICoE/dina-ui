@@ -78,14 +78,16 @@ export function GroupLabelsEditor({ valuesPath }: GroupLabelsEditorProps) {
                       <FormikButton
                         className="btn remove-attribute"
                         onClick={(_, form) => {
-                          // Delete the value and hide the managed attribute:
+                          // Delete the value and hide the label:
                           form.setFieldValue(
                             `${valuesPath}.${language}`,
                             undefined
                           );
+                          // Add the language back to availableLanguages
                           setAvailableLanguages(
                             concat(availableLanguages, language).sort()
                           );
+                          // Remove the language from visibleLanguages
                           setVisibleLanguages((languages) =>
                             languages.filter((lang) => lang !== language)
                           );
@@ -104,12 +106,15 @@ export function GroupLabelsEditor({ valuesPath }: GroupLabelsEditorProps) {
                   onChange={(value) => {
                     const selectedLang = value?.value;
                     if (selectedLang) {
+                      // add the language to visibleLanguages
                       setVisibleLanguages(
                         concat(visibleLanguages, selectedLang)
                       );
+                      // remove the language from availableLanguages
                       setAvailableLanguages((languages) =>
                         languages.filter((lang) => lang !== selectedLang)
                       );
+                      // set fieldValue in the formik.
                       form.setFieldValue(`${valuesPath}.${selectedLang}`, "");
                     }
                   }}
