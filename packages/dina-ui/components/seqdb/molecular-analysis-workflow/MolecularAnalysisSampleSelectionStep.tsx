@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { compact, pick, uniq, difference, concat } from "lodash";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   MaterialSample,
   MaterialSampleSummary
@@ -19,6 +19,8 @@ import { useMaterialSampleRelationshipColumns } from "../../collection/material-
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import CopyPasteWorkbookButton from "../../molecular-analysis/CopyPasteWorkbookButton";
+import DataPasteZone from "../../molecular-analysis/DataPasteZone";
 
 export interface MolecularAnalysisSampleSelectionStepProps {
   molecularAnalysisId: string;
@@ -44,6 +46,13 @@ export function MolecularAnalysisSampleSelectionStep({
   const { username } = useAccount();
   const { PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN } =
     useMaterialSampleRelationshipColumns();
+  const [enableDataPasteZone, setEnableDataPasteZone] =
+    useState<boolean>(false);
+
+  // Use useCallback to memoize the function
+  const handleShowDataPasteZone = useCallback(() => {
+    setEnableDataPasteZone((prev) => !prev);
+  }, []);
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -368,7 +377,7 @@ export function MolecularAnalysisSampleSelectionStep({
   }
 
   return (
-    <div>
+    <div style={{ textAlign: "center", marginTop: "20px" }}>
       {!editMode ? (
         <>
           <strong>
@@ -407,6 +416,8 @@ export function MolecularAnalysisSampleSelectionStep({
           }}
         />
       )}
+      <CopyPasteWorkbookButton onClick={handleShowDataPasteZone} />
+      {enableDataPasteZone && <DataPasteZone />}
     </div>
   );
 }
