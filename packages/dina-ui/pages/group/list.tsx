@@ -41,10 +41,6 @@ export default function GroupListPage() {
   return (
     <PageLayout titleId="groupListTitle" buttonBarContent={buttonBarContent}>
       <ListPageLayout
-        additionalFilters={(filterForm) => ({
-          // Apply group filter:
-          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-        })}
         defaultSort={[{ id: "name", desc: false }]}
         id="group-list"
         queryTableProps={{
