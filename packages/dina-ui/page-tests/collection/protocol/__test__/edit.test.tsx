@@ -241,7 +241,7 @@ describe("protocol edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockPatch).lastCalledWith(
@@ -291,7 +291,7 @@ describe("protocol edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test English Description field default value
     expect(
@@ -311,7 +311,7 @@ describe("protocol edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockPatch).lastCalledWith(
@@ -376,7 +376,7 @@ describe("protocol edit page", () => {
     // wrapper.find("form").simulate("submit");
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected error
     // expect(wrapper.find(".alert.alert-danger").text()).toEqual(

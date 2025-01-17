@@ -69,7 +69,7 @@ describe("TextField component", () => {
     );
 
     fireEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(
       wrapper.getByText(/1 : test field \- test error/i)
     ).toBeInTheDocument();

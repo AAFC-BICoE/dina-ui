@@ -41,7 +41,7 @@ describe("Product details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test loading spinner to not render when product fields are rendered
     expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();

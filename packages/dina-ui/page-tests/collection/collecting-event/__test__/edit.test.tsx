@@ -122,7 +122,7 @@ describe("collecting-event edit page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test that spinner is not rendering after page has loaded
     expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
@@ -163,7 +163,7 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API Response
     expect(mockPatch).lastCalledWith(
@@ -219,7 +219,7 @@ describe("collecting-event edit page", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Edit the verbatim datetime
     fireEvent.change(
@@ -263,7 +263,7 @@ describe("collecting-event edit page", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the collecting event and the georeference assertion in separate requests:
     // (The collecting event id is required to save the georeference assertion)
@@ -322,7 +322,7 @@ describe("collecting-event edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the existing value is in the field.
     expect(
@@ -343,7 +343,7 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected response.
     expect(mockPatch).toBeCalledTimes(1);
@@ -415,7 +415,7 @@ describe("collecting-event edit page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test that spinner does not render after loading.
     expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
@@ -434,7 +434,7 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test for expected error
     expect(wrapper.getByText(/test error title: test error detail/i));
@@ -447,7 +447,7 @@ describe("collecting-event edit page", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The first assertion is already primary:
     expect(wrapper.getByRole("button", { name: /primary/i })).toBeDisabled();
@@ -455,7 +455,7 @@ describe("collecting-event edit page", () => {
     // Add a second assertion:
     userEvent.click(wrapper.getByTestId("add-another-button"));
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Make 2nd assertion primary:
     userEvent.click(wrapper.getByRole("button", { name: /primary/i }));
@@ -490,7 +490,7 @@ describe("collecting-event edit page", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Default value:
     // expect(
@@ -503,7 +503,7 @@ describe("collecting-event edit page", () => {
     // wrapper.find("form").simulate("submit");
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",

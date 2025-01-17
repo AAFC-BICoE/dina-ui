@@ -53,7 +53,7 @@ describe("Collection edit page", () => {
       <CollectionForm router={mockRouter as any} />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Fill in name information
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -72,7 +72,7 @@ describe("Collection edit page", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockSave).lastCalledWith(
@@ -99,7 +99,7 @@ describe("Collection edit page", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test default name value
     expect(wrapper.getByRole("textbox", { name: /name/i })).toHaveDisplayValue(
@@ -116,7 +116,7 @@ describe("Collection edit page", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockSave).lastCalledWith(

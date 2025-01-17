@@ -60,7 +60,7 @@ describe("MetadataFileView component", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       wrapper.getByRole("img", { name: /test caption 2/i })
@@ -78,7 +78,7 @@ describe("MetadataFileView component", () => {
       <MetadataFileView metadata={TEST_METADATA as Metadata} />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       wrapper.getByRole("img", { name: /test caption 1/i })
@@ -93,7 +93,7 @@ describe("MetadataFileView component", () => {
       <MetadataFileView metadata={TEST_METADATA as Metadata} />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper1.waitForRequests();
 
     expect(
       wrapper1.container.querySelector(".shown-file-type")?.textContent
@@ -108,7 +108,7 @@ describe("MetadataFileView component", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper2.waitForRequests();
 
     expect(
       wrapper2.container.querySelector(".shown-file-type")?.textContent

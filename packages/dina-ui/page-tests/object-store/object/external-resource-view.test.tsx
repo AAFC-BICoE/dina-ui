@@ -60,7 +60,7 @@ describe("Stored Object external resource view page", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Shows the caption
     expect(

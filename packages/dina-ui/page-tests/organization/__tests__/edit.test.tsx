@@ -91,7 +91,7 @@ describe("organization edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockPatch).lastCalledWith(
       "/agent-api/operations",
@@ -141,7 +141,7 @@ describe("organization edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the existing aliases value is in the field.
     expect(
@@ -159,7 +159,7 @@ describe("organization edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
@@ -211,7 +211,7 @@ describe("organization edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected error
     expect(wrapper.getByText("Constraint violation: Name should not be blank"));

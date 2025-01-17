@@ -35,7 +35,7 @@ describe("ErrorViewer component", () => {
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(wrapper.getByText(/test error/i)).toBeInTheDocument();
   });
 

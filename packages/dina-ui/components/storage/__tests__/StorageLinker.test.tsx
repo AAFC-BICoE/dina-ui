@@ -40,10 +40,10 @@ describe("StorageLinker", () => {
       </DinaForm>,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       wrapper.getByText(
@@ -53,7 +53,7 @@ describe("StorageLinker", () => {
 
     // Confirm "yes":
     userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Only the storage needs to be deleted:
     expect(mockSave).lastCalledWith(
@@ -75,10 +75,10 @@ describe("StorageLinker", () => {
       </DinaForm>,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       wrapper.getByText(
@@ -88,7 +88,7 @@ describe("StorageLinker", () => {
 
     // Confirm "yes":
     userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Only the storage needs to be deleted:
     expect(mockSave).lastCalledWith(

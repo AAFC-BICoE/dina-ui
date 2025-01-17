@@ -20,7 +20,7 @@ describe("ViewInMapButton component", () => {
     );
 
     // Wait for the component to render
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Use getByRole or getByText to select the anchor tag
     const link = screen.getByRole("link", {
@@ -49,7 +49,7 @@ describe("ViewInMapButton component", () => {
     );
 
     // Wait for the component to render
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the link is not present in the document
     const link = screen.queryByRole("link", {

@@ -133,7 +133,7 @@ describe("Workbook Template Generator", () => {
     // Select "Primary ID", give it alias of "Sample Name"
     userEvent.click(wrapper.getAllByRole("option", { name: /primary id/i })[0]);
     userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.type(
       wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
       "Sample Name"
@@ -143,7 +143,7 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getByRole("combobox"));
     userEvent.click(wrapper.getByRole("option", { name: /barcode/i }));
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.type(
       wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
       "Bar code"
@@ -157,7 +157,7 @@ describe("Workbook Template Generator", () => {
       })[0]
     );
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.type(
       wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
       "Coll number"
@@ -266,7 +266,7 @@ describe("Workbook Template Generator", () => {
     const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "Add new column" dropdown
     userEvent.click(wrapper.getByRole("combobox"));
@@ -281,11 +281,11 @@ describe("Workbook Template Generator", () => {
         name: /managed attributes/i
       })[0]
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Select a managed attribute to generate.
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(
       wrapper.getByRole("option", { name: /my test managed attribute/i })
     );
@@ -308,11 +308,11 @@ describe("Workbook Template Generator", () => {
         name: /preparation managed attributes/i
       })[0]
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Select a managed attribute to generate.
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(
       wrapper.getByRole("option", {
         name: /test preparation managed attribute/i
@@ -337,11 +337,11 @@ describe("Workbook Template Generator", () => {
         name: /managed attributes/i
       })[2]
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Select a managed attribute to generate.
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(
       wrapper.getByRole("option", {
         name: /test collecting event managed attribute/i
@@ -389,7 +389,7 @@ describe("Workbook Template Generator", () => {
     const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Go through all the possible classifications from the mock.
     for (const element of TEST_CLASSIFICATIONS.vocabularyElements as any) {
@@ -406,7 +406,7 @@ describe("Workbook Template Generator", () => {
           name: /scientific name details/i
         })
       );
-      await new Promise(setImmediate);
+      await wrapper.waitForRequests();
 
       // A new dropdown should appear:
       expect(

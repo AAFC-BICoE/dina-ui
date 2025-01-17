@@ -126,7 +126,7 @@ describe("ExistingAttachmentsTable component", () => {
   });
 
   it("Renders the attachments in a table", async () => {
-    const { container } = mountWithAppContext(
+    const { container, waitForRequests } = mountWithAppContext(
       <ExistingAttachmentsTable
         attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
         onDetachMetadataIds={mockOnDetachMetadataIds}
@@ -136,7 +136,7 @@ describe("ExistingAttachmentsTable component", () => {
     );
 
     // Wait for the data to render in the ReactTable component.
-    await new Promise(setImmediate);
+    await waitForRequests(200);
     const rows = container.querySelectorAll(".ReactTable tbody tr");
     expect(rows).toHaveLength(2);
 
@@ -156,7 +156,7 @@ describe("ExistingAttachmentsTable component", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Get row 2
     const row = screen.getByRole("row", {
@@ -175,7 +175,7 @@ describe("ExistingAttachmentsTable component", () => {
         name: /edit selected attachment metadata/i
       })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the Save All button in the modal
     fireEvent.click(
@@ -183,7 +183,7 @@ describe("ExistingAttachmentsTable component", () => {
         name: /save all/i
       })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The bulk editor should call our mock:
     expect(mockOnMetadatasEdited).lastCalledWith([
@@ -201,7 +201,7 @@ describe("ExistingAttachmentsTable component", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Get row 1
     const row = screen.getByRole("row", {
@@ -221,7 +221,7 @@ describe("ExistingAttachmentsTable component", () => {
       })
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockOnDetachMetadataIds).lastCalledWith([
       "00000000-0000-0000-0000-000000000000"

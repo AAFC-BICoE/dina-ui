@@ -46,7 +46,7 @@ describe("PreparationType details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test that the spinner does not render once page has loaded
     expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();

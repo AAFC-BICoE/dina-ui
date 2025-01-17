@@ -129,6 +129,16 @@ export function mountWithAppContext(
   element: React.ReactNode,
   mockAppContextProviderProps?: MockAppContextProviderProps
 ) {
+  /**
+   * @deprecated Unreliable way to wait for requests to resolve. Please use waitFor() from @testing-library/react or
+   * findBy* methods instead
+   * @param ms - The number of milliseconds to wait, default is 100.
+   */
+  const waitForRequests = async (ms = 100) => {
+    // Wait 100 ms
+    await new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
   const reactLibraryComponent = render(
     <MockAppContextProvider {...mockAppContextProviderProps}>
       {element}
@@ -145,6 +155,7 @@ export function mountWithAppContext(
 
   return {
     ...reactLibraryComponent,
-    rerender: rerenderWithContext
+    rerender: rerenderWithContext,
+    waitForRequests
   };
 }

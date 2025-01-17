@@ -69,7 +69,7 @@ describe("DateField component", () => {
 
     fireEvent.change(textbox, { target: { value: "" } });
     fireEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockOnSubmit).lastCalledWith({ testField: "" });
   });

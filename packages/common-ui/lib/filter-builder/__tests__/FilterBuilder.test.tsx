@@ -365,7 +365,7 @@ describe("FilterBuilder component", () => {
     const wrapper = mountWithAppContext(<TestComponent />);
     expect(callback).lastCalledWith(null);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(callback).lastCalledWith({
       children: [
         {
@@ -384,8 +384,8 @@ describe("FilterBuilder component", () => {
 
     // Set the model to null.
     fireEvent.click(wrapper.getByRole("button", { name: /reset to null/i }));
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
+    await wrapper.waitForRequests();
 
     // Resets itself with the inital filter model.
     expect(callback).toHaveBeenCalledTimes(4);

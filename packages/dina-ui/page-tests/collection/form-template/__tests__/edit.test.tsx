@@ -124,7 +124,7 @@ async function mountForm(
     { apiContext }
   );
 
-  await new Promise(setImmediate);
+  await wrapper.waitForRequests();
 
   // Helper to query and interact with React Switch components.
   const colEventSwitch = within(
@@ -153,9 +153,9 @@ async function mountForm(
       // Click "yes" when asked Are You Sure:
       const modalForm = wrapper.container.querySelector(".modal-content form");
       fireEvent.submit(modalForm!);
-      await new Promise(setImmediate);
+      await wrapper.waitForRequests();
     }
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
   }
 
   async function toggleColEvent(val: boolean) {
@@ -188,14 +188,14 @@ async function mountForm(
     );
     fireEvent.change(nameInput!, { target: { value: "form1" } });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
   }
 
   async function submitForm() {
     const form = wrapper.container.querySelector("form");
     fireEvent.submit(form!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
   }
 
   return {
@@ -1842,7 +1842,7 @@ describe("Form template edit page", () => {
     )!;
     fireEvent.change(lngInput, { target: { value: "2" } });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     await submitForm();
 

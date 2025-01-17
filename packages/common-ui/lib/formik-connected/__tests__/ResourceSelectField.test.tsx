@@ -103,7 +103,7 @@ describe("ResourceSelectField component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Simulate the select component's input change.
     // Simulate input change to trigger search in Select field.
@@ -269,7 +269,7 @@ describe("ResourceSelectField component", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockBulkGet.mock.calls).toEqual([
       [

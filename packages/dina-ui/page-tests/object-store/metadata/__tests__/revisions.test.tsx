@@ -52,7 +52,7 @@ describe("MetadataRevisionListPage", () => {
     });
 
     // Await metadata query:
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Renders the title:
     expect(

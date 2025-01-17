@@ -43,7 +43,7 @@ describe("Index set list page", () => {
     const wrapper = getWrapper();
 
     // Wait for data to load:
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(wrapper.getByText(/index set 1/i)).toBeInTheDocument();
   });

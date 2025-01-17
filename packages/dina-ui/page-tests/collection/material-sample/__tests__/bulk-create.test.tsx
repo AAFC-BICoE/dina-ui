@@ -60,7 +60,7 @@ describe("MaterialSampleBulkCreatePage", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Fill out the form:
     // Collection field
@@ -94,19 +94,19 @@ describe("MaterialSampleBulkCreatePage", () => {
       }
     });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click 'Go to the previous step' button
     userEvent.click(
       wrapper.getByRole("button", { name: /go to the previous step/i })
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Goes back to the previous page with the generator form values:
     expect(wrapper.getByText("test collection")).toBeInTheDocument();

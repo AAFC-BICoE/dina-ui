@@ -174,7 +174,7 @@ describe("ManagedAttributesEditor component", () => {
     if (removeButton) {
       fireEvent.click(removeButton);
     }
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Verify the field is removed
     expect(queryByText("Example Attribute 2")).not.toBeInTheDocument();
@@ -183,7 +183,7 @@ describe("ManagedAttributesEditor component", () => {
     const form = container.querySelector("form");
     fireEvent.submit(form!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Verify the mockSubmit was called without example_attribute_2
     expect(mockSubmit).toHaveBeenCalledWith({

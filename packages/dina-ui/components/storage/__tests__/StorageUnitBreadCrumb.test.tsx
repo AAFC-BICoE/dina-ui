@@ -56,7 +56,7 @@ describe("StorageUnitBreadCrumb component", () => {
 
     // Hover over image to show tooltip
     userEvent.hover(wrapper.getByRole("img"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test tooltip rendering while hovering on the img element
     expect(
@@ -84,7 +84,7 @@ describe("StorageUnitBreadCrumb component", () => {
 
     // Hover over image to show tooltip
     userEvent.hover(wrapper.getByRole("img"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test tooltip rendering while hovering on the img element
     expect(

@@ -85,7 +85,7 @@ describe("AssignedStorage component", () => {
       </DinaForm>,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.hover(wrapper.getByRole("img"));
 
     expect(
@@ -102,7 +102,7 @@ describe("AssignedStorage component", () => {
       </DinaForm>,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.click(wrapper.getByRole("button"));
     expect(mockOnChange).lastCalledWith({ id: null });

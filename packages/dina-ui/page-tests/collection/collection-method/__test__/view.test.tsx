@@ -45,7 +45,7 @@ describe("CollectionMethod details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
 

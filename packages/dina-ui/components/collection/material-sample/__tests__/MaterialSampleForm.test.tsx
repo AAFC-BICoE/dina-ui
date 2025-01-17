@@ -144,7 +144,7 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -154,7 +154,7 @@ describe("Material Sample Edit Page", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
@@ -166,7 +166,7 @@ describe("Material Sample Edit Page", () => {
     );
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
@@ -268,7 +268,7 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -278,7 +278,7 @@ describe("Material Sample Edit Page", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
@@ -287,10 +287,10 @@ describe("Material Sample Edit Page", () => {
 
     // Select an existing collecting event.
     userEvent.click(wrapper.getByRole("button", { name: /select/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
@@ -380,7 +380,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Existing CollectingEvent should show up:
     expect(
@@ -395,7 +395,7 @@ describe("Material Sample Edit Page", () => {
     );
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSave.mock.calls).toMatchObject([
       [
@@ -443,7 +443,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Existing CollectingEvent should show up:
     expect(
@@ -452,7 +452,7 @@ describe("Material Sample Edit Page", () => {
 
     // Remove the existing Collecting Event.
     userEvent.click(wrapper.getByRole("button", { name: /detach/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Existing CollectingEvent should be gone:
     expect(
@@ -467,7 +467,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSave.mock.calls).toMatchObject([
       [
@@ -537,7 +537,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Preparations are enabled:
     expect(
@@ -561,7 +561,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Storage is enabled:
     expect(
@@ -592,7 +592,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Determinations are enabled:
     expect(
@@ -618,7 +618,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Assoications are enabled:
     expect(
@@ -642,7 +642,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the associations section:
     const associationsToggle = wrapper.container.querySelectorAll(
@@ -652,11 +652,11 @@ describe("Material Sample Edit Page", () => {
       fail("Associations toggle needs to exist at this point.");
     }
     fireEvent.click(associationsToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the Material Sample:
     expect(mockSave.mock.calls).toMatchObject([
@@ -710,7 +710,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Data components are disabled:
     expect(
@@ -748,11 +748,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSave.mock.calls).toMatchObject([
       [
@@ -796,7 +796,7 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Set the group:
     userEvent.click(
@@ -818,13 +818,13 @@ describe("Material Sample Edit Page", () => {
       fail("organism toggle needs to exist at this point.");
     }
     fireEvent.click(organismToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Add a determination:
     userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     function fillOutDetermination(num: number) {
       userEvent.type(
@@ -844,16 +844,16 @@ describe("Material Sample Edit Page", () => {
 
     // Enter the second determination:
     userEvent.click(wrapper.getByTestId("add-another-button"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     fillOutDetermination(2);
 
     // Enter the third determination:
     userEvent.click(wrapper.getByTestId("add-another-button"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     fillOutDetermination(3);
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the Material Sample:
     expect(mockSave.mock.calls).toMatchObject([
@@ -1062,7 +1062,7 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Update the Primary ID.
     userEvent.type(
@@ -1072,7 +1072,7 @@ describe("Material Sample Edit Page", () => {
 
     // Attempt to save, error should be displayed.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Expect red outline around Primary ID.
     expect(wrapper.getByRole("textbox", { name: /primary id/i })).toHaveClass(
@@ -1084,12 +1084,12 @@ describe("Material Sample Edit Page", () => {
 
     // You should not be able to submit the form until this error is resolved:
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(mockOnSaved).toHaveBeenCalledTimes(0);
 
     // Click the "allow" button:
     userEvent.click(wrapper.getByRole("button", { name: /allow duplicate/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       wrapper.getByRole("textbox", { name: /primary id/i })
@@ -1097,7 +1097,7 @@ describe("Material Sample Edit Page", () => {
 
     // Submit the form with no errors:
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Form submitted successfully:
     expect(mockOnSaved).lastCalledWith("11111111-1111-1111-1111-111111111111");
@@ -1109,7 +1109,7 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable association:
     const associationToggle = wrapper.container.querySelectorAll(
@@ -1119,11 +1119,11 @@ describe("Material Sample Edit Page", () => {
       fail("Association toggle needs to exist at this point.");
     }
     fireEvent.click(associationToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the search button to find from a material sample list
     userEvent.click(wrapper.getByRole("button", { name: /search\.\.\./i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Search table is shown:
     expect(
@@ -1132,7 +1132,7 @@ describe("Material Sample Edit Page", () => {
 
     // Select one sample from search result list
     userEvent.click(wrapper.getByRole("button", { name: /select/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Expect the selected sample being populated to the sample input
     expect(
@@ -1153,7 +1153,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the Organisms form section:
     const organismToggle = wrapper.container.querySelectorAll(
@@ -1163,7 +1163,7 @@ describe("Material Sample Edit Page", () => {
       fail("organism toggle needs to exist at this point.");
     }
     fireEvent.click(organismToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Update the lifestage.
     userEvent.type(
@@ -1173,7 +1173,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSave.mock.calls).toEqual([
       // Separate transaction to add the organism:
@@ -1251,7 +1251,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Expect Organism Section automatically opened.
     expect(
@@ -1297,7 +1297,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSave.mock.calls).toEqual([
       [
@@ -1368,7 +1368,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(
       wrapper.getByRole("heading", { name: /organisms/i })
     ).toBeInTheDocument();
@@ -1382,7 +1382,7 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(
       wrapper.getAllByRole("button", { name: /remove organism/i })[0]
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The quantity input is updated:
     expect(
@@ -1391,7 +1391,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSave.mock.calls).toEqual([
       [
@@ -1457,7 +1457,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const organismQuantity = wrapper.getByRole("spinbutton", {
       name: /organisms quantity/i
@@ -1472,7 +1472,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the Material Sample with no organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1515,7 +1515,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const organismQuantity = wrapper.getByRole("spinbutton", {
       name: /organisms quantity/i
@@ -1529,7 +1529,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the Material Sample with no organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1572,7 +1572,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const organismQuantity = wrapper.getByRole("spinbutton", {
       name: /organisms quantity/i
@@ -1594,7 +1594,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the Material Sample with the organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1700,7 +1700,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // 3 organisms in quantity:
     expect(
@@ -1739,7 +1739,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the Material Sample with the organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1838,7 +1838,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // 3 organisms in quantity:
     expect(
@@ -1859,7 +1859,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the Material Sample with the 3 SAME organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1962,7 +1962,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // 3 organisms in quantity:
     expect(
@@ -1988,7 +1988,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check to ensure that
     expect(mockSave.mock.calls).toEqual([
@@ -2097,7 +2097,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Shows the initial determiner value:
     expect(wrapper.getByText(/person 1/i)).toBeInTheDocument();
@@ -2107,11 +2107,11 @@ describe("Material Sample Edit Page", () => {
       wrapper.getByRole("combobox", { name: /determining agents person 1/i })
     );
     userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the Material Sample with the 3 SAME organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -2182,7 +2182,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Attribute 1 should be hidden:
     expect(wrapper.queryByText(/attribute 1/i)).not.toBeInTheDocument();
@@ -2200,7 +2200,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSave.mock.calls).toEqual([
       [
@@ -2239,7 +2239,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -2249,7 +2249,7 @@ describe("Material Sample Edit Page", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Attributes 2 and 3 are visible and empty:
     expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
@@ -2272,7 +2272,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the Organisms form section:
     const organismToggle = wrapper.container.querySelectorAll(
@@ -2282,13 +2282,13 @@ describe("Material Sample Edit Page", () => {
       fail("organism toggle needs to exist at this point.");
     }
     fireEvent.click(organismToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Add a determination:
     userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Attributes 2 and 3 are visible and empty:
     expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();

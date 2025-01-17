@@ -130,7 +130,7 @@ describe("DataEntry", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.getByRole("group"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
@@ -178,7 +178,7 @@ describe("DataEntry", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.getByRole("group"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
@@ -232,7 +232,7 @@ describe("DataEntry", () => {
 
     // form submission
     fireEvent.submit(wrapper.getByRole("group"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({

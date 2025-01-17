@@ -79,7 +79,7 @@ describe("Protocol details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test that spinner does not render after page has loaded
     expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();

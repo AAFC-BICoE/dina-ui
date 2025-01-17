@@ -67,7 +67,7 @@ describe("InstitutionForm.", () => {
       <InstitutionForm onSaved={mockOnSaved} />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Change name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -89,7 +89,7 @@ describe("InstitutionForm.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockSave).lastCalledWith(
@@ -149,7 +149,7 @@ describe("InstitutionForm.", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Change name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -170,7 +170,7 @@ describe("InstitutionForm.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockSave).lastCalledWith(

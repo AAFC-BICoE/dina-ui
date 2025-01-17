@@ -96,7 +96,7 @@ describe("AttachmentUploader component", () => {
       new File(["file content"], "file2.pdf", { type: "application/pdf" }),
       new File(["file content"], "file3.pdf", { type: "application/pdf" })
     ];
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Select group
     fireEvent.mouseDown(
@@ -104,7 +104,7 @@ describe("AttachmentUploader component", () => {
         name: /group select\.\.\./i
       })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     fireEvent.click(
       screen.getByRole("option", {
@@ -112,7 +112,7 @@ describe("AttachmentUploader component", () => {
       })
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Find the file input in the Dropzone component
     const fileInput = screen.getByLabelText(/drag and drop files here/i);
@@ -126,7 +126,7 @@ describe("AttachmentUploader component", () => {
     fireEvent.change(fileInput);
 
     // Await the processing of the file uploads
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Simulate the save upload
     fireEvent.click(
@@ -135,7 +135,7 @@ describe("AttachmentUploader component", () => {
       })
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Should now be at metadata modal
     // Simulate clicking Save All metadata button
@@ -145,7 +145,7 @@ describe("AttachmentUploader component", () => {
       })
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Ensure the afterMetadatasSaved callback was called with the right metadata IDs
     expect(mockAfterMetadatasSaved).toHaveBeenCalledWith(["0", "1", "2"]);

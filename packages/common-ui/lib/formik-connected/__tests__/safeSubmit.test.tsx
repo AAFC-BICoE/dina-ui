@@ -30,7 +30,7 @@ describe("safeSubmit function", () => {
     fireEvent.submit(form!);
 
     // Wait for async operations to complete
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The submit function is called with the form values and the FormikActions object.
     expect(onSubmit).toHaveBeenCalledWith(
@@ -49,7 +49,7 @@ describe("safeSubmit function", () => {
     fireEvent.submit(form!);
 
     // Wait for async operations to complete
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Use querySelector to check for the error message
     const errorMessage = wrapper.container.querySelector(".alert.alert-danger");
@@ -70,7 +70,7 @@ describe("safeSubmit function", () => {
     fireEvent.submit(form!);
 
     // Wait for async operations to complete
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Use querySelector to get error messages
     const errorMessages = wrapper.container.querySelectorAll(".error-message");
@@ -95,7 +95,7 @@ describe("safeSubmit function", () => {
     fireEvent.submit(form!);
 
     // Wait for async operations to complete
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Use querySelector to get error messages
     const errorMessages = wrapper.container.querySelectorAll(".error-message");

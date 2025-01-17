@@ -157,7 +157,7 @@ describe("ThermocyclerProfile edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the profile form to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the existing profile's app value is in the field.
     expect(wrapper.getByDisplayValue("PCR of ITS regions")).toBeInTheDocument();
@@ -170,7 +170,7 @@ describe("ThermocyclerProfile edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.

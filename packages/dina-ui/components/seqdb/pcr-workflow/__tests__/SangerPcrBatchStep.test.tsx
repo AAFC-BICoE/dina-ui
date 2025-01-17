@@ -69,7 +69,7 @@ describe("SangerPcrBatchStep component", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.type(
       wrapper.getByRole("textbox", { name: /name/i }),
@@ -77,7 +77,7 @@ describe("SangerPcrBatchStep component", () => {
     );
 
     userEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockOnSaved).lastCalledWith(1, {
       storageUnit: {
@@ -109,7 +109,7 @@ describe("SangerPcrBatchStep component", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The form is initially in read-only mode:
     expect(wrapper.getByText(/test\-batch/i)).toBeInTheDocument();
@@ -128,7 +128,7 @@ describe("SangerPcrBatchStep component", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Edit a field:
     userEvent.type(
@@ -137,7 +137,7 @@ describe("SangerPcrBatchStep component", () => {
     );
 
     userEvent.click(wrapper2.getByRole("button"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockOnSaved).lastCalledWith(1, {
       storageUnit: {

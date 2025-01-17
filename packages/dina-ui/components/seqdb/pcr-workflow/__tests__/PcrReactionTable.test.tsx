@@ -20,7 +20,7 @@ describe("PcrReactionTable component", () => {
       </DinaForm>
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const tableRows = wrapper.getAllByRole("row");
     expect(tableRows).toHaveLength(31); // 30 + header

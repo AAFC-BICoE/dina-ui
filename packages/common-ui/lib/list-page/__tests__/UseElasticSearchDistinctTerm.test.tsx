@@ -133,7 +133,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         }
       }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSuggestionRequest).toBeCalledWith(
       "search-api/search-ws/search",
@@ -174,7 +174,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSuggestionRequest).toBeCalledWith(
       "search-api/search-ws/search",
@@ -216,7 +216,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSuggestionRequestRelationship).toBeCalledWith(
       "search-api/search-ws/search",
@@ -280,7 +280,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         }
       );
 
-      await new Promise(setImmediate);
+      await wrapper.waitForRequests();
 
       // No search results should be provided.
       expect(mockSearchResults).toBeCalledTimes(0);
@@ -313,7 +313,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         }
       );
 
-      await new Promise(setImmediate);
+      await wrapper.waitForRequests();
 
       expect(mockSuggestionRequest).toBeCalledTimes(0);
       expect(mockEmptyResults).toBeCalledTimes(1);
@@ -341,7 +341,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         }
       );
 
-      await new Promise(setImmediate);
+      await wrapper.waitForRequests();
 
       expect(mockSuggestionRequest).toBeCalledWith(
         "search-api/search-ws/search",

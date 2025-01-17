@@ -38,7 +38,7 @@ describe("RevisionsPageLayout component", () => {
       { apiContext: { apiClient: { get: mockGet } as any } }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const table = document.querySelector("table");
     if (!table) {

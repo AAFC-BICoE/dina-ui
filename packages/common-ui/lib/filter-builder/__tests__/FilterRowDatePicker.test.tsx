@@ -25,7 +25,7 @@ describe("FilterRowDatePicker", () => {
       />
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const datepicker = wrapper.getByRole("textbox") as HTMLInputElement;
     expect(datepicker.value).toEqual("10/12/2020"); // User friendly version.
@@ -48,19 +48,19 @@ describe("FilterRowDatePicker", () => {
       />
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     const datepickers = wrapper.getAllByRole("textbox") as HTMLInputElement[];
 
     // Passes the selected dates as a string to react-datepicker:
     fireEvent.change(datepickers[0], { target: { value: "10/20/2020" } });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(mockOnChanged).lastCalledWith({
       high: "Thu Oct 15 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
       low: "Tue Oct 20 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"
     });
 
     fireEvent.change(datepickers[1], { target: { value: "10/25/2020" } });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(mockOnChanged).lastCalledWith({
       high: "Sun Oct 25 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
       low: "Mon Oct 12 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"

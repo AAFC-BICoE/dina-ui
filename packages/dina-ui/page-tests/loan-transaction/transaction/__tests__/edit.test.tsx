@@ -133,10 +133,10 @@ describe("Transaction Form", () => {
     // Material Out radio button
     fireEvent.click(wrapper.getByLabelText(/material out/i));
     expect(wrapper.getByLabelText(/material out/i)).toBeChecked();
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     // To Be Returned switch button
     fireEvent.click(wrapper.getByRole("switch", { name: "" }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     // Transaction Type field
     fireEvent.change(
       wrapper.getByRole("textbox", { name: /transaction type/i }),
@@ -278,20 +278,20 @@ describe("Transaction Form", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /add new agent/i }));
 
     userEvent.click(wrapper.getByRole("combobox", { name: /agent/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(wrapper.getByRole("option", { name: /test person/i }));
 
     // Add an Agent Role:
     userEvent.click(wrapper.getByRole("combobox", { name: /role\/action/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     fireEvent.change(wrapper.getByRole("combobox", { name: /role\/action/i }), {
       target: { value: "my-role-1" }
     });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(
       wrapper.getByRole("option", { name: /add "my\-role\-1"/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Agent Details Date field
     fireEvent.change(wrapper.getAllByPlaceholderText(/yyyy\-mm\-dd/i)[3], {
@@ -305,7 +305,7 @@ describe("Transaction Form", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     /** Make sure the expected submission matches the typescript type. */
     const EXPECTED_SUBMITTED_TRANSACTION: InputResource<Transaction> & {
@@ -389,7 +389,7 @@ describe("Transaction Form", () => {
       testCtx as any
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The Agent ID string should be converted to an object with ID and type:
     // Test replaced by checking for expected elements/properties in the UI
@@ -401,7 +401,7 @@ describe("Transaction Form", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected response
     expect(mockSave.mock.calls).toEqual([

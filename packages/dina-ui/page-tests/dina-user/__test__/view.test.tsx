@@ -69,7 +69,7 @@ describe("Dina user who am i page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // expect(wrapper.find(".spinner-border").exists()).toEqual(false);
     expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();

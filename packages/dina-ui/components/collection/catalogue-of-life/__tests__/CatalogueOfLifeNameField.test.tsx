@@ -37,7 +37,7 @@ describe("CatalogueOfLifeNameField component", () => {
     const input = screen.getByRole("textbox"); // Assuming the input has role "textbox"
     fireEvent.change(input, { target: { value: "  Poa muralis  " } });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const searchButton = screen.getByRole("button", { name: /search/i });
     fireEvent.click(searchButton);

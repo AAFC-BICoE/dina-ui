@@ -29,7 +29,7 @@ describe("StringArrayField component", () => {
     });
 
     fireEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSubmit.mock.calls).toEqual([
       [{ lines: ["line1", "line2", "line3", "line4"] }]
@@ -61,10 +61,10 @@ describe("StringArrayField component", () => {
     fireEvent.click(
       wrapper.getByRole("button", { name: /set new field value/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSubmit.mock.calls).toEqual([[{ lines: ["new", "value"] }]]);
   });

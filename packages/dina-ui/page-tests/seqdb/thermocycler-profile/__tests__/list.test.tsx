@@ -37,7 +37,7 @@ describe("PcrProfile list page", () => {
     });
 
     // Wait for the page to load
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the table contains the links to profile details pages.
     expect(wrapper.getByText(/test profile 1/i)).toBeInTheDocument();

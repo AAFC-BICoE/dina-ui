@@ -165,7 +165,7 @@ describe("StorageUnitChildrenViewer component", () => {
     // The page should load initially with a loading spinner.
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
@@ -195,17 +195,17 @@ describe("StorageUnitChildrenViewer component", () => {
         accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
       }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click "Move All Content" button
     userEvent.click(wrapper.getByRole("button", { name: /move all content/i }));
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click "Select" button for B (Box) storage unit
     userEvent.click(wrapper.getAllByRole("button", { name: /select/i })[0]);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API Call
     expect(mockSave).lastCalledWith(
@@ -251,19 +251,19 @@ describe("StorageUnitChildrenViewer component", () => {
         accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
       }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click "Add Existing Storage Unit" button
     userEvent.click(
       wrapper.getByRole("button", { name: /add existing storage unit/i })
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click "Select" button to select storage B
     userEvent.click(wrapper.getByRole("button", { name: /select/i }));
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Updates B to set X as the new parent:
     expect(mockSave).lastCalledWith(

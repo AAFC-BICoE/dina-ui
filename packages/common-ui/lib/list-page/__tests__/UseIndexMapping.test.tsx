@@ -215,7 +215,7 @@ describe("Use Index Mapping Hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockIndexMapRetrieved).toHaveBeenCalledTimes(1);
     expect(mockIndexMapRetrieved).toMatchSnapshot();

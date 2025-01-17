@@ -40,7 +40,7 @@ describe("PersonForm", () => {
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSave).lastCalledWith(
       [
@@ -65,7 +65,7 @@ describe("PersonForm", () => {
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSave).lastCalledWith(
       [

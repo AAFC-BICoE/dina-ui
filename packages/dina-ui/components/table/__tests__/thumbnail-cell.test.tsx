@@ -43,7 +43,7 @@ describe("Thumbnail cell component", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected thumbnail src value
     expect(wrapper.getByRole("img")).toHaveAttribute("src", MOCK_AXIOS_REPONSE);

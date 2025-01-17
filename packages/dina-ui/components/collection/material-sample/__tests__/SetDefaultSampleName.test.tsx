@@ -63,7 +63,7 @@ describe("SetDefaultSampleName", () => {
       name: /collection 1 \(initial\-code\)/i
     });
     fireEvent.mouseDown(combobox); // Open the combobox options
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Select the new option (assuming the new option is rendered as expected)
     const option = await screen.findByRole("option", { name: /TEST_CODE_2/i });
@@ -91,7 +91,7 @@ describe("SetDefaultSampleName", () => {
     );
 
     // Wait for any asynchronous updates
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the initial value is correct and remains unchanged
     const input = screen.getByRole("textbox", {

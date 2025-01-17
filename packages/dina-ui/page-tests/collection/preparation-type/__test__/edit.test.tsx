@@ -122,7 +122,7 @@ describe("preparation-type edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockPatch).lastCalledWith(
@@ -168,7 +168,7 @@ describe("preparation-type edit page", () => {
     );
 
     // Wait for the page to load
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test English Description field value
     expect(
@@ -188,7 +188,7 @@ describe("preparation-type edit page", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockPatch).lastCalledWith(
@@ -248,7 +248,7 @@ describe("preparation-type edit page", () => {
     // Submit form without name field value
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected error
     expect(

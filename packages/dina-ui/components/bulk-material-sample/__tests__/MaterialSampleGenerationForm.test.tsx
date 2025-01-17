@@ -55,7 +55,7 @@ describe("MaterialSampleGenerationForm", () => {
       <MaterialSampleGenerationForm onGenerate={mockOnGenerate} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Fill out the form
     // Change the collection
@@ -113,7 +113,7 @@ describe("MaterialSampleGenerationForm", () => {
     );
 
     fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Sample initialValues are created with the expected names and the linked collection:
     expect(mockOnGenerate).lastCalledWith({

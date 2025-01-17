@@ -131,7 +131,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Should automatically be in edit mode since no material samples are linked yet.
     expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
@@ -154,7 +154,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
 
     // Perform save
     userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSave).toBeCalledWith(
       [
@@ -221,7 +221,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Should not automatically be in edit mode since material samples are linked already.
     expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
@@ -233,24 +233,24 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
 
     // Switch to edit mode.
     userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Remove "Sample 2" from the currently selected list.
     userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[4]);
     userEvent.click(wrapper.getByTestId("remove-resources"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(wrapper.getByText(/total selected records: 1/i)).toBeInTheDocument();
 
     // Now add "Sample 3" to the selected list.
     userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[2]);
     userEvent.click(wrapper.getByTestId("move-resources-over"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(wrapper.getByText(/total selected records: 2/i)).toBeInTheDocument();
 
     // Perform save
     userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Create a molecular-analysis-run-item since a run exists for this workflow.
     expect(mockSave.mock.calls[0]).toEqual([

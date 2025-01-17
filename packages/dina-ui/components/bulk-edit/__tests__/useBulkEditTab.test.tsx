@@ -193,10 +193,10 @@ describe("Material sample bulk edit tab", () => {
 
   it("Without changing any fields, overrides nothing", async () => {
     const wrapper = mountWithAppContext(<BulkEditTab />, testCtx);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSubmitOverride).lastCalledWith({
       isRestricted: false,
@@ -215,7 +215,7 @@ describe("Material sample bulk edit tab", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Update the barcode
     fireEvent.change(wrapper.getByRole("textbox", { name: /barcode/i }), {
@@ -223,7 +223,7 @@ describe("Material sample bulk edit tab", () => {
     });
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSubmitOverride).lastCalledWith({
       type: "material-sample",
@@ -243,7 +243,7 @@ describe("Material sample bulk edit tab", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable all data components...
     const switches = wrapper.container.querySelectorAll(
@@ -255,10 +255,10 @@ describe("Material sample bulk edit tab", () => {
     switches.forEach((switchFound) => {
       fireEvent.click(switchFound);
     });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSubmitOverride).lastCalledWith({
       // Keeps the name and type:
@@ -286,7 +286,7 @@ describe("Material sample bulk edit tab", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const managedAttributesVisible = wrapper.getByRole("combobox", {
       name: /add new/i
@@ -298,12 +298,12 @@ describe("Material sample bulk edit tab", () => {
       target: { value: "Managed Attribute 2" }
     });
     fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
     fireEvent.click(
       wrapper.getByRole("option", { name: /managed attribute 2/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Select the "C" managed attribute to display.
     fireEvent.focus(managedAttributesVisible);
@@ -311,12 +311,12 @@ describe("Material sample bulk edit tab", () => {
       target: { value: "Managed Attribute 3" }
     });
     fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
     fireEvent.click(
       wrapper.getByRole("option", { name: /managed attribute 3/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const textboxB = wrapper.container.querySelector(
       ".managedAttributes_b-field input"
@@ -331,7 +331,7 @@ describe("Material sample bulk edit tab", () => {
     fireEvent.change(textboxC, { target: { value: "new-c-value" } });
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSubmitOverride).lastCalledWith({
       // Keeps the name and type:

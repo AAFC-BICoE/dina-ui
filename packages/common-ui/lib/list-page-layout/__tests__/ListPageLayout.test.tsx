@@ -27,14 +27,14 @@ describe("ListPageLayout component", () => {
     );
 
     // Wait for the default search to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Do a filtered search.
     fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
       target: { value: "101F" }
     });
     fireEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // There should be an RSQL filter.
     expect(mockGet).lastCalledWith(
@@ -70,11 +70,11 @@ describe("ListPageLayout component", () => {
     );
 
     // Wait for the default search to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the type header to trigger the sort.
     fireEvent.click(wrapper.getByText("Type"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // There should be an RSQL filter.
     expect(mockGet).lastCalledWith("pcrPrimer", {
@@ -105,7 +105,7 @@ describe("ListPageLayout component", () => {
       />,
       { apiContext: mockApiCtx }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Ensure the additional filters are included in the request:
     expect(mockGet).lastCalledWith("pcrPrimer", {

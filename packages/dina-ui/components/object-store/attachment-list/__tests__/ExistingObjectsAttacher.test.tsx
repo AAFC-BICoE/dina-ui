@@ -60,7 +60,7 @@ describe("ExistingObjectsAttacher component", () => {
     );
 
     // Await Metadata table to load:
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Select all 3 metadatas to attach.
     fireEvent.click(
@@ -76,7 +76,7 @@ describe("ExistingObjectsAttacher component", () => {
     );
 
     // Await form submit:
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The 3 test Metadata IDs should have been submitted:
     expect(mockSubmit).lastCalledWith(TEST_METADATAS.map(({ id }) => id));

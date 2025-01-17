@@ -89,7 +89,7 @@ describe("collection-method edit page", () => {
     );
 
     // Wait for asynchronous updates
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Simulate changing the name input
     const nameInput = getByLabelText(/name/i);
@@ -107,7 +107,7 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for async updates after submission
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
@@ -151,7 +151,7 @@ describe("collection-method edit page", () => {
     );
 
     // Wait for asynchronous updates
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check the initial value of the English description textarea
     const descriptionTextarea = getByLabelText(
@@ -176,7 +176,7 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for async updates after submission
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check the last called patch request
     expect(mockPatch).lastCalledWith(
@@ -239,7 +239,7 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for asynchronous updates
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the error message is displayed
     expect(

@@ -35,7 +35,7 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
     fireEvent.click(button);
 
     // Wait for state updates
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check values of decimal latitude and longitude
     const latitudeInput = screen.getByRole("textbox", {

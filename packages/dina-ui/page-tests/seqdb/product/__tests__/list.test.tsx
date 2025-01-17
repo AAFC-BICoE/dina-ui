@@ -35,7 +35,7 @@ describe("Product list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the table contains the links to product details pages.
     expect(wrapper.getByText(/test product 1/i)).toBeInTheDocument();
@@ -46,7 +46,7 @@ describe("Product list page", () => {
     const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
 
     // Wait for the default search to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enter a search value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
@@ -56,7 +56,7 @@ describe("Product list page", () => {
     // Submit the search form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockGet).toHaveBeenCalledWith(
       "seqdb-api/product",

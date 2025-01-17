@@ -181,7 +181,7 @@ describe("QueryTable component", () => {
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Wait for the second query to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The second page should start with todo #25.
     expect(wrapper.getByRole("cell", { name: /todo 25/i })).toBeInTheDocument();
@@ -224,7 +224,7 @@ describe("QueryTable component", () => {
   });
 
   it("Fetches sorted data when the defaultSort prop is passed.", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
@@ -234,7 +234,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockGet).lastCalledWith(
@@ -250,7 +250,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The first request should have no sort.
     expect(mockGet).not.lastCalledWith(
@@ -260,14 +260,14 @@ describe("QueryTable component", () => {
 
     // Click the "name" header.
     fireEvent.click(wrapper.getByText(/name/i));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The second request should have a "name" sort.
     expect(mockGet).lastCalledWith("todo", objectContaining({ sort: "name" }));
 
     // Click the "name" header again to sort by descending order.
     fireEvent.click(wrapper.getByText(/name/i));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The third request should have a "-name" sort.
     expect(mockGet).lastCalledWith("todo", objectContaining({ sort: "-name" }));
@@ -284,18 +284,18 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "name" header.
     fireEvent.click(wrapper.getByText(/name/i));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Shift-click the "description" header.
     fireEvent.click(
       wrapper.getByRole("columnheader", { name: /description/i }),
       { shiftKey: true }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // This request should be sorted by name and description.
     expect(mockGet).lastCalledWith(
@@ -321,6 +321,7 @@ describe("QueryTable component", () => {
       />,
       { apiContext }
     );
+    await component.waitForRequests();
 
     // The initial request should have a pageSize of 5.
     expect(mockGet).lastCalledWith(
@@ -349,7 +350,7 @@ describe("QueryTable component", () => {
     });
 
     // Wait for the first request to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockGet).lastCalledWith(
@@ -372,7 +373,7 @@ describe("QueryTable component", () => {
   });
 
   it("Sends a request for included resources when the include prop is passed.", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
@@ -382,7 +383,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the first request to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockGet).lastCalledWith(
@@ -506,7 +507,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish and the total to render.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Expecting a total of 300, it's displayed twice for the top and bottom pagination sections.
     expect(wrapper.getAllByText(/total matched records: 300/i).length).toEqual(
@@ -527,7 +528,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish and the result to render.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Both error messages should be rendered:
     expect(
@@ -546,7 +547,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish and render.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Loading is still expected since we are passing it as a prop.
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
@@ -629,6 +630,7 @@ describe("QueryTable component", () => {
     userEvent.clear(pageSelector);
     userEvent.type(pageSelector, "12");
     fireEvent.blur(pageSelector);
+    await wrapper.waitForRequests();
     expect(pageSelector).toHaveDisplayValue("12");
     expect(onPageChangeMock).toBeCalledTimes(1);
 
@@ -636,6 +638,7 @@ describe("QueryTable component", () => {
     userEvent.clear(pageSelector);
     userEvent.type(pageSelector, "8");
     fireEvent.blur(pageSelector);
+    await wrapper.waitForRequests();
     expect(pageSelector).toHaveDisplayValue("8");
     expect(onPageChangeMock).toBeCalledTimes(2);
 
@@ -643,6 +646,7 @@ describe("QueryTable component", () => {
     userEvent.clear(pageSelector);
     userEvent.type(pageSelector, "13");
     fireEvent.blur(pageSelector);
+    await wrapper.waitForRequests();
     expect(pageSelector).toHaveDisplayValue("1");
     expect(onPageChangeMock).toBeCalledTimes(3);
   });

@@ -252,7 +252,7 @@ describe("Metadata List Page", () => {
   it("Renders the metadata table by default.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Tests that 1 table renders on the page by default
     expect(wrapper.getByRole("table")).toBeInTheDocument();
@@ -264,12 +264,12 @@ describe("Metadata List Page", () => {
     // Renders initially with the table view:
     expect(wrapper.getByRole("radio", { name: /table/i })).toBeChecked();
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Switch to gallery view.
     userEvent.click(wrapper.getByRole("radio", { name: /gallery/i }));
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Get the cell that contains the list
     const CELL = wrapper.getByRole("cell", { name: /no thumbnail available/i });
@@ -281,7 +281,7 @@ describe("Metadata List Page", () => {
   it("Lets you select a list of metadatas and route to the edit page.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Select all 3 metadatas to edit.
     userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[0]);
@@ -310,7 +310,7 @@ describe("Metadata List Page", () => {
   it("Shows a metadata preview when you click the 'Preview' button.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Preview section is initially hidden:
     expect(wrapper.getAllByText(/preview/i)).toHaveLength(4);
@@ -318,7 +318,7 @@ describe("Metadata List Page", () => {
     // Click the preview button:
     userEvent.click(wrapper.getAllByRole("button", { name: /preview/i })[0]);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Preview section is visible: (5th preview element)
     expect(wrapper.getAllByText(/preview/i)).toHaveLength(5);
@@ -327,7 +327,7 @@ describe("Metadata List Page", () => {
   it("Disables the bulk edit button when no Metadatas are selected.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Disabled initially because none are selected:
     expect(
@@ -336,7 +336,7 @@ describe("Metadata List Page", () => {
 
     // Select all 3 Metadatas to edit.
     userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The button should now be enabled:
     expect(
@@ -345,7 +345,7 @@ describe("Metadata List Page", () => {
 
     // Deselect all 3 Metadatas.
     userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The button should now be disabled again:
     expect(
@@ -381,7 +381,7 @@ describe("Metadata List Page", () => {
       buttonWrapper.getAllByRole("button", { name: /delete selected/i })[1]
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Shows how many will be deleted:
     expect(
@@ -391,7 +391,7 @@ describe("Metadata List Page", () => {
     // Click 'yes' on the "Are you sure" modal:
     userEvent.click(buttonWrapper.getByRole("button", { name: /yes/i }));
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockDelete).toHaveBeenCalledTimes(2);
     expect(mockDelete).lastCalledWith(

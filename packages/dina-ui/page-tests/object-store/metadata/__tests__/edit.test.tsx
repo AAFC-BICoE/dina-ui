@@ -118,7 +118,7 @@ describe("Metadata single record edit page.", () => {
   it("Lets you edit the Metadata.", async () => {
     const wrapper = mountWithAppContext(<MetadataEditPage />, { apiContext });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check for the right initial values:
     expect(
@@ -154,12 +154,12 @@ describe("Metadata single record edit page.", () => {
       }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check only the changed values
     expect(mockSave).lastCalledWith(

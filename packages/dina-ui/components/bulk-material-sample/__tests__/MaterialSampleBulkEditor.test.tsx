@@ -1085,7 +1085,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Edit the first sample:
     fireEvent.click(wrapper.getByText(/ms1/i));
@@ -1106,7 +1106,7 @@ describe("MaterialSampleBulkEditor", () => {
     });
 
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the new material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -1170,7 +1170,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Edit the first sample:
     fireEvent.click(wrapper.getByRole("tab", { name: /ms1/i }));
@@ -1201,7 +1201,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the new material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -1283,13 +1283,13 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     fireEvent.click(
       wrapper.getAllByRole("button", { name: /override all/i })[1]
     );
     fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Update the other cataloge value:
     fireEvent.change(
@@ -1301,7 +1301,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the new material samples:
     expect(mockSave.mock.calls).toMatchSnapshot();
@@ -1323,7 +1323,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Go the the bulk edit tab:
     fireEvent.click(wrapper.getByText(/edit all/i));
@@ -1336,7 +1336,7 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Put an invalid value in startEventDateTime. This is validated locally by yup:
     const startDateTextbox = wrapper.getByRole("textbox", {
@@ -1346,7 +1346,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
@@ -1390,11 +1390,11 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Edit the second sample:
     fireEvent.click(wrapper.getByText(/ms2/i));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -1404,11 +1404,11 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[1]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The collecting event was saved separately.
     expect(mockSaveForBadColEvent).lastCalledWith(
@@ -1470,7 +1470,7 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Go the the bulk edit tab:
     fireEvent.click(wrapper.getByText(/edit all/i));
@@ -1483,11 +1483,11 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The collecting event was saved separately.
     expect(mockSaveForBadColEvent).lastCalledWith(
@@ -1545,7 +1545,7 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Go the the bulk edit tab:
     fireEvent.click(wrapper.getByText(/edit all/i));
@@ -1557,7 +1557,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
@@ -1593,11 +1593,11 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
@@ -1622,7 +1622,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable all the sections with the "Override All" warning boxes:
     [
@@ -1639,7 +1639,7 @@ describe("MaterialSampleBulkEditor", () => {
       }
       fireEvent.click(toggle[0]);
     });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Shows the warning for each section enabled:
     const warnings = wrapper.container.querySelectorAll(
@@ -1649,7 +1649,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button without overriding anything:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -1703,7 +1703,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable all the sections with the "Override All" warning boxes:
     [
@@ -1720,7 +1720,7 @@ describe("MaterialSampleBulkEditor", () => {
       }
       fireEvent.click(toggle[0]);
     });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the Override All buttons:
     for (const section of [
@@ -1738,11 +1738,11 @@ describe("MaterialSampleBulkEditor", () => {
         );
       }
       fireEvent.click(overrideButton);
-      await new Promise(setImmediate);
+      await wrapper.waitForRequests();
 
       // Click "Yes" on the popup dialog.
       fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-      await new Promise(setImmediate);
+      await wrapper.waitForRequests();
     }
 
     // Organisms section opens with an initial value, so it has the green indicator on the fieldset:
@@ -1779,7 +1779,7 @@ describe("MaterialSampleBulkEditor", () => {
     fireEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Override the verbatim scientific name.
     fireEvent.change(
@@ -1788,7 +1788,7 @@ describe("MaterialSampleBulkEditor", () => {
       }),
       { target: { value: "new-scientific-name" } }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Override the scheduled acitons
     fireEvent.change(wrapper.getByRole("textbox", { name: /action type/i }), {
@@ -1803,7 +1803,7 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Schedule add button needs to exist at this point.");
     }
     fireEvent.click(scheduleActionButton);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // All overridable fieldsets should now have the green bulk edited indicator:
     const overrideClasses = wrapper.container.querySelectorAll(
@@ -1819,7 +1819,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button without overriding anything:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
@@ -1879,7 +1879,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       wrapper.getByRole("combobox", { name: /tags multiple values/i })
@@ -1912,7 +1912,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The common values are displayed in the UI:
     // Tags:
@@ -1940,7 +1940,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // No changes should be made
     expect(mockSave.mock.calls).toEqual([
@@ -1986,7 +1986,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const barcodeInput = wrapper.container.querySelector(
       ".tabpanel-EDIT_ALL .barcode-field input"
@@ -2026,7 +2026,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Save All:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Save the collecting event, then save the 2 material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -2075,7 +2075,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const barcodeInput = wrapper.container.querySelector(
       ".tabpanel-EDIT_ALL .barcode-field input"
@@ -2089,7 +2089,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Manually erase the default value:
     fireEvent.change(barcodeInput, { target: { value: "" } });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Shows the blank input without the green indicator:
     expect(barcodeInput).toHaveValue("");
@@ -2108,7 +2108,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const barcodeInput = wrapper.container.querySelector(
       ".tabpanel-EDIT_ALL .barcode-field input"
@@ -2133,7 +2133,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // m1 and m2 have multiple values, so show a blank input with a placeholder:
     expect(
@@ -2172,7 +2172,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -2182,7 +2182,7 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Edit a collecting event field:
     fireEvent.change(
@@ -2192,7 +2192,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Save the collecting event, then save the 2 material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -2359,7 +2359,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -2369,7 +2369,7 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The collecting event section has a green legend to indicate a bulk edit (event without setting a new Collecting Event):
     expect(
@@ -2384,7 +2384,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Save the collecting event, then save the 2 material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -2452,7 +2452,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const storageToggle = wrapper.container.querySelectorAll(
       ".tabpanel-EDIT_ALL .enable-storage .react-switch-bg"
@@ -2461,7 +2461,7 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Storage toggle needs to exist at this point.");
     }
     fireEvent.click(storageToggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Delete the current storage...
     const removeStorageButton = wrapper.container.querySelector(
@@ -2471,7 +2471,7 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Remove existing storage button doesn't exist on the page.");
     }
     fireEvent.click(removeStorageButton);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Assign a different storage unit:
     const row = wrapper.getByRole("row", {
@@ -2481,7 +2481,7 @@ describe("MaterialSampleBulkEditor", () => {
       name: /select/i
     });
     fireEvent.click(selectStorageButton);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Green indicator shows up:
     expect(
@@ -2497,7 +2497,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the new material samples with the new storage unit:
     expect(mockSave.mock.calls).toEqual([
@@ -2605,7 +2605,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable host organism fields:
     const toggle = wrapper.container.querySelectorAll(
@@ -2615,7 +2615,7 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Associations toggle needs to exist at this point.");
     }
     fireEvent.click(toggle[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const hostRemarks = wrapper.container.querySelector(
       ".tabpanel-EDIT_ALL .hostOrganism_remarks-field textarea"
@@ -2627,7 +2627,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the new material samples with the new storage unit:
     expect(mockSave.mock.calls).toEqual([
@@ -2673,7 +2673,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Edit the first sample only:
     fireEvent.click(wrapper.getByText(/ms1/i));
@@ -2686,7 +2686,7 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(toggle);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const verbatimLocality = wrapper.container.querySelector(
       ".sample-tabpanel-0 #" +
@@ -2700,7 +2700,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the new material samples with the new storage unit:
     expect(mockSave.mock.calls).toEqual([
@@ -2765,7 +2765,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       wrapper.getByRole("textbox", { name: /barcode/i })
@@ -2786,7 +2786,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The bulk edit tab shows the barcode field from the FormTemplate:
     // For Material Sample:
@@ -2801,7 +2801,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Switch to the first individual sample tab:
     fireEvent.click(wrapper2.getByText(/ms1/i));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       wrapper2.container.querySelector(
@@ -2823,7 +2823,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       wrapper.getByRole("textbox", { name: /barcode/i })
@@ -2844,7 +2844,7 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The bulk edit tab shows the default values from the FormTemplate:
     // For Material Sample:
@@ -2862,7 +2862,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Switch to the first individual sample tab:
     fireEvent.click(wrapper2.getByText(/ms1/i));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       wrapper2.container.querySelector(

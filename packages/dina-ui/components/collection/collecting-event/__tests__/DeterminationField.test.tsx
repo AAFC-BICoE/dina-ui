@@ -20,7 +20,7 @@ describe("DeterminationField component", () => {
     );
 
     // Input some text:
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     const input = screen.getByRole("textbox", {
       name: /global name search/i
     });

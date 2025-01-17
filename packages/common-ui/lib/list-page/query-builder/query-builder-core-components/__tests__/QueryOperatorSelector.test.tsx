@@ -44,7 +44,7 @@ describe("QueryOperatorSelector component", () => {
     // Simulate opening up the menu.
     fireEvent.click(wrapper.getByText(/contains/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // 5 options should be rendered.
     const options = wrapper.getAllByRole("option");
@@ -81,10 +81,10 @@ describe("QueryOperatorSelector component", () => {
     // Select a new option in the list.
     fireEvent.click(wrapper.getByText(/contains/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     fireEvent.click(wrapper.getByRole("option", { name: /not in/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Expect it to be changed to Not In.
     expect(wrapper.getByText(OPERATOR_OPTIONS[2].label)).toBeInTheDocument();

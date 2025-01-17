@@ -122,7 +122,7 @@ describe("preparation-method edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockPatch).lastCalledWith(
@@ -167,7 +167,7 @@ describe("preparation-method edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test default Eng Description value
     // expect(wrapper.find(".en-description textarea").prop("value")).toEqual(
@@ -194,7 +194,7 @@ describe("preparation-method edit page", () => {
     // wrapper.find("form").simulate("submit");
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockPatch).lastCalledWith(
@@ -254,7 +254,7 @@ describe("preparation-method edit page", () => {
     // Submit default form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected error
     expect(

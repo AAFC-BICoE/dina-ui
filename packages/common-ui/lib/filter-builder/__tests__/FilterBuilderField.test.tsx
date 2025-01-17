@@ -49,7 +49,7 @@ describe("FilterBuilderField component", () => {
 
     // Submit the search...
     fireEvent.click(wrapper.getByRole("button", { name: /search/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Formik should have the initial value.
     expect(mockSubmit).lastCalledWith(
@@ -63,7 +63,7 @@ describe("FilterBuilderField component", () => {
       target: { value: "test value" }
     });
     fireEvent.click(wrapper.getByRole("button", { name: /search/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith(
