@@ -405,16 +405,22 @@ export const TEST_METAGENOMIC_MOLECULAR_ANALYSIS_ITEMS: PersistedResource<Metage
     {
       id: "7de1c19c-6016-4e51-973c-f76e21385f72",
       type: "metagenomics-batch-item",
+      molecularAnalysisRunItem:
+        TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[0],
       pcrBatchItem: TEST_PCR_BATCH_ITEMS[0] as any
     },
     {
       id: "120cf8dd-9009-4a1b-b27a-c766095418f9",
       type: "metagenomics-batch-item",
+      molecularAnalysisRunItem:
+        TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[1],
       pcrBatchItem: TEST_PCR_BATCH_ITEMS[1] as any
     },
     {
       id: "f3152f83-4aa9-40d5-a88f-099dad53dd76",
       type: "metagenomics-batch-item",
+      molecularAnalysisRunItem:
+        TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[2],
       pcrBatchItem: TEST_PCR_BATCH_ITEMS[2] as any
     }
   ];

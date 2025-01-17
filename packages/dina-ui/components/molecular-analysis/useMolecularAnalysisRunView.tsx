@@ -118,7 +118,7 @@ export function useMolecularAnalysisRunView({
         async function fetchMetagenomicsBatchItems() {
           const fetchPaths = molecularAnalysisRunItems.map(
             (molecularAnalysisRunItem) =>
-              `seqdb-api/metagenomics-batch-item?include=pcrBatchItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+              `seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
           );
           const metagenomicsBatchItems: PersistedResource<MetagenomicsBatchItem>[] =
             [];

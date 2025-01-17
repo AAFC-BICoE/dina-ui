@@ -107,13 +107,13 @@ const mockGet = jest.fn(async (path, params) => {
       return { data: [TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS[2]] };
 
     // Metageneomic Batch Items
-    case "seqdb-api/metagenomics-batch-item?include=pcrBatchItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
+    case "seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
       TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[0].id:
       return { data: [TEST_METAGENOMIC_MOLECULAR_ANALYSIS_ITEMS[0]] };
-    case "seqdb-api/metagenomics-batch-item?include=pcrBatchItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
+    case "seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
       TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[1].id:
       return { data: [TEST_METAGENOMIC_MOLECULAR_ANALYSIS_ITEMS[1]] };
-    case "seqdb-api/metagenomics-batch-item?include=pcrBatchItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
+    case "seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==" +
       TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_METAGENOMICS[2].id:
       return { data: [TEST_METAGENOMIC_MOLECULAR_ANALYSIS_ITEMS[2]] };
 
