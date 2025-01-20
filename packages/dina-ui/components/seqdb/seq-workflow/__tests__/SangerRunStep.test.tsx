@@ -30,6 +30,7 @@ import {
 } from "../__mocks__/SangerRunStepMocks";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
+import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
@@ -350,7 +351,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
                   }
                 }
               },
-              usageType: "seq-reaction",
+              usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
@@ -366,7 +367,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
                   }
                 }
               },
-              usageType: "seq-reaction",
+              usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
@@ -381,7 +382,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
                   }
                 }
               },
-              usageType: "seq-reaction",
+              usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"

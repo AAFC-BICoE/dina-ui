@@ -22,7 +22,10 @@ import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -279,7 +282,7 @@ export function SangerSampleSelectionStep({
             itemsToCreate.map((_) => ({
               resource: {
                 type: "molecular-analysis-run-item",
-                usageType: "seq-reaction",
+                usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
                 relationships: {
                   run: {
                     data: {

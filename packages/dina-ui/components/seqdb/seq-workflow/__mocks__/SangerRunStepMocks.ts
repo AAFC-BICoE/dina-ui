@@ -8,6 +8,7 @@ import {
   SeqReaction
 } from "packages/dina-ui/types/seqdb-api";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
+import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 export const TEST_MOLECULAR_ANALYSIS_RUN_ID =
   "00aca736-67c5-4258-9b7c-b3bb3c1f6b58";
@@ -53,7 +54,7 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "d21066cc-c4e3-4263-aeba-8e6bc6badb36",
         type: "molecular-analysis-run-item",
-        usageType: "seq-reaction",
+        usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: {
@@ -92,7 +93,7 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "83d21135-51eb-4637-a202-e5b73f7a8ff9",
         type: "molecular-analysis-run-item",
-        usageType: "seq-reaction",
+        usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: {
@@ -131,7 +132,7 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "9a836ab0-f0ae-4d6a-aa48-b386ea6af2cf",
         type: "molecular-analysis-run-item",
-        usageType: "seq-reaction",
+        usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: {
@@ -177,7 +178,7 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
         id: "cd8c4d28-586a-45c0-8f27-63030aba07cf",
         type: "molecular-analysis-run-item",
         name: "Provided run item name",
-        usageType: "seq-reaction",
+        usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: TEST_MOLECULAR_ANALYSIS_RUN
@@ -212,7 +213,7 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "ce53527e-7794-4c37-91d8-28efff006a56",
         type: "molecular-analysis-run-item",
-        usageType: "seq-reaction",
+        usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: TEST_MOLECULAR_ANALYSIS_RUN
@@ -247,7 +248,7 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "16cf5f0e-24d4-4080-a476-2c97f0adc18e",
         type: "molecular-analysis-run-item",
-        usageType: "seq-reaction",
+        usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: TEST_MOLECULAR_ANALYSIS_RUN

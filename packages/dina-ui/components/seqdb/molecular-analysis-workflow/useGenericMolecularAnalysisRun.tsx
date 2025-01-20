@@ -6,7 +6,10 @@ import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
@@ -437,7 +440,7 @@ export function useGenericMolecularAnalysisRun({
         group: "",
         name: "",
         qcType: "",
-        type: "quality-control"
+        type: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
       }
     ]);
   }
@@ -526,7 +529,7 @@ export function useGenericMolecularAnalysisRun({
               {
                 selector: "usageType",
                 comparison: "==",
-                arguments: "quality-control"
+                arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
               }
             ]
           })("")
@@ -621,7 +624,8 @@ export function useGenericMolecularAnalysisRun({
             type: "molecular-analysis-run-item",
             resource: {
               type: "molecular-analysis-run-item",
-              usageType: "generic-molecular-analysis-item",
+              usageType:
+                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
               ...(molecularAnalysisRunItemName && {
                 name: molecularAnalysisRunItemName
               }),
@@ -668,7 +672,7 @@ export function useGenericMolecularAnalysisRun({
           type: "molecular-analysis-run-item",
           resource: {
             type: "molecular-analysis-run-item",
-            usageType: "quality-control",
+            usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL,
             relationships: {
               run: {
                 data: {
@@ -808,7 +812,7 @@ export function useGenericMolecularAnalysisRun({
               type: "molecular-analysis-run-item",
               resource: {
                 type: "molecular-analysis-run-item",
-                usageType: "quality-control",
+                usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL,
                 relationships: {
                   run: {
                     data: {
