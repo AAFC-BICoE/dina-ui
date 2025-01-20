@@ -123,7 +123,7 @@ export function IdentifierTypeForm({
             attributes: {
               ...resource,
               ...(resource.uriTemplate && {
-                uriTemplate: resource.uriTemplate.endsWith("$1")
+                uriTemplate: resource.uriTemplate.includes("$1")
                   ? resource.uriTemplate
                   : `${resource.uriTemplate}$1`
               })
@@ -145,7 +145,9 @@ export function IdentifierTypeForm({
             attributes: {
               ...resource,
               ...(resource.uriTemplate && {
-                uriTemplate: `${resource.uriTemplate}$1`
+                uriTemplate: resource.uriTemplate.includes("$1")
+                  ? resource.uriTemplate
+                  : `${resource.uriTemplate}$1`
               })
             }
           }
