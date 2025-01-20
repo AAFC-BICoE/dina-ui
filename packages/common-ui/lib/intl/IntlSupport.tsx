@@ -3,8 +3,7 @@ import { createContext, useContext, useEffect, useMemo } from "react";
 import {
   FormattedMessage as ReactFormattedMessage,
   IntlProvider as ReactIntlProvider,
-  useIntl as useReactIntl,
-  ReactIntlErrorCode
+  useIntl as useReactIntl
 } from "react-intl";
 
 interface MessageDictionary {

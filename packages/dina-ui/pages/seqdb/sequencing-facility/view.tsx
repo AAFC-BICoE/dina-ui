@@ -7,8 +7,7 @@ import {
 import { SequencingFacilityFormFields } from "./edit";
 
 export default function SequencingFacilityDetailsPage() {
-  const [convertArrayToString, convertStringToArray] =
-    useStringArrayConverter();
+  const [convertArrayToString] = useStringArrayConverter();
   return (
     <ViewPageLayout<SequencingFacilityVO>
       mainClass="container-fluid"

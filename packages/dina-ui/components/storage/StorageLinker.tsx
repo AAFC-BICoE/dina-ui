@@ -170,8 +170,6 @@ export function StorageLinkerField({
   createStorageMode,
   parentStorageUnitUUID
 }: StorageLinkerFieldProps) {
-  const formId = useField<string | undefined>("id")[0].value;
-
   const { getFieldLabel } = useFieldLabels();
 
   return (

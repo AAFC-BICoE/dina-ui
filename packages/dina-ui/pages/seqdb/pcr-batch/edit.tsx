@@ -17,8 +17,7 @@ import {
   useApiClient,
   useDinaFormContext,
   useQuery,
-  withResponse,
-  withResponseOrDisabled
+  withResponse
 } from "common-ui";
 import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
@@ -30,7 +29,6 @@ import {
 } from "../../../components/seqdb/pcr-workflow/PcrReactionTable";
 import { ReactNode, useState } from "react";
 import {
-  AttachmentsField,
   Footer,
   GroupSelectField,
   Head,
@@ -45,7 +43,6 @@ import { Person } from "../../../types/agent-api";
 import {
   MaterialSampleSummary,
   Protocol,
-  StorageUnit,
   StorageUnitType
 } from "../../../types/collection-api";
 import {

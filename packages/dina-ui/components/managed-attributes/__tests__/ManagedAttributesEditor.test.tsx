@@ -1,9 +1,9 @@
-import { DinaForm, ResourceSelect } from "common-ui";
+import { DinaForm } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { FormTemplate } from "../../../types/collection-api";
 import { mountWithAppContext } from "common-ui";
 import { ManagedAttributesEditor } from "../ManagedAttributesEditor";
-import { screen, waitFor, fireEvent } from "@testing-library/react";
+import { waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const EXAMPLE_MA_1 = {

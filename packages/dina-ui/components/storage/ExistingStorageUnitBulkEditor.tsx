@@ -1,7 +1,6 @@
 import { LoadingSpinner } from "common-ui";
-import { InputResource, PersistedResource } from "kitsu";
+import { InputResource } from "kitsu";
 import { compact } from "lodash";
-import { Promisable } from "type-fest";
 import { useStorageUnit } from "packages/dina-ui/pages/collection/storage-unit/edit";
 import { StorageUnit } from "packages/dina-ui/types/collection-api";
 import { StorageUnitBulkEditor } from "./StorageUnitBulkEditor";

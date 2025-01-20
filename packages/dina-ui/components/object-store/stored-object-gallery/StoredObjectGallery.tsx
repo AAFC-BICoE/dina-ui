@@ -1,4 +1,4 @@
-import { CheckBoxFieldProps, useQuery } from "common-ui";
+import { CheckBoxFieldProps } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";

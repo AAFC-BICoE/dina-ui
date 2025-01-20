@@ -92,7 +92,7 @@ describe("MetersField component", () => {
   });
 
   it("Does the unit conversion onBlur.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm initialValues={{}}>
         <MetersField name="length" />
       </DinaForm>
@@ -189,7 +189,7 @@ describe("MetersField component", () => {
   });
 
   it("Renders the initial value.", () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm
         initialValues={{ length: "10.00" }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -202,7 +202,7 @@ describe("MetersField component", () => {
   });
 
   it("Updates the input value when the form state changes.", () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm
         initialValues={{ length: "10.00" }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}

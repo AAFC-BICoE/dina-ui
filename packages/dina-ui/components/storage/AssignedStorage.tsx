@@ -3,7 +3,6 @@ import {
   SelectField,
   SelectOption,
   TextField,
-  useBulkEditTabContext,
   useDinaFormContext,
   withResponse
 } from "common-ui";

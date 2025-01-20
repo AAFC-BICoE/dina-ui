@@ -3,12 +3,12 @@ import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { QueryLogicSwitchField } from "../QueryLogicSwitchField";
 import "@testing-library/jest-dom";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 describe("QueryLogicSwitchField component", () => {
   it("Displays the field's label value.", () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: "and" } }}>
         <QueryLogicSwitchField name="testObject.testField" />
       </DinaForm>
@@ -19,7 +19,7 @@ describe("QueryLogicSwitchField component", () => {
   });
 
   it("Changes the selected query logic will update the submitted value.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: "and" } }}>
         <QueryLogicSwitchField name="testObject.testField" />
       </DinaForm>

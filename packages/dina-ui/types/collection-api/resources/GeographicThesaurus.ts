@@ -1,5 +1,3 @@
-import { KitsuResource } from "kitsu";
-
 export interface GeographicThesaurus {
   subjectId: string;
   preferredTerm: string;

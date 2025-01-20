@@ -1,7 +1,7 @@
 import CollectionDetailsPage from "../../../pages/collection/collection/view";
 import { mountWithAppContext } from "common-ui";
 import { Collection } from "../../../types/collection-api";
-import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const TEST_COLLECTION: Collection = {
@@ -33,7 +33,7 @@ jest.mock("next/router", () => ({
 
 describe("Collection view page", () => {
   it("Renders the Collection details", async () => {
-    const wrapper = mountWithAppContext(<CollectionDetailsPage />, {
+    mountWithAppContext(<CollectionDetailsPage />, {
       apiContext
     });
 

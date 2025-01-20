@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { ExistingObjectsAttacher } from "../ExistingObjectsAttacher";
-import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
@@ -54,7 +54,7 @@ describe("ExistingObjectsAttacher component", () => {
   });
 
   it("Provides the callback with the existing Metadatas", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <ExistingObjectsAttacher onMetadataIdsSubmitted={mockSubmit} />,
       { apiContext }
     );

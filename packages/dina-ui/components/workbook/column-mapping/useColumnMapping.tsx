@@ -6,7 +6,6 @@ import {
   Tooltip,
   filterBy,
   useApiClient,
-  useDinaFormContext,
   useQuery
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";

@@ -163,14 +163,13 @@ export function MolecularAnalysisResultsStep({
                                   }
                                 } as any
                               ];
-                            const savedRunItem =
-                              await save?.<MolecularAnalysisRunItem>(
-                                molecularAnalysisRunItemSaveArgs,
-                                {
-                                  apiBaseUrl:
-                                    "seqdb-api/molecular-analysis-run-item"
-                                }
-                              );
+                            await save?.<MolecularAnalysisRunItem>(
+                              molecularAnalysisRunItemSaveArgs,
+                              {
+                                apiBaseUrl:
+                                  "seqdb-api/molecular-analysis-run-item"
+                              }
+                            );
                           }
                         }
                       }

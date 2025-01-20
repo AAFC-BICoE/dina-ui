@@ -17,7 +17,7 @@ import {
   useCollectingEventQuery,
   useCollectingEventSave
 } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import PageLayout from "../../../components/page/PageLayout";
 

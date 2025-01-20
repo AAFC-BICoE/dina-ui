@@ -1,4 +1,3 @@
-import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../../components";
 import { SeqBatch } from "../../../types/seqdb-api";
 import { useSeqBatchQuery, LoadExternalDataForSeqBatchForm } from "./edit";

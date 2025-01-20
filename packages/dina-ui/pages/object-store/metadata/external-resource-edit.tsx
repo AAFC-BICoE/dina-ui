@@ -135,12 +135,11 @@ function ExternalResourceMetadataForm({
   }) => {
     const {
       // Don't include derivatives in the form submission:
-      derivatives,
+      derivatives: _derivatives,
       license,
       acSubtype,
       ...metadataValues
     } = submittedValues;
-
     if (license) {
       const selectedLicense = license?.id
         ? (

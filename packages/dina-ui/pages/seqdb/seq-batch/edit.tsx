@@ -8,15 +8,13 @@ import {
   DinaFormSubmitParams,
   FieldSet,
   filterBy,
-  LoadingSpinner,
   ResourceSelectField,
   SubmitButton,
   TextField,
   useAccount,
   useDinaFormContext,
   useQuery,
-  withResponse,
-  withResponseOrDisabled
+  withResponse
 } from "common-ui";
 import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
@@ -25,7 +23,6 @@ import { useRouter } from "next/router";
 import { SeqReactionDndTable } from "packages/dina-ui/components/seqdb/seq-workflow/seq-reaction-step/SeqReactionDndTable";
 import {
   Protocol,
-  StorageUnit,
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
 import { ReactNode } from "react";
@@ -42,7 +39,6 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import {
   Region,
   SeqBatch,
-  SeqReaction,
   ThermocyclerProfile
 } from "../../../types/seqdb-api";
 import { useSeqReactionState } from "packages/dina-ui/components/seqdb/seq-workflow/seq-reaction-step/useSeqReactionState";
@@ -218,7 +214,7 @@ export function LoadExternalDataForSeqBatchForm({
 
 /** Re-usable field layout between edit and view pages. */
 export function SeqBatchFormFields() {
-  const { readOnly, initialValues } = useDinaFormContext();
+  const { readOnly } = useDinaFormContext();
   const { values } = useFormikContext<any>();
 
   // When the storage unit type is changed, the storage unit needs to be cleared.

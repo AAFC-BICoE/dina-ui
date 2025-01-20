@@ -74,9 +74,9 @@ export function useMolecularAnalysisGridControls({
   const [multipleStorageUnitsWarning, setMultipleStorageUnitsWarning] =
     useState<boolean>(false);
 
-  const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
-    string[]
-  >(`molecularAnalysisWorkflowMaterialSampleSortOrder-${molecularAnalysisId}`);
+  const [materialSampleSortOrder] = useLocalStorage<string[]>(
+    `molecularAnalysisWorkflowMaterialSampleSortOrder-${molecularAnalysisId}`
+  );
 
   const [gridState, setGridState] = useState({
     // Available MolecularAnalysisItems with no well coordinates.

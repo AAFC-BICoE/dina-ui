@@ -8,8 +8,7 @@ import {
   ListPageLayout,
   LoadingSpinner,
   useFieldLabels,
-  useQuery,
-  withResponse
+  useQuery
 } from "common-ui";
 import { KitsuResource } from "kitsu";
 import { get, pick, startCase } from "lodash";

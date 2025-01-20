@@ -23,7 +23,7 @@ type Option = {
 
 export function GroupLabelsEditor({ valuesPath }: GroupLabelsEditorProps) {
   const instanceContext = useInstanceContext();
-  const [languageToAdd, setLanguageToAdd] = useState<Option | null>(null);
+  const [languageToAdd] = useState<Option | null>(null);
   const supportedLanguagesArray: string[] =
     instanceContext?.supportedLanguages?.split(",")?.length &&
     instanceContext?.supportedLanguages !== ""

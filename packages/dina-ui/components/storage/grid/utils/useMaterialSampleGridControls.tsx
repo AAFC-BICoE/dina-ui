@@ -42,9 +42,9 @@ export function useMaterialSampleGridControls({
 
   const [isStorage, setIsStorage] = useState<boolean>(false);
 
-  const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
-    string[]
-  >(SAMPLE_SELECTION_MATERIAL_SAMPLE_SORT_ORDER);
+  const [materialSampleSortOrder] = useLocalStorage<string[]>(
+    SAMPLE_SELECTION_MATERIAL_SAMPLE_SORT_ORDER
+  );
 
   const [gridState, setGridState] = useState({
     // Available Material Samples with no well coordinates.
@@ -342,11 +342,9 @@ export function useMaterialSampleGridControls({
           };
         });
 
-      const savedStorageUnitUsage = storageUnitUsageSaveArgs.length
-        ? await save<StorageUnitUsage>(storageUnitUsageSaveArgs, {
-            apiBaseUrl: "/collection-api"
-          })
-        : [];
+      await save<StorageUnitUsage>(storageUnitUsageSaveArgs, {
+        apiBaseUrl: "/collection-api"
+      });
     } catch (err) {
       alert(err);
     }

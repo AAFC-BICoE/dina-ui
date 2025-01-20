@@ -6,10 +6,8 @@ import {
   DinaFormOnSubmit,
   DinaFormSubmitParams,
   SubmitButton,
-  TextField,
-  useDinaFormContext
+  TextField
 } from "../../../common-ui/lib";
-import { useSeqdbIntl } from "../../../dina-ui/intl/seqdb-intl";
 import { Group } from "../../../dina-ui/types/user-api";
 import { GroupLabelsEditor } from "./GroupLabelsEditor";
 
@@ -69,8 +67,6 @@ export function GroupForm({ group, router }: GroupFormProps) {
 }
 
 export function GroupFormFields({ group }: { group: Group }) {
-  const { formatMessage } = useSeqdbIntl();
-  const { readOnly } = useDinaFormContext();
   return (
     <div>
       <div className="row">

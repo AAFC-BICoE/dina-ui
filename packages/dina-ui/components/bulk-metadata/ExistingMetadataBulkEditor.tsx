@@ -1,8 +1,7 @@
 import { LoadingSpinner } from "common-ui";
-import { InputResource, PersistedResource } from "kitsu";
+import { InputResource } from "kitsu";
 import { compact } from "lodash";
-import { Promisable } from "type-fest";
-import { License, Metadata } from "../../types/objectstore-api";
+import { Metadata } from "../../types/objectstore-api";
 import { useMetadataEditQuery } from "../object-store/metadata/useMetadata";
 import { MetadataBulkEditor } from "./MetadataBulkEditor";
 

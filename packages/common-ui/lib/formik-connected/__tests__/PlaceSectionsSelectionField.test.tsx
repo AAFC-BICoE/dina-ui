@@ -36,7 +36,7 @@ describe("PlaceSectionSelectionField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Display Src Admin Levels to table.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm initialValues={{ srcAdminLevels: TEST_SRC_ADMIN_LEVELS }}>
         <PlaceSectionsSelectionField
           name="srcAdminLevels"

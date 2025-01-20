@@ -5,9 +5,6 @@ import {
   useAccount
 } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../components";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { DinaUser } from "packages/dina-ui/types/user-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 const GROUP_TABLE_COLUMNS: ColumnDefinition<any>[] = [
@@ -30,7 +27,6 @@ const GROUP_TABLE_COLUMNS: ColumnDefinition<any>[] = [
 ];
 
 export default function GroupListPage() {
-  const { formatMessage } = useDinaIntl();
   const { isAdmin } = useAccount();
   const buttonBarContent = (
     <div className="flex d-flex ms-auto">

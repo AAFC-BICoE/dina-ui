@@ -59,7 +59,7 @@ export const isBetweenStateString = (val: string): val is string => {
     // Check if the parsed object has the required properties
     // and is a valid BetweenStates object
     return isBetweenStateObject(parsedState);
-  } catch (error) {
+  } catch {
     // Not a valid BetweenStates string
     return false;
   }
@@ -83,7 +83,7 @@ export const convertStringToBetweenState = (val: string): BetweenStates => {
     } else {
       return DEFAULT_TYPE;
     }
-  } catch (error) {
+  } catch {
     return DEFAULT_TYPE; // Return default values on parsing error
   }
 };

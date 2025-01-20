@@ -1,7 +1,6 @@
 import { LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
-import Link from "next/link";
 import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
 import { useEffect } from "react";
 

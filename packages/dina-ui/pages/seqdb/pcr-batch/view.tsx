@@ -1,4 +1,3 @@
-import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../../components";
 import { PcrBatch } from "../../../types/seqdb-api";
 import { usePcrBatchQuery, LoadExternalDataForPcrBatchForm } from "./edit";

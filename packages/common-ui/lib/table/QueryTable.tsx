@@ -10,7 +10,7 @@ import {
   KitsuResponse,
   PersistedResource
 } from "kitsu";
-import { ReactNode, useEffect, useReducer, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
   ClientSideJoinSpec,

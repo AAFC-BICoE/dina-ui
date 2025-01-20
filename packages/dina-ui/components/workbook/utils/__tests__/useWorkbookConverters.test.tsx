@@ -787,46 +787,6 @@ describe("useWorkbookConverters", () => {
     ]);
   });
 
-  it("saveData", async () => {
-    const mockData = {
-      type: "mock-entity",
-      group: "cnc",
-      stringField: "string value1",
-      booleanField: true,
-      numberField: 123,
-      objectField: {
-        name: "object name 1",
-        age: 12,
-        address: {
-          addressLine1: "object 1 address line 1",
-          city: "object 1 address city",
-          relationshipConfig: {
-            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-            type: "address",
-            baseApiPath: "fake-api",
-            hasGroup: true
-          }
-        },
-        relationshipConfig: {
-          baseApiPath: "fake-api",
-          hasGroup: true,
-          linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-          type: "object-field"
-        }
-      },
-      objectArrayField: [
-        {
-          name: "name1",
-          age: 11,
-          collector: {
-            name: "Tom",
-            age: 61
-          }
-        }
-      ]
-    };
-  });
-
   it("searchColumnMap", () => {
     const mockSave = jest
       .fn()

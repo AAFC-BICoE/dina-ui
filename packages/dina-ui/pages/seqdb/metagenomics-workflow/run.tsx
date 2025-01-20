@@ -55,8 +55,7 @@ export default function MetagenomicWorkflowRunPage() {
   ]);
 
   // Used to determine if the resource needs to be reloaded.
-  const [reloadMetagenomicsBatch, setReloadMetagenomicsBatch] =
-    useState<number>(Date.now());
+  const [reloadMetagenomicsBatch] = useState<number>(Date.now());
 
   // Loaded resource id
   const [metagenomicsBatchId, setMetagenomicsBatchId] = useState<

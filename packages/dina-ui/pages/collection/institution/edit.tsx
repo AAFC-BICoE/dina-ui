@@ -131,7 +131,6 @@ export function InstitutionForm({
 
 /** Re-usable field layout between edit and view pages. */
 export function InstitutionFormLayout() {
-  const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
   const typeOptions: SelectOption<string | undefined>[] = [
     {

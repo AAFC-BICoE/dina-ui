@@ -1,6 +1,5 @@
 import { KitsuResource } from "kitsu";
 import { Person } from "../../objectstore-api";
-import { SeqBatch } from "./SeqBatch";
 import { SequencingFacility } from "./SequencingFacility";
 
 export interface SeqSubmissionAttributes {

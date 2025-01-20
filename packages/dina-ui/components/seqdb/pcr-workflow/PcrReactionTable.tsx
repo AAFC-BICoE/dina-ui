@@ -9,7 +9,7 @@ import {
   useStringComparator
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { compact, sortBy } from "lodash";
+import { compact } from "lodash";
 import { useEffect, useState } from "react";
 import { MaterialSampleSummary } from "../../../types/collection-api";
 import {

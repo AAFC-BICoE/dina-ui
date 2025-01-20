@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { ScheduledActionsField } from "../ScheduledActionsField";
-import { screen, waitFor, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockOnSubmit = jest.fn();
@@ -29,16 +29,15 @@ const testCtx = {
 
 describe("ScheduledActionsField", () => {
   it("Edits the scheduled actions.", async () => {
-    const { container, getByRole, getByText, getAllByRole } =
-      mountWithAppContext(
-        <DinaForm
-          initialValues={{}}
-          onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
-        >
-          <ScheduledActionsField defaultDate="2021-10-12" />
-        </DinaForm>,
-        testCtx
-      );
+    const { container, getByText } = mountWithAppContext(
+      <DinaForm
+        initialValues={{}}
+        onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
+      >
+        <ScheduledActionsField defaultDate="2021-10-12" />
+      </DinaForm>,
+      testCtx
+    );
 
     // No actions initially:
     expect(container.querySelector(".ReactTable")).toBeNull();
