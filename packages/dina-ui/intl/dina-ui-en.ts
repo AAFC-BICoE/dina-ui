@@ -1182,5 +1182,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addButtonText: "Add",
   removeButtonText: "Remove",
   extractedData: "Extracted Data",
-  dataPasteZone: "Data Paste Zone"
+  dataPasteZone: "Data Paste Zone",
+  mappedData: "Mapped Data"
 };

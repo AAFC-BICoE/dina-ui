@@ -81,6 +81,67 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
               </tbody>
             </table>
           </div>
+          <div
+            style={{
+              outlineColor: "black",
+              outline: "solid",
+              borderRadius: "5px"
+            }}
+            className="col-md-1"
+          >
+            {">>"}
+          </div>
+          <div className="col-md-5">
+            <FieldHeader name={"mappedData"} />
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginTop: "20px"
+              }}
+            >
+              <thead>
+                <tr>
+                  <th
+                    style={{
+                      border: "1px solid #ccc",
+                      padding: "8px",
+                      backgroundColor: "#f4f4f4"
+                    }}
+                  >
+                    "Original"
+                  </th>
+                  <th
+                    style={{
+                      border: "1px solid #ccc",
+                      padding: "8px",
+                      backgroundColor: "#f4f4f4"
+                    }}
+                  >
+                    "Mapped"
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {tableData.slice(1).map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {row.map((cell, cellIndex) => (
+                      <td
+                        key={cellIndex}
+                        style={{
+                          border: "1px solid #ccc",
+                          padding: "8px",
+                          textAlign: "left"
+                        }}
+                      >
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
