@@ -1,9 +1,4 @@
-import {
-  FieldSet,
-  FormikButton,
-  useDinaFormContext,
-  SelectOption
-} from "common-ui";
+import { FieldSet, FormikButton, useDinaFormContext } from "common-ui";
 import { Person } from "../../../dina-ui/types/objectstore-api";
 import React, { useState } from "react";
 import { FieldArray } from "formik";

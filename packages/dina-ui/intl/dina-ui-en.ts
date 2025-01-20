@@ -1,5 +1,3 @@
-import { ColumnSelector } from "packages/common-ui/lib";
-
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */
@@ -1180,5 +1178,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   autoSelectButtonTitle: "Auto Select",
   attachmentsBasedOnItemNameButton: "Attachments based on item name",
   addButtonText: "Add",
-  removeButtonText: "Remove"
+  removeButtonText: "Remove",
+  editIdentifierTitle: "Edit Identifier",
+  field_uriTemplate: "URI Template"
 };
