@@ -113,7 +113,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
   });
 
   it("Non-relationship suggestions retrieved (keyword multiField)", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <QueryBuilderContextProvider
         value={{ groups: GROUPS, performSubmit: noop }}
       >
@@ -153,7 +153,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
   });
 
   it("Non-relationship suggestions retrieved (keyword type)", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <QueryBuilderContextProvider
         value={{ groups: GROUPS, performSubmit: noop }}
       >
@@ -194,7 +194,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
   });
 
   it("Relationship suggestions retrieved", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <QueryBuilderContextProvider
         value={{ groups: GROUPS, performSubmit: noop }}
       >
@@ -254,7 +254,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
 
   describe("Error handling / Props not provided cases", () => {
     it("Unable to retrieve results, empty suggestion list returned", async () => {
-      mountWithAppContext(
+      const wrapper = mountWithAppContext(
         <QueryBuilderContextProvider
           value={{ groups: GROUPS, performSubmit: noop }}
         >
@@ -290,7 +290,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
     });
 
     it("No field name provided, no results should be returned.", async () => {
-      mountWithAppContext(
+      const wrapper = mountWithAppContext(
         <QueryBuilderContextProvider
           value={{ groups: GROUPS, performSubmit: noop }}
         >
@@ -320,7 +320,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
     });
 
     it("No group provided, the query should not include group", async () => {
-      mountWithAppContext(
+      const wrapper = mountWithAppContext(
         <QueryBuilderContextProvider
           value={{ groups: [], performSubmit: noop }}
         >

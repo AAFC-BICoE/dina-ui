@@ -81,7 +81,7 @@ describe("collection-method edit page", () => {
     mockQuery = {};
   });
   it("Provides a form to add a collection-method.", async () => {
-    const { container, getByLabelText } = mountWithAppContext(
+    const { container, getByLabelText, waitForRequests } = mountWithAppContext(
       <CollectionMethodEditPage />,
       {
         apiContext
@@ -89,7 +89,7 @@ describe("collection-method edit page", () => {
     );
 
     // Wait for asynchronous updates
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     // Simulate changing the name input
     const nameInput = getByLabelText(/name/i);
@@ -107,7 +107,7 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for async updates after submission
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
@@ -135,7 +135,7 @@ describe("collection-method edit page", () => {
   });
 
   it("Edits an existing collection method.", async () => {
-    const { container, getByLabelText, getByRole } = mountWithAppContext(
+    const { container, getByLabelText, waitForRequests } = mountWithAppContext(
       <CollectionMethodForm
         onSaved={mockOnSaved}
         fetchedCollectionMethod={{
@@ -151,7 +151,7 @@ describe("collection-method edit page", () => {
     );
 
     // Wait for asynchronous updates
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     // Check the initial value of the English description textarea
     const descriptionTextarea = getByLabelText(
@@ -176,7 +176,7 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for async updates after submission
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     // Check the last called patch request
     expect(mockPatch).lastCalledWith(
@@ -229,7 +229,7 @@ describe("collection-method edit page", () => {
 
     mockQuery = {};
 
-    const { container, getByText } = mountWithAppContext(
+    const { container, getByText, waitForRequests } = mountWithAppContext(
       <CollectionMethodEditPage />,
       { apiContext }
     );
@@ -239,7 +239,7 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for asynchronous updates
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     // Check that the error message is displayed
     expect(

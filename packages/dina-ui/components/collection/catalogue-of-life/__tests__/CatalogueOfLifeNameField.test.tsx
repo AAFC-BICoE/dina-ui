@@ -19,7 +19,7 @@ describe("CatalogueOfLifeNameField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Sets a value from the Catalogue of Life API.", async () => {
-    const { container } = mountWithAppContext(
+    const { container, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{ scientificName: "", scientificNameSource: null }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -37,7 +37,7 @@ describe("CatalogueOfLifeNameField component", () => {
     const input = screen.getByRole("textbox"); // Assuming the input has role "textbox"
     fireEvent.change(input, { target: { value: "  Poa muralis  " } });
 
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     const searchButton = screen.getByRole("button", { name: /search/i });
     fireEvent.click(searchButton);

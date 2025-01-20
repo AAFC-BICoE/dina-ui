@@ -6,7 +6,7 @@ import "@testing-library/jest-dom";
 
 describe("ViewInMapButton component", () => {
   it("Shows the map link.", async () => {
-    const { container } = mountWithAppContext(
+    const { waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{
           assertion: {
@@ -20,7 +20,7 @@ describe("ViewInMapButton component", () => {
     );
 
     // Wait for the component to render
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     // Use getByRole or getByText to select the anchor tag
     const link = screen.getByRole("link", {
@@ -35,7 +35,7 @@ describe("ViewInMapButton component", () => {
   });
 
   it("Shows nothing when a lat or lon is blank.", async () => {
-    const { container } = mountWithAppContext(
+    const { waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{
           assertion: {
@@ -49,7 +49,7 @@ describe("ViewInMapButton component", () => {
     );
 
     // Wait for the component to render
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     // Check that the link is not present in the document
     const link = screen.queryByRole("link", {

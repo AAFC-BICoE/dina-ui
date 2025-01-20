@@ -68,7 +68,7 @@ describe("CollectionSelectField", () => {
 
   it("Shows admins all collections to choose from.", async () => {
     // Mount the component with the context
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <CollectionSelectField name="collection" />
       </DinaForm>,

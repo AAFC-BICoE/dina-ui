@@ -150,19 +150,20 @@ describe("ManagedAttributesEditor component", () => {
   it("Lets you remove an attribute value with the remove button", async () => {
     const mockSubmit = jest.fn();
 
-    const { container, findByText, queryByText } = mountWithAppContext(
-      <DinaForm
-        initialValues={{ managedAttributes: exampleValues }}
-        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
-      >
-        <ManagedAttributesEditor
-          valuesPath="managedAttributes"
-          managedAttributeApiPath="collection-api/managed-attribute"
-          managedAttributeComponent="COLLECTING_EVENT"
-        />
-      </DinaForm>,
-      { apiContext }
-    );
+    const { container, findByText, queryByText, waitForRequests } =
+      mountWithAppContext(
+        <DinaForm
+          initialValues={{ managedAttributes: exampleValues }}
+          onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+        >
+          <ManagedAttributesEditor
+            valuesPath="managedAttributes"
+            managedAttributeApiPath="collection-api/managed-attribute"
+            managedAttributeComponent="COLLECTING_EVENT"
+          />
+        </DinaForm>,
+        { apiContext }
+      );
 
     // Click the Remove button:
     const removeButton = await findByText("Example Attribute 2").then((label) =>
@@ -174,7 +175,7 @@ describe("ManagedAttributesEditor component", () => {
     if (removeButton) {
       fireEvent.click(removeButton);
     }
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     // Verify the field is removed
     expect(queryByText("Example Attribute 2")).not.toBeInTheDocument();
@@ -183,7 +184,7 @@ describe("ManagedAttributesEditor component", () => {
     const form = container.querySelector("form");
     fireEvent.submit(form!);
 
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     // Verify the mockSubmit was called without example_attribute_2
     expect(mockSubmit).toHaveBeenCalledWith({

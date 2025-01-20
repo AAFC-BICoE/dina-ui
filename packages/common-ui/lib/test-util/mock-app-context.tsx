@@ -12,7 +12,7 @@ import {
 import { merge, noop } from "lodash";
 import { FileUploadProviderImpl } from "../../../dina-ui/components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../../../dina-ui/intl/dina-ui-intl";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, ReactNode } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { SWRConfig } from "swr";
@@ -22,7 +22,7 @@ interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
   accountContext?: Partial<AccountContextI>;
   instanceContext?: Partial<InstanceContextI>;
-  children?: React.ReactNode;
+  element?: ReactNode;
 }
 /**
  * Wraps a test-rendered component to provide the contexts that would be available in
@@ -32,7 +32,7 @@ export function MockAppContextProvider({
   accountContext,
   apiContext = { apiClient: { get: () => undefined as any } },
   instanceContext,
-  children
+  element
 }: MockAppContextProviderProps) {
   const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = useMemo(
     () => ({
@@ -109,7 +109,7 @@ export function MockAppContextProvider({
                 <DndProvider backend={HTML5Backend}>
                   <div ref={modalWrapperRef}>
                     <ModalProvider appElement={modalWrapperRef.current}>
-                      {children}
+                      {element}
                     </ModalProvider>
                   </div>
                 </DndProvider>
@@ -126,30 +126,31 @@ export function MockAppContextProvider({
  * Helper function to get a test wrapper with the required context providers using React-Testing library.
  */
 export function mountWithAppContext(
-  element: React.ReactNode,
+  element: ReactNode,
   mockAppContextProviderProps?: MockAppContextProviderProps
 ) {
   /**
    * @deprecated Unreliable way to wait for requests to resolve. Please use waitFor() from @testing-library/react or
    * findBy* methods instead
-   * @param ms - The number of milliseconds to wait, default is 100.
+   * @param ms - The number of milliseconds to wait, default is 250.
    */
-  const waitForRequests = async (ms = 100) => {
-    // Wait 100 ms
+  const waitForRequests = async (ms = 250) => {
     await new Promise((resolve) => setTimeout(resolve, ms));
   };
 
   const reactLibraryComponent = render(
-    <MockAppContextProvider {...mockAppContextProviderProps}>
-      {element}
-    </MockAppContextProvider>
+    <MockAppContextProvider
+      {...mockAppContextProviderProps}
+      element={element}
+    />
   );
 
-  const rerenderWithContext = (elementRerender: React.ReactNode) => {
+  const rerenderWithContext = (elementRerender: ReactNode) => {
     reactLibraryComponent.rerender(
-      <MockAppContextProvider {...mockAppContextProviderProps}>
-        {elementRerender}
-      </MockAppContextProvider>
+      <MockAppContextProvider
+        {...mockAppContextProviderProps}
+        element={elementRerender}
+      />
     );
   };
 

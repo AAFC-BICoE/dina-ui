@@ -19,7 +19,7 @@ const mockOnSubmit = jest.fn();
 describe("GlobalNamesField component", () => {
   beforeEach(jest.clearAllMocks);
   it("Sets a value from the global name API.", async () => {
-    const { container } = mountWithAppContext(
+    const { container, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{ scientificName: "", scientificNameSource: null }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -39,7 +39,7 @@ describe("GlobalNamesField component", () => {
     const input = container.querySelector("input.global-name-input");
     fireEvent.change(input!, { target: { value: "  monodon  " } });
 
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     // Simulate clicking the search button
     const searchButton = screen.getByRole("button", {

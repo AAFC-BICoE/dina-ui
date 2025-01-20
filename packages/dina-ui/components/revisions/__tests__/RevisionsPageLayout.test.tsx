@@ -30,7 +30,7 @@ const mockGet = jest.fn(async (path) => {
 
 describe("RevisionsPageLayout component", () => {
   it("Renders the revisions.", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <RevisionsPageLayout
         auditSnapshotPath="objectstore-api/audit-snapshots"
         instanceId={`metadata/471bf855-f5da-492a-a58e-922238e5a257`}

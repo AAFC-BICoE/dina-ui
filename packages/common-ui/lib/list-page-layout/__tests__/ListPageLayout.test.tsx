@@ -89,7 +89,7 @@ describe("ListPageLayout component", () => {
   });
 
   it("Allows a passed additionalFilters prop.", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"
         additionalFilters={{

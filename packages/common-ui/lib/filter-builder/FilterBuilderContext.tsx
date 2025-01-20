@@ -1,5 +1,5 @@
 import { startCase } from "lodash";
-import { createContext, useMemo } from "react";
+import { createContext, useMemo, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { FilterAttribute } from "./FilterBuilder";
 import { FilterAttributeOption } from "./FilterRow";
@@ -9,7 +9,7 @@ export interface FilterBuilderContextI {
 }
 
 export interface FilterBuilderContextProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
   filterAttributes: FilterAttribute[];
 }
 

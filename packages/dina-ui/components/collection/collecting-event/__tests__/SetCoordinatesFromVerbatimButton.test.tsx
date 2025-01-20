@@ -8,7 +8,7 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
   it("Sets the lat/lon from the verbatim fields.", async () => {
     const onClickCallback = jest.fn();
 
-    const { container } = mountWithAppContext(
+    const { waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{
           verbatimLatitude: "45°32′25″N",
@@ -35,7 +35,7 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
     fireEvent.click(button);
 
     // Wait for state updates
-    await wrapper.waitForRequests();
+    await waitForRequests();
 
     // Check values of decimal latitude and longitude
     const latitudeInput = screen.getByRole("textbox", {
