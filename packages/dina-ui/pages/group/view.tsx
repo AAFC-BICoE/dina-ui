@@ -1,8 +1,8 @@
 import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../components";
-import { Group } from "../../types/user-api";
 import { GroupFormLayout } from "../../components/group/GroupFormLayout";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { Group } from "../../types/user-api";
 
 export default function GroupDetailsPage() {
   const { locale } = useDinaIntl();
@@ -21,13 +21,13 @@ export default function GroupDetailsPage() {
       query={(id) => ({
         path: `user-api/group/${id}`
       })}
-      entityLink="/user-api/group"
+      entityLink="/group"
       type="group"
       apiBaseUrl="/user-api"
       showEditButton={false}
       showDeleteButton={false}
       showGroup={false}
-      showBackButton={false}
+      showBackButton={true}
       nameField={[`labels.${locale}`, "name"]}
       forceTitleUppercase={true}
     />

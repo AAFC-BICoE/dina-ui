@@ -8,15 +8,14 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { GroupSelectField } from "../group-select/GroupSelectField";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { QualityControlSection } from "../seqdb/molecular-analysis-workflow/QualityControlSection";
-import {
-  SequencingRunItem,
-  useMolecularAnalysisRunView
-} from "./useMolecularAnalysisRun";
-import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
+import { SequencingRunItem } from "./useMolecularAnalysisRun";
+import { SeqdbMessage } from "../../intl/seqdb-intl";
+import { useMolecularAnalysisRunView } from "./useMolecularAnalysisRunView";
 
 export function MolecularAnalysisRunFormFields() {
   const { initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
+
   const {
     loading,
     sequencingRunItems,
@@ -26,6 +25,7 @@ export function MolecularAnalysisRunFormFields() {
   } = useMolecularAnalysisRunView({
     molecularAnalysisRunId: initialValues.id
   });
+
   return loading ? (
     <LoadingSpinner loading={true} />
   ) : (

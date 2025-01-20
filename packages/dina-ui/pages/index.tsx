@@ -311,6 +311,11 @@ export function Home() {
                     <DinaMessage id="fieldExtensions" />
                   </a>
                 </Link>
+                <Link href="/identifier/list">
+                  <a>
+                    <DinaMessage id="identifiers" />
+                  </a>
+                </Link>
                 <Link href="/collection/institution/list">
                   <a>
                     <DinaMessage id="institutionListTitle" />
@@ -385,6 +390,11 @@ export function Home() {
                 </h2>
 
                 <Stack style={{ display: "inline-flex" }}>
+                  <Link href="/group/list">
+                    <a>
+                      <DinaMessage id="groupListTitle" />
+                    </a>
+                  </Link>
                   {isAdmin && (
                     <>
                       <Link href="/dina-user/list">

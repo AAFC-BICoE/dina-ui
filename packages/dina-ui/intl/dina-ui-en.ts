@@ -33,6 +33,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addMetadataTitle: "Add Metadata",
   addNewChildStorageUnit: "Add New Child Storage Unit",
   addNewElement: "Add New {typeName}",
+  addNewGroup: "Add New Group",
   addNewPerson: "Add New Person",
   addObjectSubtypeTitle: "Add New Object Subtype",
   addOrganizationTitle: "Add New Organization",
@@ -372,6 +373,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field__relationshipPresence_column: "Has {relationshipName}",
   field_gridLayoutDefinition_column_label: "By Column",
   field_gridLayoutDefinition_row_label: "By Row",
+  field_groupLabels: "Labels",
   field_host: "Host",
   field_id: "UUID",
   field_isFiledAs_tooltip:
@@ -538,6 +540,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   goToThePreviousStep: "Go to the previous step",
   governmentOfCanada: "Government of Canada",
   governmentOfCanadaSymbol: "Symbol of the Government of Canada",
+  groupName: "Name",
+  groupListTitle: "Groups",
+  editGroupTitle: "Edit Group",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
   hostOrganismLegend: "Host Organism",
@@ -556,6 +561,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   isTargetHeader: "Is Target ?",
   isolation: "Isolation",
   keepContentsTogether: "Keep Contents Together",
+  language: "Language",
   languageOfPage: "eng",
   largeImg: "Large Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
@@ -1172,5 +1178,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   autoSelectButtonTitle: "Auto Select",
   attachmentsBasedOnItemNameButton: "Attachments based on item name",
   addButtonText: "Add",
-  removeButtonText: "Remove"
+  removeButtonText: "Remove",
+  editIdentifierTitle: "Edit Identifier",
+  field_uriTemplate: "URI Template"
 };

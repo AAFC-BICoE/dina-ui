@@ -18,7 +18,10 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 export interface MolecularAnalysisSampleSelectionStepProps {
   molecularAnalysisId: string;
@@ -235,7 +238,8 @@ export function MolecularAnalysisSampleSelectionStep({
             itemsToCreate.map((_) => ({
               resource: {
                 type: "molecular-analysis-run-item",
-                usageType: "generic-molecular-analysis-item",
+                usageType:
+                  MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
                 relationships: {
                   run: {
                     data: {
