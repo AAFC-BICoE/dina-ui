@@ -1180,5 +1180,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   autoSelectButtonTitle: "Auto Select",
   attachmentsBasedOnItemNameButton: "Attachments based on item name",
   addButtonText: "Add",
-  removeButtonText: "Remove"
+  removeButtonText: "Remove",
+  extractedData: "Extracted Data",
+  dataPasteZone: "Data Paste Zone"
 };

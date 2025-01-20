@@ -1,3 +1,4 @@
+import { FieldHeader } from "packages/common-ui/lib";
 import React, { useState } from "react";
 
 interface DataPasteZoneProps {}
@@ -18,7 +19,7 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
 
   return (
     <div style={{ textAlign: "center", marginTop: "20px" }}>
-      <h2>Data Paste Zone</h2>
+      <FieldHeader name={"extractedData"} />
       <textarea
         placeholder="Paste your data here (e.g., copied from Excel)"
         onPaste={handlePaste}
@@ -34,48 +35,53 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
         }}
       />
       {tableData.length > 1 && (
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: "20px"
-          }}
-        >
-          <thead>
-            <tr>
-              {tableData[0].map((header, index) => (
-                <th
-                  key={index}
-                  style={{
-                    border: "1px solid #ccc",
-                    padding: "8px",
-                    backgroundColor: "#f4f4f4"
-                  }}
-                >
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.slice(1).map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {row.map((cell, cellIndex) => (
-                  <td
-                    key={cellIndex}
-                    style={{
-                      border: "1px solid #ccc",
-                      padding: "8px",
-                      textAlign: "left"
-                    }}
-                  >
-                    {cell}
-                  </td>
+        <div className="row">
+          <div className="col-md-6">
+            <FieldHeader name={"extractedData"} />
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginTop: "20px"
+              }}
+            >
+              <thead>
+                <tr>
+                  {tableData[0].map((header, index) => (
+                    <th
+                      key={index}
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "8px",
+                        backgroundColor: "#f4f4f4"
+                      }}
+                    >
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {tableData.slice(1).map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {row.map((cell, cellIndex) => (
+                      <td
+                        key={cellIndex}
+                        style={{
+                          border: "1px solid #ccc",
+                          padding: "8px",
+                          textAlign: "left"
+                        }}
+                      >
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </div>
   );
