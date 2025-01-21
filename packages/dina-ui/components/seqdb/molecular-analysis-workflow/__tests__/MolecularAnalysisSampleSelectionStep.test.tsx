@@ -113,7 +113,6 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
           <MolecularAnalysisSampleSelectionStep
             onSaved={onSavedMock}
             editMode={editMode}
-            setEditMode={setEditMode}
             performSave={performSave}
             setPerformSave={setPerformSave}
             molecularAnalysisId="5ac77b71-71f5-46b3-90f9-940629a7e035"

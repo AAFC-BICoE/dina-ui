@@ -193,7 +193,6 @@ export default function MolecularAnalysisWorkflowRunPage() {
               molecularAnalysisId={molecularAnalysisId}
               onSaved={onSaved}
               editMode={editMode}
-              setEditMode={setEditMode}
               performSave={performSave}
               setPerformSave={setPerformSave}
             />

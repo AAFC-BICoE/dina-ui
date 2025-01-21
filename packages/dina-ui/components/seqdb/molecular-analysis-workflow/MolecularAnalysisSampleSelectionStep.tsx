@@ -29,7 +29,6 @@ export interface MolecularAnalysisSampleSelectionStepProps {
     molecularAnalysisSaved?: PersistedResource<GenericMolecularAnalysis>
   ) => Promise<void>;
   editMode: boolean;
-  setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
 }
@@ -38,7 +37,6 @@ export function MolecularAnalysisSampleSelectionStep({
   molecularAnalysisId,
   editMode,
   onSaved,
-  setEditMode,
   performSave,
   setPerformSave
 }: MolecularAnalysisSampleSelectionStepProps) {
@@ -184,10 +182,6 @@ export function MolecularAnalysisSampleSelectionStep({
       sampleIds.map((id) => `/material-sample-summary/${id}`),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      // If there is nothing stored yet, automatically go to edit mode.
-      if (response.length === 0) {
-        setEditMode(true);
-      }
       const sorted = sortMaterialSamples(response ?? []);
       setSelectedResources(sorted);
     });
