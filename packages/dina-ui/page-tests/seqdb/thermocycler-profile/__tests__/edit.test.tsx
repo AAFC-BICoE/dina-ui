@@ -68,7 +68,7 @@ describe("ThermocyclerProfile edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     setImmediate(() => {
-      expect(mockPatch).lastCalledWith(
+      expect(mockPatch).toHaveBeenLastCalledWith(
         "/seqdb-api/operations",
         [
           {
@@ -89,7 +89,9 @@ describe("ThermocyclerProfile edit page", () => {
       );
 
       // The user should be redirected to the new profile's details page.
-      expect(mockPush).lastCalledWith("/seqdb/thermocycler-profile/view?id=1");
+      expect(mockPush).toHaveBeenLastCalledWith(
+        "/seqdb/thermocycler-profile/view?id=1"
+      );
       done();
     });
   });
@@ -174,7 +176,7 @@ describe("ThermocyclerProfile edit page", () => {
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -200,7 +202,9 @@ describe("ThermocyclerProfile edit page", () => {
     );
 
     // The user should be redirected to the existing profile's details page.
-    expect(mockPush).lastCalledWith("/seqdb/thermocycler-profile/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith(
+      "/seqdb/thermocycler-profile/view?id=1"
+    );
   });
 });
 

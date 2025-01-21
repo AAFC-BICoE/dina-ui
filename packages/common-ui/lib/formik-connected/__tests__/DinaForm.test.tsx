@@ -22,7 +22,7 @@ describe("DinaForm component.", () => {
     fireEvent.click(wrapper.getByRole("button"));
     await wrapper.waitForRequests();
 
-    expect(mockOnSubmit).lastCalledWith({
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       account: expect.objectContaining({
         username: "test-user"
       }),

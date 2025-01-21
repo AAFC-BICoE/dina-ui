@@ -1411,7 +1411,7 @@ describe("MaterialSampleBulkEditor", () => {
     await wrapper.waitForRequests();
 
     // The collecting event was saved separately.
-    expect(mockSaveForBadColEvent).lastCalledWith(
+    expect(mockSaveForBadColEvent).toHaveBeenLastCalledWith(
       [
         {
           resource: expect.objectContaining({
@@ -1490,7 +1490,7 @@ describe("MaterialSampleBulkEditor", () => {
     await wrapper.waitForRequests();
 
     // The collecting event was saved separately.
-    expect(mockSaveForBadColEvent).lastCalledWith(
+    expect(mockSaveForBadColEvent).toHaveBeenLastCalledWith(
       [
         {
           resource: expect.objectContaining({

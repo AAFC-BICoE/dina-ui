@@ -185,7 +185,7 @@ describe("ExistingAttachmentsTable component", () => {
     await wrapper.waitForRequests();
 
     // The bulk editor should call our mock:
-    expect(mockOnMetadatasEdited).lastCalledWith([
+    expect(mockOnMetadatasEdited).toHaveBeenLastCalledWith([
       "11111111-1111-1111-1111-111111111111"
     ]);
   });
@@ -222,7 +222,7 @@ describe("ExistingAttachmentsTable component", () => {
 
     await wrapper.waitForRequests();
 
-    expect(mockOnDetachMetadataIds).lastCalledWith([
+    expect(mockOnDetachMetadataIds).toHaveBeenLastCalledWith([
       "00000000-0000-0000-0000-000000000000"
     ]);
   });

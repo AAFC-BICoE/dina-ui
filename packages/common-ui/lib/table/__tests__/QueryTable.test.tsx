@@ -236,7 +236,7 @@ describe("QueryTable component", () => {
     await wrapper.waitForRequests();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenLastCalledWith(
       "todo",
       objectContaining({ sort: "description" })
     );
@@ -252,7 +252,7 @@ describe("QueryTable component", () => {
     await wrapper.waitForRequests();
 
     // The first request should have no sort.
-    expect(mockGet).not.lastCalledWith(
+    expect(mockGet).not.toHaveBeenLastCalledWith(
       anything(),
       objectContaining({ sort: anything() })
     );
@@ -262,14 +262,20 @@ describe("QueryTable component", () => {
     await wrapper.waitForRequests();
 
     // The second request should have a "name" sort.
-    expect(mockGet).lastCalledWith("todo", objectContaining({ sort: "name" }));
+    expect(mockGet).toHaveBeenLastCalledWith(
+      "todo",
+      objectContaining({ sort: "name" })
+    );
 
     // Click the "name" header again to sort by descending order.
     fireEvent.click(wrapper.getByText(/name/i));
     await wrapper.waitForRequests();
 
     // The third request should have a "-name" sort.
-    expect(mockGet).lastCalledWith("todo", objectContaining({ sort: "-name" }));
+    expect(mockGet).toHaveBeenLastCalledWith(
+      "todo",
+      objectContaining({ sort: "-name" })
+    );
 
     // There should have been 3 requests: the initial one, the ascending sort and the
     // descending sort.
@@ -297,7 +303,7 @@ describe("QueryTable component", () => {
     await wrapper.waitForRequests();
 
     // This request should be sorted by name and description.
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenLastCalledWith(
       "todo",
       objectContaining({ sort: "name,description" })
     );
@@ -323,7 +329,7 @@ describe("QueryTable component", () => {
     await component.waitForRequests();
 
     // The initial request should have a pageSize of 5.
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenLastCalledWith(
       "todo",
       objectContaining({ page: { limit: 5, offset: 0 } })
     );
@@ -352,7 +358,7 @@ describe("QueryTable component", () => {
     await wrapper.waitForRequests();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenLastCalledWith(
       "todo",
       objectContaining({ filter: firstFilterProp })
     );
@@ -365,7 +371,7 @@ describe("QueryTable component", () => {
 
     // When a new filter is passed, a new request is sent with the new filter.
     expect(mockGet).toHaveBeenCalledTimes(2);
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenLastCalledWith(
       "todo",
       objectContaining({ filter: secondFilterProp })
     );
@@ -385,7 +391,7 @@ describe("QueryTable component", () => {
     await wrapper.waitForRequests();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenLastCalledWith(
       "todo",
       objectContaining({ include: "relatedResource" })
     );

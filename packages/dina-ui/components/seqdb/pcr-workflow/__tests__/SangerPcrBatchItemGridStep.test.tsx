@@ -506,7 +506,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     userEvent.click(wrapper.getByRole("button", { name: /perform save/i }));
     await wrapper.waitForRequests();
 
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -593,7 +593,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     await wrapper.waitForRequests();
 
     // Only 4 and 5 has been changed and should be in the save request.
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           delete: {

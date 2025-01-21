@@ -70,7 +70,7 @@ describe("PcrPrimer edit page", () => {
     await wrapper.waitForRequests();
 
     // Test expected API Response
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -94,7 +94,7 @@ describe("PcrPrimer edit page", () => {
     );
 
     // The user should be redirected to the new primer's details page.
-    expect(mockPush).lastCalledWith("/seqdb/pcr-primer/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith("/seqdb/pcr-primer/view?id=1");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -184,7 +184,7 @@ describe("PcrPrimer edit page", () => {
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -211,7 +211,7 @@ describe("PcrPrimer edit page", () => {
     );
 
     // The user should be redirected to the existing primer's details page.
-    expect(mockPush).lastCalledWith("/seqdb/pcr-primer/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith("/seqdb/pcr-primer/view?id=1");
   });
 });
 

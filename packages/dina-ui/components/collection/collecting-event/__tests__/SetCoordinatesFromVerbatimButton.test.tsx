@@ -48,7 +48,7 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
     expect(latitudeInput.value).toEqual("45.540278");
     expect(longitudeInput.value).toEqual("-129.675278");
 
-    expect(onClickCallback).lastCalledWith({
+    expect(onClickCallback).toHaveBeenLastCalledWith({
       lat: "45.540278",
       lon: "-129.675278"
     });

@@ -105,6 +105,6 @@ describe("AssignedStorage component", () => {
     await wrapper.waitForRequests();
 
     userEvent.click(wrapper.getByRole("button"));
-    expect(mockOnChange).lastCalledWith({ id: null });
+    expect(mockOnChange).toHaveBeenLastCalledWith({ id: null });
   });
 });

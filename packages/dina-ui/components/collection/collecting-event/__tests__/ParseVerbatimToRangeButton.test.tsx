@@ -32,7 +32,7 @@ describe("ParseVerbatimToRangeButton component", () => {
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(mockSubmit).lastCalledWith({
+      expect(mockSubmit).toHaveBeenLastCalledWith({
         verbatim: "1m to 20m ",
         min: "1",
         max: "20"
@@ -65,7 +65,7 @@ describe("ParseVerbatimToRangeButton component", () => {
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(mockSubmit).lastCalledWith({
+      expect(mockSubmit).toHaveBeenLastCalledWith({
         verbatim: "1m ",
         min: "1"
       });

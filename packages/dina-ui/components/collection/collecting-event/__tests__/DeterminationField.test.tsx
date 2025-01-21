@@ -32,7 +32,7 @@ describe("DeterminationField component", () => {
 
     await waitFor(() => {
       // Empty determination submitted:
-      expect(mockOnSubmit).lastCalledWith({
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
         determination: [{ isPrimary: true }]
       });
     });

@@ -152,7 +152,7 @@ describe("useQuery hook", () => {
     await waitForRequests();
 
     expect(mockOnSuccess).toHaveBeenCalledTimes(1);
-    expect(mockOnSuccess).lastCalledWith(MOCK_TODO_RESPONSE);
+    expect(mockOnSuccess).toHaveBeenLastCalledWith(MOCK_TODO_RESPONSE);
   });
 
   it("Re-fetches the data if the 'deps' prop changes.", async () => {
@@ -171,7 +171,7 @@ describe("useQuery hook", () => {
 
     // The request should have been sent twice.
     expect(mockOnSuccess).toHaveBeenCalledTimes(2);
-    expect(mockOnSuccess).lastCalledWith(MOCK_TODO_RESPONSE);
+    expect(mockOnSuccess).toHaveBeenLastCalledWith(MOCK_TODO_RESPONSE);
   });
 
   it("Does not re-fetch the data if the 'deps' prop stays the same.", async () => {
@@ -190,7 +190,7 @@ describe("useQuery hook", () => {
 
     // The request should only have been sent once.
     expect(mockOnSuccess).toHaveBeenCalledTimes(1);
-    expect(mockOnSuccess).lastCalledWith(MOCK_TODO_RESPONSE);
+    expect(mockOnSuccess).toHaveBeenLastCalledWith(MOCK_TODO_RESPONSE);
   });
 
   it("Lets you do client-side data joins across multiple back-end APIs", async () => {
@@ -218,7 +218,7 @@ describe("useQuery hook", () => {
     await waitForRequests();
 
     expect(mockBulkGet).toHaveBeenCalledTimes(1);
-    expect(mockBulkGet).lastCalledWith(["person/100"], {
+    expect(mockBulkGet).toHaveBeenLastCalledWith(["person/100"], {
       apiBaseUrl: "/people-api",
       returnNullForMissingResource: true
     });
@@ -383,14 +383,14 @@ describe("useQuery hook", () => {
     expect(mockGet).toHaveBeenCalledTimes(1);
 
     // The response is undefined before sending the first request.
-    expect(mockChild).not.lastCalledWith(
+    expect(mockChild).not.toHaveBeenLastCalledWith(
       expect.objectContaining({ response: expect.anything() })
     );
 
     // Continue the test after the first request finishes.
     await waitForRequests();
 
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ response: MOCK_TODOS_RESPONSE })
     );
 
@@ -403,14 +403,14 @@ describe("useQuery hook", () => {
     expect(mockGet).toHaveBeenCalledTimes(2);
 
     // The loading state is returned when waiting for the second fetch.
-    expect(mockChild).lastCalledWith({
+    expect(mockChild).toHaveBeenLastCalledWith({
       isDisabled: false,
       loading: true
     });
 
     // Continue the test after the second request finishes.
     await waitForRequests();
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ response: MOCK_TODOS_RESPONSE_PAGE_2 })
     );
   });
@@ -426,7 +426,7 @@ describe("useQuery hook", () => {
     );
 
     // Renders with loading as true when initially fetching data.
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ loading: true })
     );
 
@@ -435,7 +435,7 @@ describe("useQuery hook", () => {
 
     // The component renders a third time when the first query finishes.
     expect(mockChild).toHaveBeenCalledTimes(2);
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ loading: false })
     );
 
@@ -443,7 +443,7 @@ describe("useQuery hook", () => {
     rerender(pagedQuery({ offset: 3, limit: 3 }, mockChild));
 
     // Query component renders with loading as true when re-fetching data.
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ loading: true })
     );
 
@@ -451,7 +451,7 @@ describe("useQuery hook", () => {
     await waitForRequests();
 
     // Renders with loading as false after the second query finishes.
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ loading: false })
     );
   });

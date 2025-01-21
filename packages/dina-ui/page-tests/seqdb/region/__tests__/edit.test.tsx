@@ -66,7 +66,7 @@ describe("Region edit page", () => {
 
     await wrapper.waitForRequests();
 
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -86,7 +86,7 @@ describe("Region edit page", () => {
     );
 
     // The user should be redirected to the new region's details page.
-    expect(mockPush).lastCalledWith("/seqdb/region/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith("/seqdb/region/view?id=1");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -173,7 +173,7 @@ describe("Region edit page", () => {
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -195,7 +195,7 @@ describe("Region edit page", () => {
     );
 
     // The user should be redirected to the existing region's details page.
-    expect(mockPush).lastCalledWith("/seqdb/region/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith("/seqdb/region/view?id=1");
   });
 });
 

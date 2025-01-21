@@ -79,7 +79,7 @@ describe("SangerPcrBatchStep component", () => {
     userEvent.click(wrapper.getByRole("button"));
     await wrapper.waitForRequests();
 
-    expect(mockOnSaved).lastCalledWith(1, {
+    expect(mockOnSaved).toHaveBeenLastCalledWith(1, {
       storageUnit: {
         id: null,
         type: "storage-unit"
@@ -139,7 +139,7 @@ describe("SangerPcrBatchStep component", () => {
     userEvent.click(wrapper2.getByRole("button"));
     await wrapper.waitForRequests();
 
-    expect(mockOnSaved).lastCalledWith(1, {
+    expect(mockOnSaved).toHaveBeenLastCalledWith(1, {
       storageUnit: {
         id: null,
         type: "storage-unit"

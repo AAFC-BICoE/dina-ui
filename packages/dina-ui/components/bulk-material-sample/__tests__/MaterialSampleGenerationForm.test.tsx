@@ -116,7 +116,7 @@ describe("MaterialSampleGenerationForm", () => {
     await wrapper.waitForRequests();
 
     // Sample initialValues are created with the expected names and the linked collection:
-    expect(mockOnGenerate).lastCalledWith({
+    expect(mockOnGenerate).toHaveBeenLastCalledWith({
       generationMode: "SERIES",
       samples: expectedNames.map((name) => ({
         parentMaterialSample: undefined,

@@ -221,7 +221,7 @@ describe("Metadata external resource edit page.", () => {
     await wrapper.waitForRequests();
 
     // Test response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {

@@ -79,6 +79,8 @@ describe("ExistingObjectsAttacher component", () => {
     await wrapper.waitForRequests();
 
     // The 3 test Metadata IDs should have been submitted:
-    expect(mockSubmit).lastCalledWith(TEST_METADATAS.map(({ id }) => id));
+    expect(mockSubmit).toHaveBeenLastCalledWith(
+      TEST_METADATAS.map(({ id }) => id)
+    );
   });
 });

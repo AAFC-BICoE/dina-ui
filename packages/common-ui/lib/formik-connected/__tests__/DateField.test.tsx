@@ -71,7 +71,7 @@ describe("DateField component", () => {
     fireEvent.click(wrapper.getByRole("button"));
     await wrapper.waitForRequests();
 
-    expect(mockOnSubmit).lastCalledWith({ testField: "" });
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({ testField: "" });
   });
 
   it("Shows an error on non-existing dates.", () => {

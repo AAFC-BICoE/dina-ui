@@ -92,7 +92,7 @@ describe("InstitutionForm.", () => {
     await wrapper.waitForRequests();
 
     // Test expected API response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -112,7 +112,7 @@ describe("InstitutionForm.", () => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "123",
       name: "test-institution",
       multilingualDescription: {
@@ -173,7 +173,7 @@ describe("InstitutionForm.", () => {
     await wrapper.waitForRequests();
 
     // Test expected API response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -200,7 +200,7 @@ describe("InstitutionForm.", () => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "333",
       multilingualDescription: {
         descriptions: [

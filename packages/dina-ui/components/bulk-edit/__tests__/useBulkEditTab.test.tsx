@@ -192,7 +192,7 @@ describe("Material sample bulk edit tab", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
     await wrapper.waitForRequests();
 
-    expect(mockSubmitOverride).lastCalledWith({
+    expect(mockSubmitOverride).toHaveBeenLastCalledWith({
       isRestricted: false,
       type: "material-sample"
     });
@@ -219,7 +219,7 @@ describe("Material sample bulk edit tab", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
     await wrapper.waitForRequests();
 
-    expect(mockSubmitOverride).lastCalledWith({
+    expect(mockSubmitOverride).toHaveBeenLastCalledWith({
       type: "material-sample",
       materialSampleName: "test-sample",
       barcode: "test-barcode-override",
@@ -254,7 +254,7 @@ describe("Material sample bulk edit tab", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
     await wrapper.waitForRequests();
 
-    expect(mockSubmitOverride).lastCalledWith({
+    expect(mockSubmitOverride).toHaveBeenLastCalledWith({
       // Keeps the name and type:
       type: "material-sample",
       materialSampleName: "test-sample",
@@ -292,8 +292,11 @@ describe("Material sample bulk edit tab", () => {
       target: { value: "Managed Attribute 2" }
     });
     fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
-    await wrapper.waitForRequests();
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Wait for loading to appear and disappear.
+    const loading = await wrapper.findByText(/loading\.\.\./i);
+    await waitForElementToBeRemoved(loading);
+
     fireEvent.click(
       wrapper.getByRole("option", { name: /managed attribute 2/i })
     );
@@ -305,8 +308,11 @@ describe("Material sample bulk edit tab", () => {
       target: { value: "Managed Attribute 3" }
     });
     fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
-    await wrapper.waitForRequests();
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Wait for loading to appear and disappear.
+    const loading2 = await wrapper.findByText(/loading\.\.\./i);
+    await waitForElementToBeRemoved(loading2);
+
     fireEvent.click(
       wrapper.getByRole("option", { name: /managed attribute 3/i })
     );
@@ -327,7 +333,7 @@ describe("Material sample bulk edit tab", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
     await wrapper.waitForRequests();
 
-    expect(mockSubmitOverride).lastCalledWith({
+    expect(mockSubmitOverride).toHaveBeenLastCalledWith({
       // Keeps the name and type:
       isRestricted: false,
       type: "material-sample",

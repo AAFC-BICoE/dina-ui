@@ -127,7 +127,7 @@ describe("ResourceSelect component", () => {
     await wrapper.waitForRequests();
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       {
         id: "3",
         name: "todo 3",
@@ -166,7 +166,7 @@ describe("ResourceSelect component", () => {
     await wrapper.waitForRequests();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
-    expect(mockGet).lastCalledWith("todo-api/todo", {
+    expect(mockGet).toHaveBeenLastCalledWith("todo-api/todo", {
       page: { limit: 6 },
       include: "group",
       sort: "-createdOn"
@@ -210,7 +210,7 @@ describe("ResourceSelect component", () => {
     // The GET function shsould have been called twice: for the initial query and again for the
     // filtered query.
     expect(mockGet).toHaveBeenCalledTimes(2);
-    expect(mockGet).lastCalledWith("todo-api/todo", {
+    expect(mockGet).toHaveBeenLastCalledWith("todo-api/todo", {
       filter: {
         description: "test filter value"
       },
@@ -265,7 +265,7 @@ describe("ResourceSelect component", () => {
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       { id: null },
       expect.objectContaining({})
     );
@@ -328,7 +328,7 @@ describe("ResourceSelect component", () => {
     await wrapper.waitForRequests();
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       [
         {
           id: "2",
@@ -431,7 +431,7 @@ describe("ResourceSelect component", () => {
 
     await wrapper.waitForRequests();
     expect(mockGetResource).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       TEST_ASYNC_TODO,
       expect.objectContaining({})
     );
@@ -476,7 +476,7 @@ describe("ResourceSelect component", () => {
 
     expect(mockGetResource).toHaveBeenCalledTimes(1);
     // Called with the normal option plus the async-fetched value:
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       [
         {
           id: "100",
@@ -540,7 +540,7 @@ describe("ResourceSelect component", () => {
 
     await wrapper.waitForRequests();
 
-    expect(mockBulkGet).lastCalledWith(["todo/ABC"], {
+    expect(mockBulkGet).toHaveBeenLastCalledWith(["todo/ABC"], {
       apiBaseUrl: "/todo-api",
       returnNullForMissingResource: true
     });

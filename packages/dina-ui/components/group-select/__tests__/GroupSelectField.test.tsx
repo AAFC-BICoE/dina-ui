@@ -141,7 +141,7 @@ describe("GroupSelectField component", () => {
     await wrapper.waitForRequests();
 
     // The default group was selected:
-    expect(mockSubmit).lastCalledWith({ group: "cnc" });
+    expect(mockSubmit).toHaveBeenLastCalledWith({ group: "cnc" });
   });
 
   it("Doesn't set the default value when the initial value is null.", async () => {
@@ -164,6 +164,6 @@ describe("GroupSelectField component", () => {
     await wrapper.waitForRequests();
 
     // The default group was selected:
-    expect(mockSubmit).lastCalledWith({ group: null });
+    expect(mockSubmit).toHaveBeenLastCalledWith({ group: null });
   });
 });

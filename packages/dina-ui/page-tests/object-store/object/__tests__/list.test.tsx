@@ -289,7 +289,7 @@ describe("Metadata List Page", () => {
     userEvent.click(wrapper.getByRole("button", { name: /edit selected/i }));
 
     // Router push should have been called with the 3 IDs.
-    expect(mockPush).lastCalledWith({
+    expect(mockPush).toHaveBeenLastCalledWith({
       pathname: "/object-store/metadata/bulk-edit"
     });
 
@@ -391,7 +391,7 @@ describe("Metadata List Page", () => {
     await wrapper.waitForRequests();
 
     expect(mockDelete).toHaveBeenCalledTimes(2);
-    expect(mockDelete).lastCalledWith(
+    expect(mockDelete).toHaveBeenLastCalledWith(
       `/objectstore-api/metadata/11111111-1111-1111-1111-111111111111`
     );
     expect(mockReload).toHaveBeenCalledTimes(1);

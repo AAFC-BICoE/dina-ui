@@ -140,7 +140,7 @@ describe("BrowseStorageTree component", () => {
       within(wrapper.getByTestId("collapser-button-C")).getByRole("button")
     );
 
-    expect(mockOnSelect).lastCalledWith(STORAGE_C);
+    expect(mockOnSelect).toHaveBeenLastCalledWith(STORAGE_C);
   });
 
   it("Filters the list based on a text filter.", async () => {
@@ -153,7 +153,7 @@ describe("BrowseStorageTree component", () => {
     await wrapper.waitForRequests();
 
     // With no filter, gets the top-level units:
-    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+    expect(mockGet).toHaveBeenLastCalledWith("collection-api/storage-unit", {
       filter: {
         rsql: "group=in=(aafc,cnc)"
       },
@@ -173,7 +173,7 @@ describe("BrowseStorageTree component", () => {
     await wrapper.waitForRequests();
 
     // With a filter, gets units from any level matching the search text:
-    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+    expect(mockGet).toHaveBeenLastCalledWith("collection-api/storage-unit", {
       filter: {
         rsql: "name==*test-search-text*;group=in=(aafc,cnc)"
       },
@@ -190,7 +190,7 @@ describe("BrowseStorageTree component", () => {
     await wrapper.waitForRequests();
 
     // No filter again:
-    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+    expect(mockGet).toHaveBeenLastCalledWith("collection-api/storage-unit", {
       filter: {
         rsql: "group=in=(aafc,cnc)"
       },

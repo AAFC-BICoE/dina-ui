@@ -111,7 +111,7 @@ describe("FilterRow component", () => {
     fireEvent.click(wrapper.getByRole("option", { name: /description/i }));
     await wrapper.waitForRequests();
 
-    expect(mockModelChange).lastCalledWith({
+    expect(mockModelChange).toHaveBeenLastCalledWith({
       attribute: "description",
       id: 1,
       predicate: "IS",
@@ -130,7 +130,7 @@ describe("FilterRow component", () => {
     fireEvent.click(wrapper.getAllByRole("option", { name: "" })[1]);
     await wrapper.waitForRequests();
 
-    expect(mockModelChange).lastCalledWith({
+    expect(mockModelChange).toHaveBeenLastCalledWith({
       attribute: "name",
       id: 1,
       predicate: "IS NOT",
@@ -147,7 +147,7 @@ describe("FilterRow component", () => {
       target: { value: "101F" }
     });
 
-    expect(mockModelChange).lastCalledWith({
+    expect(mockModelChange).toHaveBeenLastCalledWith({
       attribute: "name",
       id: 1,
       predicate: "IS",

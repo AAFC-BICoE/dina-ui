@@ -75,7 +75,7 @@ describe("Collection edit page", () => {
     await wrapper.waitForRequests();
 
     // Test expected API response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: expect.objectContaining({
@@ -88,7 +88,9 @@ describe("Collection edit page", () => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
-    expect(mockPush).lastCalledWith("/collection/collection/view?id=123");
+    expect(mockPush).toHaveBeenLastCalledWith(
+      "/collection/collection/view?id=123"
+    );
   });
 
   it("Lets you edit an existing Collection", async () => {
@@ -119,7 +121,7 @@ describe("Collection edit page", () => {
     await wrapper.waitForRequests();
 
     // Test expected API response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: expect.objectContaining({
@@ -136,6 +138,8 @@ describe("Collection edit page", () => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
-    expect(mockPush).lastCalledWith("/collection/collection/view?id=123");
+    expect(mockPush).toHaveBeenLastCalledWith(
+      "/collection/collection/view?id=123"
+    );
   });
 });

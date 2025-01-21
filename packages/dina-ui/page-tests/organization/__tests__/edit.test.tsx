@@ -93,7 +93,7 @@ describe("organization edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
     await wrapper.waitForRequests();
 
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/agent-api/operations",
       [
         {
@@ -117,7 +117,7 @@ describe("organization edit page", () => {
     );
 
     // The user should be redirected to the new organization's details page.
-    expect(mockPush).lastCalledWith("/organization/list");
+    expect(mockPush).toHaveBeenLastCalledWith("/organization/list");
   });
 
   it("Provides a form to edit an organization.", async () => {
@@ -163,7 +163,7 @@ describe("organization edit page", () => {
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/agent-api/operations",
       [
         {
@@ -182,7 +182,7 @@ describe("organization edit page", () => {
     );
 
     // The user should be redirected to organization's list page.
-    expect(mockPush).lastCalledWith("/organization/list");
+    expect(mockPush).toHaveBeenLastCalledWith("/organization/list");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {

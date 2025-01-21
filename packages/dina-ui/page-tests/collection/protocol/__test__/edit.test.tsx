@@ -244,7 +244,7 @@ describe("protocol edit page", () => {
     await wrapper.waitForRequests();
 
     // Test expected API response
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {
@@ -271,7 +271,7 @@ describe("protocol edit page", () => {
     );
 
     // The user should be redirected to the new protocol's details page.
-    expect(mockPush).lastCalledWith("/collection/protocol/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith("/collection/protocol/view?id=1");
   });
 
   it("Edits an existing protocol.", async () => {
@@ -314,7 +314,7 @@ describe("protocol edit page", () => {
     await wrapper.waitForRequests();
 
     // Test expected API response
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {

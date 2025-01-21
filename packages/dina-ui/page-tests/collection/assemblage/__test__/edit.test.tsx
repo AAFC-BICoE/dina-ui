@@ -130,7 +130,7 @@ describe("AssemblageForm.", () => {
     await wrapper.waitForRequests();
 
     // Test expected values
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -172,7 +172,7 @@ describe("AssemblageForm.", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "123",
       name: "test-assemblage",
       relationships: {
@@ -268,7 +268,7 @@ describe("AssemblageForm.", () => {
     await wrapper.waitForRequests();
 
     // Test expected values
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -307,7 +307,7 @@ describe("AssemblageForm.", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "333",
       multilingualDescription: {
         descriptions: [

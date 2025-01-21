@@ -133,7 +133,7 @@ describe("DataEntry", () => {
     await wrapper.waitForRequests();
 
     // Formik should have the updated value.
-    expect(mockSubmit).lastCalledWith({
+    expect(mockSubmit).toHaveBeenLastCalledWith({
       [name]: {
         BLOCK_OPTION_1: {
           rows: {
@@ -181,7 +181,7 @@ describe("DataEntry", () => {
     await wrapper.waitForRequests();
 
     // Formik should have the updated value.
-    expect(mockSubmit).lastCalledWith({
+    expect(mockSubmit).toHaveBeenLastCalledWith({
       [name]: {
         BLOCK_OPTION_1: {
           rows: {
@@ -235,7 +235,7 @@ describe("DataEntry", () => {
     await wrapper.waitForRequests();
 
     // Formik should have the updated value.
-    expect(mockSubmit).lastCalledWith({
+    expect(mockSubmit).toHaveBeenLastCalledWith({
       [name]: {
         BLOCK_OPTION_1: {
           rows: {

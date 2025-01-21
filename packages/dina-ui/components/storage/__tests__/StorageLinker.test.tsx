@@ -56,7 +56,7 @@ describe("StorageLinker", () => {
     await wrapper.waitForRequests();
 
     // Only the storage needs to be deleted:
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [{ delete: { id: "A", type: "storage-unit" } }],
       { apiBaseUrl: "/collection-api" }
     );
@@ -91,7 +91,7 @@ describe("StorageLinker", () => {
     await wrapper.waitForRequests();
 
     // Only the storage needs to be deleted:
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         // Detach the Material Sample:
         {

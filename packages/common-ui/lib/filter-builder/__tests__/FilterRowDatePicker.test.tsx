@@ -34,7 +34,7 @@ describe("FilterRowDatePicker", () => {
       "Tue Oct 20 2020 21:05:30 GMT+0000 (Coordinated Universal Time)";
 
     fireEvent.change(datepicker, { target: { value: "10/20/2020" } });
-    expect(mockOnChanged).lastCalledWith(TEST_SINGLE_DATE_CHANGE);
+    expect(mockOnChanged).toHaveBeenLastCalledWith(TEST_SINGLE_DATE_CHANGE);
   });
 
   it("Renders the date range picker.", async () => {
@@ -54,14 +54,14 @@ describe("FilterRowDatePicker", () => {
     // Passes the selected dates as a string to react-datepicker:
     fireEvent.change(datepickers[0], { target: { value: "10/20/2020" } });
     await wrapper.waitForRequests();
-    expect(mockOnChanged).lastCalledWith({
+    expect(mockOnChanged).toHaveBeenLastCalledWith({
       high: "Thu Oct 15 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
       low: "Tue Oct 20 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"
     });
 
     fireEvent.change(datepickers[1], { target: { value: "10/25/2020" } });
     await wrapper.waitForRequests();
-    expect(mockOnChanged).lastCalledWith({
+    expect(mockOnChanged).toHaveBeenLastCalledWith({
       high: "Sun Oct 25 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
       low: "Mon Oct 12 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"
     });

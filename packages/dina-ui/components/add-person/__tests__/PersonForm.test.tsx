@@ -42,7 +42,7 @@ describe("PersonForm", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await wrapper.waitForRequests();
 
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -67,7 +67,7 @@ describe("PersonForm", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await wrapper.waitForRequests();
 
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {

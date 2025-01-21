@@ -37,7 +37,7 @@ describe("ListPageLayout component", () => {
     await wrapper.waitForRequests();
 
     // There should be an RSQL filter.
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenLastCalledWith(
       expect.anything(),
       expect.objectContaining({
         filter: { rsql: "name==*101F*" }
@@ -48,7 +48,7 @@ describe("ListPageLayout component", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /reset filters/i }));
 
     // There should be no RSQL filter.
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenLastCalledWith(
       expect.anything(),
       expect.objectContaining({
         filter: {}
@@ -77,7 +77,7 @@ describe("ListPageLayout component", () => {
     await wrapper.waitForRequests();
 
     // There should be an RSQL filter.
-    expect(mockGet).lastCalledWith("pcrPrimer", {
+    expect(mockGet).toHaveBeenLastCalledWith("pcrPrimer", {
       filter: {},
       page: { limit: 25, offset: 0 },
       sort: "-type"
@@ -108,7 +108,7 @@ describe("ListPageLayout component", () => {
     await wrapper.waitForRequests();
 
     // Ensure the additional filters are included in the request:
-    expect(mockGet).lastCalledWith("pcrPrimer", {
+    expect(mockGet).toHaveBeenLastCalledWith("pcrPrimer", {
       filter: { attr1: "a", rsql: "attr2==b" },
       page: { limit: 25, offset: 0 },
       sort: "-createdOn"

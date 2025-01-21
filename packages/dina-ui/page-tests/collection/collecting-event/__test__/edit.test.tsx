@@ -166,7 +166,7 @@ describe("collecting-event edit page", () => {
     await wrapper.waitForRequests();
 
     // Test expected API Response
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {
@@ -195,7 +195,9 @@ describe("collecting-event edit page", () => {
     );
 
     // The user should be redirected to the new collecting-event's details page.
-    expect(mockPush).lastCalledWith("/collection/collecting-event/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith(
+      "/collection/collecting-event/view?id=1"
+    );
   });
 
   it("Lets you add georeference assertions on a new Collecting Event.", async () => {
@@ -347,7 +349,7 @@ describe("collecting-event edit page", () => {
 
     // Test expected response.
     expect(mockPatch).toBeCalledTimes(1);
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {
@@ -505,7 +507,7 @@ describe("collecting-event edit page", () => {
 
     await wrapper.waitForRequests();
 
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {

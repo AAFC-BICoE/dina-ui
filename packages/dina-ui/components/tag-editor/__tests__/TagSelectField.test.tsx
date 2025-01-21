@@ -50,7 +50,7 @@ describe("TagSelectField", () => {
 
     await wrapper.waitForRequests();
 
-    expect(mockGet).lastCalledWith("collection-api/material-sample", {
+    expect(mockGet).toHaveBeenLastCalledWith("collection-api/material-sample", {
       fields: { "material-sample": "tags" }, // Only request tags field.
       filter: { rsql: "group=in=(aafc,cnc)", tags: { NEQ: "null" } }, // Restrict to user's groups
       page: { limit: 100 },

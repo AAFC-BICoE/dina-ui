@@ -73,7 +73,7 @@ describe("Object subtype edit page", () => {
     await wrapper.waitForRequests();
 
     // Test expected response
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/objectstore-api/operations",
       [
         {
@@ -92,7 +92,9 @@ describe("Object subtype edit page", () => {
     );
 
     // The user should be redirected to the new object subtype's details page.
-    expect(mockPush).lastCalledWith("/object-store/object-subtype/list");
+    expect(mockPush).toHaveBeenLastCalledWith(
+      "/object-store/object-subtype/list"
+    );
   });
 
   it("Provides a form to edit a object subtype.", async () => {
@@ -145,7 +147,7 @@ describe("Object subtype edit page", () => {
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/objectstore-api/operations",
       [
         {
@@ -164,7 +166,9 @@ describe("Object subtype edit page", () => {
     );
 
     // The user should be redirected to object subtype's list page.
-    expect(mockPush).lastCalledWith("/object-store/object-subtype/list");
+    expect(mockPush).toHaveBeenLastCalledWith(
+      "/object-store/object-subtype/list"
+    );
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {

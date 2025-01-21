@@ -6,7 +6,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -156,14 +156,21 @@ describe("Material Sample Edit Page", () => {
     fireEvent.click(collectingEventToggle[0]);
     await wrapper.waitForRequests();
 
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /primary id/i }),
-      "test-material-sample-id"
-    );
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
-      "2019-12-21T16:00"
-    );
+    const primaryId = await wrapper.findByRole("textbox", {
+      name: "Primary ID"
+    });
+    userEvent.type(primaryId, "test-material-sample-id");
+    await waitFor(() => {
+      expect(primaryId).toHaveDisplayValue("test-material-sample-id");
+    });
+
+    const verbatimDate = await wrapper.findByRole("textbox", {
+      name: /verbatim event datetime/i
+    });
+    userEvent.type(verbatimDate, "2019-12-21T16:00", { delay: 0 });
+    await waitFor(() => {
+      expect(verbatimDate).toHaveDisplayValue("2019-12-21T16:00");
+    });
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await wrapper.waitForRequests();
@@ -284,13 +291,14 @@ describe("Material Sample Edit Page", () => {
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
+    await wrapper.waitForRequests(1000);
 
     // Select an existing collecting event.
     userEvent.click(wrapper.getByRole("button", { name: /select/i }));
-    await wrapper.waitForRequests();
+    await wrapper.waitForRequests(500);
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await wrapper.waitForRequests();
+    await wrapper.waitForRequests(500);
 
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
@@ -384,18 +392,24 @@ describe("Material Sample Edit Page", () => {
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      await wrapper.findByRole("textbox", { name: /verbatim event datetime/i })
     ).toHaveDisplayValue("2021-04-13");
 
     // Update the Primary ID.
-    userEvent.clear(wrapper.getByRole("textbox", { name: /primary id/i }));
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /primary id/i }),
-      "test-material-sample-id"
-    );
+    const primaryId = await wrapper.findByRole("textbox", {
+      name: /primary id/i
+    });
+    userEvent.clear(primaryId);
+    userEvent.type(primaryId, "test-material-sample-id");
+    await waitFor(() => {
+      expect(primaryId).toHaveDisplayValue("test-material-sample-id");
+    });
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await wrapper.waitForRequests();
+    await waitFor(() => {
+      // Collecting event and material sample calls are expected.
+      expect(mockSave).toHaveBeenCalledTimes(2);
+    });
 
     expect(mockSave.mock.calls).toMatchObject([
       [
@@ -447,7 +461,7 @@ describe("Material Sample Edit Page", () => {
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      await wrapper.findByRole("textbox", { name: /verbatim event datetime/i })
     ).toHaveDisplayValue("2021-04-13");
 
     // Remove the existing Collecting Event.
@@ -460,14 +474,20 @@ describe("Material Sample Edit Page", () => {
     ).toHaveDisplayValue("");
 
     // Set the new Collecting Event's verbatimEventDateTime:
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
-      "2019-12-21T16:00"
-    );
+    const verbatimDate = wrapper.getByRole("textbox", {
+      name: /verbatim event datetime/i
+    });
+    userEvent.type(verbatimDate, "2019-12-21T16:00");
+    await waitFor(() => {
+      expect(verbatimDate).toHaveDisplayValue("2019-12-21T16:00");
+    });
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await wrapper.waitForRequests();
+    await waitFor(() => {
+      // Collecting event and material sample calls are expected.
+      expect(mockSave).toHaveBeenCalledTimes(2);
+    });
 
     expect(mockSave.mock.calls).toMatchObject([
       [
@@ -752,7 +772,10 @@ describe("Material Sample Edit Page", () => {
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await wrapper.waitForRequests();
+    await waitFor(() => {
+      // Collecting event and material sample calls are expected.
+      expect(mockSave).toHaveBeenCalledTimes(2);
+    });
 
     expect(mockSave.mock.calls).toMatchObject([
       [
@@ -796,19 +819,22 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await wrapper.waitForRequests();
+    await wrapper.waitForRequests(500);
 
     // Set the group:
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", { name: /group select\.\.\./i })
     );
-    userEvent.click(wrapper.getByRole("option", { name: /aafc/i }));
+    await userEvent.click(
+      await wrapper.findByRole("option", { name: /aafc/i })
+    );
 
     // Set the Primary ID.
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /primary id/i }),
-      "test-material-sample-id"
-    );
+    const primaryId = wrapper.getByRole("textbox", { name: /primary id/i });
+    await userEvent.type(primaryId, "test-material-sample-id");
+    await waitFor(() => {
+      expect(primaryId).toHaveDisplayValue("test-material-sample-id");
+    });
 
     // Enable the Organisms form section:
     const organismToggle = wrapper.container.querySelectorAll(
@@ -821,39 +847,39 @@ describe("Material Sample Edit Page", () => {
     await wrapper.waitForRequests();
 
     // Add a determination:
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
     await wrapper.waitForRequests();
 
-    function fillOutDetermination(num: number) {
-      userEvent.type(
-        wrapper.getByRole("textbox", {
+    async function fillOutDetermination(num: number) {
+      await userEvent.type(
+        await wrapper.findByRole("textbox", {
           name: /verbatim scientific name × insert hybrid symbol/i
         }),
         `test-name-${num}`
       );
-      userEvent.type(
-        wrapper.getByRole("textbox", { name: /verbatim determiner/i }),
+      await userEvent.type(
+        await wrapper.findByRole("textbox", { name: /verbatim determiner/i }),
         `test-agent-${num}`
       );
     }
 
     // Enter the first determination:
-    fillOutDetermination(1);
+    await fillOutDetermination(1);
 
     // Enter the second determination:
-    userEvent.click(wrapper.getByTestId("add-another-button"));
-    await wrapper.waitForRequests();
-    fillOutDetermination(2);
+    await userEvent.click(wrapper.getByTestId("add-another-button"));
+    await fillOutDetermination(2);
 
     // Enter the third determination:
-    userEvent.click(wrapper.getByTestId("add-another-button"));
-    await wrapper.waitForRequests();
-    fillOutDetermination(3);
+    await userEvent.click(wrapper.getByTestId("add-another-button"));
+    await fillOutDetermination(3);
 
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await wrapper.waitForRequests();
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => {
+      expect(mockSave).toHaveBeenCalledTimes(2);
+    });
 
     // Saves the Material Sample:
     expect(mockSave.mock.calls).toMatchObject([
@@ -1065,13 +1091,13 @@ describe("Material Sample Edit Page", () => {
     await wrapper.waitForRequests();
 
     // Update the Primary ID.
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-duplicate-name"
     );
 
     // Attempt to save, error should be displayed.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await wrapper.waitForRequests();
 
     // Expect red outline around Primary ID.
@@ -1083,7 +1109,7 @@ describe("Material Sample Edit Page", () => {
     ).toBeInTheDocument();
 
     // You should not be able to submit the form until this error is resolved:
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await wrapper.waitForRequests();
     expect(mockOnSaved).toHaveBeenCalledTimes(0);
 
@@ -1100,7 +1126,9 @@ describe("Material Sample Edit Page", () => {
     await wrapper.waitForRequests();
 
     // Form submitted successfully:
-    expect(mockOnSaved).lastCalledWith("11111111-1111-1111-1111-111111111111");
+    expect(mockOnSaved).toHaveBeenLastCalledWith(
+      "11111111-1111-1111-1111-111111111111"
+    );
   });
 
   it("Add the associated sample selected from search result list to a new association.", async () => {
@@ -2106,7 +2134,7 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(
       wrapper.getByRole("combobox", { name: /determining agents person 1/i })
     );
-    userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
+    userEvent.click(await wrapper.findByRole("option", { name: /person 2/i }));
     await wrapper.waitForRequests();
 
     // Save the form
@@ -2188,7 +2216,9 @@ describe("Material Sample Edit Page", () => {
     expect(wrapper.queryByText(/attribute 1/i)).not.toBeInTheDocument();
 
     // Attribute 2 already has a value:
-    expect(wrapper.getByDisplayValue(/attribute 2 value/i)).toBeInTheDocument();
+    expect(
+      await wrapper.findByDisplayValue(/attribute 2 value/i)
+    ).toBeInTheDocument();
 
     // Attribute 3 is visible and empty:
     expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();

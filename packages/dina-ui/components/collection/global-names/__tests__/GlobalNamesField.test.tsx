@@ -81,7 +81,7 @@ describe("GlobalNamesField component", () => {
       ]
     ]);
 
-    expect(mockFetchJson).lastCalledWith(
+    expect(mockFetchJson).toHaveBeenLastCalledWith(
       "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false"
     );
 
@@ -90,7 +90,7 @@ describe("GlobalNamesField component", () => {
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(mockOnSubmit).lastCalledWith({
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
         scientificName: "Monodon Linnaeus, 1758",
         scientificNameSource: "GNA"
       });

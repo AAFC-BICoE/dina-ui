@@ -100,16 +100,17 @@ describe("User edit page", () => {
     );
     await wrapper.waitForRequests();
 
-    userEvent.click(wrapper.getByRole("option", { name: /super/i }));
+    userEvent.click(wrapper.getByRole("option", { name: /super\-user/i }));
+    await wrapper.waitForRequests();
 
     // Remove a group: (cnc)
     userEvent.click(
       wrapper.getAllByRole("button", { name: /remove group/i })[0]
     );
+    await wrapper.waitForRequests();
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
-
     await wrapper.waitForRequests();
 
     // Check form state: cnc removed, test-group added:

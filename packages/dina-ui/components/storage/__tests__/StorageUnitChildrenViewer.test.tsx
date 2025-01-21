@@ -208,7 +208,7 @@ describe("StorageUnitChildrenViewer component", () => {
     await wrapper.waitForRequests();
 
     // Test expected API Call
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         ...STORAGE_UNIT_CHILDREN.map((unit) => ({
           resource: {
@@ -233,7 +233,9 @@ describe("StorageUnitChildrenViewer component", () => {
       { apiBaseUrl: "/collection-api" }
     );
     // The browser is navigated to the new location:
-    expect(mockPush).lastCalledWith("/collection/storage-unit/view?id=B");
+    expect(mockPush).toHaveBeenLastCalledWith(
+      "/collection/storage-unit/view?id=B"
+    );
   });
 
   it("Lets you move an existing Storage Unit into this Storage Unit", async () => {
@@ -266,7 +268,7 @@ describe("StorageUnitChildrenViewer component", () => {
     await wrapper.waitForRequests();
 
     // Updates B to set X as the new parent:
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {

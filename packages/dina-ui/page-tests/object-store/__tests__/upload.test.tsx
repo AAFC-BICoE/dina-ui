@@ -112,7 +112,7 @@ describe("Upload page", () => {
     await wrapper.waitForRequests();
 
     // The group name should be in the URL:
-    expect(mockPost).lastCalledWith(
+    expect(mockPost).toHaveBeenLastCalledWith(
       "/objectstore-api/file/example-group",
       // Form data with the file would go here:
       expect.anything(),
@@ -121,7 +121,7 @@ describe("Upload page", () => {
     );
 
     // You should get redirected to the bulk edit page with the new metadata IDs.
-    expect(mockPush).lastCalledWith({
+    expect(mockPush).toHaveBeenLastCalledWith({
       pathname: "/object-store/metadata/bulk-edit",
       query: {
         group: "example-group"

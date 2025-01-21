@@ -109,7 +109,7 @@ describe("collection-method edit page", () => {
     // Wait for async updates after submission
     await waitForRequests();
 
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {
@@ -131,7 +131,9 @@ describe("collection-method edit page", () => {
     );
 
     // Check that the user is redirected to the new collection-method's details page
-    expect(mockPush).lastCalledWith("/collection/collection-method/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith(
+      "/collection/collection-method/view?id=1"
+    );
   });
 
   it("Edits an existing collection method.", async () => {
@@ -179,7 +181,7 @@ describe("collection-method edit page", () => {
     await waitForRequests();
 
     // Check the last called patch request
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {

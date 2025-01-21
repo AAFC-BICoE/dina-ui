@@ -200,7 +200,7 @@ describe("AutoSuggestTextField", () => {
     );
     await wrapper.waitForRequests();
 
-    expect(mockGet).lastCalledWith("agent-api/person", {
+    expect(mockGet).toHaveBeenLastCalledWith("agent-api/person", {
       filter: { rsql: "name==*p*" },
       sort: "-createdOn"
     });
@@ -284,15 +284,18 @@ describe("AutoSuggestTextField", () => {
       wrapper.queryByText(/person3\-elastic\-search/i)
     ).not.toBeInTheDocument();
 
-    expect(mockGetAxios).lastCalledWith("search-api/search-ws/auto-complete", {
-      params: {
-        indexName: "dina_agent_index",
-        autoCompleteField: "data.attributes.name",
-        prefix: "p",
-        additionalField: undefined,
-        group: undefined
+    expect(mockGetAxios).toHaveBeenLastCalledWith(
+      "search-api/search-ws/auto-complete",
+      {
+        params: {
+          indexName: "dina_agent_index",
+          autoCompleteField: "data.attributes.name",
+          prefix: "p",
+          additionalField: undefined,
+          group: undefined
+        }
       }
-    });
+    );
 
     expect(mockGetAxios).toHaveBeenCalledTimes(1);
 
@@ -389,7 +392,7 @@ describe("AutoSuggestTextField", () => {
     );
     await wrapper.waitForRequests();
 
-    expect(mockGetAll).lastCalledWith("agent-api/person", {
+    expect(mockGetAll).toHaveBeenLastCalledWith("agent-api/person", {
       filter: { rsql: "name==*p*" },
       sort: "-createdOn"
     });

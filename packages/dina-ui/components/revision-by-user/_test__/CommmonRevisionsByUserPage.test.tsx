@@ -94,7 +94,7 @@ describe("MetadataRevisionListPage", () => {
     userEvent.click(wrapper.getByRole("button", { name: /search/i }));
     await wrapper.waitForRequests();
 
-    expect(mockPush).lastCalledWith({
+    expect(mockPush).toHaveBeenLastCalledWith({
       pathname: "the-page-url",
       query: {
         author: "searched-author"

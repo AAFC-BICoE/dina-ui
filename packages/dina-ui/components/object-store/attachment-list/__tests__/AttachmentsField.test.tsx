@@ -261,7 +261,7 @@ describe("AttachmentsField component", () => {
 
     await waitForRequests();
 
-    expect(mockOnSubmit).lastCalledWith({
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       attachment: [{ id: "example-2", type: "metadata" }]
     });
   });

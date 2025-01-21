@@ -161,7 +161,7 @@ describe("Metadata single record edit page.", () => {
     await wrapper.waitForRequests();
 
     // Check only the changed values
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {

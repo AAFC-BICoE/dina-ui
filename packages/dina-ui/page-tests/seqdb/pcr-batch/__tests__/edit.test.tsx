@@ -206,7 +206,7 @@ describe("PcrBatch edit page", () => {
     await wrapper.waitForRequests();
 
     // Test for expected API Response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -276,7 +276,7 @@ describe("PcrBatch edit page", () => {
     await wrapper.waitForRequests();
 
     // Test for expected API Response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -337,7 +337,7 @@ describe("PcrBatch edit page", () => {
     await wrapper.waitForRequests();
 
     // Test expected API Response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {

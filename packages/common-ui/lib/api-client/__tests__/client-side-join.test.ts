@@ -64,7 +64,7 @@ describe("ClientSideJoiner", () => {
 
     // Bulk get is called once, with unique person ids.
     // There were 2 unique person IDs in the
-    expect(mockBulkGet).lastCalledWith(
+    expect(mockBulkGet).toHaveBeenLastCalledWith(
       [
         "person/a08211f2-aee4-443f-a224-a7768cd9d588",
         "person/6328f159-78d9-401e-8273-74e90ea58d81"

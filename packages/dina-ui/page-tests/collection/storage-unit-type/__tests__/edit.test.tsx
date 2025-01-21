@@ -47,7 +47,7 @@ describe("Storage Unit Type form.", () => {
     await wrapper.waitForRequests();
 
     // Test expected result
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -59,7 +59,7 @@ describe("Storage Unit Type form.", () => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "123",
       name: "test-storage-type",
       type: "storage-unit-type"
@@ -94,7 +94,7 @@ describe("Storage Unit Type form.", () => {
     await wrapper.waitForRequests();
 
     // Test expected result
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -110,7 +110,7 @@ describe("Storage Unit Type form.", () => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "333",
       group: "test-group",
       name: "edited-name",

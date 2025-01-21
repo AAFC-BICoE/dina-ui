@@ -74,7 +74,7 @@ describe("Product edit page", () => {
     await wrapper.waitForRequests();
 
     // Test expected API Response
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -95,7 +95,7 @@ describe("Product edit page", () => {
     );
 
     // The user should be redirected to the new product's details page.
-    expect(mockPush).lastCalledWith("/seqdb/product/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith("/seqdb/product/view?id=1");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -187,7 +187,7 @@ describe("Product edit page", () => {
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -207,7 +207,7 @@ describe("Product edit page", () => {
     );
 
     // The user should be redirected to the existing product's details page.
-    expect(mockPush).lastCalledWith("/seqdb/product/view?id=10");
+    expect(mockPush).toHaveBeenLastCalledWith("/seqdb/product/view?id=10");
   });
 });
 

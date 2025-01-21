@@ -282,7 +282,7 @@ Constraint violation: description size must be between 1 and 10`;
     ]);
 
     // Expect correct patch args.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/operations",
       [
         {
@@ -374,7 +374,7 @@ Constraint violation: description size must be between 1 and 10`;
       }
     ]);
 
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/operations",
       [
         {
@@ -420,7 +420,7 @@ Constraint violation: description size must be between 1 and 10`;
     ]);
 
     expect(response).toEqual([undefined]);
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/operations",
       [{ op: "DELETE", path: "test-type/1234" }],
       expect.anything()
@@ -462,7 +462,7 @@ Constraint violation: description size must be between 1 and 10`;
       }
     ]);
 
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/operations",
       [
         // The "meta" field should be excluded from the save operation:
@@ -508,7 +508,7 @@ Constraint violation: description size must be between 1 and 10`;
     ]);
 
     // Bulk-requests by ID:
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/operations",
       [
         { op: "GET", path: "pcrPrimer/123" },
@@ -718,17 +718,20 @@ Constraint violation: description size must be between 1 and 10`;
       include: "author"
     });
 
-    expect(mockAxiosGet).lastCalledWith("my-api/topic/100/articles/200", {
-      headers: {
-        Accept: "application/vnd.api+json",
-        "Content-Type": "application/vnd.api+json",
-        myHeader: "my-value"
-      },
-      params: {
-        include: "author"
+    expect(mockAxiosGet).toHaveBeenLastCalledWith(
+      "my-api/topic/100/articles/200",
+      {
+        headers: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+          myHeader: "my-value"
+        },
+        params: {
+          include: "author"
+        }
+        // paramsSerializer: expect.anything()
       }
-      // paramsSerializer: expect.anything()
-    });
+    );
 
     expect(response).toEqual({
       data: [
