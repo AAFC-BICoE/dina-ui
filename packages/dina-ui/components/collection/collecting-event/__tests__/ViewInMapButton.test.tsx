@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { ViewInMapButton } from "../GeoReferenceAssertionRow";
-import { screen, waitFor, fireEvent } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 describe("ViewInMapButton component", () => {

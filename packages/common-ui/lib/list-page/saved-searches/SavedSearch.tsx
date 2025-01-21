@@ -155,8 +155,7 @@ export function SavedSearch({
 
   const [changesMade, setChangesMade] = useState<boolean>(false);
 
-  const [selectedSavedSearchName, setSelectedSavedSearchName] =
-    useState<string>();
+  const [selectedSavedSearchName] = useState<string>();
 
   // Local storage of the displayed columns that are saved.
   const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =

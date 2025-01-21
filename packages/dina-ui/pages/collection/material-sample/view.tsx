@@ -25,7 +25,6 @@ import {
   Footer,
   HOST_ORGANISM_FIELDS,
   Head,
-  ManagedAttributesEditor,
   MaterialSampleBreadCrumb,
   MaterialSampleFormTemplateSelect,
   MaterialSampleIdentifiersSection,

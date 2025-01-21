@@ -42,10 +42,6 @@ export function ManagedAttributeForm({
   componentField,
   withGroup = true
 }: ManagedAttributeFormProps) {
-  const { formatMessage } = useDinaIntl();
-
-  const id = fetchedManagedAttribute?.id;
-
   const initialValues: Partial<ManagedAttribute> = fetchedManagedAttribute
     ? {
         ...fetchedManagedAttribute,

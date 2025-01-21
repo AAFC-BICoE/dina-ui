@@ -1,9 +1,4 @@
-import {
-  filterBy,
-  ResourceSelectField,
-  TextField,
-  useDinaFormContext
-} from "common-ui";
+import { filterBy, ResourceSelectField, TextField } from "common-ui";
 import { GroupSelectField } from "..";
 import { Region } from "../../types/seqdb-api/resources/Region";
 import { FieldArray } from "formik";

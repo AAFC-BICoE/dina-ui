@@ -1,6 +1,5 @@
 import {
   AreYouSureModal,
-  CommonMessage,
   filterBy,
   LoadingSpinner,
   ResourceSelect,

@@ -6,14 +6,13 @@ import {
   FormikButton,
   NumberField,
   ReactTable,
-  TextField,
   ToggleField,
   useDinaFormContext,
   useFieldLabels
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { get, isEmpty, keys } from "lodash";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { BulkEditTabWarning, OrganismStateField } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ORGANISMS_COMPONENT_NAME } from "../../../types/collection-api";
@@ -230,7 +229,7 @@ function OrganismsTable({
   useTargetOrganism
 }: OrganismsTableProps) {
   const { getFieldLabel } = useFieldLabels();
-  const { isTemplate, readOnly, initialValues } = useDinaFormContext();
+  const { isTemplate, readOnly } = useDinaFormContext();
 
   function handleRemoveClick(index: number) {
     onRemoveClick(index);

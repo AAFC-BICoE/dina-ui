@@ -8,18 +8,13 @@ import {
 import { Dictionary, toPairs } from "lodash";
 import { useContext, useState, useEffect } from "react";
 import {
-  MaterialSample,
   MaterialSampleSummary,
   Protocol,
   StorageUnit,
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import {
-  LibraryPrep,
-  NgsIndex,
-  PcrBatchItem
-} from "packages/dina-ui/types/seqdb-api";
+import { NgsIndex } from "packages/dina-ui/types/seqdb-api";
 import { isEqual } from "lodash";
 import { MetagenomicsIndexAssignmentStepProps } from "../metagenomics-workflow/MetagenomicsIndexAssignmentStep";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";

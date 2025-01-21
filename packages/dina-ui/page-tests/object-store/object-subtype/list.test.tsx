@@ -1,4 +1,3 @@
-import { QueryTable } from "common-ui";
 import { PersistedResource } from "kitsu";
 import ObjectSubtypeListPage from "../../../pages/object-store/object-subtype/list";
 import { mountWithAppContext } from "common-ui";

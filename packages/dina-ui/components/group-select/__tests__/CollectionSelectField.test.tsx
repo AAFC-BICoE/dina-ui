@@ -1,8 +1,7 @@
 import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { CollectionSelectField } from "../../resource-select-fields/resource-select-fields";
-import Select from "react-select/base";
-import { screen, waitFor, fireEvent } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const COLL1 = {

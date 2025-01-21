@@ -1,6 +1,5 @@
 import { PersistedResource } from "kitsu";
 import { ManagedAttribute } from "../../../../types/collection-api";
-import CreatableSelect from "react-select/creatable";
 import MetadataEditPage from "../../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "common-ui";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";

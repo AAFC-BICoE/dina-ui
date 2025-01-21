@@ -1,6 +1,6 @@
 import { BackButton, ButtonBar, SubmitButton, withResponse } from "common-ui";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Footer,
   Head,
@@ -51,7 +51,6 @@ export default function MaterialSampleEditPage() {
 
   const {
     navOrder,
-    setNavOrder,
     sampleFormTemplate,
     setSampleFormTemplateUUID,
     visibleManagedAttributeKeys,

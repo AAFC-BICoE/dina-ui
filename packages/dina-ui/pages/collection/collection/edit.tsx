@@ -72,10 +72,6 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
       }
     : { type: "collection", institution: undefined };
 
-  const {
-    query: { id }
-  } = router;
-
   async function onSubmit({
     submittedValues,
     api: { save }

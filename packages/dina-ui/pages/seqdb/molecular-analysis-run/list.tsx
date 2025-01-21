@@ -2,8 +2,7 @@ import {
   ColumnDefinition,
   FieldHeader,
   ListPageLayout,
-  dateCell,
-  titleCell
+  dateCell
 } from "common-ui";
 import Link from "next/link";
 import { groupCell } from "../../../components";

@@ -19,6 +19,7 @@ import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resource
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { PersistedResource } from "kitsu";
+import { MolecularAnalysisRunItemUsageType } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 interface ContainerGridProps {
   molecularAnalysisId: string;
@@ -73,9 +74,9 @@ export function useMolecularAnalysisGridControls({
   const [multipleStorageUnitsWarning, setMultipleStorageUnitsWarning] =
     useState<boolean>(false);
 
-  const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
-    string[]
-  >(`molecularAnalysisWorkflowMaterialSampleSortOrder-${molecularAnalysisId}`);
+  const [materialSampleSortOrder] = useLocalStorage<string[]>(
+    `molecularAnalysisWorkflowMaterialSampleSortOrder-${molecularAnalysisId}`
+  );
 
   const [gridState, setGridState] = useState({
     // Available MolecularAnalysisItems with no well coordinates.
@@ -509,7 +510,8 @@ export function useMolecularAnalysisGridControls({
               storageUnit: pick(storageUnit, "id", "type") as any,
               type: "storage-unit-usage",
               id: item.storageUnitUsage?.id,
-              usageType: "generic-molecular-analysis-item"
+              usageType:
+                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM
             }
           }));
       const savedStorageUnitUsage = storageUnitUsageSaveArgs.length

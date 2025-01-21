@@ -1,4 +1,4 @@
-import { isArray, omitBy, isEmpty } from "lodash";
+import { omitBy, isEmpty } from "lodash";
 
 /**
  * Checks whether an API resource's attribute is blank.

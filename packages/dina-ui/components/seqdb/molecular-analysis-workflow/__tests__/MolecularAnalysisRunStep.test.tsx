@@ -28,6 +28,7 @@ import {
   MolecularAnalysisRunStep,
   MolecularAnalysisRunStepProps
 } from "../MolecularAnalysisRunStep";
+import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
@@ -51,7 +52,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       switch (params.filter.rsql) {
         case "run.uuid==" +
           TEST_MOLECULAR_ANALYSIS_RUN_ID +
-          ";usageType==quality-control":
+          ";usageType==" +
+          MolecularAnalysisRunItemUsageType.QUALITY_CONTROL:
           return { data: TEST_QUALITY_CONTROL_RUN_ITEMS };
       }
 
@@ -365,7 +367,8 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
                   }
                 }
               },
-              usageType: "generic-molecular-analysis-item",
+              usageType:
+                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
@@ -381,7 +384,8 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
                   }
                 }
               },
-              usageType: "generic-molecular-analysis-item",
+              usageType:
+                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
@@ -396,7 +400,8 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
                   }
                 }
               },
-              usageType: "generic-molecular-analysis-item",
+              usageType:
+                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
@@ -475,7 +480,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
                 }
               },
               type: "molecular-analysis-run-item",
-              usageType: "quality-control"
+              usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
             },
             type: "molecular-analysis-run-item"
           }
@@ -644,7 +649,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
                 }
               },
               type: "molecular-analysis-run-item",
-              usageType: "quality-control"
+              usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
             },
             type: "molecular-analysis-run-item"
           }

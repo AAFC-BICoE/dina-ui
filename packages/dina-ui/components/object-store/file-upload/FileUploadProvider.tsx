@@ -84,7 +84,7 @@ export function fileUploadErrorHandler(
 
   try {
     parsedData = JSON.parse(data);
-  } catch (e) {
+  } catch {
     // Check if the error is a Unsupported Media Type error.
     if (data.includes("Unsupported Media Type")) {
       throw new Error(

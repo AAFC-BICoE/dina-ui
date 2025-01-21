@@ -66,9 +66,9 @@ export function useSeqSelectCoordinatesControls({
 
   const [isStorage, setIsStorage] = useState<boolean>(false);
 
-  const [seqReactionSortOrder, setSeqReactionSortOrder] = useLocalStorage<
-    string[]
-  >(`seqReactionSortOrder-${seqBatch?.id}`);
+  const [seqReactionSortOrder] = useLocalStorage<string[]>(
+    `seqReactionSortOrder-${seqBatch?.id}`
+  );
 
   const [gridState, setGridState] = useState({
     // Available SeqBatchItems with no well coordinates.

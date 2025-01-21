@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { GroupFieldView } from "../GroupFieldView";
-import { screen, waitFor, fireEvent } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 describe("GroupFieldView component.", () => {

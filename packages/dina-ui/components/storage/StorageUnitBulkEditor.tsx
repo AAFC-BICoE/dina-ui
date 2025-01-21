@@ -212,7 +212,7 @@ function useBulkStorageUnitSave({
 }: BulkStorageUnitSaveParams) {
   // Force re-render when there is a bulk submission error:
   const [_error, setError] = useState<unknown | null>(null);
-  const { save, apiClient } = useApiClient();
+  const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
   const { bulkEditFormRef, resourceHooks } = bulkEditCtx;

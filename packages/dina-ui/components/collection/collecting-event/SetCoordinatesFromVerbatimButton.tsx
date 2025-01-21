@@ -3,7 +3,7 @@ import Coordinates from "coordinate-parser";
 import { FormikContextType } from "formik";
 import { get } from "lodash";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { SiConvertio } from "react-icons/si";
 
 export interface SetCoordinatesFromVerbatimButtonProps {

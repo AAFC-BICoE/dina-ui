@@ -1,7 +1,6 @@
 import { FormikProps } from "formik";
 import React, { useRef, useState } from "react";
 import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
-import { GoCircleSlash } from "react-icons/go";
 import { SelectField, SelectOption } from "./SelectField";
 
 interface SelectFieldWithNavProps<T> {

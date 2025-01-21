@@ -1,10 +1,5 @@
-import { AccountContextI, OnFormikSubmit } from "common-ui";
+import { AccountContextI } from "common-ui";
 import { noop } from "lodash";
-import {
-  FileUploader,
-  IFileWithMeta,
-  IMeta
-} from "../../../components/object-store";
 import { fileUploadErrorHandler } from "../../../components/object-store/file-upload/FileUploadProvider";
 import UploadPage, {
   BULK_ADD_IDS_KEY
@@ -164,7 +159,7 @@ describe("Upload page", () => {
         } as File,
         mockFormatMessage
       );
-    } catch (error) {
+    } catch {
       expect(mockFormatMessage).toHaveBeenCalledWith(
         "unsupportedFileTypeError",
         { fileName: "fileName_test.png" }
@@ -183,7 +178,7 @@ describe("Upload page", () => {
         } as File,
         mockFormatMessage
       );
-    } catch (error) {
+    } catch {
       expect(mockFormatMessage).toHaveBeenCalledWith("http403ForbiddenError");
       done();
     }

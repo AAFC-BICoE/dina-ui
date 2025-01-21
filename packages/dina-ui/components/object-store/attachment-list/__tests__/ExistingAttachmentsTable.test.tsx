@@ -1,8 +1,7 @@
-import { DinaForm, FormikButton, ReactTable } from "common-ui";
+import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
-import { ExistingMetadataBulkEditor } from "../../../bulk-metadata/ExistingMetadataBulkEditor";
 import { ExistingAttachmentsTable } from "../ExistingAttachmentsTable";
-import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import { screen, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockBulkGet = jest.fn(async (paths) => {
@@ -145,7 +144,7 @@ describe("ExistingAttachmentsTable component", () => {
   });
 
   it("Lets you bulk edit attachment Metadatas.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm initialValues={{}}>
         <ExistingAttachmentsTable
           attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
@@ -192,7 +191,7 @@ describe("ExistingAttachmentsTable component", () => {
   });
 
   it("Lets you detach attachment Metadatas.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <ExistingAttachmentsTable
         attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
         onDetachMetadataIds={mockOnDetachMetadataIds}

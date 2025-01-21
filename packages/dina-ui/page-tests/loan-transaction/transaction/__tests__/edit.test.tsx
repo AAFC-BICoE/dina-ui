@@ -1,7 +1,4 @@
-import { ResourceSelect } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import CreatableSelect from "react-select/creatable";
-import Switch from "react-switch";
 import TransactionEditPage, {
   TransactionForm
 } from "../../../../pages/loan-transaction/transaction/edit";

@@ -7,14 +7,11 @@ import {
   SubmitButton,
   useStringComparator
 } from "packages/common-ui/lib";
-import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
 import { useMemo } from "react";
 import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
 import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
-import { UseIndexAssignmentReturn } from "./useIndexAssignmentAPI";
 import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
-import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import { MetagenomicsIndexAssignmentStepProps } from "../metagenomics-workflow/MetagenomicsIndexAssignmentStep";
 import {
   MetagenomicsIndexAssignmentResource,

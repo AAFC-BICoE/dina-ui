@@ -9,7 +9,7 @@ import { UploadingMetadataBulkEditor } from "../../../components/bulk-metadata/U
 
 export default function MetadataBulkEditPage() {
   const router = useRouter();
-  const { initialized: accountInitialized, agentId } = useAccount();
+  const { initialized: accountInitialized } = useAccount();
   const { formatMessage } = useDinaIntl();
 
   const [metadataIds] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY);

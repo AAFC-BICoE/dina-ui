@@ -20,7 +20,7 @@ const checkboxProps = {
 };
 
 export function CheckBoxField(props: CheckBoxProps) {
-  const { onCheckBoxClick, disabled, type } = props;
+  const { onCheckBoxClick, disabled } = props;
   return (
     <FieldWrapper {...props} readOnlyRender={(value) => String(!!value)}>
       {({ setValue, value, formik }) => {

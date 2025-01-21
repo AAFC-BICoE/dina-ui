@@ -80,9 +80,9 @@ export function AttachmentsEditor({
   wrapContent = (content) => content,
   name
 }: AttachmentsEditorProps) {
-  const { isTemplate, readOnly } = useDinaFormContext();
+  const { isTemplate } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
-  const { closeModal, openModal } = useModal();
+  const { closeModal } = useModal();
 
   // Just check if the object-store is up:
   const { error: objectStoreError } = useQuery<[]>({

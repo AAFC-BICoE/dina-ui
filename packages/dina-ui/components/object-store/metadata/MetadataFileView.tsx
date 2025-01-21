@@ -1,4 +1,3 @@
-import { InputResource } from "kitsu";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { DownLoadLinks, FileView } from "../file-view/FileView";

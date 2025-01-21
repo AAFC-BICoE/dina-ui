@@ -36,7 +36,7 @@ export function FieldSet({
   ...formSectionProps
 }: FieldSetProps) {
   const context = useContext(DinaFormContext);
-  const { componentName, sectionName, isTemplate } = formSectionProps;
+  const { componentName, sectionName } = formSectionProps;
 
   // Check the section to see if it should be visible or not.
   const disableSection = useMemo(() => {

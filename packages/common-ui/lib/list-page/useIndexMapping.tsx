@@ -237,7 +237,7 @@ export function useIndexMapping({
       }
 
       return result;
-    } catch (error) {
+    } catch {
       return undefined;
     }
   }

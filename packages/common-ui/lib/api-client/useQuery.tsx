@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { ApiClientContext } from "./ApiClientContext";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
-import { ResponseType } from "axios";
 import Link from "next/link";
 
 /** Attributes that compose a JsonApi query. */

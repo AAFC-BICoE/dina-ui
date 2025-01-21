@@ -25,8 +25,6 @@ import {
   SequencingFacility,
   SequencingFacilityContactVO
 } from "../../../types/seqdb-api/";
-import { Card } from "react-bootstrap";
-import { useState } from "react";
 
 interface SequencingFacilityFormProps {
   sequencingFacility?: SequencingFacilityVO;

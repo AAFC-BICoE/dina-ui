@@ -6,12 +6,10 @@ import {
   SaveArgs,
   filterBy,
   useAccount,
-  useApiClient,
-  useQuery
+  useApiClient
 } from "common-ui";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { compact, pick, uniq, difference, concat } from "lodash";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import {
   MaterialSample,
@@ -22,7 +20,10 @@ import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -279,7 +280,7 @@ export function SangerSampleSelectionStep({
             itemsToCreate.map((_) => ({
               resource: {
                 type: "molecular-analysis-run-item",
-                usageType: "seq-reaction",
+                usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
                 relationships: {
                   run: {
                     data: {
@@ -331,10 +332,9 @@ export function SangerSampleSelectionStep({
                   }
                 };
               });
-            const saveMetagenomicsBatchItems =
-              await save<MetagenomicsBatchItem>(metagenomicsBatchItemSaveArgs, {
-                apiBaseUrl: "/seqdb-api"
-              });
+            await save<MetagenomicsBatchItem>(metagenomicsBatchItemSaveArgs, {
+              apiBaseUrl: "/seqdb-api"
+            });
           }
         }
       }
@@ -361,7 +361,7 @@ export function SangerSampleSelectionStep({
             { apiBaseUrl: "/seqdb-api" }
           );
           // Delete the molecular analysis run items.
-          const deletedMolecularAnalysisRunItemsResp = await save(
+          await save(
             itemsToDelete.map((itemToDelete) => {
               const molecularAnalysisRunItem:
                 | MolecularAnalysisRunItem

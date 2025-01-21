@@ -1,7 +1,6 @@
 import React from "react";
-import { License, Metadata } from "../../types/objectstore-api";
-import { InputResource, PersistedResource, KitsuResource } from "kitsu";
-import { Promisable } from "type-fest";
+import { Metadata } from "../../types/objectstore-api";
+import { InputResource } from "kitsu";
 import {
   BulkEditTabContextI,
   ButtonBar,
@@ -225,7 +224,7 @@ function useBulkMetadataSave({
 }: BulkMetadataSaveParams) {
   // Force re-render when there is a bulk submission error:
   const [_error, setError] = useState<unknown | null>(null);
-  const { save, apiClient } = useApiClient();
+  const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
   const { bulkEditFormRef, resourceHooks: metadataHooks } = bulkEditCtx;
@@ -258,11 +257,9 @@ function useBulkMetadataSave({
 
         try {
           const submittedValues = formik.values;
-          const {
-            // Don't include derivatives in the form submission:
-            derivatives,
-            ...metadataValues
-          } = submittedValues;
+          // Don't include derivatives in the form submission:
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { derivatives, ...metadataValues } = submittedValues;
 
           const saveOp = await saveHook.prepareMetadataSaveOperation({
             submittedValues: metadataValues,

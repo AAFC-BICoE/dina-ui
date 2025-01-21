@@ -7,9 +7,7 @@ import {
 } from "../../../../types/objectstore-api";
 import { mountWithAppContext } from "common-ui";
 import ExternalResourceMetadataPage from "../../../../pages/object-store/metadata/external-resource-edit";
-import Select from "react-select/base";
-import { ResourceSelectField } from "common-ui";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 

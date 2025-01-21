@@ -6,7 +6,6 @@ import {
   SelectOption,
   SubmitButton
 } from "common-ui";
-import { LibraryPrep } from "../../../../types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
 import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
 import { MetagenomicsIndexAssignmentStepProps } from "../../metagenomics-workflow/MetagenomicsIndexAssignmentStep";
@@ -25,7 +24,6 @@ interface MetagenomicsIndexGridProps
 
 export function MetagenomicsIndexGrid(props: MetagenomicsIndexGridProps) {
   const {
-    pcrBatch,
     metagenomicsBatch,
     editMode,
     performSave,

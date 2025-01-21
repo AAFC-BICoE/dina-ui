@@ -1,4 +1,4 @@
-import { DinaForm, Tooltip } from "common-ui";
+import { DinaForm } from "common-ui";
 import { fromPairs } from "lodash";
 import { ViewPageLayout } from "../../../components";
 import { ReportTemplateFormLayout } from "./edit";

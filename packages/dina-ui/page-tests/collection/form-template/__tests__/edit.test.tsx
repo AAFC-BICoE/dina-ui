@@ -19,7 +19,7 @@ import {
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
-import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import { fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 const mockOnSaved = jest.fn();
 

@@ -1,7 +1,6 @@
 import {
   CheckBoxField,
   FieldSet,
-  StringArrayField,
   TextField,
   useDinaFormContext
 } from "common-ui";

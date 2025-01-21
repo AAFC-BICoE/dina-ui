@@ -1,7 +1,6 @@
 import { DinaForm } from "common-ui";
 import { RolesPerGroupEditor } from "../../../pages/dina-user/edit";
 import { mountWithAppContext } from "common-ui";
-import Select from "react-select";
 import { SUPER_USER, USER, GUEST } from "common-ui/types/DinaRoles";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";

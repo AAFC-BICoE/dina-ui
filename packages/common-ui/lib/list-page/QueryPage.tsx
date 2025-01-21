@@ -425,7 +425,7 @@ export function QueryPage<TData extends KitsuResource>({
   const sessionStorageLastUsedKeyTreeKey = uniqueName + "-last-used-tree";
   const localStorageLastUsedSavedSearchChangedKey =
     uniqueName + "-saved-search-changed";
-  const [sessionStorageQueryTree, setSessionStorageQueryTree] =
+  const [_sessionStorageQueryTree, setSessionStorageQueryTree] =
     useSessionStorage<JsonTree>(
       sessionStorageLastUsedKeyTreeKey,
       defaultJsonTree

@@ -50,7 +50,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Renders checkboxes.", () => {
-    const wrapper = mountWithAppContext(<TestComponent />);
+    mountWithAppContext(<TestComponent />);
     // Find all checkbox inputs
     const checkboxes = screen.getAllByRole("checkbox", { name: /select/i });
     // Assert that 5 checkboxes are rendered

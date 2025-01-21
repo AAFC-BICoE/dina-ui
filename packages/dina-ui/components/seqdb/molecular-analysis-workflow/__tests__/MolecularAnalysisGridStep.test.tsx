@@ -22,6 +22,7 @@ import "@testing-library/jest-dom";
 import { waitForElementToBeRemoved } from "@testing-library/react";
 import { useState, useEffect } from "react";
 import userEvent from "@testing-library/user-event";
+import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 const onSavedMock = jest.fn();
 const mockSetEditMode = jest.fn();
@@ -284,7 +285,8 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
                 type: "storage-unit"
               },
               type: "storage-unit-usage",
-              usageType: "generic-molecular-analysis-item",
+              usageType:
+                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
               wellColumn: 1,
               wellRow: "A"
             },
@@ -298,7 +300,8 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
                 type: "storage-unit"
               },
               type: "storage-unit-usage",
-              usageType: "generic-molecular-analysis-item",
+              usageType:
+                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
               wellColumn: 2,
               wellRow: "A"
             },
@@ -312,7 +315,8 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
                 type: "storage-unit"
               },
               type: "storage-unit-usage",
-              usageType: "generic-molecular-analysis-item",
+              usageType:
+                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
               wellColumn: 3,
               wellRow: "A"
             },

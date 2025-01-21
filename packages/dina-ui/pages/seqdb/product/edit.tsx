@@ -59,8 +59,6 @@ export function ProductEditPage({ router }: WithRouterProps) {
 }
 
 function ProductForm({ product, router }: ProductFormProps) {
-  const { formatMessage } = useSeqdbIntl();
-
   const { id } = router.query;
   const initialValues = product || {};
 

@@ -1,4 +1,4 @@
-import { Row, Table, flexRender } from "@tanstack/react-table";
+import { Row, flexRender } from "@tanstack/react-table";
 import { CSSProperties } from "react";
 import { useDrag, useDrop } from "react-dnd";
 

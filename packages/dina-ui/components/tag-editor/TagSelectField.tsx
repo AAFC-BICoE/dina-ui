@@ -3,13 +3,12 @@ import {
   FieldWrapperProps,
   Tooltip,
   filterBy,
-  rsql,
   useAccount,
   useQuery
 } from "common-ui";
 import { KitsuResource } from "kitsu";
 import { compact, last, uniq, get } from "lodash";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
 import { components as reactSelectComponents } from "react-select";
 import CreatableSelect from "react-select/creatable";

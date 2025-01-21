@@ -8,8 +8,8 @@ import Kitsu, {
   KitsuResourceLink,
   PersistedResource
 } from "kitsu";
-import { deserialise, error as kitsuError, query } from "kitsu-core";
-import { compact, flatMap, fromPairs, isEmpty, keys, omit } from "lodash";
+import { deserialise, error as kitsuError } from "kitsu-core";
+import { compact, fromPairs, isEmpty, keys, omit } from "lodash";
 import LRUCache from "lru-cache";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -22,7 +22,6 @@ import {
   SuccessfulOperation
 } from "./operations-types";
 import DataLoader from "dataloader";
-import { ResponseType } from "axios";
 
 export interface BulkGetOptions {
   apiBaseUrl?: string;

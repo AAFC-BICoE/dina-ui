@@ -1,5 +1,4 @@
 import { writeStorage } from "@rehooks/local-storage";
-import { ResourceSelect } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
 import { mountWithAppContext } from "common-ui";
