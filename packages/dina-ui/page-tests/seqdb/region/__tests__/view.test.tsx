@@ -44,7 +44,7 @@ describe("Region details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Expect loading spinner to not be in the UI
     expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();

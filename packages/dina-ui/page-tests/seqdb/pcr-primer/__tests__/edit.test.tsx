@@ -67,10 +67,10 @@ describe("PcrPrimer edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the primer form to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API Response
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -94,7 +94,7 @@ describe("PcrPrimer edit page", () => {
     );
 
     // The user should be redirected to the new primer's details page.
-    expect(mockPush).lastCalledWith("/seqdb/pcr-primer/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith("/seqdb/pcr-primer/view?id=1");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -123,7 +123,7 @@ describe("PcrPrimer edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the primer form to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected error
     expect(
@@ -160,7 +160,7 @@ describe("PcrPrimer edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the primer form to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the existing primer's seq value is in the field.
     expect(
@@ -180,11 +180,11 @@ describe("PcrPrimer edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the primer form to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -211,7 +211,7 @@ describe("PcrPrimer edit page", () => {
     );
 
     // The user should be redirected to the existing primer's details page.
-    expect(mockPush).lastCalledWith("/seqdb/pcr-primer/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith("/seqdb/pcr-primer/view?id=1");
   });
 });
 

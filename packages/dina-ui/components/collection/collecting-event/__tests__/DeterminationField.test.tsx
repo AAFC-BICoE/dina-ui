@@ -10,7 +10,7 @@ describe("DeterminationField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Doesn't try to save what the user types into the name search box.", async () => {
-    const { container } = mountWithAppContext(
+    const { container, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{ determination: [{ isPrimary: true }] }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -20,7 +20,7 @@ describe("DeterminationField component", () => {
     );
 
     // Input some text:
-    await new Promise(setImmediate);
+    await waitForRequests();
     const input = screen.getByRole("textbox", {
       name: /global name search/i
     });
@@ -32,7 +32,7 @@ describe("DeterminationField component", () => {
 
     await waitFor(() => {
       // Empty determination submitted:
-      expect(mockOnSubmit).lastCalledWith({
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
         determination: [{ isPrimary: true }]
       });
     });

@@ -19,7 +19,7 @@ const mockOnSubmit = jest.fn();
 describe("GlobalNamesField component", () => {
   beforeEach(jest.clearAllMocks);
   it("Sets a value from the global name API.", async () => {
-    const { container } = mountWithAppContext(
+    const { container, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{ scientificName: "", scientificNameSource: null }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -39,7 +39,7 @@ describe("GlobalNamesField component", () => {
     const input = container.querySelector("input.global-name-input");
     fireEvent.change(input!, { target: { value: "  monodon  " } });
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Simulate clicking the search button
     const searchButton = screen.getByRole("button", {
@@ -81,7 +81,7 @@ describe("GlobalNamesField component", () => {
       ]
     ]);
 
-    expect(mockFetchJson).lastCalledWith(
+    expect(mockFetchJson).toHaveBeenLastCalledWith(
       "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false"
     );
 
@@ -90,7 +90,7 @@ describe("GlobalNamesField component", () => {
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(mockOnSubmit).lastCalledWith({
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
         scientificName: "Monodon Linnaeus, 1758",
         scientificNameSource: "GNA"
       });

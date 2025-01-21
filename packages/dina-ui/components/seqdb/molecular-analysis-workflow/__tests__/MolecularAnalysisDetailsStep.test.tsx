@@ -84,7 +84,7 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Should automatically be in edit mode.
     expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
 
     // Perform save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Expect the mock save to be called.
     expect(mockSave).toBeCalledWith(
@@ -165,7 +165,7 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Should not be in edit mode automatically.
     expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
@@ -210,12 +210,12 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
     userEvent.click(
       wrapper.getByRole("combobox", { name: /protocol protocol test 2/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
 
     // Perform save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Expect the save request to contain the UUID and changes made.
     expect(mockSave).toBeCalledWith(

@@ -200,7 +200,7 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
 
 describe("Use Index Mapping Hook", () => {
   it("Retrieve index and transform the structure.", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <UseIndexMappingWrapper
         indexMapRetrieved={(newIndexMap: any) => {
           mockIndexMapRetrieved(newIndexMap);
@@ -215,7 +215,7 @@ describe("Use Index Mapping Hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockIndexMapRetrieved).toHaveBeenCalledTimes(1);
     expect(mockIndexMapRetrieved).toMatchSnapshot();

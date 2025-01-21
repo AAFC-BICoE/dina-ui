@@ -89,28 +89,29 @@ describe("User edit page", () => {
 
     // Add new group + roles:
     userEvent.click(wrapper.getAllByRole("combobox", { name: / /i })[1]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.click(wrapper.getByRole("option", { name: /test-group/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Select Role for test-group
     userEvent.click(
       wrapper.getAllByRole("combobox", { name: /select\.\.\./i })[1]
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
-    userEvent.click(wrapper.getByRole("option", { name: /super/i }));
+    userEvent.click(wrapper.getByRole("option", { name: /super\-user/i }));
+    await wrapper.waitForRequests();
 
     // Remove a group: (cnc)
     userEvent.click(
       wrapper.getAllByRole("button", { name: /remove group/i })[0]
     );
+    await wrapper.waitForRequests();
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
-
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check form state: cnc removed, test-group added:
     expect(mockSubmit.mock.calls).toEqual([

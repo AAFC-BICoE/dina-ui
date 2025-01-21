@@ -225,7 +225,7 @@ describe("FilterBuilder component", () => {
     const firstInput = wrapper.getByRole("textbox", { name: /filter value/i });
     fireEvent.change(firstInput, { target: { value: "first filter value" } });
     expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange).lastCalledWith({
+    expect(onChange).toHaveBeenLastCalledWith({
       children: [
         {
           attribute: "name",
@@ -245,7 +245,7 @@ describe("FilterBuilder component", () => {
     const firstAndButton = wrapper.getByRole("button", { name: /and/i });
     fireEvent.click(firstAndButton);
     expect(onChange).toHaveBeenCalledTimes(2);
-    expect(onChange).lastCalledWith({
+    expect(onChange).toHaveBeenLastCalledWith({
       children: [
         {
           attribute: "name",
@@ -273,7 +273,7 @@ describe("FilterBuilder component", () => {
     const orButton = wrapper.getAllByRole("button", { name: /or/i })[1];
     fireEvent.click(orButton);
     expect(onChange).toHaveBeenCalledTimes(3);
-    expect(onChange).lastCalledWith({
+    expect(onChange).toHaveBeenLastCalledWith({
       children: [
         {
           attribute: "name",
@@ -316,7 +316,7 @@ describe("FilterBuilder component", () => {
     const firstDeleteButton = wrapper.getAllByRole("button", { name: /-/i })[0];
     fireEvent.click(firstDeleteButton);
     expect(onChange).toHaveBeenCalledTimes(4);
-    expect(onChange).lastCalledWith({
+    expect(onChange).toHaveBeenLastCalledWith({
       children: [
         {
           attribute: "name",
@@ -363,10 +363,10 @@ describe("FilterBuilder component", () => {
     }
 
     const wrapper = mountWithAppContext(<TestComponent />);
-    expect(callback).lastCalledWith(null);
+    expect(callback).toHaveBeenLastCalledWith(null);
 
-    await new Promise(setImmediate);
-    expect(callback).lastCalledWith({
+    await wrapper.waitForRequests();
+    expect(callback).toHaveBeenLastCalledWith({
       children: [
         {
           attribute: "name",
@@ -384,12 +384,12 @@ describe("FilterBuilder component", () => {
 
     // Set the model to null.
     fireEvent.click(wrapper.getByRole("button", { name: /reset to null/i }));
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
+    await wrapper.waitForRequests();
 
     // Resets itself with the inital filter model.
     expect(callback).toHaveBeenCalledTimes(4);
-    expect(callback).lastCalledWith({
+    expect(callback).toHaveBeenLastCalledWith({
       children: [
         {
           attribute: "name",

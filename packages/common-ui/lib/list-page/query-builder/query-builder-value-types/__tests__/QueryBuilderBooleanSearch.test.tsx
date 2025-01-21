@@ -7,6 +7,7 @@ import { QueryBuilderContextProvider } from "../../QueryBuilder";
 import { noop } from "lodash";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 describe("QueryBuilderBooleanSearch", () => {
   describe("QueryBuilderBooleanSearch Component", () => {
@@ -74,7 +75,7 @@ describe("QueryBuilderBooleanSearch", () => {
       userEvent.type(combobox, "{enter}");
 
       // Expect performSubmit to be called once
-      expect(mockPerformSubmit).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(mockPerformSubmit).toHaveBeenCalledTimes(1));
     });
   });
 

@@ -109,9 +109,9 @@ describe("FilterRow component", () => {
     const select = wrapper.getByRole("combobox", { name: /filter attribute/i });
     fireEvent.change(select, { target: { value: "Desc" } });
     fireEvent.click(wrapper.getByRole("option", { name: /description/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
-    expect(mockModelChange).lastCalledWith({
+    expect(mockModelChange).toHaveBeenLastCalledWith({
       attribute: "description",
       id: 1,
       predicate: "IS",
@@ -128,9 +128,9 @@ describe("FilterRow component", () => {
     const select = wrapper.getByRole("combobox", { name: /filter predicate/i });
     fireEvent.change(select, { target: { value: "i" } });
     fireEvent.click(wrapper.getAllByRole("option", { name: "" })[1]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
-    expect(mockModelChange).lastCalledWith({
+    expect(mockModelChange).toHaveBeenLastCalledWith({
       attribute: "name",
       id: 1,
       predicate: "IS NOT",
@@ -147,7 +147,7 @@ describe("FilterRow component", () => {
       target: { value: "101F" }
     });
 
-    expect(mockModelChange).lastCalledWith({
+    expect(mockModelChange).toHaveBeenLastCalledWith({
       attribute: "name",
       id: 1,
       predicate: "IS",

@@ -54,7 +54,7 @@ describe("MetadataRevisionListPage", () => {
     );
 
     // Await revisions query:
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const table = document.querySelector("table");
     if (!table) {
@@ -92,9 +92,9 @@ describe("MetadataRevisionListPage", () => {
       "searched-author"
     );
     userEvent.click(wrapper.getByRole("button", { name: /search/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
-    expect(mockPush).lastCalledWith({
+    expect(mockPush).toHaveBeenLastCalledWith({
       pathname: "the-page-url",
       query: {
         author: "searched-author"

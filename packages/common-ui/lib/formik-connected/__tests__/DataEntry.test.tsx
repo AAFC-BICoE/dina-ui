@@ -130,10 +130,10 @@ describe("DataEntry", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.getByRole("group"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Formik should have the updated value.
-    expect(mockSubmit).lastCalledWith({
+    expect(mockSubmit).toHaveBeenLastCalledWith({
       [name]: {
         BLOCK_OPTION_1: {
           rows: {
@@ -178,10 +178,10 @@ describe("DataEntry", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.getByRole("group"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Formik should have the updated value.
-    expect(mockSubmit).lastCalledWith({
+    expect(mockSubmit).toHaveBeenLastCalledWith({
       [name]: {
         BLOCK_OPTION_1: {
           rows: {
@@ -232,10 +232,10 @@ describe("DataEntry", () => {
 
     // form submission
     fireEvent.submit(wrapper.getByRole("group"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Formik should have the updated value.
-    expect(mockSubmit).lastCalledWith({
+    expect(mockSubmit).toHaveBeenLastCalledWith({
       [name]: {
         BLOCK_OPTION_1: {
           rows: {

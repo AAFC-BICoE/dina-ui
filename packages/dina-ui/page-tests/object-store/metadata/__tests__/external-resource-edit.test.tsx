@@ -113,7 +113,7 @@ describe("Metadata external resource edit page.", () => {
     const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
       apiContext
     });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test initial values
     expect(wrapper.getByRole("combobox", { name: /tags/i })).toHaveDisplayValue(
@@ -133,7 +133,7 @@ describe("Metadata external resource edit page.", () => {
     userEvent.click(wrapper.getByRole("combobox", { name: /media format/i }));
     userEvent.click(wrapper.getByRole("option", { name: /image\/jpeg/i }));
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Set values:
     fireEvent.change(
@@ -157,7 +157,7 @@ describe("Metadata external resource edit page.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test response
     expect(mockSave).toBeCalledWith(
@@ -190,7 +190,7 @@ describe("Metadata external resource edit page.", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check for the right initial values:
     expect(
@@ -211,17 +211,17 @@ describe("Metadata external resource edit page.", () => {
         name: /stored object type image/i
       })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(wrapper.getByRole("option", { name: /moving image/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {

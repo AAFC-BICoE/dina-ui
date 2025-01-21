@@ -19,7 +19,7 @@ describe("CatalogueOfLifeNameField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Sets a value from the Catalogue of Life API.", async () => {
-    const { container } = mountWithAppContext(
+    const { container, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{ scientificName: "", scientificNameSource: null }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -37,7 +37,7 @@ describe("CatalogueOfLifeNameField component", () => {
     const input = screen.getByRole("textbox"); // Assuming the input has role "textbox"
     fireEvent.change(input, { target: { value: "  Poa muralis  " } });
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     const searchButton = screen.getByRole("button", { name: /search/i });
     fireEvent.click(searchButton);
@@ -77,7 +77,7 @@ describe("CatalogueOfLifeNameField component", () => {
     ]);
 
     // The whitespace for the query string should be trimmed:
-    expect(mockFetchJson).lastCalledWith(
+    expect(mockFetchJson).toHaveBeenLastCalledWith(
       "https://api.catalogueoflife.org/dataset/2328/nameusage?q=Poa+muralis"
     );
 
@@ -85,7 +85,7 @@ describe("CatalogueOfLifeNameField component", () => {
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(mockOnSubmit).lastCalledWith({
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
         scientificName: "Poa muralis Wibel, nom. illeg.",
         scientificNameSource: "COLPLUS"
       });
@@ -94,11 +94,11 @@ describe("CatalogueOfLifeNameField component", () => {
     // Remove the name:
     const removeButton = screen.getByRole("button", { name: /remove/i });
     fireEvent.click(removeButton);
-    expect(mockOnChange).lastCalledWith(null, expect.anything());
+    expect(mockOnChange).toHaveBeenLastCalledWith(null, expect.anything());
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(mockOnSubmit).lastCalledWith({
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
         scientificName: null,
         scientificNameSource: null
       });

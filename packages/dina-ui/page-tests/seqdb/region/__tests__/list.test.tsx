@@ -39,7 +39,7 @@ describe("Region list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the table contains the links to region details pages.
     expect(wrapper.getByText(/test region 1/i)).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe("Region list page", () => {
     const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
 
     // Wait for the default search to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enter a search value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /filter/i }), {
@@ -62,7 +62,7 @@ describe("Region list page", () => {
     // Submit the search form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API call and UI elements
     expect(mockGet).toHaveBeenCalledWith(

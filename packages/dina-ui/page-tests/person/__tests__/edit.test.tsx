@@ -80,10 +80,10 @@ describe("person edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected response
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/agent-api/operations",
       [
         {
@@ -102,7 +102,7 @@ describe("person edit page", () => {
     );
 
     // The user should be redirected to the new person's details page.
-    expect(mockPush).lastCalledWith("/person/list");
+    expect(mockPush).toHaveBeenLastCalledWith("/person/list");
   });
 
   it("Provides a form to edit an person.", async () => {
@@ -127,7 +127,7 @@ describe("person edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the existing displayName value is in the field.
     expect(
@@ -145,11 +145,11 @@ describe("person edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/agent-api/operations",
       [
         {
@@ -168,7 +168,7 @@ describe("person edit page", () => {
     );
 
     // The user should be redirected to person's list page.
-    expect(mockPush).lastCalledWith("/person/list");
+    expect(mockPush).toHaveBeenLastCalledWith("/person/list");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -195,7 +195,7 @@ describe("person edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected error
     expect(

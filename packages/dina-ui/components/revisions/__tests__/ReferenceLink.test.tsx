@@ -28,7 +28,7 @@ describe("ReferenceLink component", () => {
       />,
       { apiContext: { apiClient: { get: mockGet } as any } }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Shows the custom ".display-name" span and the link:
     expect(wrapper.getByText(/mat poff/i)).toBeInTheDocument();

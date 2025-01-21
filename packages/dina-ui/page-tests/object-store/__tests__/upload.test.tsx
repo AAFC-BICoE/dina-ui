@@ -90,7 +90,7 @@ describe("Upload page", () => {
       new File(["file content"], "file2.pdf", { type: "application/pdf" }),
       new File(["file content"], "file3.pdf", { type: "application/pdf" })
     ];
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Find the file input in the Dropzone component
     const fileInput = screen.getByLabelText(/drag and drop files here/i);
@@ -104,15 +104,15 @@ describe("Upload page", () => {
     fireEvent.change(fileInput);
 
     // Await the processing of the file uploads
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Submit
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The group name should be in the URL:
-    expect(mockPost).lastCalledWith(
+    expect(mockPost).toHaveBeenLastCalledWith(
       "/objectstore-api/file/example-group",
       // Form data with the file would go here:
       expect.anything(),
@@ -121,7 +121,7 @@ describe("Upload page", () => {
     );
 
     // You should get redirected to the bulk edit page with the new metadata IDs.
-    expect(mockPush).lastCalledWith({
+    expect(mockPush).toHaveBeenLastCalledWith({
       pathname: "/object-store/metadata/bulk-edit",
       query: {
         group: "example-group"

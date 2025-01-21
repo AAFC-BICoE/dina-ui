@@ -66,7 +66,7 @@ describe("AreYouSureModal", () => {
 
     // Click 'yes':
     fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Should have run the function:
     expect(mockYesClick).toHaveBeenCalledTimes(1);

@@ -67,7 +67,7 @@ describe("CollectionSelectField", () => {
 
   it("Shows admins all collections to choose from.", async () => {
     // Mount the component with the context
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <CollectionSelectField name="collection" />
       </DinaForm>,
@@ -75,7 +75,7 @@ describe("CollectionSelectField", () => {
     );
 
     // Wait for any asynchronous updates
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the select field is not disabled
     const select = screen.getByRole("combobox", { name: /collection/i });
@@ -101,7 +101,7 @@ describe("CollectionSelectField", () => {
       { ...testCtx, accountContext: { groupNames: ["aafc"] } }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Use querySelector to find the input element by its role
     const combobox = wrapper.container.querySelector('input[role="combobox"]');

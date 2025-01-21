@@ -91,7 +91,7 @@ describe("CreatableSelectField component", () => {
     fireEvent.click(wrapper.getByRole("option", { name: /fusion primer/i }));
 
     // The mock function should have been called with the new value.
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       "FUSION_PRIMER", // New selected value
       expect.anything(),
       "ITRU_PRIMER"
@@ -110,7 +110,7 @@ describe("CreatableSelectField component", () => {
     );
 
     // The mock function should have been called with the new value.
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       ["PRIMER"],
       expect.anything(),
       "ITRU_PRIMER"

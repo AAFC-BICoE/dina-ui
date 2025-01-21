@@ -137,7 +137,7 @@ describe("PcrBatch edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Change textbox value to "test new batch"
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -153,7 +153,7 @@ describe("PcrBatch edit page", () => {
     );
     userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -198,15 +198,15 @@ describe("PcrBatch edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test for expected API Response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -254,7 +254,7 @@ describe("PcrBatch edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Change textbox value to "test new batch"
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -267,16 +267,16 @@ describe("PcrBatch edit page", () => {
         name: /storage unit type type here to search\./i
       })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(wrapper.getByRole("option", { name: /undefined/i }));
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test for expected API Response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -306,7 +306,7 @@ describe("PcrBatch edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Change textbox value to "test new batch"
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -319,25 +319,25 @@ describe("PcrBatch edit page", () => {
         name: /storage unit type type here to search\./i
       })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(wrapper.getByRole("option", { name: /undefined/i }));
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Select a storage unit.
     userEvent.click(wrapper.getByText(/<none>/i));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(wrapper.getByRole("option", { name: "" }));
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API Response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {

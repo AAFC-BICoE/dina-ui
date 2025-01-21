@@ -7,6 +7,7 @@ import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
 import { noop } from "lodash";
 import userEvent from "@testing-library/user-event";
+import { waitFor } from "@testing-library/dom";
 
 describe("QueryBuilderNumberSearch", () => {
   describe("QueryBuilderNumberSearch Component", () => {
@@ -120,7 +121,9 @@ describe("QueryBuilderNumberSearch", () => {
       userEvent.type(textField, "{enter}");
 
       // Expect performSubmit to be called once
-      expect(mockPerformSubmit).toHaveBeenCalledTimes(1);
+      await waitFor(() => {
+        expect(mockPerformSubmit).toHaveBeenCalledTimes(1);
+      });
     });
   });
 

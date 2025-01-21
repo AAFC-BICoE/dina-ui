@@ -86,7 +86,7 @@ describe("AssemblageForm.", () => {
       }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Fill form with test values
     fireEvent.change(
@@ -127,10 +127,10 @@ describe("AssemblageForm.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected values
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -172,7 +172,7 @@ describe("AssemblageForm.", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "123",
       name: "test-assemblage",
       relationships: {
@@ -237,7 +237,7 @@ describe("AssemblageForm.", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Edit form values
     fireEvent.change(
@@ -265,10 +265,10 @@ describe("AssemblageForm.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected values
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -307,7 +307,7 @@ describe("AssemblageForm.", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "333",
       multilingualDescription: {
         descriptions: [

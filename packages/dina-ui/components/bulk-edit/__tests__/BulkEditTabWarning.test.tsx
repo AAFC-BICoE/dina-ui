@@ -193,7 +193,7 @@ describe("BulkEditTabWarning", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the determination:
     const organismToggle = wrapper.container.querySelector(
@@ -203,7 +203,7 @@ describe("BulkEditTabWarning", () => {
       fail("Organism toggle needs to exist at this point.");
     }
     fireEvent.click(organismToggle);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Find the organism override button and click it.
     const overrideButton = wrapper.container.querySelector(
@@ -218,13 +218,13 @@ describe("BulkEditTabWarning", () => {
 
     // Click "Yes" on the popup dialog.
     fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "Add New Determination" button.
     fireEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Override the verbatim scientific name.
     fireEvent.change(
@@ -233,11 +233,11 @@ describe("BulkEditTabWarning", () => {
       }),
       { target: { value: "test-name-override" } }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
@@ -310,7 +310,7 @@ describe("BulkEditTabWarning", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the determination:
     const organismToggle = wrapper.container.querySelector(
@@ -320,7 +320,7 @@ describe("BulkEditTabWarning", () => {
       fail("Organism toggle needs to exist at this point.");
     }
     fireEvent.click(organismToggle);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The Override button is there:
     const overrideButton = wrapper.container.querySelector(
@@ -334,7 +334,7 @@ describe("BulkEditTabWarning", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Saves the material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -366,7 +366,7 @@ describe("BulkEditTabWarning", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the determination:
     const organismToggle = wrapper.container.querySelector(
@@ -376,13 +376,13 @@ describe("BulkEditTabWarning", () => {
       fail("Organism toggle needs to exist at this point.");
     }
     fireEvent.click(organismToggle);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "Add New Determination" button.
     fireEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Override the verbatim scientific name.
     fireEvent.change(
@@ -391,11 +391,11 @@ describe("BulkEditTabWarning", () => {
       }),
       { target: { value: "test-name-override" } }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
@@ -456,7 +456,7 @@ describe("BulkEditTabWarning", () => {
         isEqual(sample.organism, SAMPLES_WITH_SAME_DETERMINATIONS[0].organism)
       )
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Enable the determination:
     const organismToggle = wrapper.container.querySelector(
@@ -466,7 +466,7 @@ describe("BulkEditTabWarning", () => {
       fail("Organism toggle needs to exist at this point.");
     }
     fireEvent.click(organismToggle);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Find the organism override button and click it.
     const overrideButton = wrapper.container.querySelector(
@@ -481,13 +481,13 @@ describe("BulkEditTabWarning", () => {
 
     // Click "Yes" on the popup dialog.
     fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "Add New Determination" button.
     fireEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Override the verbatim scientific name.
     fireEvent.change(
@@ -496,11 +496,11 @@ describe("BulkEditTabWarning", () => {
       }),
       { target: { value: "test-name-override" } }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {

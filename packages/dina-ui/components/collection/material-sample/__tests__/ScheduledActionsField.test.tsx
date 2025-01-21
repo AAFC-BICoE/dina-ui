@@ -29,7 +29,7 @@ const testCtx = {
 
 describe("ScheduledActionsField", () => {
   it("Edits the scheduled actions.", async () => {
-    const { container, getByText } = mountWithAppContext(
+    const { container, getByText, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -58,10 +58,10 @@ describe("ScheduledActionsField", () => {
         name: /add/i
       })
     );
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     fireEvent.submit(container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // One action added:
     expect(mockOnSubmit).toHaveBeenLastCalledWith({
@@ -95,10 +95,10 @@ describe("ScheduledActionsField", () => {
       target: { value: "remarks-2" }
     });
     fireEvent.click(getByText("Add"));
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     fireEvent.submit(container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Two actions added:
     expect(mockOnSubmit).toHaveBeenLastCalledWith({
@@ -128,17 +128,17 @@ describe("ScheduledActionsField", () => {
       target: { value: "edited-remarks-1" }
     });
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     fireEvent.click(
       screen.getByRole("button", {
         name: /save/i
       })
     );
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     fireEvent.submit(container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Two actions saved:
     expect(mockOnSubmit).toHaveBeenLastCalledWith({
@@ -164,7 +164,7 @@ describe("ScheduledActionsField", () => {
     );
 
     fireEvent.submit(container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // One action saved:
     expect(mockOnSubmit).toHaveBeenLastCalledWith({

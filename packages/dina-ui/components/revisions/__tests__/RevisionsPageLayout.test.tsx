@@ -30,7 +30,7 @@ const mockGet = jest.fn(async (path) => {
 
 describe("RevisionsPageLayout component", () => {
   it("Renders the revisions.", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <RevisionsPageLayout
         auditSnapshotPath="objectstore-api/audit-snapshots"
         instanceId={`metadata/471bf855-f5da-492a-a58e-922238e5a257`}
@@ -38,7 +38,7 @@ describe("RevisionsPageLayout component", () => {
       { apiContext: { apiClient: { get: mockGet } as any } }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const table = document.querySelector("table");
     if (!table) {

@@ -31,7 +31,7 @@ const testCtx = {
 
 describe("SetDefaultSampleName", () => {
   it("Sets the sample name based on the selected Collection.", async () => {
-    mountWithAppContext(
+    const { waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{
           materialSampleName: "",
@@ -63,7 +63,7 @@ describe("SetDefaultSampleName", () => {
       name: /collection 1 \(initial\-code\)/i
     });
     fireEvent.mouseDown(combobox); // Open the combobox options
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Select the new option (assuming the new option is rendered as expected)
     const option = await screen.findByRole("option", { name: /TEST_CODE_2/i });
@@ -76,7 +76,7 @@ describe("SetDefaultSampleName", () => {
   });
 
   it("Doesn't change the sample name when it already starts with the prefix.", async () => {
-    mountWithAppContext(
+    const { waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{
           materialSampleName: "INITIAL-CODE-100",
@@ -91,7 +91,7 @@ describe("SetDefaultSampleName", () => {
     );
 
     // Wait for any asynchronous updates
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Check that the initial value is correct and remains unchanged
     const input = screen.getByRole("textbox", {

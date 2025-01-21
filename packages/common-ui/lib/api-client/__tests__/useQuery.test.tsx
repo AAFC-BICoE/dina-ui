@@ -147,50 +147,50 @@ describe("useQuery hook", () => {
 
   it("Provides an onSuccess callback arg", async () => {
     mockGet.mockImplementationOnce(async () => MOCK_TODO_RESPONSE);
-    mountWithAppContext(<TestComponent />, testCtx);
+    const { waitForRequests } = mountWithAppContext(<TestComponent />, testCtx);
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     expect(mockOnSuccess).toHaveBeenCalledTimes(1);
-    expect(mockOnSuccess).lastCalledWith(MOCK_TODO_RESPONSE);
+    expect(mockOnSuccess).toHaveBeenLastCalledWith(MOCK_TODO_RESPONSE);
   });
 
   it("Re-fetches the data if the 'deps' prop changes.", async () => {
     mockGet.mockImplementation(async () => MOCK_TODO_RESPONSE);
 
     // Render with an initial 'deps' prop.
-    const { rerender } = mountWithAppContext(
+    const { rerender, waitForRequests } = mountWithAppContext(
       <TestComponent deps={[1]} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Update with a different 'deps' prop.
     rerender(<TestComponent deps={[2]} />);
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // The request should have been sent twice.
     expect(mockOnSuccess).toHaveBeenCalledTimes(2);
-    expect(mockOnSuccess).lastCalledWith(MOCK_TODO_RESPONSE);
+    expect(mockOnSuccess).toHaveBeenLastCalledWith(MOCK_TODO_RESPONSE);
   });
 
   it("Does not re-fetch the data if the 'deps' prop stays the same.", async () => {
     mockGet.mockImplementation(async () => MOCK_TODO_RESPONSE);
 
     // Render with an initial 'deps' prop.
-    const { rerender } = mountWithAppContext(
+    const { rerender, waitForRequests } = mountWithAppContext(
       <TestComponent deps={[1]} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Update with the same 'deps' prop.
     rerender(<TestComponent deps={[1]} />);
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // The request should only have been sent once.
     expect(mockOnSuccess).toHaveBeenCalledTimes(1);
-    expect(mockOnSuccess).lastCalledWith(MOCK_TODO_RESPONSE);
+    expect(mockOnSuccess).toHaveBeenLastCalledWith(MOCK_TODO_RESPONSE);
   });
 
   it("Lets you do client-side data joins across multiple back-end APIs", async () => {
@@ -200,7 +200,7 @@ describe("useQuery hook", () => {
     ]);
 
     // Render with a joinSpec to a "people-api".
-    mountWithAppContext(
+    const { waitForRequests } = mountWithAppContext(
       <TestComponent
         joinSpecs={[
           {
@@ -215,10 +215,10 @@ describe("useQuery hook", () => {
     );
 
     // Await response:
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     expect(mockBulkGet).toHaveBeenCalledTimes(1);
-    expect(mockBulkGet).lastCalledWith(["person/100"], {
+    expect(mockBulkGet).toHaveBeenLastCalledWith(["person/100"], {
       apiBaseUrl: "/people-api",
       returnNullForMissingResource: true
     });
@@ -242,8 +242,11 @@ describe("useQuery hook", () => {
 
   it("Lets you disable the query.", async () => {
     // Render with an initial 'deps' prop.
-    mountWithAppContext(<TestComponent disabled={true} />, testCtx);
-    await new Promise(setImmediate);
+    const { waitForRequests } = mountWithAppContext(
+      <TestComponent disabled={true} />,
+      testCtx
+    );
+    await waitForRequests();
 
     expect(mockGet).toHaveBeenCalledTimes(0);
   });
@@ -373,21 +376,21 @@ describe("useQuery hook", () => {
     const mockChild = jest.fn(() => null);
 
     // The first render will fetch the data once.
-    const { rerender } = mountWithAppContext(
+    const { rerender, waitForRequests } = mountWithAppContext(
       pagedQuery({ offset: 0, limit: 3 }, mockChild),
       testCtx
     );
     expect(mockGet).toHaveBeenCalledTimes(1);
 
     // The response is undefined before sending the first request.
-    expect(mockChild).not.lastCalledWith(
+    expect(mockChild).not.toHaveBeenLastCalledWith(
       expect.objectContaining({ response: expect.anything() })
     );
 
     // Continue the test after the first request finishes.
-    await new Promise(setImmediate);
+    await waitForRequests();
 
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ response: MOCK_TODOS_RESPONSE })
     );
 
@@ -400,14 +403,14 @@ describe("useQuery hook", () => {
     expect(mockGet).toHaveBeenCalledTimes(2);
 
     // The loading state is returned when waiting for the second fetch.
-    expect(mockChild).lastCalledWith({
+    expect(mockChild).toHaveBeenLastCalledWith({
       isDisabled: false,
       loading: true
     });
 
     // Continue the test after the second request finishes.
-    await new Promise(setImmediate);
-    expect(mockChild).lastCalledWith(
+    await waitForRequests();
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ response: MOCK_TODOS_RESPONSE_PAGE_2 })
     );
   });
@@ -417,22 +420,22 @@ describe("useQuery hook", () => {
     const mockChild = jest.fn(() => null);
 
     // Initial render.
-    const { rerender } = mountWithAppContext(
+    const { rerender, waitForRequests } = mountWithAppContext(
       pagedQuery({ offset: 0, limit: 3 }, mockChild),
       testCtx
     );
 
     // Renders with loading as true when initially fetching data.
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ loading: true })
     );
 
     // Continue the test after the first query finishes.
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // The component renders a third time when the first query finishes.
     expect(mockChild).toHaveBeenCalledTimes(2);
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ loading: false })
     );
 
@@ -440,15 +443,15 @@ describe("useQuery hook", () => {
     rerender(pagedQuery({ offset: 3, limit: 3 }, mockChild));
 
     // Query component renders with loading as true when re-fetching data.
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ loading: true })
     );
 
     // Continue the test after the second query finishes.
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Renders with loading as false after the second query finishes.
-    expect(mockChild).lastCalledWith(
+    expect(mockChild).toHaveBeenLastCalledWith(
       expect.objectContaining({ loading: false })
     );
   });

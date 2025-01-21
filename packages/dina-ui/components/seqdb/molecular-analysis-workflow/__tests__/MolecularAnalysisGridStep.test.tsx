@@ -212,7 +212,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 1/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
@@ -249,7 +249,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 1/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
@@ -271,7 +271,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Save the new coordinates.
     userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Expect the 3 API calls for the storage-unit-usages.
     expect(mockSave.mock.calls).toEqual([
@@ -395,7 +395,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Save, should delete the 3 storage unit usages.
     userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Update each generic-molecular-analysis-item to remove the storage unit usage relationship.
     // Then delete the storage unit usages.
@@ -482,7 +482,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Change the storage unit type...
     userEvent.click(wrapper.getAllByRole("combobox")[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 2/i })
     );
@@ -557,7 +557,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 3/i })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Expect a warning message to appear since this storage unit type has not grid support.
     expect(

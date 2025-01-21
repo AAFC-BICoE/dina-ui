@@ -64,9 +64,9 @@ describe("Region edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -86,7 +86,7 @@ describe("Region edit page", () => {
     );
 
     // The user should be redirected to the new region's details page.
-    expect(mockPush).lastCalledWith("/seqdb/region/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith("/seqdb/region/view?id=1");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -119,7 +119,7 @@ describe("Region edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected error response.
     expect(
@@ -153,7 +153,7 @@ describe("Region edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the region form to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the existing region's symbol value is in the field.
     expect(wrapper.getByDisplayValue("symbol")).toBeInTheDocument();
@@ -169,11 +169,11 @@ describe("Region edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/seqdb-api/operations",
       [
         {
@@ -195,7 +195,7 @@ describe("Region edit page", () => {
     );
 
     // The user should be redirected to the existing region's details page.
-    expect(mockPush).lastCalledWith("/seqdb/region/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith("/seqdb/region/view?id=1");
   });
 });
 

@@ -90,7 +90,7 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
 
@@ -114,10 +114,10 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSearchApiGet).toHaveBeenCalledTimes(1);
-    expect(mockSearchApiGet).lastCalledWith(
+    expect(mockSearchApiGet).toHaveBeenLastCalledWith(
       "search-api/search-ws/auto-complete",
       {
         params: {
@@ -151,11 +151,11 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
       }
     );
     expect(wrapper.queryByText(/loading: true/i)).toBeInTheDocument();
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockSearchApiGetWithError).toHaveBeenCalledTimes(1);
     expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
-    expect(mockAgentApiGet).lastCalledWith("agent-api/person", {
+    expect(mockAgentApiGet).toHaveBeenLastCalledWith("agent-api/person", {
       sort: "-createdOn"
     });
 

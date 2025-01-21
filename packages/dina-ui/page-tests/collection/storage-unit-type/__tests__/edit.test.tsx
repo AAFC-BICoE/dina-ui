@@ -34,7 +34,7 @@ describe("Storage Unit Type form.", () => {
       <StorageUnitTypeForm onSaved={mockOnSaved} />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Change Name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -44,10 +44,10 @@ describe("Storage Unit Type form.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected result
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -59,7 +59,7 @@ describe("Storage Unit Type form.", () => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "123",
       name: "test-storage-type",
       type: "storage-unit-type"
@@ -81,7 +81,7 @@ describe("Storage Unit Type form.", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Change Name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -91,10 +91,10 @@ describe("Storage Unit Type form.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected result
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -110,7 +110,7 @@ describe("Storage Unit Type form.", () => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "333",
       group: "test-group",
       name: "edited-name",

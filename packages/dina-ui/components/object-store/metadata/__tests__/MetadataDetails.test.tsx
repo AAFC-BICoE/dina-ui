@@ -51,7 +51,7 @@ describe("MetadataDetails component", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       screen.getByRole("img", {

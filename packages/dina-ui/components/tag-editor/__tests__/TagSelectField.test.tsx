@@ -48,9 +48,9 @@ describe("TagSelectField", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
-    expect(mockGet).lastCalledWith("collection-api/material-sample", {
+    expect(mockGet).toHaveBeenLastCalledWith("collection-api/material-sample", {
       fields: { "material-sample": "tags" }, // Only request tags field.
       filter: { rsql: "group=in=(aafc,cnc)", tags: { NEQ: "null" } }, // Restrict to user's groups
       page: { limit: 100 },
@@ -93,7 +93,7 @@ describe("TagSelectField", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Change combobox value
     fireEvent.change(
@@ -107,7 +107,7 @@ describe("TagSelectField", () => {
       }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected option in the combobox
     expect(

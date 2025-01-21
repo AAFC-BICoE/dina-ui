@@ -1,15 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`MaterialSampleBulkEditor Bulk edit all material samples using other catalogue and other identifiers 1`] = `
-Array [
-  Array [
-    Array [
-      Object {
-        "resource": Object {
+[
+  [
+    [
+      {
+        "resource": {
           "assemblages": undefined,
-          "associations": Array [],
+          "associations": [],
           "attachment": undefined,
-          "collectingEvent": Object {
+          "collectingEvent": {
             "id": null,
             "type": "collecting-event",
           },
@@ -21,33 +21,33 @@ Array [
           "organismsQuantity": undefined,
           "preparationDate": null,
           "preparationFixative": null,
-          "preparationManagedAttributes": Object {},
+          "preparationManagedAttributes": {},
           "preparationMaterials": null,
-          "preparationMethod": Object {
+          "preparationMethod": {
             "id": null,
             "type": "preparation-method",
           },
-          "preparationProtocol": Object {
+          "preparationProtocol": {
             "id": null,
             "type": "protocol",
           },
           "preparationRemarks": null,
           "preparationSubstrate": null,
-          "preparationType": Object {
+          "preparationType": {
             "id": null,
             "type": "preparation-type",
           },
           "preparedBy": undefined,
           "preservationType": null,
           "projects": undefined,
-          "relationships": Object {
-            "organism": Object {
-              "data": Array [],
+          "relationships": {
+            "organism": {
+              "data": [],
             },
-            "preparedBy": Object {
-              "data": Array [],
+            "preparedBy": {
+              "data": [],
             },
-            "storageUnitUsage": Object {
+            "storageUnitUsage": {
               "data": null,
             },
           },
@@ -60,19 +60,19 @@ Array [
         "type": "material-sample",
       },
     ],
-    Object {
+    {
       "apiBaseUrl": "/collection-api",
     },
   ],
-  Array [
-    Array [
-      Object {
-        "resource": Object {
+  [
+    [
+      {
+        "resource": {
           "assemblages": undefined,
-          "associations": Array [],
+          "associations": [],
           "attachment": undefined,
           "dwcDegreeOfEstablishment": null,
-          "dwcOtherCatalogNumbers": Array [
+          "dwcOtherCatalogNumbers": [
             "otherCatalogAll",
           ],
           "hostOrganism": null,
@@ -83,19 +83,19 @@ Array [
           "organismsQuantity": undefined,
           "preparationDate": null,
           "preparationFixative": null,
-          "preparationManagedAttributes": Object {},
+          "preparationManagedAttributes": {},
           "preparationMaterials": null,
           "preparationRemarks": null,
           "preparationSubstrate": null,
           "preparedBy": undefined,
           "preservationType": null,
           "projects": undefined,
-          "relationships": Object {
-            "organism": Object {
-              "data": Array [],
+          "relationships": {
+            "organism": {
+              "data": [],
             },
-            "preparedBy": Object {
-              "data": Array [],
+            "preparedBy": {
+              "data": [],
             },
           },
           "restrictionFieldsExtension": null,
@@ -106,13 +106,13 @@ Array [
         },
         "type": "material-sample",
       },
-      Object {
-        "resource": Object {
+      {
+        "resource": {
           "assemblages": undefined,
-          "associations": Array [],
+          "associations": [],
           "attachment": undefined,
           "dwcDegreeOfEstablishment": null,
-          "dwcOtherCatalogNumbers": Array [
+          "dwcOtherCatalogNumbers": [
             "otherCatalogAll",
           ],
           "hostOrganism": null,
@@ -123,19 +123,19 @@ Array [
           "organismsQuantity": undefined,
           "preparationDate": null,
           "preparationFixative": null,
-          "preparationManagedAttributes": Object {},
+          "preparationManagedAttributes": {},
           "preparationMaterials": null,
           "preparationRemarks": null,
           "preparationSubstrate": null,
           "preparedBy": undefined,
           "preservationType": null,
           "projects": undefined,
-          "relationships": Object {
-            "organism": Object {
-              "data": Array [],
+          "relationships": {
+            "organism": {
+              "data": [],
             },
-            "preparedBy": Object {
-              "data": Array [],
+            "preparedBy": {
+              "data": [],
             },
           },
           "restrictionFieldsExtension": null,
@@ -146,13 +146,13 @@ Array [
         },
         "type": "material-sample",
       },
-      Object {
-        "resource": Object {
+      {
+        "resource": {
           "assemblages": undefined,
-          "associations": Array [],
+          "associations": [],
           "attachment": undefined,
           "dwcDegreeOfEstablishment": null,
-          "dwcOtherCatalogNumbers": Array [
+          "dwcOtherCatalogNumbers": [
             "otherCatalogAll",
           ],
           "hostOrganism": null,
@@ -163,19 +163,19 @@ Array [
           "organismsQuantity": undefined,
           "preparationDate": null,
           "preparationFixative": null,
-          "preparationManagedAttributes": Object {},
+          "preparationManagedAttributes": {},
           "preparationMaterials": null,
           "preparationRemarks": null,
           "preparationSubstrate": null,
           "preparedBy": undefined,
           "preservationType": null,
           "projects": undefined,
-          "relationships": Object {
-            "organism": Object {
-              "data": Array [],
+          "relationships": {
+            "organism": {
+              "data": [],
             },
-            "preparedBy": Object {
-              "data": Array [],
+            "preparedBy": {
+              "data": [],
             },
           },
           "restrictionFieldsExtension": null,
@@ -187,7 +187,7 @@ Array [
         "type": "material-sample",
       },
     ],
-    Object {
+    {
       "apiBaseUrl": "/collection-api",
     },
   ],

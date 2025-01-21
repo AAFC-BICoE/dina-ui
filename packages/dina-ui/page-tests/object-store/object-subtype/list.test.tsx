@@ -45,7 +45,7 @@ describe("Object subtype list page", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test link element in table
     expect(wrapper.getByRole("link", { name: /drawing/i })).toBeInTheDocument();

@@ -81,7 +81,7 @@ describe("ProjectForm.", () => {
     const wrapper = mountWithAppContext(<ProjectForm onSaved={mockOnSaved} />, {
       apiContext
     });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Change Name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -104,10 +104,10 @@ describe("ProjectForm.", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for page to load
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API responses
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -132,7 +132,7 @@ describe("ProjectForm.", () => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "123",
       name: "test-project",
       relationships: {
@@ -172,7 +172,7 @@ describe("ProjectForm.", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Change Name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -194,10 +194,10 @@ describe("ProjectForm.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
-    expect(mockSave).lastCalledWith(
+    expect(mockSave).toHaveBeenLastCalledWith(
       [
         {
           resource: {
@@ -227,7 +227,7 @@ describe("ProjectForm.", () => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
-    expect(mockOnSaved).lastCalledWith({
+    expect(mockOnSaved).toHaveBeenLastCalledWith({
       id: "333",
       multilingualDescription: {
         descriptions: [

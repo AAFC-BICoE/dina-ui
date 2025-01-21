@@ -36,7 +36,7 @@ describe("FormikButton component", () => {
     const wrapper = getWrapper();
 
     mockOnSubmit.mockImplementation(async () => {
-      await new Promise(setImmediate);
+      await wrapper.waitForRequests();
     });
 
     // Submit the form

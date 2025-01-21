@@ -41,7 +41,7 @@ describe("DeleteButton", () => {
     // Wait for the loading to be removed.
     await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
 
-    expect(mockDoOperations).lastCalledWith(
+    expect(mockDoOperations).toHaveBeenLastCalledWith(
       [
         {
           op: "DELETE",
@@ -50,7 +50,7 @@ describe("DeleteButton", () => {
       ],
       undefined
     );
-    expect(mockPush).lastCalledWith("/metadata/list");
+    expect(mockPush).toHaveBeenLastCalledWith("/metadata/list");
   });
 
   it("Renders blank if the passed ID is undefined.", () => {

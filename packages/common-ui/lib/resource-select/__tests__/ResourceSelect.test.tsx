@@ -76,7 +76,7 @@ describe("ResourceSelect component", () => {
     ).toBeInTheDocument();
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(
       container.querySelector(".react-select__loading-indicator")
@@ -89,11 +89,11 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     fireEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // There should be 4 options including the <None> option.
     const options = wrapper.getAllByRole("option");
@@ -114,20 +114,20 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     fireEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const options = wrapper.getAllByRole("option");
 
     // Select the third option.
     fireEvent.click(options[3]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       {
         id: "3",
         name: "todo 3",
@@ -143,11 +143,11 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     fireEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const options = wrapper.getAllByRole("option");
 
@@ -163,10 +163,10 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
-    expect(mockGet).lastCalledWith("todo-api/todo", {
+    expect(mockGet).toHaveBeenLastCalledWith("todo-api/todo", {
       page: { limit: 6 },
       include: "group",
       sort: "-createdOn"
@@ -177,7 +177,7 @@ describe("ResourceSelect component", () => {
     mountWithContext(<ResourceSelect {...DEFAULT_SELECT_PROPS} />);
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
 
@@ -199,18 +199,18 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Simulate changing the value and filtering it.
     fireEvent.change(wrapper.getByRole("combobox"), {
       target: { value: "test filter value" }
     });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The GET function shsould have been called twice: for the initial query and again for the
     // filtered query.
     expect(mockGet).toHaveBeenCalledTimes(2);
-    expect(mockGet).lastCalledWith("todo-api/todo", {
+    expect(mockGet).toHaveBeenLastCalledWith("todo-api/todo", {
       filter: {
         description: "test filter value"
       },
@@ -250,12 +250,12 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Display the options...
     fireEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const options = wrapper.getAllByRole("option");
     expect(options[0].textContent).toEqual("<None>");
@@ -265,7 +265,7 @@ describe("ResourceSelect component", () => {
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       { id: null },
       expect.objectContaining({})
     );
@@ -322,13 +322,13 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     fireEvent.click(wrapper.getByRole("button", { name: /remove todo 1/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       [
         {
           id: "2",
@@ -368,7 +368,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(wrapper.getByText(/todo 2/i)).toBeInTheDocument();
     expect(wrapper.getByText(/todo 3/i)).toBeInTheDocument();
@@ -380,12 +380,12 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Display the options...
     fireEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const options = wrapper.getAllByRole("option");
 
@@ -414,12 +414,12 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Display the options...
     fireEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const options = wrapper.getAllByRole("option");
 
@@ -429,9 +429,9 @@ describe("ResourceSelect component", () => {
     // Select the callback option, which should call the callback:
     fireEvent.click(options[4]);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(mockGetResource).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       TEST_ASYNC_TODO,
       expect.objectContaining({})
     );
@@ -457,12 +457,12 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Display the options...
     fireEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const options = wrapper.getAllByRole("option");
 
@@ -472,11 +472,11 @@ describe("ResourceSelect component", () => {
     // Select the callback option, which should call the callback:
     fireEvent.click(options[3]);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(mockGetResource).toHaveBeenCalledTimes(1);
     // Called with the normal option plus the async-fetched value:
-    expect(mockOnChange).lastCalledWith(
+    expect(mockOnChange).toHaveBeenLastCalledWith(
       [
         {
           id: "100",
@@ -507,12 +507,12 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // There should be 5 options including the custom callback option and the none option.
     fireEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     const options = wrapper.getAllByRole("option");
     expect(options.length).toEqual(5);
@@ -522,7 +522,7 @@ describe("ResourceSelect component", () => {
       target: { value: "incorrect search with no matches" }
     });
     fireEvent.keyPress(wrapper.getByRole("combobox"), { key: "Enter" });
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Async option should always be displayed even in search results.
     expect(
@@ -538,9 +538,9 @@ describe("ResourceSelect component", () => {
       />
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
-    expect(mockBulkGet).lastCalledWith(["todo/ABC"], {
+    expect(mockBulkGet).toHaveBeenLastCalledWith(["todo/ABC"], {
       apiBaseUrl: "/todo-api",
       returnNullForMissingResource: true
     });
@@ -558,7 +558,7 @@ describe("ResourceSelect component", () => {
       />
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     expect(mockBulkGet).toHaveBeenCalledTimes(0);
 
     expect(wrapper.getByText(/example\-custom\-name/i)).toBeInTheDocument();

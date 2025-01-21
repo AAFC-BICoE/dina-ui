@@ -29,7 +29,7 @@ describe("GroupSelectField component", () => {
       </DinaForm>,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the dropdown to show options.
     userEvent.click(
@@ -65,7 +65,7 @@ describe("GroupSelectField component", () => {
         }
       }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the dropdown to show options.
     userEvent.click(
@@ -87,7 +87,7 @@ describe("GroupSelectField component", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(wrapper.getByText(/select\.\.\./i)).toBeInTheDocument();
   });
@@ -101,7 +101,7 @@ describe("GroupSelectField component", () => {
       </DinaForm>,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(wrapper.getByText(/cnc/i)).toBeInTheDocument();
   });
@@ -116,7 +116,7 @@ describe("GroupSelectField component", () => {
       // User has only one group:
       { ...testCtx, accountContext: { groupNames: ["cnc"] } }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(wrapper.getByText(/aafc/i)).toBeInTheDocument();
   });
@@ -133,15 +133,15 @@ describe("GroupSelectField component", () => {
       // User has only one group:
       { ...testCtx, accountContext: { groupNames: ["cnc"] } }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     expect(wrapper.queryByRole("combobox")).not.toBeInTheDocument();
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The default group was selected:
-    expect(mockSubmit).lastCalledWith({ group: "cnc" });
+    expect(mockSubmit).toHaveBeenLastCalledWith({ group: "cnc" });
   });
 
   it("Doesn't set the default value when the initial value is null.", async () => {
@@ -158,12 +158,12 @@ describe("GroupSelectField component", () => {
       // User has only one group:
       { ...testCtx, accountContext: { groupNames: ["cnc"] } }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The default group was selected:
-    expect(mockSubmit).lastCalledWith({ group: null });
+    expect(mockSubmit).toHaveBeenLastCalledWith({ group: null });
   });
 });

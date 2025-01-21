@@ -105,8 +105,8 @@ describe("Single Stored Object details page", () => {
   it("Renders the page.", async () => {
     const wrapper = mountWithAppContext(<MetadataViewPage />, { apiContext });
 
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
+    await wrapper.waitForRequests();
 
     expect(wrapper.getAllByText("Caption:")[0]).toBeInTheDocument();
     expect(wrapper.getAllByText("Test Caption")[0]).toBeInTheDocument();

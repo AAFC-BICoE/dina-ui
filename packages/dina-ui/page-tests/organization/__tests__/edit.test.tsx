@@ -91,9 +91,9 @@ describe("organization edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/agent-api/operations",
       [
         {
@@ -117,7 +117,7 @@ describe("organization edit page", () => {
     );
 
     // The user should be redirected to the new organization's details page.
-    expect(mockPush).lastCalledWith("/organization/list");
+    expect(mockPush).toHaveBeenLastCalledWith("/organization/list");
   });
 
   it("Provides a form to edit an organization.", async () => {
@@ -141,7 +141,7 @@ describe("organization edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Check that the existing aliases value is in the field.
     expect(
@@ -159,11 +159,11 @@ describe("organization edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/agent-api/operations",
       [
         {
@@ -182,7 +182,7 @@ describe("organization edit page", () => {
     );
 
     // The user should be redirected to organization's list page.
-    expect(mockPush).lastCalledWith("/organization/list");
+    expect(mockPush).toHaveBeenLastCalledWith("/organization/list");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -211,7 +211,7 @@ describe("organization edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected error
     expect(wrapper.getByText("Constraint violation: Name should not be blank"));

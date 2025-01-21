@@ -8,7 +8,7 @@ const mockSubmit = jest.fn();
 
 describe("ParseVerbatimToRangeButton component", () => {
   it("Sets the range from two detected values when there is no current min value.", async () => {
-    const { container } = mountWithAppContext(
+    const { container, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{ verbatim: "1m to 20m " }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -25,14 +25,14 @@ describe("ParseVerbatimToRangeButton component", () => {
     const button = screen.getByRole("button");
     fireEvent.click(button);
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Submit the form using querySelector
     const form = container.querySelector("form");
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(mockSubmit).lastCalledWith({
+      expect(mockSubmit).toHaveBeenLastCalledWith({
         verbatim: "1m to 20m ",
         min: "1",
         max: "20"
@@ -41,7 +41,7 @@ describe("ParseVerbatimToRangeButton component", () => {
   });
 
   it("Only sets the min when there is one detected value.", async () => {
-    const { container } = mountWithAppContext(
+    const { container, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{ verbatim: "1m " }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -58,14 +58,14 @@ describe("ParseVerbatimToRangeButton component", () => {
     const button = screen.getByRole("button");
     fireEvent.click(button);
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Submit the form using querySelector
     const form = container.querySelector("form");
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(mockSubmit).lastCalledWith({
+      expect(mockSubmit).toHaveBeenLastCalledWith({
         verbatim: "1m ",
         min: "1"
       });

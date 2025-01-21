@@ -69,7 +69,7 @@ describe("Storage Unit edit page.", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test that A (Type) link is rendered
     expect(
@@ -89,13 +89,13 @@ describe("Storage Unit edit page.", () => {
         name: /storage unit type type here to search\./i
       })
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
     userEvent.click(wrapper.getByRole("option", { name: /type/i }));
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
     expect(mockSave.mock.calls).toEqual([

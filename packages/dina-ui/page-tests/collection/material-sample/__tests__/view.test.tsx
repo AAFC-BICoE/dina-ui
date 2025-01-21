@@ -94,7 +94,7 @@ describe("Material Sample View Page", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test Material Sample Name and Collecting Date Start Event Date Time to be rendered
     expect(wrapper.getAllByText("my-sample-name")[0]).toBeInTheDocument();
@@ -109,7 +109,7 @@ describe("Material Sample View Page", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Both organism sections should be expanded:
     expect(wrapper.getAllByRole("button", { name: /•/i })).toHaveLength(2);

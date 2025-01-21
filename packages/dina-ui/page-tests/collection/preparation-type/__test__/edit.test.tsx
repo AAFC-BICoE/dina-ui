@@ -121,10 +121,10 @@ describe("preparation-type edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {
@@ -146,7 +146,9 @@ describe("preparation-type edit page", () => {
     );
 
     // The user should be redirected to the new preparation-type's details page.
-    expect(mockPush).lastCalledWith("/collection/preparation-type/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith(
+      "/collection/preparation-type/view?id=1"
+    );
   });
 
   it("Edits an existing prep type.", async () => {
@@ -167,7 +169,7 @@ describe("preparation-type edit page", () => {
     );
 
     // Wait for the page to load
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test English Description field value
     expect(
@@ -187,10 +189,10 @@ describe("preparation-type edit page", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected API response
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {
@@ -247,7 +249,7 @@ describe("preparation-type edit page", () => {
     // Submit form without name field value
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Test expected error
     expect(

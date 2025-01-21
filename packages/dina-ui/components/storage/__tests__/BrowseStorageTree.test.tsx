@@ -121,11 +121,11 @@ describe("BrowseStorageTree component", () => {
       </DinaForm>,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Open the top-level unit to show the nested units "B" and "C":
     userEvent.click(wrapper.getByTestId("collapser-button-A").children[0]);
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Shows the nested storage units:
     expect(
@@ -140,7 +140,7 @@ describe("BrowseStorageTree component", () => {
       within(wrapper.getByTestId("collapser-button-C")).getByRole("button")
     );
 
-    expect(mockOnSelect).lastCalledWith(STORAGE_C);
+    expect(mockOnSelect).toHaveBeenLastCalledWith(STORAGE_C);
   });
 
   it("Filters the list based on a text filter.", async () => {
@@ -150,10 +150,10 @@ describe("BrowseStorageTree component", () => {
       </DinaForm>,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // With no filter, gets the top-level units:
-    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+    expect(mockGet).toHaveBeenLastCalledWith("collection-api/storage-unit", {
       filter: {
         rsql: "group=in=(aafc,cnc)"
       },
@@ -170,10 +170,10 @@ describe("BrowseStorageTree component", () => {
       "test-search-text"
     );
     userEvent.click(wrapper.getByRole("button", { name: /search/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // With a filter, gets units from any level matching the search text:
-    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+    expect(mockGet).toHaveBeenLastCalledWith("collection-api/storage-unit", {
       filter: {
         rsql: "name==*test-search-text*;group=in=(aafc,cnc)"
       },
@@ -187,10 +187,10 @@ describe("BrowseStorageTree component", () => {
 
     // Reset the search:
     userEvent.click(wrapper.getByRole("button", { name: /reset/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // No filter again:
-    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+    expect(mockGet).toHaveBeenLastCalledWith("collection-api/storage-unit", {
       filter: {
         rsql: "group=in=(aafc,cnc)"
       },

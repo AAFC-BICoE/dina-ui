@@ -27,17 +27,17 @@ describe("ListPageLayout component", () => {
     );
 
     // Wait for the default search to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Do a filtered search.
     fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
       target: { value: "101F" }
     });
     fireEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // There should be an RSQL filter.
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenLastCalledWith(
       expect.anything(),
       expect.objectContaining({
         filter: { rsql: "name==*101F*" }
@@ -48,7 +48,7 @@ describe("ListPageLayout component", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /reset filters/i }));
 
     // There should be no RSQL filter.
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenLastCalledWith(
       expect.anything(),
       expect.objectContaining({
         filter: {}
@@ -70,14 +70,14 @@ describe("ListPageLayout component", () => {
     );
 
     // Wait for the default search to finish.
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Click the type header to trigger the sort.
     fireEvent.click(wrapper.getByText("Type"));
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // There should be an RSQL filter.
-    expect(mockGet).lastCalledWith("pcrPrimer", {
+    expect(mockGet).toHaveBeenLastCalledWith("pcrPrimer", {
       filter: {},
       page: { limit: 25, offset: 0 },
       sort: "-type"
@@ -89,7 +89,7 @@ describe("ListPageLayout component", () => {
   });
 
   it("Allows a passed additionalFilters prop.", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"
         additionalFilters={{
@@ -105,10 +105,10 @@ describe("ListPageLayout component", () => {
       />,
       { apiContext: mockApiCtx }
     );
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // Ensure the additional filters are included in the request:
-    expect(mockGet).lastCalledWith("pcrPrimer", {
+    expect(mockGet).toHaveBeenLastCalledWith("pcrPrimer", {
       filter: { attr1: "a", rsql: "attr2==b" },
       page: { limit: 25, offset: 0 },
       sort: "-createdOn"

@@ -81,7 +81,7 @@ describe("collection-method edit page", () => {
     mockQuery = {};
   });
   it("Provides a form to add a collection-method.", async () => {
-    const { container, getByLabelText } = mountWithAppContext(
+    const { container, getByLabelText, waitForRequests } = mountWithAppContext(
       <CollectionMethodEditPage />,
       {
         apiContext
@@ -89,7 +89,7 @@ describe("collection-method edit page", () => {
     );
 
     // Wait for asynchronous updates
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Simulate changing the name input
     const nameInput = getByLabelText(/name/i);
@@ -107,9 +107,9 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for async updates after submission
-    await new Promise(setImmediate);
+    await waitForRequests();
 
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {
@@ -131,11 +131,13 @@ describe("collection-method edit page", () => {
     );
 
     // Check that the user is redirected to the new collection-method's details page
-    expect(mockPush).lastCalledWith("/collection/collection-method/view?id=1");
+    expect(mockPush).toHaveBeenLastCalledWith(
+      "/collection/collection-method/view?id=1"
+    );
   });
 
   it("Edits an existing collection method.", async () => {
-    const { container, getByLabelText } = mountWithAppContext(
+    const { container, getByLabelText, waitForRequests } = mountWithAppContext(
       <CollectionMethodForm
         onSaved={mockOnSaved}
         fetchedCollectionMethod={{
@@ -151,7 +153,7 @@ describe("collection-method edit page", () => {
     );
 
     // Wait for asynchronous updates
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Check the initial value of the English description textarea
     const descriptionTextarea = getByLabelText(
@@ -176,10 +178,10 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for async updates after submission
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Check the last called patch request
-    expect(mockPatch).lastCalledWith(
+    expect(mockPatch).toHaveBeenLastCalledWith(
       "/collection-api/operations",
       [
         {
@@ -229,7 +231,7 @@ describe("collection-method edit page", () => {
 
     mockQuery = {};
 
-    const { container, getByText } = mountWithAppContext(
+    const { container, getByText, waitForRequests } = mountWithAppContext(
       <CollectionMethodEditPage />,
       { apiContext }
     );
@@ -239,7 +241,7 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for asynchronous updates
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Check that the error message is displayed
     expect(

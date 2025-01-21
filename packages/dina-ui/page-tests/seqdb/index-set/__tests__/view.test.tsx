@@ -70,13 +70,13 @@ describe("Index Set View Page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the page to load:
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The index set name is displayed:
     expect(wrapper.getAllByText(/test index set/i)[1]).toBeInTheDocument();
 
     // Wait for the NGS indexes table to load:
-    await new Promise(setImmediate);
+    await wrapper.waitForRequests();
 
     // The table shows the ngs indexes:
     expect(

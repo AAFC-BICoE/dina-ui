@@ -54,7 +54,7 @@ describe("AttachmentsField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Adds the selected Metadatas to the array.", async () => {
-    const { container, getByRole } = mountWithAppContext(
+    const { container, getByRole, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -69,7 +69,7 @@ describe("AttachmentsField component", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Initially empty:
     expect(container.querySelectorAll("tbody tr").length).toEqual(0);
@@ -78,14 +78,14 @@ describe("AttachmentsField component", () => {
     const addButton = getByRole("button", { name: /add attachments/i });
     fireEvent.click(addButton);
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     fireEvent.click(
       screen.getByRole("tab", {
         name: /attach existing objects/i
       })
     );
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Simulate saving the attachments
     fireEvent.click(
@@ -100,7 +100,7 @@ describe("AttachmentsField component", () => {
       })
     );
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // The Metadatas should have been added:
     expect(container.querySelectorAll("tbody tr").length).toEqual(2);
@@ -111,7 +111,7 @@ describe("AttachmentsField component", () => {
       fireEvent.submit(form);
     }
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Check the mockOnSubmit was called with the correct values
     expect(mockOnSubmit).toHaveBeenLastCalledWith({
@@ -123,7 +123,7 @@ describe("AttachmentsField component", () => {
   });
 
   it("Prevents duplicate attachments from being attached.", async () => {
-    const { container, getByRole } = mountWithAppContext(
+    const { container, getByRole, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -138,7 +138,7 @@ describe("AttachmentsField component", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Initially empty:
     expect(container.querySelectorAll("tbody tr").length).toEqual(0);
@@ -147,14 +147,14 @@ describe("AttachmentsField component", () => {
     const addButton = getByRole("button", { name: /add attachments/i });
     fireEvent.click(addButton);
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     fireEvent.click(
       screen.getByRole("tab", {
         name: /attach existing objects/i
       })
     );
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Simulate saving the attachments
     fireEvent.click(
@@ -169,7 +169,7 @@ describe("AttachmentsField component", () => {
       })
     );
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     fireEvent.click(
       screen.getByRole("button", {
@@ -177,7 +177,7 @@ describe("AttachmentsField component", () => {
       })
     );
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Add metadatas again
     fireEvent.click(
@@ -185,7 +185,7 @@ describe("AttachmentsField component", () => {
         name: /attach existing objects/i
       })
     );
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     fireEvent.click(
       screen.getByRole("checkbox", {
@@ -199,7 +199,7 @@ describe("AttachmentsField component", () => {
       })
     );
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // The Metadatas should have been added:
     expect(container.querySelectorAll("tbody tr").length).toEqual(2);
@@ -210,7 +210,7 @@ describe("AttachmentsField component", () => {
       fireEvent.submit(form);
     }
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     // Check the mockOnSubmit was called with the correct values
     expect(mockOnSubmit).toHaveBeenLastCalledWith({
@@ -222,7 +222,7 @@ describe("AttachmentsField component", () => {
   });
 
   it("Removes selected Metadatas from the array.", async () => {
-    const { container } = mountWithAppContext(
+    const { container, waitForRequests } = mountWithAppContext(
       <DinaForm
         initialValues={{
           attachment: [
@@ -242,14 +242,14 @@ describe("AttachmentsField component", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     expect(container.querySelectorAll("tbody tr").length).toEqual(2);
 
     const removeButtons = screen.getAllByRole("button", { name: /remove/i });
     fireEvent.click(removeButtons[0]);
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
     expect(container.querySelectorAll("tbody tr").length).toEqual(1);
 
@@ -259,9 +259,9 @@ describe("AttachmentsField component", () => {
       fireEvent.submit(form);
     }
 
-    await new Promise(setImmediate);
+    await waitForRequests();
 
-    expect(mockOnSubmit).lastCalledWith({
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       attachment: [{ id: "example-2", type: "metadata" }]
     });
   });
