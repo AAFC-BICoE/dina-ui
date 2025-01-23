@@ -76,7 +76,24 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   type: "metadata",
   managedAttributes: {
     test_managed_attribute: "test-managed-attribute-value"
-  }
+  },
+  derivatives: [
+    {
+      type: "derivative",
+      id: "6c11bd72-a9e1-455c-b98c-320693a43e49",
+      acHashFunction: null,
+      acHashValue: null,
+      bucket: "aafc",
+      createdBy: "System Generated",
+      createdOn: "2023-03-02T18:14:07.922656Z",
+      dcFormat: "image/jpeg",
+      dcType: "IMAGE",
+      derivativeType: "THUMBNAIL_IMAGE",
+      fileExtension: ".jpg",
+      fileIdentifier: "5dc3a982-640f-45a7-b599-dfb7dedf79ef",
+      publiclyReleasable: false
+    } as any
+  ]
 };
 
 const TEST_MANAGED_ATTRIBUTE: PersistedResource<ManagedAttribute> = {
@@ -87,7 +104,12 @@ const TEST_MANAGED_ATTRIBUTE: PersistedResource<ManagedAttribute> = {
   vocabularyElementType: "STRING"
 };
 
-const mockSave = jest.fn();
+const mockSave = jest.fn(async (saves) => {
+  return saves.map((save) => ({
+    ...save.resource,
+    id: save.resource.id ?? "123"
+  }));
+});
 
 const apiContext: any = {
   apiClient: { get: mockGet },
@@ -105,7 +127,6 @@ jest.mock("next/router", () => ({
 describe("Metadata single record edit page.", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockSave.mockImplementation((args) => args.map(({ resource }) => resource));
     mockUseRouter.mockReturnValue({
       push: () => undefined,
       query: {
@@ -157,7 +178,6 @@ describe("Metadata single record edit page.", () => {
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
-
     await new Promise(setImmediate);
 
     // Check only the changed values

@@ -156,7 +156,12 @@ export function useMetadataSave({
   }
 
   async function onSubmit({ submittedValues }) {
-    const { license, acSubtype, ...metadataValues } = submittedValues;
+    const {
+      derivatives: _derivatives,
+      license,
+      acSubtype,
+      ...metadataValues
+    } = submittedValues;
 
     if (license) {
       // The Metadata's xmpRightsWebStatement field stores the license's url.
