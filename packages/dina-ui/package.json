@@ -1,6 +1,6 @@
 {
   "name": "dina-ui",
-  "version": "0.183.0",
+  "version": "0.183.1",
   "scripts": {
     "build": "run-s next:build next:export",
     "dev": "next",
