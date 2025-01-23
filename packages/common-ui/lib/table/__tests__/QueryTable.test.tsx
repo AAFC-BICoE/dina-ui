@@ -16,7 +16,6 @@ import {
 import { mountWithAppContext } from "common-ui";
 import {
   fireEvent,
-  screen,
   waitForElementToBeRemoved,
   within
 } from "@testing-library/react";

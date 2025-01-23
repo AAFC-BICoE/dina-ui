@@ -163,6 +163,7 @@ export function toMeters(
   // Special case matcher for "x feet x inches" -formatted text:
   const feetInchMatch = FEET_INCH_REGEX.exec(text);
   if (feetInchMatch) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, feet, __, inches] = feetInchMatch;
     return toMeters(`${feet} feet + ${inches} inches`, maxDecimalPlaces);
   }
@@ -174,7 +175,7 @@ export function toMeters(
     return maxDecimalPlaces !== undefined
       ? inMeters.toFixed(clamp(decimalPlaces, maxDecimalPlaces))
       : String(inMeters);
-  } catch (error) {
+  } catch {
     // If the input contains a number:
     const containsNumbersMatch = CONTAINS_NUMBERS_REGEX.exec(text);
     if (containsNumbersMatch) {

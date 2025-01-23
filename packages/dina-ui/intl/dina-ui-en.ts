@@ -1179,6 +1179,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachmentsBasedOnItemNameButton: "Attachments based on item name",
   addButtonText: "Add",
   removeButtonText: "Remove",
+  editIdentifierTitle: "Edit Identifier",
+  field_uriTemplate: "URI Template",
   extractedData: "Extracted Data",
   dataPasteZone: "Data Paste Zone",
   mappedData: "Mapped Data",

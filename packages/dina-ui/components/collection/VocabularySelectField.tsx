@@ -6,7 +6,6 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 import useVocabularyOptions from "./useVocabularyOptions";
 import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 import { startCase } from "lodash";
-import { boolean } from "zod";
 
 export interface VocabularySelectFieldProps extends FieldWrapperProps {
   path: string;

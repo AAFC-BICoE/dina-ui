@@ -72,7 +72,7 @@ export function GeoSuggestSearchBox({
     try {
       const results = await fetchJson(url.toString());
       return results as NominatumApiSearchResult[];
-    } catch (error) {
+    } catch {
       return [];
     }
   }

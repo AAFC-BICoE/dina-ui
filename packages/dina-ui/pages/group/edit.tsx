@@ -13,10 +13,6 @@ export default function PersonEditPage() {
 
   const title = id ? "editGroupTitle" : "addGroupTitle";
 
-  async function onSubmitSuccess() {
-    await router.push(`/group/list`);
-  }
-
   const query = useQuery<Group>({
     path: `user-api/group/${id}`
   });

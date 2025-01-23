@@ -15,9 +15,9 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { GroupSelectField, Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Collection, StorageUnitType } from "../../../types/collection-api";
+import { GroupSelectField } from "../../../components";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { StorageUnitType } from "../../../types/collection-api";
 import { useFormikContext } from "formik";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 import PageLayout from "../../../components/page/PageLayout";

@@ -1,6 +1,5 @@
 import {
   DoOperationsError,
-  filterBy,
   LoadingSpinner,
   QueryPage,
   SaveArgs,

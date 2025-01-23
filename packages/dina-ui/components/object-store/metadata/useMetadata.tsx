@@ -1,5 +1,4 @@
 import {
-  DinaFormSubmitParams,
   resourceDifference,
   SaveArgs,
   useApiClient,
@@ -102,12 +101,12 @@ export function useMetadataSave({
   initialValues,
   onSaved
 }: UseMetadataSaveParams) {
-  const { apiClient, save } = useApiClient();
+  const { save } = useApiClient();
   const {
     // Don't include derivatives in the form submission:
-    derivatives: initialDerivatives,
-    license: initialLicense,
-    acSubtype: initialAcSubtype,
+    derivatives: _initialDerivatives,
+    license: _initialLicense,
+    acSubtype: _initialAcSubtype,
     ...initialMetadataValues
   } = initialValues;
 
@@ -158,8 +157,7 @@ export function useMetadataSave({
 
   async function onSubmit({ submittedValues }) {
     const {
-      // Don't include derivatives in the form submission:
-      derivatives,
+      derivatives: _derivatives,
       license,
       acSubtype,
       ...metadataValues

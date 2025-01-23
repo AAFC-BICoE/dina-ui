@@ -35,11 +35,11 @@ export function nextSampleInitialValues(
 ) {
   // Use the copied sample as a base, omitting some fields that shouldn't be copied:
   const {
-    id,
-    createdOn,
-    createdBy,
+    id: _id,
+    createdOn: _createdOn,
+    createdBy: _createdBy,
     materialSampleName,
-    allowDuplicateName,
+    allowDuplicateName: _allowDuplicateName,
     organism,
     ...copiedValues
   } = originalSample;

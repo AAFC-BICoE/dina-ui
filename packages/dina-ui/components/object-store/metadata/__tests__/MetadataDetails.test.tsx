@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataDetails } from "../MetadataDetails";
-import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
@@ -47,10 +47,9 @@ const apiContext: any = {
 
 describe("MetadataDetails component", () => {
   it("Renders the metadata details.", async () => {
-    const wrapper = mountWithAppContext(
-      <MetadataDetails metadata={TEST_METADATA} />,
-      { apiContext }
-    );
+    mountWithAppContext(<MetadataDetails metadata={TEST_METADATA} />, {
+      apiContext
+    });
 
     await new Promise(setImmediate);
 

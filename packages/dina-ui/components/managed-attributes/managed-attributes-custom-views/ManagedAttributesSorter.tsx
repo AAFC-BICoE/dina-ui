@@ -158,7 +158,7 @@ function AttributesViewList({
   const { readOnly } = useDinaFormContext();
 
   // Fetch the attributes, but omit any that are missing e.g. were deleted.
-  const { dataWithNullForMissing: fetchedAttributes, loading } =
+  const { dataWithNullForMissing: fetchedAttributes } =
     useBulkGet<ManagedAttribute>({
       ids: keys.map((key) =>
         // Use the component prefix if needed by the back-end:

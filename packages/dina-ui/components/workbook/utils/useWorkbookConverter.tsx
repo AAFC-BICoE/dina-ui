@@ -1,12 +1,11 @@
 import { useApiClient } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
-import { filter, get, has, pick, unset } from "lodash";
+import { filter, pick, unset } from "lodash";
 import { useMemo } from "react";
 import {
   FieldMappingConfigType,
   getFlattenedConfig,
   LinkOrCreateSetting,
-  PERSON_SELECT_FIELDS,
   WorkbookColumnMap,
   WorkbookDataTypeEnum
 } from "..";
@@ -31,7 +30,6 @@ import {
   convertNumberArray,
   convertString,
   convertStringArray,
-  flattenObject,
   getParentFieldPath,
   isEmptyWorkbookValue,
   isObject

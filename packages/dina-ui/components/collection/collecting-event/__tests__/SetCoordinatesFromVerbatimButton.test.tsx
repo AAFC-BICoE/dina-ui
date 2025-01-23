@@ -1,14 +1,14 @@
 import { DinaForm, NumberField } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { SetCoordinatesFromVerbatimButton } from "../SetCoordinatesFromVerbatimButton";
-import { screen, waitFor, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 describe("SetCoordinatesFromVerbatimButton component", () => {
   it("Sets the lat/lon from the verbatim fields.", async () => {
     const onClickCallback = jest.fn();
 
-    const { container } = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm
         initialValues={{
           verbatimLatitude: "45°32′25″N",

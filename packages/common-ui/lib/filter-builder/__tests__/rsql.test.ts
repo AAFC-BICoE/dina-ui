@@ -1,4 +1,3 @@
-import { KitsuResource } from "kitsu";
 import { FilterGroupModel } from "../FilterGroup";
 import { rsql } from "../rsql";
 

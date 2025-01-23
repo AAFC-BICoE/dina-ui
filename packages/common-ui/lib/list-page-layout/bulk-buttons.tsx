@@ -186,7 +186,7 @@ export function DataExportButton<TData extends KitsuResource>({
   entityLink
 }: DataExportButtonProps<TData>) {
   const router = useRouter();
-  const [exportObjectIds, setExportObjectIds] = useSessionStorage<string[]>(
+  const [_exportObjectIds, setExportObjectIds] = useSessionStorage<string[]>(
     OBJECT_EXPORT_IDS_KEY,
     []
   );

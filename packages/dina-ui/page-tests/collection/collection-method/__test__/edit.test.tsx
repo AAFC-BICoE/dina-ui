@@ -4,7 +4,7 @@ import CollectionMethodEditPage, {
 } from "../../../../pages/collection/collection-method/edit";
 import { mountWithAppContext } from "common-ui";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
-import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -135,7 +135,7 @@ describe("collection-method edit page", () => {
   });
 
   it("Edits an existing collection method.", async () => {
-    const { container, getByLabelText, getByRole } = mountWithAppContext(
+    const { container, getByLabelText } = mountWithAppContext(
       <CollectionMethodForm
         onSaved={mockOnSaved}
         fetchedCollectionMethod={{

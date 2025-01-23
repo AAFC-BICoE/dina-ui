@@ -1,4 +1,4 @@
-import { DinaForm, useAccount } from "common-ui";
+import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../components";
 import { GroupFormLayout } from "../../components/group/GroupFormLayout";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
@@ -6,7 +6,6 @@ import { Group } from "../../types/user-api";
 
 export default function GroupDetailsPage() {
   const { locale } = useDinaIntl();
-  const { isAdmin } = useAccount();
   return (
     <ViewPageLayout<Group>
       form={(props) => (

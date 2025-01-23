@@ -10,7 +10,10 @@ import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 import { Group } from "packages/dina-ui/types/user-api";
 
@@ -609,14 +612,14 @@ export const TEST_QUALITY_CONTROL_RUN_ITEMS: PersistedResource<MolecularAnalysis
       type: "molecular-analysis-run-item",
       createdBy: "dina-admin",
       createdOn: "2024-12-11T20:52:48.43824Z",
-      usageType: "quality-control"
+      usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
     },
     {
       id: "e9e39b72-ece7-454b-893a-2fc2d075e7b7",
       type: "molecular-analysis-run-item",
       createdBy: "dina-admin",
       createdOn: "2024-12-11T20:52:48.43824Z",
-      usageType: "quality-control"
+      usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
     }
   ];
 

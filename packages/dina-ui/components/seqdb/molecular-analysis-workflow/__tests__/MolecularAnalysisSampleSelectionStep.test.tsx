@@ -19,6 +19,7 @@ import {
   TEST_MOLECULAR_ANALYSIS_RUN_ID,
   TEST_SEARCH_RESPONSE
 } from "../__mocks__/MolecularAnalysisMocks";
+import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 const onSavedMock = jest.fn();
 const mockSetEditMode = jest.fn();
@@ -265,7 +266,8 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
               }
             },
             type: "molecular-analysis-run-item",
-            usageType: "generic-molecular-analysis-item"
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM
           },
           type: "molecular-analysis-run-item"
         }

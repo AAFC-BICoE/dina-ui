@@ -9,9 +9,9 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { AttachmentsEditor } from "../../object-store/attachment-list/AttachmentsField";
 import { AttachmentReadOnlySection } from "../../object-store/attachment-list/AttachmentReadOnlySection";
-import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
 import { QualityControlSection } from "./QualityControlSection";
 import { PersistedResource } from "kitsu";
+import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRunColumns";
 
 export interface MolecularAnalysisRunStepProps {
   molecularAnalysisId: string;

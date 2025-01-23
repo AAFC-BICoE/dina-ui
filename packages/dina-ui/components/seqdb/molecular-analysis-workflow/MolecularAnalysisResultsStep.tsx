@@ -14,10 +14,10 @@ import { Alert, Dropdown, DropdownButton } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "../../../types/seqdb-api/resources/GenericMolecularAnalysis";
-import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRun";
 import { Metadata } from "../../../types/objectstore-api";
 import { MolecularAnalysisResult } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 import { MolecularAnalysisRunItem } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRunColumns";
 
 export interface MolecularAnalysisResultsStepProps {
   molecularAnalysisId: string;
@@ -163,14 +163,13 @@ export function MolecularAnalysisResultsStep({
                                   }
                                 } as any
                               ];
-                            const savedRunItem =
-                              await save?.<MolecularAnalysisRunItem>(
-                                molecularAnalysisRunItemSaveArgs,
-                                {
-                                  apiBaseUrl:
-                                    "seqdb-api/molecular-analysis-run-item"
-                                }
-                              );
+                            await save?.<MolecularAnalysisRunItem>(
+                              molecularAnalysisRunItemSaveArgs,
+                              {
+                                apiBaseUrl:
+                                  "seqdb-api/molecular-analysis-run-item"
+                              }
+                            );
                           }
                         }
                       }

@@ -369,7 +369,7 @@ interface GenerateNameParams {
 }
 
 function generateName(params: GenerateNameParams) {
-  const { formState, generationMode } = params;
+  const { formState } = params;
 
   const generatedName = `${formState.baseName || ""}${
     formState.separator || ""
@@ -396,7 +396,7 @@ function generateSeriesSuffix({ index, formState }: GenerateNameParams) {
     try {
       const sc = new SpreadSheetColumn();
       return sc.fromInt(index + sc.fromStr(start)) as string;
-    } catch (error) {
+    } catch {
       return "";
     }
   }

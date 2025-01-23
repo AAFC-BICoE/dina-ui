@@ -1,5 +1,8 @@
-import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
-import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { PcrBatchItem } from "../../types/seqdb-api";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useEffect, useState } from "react";
 import {
   BulkGetOptions,
@@ -16,7 +19,7 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
-import { useMolecularAnalysisRunColumns } from "./useMolecularAnalysisRun";
+import { useMolecularAnalysisRunColumns } from "./useMolecularAnalysisRunColumns";
 
 export interface UseMetagenomicsWorkflowMolecularAnalysisRunProps {
   metagenomicsBatchId: string;
@@ -405,7 +408,8 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
             type: "molecular-analysis-run-item",
             resource: {
               type: "molecular-analysis-run-item",
-              usageType: "metagenomics-batch-item",
+              usageType:
+                MolecularAnalysisRunItemUsageType.METAGENOMICS_BATCH_ITEM,
               ...(molecularAnalysisRunItemName && {
                 name: molecularAnalysisRunItemName
               }),

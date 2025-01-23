@@ -5,7 +5,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { useState, useEffect } from "react";
-import { Button, Spinner, Dropdown, ButtonGroup } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import React from "react";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
@@ -34,8 +34,7 @@ export default function MolecularAnalysisWorkflowRunPage() {
   const [performSave, setPerformSave] = useState<boolean>(false);
 
   // Used to determine if the molecular analysis needs to be reloaded.
-  const [reloadMolecularAnalysis, setReloadMolecularAnalysis] =
-    useState<number>(Date.now());
+  const [reloadMolecularAnalysis] = useState<number>(Date.now());
 
   // Loaded Molecular Analysis ID.
   const [molecularAnalysisId, setMolecularAnalysisId] = useState<

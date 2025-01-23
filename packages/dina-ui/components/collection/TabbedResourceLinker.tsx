@@ -4,7 +4,6 @@ import {
   QueryState,
   useBulkEditTabFieldIndicators,
   useDinaFormContext,
-  useFieldLabels,
   withResponse
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
@@ -52,8 +51,6 @@ export function TabbedResourceLinker<T extends KitsuResource>({
     fieldName,
     currentValue: resourceIdProp ? { id: resourceIdProp } : undefined
   });
-  const isInBulkEditTab = !!bulkCtx;
-  const { getFieldLabel } = useFieldLabels();
 
   // In bulk edit mode, show the common value if there is one instead of a new linked resource:
   const defaultValue = bulkCtx?.defaultValue;

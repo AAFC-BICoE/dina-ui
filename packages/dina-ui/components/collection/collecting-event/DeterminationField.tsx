@@ -68,7 +68,8 @@ export function DeterminationField({
   const { readOnly, isTemplate, initialValues } = useDinaFormContext();
   const form = useFormikContext<MaterialSample>();
 
-  const [hideScientificNameInput, setHideScientificNameInput] = useState(false);
+  const [_hideScientificNameInput, setHideScientificNameInput] =
+    useState(false);
 
   const determinationsPath = name || "determination";
 

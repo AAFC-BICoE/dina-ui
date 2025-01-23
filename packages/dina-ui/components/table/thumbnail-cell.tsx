@@ -4,7 +4,6 @@ import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";
-import { Derivative } from "../../types/objectstore-api";
 import { useMetadataThumbnailPath } from "../object-store/metadata/useMetadataThumbnailPath";
 
 export interface ThumbnailCellProps {

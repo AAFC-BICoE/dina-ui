@@ -147,10 +147,9 @@ export function MetagenomicsBatchDetailsStep({
         };
       });
 
-    const saveMetagenomicsBatchItems = await save<MetagenomicsBatchItem>(
-      metagenomicsBatchItemSaveArgs,
-      { apiBaseUrl: "/seqdb-api" }
-    );
+    await save<MetagenomicsBatchItem>(metagenomicsBatchItemSaveArgs, {
+      apiBaseUrl: "/seqdb-api"
+    });
 
     await onSavedInternal(savedMetagenomicsBatch);
   }

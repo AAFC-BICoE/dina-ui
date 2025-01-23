@@ -9,7 +9,7 @@ import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resource
 export function useSeqReactionState(seqBatchId?: string) {
   const [selectedResources, setSelectedResources] = useState<SeqReaction[]>([]);
   const [loadingSeqReactions, setLoadingSeqReactions] = useState<boolean>(true);
-  const { apiClient, save, bulkGet } = useApiClient();
+  const { apiClient, bulkGet } = useApiClient();
   // The map key is pcrBatchItem.id + "_" + seqPrimer.id
   // the map value is the real UUID from the database.
   const [

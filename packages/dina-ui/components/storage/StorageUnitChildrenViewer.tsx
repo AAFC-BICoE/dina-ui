@@ -1,11 +1,9 @@
 import {
   FieldHeader,
   FieldSet,
-  LoadingSpinner,
   ReactTable,
   useApiClient,
-  useDinaFormContext,
-  useQuery
+  useDinaFormContext
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";

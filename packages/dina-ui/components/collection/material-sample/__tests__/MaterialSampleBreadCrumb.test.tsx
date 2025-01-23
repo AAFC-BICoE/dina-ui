@@ -3,7 +3,6 @@ import { DinaForm } from "../../../../../common-ui/lib";
 import { mountWithAppContext } from "common-ui";
 import { MaterialSample } from "../../../../types/collection-api";
 import { MaterialSampleBreadCrumb } from "../MaterialSampleBreadCrumb";
-import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const materialSampleWithHierarchy: PersistedResource<MaterialSample> = {

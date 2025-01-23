@@ -5,7 +5,6 @@ import {
   rangeQuery,
   existsQuery,
   betweenQuery,
-  inQuery,
   inDateQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";

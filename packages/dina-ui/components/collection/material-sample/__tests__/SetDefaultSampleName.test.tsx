@@ -31,7 +31,7 @@ const testCtx = {
 
 describe("SetDefaultSampleName", () => {
   it("Sets the sample name based on the selected Collection.", async () => {
-    const { container } = mountWithAppContext(
+    mountWithAppContext(
       <DinaForm
         initialValues={{
           materialSampleName: "",

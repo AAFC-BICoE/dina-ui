@@ -4,7 +4,6 @@ import {
   FieldSpy,
   filterBy,
   ResourceSelect,
-  Tooltip,
   useBulkEditTabContext,
   useBulkGet,
   useDinaFormContext

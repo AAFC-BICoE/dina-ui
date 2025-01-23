@@ -4,8 +4,7 @@ import { mountWithAppContext } from "common-ui";
 import { ErrorViewer } from "../ErrorViewer";
 import { OnFormikSubmit, safeSubmit } from "../safeSubmit";
 import "@testing-library/jest-dom";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent } from "@testing-library/react";
 
 function getWrapper(customOnSubmit: OnFormikSubmit) {
   const onSubmit = safeSubmit(customOnSubmit);

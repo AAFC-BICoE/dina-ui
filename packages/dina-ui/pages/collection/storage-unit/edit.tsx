@@ -3,11 +3,9 @@ import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import {
   Head,
-  Nav,
   storageUnitDisplayName,
   StorageUnitForm
 } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
 import { writeStorage } from "@rehooks/local-storage";
 import PageLayout from "../../../components/page/PageLayout";
@@ -36,7 +34,6 @@ export function useStorageUnit(id?: string) {
 
 export default function StorageUnitEditPage() {
   const router = useRouter();
-  const { formatMessage } = useDinaIntl();
   const id = router.query.id?.toString();
   const parentId = router.query.parentId?.toString();
 

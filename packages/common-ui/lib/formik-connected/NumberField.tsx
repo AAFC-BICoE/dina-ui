@@ -1,7 +1,7 @@
 import { ChangeEvent, FocusEvent } from "react";
 import { useIntl } from "react-intl";
 import * as yup from "yup";
-import { TextField, TextFieldProps, useFieldLabels } from "..";
+import { TextField, TextFieldProps } from "..";
 
 export interface NumberFieldProps extends TextFieldProps {
   placeholder?: string;
