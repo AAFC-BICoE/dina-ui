@@ -1,5 +1,3 @@
-import { ColumnSelector } from "packages/common-ui/lib";
-
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */
@@ -1183,5 +1181,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeButtonText: "Remove",
   extractedData: "Extracted Data",
   dataPasteZone: "Data Paste Zone",
-  mappedData: "Mapped Data"
+  mappedData: "Mapped Data",
+  selectColumnPlaceholder: "-- Select Column --",
+  columnNumber: "Column {columnNumber}",
+  removeRowsButtonTitle: "Remove Rows",
+  originalColumnHeader: "Original",
+  mappedColumnHeader: "Mapped",
+  resourceNotFoundWarning: "Resource Not Found"
 };

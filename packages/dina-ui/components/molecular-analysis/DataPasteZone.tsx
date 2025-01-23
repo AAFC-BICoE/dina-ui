@@ -1,15 +1,29 @@
 import React, { useState } from "react";
-import { FieldHeader } from "packages/common-ui/lib";
+import { FieldHeader, useApiClient } from "packages/common-ui/lib";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import Link from "next/link";
 
 interface DataPasteZoneProps {}
 
+interface MappedResource {
+  id?: string;
+  type?: string;
+  name?: string;
+  path?: string;
+}
+
+type MappedDataRow = [string, MappedResource] | [];
+
 export default function DataPasteZone({}: DataPasteZoneProps) {
-  const [extractedTableData, setExtractedTableData] = useState<string[][]>([]);
-  const [mappedTableData, setMappedTableData] = useState<string[][]>([]);
+  const [extractedDataTable, setExtractedDataTable] = useState<string[][]>([]);
+  const [mappedDataTable, setMappedDataTable] = useState<MappedDataRow[]>([]);
   const [selectedColumn, setSelectedColumn] = useState<number | undefined>(
     undefined
   );
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+  const { formatMessage } = useDinaIntl();
+  const { apiClient } = useApiClient();
 
   const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const clipboardData = event.clipboardData.getData("text/plain");
@@ -17,7 +31,7 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
       .trim()
       .split("\n")
       .map((row) => row.split("\t"));
-    setExtractedTableData(rows);
+    setExtractedDataTable(rows);
   };
 
   const toggleRowSelection = (index: number) => {
@@ -33,19 +47,54 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
   };
 
   const removeSelectedRows = () => {
-    setExtractedTableData((prevData) =>
+    setExtractedDataTable((prevData) =>
       prevData.filter((_, index) => !selectedRows.has(index))
     );
     setSelectedRows(new Set());
   };
 
-  const transferData = () => {
+  const transferData = async () => {
+    const newMappedDataTable: MappedDataRow[] = [];
     if (selectedColumn !== undefined) {
-      setMappedTableData(
-        extractedTableData.map((row) => [row[selectedColumn] || "", ""])
-      );
+      for (let i = 0; i < extractedDataTable.length; i++) {
+        const extractedMaterialSampleName =
+          extractedDataTable[i][selectedColumn];
+        if (!!extractedMaterialSampleName) {
+          const materialSampleQuery = await apiClient.get<MaterialSample[]>(
+            "collection-api/material-sample",
+            {
+              filter: {
+                rsql: `materialSampleName=="${extractedMaterialSampleName}"`
+              }
+            }
+          );
+          const newRow: MappedDataRow = [
+            extractedMaterialSampleName,
+            materialSampleQuery.data.length
+              ? {
+                  id: materialSampleQuery.data[0].id,
+                  type: materialSampleQuery.data[0].type,
+                  name: materialSampleQuery.data[0].materialSampleName,
+                  path: `/collection-api/material-sample?id=${materialSampleQuery.data[0].id}`
+                }
+              : { name: formatMessage("resourceNotFoundWarning") }
+          ];
+          newMappedDataTable.push(newRow);
+        } else {
+          newMappedDataTable.push([
+            formatMessage("resourceNotFoundWarning"),
+            { name: formatMessage("resourceNotFoundWarning") }
+          ]);
+        }
+      }
+      setMappedDataTable(newMappedDataTable);
     }
   };
+
+  const maxColumns = Math.max(
+    ...extractedDataTable.map((row) => row.length),
+    0
+  );
 
   return (
     <div style={{ width: "100%", padding: "1.25rem", boxSizing: "border-box" }}>
@@ -66,21 +115,25 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
           resize: "none"
         }}
       />
-      {extractedTableData.length > 0 && (
+      {extractedDataTable.length > 0 && (
         <div>
           <div>
             <label>
-              Select column:
+              {formatMessage("selectColumn")}
               <select
                 onChange={(e) => setSelectedColumn(Number(e.target.value))}
                 value={selectedColumn ?? ""}
                 style={{ marginLeft: "0.625rem" }}
               >
-                <option value="">-- Select Column --</option>
-                {extractedTableData[0].map((_, index) => (
-                  <option key={index} value={index}>{`Column ${
-                    index + 1
-                  }`}</option>
+                <option value="">
+                  {formatMessage("selectColumnPlaceholder")}
+                </option>
+                {extractedDataTable[0].map((_, index) => (
+                  <option key={index} value={index}>
+                    {formatMessage("columnNumber", {
+                      columnNumber: `${index + 1}`
+                    })}
+                  </option>
                 ))}
               </select>
             </label>
@@ -108,46 +161,54 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
                   }}
                 >
                   <tbody>
-                    {extractedTableData.map((row, rowIndex) => (
-                      <tr key={rowIndex}>
-                        <td
-                          style={{
-                            border: "0.0625rem solid #ccc",
-                            padding: "0.5rem",
-                            textAlign: "center",
-                            backgroundColor:
-                              selectedColumn === 0 ? "#d3f4ff" : "inherit",
-                            width: "2.5rem" // Adjust width to fit checkbox
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedRows.has(rowIndex)}
-                            onChange={() => toggleRowSelection(rowIndex)}
-                            style={{ marginRight: "0.3125rem" }}
-                          />
-                        </td>
-                        {row.map((cell, cellIndex) => (
+                    {extractedDataTable.map((row, rowIndex) => {
+                      // Ensure all rows have the same number of columns by padding with empty strings
+                      const paddedRow = [
+                        ...row,
+                        ...Array(maxColumns - row.length).fill("")
+                      ];
+
+                      return (
+                        <tr key={rowIndex}>
                           <td
-                            key={cellIndex}
                             style={{
                               border: "0.0625rem solid #ccc",
                               padding: "0.5rem",
-                              textAlign: "left",
+                              textAlign: "center",
                               backgroundColor:
-                                selectedColumn === cellIndex
-                                  ? "#d3f4ff"
-                                  : "inherit",
-                              wordWrap: "break-word", // Prevent text overflow
-                              maxWidth: "12.5rem", // Limit the width of the cell
-                              whiteSpace: "normal" // Allow line breaks if text is long
+                                selectedColumn === 0 ? "#d3f4ff" : "inherit",
+                              width: "2.5rem" // Adjust width to fit checkbox
                             }}
                           >
-                            {cell}
+                            <input
+                              type="checkbox"
+                              checked={selectedRows.has(rowIndex)}
+                              onChange={() => toggleRowSelection(rowIndex)}
+                              style={{ marginRight: "0.3125rem" }}
+                            />
                           </td>
-                        ))}
-                      </tr>
-                    ))}
+                          {paddedRow.map((cell, cellIndex) => (
+                            <td
+                              key={cellIndex}
+                              style={{
+                                border: "0.0625rem solid #ccc",
+                                padding: "0.5rem",
+                                textAlign: "left",
+                                backgroundColor:
+                                  selectedColumn === cellIndex
+                                    ? "#d3f4ff"
+                                    : "inherit",
+                                wordWrap: "break-word", // Prevent text overflow
+                                maxWidth: "12.5rem", // Limit the width of the cell
+                                whiteSpace: "normal" // Allow line breaks if text is long
+                              }}
+                            >
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -176,7 +237,7 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
                 className="btn btn-primary"
                 style={{ marginTop: "0.625rem" }}
               >
-                Remove Rows
+                {formatMessage("removeRowsButtonTitle")}
               </button>
             </div>
 
@@ -202,7 +263,7 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
                           backgroundColor: "#f4f4f4"
                         }}
                       >
-                        Original
+                        {formatMessage("originalColumnHeader")}
                       </th>
                       <th
                         style={{
@@ -211,12 +272,12 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
                           backgroundColor: "#f4f4f4"
                         }}
                       >
-                        Mapped
+                        {formatMessage("mappedColumnHeader")}
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {mappedTableData.map((row, rowIndex) => (
+                    {mappedDataTable.map((row, rowIndex) => (
                       <tr key={rowIndex}>
                         <td
                           style={{
@@ -234,7 +295,11 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
                             textAlign: "left"
                           }}
                         >
-                          {row[1] ?? ""}
+                          {row[1]?.path ? (
+                            <Link href={row[1]?.path}>{row[1]?.name}</Link>
+                          ) : (
+                            row[1]?.name
+                          )}
                         </td>
                       </tr>
                     ))}
