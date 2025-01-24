@@ -16,14 +16,17 @@ import {
 } from "../../../../dina-ui/types/collection-api";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { GenericMolecularAnalysis } from "../../../types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysisItem } from "../../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType
 } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import CopyPasteWorkbookButton from "../../molecular-analysis/CopyPasteWorkbookButton";
-import DataPasteZone from "../../molecular-analysis/DataPasteZone";
+import DataPasteZone, {
+  MappedDataRow
+} from "../../molecular-analysis/DataPasteZone";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export interface MolecularAnalysisSampleSelectionStepProps {
   molecularAnalysisId: string;
@@ -49,6 +52,7 @@ export function MolecularAnalysisSampleSelectionStep({
     useMaterialSampleRelationshipColumns();
   const [enableDataPasteZone, setEnableDataPasteZone] =
     useState<boolean>(false);
+  const { formatMessage } = useDinaIntl();
 
   // Use useCallback to memoize the function
   const handleShowDataPasteZone = useCallback(() => {
@@ -369,6 +373,63 @@ export function MolecularAnalysisSampleSelectionStep({
     }
   }
 
+  async function onTransferData(
+    selectedColumn,
+    extractedDataTable,
+    setMappedDataTable
+  ) {
+    const newMappedDataTable: MappedDataRow[] = [];
+    const selectedResources: MaterialSampleSummary[] = [];
+    if (selectedColumn !== undefined) {
+      for (let i = 0; i < extractedDataTable.length; i++) {
+        const extractedMaterialSampleName =
+          extractedDataTable[i][selectedColumn];
+        if (!!extractedMaterialSampleName) {
+          const materialSampleQuery = await apiClient.get<MaterialSample[]>(
+            "collection-api/material-sample",
+            {
+              filter: {
+                rsql: `materialSampleName=="${extractedMaterialSampleName}"`
+              },
+              include: "organism"
+            }
+          );
+          const newRow: MappedDataRow = [
+            extractedMaterialSampleName,
+            materialSampleQuery.data.length
+              ? {
+                  id: materialSampleQuery.data[0].id,
+                  type: materialSampleQuery.data[0].type,
+                  name: materialSampleQuery.data[0].materialSampleName,
+                  path: `/collection-api/material-sample?id=${materialSampleQuery.data[0].id}`
+                }
+              : { name: formatMessage("resourceNotFoundWarning") }
+          ];
+          newMappedDataTable.push(newRow);
+          if (materialSampleQuery.data.length) {
+            selectedResources.push({
+              type: "material-sample-summary",
+              id: materialSampleQuery.data[0].id,
+              materialSampleName:
+                materialSampleQuery.data[0].materialSampleName,
+              effectiveDeterminations:
+                materialSampleQuery.data[0].organism?.find((or) =>
+                  or?.determination?.find((det) => det.isPrimary)
+                )?.determination ?? undefined
+            });
+          }
+        } else {
+          newMappedDataTable.push([
+            formatMessage("resourceNotFoundWarning"),
+            { name: formatMessage("resourceNotFoundWarning") }
+          ]);
+        }
+      }
+      setSelectedResourcesAndSaveOrder?.(selectedResources);
+      setMappedDataTable(newMappedDataTable);
+    }
+  }
+
   // Wait until selected resources are loaded.
   if (selectedResources === undefined) {
     return <LoadingSpinner loading={true} />;
@@ -416,7 +477,9 @@ export function MolecularAnalysisSampleSelectionStep({
             }}
           />
           <CopyPasteWorkbookButton onClick={handleShowDataPasteZone} />
-          {enableDataPasteZone && <DataPasteZone />}
+          {enableDataPasteZone && (
+            <DataPasteZone onTransferData={onTransferData} />
+          )}
         </>
       )}
     </div>

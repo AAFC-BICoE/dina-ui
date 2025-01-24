@@ -1,10 +1,15 @@
 import React, { useState } from "react";
-import { FieldHeader, useApiClient } from "packages/common-ui/lib";
+import { FieldHeader } from "packages/common-ui/lib";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import Link from "next/link";
 
-interface DataPasteZoneProps {}
+interface DataPasteZoneProps {
+  onTransferData?: (
+    selectedColumn: number | undefined,
+    extractedDataTable: string[][],
+    setMappedDataTable: React.Dispatch<React.SetStateAction<MappedDataRow[]>>
+  ) => void;
+}
 
 interface MappedResource {
   id?: string;
@@ -13,9 +18,9 @@ interface MappedResource {
   path?: string;
 }
 
-type MappedDataRow = [string, MappedResource] | [];
+export type MappedDataRow = [string, MappedResource] | [];
 
-export default function DataPasteZone({}: DataPasteZoneProps) {
+export default function DataPasteZone({ onTransferData }: DataPasteZoneProps) {
   const [extractedDataTable, setExtractedDataTable] = useState<string[][]>([]);
   const [mappedDataTable, setMappedDataTable] = useState<MappedDataRow[]>([]);
   const [selectedColumn, setSelectedColumn] = useState<number | undefined>(
@@ -23,7 +28,6 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
   );
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const { formatMessage } = useDinaIntl();
-  const { apiClient } = useApiClient();
 
   const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const clipboardData = event.clipboardData.getData("text/plain");
@@ -54,41 +58,7 @@ export default function DataPasteZone({}: DataPasteZoneProps) {
   };
 
   const transferData = async () => {
-    const newMappedDataTable: MappedDataRow[] = [];
-    if (selectedColumn !== undefined) {
-      for (let i = 0; i < extractedDataTable.length; i++) {
-        const extractedMaterialSampleName =
-          extractedDataTable[i][selectedColumn];
-        if (!!extractedMaterialSampleName) {
-          const materialSampleQuery = await apiClient.get<MaterialSample[]>(
-            "collection-api/material-sample",
-            {
-              filter: {
-                rsql: `materialSampleName=="${extractedMaterialSampleName}"`
-              }
-            }
-          );
-          const newRow: MappedDataRow = [
-            extractedMaterialSampleName,
-            materialSampleQuery.data.length
-              ? {
-                  id: materialSampleQuery.data[0].id,
-                  type: materialSampleQuery.data[0].type,
-                  name: materialSampleQuery.data[0].materialSampleName,
-                  path: `/collection-api/material-sample?id=${materialSampleQuery.data[0].id}`
-                }
-              : { name: formatMessage("resourceNotFoundWarning") }
-          ];
-          newMappedDataTable.push(newRow);
-        } else {
-          newMappedDataTable.push([
-            formatMessage("resourceNotFoundWarning"),
-            { name: formatMessage("resourceNotFoundWarning") }
-          ]);
-        }
-      }
-      setMappedDataTable(newMappedDataTable);
-    }
+    onTransferData?.(selectedColumn, extractedDataTable, setMappedDataTable);
   };
 
   const maxColumns = Math.max(
