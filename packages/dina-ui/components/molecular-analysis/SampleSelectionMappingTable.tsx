@@ -1,7 +1,7 @@
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Link from "next/link";
-import { FieldHeader } from "packages/common-ui/lib";
+import { FieldHeader } from "../../../common-ui/lib";
 
 interface SampleSelectionMappingTableProps {
   extractedDataTable: string[][];

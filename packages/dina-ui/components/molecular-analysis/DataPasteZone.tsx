@@ -1,5 +1,5 @@
 import React from "react";
-import { FieldHeader } from "packages/common-ui/lib";
+import { FieldHeader } from "../../../common-ui/lib";
 interface DataPasteZoneProps {
   onDataPaste: (event: React.ClipboardEvent<HTMLTextAreaElement>) => void;
 }
