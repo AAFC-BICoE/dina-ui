@@ -23,10 +23,12 @@ import {
   MolecularAnalysisRunItemUsageType
 } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import CopyPasteWorkbookButton from "../../molecular-analysis/CopyPasteWorkbookButton";
-import DataPasteZone, {
-  MappedDataRow
-} from "../../molecular-analysis/DataPasteZone";
+import DataPasteZone from "../../molecular-analysis/DataPasteZone";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import {
+  MappedDataRow,
+  SampleSelectionMappingTable
+} from "../../molecular-analysis/SampleSelectionMappingTable";
 
 export interface MolecularAnalysisSampleSelectionStepProps {
   molecularAnalysisId: string;
@@ -52,6 +54,7 @@ export function MolecularAnalysisSampleSelectionStep({
     useMaterialSampleRelationshipColumns();
   const [enableDataPasteZone, setEnableDataPasteZone] =
     useState<boolean>(false);
+  const [extractedDataTable, setExtractedDataTable] = useState<string[][]>([]);
   const { formatMessage } = useDinaIntl();
 
   // Use useCallback to memoize the function
@@ -430,6 +433,15 @@ export function MolecularAnalysisSampleSelectionStep({
     }
   }
 
+  const onDataPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const clipboardData = event.clipboardData.getData("text/plain");
+    const rows = clipboardData
+      .trim()
+      .split("\n")
+      .map((row) => row.split("\t"));
+    setExtractedDataTable(rows);
+  };
+
   // Wait until selected resources are loaded.
   if (selectedResources === undefined) {
     return <LoadingSpinner loading={true} />;
@@ -478,7 +490,14 @@ export function MolecularAnalysisSampleSelectionStep({
           />
           <CopyPasteWorkbookButton onClick={handleShowDataPasteZone} />
           {enableDataPasteZone && (
-            <DataPasteZone onTransferData={onTransferData} />
+            <>
+              <DataPasteZone onDataPaste={onDataPaste} />
+              <SampleSelectionMappingTable
+                extractedDataTable={extractedDataTable}
+                setExtractedDataTable={setExtractedDataTable}
+                onTransferData={onTransferData}
+              />
+            </>
           )}
         </>
       )}
