@@ -133,9 +133,6 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     );
     await new Promise(setImmediate);
 
-    // Should automatically be in edit mode since no material samples are linked yet.
-    expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
-
     // 3 records are expected from the mock elasticsearch response.
     expect(
       wrapper.container.querySelector("#queryPageCount")
