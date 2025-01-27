@@ -433,12 +433,12 @@ export function useGenericMolecularAnalysisRun({
   /**
    * Creates a new quality control object and adds it to the existing quality controls list.
    */
-  function createNewQualityControl() {
-    setQualityControls([
+  function createNewQualityControl(name?: string) {
+    setQualityControls((qualityControls) => [
       ...qualityControls,
       {
         group: "",
-        name: "",
+        name: name ?? "",
         qcType: "",
         type: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
       }
