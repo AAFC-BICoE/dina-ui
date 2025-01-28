@@ -72,7 +72,7 @@ export default function ProjectEditPage() {
 export interface ProjectFormValues extends InputResource<Project> {}
 
 export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
-  const { save, apiClient } = useContext(ApiClientContext);
+  const { save } = useContext(ApiClientContext);
   // Process loaded back-end data into data structure that Forkmiks can use
   if (fetchedProject?.extensionValues) {
     fetchedProject.extensionValues = processExtensionValuesLoading(
