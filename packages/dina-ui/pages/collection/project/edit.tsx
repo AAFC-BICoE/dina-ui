@@ -151,29 +151,6 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
       );
       delete input.extensionValues;
     }
-    // const response = await apiClient.axios.post<Project>(
-    //   "collection-api/project",
-    //   {
-    //     data: {
-    //       id: input.id,
-    //       type: input.type,
-    //       attributes: {
-    //         extensionValues: input.extensionValues,
-    //         group: input.group,
-    //         status: input.status,
-    //         name: input.name,
-    //         contributors: input.contributors?.map((ctb) => ({
-    //           agent: typeof ctb.agent === "string" ? ctb.agent : ctb.agent?.id,
-    //           roles: ctb.roles,
-    //           remarks: ctb.remarks,
-    //           date: ctb.date
-    //         })),
-    //         multilingualDescription: input.multilingualDescription
-    //       },
-    //       relationships: { attachment: input.attachment }
-    //     }
-    //   }
-    // );
     const [savedProject] = await save<Project>(
       [
         {
