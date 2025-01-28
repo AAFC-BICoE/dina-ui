@@ -90,7 +90,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
           )
         )
       }
-    : { type: "project", contributors: [] };
+    : { type: "project" };
 
   const onSubmit: DinaFormOnSubmit<ProjectFormValues> = async ({
     submittedValues
