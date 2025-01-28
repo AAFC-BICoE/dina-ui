@@ -7,9 +7,10 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
+import { useRouter } from "next/router";
 import { AttachmentsField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { useRouter } from "next/router";
+import { AgentRolesField } from "../collection/AgentRolesField";
 import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export function ProjectFormLayout() {
@@ -77,6 +78,12 @@ export function ProjectFormLayout() {
         allowExistingFieldName="attachmentsConfig.allowExisting"
         attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn={true}
+      />
+      <AgentRolesField
+        fieldName="contributors"
+        readOnly={readOnly}
+        resourcePath="collection-api/project"
+        title={<DinaMessage id="contributors" />}
       />
 
       {readOnly && (

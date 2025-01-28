@@ -14,9 +14,9 @@ import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Project } from "../../../types/collection-api/resources/Project";
-import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
 import PageLayout from "../../../components/page/PageLayout";
+import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
+import { Project } from "../../../types/collection-api/resources/Project";
 
 interface ProjectFormProps {
   fetchedProject?: Project;
@@ -35,9 +35,24 @@ export default function ProjectEditPage() {
 
   const title = id ? "editProjectTitle" : "addProjectTitle";
 
-  const query = useQuery<Project>({
-    path: `collection-api/project/${id}?include=attachment`
-  });
+  const query = useQuery<Project>(
+    {
+      path: `collection-api/project/${id}?include=attachment`
+    },
+    {
+      onSuccess: async ({ data: project }) => {
+        // Convert the agent UUIDs to Person objects:
+        for (const agentRole of project.contributors ?? []) {
+          if (typeof agentRole.agent === "string") {
+            agentRole.agent = {
+              id: agentRole.agent,
+              type: "person"
+            };
+          }
+        }
+      }
+    }
+  );
 
   return (
     <PageLayout titleId={title}>
@@ -57,7 +72,7 @@ export default function ProjectEditPage() {
 export interface ProjectFormValues extends InputResource<Project> {}
 
 export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
-  const { save } = useContext(ApiClientContext);
+  const { save, apiClient } = useContext(ApiClientContext);
   // Process loaded back-end data into data structure that Forkmiks can use
   if (fetchedProject?.extensionValues) {
     fetchedProject.extensionValues = processExtensionValuesLoading(
@@ -75,7 +90,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
           )
         )
       }
-    : { type: "project" };
+    : { type: "project", contributors: [] };
 
   const onSubmit: DinaFormOnSubmit<ProjectFormValues> = async ({
     submittedValues
@@ -93,7 +108,15 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
         descriptions: toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc })
         )
-      }
+      },
+      // Convert the contributors to UUIDs for submission to the back-end:
+      contributors: submittedValues.contributors?.map((agentRole) => ({
+        ...agentRole,
+        agent:
+          typeof agentRole.agent === "object"
+            ? agentRole.agent?.id
+            : agentRole.agent
+      }))
     };
 
     // Add attachments if they were selected:
@@ -128,6 +151,29 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
       );
       delete input.extensionValues;
     }
+    // const response = await apiClient.axios.post<Project>(
+    //   "collection-api/project",
+    //   {
+    //     data: {
+    //       id: input.id,
+    //       type: input.type,
+    //       attributes: {
+    //         extensionValues: input.extensionValues,
+    //         group: input.group,
+    //         status: input.status,
+    //         name: input.name,
+    //         contributors: input.contributors?.map((ctb) => ({
+    //           agent: typeof ctb.agent === "string" ? ctb.agent : ctb.agent?.id,
+    //           roles: ctb.roles,
+    //           remarks: ctb.remarks,
+    //           date: ctb.date
+    //         })),
+    //         multilingualDescription: input.multilingualDescription
+    //       },
+    //       relationships: { attachment: input.attachment }
+    //     }
+    //   }
+    // );
     const [savedProject] = await save<Project>(
       [
         {

@@ -128,6 +128,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   configureDefaultValues: "Configure default values",
   configureFormTemplate: "Configure Form Template",
   contents: "Contents",
+  contributors: "Contributors",
   controlledVocabularyTitle: "Controlled Vocabulary",
   convertToDepthMinMax: "Convert to Depth Min/Max",
   convertToElevationMinMax: "Convert to Elevation Min/Max",
