@@ -22,9 +22,9 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import { compact, pick } from "lodash";
 import { useRouter } from "next/router";
-import { AgentRolesField } from "packages/dina-ui/components/collection/AgentRolesField";
+import { AgentRolesField } from "../../../components/collection/AgentRolesField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 import {
   AttachmentsField,
   Footer,
