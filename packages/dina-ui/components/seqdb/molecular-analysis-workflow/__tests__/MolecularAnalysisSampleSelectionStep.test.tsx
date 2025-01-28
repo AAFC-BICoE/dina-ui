@@ -133,6 +133,16 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     );
     await new Promise(setImmediate);
 
+    userEvent.click(
+      wrapper.getByRole("button", {
+        name: /edit/i
+      })
+    );
+
+    await new Promise(setImmediate);
+
+    expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+
     // 3 records are expected from the mock elasticsearch response.
     expect(
       wrapper.container.querySelector("#queryPageCount")
