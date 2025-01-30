@@ -19,12 +19,14 @@ export interface AgentRolesFieldProps {
   title: React.ReactElement;
   resourcePath: string;
   readOnly?: boolean;
+  showDate?: boolean;
 }
 
 export function AgentRolesField({
   fieldName,
   title,
   resourcePath,
+  showDate = true,
   readOnly
 }: AgentRolesFieldProps) {
   const { formatMessage } = useDinaIntl();
@@ -66,7 +68,7 @@ export function AgentRolesField({
             accessorKey: "remarks",
             header: () => <strong>{formatMessage("agentRemarks")}</strong>
           }
-        ];
+        ].filter((col) => showDate || col.id !== "transactionDate");
 
         return (
           !!data?.length && (
@@ -112,7 +114,9 @@ export function AgentRolesField({
               label={<DinaMessage id="roleAction" />}
             />
             <PersonSelectField {...fieldProps("agent")} className="col-sm-4" />
-            <DateField {...fieldProps("date")} className="col-sm-4" />
+            {showDate && (
+              <DateField {...fieldProps("date")} className="col-sm-4" />
+            )}
           </div>
           <div className="row">
             <TextField
