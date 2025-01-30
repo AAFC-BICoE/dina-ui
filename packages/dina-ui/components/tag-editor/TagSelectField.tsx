@@ -17,6 +17,7 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { useFormikContext } from "formik";
 import { useElasticSearchDistinctTerm } from "../../../common-ui/lib/list-page/useElasticSearchDistinctTerm";
 import { useDebounce } from "use-debounce";
+import { number } from "zod";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
@@ -152,11 +153,22 @@ function TagSelect({
           }
         : undefined
     );
+    // handle the situation when tagsFieldName is something like this "contributors[0].roles"
+    const match = tagsFieldName.match(/^(.+?)\[(\d+)\]\.(.+)$/);
+    let parsedFieldname = tagsFieldName;
+    let numberInsideBracket = -1;
+    let internalTagFieldName: string | undefined = undefined;
+    if (match) {
+      parsedFieldname = match[1]; // "contributors"
+      numberInsideBracket = Number(match[2]); // 0 (as a number)
+      internalTagFieldName = match[3]; // "roles"
+    }
+
     const { loading } = useQuery<KitsuResource[]>(
       {
         path: resourcePath ?? "",
         sort: "-createdOn",
-        fields: typeName ? { [typeName]: tagsFieldName } : undefined,
+        fields: typeName ? { [typeName]: parsedFieldname } : undefined,
         filter: {
           tags: { NEQ: "null" },
           ...filter("")
@@ -166,14 +178,33 @@ function TagSelect({
       {
         disabled: !resourcePath,
         onSuccess(response) {
-          const tags = uniq(
-            compact(
-              (response?.data ?? []).flatMap((it) => get(it, tagsFieldName))
+          if (
+            match &&
+            response.data &&
+            numberInsideBracket > -1 &&
+            internalTagFieldName != undefined &&
+            response.data[0][parsedFieldname] &&
+            numberInsideBracket < response.data[0][parsedFieldname].length
+          ) {
+            // handle the situation when tagsFieldName is something like this "contributors[0].roles"
+            const dataArray =
+              response.data[0][parsedFieldname][numberInsideBracket][
+                internalTagFieldName
+              ] ?? [];
+            const tags = uniq(compact(dataArray))
+              .filter((tag: string) => tag.includes(inputValue))
+              .map((tag: string) => toOption(tag));
+            tagOptions.current = tags;
+          } else {
+            const tags = uniq(
+              compact(
+                (response?.data ?? []).flatMap((it) => get(it, parsedFieldname))
+              )
             )
-          )
-            .filter((tag) => tag.includes(inputValue))
-            .map((tag) => toOption(tag));
-          tagOptions.current = tags;
+              .filter((tag) => tag.includes(inputValue))
+              .map((tag) => toOption(tag));
+            tagOptions.current = tags;
+          }
         }
       }
     );
