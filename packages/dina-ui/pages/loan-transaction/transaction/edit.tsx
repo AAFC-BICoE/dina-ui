@@ -1,4 +1,3 @@
-import { ColumnDef } from "@tanstack/react-table";
 import {
   AutoSuggestTextField,
   BackButton,
@@ -11,7 +10,6 @@ import {
   NumberField,
   QueryPage,
   RadioButtonsField,
-  ReactTable,
   StringArrayField,
   SubmitButton,
   TextField,
@@ -23,8 +21,8 @@ import {
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { compact, pick } from "lodash";
-import Link from "next/link";
 import { useRouter } from "next/router";
+import { AgentRolesField } from "../../../components/collection/AgentRolesField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import {
@@ -32,16 +30,13 @@ import {
   Footer,
   GroupSelectField,
   Head,
-  Nav,
-  PersonSelectField
+  Nav
 } from "../../../components";
-import { TabbedArrayField } from "../../../components/collection/TabbedArrayField";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 import { ManagedAttributesEditor } from "../../../components/managed-attributes/ManagedAttributesEditor";
-import { TagSelectField } from "../../../components/tag-editor/TagSelectField";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
+import { Transaction } from "../../../types/loan-transaction-api";
 import { Person } from "../../../types/objectstore-api";
 
 export interface TransactionFormProps {
@@ -419,109 +414,12 @@ export function TransactionFormLayout({
           />
         </div>
       </FieldSet>
-      {readOnly ? (
-        <FieldSpy<AgentRole[]> fieldName="agentRoles">
-          {(agentRoles) => {
-            const tableColumns: ColumnDef<AgentRole>[] = [
-              {
-                id: "roles",
-                accessorFn: (it) => it.roles?.join(", "),
-                header: () => <strong>{formatMessage("agentRole")}</strong>,
-                size: 300
-              },
-              {
-                id: "agentName",
-                cell: ({ row }) =>
-                  typeof row.original?.agent === "object" &&
-                  row.original?.agent?.id ? (
-                    <Link href={`/person/view?id=${row.original?.agent?.id}`}>
-                      <a>
-                        <PersonName id={row.original?.agent?.id} />
-                      </a>
-                    </Link>
-                  ) : (
-                    row.original?.agent
-                  ),
-                header: () => <strong>{formatMessage("agentName")}</strong>,
-                size: 300
-              },
-              {
-                id: "transactionDate",
-                accessorKey: "date",
-                header: () => <strong>{formatMessage("date")}</strong>,
-                size: 150
-              },
-              {
-                id: "remarks",
-                accessorKey: "remarks",
-                header: () => <strong>{formatMessage("agentRemarks")}</strong>
-              }
-            ];
-
-            return (
-              !!agentRoles?.length && (
-                <FieldSet
-                  legend={<DinaMessage id="agentDetails" />}
-                  fieldName="agentRoles"
-                >
-                  <div className="mb-3">
-                    <ReactTable<AgentRole>
-                      columns={tableColumns}
-                      data={agentRoles}
-                      className="-striped"
-                    />
-                  </div>
-                </FieldSet>
-              )
-            );
-          }}
-        </FieldSpy>
-      ) : (
-        <TabbedArrayField<AgentRole>
-          legend={<DinaMessage id="agentDetails" />}
-          name="agentRoles"
-          typeName={formatMessage("agent")}
-          sectionId="agent-roles-section"
-          makeNewElement={() => ({})}
-          renderTab={(role, index) => (
-            <span className="m-3">
-              {index + 1}:{" "}
-              {typeof role.agent === "object" && role.agent?.id && (
-                <>
-                  <PersonName id={role.agent.id} />{" "}
-                </>
-              )}
-              {role.roles?.join?.(", ")}
-            </span>
-          )}
-          renderTabPanel={({ fieldProps }) => (
-            <div>
-              <div className="row">
-                <TagSelectField
-                  {...fieldProps("roles")}
-                  resourcePath="loan-transaction/transaction"
-                  tagsFieldName="agentRoles[0].roles"
-                  className="col-sm-4"
-                  label={<DinaMessage id="roleAction" />}
-                />
-                <PersonSelectField
-                  {...fieldProps("agent")}
-                  className="col-sm-4"
-                />
-                <DateField {...fieldProps("date")} className="col-sm-4" />
-              </div>
-              <div className="row">
-                <TextField
-                  {...fieldProps("remarks")}
-                  className="col-sm-12"
-                  label={<DinaMessage id="agentRemarks" />}
-                  multiLines={true}
-                />
-              </div>
-            </div>
-          )}
-        />
-      )}
+      <AgentRolesField
+        fieldName="agentRoles"
+        readOnly={readOnly}
+        resourcePath="loan-transaction-api/transaction"
+        title={<DinaMessage id="agentRole" />}
+      />
       <ShipmentDetailsFieldSet fieldName="shipment" />
       <ManagedAttributesEditor
         valuesPath="managedAttributes"

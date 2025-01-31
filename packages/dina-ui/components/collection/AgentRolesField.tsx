@@ -27,6 +27,7 @@ export function AgentRolesField({
   fieldName,
   title,
   resourcePath,
+  forContributor = false,
   readOnly
 }: AgentRolesFieldProps) {
   const { formatMessage } = useDinaIntl();
@@ -58,11 +59,17 @@ export function AgentRolesField({
             size: 300
           },
           {
+            id: "transactionDate",
+            accessorKey: "date",
+            header: () => <strong>{formatMessage("date")}</strong>,
+            size: 150
+          },
+          {
             id: "remarks",
             accessorKey: "remarks",
             header: () => <strong>{formatMessage("agentRemarks")}</strong>
           }
-        ];
+        ].filter((col) => !forContributor || col.id !== "transactionDate");
 
         return (
           !!data?.length && (
@@ -97,15 +104,31 @@ export function AgentRolesField({
           {role.roles?.join?.(", ")}
         </span>
       )}
-      renderTabPanel={({ fieldProps }) => (
+      renderTabPanel={({ fieldProps, index }) => (
         <div>
           <div className="row">
-            <VocabularySelectField
-              className="col-sm-6"
-              {...fieldProps("roles")}
-              path="collection-api/vocabulary2/projectRole"
+            {forContributor ? (
+              <VocabularySelectField
+                className="col-sm-6"
+                {...fieldProps("roles")}
+                path="collection-api/vocabulary2/projectRole"
+              />
+            ) : (
+              <TagSelectField
+                {...fieldProps("roles")}
+                resourcePath={resourcePath}
+                tagsFieldName={`${fieldName}[${index}].roles`}
+                className="col-sm-4"
+                label={<DinaMessage id="roleAction" />}
+              />
+            )}
+            <PersonSelectField
+              {...fieldProps("agent")}
+              className={forContributor ? "col-sm-6" : "col-sm-4"}
             />
-            <PersonSelectField {...fieldProps("agent")} className="col-sm-6" />
+            {!forContributor && (
+              <DateField {...fieldProps("date")} className="col-sm-4" />
+            )}
           </div>
           <div className="row">
             <TextField
