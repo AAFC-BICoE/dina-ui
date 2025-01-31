@@ -13,7 +13,10 @@ import { AgentRole } from "../../../dina-ui/types/loan-transaction-api";
 import { PersonSelectField } from "../resource-select-fields/resource-select-fields";
 import { TagSelectField } from "../tag-editor/TagSelectField";
 import { TabbedArrayField } from "./TabbedArrayField";
-import { VocabularySelectField } from "./VocabularySelectField";
+import {
+  VocabularyReadOnlyView,
+  VocabularySelectField
+} from "./VocabularySelectField";
 
 export interface AgentRolesFieldProps {
   fieldName: string;
@@ -38,7 +41,15 @@ export function AgentRolesField({
         const tableColumns: ColumnDef<AgentRole>[] = [
           {
             id: "roles",
-            accessorFn: (it) => it.roles?.join(", "),
+            cell: ({ row }) =>
+              forContributor ? (
+                <VocabularyReadOnlyView
+                  value={row.original?.roles}
+                  path="collection-api/vocabulary2/projectRole"
+                />
+              ) : (
+                <span>{row.original.roles?.join(", ")}</span>
+              ),
             header: () => <strong>{formatMessage("agentRole")}</strong>,
             size: 300
           },
@@ -110,6 +121,7 @@ export function AgentRolesField({
             {forContributor ? (
               <VocabularySelectField
                 className="col-sm-6"
+                isMulti={true}
                 {...fieldProps("roles")}
                 path="collection-api/vocabulary2/projectRole"
               />
