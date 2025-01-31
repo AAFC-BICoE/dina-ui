@@ -1,6 +1,6 @@
 import { DinaForm, processExtensionValuesLoading } from "common-ui";
 import { fromPairs } from "lodash";
-import { AgentRole } from "../../../types/loan-transaction-api";
+import { AgentRole } from "packages/dina-ui/types/loan-transaction-api";
 import { ViewPageLayout } from "../../../components";
 import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
 import { Project } from "../../../types/collection-api/resources/Project";
