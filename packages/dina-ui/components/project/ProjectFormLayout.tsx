@@ -83,7 +83,7 @@ export function ProjectFormLayout() {
         fieldName="contributors"
         readOnly={readOnly}
         resourcePath="collection-api/project"
-        showDate={false}
+        forContributor={true}
         title={<DinaMessage id="contributors" />}
       />
 

@@ -13,20 +13,20 @@ import { AgentRole } from "../../../dina-ui/types/loan-transaction-api";
 import { PersonSelectField } from "../resource-select-fields/resource-select-fields";
 import { TagSelectField } from "../tag-editor/TagSelectField";
 import { TabbedArrayField } from "./TabbedArrayField";
+import { VocabularySelectField } from "./VocabularySelectField";
 
 export interface AgentRolesFieldProps {
   fieldName: string;
   title: React.ReactElement;
   resourcePath: string;
   readOnly?: boolean;
-  showDate?: boolean;
+  forContributor?: boolean;
 }
 
 export function AgentRolesField({
   fieldName,
   title,
   resourcePath,
-  showDate = true,
   readOnly
 }: AgentRolesFieldProps) {
   const { formatMessage } = useDinaIntl();
@@ -58,17 +58,11 @@ export function AgentRolesField({
             size: 300
           },
           {
-            id: "transactionDate",
-            accessorKey: "date",
-            header: () => <strong>{formatMessage("date")}</strong>,
-            size: 150
-          },
-          {
             id: "remarks",
             accessorKey: "remarks",
             header: () => <strong>{formatMessage("agentRemarks")}</strong>
           }
-        ].filter((col) => showDate || col.id !== "transactionDate");
+        ];
 
         return (
           !!data?.length && (
@@ -106,17 +100,12 @@ export function AgentRolesField({
       renderTabPanel={({ fieldProps, index }) => (
         <div>
           <div className="row">
-            <TagSelectField
+            <VocabularySelectField
+              className="col-sm-6"
               {...fieldProps("roles")}
-              resourcePath={resourcePath}
-              tagsFieldName={`${fieldName}[${index}].roles`}
-              className="col-sm-4"
-              label={<DinaMessage id="roleAction" />}
+              path="collection-api/vocabulary2/projectRole"
             />
-            <PersonSelectField {...fieldProps("agent")} className="col-sm-4" />
-            {showDate && (
-              <DateField {...fieldProps("date")} className="col-sm-4" />
-            )}
+            <PersonSelectField {...fieldProps("agent")} className="col-sm-6" />
           </div>
           <div className="row">
             <TextField
