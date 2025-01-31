@@ -135,7 +135,10 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         roles,
         username,
         subject,
-        isAdmin: rolesPerGroup?.aafc?.includes(DINA_ADMIN) ?? false,
+        isAdmin:
+          (keycloakGroups.includes(DINA_ADMIN) ||
+            rolesPerGroup?.aafc?.includes(DINA_ADMIN)) ??
+          false,
         rolesPerGroup,
         getCurrentToken
       }}
