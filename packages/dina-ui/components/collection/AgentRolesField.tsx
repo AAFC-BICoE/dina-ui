@@ -97,7 +97,7 @@ export function AgentRolesField({
           {role.roles?.join?.(", ")}
         </span>
       )}
-      renderTabPanel={({ fieldProps, index }) => (
+      renderTabPanel={({ fieldProps }) => (
         <div>
           <div className="row">
             <VocabularySelectField
