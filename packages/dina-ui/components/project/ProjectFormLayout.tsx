@@ -7,11 +7,11 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { useRouter } from "next/router";
 import { AttachmentsField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { AgentRolesField } from "../collection/AgentRolesField";
+import { useRouter } from "next/router";
 import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
+import { AgentRolesField } from "../collection/AgentRolesField";
 
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
