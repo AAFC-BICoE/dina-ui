@@ -14,9 +14,9 @@ import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Project } from "../../../types/collection-api/resources/Project";
-import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
 import PageLayout from "../../../components/page/PageLayout";
+import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
+import { Project } from "../../../types/collection-api/resources/Project";
 
 interface ProjectFormProps {
   fetchedProject?: Project;
@@ -35,9 +35,24 @@ export default function ProjectEditPage() {
 
   const title = id ? "editProjectTitle" : "addProjectTitle";
 
-  const query = useQuery<Project>({
-    path: `collection-api/project/${id}?include=attachment`
-  });
+  const query = useQuery<Project>(
+    {
+      path: `collection-api/project/${id}?include=attachment`
+    },
+    {
+      onSuccess: async ({ data: project }) => {
+        // Convert the agent UUIDs to Person objects:
+        for (const agentRole of project.contributors ?? []) {
+          if (typeof agentRole.agent === "string") {
+            agentRole.agent = {
+              id: agentRole.agent,
+              type: "person"
+            };
+          }
+        }
+      }
+    }
+  );
 
   return (
     <PageLayout titleId={title}>
@@ -93,7 +108,15 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
         descriptions: toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc })
         )
-      }
+      },
+      // Convert the contributors to UUIDs for submission to the back-end:
+      contributors: submittedValues.contributors?.map((agentRole) => ({
+        ...agentRole,
+        agent:
+          typeof agentRole.agent === "object"
+            ? agentRole.agent?.id
+            : agentRole.agent
+      }))
     };
 
     // Add attachments if they were selected:
