@@ -18,6 +18,7 @@ import { Metadata } from "../../../types/objectstore-api";
 import { MolecularAnalysisResult } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 import { MolecularAnalysisRunItem } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRunColumns";
+import { useState } from "react";
 
 export interface MolecularAnalysisResultsStepProps {
   molecularAnalysisId: string;
@@ -53,6 +54,10 @@ export function MolecularAnalysisResultsStep({
     molecularAnalysis,
     molecularAnalysisId
   });
+
+  const [autoSelectAttachmentsClicked, setAutoSelectAttachmentsClicked] =
+    useState<boolean>(false);
+  const [numAttachmentsFound, setNumAttachmentsFound] = useState<number>(0);
 
   // Table columns to display for the sequencing run.
   const COLUMNS: ColumnDef<SequencingRunItem>[] =
@@ -95,6 +100,19 @@ export function MolecularAnalysisResultsStep({
           <div className="col-12">
             <Alert variant="danger" className="mb-2">
               {errorMessage}
+            </Alert>
+          </div>
+        </div>
+      )}
+
+      {/* Number of attachments found message */}
+      {autoSelectAttachmentsClicked && (
+        <div className="row">
+          <div className="col-12">
+            <Alert variant="info" className="mb-2">
+              {formatMessage("attachmentsFoundBannerText", {
+                numAttachmentsFound: numAttachmentsFound
+              })}
             </Alert>
           </div>
         </div>
@@ -170,6 +188,7 @@ export function MolecularAnalysisResultsStep({
                                   "seqdb-api/molecular-analysis-run-item"
                               }
                             );
+                            setNumAttachmentsFound(numAttachmentsFound + 1);
                           }
                         }
                       }
@@ -179,6 +198,7 @@ export function MolecularAnalysisResultsStep({
                       console.error(error);
                     }
                   }
+                  setAutoSelectAttachmentsClicked(true);
                 }}
               >
                 <DinaMessage id="attachmentsBasedOnItemNameButton" />
