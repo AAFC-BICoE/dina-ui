@@ -1,7 +1,8 @@
 import { DINA_ADMIN, USER } from "../../../types/DinaRoles";
 import {
   keycloakGroupNamesToBareGroupNames,
-  generateKeycloakRolesPerGroup
+  generateKeycloakRolesPerGroup,
+  checkIsAdmin
 } from "../AccountProvider";
 
 describe("AccountProvider component", () => {
@@ -33,6 +34,31 @@ describe("AccountProvider component", () => {
         aafc: [USER],
         cnc: [DINA_ADMIN, USER]
       });
+    });
+  });
+
+  describe("checkIsAdmin function", () => {
+    it("Contains the dina-admin group, return true", () => {
+      // Keycloak test data
+      const testGroupRoles = [
+        "/cnc/" + USER,
+        "/aafc/" + USER,
+        "/othergroup",
+        DINA_ADMIN
+      ];
+
+      expect(checkIsAdmin(testGroupRoles)).toEqual(true);
+    });
+
+    it("Does not contain the dina-admin group at root, return false", () => {
+      // Keycloak test data
+      const testGroupRoles = [
+        "/cnc/" + DINA_ADMIN,
+        "/aafc/" + USER,
+        "/othergroup"
+      ];
+
+      expect(checkIsAdmin(testGroupRoles)).toEqual(false);
     });
   });
 });
