@@ -92,6 +92,31 @@ export default function MetadataListPage() {
     : 12;
 
   const METADATA_TABLE_COLUMNS: TableColumn<any>[] = [
+    {
+      cell: ({ row: { original } }) =>
+        (original as any)?.data?.attributes?.resourceExternalURL ? (
+          <Link
+            href={`/object-store/object/external-resource-view?id=${original?.id}`}
+          >
+            <a className="m-auto">
+              <DinaMessage id="viewDetails" />
+            </a>
+          </Link>
+        ) : (original as any).data?.attributes?.originalFilename ? (
+          <Link
+            href={`/object-store/object/view?id=${original.id}`}
+            passHref={true}
+          >
+            <a id={`file-name-${original.id}`}>
+              <DinaMessage id="viewDetails" />
+            </a>
+          </Link>
+        ) : null,
+      accessorKey: "data.attributes.id",
+      header: () => <DinaMessage id="viewDetails" />,
+      enableSorting: false,
+      id: "viewDetails"
+    },
     ThumbnailCell({
       bucketField: "data.attributes.bucket"
     }),
@@ -247,12 +272,13 @@ export default function MetadataListPage() {
                 mandatoryDisplayedColumns={[
                   "selectColumn",
                   "thumbnail",
-                  "originalFilename"
+                  "viewDetails"
                 ]}
                 nonExportableColumns={[
                   "selectColumn",
                   "thumbnail",
-                  "objectStorePreview"
+                  "objectStorePreview",
+                  "viewDetails"
                 ]}
                 nonSearchableColumns={[
                   "acMetadataCreator.displayName",
