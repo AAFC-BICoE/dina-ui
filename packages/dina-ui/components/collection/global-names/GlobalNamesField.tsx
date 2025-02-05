@@ -311,6 +311,7 @@ export function SelectedScientificNameView(
             type="button"
             href={`${scientificNameSrcDetailUrlVal}`}
             className="btn btn-info me-2 view-button "
+            target="_blank"
           >
             <DinaMessage id="viewDetailButtonLabel" />
           </a>

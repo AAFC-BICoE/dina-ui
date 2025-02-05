@@ -131,6 +131,7 @@ export function GeographySearchDialog({
                 <a
                   href={`https://www.openstreetmap.org/${boundary.osm_type}/${boundary.osm_id}`}
                   className="btn btn-info"
+                  target="_blank"
                 >
                   <DinaMessage id="viewDetailButtonLabel" />
                 </a>
