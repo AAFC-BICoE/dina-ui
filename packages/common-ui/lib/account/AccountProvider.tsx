@@ -135,10 +135,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         roles,
         username,
         subject,
-        isAdmin:
-          (keycloakGroups.includes(DINA_ADMIN) ||
-            rolesPerGroup?.aafc?.includes(DINA_ADMIN)) ??
-          false,
+        isAdmin: checkIsAdmin(keycloakGroups),
         rolesPerGroup,
         getCurrentToken
       }}
@@ -146,6 +143,15 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       {children}
     </AccountProvider>
   );
+}
+
+/**
+ * Checks if the array contains "dina-admin" as a group role (root)
+ * @param keycloakGroups Roles to check
+ * @returns `true` if "DINA-ADMIN" exists as a group role, `false` otherwise.
+ */
+export function checkIsAdmin(keycloakGroups: string[]): boolean {
+  return keycloakGroups.includes(DINA_ADMIN) ?? false;
 }
 
 /**
