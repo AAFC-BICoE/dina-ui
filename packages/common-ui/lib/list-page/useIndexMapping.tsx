@@ -42,7 +42,6 @@ export interface OverrideRelationshipConfig {
 export const overrideRelationshipConfig: OverrideRelationshipConfig = {
   "run-summary": {
     "attributes.name": {
-      label: "runName",
       isReverseRelationship: true
     },
     "attributes.items.genericMolecularAnalysisItemSummary.name": {

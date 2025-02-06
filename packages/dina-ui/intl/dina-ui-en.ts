@@ -294,11 +294,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_determination.typeStatus": "Type Status",
   "field_determination.scientificName": "Scientific Name",
   "field_determination.verbatimScientificName": "Verbatim Scientific Name",
-  field_runName: "Run Name",
-  "field_items.genericMolecularAnalysisItemSummary.name": "Run Item Name",
-  "field_items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.name":
+  "field_run-summary_name": "Run Name",
+  "field_run-summary_items.genericMolecularAnalysisItemSummary.name":
+    "Run Item Name",
+  "field_run-summary_items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.name":
     "Name",
-  "field_items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.analysisType":
+  "field_run-summary_items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.analysisType":
     "Analysis Type",
   field_determinationRemarks: "Determination Remarks",
   field_displayName: "Display Name",
@@ -952,7 +953,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   title_preparationType: "Preparation Type",
   title_storageUnit: "Storage Unit",
   title_storageUnitType: "Storage Unit Type",
-  "title_run-summary": "Molecular Analysis Workflow",
+  "title_run-summary": "Molecular Analysis",
   tgnId: "TGN Id",
   tgnLegend: "TGN Geographic Place",
   tgnPreferredTerm: "Preferred Term",

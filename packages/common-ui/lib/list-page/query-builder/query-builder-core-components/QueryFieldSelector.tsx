@@ -102,9 +102,14 @@ export function QueryFieldSelector({
           )
       )
       ?.map((prop) => {
+        // Supports field_[parentName]_[name] and field_[name] translations.
         return {
           parentName: prop.parentName,
-          label: messages["field_" + prop.label]
+          label: messages["field_" + prop.parentName + "_" + prop.label]
+            ? formatMessage({
+                id: "field_" + prop.parentName + "_" + prop.label
+              })
+            : messages["field_" + prop.label]
             ? formatMessage({ id: "field_" + prop.label })
             : startCase(prop.label),
           value: prop.value
@@ -164,7 +169,11 @@ export function QueryFieldSelector({
           return {
             ...baseStyle,
             ":before": {
-              content: `'${startCase(data.parentName)} '`
+              content: `'${
+                messages["title_" + data.parentName]
+                  ? formatMessage({ id: "title_" + data.parentName })
+                  : startCase(data.parentName)
+              } - '`
             }
           };
         }
