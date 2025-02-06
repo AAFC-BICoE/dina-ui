@@ -1527,8 +1527,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collection.data.id",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         },
@@ -1570,8 +1570,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collection.data.id",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         },
@@ -1613,8 +1613,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collection.data.id",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         },
@@ -1656,8 +1656,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collection.data.id",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         },
@@ -1699,8 +1699,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collection.data.id",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         },
@@ -2907,8 +2907,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collection.data.id",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         },
@@ -2967,8 +2967,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collection.data.id",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         },
@@ -3027,8 +3027,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collection.data.id",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         },
@@ -3087,8 +3087,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collection.data.id",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         },
@@ -3147,8 +3147,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collection.data.id",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         },

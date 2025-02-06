@@ -29,6 +29,12 @@ export interface OverrideRelationshipConfig {
 
       /** Fields to be overrided in. */
       fields?: string[];
+
+      /**
+       * This is useful since reverse relationships are not included in the relationship section of
+       * the query.
+       */
+      isReverseRelationship?: boolean;
     };
   };
 }
@@ -36,18 +42,22 @@ export interface OverrideRelationshipConfig {
 export const overrideRelationshipConfig: OverrideRelationshipConfig = {
   "run-summary": {
     "attributes.name": {
-      label: "Run Name"
+      label: "runName",
+      isReverseRelationship: true
     },
     "attributes.items.genericMolecularAnalysisItemSummary.name": {
-      fields: ["keyword"]
+      fields: ["keyword"],
+      isReverseRelationship: true
     },
     "attributes.items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.name":
       {
-        fields: ["keyword"]
+        fields: ["keyword"],
+        isReverseRelationship: true
       },
     "attributes.items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.analysisType":
       {
-        fields: ["keyword"]
+        fields: ["keyword"],
+        isReverseRelationship: true
       }
   }
 };
@@ -199,7 +209,9 @@ export function useIndexMapping({
             optimizedPrefix: relationshipFields?.includes("prefix") ?? false,
             containsSupport: relationshipFields?.includes("infix") ?? false,
             endsWithSupport:
-              relationshipFields?.includes("prefix_reverse") ?? false
+              relationshipFields?.includes("prefix_reverse") ?? false,
+            isReverseRelationship:
+              overrideConfig?.isReverseRelationship ?? false
           });
         });
       });
@@ -245,7 +257,8 @@ export function useIndexMapping({
                 optimizedPrefix: false,
                 containsSupport: false,
                 endsWithSupport: false,
-                hideField: false
+                hideField: false,
+                isReverseRelationship: false
               });
             }
           }
@@ -271,7 +284,8 @@ export function useIndexMapping({
           optimizedPrefix: false,
           containsSupport: false,
           endsWithSupport: false,
-          hideField: false
+          hideField: false,
+          isReverseRelationship: false
         });
       }
 

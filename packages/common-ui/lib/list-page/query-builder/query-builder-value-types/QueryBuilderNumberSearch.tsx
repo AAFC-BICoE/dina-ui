@@ -95,7 +95,7 @@ export function transformNumberSearchToDSL({
     return {};
   }
 
-  const { parentType, parentName } = fieldInfo;
+  const { parentType } = fieldInfo;
 
   switch (operation) {
     // less than / greater than / less than or equal to / greater than or equal to.
@@ -172,9 +172,7 @@ export function transformNumberSearchToDSL({
                 // And if it's not included, then it's not equal either.
                 {
                   bool: {
-                    must_not: existsQuery(
-                      "data.relationships." + parentName + ".data.id"
-                    )
+                    must_not: includedTypeQuery(parentType)
                   }
                 }
               ]
@@ -222,9 +220,7 @@ export function transformNumberSearchToDSL({
                 },
                 {
                   bool: {
-                    must_not: existsQuery(
-                      "data.relationships." + parentName + ".data.id"
-                    )
+                    must_not: includedTypeQuery(parentType)
                   }
                 }
               ]
