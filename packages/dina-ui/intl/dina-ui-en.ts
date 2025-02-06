@@ -1189,5 +1189,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeRowsButtonTitle: "Remove Rows",
   originalColumnHeader: "Original",
   mappedColumnHeader: "Mapped",
-  resourceNotFoundWarning: "Resource Not Found"
+  resourceNotFoundWarning: "Resource Not Found",
+  pasteRunItemName: "Paste Run Item Names",
+  pasteQualityControlName: "Paste Quality Control Names",
+  pasteMaterialSample: "Paste Material Samples"
 };

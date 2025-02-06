@@ -2,7 +2,7 @@ import {
   SequencingRunItem,
   useGenericMolecularAnalysisRun
 } from "./useGenericMolecularAnalysisRun";
-import { DinaForm, LoadingSpinner, ReactTable } from "common-ui";
+import { DinaForm, LoadingSpinner } from "common-ui";
 import { Alert } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -12,6 +12,7 @@ import { AttachmentReadOnlySection } from "../../object-store/attachment-list/At
 import { QualityControlSection } from "./QualityControlSection";
 import { PersistedResource } from "kitsu";
 import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRunColumns";
+import SequencingRunContentSection from "./SequencingRunContentSection";
 
 export interface MolecularAnalysisRunStepProps {
   molecularAnalysisId: string;
@@ -62,7 +63,7 @@ export function MolecularAnalysisRunStep({
   });
 
   // Table columns to display for the sequencing run.
-  const COLUMNS: ColumnDef<SequencingRunItem>[] =
+  const columns: ColumnDef<SequencingRunItem>[] =
     useMolecularAnalysisRunColumns({
       type: "generic-molecular-analysis-item",
       setMolecularAnalysisRunItemNames,
@@ -128,20 +129,17 @@ export function MolecularAnalysisRunStep({
               <p>{sequencingRunName}</p>
             )}
           </div>
-          <div className="col-12 mt-3">
+          <div className="col-12">
             <DinaForm initialValues={{}} readOnly={!editMode}>
               {/* Sequencing Run Content */}
-              <div className="col-12 mb-3">
-                <strong>
-                  <DinaMessage id="molecularAnalysisRunStep_sequencingRunContent" />
-                </strong>
-                <ReactTable<SequencingRunItem>
-                  className="-striped mt-2"
-                  columns={COLUMNS}
-                  data={sequencingRunItems ?? []}
-                  sort={[{ id: "wellCoordinates", desc: false }]}
-                />
-              </div>
+              <SequencingRunContentSection
+                columns={columns}
+                sequencingRunItems={sequencingRunItems}
+                editMode={editMode}
+                setMolecularAnalysisRunItemNames={
+                  setMolecularAnalysisRunItemNames
+                }
+              />
 
               {/* Sequencing Quality Control */}
               <QualityControlSection

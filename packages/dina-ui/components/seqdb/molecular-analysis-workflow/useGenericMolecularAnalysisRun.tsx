@@ -190,7 +190,7 @@ export function useGenericMolecularAnalysisRun({
     setReloadGenericMolecularAnalysisRun
   ] = useState<number>(Date.now());
 
-  // Map of MolecularAnalysisRunItem {id:name}
+  // Map of MolecularAnalysisRunItem {materialSampleId:name}
   const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
     useState<Record<string, string>>({});
 

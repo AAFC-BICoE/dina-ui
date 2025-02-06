@@ -1,5 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
+  CollapsibleSection,
   DoOperationsError,
   LoadingSpinner,
   QueryPage,
@@ -9,7 +10,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { compact, pick, uniq, difference, concat } from "lodash";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MaterialSample,
   MaterialSampleSummary
@@ -22,7 +23,6 @@ import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType
 } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-import CopyPasteWorkbookButton from "../../molecular-analysis/CopyPasteWorkbookButton";
 import DataPasteZone from "../../molecular-analysis/DataPasteZone";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -52,15 +52,9 @@ export function MolecularAnalysisSampleSelectionStep({
   const { username } = useAccount();
   const { PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN } =
     useMaterialSampleRelationshipColumns();
-  const [enableDataPasteZone, setEnableDataPasteZone] =
-    useState<boolean>(false);
+
   const [extractedDataTable, setExtractedDataTable] = useState<string[][]>([]);
   const { formatMessage } = useDinaIntl();
-
-  // Use useCallback to memoize the function
-  const handleShowDataPasteZone = useCallback(() => {
-    setEnableDataPasteZone((prev) => !prev);
-  }, []);
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -488,17 +482,18 @@ export function MolecularAnalysisSampleSelectionStep({
               enableMultiSort: true
             }}
           />
-          <CopyPasteWorkbookButton onClick={handleShowDataPasteZone} />
-          {enableDataPasteZone && (
-            <>
+          <div className="mt-3">
+            <CollapsibleSection
+              id={"pasteMaterialSample"}
+              headerKey={"pasteMaterialSample"}
+            >
               <DataPasteZone onDataPaste={onDataPaste} />
               <SampleSelectionMappingTable
                 extractedDataTable={extractedDataTable}
-                setExtractedDataTable={setExtractedDataTable}
                 onTransferData={onTransferData}
               />
-            </>
-          )}
+            </CollapsibleSection>
+          </div>
         </>
       )}
     </div>

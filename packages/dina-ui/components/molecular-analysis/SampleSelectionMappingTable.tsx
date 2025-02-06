@@ -5,7 +5,6 @@ import { FieldHeader } from "../../../common-ui/lib";
 
 interface SampleSelectionMappingTableProps {
   extractedDataTable: string[][];
-  setExtractedDataTable: Dispatch<SetStateAction<string[][]>>;
   onTransferData?: (
     selectedColumn: number | undefined,
     extractedDataTable: string[][],
@@ -22,7 +21,6 @@ interface MappedResource {
 export type MappedDataRow = [string, MappedResource] | [];
 export function SampleSelectionMappingTable({
   extractedDataTable,
-  setExtractedDataTable,
   onTransferData
 }: SampleSelectionMappingTableProps) {
   const { formatMessage } = useDinaIntl();
@@ -30,25 +28,7 @@ export function SampleSelectionMappingTable({
   const [selectedColumn, setSelectedColumn] = useState<number | undefined>(
     undefined
   );
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
-  const toggleRowSelection = (index: number) => {
-    setSelectedRows((prevSelectedRows) => {
-      const newSelectedRows = new Set(prevSelectedRows);
-      if (newSelectedRows.has(index)) {
-        newSelectedRows.delete(index);
-      } else {
-        newSelectedRows.add(index);
-      }
-      return newSelectedRows;
-    });
-  };
-  const removeSelectedRows = () => {
-    setExtractedDataTable((prevData) =>
-      prevData.filter((_, index) => !selectedRows.has(index))
-    );
-    setSelectedRows(new Set());
-  };
   const transferData = async () => {
     onTransferData?.(selectedColumn, extractedDataTable, setMappedDataTable);
   };
@@ -122,14 +102,7 @@ export function SampleSelectionMappingTable({
                                 selectedColumn === 0 ? "#d3f4ff" : "inherit",
                               width: "2.5rem" // Adjust width to fit checkbox
                             }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedRows.has(rowIndex)}
-                              onChange={() => toggleRowSelection(rowIndex)}
-                              style={{ marginRight: "0.3125rem" }}
-                            />
-                          </td>
+                          ></td>
                           {paddedRow.map((cell, cellIndex) => (
                             <td
                               key={cellIndex}
@@ -174,13 +147,6 @@ export function SampleSelectionMappingTable({
                 onClick={transferData}
               >
                 {">>"}
-              </button>
-              <button
-                onClick={removeSelectedRows}
-                className="btn btn-primary"
-                style={{ marginTop: "0.625rem" }}
-              >
-                {formatMessage("removeRowsButtonTitle")}
               </button>
             </div>
 

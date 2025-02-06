@@ -5,9 +5,8 @@ import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
-import { useState, useCallback } from "react";
-import CopyPasteWorkbookButton from "../../molecular-analysis/CopyPasteWorkbookButton";
 import DataPasteZone from "../../molecular-analysis/DataPasteZone";
+import { CollapsibleSection } from "../../../../common-ui/lib";
 
 interface QualityControlSectionProps {
   editMode?: boolean;
@@ -32,12 +31,6 @@ export function QualityControlSection({
   deleteQualityControl
 }: QualityControlSectionProps) {
   const { formatMessage } = useIntl();
-  const [enableDataPasteZone, setEnableDataPasteZone] =
-    useState<boolean>(false);
-  // Use useCallback to memoize the function
-  const handleShowDataPasteZone = useCallback(() => {
-    setEnableDataPasteZone((prev) => !prev);
-  }, []);
 
   const onDataPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const clipboardData = event.clipboardData.getData("text/plain");
@@ -142,12 +135,14 @@ export function QualityControlSection({
             </div>
           );
         })}
-        <CopyPasteWorkbookButton onClick={handleShowDataPasteZone} />
-        {enableDataPasteZone && (
-          <>
+        <div className="mt-3">
+          <CollapsibleSection
+            id={"pasteQualityControlName"}
+            headerKey={"pasteQualityControlName"}
+          >
             <DataPasteZone onDataPaste={onDataPaste} />
-          </>
-        )}
+          </CollapsibleSection>
+        </div>
       </div>
     </div>
   ) : null;
