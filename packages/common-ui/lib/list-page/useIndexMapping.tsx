@@ -21,6 +21,37 @@ export interface UseIndexMappingProps {
   enableRelationshipPresence?: boolean;
 }
 
+export interface OverrideRelationshipConfig {
+  [referencedBy: string]: {
+    [attributePath: string]: {
+      /** Label to override with. */
+      label?: string;
+
+      /** Fields to be overrided in. */
+      fields?: string[];
+    };
+  };
+}
+
+export const overrideRelationshipConfig: OverrideRelationshipConfig = {
+  "run-summary": {
+    "attributes.name": {
+      label: "Run Name"
+    },
+    "attributes.items.genericMolecularAnalysisItemSummary.name": {
+      fields: ["keyword"]
+    },
+    "attributes.items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.name":
+      {
+        fields: ["keyword"]
+      },
+    "attributes.items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.analysisType":
+      {
+        fields: ["keyword"]
+      }
+  }
+};
+
 /**
  * Custom hook for retrieving the index mapping.
  *
@@ -117,14 +148,22 @@ export function useIndexMapping({
       // Read relationship attributes.
       resp.data?.relationships?.map((relationship) => {
         relationship?.attributes?.map((relationshipAttribute) => {
+          // Check if the relationship attribute is overridden.
+          const overrideConfig =
+            overrideRelationshipConfig?.[relationship.referencedBy]?.[
+              relationshipAttribute.path + "." + relationshipAttribute.name
+            ];
+
           // This is the user-friendly label to display on the search dropdown.
-          const attributeLabel = relationshipAttribute.path?.includes(".")
-            ? relationshipAttribute.path.substring(
-                relationshipAttribute.path.indexOf(".") + 1
-              ) +
-              "." +
-              relationshipAttribute.name
-            : relationshipAttribute.name;
+          const attributeLabel =
+            overrideConfig?.label ??
+            (relationshipAttribute.path?.includes(".")
+              ? relationshipAttribute.path.substring(
+                  relationshipAttribute.path.indexOf(".") + 1
+                ) +
+                "." +
+                relationshipAttribute.name
+              : relationshipAttribute.name);
 
           const fullPath =
             relationship.path +
@@ -132,6 +171,9 @@ export function useIndexMapping({
             relationshipAttribute.path +
             "." +
             attributeLabel;
+
+          const relationshipFields: string[] =
+            overrideConfig?.fields ?? relationshipAttribute?.fields ?? [];
 
           result.push({
             label: attributeLabel,
@@ -151,16 +193,13 @@ export function useIndexMapping({
             // Additional options for the field:
             distinctTerm: relationshipAttribute.distinct_term_agg,
             keywordMultiFieldSupport:
-              relationshipAttribute?.fields?.includes("keyword") ?? false,
+              relationshipFields?.includes("keyword") ?? false,
             keywordNumericSupport:
-              relationshipAttribute?.fields?.includes("keyword_numeric") ??
-              false,
-            optimizedPrefix:
-              relationshipAttribute?.fields?.includes("prefix") ?? false,
-            containsSupport:
-              relationshipAttribute?.fields?.includes("infix") ?? false,
+              relationshipFields?.includes("keyword_numeric") ?? false,
+            optimizedPrefix: relationshipFields?.includes("prefix") ?? false,
+            containsSupport: relationshipFields?.includes("infix") ?? false,
             endsWithSupport:
-              relationshipAttribute?.fields?.includes("prefix_reverse") ?? false
+              relationshipFields?.includes("prefix_reverse") ?? false
           });
         });
       });

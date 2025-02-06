@@ -82,13 +82,23 @@ function QueryBuilderAutoSuggestionTextSearch({
   useEffect(() => {
     if (!fieldSettings) return;
 
+    function getLastPartOfLabel(fieldSettings) {
+      if (!fieldSettings) return "";
+      if (fieldSettings.includes(".")) {
+        const parts = fieldSettings.split(".");
+        return parts[parts.length - 1];
+      } else {
+        return fieldSettings;
+      }
+    }
+
     setFieldName(
       fieldSettings?.parentPath
         ? fieldSettings?.parentPath +
             "." +
             fieldSettings?.path +
             "." +
-            fieldSettings?.label
+            getLastPartOfLabel(fieldSettings?.label)
         : fieldSettings?.value
     );
   }, [fieldSettings]);
