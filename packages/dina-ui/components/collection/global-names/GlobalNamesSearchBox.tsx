@@ -238,12 +238,18 @@ export function GlobalNamesSearchBox({
                   <div className="flex-grow-1 d-flex align-items-center gn-search-result-label">
                     {result.bestResult.outlink ? (
                       <span
-                        dangerouslySetInnerHTML={{ __html: safeHtmlLink }}
+                        dangerouslySetInnerHTML={{
+                          __html: safeHtmlLink.replace(
+                            /<a /g,
+                            '<a target="_blank" rel="noopener noreferrer" '
+                          )
+                        }}
                       />
                     ) : (
                       <span>{detail.currentName}</span>
                     )}
                   </div>
+
                   <FormikButton
                     className="btn btn-primary global-name-select-button"
                     buttonProps={() => ({ style: { width: "8rem" } })}
@@ -256,11 +262,12 @@ export function GlobalNamesSearchBox({
             })}
         </div>
       )}
-      {searchResult?.length === 1 && searchResult[0].matchType === "NoMatch" && (
-        <p>
-          <DinaMessage id="noResultsFound" />
-        </p>
-      )}
+      {searchResult?.length === 1 &&
+        searchResult[0].matchType === "NoMatch" && (
+          <p>
+            <DinaMessage id="noResultsFound" />
+          </p>
+        )}
     </div>
   );
 }

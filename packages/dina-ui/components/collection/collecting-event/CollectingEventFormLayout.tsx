@@ -530,7 +530,7 @@ export function CollectingEventFormLayout({
                   <div className="col-md-4">
                     {detail.sourceUrl && (
                       <Link href={`${detail.sourceUrl}`} passHref={true}>
-                        <a className="btn btn-info">
+                        <a className="btn btn-info" target="_blank">
                           <DinaMessage id="viewDetailButtonLabel" />
                         </a>
                       </Link>

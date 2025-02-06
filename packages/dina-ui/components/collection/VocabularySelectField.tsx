@@ -1,11 +1,10 @@
 import { FieldWrapper, FieldWrapperProps } from "common-ui";
-import { castArray } from "lodash";
+import { castArray, startCase } from "lodash";
+import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 import { GroupBase } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import useVocabularyOptions from "./useVocabularyOptions";
-import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
-import { startCase } from "lodash";
 
 export interface VocabularySelectFieldProps extends FieldWrapperProps {
   path: string;
@@ -93,7 +92,6 @@ export function VocabularySelectField({
 /** Shows the values or labels if available. */
 export function VocabularyReadOnlyView({ path, value }) {
   const { toOption } = useVocabularyOptions({ path });
-
   return value ? (
     <div>
       {castArray(value)

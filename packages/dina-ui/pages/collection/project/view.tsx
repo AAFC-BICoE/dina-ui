@@ -1,8 +1,9 @@
 import { DinaForm, processExtensionValuesLoading } from "common-ui";
 import { fromPairs } from "lodash";
+import { AgentRole } from "packages/dina-ui/types/loan-transaction-api";
 import { ViewPageLayout } from "../../../components";
-import { Project } from "../../../types/collection-api/resources/Project";
 import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
+import { Project } from "../../../types/collection-api/resources/Project";
 
 export default function ProjectDetailsPage() {
   return (
@@ -22,7 +23,14 @@ export default function ProjectDetailsPage() {
               ? processExtensionValuesLoading(
                   props.initialValues.extensionValues
                 )
-              : undefined
+              : undefined,
+            contributors: (props.initialValues.contributors ?? []).map(
+              (agentRole) =>
+                ({
+                  ...agentRole,
+                  agent: { id: agentRole.agent, type: "person" }
+                } as AgentRole)
+            )
           }}
         >
           <ProjectFormLayout />
