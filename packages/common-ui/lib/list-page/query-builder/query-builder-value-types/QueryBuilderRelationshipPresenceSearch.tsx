@@ -159,6 +159,7 @@ function retrieveRelationshipsFromIndexMapping(
     // Check if the mapping has a parentName and if it already exists in the accumulator
     if (
       mapping.parentName &&
+      !mapping.isReverseRelationship &&
       !acc.find((item) => item.value === mapping.parentName)
     ) {
       acc.push({
