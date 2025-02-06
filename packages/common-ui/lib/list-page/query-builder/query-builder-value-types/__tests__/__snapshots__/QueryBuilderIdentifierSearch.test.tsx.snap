@@ -111,8 +111,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -1542,8 +1542,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -1585,8 +1585,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -1628,8 +1628,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -1671,8 +1671,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -1714,8 +1714,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -3023,8 +3023,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -3083,8 +3083,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -3143,8 +3143,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -3203,8 +3203,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -3263,8 +3263,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -3934,8 +3934,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -4174,8 +4174,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -4414,8 +4414,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -4654,8 +4654,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -4971,8 +4971,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
@@ -5134,8 +5134,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.parentMaterialSample.data.id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         },
