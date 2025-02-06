@@ -21,7 +21,7 @@ export interface MolecularAnalysisRunStepProps {
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
-  onSaved: (
+  onSaved?: (
     nextStep: number,
     molecularAnalysisSaved?: PersistedResource<GenericMolecularAnalysis>
   ) => Promise<void>;
