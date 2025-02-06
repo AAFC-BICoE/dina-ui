@@ -1,7 +1,7 @@
 export interface DinaJsonMetaInfo {
   permissionsProvider?: string;
   permissions?: string[];
-  warnings?: Record<string, object>;
+  warnings?: Record<string, any>;
 }
 
 export interface HasDinaMetaInfo {
