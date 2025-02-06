@@ -1,5 +1,5 @@
-import { CollapsibleSection, ReactTable } from "packages/common-ui/lib";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { CollapsibleSection, ReactTable } from "../../../../common-ui/lib";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SequencingRunItem } from "./useGenericMolecularAnalysisRun";
 import { ColumnDef } from "@tanstack/table-core";
 import DataPasteZone from "../../molecular-analysis/DataPasteZone";
