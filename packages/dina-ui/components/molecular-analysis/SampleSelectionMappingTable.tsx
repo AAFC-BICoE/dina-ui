@@ -102,6 +102,24 @@ export function SampleSelectionMappingTable({
                     tableLayout: "fixed" // Fixed column widths
                   }}
                 >
+                  <thead>
+                    <tr>
+                      {Array.from({ length: maxColumns }, (_, i) => (
+                        <th
+                          key={i}
+                          style={{
+                            border: "0.0625rem solid #ccc",
+                            padding: "0.5rem",
+                            backgroundColor: "#f4f4f4"
+                          }}
+                        >
+                          {formatMessage("columnNumber", {
+                            columnNumber: `${i + 1}`
+                          })}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
                   <tbody>
                     {extractedDataTable.map((row, rowIndex) => {
                       // Ensure all rows have the same number of columns by padding with empty strings
