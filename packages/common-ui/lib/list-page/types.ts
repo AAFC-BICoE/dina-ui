@@ -281,7 +281,8 @@ export type DynamicFieldType =
   | "identifier"
   | "relationshipPresence"
   | "scientificNameDetails"
-  | "columnFunction";
+  | "columnFunction"
+  | "vocabulary";
 
 export interface DynamicFieldsMappingConfig {
   /** Attribute level dynamic fields */
