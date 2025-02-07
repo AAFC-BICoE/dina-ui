@@ -236,8 +236,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collectingEvent.data.id",
+            "term": Object {
+              "included.type": "collecting-event",
             },
           },
         },
@@ -399,8 +399,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "exists": Object {
-              "field": "data.relationships.collectingEvent.data.id",
+            "term": Object {
+              "included.type": "collecting-event",
             },
           },
         },

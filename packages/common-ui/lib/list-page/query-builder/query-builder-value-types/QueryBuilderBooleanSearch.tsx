@@ -76,7 +76,8 @@ export function transformBooleanSearchToDSL({
     return {};
   }
 
-  const { parentType, parentName } = fieldInfo;
+  const { parentType } = fieldInfo;
+
   switch (operation) {
     // Empty for the boolean.
     case "empty":
@@ -103,9 +104,7 @@ export function transformBooleanSearchToDSL({
                 },
                 {
                   bool: {
-                    must_not: existsQuery(
-                      "data.relationships." + parentName + ".data.id"
-                    )
+                    must_not: includedTypeQuery(parentType)
                   }
                 }
               ]

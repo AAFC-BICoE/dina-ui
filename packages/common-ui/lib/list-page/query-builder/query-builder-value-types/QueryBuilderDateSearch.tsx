@@ -128,7 +128,7 @@ export function transformDateSearchToDSL({
     return {};
   }
 
-  const { parentType, parentName, subType } = fieldInfo;
+  const { parentType, subType } = fieldInfo;
 
   switch (operation) {
     // Contains / less than / greater than / less than or equal to / greater than or equal to.
@@ -212,9 +212,7 @@ export function transformDateSearchToDSL({
                 // And if it's not included, then it's not equal either.
                 {
                   bool: {
-                    must_not: existsQuery(
-                      "data.relationships." + parentName + ".data.id"
-                    )
+                    must_not: includedTypeQuery(parentType)
                   }
                 }
               ]
@@ -265,9 +263,7 @@ export function transformDateSearchToDSL({
                 },
                 {
                   bool: {
-                    must_not: existsQuery(
-                      "data.relationships." + parentName + ".data.id"
-                    )
+                    must_not: includedTypeQuery(parentType)
                   }
                 }
               ]
