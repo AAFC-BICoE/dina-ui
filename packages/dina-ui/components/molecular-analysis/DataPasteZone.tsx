@@ -13,10 +13,10 @@ export default function DataPasteZone({ onDataPaste }: DataPasteZoneProps) {
       <textarea
         placeholder="Paste your data here (e.g., copied from Excel)"
         onPaste={onDataPaste}
+        className="form-control"
         style={{
           width: "100%",
           height: "6.25rem",
-          marginBottom: "1.25rem",
           padding: "0.625rem",
           borderRadius: "0.3125rem",
           border: "0.0625rem solid #ccc",

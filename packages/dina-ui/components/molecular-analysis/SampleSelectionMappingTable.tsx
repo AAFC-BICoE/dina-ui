@@ -2,6 +2,8 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Link from "next/link";
 import { FieldHeader } from "../../../common-ui/lib";
+import Select from "react-select";
+import { FiChevronRight } from "react-icons/fi";
 
 interface SampleSelectionMappingTableProps {
   extractedDataTable: string[][];
@@ -40,32 +42,49 @@ export function SampleSelectionMappingTable({
     <>
       {extractedDataTable.length > 0 && (
         <div>
-          <div>
+          <div style={{ marginLeft: "1.25rem" }}>
             <label>
-              {formatMessage("selectColumn")}
-              <select
-                onChange={(e) => setSelectedColumn(Number(e.target.value))}
-                value={selectedColumn ?? ""}
-                style={{ marginLeft: "0.625rem" }}
-              >
-                <option value="">
-                  {formatMessage("selectColumnPlaceholder")}
-                </option>
-                {extractedDataTable[0].map((_, index) => (
-                  <option key={index} value={index}>
-                    {formatMessage("columnNumber", {
+              <strong>{formatMessage("selectColumn")}:</strong>
+
+              <Select
+                options={
+                  extractedDataTable[0]?.map((_, index) => ({
+                    value: index,
+                    label: formatMessage("columnNumber", {
                       columnNumber: `${index + 1}`
-                    })}
-                  </option>
-                ))}
-              </select>
+                    })
+                  })) || []
+                }
+                onChange={(e) => setSelectedColumn(e?.value)}
+                value={
+                  selectedColumn !== undefined
+                    ? {
+                        value: selectedColumn,
+                        label: formatMessage("columnNumber", {
+                          columnNumber: `${selectedColumn + 1}`
+                        })
+                      }
+                    : null
+                }
+                placeholder={formatMessage("selectColumnPlaceholder")}
+                className="basic-single"
+                classNamePrefix="select"
+                // add style to make it wider
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    width: "12.5rem",
+                    marginBottom: "1rem"
+                  })
+                }}
+              />
             </label>
           </div>
           <div
             style={{
               display: "inline-flex",
               justifyContent: "center",
-              gap: "1.25rem",
+              gap: "1.8rem",
               width: "100%",
               flexWrap: "wrap" // Make sure the tables stack when needed
             }}
@@ -93,16 +112,6 @@ export function SampleSelectionMappingTable({
 
                       return (
                         <tr key={rowIndex}>
-                          <td
-                            style={{
-                              border: "0.0625rem solid #ccc",
-                              padding: "0.5rem",
-                              textAlign: "center",
-                              backgroundColor:
-                                selectedColumn === 0 ? "#d3f4ff" : "inherit",
-                              width: "2.5rem" // Adjust width to fit checkbox
-                            }}
-                          ></td>
                           {paddedRow.map((cell, cellIndex) => (
                             <td
                               key={cellIndex}
@@ -146,7 +155,7 @@ export function SampleSelectionMappingTable({
                 }}
                 onClick={transferData}
               >
-                {">>"}
+                <FiChevronRight />
               </button>
             </div>
 
