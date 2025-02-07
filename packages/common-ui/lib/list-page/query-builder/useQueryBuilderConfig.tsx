@@ -48,6 +48,7 @@ import QueryRowRelationshipPresenceSearch, {
 import QueryRowIdentifierSearch, {
   transformIdentifierToDSL
 } from "./query-builder-value-types/QueryBuilderIdentifierSearch";
+import QueryBuilderVocabularySearch from "./query-builder-value-types/QueryBuilderVocabularySearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -341,6 +342,32 @@ export function generateBuilderConfig(
         });
       }
     },
+    vocabulary: {
+      ...BasicConfig.widgets.text,
+      type: "vocabulary",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryBuilderVocabularySearch
+          matchType={factoryProps?.operator}
+          fieldConfig={
+            (factoryProps?.fieldDefinition?.fieldSettings as any)
+              ?.mapping as ESIndexMapping
+          }
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformTextSearchToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
+    },
     autoComplete: {
       ...BasicConfig.widgets.text,
       type: "autoComplete",
@@ -590,6 +617,14 @@ export function generateBuilderConfig(
             "empty",
             "notEmpty"
           ]
+        }
+      }
+    },
+    vocabulary: {
+      valueSources: ["value"],
+      widgets: {
+        vocabulary: {
+          operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"]
         }
       }
     },
