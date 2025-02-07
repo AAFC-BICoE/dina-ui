@@ -269,11 +269,7 @@ export default function MetadataListPage() {
                   ],
                   relationshipFields: []
                 }}
-                mandatoryDisplayedColumns={[
-                  "selectColumn",
-                  "thumbnail",
-                  "viewDetails"
-                ]}
+                mandatoryDisplayedColumns={["thumbnail", "viewDetails"]}
                 nonExportableColumns={[
                   "selectColumn",
                   "thumbnail",
