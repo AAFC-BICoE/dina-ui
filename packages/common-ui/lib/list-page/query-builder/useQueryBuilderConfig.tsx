@@ -80,12 +80,19 @@ function indexSettingsToFieldPath(indexSettings?: ESIndexMapping): string {
  * Converts elastic search types into query builder types.
  * @param type The type from elastic search from the index.
  * @param distinctTerm Boolean to indicate if the field contains a distinct term.
+ * @param isVocabulary Boolean to indicate if the field is a vocabulary.
  * @returns Query builder specific type.
  */
 function getQueryBuilderTypeFromIndexType(
   type: string,
-  distinctTerm: boolean
+  distinctTerm: boolean,
+  isVocabulary: boolean
 ): string {
+  // If the field is a vocabulary, then it's a vocabulary field.
+  if (isVocabulary) {
+    return "vocabulary";
+  }
+
   // If the field is a distinct term, then it's an autocomplete field.
   if (distinctTerm) {
     return "autoComplete";
@@ -844,7 +851,8 @@ export function generateBuilderConfig(
       const field = {};
       const type = getQueryBuilderTypeFromIndexType(
         indexItem.type,
-        indexItem.distinctTerm
+        indexItem.distinctTerm,
+        indexItem?.dynamicField?.type === "vocabulary"
       );
 
       // Value is used for the field name since it's required to be unique. It should not be used
