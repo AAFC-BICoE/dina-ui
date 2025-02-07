@@ -5,12 +5,14 @@ import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
+import DataPasteZone from "../../molecular-analysis/DataPasteZone";
+import { CollapsibleSection } from "../../../../common-ui/lib";
 
 interface QualityControlSectionProps {
   editMode?: boolean;
   qualityControls: QualityControl[];
   qualityControlTypes: VocabularyOption[];
-  createNewQualityControl?: () => void;
+  createNewQualityControl?: (name?: string) => void;
   updateQualityControl?: (
     index: number,
     newQualityControl: QualityControl
@@ -29,6 +31,12 @@ export function QualityControlSection({
   deleteQualityControl
 }: QualityControlSectionProps) {
   const { formatMessage } = useIntl();
+
+  const onDataPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const clipboardData = event.clipboardData.getData("text/plain");
+    const names = clipboardData.trim().split("\n");
+    names.forEach((name) => createNewQualityControl?.(name));
+  };
   return editMode || qualityControls.length > 0 ? (
     <div className="col-12 mt-3 mb-3">
       <div className="card p-3">
@@ -41,7 +49,7 @@ export function QualityControlSection({
               onClick={() => createNewQualityControl?.()}
               className="add-datablock"
             >
-              <DinaMessage id="addCustomPlaceName" />
+              <DinaMessage id="addButtonText" />
             </Button>
           )}
         </div>
@@ -127,6 +135,14 @@ export function QualityControlSection({
             </div>
           );
         })}
+        <div className="mt-3">
+          <CollapsibleSection
+            id={"pasteQualityControlName"}
+            headerKey={"pasteQualityControlName"}
+          >
+            <DataPasteZone onDataPaste={onDataPaste} />
+          </CollapsibleSection>
+        </div>
       </div>
     </div>
   ) : null;
