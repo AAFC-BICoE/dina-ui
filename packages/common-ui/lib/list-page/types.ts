@@ -215,6 +215,12 @@ export interface ESIndexMapping {
   parentType?: string;
 
   /**
+   * Reverse relationships are found in the included section but not in the relationships section.
+   * This flag is used to determine if the relationship is a reverse relationship.
+   */
+  isReverseRelationship?: boolean;
+
+  /**
    * Only provided if it was added using a dynamic field config.
    */
   dynamicField?: DynamicField;

@@ -91,8 +91,7 @@ export function transformTextSearchToDSL({
     return {};
   }
 
-  const { parentType, parentName, optimizedPrefix, keywordMultiFieldSupport } =
-    fieldInfo;
+  const { parentType, optimizedPrefix, keywordMultiFieldSupport } = fieldInfo;
 
   switch (operation) {
     // Wild card search
@@ -185,9 +184,7 @@ export function transformTextSearchToDSL({
                 // And if it's not included, then it's not equal either.
                 {
                   bool: {
-                    must_not: existsQuery(
-                      "data.relationships." + parentName + ".data.id"
-                    )
+                    must_not: includedTypeQuery(parentType)
                   }
                 }
               ]
@@ -258,9 +255,7 @@ export function transformTextSearchToDSL({
                 },
                 {
                   bool: {
-                    must_not: existsQuery(
-                      "data.relationships." + parentName + ".data.id"
-                    )
+                    must_not: includedTypeQuery(parentType)
                   }
                 }
               ]
