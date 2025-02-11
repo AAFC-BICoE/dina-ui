@@ -1190,5 +1190,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeButtonText: "Remove",
   editIdentifierTitle: "Edit Identifier",
   field_uriTemplate: "URI Template",
-  attachmentsFoundBannerText: "{numAttachmentsFound} attachments were found."
+  attachmentsFoundBannerText: "{numAttachmentsFound} attachments were found.",
+  extractedData: "Extracted Data",
+  dataPasteZone: "Data Paste Zone",
+  mappedData: "Mapped Data",
+  selectColumnPlaceholder: "-- Select Column --",
+  columnNumber: "Column {columnNumber}",
+  removeRowsButtonTitle: "Remove Rows",
+  originalColumnHeader: "Original",
+  mappedColumnHeader: "Mapped",
+  resourceNotFoundWarning: "Resource Not Found",
+  pasteRunItemName: "Paste Run Item Names",
+  pasteQualityControlName: "Paste Quality Control Names",
+  pasteMaterialSample: "Paste Material Samples"
 };

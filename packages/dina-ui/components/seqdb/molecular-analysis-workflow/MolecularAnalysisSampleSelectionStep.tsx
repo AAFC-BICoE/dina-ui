@@ -1,5 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
+  CollapsibleSection,
   DoOperationsError,
   LoadingSpinner,
   QueryPage,
@@ -16,12 +17,18 @@ import {
 } from "../../../../dina-ui/types/collection-api";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { GenericMolecularAnalysis } from "../../../types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysisItem } from "../../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType
 } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import DataPasteZone from "../../molecular-analysis/DataPasteZone";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import {
+  MappedDataRow,
+  SampleSelectionMappingTable
+} from "../../molecular-analysis/SampleSelectionMappingTable";
 
 export interface MolecularAnalysisSampleSelectionStepProps {
   molecularAnalysisId: string;
@@ -30,7 +37,6 @@ export interface MolecularAnalysisSampleSelectionStepProps {
     molecularAnalysisSaved?: PersistedResource<GenericMolecularAnalysis>
   ) => Promise<void>;
   editMode: boolean;
-  setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
 }
@@ -39,7 +45,6 @@ export function MolecularAnalysisSampleSelectionStep({
   molecularAnalysisId,
   editMode,
   onSaved,
-  setEditMode,
   performSave,
   setPerformSave
 }: MolecularAnalysisSampleSelectionStepProps) {
@@ -47,6 +52,9 @@ export function MolecularAnalysisSampleSelectionStep({
   const { username } = useAccount();
   const { PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN } =
     useMaterialSampleRelationshipColumns();
+
+  const [extractedDataTable, setExtractedDataTable] = useState<string[][]>([]);
+  const { formatMessage } = useDinaIntl();
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -178,10 +186,6 @@ export function MolecularAnalysisSampleSelectionStep({
       sampleIds.map((id) => `/material-sample-summary/${id}`),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      // If there is nothing stored yet, automatically go to edit mode.
-      if (response.length === 0) {
-        setEditMode(true);
-      }
       const sorted = sortMaterialSamples(response ?? []);
       setSelectedResources(sorted);
     });
@@ -366,13 +370,79 @@ export function MolecularAnalysisSampleSelectionStep({
     }
   }
 
+  async function onTransferData(
+    selectedColumn,
+    extractedDataTable,
+    setMappedDataTable
+  ) {
+    const newMappedDataTable: MappedDataRow[] = [];
+    const selectedResources: MaterialSampleSummary[] = [];
+    if (selectedColumn !== undefined) {
+      for (let i = 0; i < extractedDataTable.length; i++) {
+        const extractedMaterialSampleName =
+          extractedDataTable[i][selectedColumn];
+        if (!!extractedMaterialSampleName) {
+          const materialSampleQuery = await apiClient.get<MaterialSample[]>(
+            "collection-api/material-sample",
+            {
+              filter: {
+                rsql: `materialSampleName=="${extractedMaterialSampleName}"`
+              },
+              include: "organism"
+            }
+          );
+          const newRow: MappedDataRow = [
+            extractedMaterialSampleName,
+            materialSampleQuery.data.length
+              ? {
+                  id: materialSampleQuery.data[0].id,
+                  type: materialSampleQuery.data[0].type,
+                  name: materialSampleQuery.data[0].materialSampleName,
+                  path: `/collection-api/material-sample?id=${materialSampleQuery.data[0].id}`
+                }
+              : { name: formatMessage("resourceNotFoundWarning") }
+          ];
+          newMappedDataTable.push(newRow);
+          if (materialSampleQuery.data.length) {
+            selectedResources.push({
+              type: "material-sample-summary",
+              id: materialSampleQuery.data[0].id,
+              materialSampleName:
+                materialSampleQuery.data[0].materialSampleName,
+              effectiveDeterminations:
+                materialSampleQuery.data[0].organism?.find((or) =>
+                  or?.determination?.find((det) => det.isPrimary)
+                )?.determination ?? undefined
+            });
+          }
+        } else {
+          newMappedDataTable.push([
+            formatMessage("resourceNotFoundWarning"),
+            { name: formatMessage("resourceNotFoundWarning") }
+          ]);
+        }
+      }
+      setSelectedResourcesAndSaveOrder?.(selectedResources);
+      setMappedDataTable(newMappedDataTable);
+    }
+  }
+
+  const onDataPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const clipboardData = event.clipboardData.getData("text/plain");
+    const rows = clipboardData
+      .trim()
+      .split("\n")
+      .map((row) => row.split("\t"));
+    setExtractedDataTable(rows);
+  };
+
   // Wait until selected resources are loaded.
   if (selectedResources === undefined) {
     return <LoadingSpinner loading={true} />;
   }
 
   return (
-    <div>
+    <div style={{ marginTop: "20px" }}>
       {!editMode ? (
         <>
           <strong>
@@ -393,23 +463,38 @@ export function MolecularAnalysisSampleSelectionStep({
           />
         </>
       ) : (
-        <QueryPage<any>
-          indexName={"dina_material_sample_index"}
-          uniqueName="molecular-analysis-material-sample-selection-step-edit"
-          columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
-          enableColumnSelector={false}
-          selectionMode={true}
-          selectionResources={selectedResources}
-          setSelectionResources={setSelectedResourcesAndSaveOrder}
-          viewMode={false}
-          enableDnd={true}
-          onDeselect={(unselected) => onSelectMaterial(unselected)}
-          onSelect={(selected) => onDeselectMaterial(selected)}
-          reactTableProps={{
-            enableSorting: true,
-            enableMultiSort: true
-          }}
-        />
+        <>
+          {" "}
+          <QueryPage<any>
+            indexName={"dina_material_sample_index"}
+            uniqueName="molecular-analysis-material-sample-selection-step-edit"
+            columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
+            enableColumnSelector={false}
+            selectionMode={true}
+            selectionResources={selectedResources}
+            setSelectionResources={setSelectedResourcesAndSaveOrder}
+            viewMode={false}
+            enableDnd={true}
+            onDeselect={(unselected) => onSelectMaterial(unselected)}
+            onSelect={(selected) => onDeselectMaterial(selected)}
+            reactTableProps={{
+              enableSorting: true,
+              enableMultiSort: true
+            }}
+          />
+          <div className="mt-3">
+            <CollapsibleSection
+              id={"pasteMaterialSample"}
+              headerKey={"pasteMaterialSample"}
+            >
+              <DataPasteZone onDataPaste={onDataPaste} />
+              <SampleSelectionMappingTable
+                extractedDataTable={extractedDataTable}
+                onTransferData={onTransferData}
+              />
+            </CollapsibleSection>
+          </div>
+        </>
       )}
     </div>
   );

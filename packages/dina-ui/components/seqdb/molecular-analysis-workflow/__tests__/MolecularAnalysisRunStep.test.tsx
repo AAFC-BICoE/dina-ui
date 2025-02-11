@@ -549,9 +549,9 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.type(wrapper.getAllByRole("textbox")[2], "Add a new one");
 
     // Edit Quality Control 1
-    userEvent.clear(wrapper.getAllByRole("textbox")[3]);
+    userEvent.clear(wrapper.getAllByRole("textbox")[4]);
     userEvent.type(
-      wrapper.getAllByRole("textbox")[3],
+      wrapper.getAllByRole("textbox")[4],
       "Updated Quality Control"
     );
 
@@ -562,7 +562,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Add new Quality Control
     userEvent.click(wrapper.getByRole("button", { name: /add/i }));
-    userEvent.type(wrapper.getAllByRole("textbox")[4], "New Quality Control");
+    userEvent.type(wrapper.getAllByRole("textbox")[5], "New Quality Control");
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })

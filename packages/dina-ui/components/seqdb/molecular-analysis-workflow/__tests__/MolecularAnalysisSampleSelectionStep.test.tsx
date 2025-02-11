@@ -114,7 +114,6 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
           <MolecularAnalysisSampleSelectionStep
             onSaved={onSavedMock}
             editMode={editMode}
-            setEditMode={setEditMode}
             performSave={performSave}
             setPerformSave={setPerformSave}
             molecularAnalysisId="5ac77b71-71f5-46b3-90f9-940629a7e035"
@@ -134,7 +133,14 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     );
     await new Promise(setImmediate);
 
-    // Should automatically be in edit mode since no material samples are linked yet.
+    userEvent.click(
+      wrapper.getByRole("button", {
+        name: /edit/i
+      })
+    );
+
+    await new Promise(setImmediate);
+
     expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
 
     // 3 records are expected from the mock elasticsearch response.

@@ -112,7 +112,8 @@ export function ColumnSelector<TData extends KitsuResource>(
     setColumnSelectorLoading,
     setDisplayedColumns,
     overrideDisplayedColumns,
-    excludedRelationshipTypes
+    excludedRelationshipTypes,
+    mandatoryDisplayedColumns
   } = props;
 
   // Loading state, specifically for dynamically loaded columns.
@@ -127,6 +128,22 @@ export function ColumnSelector<TData extends KitsuResource>(
       `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
       []
     );
+
+  // Inject mandatory columns if they're missing from local storage
+  useEffect(() => {
+    if (mandatoryDisplayedColumns) {
+      const updatedColumns = [
+        ...new Set([
+          ...mandatoryDisplayedColumns,
+          ...localStorageDisplayedColumns
+        ])
+      ];
+
+      if (updatedColumns.length !== localStorageDisplayedColumns.length) {
+        setLocalStorageDisplayedColumns(updatedColumns);
+      }
+    }
+  }, [mandatoryDisplayedColumns]);
 
   useEffect(() => {
     let injectedMappings: (ESIndexMapping | undefined)[] = [];
