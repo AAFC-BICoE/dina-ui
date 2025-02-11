@@ -54,20 +54,44 @@ export default function QueryRowVocabularySearch({
             <LoadingSpinner loading={true} />
           ) : (
             <>
-              <Select
-                options={vocabOptions}
-                className={`col ps-0`}
-                value={vocabOptions?.find(
-                  (pickOption) => pickOption.value === value
-                )}
-                placeholder={formatMessage({
-                  id: "queryBuilder_pickList_placeholder"
-                })}
-                onChange={(pickListOption) =>
-                  setValue?.(pickListOption?.value ?? "")
-                }
-                onKeyDown={onKeyDown}
-              />
+              {matchType === "in" || matchType === "notIn" ? (
+                <Select
+                  options={vocabOptions}
+                  className={`col ps-0`}
+                  value={(value?.split(",") ?? []).map((val) => {
+                    return vocabOptions.find(
+                      (pickOption) => pickOption.value === val
+                    );
+                  })}
+                  placeholder={formatMessage({
+                    id: "queryBuilder_pickList_multiple_placeholder"
+                  })}
+                  isMulti={true}
+                  onChange={(pickListOption) =>
+                    setValue?.(
+                      (pickListOption.flat() ?? [])
+                        .map((item) => item?.value ?? "")
+                        .join(",")
+                    )
+                  }
+                  onKeyDown={onKeyDown}
+                />
+              ) : (
+                <Select
+                  options={vocabOptions}
+                  className={`col ps-0`}
+                  value={vocabOptions?.find(
+                    (pickOption) => pickOption.value === value
+                  )}
+                  placeholder={formatMessage({
+                    id: "queryBuilder_pickList_placeholder"
+                  })}
+                  onChange={(pickListOption) =>
+                    setValue?.(pickListOption?.value ?? "")
+                  }
+                  onKeyDown={onKeyDown}
+                />
+              )}
             </>
           )}
         </>
