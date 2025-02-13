@@ -1,3 +1,11 @@
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  useSortable,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import classNames from "classnames";
 import {
   AreYouSureModal,
@@ -6,19 +14,19 @@ import {
   useModal
 } from "common-ui";
 import dynamic from "next/dynamic";
-import { ComponentType, PropsWithChildren } from "react";
+import {
+  ComponentType,
+  PropsWithChildren,
+  useEffect,
+  useMemo,
+  useState
+} from "react";
+import { FaGripLines } from "react-icons/fa";
 import Switch, { ReactSwitchProps } from "react-switch";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
-import { FaGripLines } from "react-icons/fa";
-import {
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-  SortEnd
-} from "react-sortable-hoc";
+import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../../types/collection-api";
 import { useMaterialSampleSave } from "../useMaterialSample";
 import { useMaterialSampleSectionOrder } from "./useMaterialSampleSectionOrder";
-import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../../types/collection-api";
 
 export interface MaterialSampleFormNavProps {
   dataComponentState: ReturnType<
@@ -96,161 +104,183 @@ export function MaterialSampleFormNav({
     isTemplate
   });
 
-  function onSortStart(_, event: unknown) {
-    if (event instanceof MouseEvent) {
-      document.body.style.cursor = "grabbing";
+  const [items, setItems] = useState(sortedScrollTargets.map((it) => it.id));
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      setItems((prevItems) => {
+        const oldIndex = prevItems.indexOf(active.id);
+        const newIndex = prevItems.indexOf(over.id);
+        return arrayMove(prevItems, oldIndex, newIndex);
+      });
     }
-  }
+  };
 
-  function onSortEnd(sortEnd: SortEnd) {
-    document.body.style.cursor = "inherit";
-
-    const newOrder = arrayMove(
-      sortedScrollTargets,
-      sortEnd.oldIndex,
-      sortEnd.newIndex
-    ).map((it) => it.id);
-    onChangeNavOrder?.(newOrder);
-  }
+  useEffect(() => {
+    onChangeNavOrder?.(items);
+  }, [items]);
 
   return (
-    <div className="sticky-md-top material-sample-nav">
-      <style>{`.material-sample-nav .active a { color: inherit !important; } .material-sample-nav { top: 70px; }`}</style>
-      <ScrollSpyNav
-        {...(renderNav
-          ? {
-              key: sortedScrollTargets.filter((it) => !it.disabled).length,
-              scrollTargetIds: sortedScrollTargets
-                .filter((it) => !it.disabled)
-                .map((it) => it.id),
-              activeNavClass: "active",
-              offset: -20,
-              scrollDuration: "100"
-            }
-          : {})}
-      >
-        <nav className="card card-body">
-          <label className="mb-2 text-uppercase">
-            <strong>
-              <DinaMessage id="dataComponents" />
-            </strong>
-          </label>
-          {/* Display each row of the data components. */}
-          <div className="list-group">
-            <SortableNavGroup
-              axis="y"
-              useDragHandle={true}
-              onSortStart={onSortStart}
-              onSortEnd={onSortEnd}
-            >
-              {sortedScrollTargets.map((section, index) => (
-                <DataComponentNavItem
-                  key={section.id}
-                  section={section}
-                  index={index}
-                  disableRemovePrompt={disableRemovePrompt}
-                  disableSwitch={
-                    section.id === COLLECTING_EVENT_COMPONENT_NAME &&
-                    disableCollectingEventSwitch
-                  }
-                />
-              ))}
-            </SortableNavGroup>
-          </div>
-        </nav>
-      </ScrollSpyNav>
-    </div>
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={items} strategy={verticalListSortingStrategy}>
+        <div className="sticky-md-top material-sample-nav">
+          <style>{`.material-sample-nav .active a { color: inherit !important; } .material-sample-nav { top: 70px; }`}</style>
+          <ScrollSpyNav
+            {...(renderNav
+              ? {
+                  key: sortedScrollTargets.filter((it) => !it.disabled).length,
+                  scrollTargetIds: sortedScrollTargets
+                    .filter((it) => !it.disabled)
+                    .map((it) => it.id),
+                  activeNavClass: "active",
+                  offset: -20,
+                  scrollDuration: "100"
+                }
+              : {})}
+          >
+            <nav className="card card-body">
+              <label className="mb-2 text-uppercase">
+                <strong>
+                  <DinaMessage id="dataComponents" />
+                </strong>
+              </label>
+              {/* Display each row of the data components. */}
+              <div className="list-group">
+                <SortableNavGroup>
+                  {sortedScrollTargets.map((section) => (
+                    <DataComponentNavItem
+                      id={section.id}
+                      key={section.id}
+                      section={section}
+                      disableRemovePrompt={disableRemovePrompt}
+                      disableSwitch={
+                        section.id === COLLECTING_EVENT_COMPONENT_NAME &&
+                        disableCollectingEventSwitch
+                      }
+                    />
+                  ))}
+                </SortableNavGroup>
+              </div>
+            </nav>
+          </ScrollSpyNav>
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 }
 
 interface NavItemProps {
+  id: string;
   section: ScrollTarget;
   disableRemovePrompt?: boolean;
   disableSwitch?: boolean;
 }
 
-const DataComponentNavItem = SortableElement(
-  ({ section, disableRemovePrompt, disableSwitch }: NavItemProps) => {
-    const { openModal } = useModal();
-    const { isTemplate } = useDinaFormContext();
+const DataComponentNavItem = ({
+  id,
+  section,
+  disableRemovePrompt,
+  disableSwitch
+}: NavItemProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({
+    id
+  });
 
-    const Tag = section.disabled ? "div" : "a";
-    const SwitchComponent = section.customSwitch ?? Switch;
+  const style = useMemo(
+    () => ({
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1
+    }),
+    [transform, transition, isDragging]
+  );
 
-    function toggle(newVal: boolean) {
-      if (!newVal && !disableRemovePrompt) {
-        // When removing data, ask the user for confirmation first:
-        openModal(
-          <AreYouSureModal
-            actionMessage={
-              <DinaMessage
-                id="removeComponentData"
-                values={{ component: section.msg }}
+  const { openModal } = useModal();
+  const { isTemplate } = useDinaFormContext();
+
+  const Tag = section.disabled ? "div" : "a";
+  const SwitchComponent = section.customSwitch ?? Switch;
+
+  function toggle(newVal: boolean) {
+    if (!newVal && !disableRemovePrompt) {
+      // When removing data, ask the user for confirmation first:
+      openModal(
+        <AreYouSureModal
+          actionMessage={
+            <DinaMessage
+              id="removeComponentData"
+              values={{ component: section.msg }}
+            />
+          }
+          onYesButtonClicked={() => section.setEnabled?.(newVal)}
+        />
+      );
+    } else {
+      section.setEnabled?.(newVal);
+    }
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      data-dragging={isDragging}
+      className={classNames(
+        section.className,
+        "list-group-item d-flex gap-2 align-items-center"
+      )}
+      key={section.id}
+      style={{ ...style, height: "3rem", zIndex: 1030 }}
+    >
+      {isTemplate && <NavSortHandle {...listeners} isDragging={isDragging} />}
+      <Tag
+        className="flex-grow-1 text-decoration-none"
+        href={section.disabled ? undefined : `#${section.id}`}
+      >
+        {section.msg}
+      </Tag>
+      {section.setEnabled &&
+        (disableSwitch ? (
+          <Tooltip
+            id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
+            disableSpanMargin={true}
+            visibleElement={
+              <SwitchComponent
+                className="mt-2"
+                checked={!section.disabled}
+                onChange={toggle}
+                disabled={disableSwitch}
               />
             }
-            onYesButtonClicked={() => section.setEnabled?.(newVal)}
           />
-        );
-      } else {
-        section.setEnabled?.(newVal);
-      }
-    }
+        ) : (
+          <SwitchComponent
+            checked={!section.disabled}
+            onChange={toggle}
+            disabled={disableSwitch}
+          />
+        ))}
+    </div>
+  );
+};
 
-    return (
-      <div
-        className={classNames(
-          section.className,
-          "list-group-item d-flex gap-2 align-items-center"
-        )}
-        key={section.id}
-        style={{ height: "3rem", zIndex: 1030 }}
-      >
-        {isTemplate && <NavSortHandle />}
-        <Tag
-          className="flex-grow-1 text-decoration-none"
-          href={section.disabled ? undefined : `#${section.id}`}
-        >
-          {section.msg}
-        </Tag>
-        {section.setEnabled &&
-          (disableSwitch ? (
-            <Tooltip
-              id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
-              disableSpanMargin={true}
-              visibleElement={
-                <SwitchComponent
-                  className="mt-2"
-                  checked={!section.disabled}
-                  onChange={toggle}
-                  disabled={disableSwitch}
-                />
-              }
-            />
-          ) : (
-            <SwitchComponent
-              checked={!section.disabled}
-              onChange={toggle}
-              disabled={disableSwitch}
-            />
-          ))}
-      </div>
-    );
-  }
+export const SortableNavGroup = ({ children }: PropsWithChildren<{}>) => (
+  <div className="list-group">{children}</div>
 );
 
-export const SortableNavGroup = SortableContainer(
-  ({ children }: PropsWithChildren<{}>) => (
-    <div className="list-group">{children}</div>
-  )
+const NavSortHandle = (props) => (
+  <FaGripLines
+    {...props}
+    cursor={props.isDragging ? "grabbing" : "grab"}
+    size="1.5em"
+  />
 );
-
-const NavSortHandle = SortableHandle(() => (
-  <FaGripLines cursor="grab" size="1.5em" />
-));
-
-// Drag/drop re-ordering support copied from https://github.com/JedWatson/react-select/pull/3645/files
-function arrayMove<T>(array: T[], from: number, to: number) {
-  array = array.slice();
-  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
-  return array;
-}
