@@ -6,6 +6,8 @@ import {
   EditButton,
   FieldView,
   KeyValueTable,
+  ReactTable,
+  ReadOnlyValue,
   useAccount,
   useQuery,
   withResponse
@@ -16,6 +18,7 @@ import { Footer, GroupLabel, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
+import classNames from "classnames";
 
 export default function DinaUserDetailsPage() {
   const router = useRouter();
@@ -86,6 +89,11 @@ export default function DinaUserDetailsPage() {
                 </div>
                 <div className="row">
                   <div className="col-4">
+                    <AdminRolesTable adminRoles={dinaUser.adminRoles} />
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-4">
                     <RolesPerGroupTable
                       rolesPerGroup={dinaUser.rolesPerGroup}
                     />
@@ -147,6 +155,47 @@ export function RolesPerGroupTable({
           )}
           attributeHeader={<DinaMessage id="group" />}
           valueHeader={<DinaMessage id="role" />}
+        />
+      )}
+    </div>
+  );
+}
+
+export interface AdminRolesTableProps {
+  adminRoles: string[];
+  hideTitle?: boolean;
+  hideTable?: boolean;
+}
+
+export function AdminRolesTable({
+  adminRoles,
+  hideTitle,
+  hideTable
+}: AdminRolesTableProps) {
+  return (
+    <div className="mb-3">
+      {!hideTitle && (
+        <h2>
+          <DinaMessage id="adminRoles" />
+        </h2>
+      )}
+      {!hideTable && (
+        <ReactTable
+          className={classNames("-striped")}
+          highlightRow={false}
+          columns={[
+            // Render the value as a string, or the custom cell component if one is defined:
+            {
+              cell: ({ row: { original } }) => {
+                return <ReadOnlyValue value={original} />;
+              },
+              header: () => <DinaMessage id="roles" />,
+              accessorKey: "adminRoles"
+            }
+          ]}
+          data={adminRoles}
+          showPagination={false}
+          manualPagination={true}
         />
       )}
     </div>
