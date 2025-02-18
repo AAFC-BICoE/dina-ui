@@ -14,7 +14,8 @@ const TEST_DINAUSER: DinaUser = {
   agentId: "e3a18289-4a9d-4ad6-ad06-3c7f1837406e",
   id: "1",
   type: "user",
-  rolesPerGroup: { cnc: [SUPER_USER] }
+  rolesPerGroup: { cnc: [SUPER_USER] },
+  adminRoles: []
 };
 
 const TEST_AGENT: Person = {
