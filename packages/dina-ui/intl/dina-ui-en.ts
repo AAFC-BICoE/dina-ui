@@ -1102,6 +1102,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparationProtocol: "Preparation Protocol",
   preparationType: "Preparation Type",
   viewExportHistoryButton: "View Export History",
+  molecularAnalysisExport: "Molecular Analysis Export",
   exportColumns: "Export Columns:",
   dataLabel: "Data",
   objectsLabel: "Objects",
