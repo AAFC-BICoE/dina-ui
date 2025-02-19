@@ -857,6 +857,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   searchResults: "Search Results ({resultSize})",
   searchStorage: "Search Storage",
   selectAll: "Select All",
+  deselectAll: "Deselect All",
   selectAnExtenstion: "Select an extension",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",

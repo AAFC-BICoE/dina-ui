@@ -51,6 +51,9 @@ export default function ExportMolecularAnalysisPage() {
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Initial loading of the page. Used to retrieve the run items based on the query object.
+   */
   useEffect(() => {
     if (!queryObject) {
       router.push("/export/data-export/list");
@@ -58,6 +61,15 @@ export default function ExportMolecularAnalysisPage() {
 
     retrieveRunItems();
   }, []);
+
+  /**
+   * Retrieve the attachments for the run summaries if loaded in.
+   */
+  useEffect(() => {
+    if (runSummaries.length > 0) {
+      retrieveAttachments();
+    }
+  }, [runSummaries]);
 
   async function retrieveRunItems() {
     setLoading(true);
@@ -96,13 +108,28 @@ export default function ExportMolecularAnalysisPage() {
                 uniqueRunSummaries[existingRunSummaryIndex].attributes.items = [
                   ...uniqueRunSummaries[existingRunSummaryIndex].attributes
                     .items,
-                  ...included.attributes.items
+                  ...included.attributes.items.map((item) => ({
+                    ...item,
+                    enabled: true,
+                    attachments: []
+                  }))
                 ];
               } else {
-                uniqueRunSummaries.push({
+                const newIncluded = {
                   ...included,
-                  enabled: true
-                });
+                  enabled: true,
+                  attachments: [],
+                  attributes: {
+                    ...included.attributes,
+                    items: included.attributes.items.map((item) => ({
+                      ...item,
+                      enabled: true,
+                      attachments: []
+                    }))
+                  }
+                };
+
+                uniqueRunSummaries.push(newIncluded);
               }
             });
           }
@@ -118,6 +145,11 @@ export default function ExportMolecularAnalysisPage() {
         // No matter the end result, loading should stop.
         setLoading(false);
       });
+  }
+
+  async function retrieveAttachments() {
+    // console.log(runSummaries);
+    // Loop through each run summary and retrieve the attachments.
   }
 
   async function exportData(formik) {
@@ -218,7 +250,7 @@ export default function ExportMolecularAnalysisPage() {
                         <>
                           <div
                             key={index}
-                            className="d-flex align-items-center"
+                            className="d-flex align-items-center mt-3"
                           >
                             <input
                               type="checkbox"
@@ -232,6 +264,9 @@ export default function ExportMolecularAnalysisPage() {
                             />
                             <h5 className="ms-2 mb-0">
                               {runSummary?.attributes?.name}
+                              {" ("}
+                              {runSummary?.attachments?.length}
+                              {" attachments)"}
                             </h5>
                           </div>
                           {runSummary?.attributes?.items?.map(
@@ -259,6 +294,9 @@ export default function ExportMolecularAnalysisPage() {
                                     item?.genericMolecularAnalysisItemSummary
                                       ?.name
                                   }
+                                  {" ("}
+                                  {item?.attachments?.length}
+                                  {" attachments)"}
                                 </span>
                               </div>
                             )
@@ -270,6 +308,38 @@ export default function ExportMolecularAnalysisPage() {
                 )}
               </div>
             </Card.Body>
+            <Card.Footer className="d-flex">
+              <div className="me-auto">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    runSummaries.forEach((runSummary) => {
+                      runSummary.enabled = true;
+                      runSummary.attributes.items.forEach((item) => {
+                        item.enabled = true;
+                      });
+                    });
+                    setRunSummaries([...runSummaries]);
+                  }}
+                >
+                  <DinaMessage id="selectAll" />
+                </button>
+                <button
+                  className="btn btn-primary ms-2"
+                  onClick={() => {
+                    runSummaries.forEach((runSummary) => {
+                      runSummary.enabled = false;
+                      runSummary.attributes.items.forEach((item) => {
+                        item.enabled = false;
+                      });
+                    });
+                    setRunSummaries([...runSummaries]);
+                  }}
+                >
+                  <DinaMessage id="deselectAll" />
+                </button>
+              </div>
+            </Card.Footer>
           </Card>
         </div>
 
