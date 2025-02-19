@@ -48,6 +48,7 @@ import QueryRowRelationshipPresenceSearch, {
 import QueryRowIdentifierSearch, {
   transformIdentifierToDSL
 } from "./query-builder-value-types/QueryBuilderIdentifierSearch";
+import QueryBuilderVocabularySearch from "./query-builder-value-types/QueryBuilderVocabularySearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -79,12 +80,19 @@ function indexSettingsToFieldPath(indexSettings?: ESIndexMapping): string {
  * Converts elastic search types into query builder types.
  * @param type The type from elastic search from the index.
  * @param distinctTerm Boolean to indicate if the field contains a distinct term.
+ * @param isVocabulary Boolean to indicate if the field is a vocabulary.
  * @returns Query builder specific type.
  */
 function getQueryBuilderTypeFromIndexType(
   type: string,
-  distinctTerm: boolean
+  distinctTerm: boolean,
+  isVocabulary: boolean
 ): string {
+  // If the field is a vocabulary, then it's a vocabulary field.
+  if (isVocabulary) {
+    return "vocabulary";
+  }
+
   // If the field is a distinct term, then it's an autocomplete field.
   if (distinctTerm) {
     return "autoComplete";
@@ -326,6 +334,32 @@ export function generateBuilderConfig(
       factory: (factoryProps) => (
         <QueryBuilderTextSearch
           matchType={factoryProps?.operator}
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformTextSearchToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
+    },
+    vocabulary: {
+      ...BasicConfig.widgets.text,
+      type: "vocabulary",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryBuilderVocabularySearch
+          matchType={factoryProps?.operator}
+          fieldConfig={
+            (factoryProps?.fieldDefinition?.fieldSettings as any)
+              ?.mapping as ESIndexMapping
+          }
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
@@ -593,6 +627,14 @@ export function generateBuilderConfig(
         }
       }
     },
+    vocabulary: {
+      valueSources: ["value"],
+      widgets: {
+        vocabulary: {
+          operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"]
+        }
+      }
+    },
     autoComplete: {
       valueSources: ["value"],
       defaultOperator: "equals",
@@ -809,7 +851,8 @@ export function generateBuilderConfig(
       const field = {};
       const type = getQueryBuilderTypeFromIndexType(
         indexItem.type,
-        indexItem.distinctTerm
+        indexItem.distinctTerm,
+        indexItem?.dynamicField?.type === "vocabulary"
       );
 
       // Value is used for the field name since it's required to be unique. It should not be used

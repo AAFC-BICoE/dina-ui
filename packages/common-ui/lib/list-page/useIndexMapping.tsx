@@ -35,6 +35,12 @@ export interface OverrideRelationshipConfig {
        * the query.
        */
       isReverseRelationship?: boolean;
+
+      /**
+       * Vocabulary endpoint to use if the field is a vocabulary value. This will force it to use
+       * a vocabulary search instead of a text search.
+       */
+      vocabularyEndpoint?: string;
     };
   };
 }
@@ -56,7 +62,8 @@ export const overrideRelationshipConfig: OverrideRelationshipConfig = {
     "attributes.items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.analysisType":
       {
         fields: ["keyword"],
-        isReverseRelationship: true
+        isReverseRelationship: true,
+        vocabularyEndpoint: "seqdb-api/vocabulary/molecularAnalysisType"
       }
   }
 };
@@ -210,7 +217,17 @@ export function useIndexMapping({
             endsWithSupport:
               relationshipFields?.includes("prefix_reverse") ?? false,
             isReverseRelationship:
-              overrideConfig?.isReverseRelationship ?? false
+              overrideConfig?.isReverseRelationship ?? false,
+
+            // Check if it's a vocabulary endpoint.
+            dynamicField: overrideConfig?.vocabularyEndpoint
+              ? {
+                  apiEndpoint: overrideConfig.vocabularyEndpoint,
+                  label: attributeLabel,
+                  path: fullPath,
+                  type: "vocabulary"
+                }
+              : undefined
           });
         });
       });
