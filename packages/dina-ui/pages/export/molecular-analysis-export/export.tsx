@@ -23,6 +23,7 @@ import { applySourceFilteringString } from "common-ui/lib/list-page/query-builde
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { PersistedResource } from "kitsu";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 
 export default function ExportMolecularAnalysisPage() {
   const { formatNumber } = useIntl();
@@ -68,7 +69,9 @@ export default function ExportMolecularAnalysisPage() {
   useEffect(() => {
     if (runSummaries.length > 0 && !attachmentsLoaded) {
       setAttachmentsLoaded(true);
+
       retrieveRunAttachments();
+      retrieveRunItemAttachments();
     }
   }, [runSummaries]);
 
@@ -148,6 +151,9 @@ export default function ExportMolecularAnalysisPage() {
       });
   }
 
+  /**
+   * Retrieve the attachments for the run.
+   */
   async function retrieveRunAttachments() {
     // First, retrieve the top level attachments for the runs.
     const attachmentPaths = runSummaries.map((runSummary) => {
@@ -221,6 +227,43 @@ export default function ExportMolecularAnalysisPage() {
         }
       });
     }
+  }
+
+  async function retrieveRunItemAttachments() {
+    // Loop through each run summary.
+    await Promise.all(
+      runSummaries.map(async (runSummary) => {
+        // Generate a list of molecular analysis result ids to retrieve the attachments for.
+        const attachmentPaths = runSummary.attributes.items
+          .filter((item) => item.result !== null)
+          .map(
+            (item) =>
+              "molecular-analysis-result/" +
+              item.result.uuid +
+              "?include=attachments"
+          );
+
+        // Retrieve the attachments for the run items.
+        const molecularAnalysisResults: PersistedResource<MolecularAnalysisResult>[] =
+          await bulkGet(attachmentPaths, {
+            apiBaseUrl: "/seqdb-api"
+          });
+
+        // Retrieve the metadata ids for the run items.
+        const _metadataIds = molecularAnalysisResults
+          .flatMap((run) =>
+            run?.attachments?.map((attachment) => attachment.id)
+          )
+          .filter((id) => id !== undefined);
+
+        // Loop through each item in the run summary that has a result.
+        runSummary.attributes.items
+          .filter((item) => item.result !== null)
+          .forEach((_item) => {
+            // todo
+          });
+      })
+    );
   }
 
   async function retrieveMetadata(
