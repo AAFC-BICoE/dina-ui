@@ -8,7 +8,7 @@ import Select from "react-select";
 
 interface QueryRowVocabularySearchProps {
   /**
-   * Current match type being used.
+   * Current match type being used. 
    */
   matchType?: string;
 
