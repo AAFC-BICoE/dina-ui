@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import useLocalStorage from "@rehooks/local-storage";
 import {
   BackButton,
@@ -20,14 +19,14 @@ import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Card, Spinner } from "react-bootstrap";
-import {
-  applySourceFilteringString,
-  processResults
-} from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { applySourceFilteringString } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
+import { PersistedResource } from "kitsu";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
 
 export default function ExportMolecularAnalysisPage() {
   const { formatNumber } = useIntl();
-  const { apiClient } = useApiClient();
+  const { apiClient, bulkGet } = useApiClient();
   const router = useRouter();
 
   // Determines where the back button should link to.
@@ -50,6 +49,7 @@ export default function ExportMolecularAnalysisPage() {
 
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
   const [loading, setLoading] = useState(false);
+  const [attachmentsLoaded, setAttachmentsLoaded] = useState(false);
 
   /**
    * Initial loading of the page. Used to retrieve the run items based on the query object.
@@ -57,17 +57,18 @@ export default function ExportMolecularAnalysisPage() {
   useEffect(() => {
     if (!queryObject) {
       router.push("/export/data-export/list");
+    } else {
+      retrieveRunItems();
     }
-
-    retrieveRunItems();
   }, []);
 
   /**
    * Retrieve the attachments for the run summaries if loaded in.
    */
   useEffect(() => {
-    if (runSummaries.length > 0) {
-      retrieveAttachments();
+    if (runSummaries.length > 0 && !attachmentsLoaded) {
+      setAttachmentsLoaded(true);
+      retrieveRunAttachments();
     }
   }, [runSummaries]);
 
@@ -147,25 +148,102 @@ export default function ExportMolecularAnalysisPage() {
       });
   }
 
-  async function retrieveAttachments() {
-    // console.log(runSummaries);
-    // Loop through each run summary and retrieve the attachments.
+  async function retrieveRunAttachments() {
+    // First, retrieve the top level attachments for the runs.
+    const attachmentPaths = runSummaries.map((runSummary) => {
+      return "molecular-analysis-run/" + runSummary.id + "?include=attachments";
+    });
+
+    // Retrieve the attachments for the runs.
+    const molecularAnalysisRuns: PersistedResource<MolecularAnalysisRun>[] =
+      await bulkGet(attachmentPaths, {
+        apiBaseUrl: "/seqdb-api"
+      });
+
+    // Now that we have the metadatas, we need to do a request to retrieve all the metadatas.
+    const metadataIds = molecularAnalysisRuns
+      .flatMap((run) => run?.attachments?.map((attachment) => attachment.id))
+      .filter((id) => id !== undefined);
+
+    if (metadataIds.length > 0) {
+      const metadatas = await retrieveMetadata(metadataIds);
+
+      // Create a map of metadataId to metadata for efficient lookup
+      const metadataMap = new Map(
+        metadatas.map((metadata) => [metadata.id, metadata])
+      );
+
+      // For each file identifier from the metadata, we need to link it to the run summary.
+      runSummaries.forEach((_runSummary, index) => {
+        const run = molecularAnalysisRuns[index];
+        const currentRunFileIdentifiers: string[] = [];
+
+        if (run?.attachments) {
+          run.attachments.forEach((attachment) => {
+            const metadata = metadataMap.get(attachment.id); // Retrieve metadata from the map
+
+            if (metadata) {
+              if (metadata.dcType === "IMAGE") {
+                let fileIdentifier;
+                // If image has derivative, return large image derivative fileIdentifier if present
+                if (metadata.derivatives) {
+                  const largeImageDerivative = metadata.derivatives.find(
+                    (derivative) => derivative.derivativeType === "LARGE_IMAGE"
+                  );
+                  fileIdentifier = largeImageDerivative?.fileIdentifier;
+                }
+
+                // Otherwise, return original fileIdentifier
+                if (!fileIdentifier) {
+                  fileIdentifier = metadata.fileIdentifier;
+                }
+
+                // Add it to the list of current run file identifiers.
+                if (fileIdentifier) {
+                  currentRunFileIdentifiers.push(fileIdentifier);
+                }
+              }
+            }
+          });
+
+          // Update the run summaries state with the file identifiers.
+          setRunSummaries(
+            runSummaries.map((runSummary, runIndex) => {
+              if (runIndex === index) {
+                return {
+                  ...runSummary,
+                  attachments: currentRunFileIdentifiers
+                };
+              }
+              return runSummary;
+            })
+          );
+        }
+      });
+    }
   }
 
-  async function exportData(formik) {
+  async function retrieveMetadata(
+    ids: string[]
+  ): Promise<PersistedResource<Metadata>[]> {
+    const metadataPaths = ids.map((id) => `metadata/${id}?include=derivatives`);
+    const metadataResponses: PersistedResource<Metadata>[] = await bulkGet(
+      metadataPaths,
+      {
+        apiBaseUrl: "/objectstore-api"
+      }
+    );
+    return metadataResponses;
+  }
+
+  async function exportData(_formik) {
     setLoading(true);
 
     // Clear error message.
     setDataExportError(undefined);
 
-    // Prepare the query to be used for exporting purposes.
-    if (queryObject) {
-      delete (queryObject as any)._source;
-    }
-    const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
-
     // Retrieve options from the formik form.
-    const { name, includeQualityControls } = formik.values;
+    // const { name, includeQualityControls } = formik.values;
   }
 
   /**
@@ -263,10 +341,13 @@ export default function ExportMolecularAnalysisPage() {
                               }}
                             />
                             <h5 className="ms-2 mb-0">
+                              {/* Run Name */}
                               {runSummary?.attributes?.name}
-                              {" ("}
-                              {runSummary?.attachments?.length}
-                              {" attachments)"}
+
+                              {/* Total Attachments */}
+                              <span className="badge bg-secondary ms-2">
+                                {runSummary?.attachments?.length}
+                              </span>
                             </h5>
                           </div>
                           {runSummary?.attributes?.items?.map(
@@ -290,13 +371,16 @@ export default function ExportMolecularAnalysisPage() {
                                   }}
                                 />
                                 <span className="ms-2 mb-0">
+                                  {/* Run Item Name */}
                                   {
                                     item?.genericMolecularAnalysisItemSummary
                                       ?.name
                                   }
-                                  {" ("}
-                                  {item?.attachments?.length}
-                                  {" attachments)"}
+
+                                  {/* Total Attachments */}
+                                  <span className="badge bg-secondary ms-2">
+                                    {item?.attachments?.length}
+                                  </span>
                                 </span>
                               </div>
                             )
