@@ -3,6 +3,7 @@ import useLocalStorage from "@rehooks/local-storage";
 import {
   BackButton,
   CheckBoxField,
+  checkboxProps,
   CommonMessage,
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
@@ -56,7 +57,7 @@ export default function ExportMolecularAnalysisPage() {
     }
 
     retrieveRunItems();
-  }, [queryObject]);
+  }, []);
 
   async function retrieveRunItems() {
     setLoading(true);
@@ -86,11 +87,23 @@ export default function ExportMolecularAnalysisPage() {
           if (result.included) {
             result.included.forEach((included) => {
               // Check if it's been already added by the id, only display unique run summaries.
-              if (uniqueRunSummaries.find((r) => r.id === included.id)) {
-                return;
+              const existingRunSummary = uniqueRunSummaries.find(
+                (r) => r.id === included.id
+              );
+              if (existingRunSummary) {
+                const existingRunSummaryIndex =
+                  uniqueRunSummaries.indexOf(existingRunSummary);
+                uniqueRunSummaries[existingRunSummaryIndex].attributes.items = [
+                  ...uniqueRunSummaries[existingRunSummaryIndex].attributes
+                    .items,
+                  ...included.attributes.items
+                ];
+              } else {
+                uniqueRunSummaries.push({
+                  ...included,
+                  enabled: true
+                });
               }
-
-              uniqueRunSummaries.push(included);
             });
           }
         });
@@ -201,11 +214,56 @@ export default function ExportMolecularAnalysisPage() {
                 ) : (
                   <>
                     {runSummaries.map((runSummary, index) => {
-                      // console.log(runSummary);
                       return (
-                        <div key={index}>
-                          <h5>{runSummary?.attributes?.name}</h5>
-                        </div>
+                        <>
+                          <div
+                            key={index}
+                            className="d-flex align-items-center"
+                          >
+                            <input
+                              type="checkbox"
+                              name={`runSelected[${index}]`}
+                              checked={runSummary?.enabled}
+                              style={checkboxProps.style}
+                              onChange={() => {
+                                runSummary.enabled = !runSummary.enabled;
+                                setRunSummaries([...runSummaries]);
+                              }}
+                            />
+                            <h5 className="ms-2 mb-0">
+                              {runSummary?.attributes?.name}
+                            </h5>
+                          </div>
+                          {runSummary?.attributes?.items?.map(
+                            (item, itemIndex) => (
+                              <div
+                                key={itemIndex}
+                                style={{ marginLeft: "30px" }}
+                                className="d-flex align-items-center"
+                              >
+                                <input
+                                  type="checkbox"
+                                  name={`runItemSelected[${itemIndex}]`}
+                                  checked={
+                                    runSummary.enabled ? item?.enabled : false
+                                  }
+                                  disabled={!runSummary.enabled}
+                                  style={checkboxProps.style}
+                                  onChange={() => {
+                                    item.enabled = !item.enabled;
+                                    setRunSummaries([...runSummaries]);
+                                  }}
+                                />
+                                <span className="ms-2 mb-0">
+                                  {
+                                    item?.genericMolecularAnalysisItemSummary
+                                      ?.name
+                                  }
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </>
                       );
                     })}
                   </>
