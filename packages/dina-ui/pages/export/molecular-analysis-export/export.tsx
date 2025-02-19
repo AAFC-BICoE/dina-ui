@@ -2,10 +2,13 @@
 import useLocalStorage from "@rehooks/local-storage";
 import {
   BackButton,
+  CheckBoxField,
   CommonMessage,
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
-  DinaForm
+  DinaForm,
+  SubmitButton,
+  TextField
 } from "common-ui";
 import { useSessionStorage } from "usehooks-ts";
 import { useState } from "react";
@@ -14,6 +17,7 @@ import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { Card, Spinner } from "react-bootstrap";
 
 export default function ExportMolecularAnalysisPage() {
   const { formatNumber } = useIntl();
@@ -47,6 +51,21 @@ export default function ExportMolecularAnalysisPage() {
     const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
   }
 
+  const LoadingSpinner = (
+    <>
+      <Spinner
+        as="span"
+        animation="border"
+        size="sm"
+        role="status"
+        aria-hidden="true"
+      />
+      <span className="visually-hidden">
+        <DinaMessage id="loadingSpinner" />
+      </span>
+    </>
+  );
+
   return (
     <PageLayout
       titleId="molecularAnalysisExport"
@@ -76,6 +95,66 @@ export default function ExportMolecularAnalysisPage() {
           id="tableTotalCount"
           values={{ totalCount: formatNumber(totalRecords ?? 0) }}
         />
+
+        <div className="col-md-12">
+          <h4 className="mt-3">
+            <DinaMessage id="runItemSelection" />
+          </h4>
+          <Card>
+            <Card.Body>
+              <div className="row"></div>
+            </Card.Body>
+          </Card>
+        </div>
+
+        <div className="col-md-12">
+          <h4 className="mt-3">
+            <DinaMessage id="settingLabel" />
+          </h4>
+          <Card>
+            <Card.Body>
+              <div className="row">
+                <div className="col-md-4">
+                  <TextField
+                    name={"name"}
+                    customName="exportName"
+                    disabled={loading}
+                  />
+                </div>
+                <div className="col-md-4">
+                  <CheckBoxField
+                    name="includeQualityControls"
+                    overridecheckboxProps={{
+                      style: {
+                        height: "30px",
+                        width: "30px"
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            </Card.Body>
+            <Card.Footer className="d-flex">
+              <div className="me-auto">
+                <SubmitButton
+                  buttonProps={(formik) => ({
+                    style: { width: "8rem" },
+                    disabled: loading,
+                    onClick: () => {
+                      exportData(formik);
+                    }
+                  })}
+                >
+                  {loading ? (
+                    LoadingSpinner
+                  ) : (
+                    <DinaMessage id="exportButtonText" />
+                  )}
+                </SubmitButton>
+              </div>
+            </Card.Footer>
+          </Card>
+        </div>
       </DinaForm>
     </PageLayout>
   );

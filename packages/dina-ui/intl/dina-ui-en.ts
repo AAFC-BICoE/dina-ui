@@ -1103,6 +1103,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparationType: "Preparation Type",
   viewExportHistoryButton: "View Export History",
   molecularAnalysisExport: "Molecular Analysis Export",
+  runItemSelection: "Run Item Selection",
   exportColumns: "Export Columns:",
   dataLabel: "Data",
   objectsLabel: "Objects",
