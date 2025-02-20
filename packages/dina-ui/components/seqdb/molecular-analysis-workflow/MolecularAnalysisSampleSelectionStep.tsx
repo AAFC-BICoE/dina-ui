@@ -432,7 +432,10 @@ export function MolecularAnalysisSampleSelectionStep({
     const rows = clipboardData
       .trim()
       .split("\n")
-      .map((row) => row.split("\t"));
+      .map((row) =>
+        row.split("\t").map((cell) => cell.replace(/\r/g, "").trim())
+      );
+
     setExtractedDataTable(rows);
   };
 
