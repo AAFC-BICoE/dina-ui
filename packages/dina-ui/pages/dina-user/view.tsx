@@ -88,16 +88,16 @@ export default function DinaUserDetailsPage() {
                   />
                 </div>
                 <div className="row">
-                  <div className="col-4">
-                    <AdminRolesTable adminRoles={dinaUser.adminRoles} />
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-4">
+                  <div className="col-6">
                     <RolesPerGroupTable
                       rolesPerGroup={dinaUser.rolesPerGroup}
                     />
                   </div>
+                  {dinaUser.adminRoles.length !== 0 && (
+                    <div className="col-6">
+                      <AdminRolesTable adminRoles={dinaUser.adminRoles} />
+                    </div>
+                  )}
                 </div>
                 <div className="row mt-3">
                   <div>
