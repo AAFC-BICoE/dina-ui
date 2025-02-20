@@ -1,7 +1,7 @@
 import { applySourceFilteringString } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { PersistedResource } from "kitsu";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 import { DATA_EXPORT_QUERY_KEY, useApiClient } from "common-ui";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
@@ -14,6 +14,9 @@ export interface UseMolecularAnalysisExportAPIReturn {
 
   totalAttachments: number;
 
+  loadQualityControls: boolean;
+  setLoadQualityControls: Dispatch<SetStateAction<boolean>>;
+
   networkLoading: boolean;
   exportLoading: boolean;
 
@@ -23,11 +26,15 @@ export interface UseMolecularAnalysisExportAPIReturn {
 }
 
 export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExportAPIReturn {
-  const { apiClient, bulkGet } = useApiClient();
+  const { apiClient, bulkGet, save } = useApiClient();
   const router = useRouter();
 
   // Run summaries loaded in from the elastic search query.
   const [runSummaries, setRunSummaries] = useState<any[]>([]);
+
+  // Toggle the user can choose to select if quality control attachments are included.
+  const [loadQualityControls, setLoadQualityControls] =
+    useState<boolean>(false);
 
   // If any errors occur, a JSX component of the error can be presented to the user.
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
@@ -40,6 +47,9 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
 
   // Have the queries responsible for determining the number of attachments for each run item been ran.
   const [attachmentsLoaded, setAttachmentsLoaded] = useState(false);
+
+  // Have the quality controls been loaded already, do not run it again if it is true.
+  const [qualityControlsLoaded, setQualityControlsLoaded] = useState(false);
 
   // ElasticSearch query to be used to perform the export against.
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
@@ -79,6 +89,20 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     }
   }, [runSummaries]);
 
+  /**
+   * Use effect responsible for loading in the quality control attachments.
+   */
+  useEffect(() => {
+    if (loadQualityControls && !qualityControlsLoaded) {
+      setQualityControlsLoaded(true);
+      // retrieveQualityControlAttachments();
+    }
+  }, [loadQualityControls]);
+
+  /**
+   * Each time the runSummaries state changes (which can occur when loading and user selects a checkbox.)
+   * this useMemo will determine the total number of attachments.
+   */
   const totalAttachments = useMemo(() => {
     let count = 0;
 
@@ -381,6 +405,10 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     );
   }
 
+  // async function retrieveQualityControlAttachments() {
+
+  // }
+
   /**
    * Retrieves metadata resources for a given array of metadata IDs.
    *
@@ -425,14 +453,78 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     return resp?.data?.hits;
   }
 
-  async function performExport(_formik) {
+  async function performExport(formik) {
     setExportLoading(true);
 
     // Clear error message.
     setDataExportError(undefined);
 
     // Retrieve options from the formik form.
-    // const { name, includeQualityControls } = formik.values;
+    const { name } = formik.values;
+
+    // Generate fileIdentifiers array based on enabled runs and run items.
+    const fileIdentifiers: string[] = [];
+
+    // Generate the file structure based on the enabled runs and run items.
+    const exportLayout = new Map<string, string[]>();
+
+    if (runSummaries && runSummaries.length > 0) {
+      runSummaries.forEach((runSummary) => {
+        if (runSummary.enabled) {
+          if (runSummary.attachments && runSummary.attachments.length > 0) {
+            runSummary.attachments.forEach((attachmentFileIdentifier) => {
+              fileIdentifiers.push(attachmentFileIdentifier);
+            });
+            exportLayout.set(
+              runSummary.attributes.name + "/",
+              runSummary.attachments
+            );
+          }
+        }
+        if (
+          runSummary.attributes &&
+          runSummary.attributes.items &&
+          runSummary.enabled
+        ) {
+          runSummary.attributes.items.forEach((item) => {
+            if (item.enabled) {
+              if (item.attachments && item.attachments.length > 0) {
+                item.attachments.forEach((itemFileIdentifier) => {
+                  fileIdentifiers.push(itemFileIdentifier);
+                });
+                exportLayout.set(
+                  runSummary.attributes.name +
+                    "/" +
+                    item.genericMolecularAnalysisItemSummary.name,
+                  item.attachments
+                );
+              }
+            }
+          });
+        }
+      });
+    }
+
+    const objectExportSaveArg = {
+      resource: {
+        type: "object-export",
+        fileIdentifiers,
+        exportLayout: Object.fromEntries(exportLayout),
+        name
+      },
+      type: "object-export"
+    };
+
+    try {
+      await save<ObjectExport>([objectExportSaveArg], {
+        apiBaseUrl: "/objectstore-api"
+      });
+      // await getExport(objectExportResponse, formik);
+    } catch (e) {
+      setDataExportError(
+        <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
+      );
+    }
 
     setExportLoading(false);
   }
@@ -441,6 +533,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     runSummaries,
     setRunSummaries,
     totalAttachments,
+    loadQualityControls,
+    setLoadQualityControls,
     networkLoading,
     exportLoading,
     dataExportError,

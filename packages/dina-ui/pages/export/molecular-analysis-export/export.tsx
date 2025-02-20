@@ -1,6 +1,5 @@
 import {
   BackButton,
-  CheckBoxField,
   checkboxProps,
   DinaForm,
   LoadingSpinner,
@@ -25,6 +24,8 @@ export default function ExportMolecularAnalysisPage() {
     runSummaries,
     setRunSummaries,
     totalAttachments,
+    loadQualityControls,
+    setLoadQualityControls,
     networkLoading,
     exportLoading,
     dataExportError,
@@ -138,8 +139,9 @@ export default function ExportMolecularAnalysisPage() {
                         </>
                       );
                     })}
-                    <p className="mt-4">
-                      Total attachments to be exported: {totalAttachments}
+                    <p className="mt-4 mb-0">
+                      <strong>Total attachments to be exported:</strong>{" "}
+                      {totalAttachments}
                     </p>
                   </>
                 )}
@@ -195,14 +197,21 @@ export default function ExportMolecularAnalysisPage() {
                   />
                 </div>
                 <div className="col-md-4">
-                  <CheckBoxField
+                  <div>
+                    <strong>
+                      <DinaMessage id="field_includeQualityControls" />
+                    </strong>
+                  </div>
+                  <input
+                    type="checkbox"
                     name="includeQualityControls"
-                    overridecheckboxProps={{
-                      style: {
-                        height: "30px",
-                        width: "30px"
-                      }
+                    style={{
+                      height: "30px",
+                      width: "30px",
+                      marginTop: "8px"
                     }}
+                    checked={loadQualityControls}
+                    onChange={() => setLoadQualityControls((prev) => !prev)}
                   />
                 </div>
               </div>
@@ -212,7 +221,7 @@ export default function ExportMolecularAnalysisPage() {
                 <SubmitButton
                   buttonProps={(formik) => ({
                     style: { width: "8rem" },
-                    disabled: exportLoading,
+                    disabled: exportLoading || totalAttachments === 0,
                     onClick: () => {
                       performExport(formik);
                     }
