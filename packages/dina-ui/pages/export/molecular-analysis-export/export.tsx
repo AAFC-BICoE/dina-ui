@@ -34,20 +34,11 @@ export default function ExportMolecularAnalysisPage() {
   const {
     runSummaries,
     setRunSummaries,
-    loading,
+    networkLoading,
+    exportLoading,
     dataExportError,
-    setDataExportError
+    performExport
   } = useMolecularAnalysisExportAPI();
-
-  async function exportData(_formik) {
-    // setLoading(true);
-
-    // Clear error message.
-    setDataExportError(undefined);
-
-    // Retrieve options from the formik form.
-    // const { name, includeQualityControls } = formik.values;
-  }
 
   const LoadingSpinner = (
     <>
@@ -101,7 +92,7 @@ export default function ExportMolecularAnalysisPage() {
           <Card>
             <Card.Body>
               <div className="row">
-                {loading ? (
+                {networkLoading ? (
                   LoadingSpinner
                 ) : (
                   <>
@@ -222,7 +213,7 @@ export default function ExportMolecularAnalysisPage() {
                   <TextField
                     name={"name"}
                     customName="exportName"
-                    disabled={loading}
+                    disabled={exportLoading}
                   />
                 </div>
                 <div className="col-md-4">
@@ -254,13 +245,13 @@ export default function ExportMolecularAnalysisPage() {
                 <SubmitButton
                   buttonProps={(formik) => ({
                     style: { width: "8rem" },
-                    disabled: loading,
+                    disabled: exportLoading,
                     onClick: () => {
-                      exportData(formik);
+                      performExport(formik);
                     }
                   })}
                 >
-                  {loading ? (
+                  {exportLoading ? (
                     LoadingSpinner
                   ) : (
                     <DinaMessage id="exportButtonText" />

@@ -12,10 +12,12 @@ export interface UseMolecularAnalysisExportAPIReturn {
   runSummaries: any[];
   setRunSummaries: Dispatch<SetStateAction<any[]>>;
 
-  loading: boolean;
+  networkLoading: boolean;
+  exportLoading: boolean;
 
   dataExportError: JSX.Element | undefined;
-  setDataExportError: Dispatch<SetStateAction<JSX.Element | undefined>>;
+
+  performExport: (formik: any) => void;
 }
 
 export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExportAPIReturn {
@@ -29,7 +31,10 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
 
   // Loading specifically for the run item selection loading.
-  const [loading, setLoading] = useState(false);
+  const [networkLoading, setNetworkLoading] = useState(false);
+
+  // Loading specifically for waiting for the export to be complete.
+  const [exportLoading, setExportLoading] = useState(false);
 
   // Have the queries responsible for determining the number of attachments for each run item been ran.
   const [attachmentsLoaded, setAttachmentsLoaded] = useState(false);
@@ -47,7 +52,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     if (!queryObject) {
       router.push("/export/data-export/list");
     } else {
-      retrieveRunItems();
+      setNetworkLoading(true);
+      retrieveRunSummaries();
     }
   }, []);
 
@@ -55,17 +61,24 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
    * Retrieve the attachments for the run summaries if loaded in.
    */
   useEffect(() => {
+    async function waitForLoading() {
+      await retrieveRunAttachments();
+      await retrieveRunItemAttachments();
+
+      setNetworkLoading(false);
+    }
+
     if (runSummaries.length > 0 && !attachmentsLoaded) {
       setAttachmentsLoaded(true);
-
-      retrieveRunAttachments();
-      retrieveRunItemAttachments();
+      waitForLoading();
     }
   }, [runSummaries]);
 
-  async function retrieveRunItems() {
-    setLoading(true);
-
+  /**
+   * Using elasticsearch on the query being performed, retrieve all of the run summaries to be
+   * exported.
+   */
+  async function retrieveRunSummaries() {
     // Retrieve the run items based on the query object.
     let queryDSL = queryObject;
     queryDSL = applySourceFilteringString(queryDSL, [
@@ -95,6 +108,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                 (r) => r.id === included.id
               );
               if (existingRunSummary) {
+                // It exists already, so bundle the run items to the existing run.
                 const existingRunSummaryIndex =
                   uniqueRunSummaries.indexOf(existingRunSummary);
                 uniqueRunSummaries[existingRunSummaryIndex].attributes.items = [
@@ -132,10 +146,6 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       .catch((elasticSearchError) => {
         // Todo - add error handling.
         console.error(elasticSearchError);
-      })
-      .finally(() => {
-        // No matter the end result, loading should stop.
-        setLoading(false);
       });
   }
 
@@ -270,12 +280,11 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
           return currentRunSummaries.map((currentRunSummary) => {
             if (currentRunSummary.id === runSummary.id) {
               // Map over items to update the attachments for each item
-              const updatedItems = currentRunSummary.attributes.items
-                .filter((item) => item.result !== null)
-                .map((item) => {
+              const updatedItems = currentRunSummary.attributes.items.map(
+                (item) => {
                   // Find the corresponding molecularAnalysisResult for this item
                   const molecularAnalysisResult = molecularAnalysisResults.find(
-                    (result) => result?.id === item.result.uuid
+                    (result) => result?.id === item?.result?.uuid
                   );
 
                   const currentItemFileIdentifiers: string[] = [];
@@ -316,7 +325,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                     ...item,
                     attachments: currentItemFileIdentifiers
                   };
-                });
+                }
+              );
 
               return {
                 ...currentRunSummary,
@@ -377,11 +387,24 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     return resp?.data?.hits;
   }
 
+  async function performExport(_formik) {
+    setExportLoading(true);
+
+    // Clear error message.
+    setDataExportError(undefined);
+
+    // Retrieve options from the formik form.
+    // const { name, includeQualityControls } = formik.values;
+
+    setExportLoading(false);
+  }
+
   return {
     runSummaries,
     setRunSummaries,
-    loading,
+    networkLoading,
+    exportLoading,
     dataExportError,
-    setDataExportError
+    performExport
   };
 }
