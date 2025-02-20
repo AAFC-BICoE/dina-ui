@@ -129,6 +129,7 @@ export default function ExportMolecularAnalysisPage() {
                               {/* Total Attachments */}
                               <span className="badge bg-secondary ms-2">
                                 {runSummary?.attachments?.length}
+                                {" attachments"}
                               </span>
                             </h5>
                           </div>
