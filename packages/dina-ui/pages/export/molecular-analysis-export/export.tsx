@@ -1,43 +1,28 @@
-import useLocalStorage from "@rehooks/local-storage";
 import {
   BackButton,
   CheckBoxField,
   checkboxProps,
   CommonMessage,
-  DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   DinaForm,
   SubmitButton,
-  TextField,
-  useApiClient
+  TextField
 } from "common-ui";
 import { useSessionStorage } from "usehooks-ts";
-import { useEffect, useState } from "react";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Card, Spinner } from "react-bootstrap";
-import { applySourceFilteringString } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
-import { PersistedResource } from "kitsu";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
-import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import useMolecularAnalysisExportAPI from "../../../components/export/useMolecularAnalysisExportAPI";
 
 export default function ExportMolecularAnalysisPage() {
   const { formatNumber } = useIntl();
-  const { apiClient, bulkGet } = useApiClient();
   const router = useRouter();
 
   // Determines where the back button should link to.
   const entityLink = String(router.query.entityLink);
-
-  // ElasticSearch index name to be used for the export.
-  const indexName = "dina_material_sample_index";
-
-  // ElasticSearch query to be used to perform the export against.
-  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
 
   // The total number of results that will be exported.
   const [totalRecords] = useSessionStorage<number>(
@@ -45,269 +30,23 @@ export default function ExportMolecularAnalysisPage() {
     0
   );
 
-  // Run summaries loaded in from the elastic search query.
-  const [runSummaries, setRunSummaries] = useState<any[]>([]);
-
-  const [dataExportError, setDataExportError] = useState<JSX.Element>();
-  const [loading, setLoading] = useState(false);
-  const [attachmentsLoaded, setAttachmentsLoaded] = useState(false);
-
-  /**
-   * Initial loading of the page. Used to retrieve the run items based on the query object.
-   */
-  useEffect(() => {
-    if (!queryObject) {
-      router.push("/export/data-export/list");
-    } else {
-      retrieveRunItems();
-    }
-  }, []);
-
-  /**
-   * Retrieve the attachments for the run summaries if loaded in.
-   */
-  useEffect(() => {
-    if (runSummaries.length > 0 && !attachmentsLoaded) {
-      setAttachmentsLoaded(true);
-
-      retrieveRunAttachments();
-      retrieveRunItemAttachments();
-    }
-  }, [runSummaries]);
-
-  async function retrieveRunItems() {
-    setLoading(true);
-
-    // Retrieve the run items based on the query object.
-    let queryDSL = queryObject;
-    queryDSL = applySourceFilteringString(queryDSL, [
-      "included.id",
-      "included.type",
-      "included.attributes"
-    ]);
-
-    elasticSearchRequest(queryDSL)
-      .then((result) => {
-        const results = result?.hits.map((rslt) => {
-          return {
-            // Only include run-summary type includes.
-            included: rslt._source?.included?.filter(
-              (item) => item.type === "run-summary"
-            )
-          };
-        });
-
-        // Retrieve all of the run-summary includes
-        const uniqueRunSummaries: any[] = [];
-        results.forEach((result) => {
-          if (result.included) {
-            result.included.forEach((included) => {
-              // Check if it's been already added by the id, only display unique run summaries.
-              const existingRunSummary = uniqueRunSummaries.find(
-                (r) => r.id === included.id
-              );
-              if (existingRunSummary) {
-                const existingRunSummaryIndex =
-                  uniqueRunSummaries.indexOf(existingRunSummary);
-                uniqueRunSummaries[existingRunSummaryIndex].attributes.items = [
-                  ...uniqueRunSummaries[existingRunSummaryIndex].attributes
-                    .items,
-                  ...included.attributes.items.map((item) => ({
-                    ...item,
-                    enabled: true,
-                    attachments: []
-                  }))
-                ];
-              } else {
-                const newIncluded = {
-                  ...included,
-                  enabled: true,
-                  attachments: [],
-                  attributes: {
-                    ...included.attributes,
-                    items: included.attributes.items.map((item) => ({
-                      ...item,
-                      enabled: true,
-                      attachments: []
-                    }))
-                  }
-                };
-
-                uniqueRunSummaries.push(newIncluded);
-              }
-            });
-          }
-        });
-
-        setRunSummaries(uniqueRunSummaries);
-      })
-      .catch((elasticSearchError) => {
-        // Todo - add error handling.
-        console.error(elasticSearchError);
-      })
-      .finally(() => {
-        // No matter the end result, loading should stop.
-        setLoading(false);
-      });
-  }
-
-  /**
-   * Retrieve the attachments for the run.
-   */
-  async function retrieveRunAttachments() {
-    // First, retrieve the top level attachments for the runs.
-    const attachmentPaths = runSummaries.map((runSummary) => {
-      return "molecular-analysis-run/" + runSummary.id + "?include=attachments";
-    });
-
-    // Retrieve the attachments for the runs.
-    const molecularAnalysisRuns: PersistedResource<MolecularAnalysisRun>[] =
-      await bulkGet(attachmentPaths, {
-        apiBaseUrl: "/seqdb-api"
-      });
-
-    // Now that we have the metadatas, we need to do a request to retrieve all the metadatas.
-    const metadataIds = molecularAnalysisRuns
-      .flatMap((run) => run?.attachments?.map((attachment) => attachment.id))
-      .filter((id) => id !== undefined);
-
-    if (metadataIds.length > 0) {
-      const metadatas = await retrieveMetadata(metadataIds);
-
-      // Create a map of metadataId to metadata for efficient lookup
-      const metadataMap = new Map(
-        metadatas.map((metadata) => [metadata.id, metadata])
-      );
-
-      // For each file identifier from the metadata, we need to link it to the run summary.
-      runSummaries.forEach((_runSummary, index) => {
-        const run = molecularAnalysisRuns[index];
-        const currentRunFileIdentifiers: string[] = [];
-
-        if (run?.attachments) {
-          run.attachments.forEach((attachment) => {
-            const metadata = metadataMap.get(attachment.id); // Retrieve metadata from the map
-
-            if (metadata) {
-              if (metadata.dcType === "IMAGE") {
-                let fileIdentifier;
-                // If image has derivative, return large image derivative fileIdentifier if present
-                if (metadata.derivatives) {
-                  const largeImageDerivative = metadata.derivatives.find(
-                    (derivative) => derivative.derivativeType === "LARGE_IMAGE"
-                  );
-                  fileIdentifier = largeImageDerivative?.fileIdentifier;
-                }
-
-                // Otherwise, return original fileIdentifier
-                if (!fileIdentifier) {
-                  fileIdentifier = metadata.fileIdentifier;
-                }
-
-                // Add it to the list of current run file identifiers.
-                if (fileIdentifier) {
-                  currentRunFileIdentifiers.push(fileIdentifier);
-                }
-              }
-            }
-          });
-
-          // Update the run summaries state with the file identifiers.
-          setRunSummaries(
-            runSummaries.map((runSummary, runIndex) => {
-              if (runIndex === index) {
-                return {
-                  ...runSummary,
-                  attachments: currentRunFileIdentifiers
-                };
-              }
-              return runSummary;
-            })
-          );
-        }
-      });
-    }
-  }
-
-  async function retrieveRunItemAttachments() {
-    // Loop through each run summary.
-    await Promise.all(
-      runSummaries.map(async (runSummary) => {
-        // Generate a list of molecular analysis result ids to retrieve the attachments for.
-        const attachmentPaths = runSummary.attributes.items
-          .filter((item) => item.result !== null)
-          .map(
-            (item) =>
-              "molecular-analysis-result/" +
-              item.result.uuid +
-              "?include=attachments"
-          );
-
-        // Retrieve the attachments for the run items.
-        const molecularAnalysisResults: PersistedResource<MolecularAnalysisResult>[] =
-          await bulkGet(attachmentPaths, {
-            apiBaseUrl: "/seqdb-api"
-          });
-
-        // Retrieve the metadata ids for the run items.
-        const _metadataIds = molecularAnalysisResults
-          .flatMap((run) =>
-            run?.attachments?.map((attachment) => attachment.id)
-          )
-          .filter((id) => id !== undefined);
-
-        // Loop through each item in the run summary that has a result.
-        runSummary.attributes.items
-          .filter((item) => item.result !== null)
-          .forEach((_item) => {
-            // todo
-          });
-      })
-    );
-  }
-
-  async function retrieveMetadata(
-    ids: string[]
-  ): Promise<PersistedResource<Metadata>[]> {
-    const metadataPaths = ids.map((id) => `metadata/${id}?include=derivatives`);
-    const metadataResponses: PersistedResource<Metadata>[] = await bulkGet(
-      metadataPaths,
-      {
-        apiBaseUrl: "/objectstore-api"
-      }
-    );
-    return metadataResponses;
-  }
+  // Hook responsible for performing all the network calls required for retriving the run and run items.
+  const {
+    runSummaries,
+    setRunSummaries,
+    loading,
+    dataExportError,
+    setDataExportError
+  } = useMolecularAnalysisExportAPI();
 
   async function exportData(_formik) {
-    setLoading(true);
+    // setLoading(true);
 
     // Clear error message.
     setDataExportError(undefined);
 
     // Retrieve options from the formik form.
     // const { name, includeQualityControls } = formik.values;
-  }
-
-  /**
-   * Asynchronous POST request for elastic search. Used to retrieve elastic search results against
-   * the indexName in the prop.
-   *
-   * @param queryDSL query containing filters and pagination.
-   * @returns Elastic search response.
-   */
-  async function elasticSearchRequest(queryDSL) {
-    const query = { ...queryDSL };
-    const resp = await apiClient.axios.post(
-      `search-api/search-ws/search`,
-      query,
-      {
-        params: {
-          indexName
-        }
-      }
-    );
-    return resp?.data?.hits;
   }
 
   const LoadingSpinner = (
@@ -423,6 +162,7 @@ export default function ExportMolecularAnalysisPage() {
                                   {/* Total Attachments */}
                                   <span className="badge bg-secondary ms-2">
                                     {item?.attachments?.length}
+                                    {" attachments"}
                                   </span>
                                 </span>
                               </div>
