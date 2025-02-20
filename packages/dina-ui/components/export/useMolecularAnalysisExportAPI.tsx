@@ -175,7 +175,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     // Now that we have the metadatas, we need to do a request to retrieve all the metadatas.
     const metadataIds: string[] = molecularAnalysisRuns
       .flatMap((run) => run?.attachments?.map((attachment) => attachment.id))
-      .filter((id) => id !== undefined);
+      .filter((id): id is string => id !== undefined);
 
     if (metadataIds.length > 0) {
       const metadatas = await retrieveMetadata(metadataIds);
@@ -267,7 +267,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
           .flatMap((run) =>
             run?.attachments?.map((attachment) => attachment.id)
           )
-          .filter((id) => id !== undefined);
+          .filter((id): id is string => id !== undefined);
 
         // Using the metadata ids, retrieve the metadatas in a bulk get request.
         const metadatas = await retrieveMetadata(metadataIds);
