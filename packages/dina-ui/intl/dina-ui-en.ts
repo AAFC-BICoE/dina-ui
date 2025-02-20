@@ -1202,5 +1202,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   resourceNotFoundWarning: "Resource Not Found",
   pasteRunItemName: "Paste Run Item Names",
   pasteQualityControlName: "Paste Quality Control Names",
-  pasteMaterialSample: "Paste Material Samples"
+  pasteMaterialSample: "Paste Material Samples",
+  adminRoles: "Admin Roles"
 };

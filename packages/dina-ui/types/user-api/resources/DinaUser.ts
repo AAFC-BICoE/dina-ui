@@ -10,6 +10,7 @@ export interface DinaUserAttributes {
   firstName?: string;
   lastName?: string;
   rolesPerGroup: Record<string, string[] | undefined>;
+  adminRoles: string[];
 }
 
 export type DinaUser = KitsuResource & DinaUserAttributes;
