@@ -173,17 +173,12 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       });
 
     // Now that we have the metadatas, we need to do a request to retrieve all the metadatas.
-    const metadataIds = molecularAnalysisRuns
+    const metadataIds: string[] = molecularAnalysisRuns
       .flatMap((run) => run?.attachments?.map((attachment) => attachment.id))
       .filter((id) => id !== undefined);
 
     if (metadataIds.length > 0) {
       const metadatas = await retrieveMetadata(metadataIds);
-
-      // Create a map of metadataId to metadata for efficient lookup
-      const metadataMap = new Map(
-        metadatas.map((metadata) => [metadata.id, metadata])
-      );
 
       // For each file identifier from the metadata, we need to link it to the run summary.
       runSummaries.forEach((_runSummary, index) => {
@@ -192,7 +187,9 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
 
         if (run?.attachments) {
           run.attachments.forEach((attachment) => {
-            const metadata = metadataMap.get(attachment.id); // Retrieve metadata from the map
+            const metadata = metadatas.find(
+              (meta) => meta.id === attachment.id
+            );
 
             if (metadata) {
               if (metadata.dcType === "IMAGE") {
@@ -266,7 +263,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
           });
 
         // Retrieve the metadata ids for all run items in this summary.
-        const metadataIds = molecularAnalysisResults
+        const metadataIds: string[] = molecularAnalysisResults
           .flatMap((run) =>
             run?.attachments?.map((attachment) => attachment.id)
           )
