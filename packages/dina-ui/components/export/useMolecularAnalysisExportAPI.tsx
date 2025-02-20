@@ -4,13 +4,15 @@ import { PersistedResource } from "kitsu";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 import { DATA_EXPORT_QUERY_KEY, useApiClient } from "common-ui";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import useLocalStorage from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 
 export interface UseMolecularAnalysisExportAPIReturn {
   runSummaries: any[];
   setRunSummaries: Dispatch<SetStateAction<any[]>>;
+
+  totalAttachments: number;
 
   networkLoading: boolean;
   exportLoading: boolean;
@@ -53,6 +55,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       router.push("/export/data-export/list");
     } else {
       setNetworkLoading(true);
+      setAttachmentsLoaded(false);
       retrieveRunSummaries();
     }
   }, []);
@@ -71,7 +74,45 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     if (runSummaries.length > 0 && !attachmentsLoaded) {
       setAttachmentsLoaded(true);
       waitForLoading();
+    } else {
+      setNetworkLoading(false);
     }
+  }, [runSummaries]);
+
+  const totalAttachments = useMemo(() => {
+    let count = 0;
+
+    // Count attachments for runs
+    if (runSummaries && runSummaries.length > 0) {
+      runSummaries.forEach((runSummary) => {
+        if (runSummary.enabled) {
+          if (runSummary.attachments && runSummary.attachments.length > 0) {
+            count += runSummary.attachments.length;
+          }
+        }
+      });
+    }
+
+    // Count attachments for run items
+    if (runSummaries && runSummaries.length > 0) {
+      runSummaries.forEach((runSummary) => {
+        if (
+          runSummary.attributes &&
+          runSummary.attributes.items &&
+          runSummary.enabled
+        ) {
+          runSummary.attributes.items.forEach((item) => {
+            if (item.enabled) {
+              if (item.attachments && item.attachments.length > 0) {
+                count += item.attachments.length;
+              }
+            }
+          });
+        }
+      });
+    }
+
+    return count;
   }, [runSummaries]);
 
   /**
@@ -399,6 +440,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   return {
     runSummaries,
     setRunSummaries,
+    totalAttachments,
     networkLoading,
     exportLoading,
     dataExportError,

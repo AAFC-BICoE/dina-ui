@@ -2,58 +2,34 @@ import {
   BackButton,
   CheckBoxField,
   checkboxProps,
-  CommonMessage,
-  DATA_EXPORT_TOTAL_RECORDS_KEY,
   DinaForm,
+  LoadingSpinner,
   SubmitButton,
   TextField
 } from "common-ui";
-import { useSessionStorage } from "usehooks-ts";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { useIntl } from "react-intl";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Card, Spinner } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import useMolecularAnalysisExportAPI from "../../../components/export/useMolecularAnalysisExportAPI";
 
 export default function ExportMolecularAnalysisPage() {
-  const { formatNumber } = useIntl();
   const router = useRouter();
 
   // Determines where the back button should link to.
   const entityLink = String(router.query.entityLink);
 
-  // The total number of results that will be exported.
-  const [totalRecords] = useSessionStorage<number>(
-    DATA_EXPORT_TOTAL_RECORDS_KEY,
-    0
-  );
-
   // Hook responsible for performing all the network calls required for retriving the run and run items.
   const {
     runSummaries,
     setRunSummaries,
+    totalAttachments,
     networkLoading,
     exportLoading,
     dataExportError,
     performExport
   } = useMolecularAnalysisExportAPI();
-
-  const LoadingSpinner = (
-    <>
-      <Spinner
-        as="span"
-        animation="border"
-        size="sm"
-        role="status"
-        aria-hidden="true"
-      />
-      <span className="visually-hidden">
-        <DinaMessage id="loadingSpinner" />
-      </span>
-    </>
-  );
 
   return (
     <PageLayout
@@ -80,11 +56,6 @@ export default function ExportMolecularAnalysisPage() {
       <DinaForm initialValues={{}}>
         {dataExportError}
 
-        <CommonMessage
-          id="tableTotalCount"
-          values={{ totalCount: formatNumber(totalRecords ?? 0) }}
-        />
-
         <div className="col-md-12">
           <h4 className="mt-3">
             <DinaMessage id="runItemSelection" />
@@ -93,7 +64,7 @@ export default function ExportMolecularAnalysisPage() {
             <Card.Body>
               <div className="row">
                 {networkLoading ? (
-                  LoadingSpinner
+                  <LoadingSpinner loading={true} additionalClassNames="ms-3" />
                 ) : (
                   <>
                     {runSummaries.map((runSummary, index) => {
@@ -118,10 +89,12 @@ export default function ExportMolecularAnalysisPage() {
                               {runSummary?.attributes?.name}
 
                               {/* Total Attachments */}
-                              <span className="badge bg-secondary ms-2">
-                                {runSummary?.attachments?.length}
-                                {" attachments"}
-                              </span>
+                              {runSummary?.attachments?.length !== 0 && (
+                                <span className="badge bg-secondary ms-2">
+                                  {runSummary?.attachments?.length}
+                                  {" attachments"}
+                                </span>
+                              )}
                             </h5>
                           </div>
                           {runSummary?.attributes?.items?.map(
@@ -152,10 +125,12 @@ export default function ExportMolecularAnalysisPage() {
                                   }
 
                                   {/* Total Attachments */}
-                                  <span className="badge bg-secondary ms-2">
-                                    {item?.attachments?.length}
-                                    {" attachments"}
-                                  </span>
+                                  {item?.attachments?.length !== 0 && (
+                                    <span className="badge bg-secondary ms-2">
+                                      {item?.attachments?.length}
+                                      {" attachments"}
+                                    </span>
+                                  )}
                                 </span>
                               </div>
                             )
@@ -163,6 +138,9 @@ export default function ExportMolecularAnalysisPage() {
                         </>
                       );
                     })}
+                    <p className="mt-4">
+                      Total attachments to be exported: {totalAttachments}
+                    </p>
                   </>
                 )}
               </div>
@@ -219,17 +197,6 @@ export default function ExportMolecularAnalysisPage() {
                 <div className="col-md-4">
                   <CheckBoxField
                     name="includeQualityControls"
-                    overridecheckboxProps={{
-                      style: {
-                        height: "30px",
-                        width: "30px"
-                      }
-                    }}
-                  />
-                </div>
-                <div className="col-md-4">
-                  <CheckBoxField
-                    name="createFoldersForBlankRunItems"
                     overridecheckboxProps={{
                       style: {
                         height: "30px",
