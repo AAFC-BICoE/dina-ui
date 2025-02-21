@@ -171,13 +171,11 @@ export default function ExportPage<TData extends KitsuResource>() {
         type: "data-export",
         source: indexName,
         query: queryString,
-        columns: columnsToExport
-          .map((item) =>
-            item.columnSelectorString?.startsWith("columnFunction/")
-              ? item.columnSelectorString?.split("/")[1] // Get functionId
-              : item.id
-          )
-          .filter((item) => item !== undefined),
+        columns: columnsToExport.map((item) =>
+          item.columnSelectorString?.startsWith("columnFunction/")
+            ? item.columnSelectorString?.split("/")[1] // Get functionId
+            : item.id ?? ""
+        ),
         columnAliases: columnsToExport.map((item) => item?.exportHeader ?? ""),
         columnFunctions:
           Object.keys(columnFunctions ?? {}).length === 0
