@@ -12,6 +12,7 @@ import {
   DinaForm,
   downloadDataExport,
   OBJECT_EXPORT_IDS_KEY,
+  SaveArgs,
   SubmitButton,
   TextField,
   Tooltip,
@@ -21,7 +22,11 @@ import { DynamicFieldsMappingConfig } from "packages/common-ui/lib/list-page/typ
 import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMapping";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
+import {
+  ColumnSeparator,
+  DataExport,
+  ExportType
+} from "packages/dina-ui/types/dina-export-api";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
 import { useState } from "react";
@@ -46,6 +51,17 @@ export interface SavedExportOption {
   value: string;
   resource: SavedExportColumnStructure;
 }
+
+const SEPARATOR_OPTIONS: { value: ColumnSeparator; label: string }[] = [
+  {
+    value: "COMMA",
+    label: "Comma"
+  },
+  {
+    value: "TAB",
+    label: "Tab"
+  }
+];
 
 export default function ExportPage<TData extends KitsuResource>() {
   const { formatNumber } = useIntl();
@@ -86,6 +102,13 @@ export default function ExportPage<TData extends KitsuResource>() {
 
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
   const [loading, setLoading] = useState(false);
+  const [selectedSeparator, setSelectedSeparator] = useState<{
+    value: ColumnSeparator;
+    label: string;
+  }>({
+    value: "COMMA",
+    label: "Comma"
+  });
 
   const { indexMap } = useIndexMapping({
     indexName,
@@ -143,22 +166,25 @@ export default function ExportPage<TData extends KitsuResource>() {
       }, {});
 
     // Make query to data-export
-    const dataExportSaveArg = {
+    const dataExportSaveArg: SaveArgs<DataExport> = {
       resource: {
         type: "data-export",
         source: indexName,
         query: queryString,
-        columns: columnsToExport.map((item) =>
-          item.columnSelectorString?.startsWith("columnFunction/")
-            ? item.columnSelectorString?.split("/")[1] // Get functionId
-            : item.id
-        ),
+        columns: columnsToExport
+          .map((item) =>
+            item.columnSelectorString?.startsWith("columnFunction/")
+              ? item.columnSelectorString?.split("/")[1] // Get functionId
+              : item.id
+          )
+          .filter((item) => item !== undefined),
         columnAliases: columnsToExport.map((item) => item?.exportHeader ?? ""),
         columnFunctions:
           Object.keys(columnFunctions ?? {}).length === 0
             ? undefined
             : columnFunctions,
-        name: formik?.values?.name
+        name: formik?.values?.name,
+        exportOptions: { columnSeparator: selectedSeparator?.value }
       },
       type: "data-export"
     };
@@ -403,6 +429,24 @@ export default function ExportPage<TData extends KitsuResource>() {
                         </ButtonGroup>
                       </>
                     )}
+                  </div>
+                  <div className="col-md-4">
+                    <strong>
+                      <DinaMessage id="separator" />
+                    </strong>
+                    <Select<{ value: ColumnSeparator; label: string }>
+                      className="mt-2 mb-3"
+                      name="separator"
+                      options={SEPARATOR_OPTIONS}
+                      onChange={(selection) => {
+                        if (selection) {
+                          setSelectedSeparator(selection);
+                        }
+                      }}
+                      isLoading={loadingSavedExports}
+                      isDisabled={loading}
+                      defaultValue={selectedSeparator}
+                    />
                   </div>
 
                   {exportType === "TABULAR_DATA" && (
