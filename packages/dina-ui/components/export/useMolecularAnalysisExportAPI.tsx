@@ -1,4 +1,7 @@
-import { applySourceFilteringString } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import {
+  applyPagination,
+  applySourceFilteringString
+} from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { PersistedResource } from "kitsu";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
@@ -7,6 +10,7 @@ import { DATA_EXPORT_QUERY_KEY, useApiClient } from "common-ui";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import useLocalStorage from "@rehooks/local-storage";
 import { useRouter } from "next/router";
+import { Alert } from "react-bootstrap";
 
 export interface UseMolecularAnalysisExportAPIReturn {
   runSummaries: any[];
@@ -151,6 +155,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       "included.type",
       "included.attributes"
     ]);
+    queryDSL = applyPagination(queryDSL, 100, 0);
 
     elasticSearchRequest(queryDSL)
       .then((result) => {
@@ -209,8 +214,12 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
         setRunSummaries(uniqueRunSummaries);
       })
       .catch((elasticSearchError) => {
-        // Todo - add error handling.
         console.error(elasticSearchError);
+        setDataExportError(
+          <Alert variant="danger" className="mb-2">
+            {elasticSearchError}
+          </Alert>
+        );
       });
   }
 
@@ -228,7 +237,11 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   async function retrieveRunAttachments() {
     // First, retrieve the top level attachments for the runs.
     const attachmentPaths = runSummaries.map((runSummary) => {
-      return "molecular-analysis-run/" + runSummary.id + "?include=attachments";
+      return (
+        "molecular-analysis-run/" +
+        runSummary.id +
+        "?include=attachments&page[limit]=1000"
+      );
     });
 
     // Retrieve the attachments for the runs.
@@ -318,7 +331,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
             (item) =>
               "molecular-analysis-result/" +
               item.result.uuid +
-              "?include=attachments"
+              "?include=attachments&page[limit]=1000"
           );
 
         // Retrieve the attachments for the run items.
@@ -422,7 +435,9 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       return [];
     }
 
-    const metadataPaths = ids.map((id) => `metadata/${id}?include=derivatives`);
+    const metadataPaths = ids.map(
+      (id) => `metadata/${id}?include=derivatives&page[limit]=1000`
+    );
     const metadataResponses: PersistedResource<Metadata>[] = await bulkGet(
       metadataPaths,
       {
@@ -503,6 +518,21 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
           });
         }
       });
+    } else {
+      setExportLoading(false);
+      return;
+    }
+
+    // Check if any duplicates were found in the file identifiers list.
+    if (fileIdentifiers.length !== new Set(fileIdentifiers).size) {
+      setDataExportError(
+        <Alert variant="danger" className="mb-2">
+          Duplicate files detected in the export. Please ensure that each file
+          is unique and try again.
+        </Alert>
+      );
+      setExportLoading(false);
+      return;
     }
 
     const objectExportSaveArg = {
@@ -522,7 +552,9 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       // await getExport(objectExportResponse, formik);
     } catch (e) {
       setDataExportError(
-        <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
+        <Alert variant="danger" className="mb-2">
+          {e?.message ?? e.toString()}
+        </Alert>
       );
     }
 
