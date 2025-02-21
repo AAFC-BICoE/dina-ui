@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Card } from "react-bootstrap";
 import useMolecularAnalysisExportAPI from "../../../components/export/useMolecularAnalysisExportAPI";
+import { MAX_OBJECT_EXPORT_TOTAL } from "../../../components/export/exportUtils";
 
 export default function ExportMolecularAnalysisPage() {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function ExportMolecularAnalysisPage() {
     exportLoading ||
     networkLoading ||
     totalAttachments === 0 ||
-    totalAttachments > 100;
+    totalAttachments > MAX_OBJECT_EXPORT_TOTAL;
 
   return (
     <PageLayout
@@ -258,6 +259,7 @@ export default function ExportMolecularAnalysisPage() {
             </Card.Footer>
           </Card>
         </div>
+        <div className="mt-3">{dataExportError}</div>
       </DinaForm>
     </PageLayout>
   );

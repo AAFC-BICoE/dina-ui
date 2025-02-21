@@ -6,12 +6,22 @@ import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources
 import { PersistedResource } from "kitsu";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
-import { DATA_EXPORT_QUERY_KEY, useApiClient } from "common-ui";
+import {
+  DATA_EXPORT_QUERY_KEY,
+  DATA_EXPORT_TOTAL_RECORDS_KEY,
+  useApiClient
+} from "common-ui";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import useLocalStorage from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { Alert } from "react-bootstrap";
-import { getExport } from "./exportUtils";
+import {
+  getExport,
+  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
+  MAX_OBJECT_EXPORT_TOTAL
+} from "./exportUtils";
+import { useSessionStorage } from "usehooks-ts";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export interface UseMolecularAnalysisExportAPIReturn {
   runSummaries: any[];
@@ -34,6 +44,12 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   const { apiClient, bulkGet, save } = useApiClient();
   const router = useRouter();
 
+  // The total number of results that will be exported.
+  const [totalRecords] = useSessionStorage<number>(
+    DATA_EXPORT_TOTAL_RECORDS_KEY,
+    0
+  );
+
   // Run summaries loaded in from the elastic search query.
   const [runSummaries, setRunSummaries] = useState<any[]>([]);
 
@@ -45,7 +61,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
 
   // Loading specifically for the run item selection loading.
-  const [networkLoading, setNetworkLoading] = useState(false);
+  const [networkLoading, setNetworkLoading] = useState(true);
 
   // Loading specifically for waiting for the export to be complete.
   const [exportLoading, setExportLoading] = useState(false);
@@ -66,7 +82,22 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
    * Initial loading of the page. Used to retrieve the run items based on the query object.
    */
   useEffect(() => {
-    if (!queryObject) {
+    if (totalRecords > MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT) {
+      setNetworkLoading(true);
+      setDataExportError(
+        <Alert variant="danger" className="mb-2">
+          <DinaMessage
+            id="molecularAnalysisExportMaxMaterialSampleError"
+            values={{
+              limit: MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT
+            }}
+          />
+        </Alert>
+      );
+      return;
+    }
+
+    if (!queryObject || totalRecords === 0) {
       router.push("/export/data-export/list");
     } else {
       setNetworkLoading(true);
@@ -139,6 +170,17 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       });
     }
 
+    if (count > MAX_OBJECT_EXPORT_TOTAL) {
+      setDataExportError(
+        <Alert variant="danger" className="mb-2">
+          <DinaMessage
+            id="molecularAnalysisExportMaxObjectError"
+            values={{ limit: MAX_OBJECT_EXPORT_TOTAL }}
+          />
+        </Alert>
+      );
+    }
+
     return count;
   }, [runSummaries]);
 
@@ -154,7 +196,11 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       "included.type",
       "included.attributes"
     ]);
-    queryDSL = applyPagination(queryDSL, 100, 0);
+    queryDSL = applyPagination(
+      queryDSL,
+      MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
+      0
+    );
 
     elasticSearchRequest(queryDSL)
       .then((result) => {

@@ -36,7 +36,11 @@ import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
 import useSavedExports from "./useSavedExports";
-import { getExport } from "packages/dina-ui/components/export/exportUtils";
+import {
+  getExport,
+  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
+  MAX_OBJECT_EXPORT_TOTAL
+} from "packages/dina-ui/components/export/exportUtils";
 
 export interface SavedExportOption {
   label: string;
@@ -258,7 +262,8 @@ export default function ExportPage<TData extends KitsuResource>() {
   );
 
   const disableObjectExportButton =
-    localStorageExportObjectIds.length < 1 || totalRecords > 100;
+    localStorageExportObjectIds.length < 1 ||
+    totalRecords > MAX_OBJECT_EXPORT_TOTAL;
 
   return (
     <>
@@ -275,13 +280,35 @@ export default function ExportPage<TData extends KitsuResource>() {
               />
             </div>
             <div className="col-md-6 col-sm-12 d-flex">
-              <Link
-                href={`/export/molecular-analysis-export/export?entityLink=${entityLink}`}
-              >
-                <a className="btn btn-primary ms-auto">
-                  <DinaMessage id="molecularAnalysisExport" />
-                </a>
-              </Link>
+              {totalRecords >
+              MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT ? (
+                <Tooltip
+                  directComponent={
+                    <DinaMessage
+                      id="molecularAnalysisExportMaxMaterialSampleError"
+                      values={{
+                        limit:
+                          MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT
+                      }}
+                    />
+                  }
+                  placement={"bottom"}
+                  className="ms-auto"
+                  visibleElement={
+                    <div className="btn btn-primary disabled">
+                      <DinaMessage id="molecularAnalysisExport" />
+                    </div>
+                  }
+                />
+              ) : (
+                <Link
+                  href={`/export/molecular-analysis-export/export?entityLink=${entityLink}`}
+                >
+                  <a className="btn btn-primary ms-auto">
+                    <DinaMessage id="molecularAnalysisExport" />
+                  </a>
+                </Link>
+              )}
               <Link href={`/export/data-export/list?entityLink=${entityLink}`}>
                 <a className="btn btn-primary ms-2">
                   <DinaMessage id="viewExportHistoryButton" />

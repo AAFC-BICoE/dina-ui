@@ -4,7 +4,28 @@ import { downloadDataExport } from "common-ui";
 import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
+/**
+ * Total number of objects allowed to be exported in the UI.
+ *
+ * This is applied to both the object-store export and the molecular analysis export.
+ */
+export const MAX_OBJECT_EXPORT_TOTAL = 100;
+
+/**
+ * The purpose of this limit is to prevent too many requests being performed on the molecular
+ * analysis export.
+ */
+export const MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT = 200;
+
+/**
+ * How many retrys will be performed before failing the get export.
+ */
 const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
+
+/**
+ * Base delay to be applied before trying again. Extra time is added on-top of this base for each
+ * retry.
+ */
 const BASE_DELAY_EXPORT_FETCH_MS = 2000;
 
 /**
