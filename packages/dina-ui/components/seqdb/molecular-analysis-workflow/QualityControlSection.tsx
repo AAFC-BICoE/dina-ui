@@ -7,6 +7,7 @@ import { useIntl } from "react-intl";
 import Select from "react-select";
 import DataPasteZone from "../../molecular-analysis/DataPasteZone";
 import { CollapsibleSection } from "../../../../common-ui/lib";
+import { AddAttachmentsButton } from "../../object-store";
 
 interface QualityControlSectionProps {
   editMode?: boolean;
@@ -37,6 +38,7 @@ export function QualityControlSection({
     const names = clipboardData.trim().split("\n");
     names.forEach((name) => createNewQualityControl?.(name));
   };
+
   return editMode || qualityControls.length > 0 ? (
     <div className="col-12 mt-3 mb-3">
       <div className="card p-3">
@@ -57,7 +59,7 @@ export function QualityControlSection({
           return (
             <div className="card p-3 mb-3" key={index}>
               <div className="row">
-                <div className="col-6">
+                <div className="col-4">
                   <strong>
                     {formatMessage({
                       id: "qualityControlName"
@@ -119,16 +121,32 @@ export function QualityControlSection({
                     </p>
                   )}
                 </div>
-                <div className="col-1">
+                <div className="col-3">
                   {editMode && (
-                    <Button
-                      onClick={() => deleteQualityControl?.(index)}
-                      variant="danger"
-                      className="delete-datablock w-100 mt-4"
-                      data-testid={`delete-quality-control-${index}`}
-                    >
-                      <FaTrash />
-                    </Button>
+                    <>
+                      <strong>
+                        {formatMessage({
+                          id: "actions"
+                        })}
+                        {":"}
+                      </strong>
+                      <div className="d-flex align-items-center">
+                        <AddAttachmentsButton
+                          onChange={() => {}}
+                          value={[]}
+                          className="mb-0 me-4 mt-1"
+                        />
+                        <Button
+                          onClick={() => deleteQualityControl?.(index)}
+                          variant="danger"
+                          className="delete-datablock"
+                          style={{ marginTop: "-10px" }}
+                          data-testid={`delete-quality-control-${index}`}
+                        >
+                          <FaTrash />
+                        </Button>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
