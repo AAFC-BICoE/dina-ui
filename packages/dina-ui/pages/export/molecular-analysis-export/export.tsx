@@ -24,8 +24,8 @@ export default function ExportMolecularAnalysisPage() {
     runSummaries,
     setRunSummaries,
     totalAttachments,
-    loadQualityControls,
-    setLoadQualityControls,
+    // loadQualityControls,
+    // setLoadQualityControls,
     networkLoading,
     exportLoading,
     dataExportError,
@@ -196,7 +196,7 @@ export default function ExportMolecularAnalysisPage() {
                     disabled={exportLoading}
                   />
                 </div>
-                <div className="col-md-4">
+                {/* <div className="col-md-4">
                   <div>
                     <strong>
                       <DinaMessage id="field_includeQualityControls" />
@@ -213,7 +213,7 @@ export default function ExportMolecularAnalysisPage() {
                     checked={loadQualityControls}
                     onChange={() => setLoadQualityControls((prev) => !prev)}
                   />
-                </div>
+                </div> */}
               </div>
             </Card.Body>
             <Card.Footer className="d-flex">
@@ -228,7 +228,10 @@ export default function ExportMolecularAnalysisPage() {
                   })}
                 >
                   {exportLoading ? (
-                    LoadingSpinner
+                    <LoadingSpinner
+                      loading={true}
+                      additionalClassNames="spinner-border-sm"
+                    />
                   ) : (
                     <DinaMessage id="exportButtonText" />
                   )}

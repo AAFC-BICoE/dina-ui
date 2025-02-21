@@ -11,6 +11,7 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import useLocalStorage from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { Alert } from "react-bootstrap";
+import { getExport } from "./exportUtils";
 
 export interface UseMolecularAnalysisExportAPIReturn {
   runSummaries: any[];
@@ -18,8 +19,8 @@ export interface UseMolecularAnalysisExportAPIReturn {
 
   totalAttachments: number;
 
-  loadQualityControls: boolean;
-  setLoadQualityControls: Dispatch<SetStateAction<boolean>>;
+  // loadQualityControls: boolean;
+  // setLoadQualityControls: Dispatch<SetStateAction<boolean>>;
 
   networkLoading: boolean;
   exportLoading: boolean;
@@ -37,8 +38,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   const [runSummaries, setRunSummaries] = useState<any[]>([]);
 
   // Toggle the user can choose to select if quality control attachments are included.
-  const [loadQualityControls, setLoadQualityControls] =
-    useState<boolean>(false);
+  // const [loadQualityControls, setLoadQualityControls] =
+  //   useState<boolean>(false);
 
   // If any errors occur, a JSX component of the error can be presented to the user.
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
@@ -53,7 +54,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   const [attachmentsLoaded, setAttachmentsLoaded] = useState(false);
 
   // Have the quality controls been loaded already, do not run it again if it is true.
-  const [qualityControlsLoaded, setQualityControlsLoaded] = useState(false);
+  // const [qualityControlsLoaded, setQualityControlsLoaded] = useState(false);
 
   // ElasticSearch query to be used to perform the export against.
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
@@ -96,12 +97,12 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   /**
    * Use effect responsible for loading in the quality control attachments.
    */
-  useEffect(() => {
-    if (loadQualityControls && !qualityControlsLoaded) {
-      setQualityControlsLoaded(true);
-      // retrieveQualityControlAttachments();
-    }
-  }, [loadQualityControls]);
+  // useEffect(() => {
+  //   if (loadQualityControls && !qualityControlsLoaded) {
+  //     setQualityControlsLoaded(true);
+  //     // retrieveQualityControlAttachments();
+  //   }
+  // }, [loadQualityControls]);
 
   /**
    * Each time the runSummaries state changes (which can occur when loading and user selects a checkbox.)
@@ -483,6 +484,17 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     // Generate the file structure based on the enabled runs and run items.
     const exportLayout = new Map<string, string[]>();
 
+    // Folders must be unique or everything will be clumped into one folder.
+    const generateUniqueFolderName = (folderName: string) => {
+      let uniqueFolderName = folderName;
+      let counter = 2;
+      while (exportLayout.has(uniqueFolderName)) {
+        uniqueFolderName = `${folderName}(${counter})`;
+        counter++;
+      }
+      return uniqueFolderName;
+    };
+
     if (runSummaries && runSummaries.length > 0) {
       runSummaries.forEach((runSummary) => {
         if (runSummary.enabled) {
@@ -490,10 +502,9 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
             runSummary.attachments.forEach((attachmentFileIdentifier) => {
               fileIdentifiers.push(attachmentFileIdentifier);
             });
-            exportLayout.set(
-              runSummary.attributes.name + "/",
-              runSummary.attachments
-            );
+            const folderName = runSummary.attributes.name;
+            const uniqueFolderName = generateUniqueFolderName(folderName);
+            exportLayout.set(uniqueFolderName + "/", runSummary.attachments);
           }
         }
         if (
@@ -507,12 +518,13 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                 item.attachments.forEach((itemFileIdentifier) => {
                   fileIdentifiers.push(itemFileIdentifier);
                 });
-                exportLayout.set(
+                const itemFolderName =
                   runSummary.attributes.name +
-                    "/" +
-                    item.genericMolecularAnalysisItemSummary.name,
-                  item.attachments
-                );
+                  "/" +
+                  item.genericMolecularAnalysisItemSummary.name;
+                const uniqueItemFolderName =
+                  generateUniqueFolderName(itemFolderName);
+                exportLayout.set(uniqueItemFolderName, item.attachments);
               }
             }
           });
@@ -546,10 +558,19 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     };
 
     try {
-      await save<ObjectExport>([objectExportSaveArg], {
-        apiBaseUrl: "/objectstore-api"
-      });
-      // await getExport(objectExportResponse, formik);
+      const objectExportResponse = await save<ObjectExport>(
+        [objectExportSaveArg],
+        {
+          apiBaseUrl: "/objectstore-api"
+        }
+      );
+      await getExport(
+        objectExportResponse,
+        setExportLoading,
+        setDataExportError,
+        apiClient,
+        formik
+      );
     } catch (e) {
       setDataExportError(
         <Alert variant="danger" className="mb-2">
@@ -565,8 +586,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     runSummaries,
     setRunSummaries,
     totalAttachments,
-    loadQualityControls,
-    setLoadQualityControls,
+    // loadQualityControls,
+    // setLoadQualityControls,
     networkLoading,
     exportLoading,
     dataExportError,
