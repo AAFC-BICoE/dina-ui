@@ -353,6 +353,31 @@ export function applySourceFiltering<TData extends KitsuResource>(
 }
 
 /**
+ * This function applies source filtering to the elastic search query.
+ *
+ * @param elasticSearchQuery The root elastic search query to apply source query logic to.
+ * @param columns String array of columns to include in the response.
+ * @returns The modified elastic search query with source filtering applied.
+ */
+export function applySourceFilteringString(
+  elasticSearchQuery: any,
+  columns: string[]
+) {
+  const uniqueColumns = uniq(columns);
+
+  if (uniqueColumns.length === 0) {
+    return elasticSearchQuery;
+  }
+
+  return {
+    ...elasticSearchQuery,
+    _source: {
+      includes: uniqueColumns
+    }
+  };
+}
+
+/**
  * Using the existing elastic search query, the groups are added to the query.
  *
  * Multiple groups can be searched on.
