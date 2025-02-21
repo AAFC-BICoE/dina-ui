@@ -1203,5 +1203,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   pasteRunItemName: "Paste Run Item Names",
   pasteQualityControlName: "Paste Quality Control Names",
   pasteMaterialSample: "Paste Material Samples",
-  adminRoles: "Admin Roles"
+  adminRoles: "Admin Roles",
+  separator: "Separator"
 };
