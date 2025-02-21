@@ -80,9 +80,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
    */
   useEffect(() => {
     async function waitForLoading() {
-      await retrieveRunAttachments();
-      await retrieveRunItemAttachments();
-
+      await retrieveRunAndItemAttachments();
       setNetworkLoading(false);
     }
 
@@ -225,19 +223,23 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   }
 
   /**
-   * Retrieves and links image attachments to the top-level run summaries.
+   * This function will fetch attachments for both top-level run summaries and individual run items
+   * within them in. It retrieves attachments for both `molecular-analysis-run` and
+   * `molecular-analysis-result` resources.
    *
-   * This function fetches attachments for each run summary in the `runSummaries` state.
-   * It retrieves attachments directly associated with the molecular analysis runs themselves (top-level
-   * attachments, not item-level attachments). The function then filters these attachments to
-   * identify those that are images, extracts the relevant file identifiers (prioritizing
-   * 'LARGE_IMAGE' derivatives if available), and updates the `runSummaries` state. Each run summary
-   * in the state is updated with an `attachments` property, which is an array of file identifiers
-   * for its image attachments.
+   * The function performs the following steps:
+   *
+   * 1. Generates API paths for fetching attachments for both run summaries and run items.
+   * 2. Uses `bulkGet` to retrieve attachments for molecular analysis runs and molecular analysis
+   *    results separately.
+   * 3. Collects all metadata IDs from the attachments of both types of resources.
+   * 4. Retrieves all metadata objects in a single bulk request using `retrieveMetadata`.
+   * 5. Updates the `runSummaries` state, adding `attachments` properties to both run summaries
+   *    and their items with filtered image file identifiers.
    */
-  async function retrieveRunAttachments() {
-    // First, retrieve the top level attachments for the runs.
-    const attachmentPaths = runSummaries.map((runSummary) => {
+  async function retrieveRunAndItemAttachments() {
+    // 1. Generate API paths for both run summaries and run items.
+    const runAttachmentPaths = runSummaries.map((runSummary) => {
       return (
         "molecular-analysis-run/" +
         runSummary.id +
@@ -245,178 +247,107 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       );
     });
 
-    // Retrieve the attachments for the runs.
+    const itemAttachmentPaths = runSummaries.flatMap((runSummary) =>
+      runSummary.attributes.items
+        .filter((item) => item.result !== null)
+        .map(
+          (item) =>
+            "molecular-analysis-result/" +
+            item.result.uuid +
+            "?include=attachments&page[limit]=1000"
+        )
+    );
+
+    // 2. Retrieve attachments using bulkGet for both run summaries and run items.
     const molecularAnalysisRuns: PersistedResource<MolecularAnalysisRun>[] =
-      await bulkGet(attachmentPaths, {
+      await bulkGet(runAttachmentPaths, {
         apiBaseUrl: "/seqdb-api"
       });
 
-    // Now that we have the metadatas, we need to do a request to retrieve all the metadatas.
-    const metadataIds: string[] = molecularAnalysisRuns
-      .flatMap((run) => run?.attachments?.map((attachment) => attachment.id))
-      .filter((id): id is string => id !== undefined);
+    const molecularAnalysisResults: PersistedResource<MolecularAnalysisResult>[] =
+      await bulkGet(itemAttachmentPaths, {
+        apiBaseUrl: "/seqdb-api"
+      });
 
-    if (metadataIds.length > 0) {
-      const metadatas = await retrieveMetadata(metadataIds);
+    // 3. Collect metadata IDs from both run and item attachments.
+    const metadataIds: string[] = [
+      ...molecularAnalysisRuns
+        .flatMap((run) => run?.attachments?.map((attachment) => attachment.id))
+        .filter((id): id is string => id !== undefined),
+      ...molecularAnalysisResults
+        .flatMap((result) =>
+          result?.attachments?.map((attachment) => attachment.id)
+        )
+        .filter((id): id is string => id !== undefined)
+    ];
 
-      // For each file identifier from the metadata, we need to link it to the run summary.
-      runSummaries.forEach((_runSummary, index) => {
-        const run = molecularAnalysisRuns[index];
+    // 4. Retrieve all metadatas in a single bulk request.
+    const metadatas =
+      metadataIds.length > 0 ? await retrieveMetadata(metadataIds) : [];
+    const metadataMap = new Map(
+      metadatas.map((metadata) => [metadata.id, metadata])
+    );
+
+    // 5. Update runSummaries state to include attachments for both runs and items.
+    setRunSummaries((currentRunSummaries) => {
+      return currentRunSummaries.map((currentRunSummary, runSummaryIndex) => {
+        const molecularAnalysisRun = molecularAnalysisRuns[runSummaryIndex];
         const currentRunFileIdentifiers: string[] = [];
 
-        if (run?.attachments) {
-          run.attachments.forEach((attachment) => {
-            const metadata = metadatas.find(
-              (meta) => meta.id === attachment.id
-            );
-
-            if (metadata) {
-              if (metadata.dcType === "IMAGE") {
-                let fileIdentifier;
-                // If image has derivative, return large image derivative fileIdentifier if present
-                if (metadata.derivatives) {
-                  const largeImageDerivative = metadata.derivatives.find(
-                    (derivative) => derivative.derivativeType === "LARGE_IMAGE"
-                  );
-                  fileIdentifier = largeImageDerivative?.fileIdentifier;
-                }
-
-                // Otherwise, return original fileIdentifier
-                if (!fileIdentifier) {
-                  fileIdentifier = metadata.fileIdentifier;
-                }
-
-                // Add it to the list of current run file identifiers.
-                if (fileIdentifier) {
-                  currentRunFileIdentifiers.push(fileIdentifier);
-                }
+        // Process top-level run attachments
+        if (molecularAnalysisRun?.attachments) {
+          molecularAnalysisRun.attachments.forEach((attachment) => {
+            const metadata = metadataMap.get(attachment.id);
+            if (metadata?.dcType === "IMAGE") {
+              const fileIdentifier =
+                metadata.derivatives?.find(
+                  (d) => d.derivativeType === "LARGE_IMAGE"
+                )?.fileIdentifier || metadata.fileIdentifier;
+              if (fileIdentifier) {
+                currentRunFileIdentifiers.push(fileIdentifier);
               }
             }
           });
-
-          // Update the run summaries state with the file identifiers.
-          setRunSummaries(
-            runSummaries.map((runSummary, runIndex) => {
-              if (runIndex === index) {
-                return {
-                  ...runSummary,
-                  attachments: currentRunFileIdentifiers
-                };
-              }
-              return runSummary;
-            })
-          );
         }
-      });
-    }
-  }
 
-  /**
-   * Retrieves and links image attachments to run items within the run summaries.
-   *
-   * This function iterates through each run summary in the `runSummaries` state.
-   * For each run summary, it fetches attachments for each run item (within `runSummaries.attributes.items`)
-   * that has a associated `result`.  It then filters these attachments to identify image types,
-   * extracts relevant file identifiers (prioritizing 'LARGE_IMAGE' derivatives), and
-   * updates the `runSummaries` state.  Specifically, it adds an `attachments` array to each
-   * run item object in the state, containing the file identifiers of its image attachments.
-   */
-  async function retrieveRunItemAttachments() {
-    // Loop through each run summary.
-    await Promise.all(
-      runSummaries.map(async (runSummary) => {
-        // Generate a list of molecular analysis result ids to retrieve the attachments for.
-        const attachmentPaths = runSummary.attributes.items
-          .filter((item) => item.result !== null)
-          .map(
-            (item) =>
-              "molecular-analysis-result/" +
-              item.result.uuid +
-              "?include=attachments&page[limit]=1000"
+        // Update items within the current run summary
+        const updatedItems = currentRunSummary.attributes.items.map((item) => {
+          const molecularAnalysisResult = molecularAnalysisResults.find(
+            (result) => result?.id === item.result?.uuid
           );
+          const currentItemFileIdentifiers: string[] = [];
 
-        // Retrieve the attachments for the run items.
-        const molecularAnalysisResults: PersistedResource<MolecularAnalysisResult>[] =
-          await bulkGet(attachmentPaths, {
-            apiBaseUrl: "/seqdb-api"
-          });
-
-        // Retrieve the metadata ids for all run items in this summary.
-        const metadataIds: string[] = molecularAnalysisResults
-          .flatMap((run) =>
-            run?.attachments?.map((attachment) => attachment.id)
-          )
-          .filter((id): id is string => id !== undefined);
-
-        // Using the metadata ids, retrieve the metadatas in a bulk get request.
-        const metadatas = await retrieveMetadata(metadataIds);
-
-        // Update runSummaries state
-        setRunSummaries((currentRunSummaries) => {
-          return currentRunSummaries.map((currentRunSummary) => {
-            if (currentRunSummary.id === runSummary.id) {
-              // Map over items to update the attachments for each item
-              const updatedItems = currentRunSummary.attributes.items.map(
-                (item) => {
-                  // Find the corresponding molecularAnalysisResult for this item
-                  const molecularAnalysisResult = molecularAnalysisResults.find(
-                    (result) => result?.id === item?.result?.uuid
-                  );
-
-                  const currentItemFileIdentifiers: string[] = [];
-
-                  if (molecularAnalysisResult?.attachments) {
-                    molecularAnalysisResult.attachments.forEach(
-                      (attachment) => {
-                        const metadata = metadatas.find(
-                          (meta) => meta.id === attachment.id
-                        );
-                        if (metadata && metadata.dcType === "IMAGE") {
-                          let fileIdentifier: string | undefined;
-
-                          if (metadata.derivatives) {
-                            const largeImageDerivative =
-                              metadata.derivatives.find(
-                                (derivative) =>
-                                  derivative.derivativeType === "LARGE_IMAGE"
-                              );
-                            fileIdentifier =
-                              largeImageDerivative?.fileIdentifier;
-                          }
-
-                          // Otherwise, return original fileIdentifier from the metadata.
-                          if (!fileIdentifier) {
-                            fileIdentifier = metadata.fileIdentifier;
-                          }
-
-                          if (fileIdentifier) {
-                            currentItemFileIdentifiers.push(fileIdentifier);
-                          }
-                        }
-                      }
-                    );
-                  }
-
-                  return {
-                    ...item,
-                    attachments: currentItemFileIdentifiers
-                  };
+          if (molecularAnalysisResult?.attachments) {
+            molecularAnalysisResult.attachments.forEach((attachment) => {
+              const metadata = metadataMap.get(attachment?.id ?? "");
+              if (metadata?.dcType === "IMAGE") {
+                const fileIdentifier =
+                  metadata.derivatives?.find(
+                    (d) => d.derivativeType === "LARGE_IMAGE"
+                  )?.fileIdentifier || metadata.fileIdentifier;
+                if (fileIdentifier) {
+                  currentItemFileIdentifiers.push(fileIdentifier);
                 }
-              );
+              }
+            });
+          }
 
-              return {
-                ...currentRunSummary,
-                attributes: {
-                  ...currentRunSummary.attributes,
-                  items: updatedItems
-                }
-              };
-            }
-            return currentRunSummary;
-          });
+          return {
+            ...item,
+            attachments: currentItemFileIdentifiers
+          };
         });
-      })
-    );
+
+        return {
+          ...currentRunSummary,
+          attachments: currentRunFileIdentifiers,
+          attributes: {
+            ...currentRunSummary.attributes,
+            items: updatedItems
+          }
+        };
+      });
+    });
   }
 
   // async function retrieveQualityControlAttachments() {

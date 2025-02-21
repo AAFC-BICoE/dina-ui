@@ -32,6 +32,12 @@ export default function ExportMolecularAnalysisPage() {
     performExport
   } = useMolecularAnalysisExportAPI();
 
+  const disableObjectExportButton =
+    exportLoading ||
+    networkLoading ||
+    totalAttachments === 0 ||
+    totalAttachments > 100;
+
   return (
     <PageLayout
       titleId="molecularAnalysisExport"
@@ -92,8 +98,13 @@ export default function ExportMolecularAnalysisPage() {
                               {/* Total Attachments */}
                               {runSummary?.attachments?.length !== 0 && (
                                 <span className="badge bg-secondary ms-2">
-                                  {runSummary?.attachments?.length}
-                                  {" attachments"}
+                                  <DinaMessage
+                                    id="numberOfAttachments"
+                                    values={{
+                                      totalAttachments:
+                                        runSummary?.attachments?.length
+                                    }}
+                                  />
                                 </span>
                               )}
                             </h5>
@@ -128,8 +139,13 @@ export default function ExportMolecularAnalysisPage() {
                                   {/* Total Attachments */}
                                   {item?.attachments?.length !== 0 && (
                                     <span className="badge bg-secondary ms-2">
-                                      {item?.attachments?.length}
-                                      {" attachments"}
+                                      <DinaMessage
+                                        id="numberOfAttachments"
+                                        values={{
+                                          totalAttachments:
+                                            item?.attachments?.length
+                                        }}
+                                      />
                                     </span>
                                   )}
                                 </span>
@@ -140,8 +156,10 @@ export default function ExportMolecularAnalysisPage() {
                       );
                     })}
                     <p className="mt-4 mb-0">
-                      <strong>Total attachments to be exported:</strong>{" "}
-                      {totalAttachments}
+                      <strong>
+                        <DinaMessage id="totalAttachments" />
+                      </strong>
+                      {" " + totalAttachments}
                     </p>
                   </>
                 )}
@@ -221,7 +239,7 @@ export default function ExportMolecularAnalysisPage() {
                 <SubmitButton
                   buttonProps={(formik) => ({
                     style: { width: "8rem" },
-                    disabled: exportLoading || totalAttachments === 0,
+                    disabled: disableObjectExportButton,
                     onClick: () => {
                       performExport(formik);
                     }

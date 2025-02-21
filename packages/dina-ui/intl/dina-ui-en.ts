@@ -1105,6 +1105,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparationType: "Preparation Type",
   viewExportHistoryButton: "View Export History",
   molecularAnalysisExport: "Molecular Analysis Export",
+  numberOfAttachments: "{totalAttachments} attachments",
+  totalAttachments: "Total attachments to be exported:",
   runItemSelection: "Run Item Selection",
   exportColumns: "Export Columns:",
   dataLabel: "Data",
