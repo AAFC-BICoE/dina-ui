@@ -135,14 +135,16 @@ export function QualityControlSection({
             </div>
           );
         })}
-        <div className="mt-3">
-          <CollapsibleSection
-            id={"pasteQualityControlName"}
-            headerKey={"pasteQualityControlName"}
-          >
-            <DataPasteZone onDataPaste={onDataPaste} />
-          </CollapsibleSection>
-        </div>
+        {editMode && (
+          <div className="mt-3">
+            <CollapsibleSection
+              id={"pasteQualityControlName"}
+              headerKey={"pasteQualityControlName"}
+            >
+              <DataPasteZone onDataPaste={onDataPaste} />
+            </CollapsibleSection>
+          </div>
+        )}
       </div>
     </div>
   ) : null;
