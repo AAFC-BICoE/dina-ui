@@ -10,7 +10,6 @@ import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   DinaForm,
-  downloadDataExport,
   OBJECT_EXPORT_IDS_KEY,
   SaveArgs,
   SubmitButton,
@@ -42,9 +41,11 @@ import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
 import useSavedExports from "./useSavedExports";
-
-const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
-const BASE_DELAY_EXPORT_FETCH_MS = 2000;
+import {
+  getExport,
+  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
+  MAX_OBJECT_EXPORT_TOTAL
+} from "packages/dina-ui/components/export/exportUtils";
 
 export interface SavedExportOption {
   label: string;
@@ -191,72 +192,14 @@ export default function ExportPage<TData extends KitsuResource>() {
       apiBaseUrl: "/dina-export-api"
     });
 
-    await getExport(dataExportPostResponse, formik);
+    await getExport(
+      dataExportPostResponse,
+      setLoading,
+      setDataExportError,
+      apiClient,
+      formik
+    );
     setLoading(false);
-  }
-
-  // data-export POST will return immediately but export won't necessarily be available
-  // continue to get status of export until it's COMPLETED
-  async function getExport(
-    exportPostResponse: PersistedResource<KitsuResource>[],
-    formik?: any
-  ) {
-    let isFetchingDataExport = true;
-    let fetchDataExportRetries = 0;
-    let dataExportGetResponse;
-    while (isFetchingDataExport) {
-      if (fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES) {
-        if (dataExportGetResponse?.data?.status === "COMPLETED") {
-          // Get the exported data
-          await downloadDataExport(
-            apiClient,
-            exportPostResponse[0].id,
-            formik?.values?.name
-          );
-          isFetchingDataExport = false;
-        } else if (dataExportGetResponse?.data?.status === "ERROR") {
-          isFetchingDataExport = false;
-          setLoading(false);
-          setDataExportError(
-            <div className="alert alert-danger">
-              <DinaMessage id="dataExportError" />
-            </div>
-          );
-        } else {
-          try {
-            dataExportGetResponse = await apiClient.get<DataExport>(
-              `dina-export-api/data-export/${exportPostResponse[0].id}`,
-              {}
-            );
-          } catch (e) {
-            if (e.cause.status === 404) {
-              console.warn(e.cause);
-            } else {
-              throw e;
-            }
-          }
-
-          // Exponential Backoff
-          await new Promise((resolve) =>
-            setTimeout(
-              resolve,
-              BASE_DELAY_EXPORT_FETCH_MS * 2 ** fetchDataExportRetries
-            )
-          );
-          fetchDataExportRetries += 1;
-        }
-      } else {
-        // Max retries reached
-        isFetchingDataExport = false;
-        setLoading(false);
-        setDataExportError(
-          <div className="alert alert-danger">
-            <DinaMessage id="dataExportError" />
-          </div>
-        );
-      }
-    }
-    isFetchingDataExport = false;
   }
 
   // Function to export and download Objects
@@ -310,7 +253,13 @@ export default function ExportPage<TData extends KitsuResource>() {
             apiBaseUrl: "/objectstore-api"
           }
         );
-        await getExport(objectExportResponse, formik);
+        await getExport(
+          objectExportResponse,
+          setLoading,
+          setDataExportError,
+          apiClient,
+          formik
+        );
       } catch (e) {
         setDataExportError(
           <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
@@ -337,7 +286,8 @@ export default function ExportPage<TData extends KitsuResource>() {
   );
 
   const disableObjectExportButton =
-    localStorageExportObjectIds.length < 1 || totalRecords > 100;
+    localStorageExportObjectIds.length < 1 ||
+    totalRecords > MAX_OBJECT_EXPORT_TOTAL;
 
   return (
     <>
@@ -354,8 +304,37 @@ export default function ExportPage<TData extends KitsuResource>() {
               />
             </div>
             <div className="col-md-6 col-sm-12 d-flex">
+              {totalRecords >
+              MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT ? (
+                <Tooltip
+                  directComponent={
+                    <DinaMessage
+                      id="molecularAnalysisExportMaxMaterialSampleError"
+                      values={{
+                        limit:
+                          MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT
+                      }}
+                    />
+                  }
+                  placement={"bottom"}
+                  className="ms-auto"
+                  visibleElement={
+                    <div className="btn btn-primary disabled">
+                      <DinaMessage id="molecularAnalysisExport" />
+                    </div>
+                  }
+                />
+              ) : (
+                <Link
+                  href={`/export/molecular-analysis-export/export?entityLink=${entityLink}`}
+                >
+                  <a className="btn btn-primary ms-auto">
+                    <DinaMessage id="molecularAnalysisExport" />
+                  </a>
+                </Link>
+              )}
               <Link href={`/export/data-export/list?entityLink=${entityLink}`}>
-                <a className="btn btn-primary ms-auto">
+                <a className="btn btn-primary ms-2">
                   <DinaMessage id="viewExportHistoryButton" />
                 </a>
               </Link>
