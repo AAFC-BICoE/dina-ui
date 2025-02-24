@@ -1,6 +1,5 @@
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
-import { QualityControl } from "../../../types/seqdb-api/resources/QualityControl";
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
@@ -8,15 +7,16 @@ import Select from "react-select";
 import DataPasteZone from "../../molecular-analysis/DataPasteZone";
 import { CollapsibleSection } from "../../../../common-ui/lib";
 import { AddAttachmentsButton } from "../../object-store";
+import { QualityControlWithAttachment } from "./useGenericMolecularAnalysisRun";
 
 interface QualityControlSectionProps {
   editMode?: boolean;
-  qualityControls: QualityControl[];
+  qualityControls: QualityControlWithAttachment[];
   qualityControlTypes: VocabularyOption[];
   createNewQualityControl?: (name?: string) => void;
   updateQualityControl?: (
     index: number,
-    newQualityControl: QualityControl
+    newQualityControl: QualityControlWithAttachment
   ) => void;
   deleteQualityControl?: (index: number) => void;
   loading?: boolean;
@@ -150,6 +150,9 @@ export function QualityControlSection({
                   )}
                 </div>
               </div>
+
+              {/* Existing Attachments */}
+              <div className="row"></div>
             </div>
           );
         })}
