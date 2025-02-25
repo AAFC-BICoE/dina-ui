@@ -19,6 +19,10 @@ import { isEqual } from "lodash";
 import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
 
+export interface QualityControlWithAttachment extends QualityControl {
+  attachments: ResourceIdentifierObject[];
+}
+
 export interface UseGenericMolecularAnalysisRunProps {
   molecularAnalysis: GenericMolecularAnalysis;
   molecularAnalysisId: string;
@@ -94,9 +98,10 @@ export interface UseGenericMolecularAnalysisRunReturn {
 
   /**
    * List of quality controls to be displayed. This is also used when they don't exist to be saved
-   * in.
+   * in. This special type extends the existing quality control and adds the attachment field for
+   * each quality control.
    */
-  qualityControls: QualityControl[];
+  qualityControls: QualityControlWithAttachment[];
 
   /**
    * List of vocabularies options for the quality control type.
@@ -119,11 +124,11 @@ export interface UseGenericMolecularAnalysisRunReturn {
    * Updates an existing quality control at the specified index with a new quality control object.
    *
    * @param {number} index - The index of the quality control to be updated.
-   * @param {QualityControl} newQualityControl - The new quality control object to replace the old one.
+   * @param {QualityControlWithAttachment} newQualityControl - The new quality control object to replace the old one.
    */
   updateQualityControl: (
     index: number,
-    newQualityControl: QualityControl
+    newQualityControl: QualityControlWithAttachment
   ) => void;
 
   /**
@@ -175,9 +180,11 @@ export function useGenericMolecularAnalysisRun({
     useState<SequencingRunItem[]>();
 
   // Quality control items
-  const [qualityControls, setQualityControls] = useState<QualityControl[]>([]);
+  const [qualityControls, setQualityControls] = useState<
+    QualityControlWithAttachment[]
+  >([]);
   const [loadedQualityControls, setLoadedQualityControls] = useState<
-    QualityControl[]
+    QualityControlWithAttachment[]
   >([]);
 
   // Sequencing run attachments
@@ -440,7 +447,8 @@ export function useGenericMolecularAnalysisRun({
         group: "",
         name: name ?? "",
         qcType: "",
-        type: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+        type: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL,
+        attachments: []
       }
     ]);
   }
@@ -462,11 +470,11 @@ export function useGenericMolecularAnalysisRun({
    * Updates an existing quality control at the specified index with a new quality control object.
    *
    * @param {number} index - The index of the quality control to be updated.
-   * @param {QualityControl} newQualityControl - The new quality control object to replace the old one.
+   * @param {QualityControlWithAttachment} newQualityControl - The new quality control object to replace the old one.
    */
   function updateQualityControl(
     index: number,
-    newQualityControl: QualityControl
+    newQualityControl: QualityControlWithAttachment
   ) {
     // Create a copy of the existing quality controls array
     const updatedQualityControls = [...qualityControls];
@@ -540,7 +548,7 @@ export function useGenericMolecularAnalysisRun({
         qualityControlItemQuery &&
         (qualityControlItemQuery as any)?.data?.length > 0
       ) {
-        const newQualityControls: QualityControl[] = [];
+        const newQualityControls: QualityControlWithAttachment[] = [];
 
         // Go through each quality control run item and then we do a query for each quality control.
         const qualityControlRunItems = (qualityControlItemQuery as any)?.data;
@@ -562,10 +570,14 @@ export function useGenericMolecularAnalysisRun({
           );
 
           const qualityControlFound = qualityControlQuery
-            ?.data?.[0] as QualityControl;
+            ?.data?.[0] as QualityControlWithAttachment;
           if (qualityControlFound) {
+            // Check if quality control result exists and load that in.
+            // Todo...
+
             newQualityControls.push({
-              ...qualityControlFound
+              ...qualityControlFound,
+              attachments: []
             });
           }
         }
@@ -723,8 +735,12 @@ export function useGenericMolecularAnalysisRun({
       );
 
       // Update the quality controls state.
-      setQualityControls(savedQualityControls as QualityControl[]);
-      setLoadedQualityControls(savedQualityControls as QualityControl[]);
+      setQualityControls(
+        savedQualityControls as QualityControlWithAttachment[]
+      );
+      setLoadedQualityControls(
+        savedQualityControls as QualityControlWithAttachment[]
+      );
 
       // Go back to view mode once completed.
       setPerformSave(false);
