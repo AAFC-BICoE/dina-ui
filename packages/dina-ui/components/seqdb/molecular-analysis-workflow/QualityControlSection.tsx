@@ -12,7 +12,7 @@ interface QualityControlSectionProps {
   editMode?: boolean;
   qualityControls: QualityControl[];
   qualityControlTypes: VocabularyOption[];
-  createNewQualityControl?: (name?: string) => void;
+  createNewQualityControl?: (name?: string, qcType?: string) => void;
   updateQualityControl?: (
     index: number,
     newQualityControl: QualityControl
@@ -34,8 +34,15 @@ export function QualityControlSection({
 
   const onDataPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const clipboardData = event.clipboardData.getData("text/plain");
-    const names = clipboardData.trim().split("\n");
-    names.forEach((name) => createNewQualityControl?.(name));
+    const rows = clipboardData
+      .trim()
+      .split("\n")
+      .map((row) =>
+        row.split("\t").map((cell) => cell.replace(/\r/g, "").trim())
+      );
+    rows.forEach((row) => {
+      createNewQualityControl?.(row.at(0), row.at(1)?.replaceAll(" ", "_"));
+    });
   };
   return editMode || qualityControls.length > 0 ? (
     <div className="col-12 mt-3 mb-3">
