@@ -313,7 +313,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
 
     // Add new quality control.
-    userEvent.click(wrapper.getByRole("button", { name: "Add" }));
+    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
     // Provide quality control
     userEvent.type(
@@ -561,7 +561,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByText(/acn blank/i)).not.toBeInTheDocument();
 
     // Add new Quality Control
-    userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
     userEvent.type(wrapper.getAllByRole("textbox")[5], "New Quality Control");
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
@@ -569,7 +569,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Add blank quality control, should not be saved.
-    userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -757,7 +757,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Create 4 new quality controls.
     for (let i = 0; i < 4; i++) {
-      userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
     }
 
     // Quality Control 1 - Both provided.

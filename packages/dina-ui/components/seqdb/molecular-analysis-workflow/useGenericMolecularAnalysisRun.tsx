@@ -837,33 +837,36 @@ export function useGenericMolecularAnalysisRun({
         );
         if (qualityControlsWithoutId.length > 0) {
           // Create a molecular analysis result if an attachment exists.
-          const qualityControlResultSaveArgs = qualityControlsWithoutId.map(
-            (qualityControl) => {
-              if (qualityControl.attachments.length !== 0) {
-                return {
-                  type: "molecular-analysis-result",
-                  resource: {
+          const qualityControlResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
+            qualityControlsWithoutId
+              .map((qualityControl) => {
+                if (qualityControl.attachments.length !== 0) {
+                  return {
                     type: "molecular-analysis-result",
-                    group: sequencingRun.group,
-                    relationships: {
-                      attachments: {
-                        data: qualityControl.attachments
+                    resource: {
+                      type: "molecular-analysis-result",
+                      group: sequencingRun.group,
+                      relationships: {
+                        attachments: {
+                          data: qualityControl.attachments
+                        }
                       }
                     }
-                  }
-                };
-              } else {
-                return null;
-              }
-            }
-          );
+                  };
+                } else {
+                  return null;
+                }
+              })
+              .filter(
+                (saveArgs) => saveArgs !== null
+              ) as SaveArgs<MolecularAnalysisResult>[];
 
-          const savedQualityControlResults = await save(
-            qualityControlResultSaveArgs.filter(
-              (saveArgs) => saveArgs !== null
-            ),
-            { apiBaseUrl: "/seqdb-api" }
-          );
+          const savedQualityControlResults =
+            qualityControlResultSaveArgs.length > 0
+              ? await save(qualityControlResultSaveArgs, {
+                  apiBaseUrl: "/seqdb-api"
+                })
+              : [];
 
           // Create a run item for each quality control linked to the same run that was created.
           const qualityControlRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
