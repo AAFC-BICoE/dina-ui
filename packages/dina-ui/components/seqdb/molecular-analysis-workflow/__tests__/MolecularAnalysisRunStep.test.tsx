@@ -1,6 +1,10 @@
 import { mountWithAppContext } from "common-ui";
 import { noop } from "lodash";
-import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  screen,
+  waitFor,
+  waitForElementToBeRemoved
+} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -15,6 +19,7 @@ import {
   TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN,
   TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN,
   TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID,
+  TEST_MOLECULAR_ANALYSIS_RESULT,
   TEST_MOLECULAR_ANALYSIS_RUN,
   TEST_MOLECULAR_ANALYSIS_RUN_ID,
   TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID,
@@ -57,6 +62,10 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           return { data: TEST_QUALITY_CONTROL_RUN_ITEMS };
       }
 
+    case "seqdb-api/molecular-analysis-result/" +
+      TEST_MOLECULAR_ANALYSIS_RESULT.id:
+      return { data: TEST_MOLECULAR_ANALYSIS_RESULT };
+
     case "seqdb-api/quality-control":
       switch (params.filter.rsql) {
         case "molecularAnalysisRunItem.uuid==2a3b15ce-6781-466b-bc1e-49e35af3df58":
@@ -74,6 +83,17 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       "/attachments":
       return {
         data: [TEST_METADATA]
+      };
+    case "objectstore-api/config/file-upload":
+      return {
+        data: {
+          id: "file-upload",
+          type: "config",
+          attributes: {
+            "max-request-size": "1000MB",
+            "max-file-size": "1000MB"
+          }
+        }
       };
 
     // Blob storage
@@ -209,6 +229,11 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.getByText(/reserpine standard/i)).toBeInTheDocument();
     expect(wrapper.getByText(/acn blank/i)).toBeInTheDocument();
 
+    // Expect Quality Control 1 to have 2 attachments (+1 for the sequence run attachment):
+    expect(wrapper.getAllByRole("link", { name: /japan\.jpg/i }).length).toBe(
+      3
+    );
+
     // Ensure attachment appears.
     expect(
       wrapper.getByRole("heading", {
@@ -324,6 +349,38 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
+
+    // Add an attachment to the quality control
+    userEvent.click(
+      wrapper.getAllByRole("button", { name: "Add Attachments" })[0]
+    );
+    userEvent.click(
+      wrapper.getByRole("tab", { name: /attach existing objects/i })
+    );
+
+    // Wait for loading of the existing objects to attach...
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+
+    // Wait for attachments to be displayed on the page.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Add another quality control.
+    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+
+    // Provide quality control
+    userEvent.type(
+      wrapper.getByTestId("qualityControl-name-1"),
+      "Quality Control Test Name 2"
+    );
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /reserpine standard/i })
+    );
+
+    screen.logTestingPlaygroundURL();
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -466,9 +523,56 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         }
       ],
 
+      // Quality control result
+      [
+        [
+          {
+            resource: {
+              group: "aafc",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
       // Quality control run items creation
       [
         [
+          {
+            resource: {
+              relationships: {
+                result: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-result"
+                  }
+                },
+                run: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run"
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item",
+              usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+            },
+            type: "molecular-analysis-run-item"
+          },
           {
             resource: {
               relationships: {
@@ -497,6 +601,23 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             resource: {
               group: "aafc",
               name: "Quality Control Test Name 1",
+              qcType: "reserpine_standard",
+              relationships: {
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              },
+              type: "quality-control"
+            },
+            type: "quality-control"
+          },
+          {
+            resource: {
+              group: "aafc",
+              name: "Quality Control Test Name 2",
               qcType: "reserpine_standard",
               relationships: {
                 molecularAnalysisRunItem: {
@@ -571,6 +692,19 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     // Add blank quality control, should not be saved.
     userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
+    // Add an attachment to the quality control
+    userEvent.click(
+      wrapper.getAllByRole("button", { name: "Add Attachments" })[1]
+    );
+    userEvent.click(
+      wrapper.getByRole("tab", { name: /attach existing objects/i })
+    );
+
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[2]);
+
+    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
@@ -635,12 +769,43 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         }
       ],
 
+      [
+        [
+          {
+            resource: {
+              group: "aafc",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
       // Create the brand new quality control run item.
       [
         [
           {
             resource: {
               relationships: {
+                result: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-result"
+                  }
+                },
                 run: {
                   data: {
                     id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",

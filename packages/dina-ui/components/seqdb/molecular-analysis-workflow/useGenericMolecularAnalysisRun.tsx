@@ -692,14 +692,56 @@ export function useGenericMolecularAnalysisRun({
         apiBaseUrl: "/seqdb-api"
       });
 
+      // Create a result for each quality control with attachments.
+      const qualityControlResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
+        qualityControls
+          .map((qualityControl) => {
+            if (qualityControl.attachments.length !== 0) {
+              return {
+                type: "molecular-analysis-result",
+                resource: {
+                  type: "molecular-analysis-result",
+                  group: groupName,
+                  relationships: {
+                    attachments: {
+                      data: qualityControl.attachments
+                    }
+                  }
+                }
+              };
+            } else {
+              return null;
+            }
+          })
+          .filter(
+            (saveArgs) => saveArgs !== null
+          ) as SaveArgs<MolecularAnalysisResult>[];
+
+      const savedQualityControlResults =
+        qualityControlResultSaveArgs.length > 0
+          ? await save(qualityControlResultSaveArgs, {
+              apiBaseUrl: "/seqdb-api"
+            })
+          : [];
+
       // Create a run item for each quality control linked to the same run that was created.
       const qualityControlRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-        qualityControls.map(() => ({
+        [];
+      let resultIndex = 0;
+
+      qualityControls.forEach((qualityControl) => {
+        const runItem = {
           type: "molecular-analysis-run-item",
           resource: {
             type: "molecular-analysis-run-item",
             usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL,
             relationships: {
+              result: {
+                data: {
+                  id: "",
+                  type: "molecular-analysis-result"
+                }
+              },
               run: {
                 data: {
                   id: savedMolecularAnalysisRun[0].id,
@@ -707,8 +749,21 @@ export function useGenericMolecularAnalysisRun({
                 }
               }
             }
-          } as any
-        }));
+          }
+        } as any;
+
+        if (qualityControl.attachments.length !== 0) {
+          // Attachments exist. Link the ID to the result created above.
+          runItem.resource.relationships.result.data.id =
+            savedQualityControlResults[resultIndex].id;
+          resultIndex++;
+        } else {
+          // No attachments, no result needed.
+          delete runItem.resource.relationships.result;
+        }
+
+        qualityControlRunItemSaveArgs.push(runItem);
+      });
       const savedQualityControlRunItem = await save(
         qualityControlRunItemSaveArgs,
         { apiBaseUrl: "/seqdb-api" }

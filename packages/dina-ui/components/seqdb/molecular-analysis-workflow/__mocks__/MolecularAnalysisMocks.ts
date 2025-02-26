@@ -16,6 +16,7 @@ import {
 } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 import { Group } from "packages/dina-ui/types/user-api";
+import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 
 export const TEST_GROUP: PersistedResource<Group>[] = [
   {
@@ -612,7 +613,12 @@ export const TEST_QUALITY_CONTROL_RUN_ITEMS: PersistedResource<MolecularAnalysis
       type: "molecular-analysis-run-item",
       createdBy: "dina-admin",
       createdOn: "2024-12-11T20:52:48.43824Z",
-      usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+      usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL,
+      result: {
+        id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+        attachments: [],
+        type: "molecular-analysis-result"
+      }
     },
     {
       id: "e9e39b72-ece7-454b-893a-2fc2d075e7b7",
@@ -622,6 +628,22 @@ export const TEST_QUALITY_CONTROL_RUN_ITEMS: PersistedResource<MolecularAnalysis
       usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
     }
   ];
+
+export const TEST_MOLECULAR_ANALYSIS_RESULT: PersistedResource<MolecularAnalysisResult> =
+  {
+    id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+    type: "molecular-analysis-result",
+    attachments: [
+      {
+        id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+        type: "metadata"
+      },
+      {
+        id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+        type: "metadata"
+      }
+    ] as any
+  };
 
 export const TEST_QUALITY_CONTROL_1: PersistedResource<QualityControl>[] = [
   {
