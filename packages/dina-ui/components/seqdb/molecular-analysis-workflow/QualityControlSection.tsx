@@ -6,8 +6,9 @@ import { useIntl } from "react-intl";
 import Select from "react-select";
 import DataPasteZone from "../../molecular-analysis/DataPasteZone";
 import { CollapsibleSection } from "../../../../common-ui/lib";
-import { AddAttachmentsButton } from "../../object-store";
+import { AddAttachmentsButton, AttachmentsEditor } from "../../object-store";
 import { QualityControlWithAttachment } from "./useGenericMolecularAnalysisRun";
+import React from "react";
 
 interface QualityControlSectionProps {
   editMode?: boolean;
@@ -132,8 +133,16 @@ export function QualityControlSection({
                       </strong>
                       <div className="d-flex align-items-center">
                         <AddAttachmentsButton
-                          onChange={() => {}}
-                          value={[]}
+                          onChange={(newMetadatas) => {
+                            updateQualityControl?.(index, {
+                              ...qualityControl,
+                              attachments: [
+                                ...qualityControl.attachments,
+                                ...newMetadatas
+                              ]
+                            });
+                          }}
+                          value={qualityControl.attachments}
                           className="mb-0 me-4 mt-1"
                         />
                         <Button
@@ -152,7 +161,17 @@ export function QualityControlSection({
               </div>
 
               {/* Existing Attachments */}
-              <div className="row"></div>
+              {qualityControl.attachments.length > 0 && (
+                <AttachmentsEditor
+                  attachmentPath=""
+                  name={`qualityControlAttachments_${index}}`}
+                  onChange={() => {}}
+                  hideAddAttchmentBtn={true}
+                  hideAttachmentForm={true}
+                  hideTitle={true}
+                  value={qualityControl.attachments}
+                />
+              )}
             </div>
           );
         })}

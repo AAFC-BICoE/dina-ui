@@ -33,6 +33,8 @@ export interface AttachmentsFieldProps {
   /** Attachment API path for the read-only view. */
   attachmentPath: string;
   hideAddAttchmentBtn?: boolean;
+  hideAttachmentForm?: boolean;
+  hideTitle?: boolean;
   wrapContent?: (content: ReactNode) => ReactNode;
 }
 
@@ -76,6 +78,8 @@ export function AttachmentsEditor({
   allowExistingFieldName,
   allowNewFieldName,
   hideAddAttchmentBtn,
+  hideAttachmentForm,
+  hideTitle,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true },
   wrapContent = (content) => content,
   name
@@ -107,9 +111,13 @@ export function AttachmentsEditor({
     <FieldSet
       id={id}
       legend={
-        <>
-          {title ?? "Attachments"} {!isTemplate ? `(${value.length})` : ""}
-        </>
+        hideTitle ? (
+          <></>
+        ) : (
+          <>
+            {title ?? "Attachments"} {!isTemplate ? `(${value.length})` : ""}
+          </>
+        )
       }
       fieldName={name}
     >
@@ -203,14 +211,16 @@ export function AttachmentsEditor({
                 />
               ) : (
                 <>
-                  <AttachmentSection
-                    allowAttachmentsConfig={allowAttachmentsConfig}
-                    afterMetadatasSaved={addAttachedMetadatas(
-                      onChange,
-                      value,
-                      closeModal
-                    )}
-                  />
+                  {!hideAttachmentForm && (
+                    <AttachmentSection
+                      allowAttachmentsConfig={allowAttachmentsConfig}
+                      afterMetadatasSaved={addAttachedMetadatas(
+                        onChange,
+                        value,
+                        closeModal
+                      )}
+                    />
+                  )}
                 </>
               )}
             </>
