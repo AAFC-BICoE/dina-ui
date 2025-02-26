@@ -565,19 +565,33 @@ export function useGenericMolecularAnalysisRun({
                   }
                 ]
               })(""),
-              include: "molecularAnalysisRunItem"
+              include:
+                "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
             }
           );
 
           const qualityControlFound = qualityControlQuery
             ?.data?.[0] as QualityControlWithAttachment;
           if (qualityControlFound) {
-            // Check if quality control result exists and load that in.
-            // Todo...
+            // If a result exists, we need to perform a get request to retrieve the metadata to be displayed.
+            let attachments: ResourceIdentifierObject[] = [];
+            if (qualityControlFound.molecularAnalysisRunItem?.result?.id) {
+              const molecularAnalysisResultQuery =
+                await apiClient.get<MolecularAnalysisResult>(
+                  `seqdb-api/molecular-analysis-result/${qualityControlFound.molecularAnalysisRunItem?.result?.id}`,
+                  {
+                    include: "attachments"
+                  }
+                );
+              if (molecularAnalysisResultQuery?.data?.attachments) {
+                attachments = molecularAnalysisResultQuery.data
+                  .attachments as ResourceIdentifierObject[];
+              }
+            }
 
             newQualityControls.push({
               ...qualityControlFound,
-              attachments: []
+              attachments: attachments ?? []
             });
           }
         }
@@ -822,14 +836,52 @@ export function useGenericMolecularAnalysisRun({
           (qc) => !qc.id && qc.name && qc.type
         );
         if (qualityControlsWithoutId.length > 0) {
+          // Create a molecular analysis result if an attachment exists.
+          const qualityControlResultSaveArgs = qualityControlsWithoutId.map(
+            (qualityControl) => {
+              if (qualityControl.attachments.length !== 0) {
+                return {
+                  type: "molecular-analysis-result",
+                  resource: {
+                    type: "molecular-analysis-result",
+                    group: sequencingRun.group,
+                    relationships: {
+                      attachments: {
+                        data: qualityControl.attachments
+                      }
+                    }
+                  }
+                };
+              } else {
+                return null;
+              }
+            }
+          );
+
+          const savedQualityControlResults = await save(
+            qualityControlResultSaveArgs.filter(
+              (saveArgs) => saveArgs !== null
+            ),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+
           // Create a run item for each quality control linked to the same run that was created.
           const qualityControlRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-            qualityControlsWithoutId.map(() => ({
+            [];
+          let resultIndex = 0;
+          qualityControlsWithoutId.forEach((qualityControl) => {
+            const runItem = {
               type: "molecular-analysis-run-item",
               resource: {
                 type: "molecular-analysis-run-item",
                 usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL,
                 relationships: {
+                  result: {
+                    data: {
+                      id: "",
+                      type: "molecular-analysis-result"
+                    }
+                  },
                   run: {
                     data: {
                       id: sequencingRun.id,
@@ -837,8 +889,21 @@ export function useGenericMolecularAnalysisRun({
                     }
                   }
                 }
-              } as any
-            }));
+              }
+            } as any;
+
+            if (qualityControl.attachments.length !== 0) {
+              // Attachments exist. Link the ID to the result created above.
+              runItem.resource.relationships.result.data.id =
+                savedQualityControlResults[resultIndex].id;
+              resultIndex++;
+            } else {
+              // No attachments, no result needed.
+              delete runItem.resource.relationships.result;
+            }
+
+            qualityControlRunItemSaveArgs.push(runItem);
+          });
           const savedQualityControlRunItem = await save(
             qualityControlRunItemSaveArgs,
             { apiBaseUrl: "/seqdb-api" }

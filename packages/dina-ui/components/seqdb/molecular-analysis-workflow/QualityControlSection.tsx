@@ -165,7 +165,15 @@ export function QualityControlSection({
                 <AttachmentsEditor
                   attachmentPath=""
                   name={`qualityControlAttachments_${index}}`}
-                  onChange={() => {}}
+                  onChange={(newMetadatas) => {
+                    updateQualityControl?.(index, {
+                      ...qualityControl,
+                      attachments: [
+                        // Override everything since it can be deleting it.
+                        ...newMetadatas
+                      ]
+                    });
+                  }}
                   hideAddAttchmentBtn={true}
                   hideAttachmentForm={true}
                   hideTitle={true}
