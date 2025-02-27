@@ -24,10 +24,10 @@ import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import {
   ColumnSeparator,
   DataExport,
+  DataExportTemplate,
   ExportType
 } from "packages/dina-ui/types/dina-export-api";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
-import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
 import { useState } from "react";
 import {
   Button,
@@ -45,12 +45,12 @@ import {
   getExport,
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
   MAX_OBJECT_EXPORT_TOTAL
-} from "packages/dina-ui/components/export/exportUtils";
+} from "../../../components/export/exportUtils";
 
 export interface SavedExportOption {
-  label: string;
-  value: string;
-  resource: SavedExportColumnStructure;
+  label?: string;
+  value?: string;
+  resource?: DataExportTemplate;
 }
 
 const SEPARATOR_OPTIONS: { value: ColumnSeparator; label: string }[] = [
@@ -132,10 +132,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     setColumnPathsToExport,
     deleteSavedExport,
     updateSavedExport
-  } = useSavedExports<TData>({
-    indexName
-  });
-
+  } = useSavedExports<TData>({ exportType, selectedSeparator });
   async function exportData(formik) {
     setLoading(true);
 
@@ -457,7 +454,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                               ?.find(
                                 (option) =>
                                   option.value === selectedSavedExport?.name
-                              ) ?? undefined
+                              ) ?? null
                           }
                         />
                       </div>

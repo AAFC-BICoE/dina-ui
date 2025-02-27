@@ -19,7 +19,7 @@ export interface DataExportAttributes {
   query?: string;
   columns?: string[];
   name?: string;
-  exportType?: ExportType;
+  exportType: ExportType;
   exportOptions?: ExportOptions;
   columnAliases?: string[];
   columnFunctions?: Record<string, FunctionDef>;
