@@ -473,6 +473,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       [
         [
           {
+            id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
             resource: {
               id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
               relationships: {
@@ -488,6 +489,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             type: "generic-molecular-analysis-item"
           },
           {
+            id: "169eafe4-44f2-407e-aa90-1a5483edf522",
             resource: {
               id: "169eafe4-44f2-407e-aa90-1a5483edf522",
               relationships: {
@@ -503,6 +505,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             type: "generic-molecular-analysis-item"
           },
           {
+            id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
             resource: {
               id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
               relationships: {
@@ -692,7 +695,20 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     // Add blank quality control, should not be saved.
     userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
-    // Add an attachment to the quality control
+    // Add an attachment to the existing quality control
+    // userEvent.click(
+    //   wrapper.getAllByRole("button", { name: "Add Attachments" })[0]
+    // );
+    // userEvent.click(
+    //   wrapper.getByRole("tab", { name: /attach existing objects/i })
+    // );
+
+    // await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[2]);
+
+    // userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    // userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+
+    // Add an attachment to the new quality control
     userEvent.click(
       wrapper.getAllByRole("button", { name: "Add Attachments" })[1]
     );
@@ -721,6 +737,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       [
         [
           {
+            id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
             resource: {
               id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
               name: "Updated run name",
@@ -748,6 +765,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       [
         [
           {
+            id: "f65ed036-eb92-40d9-af03-d027646e8948",
             resource: {
               id: "f65ed036-eb92-40d9-af03-d027646e8948",
               name: "Update run item name 1",
@@ -756,6 +774,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             type: "molecular-analysis-run-item"
           },
           {
+            id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
             resource: {
               id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
               name: "Add a new one",
