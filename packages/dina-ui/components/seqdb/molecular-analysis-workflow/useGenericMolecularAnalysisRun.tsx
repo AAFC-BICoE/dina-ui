@@ -853,18 +853,53 @@ export function useGenericMolecularAnalysisRun({
         );
       }
 
+      // Check if the attachments have changed between the first loaded vs the current quality controls.
+      const hasAttachmentsChanged = (
+        attachments1: ResourceIdentifierObject[],
+        attachments2: ResourceIdentifierObject[]
+      ) => {
+        // Both do not contain attachments, no changes.
+        if (!attachments1 && !attachments2) {
+          return false;
+        }
+
+        // Length or one is undefined/null, changes made.
+        if (
+          !attachments1 ||
+          !attachments2 ||
+          attachments1.length !== attachments2.length
+        ) {
+          return true;
+        }
+
+        // Final case is same length but different ids.
+        const ids1 = attachments1.map((a) => a.id).sort();
+        const ids2 = attachments2.map((a) => a.id).sort();
+        return !isEqual(ids1, ids2);
+      };
+
       // Update existing quality control entities.
       const updatedQualityControls = qualityControls.filter((qc) => {
         const matchingLoadedQc = loadedQualityControls.find(
           (loadedQc) => loadedQc.id === qc.id
         );
+
+        // If no matching quality control can be found, it's not an update.
+        if (!matchingLoadedQc) {
+          return false;
+        }
+
+        // Check if the name or type has changed between the first loaded vs the current quality controls.
+        const hasNameOrTypeChanged =
+          qc.name !== matchingLoadedQc.name ||
+          qc.type !== matchingLoadedQc.type;
+
         return (
           qc.id &&
           qc.name &&
           qc.type &&
-          matchingLoadedQc &&
-          (qc.name !== matchingLoadedQc.name ||
-            qc.type !== matchingLoadedQc.type)
+          (hasNameOrTypeChanged ||
+            hasAttachmentsChanged(qc.attachments, matchingLoadedQc.attachments))
         );
       });
       if (updatedQualityControls.length > 0) {
@@ -881,6 +916,134 @@ export function useGenericMolecularAnalysisRun({
             }
           }));
         await save(qualityControlUpdateArgs, { apiBaseUrl: "/seqdb-api" });
+
+        // Handle Quality Control Results based on Attachment Changes (3 possible cases)
+        for (const qc of updatedQualityControls) {
+          const matchingLoadedQc = loadedQualityControls.find(
+            (loadedQc) => loadedQc.id === qc.id
+          )!;
+          const loadedAttachments = matchingLoadedQc.attachments || [];
+          const currentAttachments = qc.attachments || [];
+          const hasAttachmentChange = hasAttachmentsChanged(
+            qc.attachments,
+            matchingLoadedQc.attachments
+          );
+
+          if (hasAttachmentChange) {
+            if (
+              currentAttachments.length > 0 &&
+              loadedAttachments.length === 0
+            ) {
+              // Case 1: Attachments added, no previous attachments - CREATE the result and link run items..
+              const qualityControlResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
+                [
+                  {
+                    type: "molecular-analysis-result",
+                    resource: {
+                      type: "molecular-analysis-result",
+                      group: groupName,
+                      relationships: {
+                        attachments: { data: currentAttachments }
+                      }
+                    }
+                  } as any
+                ];
+              const savedQualityControlResults = await save(
+                qualityControlResultSaveArgs,
+                { apiBaseUrl: "/seqdb-api" }
+              );
+              const savedResult = savedQualityControlResults[0];
+
+              // Update MolecularAnalysisRunItem to link to result
+              const molecularAnalysisRunItemUpdateArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+                [
+                  {
+                    type: "molecular-analysis-run-item",
+                    id: matchingLoadedQc?.molecularAnalysisRunItem?.id,
+                    resource: {
+                      id: matchingLoadedQc?.molecularAnalysisRunItem?.id,
+                      type: "molecular-analysis-run-item",
+                      relationships: {
+                        result: {
+                          data: {
+                            id: savedResult.id,
+                            type: "molecular-analysis-result"
+                          }
+                        }
+                      }
+                    }
+                  } as any
+                ];
+              await save(molecularAnalysisRunItemUpdateArgs, {
+                apiBaseUrl: "/seqdb-api"
+              });
+            } else if (
+              currentAttachments.length > 0 &&
+              loadedAttachments.length > 0
+            ) {
+              // Case 2: Attachments added/changed, previous result exists - UPDATE existing result.
+              const resultIdToUpdate = (matchingLoadedQc as any)
+                .molecularAnalysisRunItem?.relationships?.result?.data?.id;
+              if (resultIdToUpdate) {
+                const qualityControlResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
+                  [
+                    {
+                      type: "molecular-analysis-result",
+                      id: resultIdToUpdate,
+                      resource: {
+                        id: resultIdToUpdate,
+                        type: "molecular-analysis-result",
+                        relationships: {
+                          attachments: { data: currentAttachments }
+                        }
+                      }
+                    } as any
+                  ];
+                await save(qualityControlResultSaveArgs, {
+                  apiBaseUrl: "/seqdb-api"
+                });
+              }
+            } else if (
+              currentAttachments.length === 0 &&
+              loadedAttachments.length > 0
+            ) {
+              // Case 3: All attachments removed, delete and unlink the result from the run items.
+              const resultIdToDelete = (matchingLoadedQc as any)
+                .molecularAnalysisRunItem?.relationships?.result?.data?.id;
+              if (resultIdToDelete) {
+                // Delete the result.
+                await save(
+                  [
+                    {
+                      delete: {
+                        id: resultIdToDelete,
+                        type: "molecular-analysis-result"
+                      }
+                    }
+                  ],
+                  { apiBaseUrl: "/seqdb-api" }
+                );
+
+                // Unlink result from MolecularAnalysisRunItem by setting result relationship to null
+                const molecularAnalysisRunItemUpdateArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+                  [
+                    {
+                      type: "molecular-analysis-run-item",
+                      id: matchingLoadedQc?.molecularAnalysisRunItem?.id,
+                      resource: {
+                        id: matchingLoadedQc?.molecularAnalysisRunItem?.id,
+                        type: "molecular-analysis-run-item",
+                        relationships: { result: null }
+                      }
+                    } as any
+                  ];
+                await save(molecularAnalysisRunItemUpdateArgs, {
+                  apiBaseUrl: "/seqdb-api"
+                });
+              }
+            }
+          }
+        }
       }
 
       // Delete quality controls that are removed
@@ -888,12 +1051,33 @@ export function useGenericMolecularAnalysisRun({
         (loadedQc) => !qualityControls.some((qc) => qc.id === loadedQc.id)
       );
       if (deletedQualityControls.length > 0) {
+        // Delete molecular analysis results if attachments existed.
+        const resultsToDelete = deletedQualityControls.filter(
+          (item) => item.attachments && item.attachments.length > 0
+        );
+        if (resultsToDelete.length > 0) {
+          await save(
+            resultsToDelete.map((item) => {
+              return {
+                delete: {
+                  id:
+                    (item as any)?.molecularAnalysisRunItem?.relationships
+                      ?.result?.data?.id ?? "",
+                  type: "molecular-analysis-result"
+                }
+              };
+            }),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+        }
+
         await save(
           deletedQualityControls.map((item) => ({
             delete: { id: item?.id ?? "", type: "quality-control" }
           })),
           { apiBaseUrl: "/seqdb-api" }
         );
+
         await save(
           deletedQualityControls.map((item) => ({
             delete: {
