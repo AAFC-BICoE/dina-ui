@@ -1,10 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import { noop } from "lodash";
-import {
-  screen,
-  waitFor,
-  waitForElementToBeRemoved
-} from "@testing-library/react";
+import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -380,8 +376,6 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
-    screen.logTestingPlaygroundURL();
-
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
@@ -696,17 +690,17 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
     // Add an attachment to the existing quality control
-    // userEvent.click(
-    //   wrapper.getAllByRole("button", { name: "Add Attachments" })[0]
-    // );
-    // userEvent.click(
-    //   wrapper.getByRole("tab", { name: /attach existing objects/i })
-    // );
+    userEvent.click(
+      wrapper.getAllByRole("button", { name: "Add Attachments" })[0]
+    );
+    userEvent.click(
+      wrapper.getByRole("tab", { name: /attach existing objects/i })
+    );
 
-    // await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[2]);
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[2]);
 
-    // userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
-    // userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
     // Add an attachment to the new quality control
     userEvent.click(
@@ -741,16 +735,6 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             resource: {
               id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
               name: "Updated run name",
-              relationships: {
-                attachments: {
-                  data: [
-                    {
-                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
-                      type: "metadata"
-                    }
-                  ]
-                }
-              },
               type: "molecular-analysis-run"
             },
             type: "molecular-analysis-run"
