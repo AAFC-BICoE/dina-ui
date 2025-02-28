@@ -177,6 +177,7 @@ export function QualityControlSection({
                   hideAddAttchmentBtn={true}
                   hideAttachmentForm={true}
                   hideTitle={true}
+                  hideRemoveBtn={!editMode}
                   value={qualityControl.attachments}
                 />
               )}
