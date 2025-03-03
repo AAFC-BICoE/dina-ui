@@ -149,8 +149,6 @@ export interface UseGenericMolecularAnalysisRunReturn {
   setMolecularAnalysisRunItemNames?: Dispatch<
     SetStateAction<Record<string, string>>
   >;
-
-  setReloadGenericMolecularAnalysisRun: Dispatch<SetStateAction<number>>;
 }
 
 export function useGenericMolecularAnalysisRun({
@@ -743,15 +741,17 @@ export function useGenericMolecularAnalysisRun({
       );
 
       // Update the current sequencing run items to include the new run items.
-      setSequencingRunItems(
-        sequencingRunItems.map((item, index) => ({
+      const sequencingRunItemsToSave = sequencingRunItems.map(
+        (item, index) => ({
           ...item,
           molecularAnalysisRunItemId: savedMolecularAnalysisRunItem[index].id,
           molecularAnalysisRunItem: savedMolecularAnalysisRunItem[
             index
           ] as MolecularAnalysisRunItem
-        }))
+        })
       );
+      setSequencingRunItems(sequencingRunItemsToSave);
+      setLoadedSequencingRunItems(sequencingRunItemsToSave);
 
       // Update the existing seq-reactions to attach the run items created.
       if (!sequencingRun?.id) {
@@ -815,7 +815,7 @@ export function useGenericMolecularAnalysisRun({
       const qualityControlResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
         qualityControlsWithoutId
           .map((qualityControl) => {
-            if (qualityControl.attachments.length !== 0) {
+            if (qualityControl?.attachments?.length !== 0) {
               return {
                 type: "molecular-analysis-result",
                 resource: {
@@ -858,7 +858,7 @@ export function useGenericMolecularAnalysisRun({
                   type: "molecular-analysis-run"
                 }
               },
-              ...(qualityControl.attachments.length !== 0 && {
+              ...(qualityControl?.attachments?.length !== 0 && {
                 result: {
                   data: { id: "", type: "molecular-analysis-result" }
                 }
@@ -868,7 +868,7 @@ export function useGenericMolecularAnalysisRun({
         };
 
         // Inject the id for the result relationship if attachments exist.
-        if (qualityControl.attachments.length !== 0) {
+        if (qualityControl?.attachments?.length !== 0) {
           (runItem as any).resource.relationships.result.data.id =
             savedQualityControlResults[resultIndex].id;
           resultIndex++;
@@ -1248,8 +1248,7 @@ export function useGenericMolecularAnalysisRun({
     updateQualityControl,
     setAttachments,
     sequencingRunId: sequencingRun?.id,
-    setMolecularAnalysisRunItemNames,
-    setReloadGenericMolecularAnalysisRun
+    setMolecularAnalysisRunItemNames
   };
 }
 

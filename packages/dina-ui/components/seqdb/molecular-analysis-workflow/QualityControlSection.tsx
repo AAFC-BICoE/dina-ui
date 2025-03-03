@@ -161,7 +161,7 @@ export function QualityControlSection({
               </div>
 
               {/* Existing Attachments */}
-              {qualityControl.attachments.length > 0 && (
+              {qualityControl?.attachments?.length > 0 && (
                 <AttachmentsEditor
                   attachmentPath=""
                   name={`qualityControlAttachments_${index}}`}

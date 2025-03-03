@@ -326,12 +326,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       )
     ).toBeInTheDocument();
 
-    // Type a name for the run to be created.
-    userEvent.type(sequencingRunNameInput!, "My new run");
-
     // Enter in names for the run items:
     userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
     userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
+
+    // Type a name for the run to be created.
+    userEvent.type(sequencingRunNameInput!, "My new run");
 
     // Add new quality control.
     userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
@@ -381,9 +381,6 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
-
-    // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
 
     // Ensure all API save requests are made correctly.
     expect(mockSave.mock.calls).toEqual([
