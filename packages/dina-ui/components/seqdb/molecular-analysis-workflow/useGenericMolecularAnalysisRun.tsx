@@ -436,6 +436,11 @@ export function useGenericMolecularAnalysisRun({
   // Reset error messages between edit modes.
   useEffect(() => {
     setErrorMessage(undefined);
+
+    // Reload all of the data is the user has canceled the request.
+    if (editMode === false) {
+      setReloadGenericMolecularAnalysisRun(Date.now());
+    }
   }, [editMode]);
 
   /**

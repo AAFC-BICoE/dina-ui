@@ -38,6 +38,7 @@ export interface AttachmentsFieldProps {
   hideRemoveBtn?: boolean;
   hideAttachmentForm?: boolean;
   hideTitle?: boolean;
+  hideCard?: boolean;
   wrapContent?: (content: ReactNode) => ReactNode;
 }
 
@@ -84,6 +85,7 @@ export function AttachmentsEditor({
   hideRemoveBtn,
   hideAttachmentForm,
   hideTitle,
+  hideCard,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true },
   wrapContent = (content) => content,
   name
@@ -182,6 +184,7 @@ export function AttachmentsEditor({
         )
       }
       fieldName={name}
+      removePadding={hideCard ?? false}
     >
       {loading ? (
         <LoadingSpinner loading={true} />

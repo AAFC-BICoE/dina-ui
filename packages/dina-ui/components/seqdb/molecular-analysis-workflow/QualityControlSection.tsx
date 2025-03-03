@@ -136,10 +136,7 @@ export function QualityControlSection({
                           onChange={(newMetadatas) => {
                             updateQualityControl?.(index, {
                               ...qualityControl,
-                              attachments: [
-                                ...qualityControl.attachments,
-                                ...newMetadatas
-                              ]
+                              attachments: [...newMetadatas]
                             });
                           }}
                           value={qualityControl.attachments}
@@ -162,24 +159,27 @@ export function QualityControlSection({
 
               {/* Existing Attachments */}
               {qualityControl?.attachments?.length > 0 && (
-                <AttachmentsEditor
-                  attachmentPath=""
-                  name={`qualityControlAttachments_${index}}`}
-                  onChange={(newMetadatas) => {
-                    updateQualityControl?.(index, {
-                      ...qualityControl,
-                      attachments: [
-                        // Override everything since it can be deleting it.
-                        ...newMetadatas
-                      ]
-                    });
-                  }}
-                  hideAddAttchmentBtn={true}
-                  hideAttachmentForm={true}
-                  hideTitle={true}
-                  hideRemoveBtn={!editMode}
-                  value={qualityControl.attachments}
-                />
+                <div style={{ marginTop: "15px" }}>
+                  <AttachmentsEditor
+                    attachmentPath=""
+                    name={`qualityControlAttachments_${index}}`}
+                    onChange={(newMetadatas) => {
+                      updateQualityControl?.(index, {
+                        ...qualityControl,
+                        attachments: [
+                          // Override everything since it can be deleting it.
+                          ...newMetadatas
+                        ]
+                      });
+                    }}
+                    hideAddAttchmentBtn={true}
+                    hideAttachmentForm={true}
+                    hideTitle={true}
+                    hideRemoveBtn={!editMode}
+                    hideCard={true}
+                    value={qualityControl.attachments}
+                  />
+                </div>
               )}
             </div>
           );

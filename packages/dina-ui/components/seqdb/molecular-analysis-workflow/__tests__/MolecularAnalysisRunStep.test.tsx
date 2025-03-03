@@ -850,16 +850,14 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         }
       ],
 
-      // Update the existing quality control.
+      // Update the existing quality control. (QC type not expected since it was not changed.)
       [
         [
           {
             id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
             resource: {
-              group: "aafc",
               id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
               name: "Updated Quality Control",
-              qcType: "reserpine_standard",
               type: "quality-control"
             },
             type: "quality-control"
