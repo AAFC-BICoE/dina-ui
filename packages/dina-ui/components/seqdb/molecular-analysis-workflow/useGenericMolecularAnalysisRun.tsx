@@ -1086,7 +1086,7 @@ export function useGenericMolecularAnalysisRun({
         ) {
           // Case 2: All attachments removed, delete and unlink the result from the run items.
           const resultIdToDelete = (matchingLoadedQc as any)
-            .molecularAnalysisRunItem?.relationships?.result?.data?.id;
+            .molecularAnalysisRunItem?.result?.id;
           if (resultIdToDelete) {
             // Delete the result.
             await save(

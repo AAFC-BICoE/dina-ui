@@ -982,6 +982,104 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ]);
   });
 
+  it("Run exists, in edit mode, delete all attachments for quality control should delete result", async () => {
+    const wrapper = mountWithAppContext(
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Remove all the attachments for the quality control
+    userEvent.click(wrapper.getAllByRole("button", { name: /remove/i })[0]);
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Remove all the attachments for the quality control
+    userEvent.click(wrapper.getAllByRole("button", { name: /remove/i })[0]);
+
+    // Click the save button.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // No errors should be present at this point.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Expect the network request to properly delete the quality control and attachments.
+    expect(mockSave.mock.calls).toEqual([
+      // Remove the attachment on the top level (this test removes all attachments on the page.)
+      [
+        [
+          {
+            id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
+            resource: {
+              id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
+              relationships: {
+                attachments: {
+                  data: []
+                }
+              },
+              type: "molecular-analysis-run"
+            },
+            type: "molecular-analysis-run"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Delete the result for the quality control since all attachments were deleted.
+      [
+        [
+          {
+            delete: {
+              id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+              type: "molecular-analysis-result"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Remove the relationship from the run item that is for the quality control.
+      [
+        [
+          {
+            id: "2a3b15ce-6781-466b-bc1e-49e35af3df58",
+            resource: {
+              id: "2a3b15ce-6781-466b-bc1e-49e35af3df58",
+              relationships: {
+                result: null
+              },
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ]
+    ]);
+  });
+
   it("Run exists, in edit mode, Add another attachment to an existing quality control", async () => {
     const wrapper = mountWithAppContext(
       <TestComponent
