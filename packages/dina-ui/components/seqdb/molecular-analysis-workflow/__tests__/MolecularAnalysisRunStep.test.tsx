@@ -902,6 +902,167 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ]);
   });
 
+  it("Run exists, in edit mode, delete quality control with existing attachments", async () => {
+    const wrapper = mountWithAppContext(
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Delete the quality control with existing attachments.
+    userEvent.click(wrapper.getByTestId("delete-quality-control-0"));
+
+    // Click the save button.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // No errors should be present at this point.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Expect the network request to properly delete the quality control and attachments.
+    expect(mockSave.mock.calls).toEqual([
+      // Delete the quality control
+      [
+        [
+          {
+            delete: {
+              id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
+              type: "quality-control"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Delete the molecular analysis run item associated with the quality control.
+      [
+        [
+          {
+            delete: {
+              id: "2a3b15ce-6781-466b-bc1e-49e35af3df58",
+              type: "molecular-analysis-run-item"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Delete the molecular analysis result.
+      [
+        [
+          {
+            delete: {
+              id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+              type: "molecular-analysis-result"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Run exists, in edit mode, Add another attachment to an existing quality control", async () => {
+    const wrapper = mountWithAppContext(
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Add an attachment to the first quality control (already contains attachments.)
+    userEvent.click(
+      wrapper.getAllByRole("button", { name: /add attachments/i })[0]
+    );
+    userEvent.click(
+      wrapper.getByRole("tab", { name: /attach existing objects/i })
+    );
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
+
+    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
+
+    // Click the save button.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // No errors should be present at this point.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Expect the network request to change the request to include all original 2 and the new
+    // attachment.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+            resource: {
+              id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      type: "metadata"
+                    },
+                    {
+                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      type: "metadata"
+                    },
+                    {
+                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ]
+    ]);
+  });
+
   it("Create incomplete quality controls, report error message and remove completely empty quality controls", async () => {
     const wrapper = mountWithAppContext(
       <TestComponent
