@@ -1,6 +1,5 @@
 import useLocalStorage from "@rehooks/local-storage";
 import { KitsuResource } from "kitsu";
-import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
 import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
@@ -12,6 +11,7 @@ import {
 } from "../list-page/types";
 import { ColumnSelectorList } from "./ColumnSelectorList";
 import { generateColumnDefinition } from "./ColumnSelectorUtils";
+import { DataExportTemplate } from "../../../dina-ui/types/dina-export-api";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
 
@@ -53,13 +53,13 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    * When provided, it will be set as the setDisplayedColumns. This is populated from the
    * saved export hook.
    */
-  overrideDisplayedColumns?: SavedExportColumnStructure;
+  overrideDisplayedColumns?: DataExportTemplate;
 
   /**
    * Should only be set to empty, indicating it has been processed.
    */
   setOverrideDisplayedColumns?: React.Dispatch<
-    React.SetStateAction<SavedExportColumnStructure | undefined>
+    React.SetStateAction<DataExportTemplate | undefined>
   >;
 
   /**
@@ -287,9 +287,10 @@ export function ColumnSelector<TData extends KitsuResource>(
             return newColumnDefinition;
           }
         );
-
-        const columns = (await Promise.all(promises)).filter(isDefinedColumn);
-        setDisplayedColumns(columns);
+        if (promises) {
+          const columns = (await Promise.all(promises)).filter(isDefinedColumn);
+          setDisplayedColumns(columns);
+        }
       }
     }
 
