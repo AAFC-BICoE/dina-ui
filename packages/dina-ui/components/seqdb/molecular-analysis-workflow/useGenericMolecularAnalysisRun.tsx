@@ -149,6 +149,11 @@ export interface UseGenericMolecularAnalysisRunReturn {
   setMolecularAnalysisRunItemNames?: Dispatch<
     SetStateAction<Record<string, string>>
   >;
+
+  /**
+   * Used to force a refresh of the data outside of this hook.
+   */
+  setReloadGenericMolecularAnalysisRun: Dispatch<SetStateAction<number>>;
 }
 
 export function useGenericMolecularAnalysisRun({
@@ -174,8 +179,6 @@ export function useGenericMolecularAnalysisRun({
   const [sequencingRun, setSequencingRun] = useState<MolecularAnalysisRun>();
 
   // Run Items
-  const [_loadedSequencingRunItems, setLoadedSequencingRunItems] =
-    useState<SequencingRunItem[]>();
   const [sequencingRunItems, setSequencingRunItems] =
     useState<SequencingRunItem[]>();
 
@@ -224,8 +227,22 @@ export function useGenericMolecularAnalysisRun({
         "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result,molecularAnalysisRunItem.result"
     },
     {
-      deps: [reloadGenericMolecularAnalysisRun],
+      deps: [reloadGenericMolecularAnalysisRun, editMode],
       onSuccess: async ({ data: genericMolecularAnalysisItems }) => {
+        // No need to reload if going between readonly to edit. Same data.
+        if (editMode === true) {
+          return;
+        }
+
+        // Reset all states to be empty.
+        setLoading(true);
+        setSequencingRunName(undefined);
+        setSequencingRunItems(undefined);
+        setQualityControls([]);
+        setLoadedQualityControls([]);
+        setAttachments([]);
+        setErrorMessage(undefined);
+
         /**
          * Fetch StorageUnitUsage linked to each GenericMolecularAnalysisItems. This will perform the API request
          * to retrieve the full storage unit since it's stored in the collection-api.
@@ -409,7 +426,6 @@ export function useGenericMolecularAnalysisRun({
 
           // All finished loading.
           setSequencingRunItems(sequencingRunItemsChain);
-          setLoadedSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
         } catch (error) {
           console.error(error);
@@ -432,16 +448,6 @@ export function useGenericMolecularAnalysisRun({
       setAutomaticEditMode(true);
     }
   }, [sequencingRunItems, loading, editMode]);
-
-  // Reset error messages between edit modes.
-  useEffect(() => {
-    setErrorMessage(undefined);
-
-    // Reload all of the data is the user has canceled the request.
-    if (editMode === false) {
-      setReloadGenericMolecularAnalysisRun(Date.now());
-    }
-  }, [editMode]);
 
   /**
    * Creates a new quality control object and adds it to the existing quality controls list.
@@ -774,7 +780,6 @@ export function useGenericMolecularAnalysisRun({
           })
         );
         setSequencingRunItems(sequencingRunItemsToSave);
-        setLoadedSequencingRunItems(sequencingRunItemsToSave);
 
         // Update the existing seq-reactions to attach the run items created.
         if (!sequencingRun?.id) {
@@ -1296,7 +1301,8 @@ export function useGenericMolecularAnalysisRun({
     updateQualityControl,
     setAttachments,
     sequencingRunId: sequencingRun?.id,
-    setMolecularAnalysisRunItemNames
+    setMolecularAnalysisRunItemNames,
+    setReloadGenericMolecularAnalysisRun
   };
 }
 

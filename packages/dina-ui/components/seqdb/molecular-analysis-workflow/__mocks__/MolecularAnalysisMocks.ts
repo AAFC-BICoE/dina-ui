@@ -18,6 +18,51 @@ import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/Quali
 import { Group } from "packages/dina-ui/types/user-api";
 import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 
+export const TEST_METADATA_1: PersistedResource<Metadata> = {
+  id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+  type: "metadata",
+  createdOn: "2024-12-03T14:56:51.439016Z",
+  bucket: "aafc",
+  fileIdentifier: "01938d06-12e5-793c-aecf-cadc6b18d6c2",
+  fileExtension: ".jpg",
+  dcFormat: "image/jpeg",
+  dcType: "IMAGE",
+  acCaption: "japan.jpg",
+  originalFilename: "japan.jpg",
+  publiclyReleasable: true,
+  group: "aafc"
+};
+
+export const TEST_METADATA_2: PersistedResource<Metadata> = {
+  id: "d15ddb56-180c-4a70-a10e-d9b7845adbf5",
+  type: "metadata",
+  createdOn: "2024-12-03T14:56:51.439016Z",
+  bucket: "aafc",
+  fileIdentifier: "337e6ebd-fdde-4664-aea4-3af2b0f0bffc",
+  fileExtension: ".jpg",
+  dcFormat: "image/jpeg",
+  dcType: "IMAGE",
+  acCaption: "canada.jpg",
+  originalFilename: "canada.jpg",
+  publiclyReleasable: true,
+  group: "aafc"
+};
+
+export const TEST_METADATA_3: PersistedResource<Metadata> = {
+  id: "c2de68ac-46e6-460c-ac90-9ea9680192ef",
+  type: "metadata",
+  createdOn: "2024-12-03T14:56:51.439016Z",
+  bucket: "aafc",
+  fileIdentifier: "2e0a83c0-3f2e-4811-82ed-0fc5d14baab2",
+  fileExtension: ".jpg",
+  dcFormat: "image/jpeg",
+  dcType: "IMAGE",
+  acCaption: "germany.jpg",
+  originalFilename: "germany.jpg",
+  publiclyReleasable: true,
+  group: "aafc"
+};
+
 export const TEST_GROUP: PersistedResource<Group>[] = [
   {
     id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
@@ -81,7 +126,7 @@ export const TEST_MOLECULAR_ANALYSIS_RUN: PersistedResource<MolecularAnalysisRun
     group: "aafc",
     attachments: [
       {
-        id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+        id: TEST_METADATA_1.id,
         type: "metadata"
       }
     ]
@@ -536,21 +581,6 @@ export const TEST_SEARCH_RESPONSE = {
   }
 };
 
-export const TEST_METADATA: PersistedResource<Metadata> = {
-  id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
-  type: "metadata",
-  createdOn: "2024-12-03T14:56:51.439016Z",
-  bucket: "aafc",
-  fileIdentifier: "01938d06-12e5-793c-aecf-cadc6b18d6c2",
-  fileExtension: ".jpg",
-  dcFormat: "image/jpeg",
-  dcType: "IMAGE",
-  acCaption: "japan.jpg",
-  originalFilename: "japan.jpg",
-  publiclyReleasable: true,
-  group: "aafc"
-};
-
 export const TEST_QUALITY_CONTROL_TYPES: PersistedResource<Vocabulary> = {
   id: "qualityControlType",
   type: "vocabulary",
@@ -635,11 +665,11 @@ export const TEST_MOLECULAR_ANALYSIS_RESULT: PersistedResource<MolecularAnalysis
     type: "molecular-analysis-result",
     attachments: [
       {
-        id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+        id: TEST_METADATA_1.id,
         type: "metadata"
       },
       {
-        id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+        id: TEST_METADATA_2.id,
         type: "metadata"
       }
     ] as any

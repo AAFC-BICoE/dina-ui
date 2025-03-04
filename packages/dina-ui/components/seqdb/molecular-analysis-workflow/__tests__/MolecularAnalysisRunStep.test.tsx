@@ -1,5 +1,4 @@
 import { mountWithAppContext } from "common-ui";
-import { noop } from "lodash";
 import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
@@ -9,7 +8,9 @@ import {
   STORAGE_UNIT_USAGE_2,
   STORAGE_UNIT_USAGE_3,
   TEST_MATERIAL_SAMPLE_SUMMARY,
-  TEST_METADATA,
+  TEST_METADATA_1,
+  TEST_METADATA_2,
+  TEST_METADATA_3,
   TEST_MOLECULAR_ANALYSIS,
   TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN,
   TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN,
@@ -74,11 +75,14 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_QUALITY_CONTROL_TYPES };
 
     case "objectstore-api/metadata":
+      return {
+        data: [TEST_METADATA_3]
+      };
     case "seqdb-api/molecular-analysis-run/" +
       TEST_MOLECULAR_ANALYSIS_RUN_ID +
       "/attachments":
       return {
-        data: [TEST_METADATA]
+        data: [TEST_METADATA_1]
       };
     case "objectstore-api/config/file-upload":
       return {
@@ -118,9 +122,21 @@ const mockBulkGet = jest.fn(async (paths) => {
         return TEST_MATERIAL_SAMPLE_SUMMARY[2];
 
       // Attachments
-      case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=derivatives":
-      case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=acMetadataCreator,derivatives":
-        return TEST_METADATA;
+      case "metadata/" + TEST_METADATA_1.id + "?include=derivatives":
+      case "metadata/" +
+        TEST_METADATA_1.id +
+        "?include=acMetadataCreator,derivatives":
+        return TEST_METADATA_1;
+      case "metadata/" + TEST_METADATA_2.id + "?include=derivatives":
+      case "metadata/" +
+        TEST_METADATA_2.id +
+        "?include=acMetadataCreator,derivatives":
+        return TEST_METADATA_2;
+      case "metadata/" + TEST_METADATA_3.id + "?include=derivatives":
+      case "metadata/" +
+        TEST_METADATA_3.id +
+        "?include=acMetadataCreator,derivatives":
+        return TEST_METADATA_3;
     }
   });
 });
@@ -150,15 +166,40 @@ const testCtx = {
 describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", () => {
   beforeEach(jest.clearAllMocks);
 
+  // Helper component for performing saving and editing.
+  function TestComponent(props: Partial<MolecularAnalysisRunStepProps>) {
+    const [editMode, setEditMode] = useState<boolean>(false);
+    const [performSave, setPerformSave] = useState<boolean>(false);
+
+    useEffect(() => {
+      mockSetEditMode(editMode);
+    }, [editMode]);
+
+    return (
+      <>
+        <p>Edit mode: {editMode ? "true" : "false"}</p>
+        <button onClick={() => setPerformSave(true)}>Save</button>
+        <button onClick={() => setEditMode(true)}>Edit</button>
+        <button onClick={() => setEditMode(false)}>Cancel</button>
+
+        <MolecularAnalysisRunStep
+          editMode={editMode}
+          performSave={performSave}
+          molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
+          molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID}
+          setEditMode={setEditMode}
+          setPerformSave={setPerformSave}
+          {...props}
+        />
+      </>
+    );
+  }
+
   it("Loading spinner is displayed on first load", async () => {
     const wrapper = mountWithAppContext(
-      <MolecularAnalysisRunStep
-        editMode={false}
-        performSave={false}
+      <TestComponent
         molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
-        setEditMode={noop}
-        setPerformSave={noop}
       />,
       testCtx
     );
@@ -168,13 +209,9 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
   it("Display the sequencing run in the UI", async () => {
     const wrapper = mountWithAppContext(
-      <MolecularAnalysisRunStep
-        editMode={true}
-        performSave={false}
+      <TestComponent
         molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
-        setEditMode={mockSetEditMode}
-        setPerformSave={noop}
       />,
       testCtx
     );
@@ -184,6 +221,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Alert should not exist, since there is only one run.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Run name should be in the textbox.
     expect(wrapper.getAllByRole("textbox")[0]).toHaveDisplayValue("run-name-1");
@@ -225,9 +266,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.getByText(/reserpine standard/i)).toBeInTheDocument();
     expect(wrapper.getByText(/acn blank/i)).toBeInTheDocument();
 
-    // Expect Quality Control 1 to have 2 attachments (+1 for the sequence run attachment):
+    // Expect Quality Control 1 to have 2 attachments
     expect(wrapper.getAllByRole("link", { name: /japan\.jpg/i }).length).toBe(
-      3
+      1
+    );
+    expect(wrapper.getAllByRole("link", { name: /canada\.jpg/i }).length).toBe(
+      1
     );
 
     // Ensure attachment appears.
@@ -236,20 +280,13 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         name: /sequencing run attachments \(1\)/i
       })
     ).toBeInTheDocument();
-
-    // Set edit mode should not be triggered in this test.
-    expect(mockSetEditMode).toBeCalledTimes(0);
   });
 
   it("Multiple runs exist for one seq-batch, display warning to user", async () => {
     const wrapper = mountWithAppContext(
-      <MolecularAnalysisRunStep
-        editMode={true}
-        performSave={false}
+      <TestComponent
         molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID} // Use the Molecular Analysis ID with multiple runs
-        setEditMode={mockSetEditMode}
-        setPerformSave={noop}
       />,
       testCtx
     );
@@ -266,40 +303,11 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ).toBeInTheDocument();
 
     // Run name should be in the textbox for the first run found.
-    expect(wrapper.getAllByRole("textbox")[0]).toHaveDisplayValue("run-name-1");
+    expect(wrapper.getByText("run-name-1")).toBeInTheDocument();
 
     // Set edit mode should not be triggered in this test.
-    expect(mockSetEditMode).toBeCalledTimes(0);
+    expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
   });
-
-  // Helper component for performing saving and editing.
-  function TestComponent(props: Partial<MolecularAnalysisRunStepProps>) {
-    const [editMode, setEditMode] = useState<boolean>(false);
-    const [performSave, setPerformSave] = useState<boolean>(false);
-
-    useEffect(() => {
-      mockSetEditMode(editMode);
-    }, [editMode]);
-
-    return (
-      <>
-        <p>Edit mode: {editMode ? "true" : "false"}</p>
-        <button onClick={() => setPerformSave(true)}>Save</button>
-        <button onClick={() => setEditMode(true)}>Edit</button>
-        <button onClick={() => setEditMode(false)}>Cancel</button>
-
-        <MolecularAnalysisRunStep
-          editMode={editMode}
-          performSave={performSave}
-          molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
-          molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID}
-          setEditMode={setEditMode}
-          setPerformSave={setPerformSave}
-          {...props}
-        />
-      </>
-    );
-  }
 
   it("No run exists, in edit mode, create a new run", async () => {
     const wrapper = mountWithAppContext(<TestComponent />, testCtx);
@@ -527,7 +535,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
                 attachments: {
                   data: [
                     {
-                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      id: TEST_METADATA_3.id,
                       type: "metadata"
                     }
                   ]
@@ -769,6 +777,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         }
       ],
 
+      // Create the new result for the 3rd quality control since it didn't have any attachments.
       [
         [
           {
@@ -778,7 +787,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
                 attachments: {
                   data: [
                     {
-                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      id: TEST_METADATA_3.id,
                       type: "metadata"
                     }
                   ]
@@ -861,6 +870,40 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
               type: "quality-control"
             },
             type: "quality-control"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      [
+        [
+          {
+            id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+            resource: {
+              id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: TEST_METADATA_1.id,
+                      type: "metadata"
+                    },
+                    {
+                      id: TEST_METADATA_2.id,
+                      type: "metadata"
+                    },
+                    {
+                      id: TEST_METADATA_3.id,
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
           }
         ],
         {
@@ -1000,11 +1043,9 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Remove all the attachments for the quality control
     userEvent.click(wrapper.getAllByRole("button", { name: /remove/i })[0]);
-
-    // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
-
-    // Remove all the attachments for the quality control
+    await waitForElementToBeRemoved(
+      wrapper.queryAllByText(/loading\.\.\./i)[0]
+    );
     userEvent.click(wrapper.getAllByRole("button", { name: /remove/i })[0]);
 
     // Click the save button.
@@ -1019,28 +1060,6 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Expect the network request to properly delete the quality control and attachments.
     expect(mockSave.mock.calls).toEqual([
-      // Remove the attachment on the top level (this test removes all attachments on the page.)
-      [
-        [
-          {
-            id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
-            resource: {
-              id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
-              relationships: {
-                attachments: {
-                  data: []
-                }
-              },
-              type: "molecular-analysis-run"
-            },
-            type: "molecular-analysis-run"
-          }
-        ],
-        {
-          apiBaseUrl: "/seqdb-api"
-        }
-      ],
-
       // Delete the result for the quality control since all attachments were deleted.
       [
         [
@@ -1133,15 +1152,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
                 attachments: {
                   data: [
                     {
-                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      id: TEST_METADATA_1.id, // Existing
                       type: "metadata"
                     },
                     {
-                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      id: TEST_METADATA_2.id, // Existing
                       type: "metadata"
                     },
                     {
-                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      id: TEST_METADATA_3.id, // New added
                       type: "metadata"
                     }
                   ]
