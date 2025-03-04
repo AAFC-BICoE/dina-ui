@@ -41,7 +41,10 @@ export function QualityControlSection({
         row.split("\t").map((cell) => cell.replace(/\r/g, "").trim())
       );
     rows.forEach((row) => {
-      createNewQualityControl?.(row.at(0), row.at(1)?.replaceAll(" ", "_"));
+      createNewQualityControl?.(
+        row.at(0),
+        row.at(1)?.replaceAll(" ", "_")?.toLowerCase()
+      );
     });
   };
   return editMode || qualityControls.length > 0 ? (
