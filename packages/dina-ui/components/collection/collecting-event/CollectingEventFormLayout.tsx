@@ -152,20 +152,22 @@ export function CollectingEventFormLayout({
       `${commonSrcDetailRoot}.country.name`,
       result?.address?.country || null
     );
-
     const stateProvinceName = result?.address?.state || null;
-    formik.setFieldValue(
-      `${commonSrcDetailRoot}.stateProvince.name`,
-      stateProvinceName
-    );
-    formik.setFieldValue(
-      `${commonSrcDetailRoot}.stateProvince.id`,
-      result?.osm_id || null
-    );
-    formik.setFieldValue(
-      `${commonSrcDetailRoot}.stateProvince.element`,
-      result?.osm_type || null
-    );
+
+    if (stateProvinceName) {
+      formik.setFieldValue(
+        `${commonSrcDetailRoot}.stateProvince.name`,
+        stateProvinceName
+      );
+      formik.setFieldValue(
+        `${commonSrcDetailRoot}.stateProvince.id`,
+        result?.osm_id || null
+      );
+      formik.setFieldValue(
+        `${commonSrcDetailRoot}.stateProvince.element`,
+        result?.osm_type || null
+      );
+    }
 
     formik.setFieldValue(
       `${commonSrcDetailRoot}.sourceUrl`,
