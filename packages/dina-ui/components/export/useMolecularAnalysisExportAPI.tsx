@@ -430,7 +430,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                   arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
                 }
               ]
-            })("")
+            })(""),
+            include: "result,run"
           }
         );
 
@@ -460,7 +461,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
           }
         }
 
-        // Collect metadata IDs from the results' attachments.
+        // Collect metadata IDs from the results attachments.
         const metadataIds: string[] = newQualityControlResults
           .flatMap((result) =>
             result.attachments.map((attachment) => attachment.id)
@@ -473,20 +474,20 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
           metadatas.map((metadata) => [metadata.id, metadata])
         );
 
-        // Update the run summaries to include the new attachments and run items for quality control.
+        // Update the run summaries to add new run items with the run item being the quality control
+        // name and attachments being set.
         setRunSummaries((currentRunSummaries) => {
           return currentRunSummaries.map((currentRunSummary) => {
+            // Going through each run summary, determine if a quality control falls into it.
             const qualityControlItems = newQualityControlItems.filter(
               (item) => item?.run?.id === currentRunSummary.id
             );
 
-            const updatedItems = currentRunSummary.attributes.items.map(
-              (item) => {
-                const qualityControlItem = qualityControlItems.find(
-                  (qcItem) => qcItem?.result?.id === item.result?.uuid
-                );
+            // Create new quality control items for UI rendering.
+            const generatedQualityControlItems = qualityControlItems.map(
+              (qcItem) => {
                 const molecularAnalysisResult = newQualityControlResults.find(
-                  (result) => result.id === qualityControlItem?.result?.id
+                  (result) => result.id === qcItem?.result?.id
                 );
                 const currentItemFileIdentifiers: string[] = [];
 
@@ -506,8 +507,15 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                 }
 
                 return {
-                  ...item,
-                  attachments: currentItemFileIdentifiers
+                  uuid: qcItem.id,
+                  name: "Quality Control",
+                  enabled: true,
+                  genericMolecularAnalysisItemSummary: {
+                    name: "Quality Control" // Todo: Need to do a network request for the quality control to get the name.
+                  },
+                  attachments: currentItemFileIdentifiers,
+                  result: qcItem.result,
+                  molecularAnalysisRunItem: qcItem
                 };
               }
             );
@@ -516,7 +524,10 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
               ...currentRunSummary,
               attributes: {
                 ...currentRunSummary.attributes,
-                items: updatedItems
+                items: [
+                  ...currentRunSummary.attributes.items,
+                  ...generatedQualityControlItems
+                ]
               }
             };
           });
