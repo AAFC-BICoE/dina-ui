@@ -40,7 +40,7 @@ import { FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
-import useSavedExports from "./useSavedExports";
+import useSavedExports, { VISIBILITY_OPTIONS } from "./useSavedExports";
 import {
   getExport,
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
@@ -122,6 +122,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     loadingDelete,
     loadingUpdate,
     changesMade,
+    setChangesMade,
     setSelectedSavedExport,
     selectedSavedExport,
     ModalElement,
@@ -131,7 +132,9 @@ export default function ExportPage<TData extends KitsuResource>() {
     columnPathsToExport,
     setColumnPathsToExport,
     deleteSavedExport,
-    updateSavedExport
+    updateSavedExport,
+    setRestrictToCreatedBy,
+    setPubliclyReleaseable
   } = useSavedExports<TData>({ exportType, selectedSeparator });
   async function exportData(formik) {
     setLoading(true);
@@ -459,29 +462,66 @@ export default function ExportPage<TData extends KitsuResource>() {
                         />
                       </div>
                       {selectedSavedExport && (
-                        <div className="col-md-4">
-                          <Button
-                            style={{ marginTop: "30px" }}
-                            variant="danger"
-                            onClick={deleteSavedExport}
-                            disabled={loadingDelete || loading}
-                          >
-                            {loadingDelete ? LoadingSpinner : <FaTrash />}
-                          </Button>
-                          {changesMade && (
+                        <div className="d-flex">
+                          <div className="me-auto">
                             <Button
-                              style={{ marginTop: "30px", marginLeft: "10px" }}
-                              variant="primary"
-                              onClick={updateSavedExport}
-                              disabled={loadingUpdate || loading}
+                              style={{ marginTop: "30px" }}
+                              variant="danger"
+                              onClick={deleteSavedExport}
+                              disabled={loadingDelete || loading}
                             >
-                              {loadingUpdate ? (
-                                LoadingSpinner
-                              ) : (
-                                <DinaMessage id="saveChanges" />
-                              )}
+                              {loadingDelete ? LoadingSpinner : <FaTrash />}
                             </Button>
-                          )}
+                            {changesMade && (
+                              <Button
+                                style={{
+                                  marginTop: "30px",
+                                  marginLeft: "10px"
+                                }}
+                                variant="primary"
+                                onClick={updateSavedExport}
+                                disabled={loadingUpdate || loading}
+                              >
+                                {loadingUpdate ? (
+                                  LoadingSpinner
+                                ) : (
+                                  <DinaMessage id="saveChanges" />
+                                )}
+                              </Button>
+                            )}
+                          </div>
+                          <div>
+                            <strong>
+                              <DinaMessage id="visibility" />
+                            </strong>
+                            <Select<{
+                              label: JSX.Element;
+                              value: {
+                                restrictToCreatedBy: boolean;
+                                publiclyReleasable: boolean;
+                              };
+                            }>
+                              className="mt-2 mb-3"
+                              name="visibility"
+                              options={VISIBILITY_OPTIONS}
+                              onChange={(selected) => {
+                                setRestrictToCreatedBy(
+                                  selected!.value.restrictToCreatedBy
+                                );
+                                setPubliclyReleaseable(
+                                  selected!.value.publiclyReleasable
+                                );
+                                setChangesMade(true);
+                              }}
+                              defaultValue={VISIBILITY_OPTIONS.find(
+                                (option) =>
+                                  option.value.publiclyReleasable ===
+                                    selectedSavedExport.publiclyReleasable &&
+                                  option.value.restrictToCreatedBy ===
+                                    selectedSavedExport.restrictToCreatedBy
+                              )}
+                            />
+                          </div>
                         </div>
                       )}
                     </>

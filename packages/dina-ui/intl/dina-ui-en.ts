@@ -1214,5 +1214,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   pasteQualityControlName: "Paste Quality Control Names",
   pasteMaterialSample: "Paste Material Samples",
   adminRoles: "Admin Roles",
-  separator: "Separator"
+  separator: "Separator",
+  visibility: "Visibility",
+  visibleToUser: "Visible to user",
+  visibleToGroup: "Visible to group",
+  visibleToEveryone: "Visible to everyone"
 };
