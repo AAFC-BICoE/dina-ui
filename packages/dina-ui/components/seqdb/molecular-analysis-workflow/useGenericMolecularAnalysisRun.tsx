@@ -230,7 +230,7 @@ export function useGenericMolecularAnalysisRun({
       deps: [reloadGenericMolecularAnalysisRun, editMode],
       onSuccess: async ({ data: genericMolecularAnalysisItems }) => {
         // No need to reload if going between readonly to edit. Same data.
-        if (editMode === true) {
+        if (editMode === true && sequencingRunName !== undefined) {
           return;
         }
 
@@ -773,8 +773,9 @@ export function useGenericMolecularAnalysisRun({
         const sequencingRunItemsToSave = sequencingRunItems.map(
           (item, index) => ({
             ...item,
-            molecularAnalysisRunItemId: savedMolecularAnalysisRunItem[index].id,
-            molecularAnalysisRunItem: savedMolecularAnalysisRunItem[
+            molecularAnalysisRunItemId:
+              savedMolecularAnalysisRunItem?.[index]?.id,
+            molecularAnalysisRunItem: savedMolecularAnalysisRunItem?.[
               index
             ] as MolecularAnalysisRunItem
           })
