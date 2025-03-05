@@ -29,8 +29,8 @@ export interface UseMolecularAnalysisExportAPIReturn {
 
   totalAttachments: number;
 
-  // loadQualityControls: boolean;
-  // setLoadQualityControls: Dispatch<SetStateAction<boolean>>;
+  loadQualityControls: boolean;
+  setLoadQualityControls: Dispatch<SetStateAction<boolean>>;
 
   networkLoading: boolean;
   exportLoading: boolean;
@@ -54,8 +54,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   const [runSummaries, setRunSummaries] = useState<any[]>([]);
 
   // Toggle the user can choose to select if quality control attachments are included.
-  // const [loadQualityControls, setLoadQualityControls] =
-  //   useState<boolean>(false);
+  const [loadQualityControls, setLoadQualityControls] =
+    useState<boolean>(false);
 
   // If any errors occur, a JSX component of the error can be presented to the user.
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
@@ -70,7 +70,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   const [attachmentsLoaded, setAttachmentsLoaded] = useState(false);
 
   // Have the quality controls been loaded already, do not run it again if it is true.
-  // const [qualityControlsLoaded, setQualityControlsLoaded] = useState(false);
+  const [_qualityControlsLoaded, setQualityControlsLoaded] = useState(false);
 
   // ElasticSearch query to be used to perform the export against.
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
@@ -126,12 +126,13 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   /**
    * Use effect responsible for loading in the quality control attachments.
    */
-  // useEffect(() => {
-  //   if (loadQualityControls && !qualityControlsLoaded) {
-  //     setQualityControlsLoaded(true);
-  //     // retrieveQualityControlAttachments();
-  //   }
-  // }, [loadQualityControls]);
+  useEffect(() => {
+    //if (loadQualityControls && !qualityControlsLoaded) {
+    if (loadQualityControls) {
+      setQualityControlsLoaded(true);
+      retrieveQualityControlAttachments();
+    }
+  }, [loadQualityControls]);
 
   /**
    * Each time the runSummaries state changes (which can occur when loading and user selects a checkbox.)
@@ -396,9 +397,27 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     });
   }
 
-  // async function retrieveQualityControlAttachments() {
+  /**
+   * Performs all of the requests required for retriving the quality controls.
+   */
+  async function retrieveQualityControlAttachments() {
+    setNetworkLoading(true);
 
-  // }
+    // Generate the path for the requests that need to be made.
+    const runPaths: string[] = runSummaries.map((runSummary) => {
+      return (
+        "/seqdb-api/molecular-analysis-run-item?filter[run.uuid][EQ]=" +
+        runSummary.id +
+        "&filter[usageType][EQ]=quality-control&include=result"
+      );
+    });
+
+    // Perform network requests to get all the quality control run items.
+    // const qualityControlRunsItems: PersistedResource<MolecularAnalysisRunItem>[] =
+    await Promise.all(runPaths.map((path) => apiClient.get(path, {})));
+
+    // Todo: Get result and metadata, then include it with the preview as a run item.
+  }
 
   /**
    * Retrieves metadata resources for a given array of metadata IDs.
@@ -498,7 +517,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                 const itemFolderName =
                   runSummary.attributes.name +
                   "/" +
-                  item.genericMolecularAnalysisItemSummary.name;
+                  (item?.genericMolecularAnalysisItemSummary?.name ??
+                    "Empty Name");
                 const uniqueItemFolderName =
                   generateUniqueFolderName(itemFolderName);
                 exportLayout.set(uniqueItemFolderName, item.attachments);
@@ -563,8 +583,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     runSummaries,
     setRunSummaries,
     totalAttachments,
-    // loadQualityControls,
-    // setLoadQualityControls,
+    loadQualityControls,
+    setLoadQualityControls,
     networkLoading,
     exportLoading,
     dataExportError,

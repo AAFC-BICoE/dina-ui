@@ -25,8 +25,8 @@ export default function ExportMolecularAnalysisPage() {
     runSummaries,
     setRunSummaries,
     totalAttachments,
-    // loadQualityControls,
-    // setLoadQualityControls,
+    loadQualityControls,
+    setLoadQualityControls,
     networkLoading,
     exportLoading,
     dataExportError,
@@ -132,10 +132,10 @@ export default function ExportMolecularAnalysisPage() {
                                 />
                                 <span className="ms-2 mb-0">
                                   {/* Run Item Name */}
-                                  {
-                                    item?.genericMolecularAnalysisItemSummary
-                                      ?.name
-                                  }
+                                  {item?.genericMolecularAnalysisItemSummary
+                                    ?.name ?? (
+                                    <i style={{ color: "gray" }}>Empty Name</i>
+                                  )}
 
                                   {/* Total Attachments */}
                                   {item?.attachments?.length !== 0 && (
@@ -215,7 +215,7 @@ export default function ExportMolecularAnalysisPage() {
                     disabled={exportLoading}
                   />
                 </div>
-                {/* <div className="col-md-4">
+                <div className="col-md-4">
                   <div>
                     <strong>
                       <DinaMessage id="field_includeQualityControls" />
@@ -232,7 +232,7 @@ export default function ExportMolecularAnalysisPage() {
                     checked={loadQualityControls}
                     onChange={() => setLoadQualityControls((prev) => !prev)}
                   />
-                </div> */}
+                </div>
               </div>
             </Card.Body>
             <Card.Footer className="d-flex">
