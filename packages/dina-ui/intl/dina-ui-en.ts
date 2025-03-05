@@ -242,6 +242,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
   projectFieldExtensions: "Project Field Extensions",
+  field_includeQualityControls: "Include Quality Controls and Blanks",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
   field_acDigitizationDate: "Date Original Version Created",
@@ -857,6 +858,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   searchResults: "Search Results ({resultSize})",
   searchStorage: "Search Storage",
   selectAll: "Select All",
+  deselectAll: "Deselect All",
   selectAnExtenstion: "Select an extension",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
@@ -1102,6 +1104,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparationProtocol: "Preparation Protocol",
   preparationType: "Preparation Type",
   viewExportHistoryButton: "View Export History",
+  molecularAnalysisExport: "Molecular Analysis Export",
+  numberOfAttachments: "{totalAttachments} attachments",
+  molecularAnalysisExportMaxMaterialSampleError:
+    "A maximum of {limit} material samples allowed per export for Molecular Analysis exporting. Please reduce your selection on the list page.",
+  molecularAnalysisExportMaxObjectError:
+    "A maximum of {limit} attachments allowed per export for Molecular Analysis exporting. Please deselect attachments in the run item selection.",
+  totalAttachments: "Total attachments to be exported:",
+  runItemSelection: "Run Item Selection",
   exportColumns: "Export Columns:",
   dataLabel: "Data",
   objectsLabel: "Objects",
@@ -1203,5 +1213,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   pasteRunItemName: "Paste Run Item Names",
   pasteQualityControlName: "Paste Quality Control Names",
   pasteMaterialSample: "Paste Material Samples",
-  adminRoles: "Admin Roles"
+  adminRoles: "Admin Roles",
+  separator: "Separator"
 };

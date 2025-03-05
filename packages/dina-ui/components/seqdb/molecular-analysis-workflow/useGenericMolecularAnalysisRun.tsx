@@ -111,7 +111,7 @@ export interface UseGenericMolecularAnalysisRunReturn {
   /**
    * Generates a blank quality control for the user to enter.
    */
-  createNewQualityControl: () => void;
+  createNewQualityControl: (name?: string, qcType?: string) => void;
 
   /**
    * Based on the index, delete the quality control.
@@ -452,13 +452,13 @@ export function useGenericMolecularAnalysisRun({
   /**
    * Creates a new quality control object and adds it to the existing quality controls list.
    */
-  function createNewQualityControl(name?: string) {
+  function createNewQualityControl(name?: string, qcType?: string) {
     setQualityControls((qualityControls) => [
       ...qualityControls,
       {
         group: "",
         name: name ?? "",
-        qcType: "",
+        qcType: qcType ?? "",
         type: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL,
         attachments: []
       }

@@ -10,8 +10,8 @@ import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   DinaForm,
-  downloadDataExport,
   OBJECT_EXPORT_IDS_KEY,
+  SaveArgs,
   SubmitButton,
   TextField,
   Tooltip,
@@ -21,9 +21,13 @@ import { DynamicFieldsMappingConfig } from "packages/common-ui/lib/list-page/typ
 import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMapping";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
+import {
+  ColumnSeparator,
+  DataExport,
+  DataExportTemplate,
+  ExportType
+} from "packages/dina-ui/types/dina-export-api";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
-import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
 import { useState } from "react";
 import {
   Button,
@@ -37,15 +41,28 @@ import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
 import useSavedExports from "./useSavedExports";
-
-const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
-const BASE_DELAY_EXPORT_FETCH_MS = 2000;
+import {
+  getExport,
+  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
+  MAX_OBJECT_EXPORT_TOTAL
+} from "../../../components/export/exportUtils";
 
 export interface SavedExportOption {
-  label: string;
-  value: string;
-  resource: SavedExportColumnStructure;
+  label?: string;
+  value?: string;
+  resource?: DataExportTemplate;
 }
+
+const SEPARATOR_OPTIONS: { value: ColumnSeparator; label: string }[] = [
+  {
+    value: "COMMA",
+    label: "Comma"
+  },
+  {
+    value: "TAB",
+    label: "Tab"
+  }
+];
 
 export default function ExportPage<TData extends KitsuResource>() {
   const { formatNumber } = useIntl();
@@ -86,6 +103,13 @@ export default function ExportPage<TData extends KitsuResource>() {
 
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
   const [loading, setLoading] = useState(false);
+  const [selectedSeparator, setSelectedSeparator] = useState<{
+    value: ColumnSeparator;
+    label: string;
+  }>({
+    value: "COMMA",
+    label: "Comma"
+  });
 
   const { indexMap } = useIndexMapping({
     indexName,
@@ -108,10 +132,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     setColumnPathsToExport,
     deleteSavedExport,
     updateSavedExport
-  } = useSavedExports<TData>({
-    indexName
-  });
-
+  } = useSavedExports<TData>({ exportType, selectedSeparator });
   async function exportData(formik) {
     setLoading(true);
 
@@ -143,7 +164,7 @@ export default function ExportPage<TData extends KitsuResource>() {
       }, {});
 
     // Make query to data-export
-    const dataExportSaveArg = {
+    const dataExportSaveArg: SaveArgs<DataExport> = {
       resource: {
         type: "data-export",
         source: indexName,
@@ -151,14 +172,15 @@ export default function ExportPage<TData extends KitsuResource>() {
         columns: columnsToExport.map((item) =>
           item.columnSelectorString?.startsWith("columnFunction/")
             ? item.columnSelectorString?.split("/")[1] // Get functionId
-            : item.id
+            : item.id ?? ""
         ),
         columnAliases: columnsToExport.map((item) => item?.exportHeader ?? ""),
         columnFunctions:
           Object.keys(columnFunctions ?? {}).length === 0
             ? undefined
             : columnFunctions,
-        name: formik?.values?.name
+        name: formik?.values?.name,
+        exportOptions: { columnSeparator: selectedSeparator?.value }
       },
       type: "data-export"
     };
@@ -167,72 +189,14 @@ export default function ExportPage<TData extends KitsuResource>() {
       apiBaseUrl: "/dina-export-api"
     });
 
-    await getExport(dataExportPostResponse, formik);
+    await getExport(
+      dataExportPostResponse,
+      setLoading,
+      setDataExportError,
+      apiClient,
+      formik
+    );
     setLoading(false);
-  }
-
-  // data-export POST will return immediately but export won't necessarily be available
-  // continue to get status of export until it's COMPLETED
-  async function getExport(
-    exportPostResponse: PersistedResource<KitsuResource>[],
-    formik?: any
-  ) {
-    let isFetchingDataExport = true;
-    let fetchDataExportRetries = 0;
-    let dataExportGetResponse;
-    while (isFetchingDataExport) {
-      if (fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES) {
-        if (dataExportGetResponse?.data?.status === "COMPLETED") {
-          // Get the exported data
-          await downloadDataExport(
-            apiClient,
-            exportPostResponse[0].id,
-            formik?.values?.name
-          );
-          isFetchingDataExport = false;
-        } else if (dataExportGetResponse?.data?.status === "ERROR") {
-          isFetchingDataExport = false;
-          setLoading(false);
-          setDataExportError(
-            <div className="alert alert-danger">
-              <DinaMessage id="dataExportError" />
-            </div>
-          );
-        } else {
-          try {
-            dataExportGetResponse = await apiClient.get<DataExport>(
-              `dina-export-api/data-export/${exportPostResponse[0].id}`,
-              {}
-            );
-          } catch (e) {
-            if (e.cause.status === 404) {
-              console.warn(e.cause);
-            } else {
-              throw e;
-            }
-          }
-
-          // Exponential Backoff
-          await new Promise((resolve) =>
-            setTimeout(
-              resolve,
-              BASE_DELAY_EXPORT_FETCH_MS * 2 ** fetchDataExportRetries
-            )
-          );
-          fetchDataExportRetries += 1;
-        }
-      } else {
-        // Max retries reached
-        isFetchingDataExport = false;
-        setLoading(false);
-        setDataExportError(
-          <div className="alert alert-danger">
-            <DinaMessage id="dataExportError" />
-          </div>
-        );
-      }
-    }
-    isFetchingDataExport = false;
   }
 
   // Function to export and download Objects
@@ -286,7 +250,13 @@ export default function ExportPage<TData extends KitsuResource>() {
             apiBaseUrl: "/objectstore-api"
           }
         );
-        await getExport(objectExportResponse, formik);
+        await getExport(
+          objectExportResponse,
+          setLoading,
+          setDataExportError,
+          apiClient,
+          formik
+        );
       } catch (e) {
         setDataExportError(
           <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
@@ -313,7 +283,8 @@ export default function ExportPage<TData extends KitsuResource>() {
   );
 
   const disableObjectExportButton =
-    localStorageExportObjectIds.length < 1 || totalRecords > 100;
+    localStorageExportObjectIds.length < 1 ||
+    totalRecords > MAX_OBJECT_EXPORT_TOTAL;
 
   return (
     <>
@@ -330,8 +301,37 @@ export default function ExportPage<TData extends KitsuResource>() {
               />
             </div>
             <div className="col-md-6 col-sm-12 d-flex">
+              {totalRecords >
+              MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT ? (
+                <Tooltip
+                  directComponent={
+                    <DinaMessage
+                      id="molecularAnalysisExportMaxMaterialSampleError"
+                      values={{
+                        limit:
+                          MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT
+                      }}
+                    />
+                  }
+                  placement={"bottom"}
+                  className="ms-auto"
+                  visibleElement={
+                    <div className="btn btn-primary disabled">
+                      <DinaMessage id="molecularAnalysisExport" />
+                    </div>
+                  }
+                />
+              ) : (
+                <Link
+                  href={`/export/molecular-analysis-export/export?entityLink=${entityLink}`}
+                >
+                  <a className="btn btn-primary ms-auto">
+                    <DinaMessage id="molecularAnalysisExport" />
+                  </a>
+                </Link>
+              )}
               <Link href={`/export/data-export/list?entityLink=${entityLink}`}>
-                <a className="btn btn-primary ms-auto">
+                <a className="btn btn-primary ms-2">
                   <DinaMessage id="viewExportHistoryButton" />
                 </a>
               </Link>
@@ -404,6 +404,24 @@ export default function ExportPage<TData extends KitsuResource>() {
                       </>
                     )}
                   </div>
+                  <div className="col-md-4">
+                    <strong>
+                      <DinaMessage id="separator" />
+                    </strong>
+                    <Select<{ value: ColumnSeparator; label: string }>
+                      className="mt-2 mb-3"
+                      name="separator"
+                      options={SEPARATOR_OPTIONS}
+                      onChange={(selection) => {
+                        if (selection) {
+                          setSelectedSeparator(selection);
+                        }
+                      }}
+                      isLoading={loadingSavedExports}
+                      isDisabled={loading}
+                      defaultValue={selectedSeparator}
+                    />
+                  </div>
 
                   {exportType === "TABULAR_DATA" && (
                     <>
@@ -436,7 +454,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                               ?.find(
                                 (option) =>
                                   option.value === selectedSavedExport?.name
-                              ) ?? undefined
+                              ) ?? null
                           }
                         />
                       </div>

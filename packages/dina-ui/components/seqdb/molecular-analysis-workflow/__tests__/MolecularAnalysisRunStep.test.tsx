@@ -1,5 +1,9 @@
 import { mountWithAppContext } from "common-ui";
-import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  fireEvent,
+  waitFor,
+  waitForElementToBeRemoved
+} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -1250,5 +1254,96 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Info alert to display that no sequencing runs exist
     expect(wrapper.queryByRole("alert")).toBeInTheDocument();
+  });
+
+  describe("Data Paste Zone Functionaltiy", () => {
+    it("Paste quality control functionality with both name and type", async () => {
+      const wrapper = mountWithAppContext(<TestComponent />, testCtx);
+
+      // Wait for loading to be finished.
+      await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+      // Should be in edit mode automatically since no runs exist.
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+      const dataPasteZone = wrapper.getAllByPlaceholderText(
+        "Paste your data here (e.g., copied from Excel)"
+      )[1];
+
+      // Simulate pasting data into the data paste zone as an excel paste (2 columns)
+      const pasteData =
+        "Quality Control Name 1\tReserpine Standard\nQuality Control Name 2\tACN Blank";
+      fireEvent.paste(dataPasteZone, {
+        clipboardData: {
+          getData: () => pasteData
+        }
+      });
+
+      // Items should be populated in:
+      expect(
+        wrapper.getByDisplayValue(/quality control name 1/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByDisplayValue(/quality control name 2/i)
+      ).toBeInTheDocument();
+      expect(wrapper.getByText(/reserpine standard/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/acn blank/i)).toBeInTheDocument();
+    });
+
+    it("Paste quality control functionality with only name", async () => {
+      const wrapper = mountWithAppContext(<TestComponent />, testCtx);
+
+      // Wait for loading to be finished.
+      await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+      // Should be in edit mode automatically since no runs exist.
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+      const dataPasteZone = wrapper.getAllByPlaceholderText(
+        "Paste your data here (e.g., copied from Excel)"
+      )[1];
+
+      // Simulate pasting data into the data paste zone as an excel paste (2 columns)
+      const pasteData = "Quality Control Name 1\nQuality Control Name 2";
+      fireEvent.paste(dataPasteZone, {
+        clipboardData: {
+          getData: () => pasteData
+        }
+      });
+
+      // Items should be populated in:
+      expect(
+        wrapper.getByDisplayValue(/quality control name 1/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByDisplayValue(/quality control name 2/i)
+      ).toBeInTheDocument();
+    });
+
+    it("Paste run names functionality", async () => {
+      const wrapper = mountWithAppContext(<TestComponent />, testCtx);
+
+      // Wait for loading to be finished.
+      await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+      // Should be in edit mode automatically since no runs exist.
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+      const dataPasteZone = wrapper.getAllByPlaceholderText(
+        "Paste your data here (e.g., copied from Excel)"
+      )[0];
+
+      // Simulate pasting data into the data paste zone as an excel paste (2 columns)
+      const pasteData = "Run Item Name 1\nRun Item Name 2";
+      fireEvent.paste(dataPasteZone, {
+        clipboardData: {
+          getData: () => pasteData
+        }
+      });
+
+      // Items should be populated in:
+      expect(wrapper.getByDisplayValue(/run item name 1/i)).toBeInTheDocument();
+      expect(wrapper.getByDisplayValue(/run item name 2/i)).toBeInTheDocument();
+    });
   });
 });

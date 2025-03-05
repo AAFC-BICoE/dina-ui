@@ -9,7 +9,7 @@ export interface CheckBoxProps extends FieldWrapperProps {
   overridecheckboxProps?: any;
 }
 
-const checkboxProps = {
+export const checkboxProps = {
   style: {
     display: "block",
     height: "20px",
