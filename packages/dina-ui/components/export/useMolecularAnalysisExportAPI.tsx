@@ -9,6 +9,7 @@ import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resour
 import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
+  filterBy,
   useApiClient
 } from "common-ui";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
@@ -22,6 +23,10 @@ import {
 } from "./exportUtils";
 import { useSessionStorage } from "usehooks-ts";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 export interface UseMolecularAnalysisExportAPIReturn {
   runSummaries: any[];
@@ -403,20 +408,123 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   async function retrieveQualityControlAttachments() {
     setNetworkLoading(true);
 
-    // Generate the path for the requests that need to be made.
-    const runPaths: string[] = runSummaries.map((runSummary) => {
-      return (
-        "/seqdb-api/molecular-analysis-run-item?filter[run.uuid][EQ]=" +
-        runSummary.id +
-        "&filter[usageType][EQ]=quality-control&include=result"
-      );
-    });
+    // Only perform the request if there are run summaries.
+    if (runSummaries.length > 0) {
+      const newQualityControlItems: MolecularAnalysisRunItem[] = [];
 
-    // Perform network requests to get all the quality control run items.
-    // const qualityControlRunsItems: PersistedResource<MolecularAnalysisRunItem>[] =
-    await Promise.all(runPaths.map((path) => apiClient.get(path, {})));
+      // Go through each run summary and perform the query for quality control run items.
+      for (const runSummary of runSummaries) {
+        const qualityControlItemQuery = await apiClient.get(
+          `seqdb-api/molecular-analysis-run-item`,
+          {
+            filter: filterBy([], {
+              extraFilters: [
+                {
+                  selector: "run.uuid",
+                  comparison: "==",
+                  arguments: runSummary.id
+                },
+                {
+                  selector: "usageType",
+                  comparison: "==",
+                  arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+                }
+              ]
+            })("")
+          }
+        );
 
-    // Todo: Get result and metadata, then include it with the preview as a run item.
+        if (
+          qualityControlItemQuery &&
+          (qualityControlItemQuery as any)?.data?.length > 0
+        ) {
+          const qualityControlRunItems = (qualityControlItemQuery as any)?.data;
+          newQualityControlItems.push(...qualityControlRunItems);
+        }
+      }
+
+      if (newQualityControlItems.length > 0) {
+        const newQualityControlResults: MolecularAnalysisResult[] = [];
+
+        // Go through each quality control run item and perform the query for each result.
+        for (const item of newQualityControlItems) {
+          const qualityControlResultQuery =
+            await apiClient.get<MolecularAnalysisResult>(
+              `seqdb-api/molecular-analysis-result/${item?.result?.id}?include=attachments`,
+              {}
+            );
+
+          const qualityControlResultFound = qualityControlResultQuery?.data;
+          if (qualityControlResultFound) {
+            newQualityControlResults.push(qualityControlResultFound);
+          }
+        }
+
+        // Collect metadata IDs from the results' attachments.
+        const metadataIds: string[] = newQualityControlResults
+          .flatMap((result) =>
+            result.attachments.map((attachment) => attachment.id)
+          )
+          .filter((id): id is string => id !== undefined);
+
+        const metadatas =
+          metadataIds.length > 0 ? await retrieveMetadata(metadataIds) : [];
+        const metadataMap = new Map(
+          metadatas.map((metadata) => [metadata.id, metadata])
+        );
+
+        // Update the run summaries to include the new attachments and run items for quality control.
+        setRunSummaries((currentRunSummaries) => {
+          return currentRunSummaries.map((currentRunSummary) => {
+            const qualityControlItems = newQualityControlItems.filter(
+              (item) => item?.run?.id === currentRunSummary.id
+            );
+
+            const updatedItems = currentRunSummary.attributes.items.map(
+              (item) => {
+                const qualityControlItem = qualityControlItems.find(
+                  (qcItem) => qcItem?.result?.id === item.result?.uuid
+                );
+                const molecularAnalysisResult = newQualityControlResults.find(
+                  (result) => result.id === qualityControlItem?.result?.id
+                );
+                const currentItemFileIdentifiers: string[] = [];
+
+                if (molecularAnalysisResult?.attachments) {
+                  molecularAnalysisResult.attachments.forEach((attachment) => {
+                    const metadata = metadataMap.get(attachment?.id ?? "");
+                    if (metadata?.dcType === "IMAGE") {
+                      const fileIdentifier =
+                        metadata.derivatives?.find(
+                          (d) => d.derivativeType === "LARGE_IMAGE"
+                        )?.fileIdentifier || metadata.fileIdentifier;
+                      if (fileIdentifier) {
+                        currentItemFileIdentifiers.push(fileIdentifier);
+                      }
+                    }
+                  });
+                }
+
+                return {
+                  ...item,
+                  attachments: currentItemFileIdentifiers
+                };
+              }
+            );
+
+            return {
+              ...currentRunSummary,
+              attributes: {
+                ...currentRunSummary.attributes,
+                items: updatedItems
+              }
+            };
+          });
+        });
+      }
+    }
+
+    setNetworkLoading(false);
   }
 
   /**
