@@ -76,7 +76,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   const [attachmentsLoaded, setAttachmentsLoaded] = useState(false);
 
   // Have the quality controls been loaded already, do not run it again if it is true.
-  const [_qualityControlsLoaded, setQualityControlsLoaded] = useState(false);
+  const [qualityControlsLoaded, setQualityControlsLoaded] = useState(false);
 
   // ElasticSearch query to be used to perform the export against.
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
@@ -133,10 +133,17 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
    * Use effect responsible for loading in the quality control attachments.
    */
   useEffect(() => {
-    //if (loadQualityControls && !qualityControlsLoaded) {
     if (loadQualityControls) {
-      setQualityControlsLoaded(true);
-      retrieveQualityControlAttachments();
+      if (!qualityControlsLoaded) {
+        setQualityControlsLoaded(true);
+        retrieveQualityControlAttachments();
+      } else {
+        changeQualityControlEnabled(true);
+      }
+    } else {
+      if (qualityControlsLoaded) {
+        changeQualityControlEnabled(false);
+      }
     }
   }, [loadQualityControls]);
 
@@ -239,6 +246,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                   ...included.attributes.items.map((item) => ({
                     ...item,
                     enabled: true,
+                    isQualityControl: false,
                     attachments: []
                   }))
                 ];
@@ -246,12 +254,14 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                 const newIncluded = {
                   ...included,
                   enabled: true,
+                  isQualityControl: false,
                   attachments: [],
                   attributes: {
                     ...included.attributes,
                     items: included.attributes.items.map((item) => ({
                       ...item,
                       enabled: true,
+                      isQualityControl: false,
                       attachments: []
                     }))
                   }
@@ -534,6 +544,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                   uuid: qcItem.id,
                   name: qualityControlNames[qcItem.id ?? ""],
                   enabled: true,
+                  isQualityControl: true,
                   genericMolecularAnalysisItemSummary: {
                     name: qualityControlNames[qcItem.id ?? ""]
                   },
@@ -560,6 +571,33 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     }
 
     setNetworkLoading(false);
+  }
+
+  /**
+   * Disables all quality control items in the run summaries items.
+   */
+  async function changeQualityControlEnabled(enabled: boolean) {
+    setRunSummaries((currentRunSummaries) => {
+      return currentRunSummaries.map((currentRunSummary) => {
+        const updatedItems = currentRunSummary.attributes.items.map((item) => {
+          if (item.isQualityControl === true) {
+            return {
+              ...item,
+              enabled: enabled
+            };
+          }
+          return item;
+        });
+
+        return {
+          ...currentRunSummary,
+          attributes: {
+            ...currentRunSummary.attributes,
+            items: updatedItems
+          }
+        };
+      });
+    });
   }
 
   /**

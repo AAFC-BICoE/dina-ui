@@ -13,6 +13,7 @@ import Link from "next/link";
 import { Card } from "react-bootstrap";
 import useMolecularAnalysisExportAPI from "../../../components/export/useMolecularAnalysisExportAPI";
 import { MAX_OBJECT_EXPORT_TOTAL } from "../../../components/export/exportUtils";
+import React from "react";
 
 export default function ExportMolecularAnalysisPage() {
   const router = useRouter();
@@ -111,47 +112,62 @@ export default function ExportMolecularAnalysisPage() {
                             </h5>
                           </div>
                           {runSummary?.attributes?.items?.map(
-                            (item, itemIndex) => (
-                              <div
-                                key={itemIndex}
-                                style={{ marginLeft: "30px" }}
-                                className="d-flex align-items-center"
-                              >
-                                <input
-                                  type="checkbox"
-                                  name={`runItemSelected[${itemIndex}]`}
-                                  checked={
-                                    runSummary.enabled ? item?.enabled : false
-                                  }
-                                  disabled={!runSummary.enabled}
-                                  style={checkboxProps.style}
-                                  onChange={() => {
-                                    item.enabled = !item.enabled;
-                                    setRunSummaries([...runSummaries]);
-                                  }}
-                                />
-                                <span className="ms-2 mb-0">
-                                  {/* Run Item Name */}
-                                  {item?.genericMolecularAnalysisItemSummary
-                                    ?.name ?? (
-                                    <i style={{ color: "gray" }}>Empty Name</i>
-                                  )}
+                            (item, itemIndex) => {
+                              if (
+                                item.isQualityControl &&
+                                !loadQualityControls
+                              ) {
+                                return (
+                                  <React.Fragment
+                                    key={itemIndex}
+                                  ></React.Fragment>
+                                );
+                              }
 
-                                  {/* Total Attachments */}
-                                  {item?.attachments?.length !== 0 && (
-                                    <span className="badge bg-secondary ms-2">
-                                      <DinaMessage
-                                        id="numberOfAttachments"
-                                        values={{
-                                          totalAttachments:
-                                            item?.attachments?.length
-                                        }}
-                                      />
-                                    </span>
-                                  )}
-                                </span>
-                              </div>
-                            )
+                              return (
+                                <div
+                                  key={itemIndex}
+                                  style={{ marginLeft: "30px" }}
+                                  className="d-flex align-items-center"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    name={`runItemSelected[${itemIndex}]`}
+                                    checked={
+                                      runSummary.enabled ? item?.enabled : false
+                                    }
+                                    disabled={!runSummary.enabled}
+                                    style={checkboxProps.style}
+                                    onChange={() => {
+                                      item.enabled = !item.enabled;
+                                      setRunSummaries([...runSummaries]);
+                                    }}
+                                  />
+                                  <span className="ms-2 mb-0">
+                                    {/* Run Item Name */}
+                                    {item?.genericMolecularAnalysisItemSummary
+                                      ?.name ?? (
+                                      <i style={{ color: "gray" }}>
+                                        Empty Name
+                                      </i>
+                                    )}
+
+                                    {/* Total Attachments */}
+                                    {item?.attachments?.length !== 0 && (
+                                      <span className="badge bg-secondary ms-2">
+                                        <DinaMessage
+                                          id="numberOfAttachments"
+                                          values={{
+                                            totalAttachments:
+                                              item?.attachments?.length
+                                          }}
+                                        />
+                                      </span>
+                                    )}
+                                  </span>
+                                </div>
+                              );
+                            }
                           )}
                         </>
                       );
