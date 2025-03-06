@@ -245,6 +245,7 @@ export default function ExportMolecularAnalysisPage() {
                       width: "30px",
                       marginTop: "8px"
                     }}
+                    disabled={exportLoading}
                     checked={loadQualityControls}
                     onChange={() => setLoadQualityControls((prev) => !prev)}
                   />
