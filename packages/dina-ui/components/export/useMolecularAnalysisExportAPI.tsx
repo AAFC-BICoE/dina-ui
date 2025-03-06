@@ -414,139 +414,145 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   }
 
   /**
-   * Performs all of the requests required for retriving the quality controls.
+   * Performs all of the requests required for retrieving the quality control attachments.
+   *
+   * Function performs the following steps:
+   *
+   * 1. Using all of the run summary ids, generate a single request to return all of the quality
+   *    control run items.
+   * 2. Retrieve all of the result ids from the run items and perform a single request to
+   *    retrieve them.
+   * 3. Retrieve the quality controls associated with the quality control items, which contains
+   *    the name and type for packaging the zip.
+   * 4. Using the results found, retrieve all of the metadata to get the file identifiers and
+   *    derivatives.
+   * 5. Set the run summaries to include the quality control attachments so the user can see and
+   *    select which to include in the export. Note that the LARGE_IMAGE derivative is always
+   *    preferred. Images are also the currently only accepted type.
    */
   async function retrieveQualityControlAttachments() {
     setNetworkLoading(true);
 
-    // Only perform the request if there are run summaries.
     if (runSummaries.length > 0) {
-      const newQualityControlItems: MolecularAnalysisRunItem[] = [];
-      const qualityControlNames: { [key: string]: string } = {};
+      const runIds = runSummaries.map((run) => run.id);
 
-      // Go through each run summary and perform the query for quality control run items.
-      for (const runSummary of runSummaries) {
-        const qualityControlItemQuery = await apiClient.get(
-          `seqdb-api/molecular-analysis-run-item`,
-          {
-            filter: filterBy([], {
-              extraFilters: [
-                {
-                  selector: "run.uuid",
-                  comparison: "==",
-                  arguments: runSummary.id
-                },
-                {
-                  selector: "usageType",
-                  comparison: "==",
-                  arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
-                }
-              ]
-            })(""),
-            include: "result,run"
-          }
-        );
-
-        if (
-          qualityControlItemQuery &&
-          (qualityControlItemQuery as any)?.data?.length > 0
-        ) {
-          const qualityControlRunItems = (qualityControlItemQuery as any)?.data;
-          newQualityControlItems.push(...qualityControlRunItems);
-        }
-      }
-
-      if (newQualityControlItems.length > 0) {
-        const newQualityControlResults: MolecularAnalysisResult[] = [];
-
-        // Go through each quality control run item and perform the query for each result.
-        for (const item of newQualityControlItems) {
-          const qualityControlResultQuery =
-            await apiClient.get<MolecularAnalysisResult>(
-              `seqdb-api/molecular-analysis-result/${item?.result?.id}?include=attachments`,
-              {}
-            );
-
-          const qualityControlResultFound = qualityControlResultQuery?.data;
-          if (qualityControlResultFound) {
-            newQualityControlResults.push(qualityControlResultFound);
-          }
-
-          // Perform the query to get the quality control name.
-          const qualityControlQuery = await apiClient.get<QualityControl>(
-            `seqdb-api/quality-control`,
+      // 1. Using all of the run summary ids, generate a single request to return all of the quality
+      // control run items.
+      const { data: newQualityControlItems } = await apiClient.get<
+        MolecularAnalysisRunItem[]
+      >("seqdb-api/molecular-analysis-run-item", {
+        filter: filterBy([], {
+          extraFilters: [
+            { selector: "run.uuid", comparison: "=in=", arguments: runIds },
             {
-              filter: filterBy([], {
-                extraFilters: [
-                  {
-                    selector: "molecularAnalysisRunItem.uuid",
-                    comparison: "==",
-                    arguments: item?.id ?? ""
-                  }
-                ]
-              })(""),
-              include: "molecularAnalysisRunItem"
+              selector: "usageType",
+              comparison: "==",
+              arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
             }
-          );
+          ]
+        })(""),
+        include: "result,run",
+        page: { limit: 100 }
+      });
 
-          const qualityControlFound = qualityControlQuery?.data?.[0];
-          if (qualityControlFound) {
-            qualityControlNames[item.id ?? ""] = qualityControlFound.name;
-          }
-        }
+      // Only continue if run items exist, if none then nothing to load.
+      if (newQualityControlItems && newQualityControlItems.length > 0) {
+        // 2. Retrieve all of the result ids from the run items and perform a single request to
+        // retrieve them.
+        const resultIds: string[] = newQualityControlItems.map(
+          (item) => item?.result?.id ?? ""
+        );
+        const { data: qualityControlResultsResponse } = await apiClient.get<
+          MolecularAnalysisResult[]
+        >("seqdb-api/molecular-analysis-result", {
+          filter: filterBy([], {
+            extraFilters: [
+              { selector: "uuid", comparison: "=in=", arguments: resultIds }
+            ]
+          })(""),
+          include: "attachments",
+          page: { limit: 100 }
+        });
 
-        // Collect metadata IDs from the results attachments.
-        const metadataIds: string[] = newQualityControlResults
-          .flatMap((result) =>
-            result.attachments.map((attachment) => attachment.id)
-          )
-          .filter((id): id is string => id !== undefined);
+        // 3. Also retrieve the quality controls associated with the quality control items, this
+        // contains the name and type for packaging the zip.
+        const { data: qualityControlNamesResponse } = await apiClient.get<
+          QualityControl[]
+        >("seqdb-api/quality-control", {
+          filter: filterBy([], {
+            extraFilters: [
+              {
+                selector: "molecularAnalysisRunItem.uuid",
+                comparison: "=in=",
+                arguments: newQualityControlItems.map((item) => item?.id ?? "")
+              }
+            ]
+          })(""),
+          include: "molecularAnalysisRunItem",
+          page: { limit: 100 }
+        });
 
+        // 4. Using the results found, retrieve all of the metadata to get the file identifiers and
+        // derivatives.
+        const metadataIds: string[] = qualityControlResultsResponse.flatMap(
+          (result) =>
+            result.attachments.map((attachment) => attachment?.id ?? "")
+        );
         const metadatas =
           metadataIds.length > 0 ? await retrieveMetadata(metadataIds) : [];
-        const metadataMap = new Map(
+        const metadataMap = new Map<string, Metadata>(
           metadatas.map((metadata) => [metadata.id, metadata])
         );
 
-        // Update the run summaries to add new run items with the run item being the quality control
-        // name and attachments being set.
+        const qualityControlNamesMap = new Map<string, string>(
+          qualityControlNamesResponse.map((qc) => [
+            qc?.molecularAnalysisRunItem?.id ?? "",
+            qc.name ?? ""
+          ])
+        );
+
+        // 5. Taking all the requests, set the run summaries to include the quality control
+        // attachments so the user can see and select which to include in the export.
+        // Please note the LARGE_IMAGE derivative is always preferred.
         setRunSummaries((currentRunSummaries) => {
           return currentRunSummaries.map((currentRunSummary) => {
-            // Going through each run summary, determine if a quality control falls into it.
-            const qualityControlItems = newQualityControlItems.filter(
+            const qualityControlItemsForRun = newQualityControlItems.filter(
               (item) => item?.run?.id === currentRunSummary.id
             );
 
-            // Create new quality control items for UI rendering.
-            const generatedQualityControlItems = qualityControlItems.map(
+            const generatedQualityControlItems = qualityControlItemsForRun.map(
               (qcItem) => {
-                const molecularAnalysisResult = newQualityControlResults.find(
-                  (result) => result.id === qcItem?.result?.id
-                );
-                const currentItemFileIdentifiers: string[] = [];
-
-                if (molecularAnalysisResult?.attachments) {
-                  molecularAnalysisResult.attachments.forEach((attachment) => {
-                    const metadata = metadataMap.get(attachment?.id ?? "");
-                    if (metadata?.dcType === "IMAGE") {
-                      const fileIdentifier =
-                        metadata.derivatives?.find(
+                const molecularAnalysisResult =
+                  qualityControlResultsResponse.find(
+                    (result) => result.id === qcItem?.result?.id
+                  );
+                const currentItemFileIdentifiers: string[] = (
+                  molecularAnalysisResult?.attachments
+                    .filter(
+                      (attachment) =>
+                        metadataMap.get(attachment?.id ?? "")?.dcType ===
+                        "IMAGE"
+                    )
+                    .map((attachment) => {
+                      const metadata = metadataMap.get(attachment?.id ?? "");
+                      return (
+                        metadata?.derivatives?.find(
                           (d) => d.derivativeType === "LARGE_IMAGE"
-                        )?.fileIdentifier || metadata.fileIdentifier;
-                      if (fileIdentifier) {
-                        currentItemFileIdentifiers.push(fileIdentifier);
-                      }
-                    }
-                  });
-                }
+                        )?.fileIdentifier || metadata?.fileIdentifier
+                      );
+                    }) || []
+                ).filter(
+                  (fileIdentifier): fileIdentifier is string =>
+                    fileIdentifier !== undefined
+                );
 
                 return {
                   uuid: qcItem.id,
-                  name: qualityControlNames[qcItem.id ?? ""],
+                  name: qualityControlNamesMap.get(qcItem?.id ?? "") || "",
                   enabled: true,
                   isQualityControl: true,
                   genericMolecularAnalysisItemSummary: {
-                    name: qualityControlNames[qcItem.id ?? ""]
+                    name: qualityControlNamesMap.get(qcItem?.id ?? "") || ""
                   },
                   attachments: currentItemFileIdentifiers,
                   result: qcItem.result,
