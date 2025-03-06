@@ -27,6 +27,7 @@ import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType
 } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 
 export interface UseMolecularAnalysisExportAPIReturn {
   runSummaries: any[];
@@ -411,6 +412,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     // Only perform the request if there are run summaries.
     if (runSummaries.length > 0) {
       const newQualityControlItems: MolecularAnalysisRunItem[] = [];
+      const qualityControlNames: { [key: string]: string } = {};
 
       // Go through each run summary and perform the query for quality control run items.
       for (const runSummary of runSummaries) {
@@ -458,6 +460,28 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
           const qualityControlResultFound = qualityControlResultQuery?.data;
           if (qualityControlResultFound) {
             newQualityControlResults.push(qualityControlResultFound);
+          }
+
+          // Perform the query to get the quality control name.
+          const qualityControlQuery = await apiClient.get<QualityControl>(
+            `seqdb-api/quality-control`,
+            {
+              filter: filterBy([], {
+                extraFilters: [
+                  {
+                    selector: "molecularAnalysisRunItem.uuid",
+                    comparison: "==",
+                    arguments: item?.id ?? ""
+                  }
+                ]
+              })(""),
+              include: "molecularAnalysisRunItem"
+            }
+          );
+
+          const qualityControlFound = qualityControlQuery?.data?.[0];
+          if (qualityControlFound) {
+            qualityControlNames[item.id ?? ""] = qualityControlFound.name;
           }
         }
 
@@ -508,10 +532,10 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
 
                 return {
                   uuid: qcItem.id,
-                  name: "Quality Control",
+                  name: qualityControlNames[qcItem.id ?? ""],
                   enabled: true,
                   genericMolecularAnalysisItemSummary: {
-                    name: "Quality Control" // Todo: Need to do a network request for the quality control to get the name.
+                    name: qualityControlNames[qcItem.id ?? ""]
                   },
                   attachments: currentItemFileIdentifiers,
                   result: qcItem.result,
