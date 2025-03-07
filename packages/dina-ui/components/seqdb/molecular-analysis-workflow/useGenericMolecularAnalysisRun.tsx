@@ -1099,6 +1099,23 @@ export function useGenericMolecularAnalysisRun({
           const resultIdToDelete = (matchingLoadedQc as any)
             .molecularAnalysisRunItem?.result?.id;
           if (resultIdToDelete) {
+            // Unlink result from MolecularAnalysisRunItem by setting result relationship to null
+            const molecularAnalysisRunItemUpdateArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+              [
+                {
+                  type: "molecular-analysis-run-item",
+                  id: matchingLoadedQc?.molecularAnalysisRunItem?.id,
+                  resource: {
+                    id: matchingLoadedQc?.molecularAnalysisRunItem?.id,
+                    type: "molecular-analysis-run-item",
+                    relationships: { result: { data: null } }
+                  }
+                } as any
+              ];
+            await save(molecularAnalysisRunItemUpdateArgs, {
+              apiBaseUrl: "/seqdb-api"
+            });
+
             // Delete the result.
             await save(
               [
@@ -1111,23 +1128,6 @@ export function useGenericMolecularAnalysisRun({
               ],
               { apiBaseUrl: "/seqdb-api" }
             );
-
-            // Unlink result from MolecularAnalysisRunItem by setting result relationship to null
-            const molecularAnalysisRunItemUpdateArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-              [
-                {
-                  type: "molecular-analysis-run-item",
-                  id: matchingLoadedQc?.molecularAnalysisRunItem?.id,
-                  resource: {
-                    id: matchingLoadedQc?.molecularAnalysisRunItem?.id,
-                    type: "molecular-analysis-run-item",
-                    relationships: { result: null }
-                  }
-                } as any
-              ];
-            await save(molecularAnalysisRunItemUpdateArgs, {
-              apiBaseUrl: "/seqdb-api"
-            });
           }
         } else {
           // Case 3: Attachments added/changed, previous result exists - UPDATE existing result.

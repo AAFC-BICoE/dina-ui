@@ -1064,21 +1064,6 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Expect the network request to properly delete the quality control and attachments.
     expect(mockSave.mock.calls).toEqual([
-      // Delete the result for the quality control since all attachments were deleted.
-      [
-        [
-          {
-            delete: {
-              id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
-              type: "molecular-analysis-result"
-            }
-          }
-        ],
-        {
-          apiBaseUrl: "/seqdb-api"
-        }
-      ],
-
       // Remove the relationship from the run item that is for the quality control.
       [
         [
@@ -1087,11 +1072,28 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             resource: {
               id: "2a3b15ce-6781-466b-bc1e-49e35af3df58",
               relationships: {
-                result: null
+                result: {
+                  data: null
+                }
               },
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Delete the result for the quality control since all attachments were deleted.
+      [
+        [
+          {
+            delete: {
+              id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+              type: "molecular-analysis-result"
+            }
           }
         ],
         {
