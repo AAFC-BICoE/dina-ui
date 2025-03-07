@@ -490,7 +490,10 @@ export default function ExportPage<TData extends KitsuResource>() {
                               </Button>
                             )}
                           </div>
-                          <div>
+                          <div
+                            className="col-md-4 p"
+                            style={{ paddingLeft: "15px" }}
+                          >
                             <strong>
                               <DinaMessage id="visibility" />
                             </strong>
