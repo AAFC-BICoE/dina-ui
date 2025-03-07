@@ -513,12 +513,12 @@ export default function ExportPage<TData extends KitsuResource>() {
                                 );
                                 setChangesMade(true);
                               }}
-                              defaultValue={VISIBILITY_OPTIONS.find(
+                              value={VISIBILITY_OPTIONS.find(
                                 (option) =>
-                                  option.value.publiclyReleasable ===
-                                    selectedSavedExport.publiclyReleasable &&
-                                  option.value.restrictToCreatedBy ===
-                                    selectedSavedExport.restrictToCreatedBy
+                                  selectedSavedExport.publiclyReleasable ===
+                                    option.value.publiclyReleasable &&
+                                  selectedSavedExport.restrictToCreatedBy ===
+                                    option.value.restrictToCreatedBy
                               )}
                             />
                           </div>
