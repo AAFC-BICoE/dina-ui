@@ -21,6 +21,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
 import classNames from "classnames";
+import { KitsuResource, PersistedResource } from "kitsu";
+import { ColumnDef } from "@tanstack/react-table";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -33,6 +35,10 @@ export interface AttachmentsFieldProps {
   /** Attachment API path for the read-only view. */
   attachmentPath: string;
   hideAddAttchmentBtn?: boolean;
+  hideRemoveBtn?: boolean;
+  hideAttachmentForm?: boolean;
+  hideTitle?: boolean;
+  hideCard?: boolean;
   wrapContent?: (content: ReactNode) => ReactNode;
 }
 
@@ -76,6 +82,10 @@ export function AttachmentsEditor({
   allowExistingFieldName,
   allowNewFieldName,
   hideAddAttchmentBtn,
+  hideRemoveBtn,
+  hideAttachmentForm,
+  hideTitle,
+  hideCard,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true },
   wrapContent = (content) => content,
   name
@@ -103,15 +113,78 @@ export function AttachmentsEditor({
   const addingAttachmentsDisabled =
     !allowAttachmentsConfig?.allowExisting && !allowAttachmentsConfig?.allowNew;
 
+  const COLUMNS: ColumnDef<PersistedResource<KitsuResource | Metadata>>[] = [
+    ThumbnailCell({
+      bucketField: "bucket",
+      isJsonApiQuery: true
+    }),
+    {
+      id: "originalFilename",
+      header: () => <FieldHeader name="originalFilename" />,
+      cell: ({ row: { original: metadata } }) => {
+        // When this Metadata has been deleted, show a "deleted" message in this cell:
+        if (Object.keys(metadata).length === 2) {
+          return (
+            <div>
+              {`<${formatMessage("deleted")}>`}
+              <Tooltip
+                id="deletedMetadata_tooltip"
+                intlValues={{ id: metadata.id }}
+              />
+            </div>
+          );
+        }
+
+        return (
+          <Link href={`/object-store/object/view?id=${metadata.id}`}>
+            <a>{(metadata as any)?.originalFilename ?? metadata.id}</a>
+          </Link>
+        );
+      }
+    },
+    ...["acCaption", "xmpMetadataDate", "acTags"].map((accessor) => ({
+      id: accessor,
+      accessorKey: accessor,
+      header: () => <FieldHeader name={accessor} />
+    })),
+    {
+      id: "actionColumn",
+      size: 0,
+      header: () => <FieldHeader name={formatMessage("remove")} />,
+      cell: ({
+        row: {
+          original: { id: mId }
+        }
+      }) => (
+        <button
+          className="btn btn-dark remove-attachment"
+          onClick={() =>
+            removeMetadata(
+              mId?.replace("?include=derivatives", "") ?? "unknown"
+            )
+          }
+          type="button"
+        >
+          <DinaMessage id="remove" />
+        </button>
+      )
+    }
+  ];
+
   return (
     <FieldSet
       id={id}
       legend={
-        <>
-          {title ?? "Attachments"} {!isTemplate ? `(${value.length})` : ""}
-        </>
+        hideTitle ? (
+          <></>
+        ) : (
+          <>
+            {title ?? "Attachments"} {!isTemplate ? `(${value.length})` : ""}
+          </>
+        )
       }
       fieldName={name}
+      removePadding={hideCard ?? false}
     >
       {loading ? (
         <LoadingSpinner loading={true} />
@@ -124,72 +197,11 @@ export function AttachmentsEditor({
               {value.length ? (
                 <div className="mb-3">
                   <ReactTable
-                    columns={[
-                      ThumbnailCell({
-                        bucketField: "bucket",
-                        isJsonApiQuery: true
-                      }),
-                      {
-                        id: "originalFilename",
-                        header: () => <FieldHeader name="originalFilename" />,
-                        cell: ({ row: { original: metadata } }) => {
-                          // When this Metadata has been deleted, show a "deleted" message in this cell:
-                          if (Object.keys(metadata).length === 2) {
-                            return (
-                              <div>
-                                {`<${formatMessage("deleted")}>`}
-                                <Tooltip
-                                  id="deletedMetadata_tooltip"
-                                  intlValues={{ id: metadata.id }}
-                                />
-                              </div>
-                            );
-                          }
-
-                          return (
-                            <Link
-                              href={`/object-store/object/view?id=${metadata.id}`}
-                            >
-                              <a>
-                                {(metadata as any)?.originalFilename ??
-                                  metadata.id}
-                              </a>
-                            </Link>
-                          );
-                        }
-                      },
-                      ...["acCaption", "xmpMetadataDate", "acTags"].map(
-                        (accessor) => ({
-                          id: accessor,
-                          accessorKey: accessor,
-                          header: () => <FieldHeader name={accessor} />
-                        })
-                      ),
-                      {
-                        id: "actionColumn",
-                        header: () => (
-                          <FieldHeader name={formatMessage("remove")} />
-                        ),
-                        cell: ({
-                          row: {
-                            original: { id: mId }
-                          }
-                        }) => (
-                          <button
-                            className="btn btn-dark remove-attachment"
-                            onClick={() =>
-                              removeMetadata(
-                                mId?.replace("?include=derivatives", "") ??
-                                  "unknown"
-                              )
-                            }
-                            type="button"
-                          >
-                            <DinaMessage id="remove" />
-                          </button>
-                        )
-                      }
-                    ]}
+                    columns={
+                      hideRemoveBtn
+                        ? COLUMNS.slice(0, COLUMNS.length - 1)
+                        : COLUMNS
+                    }
                     data={metadatas ?? []}
                   />
                 </div>
@@ -203,14 +215,16 @@ export function AttachmentsEditor({
                 />
               ) : (
                 <>
-                  <AttachmentSection
-                    allowAttachmentsConfig={allowAttachmentsConfig}
-                    afterMetadatasSaved={addAttachedMetadatas(
-                      onChange,
-                      value,
-                      closeModal
-                    )}
-                  />
+                  {!hideAttachmentForm && (
+                    <AttachmentSection
+                      allowAttachmentsConfig={allowAttachmentsConfig}
+                      afterMetadatasSaved={addAttachedMetadatas(
+                        onChange,
+                        value,
+                        closeModal
+                      )}
+                    />
+                  )}
                 </>
               )}
             </>
