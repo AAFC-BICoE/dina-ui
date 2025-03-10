@@ -15,6 +15,7 @@ import {
   TEST_METAGENOMIC_MOLECULAR_ANALYSIS_ITEMS,
   TEST_METAGENOMICS_BATCH_RUN,
   TEST_METAGENOMICS_BATCH_RUN_ID,
+  TEST_MOLECULAR_ANALYSIS_RESULT,
   TEST_MOLECULAR_ANALYSIS_RUN,
   TEST_MOLECULAR_ANALYSIS_RUN_GENRIC_ID,
   TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC,
@@ -66,6 +67,11 @@ const mockGet = jest.fn(async (path, params) => {
           TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_GENERIC_QUALITY_CONTROL[2].id:
           return { data: [QUALITY_CONTROL_3] };
       }
+
+    // Molecular Analysis Result
+    case "seqdb-api/molecular-analysis-result/" +
+      TEST_MOLECULAR_ANALYSIS_RESULT.id:
+      return { data: TEST_MOLECULAR_ANALYSIS_RESULT };
 
     // Molecular Analysis Run Items
     case "seqdb-api/molecular-analysis-run-item":
@@ -271,6 +277,11 @@ describe("Molecular Analysis Run View", () => {
     // Expect Quality Control 1 to be displayed:
     expect(wrapper.getByText("Quality Control 1")).toBeInTheDocument();
     expect(wrapper.getByText("Reserpine Standard")).toBeInTheDocument();
+
+    // Expect Quality Control 1 to have 2 attachments:
+    expect(wrapper.getAllByRole("link", { name: /japan\.jpg/i }).length).toBe(
+      2
+    );
 
     // Expect Quality Control 2 to be displayed:
     expect(wrapper.getByText("Quality Control 2")).toBeInTheDocument();

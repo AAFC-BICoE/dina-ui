@@ -1218,5 +1218,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   visibility: "Visibility",
   visibleToUser: "Visible to user",
   visibleToGroup: "Visible to group",
-  visibleToEveryone: "Visible to everyone"
+  visibleToEveryone: "Visible to everyone",
+  fileNameAliasField: "File Name Alias Field"
 };

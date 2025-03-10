@@ -13,6 +13,7 @@ import { QualityControlSection } from "./QualityControlSection";
 import { PersistedResource } from "kitsu";
 import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRunColumns";
 import SequencingRunContentSection from "./SequencingRunContentSection";
+import { useMemo } from "react";
 
 export interface MolecularAnalysisRunStepProps {
   molecularAnalysisId: string;
@@ -63,12 +64,15 @@ export function MolecularAnalysisRunStep({
   });
 
   // Table columns to display for the sequencing run.
-  const columns: ColumnDef<SequencingRunItem>[] =
-    useMolecularAnalysisRunColumns({
-      type: "generic-molecular-analysis-item",
-      setMolecularAnalysisRunItemNames,
-      readOnly: !editMode
-    });
+  const columns: ColumnDef<SequencingRunItem>[] = useMemo(
+    () =>
+      useMolecularAnalysisRunColumns({
+        type: "generic-molecular-analysis-item",
+        setMolecularAnalysisRunItemNames,
+        readOnly: !editMode
+      }),
+    [setMolecularAnalysisRunItemNames, editMode]
+  );
 
   // Display loading if network requests from hook are still loading in...
   if (loading) {

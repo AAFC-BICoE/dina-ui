@@ -2,7 +2,10 @@ import { SeqReaction } from "../../types/seqdb-api";
 import { useState } from "react";
 import { filterBy, useApiClient, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { attachGenericMolecularAnalysisItems } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
+import {
+  attachGenericMolecularAnalysisItems,
+  QualityControlWithAttachment
+} from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import {
   MolecularAnalysisRunItem,
@@ -25,6 +28,8 @@ import {
   attachStorageUnitUsage,
   SequencingRunItem
 } from "./useMolecularAnalysisRun";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 
 export interface UseMolecularAnalysisRunViewProps {
   molecularAnalysisRunId: string;
@@ -55,7 +60,9 @@ export function useMolecularAnalysisRunView({
     useState<SequencingRunItem[]>();
 
   // Quality control items
-  const [qualityControls, setQualityControls] = useState<QualityControl[]>([]);
+  const [qualityControls, setQualityControls] = useState<
+    QualityControlWithAttachment[]
+  >([]);
 
   // Quality control type vocabulary options, mainly used for localization.
   const { loading: loadingVocabularyItems, vocabOptions: qualityControlTypes } =
@@ -196,7 +203,7 @@ export function useMolecularAnalysisRunView({
 
           // Get quality controls
           if (qualityControlRunItems && qualityControlRunItems?.length > 0) {
-            const newQualityControls: QualityControl[] = [];
+            const newQualityControls: QualityControlWithAttachment[] = [];
 
             // Go through each quality control run item and then we do a query for each quality control.
             for (const item of qualityControlRunItems) {
@@ -212,15 +219,33 @@ export function useMolecularAnalysisRunView({
                       }
                     ]
                   })(""),
-                  include: "molecularAnalysisRunItem"
+                  include:
+                    "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
                 }
               );
 
               const qualityControlFound = qualityControlQuery
-                ?.data?.[0] as QualityControl;
+                ?.data?.[0] as QualityControlWithAttachment;
               if (qualityControlFound) {
+                // If a result exists, we need to perform a get request to retrieve the metadata to be displayed.
+                let attachments: ResourceIdentifierObject[] = [];
+                if (qualityControlFound.molecularAnalysisRunItem?.result?.id) {
+                  const molecularAnalysisResultQuery =
+                    await apiClient.get<MolecularAnalysisResult>(
+                      `seqdb-api/molecular-analysis-result/${qualityControlFound.molecularAnalysisRunItem?.result?.id}`,
+                      {
+                        include: "attachments"
+                      }
+                    );
+                  if (molecularAnalysisResultQuery?.data?.attachments) {
+                    attachments = molecularAnalysisResultQuery.data
+                      .attachments as ResourceIdentifierObject[];
+                  }
+                }
+
                 newQualityControls.push({
-                  ...qualityControlFound
+                  ...qualityControlFound,
+                  attachments: attachments ?? []
                 });
               }
             }

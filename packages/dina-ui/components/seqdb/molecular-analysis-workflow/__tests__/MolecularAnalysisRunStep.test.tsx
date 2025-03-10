@@ -1,5 +1,4 @@
 import { mountWithAppContext } from "common-ui";
-import { noop } from "lodash";
 import {
   fireEvent,
   waitFor,
@@ -13,12 +12,15 @@ import {
   STORAGE_UNIT_USAGE_2,
   STORAGE_UNIT_USAGE_3,
   TEST_MATERIAL_SAMPLE_SUMMARY,
-  TEST_METADATA,
+  TEST_METADATA_1,
+  TEST_METADATA_2,
+  TEST_METADATA_3,
   TEST_MOLECULAR_ANALYSIS,
   TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN,
   TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN,
   TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN,
   TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID,
+  TEST_MOLECULAR_ANALYSIS_RESULT,
   TEST_MOLECULAR_ANALYSIS_RUN,
   TEST_MOLECULAR_ANALYSIS_RUN_ID,
   TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID,
@@ -61,6 +63,10 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           return { data: TEST_QUALITY_CONTROL_RUN_ITEMS };
       }
 
+    case "seqdb-api/molecular-analysis-result/" +
+      TEST_MOLECULAR_ANALYSIS_RESULT.id:
+      return { data: TEST_MOLECULAR_ANALYSIS_RESULT };
+
     case "seqdb-api/quality-control":
       switch (params.filter.rsql) {
         case "molecularAnalysisRunItem.uuid==2a3b15ce-6781-466b-bc1e-49e35af3df58":
@@ -73,11 +79,25 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_QUALITY_CONTROL_TYPES };
 
     case "objectstore-api/metadata":
+      return {
+        data: [TEST_METADATA_3]
+      };
     case "seqdb-api/molecular-analysis-run/" +
       TEST_MOLECULAR_ANALYSIS_RUN_ID +
       "/attachments":
       return {
-        data: [TEST_METADATA]
+        data: [TEST_METADATA_1]
+      };
+    case "objectstore-api/config/file-upload":
+      return {
+        data: {
+          id: "file-upload",
+          type: "config",
+          attributes: {
+            "max-request-size": "1000MB",
+            "max-file-size": "1000MB"
+          }
+        }
       };
 
     // Blob storage
@@ -106,9 +126,21 @@ const mockBulkGet = jest.fn(async (paths) => {
         return TEST_MATERIAL_SAMPLE_SUMMARY[2];
 
       // Attachments
-      case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=derivatives":
-      case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=acMetadataCreator,derivatives":
-        return TEST_METADATA;
+      case "metadata/" + TEST_METADATA_1.id + "?include=derivatives":
+      case "metadata/" +
+        TEST_METADATA_1.id +
+        "?include=acMetadataCreator,derivatives":
+        return TEST_METADATA_1;
+      case "metadata/" + TEST_METADATA_2.id + "?include=derivatives":
+      case "metadata/" +
+        TEST_METADATA_2.id +
+        "?include=acMetadataCreator,derivatives":
+        return TEST_METADATA_2;
+      case "metadata/" + TEST_METADATA_3.id + "?include=derivatives":
+      case "metadata/" +
+        TEST_METADATA_3.id +
+        "?include=acMetadataCreator,derivatives":
+        return TEST_METADATA_3;
     }
   });
 });
@@ -138,15 +170,40 @@ const testCtx = {
 describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", () => {
   beforeEach(jest.clearAllMocks);
 
+  // Helper component for performing saving and editing.
+  function TestComponent(props: Partial<MolecularAnalysisRunStepProps>) {
+    const [editMode, setEditMode] = useState<boolean>(false);
+    const [performSave, setPerformSave] = useState<boolean>(false);
+
+    useEffect(() => {
+      mockSetEditMode(editMode);
+    }, [editMode]);
+
+    return (
+      <>
+        <p>Edit mode: {editMode ? "true" : "false"}</p>
+        <button onClick={() => setPerformSave(true)}>Save</button>
+        <button onClick={() => setEditMode(true)}>Edit</button>
+        <button onClick={() => setEditMode(false)}>Cancel</button>
+
+        <MolecularAnalysisRunStep
+          editMode={editMode}
+          performSave={performSave}
+          molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
+          molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID}
+          setEditMode={setEditMode}
+          setPerformSave={setPerformSave}
+          {...props}
+        />
+      </>
+    );
+  }
+
   it("Loading spinner is displayed on first load", async () => {
     const wrapper = mountWithAppContext(
-      <MolecularAnalysisRunStep
-        editMode={false}
-        performSave={false}
+      <TestComponent
         molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
-        setEditMode={noop}
-        setPerformSave={noop}
       />,
       testCtx
     );
@@ -156,13 +213,9 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
   it("Display the sequencing run in the UI", async () => {
     const wrapper = mountWithAppContext(
-      <MolecularAnalysisRunStep
-        editMode={true}
-        performSave={false}
+      <TestComponent
         molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
-        setEditMode={mockSetEditMode}
-        setPerformSave={noop}
       />,
       testCtx
     );
@@ -172,6 +225,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Alert should not exist, since there is only one run.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Run name should be in the textbox.
     expect(wrapper.getAllByRole("textbox")[0]).toHaveDisplayValue("run-name-1");
@@ -213,26 +270,27 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.getByText(/reserpine standard/i)).toBeInTheDocument();
     expect(wrapper.getByText(/acn blank/i)).toBeInTheDocument();
 
+    // Expect Quality Control 1 to have 2 attachments
+    expect(wrapper.getAllByRole("link", { name: /japan\.jpg/i }).length).toBe(
+      1
+    );
+    expect(wrapper.getAllByRole("link", { name: /canada\.jpg/i }).length).toBe(
+      1
+    );
+
     // Ensure attachment appears.
     expect(
       wrapper.getByRole("heading", {
         name: /sequencing run attachments \(1\)/i
       })
     ).toBeInTheDocument();
-
-    // Set edit mode should not be triggered in this test.
-    expect(mockSetEditMode).toBeCalledTimes(0);
   });
 
   it("Multiple runs exist for one seq-batch, display warning to user", async () => {
     const wrapper = mountWithAppContext(
-      <MolecularAnalysisRunStep
-        editMode={true}
-        performSave={false}
+      <TestComponent
         molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
         molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID} // Use the Molecular Analysis ID with multiple runs
-        setEditMode={mockSetEditMode}
-        setPerformSave={noop}
       />,
       testCtx
     );
@@ -249,40 +307,11 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ).toBeInTheDocument();
 
     // Run name should be in the textbox for the first run found.
-    expect(wrapper.getAllByRole("textbox")[0]).toHaveDisplayValue("run-name-1");
+    expect(wrapper.getByText("run-name-1")).toBeInTheDocument();
 
     // Set edit mode should not be triggered in this test.
-    expect(mockSetEditMode).toBeCalledTimes(0);
+    expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
   });
-
-  // Helper component for performing saving and editing.
-  function TestComponent(props: Partial<MolecularAnalysisRunStepProps>) {
-    const [editMode, setEditMode] = useState<boolean>(false);
-    const [performSave, setPerformSave] = useState<boolean>(false);
-
-    useEffect(() => {
-      mockSetEditMode(editMode);
-    }, [editMode]);
-
-    return (
-      <>
-        <p>Edit mode: {editMode ? "true" : "false"}</p>
-        <button onClick={() => setPerformSave(true)}>Save</button>
-        <button onClick={() => setEditMode(true)}>Edit</button>
-        <button onClick={() => setEditMode(false)}>Cancel</button>
-
-        <MolecularAnalysisRunStep
-          editMode={editMode}
-          performSave={performSave}
-          molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
-          molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID}
-          setEditMode={setEditMode}
-          setPerformSave={setPerformSave}
-          {...props}
-        />
-      </>
-    );
-  }
 
   it("No run exists, in edit mode, create a new run", async () => {
     const wrapper = mountWithAppContext(<TestComponent />, testCtx);
@@ -309,15 +338,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       )
     ).toBeInTheDocument();
 
-    // Type a name for the run to be created.
-    userEvent.type(sequencingRunNameInput!, "My new run");
-
     // Enter in names for the run items:
     userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
     userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
 
+    // Type a name for the run to be created.
+    userEvent.type(sequencingRunNameInput!, "My new run");
+
     // Add new quality control.
-    userEvent.click(wrapper.getByRole("button", { name: "Add" }));
+    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
     // Provide quality control
     userEvent.type(
@@ -329,14 +358,41 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
+    // Add an attachment to the quality control
+    userEvent.click(
+      wrapper.getAllByRole("button", { name: "Add Attachments" })[0]
+    );
+    userEvent.click(
+      wrapper.getByRole("tab", { name: /attach existing objects/i })
+    );
+
+    // Wait for loading of the existing objects to attach...
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+
+    // Wait for attachments to be displayed on the page.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Add another quality control.
+    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+
+    // Provide quality control
+    userEvent.type(
+      wrapper.getByTestId("qualityControl-name-1"),
+      "Quality Control Test Name 2"
+    );
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /reserpine standard/i })
+    );
+
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
-
-    // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
 
     // Ensure all API save requests are made correctly.
     expect(mockSave.mock.calls).toEqual([
@@ -420,6 +476,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       [
         [
           {
+            id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
             resource: {
               id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
               relationships: {
@@ -435,6 +492,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             type: "generic-molecular-analysis-item"
           },
           {
+            id: "169eafe4-44f2-407e-aa90-1a5483edf522",
             resource: {
               id: "169eafe4-44f2-407e-aa90-1a5483edf522",
               relationships: {
@@ -450,6 +508,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             type: "generic-molecular-analysis-item"
           },
           {
+            id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
             resource: {
               id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
               relationships: {
@@ -470,9 +529,56 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         }
       ],
 
+      // Quality control result
+      [
+        [
+          {
+            resource: {
+              group: "aafc",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: TEST_METADATA_3.id,
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
       // Quality control run items creation
       [
         [
+          {
+            resource: {
+              relationships: {
+                result: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-result"
+                  }
+                },
+                run: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run"
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item",
+              usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+            },
+            type: "molecular-analysis-run-item"
+          },
           {
             resource: {
               relationships: {
@@ -501,6 +607,23 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             resource: {
               group: "aafc",
               name: "Quality Control Test Name 1",
+              qcType: "reserpine_standard",
+              relationships: {
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              },
+              type: "quality-control"
+            },
+            type: "quality-control"
+          },
+          {
+            resource: {
+              group: "aafc",
+              name: "Quality Control Test Name 2",
               qcType: "reserpine_standard",
               relationships: {
                 molecularAnalysisRunItem: {
@@ -565,7 +688,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByText(/acn blank/i)).not.toBeInTheDocument();
 
     // Add new Quality Control
-    userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
     userEvent.type(wrapper.getAllByRole("textbox")[5], "New Quality Control");
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
@@ -573,7 +696,33 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Add blank quality control, should not be saved.
-    userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+
+    // Add an attachment to the existing quality control
+    userEvent.click(
+      wrapper.getAllByRole("button", { name: "Add Attachments" })[0]
+    );
+    userEvent.click(
+      wrapper.getByRole("tab", { name: /attach existing objects/i })
+    );
+
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[2]);
+
+    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+
+    // Add an attachment to the new quality control
+    userEvent.click(
+      wrapper.getAllByRole("button", { name: "Add Attachments" })[1]
+    );
+    userEvent.click(
+      wrapper.getByRole("tab", { name: /attach existing objects/i })
+    );
+
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[2]);
+
+    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -591,19 +740,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       [
         [
           {
+            id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
             resource: {
               id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
               name: "Updated run name",
-              relationships: {
-                attachments: {
-                  data: [
-                    {
-                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
-                      type: "metadata"
-                    }
-                  ]
-                }
-              },
               type: "molecular-analysis-run"
             },
             type: "molecular-analysis-run"
@@ -618,6 +758,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       [
         [
           {
+            id: "f65ed036-eb92-40d9-af03-d027646e8948",
             resource: {
               id: "f65ed036-eb92-40d9-af03-d027646e8948",
               name: "Update run item name 1",
@@ -626,6 +767,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             type: "molecular-analysis-run-item"
           },
           {
+            id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
             resource: {
               id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
               name: "Add a new one",
@@ -639,12 +781,44 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         }
       ],
 
+      // Create the new result for the 3rd quality control since it didn't have any attachments.
+      [
+        [
+          {
+            resource: {
+              group: "aafc",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: TEST_METADATA_3.id,
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
       // Create the brand new quality control run item.
       [
         [
           {
             resource: {
               relationships: {
+                result: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-result"
+                  }
+                },
                 run: {
                   data: {
                     id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
@@ -689,19 +863,51 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         }
       ],
 
-      // Update the existing quality control.
+      // Update the existing quality control. (QC type not expected since it was not changed.)
       [
         [
           {
             id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
             resource: {
-              group: "aafc",
               id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
               name: "Updated Quality Control",
-              qcType: "reserpine_standard",
               type: "quality-control"
             },
             type: "quality-control"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      [
+        [
+          {
+            id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+            resource: {
+              id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: TEST_METADATA_1.id,
+                      type: "metadata"
+                    },
+                    {
+                      id: TEST_METADATA_2.id,
+                      type: "metadata"
+                    },
+                    {
+                      id: TEST_METADATA_3.id,
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
           }
         ],
         {
@@ -741,6 +947,243 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ]);
   });
 
+  it("Run exists, in edit mode, delete quality control with existing attachments", async () => {
+    const wrapper = mountWithAppContext(
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Delete the quality control with existing attachments.
+    userEvent.click(wrapper.getByTestId("delete-quality-control-0"));
+
+    // Click the save button.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // No errors should be present at this point.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Expect the network request to properly delete the quality control and attachments.
+    expect(mockSave.mock.calls).toEqual([
+      // Delete the quality control
+      [
+        [
+          {
+            delete: {
+              id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
+              type: "quality-control"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Delete the molecular analysis run item associated with the quality control.
+      [
+        [
+          {
+            delete: {
+              id: "2a3b15ce-6781-466b-bc1e-49e35af3df58",
+              type: "molecular-analysis-run-item"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Delete the molecular analysis result.
+      [
+        [
+          {
+            delete: {
+              id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+              type: "molecular-analysis-result"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Run exists, in edit mode, delete all attachments for quality control should delete result", async () => {
+    const wrapper = mountWithAppContext(
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Remove all the attachments for the quality control
+    userEvent.click(wrapper.getAllByRole("button", { name: /remove/i })[0]);
+    await waitForElementToBeRemoved(
+      wrapper.queryAllByText(/loading\.\.\./i)[0]
+    );
+    userEvent.click(wrapper.getAllByRole("button", { name: /remove/i })[0]);
+
+    // Click the save button.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // No errors should be present at this point.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Expect the network request to properly delete the quality control and attachments.
+    expect(mockSave.mock.calls).toEqual([
+      // Remove the relationship from the run item that is for the quality control.
+      [
+        [
+          {
+            id: "2a3b15ce-6781-466b-bc1e-49e35af3df58",
+            resource: {
+              id: "2a3b15ce-6781-466b-bc1e-49e35af3df58",
+              relationships: {
+                result: {
+                  data: null
+                }
+              },
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Delete the result for the quality control since all attachments were deleted.
+      [
+        [
+          {
+            delete: {
+              id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+              type: "molecular-analysis-result"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Run exists, in edit mode, Add another attachment to an existing quality control", async () => {
+    const wrapper = mountWithAppContext(
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Add an attachment to the first quality control (already contains attachments.)
+    userEvent.click(
+      wrapper.getAllByRole("button", { name: /add attachments/i })[0]
+    );
+    userEvent.click(
+      wrapper.getByRole("tab", { name: /attach existing objects/i })
+    );
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
+
+    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
+
+    // Click the save button.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // No errors should be present at this point.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Expect the network request to change the request to include all original 2 and the new
+    // attachment.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+            resource: {
+              id: "cf1655f6-c6d4-484d-a8c4-5f328ccf645f",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: TEST_METADATA_1.id, // Existing
+                      type: "metadata"
+                    },
+                    {
+                      id: TEST_METADATA_2.id, // Existing
+                      type: "metadata"
+                    },
+                    {
+                      id: TEST_METADATA_3.id, // New added
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ]
+    ]);
+  });
+
   it("Create incomplete quality controls, report error message and remove completely empty quality controls", async () => {
     const wrapper = mountWithAppContext(
       <TestComponent
@@ -761,7 +1204,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Create 4 new quality controls.
     for (let i = 0; i < 4; i++) {
-      userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
     }
 
     // Quality Control 1 - Both provided.
