@@ -1215,5 +1215,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   pasteMaterialSample: "Paste Material Samples",
   adminRoles: "Admin Roles",
   separator: "Separator",
+  visibility: "Visibility",
+  visibleToUser: "Visible to user",
+  visibleToGroup: "Visible to group",
+  visibleToEveryone: "Visible to everyone",
   fileNameAliasField: "File Name Alias Field"
 };

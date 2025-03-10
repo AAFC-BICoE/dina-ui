@@ -13,6 +13,28 @@ import {
   ColumnSeparator,
   ExportType
 } from "packages/dina-ui/types/dina-export-api";
+import Select from "react-select";
+
+export const VISIBILITY_OPTIONS: {
+  label: JSX.Element;
+  value: {
+    restrictToCreatedBy: boolean;
+    publiclyReleasable: boolean;
+  };
+}[] = [
+  {
+    label: <DinaMessage id="visibleToUser" />,
+    value: { restrictToCreatedBy: true, publiclyReleasable: false }
+  },
+  {
+    label: <DinaMessage id="visibleToGroup" />,
+    value: { restrictToCreatedBy: false, publiclyReleasable: false }
+  },
+  {
+    label: <DinaMessage id="visibleToEveryone" />,
+    value: { restrictToCreatedBy: false, publiclyReleasable: true }
+  }
+];
 
 export interface UseSavedExportsProp {
   exportType: ExportType;
@@ -41,6 +63,10 @@ export default function useSavedExports<TData extends KitsuResource>({
   const [columnsToExport, setColumnsToExport] = useState<TableColumn<TData>[]>(
     []
   );
+
+  const [restrictToCreatedBy, setRestrictToCreatedBy] = useState<boolean>(true);
+
+  const [publiclyReleasable, setPubliclyReleaseable] = useState<boolean>(false);
 
   // Selected paths to be loaded in as columnToExport.
   const [columnPathsToExport, setColumnPathsToExport] =
@@ -159,8 +185,8 @@ export default function useSavedExports<TData extends KitsuResource>({
             columns: convertColumnsToPaths(columnsToExport),
             columnAliases: convertColumnsToAliases(columnsToExport),
             name: selectedSavedExport?.name,
-            restrictToCreatedBy: false,
-            publiclyReleasable: false,
+            restrictToCreatedBy: restrictToCreatedBy,
+            publiclyReleasable: publiclyReleasable,
             exportType: exportType,
             exportOptions: { columnSeparator: selectedSeparator.value }
           }
@@ -212,8 +238,8 @@ export default function useSavedExports<TData extends KitsuResource>({
             columns: convertColumnsToPaths(columnsToExport),
             columnAliases: convertColumnsToAliases(columnsToExport),
             name: savedExportName.trim(),
-            restrictToCreatedBy: false,
-            publiclyReleasable: false,
+            restrictToCreatedBy: restrictToCreatedBy,
+            publiclyReleasable: publiclyReleasable,
             exportType: exportType,
             exportOptions: { columnSeparator: selectedSeparator.value },
             group: groupNames?.[0]
@@ -288,12 +314,20 @@ export default function useSavedExports<TData extends KitsuResource>({
     }
   }, [selectedSavedExport]);
 
-  const columnsToExportPaths = convertColumnsToPaths(columnsToExport);
-  const columnsToExportAliases = convertColumnsToAliases(columnsToExport);
+  const [changesMade, setChangesMade] = useState<boolean>(false);
 
-  const changesMade =
-    !isEqual(columnsToExportPaths, selectedSavedExport?.columns ?? []) ||
-    !isEqual(columnsToExportAliases, selectedSavedExport?.columnAliases ?? []);
+  useEffect(() => {
+    const columnsToExportPaths = convertColumnsToPaths(columnsToExport);
+    const columnsToExportAliases = convertColumnsToAliases(columnsToExport);
+
+    setChangesMade(
+      !isEqual(columnsToExportPaths, selectedSavedExport?.columns ?? []) ||
+        !isEqual(
+          columnsToExportAliases,
+          selectedSavedExport?.columnAliases ?? []
+        )
+    );
+  }, [columnsToExport]);
 
   const displayOverrideWarning =
     allSavedExports.find(
@@ -337,6 +371,25 @@ export default function useSavedExports<TData extends KitsuResource>({
             disabled={loadingCreateSavedExport}
           />
           <br />
+          <strong>
+            <DinaMessage id="visibility" />
+          </strong>
+          <Select<{
+            label: JSX.Element;
+            value: {
+              restrictToCreatedBy: boolean;
+              publiclyReleasable: boolean;
+            };
+          }>
+            className="mt-2 mb-3"
+            name="visibility"
+            options={VISIBILITY_OPTIONS}
+            onChange={(selected) => {
+              setRestrictToCreatedBy(selected!.value.restrictToCreatedBy);
+              setPubliclyReleaseable(selected!.value.publiclyReleasable);
+            }}
+            defaultValue={VISIBILITY_OPTIONS[0]}
+          />
 
           <strong>
             <DinaMessage id="savedExport_columnsToBeSaved" />
@@ -382,7 +435,9 @@ export default function useSavedExports<TData extends KitsuResource>({
       showCreateSavedExportModal,
       savedExportName,
       columnsToExport,
-      loadingCreateSavedExport
+      loadingCreateSavedExport,
+      publiclyReleasable,
+      restrictToCreatedBy
     ]
   );
 
@@ -391,6 +446,7 @@ export default function useSavedExports<TData extends KitsuResource>({
     deleteSavedExport,
     allSavedExports,
     changesMade,
+    setChangesMade,
     loadingSavedExports,
     loadingDelete,
     loadingUpdate,
@@ -401,6 +457,8 @@ export default function useSavedExports<TData extends KitsuResource>({
     columnsToExport,
     setColumnsToExport,
     columnPathsToExport,
-    setColumnPathsToExport
+    setColumnPathsToExport,
+    setRestrictToCreatedBy,
+    setPubliclyReleaseable
   };
 }
