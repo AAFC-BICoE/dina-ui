@@ -314,9 +314,6 @@ export default function useSavedExports<TData extends KitsuResource>({
     }
   }, [selectedSavedExport]);
 
-  // const columnsToExportPaths = convertColumnsToPaths(columnsToExport);
-  // const columnsToExportAliases = convertColumnsToAliases(columnsToExport);
-
   const [changesMade, setChangesMade] = useState<boolean>(false);
 
   useEffect(() => {
@@ -438,7 +435,9 @@ export default function useSavedExports<TData extends KitsuResource>({
       showCreateSavedExportModal,
       savedExportName,
       columnsToExport,
-      loadingCreateSavedExport
+      loadingCreateSavedExport,
+      publiclyReleasable,
+      restrictToCreatedBy
     ]
   );
 
