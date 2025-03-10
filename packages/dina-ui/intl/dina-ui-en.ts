@@ -1214,5 +1214,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   pasteQualityControlName: "Paste Quality Control Names",
   pasteMaterialSample: "Paste Material Samples",
   adminRoles: "Admin Roles",
-  separator: "Separator"
+  separator: "Separator",
+  fileNameAliasField: "File Name Alias Field"
 };
