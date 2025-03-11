@@ -17,7 +17,10 @@ import {
   Tooltip,
   useApiClient
 } from "packages/common-ui/lib";
-import { DynamicFieldsMappingConfig } from "packages/common-ui/lib/list-page/types";
+import {
+  DynamicFieldsMappingConfig,
+  ESIndexMapping
+} from "packages/common-ui/lib/list-page/types";
 import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMapping";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
@@ -46,6 +49,9 @@ import {
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
   MAX_OBJECT_EXPORT_TOTAL
 } from "../../../components/export/exportUtils";
+import { QueryFieldSelector } from "packages/common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
+import QueryRowManagedAttributeSearch from "packages/common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import { get } from "lodash";
 
 export interface SavedExportOption {
   label?: string;
@@ -115,6 +121,13 @@ export default function ExportPage<TData extends KitsuResource>() {
     indexName,
     dynamicFieldMapping
   });
+
+  // The selected field from the query field selector.
+  const [selectedFilenameAliasField, setSelectedFilenameAliasField] =
+    useState<ESIndexMapping>();
+
+  // Used for dynamic fields to store the specific dynamic value selected.
+  const [dynamicFieldValue, setDynamicFieldValue] = useState<string>();
 
   const {
     allSavedExports,
@@ -237,11 +250,46 @@ export default function ExportPage<TData extends KitsuResource>() {
         // Otherwise, return original fileIdentifier
         return imageMetadata.fileIdentifier;
       });
+      const filenameAliases = {};
+
+      if (selectedFilenameAliasField) {
+        imageMetadatas.forEach((imageMetadata) => {
+          const filenameAlias: string =
+            selectedFilenameAliasField.label === "managedAttributes" &&
+            dynamicFieldValue
+              ? get(
+                  imageMetadata,
+                  JSON.parse(dynamicFieldValue).selectedManagedAttributeConfig
+                    .label
+                )
+              : get(imageMetadata, selectedFilenameAliasField.label);
+          if (imageMetadata.derivatives) {
+            // If image has derivative, use large image derivative fileIdentifier
+            const largeImageDerivative = imageMetadata.derivatives.find(
+              (derivative) => {
+                if (derivative.derivativeType === "LARGE_IMAGE") {
+                  return true;
+                }
+              }
+            );
+            if (largeImageDerivative) {
+              filenameAliases[largeImageDerivative.fileIdentifier] =
+                filenameAlias;
+            }
+          }
+
+          if (imageMetadata.fileIdentifier)
+            // Otherwise, use original fileIdentifier
+            filenameAliases[imageMetadata.fileIdentifier] = filenameAlias;
+        });
+      }
+
       const objectExportSaveArg = {
         resource: {
           type: "object-export",
           fileIdentifiers,
-          name: formik?.values?.name
+          name: formik?.values?.name,
+          filenameAliases: filenameAliases
         },
         type: "object-export"
       };
@@ -407,27 +455,26 @@ export default function ExportPage<TData extends KitsuResource>() {
                       </>
                     )}
                   </div>
-                  <div className="col-md-4">
-                    <strong>
-                      <DinaMessage id="separator" />
-                    </strong>
-                    <Select<{ value: ColumnSeparator; label: string }>
-                      className="mt-2 mb-3"
-                      name="separator"
-                      options={SEPARATOR_OPTIONS}
-                      onChange={(selection) => {
-                        if (selection) {
-                          setSelectedSeparator(selection);
-                        }
-                      }}
-                      isLoading={loadingSavedExports}
-                      isDisabled={loading}
-                      defaultValue={selectedSeparator}
-                    />
-                  </div>
-
                   {exportType === "TABULAR_DATA" && (
                     <>
+                      <div className="col-md-4">
+                        <strong>
+                          <DinaMessage id="separator" />
+                        </strong>
+                        <Select<{ value: ColumnSeparator; label: string }>
+                          className="mt-2 mb-3"
+                          name="separator"
+                          options={SEPARATOR_OPTIONS}
+                          onChange={(selection) => {
+                            if (selection) {
+                              setSelectedSeparator(selection);
+                            }
+                          }}
+                          isLoading={loadingSavedExports}
+                          isDisabled={loading}
+                          defaultValue={selectedSeparator}
+                        />
+                      </div>
                       <div className="col-md-4">
                         <strong>
                           <DinaMessage id="savedExport_exportDropdown" />
@@ -525,6 +572,44 @@ export default function ExportPage<TData extends KitsuResource>() {
                               )}
                             />
                           </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {exportType === "OBJECT_ARCHIVE" && (
+                    <>
+                      <div className="col-md-4">
+                        <div className="mb-2">
+                          <strong>
+                            <DinaMessage id="fileNameAliasField" />
+                          </strong>
+                        </div>
+                        <QueryFieldSelector
+                          indexMap={indexMap as ESIndexMapping[]}
+                          currentField={selectedFilenameAliasField?.value}
+                          setField={(path) => {
+                            if (indexMap) {
+                              const columnIndex = indexMap.find(
+                                (index) => index.value === path
+                              );
+                              if (columnIndex) {
+                                setSelectedFilenameAliasField(columnIndex);
+                              }
+                            }
+                          }}
+                          isInColumnSelector={false}
+                        />
+                      </div>
+                      {selectedFilenameAliasField?.dynamicField?.type ===
+                        "managedAttribute" && (
+                        <div className="col-md-4" style={{ marginTop: "22px" }}>
+                          <QueryRowManagedAttributeSearch
+                            indexMap={indexMap}
+                            managedAttributeConfig={selectedFilenameAliasField}
+                            isInColumnSelector={true}
+                            setValue={setDynamicFieldValue}
+                            value={dynamicFieldValue}
+                          />
                         </div>
                       )}
                     </>

@@ -9,6 +9,7 @@ import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resour
 import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
+  filterBy,
   useApiClient
 } from "common-ui";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
@@ -22,6 +23,11 @@ import {
 } from "./exportUtils";
 import { useSessionStorage } from "usehooks-ts";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 
 export interface UseMolecularAnalysisExportAPIReturn {
   runSummaries: any[];
@@ -29,8 +35,8 @@ export interface UseMolecularAnalysisExportAPIReturn {
 
   totalAttachments: number;
 
-  // loadQualityControls: boolean;
-  // setLoadQualityControls: Dispatch<SetStateAction<boolean>>;
+  loadQualityControls: boolean;
+  setLoadQualityControls: Dispatch<SetStateAction<boolean>>;
 
   networkLoading: boolean;
   exportLoading: boolean;
@@ -54,8 +60,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   const [runSummaries, setRunSummaries] = useState<any[]>([]);
 
   // Toggle the user can choose to select if quality control attachments are included.
-  // const [loadQualityControls, setLoadQualityControls] =
-  //   useState<boolean>(false);
+  const [loadQualityControls, setLoadQualityControls] =
+    useState<boolean>(false);
 
   // If any errors occur, a JSX component of the error can be presented to the user.
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
@@ -70,7 +76,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   const [attachmentsLoaded, setAttachmentsLoaded] = useState(false);
 
   // Have the quality controls been loaded already, do not run it again if it is true.
-  // const [qualityControlsLoaded, setQualityControlsLoaded] = useState(false);
+  const [qualityControlsLoaded, setQualityControlsLoaded] = useState(false);
 
   // ElasticSearch query to be used to perform the export against.
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
@@ -126,12 +132,20 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   /**
    * Use effect responsible for loading in the quality control attachments.
    */
-  // useEffect(() => {
-  //   if (loadQualityControls && !qualityControlsLoaded) {
-  //     setQualityControlsLoaded(true);
-  //     // retrieveQualityControlAttachments();
-  //   }
-  // }, [loadQualityControls]);
+  useEffect(() => {
+    if (loadQualityControls) {
+      if (!qualityControlsLoaded) {
+        setQualityControlsLoaded(true);
+        retrieveQualityControlAttachments();
+      } else {
+        changeQualityControlEnabled(true);
+      }
+    } else {
+      if (qualityControlsLoaded) {
+        changeQualityControlEnabled(false);
+      }
+    }
+  }, [loadQualityControls]);
 
   /**
    * Each time the runSummaries state changes (which can occur when loading and user selects a checkbox.)
@@ -232,6 +246,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                   ...included.attributes.items.map((item) => ({
                     ...item,
                     enabled: true,
+                    isQualityControl: false,
                     attachments: []
                   }))
                 ];
@@ -239,12 +254,14 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                 const newIncluded = {
                   ...included,
                   enabled: true,
+                  isQualityControl: false,
                   attachments: [],
                   attributes: {
                     ...included.attributes,
                     items: included.attributes.items.map((item) => ({
                       ...item,
                       enabled: true,
+                      isQualityControl: false,
                       attachments: []
                     }))
                   }
@@ -396,9 +413,198 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     });
   }
 
-  // async function retrieveQualityControlAttachments() {
+  /**
+   * Performs all of the requests required for retrieving the quality control attachments.
+   *
+   * Function performs the following steps:
+   *
+   * 1. Using all of the run summary ids, generate a single request to return all of the quality
+   *    control run items.
+   * 2. Retrieve all of the result ids from the run items and perform a single request to
+   *    retrieve them.
+   * 3. Retrieve the quality controls associated with the quality control items, which contains
+   *    the name and type for packaging the zip.
+   * 4. Using the results found, retrieve all of the metadata to get the file identifiers and
+   *    derivatives.
+   * 5. Set the run summaries to include the quality control attachments so the user can see and
+   *    select which to include in the export. Note that the LARGE_IMAGE derivative is always
+   *    preferred. Images are also the currently only accepted type.
+   */
+  async function retrieveQualityControlAttachments() {
+    setNetworkLoading(true);
 
-  // }
+    if (runSummaries.length > 0) {
+      const runIds = runSummaries.map((run) => run.id);
+
+      // 1. Using all of the run summary ids, generate a single request to return all of the quality
+      // control run items.
+      const { data: newQualityControlItems } = await apiClient.get<
+        MolecularAnalysisRunItem[]
+      >("seqdb-api/molecular-analysis-run-item", {
+        filter: filterBy([], {
+          extraFilters: [
+            { selector: "run.uuid", comparison: "=in=", arguments: runIds },
+            {
+              selector: "usageType",
+              comparison: "==",
+              arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+            }
+          ]
+        })(""),
+        include: "result,run",
+        page: { limit: 100 }
+      });
+
+      // Only continue if run items exist, if none then nothing to load.
+      if (newQualityControlItems && newQualityControlItems.length > 0) {
+        // 2. Retrieve all of the result ids from the run items and perform a single request to
+        // retrieve them.
+        const resultIds: string[] = newQualityControlItems.map(
+          (item) => item?.result?.id ?? ""
+        );
+        const { data: qualityControlResultsResponse } = await apiClient.get<
+          MolecularAnalysisResult[]
+        >("seqdb-api/molecular-analysis-result", {
+          filter: filterBy([], {
+            extraFilters: [
+              { selector: "uuid", comparison: "=in=", arguments: resultIds }
+            ]
+          })(""),
+          include: "attachments",
+          page: { limit: 100 }
+        });
+
+        // 3. Also retrieve the quality controls associated with the quality control items, this
+        // contains the name and type for packaging the zip.
+        const { data: qualityControlNamesResponse } = await apiClient.get<
+          QualityControl[]
+        >("seqdb-api/quality-control", {
+          filter: filterBy([], {
+            extraFilters: [
+              {
+                selector: "molecularAnalysisRunItem.uuid",
+                comparison: "=in=",
+                arguments: newQualityControlItems.map((item) => item?.id ?? "")
+              }
+            ]
+          })(""),
+          include: "molecularAnalysisRunItem",
+          page: { limit: 100 }
+        });
+
+        // 4. Using the results found, retrieve all of the metadata to get the file identifiers and
+        // derivatives.
+        const metadataIds: string[] = qualityControlResultsResponse.flatMap(
+          (result) =>
+            result.attachments.map((attachment) => attachment?.id ?? "")
+        );
+        const metadatas =
+          metadataIds.length > 0 ? await retrieveMetadata(metadataIds) : [];
+        const metadataMap = new Map<string, Metadata>(
+          metadatas.map((metadata) => [metadata.id, metadata])
+        );
+
+        const qualityControlNamesMap = new Map<string, string>(
+          qualityControlNamesResponse.map((qc) => [
+            qc?.molecularAnalysisRunItem?.id ?? "",
+            qc.name ?? ""
+          ])
+        );
+
+        // 5. Taking all the requests, set the run summaries to include the quality control
+        // attachments so the user can see and select which to include in the export.
+        // Please note the LARGE_IMAGE derivative is always preferred.
+        setRunSummaries((currentRunSummaries) => {
+          return currentRunSummaries.map((currentRunSummary) => {
+            const qualityControlItemsForRun = newQualityControlItems.filter(
+              (item) => item?.run?.id === currentRunSummary.id
+            );
+
+            const generatedQualityControlItems = qualityControlItemsForRun.map(
+              (qcItem) => {
+                const molecularAnalysisResult =
+                  qualityControlResultsResponse.find(
+                    (result) => result.id === qcItem?.result?.id
+                  );
+                const currentItemFileIdentifiers: string[] = (
+                  molecularAnalysisResult?.attachments
+                    .filter(
+                      (attachment) =>
+                        metadataMap.get(attachment?.id ?? "")?.dcType ===
+                        "IMAGE"
+                    )
+                    .map((attachment) => {
+                      const metadata = metadataMap.get(attachment?.id ?? "");
+                      return (
+                        metadata?.derivatives?.find(
+                          (d) => d.derivativeType === "LARGE_IMAGE"
+                        )?.fileIdentifier || metadata?.fileIdentifier
+                      );
+                    }) || []
+                ).filter(
+                  (fileIdentifier): fileIdentifier is string =>
+                    fileIdentifier !== undefined
+                );
+
+                return {
+                  uuid: qcItem.id,
+                  name: qualityControlNamesMap.get(qcItem?.id ?? "") || "",
+                  enabled: true,
+                  isQualityControl: true,
+                  genericMolecularAnalysisItemSummary: {
+                    name: qualityControlNamesMap.get(qcItem?.id ?? "") || ""
+                  },
+                  attachments: currentItemFileIdentifiers,
+                  result: qcItem.result,
+                  molecularAnalysisRunItem: qcItem
+                };
+              }
+            );
+
+            return {
+              ...currentRunSummary,
+              attributes: {
+                ...currentRunSummary.attributes,
+                items: [
+                  ...currentRunSummary.attributes.items,
+                  ...generatedQualityControlItems
+                ]
+              }
+            };
+          });
+        });
+      }
+    }
+
+    setNetworkLoading(false);
+  }
+
+  /**
+   * Disables all quality control items in the run summaries items.
+   */
+  async function changeQualityControlEnabled(enabled: boolean) {
+    setRunSummaries((currentRunSummaries) => {
+      return currentRunSummaries.map((currentRunSummary) => {
+        const updatedItems = currentRunSummary.attributes.items.map((item) => {
+          if (item.isQualityControl === true) {
+            return {
+              ...item,
+              enabled: enabled
+            };
+          }
+          return item;
+        });
+
+        return {
+          ...currentRunSummary,
+          attributes: {
+            ...currentRunSummary.attributes,
+            items: updatedItems
+          }
+        };
+      });
+    });
+  }
 
   /**
    * Retrieves metadata resources for a given array of metadata IDs.
@@ -498,7 +704,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                 const itemFolderName =
                   runSummary.attributes.name +
                   "/" +
-                  item.genericMolecularAnalysisItemSummary.name;
+                  (item?.genericMolecularAnalysisItemSummary?.name ??
+                    "Empty Name");
                 const uniqueItemFolderName =
                   generateUniqueFolderName(itemFolderName);
                 exportLayout.set(uniqueItemFolderName, item.attachments);
@@ -563,8 +770,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     runSummaries,
     setRunSummaries,
     totalAttachments,
-    // loadQualityControls,
-    // setLoadQualityControls,
+    loadQualityControls,
+    setLoadQualityControls,
     networkLoading,
     exportLoading,
     dataExportError,
