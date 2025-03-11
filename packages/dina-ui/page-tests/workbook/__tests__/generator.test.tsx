@@ -9,6 +9,7 @@ import {
   TEST_MANAGED_ATTRIBUTE_MATERIAL_SAMPLE,
   TEST_MANAGED_ATTRIBUTE_PREPARATION
 } from "../__mocks__/generator.mock";
+import { startCase } from "lodash";
 
 const mockPost = jest.fn();
 
@@ -415,7 +416,9 @@ describe("Workbook Template Generator", () => {
       userEvent.click(wrapper.getAllByRole("combobox")[1]);
 
       // Select classification name.
-      userEvent.click(wrapper.getByRole("option", { name: element.name }));
+      userEvent.click(
+        wrapper.getByRole("option", { name: startCase(element.name) })
+      );
 
       // Add the column.
       userEvent.click(wrapper.getByRole("button", { name: /add column/i }));

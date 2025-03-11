@@ -92,7 +92,7 @@ describe("QueryBuilderScientificNameDetailsSearch", () => {
 
     it("Should call performSubmit on enter key press in textfield", async () => {
       const mockPerformSubmit = jest.fn();
-      const { getByPlaceholderText } = mountWithAppContext(
+      const wrapper = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
             value={{ performSubmit: mockPerformSubmit, groups: [] }}
@@ -110,7 +110,7 @@ describe("QueryBuilderScientificNameDetailsSearch", () => {
       );
 
       // Find the text field element
-      const textField = getByPlaceholderText("Enter Text");
+      const textField = wrapper.getByRole("textbox");
 
       // Expect performSubmit to not be called yet.
       expect(mockPerformSubmit).toHaveBeenCalledTimes(0);
