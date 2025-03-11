@@ -237,6 +237,14 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         component: "RESTRICTION",
         path: "data.attributes.restrictionFieldsExtension",
         apiEndpoint: "collection-api/extension"
+      },
+
+      // Classification
+      {
+        type: "scientificNameDetails",
+        label: "scientificNameDetails",
+        component: "MATERIAL_SAMPLE",
+        path: "data.attributes.targetOrganismPrimaryClassification"
       }
     ],
     relationshipFields: [
