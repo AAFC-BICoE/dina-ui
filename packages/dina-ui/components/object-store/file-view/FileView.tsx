@@ -18,7 +18,7 @@ import Link from "next/link";
 import { SmallThumbnail } from "../../table/thumbnail-cell";
 import { Metadata } from "../../../types/objectstore-api";
 import Kitsu from "kitsu";
-import { handleDownloadLink } from "../../../pages/object-store/object-store-utils";
+import { handleDownloadLink } from "../object-store-utils";
 
 export type DownLoadLinks = {
   original?: string;

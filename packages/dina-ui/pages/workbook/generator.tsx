@@ -29,7 +29,7 @@ import {
 } from "../../components/workbook/utils/workbookMappingUtils";
 import InputGroup from "react-bootstrap/InputGroup";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
-import { handleDownloadLink } from "../object-store/object-store-utils";
+import { handleDownloadLink } from "../../components/object-store/object-store-utils";
 
 export interface EntityConfiguration {
   name: string;
