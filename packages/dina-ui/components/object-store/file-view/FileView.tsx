@@ -6,10 +6,19 @@ import {
 } from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ComponentType, ReactNode, useState, useRef } from "react";
+import {
+  ComponentType,
+  ReactNode,
+  useState,
+  useRef,
+  Dispatch,
+  SetStateAction
+} from "react";
 import Link from "next/link";
 import { SmallThumbnail } from "../../table/thumbnail-cell";
 import { Metadata } from "../../../types/objectstore-api";
+import Kitsu from "kitsu";
+import { handleDownloadLink } from "../../../pages/object-store/object-store-utils";
 
 export type DownLoadLinks = {
   original?: string;
@@ -65,12 +74,7 @@ export function FileView({
   const { formatMessage } = useDinaIntl();
 
   const [objectURL, setObjectURL] = useState<string>();
-  async function fetchObjectBlob(path) {
-    return await apiClient.axios.get(path, {
-      responseType: "blob",
-      timeout: 0
-    });
-  }
+
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
   const isTextDoc = DOCUMENT_FORMATS.includes(fileType.toLowerCase());
@@ -127,35 +131,6 @@ export function FileView({
 
   if (preview || (!isImage && fileType !== "pdf")) {
     clickToDownload = false;
-  }
-
-  /**
-   * When the user clicks a download link, the current token will be appended.
-   *
-   * @param path The download link.
-   */
-  async function handleDownloadLink(path?: string) {
-    if (path) {
-      try {
-        setIsDownloading(true);
-        const response = await fetchObjectBlob(path);
-        const url = window?.URL?.createObjectURL(response.data);
-        const link = document?.createElement("a");
-        const content: string = response.headers["content-disposition"];
-        const filename = content
-          .slice(content.indexOf("filename=") + "filename=".length)
-          .replaceAll('"', "");
-        link.href = url;
-        link?.setAttribute("download", filename); // or any other extension
-        document?.body?.appendChild(link);
-        link?.click();
-        window?.URL?.revokeObjectURL(url);
-        setIsDownloading(false);
-      } catch (error) {
-        setIsDownloading(false);
-        return error;
-      }
-    }
   }
 
   function fallBackRender() {
@@ -244,6 +219,8 @@ export function FileView({
                   path={downloadLinks?.original}
                   isDownloading={isDownloading}
                   handleDownloadLink={handleDownloadLink}
+                  apiClient={apiClient}
+                  setIsDownloading={setIsDownloading}
                 />
               )}
               {downloadLinks?.thumbNail && (
@@ -252,6 +229,8 @@ export function FileView({
                   path={downloadLinks?.thumbNail}
                   isDownloading={isDownloading}
                   handleDownloadLink={handleDownloadLink}
+                  apiClient={apiClient}
+                  setIsDownloading={setIsDownloading}
                 />
               )}
               {downloadLinks?.largeData && (
@@ -260,6 +239,8 @@ export function FileView({
                   path={downloadLinks?.largeData}
                   isDownloading={isDownloading}
                   handleDownloadLink={handleDownloadLink}
+                  apiClient={apiClient}
+                  setIsDownloading={setIsDownloading}
                 />
               )}
             </div>
@@ -282,13 +263,21 @@ interface DownloadLinkProps {
   id: string;
   path: string;
   isDownloading: boolean;
-  handleDownloadLink: (path?: string) => Promise<any>;
+  handleDownloadLink: (
+    path: string,
+    apiClient: Kitsu,
+    setIsDownloading: Dispatch<SetStateAction<boolean>>
+  ) => Promise<any>;
+  apiClient: Kitsu;
+  setIsDownloading: Dispatch<SetStateAction<boolean>>;
 }
 function DownloadLink({
   id,
   path,
   isDownloading,
-  handleDownloadLink
+  handleDownloadLink,
+  apiClient,
+  setIsDownloading
 }: DownloadLinkProps) {
   return isDownloading ? (
     <LoadingSpinner loading={true} />
@@ -296,7 +285,7 @@ function DownloadLink({
     <a
       className="p-2 original"
       style={{ cursor: "pointer" }}
-      onClick={() => handleDownloadLink(path)}
+      onClick={() => handleDownloadLink(path, apiClient, setIsDownloading)}
     >
       <DinaMessage id={id as any} />
     </a>

@@ -1123,7 +1123,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addReportTemplateTitle: "Add Report Template",
   backToUpload: "Back to Upload",
   backToUploadWorkbook: "Back to Upload Workbook",
-  templateName: "Workbook Template Name",
+  templateName: "Template Name",
   field_reportTemplateName: "Report Template Name",
   field_includesBarcode: "Includes Barcode",
   field_templateOutputMediaType: "Template Output Media Type",
@@ -1218,5 +1218,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   visibility: "Visibility",
   visibleToUser: "Visible to user",
   visibleToGroup: "Visible to group",
-  visibleToEveryone: "Visible to everyone"
+  visibleToEveryone: "Visible to everyone",
+  downloadTemplate: "Download Template",
+  existingTemplates: "Existing Templates"
 };
