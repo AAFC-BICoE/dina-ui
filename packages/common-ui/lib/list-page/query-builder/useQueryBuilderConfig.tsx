@@ -49,7 +49,9 @@ import QueryRowIdentifierSearch, {
   transformIdentifierToDSL
 } from "./query-builder-value-types/QueryBuilderIdentifierSearch";
 import QueryBuilderVocabularySearch from "./query-builder-value-types/QueryBuilderVocabularySearch";
-import QueryRowScientificNameDetailsSearch from "./query-builder-value-types/QueryBuilderScientificNameDetailsSearch";
+import QueryRowScientificNameDetailsSearch, {
+  transformClassificationToDSL
+} from "./query-builder-value-types/QueryBuilderScientificNameDetailsSearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -619,7 +621,7 @@ export function generateBuilderConfig(
       ),
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {
         const indexSettings = fieldValueToIndexSettings(field, indexMap);
-        return transformTextSearchToDSL({
+        return transformClassificationToDSL({
           fieldPath: indexSettingsToFieldPath(indexSettings),
           operation: op,
           value: val,

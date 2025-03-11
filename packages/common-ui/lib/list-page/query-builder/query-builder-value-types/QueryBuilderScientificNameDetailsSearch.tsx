@@ -7,6 +7,8 @@ import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/u
 import { VocabularyOption } from "../../../../../dina-ui/components/collection/VocabularySelectField";
 import useVocabularyOptions from "../../../../../dina-ui/components/collection/useVocabularyOptions";
 import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
+import { ESIndexMapping, TransformToDSLProps } from "../../types";
+import { transformTextSearchToDSL } from "./QueryBuilderTextSearch";
 
 interface QueryRowScientificNameDetailsSearchProps {
   /**
@@ -194,10 +196,49 @@ export default function QueryRowScientificNameDetailsSearch({
  * Using the query row for a target organism primary classification search, generate the elastic
  * search request to be made.
  */
-// export function transformClassificationToDSL({
-//   value,
-//   fieldInfo,
-//   indexMap
-// }: TransformToDSLProps): any {
+export function transformClassificationToDSL({
+  value,
+  fieldInfo
+}: TransformToDSLProps): any {
+  // Parse the scientific name detail search options. Trim the search value.
+  let scientificNameDetailsValue: ScientificNameDetailsSearchStates;
+  try {
+    scientificNameDetailsValue = JSON.parse(value);
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+  scientificNameDetailsValue.searchValue =
+    scientificNameDetailsValue.searchValue.trim();
 
-// }
+  if (
+    scientificNameDetailsValue.selectedOperator !== "empty" &&
+    scientificNameDetailsValue.selectedOperator !== "notEmpty"
+  ) {
+    if (!scientificNameDetailsValue.searchValue) {
+      return undefined;
+    }
+  }
+
+  // The path to search against elastic search. Using the rank to generate this path.
+  const fieldPath: string =
+    fieldInfo?.path +
+    "." +
+    scientificNameDetailsValue.selectedClassificationRank;
+
+  const commonProps = {
+    fieldPath,
+    operation: scientificNameDetailsValue.selectedOperator,
+    queryType: "",
+    value: scientificNameDetailsValue.searchValue,
+    fieldInfo: {
+      ...fieldInfo,
+      distinctTerm: false,
+
+      // All managed attributes have keyword support.
+      keywordMultiFieldSupport: true
+    } as ESIndexMapping
+  };
+
+  return transformTextSearchToDSL({ ...commonProps });
+}
