@@ -242,7 +242,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
       // Classification
       {
         type: "scientificNameDetails",
-        label: "scientificNameDetails",
+        label: "targetOrganismPrimaryClassification",
         component: "MATERIAL_SAMPLE",
         path: "data.attributes.targetOrganismPrimaryClassification"
       }
@@ -348,6 +348,15 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         component: "MATERIAL_SAMPLE",
         path: "included.attributes.identifiers",
         apiEndpoint: "collection-api/identifier-type",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
+      },
+      // Parent Material Sample - Material Sample - Classification
+      {
+        type: "scientificNameDetails",
+        label: "targetOrganismPrimaryClassification",
+        component: "MATERIAL_SAMPLE",
+        path: "included.attributes.targetOrganismPrimaryClassification",
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       }

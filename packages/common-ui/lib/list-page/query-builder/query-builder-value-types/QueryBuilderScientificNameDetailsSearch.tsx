@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
-import { noop } from "lodash";
+import { noop, startCase } from "lodash";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import { VocabularyOption } from "../../../../../dina-ui/components/collection/VocabularySelectField";
 import useVocabularyOptions from "../../../../../dina-ui/components/collection/useVocabularyOptions";
+import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
 
 interface QueryRowScientificNameDetailsSearchProps {
   /**
@@ -70,10 +71,42 @@ export default function QueryRowScientificNameDetailsSearch({
     }
   }, []);
 
+  // Supported operators for the classification search.
+  const supportedOperators: string[] = [
+    "exactMatch",
+    "wildcard",
+    "in",
+    "notIn",
+    "startsWith",
+    "notEquals",
+    "empty",
+    "notEmpty"
+  ];
+
   // Retrieve the classification options
   const { loading, vocabOptions: taxonomicRankOptions } = useVocabularyOptions({
     path: "collection-api/vocabulary2/taxonomicRank"
   });
+
+  // Capitalize each label for the taxonomic rank options.
+  useMemo(() => {
+    taxonomicRankOptions.forEach((option) => {
+      option.label = startCase(option.label);
+    });
+  }, [taxonomicRankOptions]);
+
+  // Generate the operator options
+  const operatorOptions = supportedOperators.map<SelectOption<string>>(
+    (option) => ({
+      label: formatMessage({ id: "queryBuilder_operator_" + option }),
+      value: option
+    })
+  );
+
+  // Currently selected option, if no option can be found just select the first one.
+  const selectedOperator = operatorOptions?.find(
+    (operator) => operator.value === scientificNameDetailsState.selectedOperator
+  );
 
   return (
     <div className={isInColumnSelector ? "" : "row"}>
@@ -106,6 +139,65 @@ export default function QueryRowScientificNameDetailsSearch({
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
       />
+
+      {/* Operator Selection */}
+      {!isInColumnSelector &&
+        scientificNameDetailsState.selectedClassificationRank !== "" && (
+          <Select<SelectOption<string>>
+            options={operatorOptions}
+            className={`col me-1 ps-0`}
+            value={selectedOperator}
+            onChange={(selected) =>
+              setScientificNameDetailsState({
+                ...scientificNameDetailsState,
+                selectedOperator: selected?.value ?? ""
+              })
+            }
+            captureMenuScroll={true}
+            menuPlacement={"auto"}
+            menuShouldScrollIntoView={false}
+            minMenuHeight={600}
+          />
+        )}
+
+      {/* Search Value Input */}
+      {!isInColumnSelector &&
+        scientificNameDetailsState.selectedClassificationRank !== "" &&
+        scientificNameDetailsState.selectedOperator !== "empty" &&
+        scientificNameDetailsState.selectedOperator !== "notEmpty" && (
+          <input
+            type="text"
+            value={scientificNameDetailsState.searchValue}
+            onChange={(newValue) => {
+              setScientificNameDetailsState({
+                ...scientificNameDetailsState,
+                searchValue: newValue.target.value
+              });
+            }}
+            className={"col form-control me-3"}
+            placeholder={
+              scientificNameDetailsState.selectedOperator !== "in" &&
+              scientificNameDetailsState.selectedOperator !== "notIn"
+                ? formatMessage({
+                    id: "queryBuilder_value_text_placeholder"
+                  })
+                : formatMessage({ id: "queryBuilder_value_in_placeholder" })
+            }
+            onKeyDown={onKeyDown}
+          />
+        )}
     </div>
   );
 }
+
+/**
+ * Using the query row for a target organism primary classification search, generate the elastic
+ * search request to be made.
+ */
+// export function transformClassificationToDSL({
+//   value,
+//   fieldInfo,
+//   indexMap
+// }: TransformToDSLProps): any {
+
+// }

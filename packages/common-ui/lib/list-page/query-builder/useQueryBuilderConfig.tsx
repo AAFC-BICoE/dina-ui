@@ -608,7 +608,7 @@ export function generateBuilderConfig(
     },
     scientificNameDetails: {
       ...BasicConfig.widgets.text,
-      type: "relationshipPresence",
+      type: "scientificNameDetails",
       valueSrc: "value",
       factory: (factoryProps) => (
         <QueryRowScientificNameDetailsSearch

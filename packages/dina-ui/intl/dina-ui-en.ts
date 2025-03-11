@@ -480,6 +480,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_tags: "Tags",
   field_targetOrganismPrimaryScientificName:
     "Target Organism Primary Scientific Name",
+  field_targetOrganismPrimaryClassification:
+    "Target Organism Primary Classification",
   field_title: "Title",
   "field_title.en": "English Title",
   "field_title.fr": "French Title",
