@@ -904,8 +904,11 @@ async function getVocabularyColumn<TData extends KitsuResource>(
       // Find the Vocabulary Element based on the vocabulary key.
       const vocabularyElements =
         vocabularyRequest as any as VocabularyElement[];
-      const vocabularyElement = vocabularyElements.find(
-        (vocab) => vocab.id === vocabularyKey
+      const elementsArray = Array.isArray(vocabularyElements)
+        ? vocabularyElements
+        : (vocabularyElements as any)?.vocabularyElements;
+      const vocabularyElement = elementsArray.find(
+        (vocab) => (vocab?.id || vocab.key) === vocabularyKey
       );
 
       if (vocabularyElement) {
@@ -928,8 +931,11 @@ async function getVocabularyColumn<TData extends KitsuResource>(
       // Find the Vocabulary Element based on the vocabulary key.
       const vocabularyElements =
         vocabularyRequest as any as VocabularyElement[];
-      const vocabularyElement = vocabularyElements.find(
-        (vocab) => vocab.id === vocabularyKey
+      const elementsArray = Array.isArray(vocabularyElements)
+        ? vocabularyElements
+        : (vocabularyElements as any)?.vocabularyElements;
+      const vocabularyElement = elementsArray.find(
+        (vocab) => (vocab?.id || vocab.key) === vocabularyKey
       );
 
       if (vocabularyElement) {

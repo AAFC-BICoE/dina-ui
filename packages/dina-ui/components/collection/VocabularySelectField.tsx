@@ -119,7 +119,7 @@ export function VocabularyFieldHeader({
   return (
     <>
       {referencedBy ? startCase(referencedBy) + " - " : ""}
-      {label}
+      {startCase(label)}
     </>
   );
 }
