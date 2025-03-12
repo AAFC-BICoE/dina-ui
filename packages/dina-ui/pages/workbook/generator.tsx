@@ -6,10 +6,15 @@ import {
   FieldWrapper,
   SubmitButton,
   useApiClient,
-  GeneratorColumn
+  GeneratorColumn,
+  useAccount,
+  ListPageLayout,
+  dateCell,
+  LoadingSpinner,
+  ColumnDefinition
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Alert, Card, Form, Spinner } from "react-bootstrap";
+import { Alert, Button, Card, Form } from "react-bootstrap";
 import Select from "react-select";
 import { useMemo, useState } from "react";
 import { DynamicFieldsMappingConfig } from "common-ui/lib/list-page/types";
@@ -23,6 +28,8 @@ import {
   getFlattenedConfig
 } from "../../components/workbook/utils/workbookMappingUtils";
 import InputGroup from "react-bootstrap/InputGroup";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { handleDownloadLink } from "../../components/object-store/object-store-utils";
 
 export interface EntityConfiguration {
   name: string;
@@ -75,6 +82,8 @@ export function WorkbookTemplateGenerator() {
   const [columnsToGenerate, setColumnsToGenerate] = useState<GeneratorColumn[]>(
     []
   );
+
+  const { groupNames } = useAccount();
 
   const entityTypes = ENTITY_TYPES.map((entityType) => ({
     label: formatMessage(entityType.name as any),
@@ -188,20 +197,38 @@ export function WorkbookTemplateGenerator() {
     setLoading(false);
   }
 
-  const LoadingSpinner = (
-    <>
-      <Spinner
-        as="span"
-        animation="border"
-        size="sm"
-        role="status"
-        aria-hidden="true"
-      />
-      <span className="visually-hidden">
-        <DinaMessage id="loadingSpinner" />
-      </span>
-    </>
-  );
+  const TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
+    "originalFilename",
+    "createdBy",
+    dateCell("createdOn"),
+    {
+      id: "download",
+      cell: ({ row: { original } }) => {
+        return (
+          <Button
+            disabled={loading}
+            className="btn btn-primary bulk-edit-button"
+            onClick={async () => {
+              setLoading(true);
+              await handleDownloadLink(
+                `/objectstore-api/file/aafc/${original.fileIdentifier}`,
+                apiClient,
+                setLoading
+              );
+              setLoading(false);
+            }}
+          >
+            {loading ? (
+              <LoadingSpinner loading={loading} />
+            ) : (
+              <DinaMessage id="downloadTemplate" />
+            )}
+          </Button>
+        );
+      },
+      header: ""
+    }
+  ];
 
   return (
     <DinaForm initialValues={{}}>
@@ -226,7 +253,7 @@ export function WorkbookTemplateGenerator() {
                 })}
               >
                 {loading ? (
-                  LoadingSpinner
+                  <LoadingSpinner loading={true} />
                 ) : (
                   <DinaMessage id="generateButtonText" />
                 )}
@@ -243,7 +270,9 @@ export function WorkbookTemplateGenerator() {
           <Card.Body>
             <div className="list-inline d-flex flex-row gap-4 pt-2">
               <div className="flex-grow-1">
-                <strong>Template Name</strong>
+                <strong>
+                  <DinaMessage id="templateName" />
+                </strong>
                 <InputGroup className="mt-2">
                   <Form.Control
                     name="name"
@@ -281,6 +310,7 @@ export function WorkbookTemplateGenerator() {
             </div>
           </Card.Body>
         </Card>
+
         <h4 className="mt-4">
           <DinaMessage id="templateGenerator_columnsToGenerate" />
         </h4>
@@ -292,6 +322,24 @@ export function WorkbookTemplateGenerator() {
               setDisplayedColumns={setColumnsToGenerate as any}
               dynamicFieldsMappingConfig={type.dynamicConfig}
               disabled={loading}
+            />
+          </Card.Body>
+        </Card>
+
+        <h4 className="mt-4">
+          <DinaMessage id="existingTemplates" />
+        </h4>
+        <Card>
+          <Card.Body>
+            <ListPageLayout
+              additionalFilters={{
+                rsql: `acSubtype.acSubtype=='EXPORT TEMPLATE';bucket=in=(${groupNames})`
+              }}
+              id="data-export-list"
+              queryTableProps={{
+                columns: TABLE_COLUMNS,
+                path: "objectstore-api/metadata"
+              }}
             />
           </Card.Body>
         </Card>
