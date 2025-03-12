@@ -754,8 +754,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_extension_placeholder: "Select extension to search against...",
   queryBuilder_relationship_placeholder:
     "Select relationship to search against...",
-  queryBuilder_scientificNameDetails_placeholder:
-    "Select classification rank...",
+  queryBuilder_classification_placeholder: "Select classification rank...",
   queryBuilder_field_placeholder: "Select a field to search against...",
   columnSelector_field_placeholder: "Select a field to add as a column...",
   queryBuilder_globalSearch: "Global search",

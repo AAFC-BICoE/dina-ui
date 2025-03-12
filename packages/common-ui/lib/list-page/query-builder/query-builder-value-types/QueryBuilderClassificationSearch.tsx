@@ -10,7 +10,7 @@ import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectFiel
 import { ESIndexMapping, TransformToDSLProps } from "../../types";
 import { transformTextSearchToDSL } from "./QueryBuilderTextSearch";
 
-interface QueryRowScientificNameDetailsSearchProps {
+interface QueryRowClassificationSearchProps {
   /**
    * Retrieve the current value from the Query Builder.
    */
@@ -27,10 +27,10 @@ interface QueryRowScientificNameDetailsSearchProps {
   isInColumnSelector: boolean;
 }
 
-export interface ScientificNameDetailsSearchStates {
+export interface ClassificationSearchStates {
   selectedClassificationRank: string;
 
-  /** Operator to be used on the scientific name details search. */
+  /** Operator to be used on the classification search. */
   selectedOperator: string;
 
   /** The value the user wishes to search. */
@@ -49,18 +49,18 @@ export const SUPPORTED_CLASSIFICATION_OPERATORS: string[] = [
   "notEmpty"
 ];
 
-export default function QueryRowScientificNameDetailsSearch({
+export default function QueryRowClassificationSearch({
   value,
   setValue,
   isInColumnSelector
-}: QueryRowScientificNameDetailsSearchProps) {
+}: QueryRowClassificationSearchProps) {
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
   const onKeyDown = isInColumnSelector ? noop : useQueryBuilderEnterToSearch();
 
-  const [scientificNameDetailsState, setScientificNameDetailsState] =
-    useState<ScientificNameDetailsSearchStates>(() =>
+  const [classificationState, setClassificationState] =
+    useState<ClassificationSearchStates>(() =>
       value
         ? JSON.parse(value)
         : {
@@ -73,15 +73,15 @@ export default function QueryRowScientificNameDetailsSearch({
   // Convert the state in this component to a value that can be stored in the Query Builder.
   useEffect(() => {
     if (setValue) {
-      setValue(JSON.stringify(scientificNameDetailsState));
+      setValue(JSON.stringify(classificationState));
     }
-  }, [scientificNameDetailsState]);
+  }, [classificationState]);
 
-  // Convert a value from Query Builder into the Scientific Name Details State in this component.
+  // Convert a value from Query Builder into the classification State in this component.
   // Dependent on the identifierConfig to indicate when it's changed.
   useEffect(() => {
     if (value) {
-      setScientificNameDetailsState(JSON.parse(value));
+      setClassificationState(JSON.parse(value));
     }
   }, []);
 
@@ -107,7 +107,7 @@ export default function QueryRowScientificNameDetailsSearch({
 
   // Currently selected option, if no option can be found just select the first one.
   const selectedOperator = operatorOptions?.find(
-    (operator) => operator.value === scientificNameDetailsState.selectedOperator
+    (operator) => operator.value === classificationState.selectedOperator
   );
 
   return (
@@ -117,16 +117,15 @@ export default function QueryRowScientificNameDetailsSearch({
         options={taxonomicRankOptions}
         value={taxonomicRankOptions.find(
           (option) =>
-            option.value ===
-            scientificNameDetailsState.selectedClassificationRank
+            option.value === classificationState.selectedClassificationRank
         )}
         isLoading={loading}
         placeholder={formatMessage({
-          id: "queryBuilder_scientificNameDetails_placeholder"
+          id: "queryBuilder_classification_placeholder"
         })}
         onChange={(newValue) => {
-          setScientificNameDetailsState({
-            ...scientificNameDetailsState,
+          setClassificationState({
+            ...classificationState,
             selectedClassificationRank: newValue?.value ?? "",
             selectedOperator: "",
             searchValue: ""
@@ -144,14 +143,14 @@ export default function QueryRowScientificNameDetailsSearch({
 
       {/* Operator Selection */}
       {!isInColumnSelector &&
-        scientificNameDetailsState.selectedClassificationRank !== "" && (
+        classificationState.selectedClassificationRank !== "" && (
           <Select<SelectOption<string>>
             options={operatorOptions}
             className={`col me-1 ps-0`}
             value={selectedOperator}
             onChange={(selected) =>
-              setScientificNameDetailsState({
-                ...scientificNameDetailsState,
+              setClassificationState({
+                ...classificationState,
                 selectedOperator: selected?.value ?? ""
               })
             }
@@ -164,22 +163,22 @@ export default function QueryRowScientificNameDetailsSearch({
 
       {/* Search Value Input */}
       {!isInColumnSelector &&
-        scientificNameDetailsState.selectedClassificationRank !== "" &&
-        scientificNameDetailsState.selectedOperator !== "empty" &&
-        scientificNameDetailsState.selectedOperator !== "notEmpty" && (
+        classificationState.selectedClassificationRank !== "" &&
+        classificationState.selectedOperator !== "empty" &&
+        classificationState.selectedOperator !== "notEmpty" && (
           <input
             type="text"
-            value={scientificNameDetailsState.searchValue}
+            value={classificationState.searchValue}
             onChange={(newValue) => {
-              setScientificNameDetailsState({
-                ...scientificNameDetailsState,
+              setClassificationState({
+                ...classificationState,
                 searchValue: newValue.target.value
               });
             }}
             className={"col form-control me-3"}
             placeholder={
-              scientificNameDetailsState.selectedOperator !== "in" &&
-              scientificNameDetailsState.selectedOperator !== "notIn"
+              classificationState.selectedOperator !== "in" &&
+              classificationState.selectedOperator !== "notIn"
                 ? formatMessage({
                     id: "queryBuilder_value_text_placeholder"
                   })
@@ -200,37 +199,34 @@ export function transformClassificationToDSL({
   value,
   fieldInfo
 }: TransformToDSLProps): any {
-  // Parse the scientific name detail search options. Trim the search value.
-  let scientificNameDetailsValue: ScientificNameDetailsSearchStates;
+  // Parse the classification search options. Trim the search value.
+  let classificationValue: ClassificationSearchStates;
   try {
-    scientificNameDetailsValue = JSON.parse(value);
+    classificationValue = JSON.parse(value);
   } catch (e) {
     console.error(e);
     return;
   }
-  scientificNameDetailsValue.searchValue =
-    scientificNameDetailsValue.searchValue.trim();
+  classificationValue.searchValue = classificationValue.searchValue.trim();
 
   if (
-    scientificNameDetailsValue.selectedOperator !== "empty" &&
-    scientificNameDetailsValue.selectedOperator !== "notEmpty"
+    classificationValue.selectedOperator !== "empty" &&
+    classificationValue.selectedOperator !== "notEmpty"
   ) {
-    if (!scientificNameDetailsValue.searchValue) {
+    if (!classificationValue.searchValue) {
       return undefined;
     }
   }
 
   // The path to search against elastic search. Using the rank to generate this path.
   const fieldPath: string =
-    fieldInfo?.path +
-    "." +
-    scientificNameDetailsValue.selectedClassificationRank;
+    fieldInfo?.path + "." + classificationValue.selectedClassificationRank;
 
   const commonProps = {
     fieldPath,
-    operation: scientificNameDetailsValue.selectedOperator,
+    operation: classificationValue.selectedOperator,
     queryType: "",
-    value: scientificNameDetailsValue.searchValue,
+    value: classificationValue.searchValue,
     fieldInfo: {
       ...fieldInfo,
       distinctTerm: false,

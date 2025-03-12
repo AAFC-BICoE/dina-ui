@@ -47,7 +47,7 @@ const ENTITY_TYPES: EntityConfiguration[] = [
           path: "included.attributes.determination.scientificNameDetails",
           referencedBy: "organism.determination",
           referencedType: "organism",
-          type: "scientificNameDetails",
+          type: "classification",
           component: "ORGANISM"
         }
       ]

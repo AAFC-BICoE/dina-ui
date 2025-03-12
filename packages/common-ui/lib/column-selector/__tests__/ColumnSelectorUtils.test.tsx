@@ -324,6 +324,64 @@ describe("ColumnSelectorUtils", () => {
         })
       ).toEqual("columnFunction/function2/CONVERT_COORDINATES_DD");
     });
+
+    it("Generate classification path", () => {
+      expect(
+        generateColumnPath({
+          indexMapping: {
+            dynamicField: {
+              type: "classification",
+              label: "targetOrganismPrimaryClassification",
+              component: "MATERIAL_SAMPLE",
+              path: "data.attributes.targetOrganismPrimaryClassification",
+              apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
+            },
+            value: "data.attributes.targetOrganismPrimaryClassification",
+            distinctTerm: false,
+            label: "targetOrganismPrimaryClassification",
+            path: "data.attributes.targetOrganismPrimaryClassification",
+            type: "classification",
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            containsSupport: false,
+            endsWithSupport: false,
+            hideField: false
+          },
+          dynamicFieldValue: `{"searchValue":"test","selectedOperator":"exactMatch","selectedClassificationRank":"kingdom"}`
+        })
+      ).toEqual("classification/kingdom");
+
+      expect(
+        generateColumnPath({
+          indexMapping: {
+            dynamicField: {
+              type: "classification",
+              label: "targetOrganismPrimaryClassification",
+              component: "MATERIAL_SAMPLE",
+              path: "included.attributes.targetOrganismPrimaryClassification",
+              apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
+            },
+            parentName: "parentMaterialSample",
+            parentPath: "included",
+            parentType: "collecting-event",
+            value:
+              "included.attributes.targetOrganismPrimaryClassification_parentMaterialSample",
+            distinctTerm: false,
+            label: "targetOrganismPrimaryClassification",
+            path: "included.attributes.targetOrganismPrimaryClassification",
+            type: "classification",
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            containsSupport: false,
+            endsWithSupport: false,
+            hideField: false
+          },
+          dynamicFieldValue: `{"searchValue":"test","selectedOperator":"exactMatch","selectedClassificationRank":"kingdom"}`
+        })
+      ).toEqual("classification~parentMaterialSample/kingdom");
+    });
   });
 
   describe("parseRelationshipNameFromType", () => {

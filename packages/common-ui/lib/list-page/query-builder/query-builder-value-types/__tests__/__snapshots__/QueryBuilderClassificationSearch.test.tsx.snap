@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`QueryBuilderScientificNameDetailsSearch QueryBuilderScientificNameDetailsSearch Component Display field if match type is equals: Expect text field not to be displayed since the match type is not equals 1`] = `
+exports[`QueryBuilderClassificationSearch QueryBuilderClassificationSearch Component Display field if match type is equals: Expect text field not to be displayed since the match type is not equals 1`] = `
 <DocumentFragment>
   <div>
     <form
@@ -182,7 +182,7 @@ exports[`QueryBuilderScientificNameDetailsSearch QueryBuilderScientificNameDetai
 </DocumentFragment>
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch QueryBuilderScientificNameDetailsSearch Component Display field if match type is equals: Expect text field to be displayed since match type is equals 1`] = `
+exports[`QueryBuilderClassificationSearch QueryBuilderClassificationSearch Component Display field if match type is equals: Expect text field to be displayed since match type is equals 1`] = `
 <DocumentFragment>
   <div>
     <form
@@ -370,7 +370,7 @@ exports[`QueryBuilderScientificNameDetailsSearch QueryBuilderScientificNameDetai
 </DocumentFragment>
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: empty 1`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: empty 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -397,7 +397,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: empty 2`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: empty 2`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -467,7 +467,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: exactMatch 1`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: exactMatch 1`] = `
 Object {
   "term": Object {
     "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
@@ -475,7 +475,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: exactMatch 2`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: exactMatch 2`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -499,7 +499,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: in 1`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: in 1`] = `
 Object {
   "bool": Object {
     "must": Object {
@@ -521,7 +521,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: in 2`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: in 2`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -559,7 +559,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notEmpty 1`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: notEmpty 1`] = `
 Object {
   "bool": Object {
     "must": Object {
@@ -576,7 +576,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notEmpty 2`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: notEmpty 2`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -605,7 +605,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notEquals 1`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: notEquals 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -632,7 +632,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notEquals 2`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: notEquals 2`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -688,7 +688,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notIn 1`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: notIn 1`] = `
 Object {
   "bool": Object {
     "must_not": Object {
@@ -710,7 +710,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notIn 2`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: notIn 2`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -748,7 +748,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: startsWith 1`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: startsWith 1`] = `
 Object {
   "prefix": Object {
     "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": Object {
@@ -759,7 +759,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: startsWith 2`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: startsWith 2`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -786,7 +786,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: wildcard 1`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: wildcard 1`] = `
 Object {
   "wildcard": Object {
     "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": Object {
@@ -797,7 +797,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: wildcard 2`] = `
+exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: wildcard 2`] = `
 Object {
   "nested": Object {
     "path": "included",

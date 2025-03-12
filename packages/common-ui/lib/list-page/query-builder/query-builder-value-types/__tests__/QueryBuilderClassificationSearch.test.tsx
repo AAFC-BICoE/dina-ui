@@ -1,13 +1,13 @@
-import QueryBuilderScientificNameDetailsSearch, {
-  SUPPORTED_CLASSIFICATION_OPERATORS,
-  transformClassificationToDSL
-} from "../QueryBuilderScientificNameDetailsSearch";
 import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
 import { noop } from "lodash";
 import userEvent from "@testing-library/user-event";
 import { Vocabulary } from "packages/dina-ui/types/collection-api";
+import QueryRowClassificationSearch, {
+  SUPPORTED_CLASSIFICATION_OPERATORS,
+  transformClassificationToDSL
+} from "../QueryBuilderClassificationSearch";
 
 export const TEST_CLASSIFICATIONS: Vocabulary = {
   id: "taxonomicRank",
@@ -43,8 +43,8 @@ const apiContext: any = {
   apiClient: { get: mockGet }
 };
 
-describe("QueryBuilderScientificNameDetailsSearch", () => {
-  describe("QueryBuilderScientificNameDetailsSearch Component", () => {
+describe("QueryBuilderClassificationSearch", () => {
+  describe("QueryBuilderClassificationSearch Component", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
@@ -53,7 +53,7 @@ describe("QueryBuilderScientificNameDetailsSearch", () => {
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
           >
-            <QueryBuilderScientificNameDetailsSearch
+            <QueryRowClassificationSearch
               value='{"searchValue":"","selectedOperator":"exactMatch","selectedClassificationRank":"class"}'
               setValue={jest.fn}
               isInColumnSelector={false}
@@ -75,7 +75,7 @@ describe("QueryBuilderScientificNameDetailsSearch", () => {
           <QueryBuilderContextProvider
             value={{ performSubmit: noop, groups: [] }}
           >
-            <QueryBuilderScientificNameDetailsSearch
+            <QueryRowClassificationSearch
               value='{"searchValue":"","selectedOperator":"empty","selectedClassificationRank":"class"}'
               setValue={jest.fn}
               isInColumnSelector={false}
@@ -100,7 +100,7 @@ describe("QueryBuilderScientificNameDetailsSearch", () => {
           <QueryBuilderContextProvider
             value={{ performSubmit: mockPerformSubmit, groups: [] }}
           >
-            <QueryBuilderScientificNameDetailsSearch
+            <QueryRowClassificationSearch
               value='{"searchValue":"","selectedOperator":"exactMatch","selectedClassificationRank":"class"}'
               setValue={jest.fn}
               isInColumnSelector={false}
@@ -146,11 +146,11 @@ describe("QueryBuilderScientificNameDetailsSearch", () => {
               keywordNumericSupport: false,
               optimizedPrefix: false,
               label: "Target Organism Primary Classification",
-              type: "scientificNameDetails",
+              type: "classification",
               value: ""
             },
             operation: "noOperator",
-            queryType: "scientificNameDetails"
+            queryType: "classification"
           })
         ).toMatchSnapshot();
 
@@ -172,11 +172,11 @@ describe("QueryBuilderScientificNameDetailsSearch", () => {
               keywordNumericSupport: false,
               optimizedPrefix: false,
               label: "Target Organism Primary Classification",
-              type: "scientificNameDetails",
+              type: "classification",
               value: ""
             },
             operation: "noOperator",
-            queryType: "scientificNameDetails"
+            queryType: "classification"
           })
         ).toMatchSnapshot();
       });

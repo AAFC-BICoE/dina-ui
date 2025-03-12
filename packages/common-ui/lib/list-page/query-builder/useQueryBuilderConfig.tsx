@@ -49,9 +49,9 @@ import QueryRowIdentifierSearch, {
   transformIdentifierToDSL
 } from "./query-builder-value-types/QueryBuilderIdentifierSearch";
 import QueryBuilderVocabularySearch from "./query-builder-value-types/QueryBuilderVocabularySearch";
-import QueryRowScientificNameDetailsSearch, {
+import QueryRowClassificationSearch, {
   transformClassificationToDSL
-} from "./query-builder-value-types/QueryBuilderScientificNameDetailsSearch";
+} from "./query-builder-value-types/QueryBuilderClassificationSearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -110,7 +110,7 @@ function getQueryBuilderTypeFromIndexType(
     case "fieldExtension":
     case "identifier":
     case "relationshipPresence":
-    case "scientificNameDetails":
+    case "classification":
       return type;
 
     // If it's stored directly as a keyword, it's considered a text field.
@@ -608,12 +608,12 @@ export function generateBuilderConfig(
         });
       }
     },
-    scientificNameDetails: {
+    classification: {
       ...BasicConfig.widgets.text,
-      type: "scientificNameDetails",
+      type: "classification",
       valueSrc: "value",
       factory: (factoryProps) => (
-        <QueryRowScientificNameDetailsSearch
+        <QueryRowClassificationSearch
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
           isInColumnSelector={false}
@@ -783,11 +783,11 @@ export function generateBuilderConfig(
         }
       }
     },
-    scientificNameDetails: {
+    classification: {
       valueSources: ["value"],
       defaultOperator: "noOperator",
       widgets: {
-        scientificNameDetails: {
+        classification: {
           operators: ["noOperator"]
         }
       }
