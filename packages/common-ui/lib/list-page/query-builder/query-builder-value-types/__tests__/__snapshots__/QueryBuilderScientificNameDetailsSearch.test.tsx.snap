@@ -369,3 +369,457 @@ exports[`QueryBuilderScientificNameDetailsSearch QueryBuilderScientificNameDetai
   </div>
 </DocumentFragment>
 `;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: empty 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must": Object {
+            "term": Object {
+              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: empty 2`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "should": Array [
+            Object {
+              "bool": Object {
+                "must_not": Object {
+                  "nested": Object {
+                    "path": "included",
+                    "query": Object {
+                      "bool": Object {
+                        "must": Array [
+                          Object {
+                            "exists": Object {
+                              "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+                            },
+                          },
+                          Object {
+                            "term": Object {
+                              "included.type": "material-sample",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            Object {
+              "nested": Object {
+                "path": "included",
+                "query": Object {
+                  "bool": Object {
+                    "must": Array [
+                      Object {
+                        "term": Object {
+                          "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "",
+                        },
+                      },
+                      Object {
+                        "term": Object {
+                          "included.type": "material-sample",
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: exactMatch 1`] = `
+Object {
+  "term": Object {
+    "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: exactMatch 2`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: in 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": Object {
+                "case_insensitive": true,
+                "value": "Animalia",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: in 2`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must": Object {
+                "bool": Object {
+                  "minimum_should_match": 1,
+                  "should": Array [
+                    Object {
+                      "term": Object {
+                        "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "Animalia",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notEmpty 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "exists": Object {
+        "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+      },
+    },
+    "must_not": Object {
+      "term": Object {
+        "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notEmpty 2`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+          Object {
+            "exists": Object {
+              "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+            },
+          },
+        ],
+        "must_not": Object {
+          "term": Object {
+            "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "",
+          },
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "term": Object {
+              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notEquals 2`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
+              "must_not": Object {
+                "term": Object {
+                  "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notIn 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": Object {
+                "case_insensitive": true,
+                "value": "Animalia",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: notIn 2`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must_not": Object {
+                "bool": Object {
+                  "minimum_should_match": 1,
+                  "should": Array [
+                    Object {
+                      "term": Object {
+                        "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "Animalia",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: startsWith 1`] = `
+Object {
+  "prefix": Object {
+    "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": Object {
+      "case_insensitive": true,
+      "value": "Animalia",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: startsWith 2`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": Object {
+                "case_insensitive": true,
+                "value": "Animalia",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: wildcard 1`] = `
+Object {
+  "wildcard": Object {
+    "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": Object {
+      "case_insensitive": true,
+      "value": "*Animalia*",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderScientificNameDetailsSearch transformClassificationToDSL function Operation: wildcard 2`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "wildcard": Object {
+              "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": Object {
+                "case_insensitive": true,
+                "value": "*Animalia*",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;

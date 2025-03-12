@@ -1,4 +1,7 @@
-import QueryBuilderScientificNameDetailsSearch from "../QueryBuilderScientificNameDetailsSearch";
+import QueryBuilderScientificNameDetailsSearch, {
+  SUPPORTED_CLASSIFICATION_OPERATORS,
+  transformClassificationToDSL
+} from "../QueryBuilderScientificNameDetailsSearch";
 import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
@@ -120,6 +123,63 @@ describe("QueryBuilderScientificNameDetailsSearch", () => {
 
       // Expect performSubmit to be called once
       expect(mockPerformSubmit).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("transformClassificationToDSL function", () => {
+    // Loop through all the possible operators and generate a snapshot for each.
+    SUPPORTED_CLASSIFICATION_OPERATORS.forEach((operator) => {
+      test(`Operation: ${operator}`, async () => {
+        // Attribute level
+        expect(
+          transformClassificationToDSL({
+            value: `{"selectedClassificationRank":"kingdom","selectedOperator":"${operator}","searchValue":"Animalia"}`,
+            fieldPath:
+              "included.attributes.targetOrganismPrimaryClassification",
+            fieldInfo: {
+              path: "included.attributes.targetOrganismPrimaryClassification",
+              distinctTerm: false,
+              hideField: false,
+              keywordMultiFieldSupport: false,
+              containsSupport: false,
+              endsWithSupport: false,
+              keywordNumericSupport: false,
+              optimizedPrefix: false,
+              label: "Target Organism Primary Classification",
+              type: "scientificNameDetails",
+              value: ""
+            },
+            operation: "noOperator",
+            queryType: "scientificNameDetails"
+          })
+        ).toMatchSnapshot();
+
+        // Parent level test
+        expect(
+          transformClassificationToDSL({
+            value: `{"selectedClassificationRank":"kingdom","selectedOperator":"${operator}","searchValue":"Animalia"}`,
+            fieldPath:
+              "included.attributes.targetOrganismPrimaryClassification",
+            fieldInfo: {
+              path: "included.attributes.targetOrganismPrimaryClassification",
+              parentName: "parentMaterialSample",
+              parentType: "material-sample",
+              distinctTerm: false,
+              hideField: false,
+              keywordMultiFieldSupport: false,
+              containsSupport: false,
+              endsWithSupport: false,
+              keywordNumericSupport: false,
+              optimizedPrefix: false,
+              label: "Target Organism Primary Classification",
+              type: "scientificNameDetails",
+              value: ""
+            },
+            operation: "noOperator",
+            queryType: "scientificNameDetails"
+          })
+        ).toMatchSnapshot();
+      });
     });
   });
 });

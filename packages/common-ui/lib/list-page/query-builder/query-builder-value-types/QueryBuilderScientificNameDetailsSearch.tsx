@@ -37,6 +37,18 @@ export interface ScientificNameDetailsSearchStates {
   searchValue: string;
 }
 
+// Supported operators for the classification search.
+export const SUPPORTED_CLASSIFICATION_OPERATORS: string[] = [
+  "exactMatch",
+  "wildcard",
+  "in",
+  "notIn",
+  "startsWith",
+  "notEquals",
+  "empty",
+  "notEmpty"
+];
+
 export default function QueryRowScientificNameDetailsSearch({
   value,
   setValue,
@@ -73,18 +85,6 @@ export default function QueryRowScientificNameDetailsSearch({
     }
   }, []);
 
-  // Supported operators for the classification search.
-  const supportedOperators: string[] = [
-    "exactMatch",
-    "wildcard",
-    "in",
-    "notIn",
-    "startsWith",
-    "notEquals",
-    "empty",
-    "notEmpty"
-  ];
-
   // Retrieve the classification options
   const { loading, vocabOptions: taxonomicRankOptions } = useVocabularyOptions({
     path: "collection-api/vocabulary2/taxonomicRank"
@@ -98,12 +98,12 @@ export default function QueryRowScientificNameDetailsSearch({
   }, [taxonomicRankOptions]);
 
   // Generate the operator options
-  const operatorOptions = supportedOperators.map<SelectOption<string>>(
-    (option) => ({
-      label: formatMessage({ id: "queryBuilder_operator_" + option }),
-      value: option
-    })
-  );
+  const operatorOptions = SUPPORTED_CLASSIFICATION_OPERATORS.map<
+    SelectOption<string>
+  >((option) => ({
+    label: formatMessage({ id: "queryBuilder_operator_" + option }),
+    value: option
+  }));
 
   // Currently selected option, if no option can be found just select the first one.
   const selectedOperator = operatorOptions?.find(
