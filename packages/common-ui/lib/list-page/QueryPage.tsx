@@ -345,7 +345,6 @@ export function QueryPage<TData extends KitsuResource>({
   const { groupNames } = useAccount();
   const isActionTriggeredQuery = useRef(false);
   const router = useRouter();
-  const { query } = router;
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -608,9 +607,9 @@ export function QueryPage<TData extends KitsuResource>({
           setQueryBuilderTree(emptyQueryTree());
         }
       }
-      if (query.queryTree) {
+      if (router.query.queryTree) {
         const parsedQueryTree = parseQueryTreeFromURL(
-          query.queryTree as string
+          router.query.queryTree as string
         );
         if (parsedQueryTree) {
           setQueryBuilderTree(parsedQueryTree);
@@ -623,7 +622,7 @@ export function QueryPage<TData extends KitsuResource>({
     customViewQuery,
     customViewFields,
     customViewElasticSearchQuery,
-    query.queryTree
+    router?.query?.queryTree
   ]);
 
   // If column selector is disabled, the loading spinner should be turned off.
