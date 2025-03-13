@@ -510,7 +510,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
         );
         const metadatas =
           metadataIds.length > 0 ? await retrieveMetadata(metadataIds) : [];
-        const metadataMap = new Map<string, Metadata>(
+        const metadataMap = new Map<string, PersistedResource<Metadata>>(
           metadatas.map((metadata) => [metadata.id, metadata])
         );
 
@@ -536,25 +536,13 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                   qualityControlResultsResponse.find(
                     (result) => result.id === qcItem?.result?.id
                   );
-                const currentItemFileIdentifiers: string[] = (
+                const currentItemFileIdentifiers =
                   molecularAnalysisResult?.attachments
-                    .filter(
-                      (attachment) =>
-                        metadataMap.get(attachment?.id ?? "")?.dcType ===
-                        "IMAGE"
-                    )
-                    .map((attachment) => {
-                      const metadata = metadataMap.get(attachment?.id ?? "");
-                      return (
-                        metadata?.derivatives?.find(
-                          (d) => d.derivativeType === "LARGE_IMAGE"
-                        )?.fileIdentifier || metadata?.fileIdentifier
-                      );
-                    }) || []
-                ).filter(
-                  (fileIdentifier): fileIdentifier is string =>
-                    fileIdentifier !== undefined
-                );
+                    ? getFileIdentifiers(
+                        molecularAnalysisResult.attachments as ResourceIdentifierObject[],
+                        metadataMap
+                      )
+                    : [];
 
                 return {
                   uuid: qcItem.id,
