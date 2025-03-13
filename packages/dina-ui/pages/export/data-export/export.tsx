@@ -229,43 +229,37 @@ export default function ExportPage<TData extends KitsuResource>() {
       const metadatas: PersistedResource<Metadata>[] = await bulkGet(paths, {
         apiBaseUrl: "/objectstore-api"
       });
-      const imageMetadatas = metadatas.filter((metadata) => {
-        return metadata.dcType === "IMAGE";
-      });
 
-      const fileIdentifiers = imageMetadatas.map((imageMetadata) => {
-        // If image has derivative, return large image derivative fileIdentifier if present
-        if (imageMetadata.derivatives) {
-          const largeImageDerivative = imageMetadata.derivatives.find(
-            (derivative) => {
-              if (derivative.derivativeType === "LARGE_IMAGE") {
-                return true;
-              }
-            }
+      const fileIdentifiers = metadatas.map((metadata) => {
+        // If the metadata is for an image and has derivatives, return the large image derivative fileIdentifier if present
+        if (metadata.dcType === "IMAGE" && metadata.derivatives) {
+          const largeImageDerivative = metadata.derivatives.find(
+            (derivative) => derivative.derivativeType === "LARGE_IMAGE"
           );
           if (largeImageDerivative) {
             return largeImageDerivative.fileIdentifier;
           }
         }
-        // Otherwise, return original fileIdentifier
-        return imageMetadata.fileIdentifier;
+        // Otherwise, return the original fileIdentifier
+        return metadata.fileIdentifier;
       });
+
       const filenameAliases = {};
 
       if (selectedFilenameAliasField) {
-        imageMetadatas.forEach((imageMetadata) => {
+        metadatas.forEach((metadata) => {
           const filenameAlias: string =
             selectedFilenameAliasField.label === "managedAttributes" &&
             dynamicFieldValue
               ? get(
-                  imageMetadata,
+                  metadata,
                   JSON.parse(dynamicFieldValue).selectedManagedAttributeConfig
                     .label
                 )
-              : get(imageMetadata, selectedFilenameAliasField.label);
-          if (imageMetadata.derivatives) {
+              : get(metadata, selectedFilenameAliasField.label);
+          if (metadata.derivatives) {
             // If image has derivative, use large image derivative fileIdentifier
-            const largeImageDerivative = imageMetadata.derivatives.find(
+            const largeImageDerivative = metadata.derivatives.find(
               (derivative) => {
                 if (derivative.derivativeType === "LARGE_IMAGE") {
                   return true;
@@ -278,9 +272,9 @@ export default function ExportPage<TData extends KitsuResource>() {
             }
           }
 
-          if (imageMetadata.fileIdentifier)
+          if (metadata.fileIdentifier)
             // Otherwise, use original fileIdentifier
-            filenameAliases[imageMetadata.fileIdentifier] = filenameAlias;
+            filenameAliases[metadata.fileIdentifier] = filenameAlias;
         });
       }
 

@@ -195,6 +195,7 @@ export default function ExportMolecularAnalysisPage() {
                     });
                     setRunSummaries([...runSummaries]);
                   }}
+                  disabled={exportLoading}
                 >
                   <DinaMessage id="selectAll" />
                 </button>
@@ -209,6 +210,7 @@ export default function ExportMolecularAnalysisPage() {
                     });
                     setRunSummaries([...runSummaries]);
                   }}
+                  disabled={exportLoading}
                 >
                   <DinaMessage id="deselectAll" />
                 </button>

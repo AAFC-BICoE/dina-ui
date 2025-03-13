@@ -345,7 +345,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
 
     const itemAttachmentPaths = runSummaries.flatMap((runSummary) =>
       runSummary.attributes.items
-        .filter((item) => item.result !== null)
+        .filter((item) => item?.result?.uuid)
         .map(
           (item) =>
             "molecular-analysis-result/" +
