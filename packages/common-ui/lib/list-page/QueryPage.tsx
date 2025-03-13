@@ -613,8 +613,8 @@ export function QueryPage<TData extends KitsuResource>({
           query.queryTree as string
         );
         if (parsedQueryTree) {
+          setQueryBuilderTree(parsedQueryTree);
           setSubmittedQueryBuilderTree(parsedQueryTree);
-          setSessionStorageQueryTree(Utils.getTree(parsedQueryTree));
         }
       }
     }
