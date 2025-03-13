@@ -607,7 +607,7 @@ export function QueryPage<TData extends KitsuResource>({
           setQueryBuilderTree(emptyQueryTree());
         }
       }
-      if (router.query.queryTree) {
+      if (router?.query?.queryTree) {
         const parsedQueryTree = parseQueryTreeFromURL(
           router.query.queryTree as string
         );
