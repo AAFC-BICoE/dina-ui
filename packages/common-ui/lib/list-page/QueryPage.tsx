@@ -65,6 +65,7 @@ import {
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 import { MemoizedReactTable } from "./QueryPageTable";
 import { GroupSelectFieldMemoized } from "./QueryGroupSelection";
+import { useRouter } from "next/router";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -343,6 +344,8 @@ export function QueryPage<TData extends KitsuResource>({
   const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
   const isActionTriggeredQuery = useRef(false);
+  const router = useRouter();
+  const { query } = router;
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -605,12 +608,22 @@ export function QueryPage<TData extends KitsuResource>({
           setQueryBuilderTree(emptyQueryTree());
         }
       }
+      if (query.queryTree) {
+        const parsedQueryTree = parseQueryTreeFromURL(
+          query.queryTree as string
+        );
+        if (parsedQueryTree) {
+          setSubmittedQueryBuilderTree(parsedQueryTree);
+          setSessionStorageQueryTree(Utils.getTree(parsedQueryTree));
+        }
+      }
     }
   }, [
     queryBuilderConfig,
     customViewQuery,
     customViewFields,
-    customViewElasticSearchQuery
+    customViewElasticSearchQuery,
+    query.queryTree
   ]);
 
   // If column selector is disabled, the loading spinner should be turned off.
@@ -834,6 +847,29 @@ export function QueryPage<TData extends KitsuResource>({
     setPageOffset(0);
   }, []);
 
+  // Function to serialize query tree into a URL-safe string
+  function serializeQueryTreeToURL(queryTree: ImmutableTree): string {
+    const jsonTree = Utils.getTree(queryTree);
+    const jsonTreeString = JSON.stringify(jsonTree);
+    return encodeURIComponent(jsonTreeString);
+  }
+
+  // Function to parse query tree from URL
+  function parseQueryTreeFromURL(
+    queryParam: string | undefined
+  ): ImmutableTree | null {
+    if (!queryParam) return null;
+
+    try {
+      const parsedJsonTree = JSON.parse(decodeURIComponent(queryParam));
+      const parsedImmutableTree = Utils.loadTree(parsedJsonTree);
+      return parsedImmutableTree;
+    } catch (error) {
+      console.error("Error parsing query tree:", error);
+      return null;
+    }
+  }
+
   /**
    * On search filter submit. This will also update the pagination to go back to the first page on
    * a new search.
@@ -843,6 +879,15 @@ export function QueryPage<TData extends KitsuResource>({
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
     setSessionStorageQueryTree(Utils.getTree(queryBuilderTree));
+    const serializedTree = serializeQueryTreeToURL(queryBuilderTree);
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { queryTree: serializedTree }
+      },
+      undefined,
+      { shallow: true }
+    );
   };
 
   /**
