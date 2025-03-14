@@ -11,7 +11,12 @@ import React, {
   useRef,
   CSSProperties
 } from "react";
-import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
+import {
+  GroupProperties,
+  ImmutableTree,
+  JsonTree,
+  Utils
+} from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
@@ -42,7 +47,8 @@ import {
   QueryBuilderMemo,
   defaultJsonTree,
   defaultQueryTree,
-  emptyQueryTree
+  emptyQueryTree,
+  generateJsonTreeFromSimpleQueryGroup
 } from "./query-builder/QueryBuilder";
 import {
   applyGroupFilters,
@@ -57,7 +63,12 @@ import {
   CustomViewField,
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
-import { DynamicFieldsMappingConfig, TableColumn } from "./types";
+import {
+  DynamicFieldsMappingConfig,
+  SimpleQueryGroup,
+  SimpleQueryRow,
+  TableColumn
+} from "./types";
 import { useSessionStorage } from "usehooks-ts";
 import {
   ValidationError,
@@ -849,8 +860,21 @@ export function QueryPage<TData extends KitsuResource>({
   // Function to serialize query tree into a URL-safe string
   function serializeQueryTreeToURL(queryTree: ImmutableTree): string {
     const jsonTree = Utils.getTree(queryTree);
-    const jsonTreeString = JSON.stringify(jsonTree);
-    return encodeURIComponent(jsonTreeString);
+    const props: SimpleQueryRow[] = (jsonTree.children1 as any[])?.map(
+      (child) => {
+        return {
+          field: child.properties.field,
+          operator: child.properties.operator,
+          value: child.properties.value[0]
+        };
+      }
+    );
+
+    const simpleQueryGroup: SimpleQueryGroup = {
+      conj: (jsonTree.properties as GroupProperties)?.conjunction,
+      props: props
+    };
+    return JSON.stringify(simpleQueryGroup);
   }
 
   // Function to parse query tree from URL
@@ -860,7 +884,10 @@ export function QueryPage<TData extends KitsuResource>({
     if (!queryParam) return null;
 
     try {
-      const parsedJsonTree = JSON.parse(decodeURIComponent(queryParam));
+      const parsedSimpleQueryGroup: SimpleQueryGroup = JSON.parse(queryParam);
+      const parsedJsonTree: JsonTree = generateJsonTreeFromSimpleQueryGroup(
+        parsedSimpleQueryGroup
+      );
       const parsedImmutableTree = Utils.loadTree(parsedJsonTree);
       return parsedImmutableTree;
     } catch (error) {
