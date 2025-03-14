@@ -28,6 +28,7 @@ import {
   MolecularAnalysisRunItemUsageType
 } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 export interface UseMolecularAnalysisExportAPIReturn {
   runSummaries: any[];
@@ -286,6 +287,38 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   }
 
   /**
+   * Extracts file identifiers from a list of attachments.
+   *
+   * Images have a special edge case where if a LARGE_IMAGE derivative exists, it's preferred over
+   * the original file identifier. Other file types will just always use the metadata file
+   * identifier.
+   *
+   * @param attachments - Array of attachment objects.
+   * @param metadataMap - Map containing metadata for attachments.
+   * @returns Array of file identifiers.
+   */
+  function getFileIdentifiers(
+    attachments: ResourceIdentifierObject[],
+    metadataMap: Map<string, PersistedResource<Metadata>>
+  ) {
+    const fileIdentifiers: string[] = [];
+    attachments.forEach((attachment) => {
+      const metadata = metadataMap.get(attachment.id);
+      if (metadata?.dcType === "IMAGE") {
+        const fileIdentifier =
+          metadata.derivatives?.find((d) => d.derivativeType === "LARGE_IMAGE")
+            ?.fileIdentifier || metadata.fileIdentifier;
+        if (fileIdentifier) {
+          fileIdentifiers.push(fileIdentifier);
+        }
+      } else if (metadata?.fileIdentifier) {
+        fileIdentifiers.push(metadata.fileIdentifier);
+      }
+    });
+    return fileIdentifiers;
+  }
+
+  /**
    * This function will fetch attachments for both top-level run summaries and individual run items
    * within them in. It retrieves attachments for both `molecular-analysis-run` and
    * `molecular-analysis-result` resources.
@@ -312,7 +345,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
 
     const itemAttachmentPaths = runSummaries.flatMap((runSummary) =>
       runSummary.attributes.items
-        .filter((item) => item.result !== null)
+        .filter((item) => item?.result?.uuid)
         .map(
           (item) =>
             "molecular-analysis-result/" +
@@ -355,45 +388,22 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     setRunSummaries((currentRunSummaries) => {
       return currentRunSummaries.map((currentRunSummary, runSummaryIndex) => {
         const molecularAnalysisRun = molecularAnalysisRuns[runSummaryIndex];
-        const currentRunFileIdentifiers: string[] = [];
-
-        // Process top-level run attachments
-        if (molecularAnalysisRun?.attachments) {
-          molecularAnalysisRun.attachments.forEach((attachment) => {
-            const metadata = metadataMap.get(attachment.id);
-            if (metadata?.dcType === "IMAGE") {
-              const fileIdentifier =
-                metadata.derivatives?.find(
-                  (d) => d.derivativeType === "LARGE_IMAGE"
-                )?.fileIdentifier || metadata.fileIdentifier;
-              if (fileIdentifier) {
-                currentRunFileIdentifiers.push(fileIdentifier);
-              }
-            }
-          });
-        }
+        const currentRunFileIdentifiers = molecularAnalysisRun?.attachments
+          ? getFileIdentifiers(molecularAnalysisRun.attachments, metadataMap)
+          : [];
 
         // Update items within the current run summary
         const updatedItems = currentRunSummary.attributes.items.map((item) => {
           const molecularAnalysisResult = molecularAnalysisResults.find(
             (result) => result?.id === item.result?.uuid
           );
-          const currentItemFileIdentifiers: string[] = [];
-
-          if (molecularAnalysisResult?.attachments) {
-            molecularAnalysisResult.attachments.forEach((attachment) => {
-              const metadata = metadataMap.get(attachment?.id ?? "");
-              if (metadata?.dcType === "IMAGE") {
-                const fileIdentifier =
-                  metadata.derivatives?.find(
-                    (d) => d.derivativeType === "LARGE_IMAGE"
-                  )?.fileIdentifier || metadata.fileIdentifier;
-                if (fileIdentifier) {
-                  currentItemFileIdentifiers.push(fileIdentifier);
-                }
-              }
-            });
-          }
+          const currentItemFileIdentifiers =
+            molecularAnalysisResult?.attachments
+              ? getFileIdentifiers(
+                  molecularAnalysisResult.attachments as ResourceIdentifierObject[],
+                  metadataMap
+                )
+              : [];
 
           return {
             ...item,
@@ -459,9 +469,9 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       if (newQualityControlItems && newQualityControlItems.length > 0) {
         // 2. Retrieve all of the result ids from the run items and perform a single request to
         // retrieve them.
-        const resultIds: string[] = newQualityControlItems.map(
-          (item) => item?.result?.id ?? ""
-        );
+        const resultIds: string[] = newQualityControlItems
+          .filter((item) => item?.result?.id)
+          .map((item) => item?.result?.id ?? "");
         const { data: qualityControlResultsResponse } = await apiClient.get<
           MolecularAnalysisResult[]
         >("seqdb-api/molecular-analysis-result", {
@@ -500,7 +510,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
         );
         const metadatas =
           metadataIds.length > 0 ? await retrieveMetadata(metadataIds) : [];
-        const metadataMap = new Map<string, Metadata>(
+        const metadataMap = new Map<string, PersistedResource<Metadata>>(
           metadatas.map((metadata) => [metadata.id, metadata])
         );
 
@@ -526,25 +536,13 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
                   qualityControlResultsResponse.find(
                     (result) => result.id === qcItem?.result?.id
                   );
-                const currentItemFileIdentifiers: string[] = (
+                const currentItemFileIdentifiers =
                   molecularAnalysisResult?.attachments
-                    .filter(
-                      (attachment) =>
-                        metadataMap.get(attachment?.id ?? "")?.dcType ===
-                        "IMAGE"
-                    )
-                    .map((attachment) => {
-                      const metadata = metadataMap.get(attachment?.id ?? "");
-                      return (
-                        metadata?.derivatives?.find(
-                          (d) => d.derivativeType === "LARGE_IMAGE"
-                        )?.fileIdentifier || metadata?.fileIdentifier
-                      );
-                    }) || []
-                ).filter(
-                  (fileIdentifier): fileIdentifier is string =>
-                    fileIdentifier !== undefined
-                );
+                    ? getFileIdentifiers(
+                        molecularAnalysisResult.attachments as ResourceIdentifierObject[],
+                        metadataMap
+                      )
+                    : [];
 
                 return {
                   uuid: qcItem.id,
