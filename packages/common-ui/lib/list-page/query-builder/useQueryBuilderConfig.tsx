@@ -49,6 +49,9 @@ import QueryRowIdentifierSearch, {
   transformIdentifierToDSL
 } from "./query-builder-value-types/QueryBuilderIdentifierSearch";
 import QueryBuilderVocabularySearch from "./query-builder-value-types/QueryBuilderVocabularySearch";
+import QueryRowClassificationSearch, {
+  transformClassificationToDSL
+} from "./query-builder-value-types/QueryBuilderClassificationSearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -107,6 +110,7 @@ function getQueryBuilderTypeFromIndexType(
     case "fieldExtension":
     case "identifier":
     case "relationshipPresence":
+    case "classification":
       return type;
 
     // If it's stored directly as a keyword, it's considered a text field.
@@ -603,6 +607,28 @@ export function generateBuilderConfig(
           indexMap
         });
       }
+    },
+    classification: {
+      ...BasicConfig.widgets.text,
+      type: "classification",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowClassificationSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          isInColumnSelector={false}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformClassificationToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
     }
   };
 
@@ -753,6 +779,15 @@ export function generateBuilderConfig(
       defaultOperator: "noOperator",
       widgets: {
         relationshipPresence: {
+          operators: ["noOperator"]
+        }
+      }
+    },
+    classification: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        classification: {
           operators: ["noOperator"]
         }
       }

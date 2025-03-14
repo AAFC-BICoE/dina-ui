@@ -32,6 +32,9 @@ import {
   generateColumnDefinition,
   generateColumnPath
 } from "./ColumnSelectorUtils";
+import QueryRowClassificationSearch, {
+  ClassificationSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -124,6 +127,14 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                 (columnFunctionValues.functionName === "CONCAT" &&
                   (columnFunctionValues.params?.length ?? 0) > 1)
               ) {
+                setIsValidField(true);
+                return;
+              }
+              break;
+            case "classification":
+              const classificationValues: ClassificationSearchStates =
+                JSON.parse(dynamicFieldValue);
+              if (classificationValues?.selectedClassificationRank) {
                 setIsValidField(true);
                 return;
               }
@@ -384,6 +395,13 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               setValue={setDynamicFieldValue}
               value={dynamicFieldValue}
               indexMapping={indexMapping}
+              isInColumnSelector={true}
+            />
+          )}
+          {selectedField?.dynamicField?.type === "classification" && (
+            <QueryRowClassificationSearch
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
               isInColumnSelector={true}
             />
           )}

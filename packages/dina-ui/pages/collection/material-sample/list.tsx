@@ -237,6 +237,15 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         component: "RESTRICTION",
         path: "data.attributes.restrictionFieldsExtension",
         apiEndpoint: "collection-api/extension"
+      },
+
+      // Classification
+      {
+        type: "classification",
+        label: "targetOrganismPrimaryClassification",
+        component: "MATERIAL_SAMPLE",
+        path: "data.attributes.targetOrganismPrimaryClassification",
+        apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
       }
     ],
     relationshipFields: [
@@ -342,6 +351,16 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         apiEndpoint: "collection-api/identifier-type",
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
+      },
+      // Parent Material Sample - Material Sample - Classification
+      {
+        type: "unsupported",
+        label: "targetOrganismPrimaryClassification",
+        component: "MATERIAL_SAMPLE",
+        path: "included.attributes.targetOrganismPrimaryClassification",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample",
+        apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
       }
     ]
   };

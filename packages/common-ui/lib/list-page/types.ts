@@ -286,7 +286,7 @@ export type DynamicFieldType =
   | "fieldExtension"
   | "identifier"
   | "relationshipPresence"
-  | "scientificNameDetails"
+  | "classification"
   | "columnFunction"
   | "vocabulary";
 
