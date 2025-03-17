@@ -26,7 +26,7 @@ export const MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
   "assemblages.",
   "projects.",
-  "organism."
+  "organism.determination.scientificName"
 ];
 
 export interface SampleListLayoutProps {
