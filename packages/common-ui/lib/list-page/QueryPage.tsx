@@ -855,24 +855,56 @@ export function QueryPage<TData extends KitsuResource>({
     setSortingRules(defaultSort ?? DEFAULT_SORT);
     setError(undefined);
     setPageOffset(0);
+
+    // Reset the query to empty.
+    router.push(
+      {
+        pathname: router.pathname,
+        query: null
+      },
+      undefined,
+      { shallow: true }
+    );
   }, []);
 
-  // Function to serialize query tree into a URL-safe string
-  function serializeQueryTreeToURL(queryTree: ImmutableTree): string {
+  /**
+   * Function to serialize query tree into a URL-safe string.
+   *
+   * Sub-groups are currently not supported.
+   *
+   * @param queryTree Tree to be serialized.
+   * @returns JSON string or null if cannot be serialized.
+   */
+  function serializeQueryTreeToURL(queryTree: ImmutableTree): string | null {
     const jsonTree = Utils.getTree(queryTree);
-    const props: SimpleQueryRow[] = (jsonTree.children1 as any[])?.map(
+    const props: (SimpleQueryRow | null)[] = (jsonTree.children1 as any[])?.map(
       (child) => {
+        if (!child.properties.field) {
+          return null;
+        }
+
         return {
           field: child.properties.field,
           operator: child.properties.operator,
-          value: child.properties.value[0]
+          value: child.properties.value[0] ?? "",
+          type: child.properties.valueType[0] ?? "text"
         };
       }
     );
 
+    // Filter out null values
+    const filteredProps: SimpleQueryRow[] = props.filter(
+      (item): item is SimpleQueryRow => item !== null
+    );
+
+    // If any null values were found, return null
+    if (filteredProps.length !== props.length) {
+      return null;
+    }
+
     const simpleQueryGroup: SimpleQueryGroup = {
       conj: (jsonTree.properties as GroupProperties)?.conjunction,
-      props: props
+      props: filteredProps
     };
     return JSON.stringify(simpleQueryGroup);
   }
@@ -909,7 +941,7 @@ export function QueryPage<TData extends KitsuResource>({
     router.push(
       {
         pathname: router.pathname,
-        query: { queryTree: serializedTree }
+        query: serializedTree !== null ? { queryTree: serializedTree } : null
       },
       undefined,
       { shallow: true }

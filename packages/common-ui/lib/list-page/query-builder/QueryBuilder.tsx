@@ -272,7 +272,7 @@ export function generateJsonTreeFromSimpleQueryGroup(
           operator: simpleQueryRow.operator,
           value: [simpleQueryRow.value],
           valueSrc: ["value"],
-          valueType: ["autoComplete"]
+          valueType: [simpleQueryRow.type]
         }
       };
     }
