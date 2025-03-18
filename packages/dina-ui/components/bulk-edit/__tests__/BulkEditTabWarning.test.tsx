@@ -342,14 +342,8 @@ describe("BulkEditTabWarning", () => {
         // Keeps the original values:
         SAMPLES_WITH_DIFFERENT_DETERMINATIONS.map((sample) => ({
           resource: {
-            attachment: undefined,
-            organism: undefined,
-            organismsIndividualEntry: undefined,
-            organismsQuantity: undefined,
-            projects: undefined,
             id: sample.id,
-            type: sample.type,
-            relationships: {}
+            type: sample.type
           },
           type: "material-sample"
         })),

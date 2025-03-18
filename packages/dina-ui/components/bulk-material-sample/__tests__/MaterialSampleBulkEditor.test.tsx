@@ -31,7 +31,7 @@ import {
   TEST_STORAGE_UNITS,
   TEST_COLLECTING_ORGANISM_SAMPLES,
   TEST_FORM_TEMPLATE_COMPONENTS_DISABLED
-} from "./MaterialSampleBulkMocks";
+} from "../__mocks__/MaterialSampleBulkMocks";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
