@@ -22,6 +22,13 @@ import Offcanvas from "react-bootstrap/Offcanvas";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
+export const OBJECT_STORE_NON_EXPORTABLE_COLUMNS: string[] = [
+  "selectColumn",
+  "thumbnail",
+  "objectStorePreview",
+  "viewDetails"
+];
+
 const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
 
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
@@ -270,12 +277,7 @@ export default function MetadataListPage() {
                   relationshipFields: []
                 }}
                 mandatoryDisplayedColumns={["thumbnail", "viewDetails"]}
-                nonExportableColumns={[
-                  "selectColumn",
-                  "thumbnail",
-                  "objectStorePreview",
-                  "viewDetails"
-                ]}
+                nonExportableColumns={OBJECT_STORE_NON_EXPORTABLE_COLUMNS}
                 nonSearchableColumns={[
                   "acMetadataCreator.displayName",
                   "dcCreator.displayName"

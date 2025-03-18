@@ -52,6 +52,8 @@ import {
 import { QueryFieldSelector } from "packages/common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
 import QueryRowManagedAttributeSearch from "packages/common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import { get } from "lodash";
+import { MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS } from "../../collection/material-sample/list";
+import { OBJECT_STORE_NON_EXPORTABLE_COLUMNS } from "../../object-store/object/list";
 
 export interface SavedExportOption {
   label?: string;
@@ -69,6 +71,11 @@ const SEPARATOR_OPTIONS: { value: ColumnSeparator; label: string }[] = [
     label: "Tab"
   }
 ];
+
+const NON_EXPORTABLE_COLUMNS_MAP: { [key: string]: string[] } = {
+  ["dina_material_sample_index"]: MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS,
+  ["dina_object_store_index"]: OBJECT_STORE_NON_EXPORTABLE_COLUMNS
+};
 
 export default function ExportPage<TData extends KitsuResource>() {
   const { formatNumber } = useIntl();
@@ -666,6 +673,9 @@ export default function ExportPage<TData extends KitsuResource>() {
                       uniqueName={uniqueName}
                       dynamicFieldsMappingConfig={dynamicFieldMapping}
                       disabled={loading}
+                      nonExportableColumns={
+                        NON_EXPORTABLE_COLUMNS_MAP?.[indexName] ?? []
+                      }
                     />
                   </Card.Body>
                 </Card>
