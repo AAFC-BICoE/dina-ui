@@ -285,18 +285,6 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              id: "1",
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
               type: "material-sample",
               collection: undefined,
               dwcDegreeOfEstablishment: null,
@@ -370,18 +358,6 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
 
     expect(mockSave.mock.calls).toMatchObject([
-      [
-        [
-          {
-            resource: {
-              id: "1",
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
       [
         [
           {
@@ -632,18 +608,6 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              id: "1",
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
               id: "333",
               type: "material-sample",
               identifiers: {},
@@ -717,18 +681,6 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
 
     expect(mockSave.mock.calls).toMatchObject([
-      [
-        [
-          {
-            resource: {
-              id: "1",
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
       [
         [
           {

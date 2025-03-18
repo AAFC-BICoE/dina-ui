@@ -1,5 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
+  isResourceEmpty,
   processExtensionValuesLoading,
   processExtensionValuesSaving,
   resourceDifference,
@@ -294,6 +295,12 @@ export function useCollectingEventSave({
     // If the relationship section is empty, remove it from the query.
     if (Object.keys((collectingEventDiff as any).relationships).length === 0) {
       delete (collectingEventDiff as any).relationships;
+    }
+
+    // Do not perform any request if it's empty...
+    if (isResourceEmpty(collectingEventDiff)) {
+      collectingEventFormik.setFieldValue("id", collectingEventDiff.id);
+      return collectingEventDiff as PersistedResource<CollectingEvent>;
     }
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
