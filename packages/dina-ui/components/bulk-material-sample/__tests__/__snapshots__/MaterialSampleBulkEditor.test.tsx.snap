@@ -6,9 +6,7 @@ Array [
     Array [
       Object {
         "resource": Object {
-          "assemblages": undefined,
           "associations": Array [],
-          "attachment": undefined,
           "collectingEvent": Object {
             "id": null,
             "type": "collecting-event",
@@ -16,9 +14,6 @@ Array [
           "dwcDegreeOfEstablishment": null,
           "hostOrganism": null,
           "isRestricted": false,
-          "organism": undefined,
-          "organismsIndividualEntry": undefined,
-          "organismsQuantity": undefined,
           "preparationDate": null,
           "preparationFixative": null,
           "preparationManagedAttributes": Object {},
@@ -37,9 +32,7 @@ Array [
             "id": null,
             "type": "preparation-type",
           },
-          "preparedBy": undefined,
           "preservationType": null,
-          "projects": undefined,
           "relationships": Object {
             "organism": Object {
               "data": Array [],
@@ -54,8 +47,6 @@ Array [
           "restrictionFieldsExtension": null,
           "restrictionRemarks": null,
           "scheduledAction": undefined,
-          "storageUnit": undefined,
-          "storageUnitUsage": undefined,
         },
         "type": "material-sample",
       },
@@ -68,9 +59,7 @@ Array [
     Array [
       Object {
         "resource": Object {
-          "assemblages": undefined,
           "associations": Array [],
-          "attachment": undefined,
           "dwcDegreeOfEstablishment": null,
           "dwcOtherCatalogNumbers": Array [
             "otherCatalogAll",
@@ -78,18 +67,13 @@ Array [
           "hostOrganism": null,
           "id": "1",
           "isRestricted": false,
-          "organism": undefined,
-          "organismsIndividualEntry": undefined,
-          "organismsQuantity": undefined,
           "preparationDate": null,
           "preparationFixative": null,
           "preparationManagedAttributes": Object {},
           "preparationMaterials": null,
           "preparationRemarks": null,
           "preparationSubstrate": null,
-          "preparedBy": undefined,
           "preservationType": null,
-          "projects": undefined,
           "relationships": Object {
             "organism": Object {
               "data": Array [],
@@ -100,17 +84,13 @@ Array [
           },
           "restrictionFieldsExtension": null,
           "restrictionRemarks": null,
-          "storageUnit": undefined,
-          "storageUnitUsage": undefined,
           "type": "material-sample",
         },
         "type": "material-sample",
       },
       Object {
         "resource": Object {
-          "assemblages": undefined,
           "associations": Array [],
-          "attachment": undefined,
           "dwcDegreeOfEstablishment": null,
           "dwcOtherCatalogNumbers": Array [
             "otherCatalogAll",
@@ -118,18 +98,13 @@ Array [
           "hostOrganism": null,
           "id": "2",
           "isRestricted": false,
-          "organism": undefined,
-          "organismsIndividualEntry": undefined,
-          "organismsQuantity": undefined,
           "preparationDate": null,
           "preparationFixative": null,
           "preparationManagedAttributes": Object {},
           "preparationMaterials": null,
           "preparationRemarks": null,
           "preparationSubstrate": null,
-          "preparedBy": undefined,
           "preservationType": null,
-          "projects": undefined,
           "relationships": Object {
             "organism": Object {
               "data": Array [],
@@ -140,17 +115,13 @@ Array [
           },
           "restrictionFieldsExtension": null,
           "restrictionRemarks": null,
-          "storageUnit": undefined,
-          "storageUnitUsage": undefined,
           "type": "material-sample",
         },
         "type": "material-sample",
       },
       Object {
         "resource": Object {
-          "assemblages": undefined,
           "associations": Array [],
-          "attachment": undefined,
           "dwcDegreeOfEstablishment": null,
           "dwcOtherCatalogNumbers": Array [
             "otherCatalogAll",
@@ -158,18 +129,13 @@ Array [
           "hostOrganism": null,
           "id": "3",
           "isRestricted": false,
-          "organism": undefined,
-          "organismsIndividualEntry": undefined,
-          "organismsQuantity": undefined,
           "preparationDate": null,
           "preparationFixative": null,
           "preparationManagedAttributes": Object {},
           "preparationMaterials": null,
           "preparationRemarks": null,
           "preparationSubstrate": null,
-          "preparedBy": undefined,
           "preservationType": null,
-          "projects": undefined,
           "relationships": Object {
             "organism": Object {
               "data": Array [],
@@ -180,8 +146,6 @@ Array [
           },
           "restrictionFieldsExtension": null,
           "restrictionRemarks": null,
-          "storageUnit": undefined,
-          "storageUnitUsage": undefined,
           "type": "material-sample",
         },
         "type": "material-sample",

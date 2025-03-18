@@ -28,7 +28,9 @@ import {
   TEST_SAMPLES_SAME_HOST_ORGANISM,
   TEST_SAMPLES_SAME_STORAGE_UNIT,
   TEST_STORAGE_UNIT,
-  TEST_STORAGE_UNITS
+  TEST_STORAGE_UNITS,
+  TEST_COLLECTING_ORGANISM_SAMPLES,
+  TEST_FORM_TEMPLATE_COMPONENTS_DISABLED
 } from "./MaterialSampleBulkMocks";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
@@ -104,6 +106,9 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/vocabulary2/srs":
     case "collection-api/vocabulary2/coordinateSystem":
     case "collection-api/vocabulary2/materialSampleType":
+    case "collection-api/form-template":
+    case "collection-api/assemblage":
+    case "collection-api/extension":
       return { data: [] };
   }
 });
@@ -773,11 +778,7 @@ describe("MaterialSampleBulkEditor", () => {
             // The first sample's warnable values are not touched:
             resource: {
               id: "1",
-              relationships: {},
-              type: "material-sample",
-              associations: undefined,
-              attachment: undefined,
-              projects: undefined
+              type: "material-sample"
             },
             type: "material-sample"
           },
@@ -785,10 +786,7 @@ describe("MaterialSampleBulkEditor", () => {
             // The warnable fields were not overridden:
             resource: {
               id: "2",
-              relationships: {},
-              type: "material-sample",
-              attachment: undefined,
-              projects: undefined
+              type: "material-sample"
             },
             type: "material-sample"
           },
@@ -796,10 +794,7 @@ describe("MaterialSampleBulkEditor", () => {
             // The warnable fields were not overridden:
             resource: {
               id: "3",
-              relationships: {},
-              type: "material-sample",
-              attachment: undefined,
-              projects: undefined
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -965,12 +960,7 @@ describe("MaterialSampleBulkEditor", () => {
             type: "material-sample",
             resource: {
               id: sample.id,
-              attachment: undefined,
               associations: [],
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
               type: sample.type,
               relationships: {
                 organism: {
@@ -1063,12 +1053,6 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              relationships: {},
               type: "material-sample"
             },
             type: "material-sample"
@@ -1076,12 +1060,6 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "2",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              relationships: {},
               type: "material-sample"
             },
             type: "material-sample"
@@ -1149,15 +1127,9 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
               identifiers: {},
               dwcOtherCatalogNumbers: null,
-              projects: undefined,
               barcode: "edited-barcode",
-              relationships: {},
               type: "material-sample"
             },
             type: "material-sample"
@@ -1165,12 +1137,6 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "2",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              relationships: {},
               type: "material-sample"
             },
             type: "material-sample"
@@ -1538,8 +1504,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "1",
               type: "material-sample",
-              collectingEvent: { id: "col-event-1", type: "collecting-event" },
-              relationships: {}
+              collectingEvent: { id: "col-event-1", type: "collecting-event" }
             },
             type: "material-sample"
           },
@@ -1547,8 +1512,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "2",
               type: "material-sample",
-              collectingEvent: { id: "col-event-1", type: "collecting-event" },
-              relationships: {}
+              collectingEvent: { id: "col-event-1", type: "collecting-event" }
             },
             type: "material-sample"
           }
@@ -1657,14 +1621,7 @@ describe("MaterialSampleBulkEditor", () => {
         [
           {
             resource: {
-              assemblages: undefined,
-              attachment: undefined,
               id: "1",
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              preparedBy: undefined,
-              projects: undefined,
               relationships: {
                 storageUnitUsage: {
                   data: {
@@ -1673,22 +1630,13 @@ describe("MaterialSampleBulkEditor", () => {
                   }
                 }
               },
-              storageUnit: undefined,
-              storageUnitUsage: undefined,
               type: "material-sample"
             },
             type: "material-sample"
           },
           {
             resource: {
-              assemblages: undefined,
-              attachment: undefined,
               id: "2",
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              preparedBy: undefined,
-              projects: undefined,
               relationships: {
                 storageUnitUsage: {
                   data: {
@@ -1697,8 +1645,6 @@ describe("MaterialSampleBulkEditor", () => {
                   }
                 }
               },
-              storageUnit: undefined,
-              storageUnitUsage: undefined,
               type: "material-sample"
             },
             type: "material-sample"
@@ -1755,7 +1701,6 @@ describe("MaterialSampleBulkEditor", () => {
                 name: "test host organism",
                 remarks: "bulk-edit-remarks"
               },
-              relationships: {},
               type: "material-sample"
             },
             type: "material-sample"
@@ -1768,7 +1713,6 @@ describe("MaterialSampleBulkEditor", () => {
                 remarks: "bulk-edit-remarks"
               },
               associations: [],
-              relationships: {},
               type: "material-sample"
             },
             type: "material-sample"
@@ -1989,8 +1933,8 @@ describe("MaterialSampleBulkEditor", () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
-        samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
-        initialFormTemplateUUID={TEST_FORM_TEMPLATE.id}
+        samples={TEST_COLLECTING_ORGANISM_SAMPLES}
+        initialFormTemplateUUID={TEST_FORM_TEMPLATE_COMPONENTS_DISABLED.id}
       />,
       testCtx
     );
@@ -2007,7 +1951,7 @@ describe("MaterialSampleBulkEditor", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
 
-    // Save should not override the existing collecting events, even if the form template does not use it.
+    // No changes have been made, expecting no mocksave requests.
     expect(mockSave.mock.calls).toEqual([]);
   });
 });

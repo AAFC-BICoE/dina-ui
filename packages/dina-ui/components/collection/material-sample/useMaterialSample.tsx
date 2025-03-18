@@ -781,10 +781,6 @@ export function useMaterialSampleSave({
     } = {
       ...msDiffWithOrganisms,
 
-      // These values are not submitted to the back-end:
-      organismsIndividualEntry: undefined,
-      organismsQuantity: undefined,
-
       // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
       // Explicitly declare these fields as relationships here before saving:
       // One-to-many relationships go in the 'relationships' object:
@@ -841,17 +837,26 @@ export function useMaterialSampleSave({
               : null
           }
         })
-      },
-
-      // Set the attributes to undefined after they've been moved to "relationships":
-      attachment: undefined,
-      projects: undefined,
-      organism: undefined,
-      assemblages: undefined,
-      preparedBy: undefined,
-      storageUnitUsage: undefined,
-      storageUnit: undefined
+      }
     };
+
+    // These values are not submitted to the back-end:
+    delete msInputWithRelationships.organismsIndividualEntry;
+    delete msInputWithRelationships.organismsQuantity;
+
+    // Delete these since they have been moved to the relationship section.
+    delete msInputWithRelationships.attachment;
+    delete msInputWithRelationships.projects;
+    delete msInputWithRelationships.organism;
+    delete msInputWithRelationships.assemblages;
+    delete msInputWithRelationships.preparedBy;
+    delete msInputWithRelationships.storageUnitUsage;
+    delete msInputWithRelationships.storageUnit;
+
+    // If the relationship section is empty, remove it from the query.
+    if (Object.keys(msInputWithRelationships.relationships).length === 0) {
+      delete msInputWithRelationships.relationships;
+    }
 
     // delete the association if associated sample is left unfilled
     if (
