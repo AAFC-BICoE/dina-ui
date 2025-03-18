@@ -2,6 +2,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   processExtensionValuesLoading,
   processExtensionValuesSaving,
+  resourceDifference,
   useApiClient,
   useQuery
 } from "common-ui";
@@ -145,52 +146,66 @@ export function useCollectingEventSave({
     submittedValues: CollectingEvent,
     collectingEventFormik: FormikContextType<any>
   ) {
+    // Only submit the changed values to the back-end:
+    const collectingEventDiff = collectingEventInitialValues.id
+      ? resourceDifference({
+          original: collectingEventInitialValues as CollectingEvent,
+          updated: submittedValues
+        })
+      : submittedValues;
+
     // Init relationships object for one-to-many relations:
-    (submittedValues as any).relationships = {};
+    (collectingEventDiff as any).relationships = {};
 
     // handle converting to relationship manually due to crnk bug
     if (
-      submittedValues &&
-      submittedValues.collectors &&
-      submittedValues.collectors.length > 0
+      collectingEventDiff &&
+      collectingEventDiff.collectors &&
+      collectingEventDiff.collectors.length > 0
     ) {
-      (submittedValues as any).relationships.collectors = {
-        data: submittedValues?.collectors.map((collector) => ({
+      (collectingEventDiff as any).relationships.collectors = {
+        data: collectingEventDiff?.collectors.map((collector) => ({
           id: collector.id,
           type: "person"
         }))
       };
     }
-    delete submittedValues.collectors;
+    delete collectingEventDiff.collectors;
 
-    if ((submittedValues.collectorGroups as any)?.id)
-      submittedValues.collectorGroupUuid = (
-        submittedValues.collectorGroups as any
+    if ((collectingEventDiff.collectorGroups as any)?.id)
+      collectingEventDiff.collectorGroupUuid = (
+        collectingEventDiff.collectorGroups as any
       ).id;
-    delete submittedValues.collectorGroups;
+    delete collectingEventDiff.collectorGroups;
 
-    // Treat empty array or undefined as null:
-    if (!submittedValues.otherRecordNumbers?.length) {
-      submittedValues.otherRecordNumbers = null as any;
+    // If going from an array of other record numbers to empty, set it null.
+    if (
+      collectingEventDiff?.otherRecordNumbers &&
+      collectingEventDiff.otherRecordNumbers.length === 0
+    ) {
+      collectingEventDiff.otherRecordNumbers = null as any;
     }
 
     // Add attachments if they were selected:
-    (submittedValues as any).relationships.attachment = {
-      data:
-        submittedValues.attachment?.map((it) => ({
-          id: it.id,
-          type: it.type
-        })) ?? []
-    };
-    // Delete the 'attachment' attribute because it should stay in the relationships field:
-    delete submittedValues.attachment;
+    if (collectingEventDiff?.attachment) {
+      (collectingEventDiff as any).relationships.attachment = {
+        data:
+          collectingEventDiff.attachment?.map((it) => ({
+            id: it.id,
+            type: it.type
+          })) ?? []
+      };
+
+      // Delete the 'attachment' attribute because it should stay in the relationships field:
+      delete collectingEventDiff.attachment;
+    }
 
     // Convert georeferenceByAgents to relationship
     if (
-      submittedValues.geoReferenceAssertions &&
-      submittedValues.geoReferenceAssertions.length > 0
+      collectingEventDiff.geoReferenceAssertions &&
+      collectingEventDiff.geoReferenceAssertions.length > 0
     ) {
-      for (const assertion of submittedValues.geoReferenceAssertions) {
+      for (const assertion of collectingEventDiff.geoReferenceAssertions) {
         const referenceBy = assertion.georeferencedBy;
         if (referenceBy && typeof referenceBy !== "string") {
           assertion.georeferencedBy = referenceBy.map((it) =>
@@ -202,8 +217,9 @@ export function useCollectingEventSave({
 
     // Parse srcAdminLevels to geographicPlaceNameSourceDetail
     // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
-    const srcDetail = submittedValues.geographicPlaceNameSourceDetail;
-    const srcAdminLevels = submittedValues.srcAdminLevels;
+    const srcDetail = (collectingEventDiff as any)
+      .geographicPlaceNameSourceDetail;
+    const srcAdminLevels = (collectingEventDiff as any).srcAdminLevels;
 
     if (srcDetail) {
       srcDetail.higherGeographicPlaces = null as any;
@@ -212,7 +228,7 @@ export function useCollectingEventSave({
     }
 
     if (srcAdminLevels && srcAdminLevels.length > 0 && srcDetail) {
-      const sectionIds = toPairs(submittedValues.selectedSections)
+      const sectionIds = toPairs(collectingEventDiff.selectedSections)
         .filter((pair) => pair[1])
         .map((pair) => pair[0]);
       if (srcAdminLevels.length > 1) srcDetail.higherGeographicPlaces = [];
@@ -255,30 +271,35 @@ export function useCollectingEventSave({
           }
         });
     }
-    delete submittedValues.srcAdminLevels;
-    delete submittedValues.selectedSections;
-    delete (submittedValues as any).selectAll;
+    delete collectingEventDiff.srcAdminLevels;
+    delete collectingEventDiff.selectedSections;
+    delete (collectingEventDiff as any).selectAll;
 
     // Remove the coord system for new Collecting events with no coordinates specified:
     if (
-      !submittedValues.id &&
-      !submittedValues.dwcVerbatimCoordinates?.trim?.() &&
-      !submittedValues.dwcVerbatimLatitude?.trim?.() &&
-      !submittedValues.dwcVerbatimLongitude?.trim?.()
+      !collectingEventDiff.id &&
+      !collectingEventDiff.dwcVerbatimCoordinates?.trim?.() &&
+      !collectingEventDiff.dwcVerbatimLatitude?.trim?.() &&
+      !collectingEventDiff.dwcVerbatimLongitude?.trim?.()
     ) {
-      submittedValues.dwcVerbatimCoordinateSystem = null;
+      collectingEventDiff.dwcVerbatimCoordinateSystem = null;
     }
 
-    if (submittedValues.extensionValues) {
-      submittedValues.extensionValues = processExtensionValuesSaving(
-        submittedValues.extensionValues
+    if (collectingEventDiff.extensionValues) {
+      collectingEventDiff.extensionValues = processExtensionValuesSaving(
+        collectingEventDiff.extensionValues
       );
+    }
+
+    // If the relationship section is empty, remove it from the query.
+    if (Object.keys((collectingEventDiff as any).relationships).length === 0) {
+      delete (collectingEventDiff as any).relationships;
     }
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
         {
-          resource: submittedValues,
+          resource: collectingEventDiff,
           type: "collecting-event"
         }
       ],

@@ -580,11 +580,9 @@ export function useMaterialSampleSave({
       ...(!enableCollectingEvent && {
         collectingEvent: { id: null, type: "collecting-event" }
       }),
-      ...(!enableAssociations && { associations: [], hostOrganism: null }),
-
-      // Remove the scheduledAction field from the Form Template:
-      ...{ scheduledAction: undefined }
+      ...(!enableAssociations && { associations: [], hostOrganism: null })
     };
+    delete materialSampleInput.scheduledActions;
 
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (

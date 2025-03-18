@@ -1285,9 +1285,7 @@ describe("MaterialSampleBulkEditor", () => {
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               publiclyReleasable: true,
-              dwcVerbatimLocality: "test locality",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
+              dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
           }
@@ -1303,9 +1301,7 @@ describe("MaterialSampleBulkEditor", () => {
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               publiclyReleasable: true,
-              dwcVerbatimLocality: "test locality",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
+              dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
           }
@@ -1321,9 +1317,7 @@ describe("MaterialSampleBulkEditor", () => {
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               publiclyReleasable: true,
-              dwcVerbatimLocality: "test locality",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
+              dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
           }
@@ -1474,9 +1468,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "col-event-1",
               type: "collecting-event",
-              dwcVerbatimLocality: "bulk edited locality",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
+              dwcVerbatimLocality: "bulk edited locality"
             },
             type: "collecting-event"
           }
@@ -1489,9 +1481,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "col-event-1",
               type: "collecting-event",
-              dwcVerbatimLocality: "bulk edited locality",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
+              dwcVerbatimLocality: "bulk edited locality"
             },
             type: "collecting-event"
           }
