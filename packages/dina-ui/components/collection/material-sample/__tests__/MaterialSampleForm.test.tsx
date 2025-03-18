@@ -175,7 +175,6 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              otherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               group: "aafc",
@@ -184,11 +183,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              relationships: {
-                attachment: {
-                  data: []
-                }
-              },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default value
               type: "collecting-event"
@@ -221,18 +215,11 @@ describe("Material Sample Edit Page", () => {
                 storageUnitUsage: { data: null }
               },
               type: "material-sample",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
               projects: undefined,
               isRestricted: false,
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
-              scheduledAction: undefined,
-              preparedBy: undefined,
               collection: undefined,
-              assemblages: undefined,
               storageUnitUsage: undefined,
               storageUnit: undefined,
               preservationType: null,
@@ -298,13 +285,8 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
               id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
+              type: "collecting-event"
             },
             type: "collecting-event"
           }
@@ -316,13 +298,8 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               type: "material-sample",
-              assemblages: undefined,
-              attachment: undefined,
               collection: undefined,
               dwcDegreeOfEstablishment: null,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
               preparationDate: null,
               preparationFixative: null,
               preparationManagedAttributes: {},
@@ -341,9 +318,7 @@ describe("Material Sample Edit Page", () => {
                 id: null,
                 type: "preparation-type"
               },
-              preparedBy: undefined,
               preservationType: null,
-              projects: undefined,
               managedAttributes: {},
               publiclyReleasable: true,
               identifiers: {},
@@ -352,9 +327,6 @@ describe("Material Sample Edit Page", () => {
               restrictionFieldsExtension: null,
               isRestricted: false,
               restrictionRemarks: null,
-              scheduledAction: undefined,
-              storageUnit: undefined,
-              storageUnitUsage: undefined,
               associations: [],
               hostOrganism: null,
               collectingEvent: { id: "1", type: "collecting-event" },
@@ -402,13 +374,8 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
               id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
+              type: "collecting-event"
             },
             type: "collecting-event"
           }
@@ -424,8 +391,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               identifiers: {},
               dwcOtherCatalogNumbers: null,
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {}
+              collectingEvent: { id: "1", type: "collecting-event" }
             },
             type: "material-sample"
           }
@@ -465,6 +431,14 @@ describe("Material Sample Edit Page", () => {
       "2019-12-21T16:00"
     );
 
+    // Set the additional collection numbers in the collecting event.
+    userEvent.type(
+      wrapper.getByRole("textbox", {
+        name: "Additional Collection Numbers Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers. (One value per line) Write one value per line. Press enter while typing in the field to add a new line."
+      }),
+      "1\n2\n3"
+    );
+
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
@@ -475,7 +449,7 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              otherRecordNumbers: null,
+              otherRecordNumbers: ["1", "2", "3"],
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
@@ -483,11 +457,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              relationships: {
-                attachment: {
-                  data: []
-                }
-              },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default Value
               type: "collecting-event"
@@ -509,8 +478,7 @@ describe("Material Sample Edit Page", () => {
               id: "1",
               identifiers: {},
               dwcOtherCatalogNumbers: null,
-              type: "material-sample",
-              relationships: {}
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -664,13 +632,8 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
               id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
+              type: "collecting-event"
             },
             type: "collecting-event"
           }
@@ -685,8 +648,7 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
               identifiers: {},
               dwcOtherCatalogNumbers: null,
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {}
+              collectingEvent: { id: "1", type: "collecting-event" }
             },
             type: "material-sample"
           }
@@ -759,13 +721,8 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
               id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
+              type: "collecting-event"
             },
             type: "collecting-event"
           }
@@ -780,8 +737,7 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
               identifiers: {},
               dwcOtherCatalogNumbers: null,
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {}
+              collectingEvent: { id: "1", type: "collecting-event" }
             },
             type: "material-sample"
           }
