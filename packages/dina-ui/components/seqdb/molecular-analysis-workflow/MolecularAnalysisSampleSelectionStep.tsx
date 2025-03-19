@@ -320,7 +320,9 @@ export function MolecularAnalysisSampleSelectionStep({
           .filter((item) => item);
         if (storageUnitUsageUUIDs.length > 0) {
           const storageUnitUsageIdsToDelete: string[] =
-            storageUnitUsageUUIDs.filter((id) => typeof id !== "undefined");
+            storageUnitUsageUUIDs.filter(
+              (id): id is string => id !== undefined
+            );
           await handleDeleteStorageUnitUsage(save, storageUnitUsageIdsToDelete);
         }
 
