@@ -29,6 +29,10 @@ import {
   MappedDataRow,
   SampleSelectionMappingTable
 } from "../../molecular-analysis/SampleSelectionMappingTable";
+import {
+  handleDeleteGenericMolecularAnalysisItems,
+  handleDeleteStorageUnitUsage
+} from "../../molecular-analysis/MolecularAnalysisUtils";
 
 export interface MolecularAnalysisSampleSelectionStepProps {
   molecularAnalysisId: string;
@@ -297,14 +301,12 @@ export function MolecularAnalysisSampleSelectionStep({
 
       // Perform deletes
       if (itemsToDelete.length !== 0) {
-        await save(
-          itemsToDelete.map((item) => ({
-            delete: {
-              id: item.molecularAnalysisItemUUID ?? "",
-              type: "generic-molecular-analysis-item"
-            }
-          })),
-          { apiBaseUrl: "/seqdb-api" }
+        const genericMolecularAnalysisItemIds: string[] = itemsToDelete
+          .map((itemsToDelete) => itemsToDelete.molecularAnalysisItemUUID)
+          .filter((item) => typeof item !== "undefined");
+        await handleDeleteGenericMolecularAnalysisItems(
+          save,
+          genericMolecularAnalysisItemIds
         );
 
         // Delete the storage unit usage if linked.
@@ -317,15 +319,9 @@ export function MolecularAnalysisSampleSelectionStep({
           )
           .filter((item) => item);
         if (storageUnitUsageUUIDs.length > 0) {
-          await save(
-            storageUnitUsageUUIDs.map((item) => ({
-              delete: {
-                id: item ?? "",
-                type: "storage-unit-usage"
-              }
-            })),
-            { apiBaseUrl: "/collection-api" }
-          );
+          const storageUnitUsageIdsToDelete: string[] =
+            storageUnitUsageUUIDs.filter((id) => typeof id !== "undefined");
+          await handleDeleteStorageUnitUsage(save, storageUnitUsageIdsToDelete);
         }
 
         // Check if molecular analysis items need to be deleted as well.
