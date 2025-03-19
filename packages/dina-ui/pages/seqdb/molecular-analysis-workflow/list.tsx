@@ -18,6 +18,7 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import useVocabularyOptions from "packages/dina-ui/components/collection/useVocabularyOptions";
+import { useDeleteMolecularAnalysisWorkflows } from "packages/dina-ui/components/molecular-analysis/MolecularAnalysisUtils";
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [
   "name",
@@ -34,6 +35,9 @@ export default function MolecularAnalysisWorkflowListPage() {
   const { vocabOptions, loading } = useVocabularyOptions({
     path: "seqdb-api/vocabulary/molecularAnalysisType"
   });
+
+  const { handleDeleteMolecularAnalysisWorkflows, reloadResource } =
+    useDeleteMolecularAnalysisWorkflows();
 
   const TABLE_COLUMNS: ColumnDefinition<GenericMolecularAnalysis>[] = [
     {
@@ -92,6 +96,11 @@ export default function MolecularAnalysisWorkflowListPage() {
       <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage("molecularAnalysisWorkflowTitle")}</h1>
         <ListPageLayout
+          bulkDeleteButtonProps={{
+            apiBaseUrl: "/seqdb",
+            typeName: "molecular-analysis-workflow",
+            onDelete: handleDeleteMolecularAnalysisWorkflows
+          }}
           additionalFilters={(filterForm) => ({
             isCompleted: false,
             // Apply group filter:
@@ -101,7 +110,8 @@ export default function MolecularAnalysisWorkflowListPage() {
           id="molecular-analysis-workflow-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/generic-molecular-analysis"
+            path: "seqdb-api/generic-molecular-analysis",
+            deps: [reloadResource]
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
