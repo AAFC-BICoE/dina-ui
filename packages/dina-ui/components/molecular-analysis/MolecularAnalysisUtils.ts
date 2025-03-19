@@ -5,8 +5,8 @@ import {
   filterBy,
   SaveArgs,
   useApiClient
-} from "packages/common-ui/lib";
-import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+} from "../../../common-ui/lib";
+import { GenericMolecularAnalysisItem } from "../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { useState } from "react";
 
 /**
@@ -40,7 +40,7 @@ export function useDeleteMolecularAnalysisWorkflows() {
         genericMolecularAnalysisItems.data.map(
           (genericMolecularAnalysisItem) => genericMolecularAnalysisItem.id
         );
-      const storageUnitUsageIds = genericMolecularAnalysisItems.data
+      const storageUnitUsageIds: string[] = genericMolecularAnalysisItems.data
         .map(
           (genericMolecularAnalysisItem) =>
             genericMolecularAnalysisItem.storageUnitUsage?.id
