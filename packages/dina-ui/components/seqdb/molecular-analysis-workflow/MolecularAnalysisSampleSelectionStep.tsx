@@ -303,7 +303,7 @@ export function MolecularAnalysisSampleSelectionStep({
       if (itemsToDelete.length !== 0) {
         const genericMolecularAnalysisItemIds: string[] = itemsToDelete
           .map((itemsToDelete) => itemsToDelete.molecularAnalysisItemUUID)
-          .filter((item) => item !== undefined);
+          .filter((id): id is string => id !== undefined);
         await handleDeleteGenericMolecularAnalysisItems(
           save,
           genericMolecularAnalysisItemIds

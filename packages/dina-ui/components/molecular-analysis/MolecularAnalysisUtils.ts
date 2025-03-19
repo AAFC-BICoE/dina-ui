@@ -45,7 +45,7 @@ export function useDeleteMolecularAnalysisWorkflows() {
           (genericMolecularAnalysisItem) =>
             genericMolecularAnalysisItem.storageUnitUsage?.id
         )
-        .filter((id) => id !== undefined);
+        .filter((id): id is string => id !== undefined);
       // Delete linked GenericMolecularAnalysisItems
       await handleDeleteGenericMolecularAnalysisItems(
         save,
