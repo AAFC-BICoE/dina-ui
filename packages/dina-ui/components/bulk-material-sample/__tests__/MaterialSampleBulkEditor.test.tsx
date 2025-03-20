@@ -1127,8 +1127,6 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               barcode: "edited-barcode",
               type: "material-sample"
             },

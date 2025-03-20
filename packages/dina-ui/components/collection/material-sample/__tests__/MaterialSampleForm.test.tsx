@@ -202,8 +202,6 @@ describe("Material Sample Edit Page", () => {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
               dwcDegreeOfEstablishment: null,
               hostOrganism: null,
@@ -215,7 +213,6 @@ describe("Material Sample Edit Page", () => {
                 storageUnitUsage: { data: null }
               },
               type: "material-sample",
-              projects: undefined,
               isRestricted: false,
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
@@ -309,8 +306,6 @@ describe("Material Sample Edit Page", () => {
               preservationType: null,
               managedAttributes: {},
               publiclyReleasable: true,
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
               restrictionFieldsExtension: null,
               isRestricted: false,
@@ -365,8 +360,6 @@ describe("Material Sample Edit Page", () => {
               id: "1",
               type: "material-sample",
               materialSampleName: "test-material-sample-id",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               collectingEvent: { id: "1", type: "collecting-event" }
             },
             type: "material-sample"
@@ -452,8 +445,6 @@ describe("Material Sample Edit Page", () => {
                 type: "collecting-event"
               },
               id: "1",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               type: "material-sample"
             },
             type: "material-sample"
@@ -610,8 +601,6 @@ describe("Material Sample Edit Page", () => {
             resource: {
               id: "333",
               type: "material-sample",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               collectingEvent: { id: "1", type: "collecting-event" }
             },
             type: "material-sample"
@@ -687,8 +676,6 @@ describe("Material Sample Edit Page", () => {
             resource: {
               id: "333",
               type: "material-sample",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               collectingEvent: { id: "1", type: "collecting-event" }
             },
             type: "material-sample"

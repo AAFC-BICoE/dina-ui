@@ -543,8 +543,13 @@ export function useMaterialSampleSave({
 
       if (otherIdentifiers && Object.keys(otherIdentifiers).length > 0) {
         submittedValues.identifiers = otherIdentifiers;
-      } else {
+      } else if (
+        msInitialValues.identifiers &&
+        Object.keys(msInitialValues.identifiers).length !== 0
+      ) {
         submittedValues.identifiers = {};
+      } else {
+        delete submittedValues.identifiers;
       }
     }
 
@@ -556,8 +561,14 @@ export function useMaterialSampleSave({
 
       if (otherCatalogNumbers.length !== 0) {
         submittedValues.dwcOtherCatalogNumbers = otherCatalogNumbers;
-      } else {
+      } else if (
+        msInitialValues.dwcOtherCatalogNumbers &&
+        msInitialValues.dwcOtherCatalogNumbers.length !== 0
+      ) {
         (submittedValues.dwcOtherCatalogNumbers as any) = null;
+      } else {
+        // Can be removed if it's not being cleared or set.
+        delete submittedValues.dwcOtherCatalogNumbers;
       }
     }
 
@@ -773,6 +784,7 @@ export function useMaterialSampleSave({
     const msDiffWithOrganisms = organismsWereChanged
       ? { ...msDiff, organism: await saveAndAttachOrganisms(msPreprocessed) }
       : msDiff;
+
     /** Input to submit to the back-end API. */
     const msInputWithRelationships: InputResource<MaterialSample> & {
       relationships: any;
