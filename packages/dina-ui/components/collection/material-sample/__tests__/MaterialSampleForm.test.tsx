@@ -352,15 +352,14 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       [
         [
           {
             resource: {
               id: "1",
               type: "material-sample",
-              materialSampleName: "test-material-sample-id",
-              collectingEvent: { id: "1", type: "collecting-event" }
+              materialSampleName: "test-material-sample-id"
             },
             type: "material-sample"
           }
@@ -600,8 +599,7 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               id: "333",
-              type: "material-sample",
-              collectingEvent: { id: "1", type: "collecting-event" }
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -675,8 +673,7 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               id: "333",
-              type: "material-sample",
-              collectingEvent: { id: "1", type: "collecting-event" }
+              type: "material-sample"
             },
             type: "material-sample"
           }

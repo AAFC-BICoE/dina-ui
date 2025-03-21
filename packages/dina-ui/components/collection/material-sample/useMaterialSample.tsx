@@ -716,10 +716,15 @@ export function useMaterialSampleSave({
         setColEventId(savedCollectingEvent.id);
 
         // Link the MaterialSample to the CollectingEvent:
-        msDiff.collectingEvent = {
-          id: savedCollectingEvent.id,
-          type: savedCollectingEvent.type
-        };
+        if (
+          !msInitialValues.id ||
+          msInitialValues?.collectingEvent?.id !== submittedCollectingEvent?.id
+        ) {
+          msDiff.collectingEvent = {
+            id: savedCollectingEvent.id,
+            type: savedCollectingEvent.type
+          };
+        }
       } catch (error: unknown) {
         if (error instanceof DoOperationsError) {
           // Put the error messages into both form states:

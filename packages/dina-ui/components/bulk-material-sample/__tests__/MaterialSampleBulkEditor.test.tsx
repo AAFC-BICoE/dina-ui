@@ -1491,16 +1491,14 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
-              type: "material-sample",
-              collectingEvent: { id: "col-event-1", type: "collecting-event" }
+              type: "material-sample"
             },
             type: "material-sample"
           },
           {
             resource: {
               id: "2",
-              type: "material-sample",
-              collectingEvent: { id: "col-event-1", type: "collecting-event" }
+              type: "material-sample"
             },
             type: "material-sample"
           }

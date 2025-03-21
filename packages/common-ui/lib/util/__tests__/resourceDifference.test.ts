@@ -156,22 +156,4 @@ describe("resourceDifference", () => {
       id: "1"
     });
   });
-
-  // Example from the provided code
-  it("should handle the example case", () => {
-    const original = createMaterialSample({
-      barcode: "original-barcode-1"
-    });
-
-    const updated = createMaterialSample({
-      barcode: "edited-barcode-1"
-    });
-
-    const diff = resourceDifference({ updated, original });
-    expect(diff).toEqual({
-      barcode: "edited-barcode-1",
-      type: "material-sample",
-      id: "1"
-    });
-  });
 });
