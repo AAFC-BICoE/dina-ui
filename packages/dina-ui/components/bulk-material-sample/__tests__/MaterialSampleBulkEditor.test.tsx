@@ -770,38 +770,8 @@ describe("MaterialSampleBulkEditor", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
 
-    // Saves the material samples:
-    expect(mockSave.mock.calls).toEqual([
-      [
-        [
-          {
-            // The first sample's warnable values are not touched:
-            resource: {
-              id: "1",
-              type: "material-sample"
-            },
-            type: "material-sample"
-          },
-          {
-            // The warnable fields were not overridden:
-            resource: {
-              id: "2",
-              type: "material-sample"
-            },
-            type: "material-sample"
-          },
-          {
-            // The warnable fields were not overridden:
-            resource: {
-              id: "3",
-              type: "material-sample"
-            },
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+    // No changes were made.
+    expect(mockSave.mock.calls).toHaveLength(0);
   });
 
   it("Overrides the values when the Override All buttons are clicked.", async () => {
@@ -1047,27 +1017,7 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
 
     // No changes should be made
-    expect(mockSave.mock.calls).toEqual([
-      [
-        [
-          {
-            resource: {
-              id: "1",
-              type: "material-sample"
-            },
-            type: "material-sample"
-          },
-          {
-            resource: {
-              id: "2",
-              type: "material-sample"
-            },
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+    expect(mockSave.mock.calls).toHaveLength(0);
   });
 
   it("Ignores the submitted value if the field is re-edited to the common value.", async () => {
@@ -1128,13 +1078,6 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "1",
               barcode: "edited-barcode",
-              type: "material-sample"
-            },
-            type: "material-sample"
-          },
-          {
-            resource: {
-              id: "2",
               type: "material-sample"
             },
             type: "material-sample"
@@ -1458,7 +1401,7 @@ describe("MaterialSampleBulkEditor", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
 
-    // Save the collecting event, then save the 2 material samples:
+    // Save the collecting events, no changes made to the material sample.
     expect(mockSave.mock.calls).toEqual([
       [
         [
@@ -1482,25 +1425,6 @@ describe("MaterialSampleBulkEditor", () => {
               dwcVerbatimLocality: "bulk edited locality"
             },
             type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
-              id: "1",
-              type: "material-sample"
-            },
-            type: "material-sample"
-          },
-          {
-            resource: {
-              id: "2",
-              type: "material-sample"
-            },
-            type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }

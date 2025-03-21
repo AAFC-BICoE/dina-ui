@@ -578,26 +578,34 @@ describe("Material Sample Edit Page", () => {
     );
     await new Promise(setImmediate);
 
-    // Enable the associations section:
-    const associationsToggle = wrapper.container.querySelectorAll(
-      ".enable-associations .react-switch-bg"
+    // Expect to the associated sample:
+    expect(
+      wrapper.getByRole("link", { name: /my\-sample\-name/i })
+    ).toBeInTheDocument();
+
+    // Change the remark text.
+    userEvent.type(
+      wrapper.getAllByRole("textbox", { name: /remarks/i })[4],
+      "New Remark"
     );
-    if (!associationsToggle) {
-      fail("Associations toggle needs to exist at this point.");
-    }
-    fireEvent.click(associationsToggle[0]);
-    await new Promise(setImmediate);
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
     // Saves the Material Sample:
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       [
         [
           {
             resource: {
+              associations: [
+                {
+                  associatedSample: "1",
+                  associationType: "host",
+                  remarks: "New Remark"
+                }
+              ],
               id: "333",
               type: "material-sample"
             },
@@ -667,20 +675,8 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
-    expect(mockSave.mock.calls).toMatchObject([
-      [
-        [
-          {
-            resource: {
-              id: "333",
-              type: "material-sample"
-            },
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+    // Nothing has changed, no requests expected.
+    expect(mockSave.mock.calls).toMatchObject([]);
   });
 
   it("Submits a new Material Sample with 3 Determinations.", async () => {

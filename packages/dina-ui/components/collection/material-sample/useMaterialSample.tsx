@@ -3,6 +3,7 @@ import {
   DinaFormProps,
   DinaFormSubmitParams,
   DoOperationsError,
+  isResourceEmpty,
   OperationError,
   processExtensionValuesLoading,
   processExtensionValuesSaving,
@@ -979,10 +980,21 @@ export function useMaterialSampleSave({
     async function saveToBackend() {
       delete materialSampleSaveOp.resource.useNextSequence;
       const [savedMaterialSample] = await withDuplicateSampleNameCheck(
-        async () =>
-          await save<MaterialSample>([materialSampleSaveOp], {
+        async () => {
+          // Do not perform any request if it's empty...
+          if (
+            isResourceEmpty(materialSampleSaveOp.resource) &&
+            materialSampleSaveOp?.resource?.id
+          ) {
+            return [
+              materialSampleSaveOp?.resource
+            ] as PersistedResource<MaterialSample>[];
+          }
+
+          return await save<MaterialSample>([materialSampleSaveOp], {
             apiBaseUrl: "/collection-api"
-          }),
+          });
+        },
         formik
       );
 
