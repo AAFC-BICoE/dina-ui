@@ -3,6 +3,7 @@ import {
   DinaFormProps,
   DinaFormSubmitParams,
   DoOperationsError,
+  isResourceEmpty,
   OperationError,
   processExtensionValuesLoading,
   processExtensionValuesSaving,
@@ -543,8 +544,13 @@ export function useMaterialSampleSave({
 
       if (otherIdentifiers && Object.keys(otherIdentifiers).length > 0) {
         submittedValues.identifiers = otherIdentifiers;
-      } else {
+      } else if (
+        msInitialValues.identifiers &&
+        Object.keys(msInitialValues.identifiers).length !== 0
+      ) {
         submittedValues.identifiers = {};
+      } else {
+        delete submittedValues.identifiers;
       }
     }
 
@@ -556,8 +562,14 @@ export function useMaterialSampleSave({
 
       if (otherCatalogNumbers.length !== 0) {
         submittedValues.dwcOtherCatalogNumbers = otherCatalogNumbers;
-      } else {
+      } else if (
+        msInitialValues.dwcOtherCatalogNumbers &&
+        msInitialValues.dwcOtherCatalogNumbers.length !== 0
+      ) {
         (submittedValues.dwcOtherCatalogNumbers as any) = null;
+      } else {
+        // Can be removed if it's not being cleared or set.
+        delete submittedValues.dwcOtherCatalogNumbers;
       }
     }
 
@@ -580,11 +592,9 @@ export function useMaterialSampleSave({
       ...(!enableCollectingEvent && {
         collectingEvent: { id: null, type: "collecting-event" }
       }),
-      ...(!enableAssociations && { associations: [], hostOrganism: null }),
-
-      // Remove the scheduledAction field from the Form Template:
-      ...{ scheduledAction: undefined }
+      ...(!enableAssociations && { associations: [], hostOrganism: null })
     };
+    delete materialSampleInput.scheduledActions;
 
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (
@@ -707,10 +717,15 @@ export function useMaterialSampleSave({
         setColEventId(savedCollectingEvent.id);
 
         // Link the MaterialSample to the CollectingEvent:
-        msDiff.collectingEvent = {
-          id: savedCollectingEvent.id,
-          type: savedCollectingEvent.type
-        };
+        if (
+          !msInitialValues.id ||
+          msInitialValues?.collectingEvent?.id !== submittedCollectingEvent?.id
+        ) {
+          msDiff.collectingEvent = {
+            id: savedCollectingEvent.id,
+            type: savedCollectingEvent.type
+          };
+        }
       } catch (error: unknown) {
         if (error instanceof DoOperationsError) {
           // Put the error messages into both form states:
@@ -775,15 +790,12 @@ export function useMaterialSampleSave({
     const msDiffWithOrganisms = organismsWereChanged
       ? { ...msDiff, organism: await saveAndAttachOrganisms(msPreprocessed) }
       : msDiff;
+
     /** Input to submit to the back-end API. */
     const msInputWithRelationships: InputResource<MaterialSample> & {
       relationships: any;
     } = {
       ...msDiffWithOrganisms,
-
-      // These values are not submitted to the back-end:
-      organismsIndividualEntry: undefined,
-      organismsQuantity: undefined,
 
       // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
       // Explicitly declare these fields as relationships here before saving:
@@ -841,17 +853,26 @@ export function useMaterialSampleSave({
               : null
           }
         })
-      },
-
-      // Set the attributes to undefined after they've been moved to "relationships":
-      attachment: undefined,
-      projects: undefined,
-      organism: undefined,
-      assemblages: undefined,
-      preparedBy: undefined,
-      storageUnitUsage: undefined,
-      storageUnit: undefined
+      }
     };
+
+    // These values are not submitted to the back-end:
+    delete msInputWithRelationships.organismsIndividualEntry;
+    delete msInputWithRelationships.organismsQuantity;
+
+    // Delete these since they have been moved to the relationship section.
+    delete msInputWithRelationships.attachment;
+    delete msInputWithRelationships.projects;
+    delete msInputWithRelationships.organism;
+    delete msInputWithRelationships.assemblages;
+    delete msInputWithRelationships.preparedBy;
+    delete msInputWithRelationships.storageUnitUsage;
+    delete msInputWithRelationships.storageUnit;
+
+    // If the relationship section is empty, remove it from the query.
+    if (Object.keys(msInputWithRelationships.relationships).length === 0) {
+      delete msInputWithRelationships.relationships;
+    }
 
     // delete the association if associated sample is left unfilled
     if (
@@ -959,10 +980,21 @@ export function useMaterialSampleSave({
     async function saveToBackend() {
       delete materialSampleSaveOp.resource.useNextSequence;
       const [savedMaterialSample] = await withDuplicateSampleNameCheck(
-        async () =>
-          await save<MaterialSample>([materialSampleSaveOp], {
+        async () => {
+          // Do not perform any request if it's empty...
+          if (
+            isResourceEmpty(materialSampleSaveOp.resource) &&
+            materialSampleSaveOp?.resource?.id
+          ) {
+            return [
+              materialSampleSaveOp?.resource
+            ] as PersistedResource<MaterialSample>[];
+          }
+
+          return await save<MaterialSample>([materialSampleSaveOp], {
             apiBaseUrl: "/collection-api"
-          }),
+          });
+        },
         formik
       );
 

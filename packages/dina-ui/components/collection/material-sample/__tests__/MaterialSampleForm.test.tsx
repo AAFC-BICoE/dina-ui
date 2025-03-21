@@ -175,7 +175,6 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              otherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               group: "aafc",
@@ -184,11 +183,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              relationships: {
-                attachment: {
-                  data: []
-                }
-              },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default value
               type: "collecting-event"
@@ -208,8 +202,6 @@ describe("Material Sample Edit Page", () => {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
               dwcDegreeOfEstablishment: null,
               hostOrganism: null,
@@ -221,18 +213,10 @@ describe("Material Sample Edit Page", () => {
                 storageUnitUsage: { data: null }
               },
               type: "material-sample",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
               isRestricted: false,
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
-              scheduledAction: undefined,
-              preparedBy: undefined,
               collection: undefined,
-              assemblages: undefined,
               storageUnitUsage: undefined,
               storageUnit: undefined,
               preservationType: null,
@@ -298,31 +282,9 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
-              id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
               type: "material-sample",
-              assemblages: undefined,
-              attachment: undefined,
               collection: undefined,
               dwcDegreeOfEstablishment: null,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
               preparationDate: null,
               preparationFixative: null,
               preparationManagedAttributes: {},
@@ -341,20 +303,13 @@ describe("Material Sample Edit Page", () => {
                 id: null,
                 type: "preparation-type"
               },
-              preparedBy: undefined,
               preservationType: null,
-              projects: undefined,
               managedAttributes: {},
               publiclyReleasable: true,
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
               restrictionFieldsExtension: null,
               isRestricted: false,
               restrictionRemarks: null,
-              scheduledAction: undefined,
-              storageUnit: undefined,
-              storageUnitUsage: undefined,
               associations: [],
               hostOrganism: null,
               collectingEvent: { id: "1", type: "collecting-event" },
@@ -397,35 +352,14 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
-    expect(mockSave.mock.calls).toMatchObject([
-      [
-        [
-          {
-            resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
-              id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
+    expect(mockSave.mock.calls).toEqual([
       [
         [
           {
             resource: {
               id: "1",
               type: "material-sample",
-              materialSampleName: "test-material-sample-id",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {}
+              materialSampleName: "test-material-sample-id"
             },
             type: "material-sample"
           }
@@ -465,6 +399,14 @@ describe("Material Sample Edit Page", () => {
       "2019-12-21T16:00"
     );
 
+    // Set the additional collection numbers in the collecting event.
+    userEvent.type(
+      wrapper.getByRole("textbox", {
+        name: "Additional Collection Numbers Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers. (One value per line) Write one value per line. Press enter while typing in the field to add a new line."
+      }),
+      "1\n2\n3"
+    );
+
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
@@ -475,7 +417,7 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              otherRecordNumbers: null,
+              otherRecordNumbers: ["1", "2", "3"],
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
@@ -483,11 +425,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              relationships: {
-                attachment: {
-                  data: []
-                }
-              },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default Value
               type: "collecting-event"
@@ -507,10 +444,7 @@ describe("Material Sample Edit Page", () => {
                 type: "collecting-event"
               },
               id: "1",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
-              type: "material-sample",
-              relationships: {}
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -644,49 +578,36 @@ describe("Material Sample Edit Page", () => {
     );
     await new Promise(setImmediate);
 
-    // Enable the associations section:
-    const associationsToggle = wrapper.container.querySelectorAll(
-      ".enable-associations .react-switch-bg"
+    // Expect to the associated sample:
+    expect(
+      wrapper.getByRole("link", { name: /my\-sample\-name/i })
+    ).toBeInTheDocument();
+
+    // Change the remark text.
+    userEvent.type(
+      wrapper.getAllByRole("textbox", { name: /remarks/i })[4],
+      "New Remark"
     );
-    if (!associationsToggle) {
-      fail("Associations toggle needs to exist at this point.");
-    }
-    fireEvent.click(associationsToggle[0]);
-    await new Promise(setImmediate);
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
     // Saves the Material Sample:
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       [
         [
           {
             resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
-              id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
+              associations: [
+                {
+                  associatedSample: "1",
+                  associationType: "host",
+                  remarks: "New Remark"
+                }
+              ],
               id: "333",
-              type: "material-sample",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {}
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -754,41 +675,8 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
-    expect(mockSave.mock.calls).toMatchObject([
-      [
-        [
-          {
-            resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
-              id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
-              id: "333",
-              type: "material-sample",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {}
-            },
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+    // Nothing has changed, no requests expected.
+    expect(mockSave.mock.calls).toMatchObject([]);
   });
 
   it("Submits a new Material Sample with 3 Determinations.", async () => {
