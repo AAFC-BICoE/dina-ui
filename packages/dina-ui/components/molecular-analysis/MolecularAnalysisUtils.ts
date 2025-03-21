@@ -21,7 +21,7 @@ export function useDeleteMolecularAnalysisWorkflows() {
   async function handleDeleteMolecularAnalysisWorkflows(resourceIds: string[]) {
     for (const resourceId of resourceIds) {
       // Get linked GenericMolecularAnalysisItems
-      const genericMolecularAnalysisItems = await apiClient.get<
+      const genericMolecularAnalysisItemsResp = await apiClient.get<
         GenericMolecularAnalysisItem[]
       >(`/seqdb-api/generic-molecular-analysis-item`, {
         filter: filterBy([], {
@@ -36,16 +36,21 @@ export function useDeleteMolecularAnalysisWorkflows() {
         include:
           "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run"
       });
+
+      const genericMolecularAnalysisItems =
+        genericMolecularAnalysisItemsResp.data;
+
       const genericMolecularAnalysisItemIds =
-        genericMolecularAnalysisItems.data.map(
+        genericMolecularAnalysisItemsResp.data.map(
           (genericMolecularAnalysisItem) => genericMolecularAnalysisItem.id
         );
-      const storageUnitUsageIds: string[] = genericMolecularAnalysisItems.data
+      const storageUnitUsageIds: string[] = genericMolecularAnalysisItems
         .map(
           (genericMolecularAnalysisItem) =>
             genericMolecularAnalysisItem.storageUnitUsage?.id
         )
         .filter((id): id is string => id !== undefined);
+
       // Delete linked GenericMolecularAnalysisItems
       await handleDeleteGenericMolecularAnalysisItems(
         save,
@@ -54,6 +59,26 @@ export function useDeleteMolecularAnalysisWorkflows() {
 
       // Delete linked StorageUnitUsage
       await handleDeleteStorageUnitUsage(save, storageUnitUsageIds);
+
+      // Delete MolecularAnalysisRun and MolecularAnalysisRunItems if exist
+      if (genericMolecularAnalysisItems?.[0]?.molecularAnalysisRunItem?.id) {
+        const molecularAnalysisRunItemIds: string[] =
+          genericMolecularAnalysisItems
+            .map(
+              (genericMolecularAnalysisItem) =>
+                genericMolecularAnalysisItem.molecularAnalysisRunItem?.id
+            )
+            .filter((id): id is string => id !== undefined);
+
+        // Delete MolecularAnalysisRunItems
+        await handeDeleteMolecularAnalysisRunItems(
+          save,
+          molecularAnalysisRunItemIds
+        );
+
+        // Delete MolecularAnalysisRun
+        await handleDeleteMolecularAnalysisRun;
+      }
     }
     const molecularAnlysisDeleteArgs: DeleteArgs[] = resourceIds.map(
       (resourceId) => ({
@@ -99,6 +124,12 @@ export async function handleDeleteGenericMolecularAnalysisItems(
     { apiBaseUrl: "/seqdb-api" }
   );
 }
+
+/**
+ * Handles making API calls to delete StorageUnitUsages
+ * @param save From useApiClient
+ * @param storageUnitUsageIds array of StorageUnitUsage ids to be deleted
+ */
 export async function handleDeleteStorageUnitUsage(
   save: <TData extends KitsuResource = KitsuResource>(
     args: (SaveArgs | DeleteArgs)[],
@@ -114,5 +145,53 @@ export async function handleDeleteStorageUnitUsage(
       }
     })),
     { apiBaseUrl: "/collection-api" }
+  );
+}
+
+/**
+ * Handles making API calls to delete MolecularAnalysisRunItems
+ * @param save From useApiClient
+ * @param molecularAnalysisRunItemIdsToDelete array of MolecularAnalysisRunItem ids to be deleted
+ */
+export async function handeDeleteMolecularAnalysisRunItems(
+  save: <TData extends KitsuResource = KitsuResource>(
+    args: (SaveArgs | DeleteArgs)[],
+    options?: DoOperationsOptions
+  ) => Promise<PersistedResource<TData>[]>,
+  molecularAnalysisRunItemIdsToDelete: string[]
+) {
+  await save(
+    molecularAnalysisRunItemIdsToDelete.map((id) => ({
+      delete: {
+        id: id,
+        type: "molecular-analysis-run-item"
+      }
+    })),
+    { apiBaseUrl: "/seqdb-api" }
+  );
+}
+
+/**
+ * Handles making API calls to delete MolecularAnalysisRun
+ * @param save From useApiClient
+ * @param molecularAnalysisRunItemIdsToDelete array of MolecularAnalysisRun id to be deleted
+ */
+export async function handleDeleteMolecularAnalysisRun(
+  save: <TData extends KitsuResource = KitsuResource>(
+    args: (SaveArgs | DeleteArgs)[],
+    options?: DoOperationsOptions
+  ) => Promise<PersistedResource<TData>[]>,
+  id: string
+) {
+  await save(
+    [
+      {
+        delete: {
+          id: id,
+          type: "molecular-analysis-run"
+        }
+      }
+    ],
+    { apiBaseUrl: "/seqdb-api" }
   );
 }

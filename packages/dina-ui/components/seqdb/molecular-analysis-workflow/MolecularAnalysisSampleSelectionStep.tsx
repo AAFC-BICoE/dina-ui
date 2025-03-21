@@ -30,7 +30,9 @@ import {
   SampleSelectionMappingTable
 } from "../../molecular-analysis/SampleSelectionMappingTable";
 import {
+  handeDeleteMolecularAnalysisRunItems,
   handleDeleteGenericMolecularAnalysisItems,
+  handleDeleteMolecularAnalysisRun,
   handleDeleteStorageUnitUsage
 } from "../../molecular-analysis/MolecularAnalysisUtils";
 
@@ -329,32 +331,22 @@ export function MolecularAnalysisSampleSelectionStep({
         // Check if molecular analysis items need to be deleted as well.
         if (runId) {
           // Delete the molecular analysis run items.
-          await save(
-            itemsToDelete.map((item) => ({
-              delete: {
-                id:
-                  previouslySelectedResources.find(
-                    (resource) => resource.id === item.molecularAnalysisItemUUID
-                  )?.molecularAnalysisRunItem?.id ?? "",
-                type: "molecular-analysis-run-item"
-              }
-            })),
-            { apiBaseUrl: "/seqdb-api" }
+          const molecularAnalysisRunItemIdsToDelete: string[] = itemsToDelete
+            .map(
+              (item) =>
+                previouslySelectedResources.find(
+                  (resource) => resource.id === item.molecularAnalysisItemUUID
+                )?.molecularAnalysisRunItem?.id
+            )
+            .filter((id): id is string => id !== undefined);
+          await handeDeleteMolecularAnalysisRunItems(
+            save,
+            molecularAnalysisRunItemIdsToDelete
           );
 
           // Delete the run if all seq-reactions are being deleted.
           if (itemsToDelete.length === previouslySelectedResources.length) {
-            await save(
-              [
-                {
-                  delete: {
-                    id: runId,
-                    type: "molecular-analysis-run"
-                  }
-                }
-              ],
-              { apiBaseUrl: "/seqdb-api" }
-            );
+            await handleDeleteMolecularAnalysisRun(save, runId);
           }
         }
       }
