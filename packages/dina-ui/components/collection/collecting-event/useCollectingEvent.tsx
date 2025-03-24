@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
-import { compact, omit, orderBy, toPairs } from "lodash";
+import { compact, omit, orderBy, toPairs, isEqual, cloneDeep } from "lodash";
 import { useMemo } from "react";
 import * as yup from "yup";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -216,45 +216,44 @@ export function useCollectingEventSave({
       }
     }
 
+    // First create a copy of what would be the new geographicPlaceNameSourceDetail
+    const newSourceDetail = {
+      ...(collectingEventDiff.geographicPlaceNameSourceDetail || {})
+    } as any;
+
     // Parse srcAdminLevels to geographicPlaceNameSourceDetail
     // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
-    const srcDetail = (collectingEventDiff as any)
-      .geographicPlaceNameSourceDetail;
-    const srcAdminLevels = (collectingEventDiff as any).srcAdminLevels;
+    newSourceDetail.higherGeographicPlaces = null;
+    newSourceDetail.selectedGeographicPlace = null;
+    newSourceDetail.customGeographicPlace = null;
 
-    if (srcDetail) {
-      srcDetail.higherGeographicPlaces = null as any;
-      srcDetail.selectedGeographicPlace = null as any;
-      srcDetail.customGeographicPlace = null as any;
-    }
-
-    if (srcAdminLevels && srcAdminLevels.length > 0 && srcDetail) {
+    if (
+      collectingEventDiff.srcAdminLevels &&
+      collectingEventDiff.srcAdminLevels.length > 0
+    ) {
       const sectionIds = toPairs(collectingEventDiff.selectedSections)
         .filter((pair) => pair[1])
         .map((pair) => pair[0]);
-      if (srcAdminLevels.length > 1) srcDetail.higherGeographicPlaces = [];
-      srcAdminLevels
+
+      if (collectingEventDiff.srcAdminLevels.length > 1)
+        newSourceDetail.higherGeographicPlaces = [];
+
+      collectingEventDiff.srcAdminLevels
         .filter((srcAdminLevel) => srcAdminLevel)
         .map((srcAdminLevel, idx) => {
-          const srcAdminLevelName = srcAdminLevel?.name;
-          // remove the braceket from placeName
-          const typeStart = srcAdminLevelName?.indexOf("[");
-          srcAdminLevel.name = srcAdminLevelName
-            ?.slice(0, typeStart !== -1 ? typeStart : srcAdminLevelName.length)
-            .trim();
           // the first one can either be selectedGeographicPlace or customGeographicPlace
           // when the entry only has name in it, it is user entered customPlaceName entry
           // when the enry does not have osm_id, it will be saved as customPlaceName (e.g central experimental farm)
           if (idx === 0) {
             if (!srcAdminLevel.id) {
-              srcDetail.customGeographicPlace = srcAdminLevel.name;
+              newSourceDetail.customGeographicPlace = srcAdminLevel.name;
             } else {
               if (
                 sectionIds.filter(
                   (id) => id === srcAdminLevel.shortId?.toString()
                 ).length
               )
-                srcDetail.selectedGeographicPlace = omit(srcAdminLevel, [
+                newSourceDetail.selectedGeographicPlace = omit(srcAdminLevel, [
                   "shortId",
                   "type"
                 ]);
@@ -265,13 +264,55 @@ export function useCollectingEventSave({
                 (id) => id === srcAdminLevel.shortId?.toString()
               ).length
             ) {
-              srcDetail.higherGeographicPlaces?.push(
+              newSourceDetail.higherGeographicPlaces?.push(
                 omit(srcAdminLevel, ["shortId", "type"])
               );
             }
           }
         });
     }
+
+    // Only apply changes if different from initial values or if creating a new record
+    if (
+      !collectingEventInitialValues.id || // For new collecting events
+      !isEqual(
+        collectingEventInitialValues.geographicPlaceNameSourceDetail,
+        newSourceDetail
+      )
+    ) {
+      // Clean place names before saving
+      const cleanedSourceDetail = cloneDeep(newSourceDetail);
+
+      // Clean the selectedGeographicPlace name
+      if (cleanedSourceDetail.selectedGeographicPlace?.name) {
+        const name = cleanedSourceDetail.selectedGeographicPlace.name;
+        const typeStart = name.indexOf("[");
+        cleanedSourceDetail.selectedGeographicPlace.name =
+          typeStart !== -1 ? name.slice(0, typeStart).trim() : name.trim();
+      }
+
+      // Clean the higherGeographicPlaces names
+      if (cleanedSourceDetail.higherGeographicPlaces?.length) {
+        cleanedSourceDetail.higherGeographicPlaces =
+          cleanedSourceDetail.higherGeographicPlaces.map((place) => {
+            if (place.name) {
+              const typeStart = place.name.indexOf("[");
+              place.name =
+                typeStart !== -1
+                  ? place.name.slice(0, typeStart).trim()
+                  : place.name.trim();
+            }
+            return place;
+          });
+      }
+
+      // Save the cleaned data
+      collectingEventDiff.geographicPlaceNameSourceDetail = cleanedSourceDetail;
+    } else {
+      // If no changes, remove this field from the diff
+      delete collectingEventDiff.geographicPlaceNameSourceDetail;
+    }
+
     delete collectingEventDiff.srcAdminLevels;
     delete collectingEventDiff.selectedSections;
     delete (collectingEventDiff as any).selectAll;

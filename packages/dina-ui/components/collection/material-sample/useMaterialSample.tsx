@@ -592,7 +592,10 @@ export function useMaterialSampleSave({
       ...(!enableCollectingEvent && {
         collectingEvent: { id: null, type: "collecting-event" }
       }),
-      ...(!enableAssociations && { associations: [], hostOrganism: null })
+      ...(!enableAssociations && {
+        associations: [],
+        ...(msInitialValues.hostOrganism && { hostOrganism: null })
+      })
     };
     delete materialSampleInput.scheduledActions;
 
