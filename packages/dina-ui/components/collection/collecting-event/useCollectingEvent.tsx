@@ -221,16 +221,12 @@ export function useCollectingEventSave({
       ...(collectingEventDiff.geographicPlaceNameSourceDetail || {})
     } as any;
 
-    // Parse srcAdminLevels to geographicPlaceNameSourceDetail
-    // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
-    newSourceDetail.higherGeographicPlaces = null;
-    newSourceDetail.selectedGeographicPlace = null;
-    newSourceDetail.customGeographicPlace = null;
-
     if (
       collectingEventDiff.srcAdminLevels &&
       collectingEventDiff.srcAdminLevels.length > 0
     ) {
+      // Parse srcAdminLevels to geographicPlaceNameSourceDetail
+      // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
       const sectionIds = toPairs(collectingEventDiff.selectedSections)
         .filter((pair) => pair[1])
         .map((pair) => pair[0]);
@@ -280,34 +276,41 @@ export function useCollectingEventSave({
         newSourceDetail
       )
     ) {
-      // Clean place names before saving
-      const cleanedSourceDetail = cloneDeep(newSourceDetail);
+      if (Object.keys(newSourceDetail).length > 0) {
+        // Clean place names before saving
+        const cleanedSourceDetail = cloneDeep(newSourceDetail);
 
-      // Clean the selectedGeographicPlace name
-      if (cleanedSourceDetail.selectedGeographicPlace?.name) {
-        const name = cleanedSourceDetail.selectedGeographicPlace.name;
-        const typeStart = name.indexOf("[");
-        cleanedSourceDetail.selectedGeographicPlace.name =
-          typeStart !== -1 ? name.slice(0, typeStart).trim() : name.trim();
+        // Clean the selectedGeographicPlace name
+        if (cleanedSourceDetail.selectedGeographicPlace?.name) {
+          const name = cleanedSourceDetail.selectedGeographicPlace.name;
+          const typeStart = name.indexOf("[");
+          cleanedSourceDetail.selectedGeographicPlace.name =
+            typeStart !== -1 ? name.slice(0, typeStart).trim() : name.trim();
+        }
+
+        // Clean the higherGeographicPlaces names
+        if (cleanedSourceDetail.higherGeographicPlaces?.length) {
+          cleanedSourceDetail.higherGeographicPlaces =
+            cleanedSourceDetail.higherGeographicPlaces.map((place) => {
+              if (place.name) {
+                const typeStart = place.name.indexOf("[");
+                place.name =
+                  typeStart !== -1
+                    ? place.name.slice(0, typeStart).trim()
+                    : place.name.trim();
+              }
+              return place;
+            });
+        }
+
+        // Save the cleaned data
+        collectingEventDiff.geographicPlaceNameSourceDetail =
+          cleanedSourceDetail;
+      } else if (
+        collectingEventFormik?.values?.geographicPlaceNameSourceDetail === null
+      ) {
+        (collectingEventDiff.geographicPlaceNameSourceDetail as any) = null;
       }
-
-      // Clean the higherGeographicPlaces names
-      if (cleanedSourceDetail.higherGeographicPlaces?.length) {
-        cleanedSourceDetail.higherGeographicPlaces =
-          cleanedSourceDetail.higherGeographicPlaces.map((place) => {
-            if (place.name) {
-              const typeStart = place.name.indexOf("[");
-              place.name =
-                typeStart !== -1
-                  ? place.name.slice(0, typeStart).trim()
-                  : place.name.trim();
-            }
-            return place;
-          });
-      }
-
-      // Save the cleaned data
-      collectingEventDiff.geographicPlaceNameSourceDetail = cleanedSourceDetail;
     } else {
       // If no changes, remove this field from the diff
       delete collectingEventDiff.geographicPlaceNameSourceDetail;
