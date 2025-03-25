@@ -1288,7 +1288,6 @@ describe("MaterialSampleBulkEditor", () => {
               restrictionRemarks: null,
               collectingEvent: { id: "11111", type: "collecting-event" },
               associations: [],
-              hostOrganism: null,
               relationships: {
                 organism: { data: [] },
                 preparedBy: { data: [] },
@@ -1319,7 +1318,6 @@ describe("MaterialSampleBulkEditor", () => {
               restrictionRemarks: null,
               collectingEvent: { id: "11111", type: "collecting-event" },
               associations: [],
-              hostOrganism: null,
               relationships: {
                 organism: { data: [] },
                 preparedBy: { data: [] },
@@ -1350,7 +1348,6 @@ describe("MaterialSampleBulkEditor", () => {
               restrictionRemarks: null,
               collectingEvent: { id: "11111", type: "collecting-event" },
               associations: [],
-              hostOrganism: null,
               relationships: {
                 organism: { data: [] },
                 preparedBy: { data: [] },
