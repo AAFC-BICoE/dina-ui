@@ -1854,11 +1854,41 @@ describe("MaterialSampleBulkEditor", () => {
       }
     });
 
+    // Change the barcode in the visible section.
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /barcode/i }),
+      "New Barcode"
+    );
+
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
 
-    // No changes have been made, expecting no mocksave requests.
-    expect(mockSave.mock.calls).toEqual([]);
+    // Only the primary ID and barcode should be touched.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              barcode: "New Barcode",
+              id: "1",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              barcode: "New Barcode",
+              id: "2",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
   });
 });
