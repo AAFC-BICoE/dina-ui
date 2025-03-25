@@ -6,7 +6,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -66,6 +66,34 @@ function testMaterialSample(): InputResource<MaterialSample> {
   };
 }
 
+const mockGeographicSearchResults = [
+  {
+    place_id: 342812712,
+    licence:
+      "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    osm_type: "relation",
+    osm_id: 4136816,
+    lat: "45.4208777",
+    lon: "-75.6901106",
+    category: "boundary",
+    type: "administrative",
+    place_rank: 12,
+    importance: 0.7151190250609533,
+    addresstype: "city",
+    name: "Ottawa",
+    display_name: "Ottawa, Eastern Ontario, Ontario, Canada",
+    address: {
+      city: "Ottawa",
+      state_district: "Eastern Ontario",
+      state: "Ontario",
+      "ISO3166-2-lvl4": "CA-ON",
+      country: "Canada",
+      country_code: "ca"
+    },
+    boundingbox: ["44.9617738", "45.5376502", "-76.3555857", "-75.2465783"]
+  }
+];
+
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/collecting-event":
@@ -106,39 +134,6 @@ const mockGet = jest.fn<any, any>(async (path) => {
           }
         ]
       };
-    case "https://nominatim.openstreetmap.org/search.php?q=Ottawa&addressdetails=1&format=jsonv2":
-      return [
-        {
-          place_id: 342812712,
-          licence:
-            "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
-          osm_type: "relation",
-          osm_id: 4136816,
-          lat: "45.4208777",
-          lon: "-75.6901106",
-          category: "boundary",
-          type: "administrative",
-          place_rank: 12,
-          importance: 0.7151190250609533,
-          addresstype: "city",
-          name: "Ottawa",
-          display_name: "Ottawa, Eastern Ontario, Ontario, Canada",
-          address: {
-            city: "Ottawa",
-            state_district: "Eastern Ontario",
-            state: "Ontario",
-            "ISO3166-2-lvl4": "CA-ON",
-            country: "Canada",
-            country_code: "ca"
-          },
-          boundingbox: [
-            "44.9617738",
-            "45.5376502",
-            "-76.3555857",
-            "-75.2465783"
-          ]
-        }
-      ];
     default:
       return { data: [], meta: { totalResourceCount: 0 } };
   }
@@ -196,8 +191,22 @@ const testCtx = {
 
 const mockOnSaved = jest.fn();
 
+const mockFetchResponse = (data) => {
+  return {
+    json: jest.fn().mockResolvedValue(data),
+    ok: true,
+    status: 200
+  };
+};
+
 describe("Material Sample Edit Page", () => {
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    window.fetch = jest
+      .fn()
+      .mockResolvedValue(mockFetchResponse(mockGeographicSearchResults));
+  });
 
   it("Submits a new material-sample with a new CollectingEvent.", async () => {
     const wrapper = mountWithAppContext(
@@ -264,7 +273,6 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-material-sample-id",
               dwcDegreeOfEstablishment: null,
-              hostOrganism: null,
               managedAttributes: {},
               publiclyReleasable: true, // Default value
               relationships: {
@@ -277,8 +285,6 @@ describe("Material Sample Edit Page", () => {
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
               collection: undefined,
-              storageUnitUsage: undefined,
-              storageUnit: undefined,
               preservationType: null,
               preparationDate: null,
               preparationFixative: null,
@@ -371,7 +377,6 @@ describe("Material Sample Edit Page", () => {
               isRestricted: false,
               restrictionRemarks: null,
               associations: [],
-              hostOrganism: null,
               collectingEvent: { id: "1", type: "collecting-event" },
               relationships: {
                 organism: { data: [] },
@@ -2373,7 +2378,8 @@ describe("Material Sample Edit Page", () => {
               resource: {
                 id: "333",
                 type: "material-sample",
-                hostOrganism: null
+                hostOrganism: null,
+                associations: []
               },
               type: "material-sample"
             }
@@ -2495,14 +2501,42 @@ describe("Material Sample Edit Page", () => {
       userEvent.click(wrapper.getByRole("button", { name: /search/i }));
       await new Promise(setImmediate);
 
-      screen.logTestingPlaygroundURL();
+      // Click the first search option.
+      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await new Promise(setImmediate);
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await new Promise(setImmediate);
 
       // Expect the geographicPlaceNameSourceDetail to be added.
-      expect(mockSave.mock.calls).toEqual([]);
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                geographicPlaceNameSource: "OSM",
+                geographicPlaceNameSourceDetail: {
+                  country: {
+                    name: "Canada"
+                  },
+                  stateProvince: {
+                    element: "relation",
+                    id: 4136816,
+                    name: "Ontario"
+                  },
+                  sourceUrl:
+                    "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                },
+                id: "2",
+                type: "collecting-event"
+              },
+              type: "collecting-event"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
     });
 
     it("Removes geographicPlaceNameSourceDetail when previously added and deleted", async () => {
@@ -2569,18 +2603,49 @@ describe("Material Sample Edit Page", () => {
       );
       await new Promise(setImmediate);
 
-      // Simulate selecting a location
-      // In a real test, you'd interact with the location component
-      // This would involve searching for a location and selecting it from results
+      // Enter a search value:
+      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
 
-      // For a simplified test, we'd mock the relevant functions
+      // Click the search button.
+      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await new Promise(setImmediate);
+
+      // Click the first search option.
+      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await new Promise(setImmediate);
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await new Promise(setImmediate);
 
-      // In a complete test, we would check the save call includes the new geographic place details
-      // This test would need more setup to properly simulate geographic place selection
+      // Expect the new geographicPlaceNameSourceDetail to be saved.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                geographicPlaceNameSource: "OSM",
+                geographicPlaceNameSourceDetail: {
+                  country: {
+                    name: "Canada"
+                  },
+                  stateProvince: {
+                    element: "relation",
+                    id: 4136816,
+                    name: "Ontario"
+                  },
+                  sourceUrl:
+                    "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                },
+                id: "1",
+                type: "collecting-event"
+              },
+              type: "collecting-event"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
     });
   });
 });
