@@ -5,6 +5,7 @@ import {
   DoOperationsError,
   FormikButton,
   getBulkEditTabFieldInfo,
+  isResourceEmpty,
   ResourceWithHooks,
   SaveArgs,
   useApiClient,
@@ -460,11 +461,42 @@ function useBulkSampleSave({
         }
       }
 
-      const savedSamples = await save<MaterialSample>(saveOperations, {
-        apiBaseUrl: "/collection-api"
-      });
+      // Filter out empty resources but keep track of their positions
+      const nonEmptyOperations: SaveArgs<MaterialSample>[] = [];
+      const nonEmptyIndices: number[] = [];
+      const resultSamples: PersistedResource<MaterialSample>[] = new Array(
+        saveOperations.length
+      );
 
-      await onSaved(savedSamples);
+      // First pass: store empty resources and collect non-empty ones
+      for (let i = 0; i < saveOperations.length; i++) {
+        const operation = saveOperations[i];
+
+        if (isResourceEmpty(operation.resource)) {
+          // For empty resources, just store the original resource
+          resultSamples[i] = operation.resource as any;
+        } else {
+          // For non-empty resources, collect for batch save
+          nonEmptyOperations.push(operation);
+          nonEmptyIndices.push(i);
+        }
+      }
+
+      // Make a single API call for all non-empty resources
+      if (nonEmptyOperations.length > 0) {
+        const savedSamples = await save<MaterialSample>(nonEmptyOperations, {
+          apiBaseUrl: "/collection-api"
+        });
+
+        // Place the saved resources in their original positions
+        for (let i = 0; i < savedSamples.length; i++) {
+          const originalIndex = nonEmptyIndices[i];
+          resultSamples[originalIndex] = savedSamples[i];
+        }
+      }
+
+      // Call onSaved with all samples in the original order
+      await onSaved(resultSamples);
     } catch (error: unknown) {
       // When there is an error from the bulk save-all operation, put it into the correct form:
       if (error instanceof DoOperationsError) {

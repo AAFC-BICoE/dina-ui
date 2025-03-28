@@ -78,6 +78,7 @@ export interface ScrollTarget {
   className?: string;
   disabled?: boolean;
   setEnabled?: (val: boolean) => void;
+  setDeleted?: (val: boolean) => void;
   customSwitch?: ComponentType<ReactSwitchProps>;
 }
 
@@ -188,10 +189,14 @@ const DataComponentNavItem = SortableElement(
                 values={{ component: section.msg }}
               />
             }
-            onYesButtonClicked={() => section.setEnabled?.(newVal)}
+            onYesButtonClicked={() => {
+              section.setEnabled?.(newVal);
+              section.setDeleted?.(true);
+            }}
           />
         );
       } else {
+        section.setDeleted?.(!newVal);
         section.setEnabled?.(newVal);
       }
     }
