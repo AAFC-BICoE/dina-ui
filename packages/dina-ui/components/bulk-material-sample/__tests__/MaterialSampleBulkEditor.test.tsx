@@ -232,39 +232,63 @@ describe("MaterialSampleBulkEditor", () => {
       [
         [
           {
-            resource: expect.objectContaining({
+            resource: {
               barcode: "edited-barcode-1",
               collection: {
                 id: "1",
                 type: "collection"
               },
               materialSampleName: "MS1",
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
+              },
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           },
           {
-            resource: expect.objectContaining({
+            resource: {
               barcode: "edited-barcode-2",
               collection: {
                 id: "1",
                 type: "collection"
               },
               materialSampleName: "MS2",
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
+              },
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           },
           {
-            resource: expect.objectContaining({
+            resource: {
               barcode: "edited-barcode-3",
               collection: {
                 id: "1",
                 type: "collection"
               },
               materialSampleName: "MS3",
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
+              },
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           }
         ],
@@ -327,39 +351,63 @@ describe("MaterialSampleBulkEditor", () => {
       [
         [
           {
-            resource: expect.objectContaining({
+            resource: {
               dwcOtherCatalogNumbers: ["otherCatalog1"],
               collection: {
                 id: "1",
                 type: "collection"
               },
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
+              },
               materialSampleName: "MS1",
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           },
           {
-            resource: expect.objectContaining({
+            resource: {
               dwcOtherCatalogNumbers: ["otherCatalog2"],
               collection: {
                 id: "1",
                 type: "collection"
               },
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
+              },
               materialSampleName: "MS2",
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           },
           {
-            resource: expect.objectContaining({
+            resource: {
               dwcOtherCatalogNumbers: ["otherCatalog3"],
               collection: {
                 id: "1",
                 type: "collection"
               },
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
+              },
               materialSampleName: "MS3",
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           }
         ],
@@ -533,9 +581,17 @@ describe("MaterialSampleBulkEditor", () => {
     expect(mockSaveForBadColEvent).lastCalledWith(
       [
         {
-          resource: expect.objectContaining({
-            type: "collecting-event"
-          }),
+          resource: {
+            type: "collecting-event",
+            dwcVerbatimCoordinateSystem: null,
+            dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+            geoReferenceAssertions: [
+              {
+                isPrimary: true
+              }
+            ],
+            publiclyReleasable: true
+          },
           type: "collecting-event"
         }
       ],
@@ -612,9 +668,17 @@ describe("MaterialSampleBulkEditor", () => {
     expect(mockSaveForBadColEvent).lastCalledWith(
       [
         {
-          resource: expect.objectContaining({
-            type: "collecting-event"
-          }),
+          resource: {
+            type: "collecting-event",
+            dwcVerbatimCoordinateSystem: null,
+            dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+            geoReferenceAssertions: [
+              {
+                isPrimary: true
+              }
+            ],
+            publiclyReleasable: true
+          },
           type: "collecting-event"
         }
       ],
@@ -1272,27 +1336,9 @@ describe("MaterialSampleBulkEditor", () => {
               type: "material-sample",
               materialSampleName: "MS1",
               collection: { id: "1", type: "collection" },
-              restrictionFieldsExtension: null,
-              preparationType: { id: null, type: "preparation-type" },
-              preparationDate: null,
-              preparationRemarks: null,
-              dwcDegreeOfEstablishment: null,
-              preparationMethod: { id: null, type: "preparation-method" },
-              preservationType: null,
-              preparationFixative: null,
-              preparationMaterials: null,
-              preparationSubstrate: null,
-              preparationProtocol: { id: null, type: "protocol" },
-              preparationManagedAttributes: {},
-              isRestricted: false,
-              restrictionRemarks: null,
               collectingEvent: { id: "11111", type: "collecting-event" },
-              associations: [],
               relationships: {
-                organism: { data: [] },
-                preparedBy: { data: [] },
-                collection: { data: { id: "1", type: "collection" } },
-                storageUnitUsage: { data: null }
+                collection: { data: { id: "1", type: "collection" } }
               }
             },
             type: "material-sample"
@@ -1302,27 +1348,9 @@ describe("MaterialSampleBulkEditor", () => {
               type: "material-sample",
               materialSampleName: "MS2",
               collection: { id: "1", type: "collection" },
-              restrictionFieldsExtension: null,
-              preparationType: { id: null, type: "preparation-type" },
-              preparationDate: null,
-              preparationRemarks: null,
-              dwcDegreeOfEstablishment: null,
-              preparationMethod: { id: null, type: "preparation-method" },
-              preservationType: null,
-              preparationFixative: null,
-              preparationMaterials: null,
-              preparationSubstrate: null,
-              preparationProtocol: { id: null, type: "protocol" },
-              preparationManagedAttributes: {},
-              isRestricted: false,
-              restrictionRemarks: null,
               collectingEvent: { id: "11111", type: "collecting-event" },
-              associations: [],
               relationships: {
-                organism: { data: [] },
-                preparedBy: { data: [] },
-                collection: { data: { id: "1", type: "collection" } },
-                storageUnitUsage: { data: null }
+                collection: { data: { id: "1", type: "collection" } }
               }
             },
             type: "material-sample"
@@ -1332,27 +1360,9 @@ describe("MaterialSampleBulkEditor", () => {
               type: "material-sample",
               materialSampleName: "MS3",
               collection: { id: "1", type: "collection" },
-              restrictionFieldsExtension: null,
-              preparationType: { id: null, type: "preparation-type" },
-              preparationDate: null,
-              preparationRemarks: null,
-              dwcDegreeOfEstablishment: null,
-              preparationMethod: { id: null, type: "preparation-method" },
-              preservationType: null,
-              preparationFixative: null,
-              preparationMaterials: null,
-              preparationSubstrate: null,
-              preparationProtocol: { id: null, type: "protocol" },
-              preparationManagedAttributes: {},
-              isRestricted: false,
-              restrictionRemarks: null,
               collectingEvent: { id: "11111", type: "collecting-event" },
-              associations: [],
               relationships: {
-                organism: { data: [] },
-                preparedBy: { data: [] },
-                collection: { data: { id: "1", type: "collection" } },
-                storageUnitUsage: { data: null }
+                collection: { data: { id: "1", type: "collection" } }
               }
             },
             type: "material-sample"
@@ -1673,10 +1683,18 @@ describe("MaterialSampleBulkEditor", () => {
       [
         [
           {
-            resource: expect.objectContaining({
+            resource: {
               type: "collecting-event",
-              dwcVerbatimLocality: "test locality"
-            }),
+              dwcVerbatimLocality: "test locality",
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
+              publiclyReleasable: true
+            },
             type: "collecting-event"
           }
         ],
@@ -1686,34 +1704,65 @@ describe("MaterialSampleBulkEditor", () => {
         [
           // Creates the first sample with the attached events:
           {
-            resource: expect.objectContaining({
+            resource: {
               collectingEvent: {
                 id: "11111",
                 type: "collecting-event"
               },
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS1",
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
+              },
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           },
           // Creates the next 2 samples without the attached events:
           {
-            resource: expect.objectContaining({
-              collectingEvent: {
-                id: null,
-                type: "collecting-event"
+            resource: {
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS2",
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
               },
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           },
           {
-            resource: expect.objectContaining({
-              collectingEvent: {
-                id: null,
-                type: "collecting-event"
+            resource: {
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS3",
+              relationships: {
+                collection: {
+                  data: {
+                    id: "1",
+                    type: "collection"
+                  }
+                }
               },
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           }
         ],

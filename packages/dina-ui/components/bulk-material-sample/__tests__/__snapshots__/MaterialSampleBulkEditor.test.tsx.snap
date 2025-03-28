@@ -5,47 +5,7 @@ Array [
   Array [
     Array [
       Object {
-        "resource": Object {
-          "associations": Array [],
-          "collectingEvent": Object {
-            "id": null,
-            "type": "collecting-event",
-          },
-          "dwcDegreeOfEstablishment": null,
-          "isRestricted": false,
-          "preparationDate": null,
-          "preparationFixative": null,
-          "preparationManagedAttributes": Object {},
-          "preparationMaterials": null,
-          "preparationMethod": Object {
-            "id": null,
-            "type": "preparation-method",
-          },
-          "preparationProtocol": Object {
-            "id": null,
-            "type": "protocol",
-          },
-          "preparationRemarks": null,
-          "preparationSubstrate": null,
-          "preparationType": Object {
-            "id": null,
-            "type": "preparation-type",
-          },
-          "preservationType": null,
-          "relationships": Object {
-            "organism": Object {
-              "data": Array [],
-            },
-            "preparedBy": Object {
-              "data": Array [],
-            },
-            "storageUnitUsage": Object {
-              "data": null,
-            },
-          },
-          "restrictionFieldsExtension": null,
-          "restrictionRemarks": null,
-        },
+        "resource": Object {},
         "type": "material-sample",
       },
     ],
@@ -57,90 +17,30 @@ Array [
     Array [
       Object {
         "resource": Object {
-          "associations": Array [],
-          "dwcDegreeOfEstablishment": null,
           "dwcOtherCatalogNumbers": Array [
             "otherCatalogAll",
           ],
           "id": "1",
-          "isRestricted": false,
-          "preparationDate": null,
-          "preparationFixative": null,
-          "preparationManagedAttributes": Object {},
-          "preparationMaterials": null,
-          "preparationRemarks": null,
-          "preparationSubstrate": null,
-          "preservationType": null,
-          "relationships": Object {
-            "organism": Object {
-              "data": Array [],
-            },
-            "preparedBy": Object {
-              "data": Array [],
-            },
-          },
-          "restrictionFieldsExtension": null,
-          "restrictionRemarks": null,
           "type": "material-sample",
         },
         "type": "material-sample",
       },
       Object {
         "resource": Object {
-          "associations": Array [],
-          "dwcDegreeOfEstablishment": null,
           "dwcOtherCatalogNumbers": Array [
             "otherCatalogAll",
           ],
           "id": "2",
-          "isRestricted": false,
-          "preparationDate": null,
-          "preparationFixative": null,
-          "preparationManagedAttributes": Object {},
-          "preparationMaterials": null,
-          "preparationRemarks": null,
-          "preparationSubstrate": null,
-          "preservationType": null,
-          "relationships": Object {
-            "organism": Object {
-              "data": Array [],
-            },
-            "preparedBy": Object {
-              "data": Array [],
-            },
-          },
-          "restrictionFieldsExtension": null,
-          "restrictionRemarks": null,
           "type": "material-sample",
         },
         "type": "material-sample",
       },
       Object {
         "resource": Object {
-          "associations": Array [],
-          "dwcDegreeOfEstablishment": null,
           "dwcOtherCatalogNumbers": Array [
             "otherCatalogAll",
           ],
           "id": "3",
-          "isRestricted": false,
-          "preparationDate": null,
-          "preparationFixative": null,
-          "preparationManagedAttributes": Object {},
-          "preparationMaterials": null,
-          "preparationRemarks": null,
-          "preparationSubstrate": null,
-          "preservationType": null,
-          "relationships": Object {
-            "organism": Object {
-              "data": Array [],
-            },
-            "preparedBy": Object {
-              "data": Array [],
-            },
-          },
-          "restrictionFieldsExtension": null,
-          "restrictionRemarks": null,
           "type": "material-sample",
         },
         "type": "material-sample",

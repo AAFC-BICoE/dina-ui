@@ -96,6 +96,7 @@ export function useMaterialSampleSectionOrder({
       className: component.switchClassName,
       disabled: scrollTargetSwitches[component.id]?.disabled,
       setEnabled: scrollTargetSwitches[component.id]?.setEnabled,
+      setDeleted: scrollTargetSwitches[component.id]?.setDeleted,
       customSwitch: scrollTargetSwitches[component.id]?.customSwitch
     }))
   ];

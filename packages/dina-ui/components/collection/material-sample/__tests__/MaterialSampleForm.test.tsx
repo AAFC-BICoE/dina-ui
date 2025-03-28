@@ -6,7 +6,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -2304,6 +2304,9 @@ describe("Material Sample Edit Page", () => {
 
       // Are you sure popup, click "Yes".
       userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+
+      // Wait for the loading to be removed.
+      await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
