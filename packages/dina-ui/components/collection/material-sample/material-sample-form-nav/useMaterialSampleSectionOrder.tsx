@@ -49,29 +49,35 @@ export function useMaterialSampleSectionOrder({
     },
     [COLLECTING_EVENT_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableCollectingEvent,
-      setEnabled: dataComponentState.setEnableCollectingEvent
+      setEnabled: dataComponentState.setEnableCollectingEvent,
+      setDeleted: dataComponentState.setDeleteCollectingEvent
     },
     [PREPARATIONS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enablePreparations,
-      setEnabled: dataComponentState.setEnablePreparations
+      setEnabled: dataComponentState.setEnablePreparations,
+      setDeleted: dataComponentState.setDeletePreparations
     },
     [ORGANISMS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableOrganisms,
       setEnabled: dataComponentState.setEnableOrganisms,
+      setDeleted: dataComponentState.setDeleteOrganisms,
       customSwitch: OrganismsSwitch
     },
     [ASSOCIATIONS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableAssociations,
       setEnabled: dataComponentState.setEnableAssociations,
+      setDeleted: dataComponentState.setDeleteAssociations,
       customSwitch: AssociationsSwitch
     },
     [STORAGE_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableStorage,
-      setEnabled: dataComponentState.setEnableStorage
+      setEnabled: dataComponentState.setEnableStorage,
+      setDeleted: dataComponentState.setDeleteStorage
     },
     [RESTRICTION_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableRestrictions,
-      setEnabled: dataComponentState.setEnableRestrictions
+      setEnabled: dataComponentState.setEnableRestrictions,
+      setDeleted: dataComponentState.setDeleteRestrictions
     },
     [SCHEDULED_ACTIONS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableScheduledActions,

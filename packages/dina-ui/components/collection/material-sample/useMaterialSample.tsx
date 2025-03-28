@@ -309,6 +309,17 @@ export function useMaterialSampleSave({
   const [enableAssociations, setEnableAssociations] = useState<boolean>(false);
   const [enableRestrictions, setEnableRestrictions] = useState<boolean>(false);
 
+  // Delete Data Component
+  const [deleteCollectingEvent, setDeleteCollectingEvent] =
+    useState<boolean>(false);
+  const [deletePreparations, setDeletePreparations] = useState<boolean>(false);
+  const [deleteOrganisms, setDeleteOrganisms] = useState<boolean>(false);
+  const [deleteStorage, setDeleteStorage] = useState<boolean>(false);
+  // const [deleteScheduledActions, setDeleteScheduledActions] =
+  //   useState<boolean>(false);
+  const [deleteAssociations, setDeleteAssociations] = useState<boolean>(false);
+  const [deleteRestrictions, setDeleteRestrictions] = useState<boolean>(false);
+
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
     setEnableShowParentAttributes(
@@ -419,20 +430,41 @@ export function useMaterialSampleSave({
 
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
+    // Collecting Event
     enableCollectingEvent,
     setEnableCollectingEvent,
+    setDeleteCollectingEvent,
+
+    // Preparations
     enablePreparations,
     setEnablePreparations,
+    setDeletePreparations,
+
+    // Organisms
     enableOrganisms,
     setEnableOrganisms,
+    setDeleteOrganisms,
+
+    // Storage
     enableStorage,
     setEnableStorage,
+    setDeleteStorage,
+
+    // Scheduled Actions
     enableScheduledActions,
     setEnableScheduledActions,
+
+    // Associations
     enableAssociations,
     setEnableAssociations,
+    setDeleteAssociations,
+
+    // Restrictions
     enableRestrictions,
     setEnableRestrictions,
+    setDeleteRestrictions,
+
+    // Parent Attributes (Form template only)
     enableShowParentAttributes,
     setEnableShowParentAttributes
   };
@@ -441,9 +473,8 @@ export function useMaterialSampleSave({
 
   const defaultValues: InputResource<MaterialSample> = {
     type: "material-sample",
-    managedAttributes: {},
     // Defaults to the last Collection used to create a Material Sample:
-    collection: lastUsedCollection,
+    ...(lastUsedCollection && { collection: lastUsedCollection }),
     publiclyReleasable: true
   };
 
@@ -523,6 +554,9 @@ export function useMaterialSampleSave({
         risk_group: submittedValues?.phac_human_rg?.value
       };
     }
+    if (Object.keys(submittedValues.restrictionFieldsExtension).length === 0) {
+      delete submittedValues.restrictionFieldsExtension;
+    }
 
     if (submittedValues.extensionValues) {
       submittedValues.extensionValues = processExtensionValuesSaving(
@@ -578,21 +612,21 @@ export function useMaterialSampleSave({
       ...submittedValues,
 
       // Remove the values from sections that were toggled off:
-      ...(!enablePreparations && BLANK_PREPARATION),
-      ...(!enableRestrictions && BLANK_RESTRICTION),
-      ...(!enableOrganisms && {
+      ...(deletePreparations && BLANK_PREPARATION),
+      ...(deleteRestrictions && BLANK_RESTRICTION),
+      ...(deleteOrganisms && {
         organismsIndividualEntry: undefined,
         organismsQuantity: undefined,
         organism: []
       }),
       // Remove storageUnit and storageUnitUsage if toggle is disabled
-      ...(!enableStorage && {
+      ...(deleteStorage && {
         storageUnitUsage: { id: null, type: "storage-unit-usage" }
       }),
-      ...(!enableCollectingEvent && {
+      ...(deleteCollectingEvent && {
         collectingEvent: { id: null, type: "collecting-event" }
       }),
-      ...(!enableAssociations && {
+      ...(deleteAssociations && {
         associations: [],
         ...(msInitialValues.hostOrganism && { hostOrganism: null })
       })

@@ -266,44 +266,13 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
               materialSampleName: "test-material-sample-id",
-              dwcDegreeOfEstablishment: null,
-              managedAttributes: {},
               publiclyReleasable: true, // Default value
-              relationships: {
-                organism: { data: [] },
-                preparedBy: { data: [] },
-                storageUnitUsage: { data: null }
-              },
-              type: "material-sample",
-              isRestricted: false,
-              restrictionFieldsExtension: null,
-              restrictionRemarks: null,
-              collection: undefined,
-              preservationType: null,
-              preparationDate: null,
-              preparationFixative: null,
-              preparationManagedAttributes: {},
-              preparationMaterials: null,
-              preparationMethod: {
-                id: null,
-                type: "preparation-method"
-              },
-              preparationProtocol: {
-                id: null,
-                type: "protocol"
-              },
-              preparationRemarks: null,
-              preparationSubstrate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              }
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -349,40 +318,9 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               type: "material-sample",
-              collection: undefined,
-              dwcDegreeOfEstablishment: null,
-              preparationDate: null,
-              preparationFixative: null,
-              preparationManagedAttributes: {},
-              preparationMaterials: null,
-              preparationMethod: {
-                id: null,
-                type: "preparation-method"
-              },
-              preparationProtocol: {
-                id: null,
-                type: "protocol"
-              },
-              preparationRemarks: null,
-              preparationSubstrate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preservationType: null,
-              managedAttributes: {},
               publiclyReleasable: true,
               materialSampleName: "test-material-sample-id",
-              restrictionFieldsExtension: null,
-              isRestricted: false,
-              restrictionRemarks: null,
-              associations: [],
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {
-                organism: { data: [] },
-                preparedBy: { data: [] },
-                storageUnitUsage: { data: null }
-              }
+              collectingEvent: { id: "1", type: "collecting-event" }
             },
             type: "material-sample"
           }
@@ -476,12 +414,13 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       [
         // New collecting-event created:
         [
           {
             resource: {
+              group: "aafc",
               otherRecordNumbers: ["1", "2", "3"],
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
@@ -741,7 +680,7 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
 
     // Nothing has changed, no requests expected.
-    expect(mockSave.mock.calls).toMatchObject([]);
+    expect(mockSave.mock.calls).toEqual([]);
   });
 
   it("Submits a new Material Sample with 3 Determinations.", async () => {
@@ -809,7 +748,7 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
 
     // Saves the Material Sample:
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       // First submits the organism in one transaction:
       [
         [
