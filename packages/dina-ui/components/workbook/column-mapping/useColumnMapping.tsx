@@ -426,9 +426,10 @@ export function useColumnMapping() {
       handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath === "managedAttributes") {
       handleManagedAttributeMapping(originalColumnHeader, newWorkbookColumnMap);
-    } else if (fieldPath?.startsWith("parentMaterialSample.")) {
+    } else if (fieldPath?.startsWith("parentMaterialSample")) {
       const { valueMapping, multipleValueMappings } =
-        await resolveParentMapping(columnHeaderValue);
+        await resolveParentMapping(originalColumnHeader);
+
       newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
         originalColumnName: originalColumnHeader,
@@ -623,8 +624,11 @@ export function useColumnMapping() {
     } = {};
 
     if (spreadsheetData) {
-      const spreadsheetHeaders = spreadsheetData[sheet].rows[0].content;
-      const colIndex = spreadsheetHeaders.indexOf(columnHeader) ?? -1;
+      const spreadsheetHeaders =
+        spreadsheetData?.[sheet]?.originalColumns ??
+        spreadsheetData?.[sheet]?.rows?.[0]?.content;
+      const colIndex = spreadsheetHeaders?.indexOf(columnHeader) ?? -1;
+
       if (colIndex > -1) {
         for (let i = 1; i < spreadsheetData[sheet].rows.length; i++) {
           const parentValue = spreadsheetData[sheet].rows[i].content[colIndex];
