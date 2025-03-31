@@ -12,7 +12,6 @@ import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
 import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
-import { SimpleQueryGroup, SimpleQueryRow } from "../types";
 
 export interface QueryBuilderContextI {
   performSubmit: () => void;
@@ -256,34 +255,6 @@ export function generateUUIDTree(uuid: string, path: string): JsonTree {
         }
       }
     }
-  };
-}
-
-export function generateJsonTreeFromSimpleQueryGroup(
-  simpleQueryGroup: SimpleQueryGroup
-): JsonTree {
-  const children: any = simpleQueryGroup.props.map(
-    (simpleQueryRow: SimpleQueryRow) => {
-      return {
-        id: Utils.uuid(),
-        type: "rule",
-        properties: {
-          field: simpleQueryRow.field,
-          operator: simpleQueryRow.operator,
-          value: [simpleQueryRow.value],
-          valueSrc: ["value"],
-          valueType: [simpleQueryRow.type]
-        }
-      };
-    }
-  );
-  return {
-    id: Utils.uuid(),
-    type: "group",
-    properties: {
-      conjunction: simpleQueryGroup.conj
-    },
-    children1: children
   };
 }
 
