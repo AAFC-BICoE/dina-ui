@@ -1,11 +1,24 @@
 export interface SimpleQueryGroup {
-  conj: string;
-  props: SimpleQueryRow[];
+  // Conjunction (AND/OR)
+  c: string;
+
+  // Props: Items inside the group
+  p: SimpleQueryRow[];
 }
 
 export interface SimpleQueryRow {
-  field: string;
-  operator: string;
-  value: string;
-  type: string;
+  // Field
+  f: string;
+
+  // Operator
+  o: string;
+
+  // Value
+  v: string;
+
+  // Type
+  t: string;
+
+  // Dynamic field identifier (UUID for example if managed attribute)
+  d?: string;
 }

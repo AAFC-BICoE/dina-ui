@@ -1,5 +1,6 @@
 import { Utils } from "react-awesome-query-builder";
 import { parseQueryTreeFromURL, serializeQueryTreeToURL } from "../queryUtils";
+import { ManagedAttributeSearchStates } from "../../query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 
 // Mock the react-awesome-query-builder module
 jest.mock("react-awesome-query-builder", () => ({
@@ -19,7 +20,7 @@ describe("queryUtils", () => {
     it("Should correctly serialize a basic query tree", () => {
       // Set up the mock to return a simple JSON tree
       const mockJsonTree = {
-        properties: { conjunction: "AND" },
+        properties: { conjunction: "a" },
         children1: [
           {
             properties: {
@@ -35,13 +36,13 @@ describe("queryUtils", () => {
 
       // Expected result
       const expected = JSON.stringify({
-        conj: "AND",
-        props: [
+        c: "a",
+        p: [
           {
-            field: "data.attributes.materialSampleName",
-            operator: "exactMatch",
-            value: "Sample1",
-            type: "text"
+            f: "data.attributes.materialSampleName",
+            o: "exactMatch",
+            v: "Sample1",
+            t: "text"
           }
         ]
       });
@@ -53,7 +54,7 @@ describe("queryUtils", () => {
 
     it("Should correctly serialize a query tree with multiple rules", () => {
       const mockJsonTree = {
-        properties: { conjunction: "OR" },
+        properties: { conjunction: "o" },
         children1: [
           {
             properties: {
@@ -76,19 +77,19 @@ describe("queryUtils", () => {
       (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
 
       const expected = JSON.stringify({
-        conj: "OR",
-        props: [
+        c: "o",
+        p: [
           {
-            field: "data.attributes.materialSampleName",
-            operator: "exactMatch",
-            value: "Sample1",
-            type: "text"
+            f: "data.attributes.materialSampleName",
+            o: "exactMatch",
+            v: "Sample1",
+            t: "text"
           },
           {
-            field: "data.attributes.barcode",
-            operator: "wildcard",
-            value: "barcode12345",
-            type: "text"
+            f: "data.attributes.barcode",
+            o: "wildcard",
+            v: "barcode12345",
+            t: "text"
           }
         ]
       });
@@ -98,22 +99,27 @@ describe("queryUtils", () => {
     });
 
     it("Should correctly serialize managed attribute rule", () => {
-      const complexValue = JSON.stringify({
+      const managedAttributeStates: ManagedAttributeSearchStates = {
         searchValue: "Test",
-        selectedOperator: "equals",
+        selectedOperator: "exactMatch",
+        selectedType: "STRING",
         selectedManagedAttribute: {
-          id: "0193e571-2d0c-7517-928d-2c19e04bf6cd"
+          id: "0193e571-2d0c-7517-928d-2c19e04bf6cd",
+          key: "test-1",
+          name: "test",
+          type: "managed-attribute",
+          vocabularyElementType: "STRING"
         }
-      });
+      };
 
       const mockJsonTree = {
-        properties: { conjunction: "AND" },
+        properties: { conjunction: "a" },
         children1: [
           {
             properties: {
               field: "data.attributes.managedAttributes",
               operator: "noOperator",
-              value: [complexValue],
+              value: [JSON.stringify(managedAttributeStates)],
               valueType: ["managedAttribute"]
             }
           }
@@ -122,13 +128,14 @@ describe("queryUtils", () => {
       (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
 
       const expected = JSON.stringify({
-        conj: "AND",
-        props: [
+        c: "a",
+        p: [
           {
-            field: "data.attributes.managedAttributes",
-            operator: "noOperator",
-            value: complexValue,
-            type: "managedAttribute"
+            f: "data.attributes.managedAttributes",
+            o: "exactMatch",
+            v: managedAttributeStates.searchValue,
+            t: "managedAttribute",
+            d: managedAttributeStates?.selectedManagedAttribute?.id
           }
         ]
       });
@@ -139,12 +146,12 @@ describe("queryUtils", () => {
 
     it("Should use default values for missing value and type", () => {
       const mockJsonTree = {
-        properties: { conjunction: "AND" },
+        properties: { conjunction: "a" },
         children1: [
           {
             properties: {
-              field: "user.active",
-              operator: "is_empty",
+              field: "data.attributes.barcode",
+              operator: "isEmpty",
               value: [], // No value
               valueType: [] // No type
             }
@@ -154,13 +161,13 @@ describe("queryUtils", () => {
       (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
 
       const expected = JSON.stringify({
-        conj: "AND",
-        props: [
+        c: "a",
+        p: [
           {
-            field: "user.active",
-            operator: "is_empty",
-            value: "",
-            type: "text"
+            f: "data.attributes.barcode",
+            o: "isEmpty",
+            v: "",
+            t: "text"
           }
         ]
       });
@@ -171,7 +178,7 @@ describe("queryUtils", () => {
 
     it("Should return null if a rule is missing a field", () => {
       const mockJsonTree = {
-        properties: { conjunction: "AND" },
+        properties: { conjunction: "a" },
         children1: [
           {
             properties: {
@@ -191,7 +198,7 @@ describe("queryUtils", () => {
 
     it("Should return null if some rules have fields and others don't", () => {
       const mockJsonTree = {
-        properties: { conjunction: "AND" },
+        properties: { conjunction: "a" },
         children1: [
           {
             properties: {
@@ -219,13 +226,13 @@ describe("queryUtils", () => {
 
     it("Should handle an empty query tree (no children)", () => {
       const mockJsonTree = {
-        properties: { conjunction: "AND" },
+        properties: { conjunction: "a" },
         children1: []
       };
       (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
 
       const expected = JSON.stringify({
-        conj: "AND",
+        conj: "a",
         props: []
       });
 
@@ -245,7 +252,7 @@ describe("queryUtils", () => {
       (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
 
       const queryString = JSON.stringify({
-        conj: "AND",
+        conj: "a",
         props: [
           {
             field: "data.attributes.materialSampleName",
@@ -263,7 +270,7 @@ describe("queryUtils", () => {
         id: "mock-uuid",
         type: "group",
         properties: {
-          conjunction: "AND"
+          conjunction: "a"
         },
         children1: [
           {
@@ -289,7 +296,7 @@ describe("queryUtils", () => {
       (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
 
       const queryString = JSON.stringify({
-        conj: "OR",
+        conj: "o",
         props: [
           {
             field: "data.attributes.materialSampleName",
@@ -313,7 +320,7 @@ describe("queryUtils", () => {
         expect.objectContaining({
           type: "group",
           properties: {
-            conjunction: "OR"
+            conjunction: "o"
           },
           children1: expect.arrayContaining([
             expect.objectContaining({
@@ -356,7 +363,7 @@ describe("queryUtils", () => {
       });
 
       const queryString = JSON.stringify({
-        conj: "AND",
+        conj: "a",
         props: [
           {
             field: "data.attributes.managedAttributes",
@@ -372,7 +379,7 @@ describe("queryUtils", () => {
       expect(Utils.loadTree).toHaveBeenCalledWith(
         expect.objectContaining({
           type: "group",
-          properties: { conjunction: "AND" },
+          properties: { conjunction: "a" },
           children1: [
             expect.objectContaining({
               type: "rule",

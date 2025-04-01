@@ -5,6 +5,8 @@ import {
   Utils
 } from "react-awesome-query-builder";
 import { SimpleQueryGroup, SimpleQueryRow } from "./types";
+import { isDynamicFieldType } from "../types";
+import { ManagedAttributeSearchStates } from "../query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 
 /**
  * Function to serialize query tree into a URL-safe string.
@@ -20,16 +22,25 @@ export function serializeQueryTreeToURL(
   const jsonTree = Utils.getTree(queryTree);
   const props: (SimpleQueryRow | null)[] = (jsonTree.children1 as any[])?.map(
     (child) => {
-      if (!child.properties.field) {
+      const field = child.properties.field;
+      if (!field) {
         return null;
       }
 
-      return {
-        field: child.properties.field,
-        operator: child.properties.operator,
-        value: child.properties.value[0] ?? "",
-        type: child.properties.valueType[0] ?? "text"
-      };
+      const operator = child.properties.operator;
+      const value = child.properties.value[0] ?? "";
+      const type = child.properties.valueType[0] ?? "text";
+
+      if (isDynamicFieldType(type)) {
+        return serializeDynamicFields(field, operator, value, type);
+      } else {
+        return {
+          f: field,
+          o: operator,
+          v: value,
+          t: type
+        };
+      }
     }
   );
 
@@ -44,10 +55,72 @@ export function serializeQueryTreeToURL(
   }
 
   const simpleQueryGroup: SimpleQueryGroup = {
-    conj: (jsonTree.properties as GroupProperties)?.conjunction,
-    props: filteredProps
+    c: serializeConjunction(
+      (jsonTree.properties as GroupProperties)?.conjunction
+    ),
+    p: filteredProps
   };
   return JSON.stringify(simpleQueryGroup);
+}
+
+/**
+ * Shortens the conjunction to a single character to save space on the URL.
+ *
+ * @param conjunction "AND" / "OR"
+ * @returns "a" / "o"
+ */
+function serializeConjunction(conjunction: string): string {
+  return conjunction === "OR" ? "o" : "a";
+}
+
+/**
+ * Parses the shortened conjunction back to full form.
+ *
+ * @param shortConj "a" / "o"
+ * @returns "AND" / "OR"
+ */
+function parseConjunction(shortConj: string): string {
+  return shortConj === "o" ? "OR" : "AND";
+}
+
+/**
+ * Handle special dynamic field edge values. If no special case defined here, then just treat it
+ * as a normal field.
+ *
+ * @param field query builder field
+ * @param operator query builder operator (probably noOperator for most)
+ * @param value query builder value (usually a JSON state.)
+ * @param type query builder type
+ * @returns SimpleQueryRow structure.
+ */
+function serializeDynamicFields(
+  field: string,
+  operator: string,
+  value: string,
+  type: string
+): SimpleQueryRow {
+  switch (type) {
+    // Instead of displaying noOperator, take it from the state itself.
+    case "managedAttribute":
+      const managedAttributeStates: ManagedAttributeSearchStates =
+        JSON.parse(value);
+      return {
+        f: field,
+        o: managedAttributeStates.selectedOperator,
+        v: managedAttributeStates.searchValue,
+        t: type,
+        d: managedAttributeStates?.selectedManagedAttribute?.id
+      };
+
+    // Treat all other types as just a string. No special rules.
+    default:
+      return {
+        f: field,
+        o: operator,
+        v: value,
+        t: type
+      };
+  }
 }
 
 // Function to parse query tree from URL
@@ -72,17 +145,17 @@ export function parseQueryTreeFromURL(
 export function generateJsonTreeFromSimpleQueryGroup(
   simpleQueryGroup: SimpleQueryGroup
 ): JsonTree {
-  const children: any = simpleQueryGroup.props.map(
+  const children: any = simpleQueryGroup.p.map(
     (simpleQueryRow: SimpleQueryRow) => {
       return {
         id: Utils.uuid(),
         type: "rule",
         properties: {
-          field: simpleQueryRow.field,
-          operator: simpleQueryRow.operator,
-          value: [simpleQueryRow.value],
+          field: simpleQueryRow.f,
+          operator: simpleQueryRow.o,
+          value: [simpleQueryRow.v],
           valueSrc: ["value"],
-          valueType: [simpleQueryRow.type]
+          valueType: [simpleQueryRow.t]
         }
       };
     }
@@ -91,7 +164,7 @@ export function generateJsonTreeFromSimpleQueryGroup(
     id: Utils.uuid(),
     type: "group",
     properties: {
-      conjunction: simpleQueryGroup.conj
+      conjunction: parseConjunction(simpleQueryGroup.c)
     },
     children1: children
   };
