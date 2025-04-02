@@ -369,24 +369,28 @@ describe("queryUtils", () => {
 
       const result = parseQueryTreeFromURL(queryString);
 
-      expect(Utils.loadTree).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: "group",
-          properties: { conjunction: "AND" },
-          children1: [
-            expect.objectContaining({
-              type: "rule",
-              properties: {
-                field: "data.attributes.managedAttributes",
-                operator: "equals",
-                value: "test value",
-                valueSrc: ["value"],
-                valueType: ["managedAttribute"]
-              }
-            })
-          ]
-        })
-      );
+      expect(Utils.loadTree).toHaveBeenCalledWith({
+        children1: [
+          {
+            id: "mock-uuid",
+            properties: {
+              field: "data.attributes.managedAttributes",
+              operator: "noOperator",
+              value: [
+                '{"searchValue":"test value","selectedOperator":"equals","selectedType":"","preloadId":"0193e571-2d0c-7517-928d-2c19e04bf6cd"}'
+              ],
+              valueSrc: ["value"],
+              valueType: ["managedAttribute"]
+            },
+            type: "rule"
+          }
+        ],
+        id: "mock-uuid", // Mocked above.
+        properties: {
+          conjunction: "AND"
+        },
+        type: "group"
+      });
 
       expect(result).toBe(mockImmutableTree);
     });
