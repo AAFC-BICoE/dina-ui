@@ -7,6 +7,10 @@ import {
 import { SimpleQueryGroup, SimpleQueryRow } from "./types";
 import { isDynamicFieldType } from "../types";
 import { ManagedAttributeSearchStates } from "../query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import { RelationshipPresenceSearchStates } from "../query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
+import { FieldExtensionSearchStates } from "../query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
+import { IdentifierSearchStates } from "../query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
+import { ClassificationSearchStates } from "../query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 
 /**
  * Function to serialize query tree into a URL-safe string.
@@ -87,6 +91,8 @@ function parseConjunction(shortConj: string): string {
  * Handle special dynamic field edge values. If no special case defined here, then just treat it
  * as a normal field.
  *
+ * Instead of displaying noOperator, take it from the state itself.
+ *
  * @param field query builder field
  * @param operator query builder operator (probably noOperator for most)
  * @param value query builder value (usually a JSON state.)
@@ -100,7 +106,7 @@ function serializeDynamicFields(
   type: string
 ): SimpleQueryRow {
   switch (type) {
-    // Instead of displaying noOperator, take it from the state itself.
+    // Managed Attributes
     case "managedAttribute":
       const managedAttributeStates: ManagedAttributeSearchStates =
         JSON.parse(value);
@@ -110,6 +116,52 @@ function serializeDynamicFields(
         v: managedAttributeStates.searchValue,
         t: type,
         d: managedAttributeStates?.selectedManagedAttribute?.id
+      };
+
+    // Field Extensions
+    case "fieldExtension":
+      const fieldExtensionStates: FieldExtensionSearchStates =
+        JSON.parse(value);
+      return {
+        f: field,
+        o: fieldExtensionStates.selectedOperator,
+        v: fieldExtensionStates.searchValue,
+        t: type,
+        d: fieldExtensionStates.selectedExtension,
+        d2: fieldExtensionStates.selectedField
+      };
+
+    // Identifiers
+    case "identifier":
+      const identifierStates: IdentifierSearchStates = JSON.parse(value);
+      return {
+        f: field,
+        o: identifierStates.selectedOperator,
+        v: identifierStates.searchValue,
+        t: type,
+        d: identifierStates?.selectedIdentifier?.id
+      };
+
+    case "classification":
+      const classificationStates: ClassificationSearchStates =
+        JSON.parse(value);
+      return {
+        f: field,
+        o: classificationStates.selectedOperator,
+        v: classificationStates.searchValue,
+        t: type,
+        d: classificationStates.selectedClassificationRank
+      };
+
+    // Relationship Presence
+    case "relationshipPresence":
+      const relationshipPresenceStates: RelationshipPresenceSearchStates =
+        JSON.parse(value);
+      return {
+        f: field,
+        o: relationshipPresenceStates.selectedOperator,
+        v: relationshipPresenceStates.selectedRelationship,
+        t: type
       };
 
     // Treat all other types as just a string. No special rules.
@@ -183,8 +235,6 @@ export function generateJsonTreeFromSimpleQueryGroup(
  */
 function parseDynamicFields(simpleQueryRow: SimpleQueryRow): any {
   switch (simpleQueryRow.t) {
-    // Generate request
-
     // For managedAttribute type, reconstruct the state object
     case "managedAttribute":
       // Create the managedAttribute state object
@@ -211,6 +261,7 @@ function parseDynamicFields(simpleQueryRow: SimpleQueryRow): any {
 
     // For all other dynamic field types
     default:
+      console.warn("Unsupported dynamic field for query URL parsing...");
       return {
         id: Utils.uuid(),
         type: "rule",

@@ -1,6 +1,10 @@
 import { Utils } from "react-awesome-query-builder";
 import { parseQueryTreeFromURL, serializeQueryTreeToURL } from "../queryUtils";
 import { ManagedAttributeSearchStates } from "../../query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import { FieldExtensionSearchStates } from "../../query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
+import { IdentifierSearchStates } from "../../query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
+import { ClassificationSearchStates } from "../../query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
+import { RelationshipPresenceSearchStates } from "../../query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
 
 // Mock the react-awesome-query-builder module
 jest.mock("react-awesome-query-builder", () => ({
@@ -98,50 +102,214 @@ describe("queryUtils", () => {
       expect(result).toEqual(expected);
     });
 
-    it("Should correctly serialize managed attribute rule", () => {
-      const managedAttributeStates: ManagedAttributeSearchStates = {
-        searchValue: "Test",
-        selectedOperator: "exactMatch",
-        selectedType: "STRING",
-        selectedManagedAttribute: {
-          id: "0193e571-2d0c-7517-928d-2c19e04bf6cd",
-          key: "test-1",
-          name: "test",
-          type: "managed-attribute",
-          vocabularyElementType: "STRING"
-        }
-      };
+    describe("Dynamic Field type special cases", () => {
+      it("Should correctly serialize managed attribute rule", () => {
+        const managedAttributeStates: ManagedAttributeSearchStates = {
+          searchValue: "Test",
+          selectedOperator: "exactMatch",
+          selectedType: "STRING",
+          selectedManagedAttribute: {
+            id: "0193e571-2d0c-7517-928d-2c19e04bf6cd",
+            key: "test-1",
+            name: "test",
+            type: "managed-attribute",
+            vocabularyElementType: "STRING"
+          }
+        };
 
-      const mockJsonTree = {
-        properties: { conjunction: "AND" },
-        children1: [
-          {
-            properties: {
-              field: "data.attributes.managedAttributes",
-              operator: "noOperator",
-              value: [JSON.stringify(managedAttributeStates)],
-              valueType: ["managedAttribute"]
+        const mockJsonTree = {
+          properties: { conjunction: "AND" },
+          children1: [
+            {
+              properties: {
+                field: "data.attributes.managedAttributes",
+                operator: "noOperator",
+                value: [JSON.stringify(managedAttributeStates)],
+                valueType: ["managedAttribute"]
+              }
             }
-          }
-        ]
-      };
-      (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
+          ]
+        };
+        (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
 
-      const expected = JSON.stringify({
-        c: "a",
-        p: [
-          {
-            f: "data.attributes.managedAttributes",
-            o: "exactMatch",
-            v: managedAttributeStates.searchValue,
-            t: "managedAttribute",
-            d: managedAttributeStates?.selectedManagedAttribute?.id
-          }
-        ]
+        const expected = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.attributes.managedAttributes",
+              o: "exactMatch",
+              v: managedAttributeStates.searchValue,
+              t: "managedAttribute",
+              d: managedAttributeStates?.selectedManagedAttribute?.id
+            }
+          ]
+        });
+
+        const result = serializeQueryTreeToURL({} as any);
+        expect(result).toEqual(expected);
       });
 
-      const result = serializeQueryTreeToURL({} as any);
-      expect(result).toEqual(expected);
+      it("Should correctly serialize field extension rule", () => {
+        const fieldExtensionStates: FieldExtensionSearchStates = {
+          searchValue: "Extension value",
+          selectedOperator: "contains",
+          selectedField: "field-test",
+          selectedExtension: "package-test"
+        };
+
+        const mockJsonTree = {
+          properties: { conjunction: "AND" },
+          children1: [
+            {
+              properties: {
+                field: "data.attributes.extension",
+                operator: "noOperator",
+                value: [JSON.stringify(fieldExtensionStates)],
+                valueType: ["fieldExtension"]
+              }
+            }
+          ]
+        };
+        (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
+
+        const expected = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.attributes.extension",
+              o: "contains",
+              v: fieldExtensionStates.searchValue,
+              t: "fieldExtension",
+              d: fieldExtensionStates.selectedExtension,
+              d2: fieldExtensionStates.selectedField
+            }
+          ]
+        });
+
+        const result = serializeQueryTreeToURL({} as any);
+        expect(result).toEqual(expected);
+      });
+
+      it("Should correctly serialize identifier rule", () => {
+        const identifierStates: IdentifierSearchStates = {
+          searchValue: "ID123456",
+          selectedOperator: "startsWith",
+          selectedType: "STRING",
+          selectedIdentifier: {
+            type: "identifier-type",
+            id: "cc5b8bdc-52b8-41b7-ac5a-8e633034fb15",
+            vocabularyElementType: "STRING"
+          }
+        };
+
+        const mockJsonTree = {
+          properties: { conjunction: "AND" },
+          children1: [
+            {
+              properties: {
+                field: "data.attributes.identifiers",
+                operator: "noOperator",
+                value: [JSON.stringify(identifierStates)],
+                valueType: ["identifier"]
+              }
+            }
+          ]
+        };
+        (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
+
+        const expected = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.attributes.identifiers",
+              o: "startsWith",
+              v: identifierStates.searchValue,
+              t: "identifier",
+              d: identifierStates?.selectedIdentifier?.id
+            }
+          ]
+        });
+
+        const result = serializeQueryTreeToURL({} as any);
+        expect(result).toEqual(expected);
+      });
+
+      it("Should correctly serialize classification rule", () => {
+        const classificationStates: ClassificationSearchStates = {
+          searchValue: "Mammalia",
+          selectedOperator: "exactMatch",
+          selectedClassificationRank: "class"
+        };
+
+        const mockJsonTree = {
+          properties: { conjunction: "AND" },
+          children1: [
+            {
+              properties: {
+                field: "data.attributes.classification",
+                operator: "noOperator",
+                value: [JSON.stringify(classificationStates)],
+                valueType: ["classification"]
+              }
+            }
+          ]
+        };
+        (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
+
+        const expected = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.attributes.classification",
+              o: "exactMatch",
+              v: classificationStates.searchValue,
+              t: "classification",
+              d: classificationStates.selectedClassificationRank
+            }
+          ]
+        });
+
+        const result = serializeQueryTreeToURL({} as any);
+        expect(result).toEqual(expected);
+      });
+
+      it("Should correctly serialize relationship presence rule", () => {
+        const relationshipPresenceStates: RelationshipPresenceSearchStates = {
+          selectedOperator: "exists",
+          selectedRelationship: "collecting-event",
+          selectedValue: 0 // Future use.
+        };
+
+        const mockJsonTree = {
+          properties: { conjunction: "AND" },
+          children1: [
+            {
+              properties: {
+                field: "data.relationships",
+                operator: "noOperator",
+                value: [JSON.stringify(relationshipPresenceStates)],
+                valueType: ["relationshipPresence"]
+              }
+            }
+          ]
+        };
+        (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
+
+        const expected = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.relationships",
+              o: "exists",
+              v: relationshipPresenceStates.selectedRelationship,
+              t: "relationshipPresence"
+            }
+          ]
+        });
+
+        const result = serializeQueryTreeToURL({} as any);
+        expect(result).toEqual(expected);
+      });
     });
 
     it("Should use default values for missing value and type", () => {

@@ -21,4 +21,7 @@ export interface SimpleQueryRow {
 
   // Dynamic field identifier (UUID for example if managed attribute)
   d?: string;
+
+  // Dynamic field identifier 2 (Useful for field extensions)
+  d2?: string;
 }
