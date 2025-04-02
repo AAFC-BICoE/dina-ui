@@ -47,7 +47,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'yarn'
+ #         cache: 'yarn'
+      - name: Enable Corepack
+        run: corepack enable
       - run: yarn install
       - name: Run all tests in chunk
         run: echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npx jest
@@ -63,8 +65,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'yarn'
+ #         cache: 'yarn'
 
+      - name: Enable Corepack
+        run: corepack enable
       - name: Install
         run: |
           yarn install
