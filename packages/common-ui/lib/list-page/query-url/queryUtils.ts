@@ -188,16 +188,11 @@ function parseDynamicFields(simpleQueryRow: SimpleQueryRow): any {
     // For managedAttribute type, reconstruct the state object
     case "managedAttribute":
       // Create the managedAttribute state object
-      const managedAttributeState: any = {
+      const managedAttributeState: ManagedAttributeSearchStates = {
         searchValue: simpleQueryRow.v,
         selectedOperator: simpleQueryRow.o,
-        selectedType: "PICK_LIST", // Default as it's not stored in URL
-        selectedManagedAttribute: {
-          id: simpleQueryRow.d,
-          type: "managed-attribute"
-          // Only storing the ID in URL to keep it compact
-          // Other fields will be populated when needed from the backend
-        }
+        selectedType: "",
+        preloadId: simpleQueryRow.d
       };
 
       return {
