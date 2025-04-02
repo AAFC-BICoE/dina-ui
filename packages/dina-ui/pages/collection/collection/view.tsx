@@ -9,17 +9,18 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 export default function CollectionDetailsPage() {
   const buildQueryTree = (name: string) => {
     return {
-      conj: "AND",
-      props: [
+      c: "AND",
+      p: [
         {
-          field: "collection.name",
-          operator: "equals",
-          value: name,
-          type: "autoComplete"
+          f: "collection.name",
+          o: "equals",
+          v: name,
+          t: "autoComplete"
         }
       ]
     };
   };
+
   return (
     <ViewPageLayout<Collection>
       form={(props) => (
@@ -44,7 +45,7 @@ export default function CollectionDetailsPage() {
               }
               passHref={true}
             >
-              <a class="btn btn-info">
+              <a className="btn btn-info">
                 <DinaMessage id="viewMaterialSamplesInCollection" />
               </a>
             </Link>
