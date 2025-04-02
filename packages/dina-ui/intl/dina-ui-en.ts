@@ -1222,5 +1222,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   visibleToEveryone: "Visible to everyone",
   fileNameAliasField: "File Name Alias Field",
   downloadTemplate: "Download Template",
-  existingTemplates: "Existing Templates"
+  existingTemplates: "Existing Templates",
+  viewMaterialSamplesInCollection: "View material samples in this collection"
 };
