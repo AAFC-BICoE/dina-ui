@@ -20,7 +20,7 @@ describe("queryUtils", () => {
     it("Should correctly serialize a basic query tree", () => {
       // Set up the mock to return a simple JSON tree
       const mockJsonTree = {
-        properties: { conjunction: "a" },
+        properties: { conjunction: "AND" },
         children1: [
           {
             properties: {
@@ -54,7 +54,7 @@ describe("queryUtils", () => {
 
     it("Should correctly serialize a query tree with multiple rules", () => {
       const mockJsonTree = {
-        properties: { conjunction: "o" },
+        properties: { conjunction: "OR" },
         children1: [
           {
             properties: {
@@ -113,7 +113,7 @@ describe("queryUtils", () => {
       };
 
       const mockJsonTree = {
-        properties: { conjunction: "a" },
+        properties: { conjunction: "AND" },
         children1: [
           {
             properties: {
@@ -146,7 +146,7 @@ describe("queryUtils", () => {
 
     it("Should use default values for missing value and type", () => {
       const mockJsonTree = {
-        properties: { conjunction: "a" },
+        properties: { conjunction: "AND" },
         children1: [
           {
             properties: {
@@ -178,7 +178,7 @@ describe("queryUtils", () => {
 
     it("Should return null if a rule is missing a field", () => {
       const mockJsonTree = {
-        properties: { conjunction: "a" },
+        properties: { conjunction: "AND" },
         children1: [
           {
             properties: {
@@ -198,7 +198,7 @@ describe("queryUtils", () => {
 
     it("Should return null if some rules have fields and others don't", () => {
       const mockJsonTree = {
-        properties: { conjunction: "a" },
+        properties: { conjunction: "AND" },
         children1: [
           {
             properties: {
@@ -226,14 +226,14 @@ describe("queryUtils", () => {
 
     it("Should handle an empty query tree (no children)", () => {
       const mockJsonTree = {
-        properties: { conjunction: "a" },
+        properties: { conjunction: "AND" },
         children1: []
       };
       (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
 
       const expected = JSON.stringify({
-        conj: "a",
-        props: []
+        c: "a",
+        p: []
       });
 
       const result = serializeQueryTreeToURL({} as any);
@@ -252,13 +252,13 @@ describe("queryUtils", () => {
       (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
 
       const queryString = JSON.stringify({
-        conj: "a",
-        props: [
+        c: "a",
+        p: [
           {
-            field: "data.attributes.materialSampleName",
-            operator: "exactMatch",
-            value: "Sample1",
-            type: "text"
+            f: "data.attributes.materialSampleName",
+            o: "exactMatch",
+            v: "Sample1",
+            t: "text"
           }
         ]
       });
@@ -270,7 +270,7 @@ describe("queryUtils", () => {
         id: "mock-uuid",
         type: "group",
         properties: {
-          conjunction: "a"
+          conjunction: "AND"
         },
         children1: [
           {
@@ -296,19 +296,19 @@ describe("queryUtils", () => {
       (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
 
       const queryString = JSON.stringify({
-        conj: "o",
-        props: [
+        c: "o",
+        p: [
           {
-            field: "data.attributes.materialSampleName",
-            operator: "exactMatch",
-            value: "Sample1",
-            type: "text"
+            f: "data.attributes.materialSampleName",
+            o: "exactMatch",
+            v: "Sample1",
+            t: "text"
           },
           {
-            field: "data.attributes.barcode",
-            operator: "wildcard",
-            value: "barcode12345",
-            type: "text"
+            f: "data.attributes.barcode",
+            o: "wildcard",
+            v: "barcode12345",
+            t: "text"
           }
         ]
       });
@@ -320,7 +320,7 @@ describe("queryUtils", () => {
         expect.objectContaining({
           type: "group",
           properties: {
-            conjunction: "o"
+            conjunction: "OR"
           },
           children1: expect.arrayContaining([
             expect.objectContaining({
@@ -354,22 +354,15 @@ describe("queryUtils", () => {
       const mockImmutableTree = { id: "mock-complex-tree" };
       (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
 
-      const complexValue = JSON.stringify({
-        searchValue: "x",
-        selectedOperator: "equals",
-        selectedManagedAttribute: {
-          id: "0193e571-2d0c-7517-928d-2c19e04bf6cd"
-        }
-      });
-
       const queryString = JSON.stringify({
-        conj: "a",
-        props: [
+        c: "a",
+        p: [
           {
-            field: "data.attributes.managedAttributes",
-            operator: "noOperator",
-            value: complexValue,
-            type: "managedAttribute"
+            f: "data.attributes.managedAttributes",
+            o: "equals",
+            v: "test value",
+            t: "managedAttribute",
+            d: "0193e571-2d0c-7517-928d-2c19e04bf6cd"
           }
         ]
       });
@@ -379,14 +372,14 @@ describe("queryUtils", () => {
       expect(Utils.loadTree).toHaveBeenCalledWith(
         expect.objectContaining({
           type: "group",
-          properties: { conjunction: "a" },
+          properties: { conjunction: "AND" },
           children1: [
             expect.objectContaining({
               type: "rule",
               properties: {
                 field: "data.attributes.managedAttributes",
-                operator: "noOperator",
-                value: [complexValue],
+                operator: "equals",
+                value: "test value",
                 valueSrc: ["value"],
                 valueType: ["managedAttribute"]
               }

@@ -147,6 +147,11 @@ export function generateJsonTreeFromSimpleQueryGroup(
 ): JsonTree {
   const children: any = simpleQueryGroup.p.map(
     (simpleQueryRow: SimpleQueryRow) => {
+      // Handle dynamic field specific, they are stored differently.
+      if (isDynamicFieldType(simpleQueryRow.t)) {
+        return parseDynamicFields(simpleQueryRow);
+      }
+
       return {
         id: Utils.uuid(),
         type: "rule",
@@ -168,4 +173,59 @@ export function generateJsonTreeFromSimpleQueryGroup(
     },
     children1: children
   };
+}
+
+/**
+ * Parse the simplified dynamic fields back to their original format
+ *
+ * @param simpleQueryRow The simplified query row to parse
+ * @returns A JsonTree rule node
+ */
+function parseDynamicFields(simpleQueryRow: SimpleQueryRow): any {
+  switch (simpleQueryRow.t) {
+    // Generate request
+
+    // For managedAttribute type, reconstruct the state object
+    case "managedAttribute":
+      // Create the managedAttribute state object
+      const managedAttributeState: any = {
+        searchValue: simpleQueryRow.v,
+        selectedOperator: simpleQueryRow.o,
+        selectedType: "PICK_LIST", // Default as it's not stored in URL
+        selectedManagedAttribute: {
+          id: simpleQueryRow.d,
+          type: "managed-attribute"
+          // Only storing the ID in URL to keep it compact
+          // Other fields will be populated when needed from the backend
+        }
+      };
+
+      return {
+        id: Utils.uuid(),
+        type: "rule",
+        properties: {
+          field: simpleQueryRow.f,
+          // Always use noOperator for managed attributes in query builder
+          operator: "noOperator",
+          // Serialize the state back to string
+          value: [JSON.stringify(managedAttributeState)],
+          valueSrc: ["value"],
+          valueType: [simpleQueryRow.t]
+        }
+      };
+
+    // For all other dynamic field types
+    default:
+      return {
+        id: Utils.uuid(),
+        type: "rule",
+        properties: {
+          field: simpleQueryRow.f,
+          operator: simpleQueryRow.o,
+          value: [simpleQueryRow.v],
+          valueSrc: ["value"],
+          valueType: [simpleQueryRow.t]
+        }
+      };
+  }
 }
