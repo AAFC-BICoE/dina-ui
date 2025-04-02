@@ -12,7 +12,9 @@ jobs:
         with:
           node-version: '18'
           cache: 'yarn'
-      - run: yarn install 
+      - name: Enable Corepack
+        run: corepack enable
+      - run: yarn install
 
         # Steps being performed here:
         # npx jest --listTests: List all of the available tests.
