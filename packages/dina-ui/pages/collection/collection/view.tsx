@@ -44,7 +44,7 @@ export default function CollectionDetailsPage() {
               }
               passHref={true}
             >
-              <a class="btn btn-info">
+              <a className="btn btn-info">
                 <DinaMessage id="viewMaterialSamplesInCollection" />
               </a>
             </Link>
