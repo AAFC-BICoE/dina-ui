@@ -259,7 +259,93 @@ function parseDynamicFields(simpleQueryRow: SimpleQueryRow): any {
         }
       };
 
-    // For all other dynamic field types
+    // For fieldExtension type, reconstruct the state object
+    case "fieldExtension":
+      const fieldExtensionState: FieldExtensionSearchStates = {
+        searchValue: simpleQueryRow.v,
+        selectedOperator: simpleQueryRow.o,
+        selectedExtension: simpleQueryRow.d ?? "",
+        selectedField: simpleQueryRow.d2 ?? ""
+      };
+
+      return {
+        id: Utils.uuid(),
+        type: "rule",
+        properties: {
+          field: simpleQueryRow.f,
+          operator: "noOperator",
+          value: [JSON.stringify(fieldExtensionState)],
+          valueSrc: ["value"],
+          valueType: [simpleQueryRow.t]
+        }
+      };
+
+    // For identifier type, reconstruct the state object
+    case "identifier":
+      const identifierState: IdentifierSearchStates = {
+        searchValue: simpleQueryRow.v,
+        selectedOperator: simpleQueryRow.o,
+        selectedType: "",
+        selectedIdentifier: {
+          id: simpleQueryRow.d ?? "",
+          type: "identifier-type",
+          vocabularyElementType: "STRING"
+        }
+      };
+
+      return {
+        id: Utils.uuid(),
+        type: "rule",
+        properties: {
+          field: simpleQueryRow.f,
+          operator: "noOperator",
+          value: [JSON.stringify(identifierState)],
+          valueSrc: ["value"],
+          valueType: [simpleQueryRow.t]
+        }
+      };
+
+    // For classification type, reconstruct the state object
+    case "classification":
+      const classificationState: ClassificationSearchStates = {
+        searchValue: simpleQueryRow.v,
+        selectedOperator: simpleQueryRow.o,
+        selectedClassificationRank: simpleQueryRow.d ?? ""
+      };
+
+      return {
+        id: Utils.uuid(),
+        type: "rule",
+        properties: {
+          field: simpleQueryRow.f,
+          operator: "noOperator",
+          value: [JSON.stringify(classificationState)],
+          valueSrc: ["value"],
+          valueType: [simpleQueryRow.t]
+        }
+      };
+
+    // For relationshipPresence type, reconstruct the state object
+    case "relationshipPresence":
+      const relationshipPresenceState: RelationshipPresenceSearchStates = {
+        selectedValue: 0,
+        selectedOperator: simpleQueryRow.o,
+        selectedRelationship: simpleQueryRow.v
+      };
+
+      return {
+        id: Utils.uuid(),
+        type: "rule",
+        properties: {
+          field: simpleQueryRow.f,
+          operator: "noOperator",
+          value: [JSON.stringify(relationshipPresenceState)],
+          valueSrc: ["value"],
+          valueType: [simpleQueryRow.t]
+        }
+      };
+
+    // Log a warning for unsupported dynamic field types
     default:
       console.warn("Unsupported dynamic field for query URL parsing...");
       return {

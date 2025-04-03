@@ -518,49 +518,231 @@ describe("queryUtils", () => {
       expect(result).toBe(mockImmutableTree);
     });
 
-    it("Should parse a query string with managed attributes correctly", () => {
-      const mockImmutableTree = { id: "mock-complex-tree" };
-      (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
+    describe("Dynamic field parsing", () => {
+      it("Should parse a query string with managed attributes correctly", () => {
+        const mockImmutableTree = { id: "mock-complex-tree" };
+        (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
 
-      const queryString = JSON.stringify({
-        c: "a",
-        p: [
-          {
-            f: "data.attributes.managedAttributes",
-            o: "equals",
-            v: "test value",
-            t: "managedAttribute",
-            d: "0193e571-2d0c-7517-928d-2c19e04bf6cd"
-          }
-        ]
+        const queryString = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.attributes.managedAttributes",
+              o: "equals",
+              v: "test value",
+              t: "managedAttribute",
+              d: "0193e571-2d0c-7517-928d-2c19e04bf6cd"
+            }
+          ]
+        });
+
+        const result = parseQueryTreeFromURL(queryString);
+
+        expect(Utils.loadTree).toHaveBeenCalledWith({
+          children1: [
+            {
+              id: "mock-uuid",
+              properties: {
+                field: "data.attributes.managedAttributes",
+                operator: "noOperator",
+                value: [
+                  '{"searchValue":"test value","selectedOperator":"equals","selectedType":"","preloadId":"0193e571-2d0c-7517-928d-2c19e04bf6cd"}'
+                ],
+                valueSrc: ["value"],
+                valueType: ["managedAttribute"]
+              },
+              type: "rule"
+            }
+          ],
+          id: "mock-uuid", // Mocked above.
+          properties: {
+            conjunction: "AND"
+          },
+          type: "group"
+        });
+
+        expect(result).toBe(mockImmutableTree);
       });
 
-      const result = parseQueryTreeFromURL(queryString);
+      it("Should parse a query string with field extensions correctly", () => {
+        const mockImmutableTree = { id: "mock-complex-tree" };
+        (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
 
-      expect(Utils.loadTree).toHaveBeenCalledWith({
-        children1: [
-          {
-            id: "mock-uuid",
-            properties: {
-              field: "data.attributes.managedAttributes",
-              operator: "noOperator",
-              value: [
-                '{"searchValue":"test value","selectedOperator":"equals","selectedType":"","preloadId":"0193e571-2d0c-7517-928d-2c19e04bf6cd"}'
-              ],
-              valueSrc: ["value"],
-              valueType: ["managedAttribute"]
-            },
-            type: "rule"
-          }
-        ],
-        id: "mock-uuid", // Mocked above.
-        properties: {
-          conjunction: "AND"
-        },
-        type: "group"
+        const queryString = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.attributes.extension",
+              o: "contains",
+              v: "Extension value",
+              t: "fieldExtension",
+              d: "package-test",
+              d2: "field-test"
+            }
+          ]
+        });
+
+        const result = parseQueryTreeFromURL(queryString);
+
+        expect(Utils.loadTree).toHaveBeenCalledWith({
+          children1: [
+            {
+              id: "mock-uuid",
+              properties: {
+                field: "data.attributes.extension",
+                operator: "noOperator",
+                value: [
+                  '{"searchValue":"Extension value","selectedOperator":"contains","selectedExtension":"package-test","selectedField":"field-test"}'
+                ],
+                valueSrc: ["value"],
+                valueType: ["fieldExtension"]
+              },
+              type: "rule"
+            }
+          ],
+          id: "mock-uuid", // Mocked above.
+          properties: {
+            conjunction: "AND"
+          },
+          type: "group"
+        });
+
+        expect(result).toBe(mockImmutableTree);
       });
 
-      expect(result).toBe(mockImmutableTree);
+      it("Should parse a query string with identifiers correctly", () => {
+        const mockImmutableTree = { id: "mock-complex-tree" };
+        (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
+
+        const queryString = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.attributes.identifiers",
+              o: "startswith",
+              v: "ID123456",
+              t: "identifier",
+              d: "cc5b8bdc-52b8-41b7-ac5a-8e633034fb15"
+            }
+          ]
+        });
+
+        const result = parseQueryTreeFromURL(queryString);
+
+        expect(Utils.loadTree).toHaveBeenCalledWith({
+          children1: [
+            {
+              id: "mock-uuid",
+              properties: {
+                field: "data.attributes.identifiers",
+                operator: "noOperator",
+                value: [
+                  '{"searchValue":"ID123456","selectedOperator":"startswith","selectedType":"","selectedIdentifier":{"id":"cc5b8bdc-52b8-41b7-ac5a-8e633034fb15","type":"identifier-type","vocabularyElementType":"STRING"}}'
+                ],
+                valueSrc: ["value"],
+                valueType: ["identifier"]
+              },
+              type: "rule"
+            }
+          ],
+          id: "mock-uuid", // Mocked above.
+          properties: {
+            conjunction: "AND"
+          },
+          type: "group"
+        });
+
+        expect(result).toBe(mockImmutableTree);
+      });
+
+      it("Should parse a query string with classifications correctly", () => {
+        const mockImmutableTree = { id: "mock-complex-tree" };
+        (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
+
+        const queryString = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.attributes.classification",
+              o: "exactMatch",
+              v: "Mammalia",
+              t: "classification",
+              d: "class"
+            }
+          ]
+        });
+
+        const result = parseQueryTreeFromURL(queryString);
+
+        expect(Utils.loadTree).toHaveBeenCalledWith({
+          children1: [
+            {
+              id: "mock-uuid",
+              properties: {
+                field: "data.attributes.classification",
+                operator: "noOperator",
+                value: [
+                  '{"searchValue":"Mammalia","selectedOperator":"exactMatch","selectedClassificationRank":"class"}'
+                ],
+                valueSrc: ["value"],
+                valueType: ["classification"]
+              },
+              type: "rule"
+            }
+          ],
+          id: "mock-uuid",
+          properties: {
+            conjunction: "AND"
+          },
+          type: "group"
+        });
+
+        expect(result).toBe(mockImmutableTree);
+      });
+
+      it("Should parse a query string with relationship presence correctly", () => {
+        const mockImmutableTree = { id: "mock-complex-tree" };
+        (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
+
+        const queryString = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.relationships",
+              o: "exists",
+              v: "collecting-event",
+              t: "relationshipPresence"
+            }
+          ]
+        });
+
+        const result = parseQueryTreeFromURL(queryString);
+
+        expect(Utils.loadTree).toHaveBeenCalledWith({
+          children1: [
+            {
+              id: "mock-uuid",
+              properties: {
+                field: "data.relationships",
+                operator: "noOperator",
+                value: [
+                  '{"selectedValue":0,"selectedOperator":"exists","selectedRelationship":"collecting-event"}'
+                ],
+                valueSrc: ["value"],
+                valueType: ["relationshipPresence"]
+              },
+              type: "rule"
+            }
+          ],
+          id: "mock-uuid",
+          properties: {
+            conjunction: "AND"
+          },
+          type: "group"
+        });
+
+        expect(result).toBe(mockImmutableTree);
+      });
     });
 
     it("Should return null if queryParam is undefined", () => {
