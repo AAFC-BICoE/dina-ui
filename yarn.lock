@@ -271,7 +271,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.24.6"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.1", "@babel/runtime@^7.11.1", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.16", "@babel/runtime@^7.14.0", "@babel/runtime@^7.15.4", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.6", "@babel/runtime@^7.2.0", "@babel/runtime@^7.20.13", "@babel/runtime@^7.21.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.1.2", "@babel/runtime@^7.10.1", "@babel/runtime@^7.11.1", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.16", "@babel/runtime@^7.14.0", "@babel/runtime@^7.15.4", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.6", "@babel/runtime@^7.2.0", "@babel/runtime@^7.20.13", "@babel/runtime@^7.21.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   version "7.24.6"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.24.6.tgz#5b76eb89ad45e2e4a0a8db54c456251469a3358e"
   integrity sha512-Ja18XcETdEl5mzzACGd+DKgaGJzPTCow7EglgwTmHdwokzDFYh/MHua6lU6DV/hjF2IaOJ4oX2nqnjG7RElKOw==
@@ -2337,8 +2337,8 @@ commander@~3.0.2:
     flat "^5.0.2"
     formik "^2.2.7"
     keycloak-js "21.1.2"
-    kitsu "7.0.4"
-    kitsu-core "7.0.4"
+    kitsu "8.3.1"
+    kitsu-core "8.3.1"
     lodash "^4.17.21"
     lru-cache "^6.0.0"
     mathjs "^10.0.0"
@@ -4970,24 +4970,18 @@ keyv@^4.5.4:
   dependencies:
     json-buffer "3.0.1"
 
-kitsu-core@7.0.4:
-  version "7.0.4"
-  resolved "https://registry.yarnpkg.com/kitsu-core/-/kitsu-core-7.0.4.tgz#446710b45f2ea2b3fb3857e709bc2647d42890bc"
-  integrity sha512-aOaZnA36i/j8ba1oitI2UHeucYEM0Y3VWif0VENBpoNLmJnvLKOJfcXd0p6yJoOr4TMb26Ad3VDNKdtRcThq+w==
+kitsu-core@8.3.1, kitsu-core@^8.3.1:
+  version "8.3.1"
+  resolved "https://registry.yarnpkg.com/kitsu-core/-/kitsu-core-8.3.1.tgz#89b8848694c371afca38d81333e4225fdf77cb33"
+  integrity sha512-Zf3sqz//9C8Kq9LVoBP4D8dQpaeeDqM+TWO38y/emmr3JiHMz3fNlDva5IK0bchsU3AshtXD5Z83FZxnLglkig==
 
-kitsu-core@^7.0.4:
-  version "7.2.2"
-  resolved "https://registry.yarnpkg.com/kitsu-core/-/kitsu-core-7.2.2.tgz#2140389a20e13062e9f58e247d8f045a79099105"
-  integrity sha512-DSSc1+lPYKaIUlnVsQse4pe/kryO1wvOzXOn+1ESGSg1b5zbNiZoySLd5QrZJX5hhK4cZRMYlRZIhRgBH4Bg2w==
-
-kitsu@7.0.4:
-  version "7.0.4"
-  resolved "https://registry.yarnpkg.com/kitsu/-/kitsu-7.0.4.tgz#e08602687dc3e3d8d22753e239bda655b38adeb1"
-  integrity sha512-vkPMC3RwSokyqFyGrX1nUpWq4Pz0Q7gi8fTHuYxxspVqUWguaZgc8Iq60pvGQkthuB2GLv24ZHZng0ZnpsP++w==
+kitsu@8.3.1:
+  version "8.3.1"
+  resolved "https://registry.yarnpkg.com/kitsu/-/kitsu-8.3.1.tgz#9c1e8fedd59eb2ce3569b6605bd6e472d45c9301"
+  integrity sha512-0JKkSgh1I1umq7VH4TXcxQpz4R0VijB2g4nWxBXy+B/5CLLVocmlkcEW8eylVx7A2u0misjn+t8baEGLLrwOVQ==
   dependencies:
-    "@babel/runtime" "^7.0.0"
     axios "^0.19.0"
-    kitsu-core "^7.0.4"
+    kitsu-core "^8.3.1"
     pluralize "^8.0.0"
 
 kleur@^3.0.3:
