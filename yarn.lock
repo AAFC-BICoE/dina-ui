@@ -271,7 +271,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.24.6"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.1", "@babel/runtime@^7.11.1", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.16", "@babel/runtime@^7.14.0", "@babel/runtime@^7.15.4", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.6", "@babel/runtime@^7.2.0", "@babel/runtime@^7.20.13", "@babel/runtime@^7.21.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.1.2", "@babel/runtime@^7.10.1", "@babel/runtime@^7.11.1", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.16", "@babel/runtime@^7.14.0", "@babel/runtime@^7.15.4", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.6", "@babel/runtime@^7.2.0", "@babel/runtime@^7.20.13", "@babel/runtime@^7.21.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   version "7.24.6"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.24.6.tgz#5b76eb89ad45e2e4a0a8db54c456251469a3358e"
   integrity sha512-Ja18XcETdEl5mzzACGd+DKgaGJzPTCow7EglgwTmHdwokzDFYh/MHua6lU6DV/hjF2IaOJ4oX2nqnjG7RElKOw==
@@ -1799,7 +1799,7 @@ axios-extensions@^3.1.3:
     tslib "^2.1.0"
     util "^0.12.3"
 
-axios@1.7.7, axios@^0.19.0:
+axios@1.7.7:
   version "1.7.7"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.7.tgz#2f554296f9892a72ac8d8e4c5b79c14a91d0a47f"
   integrity sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==
@@ -1808,7 +1808,7 @@ axios@1.7.7, axios@^0.19.0:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
-axios@^0.21.1:
+axios@^0.19.0, axios@^0.21.1:
   version "0.21.4"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
   integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
@@ -2337,8 +2337,8 @@ commander@~3.0.2:
     flat "^5.0.2"
     formik "^2.2.7"
     keycloak-js "21.1.2"
-    kitsu "7.0.4"
-    kitsu-core "7.0.4"
+    kitsu "8.3.1"
+    kitsu-core "8.3.1"
     lodash "^4.17.21"
     lru-cache "^6.0.0"
     mathjs "^10.0.0"
@@ -3491,12 +3491,13 @@ form-data@^3.0.0:
     mime-types "^2.1.12"
 
 form-data@^4.0.0:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.1.tgz#ba1076daaaa5bfd7e99c1a6cb02aa0a5cff90d48"
-  integrity sha512-tzN8e4TX8+kkxGPK8D5u0FNmjPUjw3lwC9lSLxxoB/+GtsJG91CO8bSWy73APlgAZzZbXEYZJuxjkHH2w+Ezhw==
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.2.tgz#35cabbdd30c3ce73deb2c42d3c8d3ed9ca51794c"
+  integrity sha512-hGfm/slu0ZabnNt4oaRZ6uREyfCj6P4fT/n6A1rGV+Z0VdGXjfOhVUpkn6qVQONHGIFwmveGXyDs75+nr6FM8w==
   dependencies:
     asynckit "^0.4.0"
     combined-stream "^1.0.8"
+    es-set-tostringtag "^2.1.0"
     mime-types "^2.1.12"
 
 formik@^2.2.7:
@@ -4970,24 +4971,18 @@ keyv@^4.5.4:
   dependencies:
     json-buffer "3.0.1"
 
-kitsu-core@7.0.4:
-  version "7.0.4"
-  resolved "https://registry.yarnpkg.com/kitsu-core/-/kitsu-core-7.0.4.tgz#446710b45f2ea2b3fb3857e709bc2647d42890bc"
-  integrity sha512-aOaZnA36i/j8ba1oitI2UHeucYEM0Y3VWif0VENBpoNLmJnvLKOJfcXd0p6yJoOr4TMb26Ad3VDNKdtRcThq+w==
+kitsu-core@8.3.1, kitsu-core@^8.3.1:
+  version "8.3.1"
+  resolved "https://registry.yarnpkg.com/kitsu-core/-/kitsu-core-8.3.1.tgz#89b8848694c371afca38d81333e4225fdf77cb33"
+  integrity sha512-Zf3sqz//9C8Kq9LVoBP4D8dQpaeeDqM+TWO38y/emmr3JiHMz3fNlDva5IK0bchsU3AshtXD5Z83FZxnLglkig==
 
-kitsu-core@^7.0.4:
-  version "7.2.2"
-  resolved "https://registry.yarnpkg.com/kitsu-core/-/kitsu-core-7.2.2.tgz#2140389a20e13062e9f58e247d8f045a79099105"
-  integrity sha512-DSSc1+lPYKaIUlnVsQse4pe/kryO1wvOzXOn+1ESGSg1b5zbNiZoySLd5QrZJX5hhK4cZRMYlRZIhRgBH4Bg2w==
-
-kitsu@7.0.4:
-  version "7.0.4"
-  resolved "https://registry.yarnpkg.com/kitsu/-/kitsu-7.0.4.tgz#e08602687dc3e3d8d22753e239bda655b38adeb1"
-  integrity sha512-vkPMC3RwSokyqFyGrX1nUpWq4Pz0Q7gi8fTHuYxxspVqUWguaZgc8Iq60pvGQkthuB2GLv24ZHZng0ZnpsP++w==
+kitsu@8.3.1:
+  version "8.3.1"
+  resolved "https://registry.yarnpkg.com/kitsu/-/kitsu-8.3.1.tgz#9c1e8fedd59eb2ce3569b6605bd6e472d45c9301"
+  integrity sha512-0JKkSgh1I1umq7VH4TXcxQpz4R0VijB2g4nWxBXy+B/5CLLVocmlkcEW8eylVx7A2u0misjn+t8baEGLLrwOVQ==
   dependencies:
-    "@babel/runtime" "^7.0.0"
     axios "^0.19.0"
-    kitsu-core "^7.0.4"
+    kitsu-core "^8.3.1"
     pluralize "^8.0.0"
 
 kleur@^3.0.3:
@@ -5382,9 +5377,9 @@ ms@^2.1.1, ms@^2.1.3:
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
 nan@^2.17.0:
-  version "2.22.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.22.0.tgz#31bc433fc33213c97bad36404bb68063de604de3"
-  integrity sha512-nbajikzWTMwsW+eSsNm3QwlOs7het9gGJU5dDZzRTQGk03vyBOauxgI4VakDzE0PtsGTmXPsXTbbjVhRwR5mpw==
+  version "2.22.2"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.22.2.tgz#6b504fd029fb8f38c0990e52ad5c26772fdacfbb"
+  integrity sha512-DANghxFkS1plDdRsX0X9pm0Z6SJNN6gBdtXfanwoZ8hooC5gosGFSBGRYHUVPz1asKA/kMRqDRdHrluZ61SpBQ==
 
 nanoclone@^0.2.1:
   version "0.2.1"
@@ -6748,7 +6743,12 @@ semver@^7.3.2, semver@^7.5.3:
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.2.tgz#1e3b34759f896e8f14d6134732ce798aeb0c6e13"
   integrity sha512-FNAIBWCx9qcRhoHcgcJ0gvU7SN1lYU2ZXuSfl04bSC5OpvDHFyJCjdNHomPXxjQlCBU67YW64PzY7/VIEH7F2w==
 
-semver@^7.3.5, semver@^7.6.0:
+semver@^7.3.5:
+  version "7.7.1"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.1.tgz#abd5098d82b18c6c81f6074ff2647fd3e7220c9f"
+  integrity sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==
+
+semver@^7.6.0:
   version "7.6.3"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.3.tgz#980f7b5550bc175fb4dc09403085627f9eb33143"
   integrity sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==
