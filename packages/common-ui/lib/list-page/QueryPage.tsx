@@ -279,6 +279,12 @@ export interface QueryPageProps<TData extends KitsuResource> {
   customViewQuery?: JsonTree;
 
   /**
+   * When using the custom query builder, should the groups be filtered by the logged in users
+   * assigned groups?
+   */
+  customViewFilterGroups?: boolean;
+
+  /**
    * Custom elastic search query to use.
    */
   customViewElasticSearchQuery?: any;
@@ -339,6 +345,7 @@ export function QueryPage<TData extends KitsuResource>({
   onSortedChange,
   viewMode,
   customViewQuery,
+  customViewFilterGroups = true,
   customViewElasticSearchQuery,
   customViewFields,
   rowStyling,
@@ -535,7 +542,7 @@ export function QueryPage<TData extends KitsuResource>({
     queryDSL = applyRootQuery(queryDSL);
 
     // Custom queries should not be adding the group.
-    if (!customViewElasticSearchQuery) {
+    if (!customViewElasticSearchQuery && customViewFilterGroups) {
       queryDSL = applyGroupFilters(queryDSL, groups);
     }
 
