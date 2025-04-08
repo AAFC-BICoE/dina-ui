@@ -19,6 +19,12 @@ import { SmallThumbnail } from "../../table/thumbnail-cell";
 import { Metadata } from "../../../types/objectstore-api";
 import Kitsu from "kitsu";
 import { handleDownloadLink } from "../object-store-utils";
+import { pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
 
 export type DownLoadLinks = {
   original?: string;
