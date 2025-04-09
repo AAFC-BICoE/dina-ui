@@ -161,7 +161,7 @@ export class ApiClientImpl implements ApiClientI {
     // Unwrap the configured axios instance from the Kitsu instance.
     const { axios } = this.apiClient;
 
-    // Perform operations
+    // Do the operations request.
     const axiosResponse = await axios.patch(
       `${apiBaseUrl}/operations`,
       operations,
