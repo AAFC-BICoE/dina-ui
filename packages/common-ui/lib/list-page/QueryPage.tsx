@@ -11,12 +11,7 @@ import React, {
   useRef,
   CSSProperties
 } from "react";
-import {
-  GroupProperties,
-  ImmutableTree,
-  JsonTree,
-  Utils
-} from "react-awesome-query-builder";
+import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
@@ -47,8 +42,7 @@ import {
   QueryBuilderMemo,
   defaultJsonTree,
   defaultQueryTree,
-  emptyQueryTree,
-  generateJsonTreeFromSimpleQueryGroup
+  emptyQueryTree
 } from "./query-builder/QueryBuilder";
 import {
   applyGroupFilters,
@@ -63,12 +57,7 @@ import {
   CustomViewField,
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
-import {
-  DynamicFieldsMappingConfig,
-  SimpleQueryGroup,
-  SimpleQueryRow,
-  TableColumn
-} from "./types";
+import { DynamicFieldsMappingConfig, TableColumn } from "./types";
 import { useSessionStorage } from "usehooks-ts";
 import {
   ValidationError,
@@ -77,6 +66,10 @@ import {
 import { MemoizedReactTable } from "./QueryPageTable";
 import { GroupSelectFieldMemoized } from "./QueryGroupSelection";
 import { useRouter } from "next/router";
+import {
+  parseQueryTreeFromURL,
+  serializeQueryTreeToURL
+} from "./query-url/queryUtils";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -873,67 +866,6 @@ export function QueryPage<TData extends KitsuResource>({
       { shallow: true }
     );
   }, []);
-
-  /**
-   * Function to serialize query tree into a URL-safe string.
-   *
-   * Sub-groups are currently not supported.
-   *
-   * @param queryTree Tree to be serialized.
-   * @returns JSON string or null if cannot be serialized.
-   */
-  function serializeQueryTreeToURL(queryTree: ImmutableTree): string | null {
-    const jsonTree = Utils.getTree(queryTree);
-    const props: (SimpleQueryRow | null)[] = (jsonTree.children1 as any[])?.map(
-      (child) => {
-        if (!child.properties.field) {
-          return null;
-        }
-
-        return {
-          field: child.properties.field,
-          operator: child.properties.operator,
-          value: child.properties.value[0] ?? "",
-          type: child.properties.valueType[0] ?? "text"
-        };
-      }
-    );
-
-    // Filter out null values
-    const filteredProps: SimpleQueryRow[] = props.filter(
-      (item): item is SimpleQueryRow => item !== null
-    );
-
-    // If any null values were found, return null
-    if (filteredProps.length !== props.length) {
-      return null;
-    }
-
-    const simpleQueryGroup: SimpleQueryGroup = {
-      conj: (jsonTree.properties as GroupProperties)?.conjunction,
-      props: filteredProps
-    };
-    return JSON.stringify(simpleQueryGroup);
-  }
-
-  // Function to parse query tree from URL
-  function parseQueryTreeFromURL(
-    queryParam: string | undefined
-  ): ImmutableTree | null {
-    if (!queryParam) return null;
-
-    try {
-      const parsedSimpleQueryGroup: SimpleQueryGroup = JSON.parse(queryParam);
-      const parsedJsonTree: JsonTree = generateJsonTreeFromSimpleQueryGroup(
-        parsedSimpleQueryGroup
-      );
-      const parsedImmutableTree = Utils.loadTree(parsedJsonTree);
-      return parsedImmutableTree;
-    } catch (error) {
-      console.error("Error parsing query tree:", error);
-      return null;
-    }
-  }
 
   /**
    * On search filter submit. This will also update the pagination to go back to the first page on
