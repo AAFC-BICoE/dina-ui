@@ -188,9 +188,16 @@ export class ApiClientImpl implements ApiClientI {
       };
 
       switch (operation.op.toUpperCase()) {
-        // case "GET":
-        //   responses = [ await this.apiClient.get(url, { headers }) ];
-        //   break;
+        case "GET":
+          const getResponse = await axios.get(url, { headers });
+          responses = [
+            {
+              data: getResponse?.data?.data,
+              included: getResponse?.data?.included,
+              status: getResponse?.status
+            }
+          ];
+          break;
         case "POST":
           const postResponse = await axios.post(
             url,
