@@ -192,21 +192,31 @@ export class ApiClientImpl implements ApiClientI {
         //   responses = [ await this.apiClient.get(url, { headers }) ];
         //   break;
         case "POST":
-          const postPayload = operation.value?.attributes;
-          if (postPayload?.type) {
-            postPayload.type = operation.path;
-          }
+          const postResponse = await axios.post(
+            url,
+            { data: operation.value },
+            { headers }
+          );
           responses = [
-            await this.apiClient.post(url, postPayload, { headers })
+            {
+              data: postResponse?.data?.data,
+              included: postResponse?.data?.included,
+              status: postResponse?.status
+            }
           ];
           break;
         case "PATCH":
-          const patchPayload = operation.value?.attributes;
-          if (patchPayload?.type) {
-            patchPayload.type = operation.path;
-          }
+          const patchResponse = await axios.patch(
+            url,
+            { data: operation.value },
+            { headers }
+          );
           responses = [
-            await this.apiClient.patch(url, patchPayload, { headers })
+            {
+              data: patchResponse?.data?.data,
+              included: patchResponse?.data?.included,
+              status: patchResponse?.status
+            }
           ];
           break;
         case "DELETE":
