@@ -263,6 +263,9 @@ export function ColumnSelector<TData extends KitsuResource>(
 
         const columns = (await Promise.all(promises)).filter(isDefinedColumn);
         setDisplayedColumns(columns);
+
+        setLoading(false);
+        setColumnSelectorLoading?.(false);
       }
     }
 
@@ -290,6 +293,9 @@ export function ColumnSelector<TData extends KitsuResource>(
         if (promises) {
           const columns = (await Promise.all(promises)).filter(isDefinedColumn);
           setDisplayedColumns(columns);
+
+          setLoading(false);
+          setColumnSelectorLoading?.(false);
         }
       }
     }
@@ -297,8 +303,6 @@ export function ColumnSelector<TData extends KitsuResource>(
     // Check if overrides are provided from the saved exports.
     if (overrideDisplayedColumns) {
       loadColumnsFromSavedExport();
-      setLoading(false);
-      setColumnSelectorLoading?.(false);
       return;
     }
 
@@ -306,21 +310,15 @@ export function ColumnSelector<TData extends KitsuResource>(
       !localStorageDisplayedColumns ||
       localStorageDisplayedColumns?.length === 0
     ) {
-      // No local storage to load from, load the default columns in.
-      setDisplayedColumns(defaultColumns ?? []);
-
       // Set the default columns into local storage.
       if (defaultColumns) {
         setLocalStorageDisplayedColumns(
           defaultColumns.map((column) => column?.id ?? "")
         );
       }
-      setLoading(false);
-    } else {
-      loadColumnsFromLocalStorage();
-      setLoading(false);
-      setColumnSelectorLoading?.(false);
     }
+
+    loadColumnsFromLocalStorage();
   }, [
     localStorageDisplayedColumns,
     injectedIndexMapping,
