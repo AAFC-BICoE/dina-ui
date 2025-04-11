@@ -199,6 +199,7 @@ export function GeographySearchBox({
               }
             }}
             value={inputValue}
+            data-testid="geographySearchBox"
           />
         </div>
       </div>
