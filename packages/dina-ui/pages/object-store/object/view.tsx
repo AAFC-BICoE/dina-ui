@@ -126,6 +126,7 @@ export default function MetadataViewPage() {
                       indexName={"dina_material_sample_index"}
                       viewMode={customViewQuery ? true : false}
                       customViewQuery={customViewQuery ?? undefined}
+                      customViewFilterGroups={false}
                       customViewFields={
                         customViewQuery
                           ? [
