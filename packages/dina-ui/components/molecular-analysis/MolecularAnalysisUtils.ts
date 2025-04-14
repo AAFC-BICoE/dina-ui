@@ -1,4 +1,4 @@
-import { KitsuResource, PersistedResource } from "kitsu";
+import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
 import {
   DeleteArgs,
   DoOperationsOptions,
@@ -8,6 +8,11 @@ import {
 } from "../../../common-ui/lib";
 import { GenericMolecularAnalysisItem } from "../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { useState } from "react";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { QualityControl } from "../../types/seqdb-api/resources/QualityControl";
 
 /**
  * Handles deleting molecular analysis workflows and unlinking and deleting any associated relationship resources
@@ -34,7 +39,7 @@ export function useDeleteMolecularAnalysisWorkflows() {
           ]
         })(""),
         include:
-          "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run"
+          "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result"
       });
 
       const genericMolecularAnalysisItems =
@@ -70,6 +75,25 @@ export function useDeleteMolecularAnalysisWorkflows() {
             )
             .filter((id): id is string => id !== undefined);
 
+        const molecularAnalysisRunItems = genericMolecularAnalysisItems.map(
+          (genericMolecularAnalysisItem) =>
+            genericMolecularAnalysisItem.molecularAnalysisRunItem
+        );
+
+        for (const molecularAnalysisRunItem of molecularAnalysisRunItems) {
+          // Delete Quality Controls
+          if (
+            molecularAnalysisRunItem?.usageType ===
+            MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+          ) {
+            await handleDeleteQualityControl(
+              save,
+              molecularAnalysisRunItem,
+              apiClient
+            );
+          }
+        }
+
         // Delete MolecularAnalysisRunItems
         await handeDeleteMolecularAnalysisRunItems(
           save,
@@ -77,7 +101,14 @@ export function useDeleteMolecularAnalysisWorkflows() {
         );
 
         // Delete MolecularAnalysisRun
-        await handleDeleteMolecularAnalysisRun;
+        if (
+          genericMolecularAnalysisItems?.[0]?.molecularAnalysisRunItem?.run?.id
+        ) {
+          await handleDeleteMolecularAnalysisRun(
+            save,
+            genericMolecularAnalysisItems[0].molecularAnalysisRunItem.run.id
+          );
+        }
       }
     }
     const molecularAnlysisDeleteArgs: DeleteArgs[] = resourceIds.map(
@@ -100,6 +131,69 @@ export function useDeleteMolecularAnalysisWorkflows() {
     handleDeleteMolecularAnalysisWorkflows,
     reloadResource
   };
+}
+
+async function handleDeleteQualityControl(
+  save: <TData extends KitsuResource = KitsuResource>(
+    args: (SaveArgs | DeleteArgs)[],
+    options?: DoOperationsOptions
+  ) => Promise<PersistedResource<TData>[]>,
+  molecularAnalysisRunItem: MolecularAnalysisRunItem,
+  apiClient: Kitsu
+) {
+  const qualityControlsQuery = await apiClient.get<QualityControl[]>(
+    `seqdb-api/quality-control`,
+    {
+      filter: filterBy([], {
+        extraFilters: [
+          {
+            selector: "molecularAnalysisRunItem.uuid",
+            comparison: "==",
+            arguments: molecularAnalysisRunItem.id!
+          }
+        ]
+      })(""),
+      include: "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
+    }
+  );
+  const qualityControls = qualityControlsQuery.data;
+  await save(
+    qualityControls.map((item) => ({
+      delete: { id: item?.id ?? "", type: "quality-control" }
+    })),
+    { apiBaseUrl: "/seqdb-api" }
+  );
+
+  await save(
+    qualityControls.map((item) => ({
+      delete: {
+        id: item?.molecularAnalysisRunItem?.id ?? "",
+        type: "molecular-analysis-run-item"
+      }
+    })),
+    { apiBaseUrl: "/seqdb-api" }
+  );
+
+  // Delete molecular analysis results if attachments existed.
+  const resultsToDelete = qualityControls.filter(
+    (item) =>
+      item?.molecularAnalysisRunItem?.result?.attachments &&
+      item?.molecularAnalysisRunItem?.result?.attachments.length > 0 &&
+      item?.molecularAnalysisRunItem?.result?.id
+  );
+  if (resultsToDelete.length > 0) {
+    await save(
+      resultsToDelete.map((item) => {
+        return {
+          delete: {
+            id: item?.molecularAnalysisRunItem?.result?.id ?? "",
+            type: "molecular-analysis-result"
+          }
+        };
+      }),
+      { apiBaseUrl: "/seqdb-api" }
+    );
+  }
 }
 
 /**
