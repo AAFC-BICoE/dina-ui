@@ -227,12 +227,15 @@ export class ApiClientImpl implements ApiClientI {
           ];
           break;
         case "DELETE":
+          const deleteResponse = await axios.delete(url, {
+            headers: {
+              "Content-Type": "application/vnd.api+json"
+            }
+          });
           responses = [
-            await this.apiClient.delete(url, {
-              headers: {
-                "Content-Type": "application/vnd.api+json"
-              }
-            })
+            {
+              status: deleteResponse.status
+            } as any
           ];
           break;
         default:
