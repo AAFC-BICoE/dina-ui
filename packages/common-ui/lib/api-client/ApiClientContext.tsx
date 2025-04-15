@@ -142,7 +142,8 @@ export class ApiClientImpl implements ApiClientI {
         false, // clone data off
         ONE_SECOND, // cleanup interval in ms
         100 // maximum cache entries
-      )
+      ),
+      ttl: ONE_SECOND
     });
 
     // Bind the methods so context consumers can use object destructuring.
