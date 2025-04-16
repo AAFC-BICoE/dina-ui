@@ -316,6 +316,19 @@ export function useCollectingEventSave({
       delete collectingEventDiff.geographicPlaceNameSourceDetail;
     }
 
+    // Handle geographicPlaceNameSourceDetail comparison
+    const initialSourceDetail =
+      collectingEventInitialValues.geographicPlaceNameSourceDetail ?? null;
+    const submittedSourceDetail =
+      submittedValues.geographicPlaceNameSourceDetail ?? null;
+
+    if (!isEqual(initialSourceDetail, submittedSourceDetail)) {
+      (collectingEventDiff.geographicPlaceNameSourceDetail as any) =
+        submittedSourceDetail ?? null;
+    } else {
+      delete collectingEventDiff.geographicPlaceNameSourceDetail;
+    }
+
     delete collectingEventDiff.srcAdminLevels;
     delete collectingEventDiff.selectedSections;
     delete (collectingEventDiff as any).selectAll;
