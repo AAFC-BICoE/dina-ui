@@ -75,23 +75,62 @@ export function useDeleteMolecularAnalysisWorkflows() {
             )
             .filter((id): id is string => id !== undefined);
 
-        const molecularAnalysisRunItems = genericMolecularAnalysisItems.map(
-          (genericMolecularAnalysisItem) =>
-            genericMolecularAnalysisItem.molecularAnalysisRunItem
-        );
-
-        for (const molecularAnalysisRunItem of molecularAnalysisRunItems) {
-          // Delete Quality Controls
-          if (
-            molecularAnalysisRunItem?.usageType ===
-            MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
-          ) {
-            await handleDeleteQualityControl(
-              save,
-              molecularAnalysisRunItem,
-              apiClient
-            );
+        // Retrieve MolecularAnalysisRunItems with Quality Control usageType
+        if (
+          genericMolecularAnalysisItems?.[0]?.molecularAnalysisRunItem?.run?.id
+        ) {
+          const qualityControlItemQuery = await apiClient.get<
+            MolecularAnalysisRunItem[]
+          >(`seqdb-api/molecular-analysis-run-item`, {
+            filter: filterBy([], {
+              extraFilters: [
+                {
+                  selector: "run.uuid",
+                  comparison: "==",
+                  arguments:
+                    genericMolecularAnalysisItems[0].molecularAnalysisRunItem
+                      .run.id
+                },
+                {
+                  selector: "usageType",
+                  comparison: "==",
+                  arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+                }
+              ]
+            })("")
+          });
+          if (qualityControlItemQuery.data.length > 0) {
+            for (const qualityControlItem of qualityControlItemQuery.data) {
+              // Delete Quality Controls
+              if (
+                qualityControlItem?.usageType ===
+                MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+              ) {
+                await handleDeleteQualityControl(
+                  save,
+                  qualityControlItem,
+                  apiClient
+                );
+              }
+            }
           }
+        }
+
+        // Delete molecular analysis results if attachments existed.
+        const resultsToDelete = genericMolecularAnalysisItems.filter(
+          (item) =>
+            item?.molecularAnalysisRunItem?.result?.attachments &&
+            item?.molecularAnalysisRunItem?.result?.attachments.length > 0 &&
+            item?.molecularAnalysisRunItem?.result?.id
+        );
+        const molecularAnalysisResultIds: string[] = resultsToDelete.map(
+          (item) => item.id
+        );
+        if (resultsToDelete.length > 0) {
+          await handleDeleteMolecularAnalysisResult(
+            save,
+            molecularAnalysisResultIds
+          );
         }
 
         // Delete MolecularAnalysisRunItems
@@ -181,19 +220,32 @@ async function handleDeleteQualityControl(
       item?.molecularAnalysisRunItem?.result?.attachments.length > 0 &&
       item?.molecularAnalysisRunItem?.result?.id
   );
+  const molecularAnalysisResultIds: string[] = resultsToDelete.map(
+    (item) => item.id
+  );
   if (resultsToDelete.length > 0) {
-    await save(
-      resultsToDelete.map((item) => {
-        return {
-          delete: {
-            id: item?.molecularAnalysisRunItem?.result?.id ?? "",
-            type: "molecular-analysis-result"
-          }
-        };
-      }),
-      { apiBaseUrl: "/seqdb-api" }
-    );
+    await handleDeleteMolecularAnalysisResult(save, molecularAnalysisResultIds);
   }
+}
+
+async function handleDeleteMolecularAnalysisResult(
+  save: <TData extends KitsuResource = KitsuResource>(
+    args: (SaveArgs | DeleteArgs)[],
+    options?: DoOperationsOptions
+  ) => Promise<PersistedResource<TData>[]>,
+  molecularAnalysisResultIds: string[]
+) {
+  await save(
+    molecularAnalysisResultIds.map((id) => {
+      return {
+        delete: {
+          id: id,
+          type: "molecular-analysis-result"
+        }
+      };
+    }),
+    { apiBaseUrl: "/seqdb-api" }
+  );
 }
 
 /**
