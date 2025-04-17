@@ -367,6 +367,19 @@ export function useCollectingEventSave({
       return collectingEventDiff as PersistedResource<CollectingEvent>;
     }
 
+    // Check if the user has permission to edit the collecting event itself. It can be attached
+    // to the material sample still.
+    const permissionsProvided = submittedValues?.meta?.permissionsProvider;
+    const canEdit = permissionsProvided
+      ? submittedValues?.meta?.permissions?.includes(
+          collectingEventInitialValues.id ? "update" : "create"
+        ) ?? false
+      : true;
+    if (!canEdit) {
+      collectingEventFormik.setFieldValue("id", collectingEventDiff.id);
+      return collectingEventDiff as PersistedResource<CollectingEvent>;
+    }
+
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
         {
