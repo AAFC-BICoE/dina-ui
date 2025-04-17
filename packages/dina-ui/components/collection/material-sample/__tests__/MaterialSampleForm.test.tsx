@@ -39,7 +39,9 @@ function testCollectionEventWithGeographicalPlace(): Partial<CollectingEvent> {
         id: "12345",
         element: "W",
         placeType: "building",
-        name: "Test Building"
+        name: "Test Building",
+        shortId: 0,
+        type: "place-section"
       },
       country: {
         code: "ca",
@@ -2517,6 +2519,7 @@ describe("Material Sample Edit Page", () => {
               resource: {
                 id: "2",
                 type: "collecting-event",
+                geographicPlaceNameSource: null,
                 geographicPlaceNameSourceDetail: null
               },
               type: "collecting-event"

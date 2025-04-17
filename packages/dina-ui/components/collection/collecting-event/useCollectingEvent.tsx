@@ -325,6 +325,13 @@ export function useCollectingEventSave({
     if (!isEqual(initialSourceDetail, submittedSourceDetail)) {
       (collectingEventDiff.geographicPlaceNameSourceDetail as any) =
         submittedSourceDetail ?? null;
+
+      // If being deleted, the source should also be deleted.
+      if (
+        (collectingEventDiff.geographicPlaceNameSourceDetail as any) === null
+      ) {
+        (collectingEventDiff.geographicPlaceNameSource as any) = null;
+      }
     } else {
       delete collectingEventDiff.geographicPlaceNameSourceDetail;
     }
