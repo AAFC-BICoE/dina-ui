@@ -26,7 +26,7 @@ import {
   range,
   find
 } from "lodash";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import {
   BLANK_PREPARATION,
@@ -1122,18 +1122,19 @@ export function useMaterialSampleSave({
     const permissionsProvided = initialValues?.meta?.permissionsProvider;
 
     const canEdit = permissionsProvided
-      ? initialValues?.meta?.permissions?.includes("update") ?? false
+      ? initialValues?.meta?.permissions?.includes(
+          colEvent?.id ? "update" : "create"
+        ) ?? false
       : true;
 
-    const isEditDisabled = colEventFormProps.readOnly || canEdit;
-    const showAlert = canEdit && !colEventFormProps.readOnly;
+    const isEditDisabled = colEventFormProps.readOnly || !canEdit;
+    const showAlert = !canEdit && !colEventFormProps.readOnly;
 
     return (
       <>
         {showAlert && (
           <Alert variant="warning" className="mb-2">
-            You do not have permission to edit this collecting event. All fields
-            are in read-only mode.
+            <DinaMessage id="collectingEventPermissionAlert" />
           </Alert>
         )}
         <DinaForm {...colEventFormProps} readOnly={isEditDisabled} />

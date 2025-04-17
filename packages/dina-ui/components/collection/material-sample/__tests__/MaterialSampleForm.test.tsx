@@ -23,7 +23,11 @@ function testCollectionEvent(): Partial<CollectingEvent> {
     verbatimEventDateTime: "2021-04-13",
     id: "1",
     type: "collecting-event",
-    group: "test group"
+    group: "test group",
+    meta: {
+      permissionsProvider: "GroupAuthorizationService",
+      permissions: ["create", "update", "delete"]
+    }
   };
 }
 
@@ -50,6 +54,19 @@ function testCollectionEventWithGeographicalPlace(): Partial<CollectingEvent> {
       recordedOn: "2022-03-02T17:41:53.968198Z",
       type: ""
     }
+  };
+}
+
+function testCollectionEventWithPermissions(): Partial<CollectingEvent> {
+  return {
+    id: "3",
+    type: "collecting-event",
+    group: "test group",
+    meta: {
+      permissionsProvider: "GroupAuthorizationService",
+      permissions: []
+    },
+    startEventDateTime: "2025-05-19"
   };
 }
 
@@ -101,11 +118,11 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
     case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol":
-      // Populate the linker table:
       return { data: testCollectionEvent() };
     case "collection-api/collecting-event/2?include=collectors,attachment,collectionMethod,protocol":
-      // Populate the linker table:
       return { data: testCollectionEventWithGeographicalPlace() };
+    case "collection-api/collecting-event/3?include=collectors,attachment,collectionMethod,protocol":
+      return { data: testCollectionEventWithPermissions() };
     case "collection-api/material-sample/1":
       return { data: testMaterialSample() };
     case "collection-api/material-sample":
@@ -2187,6 +2204,43 @@ describe("Material Sample Edit Page", () => {
     // Attributes 2 and 3 are visible and empty:
     expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
     expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
+  });
+
+  describe("Collecting event permissions", () => {
+    it("Display alert if user does not have access to edit the collecting event", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            id: "333",
+            group: "test-group",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "3",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await new Promise(setImmediate);
+
+      // Ensure the alert is displayed
+      expect(
+        wrapper.getByText(
+          /you do not have permission to edit this collecting event/i
+        )
+      ).toBeInTheDocument();
+
+      // Ensure the collecting event fields are disabled
+      const collectingEventFields = wrapper.container.querySelectorAll(
+        ".collecting-event-field input, .collecting-event-field select"
+      );
+      collectingEventFields.forEach((field) => {
+        expect(field).toBeDisabled();
+      });
+    });
   });
 
   describe("hostOrganism", () => {
