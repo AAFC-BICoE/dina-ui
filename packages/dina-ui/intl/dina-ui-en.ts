@@ -114,6 +114,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
+  collectingEventPermissionAlert:
+    "You do not have permission to edit this collecting event. All fields are in read-only mode.",
   collection: "Collection",
   collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
