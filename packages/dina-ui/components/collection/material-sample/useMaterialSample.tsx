@@ -59,6 +59,7 @@ import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
 import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { Alert } from "react-bootstrap";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet, apiClient } = useApiClient();
@@ -1117,7 +1118,27 @@ export function useMaterialSampleSave({
       )
     };
 
-    return <DinaForm {...colEventFormProps} />;
+    // Check the request to see if a permission provider is present.
+    const permissionsProvided = initialValues?.meta?.permissionsProvider;
+
+    const canEdit = permissionsProvided
+      ? initialValues?.meta?.permissions?.includes("update") ?? false
+      : true;
+
+    const isEditDisabled = colEventFormProps.readOnly || canEdit;
+    const showAlert = canEdit && !colEventFormProps.readOnly;
+
+    return (
+      <>
+        {showAlert && (
+          <Alert variant="warning" className="mb-2">
+            You do not have permission to edit this collecting event. All fields
+            are in read-only mode.
+          </Alert>
+        )}
+        <DinaForm {...colEventFormProps} readOnly={isEditDisabled} />
+      </>
+    );
   }
 
   return {

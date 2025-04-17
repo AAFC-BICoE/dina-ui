@@ -26,10 +26,10 @@ import { uniqBy } from "lodash";
 export function useCollectingEventQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
 
-  // TODO disable the fetch query when the ID is undefined.
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
-      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod,protocol`
+      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod,protocol`,
+      header: { "include-dina-permission": "true" }
     },
     {
       // Return undefined when ID is undefined:
