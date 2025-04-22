@@ -125,7 +125,7 @@ export function FileView({
     { path: filePath, responseType: "blob", timeout: 0 },
     {
       onSuccess,
-      disabled: disableRequest()
+      disabled: disableRequest() || !filePath
     }
   );
 
