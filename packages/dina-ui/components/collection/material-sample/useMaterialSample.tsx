@@ -3,6 +3,7 @@ import {
   DinaFormProps,
   DinaFormSubmitParams,
   DoOperationsError,
+  isResourceEmpty,
   OperationError,
   processExtensionValuesLoading,
   processExtensionValuesSaving,
@@ -25,7 +26,7 @@ import {
   range,
   find
 } from "lodash";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import {
   BLANK_PREPARATION,
@@ -58,6 +59,7 @@ import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
 import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { Alert } from "react-bootstrap";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet, apiClient } = useApiClient();
@@ -308,6 +310,17 @@ export function useMaterialSampleSave({
   const [enableAssociations, setEnableAssociations] = useState<boolean>(false);
   const [enableRestrictions, setEnableRestrictions] = useState<boolean>(false);
 
+  // Delete Data Component
+  const [deleteCollectingEvent, setDeleteCollectingEvent] =
+    useState<boolean>(false);
+  const [deletePreparations, setDeletePreparations] = useState<boolean>(false);
+  const [deleteOrganisms, setDeleteOrganisms] = useState<boolean>(false);
+  const [deleteStorage, setDeleteStorage] = useState<boolean>(false);
+  // const [deleteScheduledActions, setDeleteScheduledActions] =
+  //   useState<boolean>(false);
+  const [deleteAssociations, setDeleteAssociations] = useState<boolean>(false);
+  const [deleteRestrictions, setDeleteRestrictions] = useState<boolean>(false);
+
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
     setEnableShowParentAttributes(
@@ -418,20 +431,41 @@ export function useMaterialSampleSave({
 
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
+    // Collecting Event
     enableCollectingEvent,
     setEnableCollectingEvent,
+    setDeleteCollectingEvent,
+
+    // Preparations
     enablePreparations,
     setEnablePreparations,
+    setDeletePreparations,
+
+    // Organisms
     enableOrganisms,
     setEnableOrganisms,
+    setDeleteOrganisms,
+
+    // Storage
     enableStorage,
     setEnableStorage,
+    setDeleteStorage,
+
+    // Scheduled Actions
     enableScheduledActions,
     setEnableScheduledActions,
+
+    // Associations
     enableAssociations,
     setEnableAssociations,
+    setDeleteAssociations,
+
+    // Restrictions
     enableRestrictions,
     setEnableRestrictions,
+    setDeleteRestrictions,
+
+    // Parent Attributes (Form template only)
     enableShowParentAttributes,
     setEnableShowParentAttributes
   };
@@ -440,9 +474,8 @@ export function useMaterialSampleSave({
 
   const defaultValues: InputResource<MaterialSample> = {
     type: "material-sample",
-    managedAttributes: {},
     // Defaults to the last Collection used to create a Material Sample:
-    collection: lastUsedCollection,
+    ...(lastUsedCollection && { collection: lastUsedCollection }),
     publiclyReleasable: true
   };
 
@@ -522,6 +555,9 @@ export function useMaterialSampleSave({
         risk_group: submittedValues?.phac_human_rg?.value
       };
     }
+    if (Object.keys(submittedValues.restrictionFieldsExtension).length === 0) {
+      delete submittedValues.restrictionFieldsExtension;
+    }
 
     if (submittedValues.extensionValues) {
       submittedValues.extensionValues = processExtensionValuesSaving(
@@ -543,8 +579,13 @@ export function useMaterialSampleSave({
 
       if (otherIdentifiers && Object.keys(otherIdentifiers).length > 0) {
         submittedValues.identifiers = otherIdentifiers;
-      } else {
+      } else if (
+        msInitialValues.identifiers &&
+        Object.keys(msInitialValues.identifiers).length !== 0
+      ) {
         submittedValues.identifiers = {};
+      } else {
+        delete submittedValues.identifiers;
       }
     }
 
@@ -556,8 +597,14 @@ export function useMaterialSampleSave({
 
       if (otherCatalogNumbers.length !== 0) {
         submittedValues.dwcOtherCatalogNumbers = otherCatalogNumbers;
-      } else {
+      } else if (
+        msInitialValues.dwcOtherCatalogNumbers &&
+        msInitialValues.dwcOtherCatalogNumbers.length !== 0
+      ) {
         (submittedValues.dwcOtherCatalogNumbers as any) = null;
+      } else {
+        // Can be removed if it's not being cleared or set.
+        delete submittedValues.dwcOtherCatalogNumbers;
       }
     }
 
@@ -566,25 +613,26 @@ export function useMaterialSampleSave({
       ...submittedValues,
 
       // Remove the values from sections that were toggled off:
-      ...(!enablePreparations && BLANK_PREPARATION),
-      ...(!enableRestrictions && BLANK_RESTRICTION),
-      ...(!enableOrganisms && {
+      ...(deletePreparations && BLANK_PREPARATION),
+      ...(deleteRestrictions && BLANK_RESTRICTION),
+      ...(deleteOrganisms && {
         organismsIndividualEntry: undefined,
         organismsQuantity: undefined,
         organism: []
       }),
       // Remove storageUnit and storageUnitUsage if toggle is disabled
-      ...(!enableStorage && {
+      ...(deleteStorage && {
         storageUnitUsage: { id: null, type: "storage-unit-usage" }
       }),
-      ...(!enableCollectingEvent && {
+      ...(deleteCollectingEvent && {
         collectingEvent: { id: null, type: "collecting-event" }
       }),
-      ...(!enableAssociations && { associations: [], hostOrganism: null }),
-
-      // Remove the scheduledAction field from the Form Template:
-      ...{ scheduledAction: undefined }
+      ...(deleteAssociations && {
+        associations: [],
+        ...(msInitialValues.hostOrganism && { hostOrganism: null })
+      })
     };
+    delete materialSampleInput.scheduledActions;
 
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (
@@ -707,10 +755,15 @@ export function useMaterialSampleSave({
         setColEventId(savedCollectingEvent.id);
 
         // Link the MaterialSample to the CollectingEvent:
-        msDiff.collectingEvent = {
-          id: savedCollectingEvent.id,
-          type: savedCollectingEvent.type
-        };
+        if (
+          !msInitialValues.id ||
+          msInitialValues?.collectingEvent?.id !== submittedCollectingEvent?.id
+        ) {
+          msDiff.collectingEvent = {
+            id: savedCollectingEvent.id,
+            type: savedCollectingEvent.type
+          };
+        }
       } catch (error: unknown) {
         if (error instanceof DoOperationsError) {
           // Put the error messages into both form states:
@@ -775,15 +828,12 @@ export function useMaterialSampleSave({
     const msDiffWithOrganisms = organismsWereChanged
       ? { ...msDiff, organism: await saveAndAttachOrganisms(msPreprocessed) }
       : msDiff;
+
     /** Input to submit to the back-end API. */
     const msInputWithRelationships: InputResource<MaterialSample> & {
       relationships: any;
     } = {
       ...msDiffWithOrganisms,
-
-      // These values are not submitted to the back-end:
-      organismsIndividualEntry: undefined,
-      organismsQuantity: undefined,
 
       // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
       // Explicitly declare these fields as relationships here before saving:
@@ -841,17 +891,26 @@ export function useMaterialSampleSave({
               : null
           }
         })
-      },
-
-      // Set the attributes to undefined after they've been moved to "relationships":
-      attachment: undefined,
-      projects: undefined,
-      organism: undefined,
-      assemblages: undefined,
-      preparedBy: undefined,
-      storageUnitUsage: undefined,
-      storageUnit: undefined
+      }
     };
+
+    // These values are not submitted to the back-end:
+    delete msInputWithRelationships.organismsIndividualEntry;
+    delete msInputWithRelationships.organismsQuantity;
+
+    // Delete these since they have been moved to the relationship section.
+    delete msInputWithRelationships.attachment;
+    delete msInputWithRelationships.projects;
+    delete msInputWithRelationships.organism;
+    delete msInputWithRelationships.assemblages;
+    delete msInputWithRelationships.preparedBy;
+    delete msInputWithRelationships.storageUnitUsage;
+    delete msInputWithRelationships.storageUnit;
+
+    // If the relationship section is empty, remove it from the query.
+    if (Object.keys(msInputWithRelationships.relationships).length === 0) {
+      delete msInputWithRelationships.relationships;
+    }
 
     // delete the association if associated sample is left unfilled
     if (
@@ -959,10 +1018,21 @@ export function useMaterialSampleSave({
     async function saveToBackend() {
       delete materialSampleSaveOp.resource.useNextSequence;
       const [savedMaterialSample] = await withDuplicateSampleNameCheck(
-        async () =>
-          await save<MaterialSample>([materialSampleSaveOp], {
+        async () => {
+          // Do not perform any request if it's empty...
+          if (
+            isResourceEmpty(materialSampleSaveOp.resource) &&
+            materialSampleSaveOp?.resource?.id
+          ) {
+            return [
+              materialSampleSaveOp?.resource
+            ] as PersistedResource<MaterialSample>[];
+          }
+
+          return await save<MaterialSample>([materialSampleSaveOp], {
             apiBaseUrl: "/collection-api"
-          }),
+          });
+        },
         formik
       );
 
@@ -1048,7 +1118,28 @@ export function useMaterialSampleSave({
       )
     };
 
-    return <DinaForm {...colEventFormProps} />;
+    // Check the request to see if a permission provider is present.
+    const permissionsProvided = initialValues?.meta?.permissionsProvider;
+
+    const canEdit = permissionsProvided
+      ? initialValues?.meta?.permissions?.includes(
+          colEvent?.id ? "update" : "create"
+        ) ?? false
+      : true;
+
+    const isEditDisabled = colEventFormProps.readOnly || !canEdit;
+    const showAlert = !canEdit && !colEventFormProps.readOnly;
+
+    return (
+      <>
+        {showAlert && (
+          <Alert variant="warning" className="mb-2">
+            <DinaMessage id="collectingEventPermissionAlert" />
+          </Alert>
+        )}
+        <DinaForm {...colEventFormProps} readOnly={isEditDisabled} />
+      </>
+    );
   }
 
   return {

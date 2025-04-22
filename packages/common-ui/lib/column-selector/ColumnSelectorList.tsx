@@ -329,10 +329,17 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               : (mapping?.label ?? "").startsWith(id)
           );
         } else {
-          return !(mandatoryDisplayedColumns ?? []).some((id) =>
-            mapping?.parentType
-              ? (mapping?.value ?? "").startsWith(id)
-              : (mapping?.label ?? "").startsWith(id)
+          return (
+            !(mandatoryDisplayedColumns ?? []).some((id) =>
+              mapping?.parentType
+                ? (mapping?.value ?? "").startsWith(id)
+                : (mapping?.label ?? "").startsWith(id)
+            ) &&
+            !(nonExportableColumns ?? []).some((id) =>
+              mapping?.parentType
+                ? (mapping?.value ?? "").startsWith(id)
+                : (mapping?.label ?? "").startsWith(id)
+            )
           );
         }
       });

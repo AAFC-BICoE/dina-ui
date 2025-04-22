@@ -22,6 +22,13 @@ import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 
+export const MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS: string[] = [
+  "selectColumn",
+  "assemblages.",
+  "projects.",
+  "organism."
+];
+
 export interface SampleListLayoutProps {
   onSelect?: (sample: PersistedResource<MaterialSample>) => void;
   classNames?: string;
@@ -494,12 +501,7 @@ export default function MaterialSampleListPage() {
           dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
           columns={columns}
           mandatoryDisplayedColumns={["selectColumn", "materialSampleName"]}
-          nonExportableColumns={[
-            "selectColumn",
-            "assemblages.",
-            "projects.",
-            "organism."
-          ]}
+          nonExportableColumns={MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS}
           bulkDeleteButtonProps={{
             typeName: "material-sample",
             apiBaseUrl: "/collection-api"

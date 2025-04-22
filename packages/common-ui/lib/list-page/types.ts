@@ -280,15 +280,27 @@ export interface TransformToDSLProps {
  *
  * "unsupported" will just hide the options without generating the single option.
  */
-export type DynamicFieldType =
-  | "unsupported"
-  | "managedAttribute"
-  | "fieldExtension"
-  | "identifier"
-  | "relationshipPresence"
-  | "classification"
-  | "columnFunction"
-  | "vocabulary";
+export const DYNAMIC_FIELD_TYPES = [
+  "unsupported",
+  "managedAttribute",
+  "fieldExtension",
+  "identifier",
+  "relationshipPresence",
+  "classification",
+  "columnFunction",
+  "vocabulary"
+] as const;
+export type DynamicFieldType = (typeof DYNAMIC_FIELD_TYPES)[number];
+
+/**
+ * Utility function to check if a string matches one of the dynamic field types.
+ *
+ * @param value type to check.
+ * @returns true if match found, otherwise false.
+ */
+export function isDynamicFieldType(value: string): value is DynamicFieldType {
+  return (DYNAMIC_FIELD_TYPES as readonly string[]).includes(value);
+}
 
 export interface DynamicFieldsMappingConfig {
   /** Attribute level dynamic fields */
@@ -327,16 +339,4 @@ export interface DynamicField {
 export interface RelationshipDynamicField extends DynamicField {
   referencedBy: string;
   referencedType: string;
-}
-
-export interface SimpleQueryGroup {
-  conj: string;
-  props: SimpleQueryRow[];
-}
-
-export interface SimpleQueryRow {
-  field: string;
-  operator: string;
-  value: string;
-  type: string;
 }

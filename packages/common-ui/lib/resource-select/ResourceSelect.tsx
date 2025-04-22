@@ -13,7 +13,7 @@ import {
   keys,
   omitBy
 } from "lodash";
-import { ComponentProps, useState } from "react";
+import { ComponentProps, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import Select, {
   ActionMeta,
@@ -36,6 +36,9 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
     value: null | PersistedResource<TData> | PersistedResource<TData>[],
     actionMeta?: ActionMeta<{ resource: PersistedResource<TData> }>
   ) => void;
+
+  /** Callback fired when data has been loaded from the API */
+  onDataLoaded?: (data: PersistedResource<TData>[] | undefined) => void;
 
   /** The model type to select resources from. */
   model: string;
@@ -147,7 +150,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   isLoading: loadingProp,
   cannotBeChanged,
   showGroupCategary = false,
-  additionalSort
+  additionalSort,
+  onDataLoaded
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
   const { isAdmin, groupNames } = useAccount();
@@ -187,6 +191,13 @@ export function ResourceSelect<TData extends KitsuResource>({
     useCustomQuery?.(inputValue, querySpec) ?? useQuery<TData[]>(querySpec);
 
   const isLoading = queryIsLoading || inputValue !== searchValue || loadingProp;
+
+  useEffect(() => {
+    // Only call when data is actually loaded (not when loading)
+    if (!isLoading && response?.data && onDataLoaded) {
+      onDataLoaded(response.data);
+    }
+  }, [isLoading, response, onDataLoaded]);
 
   // Build the list of options from the returned resources.
   const resourceOptions =

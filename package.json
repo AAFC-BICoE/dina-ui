@@ -43,7 +43,6 @@
     "xlsx": "npm:@e965/xlsx@0.20.0"
   },
   "resolutions": {
-    "kitsu/axios": "^0.21.1",
     "lodash": "^4.17.21",
     "minimist": "^1.2.6",
     "async": "^2.6.4",
@@ -52,11 +51,10 @@
     "minimatch": "^3.0.5",
     "loader-utils": "^1.4.2",
     "json5": "^2.2.2",
-    "@types/react": "17.0.2",
-    "@types/react-dom": "17.0.2",
+    "@types/react": "17.0.36",
+    "@types/react-dom": "17.0.11",
     "mammoth": "1.6.0",
     "underscore": "1.13.1",
-    "@babel/traverse": "7.23.2",
     "follow-redirects": "^1.15.4",
     "axios": "1.7.7",
     "pdfjs-dist": "4.2.67"
@@ -69,6 +67,5 @@
       "prettier --write "
     ]
   },
-  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72",
-  "dependencies": {}
+  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
 }

@@ -65,6 +65,20 @@ export const overrideRelationshipConfig: OverrideRelationshipConfig = {
         isReverseRelationship: true,
         vocabularyEndpoint: "seqdb-api/vocabulary/molecularAnalysisType"
       }
+  },
+  collectingEvent: {
+    "attributes.geographicThesaurus.preferredTerm": {
+      fields: ["keyword"]
+    },
+    "attributes.geographicThesaurus.preferredParent": {
+      fields: ["keyword"]
+    },
+    "attributes.geographicThesaurus.additionalParents": {
+      fields: ["keyword"]
+    },
+    "attributes.geographicThesaurus.source": {
+      fields: ["keyword"]
+    }
   }
 };
 

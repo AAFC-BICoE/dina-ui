@@ -114,6 +114,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
+  collectingEventPermissionAlert:
+    "You do not have permission to edit this collecting event. All fields are in read-only mode.",
   collection: "Collection",
   collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
@@ -1222,5 +1224,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   visibleToEveryone: "Visible to everyone",
   fileNameAliasField: "File Name Alias Field",
   downloadTemplate: "Download Template",
-  existingTemplates: "Existing Templates"
+  existingTemplates: "Existing Templates",
+  viewMaterialSamplesInCollection: "View material samples in this collection"
 };
