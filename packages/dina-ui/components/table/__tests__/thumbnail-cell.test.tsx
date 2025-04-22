@@ -11,7 +11,7 @@ const METADATA_RESPONSE = {
     }
   },
   included: {
-    derivative: [
+    derivatives: [
       {
         attributes: {
           derivativeType: "THUMBNAIL_IMAGE",
