@@ -4,6 +4,11 @@ import Select from "react-select";
 import { useDinaIntl } from "../../../../../dina-ui/intl/dina-ui-intl";
 import { ESIndexMapping } from "../../types";
 import { QueryFieldSelector } from "../query-builder-core-components/QueryFieldSelector";
+import QueryRowClassificationSearch from "./QueryBuilderClassificationSearch";
+import QueryRowFieldExtensionSearch from "./QueryBuilderFieldExtensionSearch";
+import QueryRowIdentifierSearch from "./QueryBuilderIdentifierSearch";
+import QueryRowManagedAttributeSearch from "./QueryBuilderManagedAttributeSearch";
+import QueryRowRelationshipPresenceSearch from "./QueryBuilderRelationshipPresenceSearch";
 
 interface QueryRowColumnFunctionInputProps {
   /**
@@ -29,7 +34,7 @@ interface QueryRowColumnFunctionInputProps {
   /**
    * Index mapping containing all of the fields that should be displayed in the list.
    */
-  indexMapping: ESIndexMapping[] | undefined;
+  indexMapping: ESIndexMapping[];
 }
 
 export interface FormulaOption {
@@ -76,6 +81,17 @@ export default function QueryRowColumnFunctionInput({
           }
     );
 
+  // The selected field from the query field selector.
+  const [selectedField, setSelectedField] = useState<ESIndexMapping>();
+
+  // Used for dynamic fields to store the specific dynamic value selected.
+  const [dynamicFieldValue, setDynamicFieldValue] = useState<string>();
+
+  // Reset the dynamic field value so it doesn't get mixed with another one.
+  useEffect(() => {
+    setDynamicFieldValue(undefined);
+  }, [selectedField]);
+
   const onFormulaChanged = (newFormula: FunctionNameType) => {
     if (columnFunctionSearchState.functionName !== newFormula) {
       setColumnFunctionSearchState({
@@ -104,9 +120,7 @@ export default function QueryRowColumnFunctionInput({
   const indexMappingFiltered = useMemo(() => {
     return (
       indexMapping?.filter(
-        (item) => !item.dynamicField
-        // TODO:  filter out columnFunction only like this item.dynamicField?.type !== "columnFunction",
-        // but we need to handle the dynamic column input
+        (item) => item.dynamicField?.type !== "columnFunction"
       ) ?? []
     );
   }, indexMapping);
@@ -133,14 +147,26 @@ export default function QueryRowColumnFunctionInput({
   ).concat(undefined);
 
   const setFunctionParam = (fieldPath: string, index: number) => {
-    const params = columnFunctionSearchState.params!;
+    const params = columnFunctionSearchState.params ?? [];
     params[index] = indexMapping?.find((item) => item.value === fieldPath);
+
     setColumnFunctionSearchState({
       functionName: columnFunctionSearchState.functionName,
       params: [...params]
     });
   };
 
+  const onColumnItemSelected = (columnPath: string, index: number) => {
+    if (indexMapping) {
+      const columnIndex = indexMapping.find(
+        (index) => index.value === columnPath
+      );
+      if (columnIndex) {
+        setSelectedField(columnIndex);
+      }
+    }
+    setFunctionParam(columnPath, index);
+  };
   return (
     <div className={isInColumnSelector ? "" : "row"}>
       {/* Formula Selector */}
@@ -157,24 +183,92 @@ export default function QueryRowColumnFunctionInput({
       />
       {/* Field Selector */}
       {selectedFunction && selectedFunction.value === "CONCAT" ? (
-        functionParams.map((field, index) => (
-          <div key={index}>
-            <label
-              className={
-                isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"
-              }
-            >
-              <strong>{formatMessage("selectFieldToUseWithFunction")}:</strong>
-            </label>
-            <QueryFieldSelector
-              className={isInColumnSelector ? "ps-0" : "col me-1 ms-2 ps-0"}
-              indexMap={indexMappingFiltered}
-              currentField={field?.value}
-              setField={(fieldPath) => setFunctionParam(fieldPath, index)}
-              isInColumnSelector={true}
-            />
-          </div>
-        ))
+        functionParams.map((field, index) => {
+          return (
+            <div key={index}>
+              <label
+                className={
+                  isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"
+                }
+              >
+                <strong>
+                  {formatMessage("selectFieldToUseWithFunction")}:
+                </strong>
+              </label>
+              <QueryFieldSelector
+                className={isInColumnSelector ? "ps-0" : "col me-1 ms-2 ps-0"}
+                indexMap={indexMappingFiltered}
+                currentField={field?.value}
+                setField={(fieldPath) => onColumnItemSelected(fieldPath, index)}
+                isInColumnSelector={true}
+              />
+              {field?.dynamicField?.type === "managedAttribute" && (
+                <QueryRowManagedAttributeSearch
+                  indexMap={indexMapping}
+                  managedAttributeConfig={selectedField}
+                  isInColumnSelector={true}
+                  setValue={(fieldPath) => {
+                    setDynamicFieldValue(fieldPath);
+                    if (selectedField) {
+                      if (
+                        field.dynamicField &&
+                        JSON.parse(fieldPath)?.selectedManagedAttribute?.key
+                      ) {
+                        const indexValue = `${field?.dynamicField?.path}.${
+                          JSON.parse(fieldPath)?.selectedManagedAttribute?.key
+                        }`;
+
+                        const params = [
+                          ...(columnFunctionSearchState.params ?? [])
+                        ];
+                        params[index] = indexMapping?.find(
+                          (item) => item.value === indexValue
+                        );
+                        setColumnFunctionSearchState((prev) => ({
+                          ...prev,
+                          params: params
+                        }));
+                      }
+                    }
+                  }}
+                  value={dynamicFieldValue}
+                />
+              )}
+              {field?.dynamicField?.type === "fieldExtension" && (
+                <QueryRowFieldExtensionSearch
+                  fieldExtensionConfig={selectedField}
+                  setValue={setDynamicFieldValue}
+                  value={dynamicFieldValue}
+                  isInColumnSelector={true}
+                />
+              )}
+              {field?.dynamicField?.type === "identifier" && (
+                <QueryRowIdentifierSearch
+                  indexMap={indexMapping}
+                  identifierConfig={selectedField}
+                  isInColumnSelector={true}
+                  setValue={setDynamicFieldValue}
+                  value={dynamicFieldValue}
+                />
+              )}
+              {field?.dynamicField?.type === "relationshipPresence" && (
+                <QueryRowRelationshipPresenceSearch
+                  setValue={setDynamicFieldValue}
+                  value={dynamicFieldValue}
+                  indexMapping={indexMapping!}
+                  isInColumnSelector={true}
+                />
+              )}
+              {field?.dynamicField?.type === "classification" && (
+                <QueryRowClassificationSearch
+                  setValue={setDynamicFieldValue}
+                  value={dynamicFieldValue}
+                  isInColumnSelector={true}
+                />
+              )}
+            </div>
+          );
+        })
       ) : (
         <></>
       )}
