@@ -29,11 +29,13 @@ function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
 export interface BulkDeleteButtonProps {
   typeName: string;
   apiBaseUrl: string;
+  onDelete?: (resourceIds: string[]) => Promise<void>;
 }
 
 export function BulkDeleteButton({
   apiBaseUrl,
-  typeName
+  typeName,
+  onDelete
 }: BulkDeleteButtonProps) {
   const router = useRouter();
   const { openModal } = useModal();
@@ -57,6 +59,11 @@ export function BulkDeleteButton({
               </span>
             }
             onYesButtonClicked={async () => {
+              if (onDelete) {
+                await onDelete(resourceIds);
+                return;
+              }
+
               // Fetch the resources linked with material-sample for deletion
               let materialSamples: PersistedResource<MaterialSample>[] = [];
               if (typeName === "material-sample") {

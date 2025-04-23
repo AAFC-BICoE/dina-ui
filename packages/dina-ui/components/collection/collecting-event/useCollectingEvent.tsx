@@ -26,10 +26,10 @@ import { uniqBy } from "lodash";
 export function useCollectingEventQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
 
-  // TODO disable the fetch query when the ID is undefined.
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
-      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod,protocol`
+      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod,protocol`,
+      header: { "include-dina-permission": "true" }
     },
     {
       // Return undefined when ID is undefined:
@@ -316,6 +316,26 @@ export function useCollectingEventSave({
       delete collectingEventDiff.geographicPlaceNameSourceDetail;
     }
 
+    // Handle geographicPlaceNameSourceDetail comparison
+    const initialSourceDetail =
+      collectingEventInitialValues.geographicPlaceNameSourceDetail ?? null;
+    const submittedSourceDetail =
+      submittedValues.geographicPlaceNameSourceDetail ?? null;
+
+    if (!isEqual(initialSourceDetail, submittedSourceDetail)) {
+      (collectingEventDiff.geographicPlaceNameSourceDetail as any) =
+        submittedSourceDetail ?? null;
+
+      // If being deleted, the source should also be deleted.
+      if (
+        (collectingEventDiff.geographicPlaceNameSourceDetail as any) === null
+      ) {
+        (collectingEventDiff.geographicPlaceNameSource as any) = null;
+      }
+    } else {
+      delete collectingEventDiff.geographicPlaceNameSourceDetail;
+    }
+
     delete collectingEventDiff.srcAdminLevels;
     delete collectingEventDiff.selectedSections;
     delete (collectingEventDiff as any).selectAll;
@@ -343,6 +363,19 @@ export function useCollectingEventSave({
 
     // Do not perform any request if it's empty...
     if (isResourceEmpty(collectingEventDiff)) {
+      collectingEventFormik.setFieldValue("id", collectingEventDiff.id);
+      return collectingEventDiff as PersistedResource<CollectingEvent>;
+    }
+
+    // Check if the user has permission to edit the collecting event itself. It can be attached
+    // to the material sample still.
+    const permissionsProvided = submittedValues?.meta?.permissionsProvider;
+    const canEdit = permissionsProvided
+      ? submittedValues?.meta?.permissions?.includes(
+          collectingEventInitialValues.id ? "update" : "create"
+        ) ?? false
+      : true;
+    if (!canEdit) {
       collectingEventFormik.setFieldValue("id", collectingEventDiff.id);
       return collectingEventDiff as PersistedResource<CollectingEvent>;
     }
