@@ -106,7 +106,7 @@ export function FileView({
 
   const disableRequest = () => {
     // Check if it's visible to the user, if not, then disable the request.
-    if (isVisible === false) {
+    if (isVisible === false || !filePath) {
       return true;
     }
 
@@ -125,7 +125,7 @@ export function FileView({
     { path: filePath, responseType: "blob", timeout: 0 },
     {
       onSuccess,
-      disabled: disableRequest() || !filePath
+      disabled: disableRequest()
     }
   );
 
@@ -164,6 +164,8 @@ export function FileView({
   }
 
   const errorStatus = (resp.error as any)?.cause?.status;
+  const hasThumbnail = errorStatus === undefined && resp.response !== undefined;
+
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
       {resp?.loading ? (
@@ -171,7 +173,7 @@ export function FileView({
       ) : (
         <>
           {showFile ? (
-            errorStatus === undefined ? (
+            hasThumbnail ? (
               <a
                 href={objectURL}
                 target="_blank"
