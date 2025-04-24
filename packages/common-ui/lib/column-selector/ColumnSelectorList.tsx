@@ -1,5 +1,5 @@
 import useLocalStorage from "@rehooks/local-storage";
-import Kitsu, { KitsuResource } from "kitsu";
+import { KitsuResource } from "kitsu";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "react-bootstrap";
 import {
@@ -462,29 +462,4 @@ export function ColumnSelectorList<TData extends KitsuResource>({
       )}
     </>
   );
-}
-
-export async function downloadDataExport(
-  apiClient: Kitsu,
-  id: string | undefined,
-  name?: string
-) {
-  if (id) {
-    const getFileResponse = await apiClient.get(
-      `dina-export-api/file/${id}?type=DATA_EXPORT`,
-      {
-        responseType: "blob",
-        timeout: 0
-      }
-    );
-
-    // Download the data
-    const url = window?.URL.createObjectURL(getFileResponse as any);
-    const link = document?.createElement("a");
-    link.href = url ?? "";
-    link?.setAttribute("download", `${name ?? id}`);
-    document?.body?.appendChild(link);
-    link?.click();
-    window?.URL?.revokeObjectURL(url ?? "");
-  }
 }
