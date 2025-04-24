@@ -1,7 +1,7 @@
 import Kitsu, { PersistedResource } from "kitsu";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { DataExport } from "packages/dina-ui/types/dina-export-api";
-import { ObjectExport } from "packages/dina-ui/types/objectstore-api";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DataExport } from "../../../dina-ui/types/dina-export-api";
+import { ObjectExport } from "../../../dina-ui/types/objectstore-api";
 
 /**
  * Total number of objects allowed to be exported in the UI.
