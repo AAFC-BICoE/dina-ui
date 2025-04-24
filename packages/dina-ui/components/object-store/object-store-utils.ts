@@ -1,5 +1,5 @@
 import Kitsu from "kitsu";
-import { downloadBlobFile } from "packages/common-ui/lib/export/exportUtils";
+import { downloadBlobFile } from "common-ui";
 import { Dispatch, SetStateAction } from "react";
 
 /**

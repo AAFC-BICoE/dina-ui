@@ -30,7 +30,7 @@ import {
 import InputGroup from "react-bootstrap/InputGroup";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import { handleDownloadLink } from "../../components/object-store/object-store-utils";
-import { downloadBlobFile } from "packages/common-ui/lib/export/exportUtils";
+import { downloadBlobFile } from "common-ui";
 
 export interface EntityConfiguration {
   name: string;

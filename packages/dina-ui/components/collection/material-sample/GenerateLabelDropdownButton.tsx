@@ -6,7 +6,7 @@ import { ReportTemplate } from "../../../types/dina-export-api";
 import Select from "react-select";
 import { useAccount, useQuery } from "../../../../common-ui/lib";
 import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
-import { downloadBlobFile } from "packages/common-ui/lib/export/exportUtils";
+import { downloadBlobFile } from "common-ui";
 
 interface ReportTemplateOption {
   label: string;
