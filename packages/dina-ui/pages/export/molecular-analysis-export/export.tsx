@@ -3,6 +3,7 @@ import {
   checkboxProps,
   DinaForm,
   LoadingSpinner,
+  MAX_OBJECT_EXPORT_TOTAL,
   SubmitButton,
   TextField
 } from "common-ui";
@@ -12,7 +13,6 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Card } from "react-bootstrap";
 import useMolecularAnalysisExportAPI from "../../../components/export/useMolecularAnalysisExportAPI";
-import { MAX_OBJECT_EXPORT_TOTAL } from "../../../components/export/exportUtils";
 import React from "react";
 
 export default function ExportMolecularAnalysisPage() {
