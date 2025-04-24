@@ -81,6 +81,17 @@ export default function QueryRowColumnFunctionInput({
           }
     );
 
+  const [
+    submittedColumnFunctionSearchState,
+    setSubmittedColumnFunctionSearchState
+  ] = useState<ColumnFunctionSearchStates>(() =>
+    value
+      ? JSON.parse(value)
+      : {
+          functionName: "",
+          params: undefined
+        }
+  );
   // The selected field from the query field selector.
   const [selectedField, setSelectedField] = useState<ESIndexMapping>();
 
@@ -98,20 +109,29 @@ export default function QueryRowColumnFunctionInput({
         functionName: newFormula as any,
         params: newFormula === "CONCAT" ? [undefined] : undefined
       });
+      setSubmittedColumnFunctionSearchState({
+        functionName: newFormula as any,
+        params: newFormula === "CONCAT" ? [undefined] : undefined
+      });
     }
   };
 
   // Convert the state in this component to a value that can be stored in the Query Builder.
   useEffect(() => {
-    if (setValue && isValid(columnFunctionSearchState)) {
-      setValue(JSON.stringify({ [functionId]: columnFunctionSearchState }));
+    if (setValue && isValid(submittedColumnFunctionSearchState)) {
+      setValue(
+        JSON.stringify({ [functionId]: submittedColumnFunctionSearchState })
+      );
     }
-  }, [columnFunctionSearchState, setValue]);
+  }, [submittedColumnFunctionSearchState, setValue]);
 
   // Convert a value from Query Builder into the Field Extension State in this component.
   useEffect(() => {
     if (value) {
       setColumnFunctionSearchState(
+        Object.values(JSON.parse(value))[0] as ColumnFunctionSearchStates
+      );
+      setSubmittedColumnFunctionSearchState(
         Object.values(JSON.parse(value))[0] as ColumnFunctionSearchStates
       );
     }
@@ -150,9 +170,18 @@ export default function QueryRowColumnFunctionInput({
     const params = columnFunctionSearchState.params ?? [];
     params[index] = indexMapping?.find((item) => item.value === fieldPath);
 
+    const submittedParams = submittedColumnFunctionSearchState.params ?? [];
+    submittedParams[index] = indexMapping?.find(
+      (item) => item.value === fieldPath
+    );
+
     setColumnFunctionSearchState({
       functionName: columnFunctionSearchState.functionName,
       params: [...params]
+    });
+    setSubmittedColumnFunctionSearchState({
+      functionName: submittedColumnFunctionSearchState.functionName,
+      params: [...submittedParams]
     });
   };
 
@@ -207,37 +236,14 @@ export default function QueryRowColumnFunctionInput({
                   indexMap={indexMapping}
                   managedAttributeConfig={selectedField}
                   isInColumnSelector={true}
-                  setValue={(fieldPath) => {
-                    setDynamicFieldValue(fieldPath);
-                    if (selectedField) {
-                      if (
-                        field.dynamicField &&
-                        JSON.parse(fieldPath)?.selectedManagedAttribute?.key
-                      ) {
-                        const indexValue = `${field?.dynamicField?.path}.${
-                          JSON.parse(fieldPath)?.selectedManagedAttribute?.key
-                        }`;
-
-                        const params = [
-                          ...(columnFunctionSearchState.params ?? [])
-                        ];
-                        params[index] = indexMapping?.find(
-                          (item) => item.value === indexValue
-                        );
-                        setColumnFunctionSearchState((prev) => ({
-                          ...prev,
-                          params: params
-                        }));
-                      }
-                    }
-                  }}
+                  setValue={onDynamicFieldSearchChange(field, index)}
                   value={dynamicFieldValue}
                 />
               )}
               {field?.dynamicField?.type === "fieldExtension" && (
                 <QueryRowFieldExtensionSearch
                   fieldExtensionConfig={selectedField}
-                  setValue={setDynamicFieldValue}
+                  setValue={onDynamicFieldSearchChange(field, index)}
                   value={dynamicFieldValue}
                   isInColumnSelector={true}
                 />
@@ -247,13 +253,13 @@ export default function QueryRowColumnFunctionInput({
                   indexMap={indexMapping}
                   identifierConfig={selectedField}
                   isInColumnSelector={true}
-                  setValue={setDynamicFieldValue}
+                  setValue={onDynamicFieldSearchChange(field, index)}
                   value={dynamicFieldValue}
                 />
               )}
               {field?.dynamicField?.type === "relationshipPresence" && (
                 <QueryRowRelationshipPresenceSearch
-                  setValue={setDynamicFieldValue}
+                  setValue={onDynamicFieldSearchChange(field, index)}
                   value={dynamicFieldValue}
                   indexMapping={indexMapping!}
                   isInColumnSelector={true}
@@ -261,7 +267,7 @@ export default function QueryRowColumnFunctionInput({
               )}
               {field?.dynamicField?.type === "classification" && (
                 <QueryRowClassificationSearch
-                  setValue={setDynamicFieldValue}
+                  setValue={onDynamicFieldSearchChange(field, index)}
                   value={dynamicFieldValue}
                   isInColumnSelector={true}
                 />
@@ -274,4 +280,60 @@ export default function QueryRowColumnFunctionInput({
       )}
     </div>
   );
+
+  function onDynamicFieldSearchChange(
+    field: ESIndexMapping,
+    index: number
+  ): ((fieldPath: string) => void) | undefined {
+    return (fieldPath) => {
+      setDynamicFieldValue(fieldPath);
+      if (selectedField) {
+        if (field.dynamicField) {
+          const params = [...(submittedColumnFunctionSearchState.params ?? [])];
+          let indexValue: string;
+          switch (field.dynamicField.type) {
+            case "managedAttribute":
+              indexValue = `${
+                JSON.parse(fieldPath)?.selectedManagedAttributeConfig?.value
+              }`;
+
+              params[index] = indexMapping?.find((item) => {
+                return item.value === indexValue;
+              });
+              // Update dynamicField for submitted column function search state only to prevent unwanted dropdown changes
+              setSubmittedColumnFunctionSearchState((prev) => ({
+                ...prev,
+                params: params
+              }));
+              break;
+            case "fieldExtension":
+              indexValue = `${field.path}.${
+                JSON.parse(fieldPath)?.selectedExtension
+              }.${JSON.parse(fieldPath)?.selectedField}`;
+
+              params[index] = indexMapping?.find((item) => {
+                return item.value === indexValue;
+              });
+              // Update dynamicField for submitted column function search state only to prevent unwanted dropdown changes
+              setSubmittedColumnFunctionSearchState((prev) => ({
+                ...prev,
+                params: params
+              }));
+              break;
+            default:
+              const submittedParams =
+                submittedColumnFunctionSearchState.params ?? [];
+              submittedParams[index] = indexMapping?.find(
+                (item) => item.value === fieldPath
+              );
+              setSubmittedColumnFunctionSearchState({
+                functionName: submittedColumnFunctionSearchState.functionName,
+                params: [...submittedParams]
+              });
+              break;
+          }
+        }
+      }
+    };
+  }
 }
