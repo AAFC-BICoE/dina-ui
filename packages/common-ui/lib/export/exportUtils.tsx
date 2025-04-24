@@ -1,8 +1,7 @@
-import React from "react";
-import { DataExport } from "packages/dina-ui/types/dina-export-api";
-import { downloadDataExport } from "common-ui";
-import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import Kitsu, { PersistedResource } from "kitsu";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DataExport } from "../../../dina-ui/types/dina-export-api";
+import { ObjectExport } from "../../../dina-ui/types/objectstore-api";
 
 /**
  * Total number of objects allowed to be exported in the UI.
@@ -37,7 +36,7 @@ const BASE_DELAY_EXPORT_FETCH_MS = 2000;
  * Manages loading state via `setLoading`.
  */
 export async function getExport(
-  exportPostResponse: PersistedResource<KitsuResource>[],
+  exportPostResponse: PersistedResource<DataExport | ObjectExport>[],
   setLoading: (loading: boolean) => void,
   setDataExportError: (error: React.ReactNode | undefined) => void,
   apiClient: Kitsu,
@@ -53,7 +52,7 @@ export async function getExport(
         // Get the exported data
         await downloadDataExport(
           apiClient,
-          exportPostResponse[0].id,
+          exportPostResponse[0],
           formik?.values?.name
         );
         isFetchingDataExport = false;
@@ -100,4 +99,70 @@ export async function getExport(
     }
   }
   isFetchingDataExport = false;
+}
+
+/**
+ * Downloads an exported data file from the server and initiates a download in the browser.
+ *
+ * @param {Kitsu} apiClient - An instance of the API client used to make the request.
+ * @param {DataExport} exportToDownload - The data export object containing information about the export.
+ * @param {string} exportName - The name to be used for the downloaded file.
+ *
+ * @returns {Promise<void>} - A promise that resolves when the download is initiated.
+ *
+ */
+export async function downloadDataExport(
+  apiClient: Kitsu,
+  exportToDownload: DataExport | ObjectExport,
+  exportName?: string
+): Promise<void> {
+  if (exportToDownload?.id) {
+    const getFileResponse = await apiClient.get(
+      `dina-export-api/file/${exportToDownload.id}?type=DATA_EXPORT`,
+      {
+        responseType: "blob",
+        timeout: 0
+      }
+    );
+
+    // Generate the file name and file extension.
+    let fileName: string;
+    let fileExtension: string;
+    if (exportToDownload.type === "data-export") {
+      fileName = exportName ?? exportToDownload?.name ?? exportToDownload.id;
+      if (exportToDownload.exportType === "OBJECT_ARCHIVE") {
+        fileExtension = ".zip";
+      } else {
+        fileExtension =
+          exportToDownload?.exportOptions?.columnSeparator === "COMMA"
+            ? ".csv"
+            : ".tsv";
+      }
+    } else {
+      fileName = exportName ?? exportToDownload?.id;
+      fileExtension = "";
+    }
+
+    // Download the data
+    downloadBlobFile(getFileResponse as any, `${fileName}${fileExtension}`);
+  }
+}
+
+/**
+ * Downloads a file from a Blob response.
+ *
+ * @param {Blob} blob - The blob data to be downloaded.
+ * @param {string} fileName - The name of the file to be downloaded, extension should be appended to it. (e.g "file.csv")
+ */
+export function downloadBlobFile(blob: any, fileName: string): void {
+  const url = window?.URL.createObjectURL(blob);
+  const link = document?.createElement("a");
+  link.href = url ?? "";
+  link?.setAttribute("download", fileName);
+  document?.body?.appendChild(link);
+  link?.click();
+  document?.body?.removeChild(link);
+  if (typeof window !== "undefined" && window?.URL?.revokeObjectURL) {
+    window?.URL?.revokeObjectURL(url ?? "");
+  }
 }
