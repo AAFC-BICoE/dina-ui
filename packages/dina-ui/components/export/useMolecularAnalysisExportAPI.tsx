@@ -10,17 +10,15 @@ import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   filterBy,
+  getExport,
+  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
+  MAX_OBJECT_EXPORT_TOTAL,
   useApiClient
 } from "common-ui";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import useLocalStorage from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { Alert } from "react-bootstrap";
-import {
-  getExport,
-  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
-  MAX_OBJECT_EXPORT_TOTAL
-} from "./exportUtils";
 import { useSessionStorage } from "usehooks-ts";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import {

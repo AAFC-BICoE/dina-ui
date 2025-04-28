@@ -1,4 +1,5 @@
 import Kitsu from "kitsu";
+import { downloadBlobFile } from "common-ui";
 import { Dispatch, SetStateAction } from "react";
 
 /**
@@ -30,17 +31,13 @@ export async function handleDownloadLink(
     try {
       setIsDownloading(true);
       const response = await fetchObjectBlob(path, apiClient);
-      const url = window?.URL?.createObjectURL(response.data);
-      const link = document?.createElement("a");
       const content: string = response.headers["content-disposition"];
       const filename = content
         .slice(content.indexOf("filename=") + "filename=".length)
         .replaceAll('"', "");
-      link.href = url;
-      link?.setAttribute("download", filename); // or any other extension
-      document?.body?.appendChild(link);
-      link?.click();
-      window?.URL?.revokeObjectURL(url);
+
+      downloadBlobFile(response.data, filename);
+
       setIsDownloading(false);
     } catch (error) {
       setIsDownloading(false);

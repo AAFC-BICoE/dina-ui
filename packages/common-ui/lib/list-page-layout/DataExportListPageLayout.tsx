@@ -4,7 +4,6 @@ import {
   dateCell,
   useApiClient,
   LoadingSpinner,
-  downloadDataExport,
   DinaForm,
   BulkDeleteButton
 } from "..";
@@ -12,6 +11,7 @@ import { DataExport } from "../../../dina-ui/types/dina-export-api";
 import { Button } from "react-bootstrap";
 import { useState } from "react";
 import { useIntl } from "react-intl";
+import { downloadDataExport } from "../export/exportUtils";
 
 export interface DataExportListPageLayoutProps {
   username: string | undefined;
@@ -43,7 +43,7 @@ export function DataExportListPageLayout({
             className="btn btn-primary mt-2 bulk-edit-button"
             onClick={async () => {
               setLoading(true);
-              await downloadDataExport(apiClient, original?.id, original?.name);
+              await downloadDataExport(apiClient, original, original?.name);
               setLoading(false);
             }}
           >
