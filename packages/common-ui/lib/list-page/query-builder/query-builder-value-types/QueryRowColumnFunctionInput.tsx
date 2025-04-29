@@ -117,6 +117,15 @@ export default function QueryRowColumnFunctionInput({
     }
   }, [submittedColumnFunctionSearchState, setValue]);
 
+  // Convert a value from Query Builder into the Field Extension State in this component.
+  useEffect(() => {
+    if (value) {
+      setColumnFunctionSearchState(
+        Object.values(JSON.parse(value))[0] as ColumnFunctionSearchStates
+      );
+    }
+  }, [value]);
+
   const indexMappingFiltered = useMemo(() => {
     return (
       indexMapping?.filter(
