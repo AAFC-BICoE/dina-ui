@@ -281,9 +281,23 @@ export default function QueryRowColumnFunctionInput({
 
             break;
           case "fieldExtension":
-            indexValue = `${field.path}.${
+            indexValue = `${field.value}.${
               JSON.parse(fieldPath)?.selectedExtension
             }.${JSON.parse(fieldPath)?.selectedField}`;
+
+            params[index] = indexMapping?.find((item) => {
+              return item.value === indexValue;
+            });
+            // Update dynamicField for submitted column function search state only to prevent unwanted dropdown changes
+            updateSubmittedRef({
+              ...submittedColumnFunctionSearchStateRef.current,
+              params: params
+            });
+            break;
+          case "classification":
+            indexValue = `${field.value}.${
+              JSON.parse(fieldPath)?.selectedClassificationRank
+            }`;
 
             params[index] = indexMapping?.find((item) => {
               return item.value === indexValue;
