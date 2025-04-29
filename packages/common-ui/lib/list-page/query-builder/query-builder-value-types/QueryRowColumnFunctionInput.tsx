@@ -274,6 +274,11 @@ export default function QueryRowColumnFunctionInput({
             }`;
 
             break;
+          case "identifier":
+            indexValue = `${
+              JSON.parse(fieldPath)?.selectedIdentifierConfig?.value
+            }`;
+            break;
           default:
             break;
         }
