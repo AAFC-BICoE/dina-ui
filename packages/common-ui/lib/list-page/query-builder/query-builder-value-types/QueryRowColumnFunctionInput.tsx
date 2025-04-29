@@ -177,6 +177,7 @@ export default function QueryRowColumnFunctionInput({
   const onColumnItemSelected = (columnPath: string, index: number) => {
     setFunctionParam(columnPath, index);
   };
+
   return (
     <div className={isInColumnSelector ? "" : "row"}>
       {/* Formula Selector */}
@@ -276,6 +277,16 @@ export default function QueryRowColumnFunctionInput({
             indexValue = `${field.path}.${
               JSON.parse(fieldPath)?.selectedExtension
             }.${JSON.parse(fieldPath)?.selectedField}`;
+            if (field.parentName) {
+              indexValue = indexValue.replace(
+                "included.attributes",
+                field.parentName
+              );
+              foundIndexMapping = {
+                ...field,
+                value: indexValue
+              };
+            }
             break;
           case "classification":
             indexValue = `${field.path}.${
@@ -291,14 +302,17 @@ export default function QueryRowColumnFunctionInput({
           default:
             break;
         }
-        foundIndexMapping = indexMapping?.find((item) => {
-          return item.value === indexValue;
-        });
+        foundIndexMapping =
+          foundIndexMapping ??
+          indexMapping?.find((item) => {
+            return item.value === indexValue;
+          });
         if (
           foundIndexMapping &&
           JSON.stringify(foundIndexMapping) !== JSON.stringify(params.at(index))
         ) {
           params[index] = foundIndexMapping;
+
           // Update dynamicField for submitted column function search state only to prevent unwanted dropdown changes
           setSubmittedColumnFunctionSearchState((prev) => ({
             ...prev,
