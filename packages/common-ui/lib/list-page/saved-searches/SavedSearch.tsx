@@ -103,6 +103,10 @@ export function createSessionStorageLastUsedTreeKey(uniqueName: string) {
   return `${uniqueName}-last-used-tree`;
 }
 
+export function createLastUsedSavedSearchChangedKey(uniqueName: string) {
+  return `${uniqueName}-saved-search-changed`;
+}
+
 /**
  * This component contains the following logic:
  *
