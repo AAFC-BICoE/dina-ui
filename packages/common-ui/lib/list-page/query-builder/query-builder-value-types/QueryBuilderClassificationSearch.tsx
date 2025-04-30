@@ -75,7 +75,7 @@ export default function QueryRowClassificationSearch({
     if (setValue) {
       setValue(JSON.stringify(classificationState));
     }
-  }, [classificationState]);
+  }, [classificationState, setValue]);
 
   // Convert a value from Query Builder into the classification State in this component.
   // Dependent on the identifierConfig to indicate when it's changed.
