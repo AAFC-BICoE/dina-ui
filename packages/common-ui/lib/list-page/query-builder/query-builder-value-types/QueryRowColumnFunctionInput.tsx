@@ -120,7 +120,7 @@ export default function QueryRowColumnFunctionInput({
   // Convert a value from Query Builder into the Field Extension State in this component.
   useEffect(() => {
     if (value) {
-      setColumnFunctionSearchState(
+      setSubmittedColumnFunctionSearchState(
         Object.values(JSON.parse(value))[0] as ColumnFunctionSearchStates
       );
     }
@@ -272,6 +272,15 @@ export default function QueryRowColumnFunctionInput({
             indexValue = `${
               JSON.parse(fieldPath)?.selectedManagedAttributeConfig?.value
             }`;
+            if (field.parentName) {
+              indexValue = `${field.parentName}.${field.label}.${
+                JSON.parse(fieldPath)?.selectedManagedAttribute?.key
+              }`;
+              foundIndexMapping = {
+                ...field,
+                value: indexValue
+              };
+            }
             break;
           case "fieldExtension":
             indexValue = `${field.path}.${
@@ -307,6 +316,8 @@ export default function QueryRowColumnFunctionInput({
           indexMapping?.find((item) => {
             return item.value === indexValue;
           });
+
+        // Only update state if new indexMapping is different from prev
         if (
           foundIndexMapping &&
           JSON.stringify(foundIndexMapping) !== JSON.stringify(params.at(index))
