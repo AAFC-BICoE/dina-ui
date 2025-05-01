@@ -19,6 +19,7 @@ import { SmallThumbnail } from "../../table/thumbnail-cell";
 import { Metadata } from "../../../types/objectstore-api";
 import Kitsu from "kitsu";
 import { handleDownloadLink } from "../object-store-utils";
+import RcTooltip from "rc-tooltip";
 
 export type DownLoadLinks = {
   original?: string;
@@ -185,23 +186,44 @@ export function FileView({
                   width: "fit-content"
                 }}
               >
-                {isImage ? (
-                  <img
-                    alt={imgAlt ?? `File path : ${filePath}`}
-                    src={objectURL}
-                    style={{ height: imgHeight }}
-                    onError={(event) =>
-                      (event.currentTarget.style.display = "none")
-                    }
-                  />
-                ) : (
-                  <FileViewer
-                    filePath={objectURL}
-                    fileType={fileType}
-                    unsupportedComponent={fallBackRender}
-                    errorComponent={fallBackRender}
-                  />
-                )}
+                <RcTooltip
+                  overlay={
+                    <>
+                      {isFallbackRender
+                        ? shownTypeIndicatorFallback
+                        : shownTypeIndicator}
+                    </>
+                  }
+                  placement="top"
+                  align={{
+                    points: ["bc", "bc"],
+                    offset: [0, -20]
+                  }}
+                  motion={{
+                    motionName: "rc-tooltip-zoom",
+                    motionAppear: true,
+                    motionEnter: true,
+                    motionLeave: true
+                  }}
+                >
+                  {isImage ? (
+                    <img
+                      alt={imgAlt ?? `File path : ${filePath}`}
+                      src={objectURL}
+                      style={{ height: imgHeight }}
+                      onError={(event) =>
+                        (event.currentTarget.style.display = "none")
+                      }
+                    />
+                  ) : (
+                    <FileViewer
+                      filePath={objectURL}
+                      fileType={fileType}
+                      unsupportedComponent={fallBackRender}
+                      errorComponent={fallBackRender}
+                    />
+                  )}
+                </RcTooltip>
               </a>
             ) : errorStatus === 403 ? (
               <DinaMessage id="unauthorized" />
@@ -245,14 +267,14 @@ export function FileView({
               )}
             </div>
           )}
-          {!preview && (
+          {/* {!preview && (
             <div>
               {showFile &&
                 (isFallbackRender
                   ? shownTypeIndicatorFallback
                   : shownTypeIndicator)}
             </div>
-          )}
+          )} */}
         </>
       )}
     </div>
