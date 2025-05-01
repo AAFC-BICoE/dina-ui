@@ -14,6 +14,11 @@ import { License, Metadata } from "../../../types/objectstore-api";
 import { GroupLabel } from "../../group-select/GroupFieldView";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 
+const DERIVATIVE_TYPE_MESSAGES = new Map<string, string>([
+  ["THUMBNAIL_IMAGE", "thumbnail"],
+  ["LARGE_IMAGE", "largeImg"]
+]);
+
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
 }
@@ -23,7 +28,7 @@ export interface MetadataDetailsProps {
  * Tha ManagedAttributeMap must b included with the passed Metadata.
  */
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
-  const { formatMessage, locale } = useDinaIntl();
+  const { formatMessage, locale, messages } = useDinaIntl();
   const { apiClient } = useContext(ApiClientContext);
   const [license, setLicense] = useState<string>();
 
@@ -85,6 +90,49 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         <ManagedAttributesViewer
           values={metadata.managedAttributes}
           managedAttributeApiPath="objectstore-api/managed-attribute"
+        />
+      </CollapsableSection>
+
+      <CollapsableSection
+        collapserId="derivatives"
+        title={formatMessage("derivatives")}
+      >
+        <ReactTable
+          className="-striped"
+          columns={[
+            {
+              id: "type",
+              accessorKey: "derivativeType",
+              header: () => <DinaMessage id="type" />,
+              cell: ({
+                row: {
+                  original: { derivativeType }
+                }
+              }) =>
+                messages?.[
+                  DERIVATIVE_TYPE_MESSAGES.get(derivativeType) ?? ""
+                ] ? (
+                  <strong>
+                    <DinaMessage
+                      id={
+                        DERIVATIVE_TYPE_MESSAGES.get(derivativeType) ??
+                        (derivativeType as any)
+                      }
+                    />
+                  </strong>
+                ) : (
+                  <strong>derivativeType</strong>
+                ),
+              enableSorting: true
+            },
+            {
+              id: "actions",
+              accessorKey: "actions",
+              header: () => <DinaMessage id="actions" />,
+              enableSorting: false
+            }
+          ]}
+          data={metadata.derivatives ?? []}
         />
       </CollapsableSection>
 

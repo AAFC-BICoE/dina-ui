@@ -4,6 +4,7 @@
 export const DINAUI_MESSAGES_ENGLISH = {
   LETTER: "Letter",
   NUMERICAL: "Numerical",
+  actions: "Actions",
   actionType: "Action Type",
   addAnother: "Add Another {typeName}",
   addAnotherIdentifier: "Add Another Identifier",
@@ -708,6 +709,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationListTitle: "Organizations",
   originalFile: "Original File",
   downloadFile: "Download",
+  derivatives: "Derivatives",
   originalMaterialSampleLabel: "Original Material Sample",
   overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",

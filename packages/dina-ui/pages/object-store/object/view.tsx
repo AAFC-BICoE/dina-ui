@@ -75,7 +75,7 @@ export default function MetadataViewPage() {
         {canEdit && (
           <>
             <Link href={`/object-store/metadata/edit?id=${uuid}`}>
-              <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
+              <a className="btn btn-primary ms-auto" style={{ width: "5rem" }}>
                 <DinaMessage id="editButtonText" />
               </a>
             </Link>
