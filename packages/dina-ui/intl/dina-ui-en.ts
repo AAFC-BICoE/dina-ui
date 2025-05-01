@@ -301,7 +301,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_run-summary_items.genericMolecularAnalysisItemSummary.name":
     "Run Item Name",
   "field_run-summary_items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.name":
-    "Name",
+    "Workflow Name",
   "field_run-summary_items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.analysisType":
     "Analysis Type",
   field_determinationRemarks: "Determination Remarks",
