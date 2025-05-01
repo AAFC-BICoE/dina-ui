@@ -208,7 +208,7 @@ interface CollapsableSectionProps {
 }
 
 /** Wrapper for the collapsible sections of the details UI. */
-function CollapsableSection({
+export function CollapsableSection({
   children,
   collapserId,
   title

@@ -117,16 +117,6 @@ export function MetadataFileView({
           metadata={metadata}
         />
       </div>
-      {!preview && (
-        <div className="container">
-          <div className="mb-3 metadata-caption">
-            <strong>
-              <DinaMessage id="field_acCaption" />:
-            </strong>{" "}
-            {metadata.acCaption}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

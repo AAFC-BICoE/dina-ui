@@ -20,6 +20,7 @@ import { Metadata } from "../../../types/objectstore-api";
 import Kitsu from "kitsu";
 import { handleDownloadLink } from "../object-store-utils";
 import RcTooltip from "rc-tooltip";
+import { FaDownload } from "react-icons/fa6";
 
 export type DownLoadLinks = {
   original?: string;
@@ -233,32 +234,17 @@ export function FileView({
           ) : (
             <DinaMessage id="previewNotAvailable" />
           )}
+          {metadata?.acCaption && (
+            <strong style={{ display: "block", marginTop: "10px" }}>
+              {metadata?.acCaption}
+            </strong>
+          )}
           {!preview && (
             <div className="d-flex justify-content-center">
               {downloadLinks?.original && (
                 <DownloadLink
-                  id="originalFile"
+                  id="downloadFile"
                   path={downloadLinks?.original}
-                  isDownloading={isDownloading}
-                  handleDownloadLink={handleDownloadLink}
-                  apiClient={apiClient}
-                  setIsDownloading={setIsDownloading}
-                />
-              )}
-              {downloadLinks?.thumbNail && (
-                <DownloadLink
-                  id="thumbnail"
-                  path={downloadLinks?.thumbNail}
-                  isDownloading={isDownloading}
-                  handleDownloadLink={handleDownloadLink}
-                  apiClient={apiClient}
-                  setIsDownloading={setIsDownloading}
-                />
-              )}
-              {downloadLinks?.largeData && (
-                <DownloadLink
-                  id="largeImg"
-                  path={downloadLinks?.largeData}
                   isDownloading={isDownloading}
                   handleDownloadLink={handleDownloadLink}
                   apiClient={apiClient}
@@ -267,14 +253,6 @@ export function FileView({
               )}
             </div>
           )}
-          {/* {!preview && (
-            <div>
-              {showFile &&
-                (isFallbackRender
-                  ? shownTypeIndicatorFallback
-                  : shownTypeIndicator)}
-            </div>
-          )} */}
         </>
       )}
     </div>
@@ -293,6 +271,7 @@ interface DownloadLinkProps {
   apiClient: Kitsu;
   setIsDownloading: Dispatch<SetStateAction<boolean>>;
 }
+
 function DownloadLink({
   id,
   path,
@@ -305,10 +284,11 @@ function DownloadLink({
     <LoadingSpinner loading={true} />
   ) : (
     <a
-      className="p-2 original"
+      className="p-2 mt-3 original btn btn-primary"
       style={{ cursor: "pointer" }}
       onClick={() => handleDownloadLink(path, apiClient, setIsDownloading)}
     >
+      <FaDownload className="me-2" />
       <DinaMessage id={id as any} />
     </a>
   );

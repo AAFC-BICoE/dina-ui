@@ -707,6 +707,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationGermanNameLabel: "German Name",
   organizationListTitle: "Organizations",
   originalFile: "Original File",
+  downloadFile: "Download",
   originalMaterialSampleLabel: "Original Material Sample",
   overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",

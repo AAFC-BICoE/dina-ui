@@ -20,9 +20,13 @@ import {
   TagSelectReadOnly,
   TagsAndRestrictionsSection
 } from "../../../components";
-import { ExifView, MetadataDetails } from "../../../components/object-store";
+import {
+  CollapsableSection,
+  ExifView,
+  MetadataDetails
+} from "../../../components/object-store";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 
 const OBJECT_DETAILS_PAGE_CSS = `
@@ -34,6 +38,7 @@ const OBJECT_DETAILS_PAGE_CSS = `
 
 export default function MetadataViewPage() {
   const router = useRouter();
+  const { formatMessage } = useDinaIntl();
   const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
   const uuid = String(router.query.id);
   const query = useMetadataViewQuery(uuid);
@@ -119,30 +124,36 @@ export default function MetadataViewPage() {
                   <MetadataDetails metadata={response.data} />
                   <ExifView objectUpload={response.data.objectUpload} />
                   {customViewQuery && (
-                    <CustomQueryPageView
-                      titleKey="attachedMaterialSamples"
-                      uniqueName="attached-material-samples-object-store"
-                      columns={ELASTIC_SEARCH_COLUMN}
-                      indexName={"dina_material_sample_index"}
-                      viewMode={customViewQuery ? true : false}
-                      customViewQuery={customViewQuery ?? undefined}
-                      customViewFilterGroups={false}
-                      customViewFields={
-                        customViewQuery
-                          ? [
-                              {
-                                fieldName:
-                                  "data.relationships.attachment.data.id",
-                                type: "uuid"
-                              }
-                            ]
-                          : undefined
-                      }
-                      reactTableProps={{
-                        enableSorting: true,
-                        enableMultiSort: true
-                      }}
-                    />
+                    <CollapsableSection
+                      collapserId={metadata?.id ?? ""}
+                      title={formatMessage("attachedMaterialSamples")}
+                      key={metadata?.id ?? ""}
+                    >
+                      <CustomQueryPageView
+                        uniqueName="attached-material-samples-object-store"
+                        columns={ELASTIC_SEARCH_COLUMN}
+                        indexName={"dina_material_sample_index"}
+                        viewMode={customViewQuery ? true : false}
+                        removePadding={true}
+                        customViewQuery={customViewQuery ?? undefined}
+                        customViewFilterGroups={false}
+                        customViewFields={
+                          customViewQuery
+                            ? [
+                                {
+                                  fieldName:
+                                    "data.relationships.attachment.data.id",
+                                  type: "uuid"
+                                }
+                              ]
+                            : undefined
+                        }
+                        reactTableProps={{
+                          enableSorting: true,
+                          enableMultiSort: true
+                        }}
+                      />
+                    </CollapsableSection>
                   )}
                 </DinaForm>
               </div>
