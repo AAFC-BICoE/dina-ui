@@ -1,8 +1,8 @@
 import {
   LoadingSpinner,
   useApiClient,
-  useIsVisible,
-  useQuery
+  useBlobLoad,
+  useIsVisible
 } from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -75,8 +75,6 @@ export function FileView({
   const { apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const [objectURL, setObjectURL] = useState<string>();
-
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
   const isTextDoc = DOCUMENT_FORMATS.includes(fileType.toLowerCase());
@@ -102,10 +100,6 @@ export function FileView({
   );
   const showFile = !(isSpreadsheet || isTextDoc);
 
-  function onSuccess(response) {
-    setObjectURL(window?.URL?.createObjectURL(response));
-  }
-
   const disableRequest = () => {
     // Check if it's visible to the user, if not, then disable the request.
     if (isVisible === false) {
@@ -123,13 +117,13 @@ export function FileView({
     return false;
   };
 
-  const resp = useQuery(
-    { path: filePath, responseType: "blob", timeout: 0 },
-    {
-      onSuccess,
-      disabled: disableRequest()
-    }
-  );
+  const { objectUrl, error, isLoading } = useBlobLoad({
+    filePath,
+    autoOpen: false,
+    disabled: disableRequest()
+  });
+
+  const errorStatus = (error as any)?.cause?.status;
 
   if (preview || (!isImage && fileType !== "pdf")) {
     clickToDownload = false;
@@ -155,7 +149,7 @@ export function FileView({
           <SmallThumbnail filePath={fallBackFilePath} />
         ) : (
           <Link
-            href={objectURL ? (objectURL as any) : filePath}
+            href={objectUrl ? (objectUrl as any) : filePath}
             passHref={true}
           >
             <a>{filePath}</a>
@@ -165,17 +159,16 @@ export function FileView({
     );
   }
 
-  const errorStatus = (resp.error as any)?.cause?.status;
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
-      {resp?.loading ? (
+      {isLoading ? (
         <LoadingSpinner loading={true} />
       ) : (
         <>
           {showFile ? (
             errorStatus === undefined ? (
               <a
-                href={objectURL}
+                href={objectUrl as any}
                 target="_blank"
                 style={{
                   color: "inherit",
@@ -210,7 +203,7 @@ export function FileView({
                   {isImage ? (
                     <img
                       alt={imgAlt ?? `File path : ${filePath}`}
-                      src={objectURL}
+                      src={objectUrl as any}
                       style={{ height: imgHeight }}
                       onError={(event) =>
                         (event.currentTarget.style.display = "none")
@@ -218,7 +211,7 @@ export function FileView({
                     />
                   ) : (
                     <FileViewer
-                      filePath={objectURL}
+                      filePath={objectUrl as any}
                       fileType={fileType}
                       unsupportedComponent={fallBackRender}
                       errorComponent={fallBackRender}
@@ -249,6 +242,7 @@ export function FileView({
                   handleDownloadLink={handleDownloadLink}
                   apiClient={apiClient}
                   setIsDownloading={setIsDownloading}
+                  classname="p-2 mt-3"
                 />
               )}
             </div>
@@ -270,21 +264,23 @@ interface DownloadLinkProps {
   ) => Promise<any>;
   apiClient: Kitsu;
   setIsDownloading: Dispatch<SetStateAction<boolean>>;
+  classname?: string;
 }
 
-function DownloadLink({
+export function DownloadLink({
   id,
   path,
   isDownloading,
   handleDownloadLink,
   apiClient,
-  setIsDownloading
+  setIsDownloading,
+  classname
 }: DownloadLinkProps) {
   return isDownloading ? (
-    <LoadingSpinner loading={true} />
+    <LoadingSpinner additionalClassNames={classname} loading={true} />
   ) : (
     <a
-      className="p-2 mt-3 original btn btn-primary"
+      className={`${classname} original btn btn-primary`}
       style={{ cursor: "pointer" }}
       onClick={() => handleDownloadLink(path, apiClient, setIsDownloading)}
     >

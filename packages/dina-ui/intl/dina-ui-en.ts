@@ -578,6 +578,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   language: "Language",
   languageOfPage: "eng",
   largeImg: "Large Image",
+  croppedImg: "Cropped Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",

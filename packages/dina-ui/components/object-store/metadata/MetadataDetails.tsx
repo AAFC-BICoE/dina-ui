@@ -13,11 +13,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { License, Metadata } from "../../../types/objectstore-api";
 import { GroupLabel } from "../../group-select/GroupFieldView";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
-
-const DERIVATIVE_TYPE_MESSAGES = new Map<string, string>([
-  ["THUMBNAIL_IMAGE", "thumbnail"],
-  ["LARGE_IMAGE", "largeImg"]
-]);
+import { DerivativeList } from "../derivative-list/DerivativeList";
+import { formatBytes } from "../object-store-utils";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -25,10 +22,10 @@ export interface MetadataDetailsProps {
 
 /**
  * Shows the attribute details of a Metadata. Does not include the image or thumbnail.
- * Tha ManagedAttributeMap must b included with the passed Metadata.
+ * The ManagedAttributeMap must be included with the passed Metadata.
  */
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
-  const { formatMessage, locale, messages } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
   const { apiClient } = useContext(ApiClientContext);
   const [license, setLicense] = useState<string>();
 
@@ -93,49 +90,6 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         />
       </CollapsableSection>
 
-      <CollapsableSection
-        collapserId="derivatives"
-        title={formatMessage("derivatives")}
-      >
-        <ReactTable
-          className="-striped"
-          columns={[
-            {
-              id: "type",
-              accessorKey: "derivativeType",
-              header: () => <DinaMessage id="type" />,
-              cell: ({
-                row: {
-                  original: { derivativeType }
-                }
-              }) =>
-                messages?.[
-                  DERIVATIVE_TYPE_MESSAGES.get(derivativeType) ?? ""
-                ] ? (
-                  <strong>
-                    <DinaMessage
-                      id={
-                        DERIVATIVE_TYPE_MESSAGES.get(derivativeType) ??
-                        (derivativeType as any)
-                      }
-                    />
-                  </strong>
-                ) : (
-                  <strong>derivativeType</strong>
-                ),
-              enableSorting: true
-            },
-            {
-              id: "actions",
-              accessorKey: "actions",
-              header: () => <DinaMessage id="actions" />,
-              enableSorting: false
-            }
-          ]}
-          data={metadata.derivatives ?? []}
-        />
-      </CollapsableSection>
-
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
@@ -155,6 +109,9 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         ]}
         title={formatMessage("metadataMediaDetailsLabel")}
       />
+
+      <DerivativeList metadata={metadata} />
+
       <MetadataAttributeGroup
         metadata={metadata}
         fields={["dcRights", { name: "xmpRightsWebStatement", value: license }]}
@@ -182,19 +139,7 @@ interface MetadataAttributeGroupProps {
   title: string;
 }
 
-function formatBytes(bytes, decimals = 2) {
-  if (!+bytes) return "0 Bytes";
-
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
-
-function MetadataAttributeGroup({
+export function MetadataAttributeGroup({
   metadata,
   fields,
   title
