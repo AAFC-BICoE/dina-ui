@@ -6,21 +6,34 @@ import {
 } from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  ComponentType,
-  ReactNode,
-  useState,
-  useRef,
-  Dispatch,
-  SetStateAction
-} from "react";
+import { ComponentType, ReactNode, useState, useRef } from "react";
 import Link from "next/link";
 import { SmallThumbnail } from "../../table/thumbnail-cell";
 import { Metadata } from "../../../types/objectstore-api";
-import Kitsu from "kitsu";
-import { handleDownloadLink } from "../object-store-utils";
+import {
+  derivativeTypeToLabel,
+  formatBytes,
+  handleDownloadLink
+} from "../object-store-utils";
 import RcTooltip from "rc-tooltip";
-import { FaDownload } from "react-icons/fa6";
+import { DownloadButton } from "../derivative-list/DerivativeList";
+import { Badge, Dropdown } from "react-bootstrap";
+import {
+  FaDownload,
+  FaFile,
+  FaFileAudio,
+  FaFileCsv,
+  FaFileExcel,
+  FaFileImage,
+  FaFilePdf,
+  FaFilePowerpoint,
+  FaFileVideo,
+  FaFileWord,
+  FaFileZipper
+} from "react-icons/fa6";
+import { FaFileCode } from "react-icons/fa";
+import { MdOutlineRawOn } from "react-icons/md";
+import { IconType } from "react-icons/lib";
 
 export type DownLoadLinks = {
   original?: string;
@@ -73,7 +86,7 @@ export function FileView({
   metadata
 }: FileViewProps) {
   const { apiClient } = useApiClient();
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, messages } = useDinaIntl();
 
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
@@ -232,20 +245,129 @@ export function FileView({
               {metadata?.acCaption}
             </strong>
           )}
+
           {!preview && (
-            <div className="d-flex justify-content-center">
-              {downloadLinks?.original && (
-                <DownloadLink
-                  id="downloadFile"
-                  path={downloadLinks?.original}
-                  isDownloading={isDownloading}
-                  handleDownloadLink={handleDownloadLink}
-                  apiClient={apiClient}
-                  setIsDownloading={setIsDownloading}
-                  classname="p-2 mt-3"
-                />
+            <>
+              {metadata?.derivatives && metadata?.derivatives?.length === 0 ? (
+                <>
+                  <div className="d-flex justify-content-center">
+                    {downloadLinks?.original && (
+                      <DownloadButton
+                        id="downloadFile"
+                        path={downloadLinks?.original}
+                        isDownloading={isDownloading}
+                        handleDownloadLink={handleDownloadLink}
+                        apiClient={apiClient}
+                        setIsDownloading={setIsDownloading}
+                        classname="p-2 mt-3"
+                      />
+                    )}
+                  </div>
+                </>
+              ) : (
+                <Dropdown>
+                  <Dropdown.Toggle
+                    variant="primary"
+                    id="dropdown-basic"
+                    className="mt-3"
+                  >
+                    <FaDownload className="me-2" />
+                    <DinaMessage id={"downloadFile"} />
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    {downloadLinks?.original && (
+                      <Dropdown.Item
+                        as="button"
+                        className="d-flex justify-content-between align-items-center"
+                        onClick={() =>
+                          handleDownloadLink(
+                            downloadLinks?.original ?? "",
+                            apiClient,
+                            setIsDownloading
+                          )
+                        }
+                      >
+                        <div className="d-flex align-items-center">
+                          {fileExtensionToIcon(
+                            metadata?.fileExtension,
+                            "me-3 text-secondary dropdown-icon"
+                          )}
+                          <div>
+                            <div className="fw-semibold">
+                              {formatMessage("originalFile")}
+                            </div>
+                            <small className="text-muted">
+                              {metadata?.fileExtension?.toUpperCase()}
+                            </small>
+                          </div>
+                        </div>
+                        <Badge
+                          bg="light"
+                          text="dark"
+                          style={{
+                            fontSize: "0.75rem",
+                            padding: "0.35em 0.5em",
+                            marginLeft: "2em"
+                          }}
+                        >
+                          {formatBytes(
+                            (metadata as any)?.objectUpload?.sizeInBytes ?? 0
+                          )}
+                        </Badge>
+                      </Dropdown.Item>
+                    )}
+                    <Dropdown.Divider />
+                    {metadata?.derivatives?.map((derivative) => {
+                      const fileIdentifier = derivative.fileIdentifier;
+                      const bucket = derivative.bucket;
+                      const fileType = derivative.fileExtension;
+                      const derivativeType = derivative.derivativeType;
+                      const filePath = `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`;
+
+                      return (
+                        <Dropdown.Item
+                          key={fileIdentifier}
+                          as="button"
+                          className="d-flex justify-content-between align-items-center"
+                          onClick={() =>
+                            handleDownloadLink(
+                              filePath,
+                              apiClient,
+                              setIsDownloading
+                            )
+                          }
+                        >
+                          <div className="d-flex align-items-center">
+                            {fileExtensionToIcon(
+                              fileType,
+                              "me-3 text-secondary dropdown-icon"
+                            )}
+                            <div>
+                              <div className="fw-semibold">
+                                {derivativeTypeToLabel(
+                                  derivativeType,
+                                  messages
+                                )}
+                              </div>
+                              <small className="text-muted">
+                                {fileType.toUpperCase()}
+                              </small>
+                            </div>
+                          </div>
+                          {/* <Badge
+                          bg="light"
+                          text="dark"
+                          style={{ fontSize: '0.75rem', padding: '0.35em 0.5em', marginLeft: '2em' }}
+                        >
+                          {formatBytes((metadata as any)?.objectUpload?.sizeInBytes ?? 0)}
+                        </Badge> */}
+                        </Dropdown.Item>
+                      );
+                    })}
+                  </Dropdown.Menu>
+                </Dropdown>
               )}
-            </div>
+            </>
           )}
         </>
       )}
@@ -253,39 +375,72 @@ export function FileView({
   );
 }
 
-interface DownloadLinkProps {
-  id: string;
-  path: string;
-  isDownloading: boolean;
-  handleDownloadLink: (
-    path: string,
-    apiClient: Kitsu,
-    setIsDownloading: Dispatch<SetStateAction<boolean>>
-  ) => Promise<any>;
-  apiClient: Kitsu;
-  setIsDownloading: Dispatch<SetStateAction<boolean>>;
-  classname?: string;
-}
+// Raw‐format extensions
+const RAW_EXTS = new Set(["cr2", "nef"]);
 
-export function DownloadLink({
-  id,
-  path,
-  isDownloading,
-  handleDownloadLink,
-  apiClient,
-  setIsDownloading,
-  classname
-}: DownloadLinkProps) {
-  return isDownloading ? (
-    <LoadingSpinner additionalClassNames={classname} loading={true} />
-  ) : (
-    <a
-      className={`${classname} original btn btn-primary`}
-      style={{ cursor: "pointer" }}
-      onClick={() => handleDownloadLink(path, apiClient, setIsDownloading)}
-    >
-      <FaDownload className="me-2" />
-      <DinaMessage id={id as any} />
-    </a>
-  );
+// Common media groups
+const IMAGE_EXTS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "bmp",
+  "tiff",
+  "svg",
+  "webp"
+]);
+const VIDEO_EXTS = new Set(["mp4", "mov", "avi", "mkv", "wmv", "flv", "webm"]);
+const AUDIO_EXTS = new Set(["mp3", "wav", "flac", "aac", "ogg", "m4a"]);
+
+// Specific one‐off mapping (extension → icon)
+const SPECIFIC_ICON_MAP: Record<string, IconType> = {
+  pdf: FaFilePdf,
+  doc: FaFileWord,
+  docx: FaFileWord,
+  xls: FaFileExcel,
+  xlsx: FaFileExcel,
+  csv: FaFileCsv,
+  html: FaFileCode,
+  htm: FaFileCode,
+  ppt: FaFilePowerpoint,
+  pptx: FaFilePowerpoint,
+  zip: FaFileZipper,
+  gz: FaFileZipper,
+  gzip: FaFileZipper
+};
+
+/**
+ * Render an appropriate file‐icon based on a “.ext” string.
+ *
+ * @param fileExtension  The extension, e.g. ".jpg", ".PDF", ".Cr2"
+ * @param className      CSS className to pass to the icon
+ */
+export function fileExtensionToIcon(
+  fileExtension: string | undefined,
+  className = ""
+): React.ReactNode {
+  if (!fileExtension) return null;
+
+  // strip leading dot and lowercase
+  const ext = fileExtension.replace(/^\./, "").toLowerCase();
+
+  if (RAW_EXTS.has(ext)) {
+    return <MdOutlineRawOn className={className} />;
+  }
+  if (IMAGE_EXTS.has(ext)) {
+    return <FaFileImage className={className} />;
+  }
+  if (VIDEO_EXTS.has(ext)) {
+    return <FaFileVideo className={className} />;
+  }
+  if (AUDIO_EXTS.has(ext)) {
+    return <FaFileAudio className={className} />;
+  }
+  if (SPECIFIC_ICON_MAP[ext]) {
+    const Icon = SPECIFIC_ICON_MAP[ext];
+    return <Icon className={className} />;
+  }
+
+  // Default to generic file icon
+  return <FaFile className={className} />;
 }

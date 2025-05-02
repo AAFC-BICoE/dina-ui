@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import { CollapsableSection } from "../metadata/MetadataDetails";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { ReactTable, useApiClient, useBlobLoad } from "common-ui";
-import { FaUpRightFromSquare } from "react-icons/fa6";
-import { DownloadLink } from "../file-view/FileView";
-import { handleDownloadLink } from "../object-store-utils";
-
-// This is a map of derivative types to their corresponding messages.
-const DERIVATIVE_TYPE_MESSAGES = new Map<string, string>([
-  ["THUMBNAIL_IMAGE", "thumbnail"],
-  ["LARGE_IMAGE", "largeImg"],
-  ["CROPPED_IMAGE", "croppedImg"]
-]);
+import {
+  LoadingSpinner,
+  ReactTable,
+  useApiClient,
+  useBlobLoad
+} from "common-ui";
+import { FaDownload, FaUpRightFromSquare } from "react-icons/fa6";
+import {
+  derivativeTypeToLabel,
+  handleDownloadLink
+} from "../object-store-utils";
+import Kitsu from "kitsu";
 
 export interface DerivativeListProps {
   metadata: Metadata;
@@ -58,19 +59,9 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
               row: {
                 original: { derivativeType }
               }
-            }) =>
-              messages?.[DERIVATIVE_TYPE_MESSAGES.get(derivativeType) ?? ""] ? (
-                <strong>
-                  <DinaMessage
-                    id={
-                      DERIVATIVE_TYPE_MESSAGES.get(derivativeType) ??
-                      (derivativeType as any)
-                    }
-                  />
-                </strong>
-              ) : (
-                <strong>derivativeType</strong>
-              ),
+            }) => (
+              <strong>{derivativeTypeToLabel(derivativeType, messages)}</strong>
+            ),
             enableSorting: true
           },
           {
@@ -103,7 +94,7 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
                 </a>
 
                 {/* Download Button */}
-                <DownloadLink
+                <DownloadButton
                   id="downloadFile"
                   path={`/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`}
                   isDownloading={isDownloading}
@@ -120,5 +111,42 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
         data={metadata.derivatives ?? []}
       />
     </CollapsableSection>
+  );
+}
+
+interface DownloadButtonProps {
+  id: string;
+  path: string;
+  isDownloading: boolean;
+  handleDownloadLink: (
+    path: string,
+    apiClient: Kitsu,
+    setIsDownloading: Dispatch<SetStateAction<boolean>>
+  ) => Promise<any>;
+  apiClient: Kitsu;
+  setIsDownloading: Dispatch<SetStateAction<boolean>>;
+  classname?: string;
+}
+
+export function DownloadButton({
+  id,
+  path,
+  isDownloading,
+  handleDownloadLink,
+  apiClient,
+  setIsDownloading,
+  classname
+}: DownloadButtonProps) {
+  return isDownloading ? (
+    <LoadingSpinner additionalClassNames={classname} loading={true} />
+  ) : (
+    <a
+      className={`${classname} original btn btn-primary`}
+      style={{ cursor: "pointer" }}
+      onClick={() => handleDownloadLink(path, apiClient, setIsDownloading)}
+    >
+      <FaDownload className="me-2" />
+      <DinaMessage id={id as any} />
+    </a>
   );
 }

@@ -1,6 +1,7 @@
 import Kitsu from "kitsu";
 import { downloadBlobFile } from "common-ui";
 import { Dispatch, SetStateAction } from "react";
+import { startCase } from "lodash";
 
 /**
  * Util function to fetch file object as blob ready to be downloaded
@@ -56,4 +57,21 @@ export function formatBytes(bytes, decimals: number = 2): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
+export function derivativeTypeToLabel(
+  derivativeType: string,
+  messages: any
+): string {
+  switch (derivativeType) {
+    case "THUMBNAIL_IMAGE":
+      return messages?.["THUMBNAIL_IMAGE"] || "Thumbnail";
+    case "LARGE_IMAGE":
+      return messages?.["LARGE_IMAGE"] || "Large Image";
+    case "CROPPED_IMAGE":
+      return messages?.["CROPPED_IMAGE"] || "Cropped Image";
+    default:
+      // Display it as a human-readable string, should be using a translation key though.
+      return startCase(derivativeType.replace(/_/g, " "));
+  }
 }
