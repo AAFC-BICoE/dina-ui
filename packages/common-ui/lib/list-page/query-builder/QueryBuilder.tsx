@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "../..";
 import { Query, Builder, Utils, JsonTree } from "react-awesome-query-builder";
-import { createContext, useCallback, useContext } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import {
   Config,
   ImmutableTree,
@@ -12,6 +12,7 @@ import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
 import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import { FaCopy, FaCheck } from "react-icons/fa";
 
 export interface QueryBuilderContextI {
   performSubmit: () => void;
@@ -103,6 +104,9 @@ interface QueryBuilderProps {
 
   // Reference for triggering the search. This helps prevent more searches than necessary.
   triggerSearch: React.MutableRefObject<boolean>;
+
+  // Callback function to handle copying URL with query filters to clipboard
+  onCopyToClipboard: () => Promise<void>;
 }
 
 function QueryBuilder({
@@ -118,8 +122,10 @@ function QueryBuilder({
   setGroups,
   uniqueName,
   validationErrors,
-  triggerSearch
+  triggerSearch,
+  onCopyToClipboard
 }: QueryBuilderProps) {
+  const [copiedToClipboard, setCopiedToClipboard] = useState<boolean>(false);
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
   }, []);
@@ -182,8 +188,30 @@ function QueryBuilder({
           >
             <DinaMessage id="search" />
           </Button>
-          <Button onClick={onReset} variant="secondary">
+          <Button
+            onClick={() => {
+              onReset();
+              setCopiedToClipboard(false);
+            }}
+            variant="secondary"
+            className="me-2"
+          >
             <CommonMessage id="resetButtonText" />
+          </Button>
+          <Button
+            onClick={async () => {
+              await onCopyToClipboard();
+              setCopiedToClipboard(true);
+            }}
+            className="me-2"
+            disabled={validationErrors.length > 0}
+          >
+            <DinaMessage id="generateURLButtonText" />{" "}
+            {copiedToClipboard ? (
+              <FaCheck style={{ marginBottom: "4px" }} />
+            ) : (
+              <FaCopy style={{ marginBottom: "4px" }} />
+            )}
           </Button>
         </div>
       </QueryBuilderContextProvider>
