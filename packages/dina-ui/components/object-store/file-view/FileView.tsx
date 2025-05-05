@@ -12,12 +12,11 @@ import { SmallThumbnail } from "../../table/thumbnail-cell";
 import { Metadata } from "../../../types/objectstore-api";
 import {
   derivativeTypeToLabel,
-  formatBytes,
   handleDownloadLink
 } from "../object-store-utils";
 import RcTooltip from "rc-tooltip";
 import { DownloadButton } from "../derivative-list/DerivativeList";
-import { Badge, Dropdown } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import {
   FaDownload,
   FaFile,
@@ -119,19 +118,12 @@ export function FileView({
       return true;
     }
 
-    // Check if it's something that can be loaded...
-    if (metadata) {
-      return (
-        metadata?.dcType !== "IMAGE" && metadata?.dcType !== "MOVING_IMAGE"
-      );
-    }
-
     // It's visible and the metadata is an image.
     return false;
   };
 
   const { objectUrl, error, isLoading } = useBlobLoad({
-    filePath,
+    filePath: filePath,
     autoOpen: false,
     disabled: disableRequest()
   });
@@ -238,7 +230,26 @@ export function FileView({
               <DinaMessage id="thumbnailNotAvailableText" />
             )
           ) : (
-            <DinaMessage id="previewNotAvailable" />
+            <div
+              style={{
+                width: "100%",
+                aspectRatio: "3/2",
+                backgroundColor: "#f0f0f0",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                color: "#666"
+              }}
+            >
+              {fileExtensionToIcon(
+                metadata?.fileExtension,
+                "dropdown-icon mb-2"
+              )}
+              <DinaMessage id="previewNotAvailable" />
+            </div>
           )}
           {metadata?.acCaption && (
             <strong style={{ display: "block", marginTop: "10px" }}>
@@ -246,7 +257,7 @@ export function FileView({
             </strong>
           )}
 
-          {!preview && (
+          {!preview && downloadLinks?.original && (
             <>
               {metadata?.derivatives && metadata?.derivatives?.length === 0 ? (
                 <>
@@ -287,7 +298,10 @@ export function FileView({
                           )
                         }
                       >
-                        <div className="d-flex align-items-center">
+                        <div
+                          className="d-flex align-items-center"
+                          style={{ minWidth: "250px" }}
+                        >
                           {fileExtensionToIcon(
                             metadata?.fileExtension,
                             "me-3 text-secondary dropdown-icon"
@@ -301,19 +315,6 @@ export function FileView({
                             </small>
                           </div>
                         </div>
-                        <Badge
-                          bg="light"
-                          text="dark"
-                          style={{
-                            fontSize: "0.75rem",
-                            padding: "0.35em 0.5em",
-                            marginLeft: "2em"
-                          }}
-                        >
-                          {formatBytes(
-                            (metadata as any)?.objectUpload?.sizeInBytes ?? 0
-                          )}
-                        </Badge>
                       </Dropdown.Item>
                     )}
                     <Dropdown.Divider />
@@ -354,13 +355,6 @@ export function FileView({
                               </small>
                             </div>
                           </div>
-                          {/* <Badge
-                          bg="light"
-                          text="dark"
-                          style={{ fontSize: '0.75rem', padding: '0.35em 0.5em', marginLeft: '2em' }}
-                        >
-                          {formatBytes((metadata as any)?.objectUpload?.sizeInBytes ?? 0)}
-                        </Badge> */}
                         </Dropdown.Item>
                       );
                     })}
