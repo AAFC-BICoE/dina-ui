@@ -9,13 +9,27 @@ exports[`View Exif page renders exif props when received file upload response 1`
       <h4>
         Exif Properties
         <button
-          class="collapser-button m-2 btn btn-secondary"
-          title="Collapser Button"
+          aria-expanded="true"
+          aria-label="Collapse section"
+          class="collapser-button btn btn-light "
+          style="display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; margin-top: -5px; margin-left: 10px; background: transparent;"
+          title="Collapse section"
           type="button"
         >
-          <i
-            style="border: solid black; border-width: 0px 3px 3px 0px; display: inline-block; padding: 5px; transform: rotate(-135deg);"
-          />
+          <svg
+            fill="currentColor"
+            height="1em"
+            stroke="currentColor"
+            stroke-width="0"
+            style="color: rgb(0, 0, 0); font-size: 1.5rem; transform: rotate(0deg); transition: transform 2s cubic-bezier(.4,2,.55,.44); will-change: transform;"
+            viewBox="0 0 448 512"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"
+            />
+          </svg>
         </button>
       </h4>
       <div
