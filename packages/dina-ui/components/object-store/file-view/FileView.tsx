@@ -4,11 +4,8 @@ import {
   useBlobLoad,
   useIsVisible
 } from "../../../../common-ui";
-import dynamic from "next/dynamic";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ComponentType, ReactNode, useState, useRef } from "react";
-import Link from "next/link";
-import { SmallThumbnail } from "../../table/thumbnail-cell";
+import { ReactNode, useState, useRef } from "react";
 import { Metadata } from "../../../types/objectstore-api";
 import {
   derivativeTypeToLabel,
@@ -39,7 +36,6 @@ export type DownLoadLinks = {
   thumbNail?: string;
   largeData?: string;
 };
-
 export interface FileViewProps {
   clickToDownload?: boolean;
   filePath: string;
@@ -52,12 +48,6 @@ export interface FileViewProps {
   metadata?: Metadata;
 }
 
-// The FileViewer component can't be server-side rendered:
-const FileViewer: ComponentType<any> = dynamic(
-  () => import("react-file-viewer"),
-  { ssr: false }
-);
-
 export const IMG_TAG_SUPPORTED_FORMATS = [
   "apng",
   "bmp",
@@ -68,10 +58,6 @@ export const IMG_TAG_SUPPORTED_FORMATS = [
   "png",
   "svg"
 ];
-
-const SPREADSHEET_FORMATS = ["ods", "xls", "xlsm", "xlsx", "csv"];
-
-const DOCUMENT_FORMATS = ["doc", "docx", "pdf"];
 
 export function FileView({
   clickToDownload,
@@ -88,9 +74,6 @@ export function FileView({
   const { formatMessage, messages } = useDinaIntl();
 
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
-  const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
-  const isTextDoc = DOCUMENT_FORMATS.includes(fileType.toLowerCase());
-  const [isFallbackRender, setIsFallBackRender] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const visibleRef = useRef<HTMLDivElement>(null);
@@ -101,16 +84,6 @@ export function FileView({
     // Start loading images when it's 300px below the view port.
     offset: "0px 0px 300px 0px"
   });
-
-  const shownTypeIndicatorFallback = (
-    <div className="shown-file-type">
-      <strong>
-        <DinaMessage id="showing" />:
-      </strong>
-      {` ${formatMessage("thumbnail")}`}
-    </div>
-  );
-  const showFile = !(isSpreadsheet || isTextDoc);
 
   const disableRequest = () => {
     // Check if it's visible to the user, if not, then disable the request.
@@ -134,43 +107,13 @@ export function FileView({
     clickToDownload = false;
   }
 
-  function fallBackRender() {
-    const thumbnailImageDerivative = metadata?.derivatives?.find(
-      (it) => it.derivativeType === "THUMBNAIL_IMAGE"
-    );
-    const fileId = thumbnailImageDerivative?.fileIdentifier;
-    const fallBackFilePath = `/objectstore-api/file/${
-      thumbnailImageDerivative?.bucket
-    }/${
-      // Add derivative/ before the fileIdentifier if the file to display is a derivative.
-      thumbnailImageDerivative?.type === "derivative" ? "derivative/" : ""
-    }${fileId}`;
-    if (thumbnailImageDerivative) {
-      setIsFallBackRender(true);
-    }
-    return (
-      <div>
-        {thumbnailImageDerivative ? (
-          <SmallThumbnail filePath={fallBackFilePath} />
-        ) : (
-          <Link
-            href={objectUrl ? (objectUrl as any) : filePath}
-            passHref={true}
-          >
-            <a>{filePath}</a>
-          </Link>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
       {isLoading ? (
         <LoadingSpinner loading={true} />
       ) : (
         <>
-          {showFile ? (
+          {isImage ? (
             errorStatus === undefined ? (
               <a
                 href={objectUrl as any}
@@ -186,13 +129,7 @@ export function FileView({
                 }}
               >
                 <RcTooltip
-                  overlay={
-                    <>
-                      {isFallbackRender
-                        ? shownTypeIndicatorFallback
-                        : shownTypeIndicator}
-                    </>
-                  }
+                  overlay={<>{shownTypeIndicator}</>}
                   placement="top"
                   align={{
                     points: ["bc", "bc"],
@@ -205,23 +142,14 @@ export function FileView({
                     motionLeave: true
                   }}
                 >
-                  {isImage ? (
-                    <img
-                      alt={imgAlt ?? `File path : ${filePath}`}
-                      src={objectUrl as any}
-                      style={{ height: imgHeight }}
-                      onError={(event) =>
-                        (event.currentTarget.style.display = "none")
-                      }
-                    />
-                  ) : (
-                    <FileViewer
-                      filePath={objectUrl as any}
-                      fileType={fileType}
-                      unsupportedComponent={fallBackRender}
-                      errorComponent={fallBackRender}
-                    />
-                  )}
+                  <img
+                    alt={imgAlt ?? `File path : ${filePath}`}
+                    src={objectUrl as any}
+                    style={{ height: imgHeight }}
+                    onError={(event) =>
+                      (event.currentTarget.style.display = "none")
+                    }
+                  />
                 </RcTooltip>
               </a>
             ) : errorStatus === 403 ? (
