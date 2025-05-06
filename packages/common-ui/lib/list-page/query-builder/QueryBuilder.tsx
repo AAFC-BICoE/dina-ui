@@ -12,7 +12,6 @@ import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
 import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
-import { FaCopy, FaCheck } from "react-icons/fa";
 
 export interface QueryBuilderContextI {
   performSubmit: () => void;
@@ -173,6 +172,12 @@ function QueryBuilder({
           setGroups={setGroups}
           uniqueName={uniqueName}
           triggerSearch={triggerSearch}
+          copiedToClipboard={copiedToClipboard}
+          setCopiedToClipboard={setCopiedToClipboard}
+          onCopyToClipboard={async () => {
+            await onCopyToClipboard();
+            setCopiedToClipboard(true);
+          }}
         />
         <Query
           {...queryBuilderConfig}
@@ -197,21 +202,6 @@ function QueryBuilder({
             className="me-2"
           >
             <CommonMessage id="resetButtonText" />
-          </Button>
-          <Button
-            onClick={async () => {
-              await onCopyToClipboard();
-              setCopiedToClipboard(true);
-            }}
-            className="me-2"
-            disabled={validationErrors.length > 0}
-          >
-            <DinaMessage id="generateURLButtonText" />{" "}
-            {copiedToClipboard ? (
-              <FaCheck style={{ marginBottom: "4px" }} />
-            ) : (
-              <FaCopy style={{ marginBottom: "4px" }} />
-            )}
           </Button>
         </div>
       </QueryBuilderContextProvider>
