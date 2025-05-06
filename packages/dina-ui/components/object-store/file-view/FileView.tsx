@@ -44,7 +44,7 @@ export interface FileViewProps {
   imgHeight?: string;
   downloadLinks?: DownLoadLinks;
   shownTypeIndicator?: ReactNode;
-  preview?: boolean;
+  hideDownload?: boolean;
   metadata?: Metadata;
 }
 
@@ -67,13 +67,13 @@ export function FileView({
   imgHeight,
   downloadLinks,
   shownTypeIndicator,
-  preview,
+  hideDownload,
   metadata
 }: FileViewProps) {
   const { apiClient } = useApiClient();
   const { formatMessage, messages } = useDinaIntl();
 
-  const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
+  const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType?.toLowerCase());
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const visibleRef = useRef<HTMLDivElement>(null);
@@ -102,10 +102,6 @@ export function FileView({
   });
 
   const errorStatus = (error as any)?.cause?.status;
-
-  if (preview || (!isImage && fileType !== "pdf")) {
-    clickToDownload = false;
-  }
 
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
@@ -185,7 +181,7 @@ export function FileView({
             </strong>
           )}
 
-          {!preview && downloadLinks?.original && (
+          {!hideDownload && downloadLinks?.original && (
             <>
               {metadata?.derivatives && metadata?.derivatives?.length === 0 ? (
                 <>

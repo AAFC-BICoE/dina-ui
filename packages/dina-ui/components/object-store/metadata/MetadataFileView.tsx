@@ -7,7 +7,7 @@ import { LoadingSpinner } from "common-ui";
 export interface MetadataFileViewProps {
   metadata: Metadata;
   imgHeight?: string;
-  preview?: boolean;
+  hideDownload?: boolean;
 }
 
 export function getFileToDisplay(metadata) {
@@ -67,7 +67,7 @@ export function getFileToDisplay(metadata) {
 export function MetadataFileView({
   metadata,
   imgHeight,
-  preview
+  hideDownload
 }: MetadataFileViewProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -153,7 +153,7 @@ export function MetadataFileView({
               </div>
             )
           }
-          preview={preview}
+          hideDownload={hideDownload}
           metadata={metadata}
         />
       </div>

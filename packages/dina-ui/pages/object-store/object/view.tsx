@@ -111,16 +111,28 @@ export default function MetadataViewPage() {
           return (
             <div className="row mt-3">
               <div className="col-md-4">
-                <MetadataFileView metadata={response.data} preview={false} />
+                <MetadataFileView
+                  metadata={response.data}
+                  hideDownload={false}
+                />
               </div>
               <div className="col-md-8">
                 <DinaForm initialValues={response.data} readOnly={true}>
-                  <TagSelectReadOnly tagsFieldName="acTags" />
-                  <NotPubliclyReleasableWarning />
-                  <TagsAndRestrictionsSection
-                    tagsFieldName="acTags"
-                    groupSelectorName="bucket"
-                  />
+                  <div className="row d-flex">
+                    <div
+                      className="col-sm-1 mt-2"
+                      style={{ marginLeft: "-5px" }}
+                    >
+                      <NotPubliclyReleasableWarning />
+                    </div>
+                    <div className="col-sm-11">
+                      <TagSelectReadOnly tagsFieldName="acTags" />
+                      <TagsAndRestrictionsSection
+                        tagsFieldName="acTags"
+                        groupSelectorName="bucket"
+                      />
+                    </div>
+                  </div>
                   <MetadataDetails metadata={response.data} />
                   <ExifView objectUpload={response.data.objectUpload} />
                   {customViewQuery && (

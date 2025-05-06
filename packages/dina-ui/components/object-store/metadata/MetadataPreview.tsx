@@ -80,18 +80,22 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
             </div>
           </div>
           {metadata.resourceExternalURL && metadata.derivatives && (
-            <MetadataFileView metadata={metadata} preview={true} />
+            <MetadataFileView metadata={metadata} hideDownload={false} />
           )}
           {metadata.fileIdentifier && (
             <>
-              <MetadataFileView metadata={metadata} preview={true} />
-              <NotPubliclyReleasableWarning />
-              <div className="px-3">
-                <TagsAndRestrictionsSection tagsFieldName="acTags" />
+              <MetadataFileView metadata={metadata} hideDownload={false} />
+              <div className="row d-flex">
+                <div className="col-sm-2 mt-2">
+                  <NotPubliclyReleasableWarning />
+                </div>
+                <div className="col-sm-10">
+                  <TagsAndRestrictionsSection tagsFieldName="acTags" />
+                  <MetadataBadges tagsFieldName="acTags" />
+                </div>
               </div>
             </>
           )}
-          <MetadataBadges tagsFieldName="acTags" />
           <MetadataDetails metadata={metadata} />
           {metadata.fileIdentifier && (
             <ExifView objectUpload={metadata.objectUpload} />
