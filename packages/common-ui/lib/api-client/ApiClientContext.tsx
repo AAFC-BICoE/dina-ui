@@ -155,29 +155,110 @@ export class ApiClientImpl implements ApiClientI {
 
   /**
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.
+   *
+   * If a single request is provided, it will perform the request without the
+   * operation directly. It will still return like an operation response.
    */
   public async doOperations(
     operations: Operation[],
     { apiBaseUrl = "", returnNullForMissingResource }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
+    // Check if no operations were provided and skip performing anything.
+    if (operations.length === 0) {
+      console.warn("Empty operation skipped... Returning empty array.");
+      return [];
+    }
+
     // Unwrap the configured axios instance from the Kitsu instance.
     const { axios } = this.apiClient;
 
-    // Do the operations request.
-    const axiosResponse = await axios.patch(
-      `${apiBaseUrl}/operations`,
-      operations,
-      {
-        headers: {
-          Accept: "application/json-patch+json",
-          "Content-Type": "application/json-patch+json",
-          "Crnk-Compact": "true"
-        }
-      }
-    );
+    // This array will hold the responses from either the single or bulk request
+    let responses: OperationsResponse | BulkGetOperation[];
 
-    const responses: OperationsResponse | BulkGetOperation[] =
-      axiosResponse.data;
+    // Depending on the number of requests being made determines if it's an operation or just a
+    // single request.
+    if (operations.length === 1) {
+      // Single Request Only
+      const operation = operations[0];
+
+      // Request variables
+      const url = `${apiBaseUrl}/${operation.path}`;
+      const headers = {
+        Accept: "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+        "Crnk-Compact": "true"
+      };
+
+      switch (operation.op.toUpperCase()) {
+        case "GET":
+          const getResponse = await axios.get(url, { headers });
+          responses = [
+            {
+              data: getResponse?.data?.data,
+              included: getResponse?.data?.included,
+              status: getResponse?.status
+            }
+          ];
+          break;
+        case "POST":
+          const postResponse = await axios.post(
+            url,
+            { data: operation.value },
+            { headers }
+          );
+          responses = [
+            {
+              data: postResponse?.data?.data,
+              included: postResponse?.data?.included,
+              status: postResponse?.status
+            }
+          ];
+          break;
+        case "PATCH":
+          const patchResponse = await axios.patch(
+            url,
+            { data: operation.value },
+            { headers }
+          );
+          responses = [
+            {
+              data: patchResponse?.data?.data,
+              included: patchResponse?.data?.included,
+              status: patchResponse?.status
+            }
+          ];
+          break;
+        case "DELETE":
+          const deleteResponse = await axios.delete(url, {
+            headers: {
+              "Content-Type": "application/vnd.api+json"
+            }
+          });
+          responses = [
+            {
+              status: deleteResponse.status
+            } as any
+          ];
+          break;
+        default:
+          throw new Error(`Unsupported single operation: ${operation.op}`);
+      }
+    } else {
+      // Perform operations
+      const axiosResponse = await axios.patch(
+        `${apiBaseUrl}/operations`,
+        operations,
+        {
+          headers: {
+            Accept: "application/json-patch+json",
+            "Content-Type": "application/json-patch+json",
+            "Crnk-Compact": "true"
+          }
+        }
+      );
+
+      responses = axiosResponse.data;
+    }
 
     // Optionally return null instead of throwing an error for missing resources:
     if (returnNullForMissingResource) {
