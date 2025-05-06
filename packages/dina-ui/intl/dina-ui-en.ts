@@ -4,6 +4,7 @@
 export const DINAUI_MESSAGES_ENGLISH = {
   LETTER: "Letter",
   NUMERICAL: "Numerical",
+  actions: "Actions",
   actionType: "Action Type",
   addAnother: "Add Another {typeName}",
   addAnotherIdentifier: "Add Another Identifier",
@@ -577,6 +578,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   language: "Language",
   languageOfPage: "eng",
   largeImg: "Large Image",
+  croppedImg: "Cropped Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
@@ -707,6 +709,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationGermanNameLabel: "German Name",
   organizationListTitle: "Organizations",
   originalFile: "Original File",
+  downloadFile: "Download",
+  derivatives: "Derivatives",
   originalMaterialSampleLabel: "Original Material Sample",
   overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",
