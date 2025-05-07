@@ -85,6 +85,16 @@ function testMaterialSample(): InputResource<MaterialSample> {
   };
 }
 
+function testMaterialSampleNoCollectingEvent(): InputResource<MaterialSample> {
+  return {
+    id: "1",
+    type: "material-sample",
+    group: "test group",
+    materialSampleName: "my-sample-name",
+    ...blankMaterialSample()
+  };
+}
+
 const mockGeographicSearchResults = [
   {
     place_id: 342812712,
@@ -382,6 +392,84 @@ describe("Material Sample Edit Page", () => {
               id: "1",
               type: "material-sample",
               materialSampleName: "test-material-sample-id"
+            },
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Edits an existing material sample to add a collecting event", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSampleNoCollectingEvent()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await new Promise(setImmediate);
+
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
+    await new Promise(setImmediate);
+
+    // Set the new Collecting Event's verbatimEventDateTime:
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
+      "2019-12-21T16:00"
+    );
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /primary id/i }),
+      "test-material-sample-id"
+    );
+
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await new Promise(setImmediate);
+
+    // Saves the Collecting Event and the Material Sample:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        // New collecting-event created:
+        [
+          {
+            resource: {
+              group: "aafc",
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
+              verbatimEventDateTime: "2019-12-21T16:00",
+              publiclyReleasable: true, // Default Value
+              type: "collecting-event"
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        // Existing material-sample updated:
+        [
+          {
+            resource: {
+              collectingEvent: {
+                id: "11111111-1111-1111-1111-111111111111",
+                type: "collecting-event"
+              },
+              id: "1",
+              materialSampleName: "test-material-sample-id",
+              type: "material-sample"
             },
             type: "material-sample"
           }
