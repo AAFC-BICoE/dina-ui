@@ -272,7 +272,11 @@ export default function QueryRowColumnFunctionInput({
             indexValue = `${
               JSON.parse(fieldPath)?.selectedManagedAttributeConfig?.value
             }`;
-            if (field.parentName) {
+
+            if (
+              field.parentName &&
+              JSON.parse(fieldPath)?.selectedManagedAttribute?.key
+            ) {
               indexValue = `${field.parentName}.${field.label}.${
                 JSON.parse(fieldPath)?.selectedManagedAttribute?.key
               }`;

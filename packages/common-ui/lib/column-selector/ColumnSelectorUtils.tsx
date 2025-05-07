@@ -1130,13 +1130,22 @@ export function FunctionFieldLabel({
     const functionName = pathParts[2];
     const paramStr = pathParts.length > 3 ? pathParts[3] : undefined;
     const paramObjects = compact(
-      paramStr?.split("+").map((field) =>
-        indexMappings?.find((mapping) => {
+      paramStr?.split("+").map((field) => {
+        const paramObject = indexMappings?.find((mapping) => {
           return mapping.parentName
-            ? mapping.value === field
+            ? mapping.value === field ||
+                field.includes(`${mapping.parentName}.${mapping.label}`)
             : mapping.label === field;
-        })
-      )
+        });
+        if (
+          paramObject &&
+          paramObject.parentName &&
+          paramObject.value !== field
+        ) {
+          paramObject.parentName = field;
+        }
+        return paramObject;
+      })
     );
     const formattedParamStr =
       paramObjects && paramObjects.length > 0
