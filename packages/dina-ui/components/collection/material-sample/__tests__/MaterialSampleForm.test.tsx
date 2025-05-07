@@ -426,6 +426,7 @@ describe("Material Sample Edit Page", () => {
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
       "2019-12-21T16:00"
     );
+    userEvent.clear(wrapper.getByRole("textbox", { name: /primary id/i }));
     userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
