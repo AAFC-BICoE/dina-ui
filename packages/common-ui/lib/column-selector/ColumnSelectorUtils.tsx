@@ -1131,22 +1131,26 @@ export function FunctionFieldLabel({
     const paramStr = pathParts.length > 3 ? pathParts[3] : undefined;
     const paramObjects = compact(
       paramStr?.split("+").map((field) => {
-        const paramObject = indexMappings?.find((mapping) => {
-          return mapping.parentName
+        const mappingMatch = indexMappings?.find((mapping) =>
+          mapping.parentName
             ? mapping.value === field ||
-                field.includes(`${mapping.parentName}.${mapping.label}`)
-            : mapping.label === field;
-        });
-        if (
-          paramObject &&
-          paramObject.parentName &&
-          paramObject.value !== field
-        ) {
-          paramObject.parentName = field;
+              field.includes(`${mapping.parentName}.${mapping.label}`)
+            : mapping.label === field
+        );
+
+        if (!mappingMatch) return undefined;
+
+        // Create new object instead of referencing object from indexMappings
+        const paramObject = { ...mappingMatch };
+
+        if (paramObject.parentName && paramObject.value !== field) {
+          paramObject.label = field.replace(paramObject.parentName, "");
         }
+
         return paramObject;
       })
     );
+
     const formattedParamStr =
       paramObjects && paramObjects.length > 0
         ? " (" +
