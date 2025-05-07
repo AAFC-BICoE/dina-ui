@@ -1,6 +1,5 @@
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React from "react";
-import { Button } from "react-bootstrap";
 import { FaCheck, FaCopy } from "react-icons/fa";
 
 interface CopyToClipboardButtonProps {
@@ -15,14 +14,14 @@ function CopyToClipboardButton({
   onCopyToClipboard
 }: CopyToClipboardButtonProps) {
   return (
-    <Button onClick={onCopyToClipboard} className="me-2">
+    <div onClick={onCopyToClipboard} className="me-2">
       <DinaMessage id="generateURLButtonText" />{" "}
       {copiedToClipboard ? (
         <FaCheck style={{ marginBottom: "4px" }} />
       ) : (
         <FaCopy style={{ marginBottom: "4px" }} />
       )}
-    </Button>
+    </div>
   );
 }
 
