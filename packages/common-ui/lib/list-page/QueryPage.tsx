@@ -70,6 +70,10 @@ import {
   parseQueryTreeFromURL,
   serializeQueryTreeToURL
 } from "./query-url/queryUtils";
+import {
+  createLastUsedSavedSearchChangedKey,
+  createSessionStorageLastUsedTreeKey
+} from "./saved-searches/SavedSearch";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -435,12 +439,9 @@ export function QueryPage<TData extends KitsuResource>({
     return { group: groups };
   }, [groups]);
 
-  const sessionStorageLastUsedKeyTreeKey = uniqueName + "-last-used-tree";
-  const localStorageLastUsedSavedSearchChangedKey =
-    uniqueName + "-saved-search-changed";
   const [_sessionStorageQueryTree, setSessionStorageQueryTree] =
     useSessionStorage<JsonTree>(
-      sessionStorageLastUsedKeyTreeKey,
+      createSessionStorageLastUsedTreeKey(uniqueName),
       defaultJsonTree
     );
 
@@ -625,6 +626,7 @@ export function QueryPage<TData extends KitsuResource>({
         if (parsedQueryTree) {
           setQueryBuilderTree(parsedQueryTree);
           setSubmittedQueryBuilderTree(parsedQueryTree);
+          setSessionStorageQueryTree(Utils.getTree(parsedQueryTree));
         }
       }
     }
@@ -851,7 +853,7 @@ export function QueryPage<TData extends KitsuResource>({
     setSubmittedQueryBuilderTree(defaultQueryTree());
     setQueryBuilderTree(defaultQueryTree());
     setSessionStorageQueryTree(defaultJsonTree);
-    writeStorage(localStorageLastUsedSavedSearchChangedKey, false);
+    writeStorage(createLastUsedSavedSearchChangedKey(uniqueName), false);
     setSortingRules(defaultSort ?? DEFAULT_SORT);
     setError(undefined);
     setPageOffset(0);
@@ -876,15 +878,6 @@ export function QueryPage<TData extends KitsuResource>({
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
     setSessionStorageQueryTree(Utils.getTree(queryBuilderTree));
-    const serializedTree = serializeQueryTreeToURL(queryBuilderTree);
-    router.push(
-      {
-        pathname: router.pathname,
-        query: serializedTree !== null ? { queryTree: serializedTree } : null
-      },
-      undefined,
-      { shallow: true }
-    );
   };
 
   /**
@@ -992,6 +985,22 @@ export function QueryPage<TData extends KitsuResource>({
     }
   }
 
+  async function onCopyToClipboard() {
+    const serializedTree = serializeQueryTreeToURL(queryBuilderTree);
+
+    const query =
+      serializedTree !== null
+        ? `?queryTree=${encodeURIComponent(serializedTree)}`
+        : "";
+    const fullUrl = `${window.location.origin}${router.pathname}${query}`;
+
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+    } catch (err) {
+      console.error("Failed to copy URL:", err);
+    }
+  }
+
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
@@ -1018,6 +1027,7 @@ export function QueryPage<TData extends KitsuResource>({
             </div>
           )}
           <QueryBuilderMemo
+            onCopyToClipboard={onCopyToClipboard}
             indexName={indexName}
             queryBuilderTree={queryBuilderTree}
             setQueryBuilderTree={onQueryBuildTreeChange}
