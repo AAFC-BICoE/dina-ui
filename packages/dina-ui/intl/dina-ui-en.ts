@@ -1229,5 +1229,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   fileNameAliasField: "File Name Alias Field",
   downloadTemplate: "Download Template",
   existingTemplates: "Existing Templates",
-  viewMaterialSamplesInCollection: "View material samples in this collection"
+  viewMaterialSamplesInCollection: "View material samples in this collection",
+  generateURLButtonText: "Generate URL"
 };
