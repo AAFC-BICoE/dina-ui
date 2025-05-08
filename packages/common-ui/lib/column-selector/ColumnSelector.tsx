@@ -274,7 +274,15 @@ export function ColumnSelector<TData extends KitsuResource>(
         const promises = overrideDisplayedColumns?.columns?.map?.(
           async (localColumn, index) => {
             const columnFunctionPath = localColumn.includes("function")
-              ? `columnFunction/${localColumn}/${overrideDisplayedColumns.columnFunctions?.[localColumn].functionName}`
+              ? overrideDisplayedColumns.columnFunctions?.[localColumn]
+                  .functionName === "CONCAT"
+                ? `columnFunction/${localColumn}/${
+                    overrideDisplayedColumns.columnFunctions?.[localColumn]
+                      .functionName
+                  }/${overrideDisplayedColumns.columnFunctions?.[
+                    localColumn
+                  ].params.join("+")}`
+                : `columnFunction/${localColumn}/${overrideDisplayedColumns.columnFunctions?.[localColumn].functionName}`
               : undefined;
 
             const newColumnDefinition = await generateColumnDefinition({

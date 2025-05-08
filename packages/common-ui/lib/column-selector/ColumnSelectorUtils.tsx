@@ -46,14 +46,17 @@ export function getColumnFunctions<TData extends KitsuResource>(
     .reduce((prev, curr) => {
       const columnParts = curr.columnSelectorString?.split("/");
       if (columnParts) {
+        const functionName = columnParts[2];
+        const functionParams = columnParts[3]?.split("+");
+        const params =
+          functionName === "CONVERT_COORDINATES_DD"
+            ? ["collectingEvent.eventGeom"]
+            : functionParams;
         return {
           ...prev,
           [columnParts[1]]: {
             functionName: columnParts[2],
-            params:
-              columnParts[2] === "CONVERT_COORDINATES_DD"
-                ? ["collectingEvent.eventGeom"]
-                : columnParts[3].split("+")
+            params: params
           }
         };
       }
