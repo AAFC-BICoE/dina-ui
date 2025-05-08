@@ -119,7 +119,7 @@ export default function QueryRowManagedAttributeSearch({
     if (setValue) {
       setValue(JSON.stringify(managedAttributeState));
     }
-  }, [managedAttributeState]);
+  }, [managedAttributeState, setValue]);
 
   // Convert a value from Query Builder into the Managed Attribute State in this component.
   // Dependent on the managedAttributeConfig to indicate when it's changed.
