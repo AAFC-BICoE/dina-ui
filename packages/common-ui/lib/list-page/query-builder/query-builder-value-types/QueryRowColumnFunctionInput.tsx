@@ -4,6 +4,11 @@ import Select from "react-select";
 import { useDinaIntl } from "../../../../../dina-ui/intl/dina-ui-intl";
 import { ESIndexMapping } from "../../types";
 import { QueryFieldSelector } from "../query-builder-core-components/QueryFieldSelector";
+import QueryRowClassificationSearch from "./QueryBuilderClassificationSearch";
+import QueryRowFieldExtensionSearch from "./QueryBuilderFieldExtensionSearch";
+import QueryRowIdentifierSearch from "./QueryBuilderIdentifierSearch";
+import QueryRowManagedAttributeSearch from "./QueryBuilderManagedAttributeSearch";
+import QueryRowRelationshipPresenceSearch from "./QueryBuilderRelationshipPresenceSearch";
 
 interface QueryRowColumnFunctionInputProps {
   /**
@@ -29,7 +34,7 @@ interface QueryRowColumnFunctionInputProps {
   /**
    * Index mapping containing all of the fields that should be displayed in the list.
    */
-  indexMapping: ESIndexMapping[] | undefined;
+  indexMapping: ESIndexMapping[];
 }
 
 export interface FormulaOption {
@@ -67,18 +72,34 @@ export default function QueryRowColumnFunctionInput({
   ];
 
   const [columnFunctionSearchState, setColumnFunctionSearchState] =
-    useState<ColumnFunctionSearchStates>(() =>
+    useState<ColumnFunctionSearchStates>(
       value
         ? JSON.parse(value)
         : {
-            functionName: "",
+            functionName: undefined,
             params: undefined
           }
     );
 
+  const [
+    submittedColumnFunctionSearchState,
+    setSubmittedColumnFunctionSearchState
+  ] = useState<ColumnFunctionSearchStates>(
+    value
+      ? JSON.parse(value)
+      : {
+          functionName: undefined,
+          params: undefined
+        }
+  );
+
   const onFormulaChanged = (newFormula: FunctionNameType) => {
     if (columnFunctionSearchState.functionName !== newFormula) {
       setColumnFunctionSearchState({
+        functionName: newFormula as any,
+        params: newFormula === "CONCAT" ? [undefined] : undefined
+      });
+      setSubmittedColumnFunctionSearchState({
         functionName: newFormula as any,
         params: newFormula === "CONCAT" ? [undefined] : undefined
       });
@@ -87,15 +108,19 @@ export default function QueryRowColumnFunctionInput({
 
   // Convert the state in this component to a value that can be stored in the Query Builder.
   useEffect(() => {
-    if (setValue && isValid(columnFunctionSearchState)) {
-      setValue(JSON.stringify({ [functionId]: columnFunctionSearchState }));
+    if (setValue && isValid(submittedColumnFunctionSearchState)) {
+      setValue(
+        JSON.stringify({
+          [functionId]: submittedColumnFunctionSearchState
+        })
+      );
     }
-  }, [columnFunctionSearchState, setValue]);
+  }, [submittedColumnFunctionSearchState, setValue]);
 
   // Convert a value from Query Builder into the Field Extension State in this component.
   useEffect(() => {
     if (value) {
-      setColumnFunctionSearchState(
+      setSubmittedColumnFunctionSearchState(
         Object.values(JSON.parse(value))[0] as ColumnFunctionSearchStates
       );
     }
@@ -104,9 +129,7 @@ export default function QueryRowColumnFunctionInput({
   const indexMappingFiltered = useMemo(() => {
     return (
       indexMapping?.filter(
-        (item) => !item.dynamicField
-        // TODO:  filter out columnFunction only like this item.dynamicField?.type !== "columnFunction",
-        // but we need to handle the dynamic column input
+        (item) => item.dynamicField?.type !== "columnFunction"
       ) ?? []
     );
   }, indexMapping);
@@ -133,12 +156,26 @@ export default function QueryRowColumnFunctionInput({
   ).concat(undefined);
 
   const setFunctionParam = (fieldPath: string, index: number) => {
-    const params = columnFunctionSearchState.params!;
+    const params = columnFunctionSearchState.params ?? [];
     params[index] = indexMapping?.find((item) => item.value === fieldPath);
+
+    const submittedParams = submittedColumnFunctionSearchState.params ?? [];
+    submittedParams[index] = indexMapping?.find(
+      (item) => item.value === fieldPath
+    );
+
     setColumnFunctionSearchState({
       functionName: columnFunctionSearchState.functionName,
       params: [...params]
     });
+    setSubmittedColumnFunctionSearchState({
+      functionName: submittedColumnFunctionSearchState.functionName,
+      params: [...submittedParams]
+    });
+  };
+
+  const onColumnItemSelected = (columnPath: string, index: number) => {
+    setFunctionParam(columnPath, index);
   };
 
   return (
@@ -157,27 +194,147 @@ export default function QueryRowColumnFunctionInput({
       />
       {/* Field Selector */}
       {selectedFunction && selectedFunction.value === "CONCAT" ? (
-        functionParams.map((field, index) => (
-          <div key={index}>
-            <label
-              className={
-                isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"
-              }
-            >
-              <strong>{formatMessage("selectFieldToUseWithFunction")}:</strong>
-            </label>
-            <QueryFieldSelector
-              className={isInColumnSelector ? "ps-0" : "col me-1 ms-2 ps-0"}
-              indexMap={indexMappingFiltered}
-              currentField={field?.value}
-              setField={(fieldPath) => setFunctionParam(fieldPath, index)}
-              isInColumnSelector={true}
-            />
-          </div>
-        ))
+        functionParams.map((field, index) => {
+          return (
+            <div key={index}>
+              <label
+                className={
+                  isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"
+                }
+              >
+                <strong>
+                  {formatMessage("selectFieldToUseWithFunction")}:
+                </strong>
+              </label>
+              <QueryFieldSelector
+                className={isInColumnSelector ? "ps-0" : "col me-1 ms-2 ps-0"}
+                indexMap={indexMappingFiltered}
+                currentField={field?.value}
+                setField={(fieldPath) => onColumnItemSelected(fieldPath, index)}
+                isInColumnSelector={true}
+              />
+              {field?.dynamicField?.type === "managedAttribute" && (
+                <QueryRowManagedAttributeSearch
+                  indexMap={indexMapping}
+                  managedAttributeConfig={field}
+                  isInColumnSelector={true}
+                  setValue={onDynamicFieldSearchChange(field, index)}
+                />
+              )}
+              {field?.dynamicField?.type === "fieldExtension" && (
+                <QueryRowFieldExtensionSearch
+                  fieldExtensionConfig={field}
+                  setValue={onDynamicFieldSearchChange(field, index)}
+                  isInColumnSelector={true}
+                />
+              )}
+              {field?.dynamicField?.type === "identifier" && (
+                <QueryRowIdentifierSearch
+                  indexMap={indexMapping}
+                  identifierConfig={field}
+                  isInColumnSelector={true}
+                  setValue={onDynamicFieldSearchChange(field, index)}
+                />
+              )}
+              {field?.dynamicField?.type === "relationshipPresence" && (
+                <QueryRowRelationshipPresenceSearch
+                  setValue={onDynamicFieldSearchChange(field, index)}
+                  indexMapping={indexMapping!}
+                  isInColumnSelector={true}
+                />
+              )}
+              {field?.dynamicField?.type === "classification" && (
+                <QueryRowClassificationSearch
+                  setValue={onDynamicFieldSearchChange(field, index)}
+                  isInColumnSelector={true}
+                />
+              )}
+            </div>
+          );
+        })
       ) : (
         <></>
       )}
     </div>
   );
+
+  function onDynamicFieldSearchChange(
+    field: ESIndexMapping,
+    index: number
+  ): ((fieldPath: string) => void) | undefined {
+    return (fieldPath) => {
+      if (field?.dynamicField) {
+        const params = [...(submittedColumnFunctionSearchState.params ?? [])];
+        let indexValue: string;
+        let foundIndexMapping: ESIndexMapping | undefined = undefined;
+        switch (field.dynamicField.type) {
+          case "managedAttribute":
+            indexValue = `${
+              JSON.parse(fieldPath)?.selectedManagedAttributeConfig?.value
+            }`;
+
+            if (
+              field.parentName &&
+              JSON.parse(fieldPath)?.selectedManagedAttribute?.key
+            ) {
+              indexValue = `${field.parentName}.${field.label}.${
+                JSON.parse(fieldPath)?.selectedManagedAttribute?.key
+              }`;
+              foundIndexMapping = {
+                ...field,
+                value: indexValue
+              };
+            }
+            break;
+          case "fieldExtension":
+            indexValue = `${field.path}.${
+              JSON.parse(fieldPath)?.selectedExtension
+            }.${JSON.parse(fieldPath)?.selectedField}`;
+            if (field.parentName) {
+              indexValue = indexValue.replace(
+                "included.attributes",
+                field.parentName
+              );
+              foundIndexMapping = {
+                ...field,
+                value: indexValue
+              };
+            }
+            break;
+          case "classification":
+            indexValue = `${field.path}.${
+              JSON.parse(fieldPath)?.selectedClassificationRank
+            }`;
+
+            break;
+          case "identifier":
+            indexValue = `${
+              JSON.parse(fieldPath)?.selectedIdentifierConfig?.value
+            }`;
+            break;
+          default:
+            break;
+        }
+        foundIndexMapping =
+          foundIndexMapping ??
+          indexMapping?.find((item) => {
+            return item.value === indexValue;
+          });
+
+        // Only update state if new indexMapping is different from prev
+        if (
+          foundIndexMapping &&
+          JSON.stringify(foundIndexMapping) !== JSON.stringify(params.at(index))
+        ) {
+          params[index] = foundIndexMapping;
+
+          // Update dynamicField for submitted column function search state only to prevent unwanted dropdown changes
+          setSubmittedColumnFunctionSearchState((prev) => ({
+            ...prev,
+            params: params
+          }));
+        }
+      }
+    };
+  }
 }

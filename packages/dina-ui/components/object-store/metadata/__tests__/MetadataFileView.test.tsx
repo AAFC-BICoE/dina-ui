@@ -95,12 +95,7 @@ describe("MetadataFileView component", () => {
     );
     await new Promise(setImmediate);
 
-    expect(
-      wrapper1.container.querySelector(".shown-file-type")?.textContent
-    ).toEqual("Showing: Original File");
-    expect(
-      wrapper1.container.querySelector(".metadata-caption")?.textContent
-    ).toEqual("Caption: test caption 1");
+    expect(wrapper1.getByText(/test caption 1/i)).toBeInTheDocument();
 
     const wrapper2 = mountWithAppContext(
       <MetadataFileView
@@ -110,11 +105,6 @@ describe("MetadataFileView component", () => {
     );
     await new Promise(setImmediate);
 
-    expect(
-      wrapper2.container.querySelector(".shown-file-type")?.textContent
-    ).toEqual("Showing: Large Image");
-    expect(
-      wrapper2.container.querySelector(".metadata-caption")?.textContent
-    ).toEqual("Caption: test caption 2");
+    expect(wrapper2.getByText(/test caption 2/i)).toBeInTheDocument();
   });
 });

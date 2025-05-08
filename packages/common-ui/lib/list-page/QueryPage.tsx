@@ -66,7 +66,10 @@ import {
 import { MemoizedReactTable } from "./QueryPageTable";
 import { GroupSelectFieldMemoized } from "./QueryGroupSelection";
 import { useRouter } from "next/router";
-import { parseQueryTreeFromURL } from "./query-url/queryUtils";
+import {
+  parseQueryTreeFromURL,
+  serializeQueryTreeToURL
+} from "./query-url/queryUtils";
 import {
   createLastUsedSavedSearchChangedKey,
   createSessionStorageLastUsedTreeKey
@@ -623,6 +626,7 @@ export function QueryPage<TData extends KitsuResource>({
         if (parsedQueryTree) {
           setQueryBuilderTree(parsedQueryTree);
           setSubmittedQueryBuilderTree(parsedQueryTree);
+          setSessionStorageQueryTree(Utils.getTree(parsedQueryTree));
         }
       }
     }
@@ -981,6 +985,22 @@ export function QueryPage<TData extends KitsuResource>({
     }
   }
 
+  async function onCopyToClipboard() {
+    const serializedTree = serializeQueryTreeToURL(queryBuilderTree);
+
+    const query =
+      serializedTree !== null
+        ? `?queryTree=${encodeURIComponent(serializedTree)}`
+        : "";
+    const fullUrl = `${window.location.origin}${router.pathname}${query}`;
+
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+    } catch (err) {
+      console.error("Failed to copy URL:", err);
+    }
+  }
+
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
@@ -1007,6 +1027,7 @@ export function QueryPage<TData extends KitsuResource>({
             </div>
           )}
           <QueryBuilderMemo
+            onCopyToClipboard={onCopyToClipboard}
             indexName={indexName}
             queryBuilderTree={queryBuilderTree}
             setQueryBuilderTree={onQueryBuildTreeChange}

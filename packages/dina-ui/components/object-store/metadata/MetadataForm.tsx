@@ -75,7 +75,11 @@ export function MetadataForm({
       {buttonBar}
       <div className="mb-3">
         {metadata?.derivatives && (
-          <MetadataFileView metadata={metadata as Metadata} imgHeight="15rem" />
+          <MetadataFileView
+            metadata={metadata as Metadata}
+            imgHeight="15rem"
+            hideDownload={true}
+          />
         )}
       </div>
       <MetadataBadges />
