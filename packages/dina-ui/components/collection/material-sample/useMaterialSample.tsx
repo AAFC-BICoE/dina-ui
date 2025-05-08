@@ -757,7 +757,9 @@ export function useMaterialSampleSave({
         // Link the MaterialSample to the CollectingEvent:
         if (
           !msInitialValues.id ||
-          msInitialValues?.collectingEvent?.id !== submittedCollectingEvent?.id
+          msInitialValues?.collectingEvent?.id !==
+            submittedCollectingEvent?.id ||
+          !msInitialValues.collectingEvent
         ) {
           msDiff.collectingEvent = {
             id: savedCollectingEvent.id,
