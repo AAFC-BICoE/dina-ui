@@ -54,6 +54,11 @@ import {
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
   MAX_OBJECT_EXPORT_TOTAL
 } from "packages/common-ui/lib/export/exportUtils";
+import {
+  convertColumnsToAliases,
+  convertColumnsToPaths,
+  getColumnFunctions
+} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
 
 export interface SavedExportOption {
   label?: string;
@@ -156,6 +161,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     setRestrictToCreatedBy,
     setPubliclyReleaseable
   } = useSavedExports<TData>({ exportType, selectedSeparator });
+
   async function exportData(formik) {
     setLoading(true);
 
@@ -168,23 +174,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     }
     const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
 
-    const columnFunctions = columnsToExport
-      .filter((c) => c.columnSelectorString?.startsWith("columnFunction/"))
-      .reduce((prev, curr) => {
-        const columnParts = curr.columnSelectorString?.split("/");
-        if (columnParts) {
-          return {
-            ...prev,
-            [columnParts[1]]: {
-              functionName: columnParts[2],
-              params:
-                columnParts[2] === "CONVERT_COORDINATES_DD"
-                  ? ["collectingEvent.eventGeom"]
-                  : columnParts[3].split("+")
-            }
-          };
-        }
-      }, {});
+    const columnFunctions = getColumnFunctions<TData>(columnsToExport);
 
     // Make query to data-export
     const dataExportSaveArg: SaveArgs<DataExport> = {
@@ -192,12 +182,8 @@ export default function ExportPage<TData extends KitsuResource>() {
         type: "data-export",
         source: indexName,
         query: queryString,
-        columns: columnsToExport.map((item) =>
-          item.columnSelectorString?.startsWith("columnFunction/")
-            ? item.columnSelectorString?.split("/")[1] // Get functionId
-            : item.id ?? ""
-        ),
-        columnAliases: columnsToExport.map((item) => item?.exportHeader ?? ""),
+        columns: convertColumnsToPaths(columnsToExport),
+        columnAliases: convertColumnsToAliases(columnsToExport),
         columnFunctions:
           Object.keys(columnFunctions ?? {}).length === 0
             ? undefined

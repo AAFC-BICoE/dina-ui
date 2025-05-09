@@ -273,14 +273,25 @@ export function ColumnSelector<TData extends KitsuResource>(
       if (injectedIndexMapping && overrideDisplayedColumns) {
         const promises = overrideDisplayedColumns?.columns?.map?.(
           async (localColumn, index) => {
+            const columnFunctionPath = localColumn.includes("function")
+              ? overrideDisplayedColumns.columnFunctions?.[localColumn]
+                  .functionName === "CONCAT"
+                ? `columnFunction/${localColumn}/${
+                    overrideDisplayedColumns.columnFunctions?.[localColumn]
+                      .functionName
+                  }/${overrideDisplayedColumns.columnFunctions?.[
+                    localColumn
+                  ].params.join("+")}`
+                : `columnFunction/${localColumn}/${overrideDisplayedColumns.columnFunctions?.[localColumn].functionName}`
+              : undefined;
+
             const newColumnDefinition = await generateColumnDefinition({
               indexMappings: injectedIndexMapping,
               dynamicFieldsMappingConfig,
               apiClient,
               defaultColumns,
-              path: localColumn
+              path: columnFunctionPath ?? localColumn
             });
-
             // Set the column header if saved.
             if (newColumnDefinition) {
               newColumnDefinition.exportHeader =

@@ -14,6 +14,11 @@ import {
   ExportType
 } from "packages/dina-ui/types/dina-export-api";
 import Select from "react-select";
+import {
+  convertColumnsToAliases,
+  convertColumnsToPaths,
+  getColumnFunctions
+} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
 
 export const VISIBILITY_OPTIONS: {
   label: JSX.Element;
@@ -54,6 +59,7 @@ export default function useSavedExports<TData extends KitsuResource>({
   const [allSavedExports, setAllSavedExports] = useState<DataExportTemplate[]>(
     []
   );
+
   const [loadingSavedExports, setLoadingSavedExports] = useState<boolean>(true);
 
   // Currently selected states...
@@ -175,6 +181,7 @@ export default function useSavedExports<TData extends KitsuResource>({
    * @param savedExport The savedExportColumnSelection to be added to the user preferences.
    */
   async function performUpdateSavedExport(): Promise<DataExportTemplate> {
+    const columnFunctions = getColumnFunctions(columnsToExport);
     const updatedSavedExportResp = await apiClient.axios.patch(
       `/dina-export-api/data-export-template/${selectedSavedExport?.id}`,
       {
@@ -188,7 +195,11 @@ export default function useSavedExports<TData extends KitsuResource>({
             restrictToCreatedBy: restrictToCreatedBy,
             publiclyReleasable: publiclyReleasable,
             exportType: exportType,
-            exportOptions: { columnSeparator: selectedSeparator.value }
+            exportOptions: { columnSeparator: selectedSeparator.value },
+            columnFunctions:
+              Object.keys(columnFunctions ?? {}).length === 0
+                ? undefined
+                : columnFunctions
           }
         }
       },
@@ -229,6 +240,7 @@ export default function useSavedExports<TData extends KitsuResource>({
    * @param savedExport The savedExportColumnSelection to be added to the user preferences.
    */
   async function performCreateSavedExport(): Promise<DataExportTemplate> {
+    const columnFunctions = getColumnFunctions(columnsToExport);
     const createdSavedExportResp = await apiClient.axios.post(
       `/dina-export-api/data-export-template`,
       {
@@ -242,7 +254,11 @@ export default function useSavedExports<TData extends KitsuResource>({
             publiclyReleasable: publiclyReleasable,
             exportType: exportType,
             exportOptions: { columnSeparator: selectedSeparator.value },
-            group: groupNames?.[0]
+            group: groupNames?.[0],
+            columnFunctions:
+              Object.keys(columnFunctions ?? {}).length === 0
+                ? undefined
+                : columnFunctions
           }
         }
       },
@@ -282,20 +298,6 @@ export default function useSavedExports<TData extends KitsuResource>({
         console.error(error);
         setLoadingSavedExports(false);
       });
-  }
-
-  function convertColumnsToPaths(columns): string[] {
-    if (!columns) {
-      return [];
-    }
-    return columns.map((column) => column?.id ?? "");
-  }
-
-  function convertColumnsToAliases(columns): string[] {
-    if (!columns) {
-      return [];
-    }
-    return columns.map((column) => column?.exportHeader ?? "");
   }
 
   /**

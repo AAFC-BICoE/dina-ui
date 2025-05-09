@@ -20,6 +20,49 @@ import {
 import { ClassificationSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 import { VocabularyElement } from "packages/dina-ui/types/collection-api";
 
+export function convertColumnsToAliases(columns): string[] {
+  if (!columns) {
+    return [];
+  }
+  return columns.map((column) => column?.exportHeader ?? "");
+}
+
+export function convertColumnsToPaths(columns): string[] {
+  if (!columns) {
+    return [];
+  }
+  return columns.map((column) =>
+    column.columnSelectorString?.startsWith("columnFunction/")
+      ? column.columnSelectorString?.split("/")[1] // Get functionId
+      : column.id ?? ""
+  );
+}
+
+export function getColumnFunctions<TData extends KitsuResource>(
+  columnsToExport: TableColumn<TData>[]
+) {
+  return columnsToExport
+    .filter((c) => c.columnSelectorString?.startsWith("columnFunction/"))
+    .reduce((prev, curr) => {
+      const columnParts = curr.columnSelectorString?.split("/");
+      if (columnParts) {
+        const functionName = columnParts[2];
+        const functionParams = columnParts[3]?.split("+");
+        const params =
+          functionName === "CONVERT_COORDINATES_DD"
+            ? ["collectingEvent.eventGeom"]
+            : functionParams;
+        return {
+          ...prev,
+          [columnParts[1]]: {
+            functionName: columnParts[2],
+            params: params
+          }
+        };
+      }
+    }, {});
+}
+
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
   indexMapping: ESIndexMapping;
