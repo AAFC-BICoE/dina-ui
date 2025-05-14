@@ -20,6 +20,7 @@ import { Metadata } from "../../../types/objectstore-api";
 import Kitsu from "kitsu";
 import { handleDownloadLink } from "../object-store-utils";
 import { pdfjs } from "react-pdf";
+import { PDFViewer } from "./PDFViewer";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -104,7 +105,7 @@ export function FileView({
       {` ${formatMessage("thumbnail")}`}
     </div>
   );
-  const showFile = !(isSpreadsheet || isTextDoc);
+  const showFile = !(isSpreadsheet || isTextDoc) || fileType === "pdf";
 
   function onSuccess(response) {
     setObjectURL(window?.URL?.createObjectURL(response));
@@ -191,7 +192,9 @@ export function FileView({
                   width: "fit-content"
                 }}
               >
-                {isImage ? (
+                {fileType === "pdf" ? (
+                  <PDFViewer fileUrl={objectURL} />
+                ) : isImage ? (
                   <img
                     alt={imgAlt ?? `File path : ${filePath}`}
                     src={objectURL}
