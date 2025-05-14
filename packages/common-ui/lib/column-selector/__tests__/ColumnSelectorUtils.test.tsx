@@ -1,4 +1,5 @@
 import {
+  collectPathValues,
   generateColumnPath,
   parseRelationshipNameFromType
 } from "../ColumnSelectorUtils";
@@ -389,10 +390,86 @@ describe("ColumnSelectorUtils", () => {
       expect(
         parseRelationshipNameFromType("identifier~parentMaterialSample")
       ).toEqual("parentMaterialSample");
+
+      expect(
+        parseRelationshipNameFromType("fieldExtension~collectingEvent")
+      ).toEqual("collectingEvent");
     });
 
     it("Returns undefined if no relationshipName is provided", () => {
       expect(parseRelationshipNameFromType("identifier")).toBeUndefined();
+    });
+  });
+
+  describe("collectPathValues", () => {
+    // Test basic object property access
+    test("gets a value from a simple object", () => {
+      const obj = { a: { b: { c: "value" } } };
+      expect(collectPathValues(obj, "a.b.c")).toBe("value");
+    });
+
+    // Test array handling - single level
+    test("joins values from multiple array elements", () => {
+      const obj = { a: { b: [{ c: "value1" }, { c: "value2" }] } };
+      expect(collectPathValues(obj, "a.b.c")).toBe("value1; value2");
+    });
+
+    test("returns a semi-colon separated string when the path ends at an array", () => {
+      const obj = { a: { b: ["first", "second", "third"] } };
+      expect(collectPathValues(obj, "a.b")).toBe("first; second; third");
+    });
+
+    // Test array handling - multiple levels
+    test("gets values through multiple arrays", () => {
+      const obj = {
+        a: [{ b: [{ c: "value1" }] }, { b: [{ c: "value2" }, { c: "value3" }] }]
+      };
+      expect(collectPathValues(obj, "a.b.c")).toBe("value1; value2; value3");
+    });
+
+    // Test handling of missing values
+    test("ignores undefined values when joining results", () => {
+      const obj = {
+        a: [
+          { b: "value1" },
+          { c: "value2" }, // b is missing
+          { b: "value3" }
+        ]
+      };
+      expect(collectPathValues(obj, "a.b")).toBe("value1; value3");
+    });
+
+    // Test empty arrays
+    test("returns undefined for empty arrays", () => {
+      const obj = { a: { b: [] } };
+      expect(collectPathValues(obj, "a.b.c")).toBeUndefined();
+    });
+
+    // Test null/undefined values
+    test("returns undefined when encountering null", () => {
+      const obj = { a: { b: null } };
+      expect(collectPathValues(obj, "a.b.c")).toBeUndefined();
+    });
+
+    test("returns undefined when encountering undefined", () => {
+      const obj = { a: { b: undefined } };
+      expect(collectPathValues(obj, "a.b.c")).toBeUndefined();
+    });
+
+    // Test non-existent properties
+    test("returns undefined for non-existent properties", () => {
+      const obj = { a: { b: "value" } };
+      expect(collectPathValues(obj, "a.c")).toBeUndefined();
+    });
+
+    // Test empty inputs
+    test("returns undefined for empty object", () => {
+      expect(collectPathValues({}, "a.b.c")).toBeUndefined();
+    });
+
+    test("returns the object itself for empty path", () => {
+      const obj = { a: "value" };
+      expect(collectPathValues(obj, "")).toBe(obj);
     });
   });
 });

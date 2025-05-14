@@ -178,7 +178,9 @@ export function generateColumnPath({
  * @param {string} dynamicFieldType - The dynamic field type string to parse.
  * @returns {string|undefined} The relationship name if found, otherwise undefined.
  */
-export function parseRelationshipNameFromType(dynamicFieldType) {
+export function parseRelationshipNameFromType(
+  dynamicFieldType: string
+): string | undefined {
   const tildeIndex = dynamicFieldType.indexOf("~");
   if (tildeIndex !== -1) {
     return dynamicFieldType.substring(tildeIndex + 1);
@@ -450,7 +452,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
       };
     }
 
-    // Handle scientific name detaills (classification) paths.
+    // Handle scientific name details (classification) paths.
     if (
       dynamicFieldsMappingConfig &&
       pathParts.length === 2 &&
@@ -592,10 +594,10 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
       relationshipAccessor?.splice(
         1,
         0,
-        config.referencedType ? config.referencedType : ""
+        config.referencedBy ? config.referencedBy : ""
       );
       const valuePath = relationshipAccessor?.join(".");
-      const value = get(original, valuePath);
+      const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
     header: () => (
@@ -821,10 +823,10 @@ export function getIncludedExtensionFieldColumn(
       relationshipAccessor?.splice(
         1,
         0,
-        config.referencedType ? config.referencedType : ""
+        config.referencedBy ? config.referencedBy : ""
       );
       const valuePath = relationshipAccessor?.join(".");
-      const value = get(original, valuePath);
+      const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
     accessorKey,
@@ -1032,10 +1034,10 @@ export function getIncludedVocabularyColumn<TData extends KitsuResource>(
       relationshipAccessor?.splice(
         1,
         0,
-        config.referencedType ? config.referencedType : ""
+        config.referencedBy ? config.referencedBy : ""
       );
       const valuePath = relationshipAccessor?.join(".");
-      const value = get(original, valuePath);
+      const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
     header: () => (
@@ -1156,6 +1158,46 @@ async function fetchDynamicField(apiClient: Kitsu, path, params?: GetParams) {
     return data;
   } catch {
     return undefined;
+  }
+}
+
+/**
+ * Function to get values from an object using a path, collecting all values when encountering arrays.
+ * If the path leads to an array at any point, it collects values from all elements
+ * and returns them as a semi-colon separated string.
+ *
+ * @param {object} object - The object to search in.
+ * @param {string} path - The path to the desired value(s).
+ * @returns {any} - The value or semi-colon separated values at the specified path, or undefined if not found.
+ */
+export function collectPathValues(object: any, path: string): any {
+  if (!path) return object;
+
+  const parts = path.split(".");
+  const part = parts[0];
+  const remainingPath = parts.slice(1).join(".");
+
+  if (object === null || object === undefined) return undefined;
+
+  if (Array.isArray(object[part])) {
+    // If we've reached the end of the path and found an array, return its elements joined
+    if (parts.length === 1) {
+      return object[part].join("; ");
+    }
+
+    // Process each array element recursively and join the results
+    const results = object[part]
+      .map((item) => collectPathValues(item, remainingPath))
+      .filter((result) => result !== undefined);
+
+    return results.length ? results.join("; ") : undefined;
+  } else {
+    // Continue traversing if not an array
+    if (parts.length === 1) {
+      return object[part];
+    }
+
+    return collectPathValues(object[part], remainingPath);
   }
 }
 
