@@ -327,7 +327,7 @@ export function WorkbookTemplateGenerator() {
           <Card.Body>
             <ListPageLayout
               additionalFilters={{
-                rsql: `acSubtype.acSubtype=='EXPORT TEMPLATE';bucket=in=(${groupNames})`
+                rsql: `acSubtype.acSubtype=='IMPORT TEMPLATE';bucket=in=(${groupNames})`
               }}
               id="data-export-list"
               queryTableProps={{
