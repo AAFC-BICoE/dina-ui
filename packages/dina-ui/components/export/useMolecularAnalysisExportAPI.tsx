@@ -719,7 +719,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
           exportLayout.set(`${baseFolder}/results`, itemsAttachments);
         }
         if (qaAttachments.length > 0) {
-          exportLayout.set(`${baseFolder}/qas`, qaAttachments);
+          exportLayout.set(`${baseFolder}/controls`, qaAttachments);
         }
       });
     } else {
