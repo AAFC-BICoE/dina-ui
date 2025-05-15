@@ -33,6 +33,7 @@ import { validateQueryTree } from "../query-builder/query-builder-validator/quer
 import { useIntl } from "react-intl";
 import { useSessionStorage } from "usehooks-ts";
 import { useLocalStorage } from "@rehooks/local-storage";
+import CopyToClipboardButton from "../CopyToClipboardButton";
 
 export interface SavedSearchProps {
   /**
@@ -97,10 +98,21 @@ export interface SavedSearchProps {
 
   // Reference for triggering the search. This helps prevent more searches than necessary.
   triggerSearch: React.MutableRefObject<boolean>;
+
+  // Callback function to handle copying URL with query filters to clipboard
+  onCopyToClipboard?: () => Promise<void>;
+
+  copiedToClipboard?: boolean;
+
+  setCopiedToClipboard?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function createSessionStorageLastUsedTreeKey(uniqueName: string) {
   return `${uniqueName}-last-used-tree`;
+}
+
+export function createLastUsedSavedSearchChangedKey(uniqueName: string) {
+  return `${uniqueName}-saved-search-changed`;
 }
 
 /**
@@ -127,7 +139,10 @@ export function SavedSearch({
   setGroups,
   performSubmit,
   uniqueName,
-  triggerSearch
+  triggerSearch,
+  onCopyToClipboard,
+  copiedToClipboard,
+  setCopiedToClipboard
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -597,6 +612,15 @@ export function SavedSearch({
         <Dropdown.Menu>
           <Dropdown.Item onClick={openSavedSearchModal}>
             <DinaMessage id="createNew" />
+          </Dropdown.Item>
+          <Dropdown.Item>
+            <CopyToClipboardButton
+              copiedToClipboard={copiedToClipboard}
+              onCopyToClipboard={async () => {
+                await onCopyToClipboard?.();
+                setCopiedToClipboard?.(true);
+              }}
+            />
           </Dropdown.Item>
           {selectedSavedSearch && (
             <>

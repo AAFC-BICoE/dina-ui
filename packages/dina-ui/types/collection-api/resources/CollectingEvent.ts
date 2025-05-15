@@ -11,6 +11,7 @@ import { ManagedAttributeValues } from "./ManagedAttribute";
 
 import { JsonValue } from "type-fest";
 import { Protocol } from "./Protocol";
+import { DinaJsonMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface CollectingEventAttributes {
   type: "collecting-event";
@@ -67,6 +68,9 @@ export interface CollectingEventAttributes {
   selectedSections?: string[];
   extensionValues?: any;
   protocol?: Protocol;
+
+  // Used for permission information included on the request.
+  meta?: DinaJsonMetaInfo;
 }
 
 export enum GeographicPlaceNameSource {

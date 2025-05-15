@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "../..";
 import { Query, Builder, Utils, JsonTree } from "react-awesome-query-builder";
-import { createContext, useCallback, useContext } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import {
   Config,
   ImmutableTree,
@@ -12,7 +12,6 @@ import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
 import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
-import { SimpleQueryGroup, SimpleQueryRow } from "../types";
 
 export interface QueryBuilderContextI {
   performSubmit: () => void;
@@ -104,6 +103,9 @@ interface QueryBuilderProps {
 
   // Reference for triggering the search. This helps prevent more searches than necessary.
   triggerSearch: React.MutableRefObject<boolean>;
+
+  // Callback function to handle copying URL with query filters to clipboard
+  onCopyToClipboard: () => Promise<void>;
 }
 
 function QueryBuilder({
@@ -119,8 +121,10 @@ function QueryBuilder({
   setGroups,
   uniqueName,
   validationErrors,
-  triggerSearch
+  triggerSearch,
+  onCopyToClipboard
 }: QueryBuilderProps) {
+  const [copiedToClipboard, setCopiedToClipboard] = useState<boolean>(false);
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
   }, []);
@@ -168,6 +172,12 @@ function QueryBuilder({
           setGroups={setGroups}
           uniqueName={uniqueName}
           triggerSearch={triggerSearch}
+          copiedToClipboard={copiedToClipboard}
+          setCopiedToClipboard={setCopiedToClipboard}
+          onCopyToClipboard={async () => {
+            await onCopyToClipboard();
+            setCopiedToClipboard(true);
+          }}
         />
         <Query
           {...queryBuilderConfig}
@@ -183,7 +193,14 @@ function QueryBuilder({
           >
             <DinaMessage id="search" />
           </Button>
-          <Button onClick={onReset} variant="secondary">
+          <Button
+            onClick={() => {
+              onReset();
+              setCopiedToClipboard(false);
+            }}
+            variant="secondary"
+            className="me-2"
+          >
             <CommonMessage id="resetButtonText" />
           </Button>
         </div>
@@ -256,34 +273,6 @@ export function generateUUIDTree(uuid: string, path: string): JsonTree {
         }
       }
     }
-  };
-}
-
-export function generateJsonTreeFromSimpleQueryGroup(
-  simpleQueryGroup: SimpleQueryGroup
-): JsonTree {
-  const children: any = simpleQueryGroup.props.map(
-    (simpleQueryRow: SimpleQueryRow) => {
-      return {
-        id: Utils.uuid(),
-        type: "rule",
-        properties: {
-          field: simpleQueryRow.field,
-          operator: simpleQueryRow.operator,
-          value: [simpleQueryRow.value],
-          valueSrc: ["value"],
-          valueType: [simpleQueryRow.type]
-        }
-      };
-    }
-  );
-  return {
-    id: Utils.uuid(),
-    type: "group",
-    properties: {
-      conjunction: simpleQueryGroup.conj
-    },
-    children1: children
   };
 }
 

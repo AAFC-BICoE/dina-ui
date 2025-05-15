@@ -129,11 +129,6 @@ export class ApiClientImpl implements ApiClientI {
       resourceCase: "none"
     });
 
-    this.apiClient.axios?.interceptors?.response.use(
-      (successResponse) => successResponse,
-      makeAxiosErrorMoreReadable
-    );
-
     // Add caching support for one second since it's likely it's going to be same response.
     const ONE_SECOND = 1000;
     this.apiClient.axios = setupCache(this.apiClient.axios, {
@@ -142,8 +137,15 @@ export class ApiClientImpl implements ApiClientI {
         false, // clone data off
         ONE_SECOND, // cleanup interval in ms
         100 // maximum cache entries
-      )
+      ),
+      ttl: ONE_SECOND
     });
+
+    // This part needs to happen after the cache is setup since it will override it.
+    this.apiClient.axios?.interceptors?.response.use(
+      (successResponse) => successResponse,
+      makeAxiosErrorMoreReadable
+    );
 
     // Bind the methods so context consumers can use object destructuring.
     this.doOperations = this.doOperations.bind(this);

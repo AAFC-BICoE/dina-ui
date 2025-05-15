@@ -53,6 +53,8 @@ export interface CustomQueryPageViewProps<TData extends KitsuResource>
    */
   titleKey?: keyof typeof DINAUI_MESSAGES_ENGLISH;
 
+  removePadding?: boolean;
+
   /**
    * If options are provided, a dropdown menu to the right of the legend title will be displayed
    * to allow the user to choose the query thats being displayed.
@@ -65,6 +67,7 @@ export interface CustomQueryPageViewProps<TData extends KitsuResource>
 export function CustomQueryPageView<TData extends KitsuResource>({
   titleKey,
   customQueryOptions,
+  removePadding,
   ...queryPageProps
 }: CustomQueryPageViewProps<TData>) {
   const CUSTOM_QUERY_PAGE_LOCAL_STORAGE_KEY = queryPageProps.uniqueName
@@ -125,6 +128,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
   return (
     <FieldSet
       legend={legend}
+      removePadding={removePadding}
       wrapLegend={(innerLegend) => (
         <div className="row">
           {customQueryOptions ? (

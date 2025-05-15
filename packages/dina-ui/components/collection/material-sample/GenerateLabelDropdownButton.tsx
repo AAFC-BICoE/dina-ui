@@ -6,6 +6,7 @@ import { ReportTemplate } from "../../../types/dina-export-api";
 import Select from "react-select";
 import { useAccount, useQuery } from "../../../../common-ui/lib";
 import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
+import { downloadBlobFile } from "common-ui";
 
 interface ReportTemplateOption {
   label: string;
@@ -108,26 +109,23 @@ export function GenerateLabelDropdownButton({
         `dina-export-api/file/${reportTemplatePostResponse?.data?.data?.id}`,
         { responseType: "blob" }
       );
-      const url = window?.URL.createObjectURL(reportRequestGetResponse?.data);
-      const link = document?.createElement("a");
-      link.href = url;
+
+      // Generate the file name and file extension.
       const filePath = reportRequestGetResponse?.config?.url;
       const fileName = !filePath
         ? "report"
         : filePath.substring(filePath.lastIndexOf("/") + 1);
-      link?.setAttribute(
-        "download",
-        `${
-          resource.materialSampleName
-            ? resource.materialSampleName
-            : resource.name
-            ? resource.name
-            : fileName
-        }_${reportTemplate.label}`
-      );
-      document?.body?.appendChild(link);
-      link?.click();
-      window?.URL?.revokeObjectURL(url);
+      const fullName = `${
+        resource.materialSampleName
+          ? resource.materialSampleName
+          : resource.name
+          ? resource.name
+          : fileName
+      }_${reportTemplate.label}`;
+
+      // Download file
+      downloadBlobFile(reportRequestGetResponse?.data, fullName);
+
       setGeneratingReport(false);
     } catch (error) {
       setGeneratingReport(false);

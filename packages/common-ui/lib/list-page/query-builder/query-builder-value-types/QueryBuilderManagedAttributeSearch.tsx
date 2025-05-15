@@ -71,6 +71,9 @@ export interface ManagedAttributeSearchStates {
 
   /** The value the user wishes to search. */
   searchValue: string;
+
+  /** UUID of a managed attribute to load in directly. Used for the query URL case. */
+  preloadId?: string;
 }
 
 export default function QueryRowManagedAttributeSearch({
@@ -98,12 +101,25 @@ export default function QueryRowManagedAttributeSearch({
           }
     );
 
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Once the menu is open, preload id should be reset since the user wants to choose
+    // a different option.
+    if (isMenuOpen && managedAttributeState.preloadId) {
+      setManagedAttributeState((prevState) => ({
+        ...prevState,
+        preloadId: undefined
+      }));
+    }
+  }, [isMenuOpen]);
+
   // Convert the state in this component to a value that can be stored in the Query Builder.
   useEffect(() => {
     if (setValue) {
       setValue(JSON.stringify(managedAttributeState));
     }
-  }, [managedAttributeState]);
+  }, [managedAttributeState, setValue]);
 
   // Convert a value from Query Builder into the Managed Attribute State in this component.
   // Dependent on the managedAttributeConfig to indicate when it's changed.
@@ -308,7 +324,9 @@ export default function QueryRowManagedAttributeSearch({
       {/* Managed Attribute Selection */}
       <ResourceSelect<ManagedAttribute>
         filter={(input) => ({
-          ...filterBy(["name"])(input),
+          ...(managedAttributeState.preloadId !== undefined
+            ? { uuid: managedAttributeState.preloadId } // Filter by UUID if preloadId exists
+            : filterBy(["name"])(input)), // Otherwise filter by name as before
           ...(managedAttributeConfig?.dynamicField?.component
             ? {
                 managedAttributeComponent:
@@ -328,6 +346,16 @@ export default function QueryRowManagedAttributeSearch({
           id: "queryBuilder_managedAttribute_placeholder"
         })}
         pageSize={15}
+        onDataLoaded={(data) => {
+          if (managedAttributeState.preloadId) {
+            if (managedAttributeState.preloadId && data?.length === 1) {
+              setManagedAttributeState({
+                ...managedAttributeState,
+                selectedManagedAttribute: data[0]
+              });
+            }
+          }
+        }}
         onChange={(newValue) => {
           const fieldPath =
             (managedAttributeConfig?.path ?? "") +
@@ -356,7 +384,13 @@ export default function QueryRowManagedAttributeSearch({
           captureMenuScroll: true,
           menuPlacement: isInColumnSelector ? "bottom" : "auto",
           menuShouldScrollIntoView: false,
-          minMenuHeight: 600
+          minMenuHeight: 600,
+          onMenuOpen: () => {
+            setIsMenuOpen(true);
+          },
+          onMenuClose: () => {
+            setIsMenuOpen(false);
+          }
         }}
         omitNullOption={true}
       />
@@ -419,6 +453,11 @@ export function transformManagedAttributeToDSL({
     if (!managedAttributeSearchValue.searchValue) {
       return undefined;
     }
+  }
+
+  // Selected type needs to exist for a search to be performed properly.
+  if (!managedAttributeSearchValue.selectedType) {
+    return undefined;
   }
 
   const fieldPath: string =
