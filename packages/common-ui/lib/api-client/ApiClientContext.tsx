@@ -43,6 +43,12 @@ export interface DoOperationsOptions {
   returnNullForMissingResource?: boolean;
 
   overridePatchOperation?: boolean;
+
+  /**
+   * If true, the client will handle requests with only 1 request as a single request instead of an
+   * operation. Default is false for now to keep the same behavior as before for backwards compatibility.
+   */
+  efficientOperations?: boolean;
 }
 
 /** Api client interface. */
@@ -157,11 +163,16 @@ export class ApiClientImpl implements ApiClientI {
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.
    *
    * If a single request is provided, it will perform the request without the
-   * operation directly. It will still return like an operation response.
+   * operation directly. It will still return like an operation response. This is only enabled if
+   * efficientOperations is set to true.
    */
   public async doOperations(
     operations: Operation[],
-    { apiBaseUrl = "", returnNullForMissingResource }: DoOperationsOptions = {}
+    {
+      apiBaseUrl = "",
+      returnNullForMissingResource,
+      efficientOperations
+    }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
     // Check if no operations were provided and skip performing anything.
     if (operations.length === 0) {
@@ -177,7 +188,7 @@ export class ApiClientImpl implements ApiClientI {
 
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
-    if (operations.length === 1) {
+    if (operations.length === 1 && efficientOperations) {
       // Single Request Only
       const operation = operations[0];
 
