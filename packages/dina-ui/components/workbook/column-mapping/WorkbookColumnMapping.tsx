@@ -45,7 +45,7 @@ export type FieldMapType = {
   originalColumn?: string;
   targetField: string | undefined;
   targetKey?: ManagedAttribute | VocabularyElement; // When targetField is managedAttribute, targetKey stores the matching managed attribute
-  // When targetField is scientificNameDetails, targetKey stores the matching taxonomicRank
+  // When targetField is scientificNameClassification, targetKey stores the matching taxonomicRank
   skipped: boolean;
 };
 

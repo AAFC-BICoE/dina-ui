@@ -14,7 +14,7 @@ export interface Determination {
   scientificName?: string;
   transcriberRemarks?: string;
   isPrimary?: boolean;
-  scientificNameDetails?: ScientificNameSourceDetails;
+  scientificNameClassification?: ScientificNameSourceDetails;
   isFiledAs?: boolean;
   determinationRemarks?: string;
   managedAttributes?: ManagedAttributeValues;

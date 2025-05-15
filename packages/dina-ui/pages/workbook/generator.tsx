@@ -51,8 +51,8 @@ const ENTITY_TYPES: EntityConfiguration[] = [
         ...dynamicFieldMappingForMaterialSample.relationshipFields,
         {
           apiEndpoint: "collection-api/vocabulary2/taxonomicRank",
-          label: "scientificNameDetails",
-          path: "included.attributes.determination.scientificNameDetails",
+          label: "scientificNameClassification",
+          path: "included.attributes.determination.scientificNameClassification",
           referencedBy: "organism.determination",
           referencedType: "organism",
           type: "classification",
@@ -125,10 +125,10 @@ export function WorkbookTemplateGenerator() {
               return (col as any)?.managedAttribute?.name;
             }
 
-            // Special logic for scientificNameDetails.
+            // Special logic for scientificNameClassification.
             if (
               col.columnValue.startsWith(
-                "organism.determination.scientificNameDetails."
+                "organism.determination.scientificNameClassification."
               )
             ) {
               return col.columnLabel;

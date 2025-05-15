@@ -245,7 +245,7 @@ describe("BulkEditTabWarning", () => {
           {
             verbatimScientificName: "test-name-override",
             scientificName: undefined,
-            scientificNameDetails: undefined,
+            scientificNameClassification: undefined,
             scientificNameSource: undefined
           }
         ],

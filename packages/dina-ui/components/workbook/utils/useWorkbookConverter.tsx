@@ -286,7 +286,7 @@ export function useWorkbookConverter(
             ) {
               parent["isPrimary"] = true;
             }
-            if (fieldPath === "organism.determination.scientificNameDetails") {
+            if (fieldPath === "organism.determination.scientificNameClassification") {
               parent["scientificNameSource"] = ScientificNameSource.CUSTOM;
             }
           }

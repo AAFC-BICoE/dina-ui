@@ -22,7 +22,7 @@ export interface ScientificNameFieldProps {
 export const DETERMINATION_FIELDS_TO_SET: string[] = [
   "scientificName",
   "scientificNameSource",
-  "scientificNameDetails"
+  "scientificNameClassification"
 ];
 
 export function ScientificNameField({
@@ -118,14 +118,14 @@ export function ScientificNameField({
         {...fieldProps("scientificName")}
         readOnlyRender={(value, _form) => {
           const scientificNameSrcDetailUrlVal = _form.getFieldMeta(
-            fieldProps("scientificNameDetails.sourceUrl").name
+            fieldProps("scientificNameClassification.sourceUrl").name
           ).value as string;
           return (
             <SelectedScientificNameView
               value={value}
               formik={_form}
-              scientificNameDetailsField={
-                fieldProps("scientificNameDetails").name
+              scientificNameClassificationField={
+                fieldProps("scientificNameClassification").name
               }
               scientificNameSrcDetailUrlVal={scientificNameSrcDetailUrlVal}
             />
@@ -151,7 +151,7 @@ export function ScientificNameField({
                   null
                 );
                 _form.setFieldValue(
-                  fieldProps("scientificNameDetails").name,
+                  fieldProps("scientificNameClassification").name,
                   null
                 );
               }
@@ -215,10 +215,10 @@ export function ScientificNameField({
                 onSuggestionsClearRequested={noop}
                 renderSuggestion={(determination) => (
                   <>
-                    {determination.scientificNameDetails && (
+                    {determination.scientificNameClassification && (
                       <GlobalNamesReadOnly
-                        scientificNameDetails={
-                          determination.scientificNameDetails
+                        scientificNameClassification={
+                          determination.scientificNameClassification
                         }
                         value={determination.scientificName ?? ""}
                         displayFull={true}
