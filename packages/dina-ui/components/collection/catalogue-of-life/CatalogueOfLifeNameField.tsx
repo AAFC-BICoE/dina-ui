@@ -12,8 +12,8 @@ export interface CatalogueOfLifeNameFieldProps extends FieldWrapperProps {
   fetchJson?: (url: string) => Promise<any>;
   index?: number;
   isDetermination?: boolean;
-  scientificNameDetailsSrcUrlField?: string;
-  scientificNameDetailsLabelHtmlField?: string;
+  scientificNameClassificationSrcUrlField?: string;
+  scientificNameClassificationLabelHtmlField?: string;
 
   /** Mock this out in tests so it gives a predictable value. */
   dateSupplier?: () => string;
@@ -25,8 +25,8 @@ export function CatalogueOfLifeNameField({
   fetchJson,
   index,
   isDetermination,
-  scientificNameDetailsSrcUrlField,
-  scientificNameDetailsLabelHtmlField,
+  scientificNameClassificationSrcUrlField,
+  scientificNameClassificationLabelHtmlField,
   dateSupplier,
   ...fieldWrapperProps
 }: CatalogueOfLifeNameFieldProps) {
@@ -41,26 +41,26 @@ export function CatalogueOfLifeNameField({
   };
 
   const RenderAsReadonly = ({ value, form }) => {
-    const scientificNameDetailSrcUrl = getFieldValue(
+    const scientificNameClassificationSrcUrl = getFieldValue(
       form,
-      scientificNameDetailsSrcUrlField
+      scientificNameClassificationSrcUrlField
     );
-    const scientificNameDetailLabelHtml = getFieldValue(
+    const scientificNameClassificationLabelHtml = getFieldValue(
       form,
-      scientificNameDetailsLabelHtmlField
+      scientificNameClassificationLabelHtmlField
     );
     const scientificNameVal = getFieldValue(form, scientificNameSourceField);
 
     const link = document.createElement("a");
-    link.setAttribute("href", scientificNameDetailSrcUrl);
+    link.setAttribute("href", scientificNameClassificationSrcUrl);
 
-    link.innerHTML = scientificNameDetailLabelHtml;
+    link.innerHTML = scientificNameClassificationLabelHtml;
 
     const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
       ADD_ATTR: ["target", "rel"]
     });
 
-    const isFromSrcDetailsUrl = scientificNameDetailSrcUrl?.length > 0;
+    const isFromSrcDetailsUrl = scientificNameClassificationSrcUrl?.length > 0;
 
     return (
       <CatalogueOfLifeNameReadOnly
@@ -82,7 +82,7 @@ export function CatalogueOfLifeNameField({
     >
       {({ formik, setValue, value }) => {
         const scientificNameSrceDetailUrlVal = formik.getFieldMeta(
-          scientificNameDetailsSrcUrlField as any
+          scientificNameClassificationSrcUrlField as any
         ).value as string;
         return value &&
           (searchInitiated || scientificNameSrceDetailUrlVal?.length > 0) ? (

@@ -44,7 +44,7 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     scientificName: true,
     transcriberRemarks: true,
     isPrimary: true,
-    scientificNameDetails: true,
+    scientificNameClassification: true,
     isFiledAs: true,
     determinationRemarks: true,
     managedAttributes: true
@@ -112,7 +112,7 @@ export function DeterminationField({
         initialIndex={initialIndex}
         makeNewElement={() => ({
           scientificName: undefined,
-          scientificNameDetails: undefined,
+          scientificNameClassification: undefined,
           scientificNameSource: undefined
         })}
         renderTab={(det, index) => (
@@ -126,7 +126,7 @@ export function DeterminationField({
         )}
         renderTabPanel={({ fieldProps, index }) => {
           const fieldScientificNameSrcDetail = fieldProps(
-            "scientificNameDetails"
+            "scientificNameClassification"
           ).name;
 
           const scientificNameSrcDetailVal = get(
@@ -259,14 +259,14 @@ export function DeterminationField({
                           : "scientificName"
                       )}
                       label={formatMessage("scientificNameSearch")}
-                      scientificNameDetailsField={
-                        fieldProps("scientificNameDetails").name
+                      scientificNameClassificationField={
+                        fieldProps("scientificNameClassification").name
                       }
                       scientificNameSourceField={
                         fieldProps("scientificNameSource").name
                       }
-                      scientificNameDetailsSrcUrlField={
-                        fieldProps("scientificNameDetails.sourceUrl").name
+                      scientificNameClassificationSrcUrlField={
+                        fieldProps("scientificNameClassification.sourceUrl").name
                       }
                       onChange={(newValue, formik) => {
                         if (newValue && (newValue as any).isManual) {
@@ -275,7 +275,7 @@ export function DeterminationField({
                             newValue ? "CUSTOM" : null
                           );
                           formik.setFieldValue(
-                            fieldProps("scientificNameDetails").name,
+                            fieldProps("scientificNameClassification").name,
                             newValue &&
                               (newValue["classificationRanks"] ||
                                 newValue["classificationPath"])
@@ -292,7 +292,7 @@ export function DeterminationField({
                           );
 
                           formik.setFieldValue(
-                            fieldProps("scientificNameDetails").name,
+                            fieldProps("scientificNameClassification").name,
                             newValue && isArray(newValue) ? newValue[0] : null
                           );
                           // If selected a result from search , set text input value to null and hide it

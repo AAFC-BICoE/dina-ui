@@ -263,7 +263,7 @@ export function determinationRevision(value) {
       <KeyValueTable
         data={det}
         customValueCells={{
-          scientificNameDetails: ({ getValue }) => (
+          scientificNameClassification: ({ getValue }) => (
             <KeyValueTable data={getValue()} />
           ),
           managedAttributes: ({ getValue }) => (

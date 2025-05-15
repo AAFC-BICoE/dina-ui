@@ -971,7 +971,7 @@ describe("MaterialSampleBulkEditor", () => {
             verbatimScientificName: "new-scientific-name",
             determiner: undefined,
             scientificName: undefined,
-            scientificNameDetails: undefined,
+            scientificNameClassification: undefined, 
             scientificNameSource: undefined
           }
         ],

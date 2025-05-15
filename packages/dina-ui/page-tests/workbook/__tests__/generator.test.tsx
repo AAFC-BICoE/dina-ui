@@ -386,7 +386,7 @@ describe("Workbook Template Generator", () => {
     );
   });
 
-  it("Selected scientificNameDetails fields and generate template", async () => {
+  it("Selected scientificNameClassification fields and generate template", async () => {
     const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
