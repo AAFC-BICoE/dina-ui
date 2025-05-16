@@ -6,6 +6,7 @@ import {
   VocabularyElement
 } from "packages/dina-ui/types/collection-api";
 import { VocabularyOption } from "./VocabularySelectField";
+import { startCase } from "lodash";
 
 /** Gets the vocab options from the back-end. */
 export default function useVocabularyOptions({ path }) {
@@ -24,13 +25,14 @@ export default function useVocabularyOptions({ path }) {
         value
       };
     }
-    const label =
+    const label = startCase(
       find(
         value?.multilingualTitle?.titles || [],
         (item) => item.lang === locale
       )?.title ||
-      value.name ||
-      "";
+        value.name ||
+        ""
+    );
     return { label, value: value.key };
   }
 
