@@ -424,7 +424,7 @@ export function getErrorMessages(
   // Filter down to just the error responses.
   const errorResponses = operationsResponse
     .map((res, index: number) => ({ index, response: res as FailedOperation }))
-    .filter(({ response }) => !/2../.test(response.status.toString()));
+    .filter(({ response }) => !/2../.test(response?.status?.toString()));
 
   const individualErrors = errorResponses.map(({ response, index }) => {
     // Map the error responses to JsonApiErrors.
