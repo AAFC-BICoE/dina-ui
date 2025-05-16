@@ -70,6 +70,7 @@ export default function AgentListPage() {
               }
             ]
           }}
+          defaultSort={[{ id: "username", desc: false }]}
         />
       </main>
       <Footer />

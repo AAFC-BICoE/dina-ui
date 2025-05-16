@@ -512,7 +512,10 @@ export function SavedSearch({
         } as any,
         type: "user-preference"
       };
-      await save([saveArgs], { apiBaseUrl: "/user-api" });
+      await save([saveArgs], {
+        apiBaseUrl: "/user-api",
+        skipOperationForSingleRequest: true
+      });
 
       // Trigger a reload of the user preferences.
       setLastLoaded(Date.now());
@@ -553,7 +556,10 @@ export function SavedSearch({
           } as any,
           type: "user-preference"
         };
-        await save([saveArgs], { apiBaseUrl: "/user-api" });
+        await save([saveArgs], {
+          apiBaseUrl: "/user-api",
+          skipOperationForSingleRequest: true
+        });
 
         // Unselect the saved search.
         setSelectedSavedSearch(undefined);
