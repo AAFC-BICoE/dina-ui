@@ -16,9 +16,14 @@ export default function PersonEditPage() {
     await router.push(`/person/list`);
   }
 
-  const query = useQuery<Person>({
-    path: `agent-api/person/${id}?include=organizations,identifiers`
-  });
+  const query = useQuery<Person>(
+    {
+      path: `agent-api/person/${id}?include=organizations,identifiers`
+    },
+    {
+      disabled: !id
+    }
+  );
 
   return (
     <PageLayout titleId={title}>
