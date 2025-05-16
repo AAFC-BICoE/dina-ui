@@ -51,25 +51,12 @@ export default function TaxonomyTree() {
       const ranks = taxonomicRankOptions
         .map((option) => option.value.toLowerCase())
         .filter(Boolean);
-
       if (ranks.length > 0) {
         setTaxonomicRanks(ranks);
-        fetchTaxonomyData(ranks);
-      } else {
-        // Fallback if no ranks found
-        const fallbackRanks = [
-          "kingdom",
-          "phylum",
-          "class",
-          "order",
-          "family",
-          "genus"
-        ];
-        setTaxonomicRanks(fallbackRanks);
-        fetchTaxonomyData(fallbackRanks);
+        fetchTaxonomyData(ranks.slice(0, 1));
       }
     }
-  }, [loading, taxonomicRankOptions]);
+  }, [loading]);
 
   const buildAggregationQuery = (ranks: string[]): Record<string, any> => {
     const aggregationQuery: Record<string, any> = {};
@@ -290,7 +277,7 @@ export default function TaxonomyTree() {
     ranks: string[]
   ): TreeNode => {
     const root: TreeNode = {
-      name: "Taxonomy",
+      name: "Kingdom",
       children: []
     };
 
