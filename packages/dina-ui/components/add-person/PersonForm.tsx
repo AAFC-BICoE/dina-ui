@@ -171,7 +171,8 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
         }
       ],
       {
-        apiBaseUrl: "/agent-api"
+        apiBaseUrl: "/agent-api",
+        skipOperationForSingleRequest: true
       }
     );
 

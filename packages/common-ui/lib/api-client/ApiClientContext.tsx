@@ -48,7 +48,7 @@ export interface DoOperationsOptions {
    * If true, the client will handle requests with only 1 request as a single request instead of an
    * operation. Default is false for now to keep the same behavior as before for backwards compatibility.
    */
-  efficientOperations?: boolean;
+  skipOperationForSingleRequest?: boolean;
 }
 
 /** Api client interface. */
@@ -164,14 +164,14 @@ export class ApiClientImpl implements ApiClientI {
    *
    * If a single request is provided, it will perform the request without the
    * operation directly. It will still return like an operation response. This is only enabled if
-   * efficientOperations is set to true.
+   * skipOperationForSingleRequest is set to true.
    */
   public async doOperations(
     operations: Operation[],
     {
       apiBaseUrl = "",
       returnNullForMissingResource,
-      efficientOperations
+      skipOperationForSingleRequest
     }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
     // Check if no operations were provided and skip performing anything.
@@ -188,7 +188,7 @@ export class ApiClientImpl implements ApiClientI {
 
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
-    if (operations.length === 1 && efficientOperations) {
+    if (operations.length === 1 && skipOperationForSingleRequest) {
       // Single Request Only
       const operation = operations[0];
 
