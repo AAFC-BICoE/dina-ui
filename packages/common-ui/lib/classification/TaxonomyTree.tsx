@@ -130,7 +130,8 @@ export default function TaxonomyTree() {
       // Process the data and update the tree
       if (response.data.aggregations) {
         const rankAggName = `taxonomy_${rank}`;
-        const buckets = response.data.aggregations[rankAggName]?.buckets || [];
+        const buckets =
+          response.data.aggregations[`sterms#${rankAggName}`]?.buckets || [];
 
         // If this is the top level, create a new tree
         if (!parentNodeId) {
