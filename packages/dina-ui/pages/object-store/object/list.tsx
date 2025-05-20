@@ -22,6 +22,13 @@ import Offcanvas from "react-bootstrap/Offcanvas";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
+export const OBJECT_STORE_NON_EXPORTABLE_COLUMNS: string[] = [
+  "selectColumn",
+  "thumbnail",
+  "objectStorePreview",
+  "viewDetails"
+];
+
 const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
 
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
@@ -113,6 +120,10 @@ export default function MetadataListPage() {
           </Link>
         ) : null,
       accessorKey: "data.attributes.id",
+      additionalAccessors: [
+        "data.attributes.originalFilename",
+        "data.attributes.resourceExternalURL"
+      ],
       header: () => <DinaMessage id="viewDetails" />,
       enableSorting: false,
       id: "viewDetails"
@@ -120,31 +131,6 @@ export default function MetadataListPage() {
     ThumbnailCell({
       bucketField: "data.attributes.bucket"
     }),
-    {
-      cell: ({ row: { original } }) =>
-        (original as any)?.data?.attributes?.resourceExternalURL ? (
-          <Link
-            href={`/object-store/object/external-resource-view?id=${original?.id}`}
-          >
-            <a className="m-auto">
-              <DinaMessage id="detailsPageLink" />
-            </a>
-          </Link>
-        ) : (original as any).data?.attributes?.originalFilename ? (
-          <Link
-            href={`/object-store/object/view?id=${original.id}`}
-            passHref={true}
-          >
-            <a id={`file-name-${original.id}`}>
-              {(original as any).data?.attributes?.originalFilename}
-            </a>
-          </Link>
-        ) : null,
-      header: () => <FieldHeader name="originalFilename" />,
-      accessorKey: "data.attributes.originalFilename",
-      isKeyword: true,
-      id: "originalFilename"
-    },
     {
       header: () => <FieldHeader name="acCaption" />,
       accessorKey: "data.attributes.acCaption",
@@ -270,12 +256,7 @@ export default function MetadataListPage() {
                   relationshipFields: []
                 }}
                 mandatoryDisplayedColumns={["thumbnail", "viewDetails"]}
-                nonExportableColumns={[
-                  "selectColumn",
-                  "thumbnail",
-                  "objectStorePreview",
-                  "viewDetails"
-                ]}
+                nonExportableColumns={OBJECT_STORE_NON_EXPORTABLE_COLUMNS}
                 nonSearchableColumns={[
                   "acMetadataCreator.displayName",
                   "dcCreator.displayName"

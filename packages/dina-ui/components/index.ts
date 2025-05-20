@@ -73,3 +73,4 @@ export * from "./page/PageLayout";
 export * from "./seqdb/ngs-index/NgsIndexField";
 export * from "./workbook";
 export * from "./collection/material-sample/organismUtils";
+export * from "./molecular-analysis/MolecularAnalysisUtils";

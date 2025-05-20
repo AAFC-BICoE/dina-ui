@@ -1,6 +1,5 @@
 import useLocalStorage from "@rehooks/local-storage";
 import { KitsuResource } from "kitsu";
-import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
 import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
@@ -12,6 +11,7 @@ import {
 } from "../list-page/types";
 import { ColumnSelectorList } from "./ColumnSelectorList";
 import { generateColumnDefinition } from "./ColumnSelectorUtils";
+import { DataExportTemplate } from "../../../dina-ui/types/dina-export-api";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
 
@@ -53,13 +53,13 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    * When provided, it will be set as the setDisplayedColumns. This is populated from the
    * saved export hook.
    */
-  overrideDisplayedColumns?: SavedExportColumnStructure;
+  overrideDisplayedColumns?: DataExportTemplate;
 
   /**
    * Should only be set to empty, indicating it has been processed.
    */
   setOverrideDisplayedColumns?: React.Dispatch<
-    React.SetStateAction<SavedExportColumnStructure | undefined>
+    React.SetStateAction<DataExportTemplate | undefined>
   >;
 
   /**
@@ -263,6 +263,9 @@ export function ColumnSelector<TData extends KitsuResource>(
 
         const columns = (await Promise.all(promises)).filter(isDefinedColumn);
         setDisplayedColumns(columns);
+
+        setLoading(false);
+        setColumnSelectorLoading?.(false);
       }
     }
 
@@ -270,14 +273,25 @@ export function ColumnSelector<TData extends KitsuResource>(
       if (injectedIndexMapping && overrideDisplayedColumns) {
         const promises = overrideDisplayedColumns?.columns?.map?.(
           async (localColumn, index) => {
+            const columnFunctionPath = localColumn.includes("function")
+              ? overrideDisplayedColumns.columnFunctions?.[localColumn]
+                  .functionName === "CONCAT"
+                ? `columnFunction/${localColumn}/${
+                    overrideDisplayedColumns.columnFunctions?.[localColumn]
+                      .functionName
+                  }/${overrideDisplayedColumns.columnFunctions?.[
+                    localColumn
+                  ].params.join("+")}`
+                : `columnFunction/${localColumn}/${overrideDisplayedColumns.columnFunctions?.[localColumn].functionName}`
+              : undefined;
+
             const newColumnDefinition = await generateColumnDefinition({
               indexMappings: injectedIndexMapping,
               dynamicFieldsMappingConfig,
               apiClient,
               defaultColumns,
-              path: localColumn
+              path: columnFunctionPath ?? localColumn
             });
-
             // Set the column header if saved.
             if (newColumnDefinition) {
               newColumnDefinition.exportHeader =
@@ -287,17 +301,19 @@ export function ColumnSelector<TData extends KitsuResource>(
             return newColumnDefinition;
           }
         );
+        if (promises) {
+          const columns = (await Promise.all(promises)).filter(isDefinedColumn);
+          setDisplayedColumns(columns);
 
-        const columns = (await Promise.all(promises)).filter(isDefinedColumn);
-        setDisplayedColumns(columns);
+          setLoading(false);
+          setColumnSelectorLoading?.(false);
+        }
       }
     }
 
     // Check if overrides are provided from the saved exports.
     if (overrideDisplayedColumns) {
       loadColumnsFromSavedExport();
-      setLoading(false);
-      setColumnSelectorLoading?.(false);
       return;
     }
 
@@ -305,21 +321,15 @@ export function ColumnSelector<TData extends KitsuResource>(
       !localStorageDisplayedColumns ||
       localStorageDisplayedColumns?.length === 0
     ) {
-      // No local storage to load from, load the default columns in.
-      setDisplayedColumns(defaultColumns ?? []);
-
       // Set the default columns into local storage.
       if (defaultColumns) {
         setLocalStorageDisplayedColumns(
           defaultColumns.map((column) => column?.id ?? "")
         );
       }
-      setLoading(false);
-    } else {
-      loadColumnsFromLocalStorage();
-      setLoading(false);
-      setColumnSelectorLoading?.(false);
     }
+
+    loadColumnsFromLocalStorage();
   }, [
     localStorageDisplayedColumns,
     injectedIndexMapping,

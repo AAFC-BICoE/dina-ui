@@ -10,20 +10,27 @@ import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   DinaForm,
-  downloadDataExport,
   OBJECT_EXPORT_IDS_KEY,
+  SaveArgs,
   SubmitButton,
   TextField,
   Tooltip,
   useApiClient
 } from "packages/common-ui/lib";
-import { DynamicFieldsMappingConfig } from "packages/common-ui/lib/list-page/types";
+import {
+  DynamicFieldsMappingConfig,
+  ESIndexMapping
+} from "packages/common-ui/lib/list-page/types";
 import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMapping";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
+import {
+  ColumnSeparator,
+  DataExport,
+  DataExportTemplate,
+  ExportType
+} from "packages/dina-ui/types/dina-export-api";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
-import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
 import { useState } from "react";
 import {
   Button,
@@ -36,16 +43,44 @@ import { FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
-import useSavedExports from "./useSavedExports";
-
-const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
-const BASE_DELAY_EXPORT_FETCH_MS = 2000;
+import useSavedExports, { VISIBILITY_OPTIONS } from "./useSavedExports";
+import { QueryFieldSelector } from "packages/common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
+import QueryRowManagedAttributeSearch from "packages/common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import { get } from "lodash";
+import { MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS } from "../../collection/material-sample/list";
+import { OBJECT_STORE_NON_EXPORTABLE_COLUMNS } from "../../object-store/object/list";
+import {
+  getExport,
+  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
+  MAX_OBJECT_EXPORT_TOTAL
+} from "packages/common-ui/lib/export/exportUtils";
+import {
+  convertColumnsToAliases,
+  convertColumnsToPaths,
+  getColumnFunctions
+} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
 
 export interface SavedExportOption {
-  label: string;
-  value: string;
-  resource: SavedExportColumnStructure;
+  label?: string;
+  value?: string;
+  resource?: DataExportTemplate;
 }
+
+const SEPARATOR_OPTIONS: { value: ColumnSeparator; label: string }[] = [
+  {
+    value: "COMMA",
+    label: "Comma"
+  },
+  {
+    value: "TAB",
+    label: "Tab"
+  }
+];
+
+const NON_EXPORTABLE_COLUMNS_MAP: { [key: string]: string[] } = {
+  ["dina_material_sample_index"]: MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS,
+  ["dina_object_store_index"]: OBJECT_STORE_NON_EXPORTABLE_COLUMNS
+};
 
 export default function ExportPage<TData extends KitsuResource>() {
   const { formatNumber } = useIntl();
@@ -86,11 +121,25 @@ export default function ExportPage<TData extends KitsuResource>() {
 
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
   const [loading, setLoading] = useState(false);
+  const [selectedSeparator, setSelectedSeparator] = useState<{
+    value: ColumnSeparator;
+    label: string;
+  }>({
+    value: "COMMA",
+    label: "Comma"
+  });
 
   const { indexMap } = useIndexMapping({
     indexName,
     dynamicFieldMapping
   });
+
+  // The selected field from the query field selector.
+  const [selectedFilenameAliasField, setSelectedFilenameAliasField] =
+    useState<ESIndexMapping>();
+
+  // Used for dynamic fields to store the specific dynamic value selected.
+  const [dynamicFieldValue, setDynamicFieldValue] = useState<string>();
 
   const {
     allSavedExports,
@@ -98,6 +147,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     loadingDelete,
     loadingUpdate,
     changesMade,
+    setChangesMade,
     setSelectedSavedExport,
     selectedSavedExport,
     ModalElement,
@@ -107,10 +157,10 @@ export default function ExportPage<TData extends KitsuResource>() {
     columnPathsToExport,
     setColumnPathsToExport,
     deleteSavedExport,
-    updateSavedExport
-  } = useSavedExports<TData>({
-    indexName
-  });
+    updateSavedExport,
+    setRestrictToCreatedBy,
+    setPubliclyReleaseable
+  } = useSavedExports<TData>({ exportType, selectedSeparator });
 
   async function exportData(formik) {
     setLoading(true);
@@ -124,41 +174,22 @@ export default function ExportPage<TData extends KitsuResource>() {
     }
     const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
 
-    const columnFunctions = columnsToExport
-      .filter((c) => c.columnSelectorString?.startsWith("columnFunction/"))
-      .reduce((prev, curr) => {
-        const columnParts = curr.columnSelectorString?.split("/");
-        if (columnParts) {
-          return {
-            ...prev,
-            [columnParts[1]]: {
-              functionName: columnParts[2],
-              params:
-                columnParts[2] === "CONVERT_COORDINATES_DD"
-                  ? ["collectingEvent.eventGeom"]
-                  : columnParts[3].split("+")
-            }
-          };
-        }
-      }, {});
+    const columnFunctions = getColumnFunctions<TData>(columnsToExport);
 
     // Make query to data-export
-    const dataExportSaveArg = {
+    const dataExportSaveArg: SaveArgs<DataExport> = {
       resource: {
         type: "data-export",
         source: indexName,
         query: queryString,
-        columns: columnsToExport.map((item) =>
-          item.columnSelectorString?.startsWith("columnFunction/")
-            ? item.columnSelectorString?.split("/")[1] // Get functionId
-            : item.id
-        ),
-        columnAliases: columnsToExport.map((item) => item?.exportHeader ?? ""),
+        columns: convertColumnsToPaths(columnsToExport),
+        columnAliases: convertColumnsToAliases(columnsToExport),
         columnFunctions:
           Object.keys(columnFunctions ?? {}).length === 0
             ? undefined
             : columnFunctions,
-        name: formik?.values?.name
+        name: formik?.values?.name,
+        exportOptions: { columnSeparator: selectedSeparator?.value }
       },
       type: "data-export"
     };
@@ -167,72 +198,14 @@ export default function ExportPage<TData extends KitsuResource>() {
       apiBaseUrl: "/dina-export-api"
     });
 
-    await getExport(dataExportPostResponse, formik);
+    await getExport(
+      dataExportPostResponse,
+      setLoading,
+      setDataExportError,
+      apiClient,
+      formik
+    );
     setLoading(false);
-  }
-
-  // data-export POST will return immediately but export won't necessarily be available
-  // continue to get status of export until it's COMPLETED
-  async function getExport(
-    exportPostResponse: PersistedResource<KitsuResource>[],
-    formik?: any
-  ) {
-    let isFetchingDataExport = true;
-    let fetchDataExportRetries = 0;
-    let dataExportGetResponse;
-    while (isFetchingDataExport) {
-      if (fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES) {
-        if (dataExportGetResponse?.data?.status === "COMPLETED") {
-          // Get the exported data
-          await downloadDataExport(
-            apiClient,
-            exportPostResponse[0].id,
-            formik?.values?.name
-          );
-          isFetchingDataExport = false;
-        } else if (dataExportGetResponse?.data?.status === "ERROR") {
-          isFetchingDataExport = false;
-          setLoading(false);
-          setDataExportError(
-            <div className="alert alert-danger">
-              <DinaMessage id="dataExportError" />
-            </div>
-          );
-        } else {
-          try {
-            dataExportGetResponse = await apiClient.get<DataExport>(
-              `dina-export-api/data-export/${exportPostResponse[0].id}`,
-              {}
-            );
-          } catch (e) {
-            if (e.cause.status === 404) {
-              console.warn(e.cause);
-            } else {
-              throw e;
-            }
-          }
-
-          // Exponential Backoff
-          await new Promise((resolve) =>
-            setTimeout(
-              resolve,
-              BASE_DELAY_EXPORT_FETCH_MS * 2 ** fetchDataExportRetries
-            )
-          );
-          fetchDataExportRetries += 1;
-        }
-      } else {
-        // Max retries reached
-        isFetchingDataExport = false;
-        setLoading(false);
-        setDataExportError(
-          <div className="alert alert-danger">
-            <DinaMessage id="dataExportError" />
-          </div>
-        );
-      }
-    }
-    isFetchingDataExport = false;
   }
 
   // Function to export and download Objects
@@ -249,32 +222,61 @@ export default function ExportPage<TData extends KitsuResource>() {
       const metadatas: PersistedResource<Metadata>[] = await bulkGet(paths, {
         apiBaseUrl: "/objectstore-api"
       });
-      const imageMetadatas = metadatas.filter((metadata) => {
-        return metadata.dcType === "IMAGE";
-      });
 
-      const fileIdentifiers = imageMetadatas.map((imageMetadata) => {
-        // If image has derivative, return large image derivative fileIdentifier if present
-        if (imageMetadata.derivatives) {
-          const largeImageDerivative = imageMetadata.derivatives.find(
-            (derivative) => {
-              if (derivative.derivativeType === "LARGE_IMAGE") {
-                return true;
-              }
-            }
+      const fileIdentifiers = metadatas.map((metadata) => {
+        // If the metadata is for an image and has derivatives, return the large image derivative fileIdentifier if present
+        if (metadata.dcType === "IMAGE" && metadata.derivatives) {
+          const largeImageDerivative = metadata.derivatives.find(
+            (derivative) => derivative.derivativeType === "LARGE_IMAGE"
           );
           if (largeImageDerivative) {
             return largeImageDerivative.fileIdentifier;
           }
         }
-        // Otherwise, return original fileIdentifier
-        return imageMetadata.fileIdentifier;
+        // Otherwise, return the original fileIdentifier
+        return metadata.fileIdentifier;
       });
+
+      const filenameAliases = {};
+
+      if (selectedFilenameAliasField) {
+        metadatas.forEach((metadata) => {
+          const filenameAlias: string =
+            selectedFilenameAliasField.label === "managedAttributes" &&
+            dynamicFieldValue
+              ? get(
+                  metadata,
+                  JSON.parse(dynamicFieldValue).selectedManagedAttributeConfig
+                    .label
+                )
+              : get(metadata, selectedFilenameAliasField.label);
+          if (metadata.derivatives) {
+            // If image has derivative, use large image derivative fileIdentifier
+            const largeImageDerivative = metadata.derivatives.find(
+              (derivative) => {
+                if (derivative.derivativeType === "LARGE_IMAGE") {
+                  return true;
+                }
+              }
+            );
+            if (largeImageDerivative) {
+              filenameAliases[largeImageDerivative.fileIdentifier] =
+                filenameAlias;
+            }
+          }
+
+          if (metadata.fileIdentifier)
+            // Otherwise, use original fileIdentifier
+            filenameAliases[metadata.fileIdentifier] = filenameAlias;
+        });
+      }
+
       const objectExportSaveArg = {
         resource: {
           type: "object-export",
           fileIdentifiers,
-          name: formik?.values?.name
+          name: formik?.values?.name,
+          filenameAliases: filenameAliases
         },
         type: "object-export"
       };
@@ -286,7 +288,13 @@ export default function ExportPage<TData extends KitsuResource>() {
             apiBaseUrl: "/objectstore-api"
           }
         );
-        await getExport(objectExportResponse, formik);
+        await getExport(
+          objectExportResponse,
+          setLoading,
+          setDataExportError,
+          apiClient,
+          formik
+        );
       } catch (e) {
         setDataExportError(
           <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
@@ -313,7 +321,8 @@ export default function ExportPage<TData extends KitsuResource>() {
   );
 
   const disableObjectExportButton =
-    localStorageExportObjectIds.length < 1 || totalRecords > 100;
+    localStorageExportObjectIds.length < 1 ||
+    totalRecords > MAX_OBJECT_EXPORT_TOTAL;
 
   return (
     <>
@@ -330,8 +339,37 @@ export default function ExportPage<TData extends KitsuResource>() {
               />
             </div>
             <div className="col-md-6 col-sm-12 d-flex">
+              {totalRecords >
+              MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT ? (
+                <Tooltip
+                  directComponent={
+                    <DinaMessage
+                      id="molecularAnalysisExportMaxMaterialSampleError"
+                      values={{
+                        limit:
+                          MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT
+                      }}
+                    />
+                  }
+                  placement={"bottom"}
+                  className="ms-auto"
+                  visibleElement={
+                    <div className="btn btn-primary disabled">
+                      <DinaMessage id="molecularAnalysisExport" />
+                    </div>
+                  }
+                />
+              ) : (
+                <Link
+                  href={`/export/molecular-analysis-export/export?entityLink=${entityLink}`}
+                >
+                  <a className="btn btn-primary ms-auto">
+                    <DinaMessage id="molecularAnalysisExport" />
+                  </a>
+                </Link>
+              )}
               <Link href={`/export/data-export/list?entityLink=${entityLink}`}>
-                <a className="btn btn-primary ms-auto">
+                <a className="btn btn-primary ms-2">
                   <DinaMessage id="viewExportHistoryButton" />
                 </a>
               </Link>
@@ -404,9 +442,26 @@ export default function ExportPage<TData extends KitsuResource>() {
                       </>
                     )}
                   </div>
-
                   {exportType === "TABULAR_DATA" && (
                     <>
+                      <div className="col-md-4">
+                        <strong>
+                          <DinaMessage id="separator" />
+                        </strong>
+                        <Select<{ value: ColumnSeparator; label: string }>
+                          className="mt-2 mb-3"
+                          name="separator"
+                          options={SEPARATOR_OPTIONS}
+                          onChange={(selection) => {
+                            if (selection) {
+                              setSelectedSeparator(selection);
+                            }
+                          }}
+                          isLoading={loadingSavedExports}
+                          isDisabled={loading}
+                          defaultValue={selectedSeparator}
+                        />
+                      </div>
                       <div className="col-md-4">
                         <strong>
                           <DinaMessage id="savedExport_exportDropdown" />
@@ -436,34 +491,112 @@ export default function ExportPage<TData extends KitsuResource>() {
                               ?.find(
                                 (option) =>
                                   option.value === selectedSavedExport?.name
-                              ) ?? undefined
+                              ) ?? null
                           }
                         />
                       </div>
                       {selectedSavedExport && (
-                        <div className="col-md-4">
-                          <Button
-                            style={{ marginTop: "30px" }}
-                            variant="danger"
-                            onClick={deleteSavedExport}
-                            disabled={loadingDelete || loading}
-                          >
-                            {loadingDelete ? LoadingSpinner : <FaTrash />}
-                          </Button>
-                          {changesMade && (
+                        <div className="d-flex">
+                          <div className="me-auto">
                             <Button
-                              style={{ marginTop: "30px", marginLeft: "10px" }}
-                              variant="primary"
-                              onClick={updateSavedExport}
-                              disabled={loadingUpdate || loading}
+                              style={{ marginTop: "30px" }}
+                              variant="danger"
+                              onClick={deleteSavedExport}
+                              disabled={loadingDelete || loading}
                             >
-                              {loadingUpdate ? (
-                                LoadingSpinner
-                              ) : (
-                                <DinaMessage id="saveChanges" />
-                              )}
+                              {loadingDelete ? LoadingSpinner : <FaTrash />}
                             </Button>
-                          )}
+                            {changesMade && (
+                              <Button
+                                style={{
+                                  marginTop: "30px",
+                                  marginLeft: "10px"
+                                }}
+                                variant="primary"
+                                onClick={updateSavedExport}
+                                disabled={loadingUpdate || loading}
+                              >
+                                {loadingUpdate ? (
+                                  LoadingSpinner
+                                ) : (
+                                  <DinaMessage id="saveChanges" />
+                                )}
+                              </Button>
+                            )}
+                          </div>
+                          <div
+                            className="col-md-4 p"
+                            style={{ paddingLeft: "15px" }}
+                          >
+                            <strong>
+                              <DinaMessage id="visibility" />
+                            </strong>
+                            <Select<{
+                              label: JSX.Element;
+                              value: {
+                                restrictToCreatedBy: boolean;
+                                publiclyReleasable: boolean;
+                              };
+                            }>
+                              className="mt-2 mb-3"
+                              name="visibility"
+                              options={VISIBILITY_OPTIONS}
+                              onChange={(selected) => {
+                                setRestrictToCreatedBy(
+                                  selected!.value.restrictToCreatedBy
+                                );
+                                setPubliclyReleaseable(
+                                  selected!.value.publiclyReleasable
+                                );
+                                setChangesMade(true);
+                              }}
+                              value={VISIBILITY_OPTIONS.find(
+                                (option) =>
+                                  selectedSavedExport.publiclyReleasable ===
+                                    option.value.publiclyReleasable &&
+                                  selectedSavedExport.restrictToCreatedBy ===
+                                    option.value.restrictToCreatedBy
+                              )}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {exportType === "OBJECT_ARCHIVE" && (
+                    <>
+                      <div className="col-md-4">
+                        <div className="mb-2">
+                          <strong>
+                            <DinaMessage id="fileNameAliasField" />
+                          </strong>
+                        </div>
+                        <QueryFieldSelector
+                          indexMap={indexMap as ESIndexMapping[]}
+                          currentField={selectedFilenameAliasField?.value}
+                          setField={(path) => {
+                            if (indexMap) {
+                              const columnIndex = indexMap.find(
+                                (index) => index.value === path
+                              );
+                              if (columnIndex) {
+                                setSelectedFilenameAliasField(columnIndex);
+                              }
+                            }
+                          }}
+                          isInColumnSelector={false}
+                        />
+                      </div>
+                      {selectedFilenameAliasField?.dynamicField?.type ===
+                        "managedAttribute" && (
+                        <div className="col-md-4" style={{ marginTop: "22px" }}>
+                          <QueryRowManagedAttributeSearch
+                            indexMap={indexMap}
+                            managedAttributeConfig={selectedFilenameAliasField}
+                            isInColumnSelector={true}
+                            setValue={setDynamicFieldValue}
+                            value={dynamicFieldValue}
+                          />
                         </div>
                       )}
                     </>
@@ -526,6 +659,9 @@ export default function ExportPage<TData extends KitsuResource>() {
                       uniqueName={uniqueName}
                       dynamicFieldsMappingConfig={dynamicFieldMapping}
                       disabled={loading}
+                      nonExportableColumns={
+                        NON_EXPORTABLE_COLUMNS_MAP?.[indexName] ?? []
+                      }
                     />
                   </Card.Body>
                 </Card>

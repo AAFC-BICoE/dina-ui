@@ -1,5 +1,4 @@
-import { AxiosError, AxiosAdapter, getAdapter } from "axios";
-import { cacheAdapterEnhancer } from "axios-extensions";
+import { AxiosError } from "axios";
 import { FormikErrors } from "formik";
 import Kitsu, {
   GetParams,
@@ -10,7 +9,6 @@ import Kitsu, {
 } from "kitsu";
 import { deserialise, error as kitsuError } from "kitsu-core";
 import { compact, fromPairs, isEmpty, keys, omit } from "lodash";
-import LRUCache from "lru-cache";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { OperationsResponse } from "..";
@@ -22,6 +20,7 @@ import {
   SuccessfulOperation
 } from "./operations-types";
 import DataLoader from "dataloader";
+import { buildMemoryStorage, setupCache } from "axios-cache-interceptor";
 
 export interface BulkGetOptions {
   apiBaseUrl?: string;
@@ -44,6 +43,12 @@ export interface DoOperationsOptions {
   returnNullForMissingResource?: boolean;
 
   overridePatchOperation?: boolean;
+
+  /**
+   * If true, the client will handle requests with only 1 request as a single request instead of an
+   * operation. Default is false for now to keep the same behavior as before for backwards compatibility.
+   */
+  skipOperationForSingleRequest?: boolean;
 }
 
 /** Api client interface. */
@@ -130,26 +135,23 @@ export class ApiClientImpl implements ApiClientI {
       resourceCase: "none"
     });
 
+    // Add caching support for one second since it's likely it's going to be same response.
+    const ONE_SECOND = 1000;
+    this.apiClient.axios = setupCache(this.apiClient.axios, {
+      location: "client",
+      storage: buildMemoryStorage(
+        false, // clone data off
+        ONE_SECOND, // cleanup interval in ms
+        100 // maximum cache entries
+      ),
+      ttl: ONE_SECOND
+    });
+
+    // This part needs to happen after the cache is setup since it will override it.
     this.apiClient.axios?.interceptors?.response.use(
       (successResponse) => successResponse,
       makeAxiosErrorMoreReadable
     );
-    if (
-      this.apiClient.axios?.defaults?.adapter &&
-      typeof getAdapter === "function"
-    ) {
-      const ONE_SECOND = 1000;
-      const defaultAdapter = getAdapter(this.apiClient.axios.defaults.adapter);
-      this.apiClient.axios.defaults.adapter = cacheAdapterEnhancer(
-        defaultAdapter as any,
-        {
-          // Invalidate the cache after one second.
-          // All this does is batch requests if a set of react components all try to make the same request at once.
-          // e.g. a page with a lot of the same dropdown select component, or a set of group label components fetching the label for the same group.
-          defaultCache: new LRUCache({ max: 100, maxAge: ONE_SECOND })
-        }
-      ) as AxiosAdapter;
-    }
 
     // Bind the methods so context consumers can use object destructuring.
     this.doOperations = this.doOperations.bind(this);
@@ -159,29 +161,115 @@ export class ApiClientImpl implements ApiClientI {
 
   /**
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.
+   *
+   * If a single request is provided, it will perform the request without the
+   * operation directly. It will still return like an operation response. This is only enabled if
+   * skipOperationForSingleRequest is set to true.
    */
   public async doOperations(
     operations: Operation[],
-    { apiBaseUrl = "", returnNullForMissingResource }: DoOperationsOptions = {}
+    {
+      apiBaseUrl = "",
+      returnNullForMissingResource,
+      skipOperationForSingleRequest
+    }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
+    // Check if no operations were provided and skip performing anything.
+    if (operations.length === 0) {
+      console.warn("Empty operation skipped... Returning empty array.");
+      return [];
+    }
+
     // Unwrap the configured axios instance from the Kitsu instance.
     const { axios } = this.apiClient;
 
-    // Do the operations request.
-    const axiosResponse = await axios.patch(
-      `${apiBaseUrl}/operations`,
-      operations,
-      {
-        headers: {
-          Accept: "application/json-patch+json",
-          "Content-Type": "application/json-patch+json",
-          "Crnk-Compact": "true"
-        }
-      }
-    );
+    // This array will hold the responses from either the single or bulk request
+    let responses: OperationsResponse | BulkGetOperation[];
 
-    const responses: OperationsResponse | BulkGetOperation[] =
-      axiosResponse.data;
+    // Depending on the number of requests being made determines if it's an operation or just a
+    // single request.
+    if (operations.length === 1 && skipOperationForSingleRequest) {
+      // Single Request Only
+      const operation = operations[0];
+
+      // Request variables
+      const url = `${apiBaseUrl}/${operation.path}`;
+      const headers = {
+        Accept: "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+        "Crnk-Compact": "true"
+      };
+
+      switch (operation.op.toUpperCase()) {
+        case "GET":
+          const getResponse = await axios.get(url, { headers });
+          responses = [
+            {
+              data: getResponse?.data?.data,
+              included: getResponse?.data?.included,
+              status: getResponse?.status
+            }
+          ];
+          break;
+        case "POST":
+          const postResponse = await axios.post(
+            url,
+            { data: operation.value },
+            { headers }
+          );
+          responses = [
+            {
+              data: postResponse?.data?.data,
+              included: postResponse?.data?.included,
+              status: postResponse?.status
+            }
+          ];
+          break;
+        case "PATCH":
+          const patchResponse = await axios.patch(
+            url,
+            { data: operation.value },
+            { headers }
+          );
+          responses = [
+            {
+              data: patchResponse?.data?.data,
+              included: patchResponse?.data?.included,
+              status: patchResponse?.status
+            }
+          ];
+          break;
+        case "DELETE":
+          const deleteResponse = await axios.delete(url, {
+            headers: {
+              "Content-Type": "application/vnd.api+json"
+            }
+          });
+          responses = [
+            {
+              status: deleteResponse.status
+            } as any
+          ];
+          break;
+        default:
+          throw new Error(`Unsupported single operation: ${operation.op}`);
+      }
+    } else {
+      // Perform operations
+      const axiosResponse = await axios.patch(
+        `${apiBaseUrl}/operations`,
+        operations,
+        {
+          headers: {
+            Accept: "application/json-patch+json",
+            "Content-Type": "application/json-patch+json",
+            "Crnk-Compact": "true"
+          }
+        }
+      );
+
+      responses = axiosResponse.data;
+    }
 
     // Optionally return null instead of throwing an error for missing resources:
     if (returnNullForMissingResource) {
@@ -336,7 +424,7 @@ export function getErrorMessages(
   // Filter down to just the error responses.
   const errorResponses = operationsResponse
     .map((res, index: number) => ({ index, response: res as FailedOperation }))
-    .filter(({ response }) => !/2../.test(response.status.toString()));
+    .filter(({ response }) => !/2../.test(response?.status?.toString()));
 
   const individualErrors = errorResponses.map(({ response, index }) => {
     // Map the error responses to JsonApiErrors.

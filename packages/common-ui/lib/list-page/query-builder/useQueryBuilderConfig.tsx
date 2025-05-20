@@ -48,6 +48,10 @@ import QueryRowRelationshipPresenceSearch, {
 import QueryRowIdentifierSearch, {
   transformIdentifierToDSL
 } from "./query-builder-value-types/QueryBuilderIdentifierSearch";
+import QueryBuilderVocabularySearch from "./query-builder-value-types/QueryBuilderVocabularySearch";
+import QueryRowClassificationSearch, {
+  transformClassificationToDSL
+} from "./query-builder-value-types/QueryBuilderClassificationSearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -79,12 +83,19 @@ function indexSettingsToFieldPath(indexSettings?: ESIndexMapping): string {
  * Converts elastic search types into query builder types.
  * @param type The type from elastic search from the index.
  * @param distinctTerm Boolean to indicate if the field contains a distinct term.
+ * @param isVocabulary Boolean to indicate if the field is a vocabulary.
  * @returns Query builder specific type.
  */
 function getQueryBuilderTypeFromIndexType(
   type: string,
-  distinctTerm: boolean
+  distinctTerm: boolean,
+  isVocabulary: boolean
 ): string {
+  // If the field is a vocabulary, then it's a vocabulary field.
+  if (isVocabulary) {
+    return "vocabulary";
+  }
+
   // If the field is a distinct term, then it's an autocomplete field.
   if (distinctTerm) {
     return "autoComplete";
@@ -99,6 +110,7 @@ function getQueryBuilderTypeFromIndexType(
     case "fieldExtension":
     case "identifier":
     case "relationshipPresence":
+    case "classification":
       return type;
 
     // If it's stored directly as a keyword, it's considered a text field.
@@ -326,6 +338,32 @@ export function generateBuilderConfig(
       factory: (factoryProps) => (
         <QueryBuilderTextSearch
           matchType={factoryProps?.operator}
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformTextSearchToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
+    },
+    vocabulary: {
+      ...BasicConfig.widgets.text,
+      type: "vocabulary",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryBuilderVocabularySearch
+          matchType={factoryProps?.operator}
+          fieldConfig={
+            (factoryProps?.fieldDefinition?.fieldSettings as any)
+              ?.mapping as ESIndexMapping
+          }
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
@@ -569,6 +607,28 @@ export function generateBuilderConfig(
           indexMap
         });
       }
+    },
+    classification: {
+      ...BasicConfig.widgets.text,
+      type: "classification",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowClassificationSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          isInColumnSelector={false}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformClassificationToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
     }
   };
 
@@ -590,6 +650,14 @@ export function generateBuilderConfig(
             "empty",
             "notEmpty"
           ]
+        }
+      }
+    },
+    vocabulary: {
+      valueSources: ["value"],
+      widgets: {
+        vocabulary: {
+          operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"]
         }
       }
     },
@@ -714,6 +782,15 @@ export function generateBuilderConfig(
           operators: ["noOperator"]
         }
       }
+    },
+    classification: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        classification: {
+          operators: ["noOperator"]
+        }
+      }
     }
   };
 
@@ -809,7 +886,8 @@ export function generateBuilderConfig(
       const field = {};
       const type = getQueryBuilderTypeFromIndexType(
         indexItem.type,
-        indexItem.distinctTerm
+        indexItem.distinctTerm,
+        indexItem?.dynamicField?.type === "vocabulary"
       );
 
       // Value is used for the field name since it's required to be unique. It should not be used

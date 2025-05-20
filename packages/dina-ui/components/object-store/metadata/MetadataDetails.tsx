@@ -13,6 +13,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { License, Metadata } from "../../../types/objectstore-api";
 import { GroupLabel } from "../../group-select/GroupFieldView";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
+import { DerivativeList } from "../derivative-list/DerivativeList";
+import { formatBytes } from "../object-store-utils";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -20,7 +22,7 @@ export interface MetadataDetailsProps {
 
 /**
  * Shows the attribute details of a Metadata. Does not include the image or thumbnail.
- * Tha ManagedAttributeMap must b included with the passed Metadata.
+ * The ManagedAttributeMap must be included with the passed Metadata.
  */
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   const { formatMessage, locale } = useDinaIntl();
@@ -107,6 +109,9 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         ]}
         title={formatMessage("metadataMediaDetailsLabel")}
       />
+
+      <DerivativeList metadata={metadata} />
+
       <MetadataAttributeGroup
         metadata={metadata}
         fields={["dcRights", { name: "xmpRightsWebStatement", value: license }]}
@@ -134,19 +139,7 @@ interface MetadataAttributeGroupProps {
   title: string;
 }
 
-function formatBytes(bytes, decimals = 2) {
-  if (!+bytes) return "0 Bytes";
-
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
-
-function MetadataAttributeGroup({
+export function MetadataAttributeGroup({
   metadata,
   fields,
   title
@@ -208,7 +201,7 @@ interface CollapsableSectionProps {
 }
 
 /** Wrapper for the collapsible sections of the details UI. */
-function CollapsableSection({
+export function CollapsableSection({
   children,
   collapserId,
   title

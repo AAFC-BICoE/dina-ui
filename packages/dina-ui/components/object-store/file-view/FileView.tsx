@@ -1,22 +1,41 @@
 import {
   LoadingSpinner,
   useApiClient,
-  useIsVisible,
-  useQuery
+  useBlobLoad,
+  useIsVisible
 } from "../../../../common-ui";
-import dynamic from "next/dynamic";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ComponentType, ReactNode, useState, useRef } from "react";
-import Link from "next/link";
-import { SmallThumbnail } from "../../table/thumbnail-cell";
+import { ReactNode, useState, useRef } from "react";
 import { Metadata } from "../../../types/objectstore-api";
+import {
+  derivativeTypeToLabel,
+  handleDownloadLink
+} from "../object-store-utils";
+import RcTooltip from "rc-tooltip";
+import { DownloadButton } from "../derivative-list/DerivativeList";
+import { Dropdown } from "react-bootstrap";
+import {
+  FaDownload,
+  FaFile,
+  FaFileAudio,
+  FaFileCsv,
+  FaFileExcel,
+  FaFileImage,
+  FaFilePdf,
+  FaFilePowerpoint,
+  FaFileVideo,
+  FaFileWord,
+  FaFileZipper
+} from "react-icons/fa6";
+import { FaFileCode } from "react-icons/fa";
+import { MdOutlineRawOn } from "react-icons/md";
+import { IconType } from "react-icons/lib";
 
 export type DownLoadLinks = {
   original?: string;
   thumbNail?: string;
   largeData?: string;
 };
-
 export interface FileViewProps {
   clickToDownload?: boolean;
   filePath: string;
@@ -25,15 +44,9 @@ export interface FileViewProps {
   imgHeight?: string;
   downloadLinks?: DownLoadLinks;
   shownTypeIndicator?: ReactNode;
-  preview?: boolean;
+  hideDownload?: boolean;
   metadata?: Metadata;
 }
-
-// The FileViewer component can't be server-side rendered:
-const FileViewer: ComponentType<any> = dynamic(
-  () => import("react-file-viewer"),
-  { ssr: false }
-);
 
 export const IMG_TAG_SUPPORTED_FORMATS = [
   "apng",
@@ -46,10 +59,6 @@ export const IMG_TAG_SUPPORTED_FORMATS = [
   "svg"
 ];
 
-const SPREADSHEET_FORMATS = ["ods", "xls", "xlsm", "xlsx", "csv"];
-
-const DOCUMENT_FORMATS = ["doc", "docx", "pdf"];
-
 export function FileView({
   clickToDownload,
   filePath,
@@ -58,23 +67,13 @@ export function FileView({
   imgHeight,
   downloadLinks,
   shownTypeIndicator,
-  preview,
+  hideDownload,
   metadata
 }: FileViewProps) {
   const { apiClient } = useApiClient();
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, messages } = useDinaIntl();
 
-  const [objectURL, setObjectURL] = useState<string>();
-  async function fetchObjectBlob(path) {
-    return await apiClient.axios.get(path, {
-      responseType: "blob",
-      timeout: 0
-    });
-  }
-  const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
-  const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
-  const isTextDoc = DOCUMENT_FORMATS.includes(fileType.toLowerCase());
-  const [isFallbackRender, setIsFallBackRender] = useState<boolean>(false);
+  const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType?.toLowerCase());
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const visibleRef = useRef<HTMLDivElement>(null);
@@ -86,119 +85,34 @@ export function FileView({
     offset: "0px 0px 300px 0px"
   });
 
-  const shownTypeIndicatorFallback = (
-    <div className="shown-file-type">
-      <strong>
-        <DinaMessage id="showing" />:
-      </strong>
-      {` ${formatMessage("thumbnail")}`}
-    </div>
-  );
-  const showFile = !(isSpreadsheet || isTextDoc);
-
-  function onSuccess(response) {
-    setObjectURL(window?.URL?.createObjectURL(response));
-  }
-
   const disableRequest = () => {
     // Check if it's visible to the user, if not, then disable the request.
     if (isVisible === false) {
       return true;
     }
 
-    // Check if it's something that can be loaded...
-    if (metadata) {
-      return (
-        metadata?.dcType !== "IMAGE" && metadata?.dcType !== "MOVING_IMAGE"
-      );
-    }
-
     // It's visible and the metadata is an image.
     return false;
   };
 
-  const resp = useQuery(
-    { path: filePath, responseType: "blob", timeout: 0 },
-    {
-      onSuccess,
-      disabled: disableRequest()
-    }
-  );
+  const { objectUrl, error, isLoading } = useBlobLoad({
+    filePath: filePath,
+    autoOpen: false,
+    disabled: disableRequest()
+  });
 
-  if (preview || (!isImage && fileType !== "pdf")) {
-    clickToDownload = false;
-  }
+  const errorStatus = (error as any)?.cause?.status;
 
-  /**
-   * When the user clicks a download link, the current token will be appended.
-   *
-   * @param path The download link.
-   */
-  async function handleDownloadLink(path?: string) {
-    if (path) {
-      try {
-        setIsDownloading(true);
-        const response = await fetchObjectBlob(path);
-        const url = window?.URL?.createObjectURL(response.data);
-        const link = document?.createElement("a");
-        const content: string = response.headers["content-disposition"];
-        const filename = content
-          .slice(content.indexOf("filename=") + "filename=".length)
-          .replaceAll('"', "");
-        link.href = url;
-        link?.setAttribute("download", filename); // or any other extension
-        document?.body?.appendChild(link);
-        link?.click();
-        window?.URL?.revokeObjectURL(url);
-        setIsDownloading(false);
-      } catch (error) {
-        setIsDownloading(false);
-        return error;
-      }
-    }
-  }
-
-  function fallBackRender() {
-    const thumbnailImageDerivative = metadata?.derivatives?.find(
-      (it) => it.derivativeType === "THUMBNAIL_IMAGE"
-    );
-    const fileId = thumbnailImageDerivative?.fileIdentifier;
-    const fallBackFilePath = `/objectstore-api/file/${
-      thumbnailImageDerivative?.bucket
-    }/${
-      // Add derivative/ before the fileIdentifier if the file to display is a derivative.
-      thumbnailImageDerivative?.type === "derivative" ? "derivative/" : ""
-    }${fileId}`;
-    if (thumbnailImageDerivative) {
-      setIsFallBackRender(true);
-    }
-    return (
-      <div>
-        {thumbnailImageDerivative ? (
-          <SmallThumbnail filePath={fallBackFilePath} />
-        ) : (
-          <Link
-            href={objectURL ? (objectURL as any) : filePath}
-            passHref={true}
-          >
-            <a>{filePath}</a>
-          </Link>
-        )}
-      </div>
-    );
-  }
-
-  const errorStatus = (resp.error as any)?.cause?.status;
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
-      {resp?.loading ? (
+      {isLoading ? (
         <LoadingSpinner loading={true} />
       ) : (
         <>
-          {showFile ? (
+          {isImage ? (
             errorStatus === undefined ? (
               <a
-                href={objectURL}
+                href={objectUrl as any}
                 target="_blank"
                 style={{
                   color: "inherit",
@@ -210,23 +124,29 @@ export function FileView({
                   width: "fit-content"
                 }}
               >
-                {isImage ? (
+                <RcTooltip
+                  overlay={<>{shownTypeIndicator}</>}
+                  placement="top"
+                  align={{
+                    points: ["bc", "bc"],
+                    offset: [0, -20]
+                  }}
+                  motion={{
+                    motionName: "rc-tooltip-zoom",
+                    motionAppear: true,
+                    motionEnter: true,
+                    motionLeave: true
+                  }}
+                >
                   <img
                     alt={imgAlt ?? `File path : ${filePath}`}
-                    src={objectURL}
+                    src={objectUrl as any}
                     style={{ height: imgHeight }}
                     onError={(event) =>
                       (event.currentTarget.style.display = "none")
                     }
                   />
-                ) : (
-                  <FileViewer
-                    filePath={objectURL}
-                    fileType={fileType}
-                    unsupportedComponent={fallBackRender}
-                    errorComponent={fallBackRender}
-                  />
-                )}
+                </RcTooltip>
               </a>
             ) : errorStatus === 403 ? (
               <DinaMessage id="unauthorized" />
@@ -234,43 +154,138 @@ export function FileView({
               <DinaMessage id="thumbnailNotAvailableText" />
             )
           ) : (
-            <DinaMessage id="previewNotAvailable" />
-          )}
-          {!preview && (
-            <div className="d-flex justify-content-center">
-              {downloadLinks?.original && (
-                <DownloadLink
-                  id="originalFile"
-                  path={downloadLinks?.original}
-                  isDownloading={isDownloading}
-                  handleDownloadLink={handleDownloadLink}
-                />
+            <div
+              style={{
+                width: "100%",
+                aspectRatio: "3/2",
+                backgroundColor: "#f0f0f0",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                color: "#666"
+              }}
+            >
+              {fileExtensionToIcon(
+                metadata?.fileExtension,
+                "dropdown-icon mb-2"
               )}
-              {downloadLinks?.thumbNail && (
-                <DownloadLink
-                  id="thumbnail"
-                  path={downloadLinks?.thumbNail}
-                  isDownloading={isDownloading}
-                  handleDownloadLink={handleDownloadLink}
-                />
-              )}
-              {downloadLinks?.largeData && (
-                <DownloadLink
-                  id="largeImg"
-                  path={downloadLinks?.largeData}
-                  isDownloading={isDownloading}
-                  handleDownloadLink={handleDownloadLink}
-                />
-              )}
+              <DinaMessage id="previewNotAvailable" />
             </div>
           )}
-          {!preview && (
-            <div>
-              {showFile &&
-                (isFallbackRender
-                  ? shownTypeIndicatorFallback
-                  : shownTypeIndicator)}
-            </div>
+          {metadata?.acCaption && (
+            <strong style={{ display: "block", marginTop: "10px" }}>
+              {metadata?.acCaption}
+            </strong>
+          )}
+
+          {!hideDownload && downloadLinks?.original && (
+            <>
+              {metadata?.derivatives && metadata?.derivatives?.length === 0 ? (
+                <>
+                  <div className="d-flex justify-content-center">
+                    {downloadLinks?.original && (
+                      <DownloadButton
+                        id="downloadFile"
+                        path={downloadLinks?.original}
+                        isDownloading={isDownloading}
+                        handleDownloadLink={handleDownloadLink}
+                        apiClient={apiClient}
+                        setIsDownloading={setIsDownloading}
+                        classname="p-2 mt-3"
+                      />
+                    )}
+                  </div>
+                </>
+              ) : (
+                <Dropdown>
+                  <Dropdown.Toggle
+                    variant="primary"
+                    id="dropdown-basic"
+                    className="mt-3"
+                  >
+                    <FaDownload className="me-2" />
+                    <DinaMessage id={"downloadFile"} />
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    {downloadLinks?.original && (
+                      <Dropdown.Item
+                        as="button"
+                        className="d-flex justify-content-between align-items-center"
+                        onClick={() =>
+                          handleDownloadLink(
+                            downloadLinks?.original ?? "",
+                            apiClient,
+                            setIsDownloading
+                          )
+                        }
+                      >
+                        <div
+                          className="d-flex align-items-center"
+                          style={{ minWidth: "250px" }}
+                        >
+                          {fileExtensionToIcon(
+                            metadata?.fileExtension,
+                            "me-3 text-secondary dropdown-icon"
+                          )}
+                          <div>
+                            <div className="fw-semibold">
+                              {formatMessage("originalFile")}
+                            </div>
+                            <small className="text-muted">
+                              {metadata?.fileExtension?.toUpperCase()}
+                            </small>
+                          </div>
+                        </div>
+                      </Dropdown.Item>
+                    )}
+                    <Dropdown.Divider />
+                    {metadata?.derivatives?.map((derivative) => {
+                      const fileIdentifier = derivative.fileIdentifier;
+                      const bucket = derivative.bucket;
+                      const fileType = derivative.fileExtension;
+                      const derivativeType = derivative.derivativeType;
+                      const filePath = `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`;
+
+                      return (
+                        <Dropdown.Item
+                          key={fileIdentifier}
+                          as="button"
+                          className="d-flex justify-content-between align-items-center"
+                          onClick={() =>
+                            handleDownloadLink(
+                              filePath,
+                              apiClient,
+                              setIsDownloading
+                            )
+                          }
+                        >
+                          <div className="d-flex align-items-center">
+                            {fileExtensionToIcon(
+                              fileType,
+                              "me-3 text-secondary dropdown-icon"
+                            )}
+                            <div>
+                              <div className="fw-semibold">
+                                {derivativeTypeToLabel(
+                                  derivativeType,
+                                  messages
+                                )}
+                              </div>
+                              <small className="text-muted">
+                                {fileType.toUpperCase()}
+                              </small>
+                            </div>
+                          </div>
+                        </Dropdown.Item>
+                      );
+                    })}
+                  </Dropdown.Menu>
+                </Dropdown>
+              )}
+            </>
           )}
         </>
       )}
@@ -278,27 +293,72 @@ export function FileView({
   );
 }
 
-interface DownloadLinkProps {
-  id: string;
-  path: string;
-  isDownloading: boolean;
-  handleDownloadLink: (path?: string) => Promise<any>;
-}
-function DownloadLink({
-  id,
-  path,
-  isDownloading,
-  handleDownloadLink
-}: DownloadLinkProps) {
-  return isDownloading ? (
-    <LoadingSpinner loading={true} />
-  ) : (
-    <a
-      className="p-2 original"
-      style={{ cursor: "pointer" }}
-      onClick={() => handleDownloadLink(path)}
-    >
-      <DinaMessage id={id as any} />
-    </a>
-  );
+// Raw‐format extensions
+const RAW_EXTS = new Set(["cr2", "nef"]);
+
+// Common media groups
+const IMAGE_EXTS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "bmp",
+  "tiff",
+  "svg",
+  "webp"
+]);
+const VIDEO_EXTS = new Set(["mp4", "mov", "avi", "mkv", "wmv", "flv", "webm"]);
+const AUDIO_EXTS = new Set(["mp3", "wav", "flac", "aac", "ogg", "m4a"]);
+
+// Specific one‐off mapping (extension → icon)
+const SPECIFIC_ICON_MAP: Record<string, IconType> = {
+  pdf: FaFilePdf,
+  doc: FaFileWord,
+  docx: FaFileWord,
+  xls: FaFileExcel,
+  xlsx: FaFileExcel,
+  csv: FaFileCsv,
+  html: FaFileCode,
+  htm: FaFileCode,
+  ppt: FaFilePowerpoint,
+  pptx: FaFilePowerpoint,
+  zip: FaFileZipper,
+  gz: FaFileZipper,
+  gzip: FaFileZipper
+};
+
+/**
+ * Render an appropriate file‐icon based on a “.ext” string.
+ *
+ * @param fileExtension  The extension, e.g. ".jpg", ".PDF", ".Cr2"
+ * @param className      CSS className to pass to the icon
+ */
+export function fileExtensionToIcon(
+  fileExtension: string | undefined,
+  className = ""
+): React.ReactNode {
+  if (!fileExtension) return null;
+
+  // strip leading dot and lowercase
+  const ext = fileExtension.replace(/^\./, "").toLowerCase();
+
+  if (RAW_EXTS.has(ext)) {
+    return <MdOutlineRawOn className={className} />;
+  }
+  if (IMAGE_EXTS.has(ext)) {
+    return <FaFileImage className={className} />;
+  }
+  if (VIDEO_EXTS.has(ext)) {
+    return <FaFileVideo className={className} />;
+  }
+  if (AUDIO_EXTS.has(ext)) {
+    return <FaFileAudio className={className} />;
+  }
+  if (SPECIFIC_ICON_MAP[ext]) {
+    const Icon = SPECIFIC_ICON_MAP[ext];
+    return <Icon className={className} />;
+  }
+
+  // Default to generic file icon
+  return <FaFile className={className} />;
 }

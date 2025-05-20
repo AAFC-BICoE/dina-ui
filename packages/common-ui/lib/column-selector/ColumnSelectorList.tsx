@@ -1,5 +1,5 @@
 import useLocalStorage from "@rehooks/local-storage";
-import Kitsu, { KitsuResource } from "kitsu";
+import { KitsuResource } from "kitsu";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "react-bootstrap";
 import {
@@ -32,6 +32,9 @@ import {
   generateColumnDefinition,
   generateColumnPath
 } from "./ColumnSelectorUtils";
+import QueryRowClassificationSearch, {
+  ClassificationSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -124,6 +127,14 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                 (columnFunctionValues.functionName === "CONCAT" &&
                   (columnFunctionValues.params?.length ?? 0) > 1)
               ) {
+                setIsValidField(true);
+                return;
+              }
+              break;
+            case "classification":
+              const classificationValues: ClassificationSearchStates =
+                JSON.parse(dynamicFieldValue);
+              if (classificationValues?.selectedClassificationRank) {
                 setIsValidField(true);
                 return;
               }
@@ -318,10 +329,17 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               : (mapping?.label ?? "").startsWith(id)
           );
         } else {
-          return !(mandatoryDisplayedColumns ?? []).some((id) =>
-            mapping?.parentType
-              ? (mapping?.value ?? "").startsWith(id)
-              : (mapping?.label ?? "").startsWith(id)
+          return (
+            !(mandatoryDisplayedColumns ?? []).some((id) =>
+              mapping?.parentType
+                ? (mapping?.value ?? "").startsWith(id)
+                : (mapping?.label ?? "").startsWith(id)
+            ) &&
+            !(nonExportableColumns ?? []).some((id) =>
+              mapping?.parentType
+                ? (mapping?.value ?? "").startsWith(id)
+                : (mapping?.label ?? "").startsWith(id)
+            )
           );
         }
       });
@@ -387,6 +405,13 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               isInColumnSelector={true}
             />
           )}
+          {selectedField?.dynamicField?.type === "classification" && (
+            <QueryRowClassificationSearch
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
+              isInColumnSelector={true}
+            />
+          )}
           <div className="mt-2 d-grid">
             <Button
               className="btn btn-primary"
@@ -437,29 +462,4 @@ export function ColumnSelectorList<TData extends KitsuResource>({
       )}
     </>
   );
-}
-
-export async function downloadDataExport(
-  apiClient: Kitsu,
-  id: string | undefined,
-  name?: string
-) {
-  if (id) {
-    const getFileResponse = await apiClient.get(
-      `dina-export-api/file/${id}?type=DATA_EXPORT`,
-      {
-        responseType: "blob",
-        timeout: 0
-      }
-    );
-
-    // Download the data
-    const url = window?.URL.createObjectURL(getFileResponse as any);
-    const link = document?.createElement("a");
-    link.href = url ?? "";
-    link?.setAttribute("download", `${name ?? id}`);
-    document?.body?.appendChild(link);
-    link?.click();
-    window?.URL?.revokeObjectURL(url ?? "");
-  }
 }

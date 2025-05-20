@@ -1,9 +1,5 @@
-import { SaveArgs, useAccount, useApiClient } from "common-ui/lib";
-import {
-  SavedExportColumnStructure,
-  UserPreference
-} from "../../../types/user-api";
-import { FilterParam, KitsuResource } from "kitsu";
+import { useAccount, useApiClient } from "common-ui/lib";
+import { KitsuResource } from "kitsu";
 import { useEffect, useState, useMemo } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -12,36 +8,75 @@ import Alert from "react-bootstrap/Alert";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { isEqual } from "lodash";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DataExportTemplate } from "packages/dina-ui/types/dina-export-api/resources/DataExportTemplate";
+import {
+  ColumnSeparator,
+  ExportType
+} from "packages/dina-ui/types/dina-export-api";
+import Select from "react-select";
+import {
+  convertColumnsToAliases,
+  convertColumnsToPaths,
+  getColumnFunctions
+} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
+
+export const VISIBILITY_OPTIONS: {
+  label: JSX.Element;
+  value: {
+    restrictToCreatedBy: boolean;
+    publiclyReleasable: boolean;
+  };
+}[] = [
+  {
+    label: <DinaMessage id="visibleToUser" />,
+    value: { restrictToCreatedBy: true, publiclyReleasable: false }
+  },
+  {
+    label: <DinaMessage id="visibleToGroup" />,
+    value: { restrictToCreatedBy: false, publiclyReleasable: false }
+  },
+  {
+    label: <DinaMessage id="visibleToEveryone" />,
+    value: { restrictToCreatedBy: false, publiclyReleasable: true }
+  }
+];
 
 export interface UseSavedExportsProp {
-  indexName: string;
+  exportType: ExportType;
+  selectedSeparator: {
+    value: ColumnSeparator;
+    label: string;
+  };
 }
 
 export default function useSavedExports<TData extends KitsuResource>({
-  indexName
+  exportType,
+  selectedSeparator
 }: UseSavedExportsProp) {
-  const { save, apiClient } = useApiClient();
-  const { subject } = useAccount();
+  const { apiClient } = useApiClient();
+  const { groupNames } = useAccount();
 
-  const [userPreferenceID, setUserPreferenceID] = useState<string>();
-  const [everySavedExport, setEverySavedExport] = useState<
-    SavedExportColumnStructure[]
-  >([]);
-  const [allSavedExports, setAllSavedExports] = useState<
-    SavedExportColumnStructure[]
-  >([]);
+  const [allSavedExports, setAllSavedExports] = useState<DataExportTemplate[]>(
+    []
+  );
+
   const [loadingSavedExports, setLoadingSavedExports] = useState<boolean>(true);
 
   // Currently selected states...
   const [selectedSavedExport, setSelectedSavedExport] =
-    useState<SavedExportColumnStructure>();
+    useState<DataExportTemplate>();
+
   const [columnsToExport, setColumnsToExport] = useState<TableColumn<TData>[]>(
     []
   );
 
+  const [restrictToCreatedBy, setRestrictToCreatedBy] = useState<boolean>(true);
+
+  const [publiclyReleasable, setPubliclyReleaseable] = useState<boolean>(false);
+
   // Selected paths to be loaded in as columnToExport.
   const [columnPathsToExport, setColumnPathsToExport] =
-    useState<SavedExportColumnStructure>();
+    useState<DataExportTemplate>();
 
   // All states related to creating a saved export.
   const [savedExportName, setSavedExportName] = useState<string>("");
@@ -80,32 +115,15 @@ export default function useSavedExports<TData extends KitsuResource>({
   async function createSavedExport() {
     setLoadingCreateSavedExport(true);
 
-    const savedExportObject: SavedExportColumnStructure = {
-      columns: convertColumnsToPaths(columnsToExport),
-      columnAliases: convertColumnsToAliases(columnsToExport),
-      component: indexName,
-      name: savedExportName.trim()
-    };
-
     try {
-      await performSaveRequest([
-        ...everySavedExport.filter(
-          (savedExport) =>
-            !(
-              savedExport.name === savedExportName.trim() &&
-              savedExport.component === indexName
-            )
-        ),
-        savedExportObject
-      ]);
+      const createdDataExport = await performCreateSavedExport();
+      // Select the newly created saved export...
+      setSelectedSavedExport(createdDataExport);
     } catch (e) {
       console.error(e);
       setLoadingCreateSavedExport(false);
       return;
     }
-
-    // Select the newly created saved export...
-    setSelectedSavedExport(savedExportObject);
 
     setLoadingCreateSavedExport(false);
     handleCloseCreateSavedExportModal();
@@ -120,35 +138,17 @@ export default function useSavedExports<TData extends KitsuResource>({
     if (!selectedSavedExport) {
       return;
     }
-
     setLoadingUpdate(true);
 
-    const savedExportObject: SavedExportColumnStructure = {
-      columns: convertColumnsToPaths(columnsToExport),
-      columnAliases: convertColumnsToAliases(columnsToExport),
-      component: indexName,
-      name: selectedSavedExport.name
-    };
-
     try {
-      await performSaveRequest([
-        ...everySavedExport.filter(
-          (savedExport) =>
-            !(
-              savedExport.name === selectedSavedExport.name &&
-              savedExport.component === indexName
-            )
-        ),
-        savedExportObject
-      ]);
+      const updatedSavedExport = await performUpdateSavedExport();
+      // Select the newly updated saved export...
+      setSelectedSavedExport(updatedSavedExport);
     } catch (e) {
       console.error(e);
       setLoadingUpdate(false);
       return;
     }
-
-    // Select the newly upddated saved export...
-    setSelectedSavedExport(savedExportObject);
 
     setLoadingUpdate(false);
   }
@@ -163,17 +163,9 @@ export default function useSavedExports<TData extends KitsuResource>({
     }
 
     setLoadingDelete(true);
-
+    setSelectedSavedExport(undefined);
     try {
-      await performSaveRequest([
-        ...everySavedExport.filter(
-          (savedExport) =>
-            !(
-              savedExport.name === selectedSavedExport.name &&
-              savedExport.component === indexName
-            )
-        )
-      ]);
+      await performDeleteSavedExport();
     } catch (e) {
       console.error(e);
       setLoadingDelete(false);
@@ -181,29 +173,109 @@ export default function useSavedExports<TData extends KitsuResource>({
     }
 
     setLoadingDelete(false);
-    setSelectedSavedExport(undefined);
   }
 
   /**
-   * Performs the update/create (depends on the id being null). Also preforms a retrieve to
-   * update the list.
+   * Patch selected savedExport and retrieves updated exports from back end
    *
-   * @param toBeSavedExports The savedExportColumnSelection to be added to the user preferences.
+   * @param savedExport The savedExportColumnSelection to be added to the user preferences.
    */
-  async function performSaveRequest(toBeSavedExports) {
-    // Perform saving request.
-    const saveArgs: SaveArgs<UserPreference> = {
-      resource: {
-        id: userPreferenceID ?? null,
-        userId: subject,
-        savedExportColumnSelection: toBeSavedExports
-      } as any,
-      type: "user-preference"
-    };
-    await save([saveArgs], { apiBaseUrl: "/user-api" });
+  async function performUpdateSavedExport(): Promise<DataExportTemplate> {
+    const columnFunctions = getColumnFunctions(columnsToExport);
+    const updatedSavedExportResp = await apiClient.axios.patch(
+      `/dina-export-api/data-export-template/${selectedSavedExport?.id}`,
+      {
+        data: {
+          id: selectedSavedExport?.id,
+          type: selectedSavedExport?.type,
+          attributes: {
+            columns: convertColumnsToPaths(columnsToExport),
+            columnAliases: convertColumnsToAliases(columnsToExport),
+            name: selectedSavedExport?.name,
+            restrictToCreatedBy: restrictToCreatedBy,
+            publiclyReleasable: publiclyReleasable,
+            exportType: exportType,
+            exportOptions: { columnSeparator: selectedSeparator.value },
+            columnFunctions:
+              Object.keys(columnFunctions ?? {}).length === 0
+                ? undefined
+                : columnFunctions
+          }
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json"
+        }
+      }
+    );
 
     // After changes are made perform a reload.
     await retrieveSavedExports();
+
+    return {
+      id: updatedSavedExportResp.data.data.id,
+      type: updatedSavedExportResp.data.data.type,
+      ...updatedSavedExportResp.data.data.attributes
+    };
+  }
+
+  /**
+   * Deletes savedExport and retrieves updated exports from back end
+   *
+   * @param savedExport The savedExportColumnSelection to be added to the user preferences.
+   */
+  async function performDeleteSavedExport() {
+    await apiClient.axios.delete(
+      `/dina-export-api/data-export-template/${selectedSavedExport?.id}`
+    );
+
+    // After changes are made perform a reload.
+    await retrieveSavedExports();
+  }
+
+  /**
+   * Creates savedExport and retrieves updated exports from back end
+   *
+   * @param savedExport The savedExportColumnSelection to be added to the user preferences.
+   */
+  async function performCreateSavedExport(): Promise<DataExportTemplate> {
+    const columnFunctions = getColumnFunctions(columnsToExport);
+    const createdSavedExportResp = await apiClient.axios.post(
+      `/dina-export-api/data-export-template`,
+      {
+        data: {
+          type: "data-export-template",
+          attributes: {
+            columns: convertColumnsToPaths(columnsToExport),
+            columnAliases: convertColumnsToAliases(columnsToExport),
+            name: savedExportName.trim(),
+            restrictToCreatedBy: restrictToCreatedBy,
+            publiclyReleasable: publiclyReleasable,
+            exportType: exportType,
+            exportOptions: { columnSeparator: selectedSeparator.value },
+            group: groupNames?.[0],
+            columnFunctions:
+              Object.keys(columnFunctions ?? {}).length === 0
+                ? undefined
+                : columnFunctions
+          }
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json"
+        }
+      }
+    );
+
+    // After changes are made perform a reload.
+    await retrieveSavedExports();
+    return {
+      id: createdSavedExportResp.data.data.id,
+      type: createdSavedExportResp.data.data.type,
+      ...createdSavedExportResp.data.data.attributes
+    };
   }
 
   /**
@@ -213,42 +285,19 @@ export default function useSavedExports<TData extends KitsuResource>({
   async function retrieveSavedExports() {
     setLoadingSavedExports(true);
     await apiClient
-      .get<UserPreference[]>("user-api/user-preference", {
+      .get<DataExportTemplate[]>("dina-export-api/data-export-template", {
         filter: {
-          userId: subject as FilterParam
+          group: groupNames?.[0] ?? ""
         }
       })
       .then((response) => {
         setLoadingSavedExports(false);
-        setUserPreferenceID(response?.data?.[0]?.id ?? undefined);
-
-        if (response?.data?.[0]?.savedExportColumnSelection) {
-          setEverySavedExport(response.data[0].savedExportColumnSelection);
-          setAllSavedExports(
-            response.data[0].savedExportColumnSelection.filter(
-              (savedExport) => savedExport.component === indexName
-            )
-          );
-        }
+        setAllSavedExports(response.data);
       })
-      .catch((userPreferenceError) => {
-        console.error(userPreferenceError);
+      .catch((error) => {
+        console.error(error);
         setLoadingSavedExports(false);
       });
-  }
-
-  function convertColumnsToPaths(columns): string[] {
-    if (!columns) {
-      return [];
-    }
-    return columns.map((column) => column?.id ?? "");
-  }
-
-  function convertColumnsToAliases(columns): string[] {
-    if (!columns) {
-      return [];
-    }
-    return columns.map((column) => column?.exportHeader ?? "");
   }
 
   /**
@@ -267,12 +316,20 @@ export default function useSavedExports<TData extends KitsuResource>({
     }
   }, [selectedSavedExport]);
 
-  const columnsToExportPaths = convertColumnsToPaths(columnsToExport);
-  const columnsToExportAliases = convertColumnsToAliases(columnsToExport);
+  const [changesMade, setChangesMade] = useState<boolean>(false);
 
-  const changesMade =
-    !isEqual(columnsToExportPaths, selectedSavedExport?.columns ?? []) ||
-    !isEqual(columnsToExportAliases, selectedSavedExport?.columnAliases ?? []);
+  useEffect(() => {
+    const columnsToExportPaths = convertColumnsToPaths(columnsToExport);
+    const columnsToExportAliases = convertColumnsToAliases(columnsToExport);
+
+    setChangesMade(
+      !isEqual(columnsToExportPaths, selectedSavedExport?.columns ?? []) ||
+        !isEqual(
+          columnsToExportAliases,
+          selectedSavedExport?.columnAliases ?? []
+        )
+    );
+  }, [columnsToExport]);
 
   const displayOverrideWarning =
     allSavedExports.find(
@@ -316,6 +373,25 @@ export default function useSavedExports<TData extends KitsuResource>({
             disabled={loadingCreateSavedExport}
           />
           <br />
+          <strong>
+            <DinaMessage id="visibility" />
+          </strong>
+          <Select<{
+            label: JSX.Element;
+            value: {
+              restrictToCreatedBy: boolean;
+              publiclyReleasable: boolean;
+            };
+          }>
+            className="mt-2 mb-3"
+            name="visibility"
+            options={VISIBILITY_OPTIONS}
+            onChange={(selected) => {
+              setRestrictToCreatedBy(selected!.value.restrictToCreatedBy);
+              setPubliclyReleaseable(selected!.value.publiclyReleasable);
+            }}
+            defaultValue={VISIBILITY_OPTIONS[0]}
+          />
 
           <strong>
             <DinaMessage id="savedExport_columnsToBeSaved" />
@@ -361,7 +437,9 @@ export default function useSavedExports<TData extends KitsuResource>({
       showCreateSavedExportModal,
       savedExportName,
       columnsToExport,
-      loadingCreateSavedExport
+      loadingCreateSavedExport,
+      publiclyReleasable,
+      restrictToCreatedBy
     ]
   );
 
@@ -370,6 +448,7 @@ export default function useSavedExports<TData extends KitsuResource>({
     deleteSavedExport,
     allSavedExports,
     changesMade,
+    setChangesMade,
     loadingSavedExports,
     loadingDelete,
     loadingUpdate,
@@ -380,6 +459,8 @@ export default function useSavedExports<TData extends KitsuResource>({
     columnsToExport,
     setColumnsToExport,
     columnPathsToExport,
-    setColumnPathsToExport
+    setColumnPathsToExport,
+    setRestrictToCreatedBy,
+    setPubliclyReleaseable
   };
 }

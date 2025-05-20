@@ -22,6 +22,13 @@ import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 
+export const MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS: string[] = [
+  "selectColumn",
+  "assemblages.",
+  "projects.",
+  "organism."
+];
+
 export interface SampleListLayoutProps {
   onSelect?: (sample: PersistedResource<MaterialSample>) => void;
   classNames?: string;
@@ -237,6 +244,15 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         component: "RESTRICTION",
         path: "data.attributes.restrictionFieldsExtension",
         apiEndpoint: "collection-api/extension"
+      },
+
+      // Classification
+      {
+        type: "classification",
+        label: "targetOrganismPrimaryClassification",
+        component: "MATERIAL_SAMPLE",
+        path: "data.attributes.targetOrganismPrimaryClassification",
+        apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
       }
     ],
     relationshipFields: [
@@ -342,6 +358,16 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         apiEndpoint: "collection-api/identifier-type",
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
+      },
+      // Parent Material Sample - Material Sample - Classification
+      {
+        type: "unsupported",
+        label: "targetOrganismPrimaryClassification",
+        component: "MATERIAL_SAMPLE",
+        path: "included.attributes.targetOrganismPrimaryClassification",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample",
+        apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
       }
     ]
   };
@@ -475,12 +501,7 @@ export default function MaterialSampleListPage() {
           dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
           columns={columns}
           mandatoryDisplayedColumns={["selectColumn", "materialSampleName"]}
-          nonExportableColumns={[
-            "selectColumn",
-            "assemblages.",
-            "projects.",
-            "organism."
-          ]}
+          nonExportableColumns={MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS}
           bulkDeleteButtonProps={{
             typeName: "material-sample",
             apiBaseUrl: "/collection-api"

@@ -65,6 +65,15 @@ import {
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 import { MemoizedReactTable } from "./QueryPageTable";
 import { GroupSelectFieldMemoized } from "./QueryGroupSelection";
+import { useRouter } from "next/router";
+import {
+  parseQueryTreeFromURL,
+  serializeQueryTreeToURL
+} from "./query-url/queryUtils";
+import {
+  createLastUsedSavedSearchChangedKey,
+  createSessionStorageLastUsedTreeKey
+} from "./saved-searches/SavedSearch";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -267,6 +276,12 @@ export interface QueryPageProps<TData extends KitsuResource> {
   customViewQuery?: JsonTree;
 
   /**
+   * When using the custom query builder, should the groups be filtered by the logged in users
+   * assigned groups?
+   */
+  customViewFilterGroups?: boolean;
+
+  /**
    * Custom elastic search query to use.
    */
   customViewElasticSearchQuery?: any;
@@ -327,6 +342,7 @@ export function QueryPage<TData extends KitsuResource>({
   onSortedChange,
   viewMode,
   customViewQuery,
+  customViewFilterGroups = true,
   customViewElasticSearchQuery,
   customViewFields,
   rowStyling,
@@ -343,6 +359,7 @@ export function QueryPage<TData extends KitsuResource>({
   const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
   const isActionTriggeredQuery = useRef(false);
+  const router = useRouter();
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -422,12 +439,9 @@ export function QueryPage<TData extends KitsuResource>({
     return { group: groups };
   }, [groups]);
 
-  const sessionStorageLastUsedKeyTreeKey = uniqueName + "-last-used-tree";
-  const localStorageLastUsedSavedSearchChangedKey =
-    uniqueName + "-saved-search-changed";
   const [_sessionStorageQueryTree, setSessionStorageQueryTree] =
     useSessionStorage<JsonTree>(
-      sessionStorageLastUsedKeyTreeKey,
+      createSessionStorageLastUsedTreeKey(uniqueName),
       defaultJsonTree
     );
 
@@ -522,7 +536,7 @@ export function QueryPage<TData extends KitsuResource>({
     queryDSL = applyRootQuery(queryDSL);
 
     // Custom queries should not be adding the group.
-    if (!customViewElasticSearchQuery) {
+    if (!customViewElasticSearchQuery && customViewFilterGroups) {
       queryDSL = applyGroupFilters(queryDSL, groups);
     }
 
@@ -605,12 +619,23 @@ export function QueryPage<TData extends KitsuResource>({
           setQueryBuilderTree(emptyQueryTree());
         }
       }
+      if (router?.query?.queryTree) {
+        const parsedQueryTree = parseQueryTreeFromURL(
+          router.query.queryTree as string
+        );
+        if (parsedQueryTree) {
+          setQueryBuilderTree(parsedQueryTree);
+          setSubmittedQueryBuilderTree(parsedQueryTree);
+          setSessionStorageQueryTree(Utils.getTree(parsedQueryTree));
+        }
+      }
     }
   }, [
     queryBuilderConfig,
     customViewQuery,
     customViewFields,
-    customViewElasticSearchQuery
+    customViewElasticSearchQuery,
+    router?.query?.queryTree
   ]);
 
   // If column selector is disabled, the loading spinner should be turned off.
@@ -828,10 +853,20 @@ export function QueryPage<TData extends KitsuResource>({
     setSubmittedQueryBuilderTree(defaultQueryTree());
     setQueryBuilderTree(defaultQueryTree());
     setSessionStorageQueryTree(defaultJsonTree);
-    writeStorage(localStorageLastUsedSavedSearchChangedKey, false);
+    writeStorage(createLastUsedSavedSearchChangedKey(uniqueName), false);
     setSortingRules(defaultSort ?? DEFAULT_SORT);
     setError(undefined);
     setPageOffset(0);
+
+    // Reset the query to empty.
+    router.push(
+      {
+        pathname: router.pathname,
+        query: null
+      },
+      undefined,
+      { shallow: true }
+    );
   }, []);
 
   /**
@@ -950,6 +985,22 @@ export function QueryPage<TData extends KitsuResource>({
     }
   }
 
+  async function onCopyToClipboard() {
+    const serializedTree = serializeQueryTreeToURL(queryBuilderTree);
+
+    const query =
+      serializedTree !== null
+        ? `?queryTree=${encodeURIComponent(serializedTree)}`
+        : "";
+    const fullUrl = `${window.location.origin}${router.pathname}${query}`;
+
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+    } catch (err) {
+      console.error("Failed to copy URL:", err);
+    }
+  }
+
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
@@ -976,6 +1027,7 @@ export function QueryPage<TData extends KitsuResource>({
             </div>
           )}
           <QueryBuilderMemo
+            onCopyToClipboard={onCopyToClipboard}
             indexName={indexName}
             queryBuilderTree={queryBuilderTree}
             setQueryBuilderTree={onQueryBuildTreeChange}

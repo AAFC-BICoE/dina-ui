@@ -3,13 +3,6 @@ import { mountWithAppContext } from "common-ui";
 import { FileView } from "../FileView";
 import "@testing-library/jest-dom";
 
-// Mock out the FileViewer (3rd party library component) which should only be rendered in the browser.
-jest.mock("next/dynamic", () => () => {
-  return function MockDynamicComponent() {
-    return <div>Mock dynamic component</div>;
-  };
-});
-
 const mockGet = jest.fn((path) => {
   return path;
 });

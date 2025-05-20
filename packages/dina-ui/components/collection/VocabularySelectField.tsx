@@ -1,10 +1,10 @@
 import { FieldWrapper, FieldWrapperProps } from "common-ui";
 import { castArray, startCase } from "lodash";
-import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 import { GroupBase } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import useVocabularyOptions from "./useVocabularyOptions";
+import { VocabularyElement } from "packages/dina-ui/types/collection-api";
 
 export interface VocabularySelectFieldProps extends FieldWrapperProps {
   path: string;
@@ -102,7 +102,7 @@ export function VocabularyReadOnlyView({ path, value }) {
 }
 
 export interface VocabularyFieldHeaderProps {
-  vocabulary: IdentifierType;
+  vocabulary: VocabularyElement;
   referencedBy?: string;
 }
 
@@ -114,11 +114,12 @@ export function VocabularyFieldHeader({
   const label =
     vocabulary?.multilingualTitle?.titles?.find(
       (title) => title.lang === locale
-    )?.title ?? vocabulary.id;
+    )?.title ??
+    (vocabulary.key || vocabulary.id);
   return (
     <>
       {referencedBy ? startCase(referencedBy) + " - " : ""}
-      {label}
+      {startCase(label)}
     </>
   );
 }

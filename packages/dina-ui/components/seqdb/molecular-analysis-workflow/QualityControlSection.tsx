@@ -1,21 +1,23 @@
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
-import { QualityControl } from "../../../types/seqdb-api/resources/QualityControl";
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import DataPasteZone from "../../molecular-analysis/DataPasteZone";
 import { CollapsibleSection } from "../../../../common-ui/lib";
+import { AddAttachmentsButton, AttachmentsEditor } from "../../object-store";
+import { QualityControlWithAttachment } from "./useGenericMolecularAnalysisRun";
+import React from "react";
 
 interface QualityControlSectionProps {
   editMode?: boolean;
-  qualityControls: QualityControl[];
+  qualityControls: QualityControlWithAttachment[];
   qualityControlTypes: VocabularyOption[];
-  createNewQualityControl?: (name?: string) => void;
+  createNewQualityControl?: (name?: string, qcType?: string) => void;
   updateQualityControl?: (
     index: number,
-    newQualityControl: QualityControl
+    newQualityControl: QualityControlWithAttachment
   ) => void;
   deleteQualityControl?: (index: number) => void;
   loading?: boolean;
@@ -34,9 +36,20 @@ export function QualityControlSection({
 
   const onDataPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const clipboardData = event.clipboardData.getData("text/plain");
-    const names = clipboardData.trim().split("\n");
-    names.forEach((name) => createNewQualityControl?.(name));
+    const rows = clipboardData
+      .trim()
+      .split("\n")
+      .map((row) =>
+        row.split("\t").map((cell) => cell.replace(/\r/g, "").trim())
+      );
+    rows.forEach((row) => {
+      createNewQualityControl?.(
+        row.at(0),
+        row.at(1)?.replaceAll(" ", "_")?.toLowerCase()
+      );
+    });
   };
+
   return editMode || qualityControls.length > 0 ? (
     <div className="col-12 mt-3 mb-3">
       <div className="card p-3">
@@ -57,7 +70,7 @@ export function QualityControlSection({
           return (
             <div className="card p-3 mb-3" key={index}>
               <div className="row">
-                <div className="col-6">
+                <div className="col-4">
                   <strong>
                     {formatMessage({
                       id: "qualityControlName"
@@ -119,30 +132,78 @@ export function QualityControlSection({
                     </p>
                   )}
                 </div>
-                <div className="col-1">
+                <div className="col-3">
                   {editMode && (
-                    <Button
-                      onClick={() => deleteQualityControl?.(index)}
-                      variant="danger"
-                      className="delete-datablock w-100 mt-4"
-                      data-testid={`delete-quality-control-${index}`}
-                    >
-                      <FaTrash />
-                    </Button>
+                    <>
+                      <strong>
+                        {formatMessage({
+                          id: "actions"
+                        })}
+                        {":"}
+                      </strong>
+                      <div className="d-flex align-items-center">
+                        <AddAttachmentsButton
+                          onChange={(newMetadatas) => {
+                            updateQualityControl?.(index, {
+                              ...qualityControl,
+                              attachments: [...newMetadatas]
+                            });
+                          }}
+                          value={qualityControl.attachments}
+                          className="mb-0 me-4 mt-1"
+                        />
+                        <Button
+                          onClick={() => deleteQualityControl?.(index)}
+                          variant="danger"
+                          className="delete-datablock"
+                          style={{ marginTop: "-10px" }}
+                          data-testid={`delete-quality-control-${index}`}
+                        >
+                          <FaTrash />
+                        </Button>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
+
+              {/* Existing Attachments */}
+              {qualityControl?.attachments?.length > 0 && (
+                <div style={{ marginTop: "15px" }}>
+                  <AttachmentsEditor
+                    attachmentPath=""
+                    name={`qualityControlAttachments_${index}}`}
+                    onChange={(newMetadatas) => {
+                      updateQualityControl?.(index, {
+                        ...qualityControl,
+                        attachments: [
+                          // Override everything since it can be deleting it.
+                          ...newMetadatas
+                        ]
+                      });
+                    }}
+                    hideAddAttchmentBtn={true}
+                    hideAttachmentForm={true}
+                    hideTitle={true}
+                    hideRemoveBtn={!editMode}
+                    hideCard={true}
+                    value={qualityControl.attachments}
+                  />
+                </div>
+              )}
             </div>
           );
         })}
-        <div className="mt-3">
-          <CollapsibleSection
-            id={"pasteQualityControlName"}
-            headerKey={"pasteQualityControlName"}
-          >
-            <DataPasteZone onDataPaste={onDataPaste} />
-          </CollapsibleSection>
-        </div>
+        {editMode && (
+          <div className="mt-3">
+            <CollapsibleSection
+              id={"pasteQualityControlName"}
+              headerKey={"pasteQualityControlName"}
+            >
+              <DataPasteZone onDataPaste={onDataPaste} />
+            </CollapsibleSection>
+          </div>
+        )}
       </div>
     </div>
   ) : null;
