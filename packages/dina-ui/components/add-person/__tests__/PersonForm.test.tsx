@@ -53,7 +53,7 @@ describe("PersonForm", () => {
           type: "person"
         }
       ],
-      { apiBaseUrl: "/agent-api" }
+      { apiBaseUrl: "/agent-api", skipOperationForSingleRequest: true }
     );
   });
 
@@ -80,7 +80,7 @@ describe("PersonForm", () => {
           type: "person"
         }
       ],
-      { apiBaseUrl: "/agent-api" }
+      { apiBaseUrl: "/agent-api", skipOperationForSingleRequest: true }
     );
   });
 });
