@@ -301,6 +301,7 @@ export default function TaxonomyTree() {
       series: [
         {
           type: "tree",
+          orient: "vertical",
           name: "Taxonomy",
           data: [treeData],
           top: "2%",
