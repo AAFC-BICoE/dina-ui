@@ -155,7 +155,7 @@ function GovernmentLogo() {
   return (
     <>
       <img
-        src={"/static/images/canadaLogo_" + locale + ".svg"}
+        src={"/static/images/sgn-logo.png"}
         property="logo"
         alt=""
         className="logo"
