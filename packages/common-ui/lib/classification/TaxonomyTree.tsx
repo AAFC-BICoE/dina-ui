@@ -32,6 +32,7 @@ export default function TaxonomyTree() {
   const [treeData, setTreeData] = useState<TreeNode>({ name: "Taxonomy" });
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
+  const expandedNodesRef = useRef<Set<string>>(new Set()); // Track expanded nodes
   const { apiClient } = useApiClient();
 
   // Retrieve the classification options
@@ -107,6 +108,27 @@ export default function TaxonomyTree() {
     return query;
   };
 
+  // Helper function to get aggregation key format
+  const getAggregationKey = (aggName: string, response: any): string => {
+    // Check different possible formats
+    if (response.aggregations[aggName]) {
+      return aggName;
+    }
+    if (response.aggregations[`sterms#${aggName}`]) {
+      return `sterms#${aggName}`;
+    }
+
+    // Look for any key that ends with the aggName
+    for (const key of Object.keys(response.aggregations)) {
+      if (key.endsWith(aggName)) {
+        return key;
+      }
+    }
+
+    console.warn(`Aggregation key for ${aggName} not found in response`);
+    return aggName; // Fallback
+  };
+
   // Fetch data for a specific rank
   const fetchTaxonomyData = async (
     rank: string,
@@ -130,8 +152,8 @@ export default function TaxonomyTree() {
       // Process the data and update the tree
       if (response.data.aggregations) {
         const rankAggName = `taxonomy_${rank}`;
-        const buckets =
-          response.data.aggregations[`sterms#${rankAggName}`]?.buckets || [];
+        const aggKey = getAggregationKey(rankAggName, response.data);
+        const buckets = response.data.aggregations[aggKey]?.buckets || [];
 
         // If this is the top level, create a new tree
         if (!parentNodeId) {
@@ -152,8 +174,11 @@ export default function TaxonomyTree() {
         } else {
           // Otherwise, update the existing tree by finding the parent node and adding children
           setTreeData((prevData) => {
-            // Create a deep copy of the tree
-            const newData = { ...prevData };
+            // Create a deep copy of the tree to avoid reference issues
+            const newData = JSON.parse(JSON.stringify(prevData));
+
+            // Track that this node is expanded
+            expandedNodesRef.current.add(parentNodeId);
 
             // Find the parent node and update its children
             const updateNodeChildren = (
@@ -211,6 +236,25 @@ export default function TaxonomyTree() {
     if (currentRankIndex < taxonomicRanks.length - 1 && !node.loaded) {
       const nextRank = taxonomicRanks[currentRankIndex + 1];
       fetchTaxonomyData(nextRank, node.rank, node.name.toLowerCase(), node.id);
+    } else if (node.loaded) {
+      // Toggle expanded state if already loaded
+      if (expandedNodesRef.current.has(node.id)) {
+        expandedNodesRef.current.delete(node.id);
+      } else {
+        expandedNodesRef.current.add(node.id);
+      }
+
+      // Refresh the chart to apply expansion state
+      if (chartInstance.current) {
+        chartInstance.current.setOption({
+          series: [
+            {
+              type: "tree",
+              data: [treeData]
+            }
+          ]
+        });
+      }
     }
   };
 
@@ -313,9 +357,9 @@ export default function TaxonomyTree() {
             }
           },
           expandAndCollapse: true,
+          initialTreeDepth: -1, // Show all expanded nodes
           animationDuration: 550,
           animationDurationUpdate: 750,
-          initialTreeDepth: 2,
           emphasis: {
             focus: "descendant"
           },
@@ -346,7 +390,7 @@ export default function TaxonomyTree() {
     };
 
     // Apply the options to the chart
-    chartInstance.current.setOption(option);
+    chartInstance.current.setOption(option, true); // Force update
 
     // Handle window resize
     const handleResize = () => {
