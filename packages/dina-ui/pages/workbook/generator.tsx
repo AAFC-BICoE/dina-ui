@@ -20,7 +20,6 @@ import { useMemo, useState } from "react";
 import { DynamicFieldsMappingConfig } from "common-ui/lib/list-page/types";
 import { dynamicFieldMappingForMaterialSample } from "../collection/material-sample/list";
 import Link from "next/link";
-import { isEqual } from "lodash";
 import FieldMappingConfig from "../../components/workbook/utils/FieldMappingConfig";
 import {
   FieldOptionType,
@@ -142,16 +141,6 @@ export function WorkbookTemplateGenerator() {
         }
       }
     };
-
-    // If columns and aliases are the same, do not send the aliases over.
-    if (
-      isEqual(
-        generateTemplateArg.data.attributes.columns,
-        generateTemplateArg.data.attributes?.aliases ?? []
-      )
-    ) {
-      delete generateTemplateArg.data.attributes.aliases;
-    }
 
     try {
       const workbookGenerationPostResponse = await apiClient.axios.post(
