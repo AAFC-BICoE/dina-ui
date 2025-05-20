@@ -4,11 +4,14 @@ import "./TaxonomyTree.css";
 import { useApiClient } from "..";
 import useVocabularyOptions from "../../../dina-ui/components/collection/useVocabularyOptions";
 
-// Type definitions
 interface TreeNode {
   name: string;
   value?: number;
   children?: TreeNode[];
+  id?: string; // Unique identifier for each node
+  parentKey?: string; // Parent node key for filtering
+  rank?: string; // The taxonomic rank of this node
+  loaded?: boolean; // Whether children have been loaded
 }
 
 interface ElasticsearchResponse {
@@ -26,6 +29,7 @@ interface ElasticsearchResponse {
 export default function TaxonomyTree() {
   const [error, setError] = useState<string | null>(null);
   const [taxonomicRanks, setTaxonomicRanks] = useState<string[]>([]);
+  const [treeData, setTreeData] = useState<TreeNode>({ name: "Taxonomy" });
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
   const { apiClient } = useApiClient();
@@ -53,44 +57,69 @@ export default function TaxonomyTree() {
         .filter(Boolean);
       if (ranks.length > 0) {
         setTaxonomicRanks(ranks);
-        fetchTaxonomyData(ranks.slice(0, 1));
+        // Only fetch the top level (kingdom) initially
+        fetchTaxonomyData(ranks[0]);
       }
     }
   }, [loading]);
 
-  const buildAggregationQuery = (ranks: string[]): Record<string, any> => {
-    const aggregationQuery: Record<string, any> = {};
-    let currentLevel = aggregationQuery;
+  // Update the chart whenever treeData changes
+  useEffect(() => {
+    if (treeData && chartRef.current) {
+      renderChart();
+    }
+  }, [treeData]);
 
-    ranks.forEach((rank, index) => {
-      const aggName = `taxonomy_${rank}`;
+  // Build query for a specific rank, optionally filtered by parent value
+  const buildRankQuery = (
+    rank: string,
+    parentRank?: string,
+    parentValue?: string
+  ): Record<string, any> => {
+    const query: Record<string, any> = {
+      size: 0,
+      aggs: {
+        [`taxonomy_${rank}`]: {
+          terms: {
+            field: `data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`,
+            size: 10000
+          }
+        }
+      }
+    };
 
-      currentLevel[aggName] = {
-        terms: {
-          field: `data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`,
-          size: 10000
+    // Add filter if parent rank and value are provided
+    if (parentRank && parentValue) {
+      query.query = {
+        bool: {
+          filter: [
+            {
+              term: {
+                [`data.attributes.targetOrganismPrimaryClassification.${parentRank}.keyword`]:
+                  parentValue
+              }
+            }
+          ]
         }
       };
+    }
 
-      if (index < ranks.length - 1) {
-        currentLevel[aggName].aggs = {};
-        currentLevel = currentLevel[aggName].aggs;
-      }
-    });
-
-    return aggregationQuery;
+    return query;
   };
 
-  const fetchTaxonomyData = async (ranks: string[]): Promise<void> => {
+  // Fetch data for a specific rank
+  const fetchTaxonomyData = async (
+    rank: string,
+    parentRank?: string,
+    parentValue?: string,
+    parentNodeId?: string
+  ): Promise<void> => {
     try {
-      const aggregations = buildAggregationQuery(ranks);
+      const query = buildRankQuery(rank, parentRank, parentValue);
 
       const response = await apiClient.axios.post<ElasticsearchResponse>(
         `search-api/search-ws/search`,
-        {
-          size: 0,
-          aggs: aggregations
-        },
+        query,
         {
           params: {
             indexName: "dina_material_sample_index"
@@ -98,25 +127,103 @@ export default function TaxonomyTree() {
         }
       );
 
-      renderChart(response.data.aggregations, ranks);
+      // Process the data and update the tree
+      if (response.data.aggregations) {
+        const rankAggName = `taxonomy_${rank}`;
+        const buckets = response.data.aggregations[rankAggName]?.buckets || [];
+
+        // If this is the top level, create a new tree
+        if (!parentNodeId) {
+          const rootChildren = buckets.map((bucket) => ({
+            name: capitalizeFirstLetter(bucket.key),
+            value: bucket.doc_count,
+            id: `${rank}_${bucket.key}`,
+            rank: rank,
+            parentKey: "",
+            loaded: false,
+            children: []
+          }));
+
+          setTreeData({
+            name: capitalizeFirstLetter(rank),
+            children: rootChildren
+          });
+        } else {
+          // Otherwise, update the existing tree by finding the parent node and adding children
+          setTreeData((prevData) => {
+            // Create a deep copy of the tree
+            const newData = { ...prevData };
+
+            // Find the parent node and update its children
+            const updateNodeChildren = (
+              node: TreeNode,
+              nodeId: string
+            ): boolean => {
+              if (node.id === nodeId) {
+                // Add children to this node
+                node.children = buckets.map((bucket) => ({
+                  name: capitalizeFirstLetter(bucket.key),
+                  value: bucket.doc_count,
+                  id: `${rank}_${bucket.key}`,
+                  rank: rank,
+                  parentKey: parentValue || "",
+                  loaded: false,
+                  children: []
+                }));
+                node.loaded = true;
+                return true;
+              }
+
+              if (node.children) {
+                for (const child of node.children) {
+                  if (updateNodeChildren(child, nodeId)) {
+                    return true;
+                  }
+                }
+              }
+              return false;
+            };
+
+            updateNodeChildren(newData, parentNodeId);
+            return newData;
+          });
+        }
+      }
     } catch (err) {
       console.error("Error fetching taxonomy data:", err);
       setError(err instanceof Error ? err.message : "Error fetching data");
     }
   };
 
-  const renderChart = (
-    aggregations: ElasticsearchResponse["aggregations"] | undefined,
-    ranks: string[]
-  ): void => {
+  // Handle node click event
+  const handleNodeClick = (nodeData: any) => {
+    const node = nodeData.data;
+
+    if (!node.id || !node.rank) {
+      return; // Skip if not a valid taxonomic node
+    }
+
+    // Get the current rank index
+    const currentRankIndex = taxonomicRanks.indexOf(node.rank);
+
+    // If there's a next rank and children haven't been loaded yet
+    if (currentRankIndex < taxonomicRanks.length - 1 && !node.loaded) {
+      const nextRank = taxonomicRanks[currentRankIndex + 1];
+      fetchTaxonomyData(nextRank, node.rank, node.name.toLowerCase(), node.id);
+    }
+  };
+
+  const renderChart = (): void => {
     if (!chartRef.current) return;
 
-    // Process data into a tree structure
-    const treeData = processToTreeData(aggregations, ranks);
-
-    // Initialize chart
+    // Initialize chart if it doesn't exist
     if (!chartInstance.current) {
       chartInstance.current = echarts.init(chartRef.current);
+
+      // Add click event handler
+      chartInstance.current.on("click", "series", (params) => {
+        handleNodeClick(params);
+      });
     }
 
     // Define color scheme for taxonomic levels
@@ -135,12 +242,12 @@ export default function TaxonomyTree() {
         trigger: "item",
         triggerOn: "mousemove",
         formatter: (params: any) => {
-          const { name, value } = params.data;
+          const { name, value, rank } = params.data;
           if (value) {
             return `<div class="tooltip-content">
                      <strong>${name}</strong><br/>
                      Count: ${value.toLocaleString()}<br/>
-                     Rank: ${getRankNameForNode(params.treePathInfo)}
+                     Rank: ${rank ? capitalizeFirstLetter(rank) : "Root"}
                    </div>`;
           }
           return name;
@@ -167,7 +274,7 @@ export default function TaxonomyTree() {
                 ? params.treePathInfo.length - 1
                 : 0;
               return levelColors[depth % levelColors.length];
-            }, // Type assertion to resolve itemStyle.color type issue
+            },
             borderWidth: 1,
             borderColor: "#fff"
           } as any,
@@ -249,86 +356,8 @@ export default function TaxonomyTree() {
 
     window.addEventListener("resize", handleResize);
 
-    // Return a cleanup function
-    const cleanup = () => {
-      window.removeEventListener("resize", handleResize);
-    };
-
-    // This is just to satisfy TypeScript - we're not actually cleaning up yet
-    // The real cleanup happens in the useEffect return
-    cleanup();
-  };
-
-  // Helper function to get the rank name for a node based on its path
-  const getRankNameForNode = (treePath: any[]): string => {
-    if (!treePath || !taxonomicRanks || treePath.length <= 1) {
-      return "Root";
-    }
-    // Depth in the tree corresponds to taxonomic rank index
-    const rankIndex = treePath.length - 2; // -2 because the first element is the root
-    if (rankIndex >= 0 && rankIndex < taxonomicRanks.length) {
-      return capitalizeFirstLetter(taxonomicRanks[rankIndex]);
-    }
-    return "Unknown";
-  };
-
-  const processToTreeData = (
-    aggregations: ElasticsearchResponse["aggregations"] | undefined,
-    ranks: string[]
-  ): TreeNode => {
-    const root: TreeNode = {
-      name: "Kingdom",
-      children: []
-    };
-
-    if (!aggregations) {
-      return root;
-    }
-
-    const processRankBuckets = (
-      buckets: Array<{ key: string; doc_count: number; [key: string]: any }>,
-      rankIndex: number,
-      parentNode: TreeNode
-    ): void => {
-      if (!buckets || rankIndex >= ranks.length) {
-        return;
-      }
-
-      // Sort buckets by doc_count in descending order
-      const sortedBuckets = [...buckets].sort(
-        (a, b) => b.doc_count - a.doc_count
-      );
-
-      sortedBuckets.forEach((bucket) => {
-        const node: TreeNode = {
-          name: capitalizeFirstLetter(bucket.key),
-          value: bucket.doc_count,
-          children: []
-        };
-
-        if (!parentNode.children) {
-          parentNode.children = [];
-        }
-
-        parentNode.children.push(node);
-
-        const nextRankAggName = `taxonomy_${ranks[rankIndex + 1]}`;
-        if (bucket[nextRankAggName]?.buckets && rankIndex + 1 < ranks.length) {
-          processRankBuckets(
-            bucket[nextRankAggName].buckets,
-            rankIndex + 1,
-            node
-          );
-        }
-      });
-    };
-
-    const firstRankAggName = `taxonomy_${ranks[0]}`;
-    if (aggregations[firstRankAggName]?.buckets) {
-      processRankBuckets(aggregations[firstRankAggName].buckets, 0, root);
-    }
-
-    return root;
+    // This cleanup is handled by the useEffect
+    return;
   };
 
   const capitalizeFirstLetter = (string: string): string => {
@@ -359,7 +388,7 @@ export default function TaxonomyTree() {
       <div className="chart-instructions">
         <p>
           <strong>Interactions:</strong> Scroll to zoom, drag to pan, click on
-          nodes to expand/collapse
+          nodes to fetch child taxonomic ranks
         </p>
       </div>
     </div>
