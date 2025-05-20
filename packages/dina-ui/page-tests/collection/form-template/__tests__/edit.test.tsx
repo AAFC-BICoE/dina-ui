@@ -17,9 +17,10 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  STORAGE_COMPONENT_NAME,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../../types/collection-api";
-import { fireEvent, within } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 const mockOnSaved = jest.fn();
 
@@ -229,6 +230,23 @@ const formTemplate: PersistedResource<FormTemplate> = {
   restrictToCreatedBy: true,
   viewConfiguration: {},
   components: [
+    {
+      name: SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
+      visible: true,
+      order: 0,
+      sections: [
+        {
+          name: "parent-attributes-section",
+          visible: true,
+          items: [
+            {
+              name: "parentAttributes",
+              visible: true
+            }
+          ]
+        }
+      ]
+    },
     {
       name: IDENTIFIER_COMPONENT_NAME,
       visible: true,
@@ -1775,6 +1793,8 @@ describe("Form template edit page", () => {
 
   it("Renders the template page with a custom Nav Order.", async () => {
     const { submitForm } = await mountForm(formTemplate);
+
+    screen.logTestingPlaygroundURL();
 
     await submitForm();
 

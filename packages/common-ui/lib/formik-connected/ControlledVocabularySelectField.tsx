@@ -1,17 +1,16 @@
 import { Vocabulary } from "../../../dina-ui/types/collection-api/resources/VocabularyElement";
 
-import { SortableContainer } from "react-sortable-hoc";
-import Select from "react-select";
+import classNames from "classnames";
+import { find } from "lodash";
+import { ReadOnlyValue } from "..";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import {
   JsonApiQuerySpec,
   useQuery,
   withResponse
 } from "../api-client/useQuery";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { find } from "lodash";
-import classNames from "classnames";
-import { ReadOnlyValue } from "..";
+import { SortableSelect } from "./sortable-select/SortableSelect";
 
 export interface ControlledVocabularySelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
@@ -89,8 +88,6 @@ export function ControlledVocabularySelectField(
                 options={options}
                 placeholder={formatMessage("typeHereToSearch")}
                 value={selectedValue}
-                axis="xy"
-                distance={4}
                 isMulti={isMulti}
                 isDisabled={disabled}
                 isClearable={isClearable}
@@ -102,5 +99,3 @@ export function ControlledVocabularySelectField(
     );
   });
 }
-
-const SortableSelect = SortableContainer(Select);
