@@ -344,6 +344,14 @@ export function WorkbookColumnMapping({
     workbookData: { [field: string]: any }[],
     errors: ValidationError[]
   ) {
+    // get all material sample names to check if duplicate exists.
+    const materialSampleNameMapping =
+      Object.values(workbookColumnMap ?? {}).find(
+        (item) => item.fieldPath === "materialSampleName"
+      )?.valueMapping ?? {};
+    const mappedMaterialSampleNames = Object.keys(materialSampleNameMapping);
+    const duplicateMaterialSampleNames: string[] = [];
+
     // get all mapped parent material sample names
     const parentValueMapping =
       Object.values(workbookColumnMap ?? {}).find(
@@ -355,22 +363,33 @@ export function WorkbookColumnMapping({
     for (let i = 0; i < workbookData.length; i++) {
       const row = workbookData[i];
       for (const fieldPath of Object.keys(row)) {
-        if (fieldPath === "rowNumber") {
-          continue;
-        }
-        if (fieldPath === "parentMaterialSample.materialSampleName") {
-          // If there is a parent material-sample name, but the name is not found
-          validateMissingParentMaterialSamples(
-            row,
-            fieldPath,
-            mappedParentNames,
-            missingParentMaterialSampleNames
-          );
-        } else {
-          valiateDataFormat(row, fieldPath, errors);
+        switch (fieldPath) {
+          case "rowNumber":
+            continue;
+          case "materialSampleName":
+            validateDuplicateMaterialSampleNames(
+              row,
+              fieldPath,
+              mappedMaterialSampleNames,
+              duplicateMaterialSampleNames
+            );
+            break;
+          case "parentMaterialSample.materialSampleName":
+            // If there is a parent material-sample name, but the name is not found
+            validateMissingParentMaterialSamples(
+              row,
+              fieldPath,
+              mappedParentNames,
+              missingParentMaterialSampleNames
+            );
+            break;
+          default:
+            validateDataFormat(row, fieldPath, errors);
         }
       }
     }
+
+    // Report the errors
     if (missingParentMaterialSampleNames.length > 0) {
       errors.push(
         new ValidationError(
@@ -378,6 +397,18 @@ export function WorkbookColumnMapping({
             missingNames: missingParentMaterialSampleNames.join(", ")
           }),
           "parentMaterialSample.materialSampleName",
+          "sheet"
+        )
+      );
+    }
+
+    if (duplicateMaterialSampleNames.length > 0) {
+      errors.push(
+        new ValidationError(
+          formatMessage("duplicateMaterialSampleNames", {
+            duplicateNames: duplicateMaterialSampleNames.join(", ")
+          }),
+          "materialSampleName",
           "sheet"
         )
       );
@@ -401,7 +432,22 @@ export function WorkbookColumnMapping({
     }
   }
 
-  function valiateDataFormat(
+  function validateDuplicateMaterialSampleNames(
+    row: { [field: string]: any },
+    fieldPath: string,
+    mappedMaterialSampleNames: string[],
+    duplicateMaterialSampleNames: string[]
+  ) {
+    if (
+      !!row[fieldPath] &&
+      row[fieldPath].trim() !== "" &&
+      mappedMaterialSampleNames.find((name) => name === row[fieldPath])
+    ) {
+      duplicateMaterialSampleNames.push(row[fieldPath]);
+    }
+  }
+
+  function validateDataFormat(
     row: { [field: string]: any },
     fieldPath: string,
     errors: yup.ValidationError[]

@@ -1018,6 +1018,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookSkippedField: "Please select a field or skip importing it",
   missingParentMaterialSampleNames:
     "Missing parent material sample names: {missingNames}",
+  duplicateMaterialSampleNames:
+    "Duplicate Primary ID Found within collection: {duplicateNames}",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be a {dataType}",
   workBookInvalidManagedAttributeDataType:
