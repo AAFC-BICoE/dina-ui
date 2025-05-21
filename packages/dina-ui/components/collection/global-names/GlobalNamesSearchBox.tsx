@@ -208,7 +208,9 @@ export function GlobalNamesSearchBox({
                   {!searchIsDisabled &&
                     selectedDatasets &&
                     selectedDatasets.length === 0 && (
-                      <p>Select at least one name source to search</p>
+                      <p>
+                        <DinaMessage id="globalNameSourcesMustSelectOne" />
+                      </p>
                     )}
                   <Select
                     isMulti
@@ -218,7 +220,7 @@ export function GlobalNamesSearchBox({
                     onChange={(newValue) => {
                       setSelectedDatasets(Array.from(newValue));
                     }}
-                    placeholder="Name sources"
+                    placeholder={formatMessage("globalNameSources")}
                   ></Select>
                 </div>
               )}

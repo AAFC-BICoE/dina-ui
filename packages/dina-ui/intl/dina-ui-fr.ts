@@ -520,6 +520,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   georeferencedByLabel: "Géoréférencé par (agent)",
   georeferencedDateLabel: "Date géoréférencée",
   globalNameSearchLabel: "Recherche de nom globale",
+  globalNameSources: "Name sources",
+  globalNameSourcesMustSelectOne: "Select at least one name source to search",
   goToThePreviousStep: "Aller à la prochaine étape",
   governmentOfCanada: "Gouvernement du Canada",
   governmentOfCanadaSymbol: "Symbole du gouvernement du Canada",

@@ -551,6 +551,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   georeferencedByLabel: "Georeferenced By (agent)",
   georeferencedDateLabel: "Georeferenced Date",
   globalNameSearchLabel: "Global Name Search",
+  globalNameSources: "Name sources",
+  globalNameSourcesMustSelectOne: "Select at least one name source to search",
   goToThePreviousStep: "Go to the previous step",
   governmentOfCanada: "Government of Canada",
   governmentOfCanadaSymbol: "Symbol of the Government of Canada",
