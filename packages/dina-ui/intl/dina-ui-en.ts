@@ -1019,9 +1019,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   missingParentMaterialSampleNames:
     "Missing parent material sample names: {missingNames}",
   onSheetDuplicateMaterialSampleNames:
-    "Duplicate Primary ID and collection found on spreadsheet: {duplicateNames}",
+    "Some entries in your spreadsheet have the same Primary ID and Collection Name. Please review the following duplicates: {duplicateNames}",
   duplicateMaterialSampleNames:
-    "Duplicate Primary ID Found within collection: {duplicateNames}",
+    "These entries already exist in the system with the same Primary ID and Collection Name: {duplicateNames}",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be a {dataType}",
   workBookInvalidManagedAttributeDataType:

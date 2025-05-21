@@ -4,6 +4,7 @@ import {
   FieldWrapper,
   LoadingSpinner,
   SubmitButton,
+  useApiClient,
   useModal
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
@@ -70,6 +71,7 @@ export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
+  const { apiClient } = useApiClient();
   const { openModal } = useModal();
   const {
     startSavingWorkbook,
@@ -345,7 +347,8 @@ export function WorkbookColumnMapping({
   interface UniqueSampleNameCollectionPairs {
     materialSampleName: string;
     collectionName: string;
-    count: number;
+    localDuplicate: boolean;
+    serverDuplicate: boolean;
   }
 
   async function validateData(
@@ -354,8 +357,6 @@ export function WorkbookColumnMapping({
   ) {
     const uniqueSampleCollections: UniqueSampleNameCollectionPairs[] =
       generateUniqueSampleNamePairs();
-    const onSheetDuplicates: string[] = [];
-    const onServerDuplicates: string[] = [];
 
     // get all mapped parent material sample names
     const parentValueMapping =
@@ -372,8 +373,7 @@ export function WorkbookColumnMapping({
           case "rowNumber":
             continue;
           case "materialSampleName":
-            await validateDuplicateMaterialSampleNames(
-              row,
+            await validateServerDuplicateMaterialSampleNames(
               uniqueSampleCollections
             );
             break;
@@ -405,6 +405,11 @@ export function WorkbookColumnMapping({
       );
     }
 
+    const onSheetDuplicates: string[] = uniqueSampleCollections
+      .filter((pair) => pair.localDuplicate)
+      .map(
+        (pair) => pair.materialSampleName + " (" + pair.collectionName + ")"
+      );
     if (onSheetDuplicates.length > 0) {
       errors.push(
         new ValidationError(
@@ -417,6 +422,11 @@ export function WorkbookColumnMapping({
       );
     }
 
+    const onServerDuplicates: string[] = uniqueSampleCollections
+      .filter((pair) => pair.serverDuplicate)
+      .map(
+        (pair) => pair.materialSampleName + " (" + pair.collectionName + ")"
+      );
     if (onServerDuplicates.length > 0) {
       errors.push(
         new ValidationError(
@@ -480,12 +490,13 @@ export function WorkbookColumnMapping({
           pair.collectionName === collectionName
       );
       if (existingPair) {
-        existingPair.count++;
+        existingPair.localDuplicate = true;
       } else {
         uniqueSampleCollections.push({
           materialSampleName,
           collectionName,
-          count: 1
+          localDuplicate: false,
+          serverDuplicate: false
         });
       }
     }
@@ -493,12 +504,42 @@ export function WorkbookColumnMapping({
     return uniqueSampleCollections;
   }
 
-  async function validateDuplicateMaterialSampleNames(
-    row: { [field: string]: any },
+  async function validateServerDuplicateMaterialSampleNames(
     uniqueSampleCollections: UniqueSampleNameCollectionPairs[]
   ) {
-    console.warn(row);
-    console.warn(uniqueSampleCollections);
+    // If duplicates exist on the sheet, we don't need to check the server.
+    if (uniqueSampleCollections.some((pair) => pair.localDuplicate)) {
+      return;
+    }
+
+    const checkPromises = uniqueSampleCollections.map(async (pair) => {
+      // Generate the path for the current pair
+      const path = `collection-api/resource-name-identifier?filter[type][EQ]=material-sample&filter[group][EQ]=${encodeURIComponent(
+        group ?? ""
+      )}&filter[name][EQ]=${encodeURIComponent(
+        pair.materialSampleName
+      )}&filter[collection.name][EQ]=${encodeURIComponent(
+        pair.collectionName
+      )}`;
+
+      try {
+        const response = await apiClient.get(path, {
+          page: { limit: 1 } // We only need to know if at least one exists
+        });
+
+        if (response && response.data) {
+          pair.serverDuplicate = true;
+        }
+      } catch (error) {
+        console.error(
+          `Error checking server duplicate for ${pair.materialSampleName}/${pair.collectionName} at path ${path}:`,
+          error
+        );
+      }
+    });
+
+    // Wait for all the API calls and updates to complete
+    await Promise.all(checkPromises);
   }
 
   function validateDataFormat(
