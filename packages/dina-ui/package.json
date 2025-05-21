@@ -31,7 +31,7 @@
     "react-file-viewer": "^1.2.1",
     "react-switch": "^6.0.0",
     "react-tabs": "^3.2.3",
-    "react-pdf": "latest",
+    "react-pdf": "5.7.2",
     "zod": "^3.11.6"
   },
   "devDependencies": {

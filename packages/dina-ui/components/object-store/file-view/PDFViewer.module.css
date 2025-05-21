@@ -1,0 +1,17 @@
+.pdf-document-container {
+  max-width: 100%;
+  overflow: auto;
+}
+
+/* Target PDF.js canvas specifically */
+.pdf-document-container canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+/* Responsive container */
+@media (max-width: 768px) {
+  .pdf-document-container {
+    padding: 0;
+  }
+}
