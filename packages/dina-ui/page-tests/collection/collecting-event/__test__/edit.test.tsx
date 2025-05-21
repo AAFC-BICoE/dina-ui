@@ -181,11 +181,6 @@ describe("collecting-event edit page", () => {
               otherRecordNumbers: ["12", "23"],
               geoReferenceAssertions: [{ isPrimary: true }]
             },
-            relationships: {
-              attachment: {
-                data: []
-              }
-            },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
           }
@@ -286,11 +281,6 @@ describe("collecting-event edit page", () => {
                 ],
                 verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
               }),
-              relationships: {
-                attachment: {
-                  data: []
-                }
-              },
               id: "00000000-0000-0000-0000-000000000000",
               type: "collecting-event"
             }
@@ -355,34 +345,66 @@ describe("collecting-event edit page", () => {
           path: "collecting-event/1",
           value: {
             attributes: {
-              otherRecordNumbers: ["12", "13", "14"],
-              endEventDateTime: "2019-11-12",
-              geoReferenceAssertions: [
-                {
-                  isPrimary: true,
-                  dwcDecimalLongitude: 10,
-                  georeferencedBy: ["1"]
-                }
-              ],
-              group: "test group",
-              startEventDateTime: "2019-11-11",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
             },
             id: "1",
-            relationships: {
-              attachment: {
-                data: [
-                  { id: "88888", type: "metadata" },
-                  { id: "99999", type: "metadata" }
-                ]
-              },
-              collectors: {
-                data: [
-                  { id: "111", type: "person" },
-                  { id: "222", type: "person" }
-                ]
-              }
+            type: "collecting-event"
+          }
+        }
+      ],
+      expect.anything()
+    );
+  });
+
+  it("edit a collecting-event and set the otherRecordNumbers to empty", async () => {
+    // The patch request will be successful.
+    mockPatch.mockReturnValueOnce({
+      data: [
+        {
+          data: testCollectingEvent(),
+          status: 201
+        }
+      ] as OperationsResponse
+    });
+
+    mockQuery = { id: 1 };
+
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+      apiContext
+    });
+
+    // The page should load initially with a loading spinner.
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
+
+    // Wait for the form to load.
+    await new Promise(setImmediate);
+
+    // Expect the initial values to remain.
+    expect(wrapper.getByDisplayValue("12 13 14")).toBeInTheDocument();
+
+    // Set the field to be empty.
+    fireEvent.change(wrapper.getByDisplayValue("12 13 14"), {
+      target: { value: "" }
+    });
+
+    // Submit the form.
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await new Promise(setImmediate);
+
+    // Test expected response.
+    expect(mockPatch).toBeCalledTimes(1);
+    expect(mockPatch).lastCalledWith(
+      "/collection-api/operations",
+      [
+        {
+          op: "PATCH",
+          path: "collecting-event/1",
+          value: {
+            attributes: {
+              otherRecordNumbers: null
             },
+            id: "1",
             type: "collecting-event"
           }
         }
@@ -515,11 +537,6 @@ describe("collecting-event edit page", () => {
             attributes: expect.objectContaining({
               dwcVerbatimCoordinateSystem: null
             }),
-            relationships: {
-              attachment: {
-                data: []
-              }
-            },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
           }

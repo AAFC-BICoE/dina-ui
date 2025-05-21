@@ -336,26 +336,8 @@ describe("BulkEditTabWarning", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
 
-    // Saves the material samples:
-    expect(mockSave.mock.calls).toEqual([
-      [
-        // Keeps the original values:
-        SAMPLES_WITH_DIFFERENT_DETERMINATIONS.map((sample) => ({
-          resource: {
-            attachment: undefined,
-            organism: undefined,
-            organismsIndividualEntry: undefined,
-            organismsQuantity: undefined,
-            projects: undefined,
-            id: sample.id,
-            type: sample.type,
-            relationships: {}
-          },
-          type: "material-sample"
-        })),
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+    // No changes expected, not overriding anything.
+    expect(mockSave.mock.calls).toHaveLength(0);
   });
 
   it("Lets you set the values without a warning when there are no organisms in the samples.", async () => {

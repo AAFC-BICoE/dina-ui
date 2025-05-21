@@ -30,6 +30,7 @@ import {
 import InputGroup from "react-bootstrap/InputGroup";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import { handleDownloadLink } from "../../components/object-store/object-store-utils";
+import { downloadBlobFile } from "common-ui";
 
 export interface EntityConfiguration {
   name: string;
@@ -165,17 +166,10 @@ export function WorkbookTemplateGenerator() {
       );
 
       // Download the data
-      const url = window?.URL?.createObjectURL?.(
-        workbookGenerationPostResponse?.data as any
+      downloadBlobFile(
+        workbookGenerationPostResponse?.data,
+        safeFileName + ".xlsx"
       );
-      const link = document?.createElement("a");
-      link.href = url ?? "";
-      link?.setAttribute("download", safeFileName + ".xlsx");
-      document?.body?.appendChild(link);
-      link?.click();
-      if (typeof window !== "undefined" && window?.URL?.revokeObjectURL) {
-        window?.URL?.revokeObjectURL(url ?? "");
-      }
     } catch (error) {
       // Log the error for debugging
       console.error("Error generating workbook template:", error);
@@ -333,7 +327,7 @@ export function WorkbookTemplateGenerator() {
           <Card.Body>
             <ListPageLayout
               additionalFilters={{
-                rsql: `acSubtype.acSubtype=='EXPORT TEMPLATE';bucket=in=(${groupNames})`
+                rsql: `acSubtype.acSubtype=='IMPORT TEMPLATE';bucket=in=(${groupNames})`
               }}
               id="data-export-list"
               queryTableProps={{

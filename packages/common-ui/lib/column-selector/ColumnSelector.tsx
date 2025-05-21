@@ -263,6 +263,9 @@ export function ColumnSelector<TData extends KitsuResource>(
 
         const columns = (await Promise.all(promises)).filter(isDefinedColumn);
         setDisplayedColumns(columns);
+
+        setLoading(false);
+        setColumnSelectorLoading?.(false);
       }
     }
 
@@ -270,14 +273,25 @@ export function ColumnSelector<TData extends KitsuResource>(
       if (injectedIndexMapping && overrideDisplayedColumns) {
         const promises = overrideDisplayedColumns?.columns?.map?.(
           async (localColumn, index) => {
+            const columnFunctionPath = localColumn.includes("function")
+              ? overrideDisplayedColumns.columnFunctions?.[localColumn]
+                  .functionName === "CONCAT"
+                ? `columnFunction/${localColumn}/${
+                    overrideDisplayedColumns.columnFunctions?.[localColumn]
+                      .functionName
+                  }/${overrideDisplayedColumns.columnFunctions?.[
+                    localColumn
+                  ].params.join("+")}`
+                : `columnFunction/${localColumn}/${overrideDisplayedColumns.columnFunctions?.[localColumn].functionName}`
+              : undefined;
+
             const newColumnDefinition = await generateColumnDefinition({
               indexMappings: injectedIndexMapping,
               dynamicFieldsMappingConfig,
               apiClient,
               defaultColumns,
-              path: localColumn
+              path: columnFunctionPath ?? localColumn
             });
-
             // Set the column header if saved.
             if (newColumnDefinition) {
               newColumnDefinition.exportHeader =
@@ -290,6 +304,9 @@ export function ColumnSelector<TData extends KitsuResource>(
         if (promises) {
           const columns = (await Promise.all(promises)).filter(isDefinedColumn);
           setDisplayedColumns(columns);
+
+          setLoading(false);
+          setColumnSelectorLoading?.(false);
         }
       }
     }
@@ -297,8 +314,6 @@ export function ColumnSelector<TData extends KitsuResource>(
     // Check if overrides are provided from the saved exports.
     if (overrideDisplayedColumns) {
       loadColumnsFromSavedExport();
-      setLoading(false);
-      setColumnSelectorLoading?.(false);
       return;
     }
 
@@ -306,21 +321,15 @@ export function ColumnSelector<TData extends KitsuResource>(
       !localStorageDisplayedColumns ||
       localStorageDisplayedColumns?.length === 0
     ) {
-      // No local storage to load from, load the default columns in.
-      setDisplayedColumns(defaultColumns ?? []);
-
       // Set the default columns into local storage.
       if (defaultColumns) {
         setLocalStorageDisplayedColumns(
           defaultColumns.map((column) => column?.id ?? "")
         );
       }
-      setLoading(false);
-    } else {
-      loadColumnsFromLocalStorage();
-      setLoading(false);
-      setColumnSelectorLoading?.(false);
     }
+
+    loadColumnsFromLocalStorage();
   }, [
     localStorageDisplayedColumns,
     injectedIndexMapping,

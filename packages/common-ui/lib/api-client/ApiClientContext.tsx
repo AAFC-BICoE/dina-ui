@@ -1,5 +1,4 @@
-import { AxiosError, AxiosAdapter, getAdapter } from "axios";
-import { cacheAdapterEnhancer } from "axios-extensions";
+import { AxiosError } from "axios";
 import { FormikErrors } from "formik";
 import Kitsu, {
   GetParams,
@@ -10,7 +9,6 @@ import Kitsu, {
 } from "kitsu";
 import { deserialise, error as kitsuError } from "kitsu-core";
 import { compact, fromPairs, isEmpty, keys, omit } from "lodash";
-import LRUCache from "lru-cache";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { OperationsResponse } from "..";
@@ -22,6 +20,7 @@ import {
   SuccessfulOperation
 } from "./operations-types";
 import DataLoader from "dataloader";
+import { buildMemoryStorage, setupCache } from "axios-cache-interceptor";
 
 export interface BulkGetOptions {
   apiBaseUrl?: string;
@@ -130,26 +129,23 @@ export class ApiClientImpl implements ApiClientI {
       resourceCase: "none"
     });
 
+    // Add caching support for one second since it's likely it's going to be same response.
+    const ONE_SECOND = 1000;
+    this.apiClient.axios = setupCache(this.apiClient.axios, {
+      location: "client",
+      storage: buildMemoryStorage(
+        false, // clone data off
+        ONE_SECOND, // cleanup interval in ms
+        100 // maximum cache entries
+      ),
+      ttl: ONE_SECOND
+    });
+
+    // This part needs to happen after the cache is setup since it will override it.
     this.apiClient.axios?.interceptors?.response.use(
       (successResponse) => successResponse,
       makeAxiosErrorMoreReadable
     );
-    if (
-      this.apiClient.axios?.defaults?.adapter &&
-      typeof getAdapter === "function"
-    ) {
-      const ONE_SECOND = 1000;
-      const defaultAdapter = getAdapter(this.apiClient.axios.defaults.adapter);
-      this.apiClient.axios.defaults.adapter = cacheAdapterEnhancer(
-        defaultAdapter as any,
-        {
-          // Invalidate the cache after one second.
-          // All this does is batch requests if a set of react components all try to make the same request at once.
-          // e.g. a page with a lot of the same dropdown select component, or a set of group label components fetching the label for the same group.
-          defaultCache: new LRUCache({ max: 100, maxAge: ONE_SECOND })
-        }
-      ) as AxiosAdapter;
-    }
 
     // Bind the methods so context consumers can use object destructuring.
     this.doOperations = this.doOperations.bind(this);

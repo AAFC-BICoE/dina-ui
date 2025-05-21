@@ -4,6 +4,7 @@
 export const DINAUI_MESSAGES_ENGLISH = {
   LETTER: "Letter",
   NUMERICAL: "Numerical",
+  actions: "Actions",
   actionType: "Action Type",
   addAnother: "Add Another {typeName}",
   addAnotherIdentifier: "Add Another Identifier",
@@ -114,6 +115,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
+  collectingEventPermissionAlert:
+    "You do not have permission to edit this collecting event. All fields are in read-only mode.",
   collection: "Collection",
   collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
@@ -299,7 +302,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_run-summary_items.genericMolecularAnalysisItemSummary.name":
     "Run Item Name",
   "field_run-summary_items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.name":
-    "Name",
+    "Workflow Name",
   "field_run-summary_items.genericMolecularAnalysisItemSummary.genericMolecularAnalysisSummary.analysisType":
     "Analysis Type",
   field_determinationRemarks: "Determination Remarks",
@@ -575,6 +578,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   language: "Language",
   languageOfPage: "eng",
   largeImg: "Large Image",
+  croppedImg: "Cropped Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
@@ -705,6 +709,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationGermanNameLabel: "German Name",
   organizationListTitle: "Organizations",
   originalFile: "Original File",
+  downloadFile: "Download",
+  derivatives: "Derivatives",
   originalMaterialSampleLabel: "Original Material Sample",
   overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",
@@ -1223,5 +1229,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   fileNameAliasField: "File Name Alias Field",
   downloadTemplate: "Download Template",
   existingTemplates: "Existing Templates",
-  viewMaterialSamplesInCollection: "View material samples in this collection"
+  viewMaterialSamplesInCollection: "View material samples in this collection",
+  generateURLButtonText: "Generate URL"
 };

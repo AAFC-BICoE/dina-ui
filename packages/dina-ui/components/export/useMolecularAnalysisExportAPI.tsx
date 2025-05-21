@@ -10,17 +10,15 @@ import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   filterBy,
+  getExport,
+  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
+  MAX_OBJECT_EXPORT_TOTAL,
   useApiClient
 } from "common-ui";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import useLocalStorage from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { Alert } from "react-bootstrap";
-import {
-  getExport,
-  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
-  MAX_OBJECT_EXPORT_TOTAL
-} from "./exportUtils";
 import { useSessionStorage } from "usehooks-ts";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import {
@@ -678,38 +676,50 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
 
     if (runSummaries && runSummaries.length > 0) {
       runSummaries.forEach((runSummary) => {
-        if (runSummary.enabled) {
-          if (runSummary.attachments && runSummary.attachments.length > 0) {
-            runSummary.attachments.forEach((attachmentFileIdentifier) => {
-              fileIdentifiers.push(attachmentFileIdentifier);
-            });
-            const folderName = runSummary.attributes.name;
-            const uniqueFolderName = generateUniqueFolderName(folderName);
-            exportLayout.set(uniqueFolderName + "/", runSummary.attachments);
-          }
+        if (!runSummary.enabled) return;
+
+        const baseFolder = generateUniqueFolderName(runSummary.attributes.name);
+
+        const runAttachments: string[] = [];
+        const itemsAttachments: string[] = [];
+        const qaAttachments: string[] = [];
+
+        // Collect run-level attachments (go into "run1/")
+        if (runSummary.attachments?.length > 0) {
+          runSummary.attachments.forEach((attachmentFileIdentifier) => {
+            fileIdentifiers.push(attachmentFileIdentifier);
+            runAttachments.push(attachmentFileIdentifier);
+          });
         }
-        if (
-          runSummary.attributes &&
-          runSummary.attributes.items &&
-          runSummary.enabled
-        ) {
+
+        // Collect enabled item attachments
+        if (runSummary.attributes?.items) {
           runSummary.attributes.items.forEach((item) => {
-            if (item.enabled) {
-              if (item.attachments && item.attachments.length > 0) {
+            if (item.enabled && item.attachments?.length > 0) {
+              if (!item.isQualityControl) {
                 item.attachments.forEach((itemFileIdentifier) => {
                   fileIdentifiers.push(itemFileIdentifier);
+                  itemsAttachments.push(itemFileIdentifier);
                 });
-                const itemFolderName =
-                  runSummary.attributes.name +
-                  "/" +
-                  (item?.genericMolecularAnalysisItemSummary?.name ??
-                    "Empty Name");
-                const uniqueItemFolderName =
-                  generateUniqueFolderName(itemFolderName);
-                exportLayout.set(uniqueItemFolderName, item.attachments);
+              } else {
+                item.attachments.forEach((itemFileIdentifier) => {
+                  fileIdentifiers.push(itemFileIdentifier);
+                  qaAttachments.push(itemFileIdentifier);
+                });
               }
             }
           });
+        }
+
+        // Add folders to exportLayout
+        if (runAttachments.length > 0) {
+          exportLayout.set(`${baseFolder}/`, runAttachments);
+        }
+        if (itemsAttachments.length > 0) {
+          exportLayout.set(`${baseFolder}/results`, itemsAttachments);
+        }
+        if (qaAttachments.length > 0) {
+          exportLayout.set(`${baseFolder}/controls`, qaAttachments);
         }
       });
     } else {
@@ -728,7 +738,6 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       setExportLoading(false);
       return;
     }
-
     const objectExportSaveArg = {
       resource: {
         type: "object-export",

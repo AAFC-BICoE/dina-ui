@@ -1,6 +1,6 @@
 {
   "name": "dina-ui",
-  "version": "0.187.0",
+  "version": "0.190.0",
   "scripts": {
     "build": "run-s next:build next:export",
     "dev": "next",
@@ -28,7 +28,6 @@
     "react-dnd": "^15.1.2",
     "react-dnd-html5-backend": "^15.1.2",
     "react-dropzone-uploader": "^2.11.0",
-    "react-file-viewer": "^1.2.1",
     "react-switch": "^6.0.0",
     "react-tabs": "^3.2.3",
     "react-pdf": "5.7.2",

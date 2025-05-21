@@ -108,7 +108,6 @@ describe("Single Stored Object details page", () => {
     await new Promise(setImmediate);
     await new Promise(setImmediate);
 
-    expect(wrapper.getAllByText("Caption:")[0]).toBeInTheDocument();
     expect(wrapper.getAllByText("Test Caption")[0]).toBeInTheDocument();
 
     // Shows the EXIF data:

@@ -20,6 +20,49 @@ import {
 import { ClassificationSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 import { VocabularyElement } from "packages/dina-ui/types/collection-api";
 
+export function convertColumnsToAliases(columns): string[] {
+  if (!columns) {
+    return [];
+  }
+  return columns.map((column) => column?.exportHeader ?? "");
+}
+
+export function convertColumnsToPaths(columns): string[] {
+  if (!columns) {
+    return [];
+  }
+  return columns.map((column) =>
+    column.columnSelectorString?.startsWith("columnFunction/")
+      ? column.columnSelectorString?.split("/")[1] // Get functionId
+      : column.id ?? ""
+  );
+}
+
+export function getColumnFunctions<TData extends KitsuResource>(
+  columnsToExport: TableColumn<TData>[]
+) {
+  return columnsToExport
+    .filter((c) => c.columnSelectorString?.startsWith("columnFunction/"))
+    .reduce((prev, curr) => {
+      const columnParts = curr.columnSelectorString?.split("/");
+      if (columnParts) {
+        const functionName = columnParts[2];
+        const functionParams = columnParts[3]?.split("+");
+        const params =
+          functionName === "CONVERT_COORDINATES_DD"
+            ? ["collectingEvent.eventGeom"]
+            : functionParams;
+        return {
+          ...prev,
+          [columnParts[1]]: {
+            functionName: columnParts[2],
+            params: params
+          }
+        };
+      }
+    }, {});
+}
+
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
   indexMapping: ESIndexMapping;
@@ -104,11 +147,7 @@ export function generateColumnPath({
           (columnFunctionStateValues[functionId].params
             ? "/" +
               columnFunctionStateValues[functionId].params
-                .map((field) =>
-                  field.parentName
-                    ? field.value
-                    : field.value.replace(field.path + ".", "")
-                )
+                .map((field) => (field.parentName ? field.value : field.label))
                 .join("+")
             : "")
         );
@@ -393,6 +432,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
     if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
       const paramStr = pathParts.length > 3 ? "(" + pathParts[3] + ")" : "";
       const fieldId = pathParts[1] + "." + pathParts[2] + paramStr;
+
       return {
         columnSelectorString: path,
         accessorKey: path,
@@ -1128,28 +1168,38 @@ export function FunctionFieldLabel({
   indexMappings
 }: FunctionFieldLabelProps) {
   const { messages, formatMessage } = useDinaIntl();
-
   const pathParts = functionFieldPath.split("/");
   if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
     const functionName = pathParts[2];
     const paramStr = pathParts.length > 3 ? pathParts[3] : undefined;
     const paramObjects = compact(
-      paramStr
-        ?.split("+")
-        .map((field) =>
-          indexMappings?.find((mapping) =>
-            mapping.parentName
-              ? mapping.value === field
-              : mapping.value === mapping.path + "." + field
-          )
-        )
+      paramStr?.split("+").map((field) => {
+        const mappingMatch = indexMappings?.find((mapping) =>
+          mapping.parentName
+            ? mapping.value === field ||
+              field.includes(`${mapping.parentName}.${mapping.label}`)
+            : mapping.label === field
+        );
+
+        if (!mappingMatch) return undefined;
+
+        // Create new object instead of referencing object from indexMappings
+        const paramObject = { ...mappingMatch };
+
+        if (paramObject.parentName && paramObject.value !== field) {
+          paramObject.label = field.replace(paramObject.parentName, "");
+        }
+
+        return paramObject;
+      })
     );
+
     const formattedParamStr =
       paramObjects && paramObjects.length > 0
         ? " (" +
           paramObjects
-            ?.map(
-              (field) =>
+            ?.map((field) => {
+              return (
                 (field.parentName
                   ? (messages[field.parentName]
                       ? formatMessage(field.parentName as any)
@@ -1158,7 +1208,8 @@ export function FunctionFieldLabel({
                 (messages[field.label]
                   ? formatMessage(field.label as any)
                   : startCase(field.label))
-            )
+              );
+            })
             .join(" + ") +
           ")"
         : "";

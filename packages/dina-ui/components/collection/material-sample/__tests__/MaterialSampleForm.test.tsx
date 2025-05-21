@@ -6,7 +6,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -23,7 +23,50 @@ function testCollectionEvent(): Partial<CollectingEvent> {
     verbatimEventDateTime: "2021-04-13",
     id: "1",
     type: "collecting-event",
-    group: "test group"
+    group: "test group",
+    meta: {
+      permissionsProvider: "GroupAuthorizationService",
+      permissions: ["create", "update", "delete"]
+    }
+  };
+}
+
+function testCollectionEventWithGeographicalPlace(): Partial<CollectingEvent> {
+  return {
+    id: "2",
+    type: "collecting-event",
+    group: "test group",
+    geographicPlaceNameSourceDetail: {
+      sourceUrl:
+        "https://nominatim.openstreetmap.org/ui/details.html?osmtype=W&osmid=12345",
+      selectedGeographicPlace: {
+        id: "12345",
+        element: "W",
+        placeType: "building",
+        name: "Test Building",
+        shortId: 0,
+        type: "place-section"
+      },
+      country: {
+        code: "ca",
+        name: "Canada"
+      },
+      recordedOn: "2022-03-02T17:41:53.968198Z",
+      type: ""
+    }
+  };
+}
+
+function testCollectionEventWithPermissions(): Partial<CollectingEvent> {
+  return {
+    id: "3",
+    type: "collecting-event",
+    group: "test group",
+    meta: {
+      permissionsProvider: "GroupAuthorizationService",
+      permissions: []
+    },
+    startEventDateTime: "2025-05-19"
   };
 }
 
@@ -42,13 +85,54 @@ function testMaterialSample(): InputResource<MaterialSample> {
   };
 }
 
+function testMaterialSampleNoCollectingEvent(): InputResource<MaterialSample> {
+  return {
+    id: "1",
+    type: "material-sample",
+    group: "test group",
+    materialSampleName: "my-sample-name",
+    ...blankMaterialSample()
+  };
+}
+
+const mockGeographicSearchResults = [
+  {
+    place_id: 342812712,
+    licence:
+      "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    osm_type: "relation",
+    osm_id: 4136816,
+    lat: "45.4208777",
+    lon: "-75.6901106",
+    category: "boundary",
+    type: "administrative",
+    place_rank: 12,
+    importance: 0.7151190250609533,
+    addresstype: "city",
+    name: "Ottawa",
+    display_name: "Ottawa, Eastern Ontario, Ontario, Canada",
+    address: {
+      city: "Ottawa",
+      state_district: "Eastern Ontario",
+      state: "Ontario",
+      "ISO3166-2-lvl4": "CA-ON",
+      country: "Canada",
+      country_code: "ca"
+    },
+    boundingbox: ["44.9617738", "45.5376502", "-76.3555857", "-75.2465783"]
+  }
+];
+
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
     case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol":
-      // Populate the linker table:
       return { data: testCollectionEvent() };
+    case "collection-api/collecting-event/2?include=collectors,attachment,collectionMethod,protocol":
+      return { data: testCollectionEventWithGeographicalPlace() };
+    case "collection-api/collecting-event/3?include=collectors,attachment,collectionMethod,protocol":
+      return { data: testCollectionEventWithPermissions() };
     case "collection-api/material-sample/1":
       return { data: testMaterialSample() };
     case "collection-api/material-sample":
@@ -136,8 +220,22 @@ const testCtx = {
 
 const mockOnSaved = jest.fn();
 
+const mockFetchResponse = (data) => {
+  return {
+    json: jest.fn().mockResolvedValue(data),
+    ok: true,
+    status: 200
+  };
+};
+
 describe("Material Sample Edit Page", () => {
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    window.fetch = jest
+      .fn()
+      .mockResolvedValue(mockFetchResponse(mockGeographicSearchResults));
+  });
 
   it("Submits a new material-sample with a new CollectingEvent.", async () => {
     const wrapper = mountWithAppContext(
@@ -175,7 +273,6 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              otherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               group: "aafc",
@@ -184,11 +281,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              relationships: {
-                attachment: {
-                  data: []
-                }
-              },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default value
               type: "collecting-event"
@@ -203,57 +295,13 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
-              dwcDegreeOfEstablishment: null,
-              hostOrganism: null,
-              managedAttributes: {},
               publiclyReleasable: true, // Default value
-              relationships: {
-                organism: { data: [] },
-                preparedBy: { data: [] },
-                storageUnitUsage: { data: null }
-              },
-              type: "material-sample",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              isRestricted: false,
-              restrictionFieldsExtension: null,
-              restrictionRemarks: null,
-              scheduledAction: undefined,
-              preparedBy: undefined,
-              collection: undefined,
-              assemblages: undefined,
-              storageUnitUsage: undefined,
-              storageUnit: undefined,
-              preservationType: null,
-              preparationDate: null,
-              preparationFixative: null,
-              preparationManagedAttributes: {},
-              preparationMaterials: null,
-              preparationMethod: {
-                id: null,
-                type: "preparation-method"
-              },
-              preparationProtocol: {
-                id: null,
-                type: "protocol"
-              },
-              preparationRemarks: null,
-              preparationSubstrate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              }
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -298,71 +346,10 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
-              id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
               type: "material-sample",
-              assemblages: undefined,
-              attachment: undefined,
-              collection: undefined,
-              dwcDegreeOfEstablishment: null,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              preparationDate: null,
-              preparationFixative: null,
-              preparationManagedAttributes: {},
-              preparationMaterials: null,
-              preparationMethod: {
-                id: null,
-                type: "preparation-method"
-              },
-              preparationProtocol: {
-                id: null,
-                type: "protocol"
-              },
-              preparationRemarks: null,
-              preparationSubstrate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: undefined,
-              preservationType: null,
-              projects: undefined,
-              managedAttributes: {},
               publiclyReleasable: true,
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
-              restrictionFieldsExtension: null,
-              isRestricted: false,
-              restrictionRemarks: null,
-              scheduledAction: undefined,
-              storageUnit: undefined,
-              storageUnitUsage: undefined,
-              associations: [],
-              hostOrganism: null,
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {
-                organism: { data: [] },
-                preparedBy: { data: [] },
-                storageUnitUsage: { data: null }
-              }
+              collectingEvent: { id: "1", type: "collecting-event" }
             },
             type: "material-sample"
           }
@@ -397,18 +384,75 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       [
         [
           {
             resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
               id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
+              type: "material-sample",
+              materialSampleName: "test-material-sample-id"
+            },
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Edits an existing material sample to add a collecting event", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSampleNoCollectingEvent()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await new Promise(setImmediate);
+
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
+    await new Promise(setImmediate);
+
+    // Set the new Collecting Event's verbatimEventDateTime:
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
+      "2019-12-21T16:00"
+    );
+    userEvent.clear(wrapper.getByRole("textbox", { name: /primary id/i }));
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /primary id/i }),
+      "test-material-sample-id"
+    );
+
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await new Promise(setImmediate);
+
+    // Saves the Collecting Event and the Material Sample:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        // New collecting-event created:
+        [
+          {
+            resource: {
+              group: "aafc",
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
+              verbatimEventDateTime: "2019-12-21T16:00",
+              publiclyReleasable: true, // Default Value
+              type: "collecting-event"
             },
             type: "collecting-event"
           }
@@ -416,16 +460,17 @@ describe("Material Sample Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ],
       [
+        // Existing material-sample updated:
         [
           {
             resource: {
+              collectingEvent: {
+                id: "11111111-1111-1111-1111-111111111111",
+                type: "collecting-event"
+              },
               id: "1",
-              type: "material-sample",
               materialSampleName: "test-material-sample-id",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {}
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -465,17 +510,26 @@ describe("Material Sample Edit Page", () => {
       "2019-12-21T16:00"
     );
 
+    // Set the additional collection numbers in the collecting event.
+    userEvent.type(
+      wrapper.getByRole("textbox", {
+        name: "Additional Collection Numbers Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers. (One value per line) Write one value per line. Press enter while typing in the field to add a new line."
+      }),
+      "1\n2\n3"
+    );
+
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       [
         // New collecting-event created:
         [
           {
             resource: {
-              otherRecordNumbers: null,
+              group: "aafc",
+              otherRecordNumbers: ["1", "2", "3"],
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
@@ -483,11 +537,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              relationships: {
-                attachment: {
-                  data: []
-                }
-              },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default Value
               type: "collecting-event"
@@ -507,10 +556,7 @@ describe("Material Sample Edit Page", () => {
                 type: "collecting-event"
               },
               id: "1",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
-              type: "material-sample",
-              relationships: {}
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -644,49 +690,36 @@ describe("Material Sample Edit Page", () => {
     );
     await new Promise(setImmediate);
 
-    // Enable the associations section:
-    const associationsToggle = wrapper.container.querySelectorAll(
-      ".enable-associations .react-switch-bg"
+    // Expect to the associated sample:
+    expect(
+      wrapper.getByRole("link", { name: /my\-sample\-name/i })
+    ).toBeInTheDocument();
+
+    // Change the remark text.
+    userEvent.type(
+      wrapper.getAllByRole("textbox", { name: /remarks/i })[4],
+      "New Remark"
     );
-    if (!associationsToggle) {
-      fail("Associations toggle needs to exist at this point.");
-    }
-    fireEvent.click(associationsToggle[0]);
-    await new Promise(setImmediate);
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
     // Saves the Material Sample:
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       [
         [
           {
             resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
-              id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
+              associations: [
+                {
+                  associatedSample: "1",
+                  associationType: "host",
+                  remarks: "New Remark"
+                }
+              ],
               id: "333",
-              type: "material-sample",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {}
+              type: "material-sample"
             },
             type: "material-sample"
           }
@@ -754,41 +787,8 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
-    expect(mockSave.mock.calls).toMatchObject([
-      [
-        [
-          {
-            resource: {
-              startEventDateTime: "2021-04-13",
-              verbatimEventDateTime: "2021-04-13",
-              id: "1",
-              type: "collecting-event",
-              group: "test group",
-              relationships: { attachment: { data: [] } },
-              otherRecordNumbers: null
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
-              id: "333",
-              type: "material-sample",
-              identifiers: {},
-              dwcOtherCatalogNumbers: null,
-              collectingEvent: { id: "1", type: "collecting-event" },
-              relationships: {}
-            },
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+    // Nothing has changed, no requests expected.
+    expect(mockSave.mock.calls).toEqual([]);
   });
 
   it("Submits a new Material Sample with 3 Determinations.", async () => {
@@ -856,7 +856,7 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
 
     // Saves the Material Sample:
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       // First submits the organism in one transaction:
       [
         [
@@ -2293,5 +2293,447 @@ describe("Material Sample Edit Page", () => {
     // Attributes 2 and 3 are visible and empty:
     expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
     expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
+  });
+
+  describe("Collecting event permissions", () => {
+    it("Display alert if user does not have access to edit the collecting event", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            id: "333",
+            group: "test-group",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "3",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await new Promise(setImmediate);
+
+      // Ensure the alert is displayed
+      expect(
+        wrapper.getByText(
+          /you do not have permission to edit this collecting event/i
+        )
+      ).toBeInTheDocument();
+
+      // Ensure the collecting event fields are disabled
+      const collectingEventFields = wrapper.container.querySelectorAll(
+        ".collecting-event-field input, .collecting-event-field select"
+      );
+      collectingEventFields.forEach((field) => {
+        expect(field).toBeDisabled();
+      });
+    });
+  });
+
+  describe("hostOrganism", () => {
+    it("Keeps host organism unchanged when previously added with no changes made", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            hostOrganism: {
+              name: "Test Host Organism",
+              remarks: "Original remarks"
+            },
+            associations: [{ associatedSample: "1", associationType: "host" }]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await new Promise(setImmediate);
+
+      // No changes to the host organism
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await new Promise(setImmediate);
+
+      // Expect no changes to hostOrganism in the save call
+      expect(mockSave.mock.calls.length).toBe(0);
+    });
+
+    it("Updates host organism when previously added and changes are made", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            hostOrganism: {
+              name: "Test Host Organism",
+              remarks: "Original remarks"
+            },
+            associations: [{ associatedSample: "1", associationType: "host" }]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await new Promise(setImmediate);
+
+      // Change the host organism field
+      const hostOrganismTextfield = wrapper.getByRole("textbox", {
+        name: /name search/i
+      });
+      userEvent.clear(hostOrganismTextfield);
+      userEvent.type(hostOrganismTextfield, "Updated host name");
+
+      // Change the remarks field
+      const remarksTextbox = wrapper.getByText(/original remarks/i);
+      userEvent.clear(remarksTextbox);
+      userEvent.type(remarksTextbox, "Update host remarks");
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await new Promise(setImmediate);
+
+      // Check that the updated hostOrganism is in the save call
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                id: "333",
+                type: "material-sample",
+                hostOrganism: {
+                  name: "Updated host name",
+                  remarks: "Update host remarks"
+                }
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
+
+    it("Removes host organism when previously added and deleted", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            hostOrganism: {
+              name: "Test Host Organism",
+              remarks: "Original remarks"
+            },
+            associations: [{ associatedSample: "1", associationType: "host" }]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await new Promise(setImmediate);
+
+      // Disable the association:
+      const associationToggle = wrapper.container.querySelectorAll(
+        ".enable-associations .react-switch-bg"
+      );
+      if (!associationToggle) {
+        fail("Association toggle needs to exist at this point.");
+      }
+      fireEvent.click(associationToggle[0]);
+      await new Promise(setImmediate);
+
+      // Are you sure popup, click "Yes".
+      userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+
+      // Wait for the loading to be removed.
+      await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await new Promise(setImmediate);
+
+      // Check that hostOrganism is set to null in the save call
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                id: "333",
+                type: "material-sample",
+                hostOrganism: null,
+                associations: []
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
+
+    it("Adds host organism when not previously added", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            associations: [{ associatedSample: "1", associationType: "host" }]
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await new Promise(setImmediate);
+
+      // Change the host organism field
+      const hostOrganismTextfield = wrapper.getByRole("textbox", {
+        name: /name search/i
+      });
+      userEvent.clear(hostOrganismTextfield);
+      userEvent.type(hostOrganismTextfield, "New Host Organism");
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await new Promise(setImmediate);
+
+      // Check that the new hostOrganism is in the save call
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                id: "333",
+                type: "material-sample",
+                hostOrganism: {
+                  name: "New Host Organism"
+                }
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
+  });
+
+  describe("geographicPlaceNameSourceDetail", () => {
+    it("Keeps geographicPlaceNameSourceDetail unchanged when previously added with no changes made", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "2",
+              type: "collecting-event"
+            } as any
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await new Promise(setImmediate);
+
+      // Ensure the geographic place is populated.
+      expect(
+        wrapper.getByRole("cell", { name: /test building \[ building \]/i })
+      ).toBeInTheDocument();
+
+      // No changes to the geographic details
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await new Promise(setImmediate);
+
+      // Expect no changes in the save call
+      expect(mockSave.mock.calls.length).toBe(0); // No save call because nothing changed
+    });
+
+    it("Updates geographicPlaceNameSourceDetail when previously added and changes are made", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "2",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await new Promise(setImmediate);
+
+      // Click the remove this place button.
+      userEvent.click(
+        wrapper.getByRole("button", { name: /remove this place/i })
+      );
+      await new Promise(setImmediate);
+
+      // Enter a search value:
+      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+
+      // Click the search button.
+      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await new Promise(setImmediate);
+
+      // Click the first search option.
+      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await new Promise(setImmediate);
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await new Promise(setImmediate);
+
+      // Expect the geographicPlaceNameSourceDetail to be added.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                geographicPlaceNameSource: "OSM",
+                geographicPlaceNameSourceDetail: {
+                  country: {
+                    name: "Canada"
+                  },
+                  stateProvince: {
+                    element: "relation",
+                    id: 4136816,
+                    name: "Ontario"
+                  },
+                  sourceUrl:
+                    "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                },
+                id: "2",
+                type: "collecting-event"
+              },
+              type: "collecting-event"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
+
+    it("Removes geographicPlaceNameSourceDetail when previously added and deleted", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "2",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await new Promise(setImmediate);
+
+      // Click the remove this place button.
+      userEvent.click(
+        wrapper.getByRole("button", { name: /remove this place/i })
+      );
+      await new Promise(setImmediate);
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await new Promise(setImmediate);
+
+      // Check that geographicPlaceNameSourceDetail is removed in the save call
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                id: "2",
+                type: "collecting-event",
+                geographicPlaceNameSource: null,
+                geographicPlaceNameSourceDetail: null
+              },
+              type: "collecting-event"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
+
+    it("Adds geographicPlaceNameSourceDetail when not previously added", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "1",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await new Promise(setImmediate);
+
+      // Enter a search value:
+      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+
+      // Click the search button.
+      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await new Promise(setImmediate);
+
+      // Click the first search option.
+      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await new Promise(setImmediate);
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await new Promise(setImmediate);
+
+      // Expect the new geographicPlaceNameSourceDetail to be saved.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                geographicPlaceNameSource: "OSM",
+                geographicPlaceNameSourceDetail: {
+                  country: {
+                    name: "Canada"
+                  },
+                  stateProvince: {
+                    element: "relation",
+                    id: 4136816,
+                    name: "Ontario"
+                  },
+                  sourceUrl:
+                    "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                },
+                id: "1",
+                type: "collecting-event"
+              },
+              type: "collecting-event"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
   });
 });
