@@ -225,7 +225,7 @@ export function WorkbookColumnMapping({
     fieldMap: yup.array().test({
       name: "validateFieldMapping",
       exclusive: false,
-      test: (fieldMaps: FieldMapType[]) => {
+      test: async (fieldMaps: FieldMapType[]) => {
         const errors: ValidationError[] = [];
         for (let i = 0; i < fieldMaps.length; i++) {
           const fieldMapType = fieldMaps[i];
@@ -307,7 +307,9 @@ export function WorkbookColumnMapping({
           fieldMaps,
           true
         );
-        validateData(data, errors);
+
+        await validateData(data, errors);
+
         if (errors.length > 0) {
           // Scroll to top of the page to display error messages.
           window.scrollTo({ top: 0, behavior: "smooth" });
@@ -340,17 +342,20 @@ export function WorkbookColumnMapping({
     return field + " - " + error;
   }
 
-  function validateData(
+  interface UniqueSampleNameCollectionPairs {
+    materialSampleName: string;
+    collectionName: string;
+    count: number;
+  }
+
+  async function validateData(
     workbookData: { [field: string]: any }[],
     errors: ValidationError[]
   ) {
-    // get all material sample names to check if duplicate exists.
-    const materialSampleNameMapping =
-      Object.values(workbookColumnMap ?? {}).find(
-        (item) => item.fieldPath === "materialSampleName"
-      )?.valueMapping ?? {};
-    const mappedMaterialSampleNames = Object.keys(materialSampleNameMapping);
-    const duplicateMaterialSampleNames: string[] = [];
+    const uniqueSampleCollections: UniqueSampleNameCollectionPairs[] =
+      generateUniqueSampleNamePairs();
+    const onSheetDuplicates: string[] = [];
+    const onServerDuplicates: string[] = [];
 
     // get all mapped parent material sample names
     const parentValueMapping =
@@ -367,11 +372,9 @@ export function WorkbookColumnMapping({
           case "rowNumber":
             continue;
           case "materialSampleName":
-            validateDuplicateMaterialSampleNames(
+            await validateDuplicateMaterialSampleNames(
               row,
-              fieldPath,
-              mappedMaterialSampleNames,
-              duplicateMaterialSampleNames
+              uniqueSampleCollections
             );
             break;
           case "parentMaterialSample.materialSampleName":
@@ -402,11 +405,23 @@ export function WorkbookColumnMapping({
       );
     }
 
-    if (duplicateMaterialSampleNames.length > 0) {
+    if (onSheetDuplicates.length > 0) {
+      errors.push(
+        new ValidationError(
+          formatMessage("onSheetDuplicateMaterialSampleNames", {
+            duplicateNames: onSheetDuplicates.join(", ")
+          }),
+          "materialSampleName",
+          "sheet"
+        )
+      );
+    }
+
+    if (onServerDuplicates.length > 0) {
       errors.push(
         new ValidationError(
           formatMessage("duplicateMaterialSampleNames", {
-            duplicateNames: duplicateMaterialSampleNames.join(", ")
+            duplicateNames: onServerDuplicates.join(", ")
           }),
           "materialSampleName",
           "sheet"
@@ -432,19 +447,58 @@ export function WorkbookColumnMapping({
     }
   }
 
-  function validateDuplicateMaterialSampleNames(
-    row: { [field: string]: any },
-    fieldPath: string,
-    mappedMaterialSampleNames: string[],
-    duplicateMaterialSampleNames: string[]
-  ) {
-    if (
-      !!row[fieldPath] &&
-      row[fieldPath].trim() !== "" &&
-      mappedMaterialSampleNames.find((name) => name === row[fieldPath])
-    ) {
-      duplicateMaterialSampleNames.push(row[fieldPath]);
+  function generateUniqueSampleNamePairs(): UniqueSampleNameCollectionPairs[] {
+    const uniqueSampleCollections: UniqueSampleNameCollectionPairs[] = [];
+
+    const materialSampleNameHeader = "materialSampleName";
+    const collectionNameHeader = "collection.name";
+
+    // Check if required spreadsheet headers exist for this validation.
+    const spreadsheetColumns = Object.values(workbookColumnMap ?? {});
+    const materialSampleColumn = spreadsheetColumns.find(
+      (item) => item.fieldPath === materialSampleNameHeader
+    );
+    const collectionNameColumn = spreadsheetColumns.find(
+      (item) => item.fieldPath === collectionNameHeader
+    );
+
+    // If either column is not found, return empty arrays since we cannot check for duplicates.
+    if (!materialSampleColumn || !collectionNameColumn) {
+      return [];
     }
+
+    // Retrieve the workbook data.
+    const workbookData = getDataFromWorkbook(spreadsheetData, sheet, fieldMap);
+
+    // Map the unique sample name and collection pairs.
+    for (const row of workbookData) {
+      const materialSampleName = row[materialSampleNameHeader];
+      const collectionName = row[collectionNameHeader];
+      const existingPair = uniqueSampleCollections.find(
+        (pair) =>
+          pair.materialSampleName === materialSampleName &&
+          pair.collectionName === collectionName
+      );
+      if (existingPair) {
+        existingPair.count++;
+      } else {
+        uniqueSampleCollections.push({
+          materialSampleName,
+          collectionName,
+          count: 1
+        });
+      }
+    }
+
+    return uniqueSampleCollections;
+  }
+
+  async function validateDuplicateMaterialSampleNames(
+    row: { [field: string]: any },
+    uniqueSampleCollections: UniqueSampleNameCollectionPairs[]
+  ) {
+    console.warn(row);
+    console.warn(uniqueSampleCollections);
   }
 
   function validateDataFormat(

@@ -426,10 +426,7 @@ export function useColumnMapping() {
       handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath === "managedAttributes") {
       handleManagedAttributeMapping(originalColumnHeader, newWorkbookColumnMap);
-    } else if (
-      fieldPath === "materialSampleName" ||
-      fieldPath?.startsWith("parentMaterialSample")
-    ) {
+    } else if (fieldPath?.startsWith("parentMaterialSample")) {
       const { valueMapping, multipleValueMappings } =
         await resolveParentMapping(originalColumnHeader);
 
