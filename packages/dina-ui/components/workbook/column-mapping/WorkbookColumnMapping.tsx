@@ -40,6 +40,7 @@ import {
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
 import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
+import { get } from "lodash";
 
 export type FieldMapType = {
   columnHeader: string;
@@ -347,6 +348,7 @@ export function WorkbookColumnMapping({
   interface UniqueSampleNameCollectionPairs {
     materialSampleName: string;
     collectionName: string;
+    collectionUuid: string;
     localDuplicate: boolean;
     serverDuplicate: boolean;
   }
@@ -464,12 +466,11 @@ export function WorkbookColumnMapping({
     const collectionNameHeader = "collection.name";
 
     // Check if required spreadsheet headers exist for this validation.
-    const spreadsheetColumns = Object.values(workbookColumnMap ?? {});
-    const materialSampleColumn = spreadsheetColumns.find(
-      (item) => item.fieldPath === materialSampleNameHeader
+    const materialSampleColumn = fieldMap.find(
+      (item) => item.targetField === materialSampleNameHeader
     );
-    const collectionNameColumn = spreadsheetColumns.find(
-      (item) => item.fieldPath === collectionNameHeader
+    const collectionNameColumn = fieldMap.find(
+      (item) => item.targetField === collectionNameHeader
     );
 
     // If either column is not found, return empty arrays since we cannot check for duplicates.
@@ -492,12 +493,17 @@ export function WorkbookColumnMapping({
       if (existingPair) {
         existingPair.localDuplicate = true;
       } else {
-        uniqueSampleCollections.push({
-          materialSampleName,
-          collectionName,
-          localDuplicate: false,
-          serverDuplicate: false
-        });
+        const collectionRelationshipHeader = collectionNameColumn.columnHeader.replace(" ", "_");
+        const collectionUuid = get(relationshipMapping, [collectionRelationshipHeader, collectionName, 'id']);
+        if (collectionUuid) {
+          uniqueSampleCollections.push({
+            materialSampleName,
+            collectionName,
+            collectionUuid,
+            localDuplicate: false,
+            serverDuplicate: false
+          });
+        }
       }
     }
 
@@ -518,8 +524,6 @@ export function WorkbookColumnMapping({
         group ?? ""
       )}&filter[name][EQ]=${encodeURIComponent(
         pair.materialSampleName
-      )}&filter[collection.name][EQ]=${encodeURIComponent(
-        pair.collectionName
       )}`;
 
       try {
@@ -527,8 +531,25 @@ export function WorkbookColumnMapping({
           page: { limit: 1 } // We only need to know if at least one exists
         });
 
-        if (response && response.data) {
-          pair.serverDuplicate = true;
+        if (response && response.data && (response.data as any).length > 0) {
+          // Expensive request is required since resource-name-identifier does not include the collection name.
+          const expensivePath = `collection-api/material-sample?filter[materialSampleName][EQ]=${encodeURIComponent(
+            pair.materialSampleName
+          )}&filter[collection.id][EQ]=${encodeURIComponent(
+            pair.collectionUuid
+          )}&filter[group][EQ]=${encodeURIComponent(group ?? "")}`;
+
+          const expensiveRequest = await apiClient.get(expensivePath, {
+            page: { limit: 1 } // We only need to know if at least one exists
+          });
+          if (
+            expensiveRequest &&
+            expensiveRequest.data &&
+            (expensiveRequest.data as any).length > 0
+          ) {
+            // Found duplicate on the server level.
+            pair.serverDuplicate = true;
+          }
         }
       } catch (error) {
         console.error(
