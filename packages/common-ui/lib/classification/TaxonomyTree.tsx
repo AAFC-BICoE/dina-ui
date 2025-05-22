@@ -9,7 +9,7 @@ interface TreeNode {
   value?: number;
   children?: TreeNode[];
   id?: string; // Unique identifier for each node
-  parentKey?: string; // Parent node key for filtering
+  parentPath?: Array<{ rank: string; value: string }>; // Path of parent taxonomic ranks
   rank?: string; // The taxonomic rank of this node
   loaded?: boolean; // Whether children have been loaded
 }
@@ -71,11 +71,10 @@ export default function TaxonomyTree() {
     }
   }, [treeData]);
 
-  // Build query for a specific rank, optionally filtered by parent value
+  // Build query for a specific rank, with proper constraints for all parent ranks
   const buildRankQuery = (
     rank: string,
-    parentRank?: string,
-    parentValue?: string
+    parentRanksAndValues: Array<{ rank: string; value: string }> = []
   ): Record<string, any> => {
     const query: Record<string, any> = {
       size: 0,
@@ -89,18 +88,18 @@ export default function TaxonomyTree() {
       }
     };
 
-    // Add filter if parent rank and value are provided
-    if (parentRank && parentValue) {
+    // Add filters for all parent ranks if provided
+    if (parentRanksAndValues.length > 0) {
+      const mustClauses = parentRanksAndValues.map(({ rank, value }) => ({
+        term: {
+          [`data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`]:
+            value
+        }
+      }));
+
       query.query = {
         bool: {
-          filter: [
-            {
-              term: {
-                [`data.attributes.targetOrganismPrimaryClassification.${parentRank}.keyword`]:
-                  parentValue
-              }
-            }
-          ]
+          must: mustClauses
         }
       };
     }
@@ -132,12 +131,11 @@ export default function TaxonomyTree() {
   // Fetch data for a specific rank
   const fetchTaxonomyData = async (
     rank: string,
-    parentRank?: string,
-    parentValue?: string,
+    parentNodePath: Array<{ rank: string; value: string }> = [],
     parentNodeId?: string
   ): Promise<void> => {
     try {
-      const query = buildRankQuery(rank, parentRank, parentValue);
+      const query = buildRankQuery(rank, parentNodePath);
 
       const response = await apiClient.axios.post<ElasticsearchResponse>(
         `search-api/search-ws/search`,
@@ -162,7 +160,7 @@ export default function TaxonomyTree() {
             value: bucket.doc_count,
             id: `${rank}_${bucket.key}`,
             rank: rank,
-            parentKey: "",
+            parentPath: [], // Empty for top level
             loaded: false,
             children: []
           }));
@@ -192,7 +190,7 @@ export default function TaxonomyTree() {
                   value: bucket.doc_count,
                   id: `${rank}_${bucket.key}`,
                   rank: rank,
-                  parentKey: parentValue || "",
+                  parentPath: [...parentNodePath], // Store the full path to this node
                   loaded: false,
                   children: []
                 }));
@@ -235,7 +233,18 @@ export default function TaxonomyTree() {
     // If there's a next rank and children haven't been loaded yet
     if (currentRankIndex < taxonomicRanks.length - 1 && !node.loaded) {
       const nextRank = taxonomicRanks[currentRankIndex + 1];
-      fetchTaxonomyData(nextRank, node.rank, node.name.toLowerCase(), node.id);
+
+      // Build the parent path for the query
+      // Start with any existing parent path the node has
+      const parentPath = node.parentPath ? [...node.parentPath] : [];
+
+      // Add this node to the path
+      parentPath.push({
+        rank: node.rank,
+        value: node.name.toLowerCase()
+      });
+
+      fetchTaxonomyData(nextRank, parentPath, node.id);
     } else if (node.loaded) {
       // Toggle expanded state if already loaded
       if (expandedNodesRef.current.has(node.id)) {
@@ -301,8 +310,8 @@ export default function TaxonomyTree() {
       series: [
         {
           type: "tree",
-          orient: "vertical",
           name: "Taxonomy",
+          orient: "vertical",
           data: [treeData],
           top: "2%",
           left: "7%",
