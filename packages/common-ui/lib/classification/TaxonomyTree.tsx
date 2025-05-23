@@ -100,7 +100,7 @@ export default function TaxonomyTree() {
       const must = parentRanksAndValues.map(({ rank, value }) => ({
         term: {
           [`data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`]:
-            value.toLowerCase()
+            value
         }
       }));
 
@@ -244,7 +244,7 @@ export default function TaxonomyTree() {
       // Add this node to the path
       parentPath.push({
         rank: node.rank,
-        value: node.name.toLowerCase() // Ensure value is lowercase for consistent filtering
+        value: node.name
       });
 
       fetchTaxonomyData(nextRank, parentPath, node.id);
