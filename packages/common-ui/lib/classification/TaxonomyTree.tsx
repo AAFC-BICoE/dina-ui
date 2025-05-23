@@ -255,18 +255,6 @@ export default function TaxonomyTree() {
       } else {
         expandedNodesRef.current.add(node.id);
       }
-
-      // Refresh the chart to apply expansion state
-      if (chartInstance.current) {
-        chartInstance.current.setOption({
-          series: [
-            {
-              type: "tree",
-              data: [treeData]
-            }
-          ]
-        });
-      }
     }
   };
 
