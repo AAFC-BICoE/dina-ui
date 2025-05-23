@@ -71,38 +71,44 @@ export default function TaxonomyTree() {
     }
   }, [treeData]);
 
-  // Build query for a specific rank, with proper constraints for all parent ranks
+  // Build query for a specific rank, with proper filtering for parent ranks
   const buildRankQuery = (
     rank: string,
     parentRanksAndValues: Array<{ rank: string; value: string }> = []
   ): Record<string, any> => {
+    // Base query with empty filter
     const query: Record<string, any> = {
-      size: 0,
-      aggs: {
-        [`taxonomy_${rank}`]: {
-          terms: {
-            field: `data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`,
-            size: 10000
-          }
-        }
-      }
+      size: 0
     };
 
-    // Add filters for all parent ranks if provided
+    // If we have parent constraints, build nested filtered aggregations
     if (parentRanksAndValues.length > 0) {
+      // Build the terms filter conditions
       const mustClauses = parentRanksAndValues.map(({ rank, value }) => ({
         term: {
           [`data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`]:
-            value
+            value.toLowerCase()
         }
       }));
 
+      // Add the bool query to filter documents
       query.query = {
         bool: {
           must: mustClauses
         }
       };
     }
+
+    // Add the aggregation for the current rank
+    query.aggs = {
+      [`taxonomy_${rank}`]: {
+        terms: {
+          field: `data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`,
+          size: 10000,
+          order: { _count: "desc" } // Order by count descending
+        }
+      }
+    };
 
     return query;
   };
@@ -124,7 +130,6 @@ export default function TaxonomyTree() {
       }
     }
 
-    console.warn(`Aggregation key for ${aggName} not found in response`);
     return aggName; // Fallback
   };
 
@@ -135,6 +140,7 @@ export default function TaxonomyTree() {
     parentNodeId?: string
   ): Promise<void> => {
     try {
+      // Build the query for this taxonomic rank
       const query = buildRankQuery(rank, parentNodePath);
 
       const response = await apiClient.axios.post<ElasticsearchResponse>(
@@ -214,7 +220,6 @@ export default function TaxonomyTree() {
         }
       }
     } catch (err) {
-      console.error("Error fetching taxonomy data:", err);
       setError(err instanceof Error ? err.message : "Error fetching data");
     }
   };
@@ -241,7 +246,7 @@ export default function TaxonomyTree() {
       // Add this node to the path
       parentPath.push({
         rank: node.rank,
-        value: node.name.toLowerCase()
+        value: node.name.toLowerCase() // Ensure value is lowercase for consistent filtering
       });
 
       fetchTaxonomyData(nextRank, parentPath, node.id);
@@ -311,7 +316,6 @@ export default function TaxonomyTree() {
         {
           type: "tree",
           name: "Taxonomy",
-          orient: "vertical",
           data: [treeData],
           top: "2%",
           left: "7%",
