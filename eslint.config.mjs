@@ -2,6 +2,17 @@ import globals from "globals";
 import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from "eslint-config-prettier";
 
+// Create a clean copy of browser globals
+const browserGlobals = {...globals.browser};
+
+// Fix the problematic entry if it exists
+if ('AudioWorkletGlobalScope ' in browserGlobals) {
+  // Copy the value without the trailing space
+  browserGlobals['AudioWorkletGlobalScope'] = browserGlobals['AudioWorkletGlobalScope '];
+  // Remove the problematic entry
+  delete browserGlobals['AudioWorkletGlobalScope '];
+}
+
 const config = tseslint.config(
   // Files to be scanned by the linter.
   {files: ["**/*.{js,ts,jsx,tsx}"]},
@@ -14,7 +25,7 @@ const config = tseslint.config(
   ]},
 
   // Supported browsers.
-  {languageOptions: { globals: globals.browser }},
+  {languageOptions: { globals: browserGlobals }},
 
   // Typescript support.
   tseslint.configs.recommended,
