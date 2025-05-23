@@ -24,6 +24,11 @@ interface ElasticsearchResponse {
       }>;
     };
   };
+  hits?: {
+    total?: {
+      value: number;
+    };
+  };
 }
 
 export default function TaxonomyTree() {
@@ -71,51 +76,46 @@ export default function TaxonomyTree() {
     }
   }, [treeData]);
 
-  // Build query for a specific rank, with proper filtering for parent ranks
-  const buildRankQuery = (
+  // Build optimized query for taxonomic aggregations
+  const buildTaxonomyQuery = (
     rank: string,
     parentRanksAndValues: Array<{ rank: string; value: string }> = []
   ): Record<string, any> => {
-    // Base query with empty filter
+    // Create the query structure
     const query: Record<string, any> = {
-      size: 0
+      size: 0,
+      aggs: {
+        [`taxonomy_${rank}`]: {
+          terms: {
+            field: `data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`,
+            size: 10000,
+            order: { _count: "desc" }
+          }
+        }
+      }
     };
 
-    // If we have parent constraints, build nested filtered aggregations
+    // Add filters for parent taxonomic ranks if provided
     if (parentRanksAndValues.length > 0) {
-      // Build the terms filter conditions
-      const mustClauses = parentRanksAndValues.map(({ rank, value }) => ({
+      const must = parentRanksAndValues.map(({ rank, value }) => ({
         term: {
           [`data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`]:
             value.toLowerCase()
         }
       }));
 
-      // Add the bool query to filter documents
       query.query = {
         bool: {
-          must: mustClauses
+          must
         }
       };
     }
-
-    // Add the aggregation for the current rank
-    query.aggs = {
-      [`taxonomy_${rank}`]: {
-        terms: {
-          field: `data.attributes.targetOrganismPrimaryClassification.${rank}.keyword`,
-          size: 10000,
-          order: { _count: "desc" } // Order by count descending
-        }
-      }
-    };
 
     return query;
   };
 
   // Helper function to get aggregation key format
   const getAggregationKey = (aggName: string, response: any): string => {
-    // Check different possible formats
     if (response.aggregations[aggName]) {
       return aggName;
     }
@@ -123,14 +123,13 @@ export default function TaxonomyTree() {
       return `sterms#${aggName}`;
     }
 
-    // Look for any key that ends with the aggName
     for (const key of Object.keys(response.aggregations)) {
       if (key.endsWith(aggName)) {
         return key;
       }
     }
 
-    return aggName; // Fallback
+    return aggName;
   };
 
   // Fetch data for a specific rank
@@ -140,8 +139,7 @@ export default function TaxonomyTree() {
     parentNodeId?: string
   ): Promise<void> => {
     try {
-      // Build the query for this taxonomic rank
-      const query = buildRankQuery(rank, parentNodePath);
+      const query = buildTaxonomyQuery(rank, parentNodePath);
 
       const response = await apiClient.axios.post<ElasticsearchResponse>(
         `search-api/search-ws/search`,
@@ -317,16 +315,19 @@ export default function TaxonomyTree() {
           type: "tree",
           name: "Taxonomy",
           data: [treeData],
-          top: "2%",
-          left: "7%",
-          bottom: "2%",
-          right: "20%",
+          top: "5%",
+          left: "5%",
+          bottom: "5%",
+          right: "25%",
           symbolSize: (value: number) => {
             if (!value) return 7;
             // Scale node size based on log of count
             return Math.max(7, Math.min(25, 5 + Math.log10(value) * 3));
           },
           symbol: "circle",
+          // Set orientation to vertical
+          orient: "vertical",
+          layout: "orthogonal",
           itemStyle: {
             color: (params) => {
               const depth = params.treePathInfo
@@ -338,9 +339,10 @@ export default function TaxonomyTree() {
             borderColor: "#fff"
           } as any,
           label: {
-            position: "left",
+            // Adjust label position for vertical layout
+            position: "right",
             verticalAlign: "middle",
-            align: "right",
+            align: "left",
             fontSize: 12,
             fontWeight: "bold",
             distance: 5,
