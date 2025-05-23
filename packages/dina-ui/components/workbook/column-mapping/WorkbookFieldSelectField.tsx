@@ -228,7 +228,7 @@ export function WorkbookFieldSelectField({
       )}
 
       {fieldMap[columnIndex]?.targetField ===
-        "organism.determination.scientificNameClassification" && (
+        "organism.determination.scientificNameDetails" && (
         <div className="flex-fill">
           <SelectField
             name={`fieldMap[${columnIndex}].targetKey.key`}

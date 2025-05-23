@@ -644,7 +644,7 @@ export function useMaterialSampleSave({
       );
     }
 
-    // Remote the empty scientificNameClassification.classificationPath and scientificNameClassification.classificationRanks
+    // Remote the empty scientificNameDetails.classificationPath and scientificNameDetails.classificationRanks
     if (
       materialSampleInput.organism &&
       materialSampleInput.organism.length > 0
@@ -655,20 +655,20 @@ export function useMaterialSampleSave({
             // If this is manual classification input
             if (
               dtm.scientificNameSource === ScientificNameSource.CUSTOM &&
-              dtm.scientificNameClassification
+              dtm.scientificNameDetails
             ) {
               const pathArray =
-                dtm.scientificNameClassification.classificationPath?.split("|") ?? [];
+                dtm.scientificNameDetails.classificationPath?.split("|") ?? [];
               const rankArray =
-                dtm.scientificNameClassification.classificationRanks?.split("|") ?? [];
+                dtm.scientificNameDetails.classificationRanks?.split("|") ?? [];
               const firstEmptyIndex = pathArray.findIndex(
                 (path, index) => path === "" && rankArray[index] === ""
               );
               if (firstEmptyIndex > -1) {
-                dtm.scientificNameClassification.classificationRanks = rankArray
+                dtm.scientificNameDetails.classificationRanks = rankArray
                   .slice(0, firstEmptyIndex)
                   .join("|");
-                dtm.scientificNameClassification.classificationPath = pathArray
+                dtm.scientificNameDetails.classificationPath = pathArray
                   .slice(0, firstEmptyIndex)
                   .join("|");
               }

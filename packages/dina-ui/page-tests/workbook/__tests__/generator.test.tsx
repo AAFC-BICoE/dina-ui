@@ -386,7 +386,7 @@ describe("Workbook Template Generator", () => {
     );
   });
 
-  it("Selected scientificNameClassification fields and generate template", async () => {
+  it("Selected scientificNameDetails fields and generate template", async () => {
     const wrapper = mountWithAppContext(<WorkbookTemplateGenerator />, {
       apiContext
     });
@@ -401,10 +401,10 @@ describe("Workbook Template Generator", () => {
         expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
       });
 
-      // Click the "Scientific Name Classification" option.
+      // Click the "Scientific Name Details" option.
       userEvent.click(
         wrapper.getByRole("option", {
-          name: /scientific name classification/i
+          name: /scientific name details/i
         })
       );
       await new Promise(setImmediate);

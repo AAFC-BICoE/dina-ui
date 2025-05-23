@@ -20,6 +20,7 @@ import { useMemo, useState } from "react";
 import { DynamicFieldsMappingConfig } from "common-ui/lib/list-page/types";
 import { dynamicFieldMappingForMaterialSample } from "../collection/material-sample/list";
 import Link from "next/link";
+import { isEqual } from "lodash";
 import FieldMappingConfig from "../../components/workbook/utils/FieldMappingConfig";
 import {
   FieldOptionType,
@@ -50,8 +51,8 @@ const ENTITY_TYPES: EntityConfiguration[] = [
         ...dynamicFieldMappingForMaterialSample.relationshipFields,
         {
           apiEndpoint: "collection-api/vocabulary2/taxonomicRank",
-          label: "scientificNameClassification",
-          path: "included.attributes.determination.scientificNameClassification",
+          label: "scientificNameDetails",
+          path: "included.attributes.determination.scientificNameDetails",
           referencedBy: "organism.determination",
           referencedType: "organism",
           type: "classification",
@@ -124,10 +125,10 @@ export function WorkbookTemplateGenerator() {
               return (col as any)?.managedAttribute?.name;
             }
 
-            // Special logic for scientificNameClassification.
+            // Special logic for scientificNameDetails.
             if (
               col.columnValue.startsWith(
-                "organism.determination.scientificNameClassification."
+                "organism.determination.scientificNameDetails."
               )
             ) {
               return col.columnLabel;
@@ -141,6 +142,16 @@ export function WorkbookTemplateGenerator() {
         }
       }
     };
+
+    // If columns and aliases are the same, do not send the aliases over.
+    if (
+      isEqual(
+        generateTemplateArg.data.attributes.columns,
+        generateTemplateArg.data.attributes?.aliases ?? []
+      )
+    ) {
+      delete generateTemplateArg.data.attributes.aliases;
+    }
 
     try {
       const workbookGenerationPostResponse = await apiClient.axios.post(

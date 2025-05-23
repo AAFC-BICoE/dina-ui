@@ -20,8 +20,8 @@ export interface GlobalNamesFieldProps extends FieldWrapperProps {
   fetchJson?: (url: string) => Promise<any>;
   index?: number;
   isDetermination?: boolean;
-  scientificNameClassificationSrcUrlField?: string;
-  scientificNameClassificationField?: string;
+  scientificNameDetailsSrcUrlField?: string;
+  scientificNameDetailsField?: string;
   /** Mock this out in tests so it gives a predictable value. */
   dateSupplier?: () => string;
 }
@@ -32,8 +32,8 @@ export function GlobalNamesField({
   fetchJson,
   index,
   isDetermination,
-  scientificNameClassificationSrcUrlField,
-  scientificNameClassificationField,
+  scientificNameDetailsSrcUrlField,
+  scientificNameDetailsField,
   dateSupplier,
   ...fieldWrapperProps
 }: GlobalNamesFieldProps) {
@@ -43,11 +43,11 @@ export function GlobalNamesField({
     <FieldWrapper {...fieldWrapperProps} disableLabelClick={true}>
       {({ formik, setValue, value }) => {
         const scientificNameSrcDetailUrlVal = formik.getFieldMeta(
-          scientificNameClassificationSrcUrlField as any
+          scientificNameDetailsSrcUrlField as any
         ).value as string;
 
         const scientificNameSrcDetailVal = formik.getFieldMeta(
-          scientificNameClassificationField as any
+          scientificNameDetailsField as any
         ).value as string;
 
         const scientificNameSourceFieldHelpers = formik.getFieldHelpers(
@@ -75,7 +75,7 @@ export function GlobalNamesField({
           <SelectedScientificNameView
             value={value}
             formik={formik}
-            scientificNameClassificationField={scientificNameClassificationField as any}
+            scientificNameDetailsField={scientificNameDetailsField as any}
             scientificNameSrcDetailUrlVal={scientificNameSrcDetailUrlVal}
             onChange={onChange as any}
             setSearchInitiated={setSearchInitiated}
@@ -125,13 +125,13 @@ export function GlobalNamesField({
 }
 interface GlobalNamesReadOnlyProps {
   value: string;
-  scientificNameClassification: ScientificNameSourceDetails;
+  scientificNameDetails: ScientificNameSourceDetails;
   displayFull?: boolean;
 }
 
 export function GlobalNamesReadOnly({
   value,
-  scientificNameClassification,
+  scientificNameDetails,
   displayFull
 }: GlobalNamesReadOnlyProps) {
   const [showMore, setShowMore] = useState(displayFull ?? false);
@@ -139,21 +139,21 @@ export function GlobalNamesReadOnly({
 
   let safeHtmlLink: string = "";
 
-  if (scientificNameClassification?.isSynonym) {
+  if (scientificNameDetails?.isSynonym) {
     const link = document.createElement("a");
-    link.setAttribute("href", scientificNameClassification.sourceUrl as string);
+    link.setAttribute("href", scientificNameDetails.sourceUrl as string);
 
-    link.innerHTML = scientificNameClassification.currentName as string;
+    link.innerHTML = scientificNameDetails.currentName as string;
 
     safeHtmlLink = DOMPurify.sanitize(link.outerHTML, {
       ADD_ATTR: ["target", "rel"]
     });
   }
 
-  const paths = scientificNameClassification?.classificationPath
+  const paths = scientificNameDetails?.classificationPath
     ?.split("|")
     ?.reverse();
-  const ranks = scientificNameClassification?.classificationRanks
+  const ranks = scientificNameDetails?.classificationRanks
     ?.split("|")
     ?.reverse();
   const pathsInit = paths?.slice(0, 2);
@@ -212,7 +212,7 @@ export function GlobalNamesReadOnly({
   return (
     <div>
       <span style={{ fontSize: "1.5rem" }}> {value} </span>
-      {scientificNameClassification?.isSynonym && (
+      {scientificNameDetails?.isSynonym && (
         <div className="flex-grow-1 d-flex align-items-center">
           <span className="me-2">Synonym of: </span>{" "}
           <span dangerouslySetInnerHTML={{ __html: safeHtmlLink }} />
@@ -255,11 +255,11 @@ export function getFieldValue(form, fieldName) {
     : null;
 }
 
-export function RenderAsReadonly({ value, form, scientificNameClassificationField }) {
-  const scientificNameClassification = getFieldValue(form, scientificNameClassificationField);
+export function RenderAsReadonly({ value, form, scientificNameDetailsField }) {
+  const scientificNameDetails = getFieldValue(form, scientificNameDetailsField);
   return (
     <GlobalNamesReadOnly
-      scientificNameClassification={scientificNameClassification}
+      scientificNameDetails={scientificNameDetails}
       value={value}
     />
   );
@@ -268,7 +268,7 @@ export function RenderAsReadonly({ value, form, scientificNameClassificationFiel
 export interface SelectedScientificNameViewProps {
   value: string;
   formik: FormikProps<any>;
-  scientificNameClassificationField: string;
+  scientificNameDetailsField: string;
   scientificNameSrcDetailUrlVal: string;
   searchInitiated?: boolean;
   onChange?: (selection: string | null, formik: FormikProps<any>) => void;
@@ -282,7 +282,7 @@ export function SelectedScientificNameView(
   const {
     value,
     formik,
-    scientificNameClassificationField,
+    scientificNameDetailsField,
     scientificNameSrcDetailUrlVal,
     searchInitiated,
     onChange,
@@ -290,9 +290,9 @@ export function SelectedScientificNameView(
     setSearchInitiated
   } = props;
 
-  const scientificNameClassification = getFieldValue(
+  const scientificNameDetails = getFieldValue(
     formik,
-    scientificNameClassificationField
+    scientificNameDetailsField
   );
   const { readOnly } = useDinaFormContext();
 
@@ -302,7 +302,7 @@ export function SelectedScientificNameView(
         <RenderAsReadonly
           value={value}
           form={formik}
-          scientificNameClassificationField={scientificNameClassificationField}
+          scientificNameDetailsField={scientificNameDetailsField}
         />
       </div>
       <div className="my-2">
@@ -316,7 +316,7 @@ export function SelectedScientificNameView(
             <DinaMessage id="viewDetailButtonLabel" />
           </a>
         )}
-        {(searchInitiated || scientificNameClassification) && !readOnly && (
+        {(searchInitiated || scientificNameDetails) && !readOnly && (
           <button
             type="button"
             className="btn btn-danger remove-button"

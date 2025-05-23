@@ -301,7 +301,7 @@ export function useColumnMapping() {
     const originalColumnHeader = columnHeader;
     columnHeader = columnHeader.replaceAll(".", "_");
 
-    const fieldPath = "organism.determination.scientificNameClassification";
+    const fieldPath = "organism.determination.scientificNameDetails";
     const targetTaxonomicRank = taxonomicRanks.find(
       (item) =>
         item.name?.toLowerCase().trim() === columnHeader.toLowerCase().trim()
@@ -422,7 +422,7 @@ export function useColumnMapping() {
       ) {
         handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
       }
-    } else if (fieldPath === "organism.determination.scientificNameClassification") {
+    } else if (fieldPath === "organism.determination.scientificNameDetails") {
       handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath === "managedAttributes") {
       handleManagedAttributeMapping(originalColumnHeader, newWorkbookColumnMap);
@@ -554,7 +554,7 @@ export function useColumnMapping() {
           }
         } else if (targetTaxonomicRank) {
           map.push({
-            targetField: "organism.determination.scientificNameClassification",
+            targetField: "organism.determination.scientificNameDetails",
             skipped: false,
             targetKey: targetTaxonomicRank,
             columnHeader: columnHeader.columnHeader,
