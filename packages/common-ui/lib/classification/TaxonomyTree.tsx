@@ -364,9 +364,6 @@ export default function TaxonomyTree() {
           initialTreeDepth: -1, // Show all expanded nodes
           animationDuration: 550,
           animationDurationUpdate: 750,
-          emphasis: {
-            focus: "descendant"
-          },
           roam: true,
           lineStyle: {
             width: 1.5,
