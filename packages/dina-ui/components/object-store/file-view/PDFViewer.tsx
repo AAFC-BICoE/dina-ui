@@ -5,7 +5,8 @@ import { LoadingSpinner } from "common-ui";
 import RcTooltip from "rc-tooltip";
 
 // Configure PDF.js worker source
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc =
+  "../../../dina-ui/node_modules/pdfjs-dist/build/pdf.worker.js";
 
 interface PDFViewerProps {
   objectUrl: string;
