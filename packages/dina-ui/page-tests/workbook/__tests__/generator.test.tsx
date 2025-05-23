@@ -401,10 +401,10 @@ describe("Workbook Template Generator", () => {
         expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
       });
 
-      // Click the "Scientific Name Details" option.
+      // Click the "Scientific Name Classification" option.
       userEvent.click(
         wrapper.getByRole("option", {
-          name: /scientific name details/i
+          name: /scientific name classification/i
         })
       );
       await new Promise(setImmediate);
