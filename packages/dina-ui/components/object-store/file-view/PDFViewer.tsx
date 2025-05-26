@@ -4,19 +4,20 @@ import { Button, ButtonGroup } from "react-bootstrap";
 import { LoadingSpinner } from "common-ui";
 import RcTooltip from "rc-tooltip";
 
-// Configure PDF.js worker source
-pdfjs.GlobalWorkerOptions.workerSrc =
-  "../../../dina-ui/node_modules/pdfjs-dist/build/pdf.worker.js";
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
 
 interface PDFViewerProps {
   objectUrl: string;
-  shownTypeIndicator: ReactNode;
+  shownTypeIndicator: ReactNode | null;
 }
 
-export function PDFViewer({ objectUrl, shownTypeIndicator }: PDFViewerProps) {
+export function PDFViewer({
+  objectUrl,
+  shownTypeIndicator = null
+}: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [_, setLoading] = useState<boolean>(true);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
@@ -47,8 +48,7 @@ export function PDFViewer({ objectUrl, shownTypeIndicator }: PDFViewerProps) {
   };
 
   return (
-    <div className="pdf-viewer-container">
-      {loading && <LoadingSpinner loading={true} />}
+    <div className="pdf-viewer-container" data-testid="pdf-viewer-container">
       <a
         href={objectUrl as any}
         target="_blank"
