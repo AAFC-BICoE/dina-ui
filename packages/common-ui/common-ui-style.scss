@@ -367,3 +367,15 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 1.5em !important;
   height: 1.5em !important;
 }
+
+.react-pdf__Page__canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.react-pdf__Page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+

@@ -15,7 +15,13 @@ const appVersion = `${require("./package.json").version}${
 }`;
 
 module.exports = withTM({
-  env: { UI_APP_VERSION: appVersion }
+  env: { UI_APP_VERSION: appVersion },
+  webpack: (config) => {
+    config.resolve.alias.canvas = false;
+
+    return config;
+  },
+  swcMinify: false
 });
 
 /* eslint-enable @typescript-eslint/no-require-imports */
