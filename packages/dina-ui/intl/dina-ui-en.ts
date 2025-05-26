@@ -1230,5 +1230,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   downloadTemplate: "Download Template",
   existingTemplates: "Existing Templates",
   viewMaterialSamplesInCollection: "View material samples in this collection",
-  generateURLButtonText: "Generate URL"
+  generateURLButtonText: "Generate URL",
+  taxonomyTree: "Taxonomy Tree"
 };
