@@ -14,6 +14,8 @@ import {
   handleDownloadLink
 } from "../object-store-utils";
 import Kitsu from "kitsu";
+import { formatBytes } from "../object-store-utils";
+import { useQuery } from "common-ui";
 
 export interface DerivativeListProps {
   metadata: Metadata;
@@ -43,6 +45,27 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
     return null;
   }
 
+  // Cell component to display the size of the derivative (no value for auto-generated thumbnails).
+  function DerivativeSizeCell({ filePath }: { filePath: string }) {
+    const { loading, response } = useQuery({
+      path: filePath ?? "",
+      timeout: 0,
+      header: { "include-dina-permission": "true" }
+    });
+
+    if (loading) {
+      return <LoadingSpinner loading={true} />;
+    }
+
+    if (response) {
+      const fileSize = (response.data as any)?.sizeInBytes ?? 0;
+
+      return <span>{formatBytes(fileSize)}</span>;
+    }
+
+    return <span>-</span>;
+  }
+
   return (
     <CollapsableSection
       collapserId="derivatives"
@@ -68,6 +91,21 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
             id: "dcFormat",
             accessorKey: "dcFormat",
             header: () => <DinaMessage id="field_dcFormat" />
+          },
+          {
+            id: "dcSize",
+            accessorKey: "dcSize",
+            header: () => <DinaMessage id="field_dcSize" />,
+            cell: ({
+              row: {
+                original: { fileIdentifier }
+              }
+            }) => (
+              <DerivativeSizeCell
+                filePath={`/objectstore-api/object-upload/${fileIdentifier}`}
+              />
+            ),
+            enableSorting: true
           },
           {
             id: "actions",
