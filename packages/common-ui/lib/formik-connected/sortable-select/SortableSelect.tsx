@@ -8,28 +8,48 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { castArray } from "lodash";
 import { useState } from "react";
-import Select, { ActionMeta, Props as SelectProps } from "react-select";
+import Select, {
+  ActionMeta,
+  Props as SelectProps,
+  GroupBase
+} from "react-select";
+import CreatableSelect, { CreatableProps } from "react-select/creatable";
 
-export interface SortableSelectProps<Option, IsMulti extends boolean>
-  extends Omit<SelectProps<Option, IsMulti>, "onChange"> {
+export interface SortableSelectProps<
+  Option,
+  IsMulti extends boolean,
+  Group extends GroupBase<Option>
+> extends Omit<
+    SelectProps<Option, IsMulti, Group> &
+      CreatableProps<Option, IsMulti, Group>,
+    "onChange"
+  > {
   onChange?: (
     value: null | Option | Option[],
     actionMeta?: ActionMeta<Option>
   ) => void;
+
+  /**
+   * Whether to use CreatableSelect instead of regular Select.
+   */
+  isCreatable?: boolean;
 }
 
 export function SortableSelect<
   Option extends { value: string; label: string },
-  IsMulti extends boolean
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>
 >({
   isMulti,
   value,
   onChange: onChangeProp,
+  isCreatable = false,
   ...props
-}: SortableSelectProps<Option, IsMulti>) {
+}: SortableSelectProps<Option, IsMulti, Group>) {
   const [selectedValues, setSelectedValues] = useState(
     !value ? [] : castArray(value)
   );
+
   // Handle sorting logic only for multi-select mode
   const handleOnDragEnd = (event: any) => {
     const { active, over } = event;
@@ -51,7 +71,7 @@ export function SortableSelect<
     onChangeProp?.(newSelectedValues);
   };
 
-  function handleOnChange(newSelectedRaw) {
+  function handleOnChange(newSelectedRaw, actionMeta?: ActionMeta<Option>) {
     if (isMulti) {
       setSelectedValues(
         newSelectedRaw
@@ -60,12 +80,15 @@ export function SortableSelect<
             : []
           : []
       );
-      onChangeProp?.(newSelectedRaw);
+      onChangeProp?.(newSelectedRaw, actionMeta);
     } else {
       setSelectedValues(newSelectedRaw ? [newSelectedRaw as Option] : []);
-      onChangeProp?.(newSelectedRaw as Option | null);
+      onChangeProp?.(newSelectedRaw as Option | null, actionMeta);
     }
   }
+
+  // Choose the appropriate Select component based on isCreatable prop.
+  const SelectComponent = isCreatable ? CreatableSelect : Select;
 
   if (isMulti) {
     return (
@@ -77,13 +100,14 @@ export function SortableSelect<
           items={selectedValues.map((opt) => opt.value)}
           strategy={rectSortingStrategy}
         >
-          <Select<Option, IsMulti>
+          <SelectComponent<Option, IsMulti, Group>
             isMulti={isMulti}
             value={selectedValues}
             onChange={handleOnChange}
             {...props}
             components={{
-              MultiValue: MultiValue
+              MultiValue: MultiValue,
+              ...props.components
             }}
           />
         </SortableContext>
@@ -91,7 +115,7 @@ export function SortableSelect<
     );
   } else {
     return (
-      <Select<Option, IsMulti>
+      <SelectComponent<Option, IsMulti, Group>
         isMulti={isMulti}
         value={selectedValues.length > 0 ? selectedValues[0] : null}
         onChange={handleOnChange}
@@ -128,7 +152,7 @@ const MultiValue = ({ children, data, removeProps }) => {
       {...listeners}
     >
       {children}
-      <span {...removeProps} style={{ marginLeft: "6px", cursor: "pointer" }}>
+      <span {...removeProps} style={{ marginLeft: "4px", cursor: "pointer" }}>
         &times;
       </span>{" "}
     </div>

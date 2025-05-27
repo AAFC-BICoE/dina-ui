@@ -11,12 +11,10 @@ import { KitsuResource } from "kitsu";
 import { compact, get, last, uniq } from "lodash";
 import { useRef, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
-import { components as reactSelectComponents } from "react-select";
-import CreatableSelect from "react-select/creatable";
-import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDebounce } from "use-debounce";
 import { useElasticSearchDistinctTerm } from "../../../common-ui/lib/list-page/useElasticSearchDistinctTerm";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { SortableSelect } from "common-ui";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
@@ -233,10 +231,6 @@ function TagSelect({
     onChange(selected.map((option) => option.value));
   }
 
-  const onSortEnd = ({ oldIndex, newIndex }) => {
-    onChange(arrayMove(value ?? [], oldIndex, newIndex));
-  };
-
   return (
     <SortableSelect
       // Input value:
@@ -264,25 +258,10 @@ function TagSelect({
       }
       noOptionsMessage={() => formatMessage("typeNewTagOrSearchPreviousTags")}
       formatCreateLabel={(input) => `${formatMessage("add")} "${input}"`}
-      // react-sortable-hoc config:
-      axis="xy"
-      onSortEnd={onSortEnd}
-      components={{
-        MultiValue: SortableMultiValue
-      }}
-      distance={4}
+      isCreatable={true}
     />
   );
 }
-
-// Drag/drop re-ordering support copied from https://github.com/JedWatson/react-select/pull/3645/files
-function arrayMove(array: any[], from: number, to: number) {
-  array = array.slice();
-  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
-  return array;
-}
-const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
-const SortableSelect = SortableContainer(CreatableSelect);
 
 export interface TagSelectReadOnlyProps {
   resourcePath?: string;
