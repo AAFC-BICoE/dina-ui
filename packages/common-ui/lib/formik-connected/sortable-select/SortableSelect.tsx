@@ -127,16 +127,17 @@ export function SortableSelect<
 
 // Sortable item component
 const MultiValue = ({ children, data, removeProps }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
-      id: data.value // Unique ID!
+      id: data.value
     });
 
   return (
     <div
       ref={setNodeRef}
       style={{
-        ...removeProps.style,
         transform: CSS.Transform.toString(transform),
         transition,
         display: "inline-flex",
@@ -145,16 +146,49 @@ const MultiValue = ({ children, data, removeProps }) => {
         padding: "4px 6px",
         borderRadius: "2px",
         backgroundColor: "#e6e6e6",
-        cursor: "move",
         fontSize: "85%"
       }}
-      {...attributes}
-      {...listeners}
     >
-      {children}
-      <span {...removeProps} style={{ marginLeft: "4px", cursor: "pointer" }}>
+      {/* Draggable content area with the text */}
+      <div
+        style={{
+          cursor: "move",
+          display: "flex",
+          alignItems: "center"
+        }}
+        {...attributes}
+        {...listeners}
+      >
+        {children}
+      </div>
+
+      {/* Remove button */}
+      <span
+        {...removeProps}
+        style={{
+          marginLeft: "4px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "16px",
+          height: "16px",
+          borderRadius: "2px",
+          backgroundColor: isHovered ? "#dc3545" : "rgba(0,0,0,0.1)",
+          color: isHovered ? "white" : "inherit",
+          fontSize: "12px",
+          lineHeight: "1",
+          transition: "background-color 0.2s ease, color 0.2s ease"
+        }}
+        onMouseDown={(e) => {
+          // Dragging should not occur when on the remove button.
+          e.stopPropagation();
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         &times;
-      </span>{" "}
+      </span>
     </div>
   );
 };
