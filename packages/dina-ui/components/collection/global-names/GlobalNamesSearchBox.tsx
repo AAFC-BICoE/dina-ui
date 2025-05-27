@@ -65,11 +65,11 @@ export function GlobalNamesSearchBox({
 }: GlobalNamesSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
   const instanceContext = useInstanceContext();
-  const scientificNameSearchEndpoint: string =
-    instanceContext?.scientificNameSearchEndpoint ??
+  const scientificNamesSearchEndpoint: string =
+    instanceContext?.scientificNamesSearchEndpoint ??
     "https://verifier.globalnames.org/api/v1/verifications/";
-  const scientificNameDatasetsEndpoint: string =
-    instanceContext?.scientificNameDatasetsEndpoint ??
+  const scientificNamesDatasetsEndpoint: string =
+    instanceContext?.scientificNamesDatasetsEndpoint ??
     "https://verifier.globalnames.org/api/v1/data_sources";
 
   const [datasetOptions, datassetDatasetOptionsetOptions] = useLocalStorage<
@@ -92,7 +92,7 @@ export function GlobalNamesSearchBox({
         const nameDatasetsResponse = await globalNamesSourcesQuery<
           GlobalNamesDatasetsResult[]
         >({
-          url: `${scientificNameDatasetsEndpoint}`,
+          url: `${scientificNamesDatasetsEndpoint}`,
           fetchJson
         });
         if (!isCancelled && nameDatasetsResponse) {
@@ -141,7 +141,7 @@ export function GlobalNamesSearchBox({
     fetcher: (searchValue) => {
       searchValue = searchValue.replace(/\s+/g, " ").trim();
       return globalNamesQuery<GlobalNamesSearchResult[]>({
-        url: `${scientificNameSearchEndpoint}${
+        url: `${scientificNamesSearchEndpoint}${
           searchValue[0].toUpperCase() + searchValue.substring(1)
         }`,
         params: {

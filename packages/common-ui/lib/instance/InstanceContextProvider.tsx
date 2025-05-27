@@ -7,8 +7,8 @@ export interface InstanceContextI {
   instanceName: string;
   supportedGeographicReferences: string;
   tgnSearchBaseUrl?: string;
-  scientificNameSearchEndpoint?: string;
-  scientificNameDatasetsEndpoint?: string;
+  scientificNamesSearchEndpoint?: string;
+  scientificNamesDatasetsEndpoint?: string;
 }
 
 export const InstanceContext = createContext<InstanceContextI | undefined>(
@@ -48,15 +48,15 @@ export function DefaultInstanceContextProvider({
             tgnSearchBaseUrl: !!response["tgn-search-base-url"]
               ? response["tgn-search-base-url"]
               : "",
-            scientificNameSearchEndpoint: !!response[
-              "scientific-name-search-endpoint"
+            scientificNamesSearchEndpoint: !!response[
+              "scientific-names-search-endpoint"
             ]
-              ? response["scientific-name-search-endpoint"]
+              ? response["scientific-names-search-endpoint"]
               : "https://verifier.globalnames.org/api/v1/verifications/",
-            scientificNameDatasetsEndpoint: !!response[
-              "scientific-name-datasets-endpoint"
+            scientificNamesDatasetsEndpoint: !!response[
+              "scientific-names-datasets-endpoint"
             ]
-              ? response["scientific-name-datasets-endpoint"]
+              ? response["scientific-names-datasets-endpoint"]
               : "https://verifier.globalnames.org/api/v1/data_sources"
           });
         } else {
