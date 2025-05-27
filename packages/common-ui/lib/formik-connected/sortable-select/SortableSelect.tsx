@@ -7,7 +7,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { castArray } from "lodash";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Select, {
   ActionMeta,
   Props as SelectProps,
@@ -49,6 +49,12 @@ export function SortableSelect<
   const [selectedValues, setSelectedValues] = useState(
     !value ? [] : castArray(value)
   );
+
+  // Sync internal state with external value changes
+  useEffect(() => {
+    const newValues = !value ? [] : castArray(value);
+    setSelectedValues(newValues);
+  }, [value]);
 
   // Handle sorting logic only for multi-select mode
   const handleOnDragEnd = (event: any) => {
@@ -165,6 +171,9 @@ const MultiValue = ({ children, data, removeProps }) => {
       {/* Remove button */}
       <span
         {...removeProps}
+        role="button"
+        aria-label={`Remove ${data.label}`}
+        tabIndex={0}
         style={{
           marginLeft: "4px",
           cursor: "pointer",
@@ -186,6 +195,12 @@ const MultiValue = ({ children, data, removeProps }) => {
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            removeProps.onClick?.(e);
+          }
+        }}
       >
         &times;
       </span>
