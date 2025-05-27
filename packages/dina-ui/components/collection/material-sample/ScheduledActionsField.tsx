@@ -117,6 +117,7 @@ export function ScheduledActionsField({
           <UserSelectField
             name={`${fieldName}[${row.index}].assignedTo`}
             removeLabel={true}
+            additionalSort="username"
           />
         </DinaFormSection>
       )
@@ -363,6 +364,7 @@ export function ScheduledActionSubForm({
             <UserSelectField
               {...fieldProps("assignedTo")}
               className="col-sm-6"
+              additionalSort="username"
             />
           </div>
           <TextField {...fieldProps("remarks")} multiLines={true} />

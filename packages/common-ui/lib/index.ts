@@ -129,3 +129,4 @@ export * from "./settings-button/SettingsButton";
 export * from "./test-util/mock-app-context";
 export * from "./export/exportUtils";
 export * from "./export/useBlobLoad";
+export * from "./classification/TaxonomyTree";

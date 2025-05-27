@@ -298,6 +298,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_determination.typeStatus": "Type Status",
   "field_determination.scientificName": "Scientific Name",
   "field_determination.verbatimScientificName": "Verbatim Scientific Name",
+  "field_determination.scientificNameDetails": "Scientific Name Classification",
   "field_run-summary_name": "Run Name",
   "field_run-summary_items.genericMolecularAnalysisItemSummary.name":
     "Run Item Name",
@@ -501,6 +502,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_verbatimEventDateTime: "Verbatim Event Date Time",
   field_verbatimRemarks: "Verbatim Remarks",
   field_verbatimScientificName: "Verbatim Scientific Name",
+  field_scientificNameDetails: "Scientific Name Classification",
   field_visibleManagedAttributes: "Visible Managed Attributes in Editor",
   field_visibleManagedAttributes_tooltip:
     "Adding or removing an attribute using this dropdown doesn't change or remove the value. It only affects the attribute's visibility in this editor.",
@@ -1018,6 +1020,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookSkippedField: "Please select a field or skip importing it",
   missingParentMaterialSampleNames:
     "Missing parent material sample names: {missingNames}",
+  onSheetDuplicateMaterialSampleNames:
+    "Some entries in your spreadsheet have the same Primary ID and Collection Name. Please review the following duplicates: {duplicateNames}",
+  duplicateMaterialSampleNames:
+    "These entries already exist in the system with the same Primary ID and Collection Name: {duplicateNames}",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be a {dataType}",
   workBookInvalidManagedAttributeDataType:
@@ -1230,5 +1236,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   downloadTemplate: "Download Template",
   existingTemplates: "Existing Templates",
   viewMaterialSamplesInCollection: "View material samples in this collection",
-  generateURLButtonText: "Generate URL"
+  generateURLButtonText: "Generate URL",
+  taxonomyTree: "Taxonomy Tree"
 };
