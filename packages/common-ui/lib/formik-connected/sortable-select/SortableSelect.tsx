@@ -112,25 +112,25 @@ const MultiValue = ({ children, data, removeProps }) => {
     <div
       ref={setNodeRef}
       style={{
-        ...removeProps.style, // Important: Include original styles
+        ...removeProps.style,
         transform: CSS.Transform.toString(transform),
         transition,
-        display: "inline-flex", // Or 'flex' if you want them to stack
+        display: "inline-flex",
         alignItems: "center",
-        marginRight: "4px", // Add some spacing
-        padding: "2px 4px",
-        borderRadius: "4px",
-        backgroundColor: "#f0f0f0", // Example styling
-        cursor: "move" // Indicate drag possibility
+        marginRight: "4px",
+        padding: "4px 6px",
+        borderRadius: "2px",
+        backgroundColor: "#e6e6e6",
+        cursor: "move",
+        fontSize: "85%"
       }}
       {...attributes}
       {...listeners}
     >
       {children}
-      <span {...removeProps} style={{ marginLeft: "4px", cursor: "pointer" }}>
+      <span {...removeProps} style={{ marginLeft: "6px", cursor: "pointer" }}>
         &times;
       </span>{" "}
-      {/* Include the remove 'x' */}
     </div>
   );
 };

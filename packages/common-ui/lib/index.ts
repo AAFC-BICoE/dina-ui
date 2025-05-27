@@ -43,6 +43,7 @@ export * from "./formik-connected/CheckBoxField";
 export * from "./formik-connected/NumberRangeFields";
 export * from "./formik-connected/ToggleField";
 export * from "./formik-connected/RadioButtonsField";
+export * from "./formik-connected/sortable-select/SortableSelect";
 export * from "./intl/common-ui-en";
 export * from "./intl/common-ui-fr";
 export * from "./intl/common-ui-de";
