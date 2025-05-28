@@ -15,7 +15,7 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 import useVocabularyOptions from "../../collection/useVocabularyOptions";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
-import { isEqual } from "lodash";
+import { compact, isEqual } from "lodash";
 import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
 
@@ -613,7 +613,10 @@ export function useGenericMolecularAnalysisRun({
 
             newQualityControls.push({
               ...qualityControlFound,
-              attachments: (attachmentMetadatas as any) ?? []
+              attachments:
+                compact(attachmentMetadatas).length === attachments.length
+                  ? (attachmentMetadatas as ResourceIdentifierObject[])
+                  : attachments ?? []
             });
           }
         }
