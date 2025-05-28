@@ -3,7 +3,8 @@ import {
   FormikButton,
   LoadingSpinner,
   useThrottledFetch,
-  useInstanceContext
+  useInstanceContext,
+  Tooltip
 } from "common-ui";
 import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
@@ -16,6 +17,7 @@ import {
 } from "./global-names-search-result-type";
 import Select from "react-select";
 import { useLocalStorage } from "@rehooks/local-storage";
+import { FaExclamationCircle } from "react-icons/fa";
 
 export type Selection =
   | string
@@ -82,8 +84,8 @@ export function GlobalNamesSearchBox({
   const [selectedDatasets, setSelectedDatasets] = useLocalStorage<Option[]>(
     "scientificNameSelectedNameDatasets"
   );
-  // the default value for selectedDatasets will be set below
 
+  // the default value for selectedDatasets will be set below
   useEffect(() => {
     let isCancelled = false; // prevent setting state if unmounted
 
@@ -99,7 +101,11 @@ export function GlobalNamesSearchBox({
           const selectOptions = nameDatasetsResponse.map((name) => {
             return {
               value: name.id,
-              label: name.titleShort
+              label:
+                name.titleShort && name.titleShort.trim() !== ""
+                  ? name.titleShort
+                  : name.title,
+              taxonData: name.hasTaxonData
             };
           });
           datassetDatasetOptionsetOptions(selectOptions);
@@ -129,6 +135,35 @@ export function GlobalNamesSearchBox({
       isCancelled = true; // cleanup if component unmounts
     };
   }, []);
+
+  const CustomDataSourceOption = (props) => {
+    const { data, innerRef, innerProps } = props;
+
+    return (
+      <div
+        ref={innerRef}
+        {...innerProps}
+        className="d-flex align-items-center p-2 dropdown-item"
+        style={{ cursor: "pointer" }}
+      >
+        <span
+          className="flex-fill text-truncate"
+          style={{ marginRight: "8px" }}
+        >
+          {data.label}
+        </span>
+        {!data.taxonData && (
+          <Tooltip
+            id={"dataSourceHasNoTaxonData"}
+            placement="left"
+            disableSpanMargin={true}
+            className="flex-shrink-0"
+            visibleElement={<FaExclamationCircle className="text-warning" />}
+          />
+        )}
+      </div>
+    );
+  };
 
   const {
     searchIsLoading,
@@ -214,14 +249,18 @@ export function GlobalNamesSearchBox({
                     )}
                   <Select
                     isMulti
-                    name="colors"
+                    name="globalNameSources"
                     options={datasetOptions}
                     value={selectedDatasets}
                     onChange={(newValue) => {
                       setSelectedDatasets(Array.from(newValue));
                     }}
                     placeholder={formatMessage("globalNameSources")}
-                  ></Select>
+                    className="flex-fill mt-2"
+                    components={{
+                      Option: CustomDataSourceOption
+                    }}
+                  />
                 </div>
               )}
             </div>
