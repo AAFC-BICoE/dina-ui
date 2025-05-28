@@ -11,7 +11,12 @@ const mockOnChange = jest.fn((val, form) =>
 );
 
 const mockFetchJson = jest.fn(async () => {
-  return { names: TEST_GLOBAL_NAME_SEARCH_RESULT };
+  return {
+    names: TEST_GLOBAL_NAME_SEARCH_RESULT.map((result) => ({
+      ...result,
+      results: [result.bestResult]
+    }))
+  };
 });
 
 const mockOnSubmit = jest.fn();
@@ -65,7 +70,8 @@ describe("GlobalNamesField component", () => {
       [
         [
           {
-            labelHtml: "Monodontidae: Monodon Linnaeus, 1758",
+            labelHtml:
+              'Monodontidae: Monodon Linnaeus, 1758 <span class="small">[Catalogue of Life]</span>',
             recordedOn: "2021-12-16",
             sourceUrl: "https://www.catalogueoflife.org/data/taxon/63DDW",
             currentName: "Monodon Linnaeus, 1758",
@@ -82,7 +88,7 @@ describe("GlobalNamesField component", () => {
     ]);
 
     expect(mockFetchJson).lastCalledWith(
-      "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false"
+      "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false&data_sources=&all_matches=true"
     );
 
     // Submit the form
