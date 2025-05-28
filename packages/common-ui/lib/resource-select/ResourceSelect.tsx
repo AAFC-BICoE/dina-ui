@@ -15,16 +15,12 @@ import {
 } from "lodash";
 import { ComponentProps, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import Select, {
-  ActionMeta,
-  StylesConfig,
-  components as reactSelectComponents
-} from "react-select";
-import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import { ActionMeta, StylesConfig } from "react-select";
 import { useDebounce } from "use-debounce";
 import { SelectOption, useAccount } from "../..";
 import { JsonApiQuerySpec, useQuery } from "../api-client/useQuery";
 import { useBulkGet } from "./useBulkGet";
+import { SortableSelect } from "common-ui";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
@@ -80,7 +76,7 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   invalid?: boolean;
 
-  selectProps?: Partial<ComponentProps<typeof Select>>;
+  selectProps?: Partial<ComponentProps<typeof SortableSelect>>;
 
   /** Page limit. */
   pageSize?: number;
@@ -278,7 +274,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   async function onChange(
     newSelectedRaw,
-    actionMeta: ActionMeta<{ resource: PersistedResource<TData> }>
+    actionMeta?: ActionMeta<{ resource: PersistedResource<TData> }>
   ) {
     if (!newSelectedRaw) {
       // when delete all the selected options.
@@ -305,12 +301,6 @@ export function ResourceSelect<TData extends KitsuResource>({
       }
     }
   }
-
-  const onSortEnd = ({ oldIndex, newIndex }) => {
-    onChangeProp(
-      arrayMove((value ?? []) as PersistedResource<any>[], oldIndex, newIndex)
-    );
-  };
 
   const valueAsArray = compact(castArray(value));
 
@@ -400,7 +390,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   return (
     <SortableSelect
-      // react-select AsyncSelect props:
+      // react-select props:
       isMulti={isMulti}
       onInputChange={(newVal) => setInputValue(newVal)}
       inputValue={inputValue}
@@ -415,26 +405,10 @@ export function ResourceSelect<TData extends KitsuResource>({
       // The filtering is already done at the API level:
       filterOption={({ data }) => filterList?.((data as any)?.resource) ?? true}
       isDisabled={isDisabled}
-      // react-sortable-hoc config:
-      axis="xy"
-      onSortEnd={onSortEnd}
-      components={{
-        MultiValue: SortableMultiValue
-      }}
-      distance={4}
       {...selectProps}
     />
   );
 }
-
-// Drag/drop re-ordering support copied from https://github.com/JedWatson/react-select/pull/3645/files
-function arrayMove(array: any[], from: number, to: number) {
-  array = array.slice();
-  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
-  return array;
-}
-const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
-const SortableSelect = SortableContainer(Select);
 
 export function isShallowReference(resourceArray: any[]) {
   const firstElement = castArray(resourceArray)[0];
