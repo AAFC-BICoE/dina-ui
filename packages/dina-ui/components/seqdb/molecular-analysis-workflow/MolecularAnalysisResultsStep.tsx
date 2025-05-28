@@ -231,6 +231,7 @@ export function MolecularAnalysisResultsStep({
                   columns={genericMolecularAnalysisResultsColumns}
                   data={sequencingRunItems ?? []}
                   sort={[{ id: "materialSampleName", desc: false }]}
+                  showPagination={true}
                 />
               </div>
             </DinaForm>
