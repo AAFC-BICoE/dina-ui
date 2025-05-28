@@ -10,6 +10,8 @@ export interface GlobalNamesSearchResult {
 export interface GlobalNamesDatasetsResult {
   id: number;
   titleShort: string;
+  title: string;
+  hasTaxonData: boolean;
 }
 
 export interface BestResult {
