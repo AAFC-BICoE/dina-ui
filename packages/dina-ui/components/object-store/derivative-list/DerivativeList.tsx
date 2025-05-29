@@ -72,7 +72,7 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
           },
           {
             id: "dcSize",
-            accessorFn: (row) => row.objectUpload?.sizeInBytes,
+            accessorFn: (row) => (row as any).objectUpload?.sizeInBytes,
             header: () => <DinaMessage id="field_dcSize" />,
             cell: ({ getValue }) => {
               const value = getValue();

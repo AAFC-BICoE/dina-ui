@@ -103,6 +103,7 @@ export function FileView({
   });
 
   const errorStatus = (error as any)?.cause?.status;
+  const objectUpload = (metadata as any)?.objectUpload;
 
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
@@ -240,17 +241,19 @@ export function FileView({
                             </small>
                           </div>
 
-                          <Badge
-                            bg="light"
-                            text="dark"
-                            style={{
-                              fontSize: "0.75rem",
-                              padding: "0.35em 0.5em",
-                              marginLeft: "2em"
-                            }}
-                          >
-                            {formatBytes(metadata.objectUpload.sizeInBytes)}
-                          </Badge>
+                          {objectUpload && (
+                            <Badge
+                              bg="light"
+                              text="dark"
+                              style={{
+                                fontSize: "0.75rem",
+                                padding: "0.35em 0.5em",
+                                marginLeft: "2em"
+                              }}
+                            >
+                              {formatBytes(objectUpload.sizeInBytes)}
+                            </Badge>
+                          )}
                         </div>
                       </Dropdown.Item>
                     )}
@@ -261,7 +264,8 @@ export function FileView({
                       const fileType = derivative.fileExtension;
                       const derivativeType = derivative.derivativeType;
                       const filePath = `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`;
-                      const fileSize = derivative.objectUpload?.sizeInBytes;
+                      const fileSize = (derivative as any).objectUpload
+                        ?.sizeInBytes;
                       return (
                         <Dropdown.Item
                           key={fileIdentifier}

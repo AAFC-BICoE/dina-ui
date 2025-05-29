@@ -78,6 +78,8 @@ export function useMetadataViewQuery(id?: string) {
       ],
       onSuccess: async (response) => {
         // fetch the uploadObject for each derivative and add it to the derivative object.
+
+        if (!response.data.derivatives) return; // If no derivatives, return early.
         const derivativeIdentifiers =
           response.data?.derivatives?.map(
             (derivative) => `object-upload/${derivative.fileIdentifier}`
