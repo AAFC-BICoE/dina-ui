@@ -15,7 +15,6 @@ import {
 } from "../object-store-utils";
 import Kitsu from "kitsu";
 import { formatBytes } from "../object-store-utils";
-import { useQuery } from "common-ui";
 
 export interface DerivativeListProps {
   metadata: Metadata;
@@ -43,27 +42,6 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
   // If no derivatives, return null.
   if (!metadata.derivatives || metadata.derivatives.length === 0) {
     return null;
-  }
-
-  // Cell component to display the size of the derivative (no value for auto-generated thumbnails).
-  function DerivativeSizeCell({ filePath }: { filePath: string }) {
-    const { loading, response } = useQuery({
-      path: filePath ?? "",
-      timeout: 0,
-      header: { "include-dina-permission": "true" }
-    });
-
-    if (loading) {
-      return <LoadingSpinner loading={true} />;
-    }
-
-    if (response) {
-      const fileSize = (response.data as any)?.sizeInBytes ?? 0;
-
-      return <span>{formatBytes(fileSize)}</span>;
-    }
-
-    return <span>-</span>;
   }
 
   return (
@@ -94,17 +72,29 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
           },
           {
             id: "dcSize",
-            accessorKey: "dcSize",
+            accessorFn: (row) => row.objectUpload?.sizeInBytes,
             header: () => <DinaMessage id="field_dcSize" />,
-            cell: ({
-              row: {
-                original: { fileIdentifier }
-              }
-            }) => (
-              <DerivativeSizeCell
-                filePath={`/objectstore-api/object-upload/${fileIdentifier}`}
-              />
-            ),
+            cell: ({ getValue }) => {
+              const value = getValue();
+              return value === undefined ? (
+                <span className="text-muted">-</span>
+              ) : (
+                <span>{formatBytes(value)}</span>
+              );
+            },
+            sortingFn: (rowA, rowB, columnId) => {
+              const a = rowA.getValue(columnId);
+              const b = rowB.getValue(columnId);
+
+              // Put undefined values at the bottom
+              if (a === undefined && b === undefined) return 0;
+              else if (a === undefined) return 1; // a goes to bottom
+              else if (b === undefined) return -1; // b goes to bottom
+              else
+                return typeof a === "number" && typeof b === "number"
+                  ? a - b
+                  : 0; // Normal numeric sorting for defined values
+            },
             enableSorting: true
           },
           {
