@@ -23,3 +23,7 @@ jest.spyOn(console, "error").mockImplementation((...args) => {
 });
 
 jest.setTimeout(40000);
+
+if (!HTMLElement.prototype.scroll) {
+  HTMLElement.prototype.scroll = () => {};
+}
