@@ -3,21 +3,23 @@ import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 
 export interface UseThrottledFetchParams<TData> {
-  fetcher: (query: string) => Promise<TData>;
+  fetcher: (query: string, ...deps: any[]) => Promise<TData>;
   timeoutMs: number;
   initSearchValue?: string;
+  dependencies?: any[];
 }
 
 export function useThrottledFetch<TData>({
   fetcher,
   timeoutMs,
-  initSearchValue
+  initSearchValue,
+  dependencies = []
 }: UseThrottledFetchParams<TData>) {
   /** The value of the input element. */
   const [inputValue, setInputValue] = useState(initSearchValue ?? "");
 
   /**
-   * The query passed to the Catalogue of Life API.
+   * The query passed to the API.
    * This state is only set when the user submits the search input.
    */
   const [searchValue, setSearchValue] = useState("");
@@ -27,17 +29,21 @@ export function useThrottledFetch<TData>({
    * to make sure we don't send more requests than we are allowed to.
    */
   const [throttled, setThrottled] = useState(false);
+
   useEffect(() => {
     if (searchValue) {
       setThrottled(true);
       const throttleReset = setTimeout(() => setThrottled(false), timeoutMs);
       return () => clearTimeout(throttleReset);
     }
-  }, [searchValue]);
+  }, [searchValue, timeoutMs]);
+
+  // Create the SWR key with search value and dependencies
+  const swrKey = searchValue ? [searchValue, ...dependencies] : null;
 
   const { isValidating: searchIsLoading, data: mySearchResult } = useSWR(
-    [searchValue],
-    () => fetcher(searchValue),
+    swrKey,
+    () => fetcher(searchValue, ...dependencies),
     {
       shouldRetryOnError: false,
       revalidateOnFocus: false,
@@ -46,7 +52,6 @@ export function useThrottledFetch<TData>({
   );
 
   const searchResult: any = mySearchResult;
-
   const searchIsDisabled = throttled || !inputValue || searchIsLoading;
 
   /** Executes the search immediately and delays further calls. */
@@ -72,21 +77,31 @@ export function useThrottledFetch<TData>({
   };
 }
 
+export interface UseDebouncedFetchParams<TData> {
+  fetcher: (query: string, ...deps: any[]) => Promise<TData>;
+  timeoutMs: number;
+  dependencies?: any[]; // Additional dependencies for SWR
+}
+
 export function useDebouncedFetch<TData>({
   fetcher,
-  timeoutMs
-}: UseThrottledFetchParams<TData>) {
+  timeoutMs,
+  dependencies = []
+}: UseDebouncedFetchParams<TData>) {
   /** The value of the input element. */
   const [inputValue, setInputValue] = useState("");
 
   /** The debounced input value passed to the fetcher. */
   const [searchValue, { isPending }] = useDebounce(inputValue, timeoutMs);
 
+  // Create the SWR key with search value and dependencies
+  const swrKey = searchValue ? [searchValue, ...dependencies] : null;
+
   const {
     isValidating: searchIsLoading,
     data: searchResult,
     error
-  } = useSWR([searchValue], () => fetcher(searchValue), {
+  } = useSWR(swrKey, () => fetcher(searchValue, ...dependencies), {
     shouldRetryOnError: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false
@@ -94,5 +109,11 @@ export function useDebouncedFetch<TData>({
 
   const isLoading = !!inputValue && (searchIsLoading || isPending());
 
-  return { inputValue, setInputValue, isLoading, searchResult, error };
+  return {
+    inputValue,
+    setInputValue,
+    isLoading,
+    searchResult,
+    error
+  };
 }

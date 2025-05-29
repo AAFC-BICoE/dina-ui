@@ -554,7 +554,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   georeferencedDateLabel: "Georeferenced Date",
   globalNameSearchLabel: "Global Name Search",
   globalNameSources: "Name sources",
-  globalNameSourcesMustSelectOne: "Select at least one name source to search",
   dataSourceHasNoTaxonData:
     "This data source provides only names. Upper ranks data is not available.",
   goToThePreviousStep: "Go to the previous step",
