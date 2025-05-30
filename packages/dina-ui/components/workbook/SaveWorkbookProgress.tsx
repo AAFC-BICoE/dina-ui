@@ -411,10 +411,9 @@ export function SaveWorkbookProgress({
         <Link
           href={`/collection/material-sample/view?id=${id}`}
           passHref={true}
+          target="_blank"
         >
-          <a target="_blank">
-            {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-          </a>
+          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
         </Link>
       ),
       accessorKey: "materialSampleName"

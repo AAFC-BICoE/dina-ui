@@ -418,7 +418,6 @@ export function GlobalNamesSearchBox({
                         )}
                       </i>
                     </div>
-
                     <FormikButton
                       className="btn btn-primary global-name-select-button ms-auto"
                       buttonProps={() => ({

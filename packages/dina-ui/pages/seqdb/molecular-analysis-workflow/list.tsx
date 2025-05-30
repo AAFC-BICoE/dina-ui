@@ -48,6 +48,7 @@ export default function MolecularAnalysisWorkflowListPage() {
       }) => (
         <Link
           href={`/seqdb/molecular-analysis-workflow/run?genericMolecularAnalysisId=${id}`}
+          legacyBehavior
         >
           {name || id}
         </Link>
@@ -86,10 +87,11 @@ export default function MolecularAnalysisWorkflowListPage() {
       <Nav marginBottom={false} />
       <ButtonBar>
         <div className="flex d-flex">
-          <Link href={`/seqdb/molecular-analysis-workflow/run`}>
-            <a className="btn btn-primary ms-auto">
-              <SeqdbMessage id="startNewWorkflow" />
-            </a>
+          <Link
+            href={`/seqdb/molecular-analysis-workflow/run`}
+            className="btn btn-primary ms-auto"
+          >
+            <SeqdbMessage id="startNewWorkflow" />
           </Link>
         </div>
       </ButtonBar>

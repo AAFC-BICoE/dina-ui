@@ -16,11 +16,7 @@ const SEQ_SUBMISSION_TABLE_COLUMNS: ColumnDefinition<SeqSubmission>[] = [
       row: {
         original: { id, name }
       }
-    }) => (
-      <Link href={`/seqdb/seq-submission/view?id=${id}`}>
-        <a>{name}</a>
-      </Link>
-    ),
+    }) => <Link href={`/seqdb/seq-submission/view?id=${id}`}>{name}</Link>,
     accessorKey: "name"
   },
   groupCell("group"),

@@ -1,5 +1,5 @@
 import RegionDetailsPage from "../../../../pages/seqdb/region/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
 import "@testing-library/jest-dom";
 
@@ -44,10 +44,7 @@ describe("Region details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    // Expect loading spinner to not be in the UI
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     // The region's name should be rendered in a FieldView.
     expect(wrapper.getAllByText(/test region/i)[1]).toBeInTheDocument();

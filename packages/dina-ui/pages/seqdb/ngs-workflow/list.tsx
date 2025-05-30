@@ -23,7 +23,9 @@ const TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/seqdb/ngs-workflow/run?batchId=${id}`}>{name || id}</Link>
+      <Link href={`/seqdb/ngs-workflow/run?batchId=${id}`} legacyBehavior>
+        {name || id}
+      </Link>
     ),
     accessorKey: "name",
     header: () => <SeqdbMessage id="name" />
@@ -52,10 +54,11 @@ export default function NgsWorkflowListPage() {
       <Nav marginBottom={false} />
       <ButtonBar>
         <div className="flex d-flex">
-          <Link href={`/seqdb/ngs-workflow/run`}>
-            <a className="btn btn-primary ms-auto">
-              <SeqdbMessage id="startNewWorkflow" />
-            </a>
+          <Link
+            href={`/seqdb/ngs-workflow/run`}
+            className="btn btn-primary ms-auto"
+          >
+            <SeqdbMessage id="startNewWorkflow" />
           </Link>
         </div>
       </ButtonBar>

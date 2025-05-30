@@ -104,7 +104,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             aria-label="Filter Attribute"
             className="filter-attribute"
             instanceId={`attribute_${model.id}`}
-            options={this.context.attributeOptions}
+            options={(this.context as any).attributeOptions}
             onChange={this.onPropertyChanged}
             value={selectedAttributeOption}
             styles={customStyle}
@@ -276,7 +276,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     const { model } = this.props;
 
     const selectedAttribute =
-      this.context.attributeOptions.find((option) => {
+      (this.context as any).attributeOptions.find((option) => {
         const propAttributeName =
           typeof model.attribute === "string"
             ? model.attribute
@@ -285,7 +285,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
           typeof option.value === "string" ? option.value : option.value.name;
 
         return propAttributeName === optionAttrString;
-      }) ?? this.context.attributeOptions[0];
+      }) ?? (this.context as any).attributeOptions[0];
 
     return typeof selectedAttribute.value === "string"
       ? {

@@ -3,7 +3,7 @@ import { mountWithAppContext } from "common-ui";
 import { FilterBuilder, FilterBuilderProps } from "../FilterBuilder";
 import { FilterGroupModel } from "../FilterGroup";
 import "@testing-library/jest-dom";
-import { screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 
 describe("FilterBuilder component", () => {
   const filterAttributes = ["name", "description"];
@@ -365,30 +365,31 @@ describe("FilterBuilder component", () => {
     const wrapper = mountWithAppContext(<TestComponent />);
     expect(callback).lastCalledWith(null);
 
-    await new Promise(setImmediate);
-    expect(callback).lastCalledWith({
-      children: [
-        {
-          attribute: "name",
-          id: 1,
-          predicate: "IS",
-          searchType: "PARTIAL_MATCH",
-          type: "FILTER_ROW",
-          value: ""
-        }
-      ],
-      id: 2,
-      operator: "AND",
-      type: "FILTER_GROUP"
+    await waitFor(() => {
+      expect(callback).lastCalledWith({
+        children: [
+          {
+            attribute: "name",
+            id: 1,
+            predicate: "IS",
+            searchType: "PARTIAL_MATCH",
+            type: "FILTER_ROW",
+            value: ""
+          }
+        ],
+        id: 2,
+        operator: "AND",
+        type: "FILTER_GROUP"
+      });
     });
 
     // Set the model to null.
     fireEvent.click(wrapper.getByRole("button", { name: /reset to null/i }));
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
 
     // Resets itself with the inital filter model.
-    expect(callback).toHaveBeenCalledTimes(4);
+    await waitFor(() => {
+      expect(callback).toHaveBeenCalledTimes(4);
+    });
     expect(callback).lastCalledWith({
       children: [
         {

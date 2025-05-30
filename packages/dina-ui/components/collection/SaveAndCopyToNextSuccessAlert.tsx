@@ -41,12 +41,10 @@ export function SaveAndCopyToNextSuccessAlert({
               className={className}
               passHref={true}
             >
-              <a>
-                <span style={{ fontSize: "1.2em", font: "fw-bold" }}>
-                  {" "}
-                  {displayName}
-                </span>
-              </a>
+              <span style={{ fontSize: "1.2em", font: "fw-bold" }}>
+                {" "}
+                {displayName}
+              </span>
             </Link>
           </div>
 
@@ -55,7 +53,6 @@ export function SaveAndCopyToNextSuccessAlert({
           </span>
         </div>
       </div>
-
       {copyToNextSampleInfo?.notCopiedOverWarnings &&
         copyToNextSampleInfo?.notCopiedOverWarnings.length > 0 && (
           <>

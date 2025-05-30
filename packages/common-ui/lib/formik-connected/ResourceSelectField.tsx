@@ -119,7 +119,9 @@ export function ReadOnlyResourceLink<TData extends KitsuResource>({
         return (
           <Fragment key={resource?.id ?? index}>
             {readOnlyLink && resource ? (
-              <Link href={readOnlyLink + resource.id}>{valueText ?? ""}</Link>
+              <Link href={readOnlyLink + resource.id} legacyBehavior>
+                {valueText ?? ""}
+              </Link>
             ) : (
               valueText
             )}

@@ -3,6 +3,7 @@ import { mountWithAppContext } from "common-ui";
 import { useElasticSearchDistinctTerm } from "../useElasticSearchDistinctTerm";
 import { isEmpty, noop } from "lodash";
 import { QueryBuilderContextProvider } from "../query-builder/QueryBuilder";
+import { waitFor } from "@testing-library/react";
 
 const FIELD_NAME = "data.attributes.materialSampleType";
 const RELATIONSHIP_FIELD_NAME = "included.attributes.code";
@@ -133,23 +134,24 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         }
       }
     );
-    await new Promise(setImmediate);
 
-    expect(mockSuggestionRequest).toBeCalledWith(
-      "search-api/search-ws/search",
-      {
-        aggs: {
-          term_aggregation: {
-            terms: { field: FIELD_NAME + ".keyword", size: 100 }
-          }
+    await waitFor(() => {
+      expect(mockSuggestionRequest).toBeCalledWith(
+        "search-api/search-ws/search",
+        {
+          aggs: {
+            term_aggregation: {
+              terms: { field: FIELD_NAME + ".keyword", size: 100 }
+            }
+          },
+          query: { terms: { "data.attributes.group.keyword": GROUPS } },
+          size: 0
         },
-        query: { terms: { "data.attributes.group.keyword": GROUPS } },
-        size: 0
-      },
-      { params: { indexName: INDEX_NAME } }
-    );
+        { params: { indexName: INDEX_NAME } }
+      );
 
-    expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
+      expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
+    });
   });
 
   it("Non-relationship suggestions retrieved (keyword type)", async () => {
@@ -174,23 +176,23 @@ describe("Use Elastic Search Distinct Term Hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
-
-    expect(mockSuggestionRequest).toBeCalledWith(
-      "search-api/search-ws/search",
-      {
-        aggs: {
-          term_aggregation: {
-            terms: { field: FIELD_NAME, size: 100 }
-          }
+    await waitFor(() => {
+      expect(mockSuggestionRequest).toBeCalledWith(
+        "search-api/search-ws/search",
+        {
+          aggs: {
+            term_aggregation: {
+              terms: { field: FIELD_NAME, size: 100 }
+            }
+          },
+          query: { terms: { "data.attributes.group.keyword": GROUPS } },
+          size: 0
         },
-        query: { terms: { "data.attributes.group.keyword": GROUPS } },
-        size: 0
-      },
-      { params: { indexName: INDEX_NAME } }
-    );
+        { params: { indexName: INDEX_NAME } }
+      );
 
-    expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
+      expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
+    });
   });
 
   it("Relationship suggestions retrieved", async () => {
@@ -216,38 +218,38 @@ describe("Use Elastic Search Distinct Term Hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
-
-    expect(mockSuggestionRequestRelationship).toBeCalledWith(
-      "search-api/search-ws/search",
-      {
-        size: 0,
-        query: { terms: { "data.attributes.group.keyword": GROUPS } },
-        aggs: {
-          included_aggregation: {
-            nested: { path: "included" },
-            aggs: {
-              included_type_filter: {
-                filter: {
-                  bool: {
-                    filter: [{ term: { "included.type": RELATIONSHIP_TYPE } }]
-                  }
-                },
-                aggs: {
-                  term_aggregation: {
-                    terms: {
-                      field: RELATIONSHIP_FIELD_NAME + ".keyword",
-                      size: 100
+    await waitFor(() => {
+      expect(mockSuggestionRequestRelationship).toBeCalledWith(
+        "search-api/search-ws/search",
+        {
+          size: 0,
+          query: { terms: { "data.attributes.group.keyword": GROUPS } },
+          aggs: {
+            included_aggregation: {
+              nested: { path: "included" },
+              aggs: {
+                included_type_filter: {
+                  filter: {
+                    bool: {
+                      filter: [{ term: { "included.type": RELATIONSHIP_TYPE } }]
+                    }
+                  },
+                  aggs: {
+                    term_aggregation: {
+                      terms: {
+                        field: RELATIONSHIP_FIELD_NAME + ".keyword",
+                        size: 100
+                      }
                     }
                   }
                 }
               }
             }
           }
-        }
-      },
-      { params: { indexName: "dina-material-sample-index" } }
-    );
+        },
+        { params: { indexName: "dina-material-sample-index" } }
+      );
+    });
 
     expect(mockSearchResults).toBeCalledWith(["CNC"]);
   });
@@ -280,13 +282,13 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         }
       );
 
-      await new Promise(setImmediate);
-
       // No search results should be provided.
-      expect(mockSearchResults).toBeCalledTimes(0);
+      await waitFor(() => {
+        expect(mockSearchResults).toBeCalledTimes(0);
 
-      // The initial load sets it to an empty result as well.
-      expect(mockEmptyResults).toBeCalledTimes(2);
+        // The initial load sets it to an empty result as well.
+        expect(mockEmptyResults).toBeCalledTimes(2);
+      });
     });
 
     it("No field name provided, no results should be returned.", async () => {
@@ -313,10 +315,10 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         }
       );
 
-      await new Promise(setImmediate);
-
-      expect(mockSuggestionRequest).toBeCalledTimes(0);
-      expect(mockEmptyResults).toBeCalledTimes(1);
+      await waitFor(() => {
+        expect(mockSuggestionRequest).toBeCalledTimes(0);
+        expect(mockEmptyResults).toBeCalledTimes(1);
+      });
     });
 
     it("No group provided, the query should not include group", async () => {
@@ -341,23 +343,23 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         }
       );
 
-      await new Promise(setImmediate);
-
-      expect(mockSuggestionRequest).toBeCalledWith(
-        "search-api/search-ws/search",
-        {
-          aggs: {
-            term_aggregation: {
-              terms: {
-                field: "data.attributes.materialSampleType.keyword",
-                size: 100
+      await waitFor(() => {
+        expect(mockSuggestionRequest).toBeCalledWith(
+          "search-api/search-ws/search",
+          {
+            aggs: {
+              term_aggregation: {
+                terms: {
+                  field: "data.attributes.materialSampleType.keyword",
+                  size: 100
+                }
               }
-            }
+            },
+            size: 0
           },
-          size: 0
-        },
-        { params: { indexName: "dina-material-sample-index" } }
-      );
+          { params: { indexName: "dina-material-sample-index" } }
+        );
+      });
       expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
     });
   });

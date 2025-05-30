@@ -23,7 +23,11 @@ const TABLE_COLUMNS: ColumnDefinition<SeqBatch>[] = [
       row: {
         original: { id, name }
       }
-    }) => <Link href={`/seqdb/seq-batch/view?id=${id}`}>{name || id}</Link>,
+    }) => (
+      <Link href={`/seqdb/seq-batch/view?id=${id}`} legacyBehavior>
+        {name || id}
+      </Link>
+    ),
     accessorKey: "name"
   },
   groupCell("group"),

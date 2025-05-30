@@ -212,7 +212,7 @@ export function IdentifierTypeFormLayout() {
                 return (
                   <Fragment key={value}>
                     <Link href={value} passHref={true}>
-                      <a>{value}</a>
+                      {value}
                     </Link>
                   </Fragment>
                 );

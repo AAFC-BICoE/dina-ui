@@ -7,7 +7,7 @@ export const PREPARATION_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<Preparation
   {
     name: ({ id, name }) => (
       <Link href={`/collection/preparation-type/view?id=${id}`}>
-        <a>{name || id}</a>
+        {name || id}
       </Link>
     ),
     customValueCells: {

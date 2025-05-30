@@ -82,25 +82,19 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
               <div className="form-group list-inline d-flex justify-content-end">
                 <Link
                   href={`/seqdb/ngs-workflow/library-prep-worksheet?batchId=${props.batchId}&sampleLayout=table`}
+                  className="list-inline-item btn btn-primary"
+                  target="_blank"
                 >
-                  <a
-                    className="list-inline-item btn btn-primary"
-                    target="_blank"
-                  >
-                    Library Prep Worksheet With Table
-                    <FaExternalLinkAlt className="ms-2" />
-                  </a>
+                  Library Prep Worksheet With Table
+                  <FaExternalLinkAlt className="ms-2" />
                 </Link>
                 <Link
                   href={`/seqdb/ngs-workflow/library-prep-worksheet?batchId=${props.batchId}&sampleLayout=grid`}
+                  className="list-inline-item btn btn-primary"
+                  target="_blank"
                 >
-                  <a
-                    className="list-inline-item btn btn-primary"
-                    target="_blank"
-                  >
-                    Library Prep Worksheet With Grid
-                    <FaExternalLinkAlt className="ms-2" />
-                  </a>
+                  Library Prep Worksheet With Grid
+                  <FaExternalLinkAlt className="ms-2" />
                 </Link>
               </div>
             </div>

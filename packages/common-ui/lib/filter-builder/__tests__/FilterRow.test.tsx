@@ -3,7 +3,7 @@ import { mountWithAppContext } from "common-ui";
 import { FilterAttribute } from "../FilterBuilder";
 import { FilterBuilderContextProvider } from "../FilterBuilderContext";
 import { FilterRow, FilterRowProps } from "../FilterRow";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const TEST_SPECIMEN_NUMBER_FILTER: FilterAttribute = {
@@ -109,15 +109,16 @@ describe("FilterRow component", () => {
     const select = wrapper.getByRole("combobox", { name: /filter attribute/i });
     fireEvent.change(select, { target: { value: "Desc" } });
     fireEvent.click(wrapper.getByRole("option", { name: /description/i }));
-    await new Promise(setImmediate);
 
-    expect(mockModelChange).lastCalledWith({
-      attribute: "description",
-      id: 1,
-      predicate: "IS",
-      searchType: "PARTIAL_MATCH",
-      type: "FILTER_ROW",
-      value: ""
+    await waitFor(() => {
+      expect(mockModelChange).lastCalledWith({
+        attribute: "description",
+        id: 1,
+        predicate: "IS",
+        searchType: "PARTIAL_MATCH",
+        type: "FILTER_ROW",
+        value: ""
+      });
     });
     expect(mockOnChange).toHaveBeenCalledTimes(1);
   });
@@ -128,17 +129,18 @@ describe("FilterRow component", () => {
     const select = wrapper.getByRole("combobox", { name: /filter predicate/i });
     fireEvent.change(select, { target: { value: "i" } });
     fireEvent.click(wrapper.getAllByRole("option", { name: "" })[1]);
-    await new Promise(setImmediate);
 
-    expect(mockModelChange).lastCalledWith({
-      attribute: "name",
-      id: 1,
-      predicate: "IS NOT",
-      searchType: "PARTIAL_MATCH",
-      type: "FILTER_ROW",
-      value: ""
+    await waitFor(() => {
+      expect(mockModelChange).lastCalledWith({
+        attribute: "name",
+        id: 1,
+        predicate: "IS NOT",
+        searchType: "PARTIAL_MATCH",
+        type: "FILTER_ROW",
+        value: ""
+      });
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
     });
-    expect(mockOnChange).toHaveBeenCalledTimes(1);
   });
 
   it("Changes the model's filter value when the filter value is changed.", () => {

@@ -140,10 +140,11 @@ export function ReportTemplateForm({
     >
       <ButtonBar className="mb-3">
         <div className="col-md-6 col-sm-12 mt-2">
-          <Link href={"/export/report-template/upload"}>
-            <a className={`back-button my-auto`}>
-              <DinaMessage id={"backToUpload"} />
-            </a>
+          <Link
+            href={"/export/report-template/upload"}
+            className={`back-button my-auto`}
+          >
+            <DinaMessage id={"backToUpload"} />
           </Link>
         </div>
         <div className="col-md-6 col-sm-12 d-flex">

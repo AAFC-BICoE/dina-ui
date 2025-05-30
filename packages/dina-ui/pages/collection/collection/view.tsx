@@ -44,10 +44,9 @@ export default function CollectionDetailsPage() {
                 JSON.stringify(buildQueryTree(props.initialValues.name))
               }
               passHref={true}
+              className="btn btn-info"
             >
-              <a className="btn btn-info">
-                <DinaMessage id="viewMaterialSamplesInCollection" />
-              </a>
+              <DinaMessage id="viewMaterialSamplesInCollection" />
             </Link>
           )}
         </DinaForm>

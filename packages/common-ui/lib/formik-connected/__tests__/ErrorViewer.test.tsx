@@ -35,8 +35,9 @@ describe("ErrorViewer component", () => {
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
-    expect(wrapper.getByText(/test error/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/test error/i)).toBeInTheDocument();
+    });
   });
 
   it("Renders field-level errors.", async () => {

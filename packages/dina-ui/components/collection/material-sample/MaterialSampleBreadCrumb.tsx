@@ -51,7 +51,7 @@ export function MaterialSampleBreadCrumb({
             <Link
               href={`/collection/material-sample/view?id=${materialSample.id}`}
             >
-              <a>{displayName}</a>
+              {displayName}
             </Link>
           ) : (
             <div className="d-inline-flex flex-row align-items-center">
@@ -82,7 +82,6 @@ export function MaterialSampleBreadCrumb({
             </div>
           ))}
       </h1>
-
       {/* Material Sample Parents */}
       {parentPath.length !== 0 && (
         <div className="card well px-3 py-2 mb-3">
@@ -90,7 +89,7 @@ export function MaterialSampleBreadCrumb({
             {parentPath.map((node) => (
               <li className="breadcrumb-item" key={node.uuid}>
                 <Link href={`/collection/material-sample/view?id=${node.uuid}`}>
-                  <a>{node.name}</a>
+                  {node.name}
                 </Link>
               </li>
             ))}

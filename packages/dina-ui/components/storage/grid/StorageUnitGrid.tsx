@@ -57,7 +57,7 @@ export default function StorageUnitGrid({
           {usageType}{" "}
           {usageTypeLinkRef.current && (
             <Link href={usageTypeLinkRef.current}>
-              <a>{usageTypeResourceNameRef?.current}</a>
+              {usageTypeResourceNameRef?.current}
             </Link>
           )}
         </div>
@@ -67,10 +67,11 @@ export default function StorageUnitGrid({
           <div className="d-flex justify-content-between align-items-end mb-3">
             <FieldLabel name={formatMessage("contents")} />
             {!!editContentsPathRef.current && (
-              <Link href={`${editContentsPathRef.current}`}>
-                <a className={"btn btn-primary"}>
-                  <DinaMessage id="editContents" />
-                </a>
+              <Link
+                href={`${editContentsPathRef.current}`}
+                className={"btn btn-primary"}
+              >
+                <DinaMessage id="editContents" />
               </Link>
             )}
           </div>

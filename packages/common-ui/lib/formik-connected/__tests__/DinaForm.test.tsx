@@ -1,4 +1,4 @@
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { DoOperationsError } from "../..";
 import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
@@ -20,22 +20,23 @@ describe("DinaForm component.", () => {
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
 
-    expect(mockOnSubmit).lastCalledWith({
-      account: expect.objectContaining({
-        username: "test-user"
-      }),
-      api: expect.objectContaining({
-        apiClient: expect.anything(),
-        bulkGet: expect.anything(),
-        doOperations: expect.anything(),
-        save: expect.anything()
-      }),
-      formik: expect.anything(),
-      submittedValues: {
-        testAttr: "test-value"
-      }
+    await waitFor(() => {
+      expect(mockOnSubmit).lastCalledWith({
+        account: expect.objectContaining({
+          username: "test-user"
+        }),
+        api: expect.objectContaining({
+          apiClient: expect.anything(),
+          bulkGet: expect.anything(),
+          doOperations: expect.anything(),
+          save: expect.anything()
+        }),
+        formik: expect.anything(),
+        submittedValues: {
+          testAttr: "test-value"
+        }
+      });
     });
   });
 
@@ -59,9 +60,10 @@ describe("DinaForm component.", () => {
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
 
     // Both errors should be shown:
-    expect(wrapper.queryByRole("status")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("status")).toBeInTheDocument();
+    });
   });
 });

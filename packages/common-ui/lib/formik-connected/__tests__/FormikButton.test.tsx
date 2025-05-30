@@ -35,10 +35,6 @@ describe("FormikButton component", () => {
   it("Renders a loading spinner while the form is loading.", async () => {
     const wrapper = getWrapper();
 
-    mockOnSubmit.mockImplementation(async () => {
-      await new Promise(setImmediate);
-    });
-
     // Submit the form
     fireEvent.click(
       wrapper.getByRole("button", {

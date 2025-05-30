@@ -100,9 +100,6 @@ describe("ResourceSelectField component", () => {
       { apiContext }
     );
 
-    // Wait for the options to load.
-    await new Promise(setImmediate);
-
     // Simulate the select component's input change.
     // Simulate input change to trigger search in Select field.
     const input = screen.getByRole("combobox");
@@ -267,24 +264,24 @@ describe("ResourceSelectField component", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
-
-    expect(mockBulkGet.mock.calls).toEqual([
-      [
-        ["group/100"],
-        {
-          apiBaseUrl: "/test-api",
-          returnNullForMissingResource: true
-        }
-      ],
-      [
-        ["group/200", "group/300"],
-        {
-          apiBaseUrl: "/test-api",
-          returnNullForMissingResource: true
-        }
-      ]
-    ]);
+    await waitFor(() => {
+      expect(mockBulkGet.mock.calls).toEqual([
+        [
+          ["group/100"],
+          {
+            apiBaseUrl: "/test-api",
+            returnNullForMissingResource: true
+          }
+        ],
+        [
+          ["group/200", "group/300"],
+          {
+            apiBaseUrl: "/test-api",
+            returnNullForMissingResource: true
+          }
+        ]
+      ]);
+    });
 
     expect(
       wrapper.container.querySelector(".singleGroup-field .read-only-view")

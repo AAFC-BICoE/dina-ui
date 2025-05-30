@@ -49,9 +49,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
                     : "view"
                 }?id=${metadataId}`}
               >
-                <a>
-                  <DinaMessage id="detailsPageLink" />
-                </a>
+                <DinaMessage id="detailsPageLink" />
               </Link>
             </div>
             <div className="col-auto d-flex justify-content-end">
@@ -64,18 +62,16 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
                       ? "external-resource-edit"
                       : "edit"
                   }?id=${metadataId}`}
+                  className="btn btn-primary metadata-edit-link"
                 >
-                  <a className="btn btn-primary metadata-edit-link">
-                    <DinaMessage id="editButtonText" />
-                  </a>
+                  <DinaMessage id="editButtonText" />
                 </Link>
               </div>
               <Link
                 href={`/object-store/metadata/revisions?id=${metadataId}&isExternalResourceMetadata=${!!metadata?.resourceExternalURL}`}
+                className="btn btn-info metadata-revisions-link"
               >
-                <a className="btn btn-info metadata-revisions-link">
-                  <DinaMessage id="revisionsButtonText" />
-                </a>
+                <DinaMessage id="revisionsButtonText" />
               </Link>
             </div>
           </div>

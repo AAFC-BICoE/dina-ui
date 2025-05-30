@@ -106,7 +106,7 @@ function CreateNewSection({ href }: CreateButtonProps) {
   return (
     <Card bg="light" className="mb-4">
       <Card.Body className="ms-auto">
-        <Link href={href} passHref={true}>
+        <Link href={href} passHref={true} legacyBehavior>
           <Button variant="info" className="mx-1 my-1">
             <DinaMessage id="createNewLabel" />
           </Button>
@@ -135,9 +135,7 @@ function CollectionAttributeListView() {
           original: { id, name }
         }
       }) => (
-        <Link href={`/collection/managed-attribute/view?id=${id}`}>
-          <a>{name}</a>
-        </Link>
+        <Link href={`/collection/managed-attribute/view?id=${id}`}>{name}</Link>
       ),
       header: "Name",
       accessorKey: "name"
@@ -249,7 +247,7 @@ function ObjectStoreAttributeListView() {
           }
         }) => (
           <Link href={`/object-store/managed-attribute/view?id=${id}`}>
-            <a>{name}</a>
+            {name}
           </Link>
         ),
         header: "Name",
@@ -328,7 +326,7 @@ function TransactionAttributeListView() {
           }
         }) => (
           <Link href={`/loan-transaction/managed-attribute/view?id=${id}`}>
-            <a>{name}</a>
+            {name}
           </Link>
         ),
         header: "Name",
@@ -424,11 +422,7 @@ function SeqDBAttributeListView() {
         row: {
           original: { id, name }
         }
-      }) => (
-        <Link href={`/seqdb/managed-attribute/view?id=${id}`}>
-          <a>{name}</a>
-        </Link>
-      ),
+      }) => <Link href={`/seqdb/managed-attribute/view?id=${id}`}>{name}</Link>,
       header: "Name",
       accessorKey: "name"
     },

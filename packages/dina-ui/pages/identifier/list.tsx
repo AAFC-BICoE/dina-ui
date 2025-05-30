@@ -85,7 +85,7 @@ function CreateNewSection({ href }: CreateButtonProps) {
   return (
     <Card bg="light" className="mb-4">
       <Card.Body className="ms-auto">
-        <Link href={href} passHref={true}>
+        <Link href={href} passHref={true} legacyBehavior>
           <Button variant="info" className="mx-1 my-1">
             <DinaMessage id="createNewLabel" />
           </Button>
@@ -104,7 +104,7 @@ function AgentIdentifiersListView() {
       {
         cell: ({ row: { original } }) => {
           return (
-            <Link href={`/identifier/view?id=${original.id}`}>
+            <Link href={`/identifier/view?id=${original.id}`} legacyBehavior>
               {original.name}
             </Link>
           );

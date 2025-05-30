@@ -18,7 +18,9 @@ const TABLE_COLUMNS: ColumnDefinition<Institution>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/collection/institution/view?id=${id}`}>{name || id}</Link>
+      <Link href={`/collection/institution/view?id=${id}`} legacyBehavior>
+        {name || id}
+      </Link>
     ),
     accessorKey: "name"
   },

@@ -1,5 +1,5 @@
 import PcrPrimerDetailsPage from "../../../../pages/seqdb/pcr-primer/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 import "@testing-library/jest-dom";
 
@@ -48,10 +48,7 @@ describe("PcrPrimer details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    // expect(wrapper.find(".spinner-border").exists()).toEqual(false);
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     // The primer's name should be rendered in a FieldView.
     expect(wrapper.getByText(/name/i)).toBeInTheDocument();

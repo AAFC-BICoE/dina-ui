@@ -17,7 +17,11 @@ const PROJECT_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
       row: {
         original: { id, name }
       }
-    }) => <Link href={`/collection/project/view?id=${id}`}>{name}</Link>,
+    }) => (
+      <Link href={`/collection/project/view?id=${id}`} legacyBehavior>
+        {name}
+      </Link>
+    ),
     accessorKey: "name"
   },
   "status",

@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { AutoSuggestTextField } from "../AutoSuggestTextField";
 import { DinaForm } from "../DinaForm";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 interface Person extends KitsuResource {
@@ -160,13 +160,16 @@ describe("AutoSuggestTextField", () => {
       wrapper.getByRole("textbox", { name: /example person name field/i }),
       { target: { value: "p" } }
     );
-    await new Promise(setImmediate);
 
     // Select the first option in the list.
+    await waitFor(() => {
+      expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
+    });
     fireEvent.click(wrapper.getByText(/person1\-json\-api/i));
-    await new Promise(setImmediate);
 
-    expect(suggestionSelectedMock).toBeCalledTimes(1);
+    await waitFor(() => {
+      expect(suggestionSelectedMock).toBeCalledTimes(1);
+    });
     expect(suggestionSelectedMock.mock.calls[0][0]).toEqual("person1-json-api");
   });
 
@@ -198,19 +201,22 @@ describe("AutoSuggestTextField", () => {
       wrapper.getByRole("textbox", { name: /example person name field/i }),
       { target: { value: "p" } }
     );
-    await new Promise(setImmediate);
 
-    expect(mockGet).lastCalledWith("agent-api/person", {
-      filter: { rsql: "name==*p*" },
-      sort: "-createdOn"
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("agent-api/person", {
+        filter: { rsql: "name==*p*" },
+        sort: "-createdOn"
+      });
     });
 
     expect(mockGet).toHaveBeenCalledTimes(1);
 
     // Verify all the suggestions are shown...
-    expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/person2\-json\-api/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/person3\-json\-api/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/person2\-json\-api/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/person3\-json\-api/i)).toBeInTheDocument();
+    });
 
     // Test to ensure number of API calls does is not excessive.
     fireEvent.focus(
@@ -220,9 +226,9 @@ describe("AutoSuggestTextField", () => {
       wrapper.getByRole("textbox", { name: /example person name field/i }),
       { target: { value: "pe" } }
     );
-    await new Promise(setImmediate);
-
-    expect(mockGet).toHaveBeenCalledTimes(2);
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledTimes(2);
+    });
 
     // Try an empty search, since blankSearchProvider is not supplied it should not do any requests.
     fireEvent.focus(
@@ -232,7 +238,7 @@ describe("AutoSuggestTextField", () => {
       wrapper.getByRole("textbox", { name: /example person name field/i }),
       { target: { value: "" } }
     );
-    await new Promise(setImmediate);
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     expect(mockGet).toHaveBeenCalledTimes(2);
   });
@@ -260,12 +266,19 @@ describe("AutoSuggestTextField", () => {
       wrapper.getByRole("textbox", { name: /example person name field/i }),
       { target: { value: "p" } }
     );
-    await new Promise(setImmediate);
 
     // Expected suggestions to appear.
-    expect(wrapper.getByText(/person1\-elastic\-search/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/person2\-elastic\-search/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/person3\-elastic\-search/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/person1\-elastic\-search/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByText(/person2\-elastic\-search/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByText(/person3\-elastic\-search/i)
+      ).toBeInTheDocument();
+    });
 
     // Take a snapshot of the suggestion popup being displayed in the UI.
     expect(wrapper.asFragment()).toMatchSnapshot();
@@ -304,9 +317,10 @@ describe("AutoSuggestTextField", () => {
       wrapper.getByRole("textbox", { name: /example person name field/i }),
       { target: { value: "pe" } }
     );
-    await new Promise(setImmediate);
 
-    expect(mockGetAxios).toHaveBeenCalledTimes(2);
+    await waitFor(() => {
+      expect(mockGetAxios).toHaveBeenCalledTimes(2);
+    });
 
     // Try an empty search, since blankSearchProvider is not supplied it should not do any requests.
     fireEvent.focus(
@@ -316,8 +330,7 @@ describe("AutoSuggestTextField", () => {
       wrapper.getByRole("textbox", { name: /example person name field/i }),
       { target: { value: "" } }
     );
-    await new Promise(setImmediate);
-
+    await new Promise((resolve) => setTimeout(resolve, 50));
     expect(mockGetAxios).toHaveBeenCalledTimes(2);
   });
 
@@ -344,12 +357,13 @@ describe("AutoSuggestTextField", () => {
       wrapper.getByRole("textbox", { name: /example person name field/i }),
       { target: { value: "3" } }
     );
-    await new Promise(setImmediate);
 
     // Expected suggestions to appear.
-    expect(wrapper.getByText(/suggestion\-1/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/suggestion\-2/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/suggestion\-3/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/suggestion\-1/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/suggestion\-2/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/suggestion\-3/i)).toBeInTheDocument();
+    });
 
     expect(mockGetAll).toHaveBeenCalledTimes(0);
   });
@@ -387,17 +401,20 @@ describe("AutoSuggestTextField", () => {
       wrapper.getByRole("textbox", { name: /example person name field/i }),
       { target: { value: "p" } }
     );
-    await new Promise(setImmediate);
 
-    expect(mockGetAll).lastCalledWith("agent-api/person", {
-      filter: { rsql: "name==*p*" },
-      sort: "-createdOn"
+    await waitFor(() => {
+      expect(mockGetAll).lastCalledWith("agent-api/person", {
+        filter: { rsql: "name==*p*" },
+        sort: "-createdOn"
+      });
     });
 
     // Verify all the suggestions are shown...
-    expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/person2\-json\-api/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/person3\-json\-api/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/person2\-json\-api/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/person3\-json\-api/i)).toBeInTheDocument();
+    });
 
     // Should not have any calls to elastic search.
     expect(mockGetAll.mock.calls).toEqual([
@@ -445,11 +462,12 @@ describe("AutoSuggestTextField", () => {
         wrapper.getByRole("textbox", { name: /example person name field/i }),
         { target: { value: "p" } }
       );
-      await new Promise(setImmediate);
 
       // JSON API should be tried first but fails.
-      expect(mockGetFailure).toHaveBeenCalledTimes(1);
-      expect(mockGetAxios).toHaveBeenCalledTimes(1);
+      await waitFor(() => {
+        expect(mockGetFailure).toHaveBeenCalledTimes(1);
+        expect(mockGetAxios).toHaveBeenCalledTimes(1);
+      });
 
       expect(
         wrapper.queryByText(/person1\-elastic\-search/i)
@@ -468,12 +486,13 @@ describe("AutoSuggestTextField", () => {
         wrapper.getByRole("textbox", { name: /example person name field/i }),
         { target: { value: "pe" } }
       );
-      await new Promise(setImmediate);
 
       // JSON API should not be called again at this point. Already failed and should have switched to
       // elastic search.
-      expect(mockGetFailure).toHaveBeenCalledTimes(1);
-      expect(mockGetAxios).toHaveBeenCalledTimes(2);
+      await waitFor(() => {
+        expect(mockGetFailure).toHaveBeenCalledTimes(1);
+        expect(mockGetAxios).toHaveBeenCalledTimes(2);
+      });
     });
 
     it("Elastic-search is preferred, but fails, JSON-API should be used instead.", async () => {
@@ -509,16 +528,16 @@ describe("AutoSuggestTextField", () => {
         wrapper.getByRole("textbox", { name: /example person name field/i }),
         { target: { value: "p" } }
       );
-      await new Promise(setImmediate);
-      await new Promise(setImmediate);
 
       // Elastic Search should be tried first, but fails.
-      expect(mockGetFailure).toHaveBeenCalledTimes(1);
-      expect(mockGet).toHaveBeenCalledTimes(1);
+      await waitFor(() => {
+        expect(mockGetFailure).toHaveBeenCalledTimes(1);
+        expect(mockGet).toHaveBeenCalledTimes(1);
 
-      expect(wrapper.queryByText(/person1\-json\-api/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/person2\-json\-api/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/person3\-json\-api/i)).toBeInTheDocument();
+        expect(wrapper.queryByText(/person1\-json\-api/i)).toBeInTheDocument();
+        expect(wrapper.queryByText(/person2\-json\-api/i)).toBeInTheDocument();
+        expect(wrapper.queryByText(/person3\-json\-api/i)).toBeInTheDocument();
+      });
 
       fireEvent.focus(
         wrapper.getByRole("textbox", { name: /example person name field/i })
@@ -527,12 +546,13 @@ describe("AutoSuggestTextField", () => {
         wrapper.getByRole("textbox", { name: /example person name field/i }),
         { target: { value: "pe" } }
       );
-      await new Promise(setImmediate);
 
       // JSON API should not be called again at this point. Already failed and should have switched to
       // json api.
-      expect(mockGetFailure).toHaveBeenCalledTimes(1);
-      expect(mockGet).toHaveBeenCalledTimes(2);
+      await waitFor(() => {
+        expect(mockGetFailure).toHaveBeenCalledTimes(1);
+        expect(mockGet).toHaveBeenCalledTimes(2);
+      });
     });
   });
 
@@ -589,12 +609,13 @@ describe("AutoSuggestTextField", () => {
       fireEvent.focus(
         wrapper.getByRole("textbox", { name: /example person name field/i })
       );
-      await new Promise(setImmediate);
 
       // Expected suggestions to appear.
-      expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
-      expect(wrapper.getByText(/person2\-json\-api/i)).toBeInTheDocument();
-      expect(wrapper.getByText(/person3\-json\-api/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/person2\-json\-api/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/person3\-json\-api/i)).toBeInTheDocument();
+      });
     });
   });
 });

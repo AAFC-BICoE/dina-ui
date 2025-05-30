@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { DinaForm } from "common-ui";
+import { DinaForm, waitForLoadingToDisappear } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitChildrenViewer } from "../StorageUnitChildrenViewer";
@@ -163,11 +163,7 @@ describe("StorageUnitChildrenViewer component", () => {
     );
 
     // The page should load initially with a loading spinner.
-    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
-
-    await new Promise(setImmediate);
-
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     // Test expected links that show storage units children
     expect(

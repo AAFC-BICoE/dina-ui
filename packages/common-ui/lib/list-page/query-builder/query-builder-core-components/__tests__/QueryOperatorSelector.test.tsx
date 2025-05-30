@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FieldItems } from "react-awesome-query-builder";
 import { QueryOperatorSelector } from "../QueryOperatorSelector";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const OPERATOR_OPTIONS: FieldItems = [
@@ -44,13 +44,14 @@ describe("QueryOperatorSelector component", () => {
     // Simulate opening up the menu.
     fireEvent.click(wrapper.getByText(/contains/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
 
     // 5 options should be rendered.
-    const options = wrapper.getAllByRole("option");
-    expect(options.length).toEqual(5);
-    options.forEach((option, index) => {
-      expect(option.textContent).toEqual(OPERATOR_OPTIONS[index].label);
+    await waitFor(() => {
+      const options = wrapper.getAllByRole("option");
+      expect(options.length).toEqual(5);
+      options.forEach((option, index) => {
+        expect(option.textContent).toEqual(OPERATOR_OPTIONS[index].label);
+      });
     });
   });
 
@@ -81,12 +82,16 @@ describe("QueryOperatorSelector component", () => {
     // Select a new option in the list.
     fireEvent.click(wrapper.getByText(/contains/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
-
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("option", { name: /not in/i })
+      ).toBeInTheDocument();
+    });
     fireEvent.click(wrapper.getByRole("option", { name: /not in/i }));
-    await new Promise(setImmediate);
 
     // Expect it to be changed to Not In.
-    expect(wrapper.getByText(OPERATOR_OPTIONS[2].label)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(OPERATOR_OPTIONS[2].label)).toBeInTheDocument();
+    });
   });
 });

@@ -2,7 +2,11 @@ import { DinaForm } from "../DinaForm";
 import { mountWithAppContext } from "common-ui";
 import { DataEntryField } from "../data-entry/DataEntryField";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
-import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  fireEvent,
+  waitFor,
+  waitForElementToBeRemoved
+} from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const blockOptions = {
@@ -130,22 +134,23 @@ describe("DataEntry", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.getByRole("group"));
-    await new Promise(setImmediate);
 
     // Formik should have the updated value.
-    expect(mockSubmit).lastCalledWith({
-      [name]: {
-        BLOCK_OPTION_1: {
-          rows: {
-            "extensionField-0": {
-              type: "TYPE_OPTION_1",
-              unit: "UNIT_OPTION_1",
-              value: "VALUE_1"
-            }
-          },
-          select: "BLOCK_OPTION_1"
+    await waitFor(() => {
+      expect(mockSubmit).lastCalledWith({
+        [name]: {
+          BLOCK_OPTION_1: {
+            rows: {
+              "extensionField-0": {
+                type: "TYPE_OPTION_1",
+                unit: "UNIT_OPTION_1",
+                value: "VALUE_1"
+              }
+            },
+            select: "BLOCK_OPTION_1"
+          }
         }
-      }
+      });
     });
 
     // Add another row:
@@ -178,28 +183,29 @@ describe("DataEntry", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.getByRole("group"));
-    await new Promise(setImmediate);
 
     // Formik should have the updated value.
-    expect(mockSubmit).lastCalledWith({
-      [name]: {
-        BLOCK_OPTION_1: {
-          rows: {
-            "extensionField-0": {
-              type: "TYPE_OPTION_1",
-              unit: "UNIT_OPTION_1",
-              value: "VALUE_1"
-            },
+    await waitFor(() => {
+      expect(mockSubmit).lastCalledWith({
+        [name]: {
+          BLOCK_OPTION_1: {
+            rows: {
+              "extensionField-0": {
+                type: "TYPE_OPTION_1",
+                unit: "UNIT_OPTION_1",
+                value: "VALUE_1"
+              },
 
-            "extensionField-1": {
-              type: "TYPE_OPTION_2",
-              unit: "UNIT_OPTION_2",
-              value: "VALUE_2"
-            }
-          },
-          select: "BLOCK_OPTION_1"
+              "extensionField-1": {
+                type: "TYPE_OPTION_2",
+                unit: "UNIT_OPTION_2",
+                value: "VALUE_2"
+              }
+            },
+            select: "BLOCK_OPTION_1"
+          }
         }
-      }
+      });
     });
 
     fireEvent.click(addSection);
@@ -232,38 +238,39 @@ describe("DataEntry", () => {
 
     // form submission
     fireEvent.submit(wrapper.getByRole("group"));
-    await new Promise(setImmediate);
 
     // Formik should have the updated value.
-    expect(mockSubmit).lastCalledWith({
-      [name]: {
-        BLOCK_OPTION_1: {
-          rows: {
-            "extensionField-0": {
-              type: "TYPE_OPTION_1",
-              unit: "UNIT_OPTION_1",
-              value: "VALUE_1"
-            },
+    await waitFor(() => {
+      expect(mockSubmit).lastCalledWith({
+        [name]: {
+          BLOCK_OPTION_1: {
+            rows: {
+              "extensionField-0": {
+                type: "TYPE_OPTION_1",
+                unit: "UNIT_OPTION_1",
+                value: "VALUE_1"
+              },
 
-            "extensionField-1": {
-              type: "TYPE_OPTION_2",
-              unit: "UNIT_OPTION_2",
-              value: "VALUE_2"
-            }
+              "extensionField-1": {
+                type: "TYPE_OPTION_2",
+                unit: "UNIT_OPTION_2",
+                value: "VALUE_2"
+              }
+            },
+            select: "BLOCK_OPTION_1"
           },
-          select: "BLOCK_OPTION_1"
-        },
-        BLOCK_OPTION_2: {
-          rows: {
-            "extensionField-0": {
-              type: "TYPE_OPTION_3",
-              unit: "UNIT_OPTION_3",
-              value: "VALUE_3"
-            }
-          },
-          select: "BLOCK_OPTION_2"
+          BLOCK_OPTION_2: {
+            rows: {
+              "extensionField-0": {
+                type: "TYPE_OPTION_3",
+                unit: "UNIT_OPTION_3",
+                value: "VALUE_3"
+              }
+            },
+            select: "BLOCK_OPTION_2"
+          }
         }
-      }
+      });
     });
   });
 });

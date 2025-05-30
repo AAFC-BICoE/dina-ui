@@ -126,11 +126,12 @@ export function generateColumnPath({
         const relationshipPresenceValues: RelationshipPresenceSearchStates =
           JSON.parse(dynamicFieldValue);
         return (
+          // In the future, other operators can be supported.
           indexMapping.dynamicField.type +
           "/" +
           relationshipPresenceValues.selectedRelationship +
           "/" +
-          "presence" // In the future, other operators can be supported.
+          "presence"
         );
 
       // Column Functions (functionId/functionName/params)

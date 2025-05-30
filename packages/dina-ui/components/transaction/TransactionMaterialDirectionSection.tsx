@@ -33,6 +33,7 @@ export function TransactionMaterialDirectionSection({
           <div className="card pill d-flex flex-row align-items-center mb-3 py-1 px-2 gap-1">
             <Link
               href={`/loan-transaction/transaction/view?id=${transactionData.id}`}
+              legacyBehavior
             >
               {transactionData.attributes.materialDirection ===
               MaterialDirection.OUT ? (
@@ -45,7 +46,7 @@ export function TransactionMaterialDirectionSection({
               <Link
                 href={`/loan-transaction/transaction/view?id=${transactionData.id}`}
               >
-                <a>{transactionData.attributes.transactionNumber}</a>
+                {transactionData.attributes.transactionNumber}
               </Link>
             )}
           </div>

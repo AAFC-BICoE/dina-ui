@@ -20,7 +20,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
   {
     name: (ms) => (
       <Link href={`/collection/material-sample/view?id=${ms.id}`}>
-        <a>{ms.materialSampleName}</a>
+        {ms.materialSampleName}
       </Link>
     ),
     customValueCells: {

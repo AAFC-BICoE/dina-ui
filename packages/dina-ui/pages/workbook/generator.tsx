@@ -220,10 +220,8 @@ export function WorkbookTemplateGenerator() {
         buttonBarContent={
           <>
             <div className="col-md-6 col-sm-12 mt-2">
-              <Link href={"/workbook/upload"}>
-                <a className={`back-button my-auto`}>
-                  <DinaMessage id={"backToUploadWorkbook"} />
-                </a>
+              <Link href={"/workbook/upload"} className={`back-button my-auto`}>
+                <DinaMessage id={"backToUploadWorkbook"} />
               </Link>
             </div>
             <div className="col-md-6 col-sm-12 d-flex">

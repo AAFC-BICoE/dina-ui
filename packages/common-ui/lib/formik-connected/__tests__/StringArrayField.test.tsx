@@ -1,4 +1,4 @@
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { FormikButton } from "../FormikButton";
@@ -29,11 +29,12 @@ describe("StringArrayField component", () => {
     });
 
     fireEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
 
-    expect(mockSubmit.mock.calls).toEqual([
-      [{ lines: ["line1", "line2", "line3", "line4"] }]
-    ]);
+    await waitFor(() => {
+      expect(mockSubmit.mock.calls).toEqual([
+        [{ lines: ["line1", "line2", "line3", "line4"] }]
+      ]);
+    });
   });
 
   it("Displays the right value when the form state changes.", async () => {
@@ -61,11 +62,12 @@ describe("StringArrayField component", () => {
     fireEvent.click(
       wrapper.getByRole("button", { name: /set new field value/i })
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    });
 
-    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
-
-    expect(mockSubmit.mock.calls).toEqual([[{ lines: ["new", "value"] }]]);
+    await waitFor(() => {
+      expect(mockSubmit.mock.calls).toEqual([[{ lines: ["new", "value"] }]]);
+    });
   });
 });

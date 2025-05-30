@@ -17,7 +17,7 @@ const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition<Organization>[] = [
         original: { id, names }
       }
     }) => (
-      <Link href={`/organization/view?id=${id}`}>
+      <Link href={`/organization/view?id=${id}`} legacyBehavior>
         {names.length === 2 ? (
           <a>
             {names[0].languageCode === "EN"
