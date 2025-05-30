@@ -137,7 +137,7 @@ export function AttachmentsEditor({
 
         return (
           <Link href={`/object-store/object/view?id=${metadata.id}`}>
-            <a>{(metadata as any)?.originalFilename ?? metadata.id}</a>
+            {(metadata as any)?.originalFilename ?? metadata.id}
           </Link>
         );
       }

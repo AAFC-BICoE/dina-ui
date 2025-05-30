@@ -219,13 +219,11 @@ export function RevisionsPage({
           href={`${detailsPageLink}/${
             isExternalResourceMetadata ? "external-resource-view" : "view"
           }?id=${id}`}
+          className="back-button my-auto me-auto mt-2"
         >
-          <a className="back-button my-auto me-auto mt-2">
-            <DinaMessage id="detailsPageLink" />
-          </a>
+          <DinaMessage id="detailsPageLink" />
         </Link>
       </ButtonBar>
-
       <main className="container-fluid">
         <h1 id="wb-cont">{pageTitle}</h1>
         <RevisionsPageLayout

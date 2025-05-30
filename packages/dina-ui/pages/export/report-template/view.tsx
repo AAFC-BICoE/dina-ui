@@ -8,10 +8,11 @@ import Link from "next/link";
 
 export default function ReportTemplateDetailsPage() {
   const backButton = (
-    <Link href={"/export/report-template/upload"}>
-      <a className="back-button my-auto me-auto">
-        <DinaMessage id={"backToUpload"} />
-      </a>
+    <Link
+      href={"/export/report-template/upload"}
+      className="back-button my-auto me-auto"
+    >
+      <DinaMessage id={"backToUpload"} />
     </Link>
   );
   return (

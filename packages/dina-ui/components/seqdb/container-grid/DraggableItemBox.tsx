@@ -84,6 +84,7 @@ export function DraggableItemBox<
             {batchItemSample.sampleId && !editMode ? (
               <Link
                 href={`/collection/material-sample/view?id=${batchItemSample.sampleId}`}
+                legacyBehavior
               >
                 {batchItemSample.sampleName}
               </Link>

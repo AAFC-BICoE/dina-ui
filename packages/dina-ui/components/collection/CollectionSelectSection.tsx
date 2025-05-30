@@ -98,10 +98,8 @@ export function CollectionSelectField({
                       <Link
                         href={"/collection/collection/view?id=" + value?.id}
                       >
-                        <a>
-                          {value?.name || value?.id}
-                          {value?.code ? ` (${value.code})` : ""}
-                        </a>
+                        {value?.name || value?.id}
+                        {value?.code ? ` (${value.code})` : ""}
                       </Link>
                     </div>
                   }

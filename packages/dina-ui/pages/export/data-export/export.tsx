@@ -362,16 +362,16 @@ export default function ExportPage<TData extends KitsuResource>() {
               ) : (
                 <Link
                   href={`/export/molecular-analysis-export/export?entityLink=${entityLink}`}
+                  className="btn btn-primary ms-auto"
                 >
-                  <a className="btn btn-primary ms-auto">
-                    <DinaMessage id="molecularAnalysisExport" />
-                  </a>
+                  <DinaMessage id="molecularAnalysisExport" />
                 </Link>
               )}
-              <Link href={`/export/data-export/list?entityLink=${entityLink}`}>
-                <a className="btn btn-primary ms-2">
-                  <DinaMessage id="viewExportHistoryButton" />
-                </a>
+              <Link
+                href={`/export/data-export/list?entityLink=${entityLink}`}
+                className="btn btn-primary ms-2"
+              >
+                <DinaMessage id="viewExportHistoryButton" />
               </Link>
             </div>
           </>

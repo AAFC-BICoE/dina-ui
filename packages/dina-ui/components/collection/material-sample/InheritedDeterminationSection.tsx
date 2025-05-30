@@ -32,7 +32,7 @@ export default function InheritedDeterminationSection({
     <Link
       href={`/collection/material-sample/view?id=${parentWithDetermination?.uuid}`}
     >
-      <a>{parentWithDetermination?.name}</a>
+      {parentWithDetermination?.name}
     </Link>
   );
   return (

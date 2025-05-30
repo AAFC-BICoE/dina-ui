@@ -85,7 +85,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   const collectingEventParentLink = (
     <Link href={`/collection/material-sample/view?id=${highestParentId}`}>
-      <a>{highestParentMaterialSample}</a>
+      {highestParentMaterialSample}
     </Link>
   );
 
@@ -186,10 +186,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 className="me-0"
               />
               <GenerateLabelDropdownButton resource={materialSample} />
-              <Link href={`/collection/material-sample/revisions?id=${id}`}>
-                <a className="btn btn-info me-3">
-                  <DinaMessage id="revisionsButtonText" />
-                </a>
+              <Link
+                href={`/collection/material-sample/revisions?id=${id}`}
+                className="btn btn-info me-3"
+              >
+                <DinaMessage id="revisionsButtonText" />
               </Link>
               <DeleteButton
                 id={id}
@@ -346,9 +347,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                           <Link
                             href={`/collection/collecting-event/view?id=${colEvent.id}`}
                           >
-                            <a>
-                              <DinaMessage id="detailsPageLink" />
-                            </a>
+                            <DinaMessage id="detailsPageLink" />
                           </Link>
                         </div>
                       );

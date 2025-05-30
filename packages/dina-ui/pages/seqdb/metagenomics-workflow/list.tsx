@@ -24,7 +24,10 @@ const TABLE_COLUMNS: ColumnDefinition<MetagenomicsBatch>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/seqdb/metagenomics-workflow/run?pcrBatchId=${id}`}>
+      <Link
+        href={`/seqdb/metagenomics-workflow/run?pcrBatchId=${id}`}
+        legacyBehavior
+      >
         {name || id}
       </Link>
     ),
@@ -57,10 +60,11 @@ export default function MetagenomicsWorkflowListPage() {
       <Nav marginBottom={false} />
       <ButtonBar>
         <div className="flex d-flex">
-          <Link href={`/seqdb/metagenomics-workflow/run`}>
-            <a className="btn btn-primary ms-auto">
-              <SeqdbMessage id="startNewWorkflow" />
-            </a>
+          <Link
+            href={`/seqdb/metagenomics-workflow/run`}
+            className="btn btn-primary ms-auto"
+          >
+            <SeqdbMessage id="startNewWorkflow" />
           </Link>
         </div>
       </ButtonBar>

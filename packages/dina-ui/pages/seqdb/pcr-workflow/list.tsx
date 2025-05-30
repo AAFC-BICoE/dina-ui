@@ -23,7 +23,7 @@ const TABLE_COLUMNS: ColumnDefinition<PcrBatch>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/seqdb/pcr-workflow/run?pcrBatchId=${id}`}>
+      <Link href={`/seqdb/pcr-workflow/run?pcrBatchId=${id}`} legacyBehavior>
         {name || id}
       </Link>
     ),
@@ -57,10 +57,11 @@ export default function PCRWorkflowListPage() {
       <Nav marginBottom={false} />
       <ButtonBar>
         <div className="flex d-flex">
-          <Link href={`/seqdb/pcr-workflow/run`}>
-            <a className="btn btn-primary ms-auto">
-              <SeqdbMessage id="startNewWorkflow" />
-            </a>
+          <Link
+            href={`/seqdb/pcr-workflow/run`}
+            className="btn btn-primary ms-auto"
+          >
+            <SeqdbMessage id="startNewWorkflow" />
           </Link>
         </div>
       </ButtonBar>
