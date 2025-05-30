@@ -1,10 +1,24 @@
-import { FormikButton, LoadingSpinner, useThrottledFetch } from "common-ui";
+import React, { useEffect } from "react";
+import {
+  FormikButton,
+  LoadingSpinner,
+  useThrottledFetch,
+  useInstanceContext,
+  Tooltip
+} from "common-ui";
 import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
 import moment from "moment";
 import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { GlobalNamesSearchResult } from "./global-names-search-result-type";
+import {
+  GlobalNamesSearchResult,
+  GlobalNamesDatasetsResult
+} from "./global-names-search-result-type";
+import Select from "react-select";
+import { useLocalStorage } from "@rehooks/local-storage";
+import { FaExclamationCircle } from "react-icons/fa";
+import { ListGroup } from "react-bootstrap";
 
 export type Selection =
   | string
@@ -36,6 +50,11 @@ export interface GlobalNamesSearchBoxProps {
   dateSupplier?: () => string;
 }
 
+export interface Option {
+  label: string;
+  value: number;
+}
+
 export function GlobalNamesSearchBox({
   fetchJson,
   onSelect,
@@ -48,6 +67,99 @@ export function GlobalNamesSearchBox({
   dateSupplier = () => moment().format("YYYY-MM-DD") // Today
 }: GlobalNamesSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
+  const instanceContext = useInstanceContext();
+  const scientificNamesSearchEndpoint: string =
+    instanceContext?.scientificNamesSearchEndpoint ??
+    "https://verifier.globalnames.org/api/v1/verifications/";
+  const scientificNamesDatasetsEndpoint: string =
+    instanceContext?.scientificNamesDatasetsEndpoint ??
+    "https://verifier.globalnames.org/api/v1/data_sources";
+
+  const [datasetOptions, datassetDatasetOptionsetOptions] = useLocalStorage<
+    Option[]
+  >("scientificNameDatasets", []);
+  const [lastUpdated, setLastUpdated] = useLocalStorage<number>(
+    "scientificNameDatasetsLastUpdated"
+  );
+  const datasetsCacheDuration = 86_400_000; // 24 hours in milliseconds
+  const [selectedDatasets, setSelectedDatasets] = useLocalStorage<Option[]>(
+    "scientificNameSelectedNameDatasets"
+  );
+
+  // the default value for selectedDatasets will be set below
+  useEffect(() => {
+    let isCancelled = false; // prevent setting state if unmounted
+
+    const fetchNameDatasets = async () => {
+      try {
+        const nameDatasetsResponse = await globalNamesSourcesQuery<
+          GlobalNamesDatasetsResult[]
+        >({
+          url: `${scientificNamesDatasetsEndpoint}`,
+          fetchJson
+        });
+        if (!isCancelled && nameDatasetsResponse) {
+          const selectOptions = nameDatasetsResponse.map((name) => {
+            return {
+              value: name.id,
+              label:
+                name.titleShort && name.titleShort.trim() !== ""
+                  ? name.titleShort
+                  : name.title,
+              taxonData: name.hasTaxonData
+            };
+          });
+          datassetDatasetOptionsetOptions(selectOptions);
+          setLastUpdated(Date.now());
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          console.error("Fetch error:", error);
+        }
+      }
+    };
+
+    if (
+      datasetOptions.length === 0 ||
+      !lastUpdated ||
+      Date.now() - lastUpdated > datasetsCacheDuration
+    ) {
+      fetchNameDatasets();
+    }
+
+    return () => {
+      isCancelled = true; // cleanup if component unmounts
+    };
+  }, []);
+
+  const CustomDataSourceOption = (props) => {
+    const { data, innerRef, innerProps } = props;
+
+    return (
+      <div
+        ref={innerRef}
+        {...innerProps}
+        className="d-flex align-items-center p-2 dropdown-item"
+        style={{ cursor: "pointer" }}
+      >
+        <span
+          className="flex-fill text-truncate"
+          style={{ marginRight: "8px" }}
+        >
+          {data.label}
+        </span>
+        {!data.taxonData && (
+          <Tooltip
+            id={"dataSourceHasNoTaxonData"}
+            placement="left"
+            disableSpanMargin={true}
+            className="flex-shrink-0"
+            visibleElement={<FaExclamationCircle className="text-warning" />}
+          />
+        )}
+      </div>
+    );
+  };
 
   const {
     searchIsLoading,
@@ -60,18 +172,25 @@ export function GlobalNamesSearchBox({
     fetcher: (searchValue) => {
       searchValue = searchValue.replace(/\s+/g, " ").trim();
       return globalNamesQuery<GlobalNamesSearchResult[]>({
-        url: `https://verifier.globalnames.org/api/v1/verifications/${
+        url: `${scientificNamesSearchEndpoint}${
           searchValue[0].toUpperCase() + searchValue.substring(1)
         }`,
         params: {
-          capitalize: "false"
+          capitalize: "false",
+          ...(selectedDatasets && selectedDatasets?.length !== 0
+            ? {
+                data_sources: selectedDatasets.map((ds) => ds.value).join("|")
+              }
+            : {}),
+          all_matches: true
         },
         searchValue,
         fetchJson
       });
     },
     timeoutMs: 1000,
-    initSearchValue
+    initSearchValue,
+    dependencies: [selectedDatasets]
   });
 
   const onInputChange = (value) => {
@@ -89,29 +208,49 @@ export function GlobalNamesSearchBox({
       <div className="d-flex align-items-center">
         <div className="flex-grow-1">
           {isDetermination ? (
-            <div className="input-group">
-              <input
-                aria-label={formatMessage("globalNameSearchLabel")}
-                className="form-control global-name-input"
-                onChange={(e) => onInputChange(e.target.value)}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(e) => {
-                  if (e.keyCode === 13) {
-                    e.preventDefault();
-                    doThrottledSearch(inputValue);
-                  }
-                }}
-                value={inputValue}
-              />
-              <button
-                style={{ width: "10rem" }}
-                onClick={doThrottledSearch}
-                className="btn btn-primary global-name-search-button"
-                type="button"
-                disabled={searchIsDisabled}
-              >
-                <DinaMessage id="searchButton" />
-              </button>
+            <div>
+              <div className="input-group">
+                <input
+                  aria-label={formatMessage("globalNameSearchLabel")}
+                  className="form-control global-name-input"
+                  onChange={(e) => onInputChange(e.target.value)}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(e) => {
+                    if (e.keyCode === 13) {
+                      e.preventDefault();
+                      doThrottledSearch(inputValue);
+                    }
+                  }}
+                  value={inputValue}
+                />
+                <button
+                  style={{ width: "10rem" }}
+                  onClick={doThrottledSearch}
+                  className="btn btn-primary global-name-search-button"
+                  type="button"
+                  disabled={searchIsDisabled}
+                >
+                  <DinaMessage id="searchButton" />
+                </button>
+              </div>
+              {datasetOptions && (
+                <div className="d-flex align-items-center justify-content-end mb-2">
+                  <Select
+                    isMulti
+                    name="globalNameSources"
+                    options={datasetOptions}
+                    value={selectedDatasets}
+                    onChange={(newValue) => {
+                      setSelectedDatasets(Array.from(newValue));
+                    }}
+                    placeholder={formatMessage("globalNameSources")}
+                    className="flex-fill mt-2"
+                    components={{
+                      Option: CustomDataSourceOption
+                    }}
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <div>
@@ -184,86 +323,119 @@ export function GlobalNamesSearchBox({
         </Field>
       )}
       {searchIsLoading && <LoadingSpinner loading={true} />}
-      {!!searchResult && (
-        <div className="list-group mt-3">
+      {searchResult?.names?.[0]?.results?.length > 0 && (
+        <ListGroup style={{ maxHeight: "30rem", overflowY: "auto" }}>
           {searchResult.names
             ?.filter((result) => result.matchType !== "NoMatch")
-            ?.map((result, idx) => {
-              const link = document.createElement("a");
-              link.setAttribute("href", result.bestResult?.outlink);
+            ?.map((name) => {
+              return name.results.map((result, idx) => {
+                const link = document.createElement("a");
+                link.setAttribute("href", result.outlink);
 
-              const paths = result?.bestResult?.classificationPath?.split("|");
-              const ranks = result?.bestResult?.classificationRanks?.split("|");
+                const paths = result?.classificationPath?.split("|");
+                const ranks = result?.classificationRanks?.split("|");
 
-              const familyIdx = ranks?.findIndex((path) => path === "family");
-              const familyRank =
-                familyIdx >= 0 ? paths[familyIdx] + ": " : undefined;
+                const familyIdx = ranks?.findIndex((path) => path === "family");
+                const familyRank =
+                  familyIdx >= 0 ? paths[familyIdx] + ": " : undefined;
 
-              let displayText = result.bestResult?.matchedName;
-              inputValue
-                .split(" ")
-                .filter((val) => !!val?.length)
-                .map(
-                  (val) =>
-                    (displayText = displayText.replace(val, `<b>${val}</b>`))
+                let displayText = result?.matchedName;
+                inputValue
+                  .split(" ")
+                  .filter((val) => !!val?.length)
+                  .map(
+                    (val) =>
+                      (displayText = displayText.replace(val, `<b>${val}</b>`))
+                  );
+
+                link.innerHTML = familyRank
+                  ? familyRank + displayText
+                  : displayText;
+
+                // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
+                const safeHtmlLink: string = DOMPurify.sanitize(
+                  link.outerHTML,
+                  {
+                    ADD_ATTR: ["target", "rel"]
+                  }
                 );
 
-              link.innerHTML = familyRank
-                ? familyRank + displayText
-                : displayText;
+                const detail: ScientificNameSourceDetails = {};
+                detail.labelHtml = link.innerHTML ?? "";
+                detail.sourceUrl = link.href.replace("undefined", "list");
+                detail.recordedOn = dateSupplier();
+                detail.classificationPath = result?.classificationPath;
+                detail.classificationRanks = result?.classificationRanks;
+                detail.isSynonym = result.isSynonym;
+                detail.currentName = result.currentName;
 
-              // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
-              const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
-                ADD_ATTR: ["target", "rel"]
-              });
+                // Use detail to populate source details fields, result.label to populate the searchbox bound field
+                const resultArray = [detail, result?.matchedName];
 
-              const detail: ScientificNameSourceDetails = {};
-              detail.labelHtml = link.innerHTML ?? "";
-              detail.sourceUrl = link.href.replace("undefined", "list");
-              detail.recordedOn = dateSupplier();
-              detail.classificationPath = result.bestResult?.classificationPath;
-              detail.classificationRanks =
-                result.bestResult?.classificationRanks;
-              detail.isSynonym = result.bestResult.isSynonym;
-              detail.currentName = result.bestResult.currentName;
+                const getDataSourceHasNoTaxonData = (result) => {
+                  const currentDataSource = datasetOptions.find(
+                    (ds) => ds.value === result.dataSourceId
+                  );
+                  return currentDataSource
+                    ? (currentDataSource as any)?.taxonData === false
+                    : false;
+                };
 
-              // Use detail to populate source details fields, result.label to populate the searchbox bound field
-              const resultArray = [detail, result.bestResult?.matchedName];
-
-              return (
-                <div
-                  key={result.inputId ?? idx}
-                  className="list-group-item list-group-item-action d-flex"
-                >
-                  <div className="flex-grow-1 d-flex align-items-center gn-search-result-label">
-                    {result.bestResult.outlink ? (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: safeHtmlLink.replace(
-                            /<a /g,
-                            '<a target="_blank" rel="noopener noreferrer" '
-                          )
-                        }}
-                      />
-                    ) : (
-                      <span>{detail.currentName}</span>
-                    )}
-                  </div>
-
-                  <FormikButton
-                    className="btn btn-primary global-name-select-button"
-                    buttonProps={() => ({ style: { width: "8rem" } })}
-                    onClick={() => onSelect?.(resultArray)}
+                return (
+                  <ListGroup.Item
+                    key={result.inputId ?? idx}
+                    className="d-flex"
                   >
-                    <DinaMessage id="select" />
-                  </FormikButton>
-                </div>
-              );
+                    <div>
+                      <div className="row flex-grow-1 gn-search-result-label">
+                        {result.outlink ? (
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: safeHtmlLink.replace(
+                                /<a /g,
+                                '<a target="_blank" rel="noopener noreferrer" '
+                              )
+                            }}
+                          />
+                        ) : (
+                          <span>
+                            {detail.currentName || result?.matchedName}
+                          </span>
+                        )}
+                      </div>
+                      <i>
+                        {result.dataSourceTitleShort}{" "}
+                        {getDataSourceHasNoTaxonData(result) && (
+                          <Tooltip
+                            id={"dataSourceHasNoTaxonData"}
+                            placement="left"
+                            disableSpanMargin={true}
+                            className="flex-shrink-0"
+                            visibleElement={
+                              <FaExclamationCircle className="text-warning" />
+                            }
+                          />
+                        )}
+                      </i>
+                    </div>
+
+                    <FormikButton
+                      className="btn btn-primary global-name-select-button ms-auto"
+                      buttonProps={() => ({
+                        style: { minWidth: "5em", maxHeight: "3em" }
+                      })}
+                      onClick={() => onSelect?.(resultArray)}
+                    >
+                      <DinaMessage id="select" />
+                    </FormikButton>
+                  </ListGroup.Item>
+                );
+              });
             })}
-        </div>
+        </ListGroup>
       )}
-      {searchResult?.length === 1 &&
-        searchResult[0].matchType === "NoMatch" && (
+      {searchResult?.names?.length === 1 &&
+        searchResult?.names[0].matchType === "NoMatch" && (
           <p>
             <DinaMessage id="noResultsFound" />
           </p>
@@ -291,6 +463,30 @@ export async function globalNamesQuery<T>({
   const urlObject = new URL(url);
   urlObject.search = new URLSearchParams(params).toString();
 
+  try {
+    const response = await fetchJson(urlObject.toString());
+
+    if (response.error) {
+      throw new Error(String(response.error));
+    }
+
+    // Search API returns an array ; Reverse API returns a single place:
+    return response as T;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export interface GlobalNamesSourcesQueryParams {
+  url: string;
+  fetchJson?: (url: string) => Promise<any>;
+}
+export async function globalNamesSourcesQuery<T>({
+  url,
+  fetchJson = (urlArg) => window.fetch(urlArg).then((res) => res.json())
+}: GlobalNamesSourcesQueryParams): Promise<T | null> {
+  const urlObject = new URL(url);
   try {
     const response = await fetchJson(urlObject.toString());
 

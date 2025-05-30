@@ -11,7 +11,12 @@ const mockOnChange = jest.fn((val, form) =>
 );
 
 const mockFetchJson = jest.fn(async () => {
-  return { names: TEST_GLOBAL_NAME_SEARCH_RESULT };
+  return {
+    names: TEST_GLOBAL_NAME_SEARCH_RESULT.map((result) => ({
+      ...result,
+      results: [result.bestResult]
+    }))
+  };
 });
 
 const mockOnSubmit = jest.fn();
@@ -82,7 +87,7 @@ describe("GlobalNamesField component", () => {
     ]);
 
     expect(mockFetchJson).lastCalledWith(
-      "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false"
+      "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false&all_matches=true"
     );
 
     // Submit the form

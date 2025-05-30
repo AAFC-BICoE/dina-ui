@@ -353,7 +353,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       wrapper.getByTestId("qualityControl-name-0"),
       "Quality Control Test Name 1"
     );
-    userEvent.click(wrapper.getAllByRole("combobox")[0]);
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
@@ -383,7 +383,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       wrapper.getByTestId("qualityControl-name-1"),
       "Quality Control Test Name 2"
     );
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(wrapper.getAllByRole("combobox")[2]);
     userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
@@ -690,7 +690,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     // Add new Quality Control
     userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
     userEvent.type(wrapper.getAllByRole("textbox")[5], "New Quality Control");
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(wrapper.getAllByRole("combobox")[2]);
     userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
@@ -1212,7 +1212,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       wrapper.getByTestId("qualityControl-name-0"),
       "both-provided"
     );
-    userEvent.click(wrapper.getAllByRole("combobox")[0]);
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
@@ -1221,7 +1221,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.type(wrapper.getByTestId("qualityControl-name-1"), "name-only");
 
     // Quality Control 3 - Type only provided.
-    userEvent.click(wrapper.getAllByRole("combobox")[2]);
+    userEvent.click(wrapper.getAllByRole("combobox")[3]);
     userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
@@ -1235,8 +1235,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       "Please ensure all quality controls have both a name and type."
     );
 
-    // Only 3 should exist, since 4 were created and one was blank and automatically removed.
-    expect(wrapper.getAllByRole("combobox").length).toBe(3);
+    expect(wrapper.getAllByRole("combobox").length).toBe(4);
   });
 
   it("Automatically switch to edit mode and be able to cancel", async () => {
