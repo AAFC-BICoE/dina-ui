@@ -17,6 +17,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { SWRConfig } from "swr";
 import { PartialDeep } from "type-fest";
+import { screen, waitFor } from "@testing-library/react";
 
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
@@ -120,6 +121,26 @@ export function MockAppContextProvider({
       </AccountProvider>
     </SWRConfig>
   );
+}
+
+/**
+ * Waits for a loading indicator to disappear from the screen.
+ *
+ * @param loadingTextRegex A regex to match the loading text that should be present initially.
+ */
+export async function waitForLoadingToDisappear(
+  loadingTextRegex = /loading\.\.\./i
+) {
+  // Check if it's initially present.
+  if (screen.queryByText(loadingTextRegex)) {
+    expect(screen.getByText(loadingTextRegex)).toBeInTheDocument();
+  }
+
+  // Wait for the loading text to disappear.
+  // This is useful for components that show a loading state initially.
+  await waitFor(() => {
+    expect(screen.queryByText(loadingTextRegex)).not.toBeInTheDocument();
+  });
 }
 
 /**

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { mountWithAppContext } from "common-ui";
 import { ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
+import { waitFor } from "@testing-library/react";
 
 const INDEX_NAME = "dina-material-sample-index";
 
@@ -215,9 +216,9 @@ describe("Use Index Mapping Hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
-
-    expect(mockIndexMapRetrieved).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(mockIndexMapRetrieved).toHaveBeenCalledTimes(1);
+    });
     expect(mockIndexMapRetrieved).toMatchSnapshot();
   });
 });

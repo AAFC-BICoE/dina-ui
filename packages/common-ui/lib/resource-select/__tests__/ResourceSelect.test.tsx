@@ -3,7 +3,7 @@ import { ResourceSelect, ResourceSelectProps } from "../..";
 import { mountWithAppContext } from "common-ui";
 import { AsyncOption } from "../ResourceSelect";
 import "@testing-library/jest-dom";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 
 /** Example */
 interface Todo extends KitsuResource {
@@ -76,11 +76,11 @@ describe("ResourceSelect component", () => {
     ).toBeInTheDocument();
 
     // Wait for the options to load.
-    await new Promise(setImmediate);
-
-    expect(
-      container.querySelector(".react-select__loading-indicator")
-    ).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        container.querySelector(".react-select__loading-indicator")
+      ).not.toBeInTheDocument();
+    });
   });
 
   it("Fetches a list of options from the back-end API.", async () => {
@@ -93,17 +93,18 @@ describe("ResourceSelect component", () => {
 
     fireEvent.click(wrapper.getByText(/type here to search\./i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
 
     // There should be 4 options including the <None> option.
-    const options = wrapper.getAllByRole("option");
-    expect(options.length).toEqual(4);
-    expect(options.map((option) => option.textContent)).toEqual([
-      "<None>",
-      "todo 1",
-      "todo 2",
-      "todo 3"
-    ]);
+    await waitFor(() => {
+      const options = wrapper.getAllByRole("option");
+      expect(options.length).toEqual(4);
+      expect(options.map((option) => option.textContent)).toEqual([
+        "<None>",
+        "todo 1",
+        "todo 2",
+        "todo 3"
+      ]);
+    });
   });
 
   it("Calls the 'onChange' prop with a resource value.", async () => {

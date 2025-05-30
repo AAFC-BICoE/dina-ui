@@ -2,7 +2,7 @@ import { IntlProvider } from "react-intl";
 import { DinaForm } from "../../formik-connected/DinaForm";
 import { mountWithAppContext } from "common-ui";
 import { FilterBuilderField } from "../FilterBuilderField";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 
 describe("FilterBuilderField component", () => {
   const mockSubmit = jest.fn();
@@ -49,33 +49,35 @@ describe("FilterBuilderField component", () => {
 
     // Submit the search...
     fireEvent.click(wrapper.getByRole("button", { name: /search/i }));
-    await new Promise(setImmediate);
 
     // Formik should have the initial value.
-    expect(mockSubmit).lastCalledWith(
-      expect.objectContaining({
-        filter: expect.objectContaining({ type: "FILTER_GROUP" })
-      })
-    );
+    await waitFor(() => {
+      expect(mockSubmit).lastCalledWith(
+        expect.objectContaining({
+          filter: expect.objectContaining({ type: "FILTER_GROUP" })
+        })
+      );
+    });
 
     // Change an input value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
       target: { value: "test value" }
     });
     fireEvent.click(wrapper.getByRole("button", { name: /search/i }));
-    await new Promise(setImmediate);
 
     // Formik should have the updated value.
-    expect(mockSubmit).lastCalledWith(
-      expect.objectContaining({
-        filter: expect.objectContaining({
-          children: [
-            expect.objectContaining({
-              value: "test value"
-            })
-          ]
+    await waitFor(() => {
+      expect(mockSubmit).lastCalledWith(
+        expect.objectContaining({
+          filter: expect.objectContaining({
+            children: [
+              expect.objectContaining({
+                value: "test value"
+              })
+            ]
+          })
         })
-      })
-    );
+      );
+    });
   });
 });
