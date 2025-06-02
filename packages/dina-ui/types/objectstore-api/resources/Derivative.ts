@@ -18,6 +18,7 @@ export interface DerivativeAttributes {
 export interface DerivativeRelationships {
   generatedFromDerivative?: Derivative | KitsuResource | null;
   acDerivedFrom?: Metadata | KitsuResource | null;
+  acTags?: string[];
 }
 
 export type Derivative = KitsuResource &
