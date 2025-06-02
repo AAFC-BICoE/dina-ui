@@ -1,6 +1,6 @@
 import { AssemblageForm } from "../../../../pages/collection/assemblage/edit";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -75,7 +75,7 @@ const apiContext = {
 
 const mockOnSaved = jest.fn();
 
-describe("AssemblageForm.", () => {
+describe("AssemblageForm", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new assemblage", async () => {
@@ -86,7 +86,11 @@ describe("AssemblageForm.", () => {
       }
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /assemblage name/i })
+      ).toBeInTheDocument();
+    });
 
     // Fill form with test values
     fireEvent.change(
@@ -127,50 +131,50 @@ describe("AssemblageForm.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected values
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            name: "test-assemblage",
-            relationships: {
-              attachment: {
-                data: []
-              }
-            },
-            multilingualDescription: {
-              descriptions: [
-                {
-                  desc: "test english description",
-                  lang: "en"
-                },
-                {
-                  desc: "test french description",
-                  lang: "fr"
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              name: "test-assemblage",
+              relationships: {
+                attachment: {
+                  data: []
                 }
-              ]
-            },
-            multilingualTitle: {
-              titles: [
-                {
-                  title: "test english title",
-                  lang: "en"
-                },
-                {
-                  title: "test french title",
-                  lang: "fr"
-                }
-              ]
+              },
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test english description",
+                    lang: "en"
+                  },
+                  {
+                    desc: "test french description",
+                    lang: "fr"
+                  }
+                ]
+              },
+              multilingualTitle: {
+                titles: [
+                  {
+                    title: "test english title",
+                    lang: "en"
+                  },
+                  {
+                    title: "test french title",
+                    lang: "fr"
+                  }
+                ]
+              },
+              type: "assemblage"
             },
             type: "assemblage"
-          },
-          type: "assemblage"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+    });
 
     expect(mockOnSaved).lastCalledWith({
       id: "123",
@@ -237,7 +241,11 @@ describe("AssemblageForm.", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /assemblage name/i })
+      ).toBeInTheDocument();
+    });
 
     // Edit form values
     fireEvent.change(
@@ -265,47 +273,47 @@ describe("AssemblageForm.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected values
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            id: "333",
-            multilingualDescription: {
-              descriptions: [
-                {
-                  desc: "test-eng-desc",
-                  lang: "en"
-                },
-                {
-                  desc: "test-fr-desc",
-                  lang: "fr"
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              id: "333",
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test-eng-desc",
+                    lang: "en"
+                  },
+                  {
+                    desc: "test-fr-desc",
+                    lang: "fr"
+                  }
+                ]
+              },
+              multilingualTitle: {
+                titles: [
+                  {
+                    title: "test-eng-title-updated",
+                    lang: "en"
+                  }
+                ]
+              },
+              name: "edited-name",
+              relationships: {
+                attachment: {
+                  data: []
                 }
-              ]
-            },
-            multilingualTitle: {
-              titles: [
-                {
-                  title: "test-eng-title-updated",
-                  lang: "en"
-                }
-              ]
-            },
-            name: "edited-name",
-            relationships: {
-              attachment: {
-                data: []
-              }
+              },
+              type: "assemblage"
             },
             type: "assemblage"
-          },
-          type: "assemblage"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+    });
 
     expect(mockOnSaved).lastCalledWith({
       id: "333",

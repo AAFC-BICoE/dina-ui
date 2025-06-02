@@ -1,6 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import { StorageUnitTypeForm } from "../../../../pages/collection/storage-unit-type/edit";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockGet = jest.fn<any, any>(async (path) => {
@@ -34,7 +34,12 @@ describe("Storage Unit Type form.", () => {
       <StorageUnitTypeForm onSaved={mockOnSaved} />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument();
+    });
 
     // Change Name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -44,25 +49,25 @@ describe("Storage Unit Type form.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected result
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            name: "test-storage-type",
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              name: "test-storage-type",
+              type: "storage-unit-type"
+            },
             type: "storage-unit-type"
-          },
-          type: "storage-unit-type"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-    expect(mockOnSaved).lastCalledWith({
-      id: "123",
-      name: "test-storage-type",
-      type: "storage-unit-type"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+      expect(mockOnSaved).lastCalledWith({
+        id: "123",
+        name: "test-storage-type",
+        type: "storage-unit-type"
+      });
     });
   });
 
@@ -81,7 +86,11 @@ describe("Storage Unit Type form.", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument();
+    });
 
     // Change Name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -91,32 +100,32 @@ describe("Storage Unit Type form.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected result
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            id: "333",
-            group: "test-group",
-            name: "edited-name",
-            type: "storage-unit-type",
-            createdBy: "Mat",
-            createdOn: "2021-06-22"
-          },
-          type: "storage-unit-type"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-    expect(mockOnSaved).lastCalledWith({
-      id: "333",
-      group: "test-group",
-      name: "edited-name",
-      type: "storage-unit-type",
-      createdBy: "Mat",
-      createdOn: "2021-06-22"
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              id: "333",
+              group: "test-group",
+              name: "edited-name",
+              type: "storage-unit-type",
+              createdBy: "Mat",
+              createdOn: "2021-06-22"
+            },
+            type: "storage-unit-type"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+      expect(mockOnSaved).lastCalledWith({
+        id: "333",
+        group: "test-group",
+        name: "edited-name",
+        type: "storage-unit-type",
+        createdBy: "Mat",
+        createdOn: "2021-06-22"
+      });
     });
   });
 });
