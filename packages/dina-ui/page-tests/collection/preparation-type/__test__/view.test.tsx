@@ -1,5 +1,5 @@
 import PreparationTypeDetailsPage from "../../../../pages/collection/preparation-type/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
 import "@testing-library/jest-dom";
 
@@ -46,10 +46,7 @@ describe("PreparationType details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    // Test that the spinner does not render once page has loaded
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     // Test that Preparation Type Name field is populated with the proper output
     expect(

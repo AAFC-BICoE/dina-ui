@@ -2,7 +2,7 @@ import { OperationsResponse } from "common-ui";
 import { ProtocolForm } from "../../../../../dina-ui/components/collection/protocol/ProtocolForm";
 import ProtocolEditPage from "../../../../pages/collection/protocol/edit";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -241,34 +241,36 @@ describe("protocol edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API response
-    expect(mockPatch).lastCalledWith(
-      "/collection-api/operations",
-      [
-        {
-          op: "POST",
-          path: "protocol",
-          value: {
-            attributes: {
-              multilingualDescription: {
-                descriptions: [{ lang: "en", desc: "test english description" }]
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/operations",
+        [
+          {
+            op: "POST",
+            path: "protocol",
+            value: {
+              attributes: {
+                multilingualDescription: {
+                  descriptions: [
+                    { lang: "en", desc: "test english description" }
+                  ]
+                },
+                name: "updated Name"
               },
-              name: "updated Name"
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            relationships: {
-              attachments: {
-                data: []
-              }
-            },
-            type: "protocol"
+              id: "00000000-0000-0000-0000-000000000000",
+              relationships: {
+                attachments: {
+                  data: []
+                }
+              },
+              type: "protocol"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the new protocol's details page.
     expect(mockPush).lastCalledWith("/collection/protocol/view?id=1");
@@ -291,12 +293,12 @@ describe("protocol edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
-
     // Test English Description field default value
-    expect(
-      wrapper.getByRole("textbox", { name: /english description/i })
-    ).toHaveDisplayValue("test english description");
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /english description/i })
+      ).toHaveDisplayValue("test english description");
+    });
 
     // Change French Description field value
     fireEvent.change(
@@ -311,43 +313,43 @@ describe("protocol edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API response
-    expect(mockPatch).lastCalledWith(
-      "/collection-api/operations",
-      [
-        {
-          op: "POST",
-          path: "protocol",
-          value: {
-            attributes: {
-              multilingualDescription: {
-                descriptions: [
-                  {
-                    desc: "test english description",
-                    lang: "en"
-                  },
-                  {
-                    desc: "test french description",
-                    lang: "fr"
-                  }
-                ]
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/operations",
+        [
+          {
+            op: "POST",
+            path: "protocol",
+            value: {
+              attributes: {
+                multilingualDescription: {
+                  descriptions: [
+                    {
+                      desc: "test english description",
+                      lang: "en"
+                    },
+                    {
+                      desc: "test french description",
+                      lang: "fr"
+                    }
+                  ]
+                },
+                name: "test-protocol"
               },
-              name: "test-protocol"
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            relationships: {
-              attachments: {
-                data: []
-              }
-            },
-            type: "protocol"
+              id: "00000000-0000-0000-0000-000000000000",
+              relationships: {
+                attachments: {
+                  data: []
+                }
+              },
+              type: "protocol"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
   });
 
   it("Renders an error after form submit without specifying mandatory field.", async () => {
@@ -376,15 +378,12 @@ describe("protocol edit page", () => {
     // wrapper.find("form").simulate("submit");
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected error
-    // expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-    //   "Constraint violation: Name is mandatory"
-    // );
-    expect(
-      wrapper.getByText(/constraint violation: name is mandatory/i)
-    ).toBeInTheDocument();
-    expect(mockPush).toBeCalledTimes(0);
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/constraint violation: name is mandatory/i)
+      ).toBeInTheDocument();
+      expect(mockPush).toBeCalledTimes(0);
+    });
   });
 });

@@ -4,7 +4,7 @@ import OrganizationEditPage, {
 } from "../../../pages/organization/edit";
 import { mountWithAppContext } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -91,30 +91,31 @@ describe("organization edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
-    await new Promise(setImmediate);
 
-    expect(mockPatch).lastCalledWith(
-      "/agent-api/operations",
-      [
-        {
-          op: "POST",
-          path: "organization",
-          value: {
-            attributes: {
-              names: [
-                {
-                  languageCode: "EN",
-                  name: "test org new"
-                }
-              ]
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "organization"
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/agent-api/operations",
+        [
+          {
+            op: "POST",
+            path: "organization",
+            value: {
+              attributes: {
+                names: [
+                  {
+                    languageCode: "EN",
+                    name: "test org new"
+                  }
+                ]
+              },
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "organization"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the new organization's details page.
     expect(mockPush).lastCalledWith("/organization/list");
@@ -141,12 +142,12 @@ describe("organization edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
-    await new Promise(setImmediate);
-
-    // Check that the existing aliases value is in the field.
-    expect(
-      wrapper.getByRole("textbox", { name: /aliases/i })
-    ).toHaveDisplayValue("DEW,ACE");
+    await waitFor(() => {
+      // Check that the existing aliases value is in the field.
+      expect(
+        wrapper.getByRole("textbox", { name: /aliases/i })
+      ).toHaveDisplayValue("DEW,ACE");
+    });
 
     // Modify the aliases value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /aliases/i }), {
@@ -159,27 +160,27 @@ describe("organization edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
-      "/agent-api/operations",
-      [
-        {
-          op: "PATCH",
-          path: "organization/1",
-          value: {
-            attributes: expect.objectContaining({
-              aliases: ["DEW"]
-            }),
-            id: "1",
-            type: "organization"
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/agent-api/operations",
+        [
+          {
+            op: "PATCH",
+            path: "organization/1",
+            value: {
+              attributes: expect.objectContaining({
+                aliases: ["DEW"]
+              }),
+              id: "1",
+              type: "organization"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to organization's list page.
     expect(mockPush).lastCalledWith("/organization/list");
@@ -211,11 +212,13 @@ describe("organization edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected error
-    expect(wrapper.getByText("Constraint violation: Name should not be blank"));
-    expect(mockPush).toBeCalledTimes(0);
+    await waitFor(() => {
+      expect(
+        wrapper.getByText("Constraint violation: Name should not be blank")
+      );
+      expect(mockPush).toBeCalledTimes(0);
+    });
   });
 });
 

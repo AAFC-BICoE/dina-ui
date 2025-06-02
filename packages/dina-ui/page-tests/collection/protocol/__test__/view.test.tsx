@@ -2,6 +2,7 @@ import ProtocolDetailsPage from "../../../../pages/collection/protocol/view";
 import { mountWithAppContext } from "common-ui";
 import { Protocol } from "../../../../types/collection-api/resources/Protocol";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 /** Test protocol with all fields defined. */
 const TEST_PROTOCOL: Protocol = {
@@ -78,13 +79,9 @@ describe("Protocol details page", () => {
       apiContext
     });
 
-    // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    // Test that spinner does not render after page has loaded
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
-
     // Test Name field to have value "test protocol"
-    expect(wrapper.getAllByText(/test protocol/i)[1]).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getAllByText(/test protocol/i)[1]).toBeInTheDocument();
+    });
   });
 });
