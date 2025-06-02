@@ -21,7 +21,7 @@ const OBJECT_DETAILS_PAGE_CSS = `
   }
 `;
 
-export default function MetadataViewPage() {
+export default function DerivativeViewPage() {
   const router = useRouter();
   const uuid = String(router.query.id);
   const parentUuid = String(router.query.parentId);
@@ -60,7 +60,7 @@ export default function MetadataViewPage() {
       <style>{OBJECT_DETAILS_PAGE_CSS}</style>
       {buttonBar}
       <main className="container-fluid">
-        {withResponse(query, (response) => {
+        {withResponse(query, (_) => {
           return (
             <div className="row mt-3">
               <div className="col-md-4">
@@ -70,7 +70,7 @@ export default function MetadataViewPage() {
                 />
               </div>
               <div className="col-md-8">
-                <DinaForm initialValues={response.data} readOnly={true}>
+                <DinaForm initialValues={derivative} readOnly={true}>
                   <div className="row d-flex">
                     <div
                       className="col-sm-1 mt-2"
