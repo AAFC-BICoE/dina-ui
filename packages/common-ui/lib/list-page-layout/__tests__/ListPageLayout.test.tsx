@@ -1,6 +1,7 @@
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { mountWithAppContext } from "common-ui";
 import { ListPageLayout } from "../ListPageLayout";
+import "@testing-library/jest-dom";
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn();
@@ -27,22 +28,27 @@ describe("ListPageLayout component", () => {
     );
 
     // Wait for the default search to finish.
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /filter value/i })
+      ).toBeInTheDocument();
+    });
 
     // Do a filtered search.
     fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
       target: { value: "101F" }
     });
     fireEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
-    await new Promise(setImmediate);
 
     // There should be an RSQL filter.
-    expect(mockGet).lastCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        filter: { rsql: "name==*101F*" }
-      })
-    );
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          filter: { rsql: "name==*101F*" }
+        })
+      );
+    });
 
     // Click the reset button.
     fireEvent.click(wrapper.getByRole("button", { name: /reset filters/i }));
@@ -70,17 +76,20 @@ describe("ListPageLayout component", () => {
     );
 
     // Wait for the default search to finish.
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(wrapper.getByText("Type")).toBeInTheDocument();
+    });
 
     // Click the type header to trigger the sort.
     fireEvent.click(wrapper.getByText("Type"));
-    await new Promise(setImmediate);
 
     // There should be an RSQL filter.
-    expect(mockGet).lastCalledWith("pcrPrimer", {
-      filter: {},
-      page: { limit: 25, offset: 0 },
-      sort: "-type"
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("pcrPrimer", {
+        filter: {},
+        page: { limit: 25, offset: 0 },
+        sort: "-type"
+      });
     });
 
     expect(window.localStorage.getItem("test-layout_tableSort")).toEqual(
@@ -105,13 +114,14 @@ describe("ListPageLayout component", () => {
       />,
       { apiContext: mockApiCtx }
     );
-    await new Promise(setImmediate);
 
     // Ensure the additional filters are included in the request:
-    expect(mockGet).lastCalledWith("pcrPrimer", {
-      filter: { attr1: "a", rsql: "attr2==b" },
-      page: { limit: 25, offset: 0 },
-      sort: "-createdOn"
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("pcrPrimer", {
+        filter: { attr1: "a", rsql: "attr2==b" },
+        page: { limit: 25, offset: 0 },
+        sort: "-createdOn"
+      });
     });
   });
 });
