@@ -110,7 +110,7 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
               <div className="d-flex justify-content-center">
                 {/* View Button */}
                 <Link
-                  href={`/object-store/derivatives/derivative-view?id=${id}&parentId=${metadata.id}`}
+                  href={`/object-store/derivative/derivative-view?id=${id}&parentId=${metadata.id}`}
                   passHref={true}
                 >
                   <a className="btn btn-primary">
