@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { ScheduledActionsField } from "../ScheduledActionsField";
-import { screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockOnSubmit = jest.fn();
@@ -53,29 +53,47 @@ describe("ScheduledActionsField", () => {
       target: { value: "remarks-1" }
     });
 
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", {
+          name: /add/i
+        })
+      ).toBeInTheDocument()
+    );
+
     fireEvent.click(
       screen.getByRole("button", {
         name: /add/i
       })
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        scheduledActions: [
+          {
+            actionType: "at1",
+            actionStatus: "as1",
+            date: "2021-10-12",
+            remarks: "remarks-1"
+          }
+        ]
+      })
+    );
 
     fireEvent.submit(container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        scheduledActions: [
+          {
+            actionType: "at1",
+            actionStatus: "as1",
+            date: "2021-10-12",
+            remarks: "remarks-1"
+          }
+        ]
+      })
+    );
 
     // One action added:
-    expect(mockOnSubmit).toHaveBeenLastCalledWith({
-      scheduledActions: [
-        {
-          actionType: "at1",
-          actionStatus: "as1",
-          date: "2021-10-12",
-          remarks: "remarks-1"
-        }
-      ]
-    });
-
-    // The table is shown now:
     expect(container.querySelector(".ReactTable")).toBeInTheDocument();
     expect(container.querySelectorAll(".ReactTable tbody tr").length).toBe(1);
 
@@ -95,29 +113,46 @@ describe("ScheduledActionsField", () => {
       target: { value: "remarks-2" }
     });
     fireEvent.click(getByText("Add"));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        scheduledActions: [
+          {
+            actionType: "at1",
+            actionStatus: "as1",
+            date: "2021-10-12",
+            remarks: "remarks-1"
+          },
+          {
+            actionType: "at2",
+            actionStatus: "as2",
+            date: "2021-10-12",
+            remarks: "remarks-2"
+          }
+        ]
+      })
+    );
 
     fireEvent.submit(container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        scheduledActions: [
+          {
+            actionType: "at1",
+            actionStatus: "as1",
+            date: "2021-10-12",
+            remarks: "remarks-1"
+          },
+          {
+            actionType: "at2",
+            actionStatus: "as2",
+            date: "2021-10-12",
+            remarks: "remarks-2"
+          }
+        ]
+      })
+    );
 
     // Two actions added:
-    expect(mockOnSubmit).toHaveBeenLastCalledWith({
-      scheduledActions: [
-        {
-          actionType: "at1",
-          actionStatus: "as1",
-          date: "2021-10-12",
-          remarks: "remarks-1"
-        },
-        {
-          actionType: "at2",
-          actionStatus: "as2",
-          date: "2021-10-12",
-          remarks: "remarks-2"
-        }
-      ]
-    });
-
     expect(container.querySelectorAll(".ReactTable tbody tr").length).toBe(2);
 
     // Edit the first action:
@@ -128,17 +163,53 @@ describe("ScheduledActionsField", () => {
       target: { value: "edited-remarks-1" }
     });
 
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument()
+    );
 
     fireEvent.click(
       screen.getByRole("button", {
         name: /save/i
       })
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        scheduledActions: [
+          {
+            actionType: "at1",
+            actionStatus: "as1",
+            date: "2021-10-12",
+            remarks: "edited-remarks-1"
+          },
+          {
+            actionType: "at2",
+            actionStatus: "as2",
+            date: "2021-10-12",
+            remarks: "remarks-2"
+          }
+        ]
+      })
+    );
 
     fireEvent.submit(container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        scheduledActions: [
+          {
+            actionType: "at1",
+            actionStatus: "as1",
+            date: "2021-10-12",
+            remarks: "edited-remarks-1"
+          },
+          {
+            actionType: "at2",
+            actionStatus: "as2",
+            date: "2021-10-12",
+            remarks: "remarks-2"
+          }
+        ]
+      })
+    );
 
     // Two actions saved:
     expect(mockOnSubmit).toHaveBeenLastCalledWith({
@@ -164,7 +235,18 @@ describe("ScheduledActionsField", () => {
     );
 
     fireEvent.submit(container.querySelector("form")!);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        scheduledActions: [
+          {
+            actionType: "at1",
+            actionStatus: "as1",
+            date: "2021-10-12",
+            remarks: "edited-remarks-1"
+          }
+        ]
+      })
+    );
 
     // One action saved:
     expect(mockOnSubmit).toHaveBeenLastCalledWith({

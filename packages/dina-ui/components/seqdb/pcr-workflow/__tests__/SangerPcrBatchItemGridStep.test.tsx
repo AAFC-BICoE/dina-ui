@@ -6,6 +6,7 @@ import _ from "lodash";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
+import { waitFor } from "@testing-library/react";
 
 const PCR_BATCH_ID = "pcr-batch-id";
 const PCR_BATCH_ITEM_ID_1 = "pcr-batch-item-id-1";
@@ -356,7 +357,13 @@ describe("SangerPcrBatchItemGridStep component", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+
+    // Wait for the component to render and load data
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/selected material samples \(3 in list\)/i)
+      ).toBeInTheDocument();
+    });
 
     // Alert should not appear at this point.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
@@ -397,7 +404,11 @@ describe("SangerPcrBatchItemGridStep component", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+
+    // Wait for component to load in read-only mode
+    await waitFor(() => {
+      expect(wrapper.container.querySelector(".move-all")).toBeNull();
+    });
 
     // Read only mode, certain buttons should be hidden from the user.
     expect(wrapper.container.querySelector(".move-all")).toBeNull();
@@ -418,9 +429,13 @@ describe("SangerPcrBatchItemGridStep component", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
 
-    // Read only mode, certain buttons should be hidden from the user.
+    // Wait for component to load in edit mode
+    await waitFor(() => {
+      expect(wrapper2.container.querySelector(".move-all")).not.toBeNull();
+    });
+
+    // Edit mode, certain buttons should be visible to the user.
     expect(wrapper2.container.querySelector(".move-all")).not.toBeNull();
     expect(wrapper2.container.querySelector(".grid-clear")).not.toBeNull();
     expect(wrapper2.container.querySelector(".fill-by")).not.toBeNull();
@@ -439,7 +454,13 @@ describe("SangerPcrBatchItemGridStep component", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+
+    // Wait for the component to load and pre-populate values
+    await waitFor(() => {
+      expect(wrapper.getByRole("radio", { name: /column/i })).toHaveProperty(
+        "checked"
+      );
+    });
 
     // The fill by column should be pre-selected.
     expect(wrapper.getByRole("radio", { name: /column/i })).toHaveProperty(
@@ -455,19 +476,43 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
   it("Move all functionality", async () => {
     const wrapper = mountWithAppContext(<TestContainer />, testCtx);
-    await new Promise(setImmediate);
+
+    // Wait for initial render
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /switch to edit/i })
+      ).toBeInTheDocument();
+    });
 
     // Switch to edit mode.
     userEvent.click(wrapper.getByRole("button", { name: /switch to edit/i }));
-    await new Promise(setImmediate);
+
+    // Wait for edit mode buttons to appear
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /clear grid/i })
+      ).toBeInTheDocument();
+    });
 
     // Clear the grid first, cannot move with items in the grid.
     userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
-    await new Promise(setImmediate);
+
+    // Wait for grid to be cleared
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /move all/i })
+      ).toBeInTheDocument();
+    });
 
     // Click the "Move All" button.
     userEvent.click(wrapper.getByRole("button", { name: /move all/i }));
-    await new Promise(setImmediate);
+
+    // Wait for items to be moved to grid (fill by column)
+    await waitFor(() => {
+      expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
+        MATERIAL_SAMPLE_NAME_1
+      );
+    });
 
     // Expect the results to fill by column.
     expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
@@ -485,11 +530,23 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
     // Clear the grid first, cannot move with items in the grid.
     userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
-    await new Promise(setImmediate);
+
+    // Wait for grid to be cleared again
+    await waitFor(() => {
+      expect(
+        wrapper.container.querySelector(".well-A_1")?.textContent
+      ).not.toEqual(MATERIAL_SAMPLE_NAME_1);
+    });
 
     // Click the "Move All" button.
     userEvent.click(wrapper.getByRole("button", { name: /move all/i }));
-    await new Promise(setImmediate);
+
+    // Wait for items to be moved to grid (fill by row)
+    await waitFor(() => {
+      expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
+        MATERIAL_SAMPLE_NAME_1
+      );
+    });
 
     // Expect the results to fill by row.
     expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
@@ -504,7 +561,11 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
     // Save the container...
     userEvent.click(wrapper.getByRole("button", { name: /perform save/i }));
-    await new Promise(setImmediate);
+
+    // Wait for save operation to complete
+    await waitFor(() => {
+      expect(mockSave).toHaveBeenCalled();
+    });
 
     expect(mockSave).lastCalledWith(
       [
@@ -570,7 +631,13 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
   it("Load existing records and clear grid", async () => {
     const wrapper = mountWithAppContext(<TestContainer />, testCtx);
-    await new Promise(setImmediate);
+
+    // Wait for initial data to load
+    await waitFor(() => {
+      expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
+        MATERIAL_SAMPLE_NAME_4
+      );
+    });
 
     // Expect material samples already saved to the grid to be rendered on it.
     expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
@@ -582,15 +649,31 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
     // Switch to edit mode...
     userEvent.click(wrapper.getByRole("button", { name: /switch to edit/i }));
-    await new Promise(setImmediate);
+
+    // Wait for edit mode to activate
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /clear grid/i })
+      ).toBeInTheDocument();
+    });
 
     // Click the "Clear all" button.
     userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
-    await new Promise(setImmediate);
+
+    // Wait for grid to be cleared
+    await waitFor(() => {
+      expect(
+        wrapper.container.querySelector(".well-A_1")?.textContent
+      ).not.toEqual(MATERIAL_SAMPLE_NAME_4);
+    });
 
     // Save the container...
     userEvent.click(wrapper.getByRole("button", { name: /perform save/i }));
-    await new Promise(setImmediate);
+
+    // Wait for save operation to complete
+    await waitFor(() => {
+      expect(mockSave).toHaveBeenCalled();
+    });
 
     // Only 4 and 5 has been changed and should be in the save request.
     expect(mockSave).lastCalledWith(
@@ -625,7 +708,15 @@ describe("SangerPcrBatchItemGridStep component", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+
+    // Wait for alert message to appear
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /storage definition must be set to use the container grid\./i
+        )
+      ).toBeInTheDocument();
+    });
 
     // Look for alert message.
     expect(

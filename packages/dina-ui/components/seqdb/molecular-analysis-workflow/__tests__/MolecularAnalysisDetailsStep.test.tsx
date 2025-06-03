@@ -11,6 +11,7 @@ import {
   TEST_MOLECULAR_ANALYSIS_TYPES,
   TEST_PROTOCOLS
 } from "../__mocks__/MolecularAnalysisMocks";
+import { waitFor } from "@testing-library/react";
 
 const onSavedMock = jest.fn();
 const mockSetEditMode = jest.fn();
@@ -84,10 +85,11 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
       />,
       testCtx
     );
-    await new Promise(setImmediate);
 
     // Should automatically be in edit mode.
-    expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Set the name for the new molecular analysis.
     userEvent.type(
@@ -119,29 +121,30 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
 
     // Perform save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
 
     // Expect the mock save to be called.
-    expect(mockSave).toBeCalledWith(
-      [
-        {
-          resource: {
-            analysisType: "hrms",
-            createdBy: "test-user",
-            group: "aafc",
-            name: "Test Molecular Analysis Name",
-            protocol: {
-              id: "232f661a-bcd4-4ff2-8c6b-dace481b939a",
-              name: "Protocol Test 1",
-              type: "protocol"
+    await waitFor(() => {
+      expect(mockSave).toBeCalledWith(
+        [
+          {
+            resource: {
+              analysisType: "hrms",
+              createdBy: "test-user",
+              group: "aafc",
+              name: "Test Molecular Analysis Name",
+              protocol: {
+                id: "232f661a-bcd4-4ff2-8c6b-dace481b939a",
+                name: "Protocol Test 1",
+                type: "protocol"
+              },
+              type: "generic-molecular-analysis"
             },
             type: "generic-molecular-analysis"
-          },
-          type: "generic-molecular-analysis"
-        }
-      ],
-      { apiBaseUrl: "/seqdb-api" }
-    );
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+    });
   });
 
   it("Edit a existing molecular analysis", async () => {
@@ -165,24 +168,25 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
       />,
       testCtx
     );
-    await new Promise(setImmediate);
 
     // Should not be in edit mode automatically.
-    expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
 
-    // Data should be displayed
-    expect(wrapper.getByText(/existing name/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/aafc/i)).toBeInTheDocument();
-    expect(
-      wrapper.getByText(
-        /gas chromatography coupled to low\-resolution mass spectrometry \(gcms\)/i
-      )
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("link", { name: /protocol test 2/i })
-    ).toBeInTheDocument();
-    expect(wrapper.getByText(/test\-user/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/2024\-08\-29/i)).toBeInTheDocument();
+      // Data should be displayed
+      expect(wrapper.getByText(/existing name/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/aafc/i)).toBeInTheDocument();
+      expect(
+        wrapper.getByText(
+          /gas chromatography coupled to low\-resolution mass spectrometry \(gcms\)/i
+        )
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: /protocol test 2/i })
+      ).toBeInTheDocument();
+      expect(wrapper.getByText(/test\-user/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/2024\-08\-29/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode.
     userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
@@ -210,33 +214,38 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
     userEvent.click(
       wrapper.getByRole("combobox", { name: /protocol protocol test 2/i })
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("option", { name: /<none>/i })
+      ).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
 
     // Perform save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
 
     // Expect the save request to contain the UUID and changes made.
-    expect(mockSave).toBeCalledWith(
-      [
-        {
-          resource: {
-            id: "be4a1145-377d-42c4-8ff3-93f2bc6db97b",
-            analysisType: "hrms",
-            createdBy: "test-user",
-            createdOn: "2024-08-29",
-            group: "aafc",
-            name: "New Molecular Analysis Name",
-            protocol: {
-              id: null
+    await waitFor(() => {
+      expect(mockSave).toBeCalledWith(
+        [
+          {
+            resource: {
+              id: "be4a1145-377d-42c4-8ff3-93f2bc6db97b",
+              analysisType: "hrms",
+              createdBy: "test-user",
+              createdOn: "2024-08-29",
+              group: "aafc",
+              name: "New Molecular Analysis Name",
+              protocol: {
+                id: null
+              },
+              type: "generic-molecular-analysis"
             },
             type: "generic-molecular-analysis"
-          },
-          type: "generic-molecular-analysis"
-        }
-      ],
-      { apiBaseUrl: "/seqdb-api" }
-    );
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+    });
   });
 });

@@ -12,12 +12,12 @@ import { Metadata, Person } from "../../../../types/objectstore-api";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { within } from "@testing-library/dom";
+import { waitFor, within } from "@testing-library/dom"; // Import waitFor
 
 const TEST_PERSON: PersistedResource<Person> = {
   id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
-  type: "person",
-  displayName: "test agent"
+  displayName: "test agent",
+  type: "person"
 };
 
 const TEST_GROUP: PersistedResource<Group>[] = [
@@ -244,41 +244,62 @@ describe("Metadata List Page", () => {
   beforeEach(() => {
     window.localStorage.clear();
     jest.clearAllMocks();
+
+    // Mock window.matchMedia
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: jest.fn().mockImplementation((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn()
+      }))
+    });
   });
 
   it("Renders the metadata table by default.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
-    await new Promise(setImmediate);
-
-    // Tests that 1 table renders on the page by default
-    expect(wrapper.getByRole("table")).toBeInTheDocument();
+    await waitFor(() => {
+      // Tests that 1 table renders on the page by default
+      expect(wrapper.getByRole("table")).toBeInTheDocument();
+    });
   });
 
   it("Provides a toggle to see the gallery view.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
-    // Renders initially with the table view:
-    expect(wrapper.getByRole("radio", { name: /table/i })).toBeChecked();
-
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      // Renders initially with the table view:
+      expect(wrapper.getByRole("radio", { name: /table/i })).toBeChecked();
+    });
 
     // Switch to gallery view.
     userEvent.click(wrapper.getByRole("radio", { name: /gallery/i }));
 
-    await new Promise(setImmediate);
-
-    // Get the cell that contains the list
-    const CELL = wrapper.getByRole("cell", { name: /no thumbnail available/i });
-
-    // Tests gallery view as a list in the table
-    expect(within(CELL).getByRole("list")).toBeInTheDocument();
+    await waitFor(() => {
+      // Get the cell that contains the list
+      const CELL = wrapper.getByRole("cell", {
+        name: /no thumbnail available/i
+      });
+      // Tests gallery view as a list in the table
+      expect(within(CELL).getByRole("list")).toBeInTheDocument();
+    });
   });
 
   it("Lets you select a list of metadatas and route to the edit page.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      // Wait for checkboxes to be rendered
+      expect(
+        wrapper.getAllByRole("checkbox", { name: /select/i }).length
+      ).toBeGreaterThan(0);
+    });
 
     // Select all 3 metadatas to edit.
     userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[0]);
@@ -288,9 +309,11 @@ describe("Metadata List Page", () => {
     // Click the bulk edit button:
     userEvent.click(wrapper.getByRole("button", { name: /edit selected/i }));
 
-    // Router push should have been called with the 3 IDs.
-    expect(mockPush).lastCalledWith({
-      pathname: "/object-store/metadata/bulk-edit"
+    await waitFor(() => {
+      // Router push should have been called with the 3 IDs.
+      expect(mockPush).lastCalledWith({
+        pathname: "/object-store/metadata/bulk-edit"
+      });
     });
 
     expect(localStorage.getItem(BULK_EDIT_IDS_KEY)).toEqual(
@@ -307,56 +330,63 @@ describe("Metadata List Page", () => {
   it("Shows a metadata preview when you click the 'Preview' button.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
-    await new Promise(setImmediate);
-
-    // Preview section is initially hidden:
-    expect(wrapper.getAllByText(/preview/i)).toHaveLength(4);
+    await waitFor(() => {
+      // Preview section is initially hidden (3 + the radio button group label "Preview Mode")
+      expect(wrapper.getAllByText(/preview/i)).toHaveLength(4);
+    });
 
     // Click the preview button:
     userEvent.click(wrapper.getAllByRole("button", { name: /preview/i })[0]);
 
-    await new Promise(setImmediate);
-
-    // Preview section is visible: (5th preview element)
-    expect(wrapper.getAllByText(/preview/i)).toHaveLength(5);
+    await waitFor(() => {
+      // Preview section is visible: (5th preview element)
+      expect(wrapper.getAllByText(/preview/i)).toHaveLength(5);
+    });
   });
 
   it("Disables the bulk edit button when no Metadatas are selected.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      // Disabled initially because none are selected:
+      expect(
+        wrapper.getByRole("button", { name: /edit selected/i })
+      ).toBeDisabled();
 
-    // Disabled initially because none are selected:
-    expect(
-      wrapper.getByRole("button", { name: /edit selected/i })
-    ).toBeDisabled();
+      expect(
+        wrapper.getByRole("checkbox", { name: /check all/i })
+      ).toBeInTheDocument();
+    });
 
     // Select all 3 Metadatas to edit.
     userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
-    await new Promise(setImmediate);
-
-    // The button should now be enabled:
-    expect(
-      wrapper.getByRole("button", { name: /edit selected/i })
-    ).toBeEnabled();
+    await waitFor(() => {
+      // The button should now be enabled:
+      expect(
+        wrapper.getByRole("button", { name: /edit selected/i })
+      ).toBeEnabled();
+    });
 
     // Deselect all 3 Metadatas.
     userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
-    await new Promise(setImmediate);
-
-    // The button should now be disabled again:
-    expect(
-      wrapper.getByRole("button", { name: /edit selected/i })
-    ).toBeDisabled();
+    await waitFor(() => {
+      // The button should now be disabled again:
+      expect(
+        wrapper.getByRole("button", { name: /edit selected/i })
+      ).toBeDisabled();
+    });
   });
 
   it("Lets you bulk-delete metadata.", async () => {
     const pageWrapper = mountWithAppContext(<MetadataListPage />, {
       apiContext
     });
-    expect(
-      pageWrapper.getByRole("button", { name: /delete selected/i })
-    ).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(
+        pageWrapper.getByRole("button", { name: /delete selected/i })
+      ).toBeInTheDocument();
+    });
 
     // Pretend two metadatas are already selected:
     const buttonWrapper = mountWithAppContext(
@@ -373,27 +403,33 @@ describe("Metadata List Page", () => {
       { apiContext }
     );
 
-    // Click the bulk-delete button:
+    await waitFor(() => {
+      // Click the bulk-delete button:
+      expect(
+        buttonWrapper.getAllByRole("button", { name: /delete selected/i })[1]
+      ).toBeInTheDocument();
+    });
+
     userEvent.click(
       buttonWrapper.getAllByRole("button", { name: /delete selected/i })[1]
     );
 
-    await new Promise(setImmediate);
-
-    // Shows how many will be deleted:
-    expect(
-      buttonWrapper.getByText(/delete selected \(2\)/i)
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      // Shows how many will be deleted:
+      expect(
+        buttonWrapper.getByText(/delete selected \(2\)/i)
+      ).toBeInTheDocument();
+    });
 
     // Click 'yes' on the "Are you sure" modal:
     userEvent.click(buttonWrapper.getByRole("button", { name: /yes/i }));
 
-    await new Promise(setImmediate);
-
-    expect(mockDelete).toHaveBeenCalledTimes(2);
-    expect(mockDelete).lastCalledWith(
-      `/objectstore-api/metadata/11111111-1111-1111-1111-111111111111`
-    );
-    expect(mockReload).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(mockDelete).toHaveBeenCalledTimes(2);
+      expect(mockDelete).lastCalledWith(
+        `/objectstore-api/metadata/11111111-1111-1111-1111-111111111111`
+      );
+      expect(mockReload).toHaveBeenCalledTimes(1);
+    });
   });
 });

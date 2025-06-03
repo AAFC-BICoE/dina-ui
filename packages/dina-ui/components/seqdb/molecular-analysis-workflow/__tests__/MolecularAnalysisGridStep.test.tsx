@@ -19,7 +19,7 @@ import {
   STORAGE_UNIT_USAGE_4
 } from "../__mocks__/MolecularAnalysisMocks";
 import "@testing-library/jest-dom";
-import { waitForElementToBeRemoved } from "@testing-library/react";
+import { waitForElementToBeRemoved, waitFor } from "@testing-library/react";
 import { useState, useEffect } from "react";
 import userEvent from "@testing-library/user-event";
 import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
@@ -182,7 +182,9 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Switch into edit mode, skip button should not appear since storage units are linked currently.
     userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
-    expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument()
+    );
     expect(
       wrapper.queryByRole("button", { name: /skip step/i })
     ).not.toBeInTheDocument();
@@ -209,25 +211,35 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Change the dropdowns.
     userEvent.click(wrapper.getByRole("combobox"));
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /test storage unit type 1/i })
+      ).toBeInTheDocument()
+    );
     userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 1/i })
     );
-    await new Promise(setImmediate);
 
+    await waitFor(() =>
+      expect(
+        wrapper.getAllByRole("option", { name: /storage unit name/i })[0]
+      ).toBeInTheDocument()
+    );
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getAllByRole("option", { name: /storage unit name/i })[0]
     );
 
-    // Click cancel, nothing should be saved...
+    // Click cancel, nothing should be saved.
     userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
-
-    // Expect nothing to be in the view since nothing was saved:
-    expect(
-      wrapper.getByText(
-        /no coordinates have been saved yet, click "edit" to begin adding coordinates\./i
-      )
-    ).toBeInTheDocument();
+    await waitFor(() =>
+      // Expect nothing to be in the view since nothing was saved:
+      expect(
+        wrapper.getByText(
+          /no coordinates have been saved yet, click "edit" to begin adding coordinates\./i
+        )
+      ).toBeInTheDocument()
+    );
   });
 
   it("Storage units don't exist, add storage coordinates for all material samples", async () => {
@@ -246,11 +258,20 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Change the dropdowns.
     userEvent.click(wrapper.getByRole("combobox"));
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /test storage unit type 1/i })
+      ).toBeInTheDocument()
+    );
     userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 1/i })
     );
-    await new Promise(setImmediate);
 
+    await waitFor(() =>
+      expect(
+        wrapper.getAllByRole("option", { name: /storage unit name/i })[0]
+      ).toBeInTheDocument()
+    );
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getAllByRole("option", { name: /storage unit name/i })[0]
@@ -263,7 +284,8 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Fill by row, so it should have automatically selected the row option.
     expect(wrapper.getByRole("radio", { name: /row/i })).toHaveAttribute(
-      "checked"
+      "checked",
+      ""
     );
 
     // Click the move all button.
@@ -271,106 +293,106 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Save the new coordinates.
     userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await new Promise(setImmediate);
-
-    // Expect the 3 API calls for the storage-unit-usages.
-    expect(mockSave.mock.calls).toEqual([
-      [
+    await waitFor(() => {
+      // Expect the 3 API calls for the storage-unit-usages.
+      expect(mockSave.mock.calls).toEqual([
         [
-          {
-            resource: {
-              id: undefined,
-              storageUnit: {
-                id: "6f5f6d1c-69cc-49b1-b3ae-1675c18ef5b5",
-                type: "storage-unit"
+          [
+            {
+              resource: {
+                id: undefined,
+                storageUnit: {
+                  id: "6f5f6d1c-69cc-49b1-b3ae-1675c18ef5b5",
+                  type: "storage-unit"
+                },
+                type: "storage-unit-usage",
+                usageType:
+                  MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+                wellColumn: 1,
+                wellRow: "A"
               },
-              type: "storage-unit-usage",
-              usageType:
-                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
-              wellColumn: 1,
-              wellRow: "A"
+              type: "storage-unit-usage"
             },
-            type: "storage-unit-usage"
-          },
-          {
-            resource: {
-              id: undefined,
-              storageUnit: {
-                id: "6f5f6d1c-69cc-49b1-b3ae-1675c18ef5b5",
-                type: "storage-unit"
+            {
+              resource: {
+                id: undefined,
+                storageUnit: {
+                  id: "6f5f6d1c-69cc-49b1-b3ae-1675c18ef5b5",
+                  type: "storage-unit"
+                },
+                type: "storage-unit-usage",
+                usageType:
+                  MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+                wellColumn: 2,
+                wellRow: "A"
               },
-              type: "storage-unit-usage",
-              usageType:
-                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
-              wellColumn: 2,
-              wellRow: "A"
+              type: "storage-unit-usage"
             },
-            type: "storage-unit-usage"
-          },
-          {
-            resource: {
-              id: undefined,
-              storageUnit: {
-                id: "6f5f6d1c-69cc-49b1-b3ae-1675c18ef5b5",
-                type: "storage-unit"
+            {
+              resource: {
+                id: undefined,
+                storageUnit: {
+                  id: "6f5f6d1c-69cc-49b1-b3ae-1675c18ef5b5",
+                  type: "storage-unit"
+                },
+                type: "storage-unit-usage",
+                usageType:
+                  MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+                wellColumn: 3,
+                wellRow: "A"
               },
-              type: "storage-unit-usage",
-              usageType:
-                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
-              wellColumn: 3,
-              wellRow: "A"
-            },
-            type: "storage-unit-usage"
+              type: "storage-unit-usage"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
           }
         ],
-        {
-          apiBaseUrl: "/collection-api"
-        }
-      ],
-      [
         [
-          {
-            resource: {
-              id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
-              relationships: {
-                storageUnitUsage: {
-                  data: null
-                }
+          [
+            {
+              resource: {
+                id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
+                relationships: {
+                  storageUnitUsage: {
+                    data: null
+                  }
+                },
+                type: "generic-molecular-analysis-item"
               },
               type: "generic-molecular-analysis-item"
             },
-            type: "generic-molecular-analysis-item"
-          },
-          {
-            resource: {
-              id: "169eafe4-44f2-407e-aa90-1a5483edf522",
-              relationships: {
-                storageUnitUsage: {
-                  data: null
-                }
+            {
+              resource: {
+                id: "169eafe4-44f2-407e-aa90-1a5483edf522",
+                relationships: {
+                  storageUnitUsage: {
+                    data: null
+                  }
+                },
+                type: "generic-molecular-analysis-item"
               },
               type: "generic-molecular-analysis-item"
             },
-            type: "generic-molecular-analysis-item"
-          },
-          {
-            resource: {
-              id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
-              relationships: {
-                storageUnitUsage: {
-                  data: null
-                }
+            {
+              resource: {
+                id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
+                relationships: {
+                  storageUnitUsage: {
+                    data: null
+                  }
+                },
+                type: "generic-molecular-analysis-item"
               },
               type: "generic-molecular-analysis-item"
-            },
-            type: "generic-molecular-analysis-item"
+            }
+          ],
+          {
+            apiBaseUrl: "/seqdb-api"
           }
-        ],
-        {
-          apiBaseUrl: "/seqdb-api"
-        }
-      ]
-    ]);
+        ]
+      ]);
+    });
   });
 
   it("Storage units exist, remove existing storage unit usage", async () => {
@@ -389,86 +411,88 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Clear the grid.
     userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
-    expect(
-      wrapper.getByText(/selected material samples \(3 in list\)/i)
-    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        wrapper.getByText(/selected material samples \(3 in list\)/i)
+      ).toBeInTheDocument()
+    );
 
     // Save, should delete the 3 storage unit usages.
     userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await new Promise(setImmediate);
-
-    // Update each generic-molecular-analysis-item to remove the storage unit usage relationship.
-    // Then delete the storage unit usages.
-    expect(mockSave.mock.calls).toEqual([
-      [
+    await waitFor(() => {
+      // Update each generic-molecular-analysis-item to remove the storage unit usage relationship.
+      // Then delete the storage unit usages.
+      expect(mockSave.mock.calls).toEqual([
         [
-          {
-            resource: {
-              id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
-              relationships: {
-                storageUnitUsage: {
-                  data: null
-                }
+          [
+            {
+              resource: {
+                id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
+                relationships: {
+                  storageUnitUsage: {
+                    data: null
+                  }
+                },
+                type: "generic-molecular-analysis-item"
               },
               type: "generic-molecular-analysis-item"
             },
-            type: "generic-molecular-analysis-item"
-          },
-          {
-            resource: {
-              id: "169eafe4-44f2-407e-aa90-1a5483edf522",
-              relationships: {
-                storageUnitUsage: {
-                  data: null
-                }
+            {
+              resource: {
+                id: "169eafe4-44f2-407e-aa90-1a5483edf522",
+                relationships: {
+                  storageUnitUsage: {
+                    data: null
+                  }
+                },
+                type: "generic-molecular-analysis-item"
               },
               type: "generic-molecular-analysis-item"
             },
-            type: "generic-molecular-analysis-item"
-          },
-          {
-            resource: {
-              id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
-              relationships: {
-                storageUnitUsage: {
-                  data: null
-                }
+            {
+              resource: {
+                id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
+                relationships: {
+                  storageUnitUsage: {
+                    data: null
+                  }
+                },
+                type: "generic-molecular-analysis-item"
               },
               type: "generic-molecular-analysis-item"
-            },
-            type: "generic-molecular-analysis-item"
+            }
+          ],
+          {
+            apiBaseUrl: "/seqdb-api"
           }
         ],
-        {
-          apiBaseUrl: "/seqdb-api"
-        }
-      ],
-      [
         [
-          {
-            delete: {
-              id: "45ed6126-26b8-4ebd-a89f-1bbcf6c69d27",
-              type: "storage-unit-usage"
+          [
+            {
+              delete: {
+                id: "45ed6126-26b8-4ebd-a89f-1bbcf6c69d27",
+                type: "storage-unit-usage"
+              }
+            },
+            {
+              delete: {
+                id: "be81e29a-b634-43c7-8f1a-53bf394d87f2",
+                type: "storage-unit-usage"
+              }
+            },
+            {
+              delete: {
+                id: "0192fd01-9104-72fa-a18f-80d97da0c935",
+                type: "storage-unit-usage"
+              }
             }
-          },
+          ],
           {
-            delete: {
-              id: "be81e29a-b634-43c7-8f1a-53bf394d87f2",
-              type: "storage-unit-usage"
-            }
-          },
-          {
-            delete: {
-              id: "0192fd01-9104-72fa-a18f-80d97da0c935",
-              type: "storage-unit-usage"
-            }
+            apiBaseUrl: "/collection-api"
           }
-        ],
-        {
-          apiBaseUrl: "/collection-api"
-        }
-      ]
-    ]);
+        ]
+      ]);
+    });
   });
 
   it("Storage units exist, changing the storage unit type should clear the grid", async () => {
@@ -482,7 +506,11 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Change the storage unit type...
     userEvent.click(wrapper.getAllByRole("combobox")[0]);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /test storage unit type 2/i })
+      ).toBeInTheDocument()
+    );
     userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 2/i })
     );
@@ -498,6 +526,11 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     userEvent.click(wrapper.getByRole("button", { name: /proceed/i }));
     await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
 
+    await waitFor(() => {
+      expect(
+        wrapper.getAllByRole("option", { name: /storage unit name/i })[1]
+      ).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getAllByRole("option", { name: /storage unit name/i })[1]
@@ -531,11 +564,13 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
 
     // Warning should still be displayed in edit mode.
-    expect(
-      wrapper.getByText(
-        /multiple storage units have been found for the molecular analysis items\./i
-      )
-    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        wrapper.getByText(
+          /multiple storage units have been found for the molecular analysis items\./i
+        )
+      ).toBeInTheDocument()
+    );
   });
 
   it("Storage units don't exist, attempt to use a storage unit type without grid support", async () => {
@@ -554,16 +589,22 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
 
     // Change the dropdowns.
     userEvent.click(wrapper.getByRole("combobox"));
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /test storage unit type 3/i })
+      ).toBeInTheDocument()
+    );
     userEvent.click(
       wrapper.getByRole("option", { name: /test storage unit type 3/i })
     );
-    await new Promise(setImmediate);
 
     // Expect a warning message to appear since this storage unit type has not grid support.
-    expect(
-      wrapper.getByText(
-        /the currently selected storage unit does not contain a container grid in order to use the storage selector\./i
-      )
-    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        wrapper.getByText(
+          /the currently selected storage unit does not contain a container grid in order to use the storage selector\./i
+        )
+      ).toBeInTheDocument()
+    );
   });
 });
