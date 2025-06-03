@@ -1,5 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import { RevisionsPageLayout } from "../RevisionsPageLayout";
+import { waitFor } from "@testing-library/dom";
 
 const TEST_SNAPSHOTS = [
   {
@@ -38,9 +39,10 @@ describe("RevisionsPageLayout component", () => {
       { apiContext: { apiClient: { get: mockGet } as any } }
     );
 
-    await new Promise(setImmediate);
-
     const table = document.querySelector("table");
+    await waitFor(() => {
+      expect(table).not.toBeNull();
+    });
     if (!table) {
       fail("A table is expected at this point...");
     }
@@ -49,7 +51,9 @@ describe("RevisionsPageLayout component", () => {
     const numCols = table.rows[0].cells.length;
 
     // Expect a specific table layout
-    expect(numRows).toEqual(3); // 2 rows including the header.
-    expect(numCols).toEqual(6);
+    await waitFor(() => {
+      expect(numRows).toEqual(3); // 2 rows including the header.
+      expect(numCols).toEqual(6);
+    });
   });
 });

@@ -85,8 +85,6 @@ describe("StorageLinker", () => {
     });
 
     userEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
-
     await waitFor(() => {
       expect(
         wrapper.getByText(

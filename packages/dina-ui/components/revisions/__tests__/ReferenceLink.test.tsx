@@ -2,6 +2,7 @@ import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/objectstore-api";
 import { ReferenceLink } from "../ReferenceLink";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const mockGet = jest.fn(async () => ({
   data: {
@@ -28,13 +29,14 @@ describe("ReferenceLink component", () => {
       />,
       { apiContext: { apiClient: { get: mockGet } as any } }
     );
-    await new Promise(setImmediate);
 
     // Shows the custom ".display-name" span and the link:
-    expect(wrapper.getByText(/mat poff/i)).toBeInTheDocument();
-    expect(wrapper.getByRole("link")).toHaveAttribute(
-      "href",
-      "/person/view?id=64047517-b7d4-4af9-af86-4bef3ff36950"
-    );
+    await waitFor(() => {
+      expect(wrapper.getByText(/mat poff/i)).toBeInTheDocument();
+      expect(wrapper.getByRole("link")).toHaveAttribute(
+        "href",
+        "/person/view?id=64047517-b7d4-4af9-af86-4bef3ff36950"
+      );
+    });
   });
 });
