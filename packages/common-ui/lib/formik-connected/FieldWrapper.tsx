@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { FormikProps } from "formik";
-import { isArray, find, isNumber } from "lodash";
+import _ from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { FieldSpyRenderProps } from "..";
@@ -106,17 +106,17 @@ export function FieldWrapper(props: FieldWrapperProps) {
     if (!formTemplate || !componentName || !sectionName) return false;
 
     // First find the component we are looking for.
-    const componentFound = find(formTemplate?.components, {
+    const componentFound = _.find(formTemplate?.components, {
       name: componentName
     });
     if (componentFound) {
       // Next find the right section.
-      const sectionFound = find(componentFound?.sections, {
+      const sectionFound = _.find(componentFound?.sections, {
         name: sectionName
       });
       if (sectionFound) {
         if (name.includes("managedAttributes")) {
-          const visibleManagedAttributes = find(sectionFound.items, {
+          const visibleManagedAttributes = _.find(sectionFound.items, {
             name: "managedAttributesOrder"
           })?.defaultValue;
           return visibleManagedAttributes?.includes(
@@ -124,7 +124,7 @@ export function FieldWrapper(props: FieldWrapperProps) {
           );
         }
         if (name.includes("preparationManagedAttributes")) {
-          const visibleManagedAttributes = find(sectionFound.items, {
+          const visibleManagedAttributes = _.find(sectionFound.items, {
             name: "preparationManagedAttributesOrder"
           })?.defaultValue;
           return visibleManagedAttributes?.includes(
@@ -132,11 +132,9 @@ export function FieldWrapper(props: FieldWrapperProps) {
           );
         }
 
-        return (
-          !find(sectionFound.items, {
-            name: templateCheckboxFieldName ?? name
-          })?.visible ?? false
-        );
+        return !_.find(sectionFound.items, {
+          name: templateCheckboxFieldName ?? name
+        })?.visible;
       }
     }
     return false;
@@ -216,12 +214,12 @@ function LabelWrapper({
       ? ["col-sm-6", "col-sm-6"]
       : horizontal === "flex"
       ? ["", "flex-grow-1"]
-      : isArray(horizontal)
+      : _.isArray(horizontal)
       ? (horizontal || []).map((col) => `col-sm-${col}`) ||
         (isTemplate ? ["col-sm-12", "col-sm-12"] : [])
       : ["label-col", "field-col"];
 
-  const [labelStyle, valueStyle] = isNumber(horizontal)
+  const [labelStyle, valueStyle] = _.isNumber(horizontal)
     ? [
         { display: "inline-block", width: `${horizontal}em` },
         { display: "inline-block", width: `calc(100% - ${horizontal}em` }
@@ -284,10 +282,10 @@ function LabelWrapper({
             ...fieldNameClasses,
             horizontal === "flex" && "d-flex gap-2",
             horizontal ? "align-items-center" : "mb-2",
-            (horizontal === true || isArray(horizontal)) && "row",
+            (horizontal === true || _.isArray(horizontal)) && "row",
             isTemplate && `col-sm-${horizontal ? "11" : "10"}`,
-            !isTemplate && (!horizontal || isNumber(horizontal)) && "w-100",
-            !isTemplate && isNumber(horizontal) && "d-flex",
+            !isTemplate && (!horizontal || _.isNumber(horizontal)) && "w-100",
+            !isTemplate && _.isNumber(horizontal) && "d-flex",
             !removeBottomMargin && "mb-3"
           )}
           htmlFor={disableLabelClick ? "none" : undefined}

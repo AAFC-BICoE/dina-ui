@@ -12,7 +12,7 @@ import {
   SelectField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import { fromPairs, toPairs } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { Fragment, useContext } from "react";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -90,7 +90,7 @@ export function IdentifierTypeForm({
     ? {
         ...fetchedIdentifierType,
         // Convert multilingualDescription to editable Dictionary format:
-        multilingualTitle: fromPairs<string | undefined>(
+        multilingualTitle: _.fromPairs<string | undefined>(
           fetchedIdentifierType.multilingualTitle?.titles?.map(
             ({ title, lang }) => [lang ?? "", title ?? ""]
           )
@@ -105,7 +105,7 @@ export function IdentifierTypeForm({
       ...submittedValues,
       //   Convert the editable format to the stored format:
       multilingualTitle: {
-        titles: toPairs(submittedValues.multilingualTitle).map(
+        titles: _.toPairs(submittedValues.multilingualTitle).map(
           ([lang, title]) => ({ lang, title })
         )
       }

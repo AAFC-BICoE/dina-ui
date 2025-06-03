@@ -1,4 +1,4 @@
-import { noop } from "lodash";
+import _ from "lodash";
 import { useDrag } from "react-dnd";
 import RcTooltip from "rc-tooltip";
 import Link from "next/link";
@@ -17,7 +17,7 @@ export const ITEM_BOX_DRAG_KEY = "materialSampleItem";
 export function DraggableItemBox<
   ItemType extends { sampleId?: string; sampleName?: string }
 >({
-  onClick = noop,
+  onClick = _.noop,
   batchItemSample,
   coordinates,
   selected,
@@ -49,7 +49,7 @@ export function DraggableItemBox<
   const primerName = (batchItemSample as any)?.primerName ?? undefined;
 
   return (
-    <li className="list-group-item p-0" onClick={onClick} ref={drag}>
+    <li className="list-group-item p-0" onClick={onClick} ref={drag as any}>
       <RcTooltip
         placement="top"
         trigger={coordinates ? "hover" : ""}

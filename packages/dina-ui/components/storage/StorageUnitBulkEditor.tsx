@@ -19,7 +19,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormikProps } from "formik";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { keys, omit, pick, pickBy } from "lodash";
+import _ from "lodash";
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { StorageUnit } from "packages/dina-ui/types/collection-api";
 import { StorageUnitForm } from "./StorageUnitForm";
@@ -308,8 +308,8 @@ function useBulkStorageUnitSave({
         }
         // Any errored field that was edited in the Edit All tab should
         // get the red indicator in the Edit All tab.
-        const badBulkEditedFields = keys(
-          pickBy(
+        const badBulkEditedFields = _.keys(
+          _.pickBy(
             error.fieldErrors,
             (_, fieldName) =>
               getBulkEditTabFieldInfo({ bulkEditCtx, fieldName })
@@ -318,13 +318,15 @@ function useBulkStorageUnitSave({
         );
         bulkEditFormRef.current?.setErrors({
           ...bulkEditFormRef.current?.errors,
-          ...pick(error.fieldErrors, badBulkEditedFields)
+          ..._.pick(error.fieldErrors, badBulkEditedFields)
         });
         // Don't show the bulk edited fields' errors in the individual tabs
         // because the user can't fix them there:
         resourceHooks
           .map((it) => it.formRef?.current)
-          .forEach((it) => it?.setErrors(omit(it.errors, badBulkEditedFields)));
+          .forEach((it) =>
+            it?.setErrors(_.omit(it.errors, badBulkEditedFields))
+          );
       }
       setError(error);
       throw new Error(formatMessage("bulkSubmissionErrorInfo"));

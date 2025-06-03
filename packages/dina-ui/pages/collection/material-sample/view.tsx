@@ -14,7 +14,7 @@ import {
   withResponse
 } from "common-ui";
 import { Field } from "formik";
-import { isEmpty } from "lodash";
+import _ from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
@@ -221,11 +221,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           </ButtonBar>
         );
         const hasPreparations = PREPARATION_FIELDS.some(
-          (fieldName) => !isEmpty(materialSample[fieldName])
+          (fieldName) => !_.isEmpty(materialSample[fieldName])
         );
 
         const hasOrganism = materialSample?.organism?.some(
-          (org) => !isEmpty(org)
+          (org) => !_.isEmpty(org)
         );
 
         const hasInheritedDetermination = hasOrganism
@@ -236,7 +236,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
         /* Consider as having association if either host organism any field has value or having any non empty association in the array */
         const hasAssociations =
-          materialSample?.associations?.some((assct) => !isEmpty(assct)) ||
+          materialSample?.associations?.some((assct) => !_.isEmpty(assct)) ||
           HOST_ORGANISM_FIELDS.some(
             (fieldName) => materialSample.hostOrganism?.[fieldName]
           );

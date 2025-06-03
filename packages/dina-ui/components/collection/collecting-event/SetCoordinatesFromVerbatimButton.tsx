@@ -1,7 +1,7 @@
 import { FormikButton, Tooltip, useDinaFormContext } from "common-ui";
 import Coordinates from "coordinate-parser";
 import { FormikContextType } from "formik";
-import { get } from "lodash";
+import _ from "lodash";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useState } from "react";
 import { SiConvertio } from "react-icons/si";
@@ -37,7 +37,7 @@ export function SetCoordinatesFromVerbatimButton({
   function doConversion(values: any, formik: FormikContextType<any>) {
     try {
       const coords = new Coordinates(
-        `${get(values, sourceLatField)}, ${get(values, sourceLonField)}`
+        `${_.get(values, sourceLatField)}, ${_.get(values, sourceLonField)}`
       );
 
       // Limit to 6 decimal places:
@@ -83,7 +83,8 @@ export function SetCoordinatesFromVerbatimButton({
         onClick={doConversion}
         className={className}
         buttonProps={({ values }) => ({
-          disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
+          disabled:
+            !_.get(values, sourceLatField) || !_.get(values, sourceLonField)
         })}
       >
         {error && <div className="alert alert-danger">{error}</div>}

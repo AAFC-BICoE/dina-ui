@@ -1,6 +1,6 @@
 import { writeStorage } from "@rehooks/local-storage";
 import { FormikContextType } from "formik";
-import { compact, toPairs } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import {
   AreYouSureModal,
@@ -22,7 +22,7 @@ function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
   // Disable the button if none are selected:
   const disabled =
     !ctx.values.itemIdsToSelect ||
-    !compact(Object.values(ctx.values.itemIdsToSelect)).length;
+    !_.compact(Object.values(ctx.values.itemIdsToSelect)).length;
   return { disabled };
 }
 
@@ -46,7 +46,7 @@ export function BulkDeleteButton({
       buttonProps={bulkButtonProps}
       className="btn btn-danger bulk-delete-button"
       onClick={(values: BulkSelectableFormValues) => {
-        const resourceIds = toPairs(values.itemIdsToSelect)
+        const resourceIds = _.toPairs(values.itemIdsToSelect)
           .filter((pair) => pair[1])
           .map((pair) => pair[0]);
 
@@ -142,7 +142,7 @@ export function BulkEditButton({
       buttonProps={bulkButtonProps}
       className="btn btn-primary bulk-edit-button"
       onClick={async (values: BulkSelectableFormValues) => {
-        const ids = toPairs(values.itemIdsToSelect)
+        const ids = _.toPairs(values.itemIdsToSelect)
           .filter((pair) => pair[1])
           .map((pair) => pair[0]);
 
@@ -263,7 +263,7 @@ export function BulkSplitButton({ pathname }: BulkSplitButtonProps) {
       buttonProps={bulkButtonProps}
       className="btn btn-primary bulk-split-button"
       onClick={async (values: BulkSelectableFormValues) => {
-        const ids = toPairs(values.itemIdsToSelect)
+        const ids = _.toPairs(values.itemIdsToSelect)
           .filter((pair) => pair[1])
           .map((pair) => pair[0]);
 

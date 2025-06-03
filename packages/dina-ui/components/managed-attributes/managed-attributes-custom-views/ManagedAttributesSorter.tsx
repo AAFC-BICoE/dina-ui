@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { FieldArray } from "formik";
 import { PersistedResource } from "kitsu";
-import { compact, get } from "lodash";
+import _ from "lodash";
 import { useRef } from "react";
 import { GiMove } from "react-icons/gi";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -73,7 +73,7 @@ export function ManagedAttributesSorter({
           const { active, over } = event;
 
           if (active.id !== over?.id) {
-            const attributeKeys = (get(form.values, name) ?? []) as string[];
+            const attributeKeys = (_.get(form.values, name) ?? []) as string[];
             const oldIndex = attributeKeys.indexOf(active.id);
             const newIndex = attributeKeys.indexOf(over.id);
 
@@ -83,7 +83,7 @@ export function ManagedAttributesSorter({
           }
         }
 
-        const attributeKeys = (get(form.values, name) ?? []) as string[];
+        const attributeKeys = (_.get(form.values, name) ?? []) as string[];
 
         return (
           <div>
@@ -191,7 +191,7 @@ function AttributesViewList({
     useBulkGet<ManagedAttribute>({
       ids: keys.map((key) =>
         // Use the component prefix if needed by the back-end:
-        compact([managedAttributeComponent, key]).join(".")
+        _.compact([managedAttributeComponent, key]).join(".")
       ),
       listPath: managedAttributeApiPath
     });
@@ -202,7 +202,7 @@ function AttributesViewList({
     []
   );
   if (fetchedAttributes) {
-    lastFetchedAttributes.current = compact(fetchedAttributes);
+    lastFetchedAttributes.current = _.compact(fetchedAttributes);
   }
 
   const visibleAttributes = lastFetchedAttributes.current;

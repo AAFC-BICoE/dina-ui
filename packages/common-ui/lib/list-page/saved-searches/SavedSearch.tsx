@@ -25,7 +25,7 @@ import {
   SingleSavedSearch,
   SAVED_SEARCH_VERSION
 } from "./types";
-import { map, cloneDeep, sortBy, isEqual } from "lodash";
+import _ from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
@@ -194,7 +194,7 @@ export function SavedSearch({
   const dropdownOptions: SingleSavedSearch[] = useMemo(() => {
     if (!userPreferences) return [];
 
-    return map(userPreferences?.savedSearches?.[indexName], (value, key) => {
+    return _.map(userPreferences?.savedSearches?.[indexName], (value, key) => {
       return {
         ...value,
         savedSearchName: key
@@ -292,15 +292,15 @@ export function SavedSearch({
     }
 
     // Check if the group has changed.
-    if (!isEqual(sortBy(groups), sortBy(savedSearch?.groups))) {
+    if (!_.isEqual(_.sortBy(groups), _.sortBy(savedSearch?.groups))) {
       isQueryChanged = true;
     }
 
     // Check if the columns displayed has changed.
     if (
-      !isEqual(
-        sortBy(savedSearch?.columnVisibility),
-        sortBy(localStorageDisplayedColumns)
+      !_.isEqual(
+        _.sortBy(savedSearch?.columnVisibility),
+        _.sortBy(localStorageDisplayedColumns)
       )
     ) {
       isQueryChanged = true;
@@ -339,7 +339,7 @@ export function SavedSearch({
     }
 
     // Check if the group has changed.
-    if (!isEqual(sortBy(groups), sortBy(defaultSavedSearch?.groups))) {
+    if (!_.isEqual(_.sortBy(groups), _.sortBy(defaultSavedSearch?.groups))) {
       isQueryChanged = true;
     }
     return isQueryChanged;
@@ -376,7 +376,7 @@ export function SavedSearch({
     if (!userPreferences) return;
 
     // Look though the saved searches for the indexName to see if any are default.
-    return cloneDeep(dropdownOptions).find(
+    return _.cloneDeep(dropdownOptions).find(
       (savedSearch) => savedSearch.default
     );
   }
@@ -392,7 +392,7 @@ export function SavedSearch({
     if (!userPreferences || !savedSearchName) return;
 
     // Look though the saved searches for the indexName to see if any match the saved search name.
-    return cloneDeep(dropdownOptions).find(
+    return _.cloneDeep(dropdownOptions).find(
       (savedSearch) => savedSearch.savedSearchName === savedSearchName
     );
   }
@@ -594,7 +594,7 @@ export function SavedSearch({
       saveSavedSearch(searchName, isDefault, true),
     savedSearchNames:
       Object.keys(
-        cloneDeep(userPreferences)?.savedSearches?.[indexName] ?? {}
+        _.cloneDeep(userPreferences)?.savedSearches?.[indexName] ?? {}
       ) ?? []
   });
 

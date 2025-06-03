@@ -7,7 +7,7 @@ import {
   useQuery
 } from "common-ui";
 import { useField } from "formik";
-import { get, uniq } from "lodash";
+import _ from "lodash";
 import React, { useContext, useEffect } from "react";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
@@ -72,7 +72,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     groupFieldName: selectFieldProps.name
   });
 
-  const initialGroupName = get(initialValues, selectFieldProps.name);
+  const initialGroupName = _.get(initialValues, selectFieldProps.name);
 
   const { groupSelectOptions } = useAvailableGroupOptions({
     initialGroupName,
@@ -143,7 +143,7 @@ export function useAvailableGroupOptions({
   const { locale } = useDinaIntl();
   const { readOnly } = useContext(DinaFormContext) ?? {};
 
-  const selectableGroupNames = uniq([
+  const selectableGroupNames = _.uniq([
     // If the value is already set, include it in the dropdown regardless of user permissions.
     ...(initialGroupName
       ? Array.isArray(initialGroupName)

@@ -6,7 +6,7 @@ import {
   useApiClient
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { compact } from "lodash";
+import _ from "lodash";
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -93,7 +93,7 @@ export function PreLibraryPrepStep({
       (item) => item.materialSample?.id
     );
     // Fetch all materialSample names
-    const materialSamples = compact(
+    const materialSamples = _.compact(
       await bulkGet<MaterialSample>(
         materialSampleIds.map((id) => `/material-sample/${id}`),
         { apiBaseUrl: "/collection-api" }

@@ -13,7 +13,7 @@ import {
   SelectField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import { fromPairs, toPairs } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import { Footer, Head, Nav } from "../../../components";
@@ -92,7 +92,7 @@ export function ReportTemplateForm({
   const initialValues: ReportTemplateFormValues = fetchedReportTemplate
     ? {
         ...fetchedReportTemplate,
-        multilingualDescription: fromPairs<string | undefined>(
+        multilingualDescription: _.fromPairs<string | undefined>(
           fetchedReportTemplate.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
           )
@@ -112,7 +112,7 @@ export function ReportTemplateForm({
     const input: InputResource<ReportTemplate> = {
       ...submittedValues,
       multilingualDescription: {
-        descriptions: toPairs(submittedValues.multilingualDescription).map(
+        descriptions: _.toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc })
         )
       }

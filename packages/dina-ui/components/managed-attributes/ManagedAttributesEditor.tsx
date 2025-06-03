@@ -9,7 +9,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
+import _ from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../types/collection-api";
@@ -64,12 +64,12 @@ export function ManagedAttributesEditor({
       {(currentValue) => {
         function getAttributeKeysInUse() {
           const managedAttributeMaps = bulkCtx?.resourceHooks.map((sample) =>
-            get(sample.formRef.current?.values, valuesPath)
+            _.get(sample.formRef.current?.values, valuesPath)
           ) || [currentValue];
 
           // Get all unique ManagedAttribute keys in the given value maps:
-          const initialVisibleKeys = uniq(
-            flatMap(managedAttributeMaps.map(keys))
+          const initialVisibleKeys = _.uniq(
+            _.flatMap(managedAttributeMaps.map(_.keys))
           );
 
           return initialVisibleKeys;
@@ -91,7 +91,7 @@ export function ManagedAttributesEditor({
           useBulkGet<ManagedAttribute>({
             ids: visibleAttributeKeys.map((key) =>
               // Use the component prefix if needed by the back-end:
-              compact([managedAttributeComponent, key]).join(".")
+              _.compact([managedAttributeComponent, key]).join(".")
             ),
             listPath: managedAttributeApiPath
           });
@@ -102,7 +102,7 @@ export function ManagedAttributesEditor({
           PersistedResource<ManagedAttribute>[]
         >([]);
         if (fetchedAttributes) {
-          lastFetchedAttributes.current = compact(fetchedAttributes);
+          lastFetchedAttributes.current = _.compact(fetchedAttributes);
         }
 
         const visibleAttributes = lastFetchedAttributes.current;
@@ -201,8 +201,8 @@ export function ManagedAttributeMultiSelect({
       | PersistedResource<ManagedAttribute>
       | PersistedResource<ManagedAttribute>[]
   ) {
-    const newAttributes = castArray(newValues);
-    const newKeys = newAttributes.map((it) => get(it, "key"));
+    const newAttributes = _.castArray(newValues);
+    const newKeys = newAttributes.map((it) => _.get(it, "key"));
     onChange(newKeys);
   }
 
@@ -229,9 +229,9 @@ export function ManagedAttributeMultiSelect({
 
 function managedAttributeLabel(attribute: ManagedAttribute) {
   return (
-    get(attribute, "name") ||
-    get(attribute, "key") ||
-    get(attribute, "id") ||
+    _.get(attribute, "name") ||
+    _.get(attribute, "key") ||
+    _.get(attribute, "id") ||
     ""
   );
 }

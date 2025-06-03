@@ -10,7 +10,7 @@ import {
   withResponse
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { castArray, get, upperCase } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { Footer, GroupLabel, Head, Nav } from "..";
@@ -144,16 +144,16 @@ export function ViewPageLayout<T extends KitsuResource>({
           ? data.meta?.permissions?.includes("delete") ?? false
           : true;
 
-        const nameFields = castArray(nameField);
+        const nameFields = _.castArray(nameField);
         let title = [...nameFields, "id"].reduce(
           (lastValue, currentField) =>
             lastValue ||
             (typeof currentField === "function"
               ? currentField(resource)
-              : get(data, currentField)),
+              : _.get(data, currentField)),
           ""
         );
-        const group = upperCase(get(data, "group") as string);
+        const group = _.upperCase(_.get(data, "group") as string);
 
         // if title is array, only take first element
         if (Array.isArray(title)) {

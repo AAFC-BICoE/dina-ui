@@ -3,7 +3,7 @@ import { CSSProperties, useMemo } from "react";
 import { useContext } from "react";
 import { DinaFormContext, FieldSpy, FieldSpyRenderProps } from "..";
 import { DinaFormSection, DinaFormSectionProps } from "./DinaForm";
-import { find } from "lodash";
+import _ from "lodash";
 
 export interface FieldSetProps extends DinaFormSectionProps {
   /** fieldset title. */
@@ -53,12 +53,12 @@ export function FieldSet({
     if (!context?.formTemplate || !componentName || !sectionName) return false;
 
     // First find the component we are looking for.
-    const componentFound = find(context?.formTemplate?.components, {
+    const componentFound = _.find(context?.formTemplate?.components, {
       name: componentName
     });
     if (componentFound) {
       // Next find the right section.
-      const sectionFound = find(componentFound?.sections, {
+      const sectionFound = _.find(componentFound?.sections, {
         name: sectionName
       });
       if (sectionFound) {

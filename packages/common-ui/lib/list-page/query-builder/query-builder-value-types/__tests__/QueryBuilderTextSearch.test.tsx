@@ -3,7 +3,7 @@ import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "../QueryBuilderTextSearch";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
-import { noop } from "lodash";
+import _ from "lodash";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
 import userEvent from "@testing-library/user-event";
 
@@ -15,7 +15,7 @@ describe("QueryBuilderTextSearch", () => {
       const textSearchEquals = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderTextSearch
               matchType="equals"
@@ -34,7 +34,7 @@ describe("QueryBuilderTextSearch", () => {
       const textSearchEmpty = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderTextSearch
               matchType="empty"
@@ -57,7 +57,7 @@ describe("QueryBuilderTextSearch", () => {
       const textSearchIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderTextSearch
               matchType="in"
@@ -76,7 +76,7 @@ describe("QueryBuilderTextSearch", () => {
       const textSearchNotIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderTextSearch
               matchType="notIn"

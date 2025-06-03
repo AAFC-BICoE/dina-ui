@@ -1,6 +1,6 @@
 import { TooltipProps, Tooltip, ButtonBar } from "common-ui";
 import { Footer, Head, Nav } from "../../components";
-import { startCase } from "lodash";
+import _ from "lodash";
 import { useIntl } from "react-intl";
 
 export interface PageLayoutProps {
@@ -56,7 +56,7 @@ export default function PageLayout({
   const { formatMessage, messages } = useIntl();
   const title = messages[titleId]
     ? formatMessage({ id: titleId as any })
-    : startCase(titleId);
+    : _.startCase(titleId);
 
   return (
     <>

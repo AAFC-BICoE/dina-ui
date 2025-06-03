@@ -31,7 +31,7 @@ import {
   ExportType
 } from "packages/dina-ui/types/dina-export-api";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import {
   Button,
   ButtonGroup,
@@ -46,7 +46,7 @@ import { useSessionStorage } from "usehooks-ts";
 import useSavedExports, { VISIBILITY_OPTIONS } from "./useSavedExports";
 import { QueryFieldSelector } from "packages/common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
 import QueryRowManagedAttributeSearch from "packages/common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
-import { get } from "lodash";
+import _ from "lodash";
 import { MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS } from "../../collection/material-sample/list";
 import { OBJECT_STORE_NON_EXPORTABLE_COLUMNS } from "../../object-store/object/list";
 import {
@@ -119,7 +119,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     DynamicFieldsMappingConfig | undefined
   >(`${uniqueName}_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`, undefined);
 
-  const [dataExportError, setDataExportError] = useState<JSX.Element>();
+  const [dataExportError, setDataExportError] = useState<ReactNode>();
   const [loading, setLoading] = useState(false);
   const [selectedSeparator, setSelectedSeparator] = useState<{
     value: ColumnSeparator;
@@ -244,12 +244,12 @@ export default function ExportPage<TData extends KitsuResource>() {
           const filenameAlias: string =
             selectedFilenameAliasField.label === "managedAttributes" &&
             dynamicFieldValue
-              ? get(
+              ? _.get(
                   metadata,
                   JSON.parse(dynamicFieldValue).selectedManagedAttributeConfig
                     .label
                 )
-              : get(metadata, selectedFilenameAliasField.label);
+              : _.get(metadata, selectedFilenameAliasField.label);
           if (metadata.derivatives) {
             // If image has derivative, use large image derivative fileIdentifier
             const largeImageDerivative = metadata.derivatives.find(

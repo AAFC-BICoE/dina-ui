@@ -6,7 +6,7 @@ import {
   SaveArgs,
   useQuery
 } from "common-ui";
-import { compact, isEmpty, omitBy, pick, set } from "lodash";
+import _ from "lodash";
 import {
   MaterialSample,
   StorageUnit
@@ -81,7 +81,7 @@ export function useSeqSelectCoordinatesControls({
 
   // Boolean if the grid contains any of items.
   const gridIsPopulated = useMemo(
-    () => !isEmpty(gridState.cellGrid),
+    () => !_.isEmpty(gridState.cellGrid),
     [gridState]
   );
 
@@ -96,12 +96,12 @@ export function useSeqSelectCoordinatesControls({
       if (storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition) {
         const gridLayoutDefinition =
           storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition;
-        set(
+        _.set(
           seqBatch,
           "gridLayoutDefinition.numberOfColumns",
           gridLayoutDefinition.numberOfColumns
         );
-        set(
+        _.set(
           seqBatch,
           "gridLayoutDefinition.numberOfRows",
           gridLayoutDefinition.numberOfRows
@@ -167,7 +167,7 @@ export function useSeqSelectCoordinatesControls({
           const tempId: (string | undefined)[] = [];
           tempId.push(item.pcrBatchItemId);
           tempId.push(item.primerId);
-          const id = compact(tempId).join("_");
+          const id = _.compact(tempId).join("_");
           return id === reactionId;
         })
       );
@@ -175,14 +175,14 @@ export function useSeqSelectCoordinatesControls({
         const tempId: (string | undefined)[] = [];
         tempId.push(item.pcrBatchItemId);
         tempId.push(item.primerId);
-        const id = compact(tempId).join("_");
+        const id = _.compact(tempId).join("_");
         if (seqReactionSortOrder.indexOf(id) === -1) {
           sorted.push(item);
         }
       });
-      return compact(sorted);
+      return _.compact(sorted);
     } else {
-      return compact(reactionSamples);
+      return _.compact(reactionSamples);
     }
   }
 
@@ -199,13 +199,13 @@ export function useSeqSelectCoordinatesControls({
         .map((item) => "/material-sample-summary/" + item.sampleId),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      const materialSamplesTransformed = compact(response).map<MaterialSample>(
-        (resource) => ({
-          materialSampleName: resource.materialSampleName,
-          id: resource.id,
-          type: resource.type
-        })
-      );
+      const materialSamplesTransformed = _.compact(
+        response
+      ).map<MaterialSample>((resource) => ({
+        materialSampleName: resource.materialSampleName,
+        id: resource.id,
+        type: resource.type
+      }));
 
       callback(materialSamplesTransformed);
     });
@@ -260,7 +260,7 @@ export function useSeqSelectCoordinatesControls({
           });
         }
 
-        const seqReactionAndPcrBatchItem = compact(
+        const seqReactionAndPcrBatchItem = _.compact(
           seqReactions.map(
             (item) =>
               ({
@@ -278,7 +278,7 @@ export function useSeqSelectCoordinatesControls({
           seqReactionAndPcrBatchItem
         );
 
-        const pcrBatchItems = compact(
+        const pcrBatchItems = _.compact(
           await bulkGet<PcrBatchItem, true>(
             seqReactionCompleted?.map(
               (item) =>
@@ -310,7 +310,7 @@ export function useSeqSelectCoordinatesControls({
   function moveItems(items: SeqReactionSample[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the SeqBatchItem from the grid.
-      const newCellGrid: CellGrid<SeqReactionSample> = omitBy(
+      const newCellGrid: CellGrid<SeqReactionSample> = _.omitBy(
         cellGrid,
         (item) => items.includes(item)
       );
@@ -513,7 +513,7 @@ export function useSeqSelectCoordinatesControls({
               },
               storageUnitUsage: {
                 data: matchedStorageUnitUsage
-                  ? pick(matchedStorageUnitUsage, "id", "type")
+                  ? _.pick(matchedStorageUnitUsage, "id", "type")
                   : null
               }
             }

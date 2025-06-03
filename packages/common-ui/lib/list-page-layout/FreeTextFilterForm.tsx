@@ -1,6 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FormikProps } from "formik";
-import { cloneDeep, noop } from "lodash";
+import _ from "lodash";
 import { useEffect } from "react";
 import { FilterAttribute } from "../filter-builder/FilterBuilder";
 import { DinaForm, DinaFormOnSubmit } from "../formik-connected/DinaForm";
@@ -21,7 +21,7 @@ export function FreeTextFilterForm({
   children,
   filterAttributes,
   id,
-  onFilterFormSubmit = noop
+  onFilterFormSubmit = _.noop
 }: FreeTextFilterFormProps) {
   const filterformKey = `${id}_filterForm`;
   const [filterForm, setFilterForm, removeFilterForm] = useLocalStorage(
@@ -34,7 +34,7 @@ export function FreeTextFilterForm({
     formik: { setSubmitting }
   }) => {
     // On submit, put the filter form's values into local storage.
-    setFilterForm(cloneDeep(submittedValues));
+    setFilterForm(_.cloneDeep(submittedValues));
     setSubmitting(false);
     onFilterFormSubmit(submittedValues);
   };

@@ -12,7 +12,7 @@ import {
   useQuery
 } from "common-ui";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { uniqBy } from "lodash";
+import _ from "lodash";
 import Link from "next/link";
 import { CSSProperties, ReactNode } from "react";
 import { AllowAttachmentsConfig, AttachmentSection } from "..";
@@ -54,7 +54,7 @@ export function AttachmentsField(props: AttachmentsFieldProps) {
     <FieldSpy fieldName={props.name}>
       {(value, { form }) => {
         const metadatas =
-          uniqBy(value as ResourceIdentifierObject[] | undefined, "id") ?? [];
+          _.uniqBy(value as ResourceIdentifierObject[] | undefined, "id") ?? [];
         return (
           <AttachmentsEditor
             {...props}
@@ -327,7 +327,7 @@ function addAttachedMetadatas(
 ): (metadataIds: string[]) => Promise<void> {
   return async (newIds) => {
     onChange(
-      uniqBy(
+      _.uniqBy(
         [...value, ...newIds.map((it) => ({ id: it, type: "metadata" }))],
         (val) => val.id
       )

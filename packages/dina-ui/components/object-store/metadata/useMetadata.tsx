@@ -10,7 +10,7 @@ import {
   Metadata,
   ObjectUpload
 } from "../../../types/objectstore-api";
-import { keys } from "lodash";
+import _ from "lodash";
 
 export function useMetadataEditQuery(id?: string | null) {
   const { apiClient } = useApiClient();
@@ -177,7 +177,7 @@ export function useMetadataSave({
 
     // Remove blank managed attribute values from the map:
     const blankValues: any[] = ["", null];
-    for (const maKey of keys(saveOperation?.resource.managedAttributes)) {
+    for (const maKey of _.keys(saveOperation?.resource.managedAttributes)) {
       if (
         blankValues.includes(saveOperation?.resource.managedAttributes?.[maKey])
       ) {

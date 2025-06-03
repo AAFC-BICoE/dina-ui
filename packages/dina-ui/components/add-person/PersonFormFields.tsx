@@ -2,7 +2,7 @@ import { FieldSet, FormikButton, useDinaFormContext } from "common-ui";
 import { Person } from "../../../dina-ui/types/objectstore-api";
 import React, { useState } from "react";
 import { FieldArray } from "formik";
-import { clamp } from "lodash";
+import _ from "lodash";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
@@ -42,7 +42,7 @@ export function PersonFormFields({
                 remove(index);
                 // Stay on the current tab number, or reduce if removeing the last element:
                 setActiveTabIdx((current) =>
-                  clamp(current, 0, identifiers.length - 2)
+                  _.clamp(current, 0, identifiers.length - 2)
                 );
               }
               return (

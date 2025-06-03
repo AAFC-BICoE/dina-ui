@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { noop } from "lodash";
+import _ from "lodash";
 import { LoadingSpinner } from "../../../../common-ui/lib";
 import { ContainerGrid } from "../../seqdb/container-grid/ContainerGrid";
 import { DraggableItemList } from "../../seqdb/container-grid/DraggableItemList";
@@ -90,7 +90,7 @@ export function StorageUnitSelectCoordinatesStep({
                       className={`${mode}-radio`}
                       type="radio"
                       checked={fillMode === mode}
-                      onChange={noop}
+                      onChange={_.noop}
                       onClick={() =>
                         setFillMode(mode === "ROW" ? "ROW" : "COLUMN")
                       }

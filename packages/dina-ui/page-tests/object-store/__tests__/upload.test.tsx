@@ -1,5 +1,5 @@
 import { AccountContextI } from "common-ui";
-import { noop } from "lodash";
+import _ from "lodash";
 import { fileUploadErrorHandler } from "../../../components/object-store/file-upload/FileUploadProvider";
 import UploadPage, {
   BULK_ADD_IDS_KEY
@@ -23,8 +23,8 @@ const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   authenticated: true,
   groupNames: ["example-group"],
   initialized: true,
-  login: noop,
-  logout: noop,
+  login: _.noop,
+  logout: _.noop,
   roles: [],
   // Mock for a successful token update.
   getCurrentToken: () => Promise.resolve("test-token"),

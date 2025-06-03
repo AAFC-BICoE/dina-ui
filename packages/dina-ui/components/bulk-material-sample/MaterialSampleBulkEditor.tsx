@@ -11,9 +11,8 @@ import {
   useApiClient,
   withoutBlankFields
 } from "common-ui";
-import { isEmpty, cloneDeep } from "lodash";
+import _ from "lodash";
 import { InputResource, PersistedResource, KitsuResource } from "kitsu";
-import { keys, omit, pick, pickBy } from "lodash";
 import { useEffect, useMemo, useRef, useState, RefObject } from "react";
 import { Promisable } from "type-fest";
 import {
@@ -312,10 +311,10 @@ export function getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook) {
     const newSample: InputResource<MaterialSample> = {
       ...baseSample,
       ...overrides,
-      ...(!isEmpty(newManagedAttributes) && {
+      ...(!_.isEmpty(newManagedAttributes) && {
         managedAttributes: newManagedAttributes
       }),
-      ...(!isEmpty(newHostOrganism) && {
+      ...(!_.isEmpty(newHostOrganism) && {
         hostOrganism: newHostOrganism
       })
     };
@@ -389,7 +388,7 @@ function useBulkSampleSave({
     bulkEditFormRef.current?.setErrors({});
     const bulkEditCollectingEventRefPermanent = bulkEditSampleHook
       ?.colEventFormRef?.current?.values
-      ? cloneDeep(bulkEditCollectingEvtFormRef)
+      ? _.cloneDeep(bulkEditCollectingEvtFormRef)
       : undefined;
 
     try {
@@ -513,8 +512,8 @@ function useBulkSampleSave({
         }
         // Any errored field that was edited in the Edit All tab should
         // get the red indicator in the Edit All tab.
-        const badBulkEditedFields = keys(
-          pickBy(
+        const badBulkEditedFields = _.keys(
+          _.pickBy(
             error.fieldErrors,
             (_, fieldName) =>
               getBulkEditTabFieldInfo({ bulkEditCtx, fieldName })
@@ -523,13 +522,15 @@ function useBulkSampleSave({
         );
         bulkEditFormRef.current?.setErrors({
           ...bulkEditFormRef.current?.errors,
-          ...pick(error.fieldErrors, badBulkEditedFields)
+          ..._.pick(error.fieldErrors, badBulkEditedFields)
         });
         // Don't show the bulk edited fields' errors in the individual sample tabs
         // because the user can't fix them there:
         sampleHooks
           .map((it) => it.formRef?.current)
-          .forEach((it) => it?.setErrors(omit(it.errors, badBulkEditedFields)));
+          .forEach((it) =>
+            it?.setErrors(_.omit(it.errors, badBulkEditedFields))
+          );
       }
       setError(error);
       throw new Error(formatMessage("bulkSubmissionErrorInfo"));

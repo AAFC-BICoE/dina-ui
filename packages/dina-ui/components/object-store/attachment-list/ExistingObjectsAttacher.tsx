@@ -8,7 +8,7 @@ import {
   useGroupedCheckBoxes
 } from "common-ui";
 import { FormikContextType } from "formik";
-import { toPairs } from "lodash";
+import _ from "lodash";
 import Link from "next/link";
 import { ThumbnailCell } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -39,7 +39,7 @@ export function ExistingObjectsAttacher({
   const submitMetadataIds: OnFormikSubmit<
     ExistingObjectsAttacherForm
   > = async ({ selectedMetadatas }) => {
-    const metadataIds = toPairs(selectedMetadatas)
+    const metadataIds = _.toPairs(selectedMetadatas)
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
     await onMetadataIdsSubmitted(metadataIds);

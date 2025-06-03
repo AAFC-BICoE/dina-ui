@@ -10,7 +10,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "react-bootstrap";
 import { GeneratorItem } from "./GeneratorItem";
 import { GeneratorColumn, GeneratorSelectorProps } from "./GeneratorSelector";
-import { startCase } from "lodash";
+import _ from "lodash";
 import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
 import { useFormikContext } from "formik";
 import QueryRowClassificationSearch, {
@@ -252,7 +252,7 @@ export function GeneratorSelectorList({
           return {
             ...baseStyle,
             ":before": {
-              content: `'${startCase(data.parentPath)} '`
+              content: `'${_.startCase(data.parentPath)} '`
             }
           };
         }
@@ -361,7 +361,7 @@ export function GeneratorSelectorList({
                   ) as ClassificationSearchStates;
                   setDynamicFieldValue(parsedValue.selectedClassificationRank);
                   setDynamicFieldLabel(
-                    startCase(parsedValue.selectedClassificationRank)
+                    _.startCase(parsedValue.selectedClassificationRank)
                   );
                 }}
                 value={dynamicFieldValue}
