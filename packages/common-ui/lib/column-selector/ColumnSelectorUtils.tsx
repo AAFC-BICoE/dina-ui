@@ -1,5 +1,5 @@
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
-import { compact, get, startCase } from "lodash";
+import _ from "lodash";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { FieldHeader, dateCell } from "..";
 import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
@@ -319,14 +319,14 @@ function getNestedColumn<TData extends KitsuResource>(
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
       cell: ({ row: { original } }) => {
-        const value = get(original, accessorKeyRelationship);
+        const value = _.get(original, accessorKeyRelationship);
         if (value && Array.isArray(value)) {
           const values = value
-            .map((val) => get(val, accessorKeyRelationshipAttribute))
+            .map((val) => _.get(val, accessorKeyRelationshipAttribute))
             .join(", ");
           return <>{values}</>;
         } else {
-          const singleValue = get(original, accessorKeyFull);
+          const singleValue = _.get(original, accessorKeyFull);
           return <>{singleValue}</>;
         }
       },
@@ -349,7 +349,7 @@ export function NestedColumnLabel({
 
   const relationshipLabel = messages["title_" + relationship]
     ? formatMessage(("title_" + relationship) as any)
-    : startCase(relationship);
+    : _.startCase(relationship);
 
   return <FieldHeader name={label} prefixName={relationshipLabel} />;
 }
@@ -633,13 +633,13 @@ export function IncludedManagedAttributeLabel({
 
   const relationshipLabel = messages["title_" + relationship]
     ? formatMessage(("title_" + relationship) as any)
-    : startCase(relationship);
+    : _.startCase(relationship);
 
   return (
     <>
       {relationshipLabel}
       {" - "}
-      {startCase(name)}
+      {_.startCase(name)}
     </>
   );
 }
@@ -839,7 +839,7 @@ export function getIncludedExtensionFieldColumn(
         relationship={config?.referencedBy ?? ""}
       />
     ),
-    label: `${startCase(config.referencedBy)} - ${
+    label: `${_.startCase(config.referencedBy)} - ${
       extensionValue.extension.name
     } - ${extensionField.name}`,
     isKeyword: true,
@@ -869,7 +869,7 @@ export function IncludedExtensionFieldLabel({
 
   const relationshipLabel = messages["title_" + relationship]
     ? formatMessage(("title_" + relationship) as any)
-    : startCase(relationship);
+    : _.startCase(relationship);
 
   return (
     <>
@@ -1075,7 +1075,7 @@ export function IncludedVocabularyLabel({
 
   const relationshipLabel = messages["title_" + relationship]
     ? formatMessage(("title_" + relationship) as any)
-    : startCase(relationship);
+    : _.startCase(relationship);
 
   const label =
     vocabulary?.multilingualTitle?.titles?.find(
@@ -1101,7 +1101,7 @@ export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
     id: `relationshipPresence.${relationship}.${operator}`,
     header: () => <RelationshipPresenceLabel relationship={relationship} />,
     cell: ({ row: { original } }) => {
-      const relationshipExists = get(
+      const relationshipExists = _.get(
         original,
         `data.relationships.${relationship}.data`
       );
@@ -1117,7 +1117,7 @@ export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
       return <FaRegSquare />;
     },
     relationshipType: relationship,
-    label: startCase(`${relationship}`),
+    label: _.startCase(`${relationship}`),
     isKeyword: true,
     isColumnVisible: true,
     enableSorting: false,
@@ -1141,7 +1141,7 @@ export function RelationshipPresenceLabel({
 
   const relationshipLabel = messages["title_" + relationship]
     ? formatMessage(("title_" + relationship) as any)
-    : startCase(relationship);
+    : _.startCase(relationship);
 
   return (
     <>
@@ -1215,7 +1215,7 @@ export function FunctionFieldLabel({
   if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
     const functionName = pathParts[2];
     const paramStr = pathParts.length > 3 ? pathParts[3] : undefined;
-    const paramObjects = compact(
+    const paramObjects = _.compact(
       paramStr?.split("+").map((field) => {
         const mappingMatch = indexMappings?.find((mapping) =>
           mapping.parentName
@@ -1246,11 +1246,11 @@ export function FunctionFieldLabel({
                 (field.parentName
                   ? (messages[field.parentName]
                       ? formatMessage(field.parentName as any)
-                      : startCase(field.parentName)) + " "
+                      : _.startCase(field.parentName)) + " "
                   : "") +
                 (messages[field.label]
                   ? formatMessage(field.label as any)
-                  : startCase(field.label))
+                  : _.startCase(field.label))
               );
             })
             .join(" + ") +

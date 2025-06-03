@@ -9,7 +9,7 @@ import {
   useApiClient
 } from "common-ui";
 import { KitsuResponse, PersistedResource } from "kitsu";
-import { compact, pick, uniq, difference, concat } from "lodash";
+import _ from "lodash";
 import { useEffect, useState } from "react";
 import {
   MaterialSample,
@@ -89,7 +89,9 @@ export function SangerSampleSelectionStep({
     materialSamples: MaterialSampleSummary[]
   ) {
     setSelectedResources(materialSamples);
-    setMaterialSampleSortOrder(compact(materialSamples.map((item) => item.id)));
+    setMaterialSampleSortOrder(
+      _.compact(materialSamples.map((item) => item.id))
+    );
   }
 
   // Sort MaterialSamples based on the preserved order in local storage
@@ -103,16 +105,16 @@ export function SangerSampleSelectionStep({
           sorted.push(item);
         }
       });
-      return compact(sorted);
+      return _.compact(sorted);
     } else {
-      return compact(samples);
+      return _.compact(samples);
     }
   }
 
   function onSelectMaterial(selected: MaterialSample[]) {
-    const ids = compact(
-      uniq(
-        concat(
+    const ids = _.compact(
+      _.uniq(
+        _.concat(
           materialSampleSortOrder,
           selected.map((material) => material.id)
         )
@@ -122,10 +124,10 @@ export function SangerSampleSelectionStep({
   }
 
   function onDeselectMaterial(unselected: MaterialSample[]) {
-    const ids = uniq(
-      difference(
+    const ids = _.uniq(
+      _.difference(
         materialSampleSortOrder,
-        compact(unselected.map((material) => material.id))
+        _.compact(unselected.map((material) => material.id))
       )
     );
     setMaterialSampleSortOrder(ids);
@@ -191,10 +193,10 @@ export function SangerSampleSelectionStep({
         {}
       );
       // Convert to UUID arrays to compare the two arrays.
-      const selectedResourceUUIDs = compact(
+      const selectedResourceUUIDs = _.compact(
         selectedResources?.map((material) => material.id)
       );
-      const previouslySelectedResourcesUUIDs = compact(
+      const previouslySelectedResourcesUUIDs = _.compact(
         previouslySelectedResources?.map((item) => ({
           materialSampleUUID: item?.materialSample?.id,
           pcrBatchItemUUID: item?.id
@@ -202,7 +204,7 @@ export function SangerSampleSelectionStep({
       );
 
       // UUIDs of PCR Batch Items that need to be created.
-      const itemsToCreate = uniq(
+      const itemsToCreate = _.uniq(
         selectedResourceUUIDs.filter(
           (uuid) =>
             !previouslySelectedResourcesUUIDs.some(
@@ -212,7 +214,7 @@ export function SangerSampleSelectionStep({
       );
 
       // UUIDs of PCR Batch Items that need to be deleted.
-      const itemsToDelete = uniq(
+      const itemsToDelete = _.uniq(
         previouslySelectedResourcesUUIDs.filter(
           (uuid) =>
             !selectedResourceUUIDs.includes(uuid.materialSampleUUID as string)
@@ -257,7 +259,7 @@ export function SangerSampleSelectionStep({
               type: "pcr-batch-item",
               group: pcrBatch.group ?? "",
               createdBy: username ?? "",
-              pcrBatch: pick(pcrBatch, "id", "type"),
+              pcrBatch: _.pick(pcrBatch, "id", "type"),
               relationships: {
                 materialSample: {
                   data: {

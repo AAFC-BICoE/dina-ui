@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
-import { noop, startCase } from "lodash";
+import _ from "lodash";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import { VocabularyOption } from "../../../../../dina-ui/components/collection/VocabularySelectField";
 import useVocabularyOptions from "../../../../../dina-ui/components/collection/useVocabularyOptions";
@@ -57,7 +57,9 @@ export default function QueryRowClassificationSearch({
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = isInColumnSelector ? noop : useQueryBuilderEnterToSearch();
+  const onKeyDown = isInColumnSelector
+    ? _.noop
+    : useQueryBuilderEnterToSearch();
 
   const [classificationState, setClassificationState] =
     useState<ClassificationSearchStates>(() =>
@@ -93,7 +95,7 @@ export default function QueryRowClassificationSearch({
   // Capitalize each label for the taxonomic rank options.
   useMemo(() => {
     taxonomicRankOptions.forEach((option) => {
-      option.label = startCase(option.label);
+      option.label = _.startCase(option.label);
     });
   }, [taxonomicRankOptions]);
 

@@ -21,7 +21,7 @@ import {
   useInstanceContext
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
-import { compact, find } from "lodash";
+import _ from "lodash";
 import Link from "next/link";
 import { ChangeEvent, useRef, useState } from "react";
 import useSWR from "swr";
@@ -784,10 +784,10 @@ export function CollectingEventFormLayout({
                   path: "collection-api/vocabulary2/coordinateSystem"
                 }),
                 option: (vocabElement) =>
-                  compact(
+                  _.compact(
                     vocabElement?.vocabularyElements?.map(
                       (it) =>
-                        find(
+                        _.find(
                           it?.multilingualTitle?.titles || [],
                           (item) => item.lang === locale
                         )?.title
@@ -885,10 +885,10 @@ export function CollectingEventFormLayout({
                   path: "collection-api/vocabulary2/srs"
                 }),
                 option: (vocabElement) =>
-                  compact(
+                  _.compact(
                     vocabElement?.vocabularyElements?.map(
                       (it) =>
-                        find(
+                        _.find(
                           it?.multilingualTitle?.titles || [],
                           (item) => item.lang === locale
                         )?.title ||

@@ -1,5 +1,5 @@
 import { InputResource } from "kitsu";
-import { fromPairs, toPairs } from "lodash";
+import _ from "lodash";
 import { Protocol } from "packages/dina-ui/types/collection-api";
 import { ProtocolFormValue } from "./ProtocolForm";
 
@@ -25,7 +25,7 @@ export function useProtocolFormConverter() {
       ? {
           ...protocol,
           // Convert multilingualDescription to editable Dictionary format:
-          multilingualDescription: fromPairs<string | undefined>(
+          multilingualDescription: _.fromPairs<string | undefined>(
             protocol.multilingualDescription?.descriptions?.map(
               ({ desc, lang }) => [lang ?? "", desc ?? ""]
             )
@@ -71,7 +71,7 @@ export function useProtocolFormConverter() {
       ...protocolFormValue,
       // Convert the editable format to the stored format:
       multilingualDescription: {
-        descriptions: toPairs(protocolFormValue.multilingualDescription).map(
+        descriptions: _.toPairs(protocolFormValue.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc })
         )
       }

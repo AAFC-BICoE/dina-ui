@@ -1,6 +1,6 @@
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
-import { compact, toPairs, uniq } from "lodash";
+import _ from "lodash";
 import {
   BackButton,
   ButtonBar,
@@ -415,10 +415,10 @@ export function MaterialSampleForm({
       )
   };
 
-  const formSectionPairs = toPairs(formSections);
+  const formSectionPairs = _.toPairs(formSections);
 
-  const sortedFormSectionPairs = uniq([
-    ...compact(
+  const sortedFormSectionPairs = _.uniq([
+    ..._.compact(
       (navOrder ?? []).map((id) => formSectionPairs.find(([it]) => it === id))
     ),
     ...formSectionPairs

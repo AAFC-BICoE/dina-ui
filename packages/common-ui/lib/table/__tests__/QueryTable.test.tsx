@@ -4,7 +4,7 @@ import {
   KitsuResponse,
   PersistedResource
 } from "kitsu";
-import { range } from "lodash";
+import _ from "lodash";
 import { IntlProvider } from "react-intl";
 import "@testing-library/jest-dom";
 import {
@@ -34,7 +34,7 @@ interface Todo extends KitsuResource {
  */
 function getMockTodos(page): KitsuResponse<Todo[], MetaWithTotal> {
   const offset = page.offset || 0;
-  const idRange = range(offset, offset + page.limit);
+  const idRange = _.range(offset, offset + page.limit);
 
   return {
     data: idRange.map<PersistedResource<Todo>>((i) => ({

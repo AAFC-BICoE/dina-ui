@@ -5,7 +5,7 @@ import {
   SaveArgs,
   useQuery
 } from "common-ui";
-import { Dictionary, toPairs } from "lodash";
+import _, { Dictionary } from "lodash";
 import { useContext, useState, useEffect } from "react";
 import {
   MaterialSampleSummary,
@@ -15,7 +15,6 @@ import {
 } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { NgsIndex } from "packages/dina-ui/types/seqdb-api";
-import { isEqual } from "lodash";
 import { MetagenomicsIndexAssignmentStepProps } from "../metagenomics-workflow/MetagenomicsIndexAssignmentStep";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 
@@ -240,7 +239,7 @@ export function useMetagenomicsIndexAssignmentAPI({
     const edits: Dictionary<Partial<MetagenomicsIndexAssignmentResource>> = {};
 
     // Get the new i7 values:
-    const colIndexes = toPairs<string>(indexI7s);
+    const colIndexes = _.toPairs<string>(indexI7s);
     for (const [col, index] of colIndexes) {
       const colResources = resourcesToSave.filter(
         (it) => String(it?.storageUnitUsage?.wellColumn) === col
@@ -255,7 +254,7 @@ export function useMetagenomicsIndexAssignmentAPI({
     }
 
     // Get the new i5 values:
-    const rowIndexes = toPairs<string>(indexI5s);
+    const rowIndexes = _.toPairs<string>(indexI5s);
     for (const [row, index] of rowIndexes) {
       const rowPreps = resourcesToSave.filter(
         (it) => it?.storageUnitUsage?.wellRow === row
@@ -269,7 +268,7 @@ export function useMetagenomicsIndexAssignmentAPI({
       }
     }
 
-    const saveOps: SaveArgs[] = toPairs(edits).map(([id, prepEdit]) => ({
+    const saveOps: SaveArgs[] = _.toPairs(edits).map(([id, prepEdit]) => ({
       resource: { id, type: "metagenomics-batch-item", ...prepEdit },
       type: "metagenomics-batch-item"
     }));
@@ -309,7 +308,7 @@ export function useMetagenomicsIndexAssignmentAPI({
           ({
             type: "metagenomics-batch-item",
             id: metagenomicsIndexAssignmentResources[index].id,
-            ...(!isEqual(
+            ...(!_.isEqual(
               metagenomicsIndexAssignmentResources[index]?.indexI5?.id,
               submittedValue.indexI5
             ) && {
@@ -318,7 +317,7 @@ export function useMetagenomicsIndexAssignmentAPI({
                 id: submittedValue.indexI5 ? submittedValue.indexI5 : null
               }
             }),
-            ...(!isEqual(
+            ...(!_.isEqual(
               metagenomicsIndexAssignmentResources[index]?.indexI7?.id,
               submittedValue.indexI7
             ) && {

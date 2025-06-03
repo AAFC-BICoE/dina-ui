@@ -4,7 +4,7 @@ import {
   ORGANISMS_COMPONENT_NAME,
   FormTemplateSectionItem
 } from "../../types/collection-api";
-import { sortBy, isEmpty } from "lodash";
+import _ from "lodash";
 
 export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined
@@ -63,8 +63,8 @@ export function getComponentArrayValues(
 
   if (
     invisibleUndefined &&
-    isEmpty(componentValues) &&
-    isEmpty(templateCheckboxes)
+    _.isEmpty(componentValues) &&
+    _.isEmpty(templateCheckboxes)
   ) {
     return undefined;
   }
@@ -153,8 +153,8 @@ export function getComponentValues(
 
   if (
     invisibleUndefined &&
-    isEmpty(componentValues) &&
-    isEmpty(templateCheckboxes)
+    _.isEmpty(componentValues) &&
+    _.isEmpty(templateCheckboxes)
   ) {
     return undefined;
   }
@@ -239,7 +239,7 @@ export function getComponentOrderFromTemplate(
     return null;
   }
 
-  return sortBy(template.components, "order").map<string>(
+  return _.sortBy(template.components, "order").map<string>(
     (component) => component.name ?? ""
   );
 }

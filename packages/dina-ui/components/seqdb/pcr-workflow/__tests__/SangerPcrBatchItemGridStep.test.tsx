@@ -2,7 +2,7 @@ import { StorageUnit } from "../../../../types/collection-api";
 import { mountWithAppContext } from "common-ui";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { SangerPcrBatchItemGridStep } from "../pcr-batch-plating-step/SangerPcrBatchItemGridStep";
-import { noop } from "lodash";
+import _ from "lodash";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
@@ -349,9 +349,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
         editMode={false}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
         onSaved={jest.fn()}
       />,
       testCtx
@@ -390,9 +390,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
         editMode={false}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
         onSaved={mockOnSaved}
       />,
       testCtx
@@ -411,9 +411,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
         editMode={true}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
         onSaved={mockOnSaved}
       />,
       testCtx
@@ -432,9 +432,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
         editMode={true}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
         onSaved={mockOnSaved}
       />,
       testCtx
@@ -618,9 +618,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
         pcrBatch={PCR_BATCH_NO_STORAGE}
         pcrBatchId={PCR_BATCH_ID}
         editMode={false}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
         onSaved={mockOnSaved}
       />,
       testCtx

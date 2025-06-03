@@ -36,7 +36,7 @@ export function DraggableItemList<
   return (
     <ul
       className="list-group available-sample-list"
-      ref={dropRef}
+      ref={dropRef as any}
       style={{
         minHeight: "400px",
         maxHeight: "400px",

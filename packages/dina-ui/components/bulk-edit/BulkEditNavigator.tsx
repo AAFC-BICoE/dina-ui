@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { ResourceWithHooks } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, KitsuResource } from "kitsu";
-import { isEmpty } from "lodash";
+import _ from "lodash";
 import { ReactNode, RefObject } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { SelectNavigation } from "./SelectNavigation";
@@ -48,7 +48,7 @@ export function BulkEditNavigator({
   const tabsWithErrors = [...resources, ...extraTabs].filter(
     (resource) =>
       !!resource.formRef.current?.status ||
-      !isEmpty(resource.formRef.current?.errors)
+      !_.isEmpty(resource.formRef.current?.errors)
   );
 
   function isSelected(key: string) {

@@ -128,7 +128,7 @@ export default function UploadPage() {
                     dup.originalFilename && (
                       <tr key={idx} className={`${idx}-row`}>
                         <td>{dup.originalFilename}</td>
-                        <td>{dup.meta?.warnings?.duplicate_found}</td>
+                        <td>{String(dup.meta?.warnings?.duplicate_found)}</td>
                       </tr>
                     )
                 )}

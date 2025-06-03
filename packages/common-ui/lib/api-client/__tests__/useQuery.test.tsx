@@ -1,6 +1,6 @@
 import { DocWithErrors } from "jsonapi-typescript";
 import { KitsuResource, KitsuResponse, KitsuResponseData } from "kitsu";
-import { last } from "lodash";
+import _ from "lodash";
 import { mountWithAppContext } from "common-ui";
 import { ClientSideJoinSpec } from "../client-side-join";
 import { MetaWithTotal } from "../operations-types";
@@ -316,7 +316,7 @@ describe("useQuery hook", () => {
     expect(mockGet).toHaveBeenCalledTimes(1);
 
     // Get the params of the last call to Kitsu's GET method.
-    const [path, getParams] = last(mockGet.mock.calls) || [
+    const [path, getParams] = _.last(mockGet.mock.calls) || [
       undefined,
       undefined
     ];
@@ -346,7 +346,7 @@ describe("useQuery hook", () => {
 
     expect(mockGet).toHaveBeenCalledTimes(1);
     // Get the params of the last call to Kitsu's GET method.
-    const [path, getParams] = last(mockGet.mock.calls) || [
+    const [path, getParams] = _.last(mockGet.mock.calls) || [
       undefined,
       undefined
     ];

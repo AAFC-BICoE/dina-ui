@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { fromPairs } from "lodash";
+import _ from "lodash";
 import { ViewPageLayout } from "../../../components";
 import { ReportTemplateFormLayout } from "./edit";
 import { ReportTemplate } from "../../../types/dina-export-api";
@@ -23,7 +23,7 @@ export default function ReportTemplateDetailsPage() {
           initialValues={{
             ...props.initialValues,
             // Convert multilingualDescription to editable Dictionary format:
-            multilingualDescription: fromPairs<string | undefined>(
+            multilingualDescription: _.fromPairs<string | undefined>(
               props.initialValues.multilingualDescription?.descriptions?.map(
                 ({ desc, lang }) => [lang ?? "", desc ?? ""]
               )

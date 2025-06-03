@@ -2,7 +2,7 @@ import React from "react";
 import { ContainerGrid } from "../../seqdb/container-grid/ContainerGrid";
 import { MaterialSample, StorageUnit } from "../../../types/collection-api";
 import { useState } from "react";
-import { noop } from "lodash";
+import _ from "lodash";
 import { PersistedResource } from "kitsu";
 import { LoadingSpinner, useDinaFormContext } from "common-ui";
 import { ErrorBanner } from "../../error/ErrorBanner";
@@ -85,7 +85,7 @@ export default function StorageUnitGrid({
           cellGrid={cellGrid}
           editMode={false}
           movedItems={[]}
-          onDrop={noop}
+          onDrop={_.noop}
         />
       </div>
     </div>

@@ -5,7 +5,7 @@ import {
   MaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../../bulk-material-sample/MaterialSampleBulkEditor";
-import { isEqual } from "lodash";
+import _ from "lodash";
 import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
@@ -435,7 +435,7 @@ describe("BulkEditTabWarning", () => {
     // even though the back-end shouldn't actually allow this:
     expect(
       SAMPLES_WITH_SAME_DETERMINATIONS.every((sample) =>
-        isEqual(sample.organism, SAMPLES_WITH_SAME_DETERMINATIONS[0].organism)
+        _.isEqual(sample.organism, SAMPLES_WITH_SAME_DETERMINATIONS[0].organism)
       )
     );
     await new Promise(setImmediate);

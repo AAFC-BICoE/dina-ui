@@ -1,4 +1,4 @@
-import { startCase } from "lodash";
+import _ from "lodash";
 import { useIntl } from "react-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 
@@ -63,7 +63,7 @@ export function useFieldLabels() {
     const fieldLabel = messages[messageKey]
       ? formatMessage({ id: messageKey as any })
       : startCaseLabel
-      ? startCase(name)
+      ? _.startCase(name)
       : name;
 
     return { tooltip, fieldLabel };

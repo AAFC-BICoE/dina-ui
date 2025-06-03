@@ -1,6 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import { SangerPcrBatchStep } from "../SangerPcrBatchStep";
-import { noop } from "lodash";
+import _ from "lodash";
 import { PcrBatch } from "../../../../types/seqdb-api";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
@@ -63,9 +63,9 @@ describe("SangerPcrBatchStep component", () => {
       <SangerPcrBatchStep
         onSaved={mockOnSaved}
         editMode={true}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
       />,
       testCtx
     );
@@ -103,9 +103,9 @@ describe("SangerPcrBatchStep component", () => {
         pcrBatchId={PCR_BATCH_ID}
         pcrBatch={PCR_BATCH}
         editMode={false}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
       />,
       testCtx
     );
@@ -122,9 +122,9 @@ describe("SangerPcrBatchStep component", () => {
         pcrBatchId={PCR_BATCH_ID}
         pcrBatch={PCR_BATCH}
         editMode={true}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
       />,
       testCtx
     );

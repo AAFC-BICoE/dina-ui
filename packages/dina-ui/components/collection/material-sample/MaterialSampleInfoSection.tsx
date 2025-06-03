@@ -15,7 +15,7 @@ import {
 } from "../../..//types/collection-api";
 import { Vocabulary } from "../../../types/collection-api";
 import { MaterialSampleStateReadOnlyRender } from "../MaterialSampleStateWarning";
-import { find, compact } from "lodash";
+import _ from "lodash";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 
@@ -66,10 +66,10 @@ export function MaterialSampleInfoSection({
                   path: "collection-api/vocabulary2/materialSampleState"
                 }),
                 option: (vocabElement) =>
-                  compact(
+                  _.compact(
                     vocabElement?.vocabularyElements?.map(
                       (it) =>
-                        find(
+                        _.find(
                           it?.multilingualTitle?.titles || [],
                           (item) => item.lang === locale
                         )?.title ||

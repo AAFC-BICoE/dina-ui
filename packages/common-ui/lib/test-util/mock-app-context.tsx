@@ -9,7 +9,7 @@ import {
   InstanceContextProvider,
   ModalProvider
 } from "common-ui";
-import { merge, noop } from "lodash";
+import _ from "lodash";
 import { FileUploadProviderImpl } from "../../../dina-ui/components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../../../dina-ui/intl/dina-ui-intl";
 import { useMemo, useRef } from "react";
@@ -40,8 +40,8 @@ export function MockAppContextProvider({
       authenticated: true,
       groupNames: ["aafc", "cnc"],
       initialized: true,
-      login: noop,
-      logout: noop,
+      login: _.noop,
+      logout: _.noop,
       roles: ["user"],
       getCurrentToken: () => Promise.resolve("test-token"),
       username: "test-user",
@@ -100,7 +100,7 @@ export function MockAppContextProvider({
         value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
       >
         <ApiClientProvider
-          value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
+          value={_.merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
           <DinaIntlProvider>
             <InstanceContextProvider

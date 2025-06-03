@@ -1,5 +1,5 @@
 import { DinaForm, Tooltip } from "common-ui";
-import { fromPairs } from "lodash";
+import _ from "lodash";
 import { ViewPageLayout } from "../../../components";
 import { Assemblage } from "../../../types/collection-api/resources/Assemblage";
 import { AssemblageFormLayout } from "./edit";
@@ -13,12 +13,12 @@ export default function AssemblageDetailsPage() {
           initialValues={{
             ...props.initialValues,
             // Convert multilingualDescription to editable Dictionary format:
-            multilingualDescription: fromPairs<string | undefined>(
+            multilingualDescription: _.fromPairs<string | undefined>(
               props.initialValues.multilingualDescription?.descriptions?.map(
                 ({ desc, lang }) => [lang ?? "", desc ?? ""]
               )
             ),
-            multilingualTitle: fromPairs<string | undefined>(
+            multilingualTitle: _.fromPairs<string | undefined>(
               props.initialValues.multilingualTitle?.titles?.map(
                 ({ title, lang }) => [lang ?? "", title ?? ""]
               )

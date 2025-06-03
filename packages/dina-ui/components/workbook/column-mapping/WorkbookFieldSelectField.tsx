@@ -1,5 +1,5 @@
 import { useFormikContext } from "formik";
-import { startCase } from "lodash";
+import _ from "lodash";
 import { useMemo } from "react";
 import {
   ResourceSelectField,
@@ -72,7 +72,7 @@ export function WorkbookFieldSelectField({
           return {
             ...baseStyle,
             ":before": {
-              content: `'${startCase(data.parentPath)} '`
+              content: `'${_.startCase(data.parentPath)} '`
             }
           };
         }

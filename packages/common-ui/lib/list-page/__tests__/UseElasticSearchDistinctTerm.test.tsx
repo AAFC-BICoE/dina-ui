@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { mountWithAppContext } from "common-ui";
 import { useElasticSearchDistinctTerm } from "../useElasticSearchDistinctTerm";
-import { isEmpty, noop } from "lodash";
+import _ from "lodash";
 import { QueryBuilderContextProvider } from "../query-builder/QueryBuilder";
 import { waitFor } from "@testing-library/react";
 
@@ -41,7 +41,7 @@ function UseElasticSearchDistinctTermWrapper({
   });
 
   useEffect(() => {
-    if (!isEmpty(searchResults)) {
+    if (!_.isEmpty(searchResults)) {
       searchResultsRetrieved(searchResults);
     } else {
       emptyResultsRetrieved?.();
@@ -116,7 +116,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
   it("Non-relationship suggestions retrieved (keyword multiField)", async () => {
     mountWithAppContext(
       <QueryBuilderContextProvider
-        value={{ groups: GROUPS, performSubmit: noop }}
+        value={{ groups: GROUPS, performSubmit: _.noop }}
       >
         <UseElasticSearchDistinctTermWrapper
           fieldName={FIELD_NAME}
@@ -157,7 +157,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
   it("Non-relationship suggestions retrieved (keyword type)", async () => {
     mountWithAppContext(
       <QueryBuilderContextProvider
-        value={{ groups: GROUPS, performSubmit: noop }}
+        value={{ groups: GROUPS, performSubmit: _.noop }}
       >
         <UseElasticSearchDistinctTermWrapper
           fieldName={FIELD_NAME}
@@ -198,7 +198,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
   it("Relationship suggestions retrieved", async () => {
     mountWithAppContext(
       <QueryBuilderContextProvider
-        value={{ groups: GROUPS, performSubmit: noop }}
+        value={{ groups: GROUPS, performSubmit: _.noop }}
       >
         <UseElasticSearchDistinctTermWrapper
           fieldName={RELATIONSHIP_FIELD_NAME}
@@ -258,7 +258,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
     it("Unable to retrieve results, empty suggestion list returned", async () => {
       mountWithAppContext(
         <QueryBuilderContextProvider
-          value={{ groups: GROUPS, performSubmit: noop }}
+          value={{ groups: GROUPS, performSubmit: _.noop }}
         >
           <UseElasticSearchDistinctTermWrapper
             fieldName={FIELD_NAME}
@@ -294,7 +294,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
     it("No field name provided, no results should be returned.", async () => {
       mountWithAppContext(
         <QueryBuilderContextProvider
-          value={{ groups: GROUPS, performSubmit: noop }}
+          value={{ groups: GROUPS, performSubmit: _.noop }}
         >
           <UseElasticSearchDistinctTermWrapper
             searchResultsRetrieved={(results: any) => {
@@ -324,7 +324,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
     it("No group provided, the query should not include group", async () => {
       mountWithAppContext(
         <QueryBuilderContextProvider
-          value={{ groups: [], performSubmit: noop }}
+          value={{ groups: [], performSubmit: _.noop }}
         >
           <UseElasticSearchDistinctTermWrapper
             fieldName={FIELD_NAME}

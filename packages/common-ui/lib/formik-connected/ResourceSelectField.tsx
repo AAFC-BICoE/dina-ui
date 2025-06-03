@@ -1,5 +1,5 @@
 import { KitsuResource, PersistedResource } from "kitsu";
-import { castArray, compact } from "lodash";
+import _ from "lodash";
 import Link from "next/link";
 import { Fragment } from "react";
 import {
@@ -101,7 +101,7 @@ export function ReadOnlyResourceLink<TData extends KitsuResource>({
   value,
   resourceSelectFieldProps: { readOnlyLink, model, optionLabel }
 }: ReadOnlyResourceLinkProps<TData>) {
-  const values = compact(castArray(value));
+  const values = _.compact(_.castArray(value));
   const valueIsShallowReference = isShallowReference(values);
   const resources =
     useBulkGet<TData>({

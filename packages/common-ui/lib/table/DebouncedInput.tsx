@@ -1,4 +1,4 @@
-import { debounce } from "lodash";
+import _ from "lodash";
 import { InputHTMLAttributes, useEffect, useRef, useState } from "react";
 
 export function DebouncedInput({
@@ -14,7 +14,7 @@ export function DebouncedInput({
   const [value, setValue] = useState(initialValue);
 
   const debouncedOnChange = useRef(
-    debounce((valueParam) => {
+    _.debounce((valueParam) => {
       onChange(valueParam);
     }, debounceTime)
   ).current;

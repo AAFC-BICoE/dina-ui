@@ -1,5 +1,5 @@
 import { DinaForm, FieldView, useApiClient, useIsMounted } from "common-ui";
-import { toPairs } from "lodash";
+import _ from "lodash";
 import { ManagedAttribute } from "../../types/collection-api";
 import { useEffect, useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -55,7 +55,7 @@ export function ManagedAttributesViewer({
   }, []);
   const managedAttributeValues = (
     values
-      ? toPairs(values).map(([key, mav]) => ({
+      ? _.toPairs(values).map(([key, mav]) => ({
           key,
           value: mav
         }))

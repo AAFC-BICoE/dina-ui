@@ -1,5 +1,5 @@
 import { Formik } from "formik";
-import { noop } from "lodash";
+import _ from "lodash";
 import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { ErrorViewer } from "../ErrorViewer";
@@ -11,7 +11,7 @@ describe("ErrorViewer component", () => {
   it("Renders nothing when Formik has no status.", () => {
     // Render the component with React Testing Library
     const wrapper = mountWithAppContext(
-      <Formik initialValues={{}} onSubmit={noop}>
+      <Formik initialValues={{}} onSubmit={_.noop}>
         <ErrorViewer />
       </Formik>
     );

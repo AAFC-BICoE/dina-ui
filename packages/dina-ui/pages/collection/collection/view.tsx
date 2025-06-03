@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { fromPairs } from "lodash";
+import _ from "lodash";
 import Link from "next/link";
 import { ViewPageLayout } from "../../../components";
 import { Collection } from "../../../types/collection-api";
@@ -29,7 +29,7 @@ export default function CollectionDetailsPage() {
           initialValues={{
             ...props.initialValues,
             // Convert multilingualDescription to editable Dictionary format:
-            multilingualDescription: fromPairs<string | undefined>(
+            multilingualDescription: _.fromPairs<string | undefined>(
               props.initialValues.multilingualDescription?.descriptions?.map(
                 ({ desc, lang }) => [lang ?? "", desc ?? ""]
               )
