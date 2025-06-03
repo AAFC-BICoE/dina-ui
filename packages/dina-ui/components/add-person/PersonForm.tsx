@@ -64,7 +64,8 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       // Don't call the API with an empty Save array:
       if (identifierSaveArgs.length) {
         savedIdentifiers = await save<Identifier>(identifierSaveArgs, {
-          apiBaseUrl: "/agent-api"
+          apiBaseUrl: "/agent-api",
+          skipOperationForSingleRequest: true
         });
       }
 

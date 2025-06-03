@@ -133,7 +133,8 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
         }
       ],
       {
-        apiBaseUrl: "/agent-api"
+        apiBaseUrl: "/agent-api",
+        skipOperationForSingleRequest: true
       }
     );
 
