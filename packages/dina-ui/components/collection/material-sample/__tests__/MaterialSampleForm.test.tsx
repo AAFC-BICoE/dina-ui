@@ -6,7 +6,11 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  fireEvent,
+  waitFor,
+  waitForElementToBeRemoved
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -242,7 +246,7 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() => expect(wrapper.container).toBeInTheDocument());
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -252,7 +256,11 @@ describe("Material Sample Edit Page", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByLabelText(/verbatim event datetime/i)
+      ).toBeInTheDocument()
+    );
 
     userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
@@ -264,7 +272,7 @@ describe("Material Sample Edit Page", () => {
     );
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
 
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
@@ -316,7 +324,7 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() => expect(wrapper.container).toBeInTheDocument());
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -326,7 +334,11 @@ describe("Material Sample Edit Page", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("button", { name: /select/i })
+      ).toBeInTheDocument()
+    );
 
     userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
@@ -335,10 +347,12 @@ describe("Material Sample Edit Page", () => {
 
     // Select an existing collecting event.
     userEvent.click(wrapper.getByRole("button", { name: /select/i }));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(wrapper.getByRole("button", { name: /save/i })).toBeInTheDocument()
+    );
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
@@ -367,7 +381,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      ).toHaveDisplayValue("2021-04-13")
+    );
 
     // Existing CollectingEvent should show up:
     expect(
@@ -382,7 +400,7 @@ describe("Material Sample Edit Page", () => {
     );
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
     expect(mockSave.mock.calls).toEqual([
       [
@@ -409,7 +427,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() => expect(wrapper.container).toBeInTheDocument());
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -419,7 +437,11 @@ describe("Material Sample Edit Page", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      ).toBeInTheDocument()
+    );
 
     // Set the new Collecting Event's verbatimEventDateTime:
     userEvent.type(
@@ -433,7 +455,7 @@ describe("Material Sample Edit Page", () => {
     );
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
 
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
@@ -488,7 +510,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      ).toHaveDisplayValue("2021-04-13")
+    );
 
     // Existing CollectingEvent should show up:
     expect(
@@ -497,7 +523,11 @@ describe("Material Sample Edit Page", () => {
 
     // Remove the existing Collecting Event.
     userEvent.click(wrapper.getByRole("button", { name: /detach/i }));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      ).toHaveDisplayValue("")
+    );
 
     // Existing CollectingEvent should be gone:
     expect(
@@ -520,7 +550,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
 
     expect(mockSave.mock.calls).toEqual([
       [
@@ -583,7 +613,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelector(".enable-catalogue-info input")
+      ).toHaveAttribute("aria-checked", "true")
+    );
 
     // Preparations are enabled:
     expect(
@@ -607,7 +641,14 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.container.querySelector(".enable-storage input")
+      ).toHaveAttribute("aria-checked", "true");
+      expect(
+        wrapper.getByRole("heading", { name: /storage/i })
+      ).toBeInTheDocument();
+    });
 
     // Storage is enabled:
     expect(
@@ -638,7 +679,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelector(".enable-organisms input")
+      ).toHaveAttribute("aria-checked", "true")
+    );
 
     // Determinations are enabled:
     expect(
@@ -664,9 +709,13 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelector(".enable-associations input")
+      ).toHaveAttribute("aria-checked", "true")
+    );
 
-    // Assoications are enabled:
+    // Associations are enabled:
     expect(
       wrapper.container.querySelector(".enable-associations input")
     ).toHaveAttribute("aria-checked", "true");
@@ -688,7 +737,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("link", { name: /my\-sample\-name/i })
+      ).toBeInTheDocument()
+    );
 
     // Expect to the associated sample:
     expect(
@@ -703,7 +756,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
     // Saves the Material Sample:
     expect(mockSave.mock.calls).toEqual([
@@ -743,27 +796,28 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
 
     // Data components are disabled:
-    expect(
-      wrapper.container.querySelector(".enable-collecting-event input")
-    ).toHaveAttribute("aria-checked", "false");
-    expect(
-      wrapper.container.querySelector(".enable-organisms input")
-    ).toHaveAttribute("aria-checked", "false");
-    expect(
-      wrapper.container.querySelector(".enable-storage input")
-    ).toHaveAttribute("aria-checked", "false");
-    expect(
-      wrapper.container.querySelector(".enable-scheduled-actions input")
-    ).toHaveAttribute("aria-checked", "false");
-    expect(
-      wrapper.container.querySelector(".enable-restrictions input")
-    ).toHaveAttribute("aria-checked", "false");
-    expect(
-      wrapper.container.querySelector(".enable-associations input")
-    ).toHaveAttribute("aria-checked", "false");
+    await waitFor(() => {
+      expect(
+        wrapper.container.querySelector(".enable-collecting-event input")
+      ).toHaveAttribute("aria-checked", "false");
+      expect(
+        wrapper.container.querySelector(".enable-organisms input")
+      ).toHaveAttribute("aria-checked", "false");
+      expect(
+        wrapper.container.querySelector(".enable-storage input")
+      ).toHaveAttribute("aria-checked", "false");
+      expect(
+        wrapper.container.querySelector(".enable-scheduled-actions input")
+      ).toHaveAttribute("aria-checked", "false");
+      expect(
+        wrapper.container.querySelector(".enable-restrictions input")
+      ).toHaveAttribute("aria-checked", "false");
+      expect(
+        wrapper.container.querySelector(".enable-associations input")
+      ).toHaveAttribute("aria-checked", "false");
+    });
   });
 
   it("Renders an existing Material Sample with the managed attribute when there is selected attribute with assinged value", async () => {
@@ -781,14 +835,20 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /save/i })
+      ).toBeInTheDocument();
+    });
 
     // Save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
 
     // Nothing has changed, no requests expected.
-    expect(mockSave.mock.calls).toEqual([]);
+    await waitFor(() => {
+      expect(mockSave.mock.calls).toEqual([]);
+    });
   });
 
   it("Submits a new Material Sample with 3 Determinations.", async () => {
@@ -796,11 +856,18 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("combobox", { name: /group select\.\.\./i })
+      ).toBeInTheDocument()
+    );
 
     // Set the group:
     userEvent.click(
       wrapper.getByRole("combobox", { name: /group select\.\.\./i })
+    );
+    await waitFor(() =>
+      expect(wrapper.getByRole("option", { name: /aafc/i })).toBeInTheDocument()
     );
     userEvent.click(wrapper.getByRole("option", { name: /aafc/i }));
 
@@ -818,13 +885,23 @@ describe("Material Sample Edit Page", () => {
       fail("organism toggle needs to exist at this point.");
     }
     fireEvent.click(organismToggle[0]);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("button", { name: /add new determination/i })
+      ).toBeInTheDocument()
+    );
 
     // Add a determination:
     userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", {
+          name: /verbatim scientific name × insert hybrid symbol/i
+        })
+      ).toBeInTheDocument()
+    );
 
     function fillOutDetermination(num: number) {
       userEvent.type(
@@ -844,16 +921,28 @@ describe("Material Sample Edit Page", () => {
 
     // Enter the second determination:
     userEvent.click(wrapper.getByTestId("add-another-button"));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.queryAllByRole("textbox", {
+          name: /verbatim scientific name × insert hybrid symbol/i
+        }).length
+      ).toBe(2)
+    );
     fillOutDetermination(2);
 
     // Enter the third determination:
     userEvent.click(wrapper.getByTestId("add-another-button"));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.queryAllByRole("textbox", {
+          name: /verbatim scientific name × insert hybrid symbol/i
+        }).length
+      ).toBe(3)
+    );
     fillOutDetermination(3);
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockOnSaved).toHaveBeenCalled());
 
     // Saves the Material Sample:
     expect(mockSave.mock.calls).toEqual([
@@ -1062,7 +1151,11 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /primary id/i })
+      ).toBeInTheDocument()
+    );
 
     // Update the Primary ID.
     userEvent.type(
@@ -1072,7 +1165,11 @@ describe("Material Sample Edit Page", () => {
 
     // Attempt to save, error should be displayed.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByText(/1 : primary id \- duplicate primary id found/i)
+      ).toBeInTheDocument()
+    );
 
     // Expect red outline around Primary ID.
     expect(wrapper.getByRole("textbox", { name: /primary id/i })).toHaveClass(
@@ -1084,12 +1181,15 @@ describe("Material Sample Edit Page", () => {
 
     // You should not be able to submit the form until this error is resolved:
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
-    expect(mockOnSaved).toHaveBeenCalledTimes(0);
+    await waitFor(() => expect(mockOnSaved).toHaveBeenCalledTimes(0));
 
     // Click the "allow" button:
     userEvent.click(wrapper.getByRole("button", { name: /allow duplicate/i }));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /primary id/i })
+      ).not.toHaveClass("is-invalid")
+    );
 
     expect(
       wrapper.getByRole("textbox", { name: /primary id/i })
@@ -1097,7 +1197,9 @@ describe("Material Sample Edit Page", () => {
 
     // Submit the form with no errors:
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockOnSaved).lastCalledWith("11111111-1111-1111-1111-111111111111")
+    );
 
     // Form submitted successfully:
     expect(mockOnSaved).lastCalledWith("11111111-1111-1111-1111-111111111111");
@@ -1109,7 +1211,13 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".enable-associations .react-switch-bg"
+        )[0]
+      ).toBeInTheDocument()
+    );
 
     // Enable association:
     const associationToggle = wrapper.container.querySelectorAll(
@@ -1119,11 +1227,19 @@ describe("Material Sample Edit Page", () => {
       fail("Association toggle needs to exist at this point.");
     }
     fireEvent.click(associationToggle[0]);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("button", { name: /search\.\.\./i })
+      ).toBeInTheDocument()
+    );
 
     // Click the search button to find from a material sample list
     userEvent.click(wrapper.getByRole("button", { name: /search\.\.\./i }));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("link", { name: /test name/i })
+      ).toBeInTheDocument()
+    );
 
     // Search table is shown:
     expect(
@@ -1132,7 +1248,11 @@ describe("Material Sample Edit Page", () => {
 
     // Select one sample from search result list
     userEvent.click(wrapper.getByRole("button", { name: /select/i }));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("link", { name: /my\-sample\-name/i })
+      ).toBeInTheDocument()
+    );
 
     // Expect the selected sample being populated to the sample input
     expect(
@@ -1153,7 +1273,13 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".enable-organisms .react-switch-bg"
+        )[0]
+      ).toBeInTheDocument()
+    );
 
     // Enable the Organisms form section:
     const organismToggle = wrapper.container.querySelectorAll(
@@ -1163,7 +1289,11 @@ describe("Material Sample Edit Page", () => {
       fail("organism toggle needs to exist at this point.");
     }
     fireEvent.click(organismToggle[0]);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /life stage/i })
+      ).toBeInTheDocument()
+    );
 
     // Update the lifestage.
     userEvent.type(
@@ -1173,7 +1303,46 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                // The group is copied from the sample:
+                group: "test-group",
+                lifeStage: "test lifestage",
+                type: "organism"
+              },
+              type: "organism"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ],
+        [
+          [
+            {
+              resource: expect.objectContaining({
+                id: "333",
+                relationships: expect.objectContaining({
+                  organism: {
+                    data: [
+                      {
+                        id: "11111111-1111-1111-1111-111111111111",
+                        type: "organism"
+                      }
+                    ]
+                  }
+                }),
+                type: "material-sample"
+              }),
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ])
+    );
 
     expect(mockSave.mock.calls).toEqual([
       // Separate transaction to add the organism:
@@ -1251,23 +1420,24 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
-
-    // Expect Organism Section automatically opened.
-    expect(
-      wrapper.getByRole("heading", { name: /organisms/i })
-    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("heading", { name: /organisms/i })
+      ).toBeInTheDocument()
+    );
 
     // Expect the 3 organisms to be present based on the lifestage in the tables.
-    expect(
-      wrapper.getByRole("cell", { name: /lifestage 1/i })
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("cell", { name: /lifestage 2/i })
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("cell", { name: /lifestage 3/i })
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("cell", { name: /lifestage 1/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("cell", { name: /lifestage 2/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("cell", { name: /lifestage 3/i })
+      ).toBeInTheDocument();
+    });
 
     // Expand all organism sections:
     const expandButtons =
@@ -1283,6 +1453,7 @@ describe("Material Sample Edit Page", () => {
     const lastLifestageField = wrapper.getAllByRole("textbox", {
       name: /life stage/i
     })[2];
+    await waitFor(() => expect(lastLifestageField).toBeInTheDocument());
     userEvent.clear(lastLifestageField);
     userEvent.type(lastLifestageField, "This should be removed...");
 
@@ -1297,47 +1468,47 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
-
-    expect(mockSave.mock.calls).toEqual([
-      [
+    await waitFor(() =>
+      expect(mockSave.mock.calls).toEqual([
         [
-          // Only the first organism is kept:
-          {
-            resource: {
-              id: "organism-1",
-              group: "test-group",
-              lifeStage: "lifestage 1",
+          [
+            // Only the first organism is kept:
+            {
+              resource: {
+                id: "organism-1",
+                group: "test-group",
+                lifeStage: "lifestage 1",
+                type: "organism"
+              },
               type: "organism"
-            },
-            type: "organism"
-          }
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
         ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
         [
-          {
-            resource: expect.objectContaining({
-              id: "333",
-              relationships: expect.objectContaining({
-                organism: {
-                  data: [
-                    {
-                      id: "organism-1",
-                      type: "organism"
-                    }
-                  ]
-                }
+          [
+            {
+              resource: expect.objectContaining({
+                id: "333",
+                relationships: expect.objectContaining({
+                  organism: {
+                    data: [
+                      {
+                        id: "organism-1",
+                        type: "organism"
+                      }
+                    ]
+                  }
+                }),
+                type: "material-sample"
               }),
               type: "material-sample"
-            }),
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ])
+    );
   });
 
   it("Lets you remove an organism with the Remove button.", async () => {
@@ -1368,7 +1539,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("heading", { name: /organisms/i })
+      ).toBeInTheDocument()
+    );
     expect(
       wrapper.getByRole("heading", { name: /organisms/i })
     ).toBeInTheDocument();
@@ -1382,7 +1557,11 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(
       wrapper.getAllByRole("button", { name: /remove organism/i })[0]
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
+      ).toHaveDisplayValue("1")
+    );
 
     // The quantity input is updated:
     expect(
@@ -1391,48 +1570,48 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
-
-    expect(mockSave.mock.calls).toEqual([
-      [
-        // Saves only 1 organism (the second one):
+    await waitFor(() =>
+      expect(mockSave.mock.calls).toEqual([
         [
-          {
-            resource: {
-              group: "test-group",
-              id: "organism-2",
-              lifeStage: "lifestage 2",
+          // Saves only 1 organism (the second one):
+          [
+            {
+              resource: {
+                group: "test-group",
+                id: "organism-2",
+                lifeStage: "lifestage 2",
+                type: "organism"
+              },
               type: "organism"
-            },
-            type: "organism"
-          }
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
         ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
         [
-          {
-            resource: expect.objectContaining({
-              id: "333",
-              relationships: expect.objectContaining({
-                organism: {
-                  // Only 1 organism linked now:
-                  data: [
-                    {
-                      id: "organism-2",
-                      type: "organism"
-                    }
-                  ]
-                }
+          [
+            {
+              resource: expect.objectContaining({
+                id: "333",
+                relationships: expect.objectContaining({
+                  organism: {
+                    // Only 1 organism linked now:
+                    data: [
+                      {
+                        id: "organism-2",
+                        type: "organism"
+                      }
+                    ]
+                  }
+                }),
+                type: "material-sample"
               }),
               type: "material-sample"
-            }),
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ])
+    );
   });
 
   it("Lets you remove all organisms by setting the quantity to 0.", async () => {
@@ -1457,7 +1636,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
+      ).toBeInTheDocument()
+    );
 
     const organismQuantity = wrapper.getByRole("spinbutton", {
       name: /organisms quantity/i
@@ -1472,7 +1655,24 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: expect.objectContaining({
+                relationships: expect.objectContaining({
+                  organism: { data: [] }
+                }),
+                type: "material-sample"
+              }),
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ])
+    );
 
     // Saves the Material Sample with no organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1515,7 +1715,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
+      ).toBeInTheDocument()
+    );
 
     const organismQuantity = wrapper.getByRole("spinbutton", {
       name: /organisms quantity/i
@@ -1529,7 +1733,24 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: expect.objectContaining({
+                relationships: expect.objectContaining({
+                  organism: { data: [] }
+                }),
+                type: "material-sample"
+              }),
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ])
+    );
 
     // Saves the Material Sample with no organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1572,7 +1793,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
+      ).toBeInTheDocument()
+    );
 
     const organismQuantity = wrapper.getByRole("spinbutton", {
       name: /organisms quantity/i
@@ -1594,76 +1819,75 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
-
-    // Saves the Material Sample with the organisms:
-    expect(mockSave.mock.calls).toEqual([
-      [
-        // In the first API call, the 3 organisms are saved:
+    await waitFor(() =>
+      expect(mockSave.mock.calls).toEqual([
         [
-          // This is the initial existing organism with an ID from the form's initial values:
-          {
-            resource: {
-              group: "test-group",
-              id: "organism-1",
-              lifeStage: "common-life-stage",
+          // In the first API call, the 3 organisms are saved:
+          [
+            // This is the initial existing organism with an ID from the form's initial values:
+            {
+              resource: {
+                group: "test-group",
+                id: "organism-1",
+                lifeStage: "common-life-stage",
+                type: "organism"
+              },
               type: "organism"
             },
-            type: "organism"
-          },
-          // New organism which is a copy of Organism #1:
-          {
-            resource: {
-              group: "test-group",
-              lifeStage: "common-life-stage",
+            // New organism which is a copy of Organism #1:
+            {
+              resource: {
+                group: "test-group",
+                lifeStage: "common-life-stage",
+                type: "organism"
+              },
               type: "organism"
             },
-            type: "organism"
-          },
-          // New organism which is a copy of Organism #1:
-          {
-            resource: {
-              group: "test-group",
-              lifeStage: "common-life-stage",
+            // New organism which is a copy of Organism #1:
+            {
+              resource: {
+                group: "test-group",
+                lifeStage: "common-life-stage",
+                type: "organism"
+              },
               type: "organism"
-            },
-            type: "organism"
-          }
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
         ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
         [
-          {
-            resource: expect.objectContaining({
-              id: "333",
-              relationships: expect.objectContaining({
-                organism: {
-                  // The first organism is kept, and 2 more copies are added:
-                  data: [
-                    {
-                      id: "organism-1",
-                      type: "organism"
-                    },
-                    {
-                      id: "11111111-1111-1111-1111-111111111111",
-                      type: "organism"
-                    },
-                    {
-                      id: "11111111-1111-1111-1111-111111111111",
-                      type: "organism"
-                    }
-                  ]
-                }
+          [
+            {
+              resource: expect.objectContaining({
+                id: "333",
+                relationships: expect.objectContaining({
+                  organism: {
+                    // The first organism is kept, and 2 more copies are added:
+                    data: [
+                      {
+                        id: "organism-1",
+                        type: "organism"
+                      },
+                      {
+                        id: "11111111-1111-1111-1111-111111111111",
+                        type: "organism"
+                      },
+                      {
+                        id: "11111111-1111-1111-1111-111111111111",
+                        type: "organism"
+                      }
+                    ]
+                  }
+                }),
+                type: "material-sample"
               }),
               type: "material-sample"
-            }),
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ])
+    );
   });
 
   it("Lets you edit one of multiple DIFFERENT existing attached organisms.", async () => {
@@ -1700,7 +1924,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await wrapper.findByRole("spinbutton", { name: /organisms quantity/i });
 
     // 3 organisms in quantity:
     expect(
@@ -1739,7 +1963,7 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await wrapper.findByRole("button", { name: /save/i }); // Wait for the save button to re-enable or similar indicator of save completion
 
     // Saves the Material Sample with the organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1838,7 +2062,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
+      ).toBeInTheDocument()
+    );
 
     // 3 organisms in quantity:
     expect(
@@ -1859,70 +2087,69 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
-
-    // Saves the Material Sample with the 3 SAME organisms:
-    expect(mockSave.mock.calls).toEqual([
-      // IsTarget should be reverted to null.
-      // Organism 1's values with "lifestage 1" are copied to the other organisms:
-      [
+    await waitFor(() =>
+      expect(mockSave.mock.calls).toEqual([
+        // IsTarget should be reverted to null.
+        // Organism 1's values with "lifestage 1" are copied to the other organisms:
         [
-          {
-            resource: {
-              group: "test-group",
-              id: "organism-1",
-              lifeStage: "lifestage 1",
-              type: "organism",
-              isTarget: null
+          [
+            {
+              resource: {
+                group: "test-group",
+                id: "organism-1",
+                lifeStage: "lifestage 1",
+                type: "organism",
+                isTarget: null
+              },
+              type: "organism"
             },
-            type: "organism"
-          },
-          {
-            resource: {
-              group: "test-group",
-              id: "organism-2",
-              lifeStage: "lifestage 1",
-              type: "organism",
-              isTarget: null
+            {
+              resource: {
+                group: "test-group",
+                id: "organism-2",
+                lifeStage: "lifestage 1",
+                type: "organism",
+                isTarget: null
+              },
+              type: "organism"
             },
-            type: "organism"
-          },
-          {
-            resource: {
-              group: "test-group",
-              id: "organism-3",
-              lifeStage: "lifestage 1",
-              type: "organism",
-              isTarget: null
-            },
-            type: "organism"
-          }
+            {
+              resource: {
+                group: "test-group",
+                id: "organism-3",
+                lifeStage: "lifestage 1",
+                type: "organism",
+                isTarget: null
+              },
+              type: "organism"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
         ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      // The material sample is saved with the same 3 organisms linked:
-      [
+        // The material sample is saved with the same 3 organisms linked:
         [
-          {
-            resource: expect.objectContaining({
-              id: "333",
-              relationships: expect.objectContaining({
-                organism: {
-                  data: [
-                    { id: "organism-1", type: "organism" },
-                    { id: "organism-2", type: "organism" },
-                    { id: "organism-3", type: "organism" }
-                  ]
-                }
+          [
+            {
+              resource: expect.objectContaining({
+                id: "333",
+                relationships: expect.objectContaining({
+                  organism: {
+                    data: [
+                      { id: "organism-1", type: "organism" },
+                      { id: "organism-2", type: "organism" },
+                      { id: "organism-3", type: "organism" }
+                    ]
+                  }
+                }),
+                type: "material-sample"
               }),
               type: "material-sample"
-            }),
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ])
+    );
   });
 
   it("Changing the target organism should unset all the other organisms as the target", async () => {
@@ -1962,7 +2189,11 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
+      ).toBeInTheDocument()
+    );
 
     // 3 organisms in quantity:
     expect(
@@ -1988,69 +2219,68 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
-
-    // Check to ensure that
-    expect(mockSave.mock.calls).toEqual([
-      // Since the first organism was toggled, the second organism should be false now.
-      [
+    await waitFor(() =>
+      expect(mockSave.mock.calls).toEqual([
+        // Since the first organism was toggled, the second organism should be false now.
         [
-          {
-            resource: {
-              group: "test-group",
-              id: "organism-1",
-              lifeStage: "lifestage 1",
-              type: "organism",
-              isTarget: true
+          [
+            {
+              resource: {
+                group: "test-group",
+                id: "organism-1",
+                lifeStage: "lifestage 1",
+                type: "organism",
+                isTarget: true
+              },
+              type: "organism"
             },
-            type: "organism"
-          },
-          {
-            resource: {
-              group: "test-group",
-              id: "organism-2",
-              lifeStage: "lifestage 2",
-              type: "organism",
-              isTarget: false
+            {
+              resource: {
+                group: "test-group",
+                id: "organism-2",
+                lifeStage: "lifestage 2",
+                type: "organism",
+                isTarget: false
+              },
+              type: "organism"
             },
-            type: "organism"
-          },
-          {
-            resource: {
-              group: "test-group",
-              id: "organism-3",
-              lifeStage: "lifestage 3",
-              type: "organism",
-              isTarget: false
-            },
-            type: "organism"
-          }
+            {
+              resource: {
+                group: "test-group",
+                id: "organism-3",
+                lifeStage: "lifestage 3",
+                type: "organism",
+                isTarget: false
+              },
+              type: "organism"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
         ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      // The material sample is saved with the same 3 organisms linked:
-      [
+        // The material sample is saved with the same 3 organisms linked:
         [
-          {
-            resource: expect.objectContaining({
-              id: "333",
-              relationships: expect.objectContaining({
-                organism: {
-                  data: [
-                    { id: "organism-1", type: "organism" },
-                    { id: "organism-2", type: "organism" },
-                    { id: "organism-3", type: "organism" }
-                  ]
-                }
+          [
+            {
+              resource: expect.objectContaining({
+                id: "333",
+                relationships: expect.objectContaining({
+                  organism: {
+                    data: [
+                      { id: "organism-1", type: "organism" },
+                      { id: "organism-2", type: "organism" },
+                      { id: "organism-3", type: "organism" }
+                    ]
+                  }
+                }),
+                type: "material-sample"
               }),
               type: "material-sample"
-            }),
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ])
+    );
   });
 
   it("Converts the Sample's determiners from object (front-end format) to UUID (back-end format).", async () => {
@@ -2097,7 +2327,9 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(wrapper.getByText(/person 1/i)).toBeInTheDocument()
+    );
 
     // Shows the initial determiner value:
     expect(wrapper.getByText(/person 1/i)).toBeInTheDocument();
@@ -2106,59 +2338,62 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(
       wrapper.getByRole("combobox", { name: /determining agents person 1/i })
     );
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /person 2/i })
+      ).toBeInTheDocument()
+    );
     userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
-    await new Promise(setImmediate);
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
-
-    // Saves the Material Sample with the 3 SAME organisms:
-    expect(mockSave.mock.calls).toEqual([
-      // Updates the organism with the new determiners:
-      [
+    await waitFor(() =>
+      expect(mockSave.mock.calls).toEqual([
+        // Updates the organism with the new determiners:
         [
-          {
-            resource: {
-              determination: [
-                {
-                  // The new value as IDs only:
-                  determiner: ["person-1-uuid", "person-2-uuid"],
-                  isPrimary: true
-                },
-                {
-                  determiner: ["person-2-uuid"],
-                  isPrimary: true
-                }
-              ],
-              group: "test-group",
-              id: "organism-1",
-              lifeStage: "lifestage 1",
+          [
+            {
+              resource: {
+                determination: [
+                  {
+                    // The new value as IDs only:
+                    determiner: ["person-1-uuid", "person-2-uuid"],
+                    isPrimary: true
+                  },
+                  {
+                    determiner: ["person-2-uuid"],
+                    isPrimary: true
+                  }
+                ],
+                group: "test-group",
+                id: "organism-1",
+                lifeStage: "lifestage 1",
+                type: "organism"
+              },
               type: "organism"
-            },
-            type: "organism"
-          }
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
         ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
         [
-          {
-            resource: expect.objectContaining({
-              id: "333",
-              relationships: expect.objectContaining({
-                organism: {
-                  data: [{ id: "organism-1", type: "organism" }]
-                }
+          [
+            {
+              resource: expect.objectContaining({
+                id: "333",
+                relationships: expect.objectContaining({
+                  organism: {
+                    data: [{ id: "organism-1", type: "organism" }]
+                  }
+                }),
+                type: "material-sample"
               }),
               type: "material-sample"
-            }),
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ])
+    );
   });
 
   it("Lets you set a Custom managed attributes view via prop.", async () => {
@@ -2182,7 +2417,9 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(wrapper.queryByText(/attribute 1/i)).not.toBeInTheDocument()
+    );
 
     // Attribute 1 should be hidden:
     expect(wrapper.queryByText(/attribute 1/i)).not.toBeInTheDocument();
@@ -2200,27 +2437,27 @@ describe("Material Sample Edit Page", () => {
 
     // Save the form
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
-
-    expect(mockSave.mock.calls).toEqual([
-      [
+    await waitFor(() =>
+      expect(mockSave.mock.calls).toEqual([
         [
-          {
-            resource: expect.objectContaining({
-              managedAttributes: {
-                // The existing Attribute 1 value is kept event though it was hidden by the custom view:
-                attribute_1: "attribute 1 value",
-                // The new Attribute 2 value is saved:
-                attribute_2: "new attribute 2 value"
-              },
+          [
+            {
+              resource: expect.objectContaining({
+                managedAttributes: {
+                  // The existing Attribute 1 value is kept event though it was hidden by the custom view:
+                  attribute_1: "attribute 1 value",
+                  // The new Attribute 2 value is saved:
+                  attribute_2: "new attribute 2 value"
+                },
+                type: "material-sample"
+              }),
               type: "material-sample"
-            }),
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ])
+    );
   });
 
   it("Lets you set a Custom Collecting Event managed attributes view via prop.", async () => {
@@ -2239,7 +2476,13 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".enable-collecting-event .react-switch-bg"
+        )[0]
+      ).toBeInTheDocument()
+    );
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -2249,7 +2492,10 @@ describe("Material Sample Edit Page", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
+    });
 
     // Attributes 2 and 3 are visible and empty:
     expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
@@ -2272,7 +2518,13 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".enable-organisms .react-switch-bg"
+        )[0]
+      ).toBeInTheDocument()
+    );
 
     // Enable the Organisms form section:
     const organismToggle = wrapper.container.querySelectorAll(
@@ -2282,13 +2534,20 @@ describe("Material Sample Edit Page", () => {
       fail("organism toggle needs to exist at this point.");
     }
     fireEvent.click(organismToggle[0]);
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("button", { name: /add new determination/i })
+      ).toBeInTheDocument()
+    );
 
     // Add a determination:
     userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
+    });
 
     // Attributes 2 and 3 are visible and empty:
     expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
@@ -2313,14 +2572,14 @@ describe("Material Sample Edit Page", () => {
         />,
         testCtx
       );
-      await new Promise(setImmediate);
-
-      // Ensure the alert is displayed
-      expect(
-        wrapper.getByText(
-          /you do not have permission to edit this collecting event/i
-        )
-      ).toBeInTheDocument();
+      await waitFor(() => {
+        // Ensure the alert is displayed
+        expect(
+          wrapper.getByText(
+            /you do not have permission to edit this collecting event/i
+          )
+        ).toBeInTheDocument();
+      });
 
       // Ensure the collecting event fields are disabled
       const collectingEventFields = wrapper.container.querySelectorAll(
@@ -2350,13 +2609,17 @@ describe("Material Sample Edit Page", () => {
         />,
         testCtx
       );
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /save/i })
+        ).toBeInTheDocument()
+      );
 
       // No changes to the host organism
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-      await new Promise(setImmediate);
+      await waitFor(() => expect(mockSave.mock.calls.length).toBe(0));
 
       // Expect no changes to hostOrganism in the save call
       expect(mockSave.mock.calls.length).toBe(0);
@@ -2379,7 +2642,11 @@ describe("Material Sample Edit Page", () => {
         />,
         testCtx
       );
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("textbox", { name: /name search/i })
+        ).toBeInTheDocument()
+      );
 
       // Change the host organism field
       const hostOrganismTextfield = wrapper.getByRole("textbox", {
@@ -2395,7 +2662,26 @@ describe("Material Sample Edit Page", () => {
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  id: "333",
+                  type: "material-sample",
+                  hostOrganism: {
+                    name: "Updated host name",
+                    remarks: "Update host remarks"
+                  }
+                },
+                type: "material-sample"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
 
       // Check that the updated hostOrganism is in the save call
       expect(mockSave.mock.calls).toEqual([
@@ -2435,7 +2721,13 @@ describe("Material Sample Edit Page", () => {
         />,
         testCtx
       );
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelectorAll(
+            ".enable-associations .react-switch-bg"
+          )[0]
+        ).toBeInTheDocument()
+      );
 
       // Disable the association:
       const associationToggle = wrapper.container.querySelectorAll(
@@ -2445,7 +2737,6 @@ describe("Material Sample Edit Page", () => {
         fail("Association toggle needs to exist at this point.");
       }
       fireEvent.click(associationToggle[0]);
-      await new Promise(setImmediate);
 
       // Are you sure popup, click "Yes".
       userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
@@ -2455,25 +2746,24 @@ describe("Material Sample Edit Page", () => {
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-      await new Promise(setImmediate);
-
-      // Check that hostOrganism is set to null in the save call
-      expect(mockSave.mock.calls).toEqual([
-        [
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
           [
-            {
-              resource: {
-                id: "333",
-                type: "material-sample",
-                hostOrganism: null,
-                associations: []
-              },
-              type: "material-sample"
-            }
-          ],
-          { apiBaseUrl: "/collection-api" }
-        ]
-      ]);
+            [
+              {
+                resource: {
+                  id: "333",
+                  type: "material-sample",
+                  hostOrganism: null,
+                  associations: []
+                },
+                type: "material-sample"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
     });
 
     it("Adds host organism when not previously added", async () => {
@@ -2489,7 +2779,11 @@ describe("Material Sample Edit Page", () => {
         />,
         testCtx
       );
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("textbox", { name: /name search/i })
+        ).toBeInTheDocument()
+      );
 
       // Change the host organism field
       const hostOrganismTextfield = wrapper.getByRole("textbox", {
@@ -2500,26 +2794,25 @@ describe("Material Sample Edit Page", () => {
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-      await new Promise(setImmediate);
-
-      // Check that the new hostOrganism is in the save call
-      expect(mockSave.mock.calls).toEqual([
-        [
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
           [
-            {
-              resource: {
-                id: "333",
-                type: "material-sample",
-                hostOrganism: {
-                  name: "New Host Organism"
-                }
-              },
-              type: "material-sample"
-            }
-          ],
-          { apiBaseUrl: "/collection-api" }
-        ]
-      ]);
+            [
+              {
+                resource: {
+                  id: "333",
+                  type: "material-sample",
+                  hostOrganism: {
+                    name: "New Host Organism"
+                  }
+                },
+                type: "material-sample"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
     });
   });
 
@@ -2540,7 +2833,11 @@ describe("Material Sample Edit Page", () => {
         />,
         testCtx
       );
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("cell", { name: /test building \[ building \]/i })
+        ).toBeInTheDocument()
+      );
 
       // Ensure the geographic place is populated.
       expect(
@@ -2551,7 +2848,7 @@ describe("Material Sample Edit Page", () => {
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-      await new Promise(setImmediate);
+      await waitFor(() => expect(mockSave.mock.calls.length).toBe(0));
 
       // Expect no changes in the save call
       expect(mockSave.mock.calls.length).toBe(0); // No save call because nothing changed
@@ -2573,57 +2870,70 @@ describe("Material Sample Edit Page", () => {
         />,
         testCtx
       );
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /remove this place/i })
+        ).toBeInTheDocument()
+      );
 
       // Click the remove this place button.
       userEvent.click(
         wrapper.getByRole("button", { name: /remove this place/i })
       );
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
+      );
 
       // Enter a search value:
       userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
 
       // Click the search button.
       userEvent.click(wrapper.getByRole("button", { name: /search/i }));
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getAllByRole("button", { name: "Select" })[0]
+        ).toBeInTheDocument()
+      );
 
       // Click the first search option.
       userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /save/i })
+        ).toBeInTheDocument()
+      );
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-      await new Promise(setImmediate);
-
-      // Expect the geographicPlaceNameSourceDetail to be added.
-      expect(mockSave.mock.calls).toEqual([
-        [
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
           [
-            {
-              resource: {
-                geographicPlaceNameSource: "OSM",
-                geographicPlaceNameSourceDetail: {
-                  country: {
-                    name: "Canada"
+            [
+              {
+                resource: {
+                  geographicPlaceNameSource: "OSM",
+                  geographicPlaceNameSourceDetail: {
+                    country: {
+                      name: "Canada"
+                    },
+                    stateProvince: {
+                      element: "relation",
+                      id: 4136816,
+                      name: "Ontario"
+                    },
+                    sourceUrl:
+                      "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
                   },
-                  stateProvince: {
-                    element: "relation",
-                    id: 4136816,
-                    name: "Ontario"
-                  },
-                  sourceUrl:
-                    "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                  id: "2",
+                  type: "collecting-event"
                 },
-                id: "2",
                 type: "collecting-event"
-              },
-              type: "collecting-event"
-            }
-          ],
-          { apiBaseUrl: "/collection-api" }
-        ]
-      ]);
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
     });
 
     it("Removes geographicPlaceNameSourceDetail when previously added and deleted", async () => {
@@ -2642,35 +2952,42 @@ describe("Material Sample Edit Page", () => {
         />,
         testCtx
       );
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /remove this place/i })
+        ).toBeInTheDocument()
+      );
 
       // Click the remove this place button.
       userEvent.click(
         wrapper.getByRole("button", { name: /remove this place/i })
       );
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /save/i })
+        ).toBeInTheDocument()
+      );
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-      await new Promise(setImmediate);
-
-      // Check that geographicPlaceNameSourceDetail is removed in the save call
-      expect(mockSave.mock.calls).toEqual([
-        [
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
           [
-            {
-              resource: {
-                id: "2",
-                type: "collecting-event",
-                geographicPlaceNameSource: null,
-                geographicPlaceNameSourceDetail: null
-              },
-              type: "collecting-event"
-            }
-          ],
-          { apiBaseUrl: "/collection-api" }
-        ]
-      ]);
+            [
+              {
+                resource: {
+                  id: "2",
+                  type: "collecting-event",
+                  geographicPlaceNameSource: null,
+                  geographicPlaceNameSourceDetail: null
+                },
+                type: "collecting-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
     });
 
     it("Adds geographicPlaceNameSourceDetail when not previously added", async () => {
@@ -2689,51 +3006,60 @@ describe("Material Sample Edit Page", () => {
         />,
         testCtx
       );
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
+      );
 
       // Enter a search value:
       userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
 
       // Click the search button.
       userEvent.click(wrapper.getByRole("button", { name: /search/i }));
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getAllByRole("button", { name: "Select" })[0]
+        ).toBeInTheDocument()
+      );
 
       // Click the first search option.
       userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
-      await new Promise(setImmediate);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /save/i })
+        ).toBeInTheDocument()
+      );
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-      await new Promise(setImmediate);
-
-      // Expect the new geographicPlaceNameSourceDetail to be saved.
-      expect(mockSave.mock.calls).toEqual([
-        [
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
           [
-            {
-              resource: {
-                geographicPlaceNameSource: "OSM",
-                geographicPlaceNameSourceDetail: {
-                  country: {
-                    name: "Canada"
+            [
+              {
+                resource: {
+                  geographicPlaceNameSource: "OSM",
+                  geographicPlaceNameSourceDetail: {
+                    country: {
+                      name: "Canada"
+                    },
+                    stateProvince: {
+                      element: "relation",
+                      id: 4136816,
+                      name: "Ontario"
+                    },
+                    sourceUrl:
+                      "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
                   },
-                  stateProvince: {
-                    element: "relation",
-                    id: 4136816,
-                    name: "Ontario"
-                  },
-                  sourceUrl:
-                    "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                  id: "1",
+                  type: "collecting-event"
                 },
-                id: "1",
                 type: "collecting-event"
-              },
-              type: "collecting-event"
-            }
-          ],
-          { apiBaseUrl: "/collection-api" }
-        ]
-      ]);
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
     });
   });
 });
