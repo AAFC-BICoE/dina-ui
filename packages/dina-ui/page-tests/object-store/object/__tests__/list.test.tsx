@@ -12,7 +12,7 @@ import { Metadata, Person } from "../../../../types/objectstore-api";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { waitFor, within } from "@testing-library/dom"; // Import waitFor
+import { waitFor, within } from "@testing-library/react";
 
 const TEST_PERSON: PersistedResource<Person> = {
   id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",

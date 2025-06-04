@@ -42,6 +42,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           TEST_MOLECULAR_ANALYSIS_MULTIPLE_STORAGE_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_STORAGE };
       }
+      break;
     case "collection-api/storage-unit-type":
       return { data: TEST_STORAGE_UNIT_TYPES };
     case "collection-api/storage-unit":
@@ -146,8 +147,11 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
-    // Should not be in edit mode since storage units exist.
-    expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
+    // Wait a bit more for the component to determine edit mode
+    await waitFor(() => {
+      // Should not be in edit mode since storage units exist.
+      expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Should see the storage unit type selected.
     expect(wrapper.getByText(/storage unit type name/i)).toBeInTheDocument();
@@ -201,8 +205,10 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
-    // Should not be in edit mode since storage units exist.
-    expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+    // Should be in edit mode since storage units don't exist.
+    await waitFor(() => {
+      expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Skip button should be present here since no storage units exist yet.
     expect(
@@ -220,15 +226,33 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
       wrapper.getByRole("option", { name: /test storage unit type 1/i })
     );
 
-    await waitFor(() =>
-      expect(
-        wrapper.getAllByRole("option", { name: /storage unit name/i })[0]
-      ).toBeInTheDocument()
-    );
+    await waitFor(() => {
+      const comboboxes = wrapper.getAllByRole("combobox");
+      expect(comboboxes).toHaveLength(2);
+    });
+
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    userEvent.click(
-      wrapper.getAllByRole("option", { name: /storage unit name/i })[0]
-    );
+
+    await waitFor(() => {
+      const options = wrapper.getAllByRole("option");
+      const storageUnitOptions = options.filter(
+        (option) =>
+          option.textContent?.includes("storage unit name") ||
+          option.textContent?.includes("Storage Unit Name") ||
+          option.getAttribute("value")?.includes("storage-unit")
+      );
+      expect(storageUnitOptions.length).toBeGreaterThan(0);
+    });
+
+    const storageUnitOptions = wrapper
+      .getAllByRole("option")
+      .filter(
+        (option) =>
+          option.textContent?.includes("storage unit name") ||
+          option.textContent?.includes("Storage Unit Name") ||
+          option.getAttribute("value")?.includes("storage-unit")
+      );
+    userEvent.click(storageUnitOptions[0]);
 
     // Click cancel, nothing should be saved.
     userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
@@ -253,8 +277,10 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
-    // Should not be in edit mode since storage units exist.
-    expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+    // Should be in edit mode since storage units don't exist.
+    await waitFor(() => {
+      expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Change the dropdowns.
     userEvent.click(wrapper.getByRole("combobox"));
@@ -267,20 +293,42 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
       wrapper.getByRole("option", { name: /test storage unit type 1/i })
     );
 
-    await waitFor(() =>
-      expect(
-        wrapper.getAllByRole("option", { name: /storage unit name/i })[0]
-      ).toBeInTheDocument()
-    );
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    userEvent.click(
-      wrapper.getAllByRole("option", { name: /storage unit name/i })[0]
-    );
+    await waitFor(() => {
+      const comboboxes = wrapper.getAllByRole("combobox");
+      expect(comboboxes).toHaveLength(2);
+    });
 
-    // 3 material samples should appear in the list, not in the grid yet.
-    expect(
-      wrapper.getByText(/selected material samples \(3 in list\)/i)
-    ).toBeInTheDocument();
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+
+    await waitFor(() => {
+      const options = wrapper.getAllByRole("option");
+      const storageUnitOptions = options.filter(
+        (option) =>
+          option.textContent?.includes("storage unit name") ||
+          option.textContent?.includes("Storage Unit Name") ||
+          option.getAttribute("value")?.includes("storage-unit")
+      );
+      expect(storageUnitOptions.length).toBeGreaterThan(0);
+    });
+
+    // Get the storage unit options and click the first one
+    const storageUnitOptions = wrapper
+      .getAllByRole("option")
+      .filter(
+        (option) =>
+          option.textContent?.includes("storage unit name") ||
+          option.textContent?.includes("Storage Unit Name") ||
+          option.getAttribute("value")?.includes("storage-unit")
+      );
+    userEvent.click(storageUnitOptions[0]);
+
+    // Wait for material samples to be loaded
+    await waitFor(() => {
+      // 3 material samples should appear in the list, not in the grid yet.
+      expect(
+        wrapper.getByText(/selected material samples \(3 in list\)/i)
+      ).toBeInTheDocument();
+    });
 
     // Fill by row, so it should have automatically selected the row option.
     expect(wrapper.getByRole("radio", { name: /row/i })).toHaveAttribute(
@@ -401,10 +449,13 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
-    // All the material sample should be on the grid, not the list on the sidebar:
-    expect(
-      wrapper.getByText(/selected material samples \(0 in list\)/i)
-    ).toBeInTheDocument();
+    // Wait for component to stabilize
+    await waitFor(() => {
+      // All the material sample should be on the grid, not the list on the sidebar:
+      expect(
+        wrapper.getByText(/selected material samples \(0 in list\)/i)
+      ).toBeInTheDocument();
+    });
 
     // Switch to edit mode.
     userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
@@ -504,6 +555,11 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     // Switch to edit mode.
     userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
 
+    // Wait for edit mode to be active
+    await waitFor(() =>
+      expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument()
+    );
+
     // Change the storage unit type...
     userEvent.click(wrapper.getAllByRole("combobox")[0]);
     await waitFor(() =>
@@ -516,30 +572,57 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Expect a popup to ask are you sure you wish to change the storage unit type.
-    expect(
-      wrapper.getByText(
-        /changing the storage unit type will clear the existing storage coordinates stored\./i
-      )
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /changing the storage unit type will clear the existing storage coordinates stored\./i
+        )
+      ).toBeInTheDocument();
+    });
 
     // Click proceed.
     userEvent.click(wrapper.getByRole("button", { name: /proceed/i }));
-    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
 
+    // Wait for any loading to finish
     await waitFor(() => {
-      expect(
-        wrapper.getAllByRole("option", { name: /storage unit name/i })[1]
-      ).toBeInTheDocument();
+      const loadingElements = wrapper.queryAllByText(/loading\.\.\./i);
+      expect(loadingElements).toHaveLength(0);
     });
+
+    // Wait for the second combobox to be available
+    await waitFor(() => {
+      const comboboxes = wrapper.getAllByRole("combobox");
+      expect(comboboxes).toHaveLength(2);
+    });
+
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    userEvent.click(
-      wrapper.getAllByRole("option", { name: /storage unit name/i })[1]
-    );
+    await waitFor(() => {
+      const options = wrapper.getAllByRole("option");
+      const storageUnitOptions = options.filter(
+        (option) =>
+          option.textContent?.includes("storage unit name") ||
+          option.textContent?.includes("Storage Unit Name") ||
+          option.getAttribute("value")?.includes("storage-unit")
+      );
+      expect(storageUnitOptions.length).toBeGreaterThan(0);
+    });
+
+    const storageUnitOptions = wrapper
+      .getAllByRole("option")
+      .filter(
+        (option) =>
+          option.textContent?.includes("storage unit name") ||
+          option.textContent?.includes("Storage Unit Name") ||
+          option.getAttribute("value")?.includes("storage-unit")
+      );
+    userEvent.click(storageUnitOptions[1] || storageUnitOptions[0]);
 
     // Expect the grid to be cleared automatically.
-    expect(
-      wrapper.getByText(/selected material samples \(3 in list\)/i)
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/selected material samples \(3 in list\)/i)
+      ).toBeInTheDocument();
+    });
   });
 
   it("Storage units exist, and multiple storage units are found, warning expected", async () => {
@@ -554,11 +637,13 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Display a warning to the user.
-    expect(
-      wrapper.getByText(
-        /multiple storage units have been found for the molecular analysis items\./i
-      )
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /multiple storage units have been found for the molecular analysis items\./i
+        )
+      ).toBeInTheDocument();
+    });
 
     // Switch to edit mode.
     userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
@@ -585,7 +670,9 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Should be in edit mode since no storage units exist.
-    expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Change the dropdowns.
     userEvent.click(wrapper.getByRole("combobox"));

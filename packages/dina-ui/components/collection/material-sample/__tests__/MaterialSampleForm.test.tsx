@@ -2425,7 +2425,11 @@ describe("Material Sample Edit Page", () => {
     expect(wrapper.queryByText(/attribute 1/i)).not.toBeInTheDocument();
 
     // Attribute 2 already has a value:
-    expect(wrapper.getByDisplayValue(/attribute 2 value/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        wrapper.getByDisplayValue(/attribute 2 value/i)
+      ).toBeInTheDocument()
+    );
 
     // Attribute 3 is visible and empty:
     expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
