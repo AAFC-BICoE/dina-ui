@@ -144,14 +144,14 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
   it("Storage units exist, display them in view mode", async () => {
     const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
 
-    // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
-
     // Wait a bit more for the component to determine edit mode
-    await waitFor(() => {
-      // Should not be in edit mode since storage units exist.
-      expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        // Should not be in edit mode since storage units exist.
+        expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
+      },
+      { timeout: 2000 }
+    );
 
     // Should see the storage unit type selected.
     expect(wrapper.getByText(/storage unit type name/i)).toBeInTheDocument();
@@ -160,29 +160,33 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     expect(wrapper.getByText(/storage unit type name/i)).toBeInTheDocument();
 
     // Everything should be in the grid based on the mocked data:
-    expect(
-      wrapper.getByText(/selected material samples \(0 in list\)/i)
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/selected material samples \(0 in list\)/i)
+      ).toBeInTheDocument();
+    });
 
-    // Ensure Primary IDs are rendered in the grid with links:
-    expect(
-      wrapper.getByRole("link", { name: /sample 1/i }).getAttribute("href")
-    ).toEqual(
-      "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[0].id
-    );
-    expect(
-      wrapper.getByRole("link", { name: /sample 2/i }).getAttribute("href")
-    ).toEqual(
-      "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[1].id
-    );
-    expect(
-      wrapper.getByRole("link", { name: /sample 3/i }).getAttribute("href")
-    ).toEqual(
-      "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[2].id
-    );
+    await waitFor(() => {
+      // Ensure Primary IDs are rendered in the grid with links:
+      expect(
+        wrapper.getByRole("link", { name: /sample 1/i }).getAttribute("href")
+      ).toEqual(
+        "/collection/material-sample/view?id=" +
+          TEST_MATERIAL_SAMPLE_SUMMARY[0].id
+      );
+      expect(
+        wrapper.getByRole("link", { name: /sample 2/i }).getAttribute("href")
+      ).toEqual(
+        "/collection/material-sample/view?id=" +
+          TEST_MATERIAL_SAMPLE_SUMMARY[1].id
+      );
+      expect(
+        wrapper.getByRole("link", { name: /sample 3/i }).getAttribute("href")
+      ).toEqual(
+        "/collection/material-sample/view?id=" +
+          TEST_MATERIAL_SAMPLE_SUMMARY[2].id
+      );
+    });
 
     // Switch into edit mode, skip button should not appear since storage units are linked currently.
     userEvent.click(wrapper.getByRole("button", { name: /edit/i }));

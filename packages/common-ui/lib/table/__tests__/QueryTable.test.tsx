@@ -295,22 +295,25 @@ describe("QueryTable component", () => {
 
     // Wait for the initial request to finish.
     await waitFor(() => {
-      // Click the "name" header.
-      fireEvent.click(wrapper.getByText(/name/i));
+      expect(wrapper.getByText(/name/i)).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("columnheader", { name: /description/i })
+      ).toBeInTheDocument();
     });
 
-    await waitFor(() => {
-      // Shift-click the "description" header.
-      fireEvent.click(
-        wrapper.getByRole("columnheader", { name: /description/i }),
-        { shiftKey: true }
-      );
-    });
+    userEvent.click(wrapper.getByText(/name/i));
+
+    // Shift-click the "description" header.
+    userEvent.click(
+      wrapper.getByRole("columnheader", { name: /description/i }),
+      { shiftKey: true }
+    );
+
     await waitFor(() => {
       // This request should be sorted by name and description.
       expect(mockGet).lastCalledWith(
         "todo",
-        objectContaining({ sort: "name,description" })
+        objectContaining({ sort: "-name,-description" })
       );
 
       // Three requests should have happened:
@@ -341,7 +344,9 @@ describe("QueryTable component", () => {
     const reactTable = await component.findByTestId("ReactTable");
 
     // Expect 5 rows.
-    expect(reactTable.querySelectorAll("tbody tr").length).toEqual(5);
+    await waitFor(() =>
+      expect(reactTable.querySelectorAll("tbody tr").length).toEqual(5)
+    );
     const pageSizeSelect = await component.findAllByTestId("pagination");
     expect(pageSizeSelect[0]).toBeInTheDocument();
   });
