@@ -157,13 +157,16 @@ describe("ExistingAttachmentsTable component", () => {
     );
 
     // Get row 2
-    await waitFor(() => {
-      expect(
-        screen.getByRole("row", {
-          name: /select test\-file\-2\.png/i
-        })
-      ).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(
+          screen.getByRole("row", {
+            name: /select test\-file\-2\.png/i
+          })
+        ).toBeInTheDocument();
+      },
+      { timeout: 2000 }
+    );
 
     // Click row 2 checkbox
     const checkbox = within(

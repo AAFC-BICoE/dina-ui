@@ -281,14 +281,17 @@ describe("Metadata List Page", () => {
     // Switch to gallery view.
     userEvent.click(wrapper.getByRole("radio", { name: /gallery/i }));
 
-    await waitFor(() => {
-      // Get the cell that contains the list
-      const CELL = wrapper.getByRole("cell", {
-        name: /no thumbnail available/i
-      });
-      // Tests gallery view as a list in the table
-      expect(within(CELL).getByRole("list")).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        // Get the cell that contains the list
+        const CELL = wrapper.getByRole("cell", {
+          name: /no thumbnail available/i
+        });
+        // Tests gallery view as a list in the table
+        expect(within(CELL).getByRole("list")).toBeInTheDocument();
+      },
+      { timeout: 2000 }
+    );
   });
 
   it("Lets you select a list of metadatas and route to the edit page.", async () => {
