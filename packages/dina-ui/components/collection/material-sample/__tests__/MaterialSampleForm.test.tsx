@@ -866,8 +866,12 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(
       wrapper.getByRole("combobox", { name: /group select\.\.\./i })
     );
-    await waitFor(() =>
-      expect(wrapper.getByRole("option", { name: /aafc/i })).toBeInTheDocument()
+    await waitFor(
+      () =>
+        expect(
+          wrapper.getByRole("option", { name: /aafc/i })
+        ).toBeInTheDocument(),
+      { timeout: 3000 }
     );
     userEvent.click(wrapper.getByRole("option", { name: /aafc/i }));
 

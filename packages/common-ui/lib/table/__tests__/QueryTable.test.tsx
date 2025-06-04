@@ -538,7 +538,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish and the result to render.
-    await waitForElementToBeRemoved(() => {
+    await waitFor(() => {
       expect(
         wrapper.getByText(/error message 1 error message 2/i)
       ).toBeInTheDocument();

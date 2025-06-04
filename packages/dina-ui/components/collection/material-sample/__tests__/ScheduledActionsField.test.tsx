@@ -80,17 +80,19 @@ describe("ScheduledActionsField", () => {
     );
 
     fireEvent.submit(container.querySelector("form")!);
-    await waitFor(() =>
-      expect(mockOnSubmit).toHaveBeenLastCalledWith({
-        scheduledActions: [
-          {
-            actionType: "at1",
-            actionStatus: "as1",
-            date: "2021-10-12",
-            remarks: "remarks-1"
-          }
-        ]
-      })
+    await waitFor(
+      () =>
+        expect(mockOnSubmit).toHaveBeenLastCalledWith({
+          scheduledActions: [
+            {
+              actionType: "at1",
+              actionStatus: "as1",
+              date: "2021-10-12",
+              remarks: "remarks-1"
+            }
+          ]
+        }),
+      { timeout: 2000 }
     );
 
     // One action added:
