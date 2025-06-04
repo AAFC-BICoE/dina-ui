@@ -1343,8 +1343,14 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       });
 
       // Items should be populated in:
-      expect(wrapper.getByDisplayValue(/run item name 1/i)).toBeInTheDocument();
-      expect(wrapper.getByDisplayValue(/run item name 2/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(
+          wrapper.getByDisplayValue(/run item name 1/i)
+        ).toBeInTheDocument();
+        expect(
+          wrapper.getByDisplayValue(/run item name 2/i)
+        ).toBeInTheDocument();
+      });
     });
   });
 });

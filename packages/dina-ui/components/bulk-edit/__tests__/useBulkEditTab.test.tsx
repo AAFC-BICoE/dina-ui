@@ -246,16 +246,17 @@ describe("Material sample bulk edit tab", () => {
       />,
       testCtx
     );
+    // Wait for a part of the page to be loaded in.
+    await waitFor(() =>
+      expect(wrapper.getByText(/collecting event/i)).toBeInTheDocument()
+    );
 
     // Enable all data components...
     const switches = wrapper.container.querySelectorAll(
       ".material-sample-nav .react-switch-bg"
     );
-    await waitFor(() => {
-      expect(switches[0]).not.toBeNull();
-      expect(switches[switches.length - 1]).not.toBeNull();
-    });
-    switches.forEach((switchFound) => {
+    switches.forEach(async (switchFound) => {
+      await waitFor(() => expect(switchFound).toBeInTheDocument());
       fireEvent.click(switchFound);
     });
 
@@ -337,18 +338,14 @@ describe("Material sample bulk edit tab", () => {
       wrapper.getByRole("option", { name: /managed attribute 3/i })
     );
 
-    const textboxB = wrapper.container.querySelector(
-      ".managedAttributes_b-field input"
-    );
-    const textboxC = wrapper.container.querySelector(
-      ".managedAttributes_c-field input"
-    );
-    await waitFor(() => {
-      expect(textboxB).not.toBeNull();
-      expect(textboxC).not.toBeNull();
-    });
-    fireEvent.change(textboxB!, { target: { value: "new-b-value" } });
-    fireEvent.change(textboxC!, { target: { value: "new-c-value" } });
+    const textboxB = (await waitFor(() =>
+      wrapper.container.querySelector(".managedAttributes_b-field input")
+    )) as Element;
+    const textboxC = (await waitFor(() =>
+      wrapper.container.querySelector(".managedAttributes_c-field input")
+    )) as Element;
+    fireEvent.change(textboxB, { target: { value: "new-b-value" } });
+    fireEvent.change(textboxC, { target: { value: "new-c-value" } });
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
 

@@ -831,9 +831,10 @@ describe("MaterialSampleBulkEditor", () => {
           /bulk submission error: check the tabs with a red label\./i
         )
       ).toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".text-danger")
+      ).toBeInTheDocument();
     });
-
-    screen.logTestingPlaygroundURL();
 
     // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
@@ -844,7 +845,6 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.container.querySelector(".text-danger")?.textContent
     ).toEqual("MS2");
-
     expect(
       wrapper.getByText(/1 : barcode \- invalid barcode/i)
     ).toBeInTheDocument();
