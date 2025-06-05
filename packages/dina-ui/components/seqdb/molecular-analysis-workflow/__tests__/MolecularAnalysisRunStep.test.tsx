@@ -36,8 +36,75 @@ import {
 } from "../MolecularAnalysisRunStep";
 import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
+const MOCK_INDEX_MAPPING_RESP = {
+  data: {
+    indexName: "dina_object_store_index",
+    attributes: [
+      {
+        name: "originalFilename",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "bucket",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "createdBy",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "acCaption",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "id",
+        type: "text",
+        path: "data"
+      },
+      {
+        name: "type",
+        type: "text",
+        path: "data"
+      },
+      {
+        name: "createdOn",
+        type: "date",
+        path: "data.attributes"
+      }
+    ],
+    relationships: []
+  }
+};
+
+const TEST_ELASTIC_SEARCH_RESPONSE = {
+  data: {
+    hits: {
+      total: {
+        value: 1
+      },
+      hits: [
+        {
+          _source: {
+            data: {
+              id: TEST_METADATA_3.id,
+              type: "metadata",
+              attributes: TEST_METADATA_3
+            }
+          }
+        }
+      ]
+    }
+  }
+};
+
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
+    case "search-api/search-ws/mapping":
+      return MOCK_INDEX_MAPPING_RESP;
     case "/seqdb-api/generic-molecular-analysis-item":
       switch (params.filter.rsql) {
         case "genericMolecularAnalysis.uuid==" +
@@ -152,6 +219,14 @@ const mockSave = jest.fn((ops) =>
   }))
 );
 
+const mockPost = jest.fn<any, any>(async (path) => {
+  switch (path) {
+    // Elastic search response with object store mock metadata data.
+    case "search-api/search-ws/search":
+      return TEST_ELASTIC_SEARCH_RESPONSE;
+  }
+});
+
 const mockSetEditMode = jest.fn();
 
 const testCtx = {
@@ -159,7 +234,8 @@ const testCtx = {
     apiClient: {
       get: mockGet,
       axios: {
-        get: mockGet
+        get: mockGet,
+        post: mockPost
       }
     },
     bulkGet: mockBulkGet,
@@ -367,13 +443,13 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading of the existing objects to attach...
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await new Promise(setImmediate);
 
     userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
     userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
     // Wait for attachments to be displayed on the page.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await new Promise(setImmediate);
 
     // Add another quality control.
     userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
@@ -392,7 +468,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await new Promise(setImmediate);
 
     // Ensure all API save requests are made correctly.
     expect(mockSave.mock.calls).toEqual([
@@ -1129,7 +1205,6 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
     await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
-
     userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
     userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 

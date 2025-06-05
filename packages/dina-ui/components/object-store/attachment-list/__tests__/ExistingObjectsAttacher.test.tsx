@@ -36,19 +36,115 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
   }
 ];
 
+const MOCK_INDEX_MAPPING_RESP = {
+  data: {
+    indexName: "dina_object_store_index",
+    attributes: [
+      {
+        name: "originalFilename",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "bucket",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "createdBy",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "acCaption",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "id",
+        type: "text",
+        path: "data"
+      },
+      {
+        name: "type",
+        type: "text",
+        path: "data"
+      },
+      {
+        name: "createdOn",
+        type: "date",
+        path: "data.attributes"
+      }
+    ],
+    relationships: []
+  }
+};
+
+const TEST_ELASTIC_SEARCH_RESPONSE = {
+  data: {
+    hits: {
+      total: {
+        value: 3
+      },
+      hits: [
+        {
+          _source: {
+            data: {
+              id: TEST_METADATAS[0].id,
+              type: "metadata",
+              attributes: TEST_METADATAS[0]
+            }
+          }
+        },
+        {
+          _source: {
+            data: {
+              id: TEST_METADATAS[1].id,
+              type: "metadata",
+              attributes: TEST_METADATAS[1]
+            }
+          }
+        },
+        {
+          _source: {
+            data: {
+              id: TEST_METADATAS[2].id,
+              type: "metadata",
+              attributes: TEST_METADATAS[2]
+            }
+          }
+        }
+      ]
+    }
+  }
+};
+
 const mockSubmit = jest.fn();
 const mockGet = jest.fn();
 
+const mockPost = jest.fn<any, any>(async (path) => {
+  switch (path) {
+    // Elastic search response with object store mock metadata data.
+    case "search-api/search-ws/search":
+      return TEST_ELASTIC_SEARCH_RESPONSE;
+  }
+});
+
 const apiContext: any = {
-  apiClient: { get: mockGet }
+  apiClient: {
+    axios: {
+      get: mockGet,
+      post: mockPost
+    }
+  }
 };
 
 describe("ExistingObjectsAttacher component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGet.mockImplementation(async (path) => {
-      if (path === "objectstore-api/metadata") {
-        return { data: TEST_METADATAS };
+      if (path === "search-api/search-ws/mapping") {
+        return { MOCK_INDEX_MAPPING_RESP };
       }
     });
   });
