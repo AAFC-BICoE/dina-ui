@@ -174,5 +174,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   exportObjectsMaxLimitTooltip:
     "Export Objects has a maximum limit of 100 files. Select up to 100 files to export.",
   mismatchMaterialSampleTypeError:
-    "Some Material Samples do not match the Split Configuration and were removed."
+    "Some Material Samples do not match the Split Configuration and were removed.",
+  attachSelected: "Attach Selected"
 };

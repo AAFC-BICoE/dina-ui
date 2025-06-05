@@ -30,6 +30,8 @@ import {
 } from "../formik-connected/GroupedCheckBoxFields";
 import { CommonMessage } from "../intl/common-ui-intl";
 import {
+  AttachSelectedButton,
+  AttachSelectedButtonProps,
   BulkDeleteButton,
   BulkDeleteButtonProps,
   BulkEditButton,
@@ -204,6 +206,8 @@ export interface QueryPageProps<TData extends KitsuResource> {
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
 
+  attachSelectedButtonsProps?: AttachSelectedButtonProps;
+
   /**
    * Router path to perform the split from, all of the ids are moved over using local storage.
    */
@@ -329,6 +333,7 @@ export function QueryPage<TData extends KitsuResource>({
   nonSearchableColumns,
   columns,
   bulkDeleteButtonProps,
+  attachSelectedButtonsProps,
   bulkEditPath,
   bulkSplitPath,
   singleEditPath,
@@ -424,7 +429,10 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(
-    bulkDeleteButtonProps || bulkEditPath || dataExportProps
+    bulkDeleteButtonProps ||
+      bulkEditPath ||
+      dataExportProps ||
+      attachSelectedButtonsProps
   );
 
   // Query Page error message state
@@ -1098,6 +1106,9 @@ export function QueryPage<TData extends KitsuResource>({
                   )}
                   {bulkSplitPath && (
                     <BulkSplitButton pathname={bulkSplitPath} />
+                  )}
+                  {attachSelectedButtonsProps && (
+                    <AttachSelectedButton {...attachSelectedButtonsProps} />
                   )}
                 </div>
               )}

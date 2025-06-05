@@ -26,6 +26,29 @@ function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
   return { disabled };
 }
 
+export interface AttachSelectedButtonProps {
+  onAttachButtonClick: (selectedMetadatas: string[]) => Promise<void>;
+}
+
+export function AttachSelectedButton({
+  onAttachButtonClick
+}: AttachSelectedButtonProps) {
+  return (
+    <FormikButton
+      className="btn btn-primary existing-objects-attach-button"
+      onClick={async (values: BulkSelectableFormValues) => {
+        const resourceIds = toPairs(values.itemIdsToSelect)
+          .filter((pair) => pair[1])
+          .map((pair) => pair[0]);
+        await onAttachButtonClick(resourceIds);
+      }}
+      buttonProps={bulkButtonProps}
+    >
+      <CommonMessage id="attachSelected" />
+    </FormikButton>
+  );
+}
+
 export interface BulkDeleteButtonProps {
   typeName: string;
   apiBaseUrl: string;
