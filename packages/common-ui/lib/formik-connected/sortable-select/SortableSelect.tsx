@@ -6,7 +6,7 @@ import {
   rectSortingStrategy
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { castArray } from "lodash";
+import _ from "lodash";
 import { useEffect, useState } from "react";
 import Select, {
   ActionMeta,
@@ -47,12 +47,12 @@ export function SortableSelect<
   ...props
 }: SortableSelectProps<Option, IsMulti, Group>) {
   const [selectedValues, setSelectedValues] = useState(
-    !value ? [] : castArray(value)
+    !value ? [] : _.castArray(value)
   );
 
   // Sync internal state with external value changes
   useEffect(() => {
-    const newValues = !value ? [] : castArray(value);
+    const newValues = !value ? [] : _.castArray(value);
     setSelectedValues(newValues);
   }, [value]);
 

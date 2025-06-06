@@ -34,18 +34,19 @@ export default function ExternalResourceMetadataViewPage() {
           <BackToListButton entityLink="/object-store/object" />
         </div>
         <div className="col-md-9 flex d-flex gap-2">
-          <Link href={`/object-store/metadata/external-resource-edit?id=${id}`}>
-            <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
-              <DinaMessage id="editButtonText" />
-            </a>
+          <Link
+            href={`/object-store/metadata/external-resource-edit?id=${id}`}
+            className="btn btn-primary ms-auto"
+            style={{ width: "10rem" }}
+          >
+            <DinaMessage id="editButtonText" />
           </Link>
           <UploadDerivativeButton acDerivedFrom={id} />
           <Link
             href={`/object-store/metadata/revisions?id=${id}&isExternalResourceMetadata=true`}
+            className="btn btn-info"
           >
-            <a className="btn btn-info">
-              <DinaMessage id="revisionsButtonText" />
-            </a>
+            <DinaMessage id="revisionsButtonText" />
           </Link>
           <DeleteButton
             className="ms-5"

@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { fromPairs } from "lodash";
+import _ from "lodash";
 import { ViewPageLayout } from "../../../components";
 import { ReportTemplateFormLayout } from "./edit";
 import { ReportTemplate } from "../../../types/dina-export-api";
@@ -8,10 +8,11 @@ import Link from "next/link";
 
 export default function ReportTemplateDetailsPage() {
   const backButton = (
-    <Link href={"/export/report-template/upload"}>
-      <a className="back-button my-auto me-auto">
-        <DinaMessage id={"backToUpload"} />
-      </a>
+    <Link
+      href={"/export/report-template/upload"}
+      className="back-button my-auto me-auto"
+    >
+      <DinaMessage id={"backToUpload"} />
     </Link>
   );
   return (
@@ -22,7 +23,7 @@ export default function ReportTemplateDetailsPage() {
           initialValues={{
             ...props.initialValues,
             // Convert multilingualDescription to editable Dictionary format:
-            multilingualDescription: fromPairs<string | undefined>(
+            multilingualDescription: _.fromPairs<string | undefined>(
               props.initialValues.multilingualDescription?.descriptions?.map(
                 ({ desc, lang }) => [lang ?? "", desc ?? ""]
               )

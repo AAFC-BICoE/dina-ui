@@ -1,5 +1,5 @@
 import { useFormikContext } from "formik";
-import { startCase } from "lodash";
+import _ from "lodash";
 import { useEffect, useMemo } from "react";
 import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
@@ -116,7 +116,7 @@ export function RelationshipFieldMapping({
                 <div className="col-3">{index2 === 0 ? columnName : ""}</div>
                 <div className="col-2">{fieldValue}</div>
                 <div className="col-2">{counts[fieldValue]}</div>
-                <div className="col-2">{startCase(parentPath)}</div>
+                <div className="col-2">{_.startCase(parentPath)}</div>
                 <div className="col-3">
                   {getResourceSelectField(
                     onChangeRelatedRecord,

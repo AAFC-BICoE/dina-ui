@@ -3,7 +3,7 @@ import { FormikProps } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CatalogueOfLifeSearchBox } from "./CatalogueOfLifeSearchBox";
 import { useState } from "react";
-import { isArray } from "lodash";
+import _ from "lodash";
 import DOMPurify from "dompurify";
 export interface CatalogueOfLifeNameFieldProps extends FieldWrapperProps {
   scientificNameSourceField?: string;
@@ -112,7 +112,7 @@ export function CatalogueOfLifeNameField({
           <CatalogueOfLifeSearchBox
             fetchJson={fetchJson}
             onSelect={(newValue) => {
-              const val = isArray(newValue) ? newValue?.[1] : newValue;
+              const val = _.isArray(newValue) ? newValue?.[1] : newValue;
               onChange?.(newValue as any, formik);
               setValue(val);
               setSearchInitiated(true);

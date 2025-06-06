@@ -2,6 +2,7 @@ import { Person } from "packages/dina-ui/types/agent-api";
 import { mountWithAppContext } from "common-ui";
 import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../useAutocompleteSearchButFallbackToRsqlApiSearch";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 // Mock out the debounce function to avoid waiting during tests.
 jest.mock("use-debounce", () => ({
@@ -90,15 +91,14 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
-
-    expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
-
-    expect(wrapper.getAllByRole("listitem").length).toEqual(1);
-    expect(wrapper.getByRole("listitem").textContent).toEqual(
-      "Person from Agent API"
-    );
-    expect(wrapper.queryByText(/loading: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
+      expect(wrapper.getAllByRole("listitem").length).toEqual(1);
+      expect(wrapper.getByRole("listitem").textContent).toEqual(
+        "Person from Agent API"
+      );
+      expect(wrapper.queryByText(/loading: false/i)).toBeInTheDocument();
+    });
     wrapper.unmount();
 
     // Try again with a full query
@@ -114,28 +114,28 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
       }
     );
 
-    await new Promise(setImmediate);
-
-    expect(mockSearchApiGet).toHaveBeenCalledTimes(1);
-    expect(mockSearchApiGet).lastCalledWith(
-      "search-api/search-ws/auto-complete",
-      {
-        params: {
-          additionalField: undefined,
-          group: undefined,
-          autoCompleteField: "data.attributes.displayName",
-          indexName: "dina_agent_index",
-          prefix: "test-query",
-          restrictedField: "testRestrictedField",
-          restrictedFieldValue: "testRestrictedValue"
+    await waitFor(() => {
+      expect(mockSearchApiGet).toHaveBeenCalledTimes(1);
+      expect(mockSearchApiGet).lastCalledWith(
+        "search-api/search-ws/auto-complete",
+        {
+          params: {
+            additionalField: undefined,
+            group: undefined,
+            autoCompleteField: "data.attributes.displayName",
+            indexName: "dina_agent_index",
+            prefix: "test-query",
+            restrictedField: "testRestrictedField",
+            restrictedFieldValue: "testRestrictedValue"
+          }
         }
-      }
-    );
-    expect(wrapper2.getAllByRole("listitem").length).toEqual(1);
-    expect(wrapper2.getByRole("listitem").textContent).toEqual(
-      "Person from Search API"
-    );
-    expect(wrapper2.queryByText(/loading: false/i)).toBeInTheDocument();
+      );
+      expect(wrapper2.getAllByRole("listitem").length).toEqual(1);
+      expect(wrapper2.getByRole("listitem").textContent).toEqual(
+        "Person from Search API"
+      );
+      expect(wrapper2.queryByText(/loading: false/i)).toBeInTheDocument();
+    });
   });
 
   it("Falls back to the RSQL filter API when the search API throws an error.", async () => {
@@ -151,18 +151,19 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
       }
     );
     expect(wrapper.queryByText(/loading: true/i)).toBeInTheDocument();
-    await new Promise(setImmediate);
 
-    expect(mockSearchApiGetWithError).toHaveBeenCalledTimes(1);
-    expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
-    expect(mockAgentApiGet).lastCalledWith("agent-api/person", {
-      sort: "-createdOn"
+    await waitFor(() => {
+      expect(mockSearchApiGetWithError).toHaveBeenCalledTimes(1);
+      expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
+      expect(mockAgentApiGet).lastCalledWith("agent-api/person", {
+        sort: "-createdOn"
+      });
+
+      expect(wrapper.getAllByRole("listitem").length).toEqual(1);
+      expect(wrapper.getByRole("listitem").textContent).toEqual(
+        "Person from Agent API"
+      );
+      expect(wrapper.queryByText(/loading: false/i)).toBeInTheDocument();
     });
-
-    expect(wrapper.getAllByRole("listitem").length).toEqual(1);
-    expect(wrapper.getByRole("listitem").textContent).toEqual(
-      "Person from Agent API"
-    );
-    expect(wrapper.queryByText(/loading: false/i)).toBeInTheDocument();
   });
 });

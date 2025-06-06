@@ -8,7 +8,7 @@ import Kitsu, {
   PersistedResource
 } from "kitsu";
 import { deserialise, error as kitsuError } from "kitsu-core";
-import { compact, fromPairs, isEmpty, keys, omit } from "lodash";
+import _ from "lodash";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { OperationsResponse } from "..";
@@ -291,7 +291,7 @@ export class ApiClientImpl implements ApiClientI {
       getErrorMessages(responses);
 
     // If there is an error message, throw it.
-    if (errorMessage || !isEmpty(fieldErrors)) {
+    if (errorMessage || !_.isEmpty(fieldErrors)) {
       throw new DoOperationsError(
         errorMessage ?? "",
         fieldErrors,
@@ -429,7 +429,7 @@ export function getErrorMessages(
   const individualErrors = errorResponses.map(({ response, index }) => {
     // Map the error responses to JsonApiErrors.
     // Ignore any error responses without an 'errors' field.
-    const jsonApiErrors = compact(response.errors);
+    const jsonApiErrors = _.compact(response.errors);
 
     // Convert the JsonApiErrors to an aggregated error string.
     const errorMessage =
@@ -443,7 +443,7 @@ export function getErrorMessages(
         )
         .join("\n") || null;
 
-    const fieldErrors = fromPairs(
+    const fieldErrors = _.fromPairs(
       jsonApiErrors
         // Only include field-level errors in the fieldErrors:
         .filter((error) => error.source?.pointer && error.detail)
@@ -457,7 +457,7 @@ export function getErrorMessages(
   });
 
   const overallErrorMessage =
-    compact(individualErrors.map((it) => it.errorMessage)).join("\n") || null;
+    _.compact(individualErrors.map((it) => it.errorMessage)).join("\n") || null;
   const overallFieldErrors = individualErrors.reduce(
     (total, curr) => ({ ...total, ...curr.fieldErrors }),
     {}
@@ -517,7 +517,7 @@ export class CustomDinaKitsu extends Kitsu {
    * Override the 'get' method so it works with our long URLs:
    */
   async get(path: string, params: GetParams = {}) {
-    const { responseType, timeout, ...paramsNet } = omit(params, "header");
+    const { responseType, timeout, ...paramsNet } = _.omit(params, "header");
     try {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },
@@ -531,7 +531,7 @@ export class CustomDinaKitsu extends Kitsu {
 
       // Omit relationships where: { data: null } because they do not deserialize properly:
       const relationships = deserialized?.data?.relationships;
-      for (const key of keys(relationships)) {
+      for (const key of _.keys(relationships)) {
         if (relationships?.[key]?.data === null) {
           delete relationships[key];
         }

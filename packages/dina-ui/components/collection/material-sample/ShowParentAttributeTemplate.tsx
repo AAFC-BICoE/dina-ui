@@ -6,7 +6,7 @@ import {
   useQuery
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
-import { get, startCase } from "lodash";
+import _ from "lodash";
 import { useLayoutEffect, useEffect, useMemo, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -29,7 +29,7 @@ export function ShowParentAttributeTemplate({
   const { formatMessage } = useDinaIntl();
   const formik = useFormikContext<any>();
   const fieldArrayName = `parentAttributes`;
-  const parentAttributes = get(formik.values, fieldArrayName);
+  const parentAttributes = _.get(formik.values, fieldArrayName);
 
   // All the options that appear in the dropdown list.
   const [selectOptions, setSelectOptions] = useState<SelectOption<string>[]>(
@@ -147,7 +147,7 @@ export function ShowParentAttributeTemplate({
       return {
         ...baseStyle,
         ":before": {
-          content: `'${startCase(data.parentPath)} '`
+          content: `'${_.startCase(data.parentPath)} '`
         }
       };
     }

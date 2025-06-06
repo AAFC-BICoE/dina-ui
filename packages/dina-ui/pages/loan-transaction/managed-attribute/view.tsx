@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { fromPairs } from "lodash";
+import _ from "lodash";
 import {
   ManagedAttributeFormLayout,
   ViewPageLayout
@@ -20,7 +20,7 @@ export default function ManagedAttributesViewPage() {
           ? {
               ...data,
               // Convert multilingualDescription to editable Dictionary format:
-              multilingualDescription: fromPairs<string | undefined>(
+              multilingualDescription: _.fromPairs<string | undefined>(
                 data.multilingualDescription?.descriptions?.map(
                   ({ desc, lang }) => [lang ?? "", desc ?? ""]
                 )

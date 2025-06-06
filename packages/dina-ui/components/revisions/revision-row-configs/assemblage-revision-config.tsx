@@ -8,9 +8,7 @@ import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttribu
 
 export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
   name: ({ id, name }) => (
-    <Link href={`/collection/assemblage/view?id=${id}`}>
-      <a>{name || id}</a>
-    </Link>
+    <Link href={`/collection/assemblage/view?id=${id}`}>{name || id}</Link>
   ),
   customValueCells: {
     attachment: ({

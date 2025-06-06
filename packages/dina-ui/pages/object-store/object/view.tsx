@@ -74,18 +74,21 @@ export default function MetadataViewPage() {
       <div className="col-md-8 flex d-flex gap-2">
         {canEdit && (
           <>
-            <Link href={`/object-store/metadata/edit?id=${uuid}`}>
-              <a className="btn btn-primary ms-auto" style={{ width: "5rem" }}>
-                <DinaMessage id="editButtonText" />
-              </a>
+            <Link
+              href={`/object-store/metadata/edit?id=${uuid}`}
+              className="btn btn-primary ms-auto"
+              style={{ width: "5rem" }}
+            >
+              <DinaMessage id="editButtonText" />
             </Link>
             <UploadDerivativeButton acDerivedFrom={uuid} />
           </>
         )}
-        <Link href={`/object-store/metadata/revisions?id=${uuid}`}>
-          <a className="btn btn-info">
-            <DinaMessage id="revisionsButtonText" />
-          </a>
+        <Link
+          href={`/object-store/metadata/revisions?id=${uuid}`}
+          className="btn btn-info"
+        >
+          <DinaMessage id="revisionsButtonText" />
         </Link>
         {canDelete && (
           <DeleteButton

@@ -40,7 +40,7 @@ import {
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
 import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
-import { get } from "lodash";
+import _ from "lodash";
 
 export type FieldMapType = {
   columnHeader: string;
@@ -495,7 +495,7 @@ export function WorkbookColumnMapping({
       } else {
         const collectionRelationshipHeader =
           collectionNameColumn.columnHeader.replace(" ", "_");
-        const collectionUuid = get(relationshipMapping, [
+        const collectionUuid = _.get(relationshipMapping, [
           collectionRelationshipHeader,
           collectionName,
           "id"

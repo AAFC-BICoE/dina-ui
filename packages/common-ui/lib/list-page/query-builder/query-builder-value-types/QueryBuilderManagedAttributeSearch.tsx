@@ -17,7 +17,7 @@ import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./QueryBuilderTextSearch";
-import { get, noop } from "lodash";
+import _ from "lodash";
 import { PersistedResource } from "kitsu";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
@@ -86,7 +86,9 @@ export default function QueryRowManagedAttributeSearch({
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = isInColumnSelector ? noop : useQueryBuilderEnterToSearch();
+  const onKeyDown = isInColumnSelector
+    ? _.noop
+    : useQueryBuilderEnterToSearch();
 
   const [managedAttributeState, setManagedAttributeState] =
     useState<ManagedAttributeSearchStates>(() =>
@@ -336,9 +338,9 @@ export default function QueryRowManagedAttributeSearch({
         })}
         model={managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""}
         optionLabel={(attribute) =>
-          get(attribute, "name") ||
-          get(attribute, "key") ||
-          get(attribute, "id") ||
+          _.get(attribute, "name") ||
+          _.get(attribute, "key") ||
+          _.get(attribute, "id") ||
           ""
         }
         isMulti={false}

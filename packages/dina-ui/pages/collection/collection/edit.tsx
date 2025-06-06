@@ -19,7 +19,7 @@ import { NextRouter, useRouter } from "next/router";
 import { GroupSelectField, IdentifierFields } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection } from "../../../types/collection-api";
-import { toPairs, fromPairs } from "lodash";
+import _ from "lodash";
 import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
@@ -64,7 +64,7 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
     ? {
         ...collection,
         // Convert multilingualDescription to editable Dictionary format:
-        multilingualDescription: fromPairs<string | undefined>(
+        multilingualDescription: _.fromPairs<string | undefined>(
           collection.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
           )
@@ -80,7 +80,7 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
       ...submittedValues,
       // Convert the editable format to the stored format:
       multilingualDescription: {
-        descriptions: toPairs(submittedValues.multilingualDescription).map(
+        descriptions: _.toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc: desc as any })
         )
       }

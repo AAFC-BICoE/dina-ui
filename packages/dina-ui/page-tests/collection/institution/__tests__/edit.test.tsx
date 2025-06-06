@@ -1,6 +1,6 @@
 import { InstitutionForm } from "../../../../pages/collection/institution/edit";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -67,7 +67,12 @@ describe("InstitutionForm.", () => {
       <InstitutionForm onSaved={mockOnSaved} />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument();
+    });
 
     // Change name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -89,29 +94,29 @@ describe("InstitutionForm.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API response
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            name: "test-institution",
-            multilingualDescription: {
-              descriptions: [
-                {
-                  desc: "test eng desc",
-                  lang: "en"
-                }
-              ]
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              name: "test-institution",
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test eng desc",
+                    lang: "en"
+                  }
+                ]
+              },
+              type: "institution"
             },
             type: "institution"
-          },
-          type: "institution"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+    });
     expect(mockOnSaved).lastCalledWith({
       id: "123",
       name: "test-institution",
@@ -149,7 +154,11 @@ describe("InstitutionForm.", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument();
+    });
 
     // Change name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -170,36 +179,36 @@ describe("InstitutionForm.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API response
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            id: "333",
-            multilingualDescription: {
-              descriptions: [
-                {
-                  desc: "test-eng-desc",
-                  lang: "en"
-                },
-                {
-                  desc: "test-fr-desc",
-                  lang: "fr"
-                }
-              ]
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              id: "333",
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test-eng-desc",
+                    lang: "en"
+                  },
+                  {
+                    desc: "test-fr-desc",
+                    lang: "fr"
+                  }
+                ]
+              },
+              name: "edited-name",
+              type: "institution",
+              createdBy: "Mat",
+              createdOn: "2021-06-22"
             },
-            name: "edited-name",
-            type: "institution",
-            createdBy: "Mat",
-            createdOn: "2021-06-22"
-          },
-          type: "institution"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
+            type: "institution"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+    });
     expect(mockOnSaved).lastCalledWith({
       id: "333",
       multilingualDescription: {

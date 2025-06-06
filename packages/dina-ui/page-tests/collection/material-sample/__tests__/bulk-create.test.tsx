@@ -2,7 +2,7 @@ import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -59,12 +59,23 @@ describe("MaterialSampleBulkCreatePage", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("combobox", { name: /collection/i })
+      ).toBeInTheDocument();
+    });
 
     // Fill out the form:
     // Collection field
     userEvent.click(wrapper.getByRole("combobox", { name: /collection/i }));
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("option", { name: /test collection/i })
+      ).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getByRole("option", { name: /test collection/i }));
+
     // Material Samples to Create field
     fireEvent.change(
       wrapper.getByRole("spinbutton", { name: /material samples to create/i }),
@@ -93,33 +104,34 @@ describe("MaterialSampleBulkCreatePage", () => {
       }
     });
 
-    await new Promise(setImmediate);
-
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Click 'Go to the previous step' button
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /go to the previous step/i })
+      ).toBeInTheDocument();
+    });
     userEvent.click(
       wrapper.getByRole("button", { name: /go to the previous step/i })
     );
 
-    await new Promise(setImmediate);
-
     // Goes back to the previous page with the generator form values:
-    expect(wrapper.getByText("test collection")).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("spinbutton", { name: /material samples to create/i })
-    ).toHaveDisplayValue("5");
-    expect(
-      wrapper.getByRole("textbox", { name: /base name/i })
-    ).toHaveDisplayValue("my-sample");
-    expect(wrapper.getByRole("textbox", { name: /start/i })).toHaveDisplayValue(
-      "00001"
-    );
-    expect(
-      wrapper.getByRole("textbox", { name: /separator/i })
-    ).toHaveDisplayValue("-");
+    await waitFor(() => {
+      expect(wrapper.getByText("test collection")).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("spinbutton", { name: /material samples to create/i })
+      ).toHaveDisplayValue("5");
+      expect(
+        wrapper.getByRole("textbox", { name: /base name/i })
+      ).toHaveDisplayValue("my-sample");
+      expect(
+        wrapper.getByRole("textbox", { name: /start/i })
+      ).toHaveDisplayValue("00001");
+      expect(
+        wrapper.getByRole("textbox", { name: /separator/i })
+      ).toHaveDisplayValue("-");
+    });
   });
 });

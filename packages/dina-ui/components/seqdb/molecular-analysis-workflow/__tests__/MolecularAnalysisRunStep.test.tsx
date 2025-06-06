@@ -1333,18 +1333,32 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       const dataPasteZone = wrapper.getAllByPlaceholderText(
         "Paste your data here (e.g., copied from Excel)"
       )[0];
+      await waitFor(() => expect(dataPasteZone).toBeInTheDocument());
 
       // Simulate pasting data into the data paste zone as an excel paste (2 columns)
       const pasteData = "Run Item Name 1\nRun Item Name 2";
       fireEvent.paste(dataPasteZone, {
         clipboardData: {
-          getData: () => pasteData
+          getData: (type: string) => {
+            // Ensure your component asks for the correct type, usually "text/plain"
+            if (type === "text/plain") {
+              return pasteData;
+            }
+            return "";
+          }
         }
       });
+      fireEvent.change(dataPasteZone, { target: { value: pasteData } });
 
       // Items should be populated in:
-      expect(wrapper.getByDisplayValue(/run item name 1/i)).toBeInTheDocument();
-      expect(wrapper.getByDisplayValue(/run item name 2/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(
+          wrapper.getByDisplayValue(/run item name 1/i)
+        ).toBeInTheDocument();
+        expect(
+          wrapper.getByDisplayValue(/run item name 2/i)
+        ).toBeInTheDocument();
+      });
     });
   });
 });

@@ -9,7 +9,7 @@ import { RevisionRowConfig } from "../revision-row-config";
 export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig<Transaction> = {
   name: ({ id, transactionNumber }) => (
     <Link href={`/loan-transaction/transaction/view?id=${id}`}>
-      <a>{transactionNumber || id}</a>
+      {transactionNumber || id}
     </Link>
   ),
   customValueCells: {

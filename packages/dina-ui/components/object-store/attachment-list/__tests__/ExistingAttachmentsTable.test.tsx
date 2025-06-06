@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { ExistingAttachmentsTable } from "../ExistingAttachmentsTable";
-import { screen, fireEvent, within } from "@testing-library/react";
+import { screen, fireEvent, within, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockBulkGet = jest.fn(async (paths) => {
@@ -135,12 +135,13 @@ describe("ExistingAttachmentsTable component", () => {
     );
 
     // Wait for the data to render in the ReactTable component.
-    await new Promise(setImmediate);
-    const rows = container.querySelectorAll(".ReactTable tbody tr");
-    expect(rows).toHaveLength(2);
+    await waitFor(() => {
+      const rows = container.querySelectorAll(".ReactTable tbody tr");
+      expect(rows).toHaveLength(2);
 
-    expect(screen.getByAltText("test-file-1.png")).toBeInTheDocument();
-    expect(screen.getByAltText("test-file-2.png")).toBeInTheDocument();
+      expect(screen.getByAltText("test-file-1.png")).toBeInTheDocument();
+      expect(screen.getByAltText("test-file-2.png")).toBeInTheDocument();
+    });
   });
 
   it("Lets you bulk edit attachment Metadatas.", async () => {
@@ -155,15 +156,24 @@ describe("ExistingAttachmentsTable component", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
-
     // Get row 2
-    const row = screen.getByRole("row", {
-      name: /select test\-file\-2\.png/i
-    });
+    await waitFor(
+      () => {
+        expect(
+          screen.getByRole("row", {
+            name: /select test\-file\-2\.png/i
+          })
+        ).toBeInTheDocument();
+      },
+      { timeout: 2000 }
+    );
 
     // Click row 2 checkbox
-    const checkbox = within(row).getByRole("checkbox", {
+    const checkbox = within(
+      screen.getByRole("row", {
+        name: /select test\-file\-2\.png/i
+      })
+    ).getByRole("checkbox", {
       name: /select/i
     });
     fireEvent.click(checkbox);
@@ -174,20 +184,27 @@ describe("ExistingAttachmentsTable component", () => {
         name: /edit selected attachment metadata/i
       })
     );
-    await new Promise(setImmediate);
 
     // Click the Save All button in the modal
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", {
+          name: /save all/i
+        })
+      ).toBeInTheDocument();
+    });
     fireEvent.click(
       screen.getByRole("button", {
         name: /save all/i
       })
     );
-    await new Promise(setImmediate);
 
     // The bulk editor should call our mock:
-    expect(mockOnMetadatasEdited).lastCalledWith([
-      "11111111-1111-1111-1111-111111111111"
-    ]);
+    await waitFor(() => {
+      expect(mockOnMetadatasEdited).lastCalledWith([
+        "11111111-1111-1111-1111-111111111111"
+      ]);
+    });
   });
 
   it("Lets you detach attachment Metadatas.", async () => {
@@ -200,15 +217,21 @@ describe("ExistingAttachmentsTable component", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
-
     // Get row 1
-    const row = screen.getByRole("row", {
-      name: /select test\-file\-1\.png/i
+    await waitFor(() => {
+      expect(
+        screen.getByRole("row", {
+          name: /select test\-file\-1\.png/i
+        })
+      ).toBeInTheDocument();
     });
 
     // Click row 1 checkbox
-    const checkbox = within(row).getByRole("checkbox", {
+    const checkbox = within(
+      screen.getByRole("row", {
+        name: /select test\-file\-1\.png/i
+      })
+    ).getByRole("checkbox", {
       name: /select/i
     });
     fireEvent.click(checkbox);
@@ -220,10 +243,10 @@ describe("ExistingAttachmentsTable component", () => {
       })
     );
 
-    await new Promise(setImmediate);
-
-    expect(mockOnDetachMetadataIds).lastCalledWith([
-      "00000000-0000-0000-0000-000000000000"
-    ]);
+    await waitFor(() => {
+      expect(mockOnDetachMetadataIds).lastCalledWith([
+        "00000000-0000-0000-0000-000000000000"
+      ]);
+    });
   });
 });

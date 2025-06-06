@@ -1,4 +1,4 @@
-import { find } from "lodash";
+import _ from "lodash";
 import { useQuery } from "../../../common-ui/lib";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { VocabularyOption } from "./VocabularySelectField";
@@ -21,7 +21,7 @@ export default function useTypedVocabularyOptions<T extends TypedVocabulary>({
 
   function toOption(value: T): VocabularyOption {
     const label =
-      find(
+      _.find(
         value?.multilingualTitle?.titles || [],
         (item) => item.lang === locale
       )?.title ||

@@ -13,7 +13,7 @@ import {
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import { toPairs, fromPairs } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { Head, Nav, IdentifierFields, Footer } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -74,7 +74,7 @@ export function InstitutionForm({
     ? {
         ...institution,
         // Convert multilingualDescription to editable Dictionary format:
-        multilingualDescription: fromPairs<string | undefined>(
+        multilingualDescription: _.fromPairs<string | undefined>(
           institution.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
           )
@@ -90,7 +90,7 @@ export function InstitutionForm({
       ...submittedValues,
       // Convert the editable format to the stored format:
       multilingualDescription: {
-        descriptions: toPairs(submittedValues.multilingualDescription).map(
+        descriptions: _.toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc: desc as any })
         )
       }

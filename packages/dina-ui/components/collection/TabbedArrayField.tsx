@@ -7,7 +7,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
-import { clamp, get, isEmpty } from "lodash";
+import _ from "lodash";
 import { ReactNode, useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -77,7 +77,9 @@ export function TabbedArrayField<T>({
 
         function removeElement(index: number) {
           fieldArrayProps.remove(index); // Stay on the current tab number, or reduce if removeing the last element:
-          setActiveTabIdx((current) => clamp(current, 0, elements.length - 2));
+          setActiveTabIdx((current) =>
+            _.clamp(current, 0, elements.length - 2)
+          );
         }
 
         function elementInternal(index: number) {
@@ -220,7 +222,7 @@ export function TabbedArrayField<T>({
 
 function TabErrorIndicator({ name, index, children }) {
   const { errors } = useFormikContext();
-  const hasError = !isEmpty(get(errors, `${name}[${index}]`));
+  const hasError = !_.isEmpty(_.get(errors, `${name}[${index}]`));
 
   return children(hasError);
 }

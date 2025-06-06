@@ -1,5 +1,5 @@
 import PreparationMethodDetailsPage from "../../../../pages/collection/preparation-method/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { PreparationMethod } from "../../../../types/collection-api/resources/PreparationMethod";
 import "@testing-library/jest-dom";
 
@@ -46,10 +46,7 @@ describe("PreparationMethod details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    // Test for spinner to not be rendered after loading
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     // Test for Preparation Method Name value
     expect(

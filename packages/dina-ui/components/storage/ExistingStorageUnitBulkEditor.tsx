@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "common-ui";
 import { InputResource } from "kitsu";
-import { compact } from "lodash";
+import _ from "lodash";
 import { useStorageUnit } from "packages/dina-ui/pages/collection/storage-unit/edit";
 import { StorageUnit } from "packages/dina-ui/types/collection-api";
 import { StorageUnitBulkEditor } from "./StorageUnitBulkEditor";
@@ -24,7 +24,7 @@ export function ExistingStorageUnitBulkEditor({
     false
   );
 
-  const errors = compact(storageUnitQueries.map((query) => query.error));
+  const errors = _.compact(storageUnitQueries.map((query) => query.error));
 
   if (isLoading) {
     return <LoadingSpinner loading={true} />;
@@ -42,7 +42,7 @@ export function ExistingStorageUnitBulkEditor({
     );
   }
 
-  const storageUnits = compact(
+  const storageUnits = _.compact(
     storageUnitQueries.map(
       (query) => query.response?.data as InputResource<StorageUnit>
     )

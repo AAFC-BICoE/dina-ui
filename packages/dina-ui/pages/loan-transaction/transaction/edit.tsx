@@ -20,7 +20,7 @@ import {
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import { compact, pick } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { AgentRolesField } from "../../../components/collection/AgentRolesField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -234,16 +234,18 @@ export function TransactionFormLayout({
       sampleIds.map((id) => `/material-sample/${id}?include=organism`),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      const materialSamplesTransformed = compact(response).map((resource) => ({
-        data: {
-          attributes: pick(resource, ["materialSampleName"])
-        },
-        id: resource.id,
-        type: resource.type,
-        included: {
-          organism: resource.organism
-        }
-      }));
+      const materialSamplesTransformed = _.compact(response).map(
+        (resource) => ({
+          data: {
+            attributes: _.pick(resource, ["materialSampleName"])
+          },
+          id: resource.id,
+          type: resource.type,
+          included: {
+            organism: resource.organism
+          }
+        })
+      );
       if (setSelectedResources !== undefined) {
         setSelectedResources(materialSamplesTransformed ?? []);
       }

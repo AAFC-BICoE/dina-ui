@@ -9,7 +9,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { connect, Field, FormikContextType } from "formik";
-import { get } from "lodash";
+import _ from "lodash";
 import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../../dina-ui/types/collection-api";
 import { useRef, useState } from "react";
 import { PersonSelectField } from "../..";
@@ -118,7 +118,7 @@ export function GeoReferenceAssertionRow({
   /** Make this Assertion the Primary. */
   function makePrimary(formik: FormikContextType<any>) {
     const assertions: GeoReferenceAssertion[] =
-      get(formik.values, assertionsPath) ?? [];
+      _.get(formik.values, assertionsPath) ?? [];
 
     assertions.forEach((_, idx) => {
       formik.setFieldValue(`${assertionsPath}[${idx}].isPrimary`, false);
@@ -142,7 +142,7 @@ export function GeoReferenceAssertionRow({
               className="btn btn-primary primary-assertion-button"
               buttonProps={(ctx) => {
                 const isPrimary =
-                  get(ctx.values, commonRoot + "isPrimary") ?? false;
+                  _.get(ctx.values, commonRoot + "isPrimary") ?? false;
                 return {
                   disabled: isPrimary,
                   children: isPrimary ? (
@@ -249,7 +249,7 @@ export function GeoReferenceAssertionRow({
 
 export const ViewInMapButton = connect<{ assertionPath: string }>(
   ({ assertionPath, formik: { values } }) => {
-    const { dwcDecimalLatitude: lat, dwcDecimalLongitude: lon } = get(
+    const { dwcDecimalLatitude: lat, dwcDecimalLongitude: lon } = _.get(
       values,
       assertionPath
     );

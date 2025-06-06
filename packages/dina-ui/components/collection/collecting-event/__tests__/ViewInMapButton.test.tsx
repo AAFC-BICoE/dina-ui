@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { ViewInMapButton } from "../GeoReferenceAssertionRow";
-import { screen } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 describe("ViewInMapButton component", () => {
@@ -20,7 +20,13 @@ describe("ViewInMapButton component", () => {
     );
 
     // Wait for the component to render
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("link", {
+          name: /view on map/i // Adjust this text if necessary
+        })
+      ).toBeInTheDocument();
+    });
 
     // Use getByRole or getByText to select the anchor tag
     const link = screen.getByRole("link", {
@@ -49,7 +55,13 @@ describe("ViewInMapButton component", () => {
     );
 
     // Wait for the component to render
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("link", {
+          name: /view on map/i // Adjust this text if necessary
+        })
+      ).not.toBeInTheDocument();
+    });
 
     // Check that the link is not present in the document
     const link = screen.queryByRole("link", {

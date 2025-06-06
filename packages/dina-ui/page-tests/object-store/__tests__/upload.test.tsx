@@ -1,11 +1,11 @@
 import { AccountContextI } from "common-ui";
-import { noop } from "lodash";
+import _ from "lodash";
 import { fileUploadErrorHandler } from "../../../components/object-store/file-upload/FileUploadProvider";
 import UploadPage, {
   BULK_ADD_IDS_KEY
 } from "../../../pages/object-store/upload";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -23,13 +23,15 @@ const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   authenticated: true,
   groupNames: ["example-group"],
   initialized: true,
-  login: noop,
-  logout: noop,
+  login: _.noop,
+  logout: _.noop,
   roles: [],
   // Mock for a successful token update.
   getCurrentToken: () => Promise.resolve("test-token"),
   username: "test-user"
 };
+
+window.HTMLElement.prototype.scroll = jest.fn();
 
 describe("Upload page", () => {
   beforeEach(() => {
@@ -90,7 +92,11 @@ describe("Upload page", () => {
       new File(["file content"], "file2.pdf", { type: "application/pdf" }),
       new File(["file content"], "file3.pdf", { type: "application/pdf" })
     ];
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByLabelText(/drag and drop files here/i)
+      ).toBeInTheDocument();
+    });
 
     // Find the file input in the Dropzone component
     const fileInput = screen.getByLabelText(/drag and drop files here/i);
@@ -104,21 +110,25 @@ describe("Upload page", () => {
     fireEvent.change(fileInput);
 
     // Await the processing of the file uploads
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /save/i })
+      ).toBeInTheDocument();
+    });
 
     // Submit
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
-    await new Promise(setImmediate);
-
     // The group name should be in the URL:
-    expect(mockPost).lastCalledWith(
-      "/objectstore-api/file/example-group",
-      // Form data with the file would go here:
-      expect.anything(),
-      // Passes in the custom error handler:
-      expect.anything()
-    );
+    await waitFor(() => {
+      expect(mockPost).lastCalledWith(
+        "/objectstore-api/file/example-group",
+        // Form data with the file would go here:
+        expect.anything(),
+        // Passes in the custom error handler:
+        expect.anything()
+      );
+    });
 
     // You should get redirected to the bulk edit page with the new metadata IDs.
     expect(mockPush).lastCalledWith({

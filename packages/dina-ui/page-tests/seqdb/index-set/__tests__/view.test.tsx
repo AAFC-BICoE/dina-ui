@@ -1,7 +1,8 @@
 import IndexSetViewPage from "../../../../pages/seqdb/index-set/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { IndexSet, NgsIndex } from "../../../../types/seqdb-api";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
@@ -65,24 +66,20 @@ describe("Index Set View Page", () => {
   it("Renders the index set view page.", async () => {
     const wrapper = getWrapper();
 
-    // Renders initially with loading indicator:
-    // expect(wrapper.find(LoadingSpinner).exists()).toEqual(true);
-    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
-
     // Wait for the page to load:
-    await new Promise(setImmediate);
+    await waitForLoadingToDisappear();
 
     // The index set name is displayed:
     expect(wrapper.getAllByText(/test index set/i)[1]).toBeInTheDocument();
 
     // Wait for the NGS indexes table to load:
-    await new Promise(setImmediate);
-
-    // The table shows the ngs indexes:
-    expect(
-      wrapper.getByRole("cell", {
-        name: /index 1/i
-      })
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      // The table shows the ngs indexes:
+      expect(
+        wrapper.getByRole("cell", {
+          name: /index 1/i
+        })
+      ).toBeInTheDocument();
+    });
   });
 });

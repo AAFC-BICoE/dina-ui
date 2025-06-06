@@ -2,6 +2,7 @@ import OrganizationDetailsPage from "../../../pages/organization/view";
 import { mountWithAppContext } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 /** Test organization with all fields defined. */
 const TEST_ORGANIZATION: Organization = {
@@ -49,15 +50,15 @@ describe("Organization details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+      // The organization's name should be rendered in a FieldView.
+      expect(wrapper.getByText("English Name")).toBeInTheDocument();
+      expect(wrapper.getAllByText(/organization a/i)).not.toBeNull();
 
-    // The organization's name should be rendered in a FieldView.
-    expect(wrapper.getByText("English Name")).toBeInTheDocument();
-    expect(wrapper.getAllByText(/organization a/i)).not.toBeNull();
-
-    // The organization's email should be rendered in a FieldView.
-    expect(wrapper.getByText("org1, org2")).toBeInTheDocument();
+      // The organization's email should be rendered in a FieldView.
+      expect(wrapper.getByText("org1, org2")).toBeInTheDocument();
+    });
   });
 });

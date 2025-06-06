@@ -3,7 +3,7 @@ import { ManagedAttribute } from "../../../../types/collection-api";
 import MetadataEditPage from "../../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "common-ui";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -138,12 +138,12 @@ describe("Metadata single record edit page.", () => {
   it("Lets you edit the Metadata.", async () => {
     const wrapper = mountWithAppContext(<MetadataEditPage />, { apiContext });
 
-    await new Promise(setImmediate);
-
     // Check for the right initial values:
-    expect(
-      wrapper.getByRole("textbox", { name: /original filename/i })
-    ).toHaveDisplayValue("test-file.png");
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /original filename/i })
+      ).toHaveDisplayValue("test-file.png");
+    });
 
     expect(wrapper.getByText(/tag1/i)).toBeInTheDocument();
     expect(wrapper.getByText(/tag2/i)).toBeInTheDocument();
@@ -174,30 +174,29 @@ describe("Metadata single record edit page.", () => {
       }
     );
 
-    await new Promise(setImmediate);
-
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
-    await new Promise(setImmediate);
 
     // Check only the changed values
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            acSubtype: "TEST_SUBTYPE",
-            acTags: ["new tag 1", "new tag 2"],
-            id: "25f81de5-bbee-430c-b5fa-71986b70e612",
-            managedAttributes: {
-              test_managed_attribute: "new-managed-attribute-value"
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              acSubtype: "TEST_SUBTYPE",
+              acTags: ["new tag 1", "new tag 2"],
+              id: "25f81de5-bbee-430c-b5fa-71986b70e612",
+              managedAttributes: {
+                test_managed_attribute: "new-managed-attribute-value"
+              },
+              type: "metadata",
+              xmpRightsUsageTerms: ""
             },
-            type: "metadata",
-            xmpRightsUsageTerms: ""
-          },
-          type: "metadata"
-        }
-      ],
-      { apiBaseUrl: "/objectstore-api" }
-    );
+            type: "metadata"
+          }
+        ],
+        { apiBaseUrl: "/objectstore-api" }
+      );
+    });
   });
 });

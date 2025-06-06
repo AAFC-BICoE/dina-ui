@@ -1,4 +1,4 @@
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { SubmitButton } from "../SubmitButton";
@@ -69,9 +69,10 @@ describe("TextField component", () => {
     );
 
     fireEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
-    expect(
-      wrapper.getByText(/1 : test field \- test error/i)
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/1 : test field \- test error/i)
+      ).toBeInTheDocument();
+    });
   });
 });

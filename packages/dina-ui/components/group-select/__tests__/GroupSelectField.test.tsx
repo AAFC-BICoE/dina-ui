@@ -5,6 +5,7 @@ import { deleteFromStorage, writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../useStoredDefaultGroup";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const mockSubmit = jest.fn();
 
@@ -29,7 +30,11 @@ describe("GroupSelectField component", () => {
       </DinaForm>,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("combobox", { name: /group select\.\.\./i })
+      ).toBeInTheDocument()
+    );
 
     // Click the dropdown to show options.
     userEvent.click(
@@ -65,7 +70,11 @@ describe("GroupSelectField component", () => {
         }
       }
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("combobox", { name: /group select\.\.\./i })
+      ).toBeInTheDocument()
+    );
 
     // Click the dropdown to show options.
     userEvent.click(
@@ -87,9 +96,9 @@ describe("GroupSelectField component", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
-
-    expect(wrapper.getByText(/select\.\.\./i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(wrapper.getByText(/select\.\.\./i)).toBeInTheDocument()
+    );
   });
 
   it("Sets the default group from local storage when this feature is enabled.", async () => {
@@ -101,9 +110,7 @@ describe("GroupSelectField component", () => {
       </DinaForm>,
       testCtx
     );
-    await new Promise(setImmediate);
-
-    expect(wrapper.getByText(/cnc/i)).toBeInTheDocument();
+    await waitFor(() => expect(wrapper.getByText(/cnc/i)).toBeInTheDocument());
   });
 
   it("Doesn't set the default group if a group is passed using initialValues.", async () => {
@@ -116,9 +123,7 @@ describe("GroupSelectField component", () => {
       // User has only one group:
       { ...testCtx, accountContext: { groupNames: ["cnc"] } }
     );
-    await new Promise(setImmediate);
-
-    expect(wrapper.getByText(/aafc/i)).toBeInTheDocument();
+    await waitFor(() => expect(wrapper.getByText(/aafc/i)).toBeInTheDocument());
   });
 
   it("Hides the field and sets the only option when the default option is the only option.", async () => {
@@ -133,12 +138,12 @@ describe("GroupSelectField component", () => {
       // User has only one group:
       { ...testCtx, accountContext: { groupNames: ["cnc"] } }
     );
-    await new Promise(setImmediate);
-
-    expect(wrapper.queryByRole("combobox")).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(wrapper.queryByRole("combobox")).not.toBeInTheDocument()
+    );
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockSubmit).lastCalledWith({ group: "cnc" }));
 
     // The default group was selected:
     expect(mockSubmit).lastCalledWith({ group: "cnc" });
@@ -158,10 +163,12 @@ describe("GroupSelectField component", () => {
       // User has only one group:
       { ...testCtx, accountContext: { groupNames: ["cnc"] } }
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(wrapper.getByRole("button", { name: /save/i })).toBeInTheDocument()
+    );
 
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockSubmit).lastCalledWith({ group: null }));
 
     // The default group was selected:
     expect(mockSubmit).lastCalledWith({ group: null });

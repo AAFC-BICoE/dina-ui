@@ -1,7 +1,7 @@
 import { Vocabulary } from "../../../dina-ui/types/collection-api/resources/VocabularyElement";
 
 import classNames from "classnames";
-import { find } from "lodash";
+import _ from "lodash";
 import { ReadOnlyValue } from "..";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import {
@@ -35,7 +35,7 @@ export function ControlledVocabularySelectField(
   return withResponse(vocQuery, ({ data }) => {
     const options = data?.vocabularyElements?.map((el) => ({
       label:
-        find(
+        _.find(
           el?.multilingualTitle?.titles || [],
           (item) => item.lang === locale
         )?.title ||

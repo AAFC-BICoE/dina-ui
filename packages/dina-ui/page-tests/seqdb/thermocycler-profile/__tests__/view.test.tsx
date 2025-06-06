@@ -1,5 +1,5 @@
 import ThermocyclerProfileDetailsPage from "../../../../pages/seqdb/thermocycler-profile/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
 import "@testing-library/jest-dom";
 
@@ -42,9 +42,7 @@ describe("PcrProfile details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     // The profile's name should be rendered in a FieldView.
     expect(wrapper.getByText(/thermocycler profile name/i)).toBeInTheDocument();

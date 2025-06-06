@@ -163,7 +163,7 @@ function GridCell<ItemType extends { sampleName?: string }>({
       overlay={<div style={{ maxWidth: "15rem" }}>{coordinates}</div>}
     >
       <div
-        ref={drop}
+        ref={drop as any}
         style={{
           border: dragHover ? "3px dashed #1C6EA4" : undefined,
           background: dragHover ? "#f7fbff" : undefined,

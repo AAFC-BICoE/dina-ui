@@ -232,7 +232,9 @@ export function SampleSelectionMappingTable({
                           }}
                         >
                           {row[1]?.path ? (
-                            <Link href={row[1]?.path}>{row[1]?.name}</Link>
+                            <Link href={row[1]?.path} legacyBehavior>
+                              {row[1]?.name}
+                            </Link>
                           ) : (
                             row[1]?.name
                           )}

@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { TagSelectField } from "../TagSelectField";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -48,13 +48,13 @@ describe("TagSelectField", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
-
-    expect(mockGet).lastCalledWith("collection-api/material-sample", {
-      fields: { "material-sample": "tags" }, // Only request tags field.
-      filter: { rsql: "group=in=(aafc,cnc)", tags: { NEQ: "null" } }, // Restrict to user's groups
-      page: { limit: 100 },
-      sort: "-createdOn" // Newest first
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("collection-api/material-sample", {
+        fields: { "material-sample": "tags" }, // Only request tags field.
+        filter: { rsql: "group=in=(aafc,cnc)", tags: { NEQ: "null" } }, // Restrict to user's groups
+        page: { limit: 100 },
+        sort: "-createdOn" // Newest first
+      });
     });
 
     // Test expected combobox
@@ -93,7 +93,13 @@ describe("TagSelectField", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("combobox", {
+          name: /tags type new tag or search previous tags/i
+        })
+      ).toBeInTheDocument();
+    });
 
     // Change combobox value
     fireEvent.change(
@@ -107,11 +113,11 @@ describe("TagSelectField", () => {
       }
     );
 
-    await new Promise(setImmediate);
-
     // Test expected option in the combobox
-    expect(
-      wrapper.getByRole("option", { name: /add "my\-tag\-1"/i })
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("option", { name: /add "my\-tag\-1"/i })
+      ).toBeInTheDocument();
+    });
   });
 });

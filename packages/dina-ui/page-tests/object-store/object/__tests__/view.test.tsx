@@ -3,6 +3,7 @@ import MetadataViewPage from "../../../../pages/object-store/object/view";
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2"],
@@ -98,19 +99,14 @@ jest.mock("next/router", () => ({
 }));
 
 describe("Single Stored Object details page", () => {
-  // beforeEach(() => {
-  //   jest.resetAllMocks()
-  // });
-
   it("Renders the page.", async () => {
     const wrapper = mountWithAppContext(<MetadataViewPage />, { apiContext });
 
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(wrapper.getAllByText("Test Caption")[0]).toBeInTheDocument();
 
-    expect(wrapper.getAllByText("Test Caption")[0]).toBeInTheDocument();
-
-    // Shows the EXIF data:
-    expect(wrapper.getByText(/flash did not fire/i)).toBeInTheDocument();
+      // Shows the EXIF data:
+      expect(wrapper.getByText(/flash did not fire/i)).toBeInTheDocument();
+    });
   });
 });

@@ -1,4 +1,4 @@
-import { compact } from "lodash";
+import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 import { useDinaIntl } from "../../../../../dina-ui/intl/dina-ui-intl";
@@ -136,7 +136,10 @@ export default function QueryRowColumnFunctionInput({
 
   const isValid = (state: ColumnFunctionSearchStates) => {
     if (state && state.functionName) {
-      if (state.functionName === "CONCAT" && compact(state.params).length > 1) {
+      if (
+        state.functionName === "CONCAT" &&
+        _.compact(state.params).length > 1
+      ) {
         return true;
       } else if (state.functionName === "CONVERT_COORDINATES_DD") {
         state.params = undefined;
@@ -152,7 +155,10 @@ export default function QueryRowColumnFunctionInput({
     ) ?? null;
 
   const functionParams = (
-    compact(columnFunctionSearchState.params) as (ESIndexMapping | undefined)[]
+    _.compact(columnFunctionSearchState.params) as (
+      | ESIndexMapping
+      | undefined
+    )[]
   ).concat(undefined);
 
   const setFunctionParam = (fieldPath: string, index: number) => {

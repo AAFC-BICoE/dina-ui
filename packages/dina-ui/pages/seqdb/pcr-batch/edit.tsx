@@ -21,7 +21,7 @@ import {
 } from "common-ui";
 import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
-import { assign, cloneDeep } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import {
   PcrReactionTable,
@@ -258,7 +258,7 @@ export function LoadExternalDataForPcrBatchForm({
   } = usePcrReactionData(dinaFormProps?.initialValues?.id);
 
   // Create a copy of the initial value so we don't change the prop version.
-  const initialValues = assign(cloneDeep(dinaFormProps.initialValues), {
+  const initialValues = _.assign(_.cloneDeep(dinaFormProps.initialValues), {
     results: Object.fromEntries(
       pcrBatchItems.map((obj) => [obj.id, obj.result])
     )
