@@ -1,4 +1,4 @@
-import { get } from "lodash";
+import _ from "lodash";
 import { TableColumn } from "../list-page/types";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { KitsuResource } from "kitsu";
@@ -11,7 +11,7 @@ export function stringArrayCell<TData extends KitsuResource>(
   return {
     id: label,
     cell: ({ row: { original } }) => {
-      const value = get(original, accessorKey ?? label);
+      const value = _.get(original, accessorKey ?? label);
       if (value) {
         const joinedString = value.join(", ");
         return <div className="stringArray-cell">{joinedString}</div>;

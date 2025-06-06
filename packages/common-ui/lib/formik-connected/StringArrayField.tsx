@@ -1,4 +1,4 @@
-import { isArray, isEqual } from "lodash";
+import _ from "lodash";
 import { useEffect } from "react";
 import { InputHTMLAttributes, useState } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
@@ -46,7 +46,7 @@ function StringArrayFieldInternal(
 
   // When the outer form state changes, set the inner text state:
   useEffect(() => {
-    if (!isEqual(inputProps.value, asArray(textValue))) {
+    if (!_.isEqual(inputProps.value, asArray(textValue))) {
       setTextValue(asText((inputProps.value || []) as string[]));
     }
   }, [inputProps.value]);
@@ -57,7 +57,7 @@ function StringArrayFieldInternal(
     const newTextAsArray = asArray(newText);
 
     // When the inner text state changes, set the outer form state:
-    if (!isEqual(newTextAsArray, inputProps.value)) {
+    if (!_.isEqual(newTextAsArray, inputProps.value)) {
       inputProps.onChange?.({ target: { value: newTextAsArray } } as any);
     }
   }
@@ -84,7 +84,7 @@ function asArray(text?: string) {
 
 function asText(array?: string[]) {
   return (
-    isArray(array) ? array : array && typeof array === "string" ? [array] : []
+    _.isArray(array) ? array : array && typeof array === "string" ? [array] : []
   )
     .concat("")
     .join("\n");

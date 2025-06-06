@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import axios from "axios";
 import { AccountProvider } from "./AccountProvider";
-import { noop } from "lodash";
+import _ from "lodash";
 import { DINA_ADMIN } from "common-ui/types/DinaRoles";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useInstanceContext } from "../instance/useInstanceContext";
@@ -75,8 +75,8 @@ export function DevUserAccountProvider({
           authenticated: true,
           groupNames,
           initialized: true,
-          login: noop,
-          logout: noop,
+          login: _.noop,
+          logout: _.noop,
           roles: [],
           username,
           subject: agentId,

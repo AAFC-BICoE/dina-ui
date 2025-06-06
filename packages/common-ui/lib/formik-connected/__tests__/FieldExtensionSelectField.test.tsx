@@ -61,9 +61,10 @@ describe("FieldExtensionSelectField component", () => {
     );
 
     // Wait for the mock API call to complete and verify it was called with the correct path
-    await waitFor(() =>
-      expect(mockGet).lastCalledWith("test-path/extension/cfia_ppc", {})
-    );
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("test-path/extension/cfia_ppc", {});
+      expect(screen.getByRole("combobox")).toBeInTheDocument();
+    });
 
     // Find the select element using screen
     const selectElement = screen.getByRole("combobox");

@@ -1,10 +1,11 @@
 import { PersistedResource } from "kitsu";
-import { DinaForm } from "common-ui";
+import { DinaForm, waitForLoadingToDisappear } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitChildrenViewer } from "../StorageUnitChildrenViewer";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const STORAGE_UNIT_CHILDREN = ["B", "C", "D"].map<
   PersistedResource<StorageUnit>
@@ -163,11 +164,7 @@ describe("StorageUnitChildrenViewer component", () => {
     );
 
     // The page should load initially with a loading spinner.
-    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
-
-    await new Promise(setImmediate);
-
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     // Test expected links that show storage units children
     expect(
@@ -195,45 +192,52 @@ describe("StorageUnitChildrenViewer component", () => {
         accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
       }
     );
-    await new Promise(setImmediate);
 
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("button", { name: /move all content/i })
+      ).toBeInTheDocument()
+    );
     // Click "Move All Content" button
     userEvent.click(wrapper.getByRole("button", { name: /move all content/i }));
 
-    await new Promise(setImmediate);
-
+    await waitFor(() =>
+      expect(
+        wrapper.getAllByRole("button", { name: /select/i })[0]
+      ).toBeInTheDocument()
+    );
     // Click "Select" button for B (Box) storage unit
     userEvent.click(wrapper.getAllByRole("button", { name: /select/i })[0]);
 
-    await new Promise(setImmediate);
-
-    // Test expected API Call
-    expect(mockSave).lastCalledWith(
-      [
-        ...STORAGE_UNIT_CHILDREN.map((unit) => ({
-          resource: {
-            id: unit.id,
-            type: "storage-unit",
-            parentStorageUnit: { type: "storage-unit", id: "B" }
-          },
-          type: "storage-unit"
-        })),
-        {
-          resource: {
-            id: "ms-1",
-            storageUnit: {
-              id: "B",
-              type: "storage-unit"
+    await waitFor(() => {
+      // Test expected API Call
+      expect(mockSave).lastCalledWith(
+        [
+          ...STORAGE_UNIT_CHILDREN.map((unit) => ({
+            resource: {
+              id: unit.id,
+              type: "storage-unit",
+              parentStorageUnit: { type: "storage-unit", id: "B" }
+            },
+            type: "storage-unit"
+          })),
+          {
+            resource: {
+              id: "ms-1",
+              storageUnit: {
+                id: "B",
+                type: "storage-unit"
+              },
+              type: "material-sample"
             },
             type: "material-sample"
-          },
-          type: "material-sample"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-    // The browser is navigated to the new location:
-    expect(mockPush).lastCalledWith("/collection/storage-unit/view?id=B");
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+      // The browser is navigated to the new location:
+      expect(mockPush).lastCalledWith("/collection/storage-unit/view?id=B");
+    });
   });
 
   it("Lets you move an existing Storage Unit into this Storage Unit", async () => {
@@ -251,35 +255,43 @@ describe("StorageUnitChildrenViewer component", () => {
         accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
       }
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("button", { name: /add existing storage unit/i })
+      ).toBeInTheDocument()
+    );
 
     // Click "Add Existing Storage Unit" button
     userEvent.click(
       wrapper.getByRole("button", { name: /add existing storage unit/i })
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("button", { name: /select/i })
+      ).toBeInTheDocument()
+    );
 
     // Click "Select" button to select storage B
     userEvent.click(wrapper.getByRole("button", { name: /select/i }));
 
-    await new Promise(setImmediate);
-
-    // Updates B to set X as the new parent:
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            id: "B",
-            type: "storage-unit",
-            parentStorageUnit: { type: "storage-unit", id: "X" }
-          },
-          type: "storage-unit"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-    // The browser is navigated to the new location:
-    expect(mockReload).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      // Updates B to set X as the new parent:
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              id: "B",
+              type: "storage-unit",
+              parentStorageUnit: { type: "storage-unit", id: "X" }
+            },
+            type: "storage-unit"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+      // The browser is navigated to the new location:
+      expect(mockReload).toHaveBeenCalledTimes(1);
+    });
   });
 });

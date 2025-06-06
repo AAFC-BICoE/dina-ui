@@ -1,6 +1,6 @@
 import { FieldSet, filterBy, useQuery } from "common-ui";
 import { InputResource } from "kitsu";
-import { get } from "lodash";
+import _ from "lodash";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
@@ -74,7 +74,7 @@ export function ShowParentMaterialSample({
         {attrList?.map((attr, idx) => {
           if (MATERIAL_SAMPLE_ATTR_NAMES.includes(attr)) {
             const value = getHumanReadableString(
-              get(parentMaterialSample, attr)
+              _.get(parentMaterialSample, attr)
             );
             const label =
               formatMessage(`field_${attr}` as any) ??

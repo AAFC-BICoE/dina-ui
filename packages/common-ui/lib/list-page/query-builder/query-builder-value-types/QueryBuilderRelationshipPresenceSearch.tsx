@@ -3,7 +3,7 @@ import { MessageFormatElement, useIntl } from "react-intl";
 import { SelectOption } from "common-ui";
 import { ESIndexMapping, TransformToDSLProps } from "../../types";
 import Select from "react-select";
-import { startCase } from "lodash";
+import _ from "lodash";
 import { existsQuery } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 export interface QueryRowRelationshipPresenceSearchProps {
@@ -165,7 +165,7 @@ function retrieveRelationshipsFromIndexMapping(
       acc.push({
         label: messages["title_" + mapping.parentName]
           ? messages["title_" + mapping.parentName]
-          : startCase(mapping.parentName),
+          : _.startCase(mapping.parentName),
         value: mapping.parentName
       } as SelectOption<string>);
     }

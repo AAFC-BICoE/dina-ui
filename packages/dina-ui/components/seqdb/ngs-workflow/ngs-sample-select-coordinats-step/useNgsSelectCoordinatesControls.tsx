@@ -6,7 +6,7 @@ import {
   SaveArgs,
   useQuery
 } from "common-ui";
-import { compact, isEmpty, omitBy, pick, set } from "lodash";
+import _ from "lodash";
 import {
   MaterialSample,
   StorageUnit
@@ -74,7 +74,7 @@ export function useNsgSelectCoordinatesControls({
 
   // Boolean if the grid contains any of items.
   const gridIsPopulated = useMemo(
-    () => !isEmpty(gridState.cellGrid),
+    () => !_.isEmpty(gridState.cellGrid),
     [gridState]
   );
 
@@ -89,12 +89,12 @@ export function useNsgSelectCoordinatesControls({
       if (storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition) {
         const gridLayoutDefinition =
           storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition;
-        set(
+        _.set(
           libraryPrepBatch,
           "gridLayoutDefinition.numberOfColumns",
           gridLayoutDefinition.numberOfColumns
         );
-        set(
+        _.set(
           libraryPrepBatch,
           "gridLayoutDefinition.numberOfRows",
           gridLayoutDefinition.numberOfRows
@@ -160,21 +160,21 @@ export function useNsgSelectCoordinatesControls({
         ngsSampleArray.find((item) => {
           const tempId: (string | undefined)[] = [];
           tempId.push(item.sampleId);
-          const id = compact(tempId).join("_");
+          const id = _.compact(tempId).join("_");
           return id === reactionId;
         })
       );
       ngsSampleArray.forEach((item) => {
         const tempId: (string | undefined)[] = [];
         tempId.push(item.sampleId);
-        const id = compact(tempId).join("_");
+        const id = _.compact(tempId).join("_");
         if (ngsSamplesSortOrder.indexOf(id) === -1) {
           sorted.push(item);
         }
       });
-      return compact(sorted);
+      return _.compact(sorted);
     } else {
-      return compact(ngsSampleArray);
+      return _.compact(ngsSampleArray);
     }
   }
 
@@ -191,13 +191,13 @@ export function useNsgSelectCoordinatesControls({
         .map((item) => "/material-sample/" + item.sampleId),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      const materialSamplesTransformed = compact(response).map<MaterialSample>(
-        (resource) => ({
-          materialSampleName: resource.materialSampleName,
-          id: resource.id,
-          type: resource.type
-        })
-      );
+      const materialSamplesTransformed = _.compact(
+        response
+      ).map<MaterialSample>((resource) => ({
+        materialSampleName: resource.materialSampleName,
+        id: resource.id,
+        type: resource.type
+      }));
 
       callback(materialSamplesTransformed);
     });
@@ -252,7 +252,7 @@ export function useNsgSelectCoordinatesControls({
           });
         }
 
-        const libraryPrepsAndLibraryPrepBatch = compact(
+        const libraryPrepsAndLibraryPrepBatch = _.compact(
           libraryPreps.map(
             (item) =>
               ({
@@ -268,7 +268,7 @@ export function useNsgSelectCoordinatesControls({
           libraryPrepsAndLibraryPrepBatch
         );
 
-        const libraryPrepItems = compact(
+        const libraryPrepItems = _.compact(
           await bulkGet<LibraryPrep, true>(
             ngsSamplesCompleted?.map(
               (item) =>
@@ -299,7 +299,7 @@ export function useNsgSelectCoordinatesControls({
   function moveItems(items: NsgSample[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the NsgSample from the grid.
-      const newCellGrid: CellGrid<NsgSample> = omitBy(cellGrid, (item) =>
+      const newCellGrid: CellGrid<NsgSample> = _.omitBy(cellGrid, (item) =>
         items.includes(item)
       );
 
@@ -495,7 +495,7 @@ export function useNsgSelectCoordinatesControls({
               },
               storageUnitUsage: {
                 data: matchedStorageUnitUsage
-                  ? pick(matchedStorageUnitUsage, "id", "type")
+                  ? _.pick(matchedStorageUnitUsage, "id", "type")
                   : null
               }
             }

@@ -7,7 +7,7 @@ import {
   useModal
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import { isArray } from "lodash";
+import _ from "lodash";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { ResourceNameIdentifier } from "../../types/common";
@@ -71,7 +71,7 @@ export function useStorageUnitSave({
 
     const proceedWithSave = async () => {
       if (submittedValues.isMultiple) {
-        const names = isArray(submittedValues.name)
+        const names = _.isArray(submittedValues.name)
           ? submittedValues.name
           : [submittedValues.name];
         delete submittedValues.isMultiple;
@@ -84,7 +84,7 @@ export function useStorageUnitSave({
       } else {
         delete submittedValues.isMultiple;
         savedArgs.push({
-          resource: isArray(submittedValues.name)
+          resource: _.isArray(submittedValues.name)
             ? { ...submittedValues, name: submittedValues.name.join() }
             : submittedValues,
           type: "storage-unit"

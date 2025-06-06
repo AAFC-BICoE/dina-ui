@@ -7,9 +7,7 @@ import { RevisionRowConfig } from "../revision-row-config";
 
 export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
   name: ({ id, originalFilename }) => (
-    <Link href={`/object-store/object/view?id=${id}`}>
-      <a>{originalFilename}</a>
-    </Link>
+    <Link href={`/object-store/object/view?id=${id}`}>{originalFilename}</Link>
   ),
   customValueCells: {
     // Date Fields:

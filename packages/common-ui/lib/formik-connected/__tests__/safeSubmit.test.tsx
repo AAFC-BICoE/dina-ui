@@ -4,7 +4,7 @@ import { mountWithAppContext } from "common-ui";
 import { ErrorViewer } from "../ErrorViewer";
 import { OnFormikSubmit, safeSubmit } from "../safeSubmit";
 import "@testing-library/jest-dom";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 
 function getWrapper(customOnSubmit: OnFormikSubmit) {
   const onSubmit = safeSubmit(customOnSubmit);
@@ -28,14 +28,13 @@ describe("safeSubmit function", () => {
     const form = wrapper.container.querySelector("form");
     fireEvent.submit(form!);
 
-    // Wait for async operations to complete
-    await new Promise(setImmediate);
-
     // The submit function is called with the form values and the FormikActions object.
-    expect(onSubmit).toHaveBeenCalledWith(
-      { testProperty: "testValue" },
-      expect.objectContaining({ setStatus: expect.anything() })
-    );
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        { testProperty: "testValue" },
+        expect.objectContaining({ setStatus: expect.anything() })
+      );
+    });
   });
 
   it("Sets the form error message if the submit function throws an error.", async () => {
@@ -47,13 +46,14 @@ describe("safeSubmit function", () => {
     const form = wrapper.container.querySelector("form");
     fireEvent.submit(form!);
 
-    // Wait for async operations to complete
-    await new Promise(setImmediate);
-
     // Use querySelector to check for the error message
-    const errorMessage = wrapper.container.querySelector(".alert.alert-danger");
-    expect(errorMessage).toBeInTheDocument(); // Ensure the error message is in the document
-    expect(errorMessage?.textContent).toEqual("Test error message");
+    await waitFor(() => {
+      const errorMessage = wrapper.container.querySelector(
+        ".alert.alert-danger"
+      );
+      expect(errorMessage).toBeInTheDocument(); // Ensure the error message is in the document
+      expect(errorMessage?.textContent).toEqual("Test error message");
+    });
   });
 
   it("Sets the form error message and the field errors..", async () => {
@@ -68,20 +68,20 @@ describe("safeSubmit function", () => {
     const form = wrapper.container.querySelector("form");
     fireEvent.submit(form!);
 
-    // Wait for async operations to complete
-    await new Promise(setImmediate);
-
     // Use querySelector to get error messages
-    const errorMessages = wrapper.container.querySelectorAll(".error-message");
-    const errorTexts = Array.from(errorMessages).map(
-      (node) => node.textContent
-    );
+    await waitFor(() => {
+      const errorMessages =
+        wrapper.container.querySelectorAll(".error-message");
+      const errorTexts = Array.from(errorMessages).map(
+        (node) => node.textContent
+      );
 
-    expect(errorTexts).toEqual([
-      "Test error message",
-      "1 : Field A - must be a number",
-      "2 : Field B - must be set"
-    ]);
+      expect(errorTexts).toEqual([
+        "Test error message",
+        "1 : Field A - must be a number",
+        "2 : Field B - must be set"
+      ]);
+    });
   });
 
   it("Sets no error message when none are thrown by the form submission.", async () => {
@@ -93,15 +93,15 @@ describe("safeSubmit function", () => {
     const form = wrapper.container.querySelector("form");
     fireEvent.submit(form!);
 
-    // Wait for async operations to complete
-    await new Promise(setImmediate);
-
     // Use querySelector to get error messages
-    const errorMessages = wrapper.container.querySelectorAll(".error-message");
-    const errorTexts = Array.from(errorMessages).map(
-      (node) => node.textContent
-    );
+    await waitFor(() => {
+      const errorMessages =
+        wrapper.container.querySelectorAll(".error-message");
+      const errorTexts = Array.from(errorMessages).map(
+        (node) => node.textContent
+      );
 
-    expect(errorTexts).toEqual([]);
+      expect(errorTexts).toEqual([]);
+    });
   });
 });

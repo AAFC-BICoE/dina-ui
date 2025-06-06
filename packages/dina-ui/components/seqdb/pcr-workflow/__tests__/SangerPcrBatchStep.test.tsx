@@ -1,9 +1,10 @@
 import { mountWithAppContext } from "common-ui";
 import { SangerPcrBatchStep } from "../SangerPcrBatchStep";
-import { noop } from "lodash";
+import _ from "lodash";
 import { PcrBatch } from "../../../../types/seqdb-api";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const PCR_BATCH_ID = "test-batch-id";
 const PCR_BATCH_NAME = "test-batch";
@@ -63,13 +64,17 @@ describe("SangerPcrBatchStep component", () => {
       <SangerPcrBatchStep
         onSaved={mockOnSaved}
         editMode={true}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument();
+    });
 
     userEvent.type(
       wrapper.getByRole("textbox", { name: /name/i }),
@@ -77,22 +82,23 @@ describe("SangerPcrBatchStep component", () => {
     );
 
     userEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
 
-    expect(mockOnSaved).lastCalledWith(1, {
-      storageUnit: {
-        id: null,
-        type: "storage-unit"
-      },
-      createdBy: "test-user",
-      id: "11111111-1111-1111-1111-111111111111",
-      name: PCR_BATCH_NAME,
-      relationships: {
-        attachment: {
-          data: []
-        }
-      },
-      type: "pcr-batch"
+    await waitFor(() => {
+      expect(mockOnSaved).lastCalledWith(1, {
+        storageUnit: {
+          id: null,
+          type: "storage-unit"
+        },
+        createdBy: "test-user",
+        id: "11111111-1111-1111-1111-111111111111",
+        name: PCR_BATCH_NAME,
+        relationships: {
+          attachment: {
+            data: []
+          }
+        },
+        type: "pcr-batch"
+      });
     });
   });
 
@@ -103,16 +109,17 @@ describe("SangerPcrBatchStep component", () => {
         pcrBatchId={PCR_BATCH_ID}
         pcrBatch={PCR_BATCH}
         editMode={false}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
       />,
       testCtx
     );
-    await new Promise(setImmediate);
 
     // The form is initially in read-only mode:
-    expect(wrapper.getByText(/test\-batch/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/test\-batch/i)).toBeInTheDocument();
+    });
     wrapper.unmount();
 
     // Go to edit mode:
@@ -122,39 +129,44 @@ describe("SangerPcrBatchStep component", () => {
         pcrBatchId={PCR_BATCH_ID}
         pcrBatch={PCR_BATCH}
         editMode={true}
-        setEditMode={noop}
+        setEditMode={_.noop}
         performSave={false}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
       />,
       testCtx
     );
-    await new Promise(setImmediate);
 
     // Edit a field:
+    await waitFor(() => {
+      expect(
+        wrapper2.getByRole("textbox", { name: /objective/i })
+      ).toBeInTheDocument();
+    });
     userEvent.type(
       wrapper2.getByRole("textbox", { name: /objective/i }),
       "test-objective"
     );
 
     userEvent.click(wrapper2.getByRole("button"));
-    await new Promise(setImmediate);
 
-    expect(mockOnSaved).lastCalledWith(1, {
-      storageUnit: {
-        id: null,
-        type: "storage-unit"
-      },
-      createdBy: "test-user",
-      id: "11111111-1111-1111-1111-111111111111",
-      name: PCR_BATCH_NAME,
-      isCompleted: false,
-      objective: "test-objective",
-      relationships: {
-        attachment: {
-          data: []
-        }
-      },
-      type: "pcr-batch"
+    await waitFor(() => {
+      expect(mockOnSaved).lastCalledWith(1, {
+        storageUnit: {
+          id: null,
+          type: "storage-unit"
+        },
+        createdBy: "test-user",
+        id: "11111111-1111-1111-1111-111111111111",
+        name: PCR_BATCH_NAME,
+        isCompleted: false,
+        objective: "test-objective",
+        relationships: {
+          attachment: {
+            data: []
+          }
+        },
+        type: "pcr-batch"
+      });
     });
   });
 });

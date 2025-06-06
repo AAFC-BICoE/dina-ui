@@ -4,6 +4,7 @@ import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitBreadCrumb } from "../StorageUnitBreadCrumb";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const storageUnitWithHierarchy: PersistedResource<StorageUnit> = {
   id: "A",
@@ -56,14 +57,15 @@ describe("StorageUnitBreadCrumb component", () => {
 
     // Hover over image to show tooltip
     userEvent.hover(wrapper.getByRole("img"));
-    await new Promise(setImmediate);
 
     // Test tooltip rendering while hovering on the img element
-    expect(
-      wrapper.getByRole("tooltip", {
-        name: /c \(room\) > b \(cabinet\) > a \(box\)/i
-      })
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("tooltip", {
+          name: /c \(room\) > b \(cabinet\) > a \(box\)/i
+        })
+      ).toBeInTheDocument();
+    });
 
     // Test href value/attribute for each link in the tooltip
     expect(wrapper.getByRole("link", { name: /c \(room\)/i })).toHaveAttribute(
@@ -84,14 +86,15 @@ describe("StorageUnitBreadCrumb component", () => {
 
     // Hover over image to show tooltip
     userEvent.hover(wrapper.getByRole("img"));
-    await new Promise(setImmediate);
 
     // Test tooltip rendering while hovering on the img element
-    expect(
-      wrapper.getByRole("tooltip", {
-        name: /c \(room\) > b \(cabinet\) > a \(box\)/i
-      })
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("tooltip", {
+          name: /c \(room\) > b \(cabinet\) > a \(box\)/i
+        })
+      ).toBeInTheDocument();
+    });
 
     // Test href value/attribute for each link in the tooltip
     expect(wrapper.getByRole("link", { name: /c \(room\)/i })).toHaveAttribute(

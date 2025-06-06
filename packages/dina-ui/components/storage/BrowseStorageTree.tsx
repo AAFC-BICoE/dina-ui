@@ -288,10 +288,11 @@ function StorageUnitCollapser({
           {showPathInName ? (
             <StorageUnitBreadCrumb storageUnit={storageUnit} />
           ) : (
-            <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-              <a className="storage-unit-name">
-                {storageUnitDisplayName(storageUnit)}
-              </a>
+            <Link
+              href={`/collection/storage-unit/view?id=${storageUnit.id}`}
+              className="storage-unit-name"
+            >
+              {storageUnitDisplayName(storageUnit)}
             </Link>
           )}
           {!disabled && (

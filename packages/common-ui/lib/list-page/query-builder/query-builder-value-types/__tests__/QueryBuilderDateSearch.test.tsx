@@ -5,7 +5,7 @@ import QueryBuilderDateSearch, {
 } from "../QueryBuilderDateSearch";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
-import { noop } from "lodash";
+import _ from "lodash";
 import userEvent from "@testing-library/user-event";
 
 describe("QueryBuilderDateSearch", () => {
@@ -16,7 +16,7 @@ describe("QueryBuilderDateSearch", () => {
       const dateSearchEquals = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderDateSearch
               matchType="equals"
@@ -35,7 +35,7 @@ describe("QueryBuilderDateSearch", () => {
       const dateSearchEmpty = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderDateSearch
               matchType="empty"

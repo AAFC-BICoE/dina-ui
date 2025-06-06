@@ -5,7 +5,7 @@ import QueryBuilderNumberSearch, {
 } from "../QueryBuilderNumberSearch";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
-import { noop } from "lodash";
+import _ from "lodash";
 import userEvent from "@testing-library/user-event";
 
 describe("QueryBuilderNumberSearch", () => {
@@ -16,7 +16,7 @@ describe("QueryBuilderNumberSearch", () => {
       const numberSearchEquals = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderNumberSearch
               matchType="equals"
@@ -35,7 +35,7 @@ describe("QueryBuilderNumberSearch", () => {
       const numberSearchEmpty = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderNumberSearch
               matchType="empty"
@@ -58,7 +58,7 @@ describe("QueryBuilderNumberSearch", () => {
       const numberSearchIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderNumberSearch
               matchType="in"
@@ -77,7 +77,7 @@ describe("QueryBuilderNumberSearch", () => {
       const numberSearchNotIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderNumberSearch
               matchType="notIn"

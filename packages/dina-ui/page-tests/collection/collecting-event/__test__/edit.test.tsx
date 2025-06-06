@@ -5,7 +5,7 @@ import { Person } from "../../../../types/agent-api/resources/Person";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -122,21 +122,18 @@ describe("collecting-event edit page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    // Test that spinner is not rendering after page has loaded
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
-
-    // Find datetime fields
-    expect(
-      wrapper.getAllByRole("textbox", { name: /start event date time/i })
-    ).toHaveLength(1);
-    expect(
-      wrapper.getAllByRole("textbox", { name: /end event date time/i })
-    ).toHaveLength(1);
-    expect(
-      wrapper.getAllByRole("textbox", { name: /verbatim event datetime/i })
-    ).toHaveLength(1);
+    await waitFor(() => {
+      // Find datetime fields
+      expect(
+        wrapper.getAllByRole("textbox", { name: /start event date time/i })
+      ).toHaveLength(1);
+      expect(
+        wrapper.getAllByRole("textbox", { name: /end event date time/i })
+      ).toHaveLength(1);
+      expect(
+        wrapper.getAllByRole("textbox", { name: /verbatim event datetime/i })
+      ).toHaveLength(1);
+    });
 
     // Edit the verbatim datetime
     fireEvent.change(
@@ -163,31 +160,31 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API Response
-    expect(mockPatch).lastCalledWith(
-      "/collection-api/operations",
-      [
-        {
-          op: "POST",
-          path: "collecting-event",
-          value: {
-            attributes: {
-              dwcVerbatimCoordinateSystem: null,
-              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true, // Default value
-              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
-              otherRecordNumbers: ["12", "23"],
-              geoReferenceAssertions: [{ isPrimary: true }]
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "collecting-event"
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/operations",
+        [
+          {
+            op: "POST",
+            path: "collecting-event",
+            value: {
+              attributes: {
+                dwcVerbatimCoordinateSystem: null,
+                dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+                publiclyReleasable: true, // Default value
+                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
+                otherRecordNumbers: ["12", "23"],
+                geoReferenceAssertions: [{ isPrimary: true }]
+              },
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "collecting-event"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the new collecting-event's details page.
     expect(mockPush).lastCalledWith("/collection/collecting-event/view?id=1");
@@ -213,8 +210,6 @@ describe("collecting-event edit page", () => {
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
     });
-
-    await new Promise(setImmediate);
 
     // Edit the verbatim datetime
     fireEvent.change(
@@ -258,37 +253,37 @@ describe("collecting-event edit page", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Saves the collecting event and the georeference assertion in separate requests:
     // (The collecting event id is required to save the georeference assertion)
-    expect(mockPatch.mock.calls).toEqual([
-      [
-        "/collection-api/operations",
+    await waitFor(() => {
+      expect(mockPatch.mock.calls).toEqual([
         [
-          {
-            op: "POST",
-            path: "collecting-event",
-            value: {
-              attributes: expect.objectContaining({
-                geoReferenceAssertions: [
-                  {
-                    isPrimary: true,
-                    dwcCoordinateUncertaintyInMeters: "5",
-                    dwcDecimalLatitude: "45.394728",
-                    dwcDecimalLongitude: "-75.701452"
-                  }
-                ],
-                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
-              }),
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "collecting-event"
+          "/collection-api/operations",
+          [
+            {
+              op: "POST",
+              path: "collecting-event",
+              value: {
+                attributes: expect.objectContaining({
+                  geoReferenceAssertions: [
+                    {
+                      isPrimary: true,
+                      dwcCoordinateUncertaintyInMeters: "5",
+                      dwcDecimalLatitude: "45.394728",
+                      dwcDecimalLongitude: "-75.701452"
+                    }
+                  ],
+                  verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
+                }),
+                id: "00000000-0000-0000-0000-000000000000",
+                type: "collecting-event"
+              }
             }
-          }
-        ],
-        expect.anything()
-      ]
-    ]);
+          ],
+          expect.anything()
+        ]
+      ]);
+    });
   });
 
   it("Provides a form to edit a collecting-event.", async () => {
@@ -312,12 +307,12 @@ describe("collecting-event edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
-    await new Promise(setImmediate);
-
-    // Check that the existing value is in the field.
-    expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-    ).toHaveDisplayValue("From 2019,12,21 4pm to 2019,12,22 4pm");
+    await waitFor(() => {
+      // Check that the existing value is in the field.
+      expect(
+        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      ).toHaveDisplayValue("From 2019,12,21 4pm to 2019,12,22 4pm");
+    });
 
     // Modify the value.
     fireEvent.change(
@@ -333,27 +328,27 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected response.
-    expect(mockPatch).toBeCalledTimes(1);
-    expect(mockPatch).lastCalledWith(
-      "/collection-api/operations",
-      [
-        {
-          op: "PATCH",
-          path: "collecting-event/1",
-          value: {
-            attributes: {
-              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
-            },
-            id: "1",
-            type: "collecting-event"
+    await waitFor(() => {
+      expect(mockPatch).toBeCalledTimes(1);
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/operations",
+        [
+          {
+            op: "PATCH",
+            path: "collecting-event/1",
+            value: {
+              attributes: {
+                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
+              },
+              id: "1",
+              type: "collecting-event"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
   });
 
   it("edit a collecting-event and set the otherRecordNumbers to empty", async () => {
@@ -377,10 +372,11 @@ describe("collecting-event edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
-    await new Promise(setImmediate);
-
-    // Expect the initial values to remain.
-    expect(wrapper.getByDisplayValue("12 13 14")).toBeInTheDocument();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    await waitFor(() => {
+      // Expect the initial values to remain.
+      expect(wrapper.getByDisplayValue("12 13 14")).toBeInTheDocument();
+    });
 
     // Set the field to be empty.
     fireEvent.change(wrapper.getByDisplayValue("12 13 14"), {
@@ -390,27 +386,27 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected response.
-    expect(mockPatch).toBeCalledTimes(1);
-    expect(mockPatch).lastCalledWith(
-      "/collection-api/operations",
-      [
-        {
-          op: "PATCH",
-          path: "collecting-event/1",
-          value: {
-            attributes: {
-              otherRecordNumbers: null
-            },
-            id: "1",
-            type: "collecting-event"
+    await waitFor(() => {
+      expect(mockPatch).toBeCalledTimes(1);
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/operations",
+        [
+          {
+            op: "PATCH",
+            path: "collecting-event/1",
+            value: {
+              attributes: {
+                otherRecordNumbers: null
+              },
+              id: "1",
+              type: "collecting-event"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -437,10 +433,11 @@ describe("collecting-event edit page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    // Test that spinner does not render after loading.
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("combobox", { name: /group select\.\.\./i })
+      ).toBeInTheDocument();
+    });
 
     // Change combobox value.
     fireEvent.change(
@@ -455,12 +452,13 @@ describe("collecting-event edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
-
-    await new Promise(setImmediate);
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Test for expected error
-    expect(wrapper.getByText(/test error title: test error detail/i));
-    expect(mockPush).toBeCalledTimes(0);
+    await waitFor(() => {
+      expect(wrapper.getByText(/test error title: test error detail/i));
+      expect(mockPush).toBeCalledTimes(0);
+    });
   });
 
   it("Lets you set the primary GeoReferenceAssertion.", async () => {
@@ -469,15 +467,19 @@ describe("collecting-event edit page", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
-
     // The first assertion is already primary:
-    expect(wrapper.getByRole("button", { name: /primary/i })).toBeDisabled();
+    await waitFor(() => {
+      expect(wrapper.getByRole("button", { name: /primary/i })).toBeDisabled();
+    });
 
     // Add a second assertion:
     userEvent.click(wrapper.getByTestId("add-another-button"));
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /primary/i })
+      ).toBeInTheDocument();
+    });
 
     // Make 2nd assertion primary:
     userEvent.click(wrapper.getByRole("button", { name: /primary/i }));
@@ -512,38 +514,33 @@ describe("collecting-event edit page", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /verbatim coordinate system/i })
+      ).toHaveDisplayValue("decimal degrees");
+    });
 
-    // Default value:
-    // expect(
-    //   wrapper.find(".dwcVerbatimCoordinateSystem-field input").prop("value")
-    // ).toEqual("decimal degrees");
-    expect(
-      wrapper.getByRole("textbox", { name: /verbatim coordinate system/i })
-    ).toHaveDisplayValue("decimal degrees");
-
-    // wrapper.find("form").simulate("submit");
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
-    expect(mockPatch).lastCalledWith(
-      "/collection-api/operations",
-      [
-        {
-          op: "POST",
-          path: "collecting-event",
-          value: {
-            attributes: expect.objectContaining({
-              dwcVerbatimCoordinateSystem: null
-            }),
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "collecting-event"
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/operations",
+        [
+          {
+            op: "POST",
+            path: "collecting-event",
+            value: {
+              attributes: expect.objectContaining({
+                dwcVerbatimCoordinateSystem: null
+              }),
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "collecting-event"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
   });
 });
 

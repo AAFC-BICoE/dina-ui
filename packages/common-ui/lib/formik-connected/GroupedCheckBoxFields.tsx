@@ -1,6 +1,6 @@
 import { connect, Field } from "formik";
 import { KitsuResource } from "kitsu";
-import { noop, toPairs } from "lodash";
+import _ from "lodash";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
@@ -98,7 +98,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
                   aria-labelledby={`select-column-header ${fileHyperlinkId}`}
                   checked={disabled ? false : value || false}
                   onClick={onCheckBoxClick}
-                  onChange={noop}
+                  onChange={_.noop}
                   style={{
                     display: "block",
                     height: "20px",
@@ -158,7 +158,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
 
   /** Table column header with a CheckAllCheckBox for the QueryTable. */
   const CheckBoxHeader = connect(({ formik: { values } }) => {
-    const totalChecked = toPairs(values[fieldName]).filter(
+    const totalChecked = _.toPairs(values[fieldName]).filter(
       (pair) => pair[1]
     ).length;
     return (
@@ -180,7 +180,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   });
 
   const DetachedTotalSelected = connect(({ formik: { values } }) => {
-    const totalChecked = toPairs(values[fieldName]).filter(
+    const totalChecked = _.toPairs(values[fieldName]).filter(
       (pair) => pair[1]
     ).length;
     return (

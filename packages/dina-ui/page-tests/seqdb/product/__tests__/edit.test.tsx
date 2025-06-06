@@ -4,7 +4,7 @@ import { mountWithAppContext } from "common-ui";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
 import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -71,28 +71,28 @@ describe("Product edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API Response
-    expect(mockPatch).lastCalledWith(
-      "/seqdb-api/operations",
-      [
-        {
-          op: "POST",
-          path: "product",
-          value: {
-            attributes: {
-              group: "aafc",
-              name: "New Product",
-              type: undefined
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "product"
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/seqdb-api/operations",
+        [
+          {
+            op: "POST",
+            path: "product",
+            value: {
+              attributes: {
+                group: "aafc",
+                name: "New Product",
+                type: undefined
+              },
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "product"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the new product's details page.
     expect(mockPush).lastCalledWith("/seqdb/product/view?id=1");
@@ -131,15 +131,15 @@ describe("Product edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected error prompt
-    expect(
-      wrapper.getByText(
-        /constraint violation: name size must be between 1 and 10/i
-      )
-    ).toBeInTheDocument();
-    expect(mockPush).toBeCalledTimes(0);
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /constraint violation: name size must be between 1 and 10/i
+        )
+      ).toBeInTheDocument();
+      expect(mockPush).toBeCalledTimes(0);
+    });
   });
 
   it("Provides a form to edit a Product.", async () => {
@@ -165,12 +165,12 @@ describe("Product edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the product form to load.
-    await new Promise(setImmediate);
-
-    // Check that the existing product's name value is in the field.
-    expect(
-      wrapper.getByDisplayValue("Rapid Alkaline DNA Extraction")
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      // Check that the existing product's name value is in the field.
+      expect(
+        wrapper.getByDisplayValue("Rapid Alkaline DNA Extraction")
+      ).toBeInTheDocument();
+    });
 
     // Modify the "description" value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /description/i }), {
@@ -183,28 +183,28 @@ describe("Product edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
-      "/seqdb-api/operations",
-      [
-        {
-          op: "PATCH",
-          path: "product/10",
-          value: {
-            attributes: expect.objectContaining({
-              description: "new desc for product 10, was a null value",
-              name: "Rapid Alkaline DNA Extraction"
-            }),
-            id: "10",
-            type: "product"
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/seqdb-api/operations",
+        [
+          {
+            op: "PATCH",
+            path: "product/10",
+            value: {
+              attributes: expect.objectContaining({
+                description: "new desc for product 10, was a null value",
+                name: "Rapid Alkaline DNA Extraction"
+              }),
+              id: "10",
+              type: "product"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the existing product's details page.
     expect(mockPush).lastCalledWith("/seqdb/product/view?id=10");

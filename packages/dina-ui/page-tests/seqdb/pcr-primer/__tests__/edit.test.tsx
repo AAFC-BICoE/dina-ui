@@ -4,7 +4,7 @@ import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/u
 import { PcrPrimerEditPage } from "../../../../pages/seqdb/pcr-primer/edit";
 import { mountWithAppContext } from "common-ui";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -67,31 +67,31 @@ describe("PcrPrimer edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the primer form to load.
-    await new Promise(setImmediate);
-
-    // Test expected API Response
-    expect(mockPatch).lastCalledWith(
-      "/seqdb-api/operations",
-      [
-        {
-          op: "POST",
-          path: "pcr-primer",
-          value: {
-            attributes: {
-              direction: "F",
-              group: "aafc",
-              lotNumber: 1,
-              name: "New PcrPrimer",
-              seq: "",
-              type: "PRIMER"
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "pcr-primer"
+    await waitFor(() => {
+      // Test expected API Response
+      expect(mockPatch).lastCalledWith(
+        "/seqdb-api/operations",
+        [
+          {
+            op: "POST",
+            path: "pcr-primer",
+            value: {
+              attributes: {
+                direction: "F",
+                group: "aafc",
+                lotNumber: 1,
+                name: "New PcrPrimer",
+                seq: "",
+                type: "PRIMER"
+              },
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "pcr-primer"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the new primer's details page.
     expect(mockPush).lastCalledWith("/seqdb/pcr-primer/view?id=1");
@@ -123,14 +123,14 @@ describe("PcrPrimer edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the primer form to load.
-    await new Promise(setImmediate);
-
-    // Test expected error
-    expect(
-      wrapper.getByText(
-        /constraint violation: name size must be between 1 and 10/i
-      )
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      // Test expected error
+      expect(
+        wrapper.getByText(
+          /constraint violation: name size must be between 1 and 10/i
+        )
+      ).toBeInTheDocument();
+    });
     expect(mockPush).toBeCalledTimes(0);
   });
 
@@ -160,13 +160,12 @@ describe("PcrPrimer edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the primer form to load.
-    await new Promise(setImmediate);
-
-    // Check that the existing primer's seq value is in the field.
-    expect(
-      wrapper.getByDisplayValue("ACTACGATCAGCATCGATG")
-    ).toBeInTheDocument();
-    // expect(wrapper.getByRole('textbox', { name: /primer sequence \(5' \- 3'\)/i })).toHaveTextContent("ACTACGATCAGCATCGATG");
+    await waitFor(() => {
+      // Check that the existing primer's seq value is in the field.
+      expect(
+        wrapper.getByDisplayValue("ACTACGATCAGCATCGATG")
+      ).toBeInTheDocument();
+    });
 
     // Modify the "seq"/Primer Sequence (5' - 3') value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /seq/i }), {
@@ -180,35 +179,35 @@ describe("PcrPrimer edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the primer form to load.
-    await new Promise(setImmediate);
-
-    // "patch" should have been called with a jsonpatch request containing the existing values
-    // and the modified one.
-    expect(mockPatch).lastCalledWith(
-      "/seqdb-api/operations",
-      [
-        {
-          op: "PATCH",
-          path: "pcr-primer/1",
-          value: {
-            attributes: expect.objectContaining({
-              application: null,
-              group: "aafc",
-              name: "ITS1",
-              seq: "new seq value"
-            }),
-            id: "1",
-            relationships: {
-              region: {
-                data: expect.objectContaining({ id: "2", type: "region" })
-              }
-            },
-            type: "pcr-primer"
+    await waitFor(() => {
+      // "patch" should have been called with a jsonpatch request containing the existing values
+      // and the modified one.
+      expect(mockPatch).lastCalledWith(
+        "/seqdb-api/operations",
+        [
+          {
+            op: "PATCH",
+            path: "pcr-primer/1",
+            value: {
+              attributes: expect.objectContaining({
+                application: null,
+                group: "aafc",
+                name: "ITS1",
+                seq: "new seq value"
+              }),
+              id: "1",
+              relationships: {
+                region: {
+                  data: expect.objectContaining({ id: "2", type: "region" })
+                }
+              },
+              type: "pcr-primer"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the existing primer's details page.
     expect(mockPush).lastCalledWith("/seqdb/pcr-primer/view?id=1");

@@ -37,8 +37,11 @@ export function StorageSearchSelector({
   const tableColumns: ColumnDefinition<StorageUnit>[] = [
     {
       cell: ({ row: { original } }) => (
-        <Link href={`/collection/storage-unit/view?id=${original.id}`}>
-          <a target="_blank">{storageUnitDisplayName(original)}</a>
+        <Link
+          href={`/collection/storage-unit/view?id=${original.id}`}
+          target="_blank"
+        >
+          {storageUnitDisplayName(original)}
         </Link>
       ),
       size: 400,

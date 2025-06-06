@@ -3,6 +3,7 @@ import { DinaForm } from "common-ui";
 import { StorageLinkerField } from "../StorageLinker";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -40,26 +41,30 @@ describe("StorageLinker", () => {
       </DinaForm>,
       testCtx
     );
-    await new Promise(setImmediate);
 
+    await waitFor(() => {
+      expect(wrapper.getByRole("button")).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
 
-    expect(
-      wrapper.getByText(
-        /storage a is empty\. would you like to permanently delete this storage container\?/i
-      )
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /storage a is empty\. would you like to permanently delete this storage container\?/i
+        )
+      ).toBeInTheDocument();
+    });
 
     // Confirm "yes":
     userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
 
     // Only the storage needs to be deleted:
-    expect(mockSave).lastCalledWith(
-      [{ delete: { id: "A", type: "storage-unit" } }],
-      { apiBaseUrl: "/collection-api" }
-    );
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [{ delete: { id: "A", type: "storage-unit" } }],
+        { apiBaseUrl: "/collection-api" }
+      );
+    });
   });
 
   it("Prompts to remove the empty Storage when the stored Material Sample has an ID. e.g. edit form.", async () => {
@@ -75,44 +80,47 @@ describe("StorageLinker", () => {
       </DinaForm>,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(wrapper.getByRole("button")).toBeInTheDocument();
+    });
 
     userEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
-
-    expect(
-      wrapper.getByText(
-        /storage a is empty\. would you like to permanently delete this storage container\?/i
-      )
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /storage a is empty\. would you like to permanently delete this storage container\?/i
+        )
+      ).toBeInTheDocument();
+    });
 
     // Confirm "yes":
     userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
 
     // Only the storage needs to be deleted:
-    expect(mockSave).lastCalledWith(
-      [
-        // Detach the Material Sample:
-        {
-          resource: {
-            id: "123",
-            storageUnit: {
-              id: null
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          // Detach the Material Sample:
+          {
+            resource: {
+              id: "123",
+              storageUnit: {
+                id: null
+              },
+              type: "material-sample"
             },
             type: "material-sample"
           },
-          type: "material-sample"
-        },
-        // Delete the storage unit:
-        {
-          delete: {
-            id: "A",
-            type: "storage-unit"
+          // Delete the storage unit:
+          {
+            delete: {
+              id: "A",
+              type: "storage-unit"
+            }
           }
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+    });
   });
 });

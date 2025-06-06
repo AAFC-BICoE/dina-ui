@@ -10,7 +10,7 @@ import {
 } from "../global-names/GlobalNamesField";
 import { useState, useRef } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
-import { noop, uniqWith, isEqual } from "lodash";
+import _ from "lodash";
 import { Determination } from "packages/dina-ui/types/collection-api/resources/Determination";
 import { includedTypeQuery } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
@@ -108,7 +108,7 @@ export function ScientificNameField({
       });
 
       // Remove suggestions that are exact duplicates...
-      setSuggestions(uniqWith(suggestionsFound, isEqual));
+      setSuggestions(_.uniqWith(suggestionsFound, _.isEqual));
     }
   });
 
@@ -212,7 +212,7 @@ export function ScientificNameField({
                 onSuggestionSelected={(_event, data) =>
                   suggestionSelected(data.suggestion)
                 }
-                onSuggestionsClearRequested={noop}
+                onSuggestionsClearRequested={_.noop}
                 renderSuggestion={(determination) => (
                   <>
                     {determination.scientificNameDetails && (

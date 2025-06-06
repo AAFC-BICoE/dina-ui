@@ -1,6 +1,6 @@
 import { SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { Person } from "../../../types/objectstore-api";
 import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import "@testing-library/jest-dom";
@@ -70,10 +70,7 @@ describe("Dina user who am i page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    // expect(wrapper.find(".spinner-border").exists()).toEqual(false);
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     // The dina username should be rendered in a FieldView.
     expect(wrapper.getByRole("heading", { name: /user/i })).toBeInTheDocument();

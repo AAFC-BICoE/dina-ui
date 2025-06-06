@@ -1,7 +1,7 @@
 import { mountWithAppContext } from "common-ui";
 import { AreYouSureModal } from "../AreYouSureModal";
 import { useModal } from "../modal";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockYesClick = jest.fn();
@@ -66,10 +66,11 @@ describe("AreYouSureModal", () => {
 
     // Click 'yes':
     fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
 
     // Should have run the function:
-    expect(mockYesClick).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(mockYesClick).toHaveBeenCalledTimes(1);
+    });
 
     // Should be closed now:
     expect(wrapper.queryByText(/test message/i)).not.toBeInTheDocument();

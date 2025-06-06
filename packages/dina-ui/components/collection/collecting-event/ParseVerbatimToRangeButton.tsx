@@ -5,7 +5,7 @@ import {
   Tooltip,
   useDinaFormContext
 } from "common-ui";
-import { get } from "lodash";
+import _ from "lodash";
 import { CollectingEvent } from "../../../types/collection-api";
 import { SiConvertio } from "react-icons/si";
 
@@ -24,7 +24,7 @@ export function ParseVerbatimToRangeButton({
     values,
     formik
   ) => {
-    const verbatimText: string = get(values, verbatimField)?.toString() ?? "";
+    const verbatimText: string = _.get(values, verbatimField)?.toString() ?? "";
     const [newMin, newMax] = verbatimText
       .split(/to|\-/)
       .map((text) => toMeters(text));

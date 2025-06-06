@@ -15,7 +15,7 @@ import {
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
-import { compact, pick, toPairs, uniqBy } from "lodash";
+import _ from "lodash";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useEffect, useMemo, useState } from "react";
@@ -108,7 +108,7 @@ export function SangerSeqReactionStep({
   async function saveSeqReactions() {
     // The map key is pcrBatchItem.id + "_" + seqPrimer.id
     // The map value is a instance of SeqReaction
-    const selectedResourceMap = compact(selectedResources).reduce(
+    const selectedResourceMap = _.compact(selectedResources).reduce(
       (accu, obj) => ({
         ...accu,
         [`${obj.pcrBatchItem?.id}_${obj.seqPrimer?.id}`]: obj
@@ -116,7 +116,7 @@ export function SangerSeqReactionStep({
       {} as { [key: string]: SeqReaction }
     );
 
-    const initialResourceMap = compact(initialSeqReactions).reduce(
+    const initialResourceMap = _.compact(initialSeqReactions).reduce(
       (accu, obj) => ({
         ...accu,
         [`${obj.pcrBatchItem?.id}_${obj.seqPrimer?.id}`]: obj
@@ -132,7 +132,7 @@ export function SangerSeqReactionStep({
       .filter((key) => !previouslySelectedResourcesIDMap[key])
       .map((key) => selectedResourceMap[key]);
 
-    const itemsToDelete: SeqReaction[] = compact(
+    const itemsToDelete: SeqReaction[] = _.compact(
       Object.keys(previouslySelectedResourcesIDMap)
         .filter((key) => !selectedResourceMap[key])
         .map((key) => initialResourceMap[key])
@@ -176,10 +176,10 @@ export function SangerSeqReactionStep({
             createdBy: username ?? "",
             relationships: {
               seqBatch: {
-                data: pick(data.seqBatch, "id", "type")
+                data: _.pick(data.seqBatch, "id", "type")
               },
               pcrBatchItem: {
-                data: pick(data.pcrBatchItem, "id", "type")
+                data: _.pick(data.pcrBatchItem, "id", "type")
               },
               seqPrimer: {
                 data: {
@@ -293,7 +293,7 @@ export function SangerSeqReactionStep({
           )
         }));
 
-        const materialSamples = compact(
+        const materialSamples = _.compact(
           await bulkGet<MaterialSample, true>(
             data?.map(
               (item) => `/material-sample-summary/${item.materialSample?.id}`
@@ -387,7 +387,7 @@ export function SangerSeqReactionStep({
 
   function setSelectedResourcesAndSaveOrder(seqReactions: SeqReaction[]) {
     setSelectedResources(seqReactions);
-    setSeqReactionSortOrder(compact(seqReactions.map((item) => item.id)));
+    setSeqReactionSortOrder(_.compact(seqReactions.map((item) => item.id)));
   }
 
   const pcrBatchTable = (
@@ -422,7 +422,7 @@ export function SangerSeqReactionStep({
   function addSelectedResources(formValues, formik: FormikContextType<any>) {
     const itemIdsToSelect = formValues.itemIdsToSelect;
 
-    const ids = toPairs(itemIdsToSelect)
+    const ids = _.toPairs(itemIdsToSelect)
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
 
@@ -446,7 +446,7 @@ export function SangerSeqReactionStep({
       }));
 
     // Append the newly selected resources with the current resources.
-    const selectedResourcesAppended = uniqBy(
+    const selectedResourcesAppended = _.uniqBy(
       [...selectedResources, ...selectedObjects],
       "id"
     );
@@ -468,7 +468,7 @@ export function SangerSeqReactionStep({
   function removeSelectedResources(formValues, formik: FormikContextType<any>) {
     const itemIdsToDelete = formValues.itemIdsToDelete;
 
-    const ids = toPairs(itemIdsToDelete)
+    const ids = _.toPairs(itemIdsToDelete)
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
 
@@ -480,7 +480,9 @@ export function SangerSeqReactionStep({
 
     // Save ordering when remove Seq Reactions.
     // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
-    setSeqReactionSortOrder(compact(unselectedObjects.map((item) => item.id)));
+    setSeqReactionSortOrder(
+      _.compact(unselectedObjects.map((item) => item.id))
+    );
     setSelectedResources(unselectedObjects);
     formik.setFieldValue("itemIdsToDelete", {});
   }
@@ -510,7 +512,7 @@ export function SangerSeqReactionStep({
       }));
 
     // Append the newly selected resources with the current resources.
-    const selectedResourcesAppended = uniqBy(
+    const selectedResourcesAppended = _.uniqBy(
       [...selectedResources, ...selectedObjects],
       "id"
     );

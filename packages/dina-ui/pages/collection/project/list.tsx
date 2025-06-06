@@ -16,7 +16,7 @@ const PROJECT_TABLE_COLUMNS: TableColumn<any>[] = [
     id: "name",
     cell: ({ row: { original } }) => {
       return (
-        <Link href={`/collection/project/view?id=${original.id}`}>
+        <Link href={`/collection/project/view?id=${original.id}`} legacyBehavior>
           {original.data.attributes.name}
         </Link>
       );

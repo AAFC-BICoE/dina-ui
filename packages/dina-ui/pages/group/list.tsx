@@ -13,7 +13,11 @@ const GROUP_TABLE_COLUMNS: ColumnDefinition<any>[] = [
       row: {
         original: { id, name }
       }
-    }) => <Link href={`/group/view?id=${id}`}>{name}</Link>,
+    }) => (
+      <Link href={`/group/view?id=${id}`} legacyBehavior>
+        {name}
+      </Link>
+    ),
     accessorKey: "name"
   },
   {

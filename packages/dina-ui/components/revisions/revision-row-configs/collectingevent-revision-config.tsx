@@ -13,9 +13,7 @@ import { RevisionRowConfig } from "../revision-row-config";
 export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingEvent> =
   {
     name: ({ id }) => (
-      <Link href={`/collection/collecting-event/view?id=${id}`}>
-        <a>{id}</a>
-      </Link>
+      <Link href={`/collection/collecting-event/view?id=${id}`}>{id}</Link>
     ),
     customValueCells: {
       // Link to the collector:

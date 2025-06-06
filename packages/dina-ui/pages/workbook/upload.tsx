@@ -140,10 +140,12 @@ export function UploadWorkbookPage() {
       </>
     ) : (
       <div className="col-md-6 col-sm-12 d-flex ms-auto">
-        <Link href={`/workbook/generator`}>
-          <a className="btn btn-primary ms-auto" style={{ width: "16rem" }}>
-            <DinaMessage id="workbookGenerateTemplateTitle" />
-          </a>
+        <Link
+          href={`/workbook/generator`}
+          className="btn btn-primary ms-auto"
+          style={{ width: "16rem" }}
+        >
+          <DinaMessage id="workbookGenerateTemplateTitle" />
         </Link>
       </div>
     );

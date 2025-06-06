@@ -6,6 +6,7 @@ import {
   PCR_BATCH_ITEMS
 } from "../__mocks__/PcrWorkflowMocks";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 describe("PcrReactionTable component", () => {
   beforeEach(jest.clearAllMocks);
@@ -20,10 +21,10 @@ describe("PcrReactionTable component", () => {
       </DinaForm>
     );
 
-    await new Promise(setImmediate);
-
-    const tableRows = wrapper.getAllByRole("row");
-    expect(tableRows).toHaveLength(31); // 30 + header
+    await waitFor(() => {
+      const tableRows = wrapper.getAllByRole("row");
+      expect(tableRows).toHaveLength(31); // 30 + header
+    });
 
     const expectedWellCoordinates = [
       "A1",

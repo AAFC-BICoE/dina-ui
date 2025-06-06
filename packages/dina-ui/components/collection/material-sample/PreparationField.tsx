@@ -18,7 +18,7 @@ import {
   PreparationType,
   Vocabulary
 } from "../../../types/collection-api";
-import { find, compact } from "lodash";
+import _ from "lodash";
 
 export interface PreparationFieldProps {
   className?: string;
@@ -162,10 +162,10 @@ export function PreparationField({
                 path: "collection-api/vocabulary2/degreeOfEstablishment"
               }),
               option: (vocabElement) =>
-                compact(
+                _.compact(
                   vocabElement?.vocabularyElements?.map(
                     (it) =>
-                      find(
+                      _.find(
                         it?.multilingualTitle?.titles || [],
                         (item) => item.lang === locale
                       )?.title ||
