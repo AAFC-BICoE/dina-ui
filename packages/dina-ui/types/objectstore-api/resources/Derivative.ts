@@ -13,12 +13,12 @@ export interface DerivativeAttributes {
   createdBy: string;
   createdOn: string;
   derivativeType: string;
+  acTags?: string[];
 }
 
 export interface DerivativeRelationships {
   generatedFromDerivative?: Derivative | KitsuResource | null;
   acDerivedFrom?: Metadata | KitsuResource | null;
-  acTags?: string[];
 }
 
 export type Derivative = KitsuResource &

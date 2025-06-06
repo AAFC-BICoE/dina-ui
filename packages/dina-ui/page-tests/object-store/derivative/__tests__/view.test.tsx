@@ -1,4 +1,4 @@
-import DerivativeViewPage from "../../../../pages/object-store/derivative/derivative-view";
+import DerivativeViewPage from "../../../../pages/object-store/derivative/view";
 import { mountWithAppContext } from "common-ui";
 import "@testing-library/jest-dom";
 
