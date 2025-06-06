@@ -9,44 +9,6 @@ const TEST_METADATA = {
     permissionsProvider: "DummyPermissionsProvider",
     permissions: ["permission1", "permission2", "permission3"]
   },
-  derivatives: [
-    {
-      id: "dummy-derivative-id-1",
-      type: "derivative",
-      bucket: "dummy-bucket",
-      fileIdentifier: "derivative-file-identifier",
-      fileExtension: ".dummy1",
-      dcType: "DUMMY_TYPE_1",
-      dcFormat: "dummy/format1",
-      acHashFunction: "DUMMY_HASH_FUNCTION_1",
-      acHashValue: "dummyhashvalue12345678901",
-      createdBy: "dummy-user-1",
-      createdOn: "2023-01-01T00:00:00.000Z",
-      derivativeType: "DUMMY_DERIVATIVE_TYPE_1",
-      publiclyReleasable: null,
-      acTags: ["derivative_tag_1", "derivative_tag_2"],
-      objectUpload: {
-        id: "derivative-file-identifier",
-        type: "object-upload",
-        dcType: "DUMMY_TYPE_1",
-        createdBy: "dummy-user-1",
-        createdOn: "2023-01-01T00:00:00.000Z",
-        originalFilename: "dummyfile1.dummy",
-        sha1Hex: "dummyhashvalue12345678901",
-        receivedMediaType: "dummy/media-type1",
-        detectedMediaType: "dummy/media-type1",
-        detectedFileExtension: ".dummy1",
-        evaluatedMediaType: "dummy/media-type1",
-        evaluatedFileExtension: ".dummy1",
-        sizeInBytes: 12345,
-        bucket: "dummy-bucket",
-        dateTimeDigitized: null,
-        exif: {},
-        isDerivative: true,
-        uuid: "dummy-uuid-1"
-      }
-    }
-  ],
   acMetadataCreator: "dummy-metadata-creator",
   createdBy: "dummy-user",
   createdOn: "2023-01-01T00:00:00.000Z",
@@ -69,17 +31,55 @@ const TEST_METADATA = {
   acTags: ["metadata_tag"]
 };
 
+const TEST_DERIVATIVE = {
+  id: "dummy-derivative-id-1",
+  type: "derivative",
+  bucket: "dummy-bucket",
+  fileIdentifier: "derivative-file-identifier",
+  fileExtension: ".dummy1",
+  dcType: "DUMMY_TYPE_1",
+  dcFormat: "dummy/format1",
+  acHashFunction: "DUMMY_HASH_FUNCTION_1",
+  acHashValue: "dummyhashvalue12345678901",
+  createdBy: "dummy-user-1",
+  createdOn: "2023-01-01T00:00:00.000Z",
+  derivativeType: "DUMMY_DERIVATIVE_TYPE_1",
+  publiclyReleasable: null,
+  acTags: ["derivative_tag_1", "derivative_tag_2"],
+  objectUpload: {
+    id: "derivative-file-identifier",
+    type: "object-upload",
+    dcType: "DUMMY_TYPE_1",
+    createdBy: "dummy-user-1",
+    createdOn: "2023-01-01T00:00:00.000Z",
+    originalFilename: "dummyfile1.dummy",
+    sha1Hex: "dummyhashvalue12345678901",
+    receivedMediaType: "dummy/media-type1",
+    detectedMediaType: "dummy/media-type1",
+    detectedFileExtension: ".dummy1",
+    evaluatedMediaType: "dummy/media-type1",
+    evaluatedFileExtension: ".dummy1",
+    sizeInBytes: 12345,
+    bucket: "dummy-bucket",
+    dateTimeDigitized: null,
+    exif: {},
+    isDerivative: true,
+    uuid: "dummy-uuid-1"
+  },
+  acDerivedFrom: TEST_METADATA
+};
+
 // Pretend the metadata id was passed in the URL:
 jest.mock("next/router", () => ({
   useRouter: () => ({
-    query: { id: "dummy-derivative-id-1", parentId: "dummy-metadata-id" }
+    query: { id: "dummy-derivative-id-1" }
   })
 }));
 
 const mockGet = jest.fn(async (path) => {
   switch (path) {
-    case "objectstore-api/metadata/dummy-metadata-id":
-      return { data: TEST_METADATA };
+    case "objectstore-api/derivative/dummy-derivative-id-1":
+      return { data: TEST_DERIVATIVE };
   }
 });
 

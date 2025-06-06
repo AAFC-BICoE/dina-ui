@@ -1,8 +1,7 @@
 import { ButtonBar, DinaForm, LoadingSpinner, withResponse } from "common-ui";
-import { find } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useMetadataViewQuery } from "../../../components/object-store/metadata/useMetadata";
+import { useDerivativeMetadataViewQuery } from "../../../components/object-store/metadata/useMetadata";
 import {
   Footer,
   Head,
@@ -13,6 +12,7 @@ import {
 } from "../../../components";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DerivativeDetails } from "../../../components/object-store/derivative/DerivativeDetails";
+import { Metadata } from "../../../types/objectstore-api";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -24,30 +24,26 @@ const OBJECT_DETAILS_PAGE_CSS = `
 export default function DerivativeViewPage() {
   const router = useRouter();
   const uuid = String(router.query.id);
-  const parentUuid = String(router.query.parentId);
-  const query = useMetadataViewQuery(parentUuid);
-  if (query?.loading) {
+  const derivativeQuery = useDerivativeMetadataViewQuery(uuid);
+  if (derivativeQuery?.loading || derivativeQuery?.loading) {
     return <LoadingSpinner loading={true} />;
   }
 
-  const metadata = query.response?.data;
-  const derivative = find(
-    metadata?.derivatives,
-    (derivative) => derivative.id === uuid
-  ) as any;
+  const derivative = derivativeQuery.response?.data;
 
-  if (derivative && derivative.objectUpload)
-    derivative.acCaption = derivative?.objectUpload.originalFilename;
+  const parentFileName = (derivative?.acDerivedFrom as Metadata)
+    ?.originalFilename;
 
   const fileName =
-    derivative?.objectUpload?.originalFilename ||
-    `${metadata?.originalFilename} Thumbnail`;
+    derivative?.objectUpload?.originalFilename || `${parentFileName} Thumbnail`;
 
   const buttonBar = (
     <ButtonBar className="mb-3">
       <div className="col-md-4 mt-2">
-        <Link href={`/object-store/object/view?id=${parentUuid}`}>
-          <a>Back to parent file: {metadata?.originalFilename}</a>
+        <Link
+          href={`/object-store/object/view?id=${derivative?.acDerivedFrom?.id}`}
+        >
+          <a>Back to parent file: {parentFileName}</a>
         </Link>
       </div>
     </ButtonBar>
@@ -60,7 +56,7 @@ export default function DerivativeViewPage() {
       <style>{OBJECT_DETAILS_PAGE_CSS}</style>
       {buttonBar}
       <main className="container-fluid">
-        {withResponse(query, (_) => {
+        {withResponse(derivativeQuery, (_) => {
           return (
             <div className="row mt-3">
               <div className="col-md-4">
@@ -70,7 +66,7 @@ export default function DerivativeViewPage() {
                 />
               </div>
               <div className="col-md-8">
-                <DinaForm initialValues={derivative} readOnly={true}>
+                <DinaForm initialValues={derivative as any} readOnly={true}>
                   <div className="row d-flex">
                     <div
                       className="col-sm-1 mt-2"

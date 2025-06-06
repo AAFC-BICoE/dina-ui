@@ -1,11 +1,11 @@
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Metadata } from "../../../types/objectstore-api";
+import { Derivative, Metadata } from "../../../types/objectstore-api";
 import { DownLoadLinks, FileView } from "../file-view/FileView";
 import { LoadingSpinner } from "common-ui";
 
 export interface MetadataFileViewProps {
-  metadata: Metadata;
+  metadata: Metadata | Derivative;
   imgHeight?: string;
   hideDownload?: boolean;
 }
@@ -95,12 +95,18 @@ export function MetadataFileView({
     return null;
   }, [fileToDisplay, fileId]);
 
+  const caption =
+    metadata.type === "derivative"
+      ? metadata.objectUpload?.originalFilename ??
+        `${(metadata.acDerivedFrom as Metadata)?.originalFilename} Thumbnail`
+      : metadata.acCaption;
+
   const downloadLinks: DownLoadLinks = {};
 
   const COMMON_LINK_ROOT = "/objectstore-api/file/";
 
   // External resources do not have original files.
-  if (!metadata.resourceExternalURL) {
+  if (!(metadata as any).resourceExternalURL) {
     downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
   }
 
@@ -133,11 +139,8 @@ export function MetadataFileView({
     <div>
       <div className="mb-3">
         <FileView
-          imgAlt={
-            metadata?.acCaption
-              ? metadata.acCaption
-              : metadata?.originalFilename
-          }
+          imgAlt={caption}
+          caption={caption}
           clickToDownload={true}
           filePath={filePath}
           fileType={fileType}
