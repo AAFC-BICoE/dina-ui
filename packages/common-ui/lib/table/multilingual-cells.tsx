@@ -73,7 +73,8 @@ function multilingualFieldCell(
   allowSorting: boolean,
   accessorKey: string,
   type: string,
-  className?: string
+  className?: string,
+  id?: string
 ) {
   if (!className) {
     className = type;
@@ -94,7 +95,8 @@ function multilingualFieldCell(
           );
         },
         accessorKey,
-        enableSorting: false
+        enableSorting: false,
+        id: id
       }
     : {
         cell: ({ row: { original } }) => {
@@ -119,6 +121,7 @@ function multilingualFieldCell(
           }
         },
         accessorKey,
+        id: id,
         enableSorting: allowSorting,
         sortingFn: (rowa: any, rowb: any, _: string): number => {
           // Retrieve both languages in the users preferred language.
@@ -170,14 +173,16 @@ function languageBadge(language) {
 export const descriptionCell = (
   displayAll: boolean,
   allowSorting: boolean,
-  accessorKey: string
+  accessorKey: string,
+  id?: string
 ) =>
   multilingualFieldCell(
     displayAll,
     allowSorting,
     accessorKey,
     "desc",
-    "description"
+    "description",
+    id
   );
 export const titleCell = (
   displayAll: boolean,
