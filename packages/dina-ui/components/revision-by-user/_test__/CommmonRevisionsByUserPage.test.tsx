@@ -5,7 +5,7 @@ import RevisionsByUserPage, {
 } from "../CommonRevisionsByUserPage";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { waitFor } from "@testing-library/dom";
+import { waitFor } from "@testing-library/react";
 
 const TEST_SNAPSHOTS = [
   {

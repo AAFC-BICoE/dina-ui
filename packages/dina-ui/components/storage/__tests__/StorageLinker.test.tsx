@@ -3,7 +3,7 @@ import { DinaForm } from "common-ui";
 import { StorageLinkerField } from "../StorageLinker";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import { waitFor } from "@testing-library/dom";
+import { waitFor } from "@testing-library/react";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {

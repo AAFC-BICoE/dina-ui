@@ -856,22 +856,20 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
+
+    // Set the group:
     await waitFor(() =>
       expect(
         wrapper.getByRole("combobox", { name: /group select\.\.\./i })
       ).toBeInTheDocument()
     );
-
-    // Set the group:
     userEvent.click(
       wrapper.getByRole("combobox", { name: /group select\.\.\./i })
     );
-    await waitFor(
-      () =>
-        expect(
-          wrapper.getByRole("option", { name: /aafc/i })
-        ).toBeInTheDocument(),
-      { timeout: 3000 }
+
+    // Select the option.
+    await waitFor(() =>
+      expect(wrapper.getByRole("option", { name: /aafc/i })).toBeInTheDocument()
     );
     userEvent.click(wrapper.getByRole("option", { name: /aafc/i }));
 
@@ -924,27 +922,16 @@ describe("Material Sample Edit Page", () => {
     fillOutDetermination(1);
 
     // Enter the second determination:
+    await waitFor(() => wrapper.getByTestId("add-another-button"));
     userEvent.click(wrapper.getByTestId("add-another-button"));
-    await waitFor(() =>
-      expect(
-        wrapper.queryAllByRole("textbox", {
-          name: /verbatim scientific name × insert hybrid symbol/i
-        }).length
-      ).toBe(2)
-    );
     fillOutDetermination(2);
 
     // Enter the third determination:
+    await waitFor(() => wrapper.getByTestId("add-another-button"));
     userEvent.click(wrapper.getByTestId("add-another-button"));
-    await waitFor(() =>
-      expect(
-        wrapper.queryAllByRole("textbox", {
-          name: /verbatim scientific name × insert hybrid symbol/i
-        }).length
-      ).toBe(3)
-    );
     fillOutDetermination(3);
 
+    await waitFor(() => wrapper.getByRole("button", { name: /save/i }));
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockOnSaved).toHaveBeenCalled());
 

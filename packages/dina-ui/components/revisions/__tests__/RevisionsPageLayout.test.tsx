@@ -1,6 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import { RevisionsPageLayout } from "../RevisionsPageLayout";
-import { waitFor } from "@testing-library/dom";
+import { waitFor } from "@testing-library/react";
 
 const TEST_SNAPSHOTS = [
   {

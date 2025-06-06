@@ -4,7 +4,7 @@ import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitBreadCrumb } from "../StorageUnitBreadCrumb";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import { waitFor } from "@testing-library/dom";
+import { waitFor } from "@testing-library/react";
 
 const storageUnitWithHierarchy: PersistedResource<StorageUnit> = {
   id: "A",
