@@ -250,7 +250,7 @@ function NavCollectionDropdown({ formatMessage }) {
       </Link>
       <Link href="/collection/classification/taxonomy-tree" passHref={true}>
         <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
-          <DinaMessage id="taxonomyTree" />
+          <DinaMessage id="taxonomicHierarchy" />
         </NavDropdown.Item>
       </Link>
       <Link href="/workbook/upload" passHref={true}>

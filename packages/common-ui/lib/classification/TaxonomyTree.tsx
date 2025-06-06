@@ -3,6 +3,7 @@ import * as echarts from "echarts";
 import "./TaxonomyTree.css";
 import { useApiClient } from "..";
 import useVocabularyOptions from "../../../dina-ui/components/collection/useVocabularyOptions";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 interface TreeNode {
   name: string;
@@ -421,21 +422,26 @@ export default function TaxonomyTree() {
 
   return (
     <div className="taxonomy-tree-container">
-      <h2>Taxonomic Classification Tree</h2>
-      <div className="taxonomy-ranks">
-        <strong>Classification levels:</strong>{" "}
-        {taxonomicRanks.map(capitalizeFirstLetter).join(" → ")}
+      <div className="chart-instructions mb-2">
+        <strong>
+          <DinaMessage id="taxonomyHierarchySubtitle" />
+        </strong>
       </div>
       <div
         ref={chartRef}
         className="chart-container"
         style={{ height: "700px", width: "100%" }}
       ></div>
+      <div className="taxonomy-ranks">
+        <strong>
+          <DinaMessage id="classificationlevels" />
+        </strong>
+        {taxonomicRanks.map(capitalizeFirstLetter).join(" → ")}
+      </div>
       <div className="chart-instructions">
-        <p>
-          <strong>Interactions:</strong> Scroll to zoom, drag to pan, click on
-          nodes to fetch child taxonomic ranks
-        </p>
+        <strong>
+          <DinaMessage id="taxonomyHierarchyChartInstructions" />
+        </strong>
       </div>
     </div>
   );
