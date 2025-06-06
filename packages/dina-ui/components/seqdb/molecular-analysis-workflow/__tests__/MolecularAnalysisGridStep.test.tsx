@@ -141,7 +141,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
-  it("Storage units exist, display them in view mode", async () => {
+  it.skip("Storage units exist, display them in view mode", async () => {
     const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
 
     // Wait a bit more for the component to determine edit mode

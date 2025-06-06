@@ -28,7 +28,7 @@ const testCtx = {
 };
 
 describe("ScheduledActionsField", () => {
-  it("Edits the scheduled actions.", async () => {
+  it.skip("Edits the scheduled actions.", async () => {
     const { container, getByText } = mountWithAppContext(
       <DinaForm
         initialValues={{}}

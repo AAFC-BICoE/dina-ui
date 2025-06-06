@@ -3,7 +3,7 @@ import { ResourceWithHooks } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, KitsuResource } from "kitsu";
 import _ from "lodash";
-import { ReactNode, RefObject } from "react";
+import { ReactNode, RefObject, useEffect, useReducer } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { SelectNavigation } from "./SelectNavigation";
 
@@ -14,6 +14,7 @@ export interface BulkEditNavigatorProps {
   onSelectTab: (newSelected: ResourceWithHooks | BulkNavigatorTab) => void;
   extraTabs?: BulkNavigatorTab[];
   tabNameConfig?: (resource: ResourceWithHooks) => string | undefined;
+  submissionError?: unknown | null;
 }
 
 export interface ResourceRenderProps<T extends KitsuResource = KitsuResource> {
@@ -39,17 +40,26 @@ export function BulkEditNavigator({
   resources,
   renderOneResource,
   extraTabs = [],
-  tabNameConfig
+  tabNameConfig,
+  submissionError
 }: BulkEditNavigatorProps) {
   const tabElements = [...extraTabs, ...resources];
+  // Use useReducer to force re-renders
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   const tooManyResourcesForTabs = resources.length >= 10;
 
+  // Calculate tabs with errors on every render (no useMemo)
   const tabsWithErrors = [...resources, ...extraTabs].filter(
     (resource) =>
       !!resource.formRef.current?.status ||
       !_.isEmpty(resource.formRef.current?.errors)
   );
+
+  useEffect(() => {
+    // Force component to re-render when submissionError changes
+    forceUpdate();
+  }, [submissionError]);
 
   function isSelected(key: string) {
     return selectedTab.key === key;

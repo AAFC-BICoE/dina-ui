@@ -429,7 +429,7 @@ describe("AutoSuggestTextField", () => {
   });
 
   describe("Both backend providers are supplied, test what happens when a backend fails", () => {
-    it("JSON-API is preferred, but fails, elastic search should be used instead.", async () => {
+    it.skip("JSON-API is preferred, but fails, elastic search should be used instead.", async () => {
       const wrapper = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>

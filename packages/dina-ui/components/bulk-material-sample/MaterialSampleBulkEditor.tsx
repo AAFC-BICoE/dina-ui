@@ -108,7 +108,7 @@ export function MaterialSampleBulkEditor({
     setSelectedTab(bulkEditTab);
   }, []);
 
-  const { saveAll } = useBulkSampleSave({
+  const { saveAll, submissionError } = useBulkSampleSave({
     onSaved,
     samplePreProcessor: sampleBulkOverrider,
     bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef },
@@ -158,6 +158,7 @@ export function MaterialSampleBulkEditor({
           onSelectTab={setSelectedTab}
           resources={sampleHooks}
           extraTabs={[bulkEditTab]}
+          submissionError={submissionError}
           tabNameConfig={(materialSample: ResourceWithHooks<MaterialSample>) =>
             materialSample?.resource?.materialSampleName
           }
@@ -376,14 +377,14 @@ function useBulkSampleSave({
   bulkEditSampleHook
 }: BulkSampleSaveParams) {
   // Force re-render when there is a bulk submission error:
-  const [_error, setError] = useState<unknown | null>(null);
+  const [submissionError, setSubmissionError] = useState<unknown | null>(null);
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
   const { bulkEditFormRef, resourceHooks: sampleHooks } = bulkEditCtx;
 
   async function saveAll() {
-    setError(null);
+    setSubmissionError(null);
     bulkEditFormRef.current?.setStatus(null);
     bulkEditFormRef.current?.setErrors({});
     const bulkEditCollectingEventRefPermanent = bulkEditSampleHook
@@ -432,6 +433,7 @@ function useBulkSampleSave({
                     }))
                   );
                 }
+                setSubmissionError(error);
                 throw error;
               }
             },
@@ -456,6 +458,7 @@ function useBulkSampleSave({
               }))
             );
           }
+          setSubmissionError(error);
           throw error;
         }
       }
@@ -532,10 +535,10 @@ function useBulkSampleSave({
             it?.setErrors(_.omit(it.errors, badBulkEditedFields))
           );
       }
-      setError(error);
+      setSubmissionError(error);
       throw new Error(formatMessage("bulkSubmissionErrorInfo"));
     }
   }
 
-  return { saveAll };
+  return { saveAll, submissionError };
 }
