@@ -14,6 +14,8 @@ import {
   handleDownloadLink
 } from "../object-store-utils";
 import Kitsu from "kitsu";
+import { formatBytes } from "../object-store-utils";
+import Link from "next/link";
 
 export interface DerivativeListProps {
   metadata: Metadata;
@@ -70,28 +72,52 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
             header: () => <DinaMessage id="field_dcFormat" />
           },
           {
+            id: "dcSize",
+            accessorFn: (row) => (row as any).objectUpload?.sizeInBytes,
+            header: () => <DinaMessage id="field_dcSize" />,
+            cell: ({ getValue }) => {
+              const value = getValue();
+              return value === undefined ? (
+                <span className="text-muted">-</span>
+              ) : (
+                <span>{formatBytes(value)}</span>
+              );
+            },
+            sortingFn: (rowA, rowB, columnId) => {
+              const a = rowA.getValue(columnId);
+              const b = rowB.getValue(columnId);
+
+              // Put undefined values at the bottom
+              if (a === undefined && b === undefined) return 0;
+              else if (a === undefined) return 1; // a goes to bottom
+              else if (b === undefined) return -1; // b goes to bottom
+              else
+                return typeof a === "number" && typeof b === "number"
+                  ? a - b
+                  : 0; // Normal numeric sorting for defined values
+            },
+            enableSorting: true
+          },
+          {
             id: "actions",
             accessorKey: "actions",
             header: () => <DinaMessage id="actions" />,
             cell: ({
               row: {
-                original: { fileIdentifier, bucket }
+                original: { id, bucket, fileIdentifier }
               }
             }) => (
               <div className="d-flex justify-content-center">
                 {/* View Button */}
-                <a
-                  onClick={() => {
-                    setSelectedDerivativePath(
-                      `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`
-                    );
-                    setIsDownloading(false);
-                  }}
-                  className="btn btn-primary"
+                <Link
+                  href={`/object-store/derivative/view?id=${id}`}
+                  passHref={true}
                 >
-                  <FaUpRightFromSquare className="me-2" />
-                  <DinaMessage id="view" />
-                </a>
+                  <a className="btn btn-primary">
+                    <FaUpRightFromSquare className="me-2" />
+                    <DinaMessage id="view" />
+                  </a>
+                </Link>
 
                 {/* Download Button */}
                 <DownloadButton

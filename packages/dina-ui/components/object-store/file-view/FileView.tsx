@@ -6,14 +6,14 @@ import {
 } from "../../../../common-ui";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ReactNode, useState, useRef } from "react";
-import { Metadata } from "../../../types/objectstore-api";
+import { Metadata, Derivative } from "../../../types/objectstore-api";
 import {
   derivativeTypeToLabel,
   handleDownloadLink
 } from "../object-store-utils";
 import RcTooltip from "rc-tooltip";
 import { DownloadButton } from "../derivative-list/DerivativeList";
-import { Dropdown } from "react-bootstrap";
+import { Badge, Dropdown } from "react-bootstrap";
 import {
   FaDownload,
   FaFile,
@@ -30,6 +30,7 @@ import {
 import { FaFileCode } from "react-icons/fa";
 import { MdOutlineRawOn } from "react-icons/md";
 import { IconType } from "react-icons/lib";
+import { formatBytes } from "../object-store-utils";
 
 export type DownLoadLinks = {
   original?: string;
@@ -40,12 +41,13 @@ export interface FileViewProps {
   clickToDownload?: boolean;
   filePath: string;
   fileType: string;
+  caption?: string;
   imgAlt?: string;
   imgHeight?: string;
   downloadLinks?: DownLoadLinks;
   shownTypeIndicator?: ReactNode;
   hideDownload?: boolean;
-  metadata?: Metadata;
+  metadata?: Metadata | Derivative;
 }
 
 export const IMG_TAG_SUPPORTED_FORMATS = [
@@ -63,6 +65,7 @@ export function FileView({
   clickToDownload,
   filePath,
   fileType,
+  caption,
   imgAlt,
   imgHeight,
   downloadLinks,
@@ -102,6 +105,7 @@ export function FileView({
   });
 
   const errorStatus = (error as any)?.cause?.status;
+  const objectUpload = (metadata as any)?.objectUpload;
 
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
@@ -175,15 +179,17 @@ export function FileView({
               <DinaMessage id="previewNotAvailable" />
             </div>
           )}
-          {metadata?.acCaption && (
+          {caption && (
             <strong style={{ display: "block", marginTop: "10px" }}>
-              {metadata?.acCaption}
+              {caption}
             </strong>
           )}
 
           {!hideDownload && downloadLinks?.original && (
             <>
-              {metadata?.derivatives && metadata?.derivatives?.length === 0 ? (
+              {metadata?.type != "derivative" &&
+              metadata?.derivatives &&
+              metadata?.derivatives?.length === 0 ? (
                 <>
                   <div className="d-flex justify-content-center">
                     {downloadLinks?.original && (
@@ -238,50 +244,80 @@ export function FileView({
                               {metadata?.fileExtension?.toUpperCase()}
                             </small>
                           </div>
+
+                          {objectUpload && (
+                            <Badge
+                              bg="light"
+                              text="dark"
+                              style={{
+                                fontSize: "0.75rem",
+                                padding: "0.35em 0.5em",
+                                marginLeft: "2em"
+                              }}
+                            >
+                              {formatBytes(objectUpload.sizeInBytes)}
+                            </Badge>
+                          )}
                         </div>
                       </Dropdown.Item>
                     )}
                     <Dropdown.Divider />
-                    {metadata?.derivatives?.map((derivative) => {
-                      const fileIdentifier = derivative.fileIdentifier;
-                      const bucket = derivative.bucket;
-                      const fileType = derivative.fileExtension;
-                      const derivativeType = derivative.derivativeType;
-                      const filePath = `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`;
+                    {metadata?.type !== "derivative" &&
+                      metadata?.derivatives?.map((derivative) => {
+                        const fileIdentifier = derivative.fileIdentifier;
+                        const bucket = derivative.bucket;
+                        const fileType = derivative.fileExtension;
+                        const derivativeType = derivative.derivativeType;
+                        const filePath = `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`;
+                        const fileSize = (derivative as any).objectUpload
+                          ?.sizeInBytes;
 
-                      return (
-                        <Dropdown.Item
-                          key={fileIdentifier}
-                          as="button"
-                          className="d-flex justify-content-between align-items-center"
-                          onClick={() =>
-                            handleDownloadLink(
-                              filePath,
-                              apiClient,
-                              setIsDownloading
-                            )
-                          }
-                        >
-                          <div className="d-flex align-items-center">
-                            {fileExtensionToIcon(
-                              fileType,
-                              "me-3 text-secondary dropdown-icon"
-                            )}
-                            <div>
-                              <div className="fw-semibold">
-                                {derivativeTypeToLabel(
-                                  derivativeType,
-                                  messages
-                                )}
+                        return (
+                          <Dropdown.Item
+                            key={fileIdentifier}
+                            as="button"
+                            className="d-flex justify-content-between align-items-center"
+                            onClick={() =>
+                              handleDownloadLink(
+                                filePath,
+                                apiClient,
+                                setIsDownloading
+                              )
+                            }
+                          >
+                            <div className="d-flex align-items-center">
+                              {fileExtensionToIcon(
+                                fileType,
+                                "me-3 text-secondary dropdown-icon"
+                              )}
+                              <div>
+                                <div className="fw-semibold">
+                                  {derivativeTypeToLabel(
+                                    derivativeType,
+                                    messages
+                                  )}
+                                </div>
+                                <small className="text-muted">
+                                  {fileType.toUpperCase()}
+                                </small>
                               </div>
-                              <small className="text-muted">
-                                {fileType.toUpperCase()}
-                              </small>
+                              {fileSize && (
+                                <Badge
+                                  bg="light"
+                                  text="dark"
+                                  style={{
+                                    fontSize: "0.75rem",
+                                    padding: "0.35em 0.5em",
+                                    marginLeft: "2em"
+                                  }}
+                                >
+                                  {formatBytes(fileSize)}
+                                </Badge>
+                              )}
                             </div>
-                          </div>
-                        </Dropdown.Item>
-                      );
-                    })}
+                          </Dropdown.Item>
+                        );
+                      })}
                   </Dropdown.Menu>
                 </Dropdown>
               )}
