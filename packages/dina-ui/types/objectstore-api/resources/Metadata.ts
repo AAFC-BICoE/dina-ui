@@ -49,7 +49,7 @@ export interface MetadataRelationships {
   dcCreator?: Person | KitsuResource | null;
   managedAttributes?: Record<string, string | null | undefined>;
   derivatives?:
-    | (PersistedResource<Derivative>[] & { objectUpload: ObjectUpload })
+    | PersistedResource<Derivative & { objectUpload: ObjectUpload }>[]
     | PersistedResource<Derivative>[]
     | null;
 }
