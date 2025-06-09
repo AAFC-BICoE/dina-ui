@@ -31,7 +31,7 @@ export function ExistingObjectsAttacher({
       }) =>
         included?.acMetadataCreator?.id ? (
           <Link href={`/person/view?id=${included?.acMetadataCreator?.id}`}>
-            <a>{included?.acMetadataCreator?.attributes?.displayName}</a>
+            {included?.acMetadataCreator?.attributes?.displayName}
           </Link>
         ) : null,
       header: () => <FieldHeader name="acMetadataCreator.displayName" />,
@@ -49,7 +49,7 @@ export function ExistingObjectsAttacher({
       }) =>
         included?.dcCreator?.id ? (
           <Link href={`/person/view?id=${included?.dcCreator?.id}`}>
-            <a>{included?.dcCreator?.attributes?.displayName}</a>
+            {included?.dcCreator?.attributes?.displayName}
           </Link>
         ) : null,
       header: () => <FieldHeader name="dcCreator.displayName" />,

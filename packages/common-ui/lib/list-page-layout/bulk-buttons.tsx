@@ -37,7 +37,7 @@ export function AttachSelectedButton({
     <FormikButton
       className="btn btn-primary existing-objects-attach-button"
       onClick={async (values: BulkSelectableFormValues) => {
-        const resourceIds = toPairs(values.itemIdsToSelect)
+        const resourceIds = _.toPairs(values.itemIdsToSelect)
           .filter((pair) => pair[1])
           .map((pair) => pair[0]);
         await onAttachButtonClick(resourceIds);
