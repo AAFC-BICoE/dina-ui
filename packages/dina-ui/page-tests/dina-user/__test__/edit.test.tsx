@@ -2,7 +2,7 @@ import { DinaForm } from "common-ui";
 import { RolesPerGroupEditor } from "../../../pages/dina-user/edit";
 import { mountWithAppContext } from "common-ui";
 import { SUPER_USER, USER, GUEST } from "common-ui/types/DinaRoles";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -89,17 +89,24 @@ describe("User edit page", () => {
 
     // Add new group + roles:
     userEvent.click(wrapper.getAllByRole("combobox", { name: / /i })[1]);
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("option", { name: /test-group/i })
+      ).toBeInTheDocument();
+    });
 
     userEvent.click(wrapper.getByRole("option", { name: /test-group/i }));
-    await new Promise(setImmediate);
 
     // Select Role for test-group
     userEvent.click(
       wrapper.getAllByRole("combobox", { name: /select\.\.\./i })[1]
     );
-    await new Promise(setImmediate);
 
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("option", { name: /super/i })
+      ).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getByRole("option", { name: /super/i }));
 
     // Remove a group: (cnc)
@@ -110,19 +117,19 @@ describe("User edit page", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Check form state: cnc removed, test-group added:
-    expect(mockSubmit.mock.calls).toEqual([
-      [
-        {
-          rolesPerGroup: {
-            aafc: [USER],
-            // Only one role at a time is allowed for now:
-            "test-group": [SUPER_USER]
+    await waitFor(() => {
+      expect(mockSubmit.mock.calls).toEqual([
+        [
+          {
+            rolesPerGroup: {
+              aafc: [USER],
+              // Only one role at a time is allowed for now:
+              "test-group": [SUPER_USER]
+            }
           }
-        }
-      ]
-    ]);
+        ]
+      ]);
+    });
   });
 });

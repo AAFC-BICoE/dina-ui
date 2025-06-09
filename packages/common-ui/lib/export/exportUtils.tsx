@@ -2,6 +2,7 @@ import Kitsu, { PersistedResource } from "kitsu";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { DataExport } from "../../../dina-ui/types/dina-export-api";
 import { ObjectExport } from "../../../dina-ui/types/objectstore-api";
+import { ReactNode } from "react";
 
 /**
  * Total number of objects allowed to be exported in the UI.
@@ -38,7 +39,7 @@ const BASE_DELAY_EXPORT_FETCH_MS = 2000;
 export async function getExport(
   exportPostResponse: PersistedResource<DataExport | ObjectExport>[],
   setLoading: (loading: boolean) => void,
-  setDataExportError: (error: React.ReactNode | undefined) => void,
+  setDataExportError: (error: ReactNode | undefined) => void,
   apiClient: Kitsu,
   formik?: any
 ) {

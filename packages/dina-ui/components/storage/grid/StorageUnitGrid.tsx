@@ -2,7 +2,7 @@ import React from "react";
 import { ContainerGrid } from "../../seqdb/container-grid/ContainerGrid";
 import { MaterialSample, StorageUnit } from "../../../types/collection-api";
 import { useState } from "react";
-import { noop } from "lodash";
+import _ from "lodash";
 import { PersistedResource } from "kitsu";
 import { LoadingSpinner, useDinaFormContext } from "common-ui";
 import { ErrorBanner } from "../../error/ErrorBanner";
@@ -57,7 +57,7 @@ export default function StorageUnitGrid({
           {usageType}{" "}
           {usageTypeLinkRef.current && (
             <Link href={usageTypeLinkRef.current}>
-              <a>{usageTypeResourceNameRef?.current}</a>
+              {usageTypeResourceNameRef?.current}
             </Link>
           )}
         </div>
@@ -67,10 +67,11 @@ export default function StorageUnitGrid({
           <div className="d-flex justify-content-between align-items-end mb-3">
             <FieldLabel name={formatMessage("contents")} />
             {!!editContentsPathRef.current && (
-              <Link href={`${editContentsPathRef.current}`}>
-                <a className={"btn btn-primary"}>
-                  <DinaMessage id="editContents" />
-                </a>
+              <Link
+                href={`${editContentsPathRef.current}`}
+                className={"btn btn-primary"}
+              >
+                <DinaMessage id="editContents" />
               </Link>
             )}
           </div>
@@ -84,7 +85,7 @@ export default function StorageUnitGrid({
           cellGrid={cellGrid}
           editMode={false}
           movedItems={[]}
-          onDrop={noop}
+          onDrop={_.noop}
         />
       </div>
     </div>

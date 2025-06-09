@@ -5,8 +5,8 @@ import {
   MaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../../bulk-material-sample/MaterialSampleBulkEditor";
-import { isEqual } from "lodash";
-import { fireEvent } from "@testing-library/react";
+import _ from "lodash";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockGet = jest.fn<any, any>(async (path) => {
@@ -193,113 +193,114 @@ describe("BulkEditTabWarning", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
-
-    // Enable the determination:
-    const organismToggle = wrapper.container.querySelector(
-      ".enable-organisms .react-switch-bg"
-    );
-    if (!organismToggle) {
-      fail("Organism toggle needs to exist at this point.");
-    }
-    fireEvent.click(organismToggle);
-    await new Promise(setImmediate);
-
-    // Find the organism override button and click it.
-    const overrideButton = wrapper.container.querySelector(
-      "#organisms-component button"
-    );
-    if (!overrideButton) {
-      fail(
-        "Override button inside of the organisms component needs to exist at this point."
+    await waitFor(() => {
+      // Enable the determination:
+      const organismToggle = wrapper.container.querySelector(
+        ".enable-organisms .react-switch-bg"
       );
-    }
-    fireEvent.click(overrideButton);
+      if (!organismToggle) {
+        fail("Organism toggle needs to exist at this point.");
+      }
+      fireEvent.click(organismToggle);
+    });
+    await waitFor(() => {
+      // Find the organism override button and click it.
+      const overrideButton = wrapper.container.querySelector(
+        "#organisms-component button"
+      );
+      if (!overrideButton) {
+        fail(
+          "Override button inside of the organisms component needs to exist at this point."
+        );
+      }
+      fireEvent.click(overrideButton);
 
-    // Click "Yes" on the popup dialog.
-    fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
+      // Click "Yes" on the popup dialog.
+      fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+    });
+    await waitFor(() => {
+      // Click the "Add New Determination" button.
+      fireEvent.click(
+        wrapper.getByRole("button", { name: /add new determination/i })
+      );
+    });
+    await waitFor(() => {
+      // Override the verbatim scientific name.
+      fireEvent.change(
+        wrapper.getByRole("textbox", {
+          name: /verbatim scientific name × insert hybrid symbol/i
+        }),
+        { target: { value: "test-name-override" } }
+      );
+    });
+    await waitFor(() => {
+      // Click the "Save All" button:
+      fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    });
 
-    // Click the "Add New Determination" button.
-    fireEvent.click(
-      wrapper.getByRole("button", { name: /add new determination/i })
-    );
-    await new Promise(setImmediate);
-
-    // Override the verbatim scientific name.
-    fireEvent.change(
-      wrapper.getByRole("textbox", {
-        name: /verbatim scientific name × insert hybrid symbol/i
-      }),
-      { target: { value: "test-name-override" } }
-    );
-    await new Promise(setImmediate);
-
-    // Click the "Save All" button:
-    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
-
-    const EXPECTED_ORGANISM_SAVE = {
-      resource: {
-        determination: [
-          {
-            verbatimScientificName: "test-name-override",
-            scientificName: undefined,
-            scientificNameDetails: undefined,
-            scientificNameSource: undefined
-          }
-        ],
+    await waitFor(() => {
+      const EXPECTED_ORGANISM_SAVE = {
+        resource: {
+          determination: [
+            {
+              verbatimScientificName: "test-name-override",
+              scientificName: undefined,
+              scientificNameDetails: undefined,
+              scientificNameSource: undefined
+            }
+          ],
+          type: "organism"
+        },
         type: "organism"
-      },
-      type: "organism"
-    };
+      };
 
-    // Saves the new material samples with the new common determination:
-    expect(mockSave.mock.calls).toEqual([
-      // Creates the same organism 3 times, 1 for each of the 3 samples:
-      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
-      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
-      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
-      // Saves the 3 samples (with linked organisms) in one transaction:
-      [
+      // Saves the new material samples with the new common determination:
+      expect(mockSave.mock.calls).toEqual([
+        // Creates the same organism 3 times, 1 for each of the 3 samples:
+        [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+        [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+        [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+        // Saves the 3 samples (with linked organisms) in one transaction:
         [
-          {
-            resource: expect.objectContaining({
-              relationships: {
-                organism: {
-                  data: [{ id: "11111", type: "organism" }]
-                }
-              },
+          [
+            {
+              resource: expect.objectContaining({
+                relationships: {
+                  organism: {
+                    data: [{ id: "11111", type: "organism" }]
+                  }
+                },
+                type: "material-sample"
+              }),
               type: "material-sample"
-            }),
-            type: "material-sample"
-          },
-          {
-            resource: expect.objectContaining({
-              relationships: {
-                organism: {
-                  data: [{ id: "11111", type: "organism" }]
-                }
-              },
+            },
+            {
+              resource: expect.objectContaining({
+                relationships: {
+                  organism: {
+                    data: [{ id: "11111", type: "organism" }]
+                  }
+                },
+                type: "material-sample"
+              }),
               type: "material-sample"
-            }),
-            type: "material-sample"
-          },
-          {
-            resource: expect.objectContaining({
-              relationships: {
-                organism: {
-                  data: [{ id: "11111", type: "organism" }]
-                }
-              },
+            },
+            {
+              resource: expect.objectContaining({
+                relationships: {
+                  organism: {
+                    data: [{ id: "11111", type: "organism" }]
+                  }
+                },
+                type: "material-sample"
+              }),
               type: "material-sample"
-            }),
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
   });
 
   it("Keeps the original multiple values if you decide not to click the Override All button.", async () => {
@@ -310,34 +311,36 @@ describe("BulkEditTabWarning", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
-
-    // Enable the determination:
-    const organismToggle = wrapper.container.querySelector(
-      ".enable-organisms .react-switch-bg"
-    );
-    if (!organismToggle) {
-      fail("Organism toggle needs to exist at this point.");
-    }
-    fireEvent.click(organismToggle);
-    await new Promise(setImmediate);
-
-    // The Override button is there:
-    const overrideButton = wrapper.container.querySelector(
-      "#organisms-component button"
-    );
-    if (!overrideButton) {
-      fail(
-        "Override button inside of the organisms component needs to exist at this point."
+    await waitFor(() => {
+      // Enable the determination:
+      const organismToggle = wrapper.container.querySelector(
+        ".enable-organisms .react-switch-bg"
       );
-    }
+      if (!organismToggle) {
+        fail("Organism toggle needs to exist at this point.");
+      }
+      fireEvent.click(organismToggle);
+    });
+
+    await waitFor(() => {
+      // The Override button is there:
+      const overrideButton = wrapper.container.querySelector(
+        "#organisms-component button"
+      );
+      if (!overrideButton) {
+        fail(
+          "Override button inside of the organisms component needs to exist at this point."
+        );
+      }
+    });
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
 
-    // No changes expected, not overriding anything.
-    expect(mockSave.mock.calls).toHaveLength(0);
+    await waitFor(() => {
+      // No changes expected, not overriding anything.
+      expect(mockSave.mock.calls).toHaveLength(0);
+    });
   });
 
   it("Lets you set the values without a warning when there are no organisms in the samples.", async () => {
@@ -348,78 +351,82 @@ describe("BulkEditTabWarning", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      // Enable the determination:
+      const organismToggle = wrapper.container.querySelector(
+        ".enable-organisms .react-switch-bg"
+      );
+      if (!organismToggle) {
+        fail("Organism toggle needs to exist at this point.");
+      }
+      fireEvent.click(organismToggle);
+    });
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /add new determination/i })
+      ).toBeInTheDocument();
+    });
 
-    // Enable the determination:
-    const organismToggle = wrapper.container.querySelector(
-      ".enable-organisms .react-switch-bg"
-    );
-    if (!organismToggle) {
-      fail("Organism toggle needs to exist at this point.");
-    }
-    fireEvent.click(organismToggle);
-    await new Promise(setImmediate);
-
-    // Click the "Add New Determination" button.
     fireEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await new Promise(setImmediate);
 
-    // Override the verbatim scientific name.
-    fireEvent.change(
-      wrapper.getByRole("textbox", {
-        name: /verbatim scientific name × insert hybrid symbol/i
-      }),
-      { target: { value: "test-name-override" } }
-    );
-    await new Promise(setImmediate);
-
-    // Click the "Save All" button:
-    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
-
-    const EXPECTED_ORGANISM_SAVE = {
-      resource: {
-        determination: [
-          {
-            verbatimScientificName: "test-name-override",
-            determiner: undefined
-          }
-        ],
-        group: undefined,
-        type: "organism"
-      },
-      type: "organism"
-    };
-
-    // Saves the material samples:
-    expect(mockSave.mock.calls).toEqual([
-      // 3 copies of the organism are saved, 1 for each sample:
-      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
-      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
-      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
-      [
-        SAMPLES_WITHOUT_ORGANISMS.map((sample) => ({
-          resource: {
-            id: sample.id,
-            type: sample.type,
-            attachment: undefined,
-            organism: undefined,
-            organismsIndividualEntry: undefined,
-            organismsQuantity: undefined,
-            projects: undefined,
-            relationships: {
-              organism: {
-                data: [{ id: "11111", type: "organism" }]
-              }
+    await waitFor(() => {
+      // Override the verbatim scientific name.
+      fireEvent.change(
+        wrapper.getByRole("textbox", {
+          name: /verbatim scientific name × insert hybrid symbol/i
+        }),
+        { target: { value: "test-name-override" } }
+      );
+    });
+    await waitFor(() => {
+      // Click the "Save All" button:
+      fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    });
+    await waitFor(() => {
+      const EXPECTED_ORGANISM_SAVE = {
+        resource: {
+          determination: [
+            {
+              verbatimScientificName: "test-name-override",
+              determiner: undefined
             }
-          },
-          type: "material-sample"
-        })),
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+          ],
+          group: undefined,
+          type: "organism"
+        },
+        type: "organism"
+      };
+
+      // Saves the material samples:
+      expect(mockSave.mock.calls).toEqual([
+        // 3 copies of the organism are saved, 1 for each sample:
+        [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+        [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+        [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+        [
+          SAMPLES_WITHOUT_ORGANISMS.map((sample) => ({
+            resource: {
+              id: sample.id,
+              type: sample.type,
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              projects: undefined,
+              relationships: {
+                organism: {
+                  data: [{ id: "11111", type: "organism" }]
+                }
+              }
+            },
+            type: "material-sample"
+          })),
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
   });
 
   it("Shows the Override button on the Organisms section, even when the Organisms are the same.", async () => {
@@ -435,20 +442,24 @@ describe("BulkEditTabWarning", () => {
     // even though the back-end shouldn't actually allow this:
     expect(
       SAMPLES_WITH_SAME_DETERMINATIONS.every((sample) =>
-        isEqual(sample.organism, SAMPLES_WITH_SAME_DETERMINATIONS[0].organism)
+        _.isEqual(sample.organism, SAMPLES_WITH_SAME_DETERMINATIONS[0].organism)
       )
     );
-    await new Promise(setImmediate);
-
-    // Enable the determination:
-    const organismToggle = wrapper.container.querySelector(
-      ".enable-organisms .react-switch-bg"
-    );
-    if (!organismToggle) {
-      fail("Organism toggle needs to exist at this point.");
-    }
-    fireEvent.click(organismToggle);
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      // Enable the determination:
+      const organismToggle = wrapper.container.querySelector(
+        ".enable-organisms .react-switch-bg"
+      );
+      if (!organismToggle) {
+        fail("Organism toggle needs to exist at this point.");
+      }
+      fireEvent.click(organismToggle);
+    });
+    await waitFor(() => {
+      expect(
+        wrapper.container.querySelector("#organisms-component button")
+      ).toBeInTheDocument();
+    });
 
     // Find the organism override button and click it.
     const overrideButton = wrapper.container.querySelector(
@@ -463,13 +474,23 @@ describe("BulkEditTabWarning", () => {
 
     // Click "Yes" on the popup dialog.
     fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /add new determination/i })
+      ).toBeInTheDocument();
+    });
 
     // Click the "Add New Determination" button.
     fireEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", {
+          name: /verbatim scientific name × insert hybrid symbol/i
+        })
+      ).toBeInTheDocument();
+    });
 
     // Override the verbatim scientific name.
     fireEvent.change(
@@ -478,48 +499,53 @@ describe("BulkEditTabWarning", () => {
       }),
       { target: { value: "test-name-override" } }
     );
-    await new Promise(setImmediate);
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /save all/i })
+      ).toBeInTheDocument();
+    });
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await new Promise(setImmediate);
-
-    const EXPECTED_ORGANISM_SAVE = {
-      resource: {
-        group: undefined,
-        determination: [
-          {
-            verbatimScientificName: "test-name-override",
-            determiner: undefined
-          }
-        ],
+    await waitFor(() => {
+      const EXPECTED_ORGANISM_SAVE = {
+        resource: {
+          group: undefined,
+          determination: [
+            {
+              verbatimScientificName: "test-name-override",
+              determiner: undefined
+            }
+          ],
+          type: "organism"
+        },
         type: "organism"
-      },
-      type: "organism"
-    };
+      };
 
-    expect(mockSave.mock.calls).toEqual([
-      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
-      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
-      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
-      [
-        SAMPLES_WITH_SAME_DETERMINATIONS.map((sample) => ({
-          resource: {
-            attachment: undefined,
-            organism: undefined,
-            organismsIndividualEntry: undefined,
-            organismsQuantity: undefined,
-            projects: undefined,
-            id: sample.id,
-            relationships: {
-              organism: { data: [{ id: "11111", type: "organism" }] }
+      expect(mockSave.mock.calls).toEqual([
+        [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+        [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+        [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+        [
+          SAMPLES_WITH_SAME_DETERMINATIONS.map((sample) => ({
+            resource: {
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              projects: undefined,
+              id: sample.id,
+              relationships: {
+                organism: { data: [{ id: "11111", type: "organism" }] }
+              },
+              type: "material-sample"
             },
             type: "material-sample"
-          },
-          type: "material-sample"
-        })),
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+          })),
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
   });
 });

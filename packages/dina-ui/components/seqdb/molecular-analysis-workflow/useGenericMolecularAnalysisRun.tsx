@@ -15,7 +15,7 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 import useVocabularyOptions from "../../collection/useVocabularyOptions";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
-import { isEqual } from "lodash";
+import _ from "lodash";
 import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
 
@@ -642,7 +642,7 @@ export function useGenericMolecularAnalysisRun({
     // Final case is same length but different ids.
     const ids1 = attachments1.map((a) => a.id).sort();
     const ids2 = attachments2.map((a) => a.id).sort();
-    return !isEqual(ids1, ids2);
+    return !_.isEqual(ids1, ids2);
   }
 
   /**
@@ -831,7 +831,7 @@ export function useGenericMolecularAnalysisRun({
   async function createNewQualityControls(molecularAnalysisRunId: string) {
     const groupName = molecularAnalysis.group;
 
-    if (!isEqual(qualityControls, loadedQualityControls)) {
+    if (!_.isEqual(qualityControls, loadedQualityControls)) {
       const qualityControlsWithoutId = qualityControls.filter(
         (qc) => !qc.id && qc.name && qc.type
       );

@@ -1,5 +1,5 @@
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
-import { compact, get, startCase } from "lodash";
+import _ from "lodash";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { FieldHeader, dateCell } from "..";
 import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
@@ -126,11 +126,12 @@ export function generateColumnPath({
         const relationshipPresenceValues: RelationshipPresenceSearchStates =
           JSON.parse(dynamicFieldValue);
         return (
+          // In the future, other operators can be supported.
           indexMapping.dynamicField.type +
           "/" +
           relationshipPresenceValues.selectedRelationship +
           "/" +
-          "presence" // In the future, other operators can be supported.
+          "presence"
         );
 
       // Column Functions (functionId/functionName/params)
@@ -178,7 +179,9 @@ export function generateColumnPath({
  * @param {string} dynamicFieldType - The dynamic field type string to parse.
  * @returns {string|undefined} The relationship name if found, otherwise undefined.
  */
-export function parseRelationshipNameFromType(dynamicFieldType) {
+export function parseRelationshipNameFromType(
+  dynamicFieldType: string
+): string | undefined {
   const tildeIndex = dynamicFieldType.indexOf("~");
   if (tildeIndex !== -1) {
     return dynamicFieldType.substring(tildeIndex + 1);
@@ -316,14 +319,14 @@ function getNestedColumn<TData extends KitsuResource>(
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
       cell: ({ row: { original } }) => {
-        const value = get(original, accessorKeyRelationship);
+        const value = _.get(original, accessorKeyRelationship);
         if (value && Array.isArray(value)) {
           const values = value
-            .map((val) => get(val, accessorKeyRelationshipAttribute))
+            .map((val) => _.get(val, accessorKeyRelationshipAttribute))
             .join(", ");
           return <>{values}</>;
         } else {
-          const singleValue = get(original, accessorKeyFull);
+          const singleValue = _.get(original, accessorKeyFull);
           return <>{singleValue}</>;
         }
       },
@@ -346,7 +349,7 @@ export function NestedColumnLabel({
 
   const relationshipLabel = messages["title_" + relationship]
     ? formatMessage(("title_" + relationship) as any)
-    : startCase(relationship);
+    : _.startCase(relationship);
 
   return <FieldHeader name={label} prefixName={relationshipLabel} />;
 }
@@ -450,7 +453,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
       };
     }
 
-    // Handle scientific name detaills (classification) paths.
+    // Handle scientific name details (classification) paths.
     if (
       dynamicFieldsMappingConfig &&
       pathParts.length === 2 &&
@@ -592,10 +595,10 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
       relationshipAccessor?.splice(
         1,
         0,
-        config.referencedType ? config.referencedType : ""
+        config.referencedBy ? config.referencedBy : ""
       );
       const valuePath = relationshipAccessor?.join(".");
-      const value = get(original, valuePath);
+      const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
     header: () => (
@@ -630,13 +633,13 @@ export function IncludedManagedAttributeLabel({
 
   const relationshipLabel = messages["title_" + relationship]
     ? formatMessage(("title_" + relationship) as any)
-    : startCase(relationship);
+    : _.startCase(relationship);
 
   return (
     <>
       {relationshipLabel}
       {" - "}
-      {startCase(name)}
+      {_.startCase(name)}
     </>
   );
 }
@@ -821,10 +824,10 @@ export function getIncludedExtensionFieldColumn(
       relationshipAccessor?.splice(
         1,
         0,
-        config.referencedType ? config.referencedType : ""
+        config.referencedBy ? config.referencedBy : ""
       );
       const valuePath = relationshipAccessor?.join(".");
-      const value = get(original, valuePath);
+      const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
     accessorKey,
@@ -836,7 +839,7 @@ export function getIncludedExtensionFieldColumn(
         relationship={config?.referencedBy ?? ""}
       />
     ),
-    label: `${startCase(config.referencedBy)} - ${
+    label: `${_.startCase(config.referencedBy)} - ${
       extensionValue.extension.name
     } - ${extensionField.name}`,
     isKeyword: true,
@@ -866,7 +869,7 @@ export function IncludedExtensionFieldLabel({
 
   const relationshipLabel = messages["title_" + relationship]
     ? formatMessage(("title_" + relationship) as any)
-    : startCase(relationship);
+    : _.startCase(relationship);
 
   return (
     <>
@@ -1032,10 +1035,10 @@ export function getIncludedVocabularyColumn<TData extends KitsuResource>(
       relationshipAccessor?.splice(
         1,
         0,
-        config.referencedType ? config.referencedType : ""
+        config.referencedBy ? config.referencedBy : ""
       );
       const valuePath = relationshipAccessor?.join(".");
-      const value = get(original, valuePath);
+      const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
     header: () => (
@@ -1072,7 +1075,7 @@ export function IncludedVocabularyLabel({
 
   const relationshipLabel = messages["title_" + relationship]
     ? formatMessage(("title_" + relationship) as any)
-    : startCase(relationship);
+    : _.startCase(relationship);
 
   const label =
     vocabulary?.multilingualTitle?.titles?.find(
@@ -1098,7 +1101,7 @@ export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
     id: `relationshipPresence.${relationship}.${operator}`,
     header: () => <RelationshipPresenceLabel relationship={relationship} />,
     cell: ({ row: { original } }) => {
-      const relationshipExists = get(
+      const relationshipExists = _.get(
         original,
         `data.relationships.${relationship}.data`
       );
@@ -1114,7 +1117,7 @@ export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
       return <FaRegSquare />;
     },
     relationshipType: relationship,
-    label: startCase(`${relationship}`),
+    label: _.startCase(`${relationship}`),
     isKeyword: true,
     isColumnVisible: true,
     enableSorting: false,
@@ -1138,7 +1141,7 @@ export function RelationshipPresenceLabel({
 
   const relationshipLabel = messages["title_" + relationship]
     ? formatMessage(("title_" + relationship) as any)
-    : startCase(relationship);
+    : _.startCase(relationship);
 
   return (
     <>
@@ -1159,6 +1162,46 @@ async function fetchDynamicField(apiClient: Kitsu, path, params?: GetParams) {
   }
 }
 
+/**
+ * Function to get values from an object using a path, collecting all values when encountering arrays.
+ * If the path leads to an array at any point, it collects values from all elements
+ * and returns them as a semi-colon separated string.
+ *
+ * @param {object} object - The object to search in.
+ * @param {string} path - The path to the desired value(s).
+ * @returns {any} - The value or semi-colon separated values at the specified path, or undefined if not found.
+ */
+export function collectPathValues(object: any, path: string): any {
+  if (!path) return object;
+
+  const parts = path.split(".");
+  const part = parts[0];
+  const remainingPath = parts.slice(1).join(".");
+
+  if (object === null || object === undefined) return undefined;
+
+  if (Array.isArray(object[part])) {
+    // If we've reached the end of the path and found an array, return its elements joined
+    if (parts.length === 1) {
+      return object[part].join("; ");
+    }
+
+    // Process each array element recursively and join the results
+    const results = object[part]
+      .map((item) => collectPathValues(item, remainingPath))
+      .filter((result) => result !== undefined);
+
+    return results.length ? results.join("; ") : undefined;
+  } else {
+    // Continue traversing if not an array
+    if (parts.length === 1) {
+      return object[part];
+    }
+
+    return collectPathValues(object[part], remainingPath);
+  }
+}
+
 export interface FunctionFieldLabelProps {
   functionFieldPath: string;
   indexMappings?: ESIndexMapping[];
@@ -1172,7 +1215,7 @@ export function FunctionFieldLabel({
   if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
     const functionName = pathParts[2];
     const paramStr = pathParts.length > 3 ? pathParts[3] : undefined;
-    const paramObjects = compact(
+    const paramObjects = _.compact(
       paramStr?.split("+").map((field) => {
         const mappingMatch = indexMappings?.find((mapping) =>
           mapping.parentName
@@ -1203,11 +1246,11 @@ export function FunctionFieldLabel({
                 (field.parentName
                   ? (messages[field.parentName]
                       ? formatMessage(field.parentName as any)
-                      : startCase(field.parentName)) + " "
+                      : _.startCase(field.parentName)) + " "
                   : "") +
                 (messages[field.label]
                   ? formatMessage(field.label as any)
-                  : startCase(field.label))
+                  : _.startCase(field.label))
               );
             })
             .join(" + ") +

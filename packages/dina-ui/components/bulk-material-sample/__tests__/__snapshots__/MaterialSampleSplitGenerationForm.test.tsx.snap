@@ -187,6 +187,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -200,6 +201,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -213,6 +215,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -226,6 +229,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -239,6 +243,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -252,6 +257,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -265,6 +271,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -340,7 +347,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
             >
               <span
                 class="css-1f43avz-a11yText-A11yText"
-                id="react-select-2-live-region"
+                id="react-select-3-live-region"
               >
                 <span
                   id="aria-selection"
@@ -374,7 +381,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 >
                   <div
                     class=" css-1jqq78o-placeholder"
-                    id="react-select-2-placeholder"
+                    id="react-select-3-placeholder"
                   >
                     Select...
                   </div>
@@ -385,14 +392,14 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                     <input
                       aria-activedescendant=""
                       aria-autocomplete="list"
-                      aria-describedby="react-select-2-placeholder"
+                      aria-describedby="react-select-3-placeholder"
                       aria-expanded="false"
                       aria-haspopup="true"
                       autocapitalize="none"
                       autocomplete="off"
                       autocorrect="off"
                       class=""
-                      id="react-select-2-input"
+                      id="react-select-3-input"
                       role="combobox"
                       spellcheck="false"
                       style="opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
@@ -803,6 +810,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -816,6 +824,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -829,6 +838,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -842,6 +852,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -855,6 +866,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -868,6 +880,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -881,6 +894,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -966,7 +980,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
             >
               <span
                 class="css-1f43avz-a11yText-A11yText"
-                id="react-select-3-live-region"
+                id="react-select-5-live-region"
               >
                 <span
                   id="aria-selection"
@@ -1000,7 +1014,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 >
                   <div
                     class=" css-1jqq78o-placeholder"
-                    id="react-select-3-placeholder"
+                    id="react-select-5-placeholder"
                   >
                     Select...
                   </div>
@@ -1011,14 +1025,14 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                     <input
                       aria-activedescendant=""
                       aria-autocomplete="list"
-                      aria-describedby="react-select-3-placeholder"
+                      aria-describedby="react-select-5-placeholder"
                       aria-expanded="false"
                       aria-haspopup="true"
                       autocapitalize="none"
                       autocomplete="off"
                       autocorrect="off"
                       class=""
-                      id="react-select-3-input"
+                      id="react-select-5-input"
                       role="combobox"
                       spellcheck="false"
                       style="opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"

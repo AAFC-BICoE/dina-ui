@@ -1,5 +1,5 @@
 import { LoadingSpinner } from "common-ui";
-import { noop } from "lodash";
+import _ from "lodash";
 import { LibraryPrepBatch } from "packages/dina-ui/types/seqdb-api";
 import { useEffect } from "react";
 import {
@@ -96,7 +96,7 @@ export function NgsSampleSelectCoordinatesStep(
                       className={`${mode}-radio`}
                       type="radio"
                       checked={fillMode === mode}
-                      onChange={noop}
+                      onChange={_.noop}
                       onClick={() =>
                         setFillMode(mode === "ROW" ? "ROW" : "COLUMN")
                       }

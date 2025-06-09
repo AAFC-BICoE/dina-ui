@@ -74,23 +74,25 @@ describe("CollectionSelectField", () => {
       { ...testCtx, accountContext: { isAdmin: true } }
     );
 
-    // Wait for any asynchronous updates
-    await new Promise(setImmediate);
-
     // Check that the select field is not disabled
     const select = screen.getByRole("combobox", { name: /collection/i });
-    expect(select).not.toBeDisabled();
+    await waitFor(() => {
+      expect(select).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(select).not.toBeDisabled();
 
-    // Verify the API call for fetching collections
-    expect(mockGet.mock.calls).toEqual([
-      [
-        "collection-api/collection",
-        {
-          page: { limit: 6 },
-          sort: "-createdOn"
-        }
-      ]
-    ]);
+      // Verify the API call for fetching collections
+      expect(mockGet.mock.calls).toEqual([
+        [
+          "collection-api/collection",
+          {
+            page: { limit: 6 },
+            sort: "-createdOn"
+          }
+        ]
+      ]);
+    });
   });
 
   it("Shows non-admin users with one group/collection just their collection", async () => {
@@ -101,26 +103,28 @@ describe("CollectionSelectField", () => {
       { ...testCtx, accountContext: { groupNames: ["aafc"] } }
     );
 
-    await new Promise(setImmediate);
-
     // Use querySelector to find the input element by its role
     const combobox = wrapper.container.querySelector('input[role="combobox"]');
 
     // Assert that the input element is found and is disabled
-    expect(combobox).toBeInTheDocument(); // Check that the combobox is in the document
-    expect(combobox).toBeDisabled(); // Check if it is disabled
+    await waitFor(() => {
+      expect(combobox).toBeInTheDocument(); // Check that the combobox is in the document
+      expect(combobox).toBeDisabled(); // Check if it is disabled
+    });
 
     // Verify the API call
-    expect(mockGet.mock.calls).toEqual([
-      [
-        "collection-api/collection",
-        {
-          filter: { rsql: "group=in=(aafc)" },
-          page: { limit: 6 },
-          sort: "-createdOn"
-        }
-      ]
-    ]);
+    await waitFor(() => {
+      expect(mockGet.mock.calls).toEqual([
+        [
+          "collection-api/collection",
+          {
+            filter: { rsql: "group=in=(aafc)" },
+            page: { limit: 6 },
+            sort: "-createdOn"
+          }
+        ]
+      ]);
+    });
   });
 
   it("Shows non-admin users with multiple groups/collections all available collections", async () => {

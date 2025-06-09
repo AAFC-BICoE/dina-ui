@@ -5,7 +5,7 @@ import { OnFormikSubmit } from "../formik-connected/safeSubmit";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { useModal } from "./modal";
-import { pick } from "lodash";
+import _ from "lodash";
 
 export interface AreYouSureModalProps {
   /** Describes the acion you're asking the user about. */
@@ -39,7 +39,11 @@ export function AreYouSureModal({
   async function onYesClickInternal(
     dinaFormSubmitParams: DinaFormSubmitParams<any>
   ) {
-    const yesBtnParam = pick(dinaFormSubmitParams, "submittedValues", "formik");
+    const yesBtnParam = _.pick(
+      dinaFormSubmitParams,
+      "submittedValues",
+      "formik"
+    );
     await onYesButtonClicked(yesBtnParam.submittedValues, yesBtnParam.formik);
     closeModal();
   }

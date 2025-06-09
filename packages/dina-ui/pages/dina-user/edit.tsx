@@ -13,7 +13,7 @@ import {
 } from "common-ui";
 import { GUEST, SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import { FieldArray } from "formik";
-import { keys, last, omit, uniq } from "lodash";
+import _ from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import Select from "react-select";
 import {
@@ -104,7 +104,7 @@ export function DinaUserForm({
           type: updatedUser.type
         }
       ],
-      { apiBaseUrl: "/user-api" }
+      { apiBaseUrl: "/user-api", skipOperationForSingleRequest: true }
     );
 
     await router.push(`/dina-user/view?id=${submittedValues.id}`);
@@ -161,10 +161,10 @@ export function RolesPerGroupEditor({
       <FieldArray name="rolesPerGroup">
         {({ form }) => {
           const usersGroups =
-            keys((form.values as DinaUser).rolesPerGroup) ?? [];
+            _.keys((form.values as DinaUser).rolesPerGroup) ?? [];
 
           const unsetGroupOptions = groupSelectOptions.filter(
-            (it) => !keys(form.values.rolesPerGroup).includes(it.value)
+            (it) => !_.keys(form.values.rolesPerGroup).includes(it.value)
           );
 
           return (
@@ -199,14 +199,14 @@ export function RolesPerGroupEditor({
                             isMulti={true}
                             // Only allow one group at a time:
                             onChange={(selectedRoles, formik) => {
-                              const newRole = last(selectedRoles);
+                              const newRole = _.last(selectedRoles);
                               formik.setFieldValue(
                                 `rolesPerGroup.${groupName}`,
                                 newRole ? [newRole] : []
                               );
                             }}
                             // Options should be the possible groups or the
-                            options={uniq([
+                            options={_.uniq([
                               ...editableRoles,
                               ...(initialRolesPerGroup[groupName] ?? [])
                             ]).map((it) => ({
@@ -223,7 +223,7 @@ export function RolesPerGroupEditor({
                               onClick={() => {
                                 form.setFieldValue(
                                   "rolesPerGroup",
-                                  omit(form.values.rolesPerGroup, groupName)
+                                  _.omit(form.values.rolesPerGroup, groupName)
                                 );
                               }}
                             >

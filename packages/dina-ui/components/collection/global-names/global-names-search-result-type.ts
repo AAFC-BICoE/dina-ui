@@ -7,6 +7,13 @@ export interface GlobalNamesSearchResult {
   curation: string;
 }
 
+export interface GlobalNamesDatasetsResult {
+  id: number;
+  titleShort: string;
+  title: string;
+  hasTaxonData: boolean;
+}
+
 export interface BestResult {
   dataSourceId: number;
   dataSourceTitleShort: string;

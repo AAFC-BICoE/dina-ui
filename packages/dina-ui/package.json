@@ -1,6 +1,6 @@
 {
   "name": "dina-ui",
-  "version": "0.190.0",
+  "version": "0.192.1",
   "scripts": {
     "build": "run-s next:build next:export",
     "dev": "next",
@@ -24,13 +24,11 @@
     "esri-loader": "^3.3.0",
     "esri-loader-hooks": "^0.4.0",
     "moment": "^2.29.4",
-    "next-transpile-modules": "^9.0.0",
-    "react-dnd": "^15.1.2",
-    "react-dnd-html5-backend": "^15.1.2",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dropzone-uploader": "^2.11.0",
-    "react-switch": "^6.0.0",
-    "react-tabs": "^3.2.3",
-    "react-pdf": "5.7.2",
+    "react-switch": "^7.1.0",
+    "react-tabs": "^6.1.0",
     "zod": "^3.11.6"
   },
   "devDependencies": {

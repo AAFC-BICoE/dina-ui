@@ -18,7 +18,9 @@ const COLLECTION_TABLE_COLUMNS: ColumnDefinition<Collection>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/collection/collection/view?id=${id}`}>{name || id}</Link>
+      <Link href={`/collection/collection/view?id=${id}`} legacyBehavior>
+        {name || id}
+      </Link>
     ),
     accessorKey: "name",
     header: () => <FieldHeader name="name" />

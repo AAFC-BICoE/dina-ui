@@ -1,5 +1,5 @@
 import { FieldWrapper, FieldWrapperProps } from "common-ui";
-import { castArray, startCase } from "lodash";
+import _ from "lodash";
 import { GroupBase } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
@@ -94,7 +94,7 @@ export function VocabularyReadOnlyView({ path, value }) {
   const { toOption } = useVocabularyOptions({ path });
   return value ? (
     <div>
-      {castArray(value)
+      {_.castArray(value)
         .map((text) => toOption(text).label)
         .join(", ")}
     </div>
@@ -118,8 +118,8 @@ export function VocabularyFieldHeader({
     (vocabulary.key || vocabulary.id);
   return (
     <>
-      {referencedBy ? startCase(referencedBy) + " - " : ""}
-      {startCase(label)}
+      {referencedBy ? _.startCase(referencedBy) + " - " : ""}
+      {_.startCase(label)}
     </>
   );
 }

@@ -8,7 +8,7 @@ import Kitsu, {
   PersistedResource
 } from "kitsu";
 import { deserialise, error as kitsuError } from "kitsu-core";
-import { compact, fromPairs, isEmpty, keys, omit } from "lodash";
+import _ from "lodash";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { OperationsResponse } from "..";
@@ -43,6 +43,12 @@ export interface DoOperationsOptions {
   returnNullForMissingResource?: boolean;
 
   overridePatchOperation?: boolean;
+
+  /**
+   * If true, the client will handle requests with only 1 request as a single request instead of an
+   * operation. Default is false for now to keep the same behavior as before for backwards compatibility.
+   */
+  skipOperationForSingleRequest?: boolean;
 }
 
 /** Api client interface. */
@@ -155,29 +161,115 @@ export class ApiClientImpl implements ApiClientI {
 
   /**
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.
+   *
+   * If a single request is provided, it will perform the request without the
+   * operation directly. It will still return like an operation response. This is only enabled if
+   * skipOperationForSingleRequest is set to true.
    */
   public async doOperations(
     operations: Operation[],
-    { apiBaseUrl = "", returnNullForMissingResource }: DoOperationsOptions = {}
+    {
+      apiBaseUrl = "",
+      returnNullForMissingResource,
+      skipOperationForSingleRequest
+    }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
+    // Check if no operations were provided and skip performing anything.
+    if (operations.length === 0) {
+      console.warn("Empty operation skipped... Returning empty array.");
+      return [];
+    }
+
     // Unwrap the configured axios instance from the Kitsu instance.
     const { axios } = this.apiClient;
 
-    // Do the operations request.
-    const axiosResponse = await axios.patch(
-      `${apiBaseUrl}/operations`,
-      operations,
-      {
-        headers: {
-          Accept: "application/json-patch+json",
-          "Content-Type": "application/json-patch+json",
-          "Crnk-Compact": "true"
-        }
-      }
-    );
+    // This array will hold the responses from either the single or bulk request
+    let responses: OperationsResponse | BulkGetOperation[];
 
-    const responses: OperationsResponse | BulkGetOperation[] =
-      axiosResponse.data;
+    // Depending on the number of requests being made determines if it's an operation or just a
+    // single request.
+    if (operations.length === 1 && skipOperationForSingleRequest) {
+      // Single Request Only
+      const operation = operations[0];
+
+      // Request variables
+      const url = `${apiBaseUrl}/${operation.path}`;
+      const headers = {
+        Accept: "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+        "Crnk-Compact": "true"
+      };
+
+      switch (operation.op.toUpperCase()) {
+        case "GET":
+          const getResponse = await axios.get(url, { headers });
+          responses = [
+            {
+              data: getResponse?.data?.data,
+              included: getResponse?.data?.included,
+              status: getResponse?.status
+            }
+          ];
+          break;
+        case "POST":
+          const postResponse = await axios.post(
+            url,
+            { data: operation.value },
+            { headers }
+          );
+          responses = [
+            {
+              data: postResponse?.data?.data,
+              included: postResponse?.data?.included,
+              status: postResponse?.status
+            }
+          ];
+          break;
+        case "PATCH":
+          const patchResponse = await axios.patch(
+            url,
+            { data: operation.value },
+            { headers }
+          );
+          responses = [
+            {
+              data: patchResponse?.data?.data,
+              included: patchResponse?.data?.included,
+              status: patchResponse?.status
+            }
+          ];
+          break;
+        case "DELETE":
+          const deleteResponse = await axios.delete(url, {
+            headers: {
+              "Content-Type": "application/vnd.api+json"
+            }
+          });
+          responses = [
+            {
+              status: deleteResponse.status
+            } as any
+          ];
+          break;
+        default:
+          throw new Error(`Unsupported single operation: ${operation.op}`);
+      }
+    } else {
+      // Perform operations
+      const axiosResponse = await axios.patch(
+        `${apiBaseUrl}/operations`,
+        operations,
+        {
+          headers: {
+            Accept: "application/json-patch+json",
+            "Content-Type": "application/json-patch+json",
+            "Crnk-Compact": "true"
+          }
+        }
+      );
+
+      responses = axiosResponse.data;
+    }
 
     // Optionally return null instead of throwing an error for missing resources:
     if (returnNullForMissingResource) {
@@ -199,7 +291,7 @@ export class ApiClientImpl implements ApiClientI {
       getErrorMessages(responses);
 
     // If there is an error message, throw it.
-    if (errorMessage || !isEmpty(fieldErrors)) {
+    if (errorMessage || !_.isEmpty(fieldErrors)) {
       throw new DoOperationsError(
         errorMessage ?? "",
         fieldErrors,
@@ -332,12 +424,12 @@ export function getErrorMessages(
   // Filter down to just the error responses.
   const errorResponses = operationsResponse
     .map((res, index: number) => ({ index, response: res as FailedOperation }))
-    .filter(({ response }) => !/2../.test(response.status.toString()));
+    .filter(({ response }) => !/2../.test(response?.status?.toString()));
 
   const individualErrors = errorResponses.map(({ response, index }) => {
     // Map the error responses to JsonApiErrors.
     // Ignore any error responses without an 'errors' field.
-    const jsonApiErrors = compact(response.errors);
+    const jsonApiErrors = _.compact(response.errors);
 
     // Convert the JsonApiErrors to an aggregated error string.
     const errorMessage =
@@ -351,7 +443,7 @@ export function getErrorMessages(
         )
         .join("\n") || null;
 
-    const fieldErrors = fromPairs(
+    const fieldErrors = _.fromPairs(
       jsonApiErrors
         // Only include field-level errors in the fieldErrors:
         .filter((error) => error.source?.pointer && error.detail)
@@ -365,7 +457,7 @@ export function getErrorMessages(
   });
 
   const overallErrorMessage =
-    compact(individualErrors.map((it) => it.errorMessage)).join("\n") || null;
+    _.compact(individualErrors.map((it) => it.errorMessage)).join("\n") || null;
   const overallFieldErrors = individualErrors.reduce(
     (total, curr) => ({ ...total, ...curr.fieldErrors }),
     {}
@@ -425,7 +517,7 @@ export class CustomDinaKitsu extends Kitsu {
    * Override the 'get' method so it works with our long URLs:
    */
   async get(path: string, params: GetParams = {}) {
-    const { responseType, timeout, ...paramsNet } = omit(params, "header");
+    const { responseType, timeout, ...paramsNet } = _.omit(params, "header");
     try {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },
@@ -439,7 +531,7 @@ export class CustomDinaKitsu extends Kitsu {
 
       // Omit relationships where: { data: null } because they do not deserialize properly:
       const relationships = deserialized?.data?.relationships;
-      for (const key of keys(relationships)) {
+      for (const key of _.keys(relationships)) {
         if (relationships?.[key]?.data === null) {
           delete relationships[key];
         }

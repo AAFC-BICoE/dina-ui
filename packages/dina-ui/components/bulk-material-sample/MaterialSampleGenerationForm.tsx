@@ -13,7 +13,7 @@ import {
 } from "common-ui";
 import { Field, FormikContextType, useFormikContext } from "formik";
 import { InputResource } from "kitsu";
-import { padStart, range } from "lodash";
+import _ from "lodash";
 import { useState } from "react";
 import SpreadSheetColumn from "spreadsheet-column";
 import * as yup from "yup";
@@ -325,7 +325,7 @@ function PreviewAndCustomizeFields({ generationMode }: GeneratorFieldsProps) {
               return null;
             }
 
-            return range(0, formState.numberToCreate).map((index) => {
+            return _.range(0, formState.numberToCreate).map((index) => {
               const placeholder = generateName({
                 index,
                 generationMode,
@@ -390,7 +390,7 @@ function generateSeriesSuffix({ index, formState }: GenerateNameParams) {
         ? String(suffixNumber).length
         : suffixLength ?? String(suffixNumber).length;
 
-    return padStart(String(suffixNumber), computedSuffixLen, "0");
+    return _.padStart(String(suffixNumber), computedSuffixLen, "0");
   } else {
     const start = formState.start || "A";
     try {

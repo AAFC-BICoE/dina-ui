@@ -150,7 +150,7 @@ export function useDeleteMolecularAnalysisWorkflows() {
         }
       }
     }
-    const molecularAnlysisDeleteArgs: DeleteArgs[] = resourceIds.map(
+    const molecularAnalysisDeleteArgs: DeleteArgs[] = resourceIds.map(
       (resourceId) => ({
         delete: {
           id: resourceId,
@@ -160,8 +160,8 @@ export function useDeleteMolecularAnalysisWorkflows() {
     );
 
     // Can delete workflow with protocol linked
-    await save(molecularAnlysisDeleteArgs, {
-      apiBaseUrl: `/seqdb-api/generic-molecular-analysis/`
+    await save(molecularAnalysisDeleteArgs, {
+      apiBaseUrl: `/seqdb-api/generic-molecular-analysis`
     });
     setReloadResource(Date.now());
   }

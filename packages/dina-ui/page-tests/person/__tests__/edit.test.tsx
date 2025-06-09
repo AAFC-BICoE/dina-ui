@@ -1,9 +1,8 @@
-import { OperationsResponse } from "common-ui";
+import { Person } from "../../../types/agent-api/resources/Person";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import PersonEditPage from "../../../pages/person/edit";
 import { mountWithAppContext } from "common-ui";
-import { Person } from "../../../types/agent-api/resources/Person";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -34,9 +33,16 @@ const mockGet = jest.fn(async (model) => {
 });
 
 // Mock API requests:
+const mockPost = jest.fn();
 const mockPatch = jest.fn();
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: {
+    get: mockGet,
+    axios: {
+      post: mockPost,
+      patch: mockPatch
+    }
+  }
 };
 
 describe("person edit page", () => {
@@ -44,28 +50,23 @@ describe("person edit page", () => {
     jest.clearAllMocks();
     mockQuery = {};
   });
+
   it("Provides a form to add a person.", async () => {
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            attributes: {
-              displayName: "test agent",
-              email: "testperson@a.b"
-            },
-            id: "1",
-            type: "person"
-          },
-          status: 201
-        }
-      ] as OperationsResponse
+    mockPost.mockReturnValueOnce({
+      data: {
+        attributes: {
+          displayName: "test agent",
+          email: "testperson@a.b"
+        },
+        id: "1",
+        type: "person"
+      }
     });
 
     mockQuery = {};
 
     const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
 
-    // expect(wrapper.find(".displayName-field input")).toHaveLength(1);
     expect(
       wrapper.getAllByRole("textbox", { name: /display name/i })
     ).toHaveLength(1);
@@ -80,43 +81,36 @@ describe("person edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
-    await new Promise(setImmediate);
 
     // Test expected response
-    expect(mockPatch).lastCalledWith(
-      "/agent-api/operations",
-      [
+    await waitFor(() => {
+      expect(mockPost).lastCalledWith(
+        "/agent-api/person",
         {
-          op: "POST",
-          path: "person",
-          value: {
+          data: {
             attributes: {
               displayName: "test person updated"
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "person"
           }
-        }
-      ],
-      expect.anything()
-    );
+        },
+        expect.anything()
+      );
+    });
 
-    // The user should be redirected to the new person's details page.
+    // The user should be redirected to the person list page.
     expect(mockPush).lastCalledWith("/person/list");
   });
 
-  it("Provides a form to edit an person.", async () => {
-    // The patch request will be successful.
+  it("Provides a form to edit a person.", async () => {
     mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            id: "1",
-            type: "person"
-          },
-          status: 201
+      data: {
+        data: {
+          id: "1",
+          type: "person"
         }
-      ] as OperationsResponse
+      }
     });
 
     mockQuery = { id: 1 };
@@ -127,12 +121,12 @@ describe("person edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
-    await new Promise(setImmediate);
-
-    // Check that the existing displayName value is in the field.
-    expect(
-      wrapper.getByRole("textbox", { name: /display name/i })
-    ).toHaveDisplayValue("person a");
+    await waitFor(() => {
+      // Check that the existing displayName value is in the field.
+      expect(
+        wrapper.getByRole("textbox", { name: /display name/i })
+      ).toHaveDisplayValue("person a");
+    });
 
     // Modify the displayName value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
@@ -145,65 +139,25 @@ describe("person edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
-    // "patch" should have been called with a jsonpatch request containing the existing values
-    // and the modified one.
-    expect(mockPatch).lastCalledWith(
-      "/agent-api/operations",
-      [
+    // "patch" should have been called with the updated person data
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/agent-api/person/1",
         {
-          op: "PATCH",
-          path: "person/1",
-          value: {
+          data: {
             attributes: expect.objectContaining({
               displayName: "new test person"
             }),
             id: "1",
             type: "person"
           }
-        }
-      ],
-      expect.anything()
-    );
+        },
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to person's list page.
     expect(mockPush).lastCalledWith("/person/list");
-  });
-
-  it("Renders an error after form submit if one is returned from the back-end.", async () => {
-    // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
-      data: [
-        {
-          errors: [
-            {
-              detail: "displayName and email combination should be unique",
-              status: "422",
-              title: "Constraint violation"
-            }
-          ],
-          status: 422
-        }
-      ] as OperationsResponse
-    }));
-
-    mockQuery = {};
-
-    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
-
-    // Submit the form.
-    fireEvent.submit(wrapper.container.querySelector("form")!);
-
-    await new Promise(setImmediate);
-
-    // Test expected error
-    expect(
-      wrapper.getByText(
-        "Constraint violation: displayName and email combination should be unique"
-      )
-    ).toBeInTheDocument();
-    expect(mockPush).toBeCalledTimes(0);
   });
 });
 

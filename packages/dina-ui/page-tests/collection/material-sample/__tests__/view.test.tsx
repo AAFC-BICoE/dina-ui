@@ -6,6 +6,7 @@ import {
   MaterialSample
 } from "../../../../types/collection-api";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const TEST_COLLECTION_EVENT: CollectingEvent = {
   startEventDateTime: "2019_01_01_10_10_10",
@@ -94,10 +95,11 @@ describe("Material Sample View Page", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
-
     // Test Material Sample Name and Collecting Date Start Event Date Time to be rendered
-    expect(wrapper.getAllByText("my-sample-name")[0]).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getAllByText("my-sample-name")[0]).toBeInTheDocument();
+    });
+
     expect(wrapper.getByText("2019_01_01_10_10_10")).toBeInTheDocument();
   });
 
@@ -109,12 +111,12 @@ describe("Material Sample View Page", () => {
       testCtx
     );
 
-    await new Promise(setImmediate);
-
     // Both organism sections should be expanded:
-    expect(wrapper.getAllByRole("button", { name: /•/i })).toHaveLength(2);
-    expect(wrapper.getAllByText(/test lifestage 1/i)[1]).toBeInTheDocument();
-    expect(wrapper.getAllByText(/test lifestage 2/i)[1]).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getAllByRole("button", { name: /•/i })).toHaveLength(2);
+      expect(wrapper.getAllByText(/test lifestage 1/i)[1]).toBeInTheDocument();
+      expect(wrapper.getAllByText(/test lifestage 2/i)[1]).toBeInTheDocument();
+    });
 
     // Only 1 organism has a determination:
     expect(

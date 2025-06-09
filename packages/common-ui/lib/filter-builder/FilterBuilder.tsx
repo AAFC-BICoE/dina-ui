@@ -1,4 +1,4 @@
-import { isEqual, pull } from "lodash";
+import _ from "lodash";
 import React from "react";
 import { FilterBuilderContextProvider } from "./FilterBuilderContext";
 import {
@@ -209,7 +209,7 @@ export class FilterBuilder extends React.Component<
     parent: FilterGroupModel;
   }) {
     // Remove the filter row from the parent's children array.
-    parent.children = pull(parent.children, filter);
+    parent.children = _.pull(parent.children, filter);
 
     this.flattenModel(this.state.model);
 
@@ -312,7 +312,7 @@ export class FilterBuilder extends React.Component<
       }
       case "FILTER_ROW": {
         // Don't show the remove button when this is the only FilterRow.
-        const showRemoveButton = !isEqual(this.state.model.children, [model]);
+        const showRemoveButton = !_.isEqual(this.state.model.children, [model]);
 
         return (
           <FilterRow

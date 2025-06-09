@@ -1,4 +1,4 @@
-import { isPlainObject } from "lodash";
+import _ from "lodash";
 import { useEffect } from "react";
 import DatePicker from "react-datepicker";
 
@@ -25,7 +25,7 @@ export function FilterRowDatePicker({
   useEffect(() => {
     const today = defaultDate().toString();
     // Init default DateRange:
-    if (isRange && !isPlainObject(value)) {
+    if (isRange && !_.isPlainObject(value)) {
       onDateValueChanged({ low: today, high: today });
     }
     // Init default single date string:
@@ -34,7 +34,7 @@ export function FilterRowDatePicker({
     }
   }, [isRange]);
 
-  if (isRange && isPlainObject(value) && typeof value !== "string") {
+  if (isRange && _.isPlainObject(value) && typeof value !== "string") {
     const { high, low } = value;
 
     return (

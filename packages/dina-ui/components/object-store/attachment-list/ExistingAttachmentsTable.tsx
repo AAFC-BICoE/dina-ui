@@ -9,7 +9,7 @@ import {
   useGroupedCheckBoxes
 } from "common-ui";
 import { FormikContextType } from "formik";
-import { toPairs } from "lodash";
+import _ from "lodash";
 import Link from "next/link";
 import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -77,7 +77,7 @@ export function ExistingAttachmentsTable({
 
         return metadata?.originalFilename ? (
           <Link href={`/object-store/object/view?id=${id}`} passHref={true}>
-            <a>{metadata?.originalFilename}</a>
+            {metadata?.originalFilename}
           </Link>
         ) : null;
       },
@@ -119,7 +119,7 @@ export function ExistingAttachmentsTable({
   async function editSelectedMetadatas({
     selectedMetadatas
   }: AttachmentsTableFormValues) {
-    const metadataIds = toPairs(selectedMetadatas)
+    const metadataIds = _.toPairs(selectedMetadatas)
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
 
@@ -132,7 +132,7 @@ export function ExistingAttachmentsTable({
   async function detachSelectedMetadatas({
     selectedMetadatas
   }: AttachmentsTableFormValues) {
-    const metadataIds = toPairs(selectedMetadatas)
+    const metadataIds = _.toPairs(selectedMetadatas)
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
 

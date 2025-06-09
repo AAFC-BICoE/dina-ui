@@ -1,4 +1,4 @@
-import { uniq } from "lodash";
+import _ from "lodash";
 import { CsvRow, LANGUAGES, MessageDictionary } from "./intl-config";
 import { utils as sheetUtils } from "xlsx";
 
@@ -18,7 +18,7 @@ export function messagesToCsv(messageDictionary: MessageDictionary): string {
       []
     );
 
-    const keys = uniq(keysWithDuplicates);
+    const keys = _.uniq(keysWithDuplicates);
 
     const { english, french } = appConfig;
 

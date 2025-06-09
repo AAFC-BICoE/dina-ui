@@ -1,6 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useFormikContext } from "formik";
-import { get, noop } from "lodash";
+import _ from "lodash";
 import { useEffect } from "react";
 
 export const DEFAULT_GROUP_STORAGE_KEY = "default_group";
@@ -25,13 +25,13 @@ export function useStoredDefaultGroup({
 
   useEffect(() => {
     // Set the default group value when there is no existing value:
-    const existingValue = get(initialValues, groupFieldName);
+    const existingValue = _.get(initialValues, groupFieldName);
     if (enable && typeof existingValue === "undefined" && storedDefaultGroup) {
       setFieldValue(groupFieldName, storedDefaultGroup);
     }
   }, []);
 
   return {
-    setStoredDefaultGroupIfEnabled: enable ? setStoredDefaultGroup : noop
+    setStoredDefaultGroupIfEnabled: enable ? setStoredDefaultGroup : _.noop
   };
 }

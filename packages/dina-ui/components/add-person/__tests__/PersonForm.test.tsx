@@ -1,7 +1,7 @@
 import { AddPersonButton, PersonForm } from "../PersonForm";
 import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../types/objectstore-api";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 
 const mockSave = jest.fn();
 
@@ -40,21 +40,22 @@ describe("PersonForm", () => {
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
 
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            displayName: "new test person",
-            email: "person@example.com",
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              displayName: "new test person",
+              email: "person@example.com",
+              type: "person"
+            },
             type: "person"
-          },
-          type: "person"
-        }
-      ],
-      { apiBaseUrl: "/agent-api" }
-    );
+          }
+        ],
+        { apiBaseUrl: "/agent-api", skipOperationForSingleRequest: true }
+      );
+    });
   });
 
   it("Submits the aliases as any array.", async () => {
@@ -65,22 +66,23 @@ describe("PersonForm", () => {
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await new Promise(setImmediate);
 
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            aliases: ["alias1", "alias2", "alias3"],
-            displayName: "test-person",
-            email: "a@b.com",
-            type: "person",
-            uuid: "11111"
-          },
-          type: "person"
-        }
-      ],
-      { apiBaseUrl: "/agent-api" }
-    );
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              aliases: ["alias1", "alias2", "alias3"],
+              displayName: "test-person",
+              email: "a@b.com",
+              type: "person",
+              uuid: "11111"
+            },
+            type: "person"
+          }
+        ],
+        { apiBaseUrl: "/agent-api", skipOperationForSingleRequest: true }
+      );
+    });
   });
 });

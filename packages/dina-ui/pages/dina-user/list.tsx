@@ -10,7 +10,11 @@ const USER_TABLE_COLUMNS: ColumnDefinition<any>[] = [
       row: {
         original: { id, username }
       }
-    }) => <Link href={`/dina-user/view?id=${id}`}>{username}</Link>,
+    }) => (
+      <Link href={`/dina-user/view?id=${id}`} legacyBehavior>
+        {username}
+      </Link>
+    ),
     accessorKey: "username"
   },
   {
@@ -20,7 +24,9 @@ const USER_TABLE_COLUMNS: ColumnDefinition<any>[] = [
       }
     }) =>
       agent?.id ? (
-        <Link href={`/person/view?id=${agent.id}`}>{agent.displayName}</Link>
+        <Link href={`/person/view?id=${agent.id}`} legacyBehavior>
+          {agent.displayName}
+        </Link>
       ) : null,
     accessorKey: "agent.displayName",
     enableSorting: false
@@ -70,6 +76,7 @@ export default function AgentListPage() {
               }
             ]
           }}
+          defaultSort={[{ id: "username", desc: false }]}
         />
       </main>
       <Footer />

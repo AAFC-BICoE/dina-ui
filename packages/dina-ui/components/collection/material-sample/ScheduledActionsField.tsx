@@ -15,7 +15,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FormikContextType } from "formik";
-import { isEmpty } from "lodash";
+import _ from "lodash";
 import { Fragment, ReactNode, useState } from "react";
 import * as yup from "yup";
 import { UserSelectField } from "../..";
@@ -117,6 +117,7 @@ export function ScheduledActionsField({
           <UserSelectField
             name={`${fieldName}[${row.index}].assignedTo`}
             removeLabel={true}
+            additionalSort="username"
           />
         </DinaFormSection>
       )
@@ -295,7 +296,7 @@ export function ScheduledActionSubForm({
   const submitAction: OnFormikSubmit<any> = async (newAction, formik) => {
     // Return if the sub-form has errors:
     const formErrors = await formik.validateForm();
-    if (!isEmpty(formErrors)) {
+    if (!_.isEmpty(formErrors)) {
       formik.setErrors({ ...formik.errors, ...formErrors });
       return;
     }
@@ -363,6 +364,7 @@ export function ScheduledActionSubForm({
             <UserSelectField
               {...fieldProps("assignedTo")}
               className="col-sm-6"
+              additionalSort="username"
             />
           </div>
           <TextField {...fieldProps("remarks")} multiLines={true} />

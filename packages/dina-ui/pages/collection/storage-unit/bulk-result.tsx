@@ -36,9 +36,7 @@ export default function StorageUnitBulkResult() {
                 {(units as PersistedResource<StorageUnit>[]).map((unit) => (
                   <div className="d-flex flex-row mx-3" key={unit.id}>
                     <Link href={`/collection/storage-unit/view?id=${unit.id}`}>
-                      <a>
-                        {unit["storageUnitType"]?.["name"] + " " + unit["name"]}
-                      </a>
+                      {unit["storageUnitType"]?.["name"] + " " + unit["name"]}
                     </Link>
                   </div>
                 ))}

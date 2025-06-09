@@ -7,7 +7,7 @@ export const STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<StorageUni
   {
     name: ({ id, name }) => (
       <Link href={`/collection/storage-unit-type/view?id=${id}`}>
-        <a>{name || id}</a>
+        {name || id}
       </Link>
     ),
     customValueCells: {

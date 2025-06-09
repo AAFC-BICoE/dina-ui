@@ -2,6 +2,7 @@ import ThermocyclerProfileListPage from "../../../../pages/seqdb/thermocycler-pr
 import { mountWithAppContext } from "common-ui";
 import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -36,11 +37,10 @@ describe("PcrProfile list page", () => {
       apiContext
     });
 
-    // Wait for the page to load
-    await new Promise(setImmediate);
-
     // Check that the table contains the links to profile details pages.
-    expect(wrapper.getByText(/test profile 1/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/test profile 2/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/test profile 1/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/test profile 2/i)).toBeInTheDocument();
+    });
   });
 });

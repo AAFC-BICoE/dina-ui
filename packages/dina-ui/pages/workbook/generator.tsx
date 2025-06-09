@@ -20,7 +20,6 @@ import { useMemo, useState } from "react";
 import { DynamicFieldsMappingConfig } from "common-ui/lib/list-page/types";
 import { dynamicFieldMappingForMaterialSample } from "../collection/material-sample/list";
 import Link from "next/link";
-import { isEqual } from "lodash";
 import FieldMappingConfig from "../../components/workbook/utils/FieldMappingConfig";
 import {
   FieldOptionType,
@@ -143,16 +142,6 @@ export function WorkbookTemplateGenerator() {
       }
     };
 
-    // If columns and aliases are the same, do not send the aliases over.
-    if (
-      isEqual(
-        generateTemplateArg.data.attributes.columns,
-        generateTemplateArg.data.attributes?.aliases ?? []
-      )
-    ) {
-      delete generateTemplateArg.data.attributes.aliases;
-    }
-
     try {
       const workbookGenerationPostResponse = await apiClient.axios.post(
         "objectstore-api/workbook/generation",
@@ -231,10 +220,8 @@ export function WorkbookTemplateGenerator() {
         buttonBarContent={
           <>
             <div className="col-md-6 col-sm-12 mt-2">
-              <Link href={"/workbook/upload"}>
-                <a className={`back-button my-auto`}>
-                  <DinaMessage id={"backToUploadWorkbook"} />
-                </a>
+              <Link href={"/workbook/upload"} className={`back-button my-auto`}>
+                <DinaMessage id={"backToUploadWorkbook"} />
               </Link>
             </div>
             <div className="col-md-6 col-sm-12 d-flex">

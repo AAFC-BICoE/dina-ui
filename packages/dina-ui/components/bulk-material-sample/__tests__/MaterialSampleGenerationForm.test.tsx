@@ -2,7 +2,11 @@ import { writeStorage } from "@rehooks/local-storage";
 import { mountWithAppContext } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../group-select/useStoredDefaultGroup";
 import { MaterialSampleGenerationForm } from "../MaterialSampleGenerationForm";
-import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  fireEvent,
+  waitForElementToBeRemoved,
+  waitFor
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -55,7 +59,13 @@ describe("MaterialSampleGenerationForm", () => {
       <MaterialSampleGenerationForm onGenerate={mockOnGenerate} />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("combobox", {
+          name: /collection type here to search\./i
+        })
+      ).toBeInTheDocument();
+    });
 
     // Fill out the form
     // Change the collection
@@ -113,42 +123,42 @@ describe("MaterialSampleGenerationForm", () => {
     );
 
     fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
-    await new Promise(setImmediate);
-
-    // Sample initialValues are created with the expected names and the linked collection:
-    expect(mockOnGenerate).lastCalledWith({
-      generationMode: "SERIES",
-      samples: expectedNames.map((name) => ({
-        parentMaterialSample: undefined,
-        collection: {
-          id: "100",
-          code: "TC",
-          name: "test-collection",
-          type: "collection"
-        },
-        group: "aafc",
-        sourceSet: "sourceSet1",
-        materialSampleName: name,
-        publiclyReleasable: true,
-        type: "material-sample"
-      })),
-      submittedValues: {
-        baseName: "my-sample",
-        collection: {
-          id: "100",
-          name: "test-collection",
-          code: "TC",
-          type: "collection"
-        },
-        group: "aafc",
-        increment: "NUMERICAL",
-        numberToCreate: "5",
-        sourceSet: "sourceSet1",
-        samples: [],
-        separator: "-",
-        start: "00001",
-        suffix: ""
-      }
+    await waitFor(() => {
+      // Sample initialValues are created with the expected names and the linked collection:
+      expect(mockOnGenerate).lastCalledWith({
+        generationMode: "SERIES",
+        samples: expectedNames.map((name) => ({
+          parentMaterialSample: undefined,
+          collection: {
+            id: "100",
+            code: "TC",
+            name: "test-collection",
+            type: "collection"
+          },
+          group: "aafc",
+          sourceSet: "sourceSet1",
+          materialSampleName: name,
+          publiclyReleasable: true,
+          type: "material-sample"
+        })),
+        submittedValues: {
+          baseName: "my-sample",
+          collection: {
+            id: "100",
+            name: "test-collection",
+            code: "TC",
+            type: "collection"
+          },
+          group: "aafc",
+          increment: "NUMERICAL",
+          numberToCreate: "5",
+          sourceSet: "sourceSet1",
+          samples: [],
+          separator: "-",
+          start: "00001",
+          suffix: ""
+        }
+      });
     });
   });
 });
