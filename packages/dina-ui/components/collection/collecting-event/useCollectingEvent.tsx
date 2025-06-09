@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
-import { compact, omit, orderBy, toPairs, isEqual, cloneDeep } from "lodash";
+import _ from "lodash";
 import { useMemo } from "react";
 import * as yup from "yup";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -21,7 +21,6 @@ import { Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
-import { uniqBy } from "lodash";
 
 export function useCollectingEventQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -40,7 +39,7 @@ export function useCollectingEventQuery(id?: string | null) {
           // Retrieve georeferencedBy agent arrays on GeoReferenceAssertions.
           for (const assertion of data.geoReferenceAssertions) {
             if (assertion.georeferencedBy) {
-              assertion.georeferencedBy = compact(
+              assertion.georeferencedBy = _.compact(
                 await bulkGet<Person, true>(
                   assertion.georeferencedBy.map(
                     (personId: string) => `/person/${personId}`
@@ -56,7 +55,7 @@ export function useCollectingEventQuery(id?: string | null) {
         }
 
         // Order GeoReferenceAssertions by "createdOn" ascending:
-        data.geoReferenceAssertions = orderBy(
+        data.geoReferenceAssertions = _.orderBy(
           data.geoReferenceAssertions,
           "createdOn"
         );
@@ -90,8 +89,8 @@ export function useCollectingEventQuery(id?: string | null) {
             data.extensionValues
           );
         }
-        data.attachment = uniqBy(data.attachment, "id");
-        data.collectors = uniqBy(data.collectors, "id");
+        data.attachment = _.uniqBy(data.attachment, "id");
+        data.collectors = _.uniqBy(data.collectors, "id");
       }
     }
   );
@@ -227,7 +226,7 @@ export function useCollectingEventSave({
     ) {
       // Parse srcAdminLevels to geographicPlaceNameSourceDetail
       // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
-      const sectionIds = toPairs(collectingEventDiff.selectedSections)
+      const sectionIds = _.toPairs(collectingEventDiff.selectedSections)
         .filter((pair) => pair[1])
         .map((pair) => pair[0]);
 
@@ -249,10 +248,10 @@ export function useCollectingEventSave({
                   (id) => id === srcAdminLevel.shortId?.toString()
                 ).length
               )
-                newSourceDetail.selectedGeographicPlace = omit(srcAdminLevel, [
-                  "shortId",
-                  "type"
-                ]);
+                newSourceDetail.selectedGeographicPlace = _.omit(
+                  srcAdminLevel,
+                  ["shortId", "type"]
+                );
             }
           } else {
             if (
@@ -261,7 +260,7 @@ export function useCollectingEventSave({
               ).length
             ) {
               newSourceDetail.higherGeographicPlaces?.push(
-                omit(srcAdminLevel, ["shortId", "type"])
+                _.omit(srcAdminLevel, ["shortId", "type"])
               );
             }
           }
@@ -271,14 +270,14 @@ export function useCollectingEventSave({
     // Only apply changes if different from initial values or if creating a new record
     if (
       !collectingEventInitialValues.id || // For new collecting events
-      !isEqual(
+      !_.isEqual(
         collectingEventInitialValues.geographicPlaceNameSourceDetail,
         newSourceDetail
       )
     ) {
       if (Object.keys(newSourceDetail).length > 0) {
         // Clean place names before saving
-        const cleanedSourceDetail = cloneDeep(newSourceDetail);
+        const cleanedSourceDetail = _.cloneDeep(newSourceDetail);
 
         // Clean the selectedGeographicPlace name
         if (cleanedSourceDetail.selectedGeographicPlace?.name) {
@@ -322,7 +321,7 @@ export function useCollectingEventSave({
     const submittedSourceDetail =
       submittedValues.geographicPlaceNameSourceDetail ?? null;
 
-    if (!isEqual(initialSourceDetail, submittedSourceDetail)) {
+    if (!_.isEqual(initialSourceDetail, submittedSourceDetail)) {
       (collectingEventDiff.geographicPlaceNameSourceDetail as any) =
         submittedSourceDetail ?? null;
 

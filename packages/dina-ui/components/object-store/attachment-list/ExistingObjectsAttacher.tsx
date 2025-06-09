@@ -1,4 +1,5 @@
 import { dateCell, FieldHeader, QueryPage, stringArrayCell } from "common-ui";
+import _ from "lodash";
 import Link from "next/link";
 import { ThumbnailCell } from "../..";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";

@@ -27,7 +27,7 @@ import {
   UPPER_CHARACTER_TYPE
 } from "../../../types/collection-api/resources/SplitConfiguration";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { isUndefined, isEmpty } from "lodash";
+import _ from "lodash";
 
 export default function SplitConfigurationEditPage() {
   const router = useRouter();
@@ -109,22 +109,22 @@ export function SplitConfigurationForm({
     const newErrors: any = {};
 
     // Name is a required field
-    if (isUndefined(values?.name)) {
+    if (_.isUndefined(values?.name)) {
       newErrors.name = formatMessage("requiredField");
     }
 
     // Condition Material Sample Type is a required field
-    if (isEmpty(values?.conditionalOnMaterialSampleTypes)) {
+    if (_.isEmpty(values?.conditionalOnMaterialSampleTypes)) {
       newErrors.conditionalOnMaterialSampleTypes =
         formatMessage("requiredField");
     }
 
     // Strategy is a required field
-    if (isUndefined(values?.strategy)) {
+    if (_.isUndefined(values?.strategy)) {
       newErrors.strategy = formatMessage("requiredField");
     } else if (
       values.strategy === "TYPE_BASED" &&
-      isUndefined(values.materialSampleTypeCreatedBySplit)
+      _.isUndefined(values.materialSampleTypeCreatedBySplit)
     ) {
       newErrors.materialSampleTypeCreatedBySplit = formatMessage(
         "materialSampleSplitConfigurationRequiredMaterialSampleType"
@@ -132,12 +132,12 @@ export function SplitConfigurationForm({
     }
 
     // Character Type is a required field
-    if (isUndefined(values?.characterType)) {
+    if (_.isUndefined(values?.characterType)) {
       newErrors.characterType = formatMessage("requiredField");
     }
 
     // Separator is required.
-    if (isUndefined(values?.separator)) {
+    if (_.isUndefined(values?.separator)) {
       newErrors.separator = formatMessage("requiredField");
     }
 

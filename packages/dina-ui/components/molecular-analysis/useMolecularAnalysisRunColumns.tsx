@@ -50,7 +50,7 @@ export function useMolecularAnalysisRunColumns({
             <Link
               href={`/collection/material-sample/view?id=${original.materialSampleId}`}
             >
-              <a>{materialSampleName || original.materialSampleId}</a>
+              {materialSampleName || original.materialSampleId}
             </Link>
             {" ("}
             {original?.seqReaction?.seqPrimer?.name}
@@ -154,7 +154,7 @@ export function useMolecularAnalysisRunColumns({
             <Link
               href={`/collection/material-sample/view?id=${original.materialSampleId}`}
             >
-              <a>{materialSampleName || original.materialSampleId}</a>
+              {materialSampleName || original.materialSampleId}
             </Link>
           </>
         );
@@ -256,7 +256,7 @@ export function useMolecularAnalysisRunColumns({
               <Link
                 href={`/collection/material-sample/view?id=${original.materialSampleId}`}
               >
-                <a>{materialSampleName || original.materialSampleId}</a>
+                {materialSampleName || original.materialSampleId}
               </Link>
             </>
           );
@@ -317,7 +317,10 @@ export function useMolecularAnalysisRunColumns({
           const attachmentElements = attachments?.map((attachment, index) =>
             attachment ? (
               <React.Fragment key={attachment?.id}>
-                <Link href={`/object-store/object/view?id=${attachment?.id}`}>
+                <Link
+                  href={`/object-store/object/view?id=${attachment?.id}`}
+                  legacyBehavior
+                >
                   {attachment?.originalFilename}
                 </Link>
                 {index < attachments?.length - 1 && ", "}
@@ -496,7 +499,7 @@ export function useMolecularAnalysisRunColumns({
             <Link
               href={`/collection/material-sample/view?id=${original.materialSampleId}`}
             >
-              <a>{materialSampleName || original.materialSampleId}</a>
+              {materialSampleName || original.materialSampleId}
             </Link>
           </>
         );

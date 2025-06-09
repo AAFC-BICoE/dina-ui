@@ -1,4 +1,4 @@
-import { concat, difference, keys } from "lodash";
+import _ from "lodash";
 import { useState } from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import Select from "react-select";
@@ -34,10 +34,10 @@ export function GroupLabelsEditor({ valuesPath }: GroupLabelsEditorProps) {
     <FieldSpy<Record<string, string | null | undefined>> fieldName={valuesPath}>
       {(currentValue, { form }) => {
         const [visibleLanguages, setVisibleLanguages] = useState(
-          keys(currentValue)
+          _.keys(currentValue)
         );
         const [availableLanguages, setAvailableLanguages] = useState(
-          difference(supportedLanguagesArray, visibleLanguages)
+          _.difference(supportedLanguagesArray, visibleLanguages)
         );
 
         const languageOptions = availableLanguages.map(
@@ -85,7 +85,7 @@ export function GroupLabelsEditor({ valuesPath }: GroupLabelsEditorProps) {
                           );
                           // Add the language back to availableLanguages
                           setAvailableLanguages(
-                            concat(availableLanguages, language).sort()
+                            _.concat(availableLanguages, language).sort()
                           );
                           // Remove the language from visibleLanguages
                           setVisibleLanguages((languages) =>
@@ -108,7 +108,7 @@ export function GroupLabelsEditor({ valuesPath }: GroupLabelsEditorProps) {
                     if (selectedLang) {
                       // add the language to visibleLanguages
                       setVisibleLanguages(
-                        concat(visibleLanguages, selectedLang)
+                        _.concat(visibleLanguages, selectedLang)
                       );
                       // remove the language from availableLanguages
                       setAvailableLanguages((languages) =>

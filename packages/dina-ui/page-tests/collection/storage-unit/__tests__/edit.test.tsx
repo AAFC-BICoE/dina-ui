@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import { StorageUnitForm } from "../../../../components";
 import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../../types/collection-api";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -69,12 +69,12 @@ describe("Storage Unit edit page.", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
-
     // Test that A (Type) link is rendered
-    expect(
-      wrapper.getByText("A (" + STORAGE_UNIT_TYPE_NAME + ")")
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByText("A (" + STORAGE_UNIT_TYPE_NAME + ")")
+      ).toBeInTheDocument();
+    });
 
     // Change Name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -89,37 +89,41 @@ describe("Storage Unit edit page.", () => {
         name: /storage unit type type here to search\./i
       })
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("option", { name: /type/i })
+      ).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getByRole("option", { name: /type/i }));
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API response
-    expect(mockSave.mock.calls).toEqual([
-      [
+    await waitFor(() => {
+      expect(mockSave.mock.calls).toEqual([
         [
-          {
-            resource: {
-              name: "test-storage-unit",
-              isGeneric: false,
-              parentStorageUnit: expect.objectContaining({
-                id: "A",
+          [
+            {
+              resource: {
+                name: "test-storage-unit",
+                isGeneric: false,
+                parentStorageUnit: expect.objectContaining({
+                  id: "A",
+                  type: "storage-unit"
+                }),
+                storageUnitType: expect.objectContaining({
+                  id: "cabinet",
+                  type: "storage-unit-type"
+                }),
                 type: "storage-unit"
-              }),
-              storageUnitType: expect.objectContaining({
-                id: "cabinet",
-                type: "storage-unit-type"
-              }),
+              },
               type: "storage-unit"
-            },
-            type: "storage-unit"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
   });
 });

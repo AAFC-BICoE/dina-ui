@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { ExistingObjectsAttacher } from "../ExistingObjectsAttacher";
-import { screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
@@ -156,7 +156,13 @@ describe("ExistingObjectsAttacher component", () => {
     );
 
     // Await Metadata table to load:
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("checkbox", {
+          name: /check all/i
+        })
+      ).toBeInTheDocument();
+    });
 
     // Select all 3 metadatas to attach.
     fireEvent.click(
@@ -171,10 +177,9 @@ describe("ExistingObjectsAttacher component", () => {
       })
     );
 
-    // Await form submit:
-    await new Promise(setImmediate);
-
     // The 3 test Metadata IDs should have been submitted:
-    expect(mockSubmit).lastCalledWith(TEST_METADATAS.map(({ id }) => id));
+    await waitFor(() => {
+      expect(mockSubmit).lastCalledWith(TEST_METADATAS.map(({ id }) => id));
+    });
   });
 });

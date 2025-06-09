@@ -5,7 +5,7 @@ import {
   SaveArgs,
   useQuery
 } from "common-ui";
-import { Dictionary, toPairs } from "lodash";
+import _, { Dictionary } from "lodash";
 import { useContext, useState, useEffect } from "react";
 import {
   MaterialSampleSummary,
@@ -16,7 +16,6 @@ import {
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
 import { LibraryPrep, NgsIndex } from "packages/dina-ui/types/seqdb-api";
-import { isEqual } from "lodash";
 
 export interface UseIndexAssignmentReturn {
   libraryPrepsLoading: boolean;
@@ -199,7 +198,7 @@ export function useIndexAssignmentAPI({
     const edits: Dictionary<Partial<LibraryPrep>> = {};
 
     // Get the new i7 values:
-    const colIndexes = toPairs<string>(indexI7s);
+    const colIndexes = _.toPairs<string>(indexI7s);
     for (const [col, index] of colIndexes) {
       const colPreps = libraryPrepsToSave.filter(
         (it) => String(it?.storageUnitUsage?.wellColumn) === col
@@ -214,7 +213,7 @@ export function useIndexAssignmentAPI({
     }
 
     // Get the new i5 values:
-    const rowIndexes = toPairs<string>(indexI5s);
+    const rowIndexes = _.toPairs<string>(indexI5s);
     for (const [row, index] of rowIndexes) {
       const rowPreps = libraryPrepsToSave.filter(
         (it) => it?.storageUnitUsage?.wellRow === row
@@ -228,7 +227,7 @@ export function useIndexAssignmentAPI({
       }
     }
 
-    const saveOps: SaveArgs[] = toPairs(edits).map(([id, prepEdit]) => ({
+    const saveOps: SaveArgs[] = _.toPairs(edits).map(([id, prepEdit]) => ({
       resource: { id, type: "library-prep", ...prepEdit },
       type: "library-prep"
     }));
@@ -267,7 +266,7 @@ export function useIndexAssignmentAPI({
           ({
             type: "library-prep",
             id: libraryPreps[index].id,
-            ...(!isEqual(
+            ...(!_.isEqual(
               libraryPreps[index]?.indexI5?.id,
               submittedValue.indexI5
             ) && {
@@ -276,7 +275,7 @@ export function useIndexAssignmentAPI({
                 id: submittedValue.indexI5 ? submittedValue.indexI5 : null
               }
             }),
-            ...(!isEqual(
+            ...(!_.isEqual(
               libraryPreps[index]?.indexI7?.id,
               submittedValue.indexI7
             ) && {

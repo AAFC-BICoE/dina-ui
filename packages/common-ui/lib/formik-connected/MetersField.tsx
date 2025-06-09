@@ -1,5 +1,5 @@
 import { FormikProps } from "formik";
-import { clamp, isEqual } from "lodash";
+import _ from "lodash";
 import { all, BigNumber, create, MathJsStatic } from "mathjs";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
@@ -70,7 +70,7 @@ function MetersFieldInternal({
   // When the outer form state changes, set the inner text state:
   useEffect(() => {
     const formStateVal = inputProps.value?.toString() ?? "";
-    if (!isEqual(convertInput(formStateVal), convertInput(inputVal))) {
+    if (!_.isEqual(convertInput(formStateVal), convertInput(inputVal))) {
       setInputVal(formStateVal);
     }
   }, [inputProps.value]);
@@ -173,7 +173,7 @@ export function toMeters(
     const inMeters = math.evaluate(text).toNumber("m") as BigNumber;
     const decimalPlaces = math.bignumber(inMeters).decimalPlaces();
     return maxDecimalPlaces !== undefined
-      ? inMeters.toFixed(clamp(decimalPlaces, maxDecimalPlaces))
+      ? inMeters.toFixed(_.clamp(decimalPlaces, maxDecimalPlaces))
       : String(inMeters);
   } catch {
     // If the input contains a number:

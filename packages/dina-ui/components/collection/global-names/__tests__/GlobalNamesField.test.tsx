@@ -44,11 +44,12 @@ describe("GlobalNamesField component", () => {
     const input = container.querySelector("input.global-name-input");
     fireEvent.change(input!, { target: { value: "  monodon  " } });
 
-    await new Promise(setImmediate);
-
     // Simulate clicking the search button
     const searchButton = screen.getByRole("button", {
       name: /search/i
+    });
+    await waitFor(() => {
+      expect(searchButton).toBeInTheDocument();
     });
     fireEvent.click(searchButton);
 

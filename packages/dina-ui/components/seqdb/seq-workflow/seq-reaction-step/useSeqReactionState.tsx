@@ -1,7 +1,7 @@
 import { useApiClient } from "packages/common-ui/lib";
 import { PcrBatchItem, SeqReaction } from "packages/dina-ui/types/seqdb-api";
 import { useState, useEffect } from "react";
-import { compact } from "lodash";
+import _ from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
@@ -32,7 +32,7 @@ export function useSeqReactionState(seqBatchId?: string) {
           const tempId: (string | undefined)[] = [];
           tempId.push(item.pcrBatchItem?.id);
           tempId.push(item.seqPrimer?.id);
-          const id = compact(tempId).join("_");
+          const id = _.compact(tempId).join("_");
           return id === reactionId;
         })
       );
@@ -40,14 +40,14 @@ export function useSeqReactionState(seqBatchId?: string) {
         const tempId: (string | undefined)[] = [];
         tempId.push(item.pcrBatchItem?.id);
         tempId.push(item.seqPrimer?.id);
-        const id = compact(tempId).join("_");
+        const id = _.compact(tempId).join("_");
         if (seqReactionSortOrder.indexOf(id) === -1) {
           sorted.push(item);
         }
       });
-      return compact(sorted);
+      return _.compact(sorted);
     } else {
-      return compact(reactions);
+      return _.compact(reactions);
     }
   }
 
@@ -70,7 +70,7 @@ export function useSeqReactionState(seqBatchId?: string) {
       }
     );
 
-    let pcrBatchItems = compact(
+    let pcrBatchItems = _.compact(
       await bulkGet<PcrBatchItem, true>(
         seqReactions?.map(
           (item) =>
@@ -82,7 +82,7 @@ export function useSeqReactionState(seqBatchId?: string) {
         }
       )
     );
-    const pcrBatchStorageUnitUsages = compact(
+    const pcrBatchStorageUnitUsages = _.compact(
       await bulkGet<StorageUnitUsage>(
         pcrBatchItems?.map(
           (item) => `/storage-unit-usage/${item.storageUnitUsage?.id}`
@@ -100,7 +100,7 @@ export function useSeqReactionState(seqBatchId?: string) {
       )
     }));
 
-    const materialSamples = compact(
+    const materialSamples = _.compact(
       await bulkGet<MaterialSample, true>(
         pcrBatchItems?.map(
           (item) => `/material-sample-summary/${item.materialSample?.id}`
@@ -112,7 +112,7 @@ export function useSeqReactionState(seqBatchId?: string) {
       )
     );
 
-    const seqReactionStorageUnitUsages = compact(
+    const seqReactionStorageUnitUsages = _.compact(
       await bulkGet<StorageUnitUsage>(
         seqReactions?.map(
           (item) => `/storage-unit-usage/${item.storageUnitUsage?.id}`
@@ -151,7 +151,7 @@ export function useSeqReactionState(seqBatchId?: string) {
     });
 
     setPreviouslySelectedResourcesIDMap(
-      compact(seqReactions).reduce(
+      _.compact(seqReactions).reduce(
         (accu, obj) => ({
           ...accu,
           [`${obj.pcrBatchItem?.id}_${obj.seqPrimer?.id}`]: obj.id
@@ -164,7 +164,7 @@ export function useSeqReactionState(seqBatchId?: string) {
       const tempId: (string | undefined)[] = [];
       tempId.push(item.pcrBatchItem?.id);
       tempId.push(item.seqPrimer?.id);
-      item.id = compact(tempId).join("_");
+      item.id = _.compact(tempId).join("_");
     }
     const sorted = sortSeqReactions(seqReactions);
     setSelectedResources(sorted);

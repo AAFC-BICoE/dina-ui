@@ -4,15 +4,7 @@ import {
   KitsuResourceLink,
   PersistedResource
 } from "kitsu";
-import {
-  castArray,
-  chain,
-  compact,
-  isEqual,
-  isUndefined,
-  keys,
-  omitBy
-} from "lodash";
+import _ from "lodash";
 import { ComponentProps, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { ActionMeta, StylesConfig } from "react-select";
@@ -159,7 +151,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   const [searchValue] = useDebounce(inputValue, 250);
 
   // Omit blank/null filters:
-  const filterParam = omitBy(filter(searchValue), (val) =>
+  const filterParam = _.omitBy(filter(searchValue), (val) =>
     ["", undefined].includes(val as string)
   );
 
@@ -177,9 +169,9 @@ export function ResourceSelect<TData extends KitsuResource>({
   // e.g. /api/region?include=undefined
   const querySpec: JsonApiQuerySpec = {
     path: model,
-    ...omitBy(
+    ..._.omitBy(
       { filter: filterParam, include, page, sort },
-      (val) => isUndefined(val) || isEqual(val, {})
+      (val) => _.isUndefined(val) || _.isEqual(val, {})
     )
   };
 
@@ -216,7 +208,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       }) ?? [];
 
   const groupedResourceOptions = showGroupCategary
-    ? chain(resourceOptions)
+    ? _.chain(resourceOptions)
         .groupBy((item) => (item.resource as any).group)
         .map((items, label) => ({
           label,
@@ -266,7 +258,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   // Show no options while loading: (react-select will show the "Loading..." text.)
   const options = isLoading
     ? []
-    : compact([
+    : _.compact([
         mainOptions,
         ...(showGroupCategary ? groupedResourceOptions : []),
         actionOptions
@@ -280,7 +272,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       // when delete all the selected options.
       onChangeProp(isMulti ? [] : null, actionMeta);
     } else {
-      const newSelected = castArray(newSelectedRaw);
+      const newSelected = _.castArray(newSelectedRaw);
       // If an async option is selected:
       const asyncOption: AsyncOption<TData> | undefined = newSelected?.find(
         (option) => option?.getResource
@@ -302,7 +294,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     }
   }
 
-  const valueAsArray = compact(castArray(value));
+  const valueAsArray = _.compact(_.castArray(value));
 
   // Sometimes only the ID and type are available in the form state:
   const valueIsShallowReference = isShallowReference(valueAsArray);
@@ -411,8 +403,8 @@ export function ResourceSelect<TData extends KitsuResource>({
 }
 
 export function isShallowReference(resourceArray: any[]) {
-  const firstElement = castArray(resourceArray)[0];
+  const firstElement = _.castArray(resourceArray)[0];
   return (
-    !!firstElement?.id && isEqual(keys(firstElement).sort(), ["id", "type"])
+    !!firstElement?.id && _.isEqual(_.keys(firstElement).sort(), ["id", "type"])
   );
 }

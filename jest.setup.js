@@ -22,4 +22,11 @@ jest.spyOn(console, "error").mockImplementation((...args) => {
   }
 });
 
+// Mock scroll method for react-dropzone-uploader compatibility in JSDOM test environment
+Object.defineProperty(Element.prototype, "scroll", {
+  value: jest.fn(),
+  writable: true,
+  configurable: true
+});
+
 jest.setTimeout(40000);

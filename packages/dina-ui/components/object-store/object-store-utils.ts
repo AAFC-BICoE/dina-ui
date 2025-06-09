@@ -1,7 +1,7 @@
 import Kitsu from "kitsu";
 import { downloadBlobFile } from "common-ui";
 import { Dispatch, SetStateAction } from "react";
-import { startCase } from "lodash";
+import _ from "lodash";
 
 /**
  * Util function to fetch file object as blob ready to be downloaded
@@ -72,6 +72,6 @@ export function derivativeTypeToLabel(
       return messages?.["CROPPED_IMAGE"] || "Cropped Image";
     default:
       // Display it as a human-readable string, should be using a translation key though.
-      return startCase(derivativeType.replace(/_/g, " "));
+      return _.startCase(derivativeType.replace(/_/g, " "));
   }
 }

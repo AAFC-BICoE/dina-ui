@@ -5,6 +5,7 @@ import { CollectionSelectSection } from "../../CollectionSelectSection";
 import { MaterialSampleIdentifiersSection } from "../MaterialSampleIdentifiersSection";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import React from "react";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -63,7 +64,11 @@ describe("SetDefaultSampleName", () => {
       name: /collection 1 \(initial\-code\)/i
     });
     fireEvent.mouseDown(combobox); // Open the combobox options
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("option", { name: /TEST_CODE_2/i })
+      ).toBeInTheDocument();
+    });
 
     // Select the new option (assuming the new option is rendered as expected)
     const option = await screen.findByRole("option", { name: /TEST_CODE_2/i });
@@ -90,13 +95,14 @@ describe("SetDefaultSampleName", () => {
       testCtx
     );
 
-    // Wait for any asynchronous updates
-    await new Promise(setImmediate);
-
     // Check that the initial value is correct and remains unchanged
     const input = screen.getByRole("textbox", {
       name: /primary id/i
     }) as HTMLInputElement;
+
+    await waitFor(() => {
+      expect(input).toBeInTheDocument();
+    });
     expect(input.value).toEqual("INITIAL-CODE-100");
   });
 });

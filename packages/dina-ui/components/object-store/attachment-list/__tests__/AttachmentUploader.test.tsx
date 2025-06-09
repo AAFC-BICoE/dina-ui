@@ -1,6 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import { AttachmentUploader } from "../AttachmentUploader";
-import { screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockPost = jest.fn((path) => {
@@ -96,7 +96,13 @@ describe("AttachmentUploader component", () => {
       new File(["file content"], "file2.pdf", { type: "application/pdf" }),
       new File(["file content"], "file3.pdf", { type: "application/pdf" })
     ];
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("combobox", {
+          name: /group select\.\.\./i
+        })
+      ).toBeInTheDocument();
+    });
 
     // Select group
     fireEvent.mouseDown(
@@ -104,18 +110,25 @@ describe("AttachmentUploader component", () => {
         name: /group select\.\.\./i
       })
     );
-    await new Promise(setImmediate);
 
+    await waitFor(() => {
+      expect(
+        screen.getByRole("option", {
+          name: /aafc/i
+        })
+      ).toBeInTheDocument();
+    });
     fireEvent.click(
       screen.getByRole("option", {
         name: /aafc/i
       })
     );
 
-    await new Promise(setImmediate);
-
     // Find the file input in the Dropzone component
     const fileInput = screen.getByLabelText(/drag and drop files here/i);
+    await waitFor(() => {
+      expect(fileInput).toBeInTheDocument();
+    });
 
     // Mock the `FileList` containing the files:
     Object.defineProperty(fileInput, "files", {
@@ -125,29 +138,38 @@ describe("AttachmentUploader component", () => {
     // Simulate the file selection
     fireEvent.change(fileInput);
 
-    // Await the processing of the file uploads
-    await new Promise(setImmediate);
-
     // Simulate the save upload
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", {
+          name: /save/i
+        })
+      ).toBeInTheDocument();
+    });
     fireEvent.click(
       screen.getByRole("button", {
         name: /save/i
       })
     );
 
-    await new Promise(setImmediate);
-
     // Should now be at metadata modal
     // Simulate clicking Save All metadata button
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", {
+          name: /save all/i
+        })
+      ).toBeInTheDocument();
+    });
     fireEvent.click(
       screen.getByRole("button", {
         name: /save all/i
       })
     );
 
-    await new Promise(setImmediate);
-
     // Ensure the afterMetadatasSaved callback was called with the right metadata IDs
-    expect(mockAfterMetadatasSaved).toHaveBeenCalledWith(["0", "1", "2"]);
+    await waitFor(() => {
+      expect(mockAfterMetadatasSaved).toHaveBeenCalledWith(["0", "1", "2"]);
+    });
   });
 });

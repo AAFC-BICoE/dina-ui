@@ -6,7 +6,7 @@ import {
 } from "common-ui";
 import React, { useState } from "react";
 import { FieldArray } from "formik";
-import { clamp } from "lodash";
+import _ from "lodash";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { IdentifierRow } from "./IdentifierRow";
@@ -47,7 +47,7 @@ export function IdentifierFields({
                 remove(index);
                 // Stay on the current tab number, or reduce if removeing the last element:
                 setActiveTabIdx((current) =>
-                  clamp(current, 0, identifiers.length - 2)
+                  _.clamp(current, 0, identifiers.length - 2)
                 );
               }
               return (

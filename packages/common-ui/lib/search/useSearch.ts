@@ -3,7 +3,7 @@ import { useApiClient, useDebouncedFetch } from "common-ui";
 import { DocWithData } from "jsonapi-typescript";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { deserialise } from "kitsu-core";
-import { compact } from "lodash";
+import _ from "lodash";
 
 // The parts of the API response used by this component:
 export interface AutocompleteSearchResponse {
@@ -79,7 +79,7 @@ export async function doSearch<T extends KitsuResource>(
     }
   );
 
-  const jsonApiDocs = compact(
+  const jsonApiDocs = _.compact(
     response.data.hits?.map((hit) => {
       if (hit?.source?.included) {
         return { data: hit?.source?.included?.[0] };

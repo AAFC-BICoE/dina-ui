@@ -7,7 +7,7 @@ import { SelectOption } from "common-ui";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./QueryBuilderTextSearch";
-import { noop } from "lodash";
+import _ from "lodash";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import { VocabularyOption } from "packages/dina-ui/components/collection/VocabularySelectField";
@@ -80,7 +80,9 @@ export default function QueryRowIdentifierSearch({
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = isInColumnSelector ? noop : useQueryBuilderEnterToSearch();
+  const onKeyDown = isInColumnSelector
+    ? _.noop
+    : useQueryBuilderEnterToSearch();
 
   const [identifierState, setIdentifierState] =
     useState<IdentifierSearchStates>(() =>

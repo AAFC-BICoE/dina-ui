@@ -6,7 +6,7 @@ import {
   useCollapser
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { find, get } from "lodash";
+import _ from "lodash";
 import { ReactNode, useContext, useEffect, useState } from "react";
 import { ORIENTATION_OPTIONS } from "../../../../dina-ui/pages/object-store/metadata/edit";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -101,7 +101,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           "dcCreator.displayName",
           {
             name: "orientation",
-            value: find(
+            value: _.find(
               ORIENTATION_OPTIONS,
               (option) => option.value === metadata.orientation
             )?.label
@@ -147,10 +147,10 @@ export function MetadataAttributeGroup({
   const data = fields.map((field) => {
     if (typeof field === "string") {
       if (field === "objectUpload.sizeInBytes") {
-        const sizeInBytes = get(metadata, field);
+        const sizeInBytes = _.get(metadata, field);
         return { name: "fileSize", value: formatBytes(sizeInBytes) };
       }
-      return { name: field, value: get(metadata, field) };
+      return { name: field, value: _.get(metadata, field) };
     }
     return field;
   });

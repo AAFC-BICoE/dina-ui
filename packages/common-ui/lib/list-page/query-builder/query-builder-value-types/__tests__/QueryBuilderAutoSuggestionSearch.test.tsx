@@ -4,7 +4,7 @@ import { waitFor } from "@testing-library/react";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { ESIndexMapping } from "../../../types";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
-import { noop } from "lodash";
+import _ from "lodash";
 import userEvent from "@testing-library/user-event";
 
 const INDEX_NAME = "dina-material-sample-index";
@@ -91,7 +91,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       const autoSuggestionEquals = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
+            value={{ performSubmit: _.noop, groups: ["aafc", "cnc"] }}
           >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}
@@ -114,7 +114,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       const autoSuggestionEmpty = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
+            value={{ performSubmit: _.noop, groups: ["aafc", "cnc"] }}
           >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}
@@ -141,7 +141,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       const autoSuggestionIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
+            value={{ performSubmit: _.noop, groups: ["aafc", "cnc"] }}
           >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}
@@ -164,7 +164,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       const autoSuggestionNotIn = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
+            value={{ performSubmit: _.noop, groups: ["aafc", "cnc"] }}
           >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}
@@ -189,7 +189,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       const autoSuggestionComponent = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
+            value={{ performSubmit: _.noop, groups: ["aafc", "cnc"] }}
           >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}

@@ -187,6 +187,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -200,6 +201,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -213,6 +215,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -226,6 +229,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -239,6 +243,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -252,6 +257,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >
@@ -265,6 +271,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                 <a
                   aria-expanded="false"
                   class="dropdown-toggle nav-link"
+                  href="#"
                   role="button"
                   tabindex="0"
                 >

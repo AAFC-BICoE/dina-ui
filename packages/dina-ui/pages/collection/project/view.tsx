@@ -1,5 +1,5 @@
 import { DinaForm, processExtensionValuesLoading } from "common-ui";
-import { fromPairs } from "lodash";
+import _ from "lodash";
 import { AgentRole } from "packages/dina-ui/types/loan-transaction-api";
 import { ViewPageLayout } from "../../../components";
 import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
@@ -14,7 +14,7 @@ export default function ProjectDetailsPage() {
           initialValues={{
             ...props.initialValues,
             // Convert multilingualDescription to editable Dictionary format:
-            multilingualDescription: fromPairs<string | undefined>(
+            multilingualDescription: _.fromPairs<string | undefined>(
               props.initialValues.multilingualDescription?.descriptions?.map(
                 ({ desc, lang }) => [lang ?? "", desc ?? ""]
               )

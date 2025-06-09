@@ -3,7 +3,7 @@ import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import { AttachmentsField } from "../AttachmentsField";
-import { screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const MOCK_INDEX_MAPPING_RESP = {
@@ -159,23 +159,35 @@ describe("AttachmentsField component", () => {
       testCtx as any
     );
 
-    await new Promise(setImmediate);
-
     // Initially empty:
-    expect(container.querySelectorAll("tbody tr").length).toEqual(0);
+    await waitFor(() => {
+      expect(container.querySelectorAll("tbody tr").length).toEqual(0);
+    });
 
     // Add some attachments:
-    const addButton = getByRole("button", { name: /add attachments/i });
+    const addButton = await waitFor(() => {
+      const button = getByRole("button", { name: /add attachments/i });
+      expect(button).toBeInTheDocument();
+      return button;
+    });
     fireEvent.click(addButton);
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("tab", { name: /attach existing objects/i })
+      ).toBeInTheDocument();
+    });
 
     fireEvent.click(
       screen.getByRole("tab", {
         name: /attach existing objects/i
       })
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("checkbox", { name: /check all/i })
+      ).toBeInTheDocument();
+    });
 
     // Simulate saving the attachments
     fireEvent.click(
@@ -190,10 +202,10 @@ describe("AttachmentsField component", () => {
       })
     );
 
-    await new Promise(setImmediate);
-
     // The Metadatas should have been added:
-    expect(container.querySelectorAll("tbody tr").length).toEqual(2);
+    await waitFor(() => {
+      expect(container.querySelectorAll("tbody tr").length).toEqual(2);
+    });
 
     // Submit the form
     const form = container.querySelector("form");
@@ -201,14 +213,14 @@ describe("AttachmentsField component", () => {
       fireEvent.submit(form);
     }
 
-    await new Promise(setImmediate);
-
-    // Check the mockOnSubmit was called with the correct values
-    expect(mockOnSubmit).toHaveBeenLastCalledWith({
-      attachment: [
-        { id: "1", type: "metadata" },
-        { id: "2", type: "metadata" }
-      ]
+    await waitFor(() => {
+      // Check the mockOnSubmit was called with the correct values
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        attachment: [
+          { id: "1", type: "metadata" },
+          { id: "2", type: "metadata" }
+        ]
+      });
     });
   });
 
@@ -228,23 +240,35 @@ describe("AttachmentsField component", () => {
       testCtx as any
     );
 
-    await new Promise(setImmediate);
-
     // Initially empty:
-    expect(container.querySelectorAll("tbody tr").length).toEqual(0);
+    await waitFor(() => {
+      expect(container.querySelectorAll("tbody tr").length).toEqual(0);
+    });
 
     // Add some attachments:
-    const addButton = getByRole("button", { name: /add attachments/i });
+    const addButton = await waitFor(() => {
+      const button = getByRole("button", { name: /add attachments/i });
+      expect(button).toBeInTheDocument();
+      return button;
+    });
     fireEvent.click(addButton);
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("tab", { name: /attach existing objects/i })
+      ).toBeInTheDocument();
+    });
 
     fireEvent.click(
       screen.getByRole("tab", {
         name: /attach existing objects/i
       })
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("checkbox", { name: /check all/i })
+      ).toBeInTheDocument();
+    });
 
     // Simulate saving the attachments
     fireEvent.click(
@@ -259,15 +283,23 @@ describe("AttachmentsField component", () => {
       })
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(container.querySelectorAll("tbody tr").length).toEqual(2);
+    });
 
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: /add attachments/i
-      })
-    );
+    // Click "Add attachments" again
+    const addButton2 = await waitFor(() => {
+      const button = getByRole("button", { name: /add attachments/i });
+      expect(button).toBeInTheDocument();
+      return button;
+    });
+    fireEvent.click(addButton2);
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("tab", { name: /attach existing objects/i })
+      ).toBeInTheDocument();
+    });
 
     // Add metadatas again
     fireEvent.click(
@@ -275,7 +307,11 @@ describe("AttachmentsField component", () => {
         name: /attach existing objects/i
       })
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("checkbox", { name: /check all/i })
+      ).toBeInTheDocument();
+    });
 
     fireEvent.click(
       screen.getByRole("checkbox", {
@@ -289,10 +325,10 @@ describe("AttachmentsField component", () => {
       })
     );
 
-    await new Promise(setImmediate);
-
     // The Metadatas should have been added:
-    expect(container.querySelectorAll("tbody tr").length).toEqual(2);
+    await waitFor(() => {
+      expect(container.querySelectorAll("tbody tr").length).toEqual(2);
+    });
 
     // Submit the form
     const form = container.querySelector("form");
@@ -300,14 +336,14 @@ describe("AttachmentsField component", () => {
       fireEvent.submit(form);
     }
 
-    await new Promise(setImmediate);
-
-    // Check the mockOnSubmit was called with the correct values
-    expect(mockOnSubmit).toHaveBeenLastCalledWith({
-      attachment: [
-        { id: "1", type: "metadata" },
-        { id: "2", type: "metadata" }
-      ]
+    await waitFor(() => {
+      // Check the mockOnSubmit was called with the correct values
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        attachment: [
+          { id: "1", type: "metadata" },
+          { id: "2", type: "metadata" }
+        ]
+      });
     });
   });
 
@@ -332,16 +368,16 @@ describe("AttachmentsField component", () => {
       testCtx as any
     );
 
-    await new Promise(setImmediate);
-
-    expect(container.querySelectorAll("tbody tr").length).toEqual(2);
+    await waitFor(() => {
+      expect(container.querySelectorAll("tbody tr").length).toEqual(2);
+    });
 
     const removeButtons = screen.getAllByRole("button", { name: /remove/i });
     fireEvent.click(removeButtons[0]);
 
-    await new Promise(setImmediate);
-
-    expect(container.querySelectorAll("tbody tr").length).toEqual(1);
+    await waitFor(() => {
+      expect(container.querySelectorAll("tbody tr").length).toEqual(1);
+    });
 
     // Submit the form
     const form = container.querySelector("form");
@@ -349,10 +385,10 @@ describe("AttachmentsField component", () => {
       fireEvent.submit(form);
     }
 
-    await new Promise(setImmediate);
-
-    expect(mockOnSubmit).lastCalledWith({
-      attachment: [{ id: "example-2", type: "metadata" }]
+    await waitFor(() => {
+      expect(mockOnSubmit).lastCalledWith({
+        attachment: [{ id: "example-2", type: "metadata" }]
+      });
     });
   });
 });

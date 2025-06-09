@@ -1,7 +1,7 @@
 import PcrPrimerListPage from "../../../../pages/seqdb/pcr-primer/list";
 import { mountWithAppContext } from "common-ui";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -39,18 +39,15 @@ describe("PcrPrimer list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithAppContext(<PcrPrimerListPage />, { apiContext });
 
-    await new Promise(setImmediate);
-
     // Check that the table contains the links to primer details pages.
-    expect(wrapper.getByText(/test primer 1/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/test primer 2/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/test primer 1/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/test primer 2/i)).toBeInTheDocument();
+    });
   });
 
   it("Allows a filterable search.", async () => {
     const wrapper = mountWithAppContext(<PcrPrimerListPage />, { apiContext });
-
-    // Wait for the default search to finish.
-    await new Promise(setImmediate);
 
     // Enter a search value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
@@ -62,13 +59,13 @@ describe("PcrPrimer list page", () => {
     // Submit the search form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
-    expect(mockGet).toHaveBeenCalledWith(
-      "seqdb-api/pcr-primer",
-      expect.objectContaining({ filter: { rsql: "name==*101F*" } })
-    );
-    expect(wrapper.getByText(/test primer 1/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/test primer 2/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(
+        "seqdb-api/pcr-primer",
+        expect.objectContaining({ filter: { rsql: "name==*101F*" } })
+      );
+      expect(wrapper.getByText(/test primer 1/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/test primer 2/i)).toBeInTheDocument();
+    });
   });
 });

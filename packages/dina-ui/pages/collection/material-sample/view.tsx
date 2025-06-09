@@ -14,7 +14,7 @@ import {
   withResponse
 } from "common-ui";
 import { Field } from "formik";
-import { isEmpty } from "lodash";
+import _ from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
@@ -85,7 +85,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   const collectingEventParentLink = (
     <Link href={`/collection/material-sample/view?id=${highestParentId}`}>
-      <a>{highestParentMaterialSample}</a>
+      {highestParentMaterialSample}
     </Link>
   );
 
@@ -186,10 +186,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 className="me-0"
               />
               <GenerateLabelDropdownButton resource={materialSample} />
-              <Link href={`/collection/material-sample/revisions?id=${id}`}>
-                <a className="btn btn-info me-3">
-                  <DinaMessage id="revisionsButtonText" />
-                </a>
+              <Link
+                href={`/collection/material-sample/revisions?id=${id}`}
+                className="btn btn-info me-3"
+              >
+                <DinaMessage id="revisionsButtonText" />
               </Link>
               <DeleteButton
                 id={id}
@@ -220,11 +221,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           </ButtonBar>
         );
         const hasPreparations = PREPARATION_FIELDS.some(
-          (fieldName) => !isEmpty(materialSample[fieldName])
+          (fieldName) => !_.isEmpty(materialSample[fieldName])
         );
 
         const hasOrganism = materialSample?.organism?.some(
-          (org) => !isEmpty(org)
+          (org) => !_.isEmpty(org)
         );
 
         const hasInheritedDetermination = hasOrganism
@@ -235,7 +236,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
         /* Consider as having association if either host organism any field has value or having any non empty association in the array */
         const hasAssociations =
-          materialSample?.associations?.some((assct) => !isEmpty(assct)) ||
+          materialSample?.associations?.some((assct) => !_.isEmpty(assct)) ||
           HOST_ORGANISM_FIELDS.some(
             (fieldName) => materialSample.hostOrganism?.[fieldName]
           );
@@ -346,9 +347,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                           <Link
                             href={`/collection/collecting-event/view?id=${colEvent.id}`}
                           >
-                            <a>
-                              <DinaMessage id="detailsPageLink" />
-                            </a>
+                            <DinaMessage id="detailsPageLink" />
                           </Link>
                         </div>
                       );
