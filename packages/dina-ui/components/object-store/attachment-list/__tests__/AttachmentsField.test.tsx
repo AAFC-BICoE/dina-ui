@@ -6,6 +6,50 @@ import { AttachmentsField } from "../AttachmentsField";
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
+const MOCK_INDEX_MAPPING_RESP = {
+  data: {
+    indexName: "dina_object_store_index",
+    attributes: [
+      {
+        name: "originalFilename",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "bucket",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "createdBy",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "acCaption",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "id",
+        type: "text",
+        path: "data"
+      },
+      {
+        name: "type",
+        type: "text",
+        path: "data"
+      },
+      {
+        name: "createdOn",
+        type: "date",
+        path: "data.attributes"
+      }
+    ],
+    relationships: []
+  }
+};
+
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
     id: "1",
@@ -38,11 +82,57 @@ const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "objectstore-api/metadata":
       return { data: TEST_METADATAS };
+    case "search-api/search-ws/mapping":
+      return MOCK_INDEX_MAPPING_RESP;
+  }
+});
+
+const TEST_ELASTIC_SEARCH_RESPONSE = {
+  data: {
+    hits: {
+      total: {
+        value: 2
+      },
+      hits: [
+        {
+          _source: {
+            data: {
+              id: TEST_METADATAS[0].id,
+              type: "metadata",
+              attributes: TEST_METADATAS[0]
+            }
+          }
+        },
+        {
+          _source: {
+            data: {
+              id: TEST_METADATAS[1].id,
+              type: "metadata",
+              attributes: TEST_METADATAS[1]
+            }
+          }
+        }
+      ]
+    }
+  }
+};
+
+const mockPost = jest.fn<any, any>(async (path) => {
+  switch (path) {
+    // Elastic search response with object store mock metadata data.
+    case "search-api/search-ws/search":
+      return TEST_ELASTIC_SEARCH_RESPONSE;
   }
 });
 
 const apiContext = {
-  apiClient: { get: mockGet },
+  apiClient: {
+    get: mockGet,
+    axios: {
+      get: mockGet,
+      post: mockPost
+    }
+  },
   bulkGet: mockBulkGet
 };
 
@@ -66,7 +156,7 @@ describe("AttachmentsField component", () => {
           attachmentPath={`collection-api/collecting-event/100/attachment`}
         />
       </DinaForm>,
-      testCtx
+      testCtx as any
     );
 
     // Initially empty:
@@ -147,7 +237,7 @@ describe("AttachmentsField component", () => {
           attachmentPath={`collection-api/collecting-event/100/attachment`}
         />
       </DinaForm>,
-      testCtx
+      testCtx as any
     );
 
     // Initially empty:
@@ -275,7 +365,7 @@ describe("AttachmentsField component", () => {
           attachmentPath={`collection-api/collecting-event/100/attachment`}
         />
       </DinaForm>,
-      testCtx
+      testCtx as any
     );
 
     await waitFor(() => {
