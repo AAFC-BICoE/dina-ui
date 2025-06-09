@@ -13,7 +13,7 @@ import {
 } from "../object-store-utils";
 import RcTooltip from "rc-tooltip";
 import { DownloadButton } from "../derivative-list/DerivativeList";
-import { Dropdown } from "react-bootstrap";
+import { Badge, Dropdown } from "react-bootstrap";
 import {
   FaDownload,
   FaFile,
@@ -30,6 +30,7 @@ import {
 import { FaFileCode } from "react-icons/fa";
 import { MdOutlineRawOn } from "react-icons/md";
 import { IconType } from "react-icons/lib";
+import { formatBytes } from "../object-store-utils";
 
 export type DownLoadLinks = {
   original?: string;
@@ -102,6 +103,7 @@ export function FileView({
   });
 
   const errorStatus = (error as any)?.cause?.status;
+  const objectUpload = (metadata as any)?.objectUpload;
 
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
@@ -238,6 +240,20 @@ export function FileView({
                               {metadata?.fileExtension?.toUpperCase()}
                             </small>
                           </div>
+
+                          {objectUpload && (
+                            <Badge
+                              bg="light"
+                              text="dark"
+                              style={{
+                                fontSize: "0.75rem",
+                                padding: "0.35em 0.5em",
+                                marginLeft: "2em"
+                              }}
+                            >
+                              {formatBytes(objectUpload.sizeInBytes)}
+                            </Badge>
+                          )}
                         </div>
                       </Dropdown.Item>
                     )}
@@ -248,7 +264,8 @@ export function FileView({
                       const fileType = derivative.fileExtension;
                       const derivativeType = derivative.derivativeType;
                       const filePath = `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`;
-
+                      const fileSize = (derivative as any).objectUpload
+                        ?.sizeInBytes;
                       return (
                         <Dropdown.Item
                           key={fileIdentifier}
@@ -278,6 +295,19 @@ export function FileView({
                                 {fileType.toUpperCase()}
                               </small>
                             </div>
+                            {fileSize && (
+                              <Badge
+                                bg="light"
+                                text="dark"
+                                style={{
+                                  fontSize: "0.75rem",
+                                  padding: "0.35em 0.5em",
+                                  marginLeft: "2em"
+                                }}
+                              >
+                                {formatBytes(fileSize)}
+                              </Badge>
+                            )}
                           </div>
                         </Dropdown.Item>
                       );
