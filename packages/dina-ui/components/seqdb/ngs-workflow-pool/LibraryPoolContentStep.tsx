@@ -14,15 +14,7 @@ import {
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { FilterParam, PersistedResource } from "kitsu";
-import {
-  Dictionary,
-  compact,
-  concat,
-  debounce,
-  toPairs,
-  uniq,
-  remove
-} from "lodash";
+import _, { Dictionary } from "lodash";
 import { useEffect, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -201,7 +193,7 @@ export function LibraryPoolContentStep({
   const [nameFilter, setNameFilter] = useState<string>("");
 
   const onNameFilterInputChange: (filters: ColumnFiltersState) => void =
-    debounce(
+    _.debounce(
       (filters) =>
         setNameFilter(
           "" + (filters.find((filter) => filter.id === "name")?.value ?? "")
@@ -311,7 +303,7 @@ export function LibraryPoolContentStep({
   ) => {
     const { libraryPoolIdsToSelect, libraryPrepBatchIdsToSelect } = formValues;
 
-    const libraryPoolIds = toPairs(libraryPoolIdsToSelect)
+    const libraryPoolIds = _.toPairs(libraryPoolIdsToSelect)
       .filter((pair) => pair[1])
       .map((pair) => pair[0])
       .filter(
@@ -322,7 +314,7 @@ export function LibraryPoolContentStep({
           ).length === 0
       );
 
-    const libraryPrepBatchIds = toPairs(libraryPrepBatchIdsToSelect)
+    const libraryPrepBatchIds = _.toPairs(libraryPrepBatchIdsToSelect)
       .filter((pair) => pair[1])
       .map((pair) => pair[0])
       .filter(
@@ -336,7 +328,7 @@ export function LibraryPoolContentStep({
 
     const newPoolContents = [
       ...libraryPoolIds.map<LibraryPoolContent>((id) => {
-        let libraryPoolContent: any = remove(
+        let libraryPoolContent: any = _.remove(
           toDelete,
           (p) => p.pooledLibraryPool?.id === id
         );
@@ -357,7 +349,7 @@ export function LibraryPoolContentStep({
         return libraryPoolContent;
       }),
       ...libraryPrepBatchIds.map<LibraryPoolContent>((id) => {
-        let libraryPoolContent: any = remove(
+        let libraryPoolContent: any = _.remove(
           toDelete,
           (p) => p.pooledLibraryPrepBatch?.id === id
         );
@@ -381,7 +373,7 @@ export function LibraryPoolContentStep({
     ];
 
     if (newPoolContents.length > 0) {
-      const temp = concat(selectedResources, newPoolContents);
+      const temp = _.concat(selectedResources, newPoolContents);
       setSelectedResources(temp);
       setLibraryPoolContents(temp);
     }
@@ -396,7 +388,7 @@ export function LibraryPoolContentStep({
   ) => {
     const { libraryPoolContentIdsToDelete } = formValues;
 
-    const tmp = toPairs(libraryPoolContentIdsToDelete)
+    const tmp = _.toPairs(libraryPoolContentIdsToDelete)
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
 
@@ -410,10 +402,10 @@ export function LibraryPoolContentStep({
       const resourcesToDelete = selectedResources.filter(
         (content) => tmp.indexOf(content.id as string) > -1
       );
-      const newToDelete = uniq(
-        concat(
+      const newToDelete = _.uniq(
+        _.concat(
           toDelete,
-          compact(resourcesToDelete.filter((r) => !r.id?.startsWith("tmp_")))
+          _.compact(resourcesToDelete.filter((r) => !r.id?.startsWith("tmp_")))
         )
       );
       setToDelete(newToDelete);

@@ -1,6 +1,6 @@
 import { useApiClient } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
-import { filter, pick, unset } from "lodash";
+import _ from "lodash";
 import { useMemo } from "react";
 import {
   FieldMappingConfigType,
@@ -129,7 +129,7 @@ export function useWorkbookConverter(
   function getPathOfField(fieldName: string) {
     const fieldPaths = Object.keys(flattenedConfig);
     if (fieldName.indexOf(".") === -1) {
-      const filteredPaths = filter(fieldPaths, (item) =>
+      const filteredPaths = _.filter(fieldPaths, (item) =>
         item.endsWith(fieldName)
       );
       return filteredPaths.length > 0 ? filteredPaths[0] : undefined;
@@ -467,7 +467,7 @@ export function useWorkbookConverter(
               LinkOrCreateSetting.LINK_OR_ERROR
             ) {
               // if the field is LINK_OR_ERR, and there is no matching record, then throw new error.
-              unset(value, "relationshipConfig");
+              _.unset(value, "relationshipConfig");
               const notFoundValue = JSON.stringify(value);
               delete resource[attributeName];
               throw new Error(`${attributeName} not found: ${notFoundValue}`);
@@ -518,7 +518,7 @@ export function useWorkbookConverter(
             ],
             { apiBaseUrl: relationshipConfig.baseApiPath }
           ).then((response) => {
-            const newVal = pick(response[0], ["id", "type"]);
+            const newVal = _.pick(response[0], ["id", "type"]);
             addNewValueToWorkbookColumnMap(
               fieldPath,
               value,
@@ -603,7 +603,7 @@ export function useWorkbookConverter(
                 LinkOrCreateSetting.LINK_OR_ERROR
               ) {
                 // if the field is LINK_OR_ERR, and there is no matching record, then throw new error.
-                unset(value, "relationshipConfig");
+                _.unset(value, "relationshipConfig");
                 const notFoundValue = JSON.stringify(value);
                 delete resource[attributeName];
                 throw new Error(`${attributeName} not found: ${notFoundValue}`);
@@ -637,7 +637,7 @@ export function useWorkbookConverter(
               ],
               { apiBaseUrl: relationshipConfig.baseApiPath }
             ).then((response) => {
-              const newVal = pick(response[0], ["id", "type"]);
+              const newVal = _.pick(response[0], ["id", "type"]);
               addNewValueToWorkbookColumnMap(
                 fieldPath,
                 valueInArray,

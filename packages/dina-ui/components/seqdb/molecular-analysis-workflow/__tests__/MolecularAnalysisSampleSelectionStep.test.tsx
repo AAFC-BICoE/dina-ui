@@ -20,6 +20,7 @@ import {
   TEST_SEARCH_RESPONSE
 } from "../__mocks__/MolecularAnalysisMocks";
 import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { waitFor } from "@testing-library/react";
 
 const onSavedMock = jest.fn();
 const mockSetEditMode = jest.fn();
@@ -131,7 +132,10 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    // Wait for the component to render and fetch initial data
+    await waitFor(() =>
+      expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument()
+    );
 
     userEvent.click(
       wrapper.getByRole("button", {
@@ -139,14 +143,16 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       })
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument()
+    );
 
-    expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
-
-    // 3 records are expected from the mock elasticsearch response.
-    expect(
-      wrapper.container.querySelector("#queryPageCount")
-    ).toHaveTextContent(/total matched records: 3/i);
+    // Wait for the query results to be displayed
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelector("#queryPageCount")
+      ).toHaveTextContent(/total matched records: 3/i)
+    );
 
     // The first checkbox is the select all in the header.
     userEvent.click(
@@ -157,11 +163,15 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     userEvent.click(wrapper.getByTestId("move-resources-over"));
 
     // 3 records are expected in the selected table.
-    expect(wrapper.getByText(/total selected records: 3/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        wrapper.getByText(/total selected records: 3/i)
+      ).toBeInTheDocument()
+    );
 
     // Perform save
     userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
     expect(mockSave).toBeCalledWith(
       [
@@ -228,36 +238,47 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument()
+    );
 
     // Should not automatically be in edit mode since material samples are linked already.
     expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
 
-    // 2 records are expected in the view table.
-    expect(
-      wrapper.container.querySelector("#queryPageCount")
-    ).toHaveTextContent(/total matched records: 2/i);
+    // Wait for the query results to be displayed
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelector("#queryPageCount")
+      ).toHaveTextContent(/total matched records: 2/i)
+    );
 
     // Switch to edit mode.
     userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
-    await new Promise(setImmediate);
-    expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument()
+    );
 
     // Remove "Sample 2" from the currently selected list.
     userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[4]);
     userEvent.click(wrapper.getByTestId("remove-resources"));
-    await new Promise(setImmediate);
-    expect(wrapper.getByText(/total selected records: 1/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        wrapper.getByText(/total selected records: 1/i)
+      ).toBeInTheDocument()
+    );
 
     // Now add "Sample 3" to the selected list.
     userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[2]);
     userEvent.click(wrapper.getByTestId("move-resources-over"));
-    await new Promise(setImmediate);
-    expect(wrapper.getByText(/total selected records: 2/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        wrapper.getByText(/total selected records: 2/i)
+      ).toBeInTheDocument()
+    );
 
     // Perform save
     userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(5));
 
     // Create a molecular-analysis-run-item since a run exists for this workflow.
     expect(mockSave.mock.calls[0]).toEqual([

@@ -1,30 +1,54 @@
 import {
-  ColumnDefinition,
   CreateButton,
   dateCell,
   descriptionCell,
-  ListPageLayout
+  FieldHeader,
+  QueryPage
 } from "common-ui";
 import Link from "next/link";
-import { groupCell } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
-import { PreparationType } from "../../../types/collection-api";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
 
-const PROJECT_FILTER_ATTRIBUTES = ["name", "status", "multilingualDescription"];
-const PROJECT_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
+export const PROJECT_NON_EXPORTABLE_COLUMNS: string[] = ["selectColumn"];
+
+const PROJECT_TABLE_COLUMNS: TableColumn<any>[] = [
   {
-    cell: ({
-      row: {
-        original: { id, name }
-      }
-    }) => <Link href={`/collection/project/view?id=${id}`}>{name}</Link>,
-    accessorKey: "name"
+    id: "name",
+    cell: ({ row: { original } }) => {
+      return (
+        <Link
+          href={`/collection/project/view?id=${original.id}`}
+          legacyBehavior
+        >
+          {original.data.attributes.name}
+        </Link>
+      );
+    },
+    header: () => <FieldHeader name="name" />,
+    accessorKey: "data.attributes.name"
   },
-  "status",
-  descriptionCell(false, false, "multilingualDescription"),
-  groupCell("group"),
-  "createdBy",
-  dateCell("createdOn")
+  {
+    id: "status",
+    header: () => <FieldHeader name="status" />,
+    accessorKey: "data.attributes.status"
+  },
+  {
+    id: "group",
+    header: () => <FieldHeader name="group" />,
+    accessorKey: "data.attributes.group"
+  },
+  descriptionCell(
+    false,
+    false,
+    "data.attributes.multilingualDescription",
+    "multilingualDescription"
+  ),
+  {
+    id: "createdBy",
+    header: () => <FieldHeader name="createdBy" />,
+    accessorKey: "data.attributes.createdBy"
+  },
+  dateCell("createdOn", "data.attributes.createdOn")
 ];
 
 export default function collectionMethodListPage() {
@@ -37,18 +61,33 @@ export default function collectionMethodListPage() {
         </div>
       }
     >
-      <ListPageLayout
-        filterAttributes={PROJECT_FILTER_ATTRIBUTES}
-        id="project-list"
-        queryTableProps={{
-          columns: PROJECT_TABLE_COLUMNS,
-          path: "collection-api/project",
-          defaultSort: [
+      <QueryPage
+        indexName={"dina_project_index"}
+        uniqueName="project-list"
+        reactTableProps={{
+          enableSorting: true,
+          enableMultiSort: true
+        }}
+        enableRelationshipPresence={true}
+        mandatoryDisplayedColumns={["selectColumn", "name"]}
+        nonExportableColumns={PROJECT_NON_EXPORTABLE_COLUMNS}
+        columns={PROJECT_TABLE_COLUMNS}
+        bulkDeleteButtonProps={{
+          typeName: "project",
+          apiBaseUrl: "/collection-api"
+        }}
+        dynamicFieldMapping={{
+          fields: [
+            // Field Extensions
             {
-              id: "name",
-              desc: false
+              type: "fieldExtension",
+              label: "fieldExtensions",
+              component: "PROJECT",
+              path: "data.attributes.extensionValues",
+              apiEndpoint: "collection-api/extension"
             }
-          ]
+          ],
+          relationshipFields: []
         }}
       />
     </PageLayout>

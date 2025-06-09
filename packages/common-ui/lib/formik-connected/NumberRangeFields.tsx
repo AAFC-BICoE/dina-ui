@@ -1,5 +1,5 @@
 import { useFormikContext } from "formik";
-import { isNil, find } from "lodash";
+import _ from "lodash";
 import { useIntl } from "react-intl";
 import { CommonMessage, Tooltip } from "..";
 import { useDinaFormContext } from "./DinaForm";
@@ -32,19 +32,19 @@ export function NumberRangeFields({
       return { minNameVisible: false, maxNameVisible: false };
     }
     // First find the component we are looking for.
-    const componentFound = find(formTemplate?.components, {
+    const componentFound = _.find(formTemplate?.components, {
       name: componentName
     });
     if (componentFound) {
       // Next find the right section.
-      const sectionFound = find(componentFound?.sections, {
+      const sectionFound = _.find(componentFound?.sections, {
         name: sectionName
       });
       if (sectionFound) {
         const minNameVisible =
-          find(sectionFound.items, { name: minName })?.visible ?? false;
+          _.find(sectionFound.items, { name: minName })?.visible ?? false;
         const maxNameVisible =
-          find(sectionFound.items, { name: maxName })?.visible ?? false;
+          _.find(sectionFound.items, { name: maxName })?.visible ?? false;
         return { minNameVisible, maxNameVisible };
       }
     }
@@ -63,8 +63,8 @@ export function NumberRangeFields({
   const minVal = values[minName];
   const maxVal = values[maxName];
 
-  const bothAreDefined = !isNil(minVal) && !isNil(maxVal);
-  const neitherAreDefined = isNil(minVal) && isNil(maxVal);
+  const bothAreDefined = !_.isNil(minVal) && !_.isNil(maxVal);
+  const neitherAreDefined = _.isNil(minVal) && _.isNil(maxVal);
 
   return (
     <label className="w-100">

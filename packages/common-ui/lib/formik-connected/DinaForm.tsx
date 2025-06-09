@@ -7,7 +7,7 @@ import {
   FormikProps,
   FormikValues
 } from "formik";
-import { cloneDeep } from "lodash";
+import _ from "lodash";
 import { FormTemplate } from "../../../dina-ui/types/collection-api";
 import {
   createContext,
@@ -102,7 +102,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   /** Wrapped onSubmit prop with erorr handling and API/Account params. */
   const onSubmitInternal = safeSubmit(async (submittedValues, formik) => {
     // Make a copy of the submitted values so the original can't be mutated in the passed onSubmit function:
-    const submittedValuesCopy = cloneDeep(submittedValues);
+    const submittedValuesCopy = _.cloneDeep(submittedValues);
     try {
       await onSubmitProp?.({
         submittedValues: submittedValuesCopy,
@@ -133,7 +133,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
 
   // Clone the initialValues object so it isn't modified in the form:
   const initialValues = useMemo(
-    () => cloneDeep(props.initialValues),
+    () => _.cloneDeep(props.initialValues),
     [props.initialValues]
   );
 

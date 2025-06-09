@@ -8,7 +8,7 @@ import {
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
-import { compact, get, last, uniq } from "lodash";
+import _ from "lodash";
 import { useRef, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
 import { useDebounce } from "use-debounce";
@@ -118,7 +118,7 @@ function TagSelect({
   const tagOptions = useRef<TagSelectOption[]>([]);
   const isLoading = useRef<boolean>(false);
 
-  const typeName = last(resourcePath?.split("/"));
+  const typeName = _.last(resourcePath?.split("/"));
 
   if (indexName) {
     const suggestions = useElasticSearchDistinctTerm({
@@ -182,8 +182,8 @@ function TagSelect({
             internalTagFieldName != undefined
           ) {
             // handle the situation when tagsFieldName is something like this "contributors[0].roles"
-            const dataArray = uniq(
-              compact(
+            const dataArray = _.uniq(
+              _.compact(
                 response.data
                   .flatMap((it) => it[parsedFieldname])
                   .flatMap((it) => it[internalTagFieldName])
@@ -194,9 +194,11 @@ function TagSelect({
               .map((tag: string) => toOption(tag));
             tagOptions.current = tags;
           } else {
-            const tags = uniq(
-              compact(
-                (response?.data ?? []).flatMap((it) => get(it, parsedFieldname))
+            const tags = _.uniq(
+              _.compact(
+                (response?.data ?? []).flatMap((it) =>
+                  _.get(it, parsedFieldname)
+                )
               )
             )
               .filter((tag) => tag.includes(inputValue))

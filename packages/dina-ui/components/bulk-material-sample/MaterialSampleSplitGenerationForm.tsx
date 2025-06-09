@@ -20,10 +20,9 @@ import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/re
 import { useBulkGet } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
 import { InputResource } from "kitsu";
-import { startCase } from "lodash";
+import _ from "lodash";
 import { SplitConfigurationOption } from "../collection/material-sample/SplitMaterialSampleDropdownButton";
 import Select from "react-select";
-import { flattenDeep } from "lodash";
 import { ErrorBanner } from "../error/ErrorBanner";
 import {
   SEPARATORS_DASH,
@@ -199,7 +198,7 @@ export function MaterialSampleSplitGenerationForm({
   }) => {
     if (filteredMaterialSamples.length === 1) {
       if (
-        Number(flattenDeep(Object.values(generatedIdentifiers)).length) !==
+        Number(_.flattenDeep(Object.values(generatedIdentifiers)).length) !==
         Number(submittedValues?.numberToCreate)
       ) {
         return;
@@ -445,7 +444,7 @@ function PreviewGeneratedNames({
   // Columns to be displayed
   const materialSampleType =
     splitConfiguration?.materialSampleTypeCreatedBySplit ?? "";
-  const formattedMaterialSampleType = startCase(
+  const formattedMaterialSampleType = _.startCase(
     materialSampleType.toLowerCase().replace(/_/g, " ")
   );
 

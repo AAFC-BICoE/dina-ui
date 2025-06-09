@@ -1,6 +1,6 @@
 import { ProjectForm } from "../../../../pages/collection/project/edit";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -81,7 +81,12 @@ describe("ProjectForm.", () => {
     const wrapper = mountWithAppContext(<ProjectForm onSaved={mockOnSaved} />, {
       apiContext
     });
-    await new Promise(setImmediate);
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument();
+    });
 
     // Change Name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -104,51 +109,51 @@ describe("ProjectForm.", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for page to load
-    await new Promise(setImmediate);
-
-    // Test expected API responses
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            name: "test-project",
-            relationships: {
-              attachment: {
-                data: []
-              }
-            },
-            multilingualDescription: {
-              descriptions: [
-                {
-                  desc: "test eng desc",
-                  lang: "en"
+    await waitFor(() => {
+      // Test expected API responses
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              name: "test-project",
+              relationships: {
+                attachment: {
+                  data: []
                 }
-              ]
+              },
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test eng desc",
+                    lang: "en"
+                  }
+                ]
+              },
+              type: "project"
             },
             type: "project"
-          },
-          type: "project"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-    expect(mockOnSaved).lastCalledWith({
-      id: "123",
-      name: "test-project",
-      relationships: {
-        attachment: {
-          data: []
-        }
-      },
-      multilingualDescription: {
-        descriptions: [
-          {
-            desc: "test eng desc",
-            lang: "en"
           }
-        ]
-      },
-      type: "project"
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+      expect(mockOnSaved).lastCalledWith({
+        id: "123",
+        name: "test-project",
+        relationships: {
+          attachment: {
+            data: []
+          }
+        },
+        multilingualDescription: {
+          descriptions: [
+            {
+              desc: "test eng desc",
+              lang: "en"
+            }
+          ]
+        },
+        type: "project"
+      });
     });
   });
 
@@ -172,7 +177,12 @@ describe("ProjectForm.", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument();
+    });
 
     // Change Name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -194,60 +204,60 @@ describe("ProjectForm.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API response
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            id: "333",
-            multilingualDescription: {
-              descriptions: [
-                {
-                  desc: "test-eng-desc",
-                  lang: "en"
-                },
-                {
-                  desc: "test-fr-desc",
-                  lang: "fr"
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              id: "333",
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test-eng-desc",
+                    lang: "en"
+                  },
+                  {
+                    desc: "test-fr-desc",
+                    lang: "fr"
+                  }
+                ]
+              },
+              name: "edited-name",
+              relationships: {
+                attachment: {
+                  data: []
                 }
-              ]
-            },
-            name: "edited-name",
-            relationships: {
-              attachment: {
-                data: []
-              }
+              },
+              type: "project"
             },
             type: "project"
-          },
-          type: "project"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-    expect(mockOnSaved).lastCalledWith({
-      id: "333",
-      multilingualDescription: {
-        descriptions: [
-          {
-            desc: "test-eng-desc",
-            lang: "en"
-          },
-          {
-            desc: "test-fr-desc",
-            lang: "fr"
           }
-        ]
-      },
-      name: "edited-name",
-      relationships: {
-        attachment: {
-          data: []
-        }
-      },
-      type: "project"
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+      expect(mockOnSaved).lastCalledWith({
+        id: "333",
+        multilingualDescription: {
+          descriptions: [
+            {
+              desc: "test-eng-desc",
+              lang: "en"
+            },
+            {
+              desc: "test-fr-desc",
+              lang: "fr"
+            }
+          ]
+        },
+        name: "edited-name",
+        relationships: {
+          attachment: {
+            data: []
+          }
+        },
+        type: "project"
+      });
     });
   });
 });

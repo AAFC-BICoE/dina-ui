@@ -1,8 +1,9 @@
 import { DinaForm, NumberField } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { SetCoordinatesFromVerbatimButton } from "../SetCoordinatesFromVerbatimButton";
-import { screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import React from "react";
 
 describe("SetCoordinatesFromVerbatimButton component", () => {
   it("Sets the lat/lon from the verbatim fields.", async () => {
@@ -34,9 +35,6 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
     const button = screen.getByRole("button");
     fireEvent.click(button);
 
-    // Wait for state updates
-    await new Promise(setImmediate);
-
     // Check values of decimal latitude and longitude
     const latitudeInput = screen.getByRole("textbox", {
       name: /decimal latitude/i
@@ -45,12 +43,20 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
       name: /decimal longitude/i
     }) as HTMLInputElement;
 
-    expect(latitudeInput.value).toEqual("45.540278");
-    expect(longitudeInput.value).toEqual("-129.675278");
+    // Wait for state updates
+    await waitFor(() => {
+      expect(latitudeInput).toBeInTheDocument();
+      expect(longitudeInput).toBeInTheDocument();
+    });
 
-    expect(onClickCallback).lastCalledWith({
-      lat: "45.540278",
-      lon: "-129.675278"
+    await waitFor(() => {
+      expect(latitudeInput.value).toEqual("45.540278");
+      expect(longitudeInput.value).toEqual("-129.675278");
+
+      expect(onClickCallback).lastCalledWith({
+        lat: "45.540278",
+        lon: "-129.675278"
+      });
     });
   });
 });

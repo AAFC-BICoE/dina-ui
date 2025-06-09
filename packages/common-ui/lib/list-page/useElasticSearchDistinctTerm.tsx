@@ -1,5 +1,5 @@
 import Bodybuilder from "bodybuilder";
-import { castArray } from "lodash";
+import _ from "lodash";
 import { useEffect, useState } from "react";
 import { useApiClient, useQueryBuilderContext } from "..";
 const TOTAL_SUGGESTIONS: number = 100;
@@ -58,7 +58,7 @@ export function useElasticSearchDistinctTerm({
       builder.query(
         "terms",
         "data.attributes.group.keyword",
-        castArray(groups)
+        _.castArray(groups)
       );
     }
     // If the field has a relationship type, we need to do a nested query to filter it.

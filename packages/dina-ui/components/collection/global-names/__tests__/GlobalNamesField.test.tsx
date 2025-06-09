@@ -44,11 +44,12 @@ describe("GlobalNamesField component", () => {
     const input = container.querySelector("input.global-name-input");
     fireEvent.change(input!, { target: { value: "  monodon  " } });
 
-    await new Promise(setImmediate);
-
     // Simulate clicking the search button
     const searchButton = screen.getByRole("button", {
       name: /search/i
+    });
+    await waitFor(() => {
+      expect(searchButton).toBeInTheDocument();
     });
     fireEvent.click(searchButton);
 
@@ -70,8 +71,7 @@ describe("GlobalNamesField component", () => {
       [
         [
           {
-            labelHtml:
-              'Monodontidae: Monodon Linnaeus, 1758 <span class="small">[Catalogue of Life]</span>',
+            labelHtml: "Monodontidae: Monodon Linnaeus, 1758",
             recordedOn: "2021-12-16",
             sourceUrl: "https://www.catalogueoflife.org/data/taxon/63DDW",
             currentName: "Monodon Linnaeus, 1758",
@@ -88,7 +88,7 @@ describe("GlobalNamesField component", () => {
     ]);
 
     expect(mockFetchJson).lastCalledWith(
-      "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false&data_sources=&all_matches=true"
+      "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false&all_matches=true"
     );
 
     // Submit the form

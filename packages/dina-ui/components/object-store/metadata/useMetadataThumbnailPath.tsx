@@ -1,14 +1,14 @@
 import { KitsuResource } from "kitsu";
-import { get } from "lodash";
+import _ from "lodash";
 
 export function useMetadataThumbnailPath<TData extends KitsuResource>(
   original: TData,
   bucketField: string,
   isJsonApiQuery: boolean | undefined
 ) {
-  const bucket = get(original as any, bucketField);
-  let acCaption = get(original as any, "data.attributes.acCaption");
-  let originalFileName = get(
+  const bucket = _.get(original as any, bucketField);
+  let acCaption = _.get(original as any, "data.attributes.acCaption");
+  let originalFileName = _.get(
     original as any,
     "data.attributes.originalFileName"
   );
@@ -33,8 +33,8 @@ export function useMetadataThumbnailPath<TData extends KitsuResource>(
   let hasExternalResourceDerivative =
     resourceExternalURL && (original as any)?.included?.derivatives;
   if (isJsonApiQuery) {
-    acCaption = get(original as any, "metadata.acCaption");
-    originalFileName = get(original as any, "metadata.originalFileName");
+    acCaption = _.get(original as any, "metadata.acCaption");
+    originalFileName = _.get(original as any, "metadata.originalFileName");
     derivatives = (original as any)?.metadata
       ? (original as any)?.metadata.derivatives
       : (original as any)?.derivatives;

@@ -7,7 +7,7 @@ export const COLLECTION_METHOD_REVISION_ROW_CONFIG: RevisionRowConfig<Collection
   {
     name: ({ id, name }) => (
       <Link href={`/collection/collection-method/view?id=${id}`}>
-        <a>{name || id}</a>
+        {name || id}
       </Link>
     ),
     customValueCells: {

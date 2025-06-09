@@ -8,7 +8,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
-import { compact, find, get, isArray, pick } from "lodash";
+import _ from "lodash";
 import { useState } from "react";
 import { PersonSelectField } from "../..";
 import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
@@ -75,7 +75,7 @@ export function DeterminationField({
 
   const initialIndex = Math.max(
     0,
-    (get(initialValues, determinationsPath) as Determination[])?.findIndex(
+    (_.get(initialValues, determinationsPath) as Determination[])?.findIndex(
       (dtmntn) => dtmntn?.isPrimary
     ) ?? 0
   );
@@ -83,7 +83,7 @@ export function DeterminationField({
   /** Make this Assertion the Primary. */
   function makePrimary(formik: FormikContextType<any>, index) {
     const assertions: Determination[] =
-      get(formik.values, determinationsPath) ?? [];
+      _.get(formik.values, determinationsPath) ?? [];
 
     assertions.forEach((_, idx) => {
       formik.setFieldValue(`${determinationsPath}[${idx}].isPrimary`, false);
@@ -94,7 +94,7 @@ export function DeterminationField({
   /** Make this Assertion Filed As. */
   function makeFiledAs(formik: FormikContextType<any>, index) {
     const assertions: Determination[] =
-      get(formik.values, determinationsPath) ?? [];
+      _.get(formik.values, determinationsPath) ?? [];
 
     assertions.forEach((_, idx) => {
       formik.setFieldValue(`${determinationsPath}[${idx}].isFiledAs`, false);
@@ -129,7 +129,7 @@ export function DeterminationField({
             "scientificNameDetails"
           ).name;
 
-          const scientificNameSrcDetailVal = get(
+          const scientificNameSrcDetailVal = _.get(
             form.values,
             fieldScientificNameSrcDetail
           );
@@ -137,7 +137,7 @@ export function DeterminationField({
           const scientificNameSourceField = fieldProps(
             "scientificNameSource"
           ).name;
-          const scientificNameSourceVal = get(
+          const scientificNameSourceVal = _.get(
             form.values,
             scientificNameSourceField
           );
@@ -212,7 +212,7 @@ export function DeterminationField({
                         path: "collection-api/vocabulary2/typeStatus"
                       }),
                       option: (vocabElement, searchValue) =>
-                        compact(
+                        _.compact(
                           vocabElement?.vocabularyElements
                             ?.filter((it) => it?.name !== TypeStatusEnum.NONE)
                             .filter((it) =>
@@ -222,7 +222,7 @@ export function DeterminationField({
                             )
                             .map(
                               (it) =>
-                                find(
+                                _.find(
                                   it?.multilingualTitle?.titles || [],
                                   (item) => item.lang === locale
                                 )?.title ||
@@ -279,7 +279,7 @@ export function DeterminationField({
                             newValue &&
                               (newValue["classificationRanks"] ||
                                 newValue["classificationPath"])
-                              ? pick(newValue, [
+                              ? _.pick(newValue, [
                                   "classificationRanks",
                                   "classificationPath"
                                 ])
@@ -293,7 +293,7 @@ export function DeterminationField({
 
                           formik.setFieldValue(
                             fieldProps("scientificNameDetails").name,
-                            newValue && isArray(newValue) ? newValue[0] : null
+                            newValue && _.isArray(newValue) ? newValue[0] : null
                           );
                           // If selected a result from search , set text input value to null and hide it
                           // If a search value is removed, show the text input value

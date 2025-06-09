@@ -16,11 +16,7 @@ const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition<PcrPrimer>[] = [
       row: {
         original: { id, name }
       }
-    }) => (
-      <Link href={`/seqdb/pcr-primer/view?id=${id}`}>
-        <a>{name}</a>
-      </Link>
-    ),
+    }) => <Link href={`/seqdb/pcr-primer/view?id=${id}`}>{name}</Link>,
     accessorKey: "name"
   },
   {
@@ -30,9 +26,7 @@ const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition<PcrPrimer>[] = [
       }
     }) =>
       region ? (
-        <Link href={`/seqdb/region/view?id=${region.id}`}>
-          <a>{region.name}</a>
-        </Link>
+        <Link href={`/seqdb/region/view?id=${region.id}`}>{region.name}</Link>
       ) : null,
     accessorKey: "region.name"
   },

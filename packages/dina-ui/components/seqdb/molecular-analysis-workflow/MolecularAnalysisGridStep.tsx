@@ -6,7 +6,7 @@ import {
   useModal
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { noop } from "lodash";
+import _ from "lodash";
 import { useEffect, useState } from "react";
 import {
   MolecularAnalysisItemSample,
@@ -259,7 +259,7 @@ export function MolecularAnalysisGridStep({
                           className={`${mode}-radio`}
                           type="radio"
                           checked={fillMode === mode}
-                          onChange={noop}
+                          onChange={_.noop}
                           onClick={() =>
                             setFillMode(mode === "ROW" ? "ROW" : "COLUMN")
                           }

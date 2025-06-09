@@ -1,5 +1,5 @@
 import PersonDetailsPage from "../../../pages/person/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { Person } from "../../../types/agent-api/resources/Person";
 import "@testing-library/jest-dom";
 
@@ -40,9 +40,7 @@ describe("Person details page", () => {
     const wrapper = mountWithAppContext(<PersonDetailsPage />, { apiContext });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     // The person's name should be rendered in a FieldView.
     expect(wrapper.getByText(/display name/i)).toBeInTheDocument();

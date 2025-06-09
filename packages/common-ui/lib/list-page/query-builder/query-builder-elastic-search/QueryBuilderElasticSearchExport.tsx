@@ -1,6 +1,6 @@
 import { ColumnSort } from "@tanstack/react-table";
 import { KitsuResource } from "kitsu";
-import { isEmpty, reject, uniq, compact } from "lodash";
+import _ from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { TableColumn } from "../../types";
 import {
@@ -152,7 +152,7 @@ function buildEsGroup(
   if (!result.length) return undefined;
 
   const resultFlat = result.flat(Infinity);
-  const compactedResult = reject(resultFlat, isEmpty);
+  const compactedResult = _.reject(resultFlat, _.isEmpty);
 
   return {
     bool: {
@@ -200,7 +200,7 @@ export function applySortingRules<TData extends KitsuResource>(
   columns: TableColumn<TData>[]
 ) {
   if (sortingRules && sortingRules.length > 0) {
-    const sortingQueries = compact(
+    const sortingQueries = _.compact(
       sortingRules.map((columnSort) => {
         const columnDefinition = columns.find((column) => {
           // Depending on if it's a string or not.
@@ -278,7 +278,7 @@ export function applySortingRules<TData extends KitsuResource>(
     );
 
     // Add all of the queries to the existing elastic search query.
-    if (!isEmpty(sortingQueries)) {
+    if (!_.isEmpty(sortingQueries)) {
       return {
         ...elasticSearchQuery,
         sort: sortingQueries
@@ -347,7 +347,7 @@ export function applySourceFiltering<TData extends KitsuResource>(
   return {
     ...elasticSearchQuery,
     _source: {
-      includes: uniq(sourceFilteringColumns)
+      includes: _.uniq(sourceFilteringColumns)
     }
   };
 }
@@ -363,7 +363,7 @@ export function applySourceFilteringString(
   elasticSearchQuery: any,
   columns: string[]
 ) {
-  const uniqueColumns = uniq(columns);
+  const uniqueColumns = _.uniq(columns);
 
   if (uniqueColumns.length === 0) {
     return elasticSearchQuery;

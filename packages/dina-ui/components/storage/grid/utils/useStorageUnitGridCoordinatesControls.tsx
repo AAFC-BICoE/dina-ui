@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { isArray } from "lodash";
+import _ from "lodash";
 import { useApiClient } from "common-ui";
 import { MaterialSample } from "../../../../types/collection-api";
 import { StorageUnitUsage } from "../../../../types/collection-api/resources/StorageUnitUsage";
@@ -45,7 +45,7 @@ export function useGridCoordinatesControls({
   async function getGridState() {
     setLoading?.(true);
     const newCellGrid: CellGrid<any> = {};
-    if (isArray(materialSamples) && materialSamples.length > 0) {
+    if (_.isArray(materialSamples) && materialSamples.length > 0) {
       const storageUnitUsages = materialSamples.map(
         (sample) => sample.storageUnitUsage
       );

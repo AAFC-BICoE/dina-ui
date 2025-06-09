@@ -3,6 +3,7 @@ import ExternalResourceMetadataViewPage from "../../../../dina-ui/pages/object-s
 import { mountWithAppContext } from "common-ui";
 import { Metadata } from "../../../../dina-ui/types/objectstore-api/resources/Metadata";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acSubtype: "TEST_SUBTYPE",
@@ -60,19 +61,19 @@ describe("Stored Object external resource view page", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
-
     // Shows the caption
-    expect(
-      wrapper.getByRole("cell", { name: /test caption/i })
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("cell", { name: /test caption/i })
+      ).toBeInTheDocument();
 
-    // Shows the resource URL
-    expect(
-      wrapper.getByRole("cell", { name: /http:\/\/agr\.gc\.ca/i })
-    ).toBeInTheDocument();
+      // Shows the resource URL
+      expect(
+        wrapper.getByRole("cell", { name: /http:\/\/agr\.gc\.ca/i })
+      ).toBeInTheDocument();
 
-    // Shows the media format:
-    expect(wrapper.getByRole("cell", { name: /jpeg/i })).toBeInTheDocument();
+      // Shows the media format:
+      expect(wrapper.getByRole("cell", { name: /jpeg/i })).toBeInTheDocument();
+    });
   });
 });

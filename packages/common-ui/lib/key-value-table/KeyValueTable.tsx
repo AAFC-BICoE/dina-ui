@@ -1,7 +1,7 @@
 import { CellContext, ColumnDefTemplate } from "@tanstack/react-table";
 import classNames from "classnames";
 import { FieldHeader, ReactTable } from "common-ui";
-import { toPairs } from "lodash";
+import _ from "lodash";
 import { ErrorBoundary } from "react-error-boundary";
 import { ReadOnlyValue } from "../formik-connected/FieldView";
 import { CommonMessage } from "../intl/common-ui-intl";
@@ -37,7 +37,7 @@ export function KeyValueTable({
   valueHeader = <CommonMessage id="valueLabel" />,
   tableClassName
 }: KeyValueTableProps) {
-  const pairs = toPairs(data);
+  const pairs = _.toPairs(data);
   const entries = pairs.map(([field, value]) => ({
     field,
     value

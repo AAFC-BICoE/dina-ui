@@ -7,7 +7,7 @@ import {
 } from "../../../../types/objectstore-api";
 import { mountWithAppContext } from "common-ui";
 import ExternalResourceMetadataPage from "../../../../pages/object-store/metadata/external-resource-edit";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -113,27 +113,26 @@ describe("Metadata external resource edit page.", () => {
     const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
       apiContext
     });
-    await new Promise(setImmediate);
 
     // Test initial values
-    expect(wrapper.getByRole("combobox", { name: /tags/i })).toHaveDisplayValue(
-      ""
-    );
-    expect(
-      wrapper.getByRole("textbox", { name: /file extension/i })
-    ).toHaveDisplayValue("");
-    expect(
-      wrapper.getByRole("textbox", { name: /resource external url/i })
-    ).toHaveDisplayValue("");
-    expect(
-      wrapper.getByRole("textbox", { name: /caption/i })
-    ).toHaveDisplayValue("");
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("combobox", { name: /tags/i })
+      ).toHaveDisplayValue("");
+      expect(
+        wrapper.getByRole("textbox", { name: /file extension/i })
+      ).toHaveDisplayValue("");
+      expect(
+        wrapper.getByRole("textbox", { name: /resource external url/i })
+      ).toHaveDisplayValue("");
+      expect(
+        wrapper.getByRole("textbox", { name: /caption/i })
+      ).toHaveDisplayValue("");
+    });
 
     // Select an option in the media format search.
     userEvent.click(wrapper.getByRole("combobox", { name: /media format/i }));
     userEvent.click(wrapper.getByRole("option", { name: /image\/jpeg/i }));
-
-    await new Promise(setImmediate);
 
     // Set values:
     fireEvent.change(
@@ -157,25 +156,25 @@ describe("Metadata external resource edit page.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test response
-    expect(mockSave).toBeCalledWith(
-      [
-        {
-          resource: {
-            bucket: "aafc",
-            dcFormat: "image/jpeg",
-            fileExtension: ".jpg",
-            acSubtype: null,
-            acCaption: "test caption",
-            resourceExternalURL: "http://agr.gc.ca"
-          },
-          type: "metadata"
-        }
-      ],
-      { apiBaseUrl: "/objectstore-api" }
-    );
+    await waitFor(() => {
+      expect(mockSave).toBeCalledWith(
+        [
+          {
+            resource: {
+              bucket: "aafc",
+              dcFormat: "image/jpeg",
+              fileExtension: ".jpg",
+              acSubtype: null,
+              acCaption: "test caption",
+              resourceExternalURL: "http://agr.gc.ca"
+            },
+            type: "metadata"
+          }
+        ],
+        { apiBaseUrl: "/objectstore-api" }
+      );
+    });
   });
 
   it("Lets you edit an existing external resource metadata.", async () => {
@@ -190,20 +189,20 @@ describe("Metadata external resource edit page.", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
-
     // Check for the right initial values:
-    expect(
-      wrapper.getByRole("combobox", {
-        name: /object subtype test_subtype/i
-      })
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("combobox", {
+          name: /object subtype test_subtype/i
+        })
+      ).toBeInTheDocument();
 
-    expect(
-      wrapper.getByRole("combobox", {
-        name: /stored object type image/i
-      })
-    ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("combobox", {
+          name: /stored object type image/i
+        })
+      ).toBeInTheDocument();
+    });
 
     // Set new values:
     userEvent.click(
@@ -211,35 +210,32 @@ describe("Metadata external resource edit page.", () => {
         name: /stored object type image/i
       })
     );
-    await new Promise(setImmediate);
     userEvent.click(wrapper.getByRole("option", { name: /moving image/i }));
-    await new Promise(setImmediate);
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
-    // Test response
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            acSubtype: "TEST_SUBTYPE",
-            bucket: "testbucket",
-            dcType: "MOVING_IMAGE",
-            id: "25f81de5-bbee-430c-b5fa-71986b70e612",
-            type: "metadata",
-            resourceExternalURL: "http://agr.gc.ca ",
-            xmpRightsUsageTerms: "",
-            xmpRightsWebStatement:
-              "https://open.canada.ca/en/open-government-licence-canada",
-            acCaption: "test caption"
-          },
-          type: "metadata"
-        }
-      ],
-      { apiBaseUrl: "/objectstore-api" }
-    );
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              acSubtype: "TEST_SUBTYPE",
+              bucket: "testbucket",
+              dcType: "MOVING_IMAGE",
+              id: "25f81de5-bbee-430c-b5fa-71986b70e612",
+              type: "metadata",
+              resourceExternalURL: "http://agr.gc.ca ",
+              xmpRightsUsageTerms: "",
+              xmpRightsWebStatement:
+                "https://open.canada.ca/en/open-government-licence-canada",
+              acCaption: "test caption"
+            },
+            type: "metadata"
+          }
+        ],
+        { apiBaseUrl: "/objectstore-api" }
+      );
+    });
   });
 });

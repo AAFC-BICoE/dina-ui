@@ -157,9 +157,7 @@ export function MaterialSampleLink({ id, disableLink = false }) {
     return disableLink ? (
       name
     ) : (
-      <Link href={`/collection/material-sample/view?id=${id}`}>
-        <a>{name}</a>
-      </Link>
+      <Link href={`/collection/material-sample/view?id=${id}`}>{name}</Link>
     );
   });
 }

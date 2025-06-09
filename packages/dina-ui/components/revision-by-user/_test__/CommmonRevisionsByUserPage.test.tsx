@@ -5,6 +5,7 @@ import RevisionsByUserPage, {
 } from "../CommonRevisionsByUserPage";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
+import { waitFor } from "@testing-library/react";
 
 const TEST_SNAPSHOTS = [
   {
@@ -54,9 +55,10 @@ describe("MetadataRevisionListPage", () => {
     );
 
     // Await revisions query:
-    await new Promise(setImmediate);
-
     const table = document.querySelector("table");
+    await waitFor(() => {
+      expect(table).not.toBeNull();
+    });
     if (!table) {
       fail("Table should exist at this point...");
     }
@@ -68,13 +70,15 @@ describe("MetadataRevisionListPage", () => {
     const numCols = table.rows[0].cells.length;
 
     // Renders the 2 revision rows:
-    expect(numRows).toEqual(3);
-    expect(numCols).toEqual(8);
+    await waitFor(() => {
+      expect(numRows).toEqual(3);
+      expect(numCols).toEqual(8);
 
-    // Renders the metadata's resource name cell:
-    expect(
-      wrapper.getAllByRole("link", { name: /my\-image\-1\.png/i }).at(0)
-    ).toHaveTextContent("my-image-1.png");
+      // Renders the metadata's resource name cell:
+      expect(
+        wrapper.getAllByRole("link", { name: /my\-image\-1\.png/i }).at(0)
+      ).toHaveTextContent("my-image-1.png");
+    });
   });
 
   it("Provides a search input for author.", async () => {
@@ -92,13 +96,14 @@ describe("MetadataRevisionListPage", () => {
       "searched-author"
     );
     userEvent.click(wrapper.getByRole("button", { name: /search/i }));
-    await new Promise(setImmediate);
 
-    expect(mockPush).lastCalledWith({
-      pathname: "the-page-url",
-      query: {
-        author: "searched-author"
-      }
+    await waitFor(() => {
+      expect(mockPush).lastCalledWith({
+        pathname: "the-page-url",
+        query: {
+          author: "searched-author"
+        }
+      });
     });
   });
 });

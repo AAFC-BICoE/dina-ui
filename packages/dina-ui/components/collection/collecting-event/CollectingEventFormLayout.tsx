@@ -21,7 +21,7 @@ import {
   useInstanceContext
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
-import { compact, find } from "lodash";
+import _ from "lodash";
 import Link from "next/link";
 import { ChangeEvent, useRef, useState } from "react";
 import useSWR from "swr";
@@ -531,10 +531,13 @@ export function CollectingEventFormLayout({
                   )}
                   <div className="col-md-4">
                     {detail.sourceUrl && (
-                      <Link href={`${detail.sourceUrl}`} passHref={true}>
-                        <a className="btn btn-info" target="_blank">
-                          <DinaMessage id="viewDetailButtonLabel" />
-                        </a>
+                      <Link
+                        href={`${detail.sourceUrl}`}
+                        passHref={true}
+                        className="btn btn-info"
+                        target="_blank"
+                      >
+                        <DinaMessage id="viewDetailButtonLabel" />
                       </Link>
                     )}
                   </div>
@@ -781,10 +784,10 @@ export function CollectingEventFormLayout({
                   path: "collection-api/vocabulary2/coordinateSystem"
                 }),
                 option: (vocabElement) =>
-                  compact(
+                  _.compact(
                     vocabElement?.vocabularyElements?.map(
                       (it) =>
-                        find(
+                        _.find(
                           it?.multilingualTitle?.titles || [],
                           (item) => item.lang === locale
                         )?.title
@@ -882,10 +885,10 @@ export function CollectingEventFormLayout({
                   path: "collection-api/vocabulary2/srs"
                 }),
                 option: (vocabElement) =>
-                  compact(
+                  _.compact(
                     vocabElement?.vocabularyElements?.map(
                       (it) =>
-                        find(
+                        _.find(
                           it?.multilingualTitle?.titles || [],
                           (item) => item.lang === locale
                         )?.title ||

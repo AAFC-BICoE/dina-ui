@@ -1,5 +1,5 @@
 import ProductDetailsPage from "../../../../pages/seqdb/product/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
 import "@testing-library/jest-dom";
 
@@ -41,10 +41,7 @@ describe("Product details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    // Test loading spinner to not render when product fields are rendered
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     // The product's name should be rendered in a FieldView.
     expect(wrapper.getByText(/name/i)).toBeInTheDocument();

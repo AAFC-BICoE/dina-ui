@@ -18,6 +18,7 @@ import {
 import Select from "react-select";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FaExclamationCircle } from "react-icons/fa";
+import { ListGroup } from "react-bootstrap";
 
 export type Selection =
   | string
@@ -110,11 +111,6 @@ export function GlobalNamesSearchBox({
           });
           datassetDatasetOptionsetOptions(selectOptions);
           setLastUpdated(Date.now());
-          if (selectedDatasets === undefined) {
-            // Set a default value when local storage value is empty
-            // NOTE: value with index 0 usually defaults to Catalogue of Life
-            setSelectedDatasets([selectOptions[0]]);
-          }
         }
       } catch (error) {
         if (!isCancelled) {
@@ -181,9 +177,11 @@ export function GlobalNamesSearchBox({
         }`,
         params: {
           capitalize: "false",
-          data_sources: selectedDatasets
-            ? selectedDatasets.map((ds) => ds.value).join("|")
-            : "",
+          ...(selectedDatasets && selectedDatasets?.length !== 0
+            ? {
+                data_sources: selectedDatasets.map((ds) => ds.value).join("|")
+              }
+            : {}),
           all_matches: true
         },
         searchValue,
@@ -191,7 +189,8 @@ export function GlobalNamesSearchBox({
       });
     },
     timeoutMs: 1000,
-    initSearchValue
+    initSearchValue,
+    dependencies: [selectedDatasets]
   });
 
   const onInputChange = (value) => {
@@ -229,24 +228,13 @@ export function GlobalNamesSearchBox({
                   onClick={doThrottledSearch}
                   className="btn btn-primary global-name-search-button"
                   type="button"
-                  disabled={
-                    searchIsDisabled ||
-                    !selectedDatasets ||
-                    selectedDatasets.length === 0
-                  }
+                  disabled={searchIsDisabled}
                 >
                   <DinaMessage id="searchButton" />
                 </button>
               </div>
               {datasetOptions && (
                 <div className="d-flex align-items-center justify-content-end mb-2">
-                  {!searchIsDisabled &&
-                    selectedDatasets &&
-                    selectedDatasets.length === 0 && (
-                      <p>
-                        <DinaMessage id="globalNameSourcesMustSelectOne" />
-                      </p>
-                    )}
                   <Select
                     isMulti
                     name="globalNameSources"
@@ -335,8 +323,8 @@ export function GlobalNamesSearchBox({
         </Field>
       )}
       {searchIsLoading && <LoadingSpinner loading={true} />}
-      {!!searchResult && (
-        <div className="list-group mt-3">
+      {searchResult?.names?.[0]?.results?.length > 0 && (
+        <ListGroup style={{ maxHeight: "30rem", overflowY: "auto" }}>
           {searchResult.names
             ?.filter((result) => result.matchType !== "NoMatch")
             ?.map((name) => {
@@ -359,7 +347,6 @@ export function GlobalNamesSearchBox({
                     (val) =>
                       (displayText = displayText.replace(val, `<b>${val}</b>`))
                   );
-                displayText += ` <span class="small">[${result.dataSourceTitleShort}]</span>`;
 
                 link.innerHTML = familyRank
                   ? familyRank + displayText
@@ -385,41 +372,69 @@ export function GlobalNamesSearchBox({
                 // Use detail to populate source details fields, result.label to populate the searchbox bound field
                 const resultArray = [detail, result?.matchedName];
 
-                return (
-                  <div
-                    key={result.inputId ?? idx}
-                    className="list-group-item list-group-item-action d-flex"
-                  >
-                    <div className="flex-grow-1 d-flex align-items-center gn-search-result-label">
-                      {result.outlink ? (
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: safeHtmlLink.replace(
-                              /<a /g,
-                              '<a target="_blank" rel="noopener noreferrer" '
-                            )
-                          }}
-                        />
-                      ) : (
-                        <span>{detail.currentName}</span>
-                      )}
-                    </div>
+                const getDataSourceHasNoTaxonData = (result) => {
+                  const currentDataSource = datasetOptions.find(
+                    (ds) => ds.value === result.dataSourceId
+                  );
+                  return currentDataSource
+                    ? (currentDataSource as any)?.taxonData === false
+                    : false;
+                };
 
+                return (
+                  <ListGroup.Item
+                    key={result.inputId ?? idx}
+                    className="d-flex"
+                  >
+                    <div>
+                      <div className="row flex-grow-1 gn-search-result-label">
+                        {result.outlink ? (
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: safeHtmlLink.replace(
+                                /<a /g,
+                                '<a target="_blank" rel="noopener noreferrer" '
+                              )
+                            }}
+                          />
+                        ) : (
+                          <span>
+                            {detail.currentName || result?.matchedName}
+                          </span>
+                        )}
+                      </div>
+                      <i>
+                        {result.dataSourceTitleShort}{" "}
+                        {getDataSourceHasNoTaxonData(result) && (
+                          <Tooltip
+                            id={"dataSourceHasNoTaxonData"}
+                            placement="left"
+                            disableSpanMargin={true}
+                            className="flex-shrink-0"
+                            visibleElement={
+                              <FaExclamationCircle className="text-warning" />
+                            }
+                          />
+                        )}
+                      </i>
+                    </div>
                     <FormikButton
-                      className="btn btn-primary global-name-select-button"
-                      buttonProps={() => ({ style: { width: "8rem" } })}
+                      className="btn btn-primary global-name-select-button ms-auto"
+                      buttonProps={() => ({
+                        style: { minWidth: "5em", maxHeight: "3em" }
+                      })}
                       onClick={() => onSelect?.(resultArray)}
                     >
                       <DinaMessage id="select" />
                     </FormikButton>
-                  </div>
+                  </ListGroup.Item>
                 );
               });
             })}
-        </div>
+        </ListGroup>
       )}
-      {searchResult?.length === 1 &&
-        searchResult[0].matchType === "NoMatch" && (
+      {searchResult?.names?.length === 1 &&
+        searchResult?.names[0].matchType === "NoMatch" && (
           <p>
             <DinaMessage id="noResultsFound" />
           </p>
