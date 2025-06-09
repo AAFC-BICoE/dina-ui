@@ -248,7 +248,7 @@ export function FileView({
                               style={{
                                 fontSize: "0.75rem",
                                 padding: "0.35em 0.5em",
-                                marginLeft: "2em"
+                                marginLeft: "auto"
                               }}
                             >
                               {formatBytes(objectUpload.sizeInBytes)}
@@ -279,7 +279,10 @@ export function FileView({
                             )
                           }
                         >
-                          <div className="d-flex align-items-center">
+                          <div
+                            className="d-flex align-items-center"
+                            style={{ minWidth: "250px" }}
+                          >
                             {fileExtensionToIcon(
                               fileType,
                               "me-3 text-secondary dropdown-icon"
@@ -302,7 +305,7 @@ export function FileView({
                                 style={{
                                   fontSize: "0.75rem",
                                   padding: "0.35em 0.5em",
-                                  marginLeft: "2em"
+                                  marginLeft: "auto"
                                 }}
                               >
                                 {formatBytes(fileSize)}
