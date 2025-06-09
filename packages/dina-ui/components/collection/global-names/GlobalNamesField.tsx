@@ -2,7 +2,7 @@ import { FieldWrapper, FieldWrapperProps, useDinaFormContext } from "common-ui";
 import { FormikProps } from "formik";
 
 import DOMPurify from "dompurify";
-import { isArray, startCase } from "lodash";
+import _ from "lodash";
 import { Dispatch, SetStateAction, useState } from "react";
 import Switch from "react-switch";
 import {
@@ -103,7 +103,7 @@ export function GlobalNamesField({
               <GlobalNamesSearchBox
                 fetchJson={fetchJson}
                 onSelect={(newValue) => {
-                  const val = isArray(newValue) ? newValue?.[1] : newValue;
+                  const val = _.isArray(newValue) ? newValue?.[1] : newValue;
                   onChange?.(newValue as any, formik);
                   setValue(val);
                   setSearchInitiated(true);
@@ -166,7 +166,7 @@ export function GlobalNamesReadOnly({
           <>
             <b>
               {" "}
-              {startCase(
+              {_.startCase(
                 ranksInit?.[idx] === ""
                   ? "unranked"
                   : ranksInit?.[idx] ?? "unranked"
@@ -192,7 +192,7 @@ export function GlobalNamesReadOnly({
           <>
             <b>
               {" "}
-              {startCase(
+              {_.startCase(
                 ranks?.[idx] === "" ? "unranked" : ranks?.[idx] ?? "unranked"
               )}{" "}
               :

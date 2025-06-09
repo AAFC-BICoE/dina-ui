@@ -25,7 +25,7 @@ import {
 } from "../../../../dina-ui/intl/dina-ui-intl";
 import { DataBlock } from "./DataBlock";
 import { DataEntryFieldProps } from "./DataEntryField";
-import { forOwn, groupBy } from "lodash";
+import _ from "lodash";
 
 export interface DataEntryProps extends DataEntryFieldProps {}
 
@@ -59,8 +59,8 @@ export function DataEntry({
         });
       }
       const ids: string[] = [];
-      forOwn(extensionValues, (extensionValue, extensionKey) => {
-        forOwn(extensionValue.rows, (_fieldValue, fieldKey) => {
+      _.forOwn(extensionValues, (extensionValue, extensionKey) => {
+        _.forOwn(extensionValue.rows, (_fieldValue, fieldKey) => {
           ids.push(`${extensionKey}.${fieldKey}`);
         });
       });
@@ -89,14 +89,14 @@ export function DataEntry({
         return blockOptionsQuery?.vocabOptions;
       }
 
-      const nestedExtensionFieldValue = groupBy(
+      const nestedExtensionFieldValue = _.groupBy(
         blockOptionsQuery.data,
         (extensionFieldValue: FieldExtensionValue) =>
           extensionFieldValue.extensionKey
       );
 
       const options: any = [];
-      forOwn(nestedExtensionFieldValue, (fieldExtensionValue) => {
+      _.forOwn(nestedExtensionFieldValue, (fieldExtensionValue) => {
         const blockOption = fieldExtensionValue.reduce(
           (acc, cur: FieldExtensionValue) => {
             acc.label = cur.extensionName;

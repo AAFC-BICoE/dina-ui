@@ -33,7 +33,11 @@ export function Home() {
                 <DinaMessage id="createNewLabel" />:
               </span>
 
-              <Link href="/collection/material-sample/edit" passHref={true}>
+              <Link
+                href="/collection/material-sample/edit"
+                passHref={true}
+                legacyBehavior
+              >
                 <Button variant="info" className="mx-1 my-1">
                   <DinaMessage id="materialSample" />
                 </Button>
@@ -42,25 +46,34 @@ export function Home() {
               <Link
                 href="/collection/material-sample/bulk-create"
                 passHref={true}
+                legacyBehavior
               >
                 <Button variant="info" className="mx-1 my-1">
                   <DinaMessage id="multipleMaterialSamples" />
                 </Button>
               </Link>
 
-              <Link href="/collection/collecting-event/edit" passHref={true}>
+              <Link
+                href="/collection/collecting-event/edit"
+                passHref={true}
+                legacyBehavior
+              >
                 <Button variant="info" className="mx-1 my-1">
                   <DinaMessage id="collectingEvent" />
                 </Button>
               </Link>
 
-              <Link href="/loan-transaction/transaction/edit" passHref={true}>
+              <Link
+                href="/loan-transaction/transaction/edit"
+                passHref={true}
+                legacyBehavior
+              >
                 <Button variant="info" className="mx-1 my-1">
                   <DinaMessage id="loanTransaction" />
                 </Button>
               </Link>
 
-              <Link href="/object-store/upload" passHref={true}>
+              <Link href="/object-store/upload" passHref={true} legacyBehavior>
                 <Button
                   href="/object-store/upload"
                   variant="info"
@@ -82,44 +95,28 @@ export function Home() {
 
               <Stack style={{ display: "inline-flex" }}>
                 <Link href="/collection/assemblage/list">
-                  <a>
-                    <DinaMessage id="title_assemblage" />
-                  </a>
+                  <DinaMessage id="title_assemblage" />
                 </Link>
                 <Link href="/collection/collecting-event/list">
-                  <a>
-                    <DinaMessage id="collectingEventListTitle" />
-                  </a>
+                  <DinaMessage id="collectingEventListTitle" />
                 </Link>
                 <Link href="/collection/collection/list">
-                  <a>
-                    <DinaMessage id="collectionListTitle" />
-                  </a>
+                  <DinaMessage id="collectionListTitle" />
                 </Link>
                 <Link href="/collection/material-sample/list">
-                  <a>
-                    <DinaMessage id="materialSampleListTitle" />
-                  </a>
+                  <DinaMessage id="materialSampleListTitle" />
                 </Link>
                 <Link href="/collection/revisions-by-user">
-                  <a>
-                    <DinaMessage id="revisionsByUserPageTitle" />
-                  </a>
+                  <DinaMessage id="revisionsByUserPageTitle" />
                 </Link>
                 <Link href="/collection/storage-unit/list">
-                  <a>
-                    <DinaMessage id="storageUnitListTitle" />
-                  </a>
+                  <DinaMessage id="storageUnitListTitle" />
                 </Link>
                 <Link href="/collection/project/list">
-                  <a>
-                    <DinaMessage id="projectListTitle" />
-                  </a>
+                  <DinaMessage id="projectListTitle" />
                 </Link>
                 <Link href="/workbook/upload">
-                  <a>
-                    <DinaMessage id="workbookGroupUploadTitle" />
-                  </a>
+                  <DinaMessage id="workbookGroupUploadTitle" />
                 </Link>
               </Stack>
             </Col>
@@ -132,14 +129,10 @@ export function Home() {
 
               <Stack style={{ display: "inline-flex" }}>
                 <Link href="/loan-transaction/revisions-by-user">
-                  <a>
-                    <DinaMessage id="revisionsByUserPageTitle" />
-                  </a>
+                  <DinaMessage id="revisionsByUserPageTitle" />
                 </Link>
                 <Link href="/loan-transaction/transaction/list">
-                  <a>
-                    <DinaMessage id="transactions" />
-                  </a>
+                  <DinaMessage id="transactions" />
                 </Link>
               </Stack>
             </Col>
@@ -152,29 +145,19 @@ export function Home() {
 
               <Stack style={{ display: "inline-flex" }}>
                 <Link href="/object-store/metadata/external-resource-edit">
-                  <a>
-                    <DinaMessage id="externalResourceListTitle" />
-                  </a>
+                  <DinaMessage id="externalResourceListTitle" />
                 </Link>
                 <Link href="/object-store/object-subtype/list">
-                  <a>
-                    <DinaMessage id="objectSubtypeListTitle" />
-                  </a>
+                  <DinaMessage id="objectSubtypeListTitle" />
                 </Link>
                 <Link href="/object-store/revisions-by-user">
-                  <a>
-                    <DinaMessage id="revisionsByUserPageTitle" />
-                  </a>
+                  <DinaMessage id="revisionsByUserPageTitle" />
                 </Link>
                 <Link href="/object-store/object/list">
-                  <a>
-                    <DinaMessage id="objectListTitle" />
-                  </a>
+                  <DinaMessage id="objectListTitle" />
                 </Link>
                 <Link href="/object-store/upload">
-                  <a>
-                    <DinaMessage id="uploadPageTitle" />
-                  </a>
+                  <DinaMessage id="uploadPageTitle" />
                 </Link>
               </Stack>
             </Col>
@@ -187,14 +170,10 @@ export function Home() {
 
               <Stack style={{ display: "inline-flex" }}>
                 <Link href="/organization/list" passHref={true}>
-                  <a>
-                    <DinaMessage id="organizationListTitle" />
-                  </a>
+                  <DinaMessage id="organizationListTitle" />
                 </Link>
                 <Link href="/person/list">
-                  <a>
-                    <DinaMessage id="personListTitle" />
-                  </a>
+                  <DinaMessage id="personListTitle" />
                 </Link>
               </Stack>
             </Col>
@@ -207,89 +186,55 @@ export function Home() {
 
               <Stack style={{ display: "inline-flex" }}>
                 <Link href="/seqdb/index-set/list">
-                  <a>
-                    <SeqdbMessage id="indexSetListTitle" />
-                  </a>
+                  <SeqdbMessage id="indexSetListTitle" />
                 </Link>
                 <Link href="/seqdb/library-prep-batch/list">
-                  <a>
-                    <SeqdbMessage id="libraryPrepBatchListTitle" />
-                  </a>
+                  <SeqdbMessage id="libraryPrepBatchListTitle" />
                 </Link>
                 <Link href="/seqdb/metagenomics-workflow/list">
-                  <a>
-                    <SeqdbMessage id="metagenomicsWorkflowTitle" />
-                  </a>
+                  <SeqdbMessage id="metagenomicsWorkflowTitle" />
                 </Link>
                 <Link href="/seqdb/molecular-analysis-run/list">
-                  <a>
-                    <SeqdbMessage id="molecularAnalysisRunListTitle" />
-                  </a>
+                  <SeqdbMessage id="molecularAnalysisRunListTitle" />
                 </Link>
                 <Link href="/seqdb/molecular-analysis-workflow/list">
-                  <a>
-                    <SeqdbMessage id="molecularAnalysisWorkflowTitle" />
-                  </a>
+                  <SeqdbMessage id="molecularAnalysisWorkflowTitle" />
                 </Link>
                 <Link href="/seqdb/ngs-workflow/list" passHref={true}>
-                  <a>
-                    <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
-                  </a>
+                  <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
                 </Link>
                 <Link href="/seqdb/ngs-workflow-pooling/list" passHref={true}>
-                  <a>
-                    <SeqdbMessage id="ngsWorkflowWholeGenomeSeqPoolingTitle" />
-                  </a>
+                  <SeqdbMessage id="ngsWorkflowWholeGenomeSeqPoolingTitle" />
                 </Link>
                 <Link href="/seqdb/pcr-batch/list">
-                  <a>
-                    <SeqdbMessage id="pcrBatchListTitle" />
-                  </a>
+                  <SeqdbMessage id="pcrBatchListTitle" />
                 </Link>
                 <Link href="/seqdb/pcr-primer/list">
-                  <a>
-                    <SeqdbMessage id="pcrPrimerListTitle" />
-                  </a>
+                  <SeqdbMessage id="pcrPrimerListTitle" />
                 </Link>
                 <Link href="/seqdb/pcr-workflow/list">
-                  <a>
-                    <SeqdbMessage id="pcrWorkflowListTitle" />
-                  </a>
+                  <SeqdbMessage id="pcrWorkflowListTitle" />
                 </Link>
                 <Link href="/seqdb/product/list">
-                  <a>
-                    <SeqdbMessage id="productListTitle" />
-                  </a>
+                  <SeqdbMessage id="productListTitle" />
                 </Link>
                 <Link href="/seqdb/region/list">
-                  <a>
-                    <SeqdbMessage id="regionListTitle" />
-                  </a>
+                  <SeqdbMessage id="regionListTitle" />
                 </Link>
                 <Link href="/seqdb/seq-batch/list" passHref={true}>
-                  <a>
-                    <SeqdbMessage id="seqBatchListTitle" />
-                  </a>
+                  <SeqdbMessage id="seqBatchListTitle" />
                 </Link>
                 <Link href="/seqdb/seq-submission/list" passHref={true}>
-                  <a>
-                    <SeqdbMessage id="seqSubmissionListTitle" />
-                  </a>
+                  <SeqdbMessage id="seqSubmissionListTitle" />
                 </Link>
                 <Link href="/seqdb/sequencing-facility/list">
-                  <a>
-                    <SeqdbMessage id="sequencingFacilityListTitle" />
-                  </a>
+                  <SeqdbMessage id="sequencingFacilityListTitle" />
                 </Link>
                 <Link href="/seqdb/seq-workflow/list">
-                  <a>
-                    <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
-                  </a>
+                  <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
                 </Link>
                 <Link href="/seqdb/thermocycler-profile/list">
-                  <a>
-                    <SeqdbMessage id="thermocyclerProfileListTitle" />
-                  </a>
+                  <SeqdbMessage id="thermocyclerProfileListTitle" />
                 </Link>
               </Stack>
             </Col>
@@ -302,49 +247,31 @@ export function Home() {
 
               <Stack style={{ display: "inline-flex" }}>
                 <Link href="/collection/collection-method/list">
-                  <a>
-                    <DinaMessage id="collectionMethodListTitle" />
-                  </a>
+                  <DinaMessage id="collectionMethodListTitle" />
                 </Link>
                 <Link href="/collection/extension/list">
-                  <a>
-                    <DinaMessage id="fieldExtensions" />
-                  </a>
+                  <DinaMessage id="fieldExtensions" />
                 </Link>
                 <Link href="/identifier/list">
-                  <a>
-                    <DinaMessage id="identifiers" />
-                  </a>
+                  <DinaMessage id="identifiers" />
                 </Link>
                 <Link href="/collection/institution/list">
-                  <a>
-                    <DinaMessage id="institutionListTitle" />
-                  </a>
+                  <DinaMessage id="institutionListTitle" />
                 </Link>
                 <Link href="/managed-attribute/list">
-                  <a>
-                    <DinaMessage id="managedAttributes" />
-                  </a>
+                  <DinaMessage id="managedAttributes" />
                 </Link>
                 <Link href="/collection/preparation-method/list">
-                  <a>
-                    <DinaMessage id="title_preparationMethod" />
-                  </a>
+                  <DinaMessage id="title_preparationMethod" />
                 </Link>
                 <Link href="/collection/preparation-type/list">
-                  <a>
-                    <DinaMessage id="preparationTypeListTitle" />
-                  </a>
+                  <DinaMessage id="preparationTypeListTitle" />
                 </Link>
                 <Link href="/collection/protocol/list">
-                  <a>
-                    <DinaMessage id="protocolListTitle" />
-                  </a>
+                  <DinaMessage id="protocolListTitle" />
                 </Link>
                 <Link href="/collection/storage-unit-type/list">
-                  <a>
-                    <DinaMessage id="storageUnitTypeListTitle" />
-                  </a>
+                  <DinaMessage id="storageUnitTypeListTitle" />
                 </Link>
               </Stack>
             </Col>
@@ -357,14 +284,10 @@ export function Home() {
 
               <Stack style={{ display: "inline-flex" }}>
                 <Link href="/collection/form-template/list">
-                  <a>
-                    <DinaMessage id="formTemplates" />
-                  </a>
+                  <DinaMessage id="formTemplates" />
                 </Link>
                 <Link href="/collection/split-configuration/list">
-                  <a>
-                    <DinaMessage id="splitConfigurationTitle" />
-                  </a>
+                  <DinaMessage id="splitConfigurationTitle" />
                 </Link>
                 <Link
                   href={{
@@ -375,9 +298,7 @@ export function Home() {
                     }
                   }}
                 >
-                  <a>
-                    <DinaMessage id="userProfile" />
-                  </a>
+                  <DinaMessage id="userProfile" />
                 </Link>
               </Stack>
             </Col>
@@ -391,21 +312,15 @@ export function Home() {
 
                 <Stack style={{ display: "inline-flex" }}>
                   <Link href="/group/list">
-                    <a>
-                      <DinaMessage id="groupListTitle" />
-                    </a>
+                    <DinaMessage id="groupListTitle" />
                   </Link>
                   {isAdmin && (
                     <>
                       <Link href="/dina-user/list">
-                        <a>
-                          <DinaMessage id="userListTitle" />
-                        </a>
+                        <DinaMessage id="userListTitle" />
                       </Link>
                       <Link href="/export/report-template/upload">
-                        <a>
-                          <DinaMessage id="reportTemplateUpload" />
-                        </a>
+                        <DinaMessage id="reportTemplateUpload" />
                       </Link>
                     </>
                   )}

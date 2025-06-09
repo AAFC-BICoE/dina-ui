@@ -7,7 +7,7 @@ import {
   useQuery,
   useStringComparator
 } from "common-ui";
-import { compact, isEmpty, omitBy, pick, set } from "lodash";
+import _ from "lodash";
 import {
   MaterialSample,
   StorageUnit
@@ -67,7 +67,7 @@ export function usePCRBatchItemGridControls({
 
   // Boolean if the grid contains any of items.
   const gridIsPopulated = useMemo(
-    () => !isEmpty(gridState.cellGrid),
+    () => !_.isEmpty(gridState.cellGrid),
     [gridState]
   );
 
@@ -140,7 +140,7 @@ export function usePCRBatchItemGridControls({
               ),
             { apiBaseUrl: "/collection-api" }
           ).then((response) => {
-            const materialSamplesTransformed = compact(
+            const materialSamplesTransformed = _.compact(
               response
             ).map<MaterialSample>((resource) => ({
               materialSampleName: resource.materialSampleName,
@@ -209,12 +209,12 @@ export function usePCRBatchItemGridControls({
       if (storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition) {
         const gridLayoutDefinition =
           storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition;
-        set(
+        _.set(
           pcrBatch,
           "gridLayoutDefinition.numberOfColumns",
           gridLayoutDefinition.numberOfColumns
         );
-        set(
+        _.set(
           pcrBatch,
           "gridLayoutDefinition.numberOfRows",
           gridLayoutDefinition.numberOfRows
@@ -244,16 +244,16 @@ export function usePCRBatchItemGridControls({
           sorted.push(item);
         }
       });
-      return compact(sorted);
+      return _.compact(sorted);
     } else {
-      return compact(batchItemSamples);
+      return _.compact(batchItemSamples);
     }
   }
 
   function moveItems(items: PcrBatchItemSample[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the PcrBatchItem from the grid.
-      const newCellGrid: CellGrid<PcrBatchItemSample> = omitBy(
+      const newCellGrid: CellGrid<PcrBatchItemSample> = _.omitBy(
         cellGrid,
         (item) => items.includes(item)
       );
@@ -438,7 +438,7 @@ export function usePCRBatchItemGridControls({
               relationships: {
                 storageUnitUsage: {
                   data: matchedStorageUnitUsage
-                    ? pick(matchedStorageUnitUsage, "id", "type")
+                    ? _.pick(matchedStorageUnitUsage, "id", "type")
                     : null
                 }
               }

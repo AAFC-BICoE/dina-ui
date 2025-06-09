@@ -1,19 +1,18 @@
 import {
-  FieldExtension,
-  ExtensionValue
+  ExtensionValue,
+  FieldExtension
 } from "../../../dina-ui/types/collection-api/resources/FieldExtension";
 
-import { SortableContainer } from "react-sortable-hoc";
+import { FaExclamationTriangle } from "react-icons/fa";
 import Select from "react-select";
+import { Tooltip } from "..";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import {
   JsonApiQuerySpec,
   useQuery,
   withResponse
 } from "../api-client/useQuery";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { FaExclamationTriangle } from "react-icons/fa";
-import { Tooltip } from "..";
 
 export interface FieldExtensionSelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
@@ -87,13 +86,11 @@ export function FieldExtensionSelectField(
           );
 
           return (
-            <SortableSelect
+            <Select
               onChange={onChange}
               options={options}
               placeholder={formatMessage("typeHereToSearch")}
               value={selectedValue}
-              axis="xy"
-              distance={4}
               defaultValue={null}
             />
           );
@@ -102,5 +99,3 @@ export function FieldExtensionSelectField(
     );
   });
 }
-
-const SortableSelect = SortableContainer(Select);

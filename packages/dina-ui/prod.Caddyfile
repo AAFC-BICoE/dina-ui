@@ -39,7 +39,9 @@ respond /api/instance.json "{
 	\"instance-name\": \"{$INSTANCE_NAME}\",
 	\"supported-languages-iso\": \"{$SUPPORTED_LANGUAGES_ISO}\",
 	\"supported-geographic-references\": \"{$SUPPORTED_GEOINFORMATION_SYSTEMS}\",
-	\"tgn-search-base-url\": \"{$TGN_SEARCH_BASE_URL}\"
+	\"tgn-search-base-url\": \"{$TGN_SEARCH_BASE_URL}\",
+	\"scientific-names-search-endpoint\": \"{$SCIENTIFIC_NAMES_SEARCH_ENDPOINT}\",
+	\"scientific-names-datasets-endpoint\": \"{$SCIENTIFIC_NAMES_DATASETS_ENDPOINT}\"
 }"
 
 # Proxy to the main back-end API:

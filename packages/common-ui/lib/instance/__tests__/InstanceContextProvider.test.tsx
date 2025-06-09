@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { ApiClientProvider } from "../../api-client/ApiClientContext";
 import { DefaultInstanceContextProvider } from "../InstanceContextProvider";
 import { useInstanceContext } from "../useInstanceContext";
@@ -39,7 +39,9 @@ describe("InstanceContextProvider", () => {
       </ApiClientProvider>
     );
 
-    expect(apiContext.apiClient.get).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(apiContext.apiClient.get).toHaveBeenCalledTimes(1)
+    );
     const p1 = await component.findByTestId("supportedLanguages");
     expect(p1).toBeInTheDocument();
     expect(p1.textContent).toBe("lang1, lang2");

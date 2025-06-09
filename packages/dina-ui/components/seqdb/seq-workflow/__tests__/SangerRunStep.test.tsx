@@ -1,6 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
-import { noop } from "lodash";
+import _ from "lodash";
 import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import {
@@ -124,8 +124,8 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         performSave={false}
         seqBatch={SEQ_BATCH}
         seqBatchId={SEQ_BATCH_ID}
-        setEditMode={noop}
-        setPerformSave={noop}
+        setEditMode={_.noop}
+        setPerformSave={_.noop}
       />,
       testCtx
     );
@@ -141,7 +141,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         seqBatch={SEQ_BATCH}
         seqBatchId={SEQ_BATCH_ID}
         setEditMode={mockSetEditMode}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
       />,
       testCtx
     );
@@ -220,7 +220,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         seqBatch={SEQ_BATCH}
         seqBatchId={SEQ_BATCH_ID_MULTIPLE_RUNS} // Use the SeqBatch ID with multiple runs
         setEditMode={mockSetEditMode}
-        setPerformSave={noop}
+        setPerformSave={_.noop}
       />,
       testCtx
     );

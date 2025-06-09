@@ -7,7 +7,7 @@ import {
   useQuery,
   useStringComparator
 } from "common-ui";
-import { compact, isEmpty, omitBy, pick, set } from "lodash";
+import _ from "lodash";
 import {
   MaterialSample,
   StorageUnit,
@@ -91,7 +91,7 @@ export function useMolecularAnalysisGridControls({
 
   // Boolean if the grid contains any of items.
   const gridIsPopulated = useMemo(
-    () => !isEmpty(gridState.cellGrid),
+    () => !_.isEmpty(gridState.cellGrid),
     [gridState]
   );
 
@@ -193,7 +193,7 @@ export function useMolecularAnalysisGridControls({
               ),
             { apiBaseUrl: "/collection-api" }
           ).then((response) => {
-            const materialSamplesTransformed = compact(
+            const materialSamplesTransformed = _.compact(
               response
             ).map<MaterialSample>((resource) => ({
               materialSampleName: resource.materialSampleName,
@@ -274,12 +274,12 @@ export function useMolecularAnalysisGridControls({
         }
 
         const gridLayoutDefinition = storageUnitType.gridLayoutDefinition;
-        set(
+        _.set(
           molecularAnalysis,
           "gridLayoutDefinition.numberOfColumns",
           gridLayoutDefinition.numberOfColumns
         );
-        set(
+        _.set(
           molecularAnalysis,
           "gridLayoutDefinition.numberOfRows",
           gridLayoutDefinition.numberOfRows
@@ -319,16 +319,16 @@ export function useMolecularAnalysisGridControls({
           sorted.push(item);
         }
       });
-      return compact(sorted);
+      return _.compact(sorted);
     } else {
-      return compact(batchItemSamples);
+      return _.compact(batchItemSamples);
     }
   }
 
   function moveItems(items: MolecularAnalysisItemSample[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the MolecularAnalysisItem from the grid.
-      const newCellGrid: CellGrid<MolecularAnalysisItemSample> = omitBy(
+      const newCellGrid: CellGrid<MolecularAnalysisItemSample> = _.omitBy(
         cellGrid,
         (item) => items.includes(item)
       );
@@ -507,7 +507,7 @@ export function useMolecularAnalysisGridControls({
             resource: {
               wellColumn: item.storageUnitUsage?.wellColumn,
               wellRow: item.storageUnitUsage?.wellRow,
-              storageUnit: pick(storageUnit, "id", "type") as any,
+              storageUnit: _.pick(storageUnit, "id", "type") as any,
               type: "storage-unit-usage",
               id: item.storageUnitUsage?.id,
               usageType:
@@ -535,7 +535,7 @@ export function useMolecularAnalysisGridControls({
               relationships: {
                 storageUnitUsage: {
                   data: matchedStorageUnitUsage
-                    ? pick(matchedStorageUnitUsage, "id", "type")
+                    ? _.pick(matchedStorageUnitUsage, "id", "type")
                     : null
                 }
               }

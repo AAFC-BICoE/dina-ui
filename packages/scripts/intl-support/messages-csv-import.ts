@@ -2,7 +2,7 @@ import { tsquery } from "@phenomnomnominal/tsquery";
 import * as ts from "typescript";
 import { Sheet, utils as sheetUtils } from "xlsx";
 import { CsvRow, LANGUAGES, MessageDictionary } from "./intl-config";
-import { toPairs, fromPairs } from "lodash";
+import _ from "lodash";
 
 interface ImportCsvMessagesParams {
   csvSheet: Sheet;
@@ -44,8 +44,8 @@ export function importCsvMessages({
       }
 
       // Sort the entries before write to file
-      const newMessagesArray = toPairs(newMessages);
-      newMessages = fromPairs(newMessagesArray.sort());
+      const newMessagesArray = _.toPairs(newMessages);
+      newMessages = _.fromPairs(newMessagesArray.sort());
 
       // Parse the Typescript message file:
       const srcCode = readFile(file);

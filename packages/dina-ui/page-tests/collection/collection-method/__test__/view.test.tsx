@@ -1,5 +1,5 @@
 import CollectionMethodDetailsPage from "../../../../pages/collection/collection-method/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
 import { screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -45,9 +45,7 @@ describe("CollectionMethod details page", () => {
     });
 
     // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
+    await waitForLoadingToDisappear();
 
     expect(
       wrapper.container.querySelector(".name-field .field-view")!.textContent

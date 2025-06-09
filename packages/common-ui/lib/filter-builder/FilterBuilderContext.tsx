@@ -1,4 +1,4 @@
-import { startCase } from "lodash";
+import _ from "lodash";
 import { createContext, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { FilterAttribute } from "./FilterBuilder";
@@ -46,7 +46,7 @@ export function FilterBuilderContextProvider({
           customLabel ??
           (messages[messageKey]
             ? formatMessage({ id: messageKey })
-            : startCase(fieldName));
+            : _.startCase(fieldName));
 
         return { label: optionLabel, value: attr };
       }),

@@ -1,7 +1,7 @@
 import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
-import { noop } from "lodash";
+import _ from "lodash";
 import userEvent from "@testing-library/user-event";
 import { Vocabulary } from "packages/dina-ui/types/collection-api";
 import QueryRowClassificationSearch, {
@@ -51,7 +51,7 @@ describe("QueryBuilderClassificationSearch", () => {
       const textSearchEquals = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryRowClassificationSearch
               value='{"searchValue":"","selectedOperator":"exactMatch","selectedClassificationRank":"class"}'
@@ -73,7 +73,7 @@ describe("QueryBuilderClassificationSearch", () => {
       const textSearchEmpty = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryRowClassificationSearch
               value='{"searchValue":"","selectedOperator":"empty","selectedClassificationRank":"class"}'

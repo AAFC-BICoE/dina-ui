@@ -15,7 +15,14 @@ import {
   MAX_OBJECT_EXPORT_TOTAL,
   useApiClient
 } from "common-ui";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState
+} from "react";
 import useLocalStorage from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { Alert } from "react-bootstrap";
@@ -40,7 +47,7 @@ export interface UseMolecularAnalysisExportAPIReturn {
   networkLoading: boolean;
   exportLoading: boolean;
 
-  dataExportError: JSX.Element | undefined;
+  dataExportError: ReactNode | undefined;
 
   performExport: (formik: any) => void;
 }
@@ -63,7 +70,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     useState<boolean>(false);
 
   // If any errors occur, a JSX component of the error can be presented to the user.
-  const [dataExportError, setDataExportError] = useState<JSX.Element>();
+  const [dataExportError, setDataExportError] = useState<ReactNode>();
 
   // Loading specifically for the run item selection loading.
   const [networkLoading, setNetworkLoading] = useState(true);

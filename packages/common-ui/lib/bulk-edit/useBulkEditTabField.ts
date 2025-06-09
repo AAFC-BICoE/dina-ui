@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { isBlankResourceAttribute, useBulkEditTabContext } from "common-ui";
-import { get, isEqual } from "lodash";
+import _ from "lodash";
 import { useIntl } from "react-intl";
 import { BulkEditTabContextI } from "./bulk-context";
 
@@ -36,13 +36,16 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
   );
 
   const hasNoValues = formStates.every((form) =>
-    isBlankResourceAttribute(get(form, fieldName))
+    isBlankResourceAttribute(_.get(form, fieldName))
   );
 
   let commonValue: any;
   const hasMultipleValues = !formStates.every((form) => {
-    const bulkValue = get(form, fieldName);
-    const sampleValue = get(sampleHooks[0].formRef.current?.values, fieldName);
+    const bulkValue = _.get(form, fieldName);
+    const sampleValue = _.get(
+      sampleHooks[0].formRef.current?.values,
+      fieldName
+    );
     if (fieldName.includes("extensionValues") && fieldName.includes("type")) {
       if (
         (isBlankResourceAttribute(bulkValue) &&
@@ -55,7 +58,7 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
       }
     }
     // Treat different types of blank values the same e.g. null, "", empty array:
-    return isEqual(
+    return _.isEqual(
       isBlankResourceAttribute(bulkValue) ? null : bulkValue,
       isBlankResourceAttribute(sampleValue) ? null : sampleValue
     );
@@ -64,16 +67,18 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
   const hasSameValues = !hasMultipleValues;
   commonValue =
     commonValue ??
-    (hasSameValues && !hasNoValues ? get(formStates[0], fieldName) : undefined);
+    (hasSameValues && !hasNoValues
+      ? _.get(formStates[0], fieldName)
+      : undefined);
 
   const bulkEditValue =
     "currentValue" in params
       ? params.currentValue
-      : get(bulkEditFormRef.current?.values, fieldName);
+      : _.get(bulkEditFormRef.current?.values, fieldName);
 
   const hasBulkEditValue =
     !isBlankResourceAttribute(bulkEditValue) &&
-    !isEqual(bulkEditValue, commonValue);
+    !_.isEqual(bulkEditValue, commonValue);
 
   return {
     hasNoValues,

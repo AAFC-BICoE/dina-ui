@@ -17,9 +17,10 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  STORAGE_COMPONENT_NAME,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../../types/collection-api";
-import { fireEvent, within } from "@testing-library/react";
+import { fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 const mockOnSaved = jest.fn();
 
@@ -124,7 +125,11 @@ async function mountForm(
     { apiContext }
   );
 
-  await new Promise(setImmediate);
+  await waitFor(() =>
+    expect(
+      wrapper.container.querySelector(".enable-collecting-event")
+    ).toBeInTheDocument()
+  );
 
   // Helper to query and interact with React Switch components.
   const colEventSwitch = within(
@@ -153,9 +158,9 @@ async function mountForm(
       // Click "yes" when asked Are You Sure:
       const modalForm = wrapper.container.querySelector(".modal-content form");
       fireEvent.submit(modalForm!);
-      await new Promise(setImmediate);
+      await waitFor(() => expect(modalForm).not.toBeInTheDocument());
     }
-    await new Promise(setImmediate);
+    await waitFor(() => expect(switchElement).toHaveProperty("checked", val));
   }
 
   async function toggleColEvent(val: boolean) {
@@ -188,14 +193,14 @@ async function mountForm(
     );
     fireEvent.change(nameInput!, { target: { value: "form1" } });
 
-    await new Promise(setImmediate);
+    await waitFor(() => expect(nameInput).toHaveValue("form1"));
   }
 
   async function submitForm() {
     const form = wrapper.container.querySelector("form");
     fireEvent.submit(form!);
 
-    await new Promise(setImmediate);
+    await waitFor(() => expect(mockOnSaved).toHaveBeenCalledTimes(1)); // Assuming onSaved is called after submission
   }
 
   return {
@@ -229,6 +234,23 @@ const formTemplate: PersistedResource<FormTemplate> = {
   restrictToCreatedBy: true,
   viewConfiguration: {},
   components: [
+    {
+      name: SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
+      visible: true,
+      order: 0,
+      sections: [
+        {
+          name: "parent-attributes-section",
+          visible: true,
+          items: [
+            {
+              name: "parentAttributes",
+              visible: true
+            }
+          ]
+        }
+      ]
+    },
     {
       name: IDENTIFIER_COMPONENT_NAME,
       visible: true,
@@ -1841,12 +1863,8 @@ describe("Form template edit page", () => {
       ".dwcDecimalLongitude input[type='text']"
     )!;
     fireEvent.change(lngInput, { target: { value: "2" } });
-
-    await new Promise(setImmediate);
-
     await submitForm();
-
-    expect(mockOnSaved).toHaveBeenCalledWith(expected);
+    await waitFor(() => expect(mockOnSaved).toHaveBeenCalledWith(expected));
   });
 
   it("Edits an existing action-definition: Renders the form with minimal data.", async () => {

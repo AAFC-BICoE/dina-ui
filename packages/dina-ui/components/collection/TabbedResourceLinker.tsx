@@ -102,9 +102,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                   <>
                     <div className="mb-3 d-flex justify-content-end align-items-center">
                       <Link href={`${readOnlyLink}${linkedResource.id}`}>
-                        <a>
-                          <DinaMessage id="detailsPageLink" />
-                        </a>
+                        <DinaMessage id="detailsPageLink" />
                       </Link>
                       {
                         // Do not allow changing an attached resource from a template:
@@ -126,7 +124,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                           <div className="attached-resource-link mb-3">
                             <DinaMessage id="attached" />:{" "}
                             <Link href={`${readOnlyLink}${resourceId}`}>
-                              <a>{linkedResource.id}</a>
+                              {linkedResource.id}
                             </Link>
                           </div>
                           {briefDetails(

@@ -4,7 +4,7 @@ import { mountWithAppContext } from "common-ui";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
 import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -64,26 +64,26 @@ describe("Region edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
-    expect(mockPatch).lastCalledWith(
-      "/seqdb-api/operations",
-      [
-        {
-          op: "POST",
-          path: "region",
-          value: {
-            attributes: {
-              group: "aafc",
-              name: "New Region"
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "region"
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/seqdb-api/operations",
+        [
+          {
+            op: "POST",
+            path: "region",
+            value: {
+              attributes: {
+                group: "aafc",
+                name: "New Region"
+              },
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "region"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the new region's details page.
     expect(mockPush).lastCalledWith("/seqdb/region/view?id=1");
@@ -119,14 +119,14 @@ describe("Region edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected error response.
-    expect(
-      wrapper.getByText(
-        /constraint violation: name size must be between 1 and 10/i
-      )
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /constraint violation: name size must be between 1 and 10/i
+        )
+      ).toBeInTheDocument();
+    });
     expect(mockPush).toBeCalledTimes(0);
   });
 
@@ -153,10 +153,10 @@ describe("Region edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the region form to load.
-    await new Promise(setImmediate);
-
-    // Check that the existing region's symbol value is in the field.
-    expect(wrapper.getByDisplayValue("symbol")).toBeInTheDocument();
+    await waitFor(() => {
+      // Check that the existing region's symbol value is in the field.
+      expect(wrapper.getByDisplayValue("symbol")).toBeInTheDocument();
+    });
 
     // Modify the "symbol" value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /symbol/i }), {
@@ -169,30 +169,30 @@ describe("Region edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
-      "/seqdb-api/operations",
-      [
-        {
-          op: "PATCH",
-          path: "region/1",
-          value: {
-            attributes: expect.objectContaining({
-              description: "desc",
-              group: "aafc",
-              name: "Test Region",
-              symbol: "new symbol"
-            }),
-            id: "1",
-            type: "region"
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/seqdb-api/operations",
+        [
+          {
+            op: "PATCH",
+            path: "region/1",
+            value: {
+              attributes: expect.objectContaining({
+                description: "desc",
+                group: "aafc",
+                name: "Test Region",
+                symbol: "new symbol"
+              }),
+              id: "1",
+              type: "region"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the existing region's details page.
     expect(mockPush).lastCalledWith("/seqdb/region/view?id=1");

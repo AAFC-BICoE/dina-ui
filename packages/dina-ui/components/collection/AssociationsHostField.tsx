@@ -2,7 +2,7 @@ import { FieldWrapper, FieldWrapperProps } from "common-ui";
 import { FormikProps } from "formik";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useState } from "react";
-import { isArray } from "lodash";
+import _ from "lodash";
 import DOMPurify from "dompurify";
 import { GlobalNamesSearchBox } from "./global-names/GlobalNamesSearchBox";
 export interface AssociationsHostFieldProps extends FieldWrapperProps {
@@ -112,7 +112,7 @@ export function AssociationsHostField({
           <GlobalNamesSearchBox
             fetchJson={fetchJson}
             onSelect={(newValue) => {
-              const val = isArray(newValue) ? newValue?.[1] : newValue;
+              const val = _.isArray(newValue) ? newValue?.[1] : newValue;
               onChange?.(newValue as any, formik);
               setValue(val);
               setSearchInitiated(true);

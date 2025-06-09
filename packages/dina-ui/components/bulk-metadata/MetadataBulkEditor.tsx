@@ -22,7 +22,7 @@ import { FormikProps } from "formik";
 import { useMetadataSave } from "../object-store/metadata/useMetadata";
 import { MetadataForm } from "../object-store/metadata/MetadataForm";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl"; // "packages/dina-ui/intl/dina-ui-intl"
-import { isEmpty, keys, omit, pick, pickBy } from "lodash";
+import _ from "lodash";
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 
 export interface MetadataBulkEditorProps {
@@ -196,7 +196,7 @@ export function getMetadataBulkOverrider(bulkEditFormRef) {
     const newMetadata: InputResource<Metadata> = {
       ...baseMetadata,
       ...overrides,
-      ...(!isEmpty(newManagedAttributes) && {
+      ...(!_.isEmpty(newManagedAttributes) && {
         managedAttributes: newManagedAttributes
       })
     };
@@ -335,8 +335,8 @@ function useBulkMetadataSave({
         }
         // Any errored field that was edited in the Edit All tab should
         // get the red indicator in the Edit All tab.
-        const badBulkEditedFields = keys(
-          pickBy(
+        const badBulkEditedFields = _.keys(
+          _.pickBy(
             error.fieldErrors,
             (_, fieldName) =>
               getBulkEditTabFieldInfo({ bulkEditCtx, fieldName })
@@ -345,13 +345,15 @@ function useBulkMetadataSave({
         );
         bulkEditFormRef.current?.setErrors({
           ...bulkEditFormRef.current?.errors,
-          ...pick(error.fieldErrors, badBulkEditedFields)
+          ..._.pick(error.fieldErrors, badBulkEditedFields)
         });
         // Don't show the bulk edited fields' errors in the individual tabs
         // because the user can't fix them there:
         metadataHooks
           .map((it) => it.formRef?.current)
-          .forEach((it) => it?.setErrors(omit(it.errors, badBulkEditedFields)));
+          .forEach((it) =>
+            it?.setErrors(_.omit(it.errors, badBulkEditedFields))
+          );
       }
       setError(error);
       throw new Error(formatMessage("bulkSubmissionErrorInfo"));

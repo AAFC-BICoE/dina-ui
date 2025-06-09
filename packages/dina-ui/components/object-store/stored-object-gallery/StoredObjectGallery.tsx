@@ -100,20 +100,18 @@ function GalleryItem({
         fileType="jpg"
         imgAlt={formatMessage("thumbnailNotAvailableText")}
       />
-
-      <Link href={`/object-store/object/view?id=${id}`}>
-        <a
-          style={{
-            margin: "1rem auto 1rem auto",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            width: "100%"
-          }}
-          title={linkText}
-        >
-          {linkText}
-        </a>
+      <Link
+        href={`/object-store/object/view?id=${id}`}
+        style={{
+          margin: "1rem auto 1rem auto",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          width: "100%"
+        }}
+        title={linkText}
+      >
+        {linkText}
       </Link>
       <div className="row">
         <div className="col-9">

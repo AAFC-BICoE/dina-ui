@@ -4,7 +4,7 @@ import TransactionEditPage, {
 } from "../../../../pages/loan-transaction/transaction/edit";
 import { mountWithAppContext } from "common-ui";
 import { Transaction } from "../../../../types/loan-transaction-api";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react"; // Import waitFor
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -129,11 +129,18 @@ describe("Transaction Form", () => {
     // Fill out all fields:
     // Material Out radio button
     fireEvent.click(wrapper.getByLabelText(/material out/i));
-    expect(wrapper.getByLabelText(/material out/i)).toBeChecked();
-    await new Promise(setImmediate);
+    // Use waitFor to assert that the radio button is checked after the click.
+    await waitFor(() =>
+      expect(wrapper.getByLabelText(/material out/i)).toBeChecked()
+    );
+
     // To Be Returned switch button
     fireEvent.click(wrapper.getByRole("switch", { name: "" }));
-    await new Promise(setImmediate);
+    // Wait for the switch to update its state. A simple check for its role should suffice.
+    await waitFor(() =>
+      expect(wrapper.getByRole("switch", { name: "" })).toBeInTheDocument()
+    );
+
     // Transaction Type field
     fireEvent.change(
       wrapper.getByRole("textbox", { name: /transaction type/i }),
@@ -273,22 +280,44 @@ describe("Transaction Form", () => {
 
     // Add Agent
     fireEvent.click(wrapper.getByRole("button", { name: /add new agent/i }));
+    // Wait for the agent combobox to appear
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("combobox", { name: /agent/i })
+      ).toBeInTheDocument()
+    );
 
     userEvent.click(wrapper.getByRole("combobox", { name: /agent/i }));
-    await new Promise(setImmediate);
+    // Wait for the options to appear after clicking the combobox
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /test person/i })
+      ).toBeInTheDocument()
+    );
     userEvent.click(wrapper.getByRole("option", { name: /test person/i }));
 
     // Add an Agent Role:
     userEvent.click(wrapper.getByRole("combobox", { name: /role\/action/i }));
-    await new Promise(setImmediate);
+    // Wait for the role options to appear
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("combobox", { name: /role\/action/i })
+      ).toBeInTheDocument()
+    );
     fireEvent.change(wrapper.getByRole("combobox", { name: /role\/action/i }), {
       target: { value: "my-role-1" }
     });
-    await new Promise(setImmediate);
-    userEvent.click(
-      wrapper.getByRole("option", { name: /add "my\-role\-1"/i })
+    // Wait for the "add" option to appear
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /add "my-role-1"/i })
+      ).toBeInTheDocument()
     );
-    await new Promise(setImmediate);
+    userEvent.click(wrapper.getByRole("option", { name: /add "my-role-1"/i }));
+    // Wait for the role to be added and visible
+    await waitFor(() =>
+      expect(wrapper.getByText(/my-role-1/i)).toBeInTheDocument()
+    );
 
     // Agent Details Date field
     fireEvent.change(wrapper.getAllByPlaceholderText(/yyyy\-mm\-dd/i)[3], {
@@ -302,7 +331,8 @@ describe("Transaction Form", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    // Wait for the mockSave to be called after form submission
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
     /** Make sure the expected submission matches the typescript type. */
     const EXPECTED_SUBMITTED_TRANSACTION: InputResource<Transaction> & {
@@ -386,19 +416,20 @@ describe("Transaction Form", () => {
       testCtx as any
     );
 
-    await new Promise(setImmediate);
-
-    // The Agent ID string should be converted to an object with ID and type:
-    // Test replaced by checking for expected elements/properties in the UI
-    expect(wrapper.getByText(/role 1/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/role 2/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/role 3/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/test person/i)).toBeInTheDocument();
+    // Wait for the existing transaction data to be loaded and displayed in the document.
+    // This assumes that the roles or the test person's name would be rendered once the data is loaded.
+    await waitFor(() => {
+      expect(wrapper.getByText(/role 1/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/role 2/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/role 3/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/test person/i)).toBeInTheDocument();
+    });
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
+    // Wait for the mockSave to be called after form submission
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
     // Test expected response
     expect(mockSave.mock.calls).toEqual([

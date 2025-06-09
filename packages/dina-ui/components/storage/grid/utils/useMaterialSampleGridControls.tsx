@@ -5,7 +5,7 @@ import {
   useQuery,
   useStringComparator
 } from "common-ui";
-import { compact, isEmpty, omitBy } from "lodash";
+import _ from "lodash";
 import { MaterialSample, StorageUnit } from "../../../../types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { StorageUnitUsage } from "../../../../types/collection-api/resources/StorageUnitUsage";
@@ -65,7 +65,7 @@ export function useMaterialSampleGridControls({
 
   // Boolean if the grid contains any of items.
   const gridIsPopulated = useMemo(
-    () => !isEmpty(gridState.cellGrid),
+    () => !_.isEmpty(gridState.cellGrid),
     [gridState]
   );
   const { loading: materialSamplesQueryLoading } = useQuery<MaterialSample[]>(
@@ -156,9 +156,9 @@ export function useMaterialSampleGridControls({
           sorted.push(item);
         }
       });
-      return compact(sorted);
+      return _.compact(sorted);
     } else {
-      return compact(batchItemSamples);
+      return _.compact(batchItemSamples);
     }
   }
 
@@ -176,7 +176,7 @@ export function useMaterialSampleGridControls({
           sampleName?: string;
           sampleId?: string;
         }
-      > = omitBy(cellGrid, (item) => items.includes(item));
+      > = _.omitBy(cellGrid, (item) => items.includes(item));
 
       // Remove the PcrBatchItem from the available PcrBatchItems.
       let newAvailableItems = availableItems.filter((s) => !items.includes(s));

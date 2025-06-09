@@ -11,7 +11,7 @@ import { MaterialSample, StorageUnit } from "../../../types/collection-api";
 import { useEffect, useState } from "react";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { compact, uniq, difference, concat } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { SELECT_MATERIAL_SAMPLES_TAB_INDEX } from "../../../pages/collection/storage-unit/grid";
@@ -84,7 +84,9 @@ export function StorageUnitSampleSelectionStep({
 
   function setSelectedResourcesAndSaveOrder(materialSamples: MaterialSample[]) {
     setSelectedResources(materialSamples);
-    setMaterialSampleSortOrder(compact(materialSamples.map((item) => item.id)));
+    setMaterialSampleSortOrder(
+      _.compact(materialSamples.map((item) => item.id))
+    );
   }
 
   // Sort MaterialSamples based on the preserved order in local storage
@@ -98,16 +100,16 @@ export function StorageUnitSampleSelectionStep({
           sorted.push(item);
         }
       });
-      return compact(sorted);
+      return _.compact(sorted);
     } else {
-      return compact(samples);
+      return _.compact(samples);
     }
   }
 
   function onSelectMaterial(selected: MaterialSample[]) {
-    const ids = compact(
-      uniq(
-        concat(
+    const ids = _.compact(
+      _.uniq(
+        _.concat(
           materialSampleSortOrder,
           selected.map((material) => material.id)
         )
@@ -117,10 +119,10 @@ export function StorageUnitSampleSelectionStep({
   }
 
   function onDeselectMaterial(unselected: MaterialSample[]) {
-    const ids = uniq(
-      difference(
+    const ids = _.uniq(
+      _.difference(
         materialSampleSortOrder,
-        compact(unselected.map((material) => material.id))
+        _.compact(unselected.map((material) => material.id))
       )
     );
     setMaterialSampleSortOrder(ids);

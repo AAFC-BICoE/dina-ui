@@ -12,7 +12,7 @@ import {
   MultilingualDescription
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import { fromPairs, toPairs } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
@@ -82,7 +82,7 @@ export function PreparationTypeForm({
     ? {
         ...fetchedPrepType,
         // Convert multilingualDescription to editable Dictionary format:
-        multilingualDescription: fromPairs<string | undefined>(
+        multilingualDescription: _.fromPairs<string | undefined>(
           fetchedPrepType.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
           )
@@ -97,7 +97,7 @@ export function PreparationTypeForm({
       ...submittedValues,
       // Convert the editable format to the stored format:
       multilingualDescription: {
-        descriptions: toPairs(submittedValues.multilingualDescription).map(
+        descriptions: _.toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc })
         )
       }

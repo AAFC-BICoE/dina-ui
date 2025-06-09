@@ -1,7 +1,7 @@
 import { mountWithAppContext } from "common-ui";
 import MolecularAnalysisRunViewPage from "../../../../pages/seqdb/molecular-analysis-run/view";
 import "@testing-library/jest-dom";
-import { waitForElementToBeRemoved } from "@testing-library/react";
+import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import {
   QUALITY_CONTROL_1,
   QUALITY_CONTROL_2,
@@ -229,32 +229,38 @@ describe("Molecular Analysis Run View", () => {
     const wrapper = mountWithAppContext(<MolecularAnalysisRunViewPage />, {
       apiContext
     });
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitFor(() => {
+      // Ensure the title is displayed of the run.
+      expect(wrapper.getAllByText(/run name 1/i)[0]).toBeInTheDocument();
 
-    // Ensure the title is displayed of the run.
-    expect(wrapper.getAllByText(/run name 1/i)[0]).toBeInTheDocument();
+      // Ensure Molecular Analysis Run Items are displayed:
+      expect(
+        wrapper.getByRole("link", { name: "Sample 1" })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: "Sample 2" })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: "Sample 3" })
+      ).toBeInTheDocument();
 
-    // Ensure Molecular Analysis Run Items are displayed:
-    expect(wrapper.getByRole("link", { name: "Sample 1" })).toBeInTheDocument();
-    expect(wrapper.getByRole("link", { name: "Sample 2" })).toBeInTheDocument();
-    expect(wrapper.getByRole("link", { name: "Sample 3" })).toBeInTheDocument();
+      // Ensure Run Item Names are displayed:
+      expect(wrapper.getByText("Run Item 1")).toBeInTheDocument();
+      expect(wrapper.getByText("Run Item 2")).toBeInTheDocument();
+      expect(wrapper.getByText("Run Item 3")).toBeInTheDocument();
 
-    // Ensure Run Item Names are displayed:
-    expect(wrapper.getByText("Run Item 1")).toBeInTheDocument();
-    expect(wrapper.getByText("Run Item 2")).toBeInTheDocument();
-    expect(wrapper.getByText("Run Item 3")).toBeInTheDocument();
+      // Ensure Well Coordinates are displayed:
+      expect(wrapper.getByText("A1")).toBeInTheDocument();
+      expect(wrapper.getByText("A2")).toBeInTheDocument();
+      expect(wrapper.getByText("A3")).toBeInTheDocument();
 
-    // Ensure Well Coordinates are displayed:
-    expect(wrapper.getByText("A1")).toBeInTheDocument();
-    expect(wrapper.getByText("A2")).toBeInTheDocument();
-    expect(wrapper.getByText("A3")).toBeInTheDocument();
-
-    // Ensure the attachment appears.
-    expect(
-      wrapper.getByRole("heading", {
-        name: /sequencing run attachments \(1\)/i
-      })
-    ).toBeInTheDocument();
+      // Ensure the attachment appears.
+      expect(
+        wrapper.getByRole("heading", {
+          name: /sequencing run attachments \(1\)/i
+        })
+      ).toBeInTheDocument();
+    });
   });
 
   it("Renders the molecular analysis run details for generic molecular analysis with quality controls", async () => {
@@ -262,34 +268,35 @@ describe("Molecular Analysis Run View", () => {
     const wrapper = mountWithAppContext(<MolecularAnalysisRunViewPage />, {
       apiContext
     });
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Ensure the title is displayed of the run.
-    expect(
-      wrapper.getAllByText("Quality Control Run Name 1")[0]
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getAllByText("Quality Control Run Name 1")[0]
+      ).toBeInTheDocument();
 
-    // Ensure the quality control section is displayed.
-    expect(
-      wrapper.getByRole("heading", { name: "Sequencing Quality Control:" })
-    );
+      // Ensure the quality control section is displayed.
+      expect(
+        wrapper.getByRole("heading", { name: "Sequencing Quality Control:" })
+      );
 
-    // Expect Quality Control 1 to be displayed:
-    expect(wrapper.getByText("Quality Control 1")).toBeInTheDocument();
-    expect(wrapper.getByText("Reserpine Standard")).toBeInTheDocument();
+      // Expect Quality Control 1 to be displayed:
+      expect(wrapper.getByText("Quality Control 1")).toBeInTheDocument();
+      expect(wrapper.getByText("Reserpine Standard")).toBeInTheDocument();
 
-    // Expect Quality Control 1 to have 2 attachments:
-    expect(wrapper.getAllByRole("link", { name: /japan\.jpg/i }).length).toBe(
-      2
-    );
+      // Expect Quality Control 1 to have 2 attachments:
+      expect(wrapper.getAllByRole("link", { name: /japan\.jpg/i }).length).toBe(
+        2
+      );
 
-    // Expect Quality Control 2 to be displayed:
-    expect(wrapper.getByText("Quality Control 2")).toBeInTheDocument();
-    expect(wrapper.getByText("ACN Blank")).toBeInTheDocument();
+      // Expect Quality Control 2 to be displayed:
+      expect(wrapper.getByText("Quality Control 2")).toBeInTheDocument();
+      expect(wrapper.getByText("ACN Blank")).toBeInTheDocument();
 
-    // Expect Quality Control 3 to be displayed:
-    expect(wrapper.getByText("Quality Control 3")).toBeInTheDocument();
-    expect(wrapper.getByText("MEOH Blank")).toBeInTheDocument();
+      // Expect Quality Control 3 to be displayed:
+      expect(wrapper.getByText("Quality Control 3")).toBeInTheDocument();
+      expect(wrapper.getByText("MEOH Blank")).toBeInTheDocument();
+    });
   });
 
   it("Renders the molecular analysis run details for generic molecular analysis with no run items", async () => {
@@ -297,10 +304,11 @@ describe("Molecular Analysis Run View", () => {
     const wrapper = mountWithAppContext(<MolecularAnalysisRunViewPage />, {
       apiContext
     });
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
-    expect(wrapper.getAllByText("No run items")[0]).toBeInTheDocument();
-    expect(wrapper.getAllByText("No Rows Found").length).toBe(2);
+    await waitFor(() => {
+      expect(wrapper.getAllByText("No run items")[0]).toBeInTheDocument();
+      expect(wrapper.getAllByText("No Rows Found").length).toBe(2);
+    });
   });
 
   it("Renders the molecular analysis run details for metagenomics batch items", async () => {

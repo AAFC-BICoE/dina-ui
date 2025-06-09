@@ -1,4 +1,4 @@
-import { startCase } from "lodash";
+import _ from "lodash";
 import { PropsWithChildren, useState, createContext, useContext } from "react";
 import { Accordion } from "react-bootstrap";
 import { useIntl } from "react-intl";
@@ -48,7 +48,7 @@ export function CollapsibleSection({
   // Try to use dina messages first, if not just use the string directly.
   const headerLabel = messages[headerKey]
     ? formatMessage({ id: headerKey as any })
-    : startCase(headerKey);
+    : _.startCase(headerKey);
 
   return (
     <CollapsibleSectionContext.Provider value={{ isAccordionOpen }}>

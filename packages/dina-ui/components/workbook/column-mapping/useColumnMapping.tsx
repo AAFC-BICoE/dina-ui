@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { pick } from "lodash";
+import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import {
   SelectField,
@@ -676,11 +676,11 @@ export function useColumnMapping() {
         if (found) {
           if (PERSON_SELECT_FIELDS.has(fieldPath)) {
             theRelationshipMapping[columnHeader][value.replaceAll(".", "_")] = [
-              pick(found, ["id", "type"])
+              _.pick(found, ["id", "type"])
             ];
           } else {
             theRelationshipMapping[columnHeader][value.replaceAll(".", "_")] =
-              pick(found, ["id", "type"]);
+              _.pick(found, ["id", "type"]);
           }
         } else {
           // No value was found without string splitting
@@ -699,7 +699,7 @@ export function useColumnMapping() {
                 | undefined = getInitialRelationshipFieldValues(fieldValue);
               if (initialRelationshipFieldValue) {
                 relationshipMappingDefaultValues.push(
-                  pick(initialRelationshipFieldValue, ["id", "type"])
+                  _.pick(initialRelationshipFieldValue, ["id", "type"])
                 );
               }
             }

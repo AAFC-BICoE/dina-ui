@@ -2,7 +2,7 @@ import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { validateDate } from "../query-builder-value-types/QueryBuilderDateSearch";
 import { validateNumber } from "../query-builder-value-types/QueryBuilderNumberSearch";
 import { validateManagedAttribute } from "../query-builder-value-types/QueryBuilderManagedAttributeSearch";
-import { flattenDeep } from "lodash";
+import _ from "lodash";
 
 export interface ValidationError {
   /** Error message to display to the user. */
@@ -42,7 +42,7 @@ export function getElasticSearchValidationResults(
     return results === true ? [] : [results];
   } else {
     // Filter out "true" values and return only ValidationError objects:
-    const validationErrors = flattenDeep(results).filter(
+    const validationErrors = _.flattenDeep(results).filter(
       (result): result is ValidationError => result !== true
     );
 

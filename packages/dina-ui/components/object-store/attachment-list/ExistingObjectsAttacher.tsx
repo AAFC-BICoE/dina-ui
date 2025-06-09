@@ -8,7 +8,7 @@ import {
   useGroupedCheckBoxes
 } from "common-ui";
 import { FormikContextType } from "formik";
-import { toPairs } from "lodash";
+import _ from "lodash";
 import Link from "next/link";
 import { ThumbnailCell } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -36,13 +36,14 @@ export function ExistingObjectsAttacher({
     fieldName: "selectedMetadatas"
   });
 
-  const submitMetadataIds: OnFormikSubmit<ExistingObjectsAttacherForm> =
-    async ({ selectedMetadatas }) => {
-      const metadataIds = toPairs(selectedMetadatas)
-        .filter((pair) => pair[1])
-        .map((pair) => pair[0]);
-      await onMetadataIdsSubmitted(metadataIds);
-    };
+  const submitMetadataIds: OnFormikSubmit<
+    ExistingObjectsAttacherForm
+  > = async ({ selectedMetadatas }) => {
+    const metadataIds = _.toPairs(selectedMetadatas)
+      .filter((pair) => pair[1])
+      .map((pair) => pair[0]);
+    await onMetadataIdsSubmitted(metadataIds);
+  };
 
   const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
     {
@@ -64,13 +65,14 @@ export function ExistingObjectsAttacher({
         }
       }) =>
         resourceExternalURL ? (
-          <Link href={`/object-store/object/external-resource-view?id=${id}`}>
-            <a className="m-auto">
-              <DinaMessage id="detailsPageLink" />
-            </a>
+          <Link
+            href={`/object-store/object/external-resource-view?id=${id}`}
+            className="m-auto"
+          >
+            <DinaMessage id="detailsPageLink" />
           </Link>
         ) : originalFilename ? (
-          <Link href={`/object-store/object/view?id=${id}`}>
+          <Link href={`/object-store/object/view?id=${id}`} legacyBehavior>
             {originalFilename}
           </Link>
         ) : null,

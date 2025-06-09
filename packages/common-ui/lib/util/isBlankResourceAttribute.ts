@@ -1,4 +1,4 @@
-import { omitBy, isEmpty } from "lodash";
+import _ from "lodash";
 
 /**
  * Checks whether an API resource's attribute is blank.
@@ -17,7 +17,7 @@ export function isBlankResourceAttribute(value: any) {
         return true;
       }
 
-      return isEmpty(value);
+      return _.isEmpty(value);
     default:
       return false;
   }
@@ -27,7 +27,7 @@ export function withoutBlankFields<T>(
   preprocessed: T,
   original?: T
 ): { [P in keyof T]: T[P] } {
-  const overriddenObject = omitBy(
+  const overriddenObject = _.omitBy(
     preprocessed as any,
     isBlankResourceAttribute
   ) as {

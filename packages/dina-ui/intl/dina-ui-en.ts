@@ -556,6 +556,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   georeferencedByLabel: "Georeferenced By (agent)",
   georeferencedDateLabel: "Georeferenced Date",
   globalNameSearchLabel: "Global Name Search",
+  globalNameSources: "Name sources",
+  dataSourceHasNoTaxonData:
+    "This data source provides only names. Upper ranks data is not available.",
   goToThePreviousStep: "Go to the previous step",
   governmentOfCanada: "Government of Canada",
   governmentOfCanadaSymbol: "Symbol of the Government of Canada",
@@ -1239,5 +1242,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   downloadTemplate: "Download Template",
   existingTemplates: "Existing Templates",
   viewMaterialSamplesInCollection: "View material samples in this collection",
-  generateURLButtonText: "Generate URL"
+  generateURLButtonText: "Generate URL",
+  taxonomyTree: "Taxonomy Tree"
 };

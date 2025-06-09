@@ -4,7 +4,7 @@ import QueryBuilderBooleanSearch, {
 } from "../QueryBuilderBooleanSearch";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
-import { noop } from "lodash";
+import _ from "lodash";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -15,7 +15,7 @@ describe("QueryBuilderBooleanSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const { queryByRole } = mountWithAppContext(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop } as any}>
+          <QueryBuilderContextProvider value={{ performSubmit: _.noop } as any}>
             <QueryBuilderBooleanSearch
               matchType="equals"
               value="test"
@@ -33,7 +33,7 @@ describe("QueryBuilderBooleanSearch", () => {
       const { queryByRole } = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: noop, groups: [] }}
+            value={{ performSubmit: _.noop, groups: [] }}
           >
             <QueryBuilderBooleanSearch
               matchType="empty"

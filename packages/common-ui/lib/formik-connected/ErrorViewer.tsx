@@ -1,6 +1,6 @@
 import { flatten } from "flat";
 import { useFormikContext } from "formik";
-import { compact, toPairs } from "lodash";
+import _ from "lodash";
 import { useMemo } from "react";
 import { useFieldLabels } from "../field-header/FieldHeader";
 
@@ -27,7 +27,7 @@ export function ErrorViewer({ customErrorViewerMessage }: ErrorViewProps) {
   /** A string of form-level and field-level error messages. */
   const errorMessages = useMemo(
     () => {
-      const fieldErrors = toPairs(
+      const fieldErrors = _.toPairs(
         flatten<object, any>(errors, { transformKey })
       ).map(([field, error], index) => {
         // Return null if the error is not renderable:
@@ -65,7 +65,7 @@ export function ErrorViewer({ customErrorViewerMessage }: ErrorViewProps) {
         </div>
       ) : null;
 
-      return compact([formError, ...fieldErrors]);
+      return _.compact([formError, ...fieldErrors]);
     },
     // Update the form-level error message on form submit or when errors change:
     [isSubmitting, errors, status]

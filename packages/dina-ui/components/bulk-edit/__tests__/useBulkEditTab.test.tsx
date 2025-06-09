@@ -11,7 +11,8 @@ import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-
 import { MaterialSampleFormProps } from "../../collection/material-sample/MaterialSampleForm";
 import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
-import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockSubmitOverride = jest.fn();
 
@@ -187,13 +188,18 @@ describe("Material sample bulk edit tab", () => {
 
   it("Without changing any fields, overrides nothing", async () => {
     const wrapper = mountWithAppContext(<BulkEditTab />, testCtx);
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /get overrides/i })
+      ).toBeInTheDocument();
+    });
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
-    await new Promise(setImmediate);
 
-    expect(mockSubmitOverride).lastCalledWith({
-      type: "material-sample"
+    await waitFor(() => {
+      expect(mockSubmitOverride).lastCalledWith({
+        type: "material-sample"
+      });
     });
   });
 
@@ -208,7 +214,11 @@ describe("Material sample bulk edit tab", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /barcode/i })
+      ).toBeInTheDocument();
+    });
 
     // Update the barcode
     fireEvent.change(wrapper.getByRole("textbox", { name: /barcode/i }), {
@@ -216,12 +226,13 @@ describe("Material sample bulk edit tab", () => {
     });
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
-    await new Promise(setImmediate);
 
-    expect(mockSubmitOverride).lastCalledWith({
-      type: "material-sample",
-      materialSampleName: "test-sample",
-      barcode: "test-barcode-override"
+    await waitFor(() => {
+      expect(mockSubmitOverride).lastCalledWith({
+        type: "material-sample",
+        materialSampleName: "test-sample",
+        barcode: "test-barcode-override"
+      });
     });
   });
 
@@ -235,32 +246,38 @@ describe("Material sample bulk edit tab", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    // Wait for a part of the page to be loaded in.
+    await waitFor(() =>
+      expect(wrapper.getByText(/collecting event/i)).toBeInTheDocument()
+    );
 
     // Enable all data components...
     const switches = wrapper.container.querySelectorAll(
       ".material-sample-nav .react-switch-bg"
     );
-    if (!switches || switches.length === 0) {
-      fail("Data component switches are expected...");
-    }
-    switches.forEach((switchFound) => {
+    switches.forEach(async (switchFound) => {
+      await waitFor(() => expect(switchFound).toBeInTheDocument());
       fireEvent.click(switchFound);
     });
-    await new Promise(setImmediate);
 
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: /get overrides/i })
+      ).toBeInTheDocument();
+    });
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
-    await new Promise(setImmediate);
 
-    expect(mockSubmitOverride).lastCalledWith({
-      // Keeps the name and type:
-      type: "material-sample",
-      materialSampleName: "test-sample",
-      // Sets the default association because it's enabled and there are no values set in the other tabs:
-      associations: [{}],
-      // Sets the default organism because it's enabled and there are no values set in the other tabs:
-      organism: [{}],
-      organismsQuantity: 1
+    await waitFor(() => {
+      expect(mockSubmitOverride).lastCalledWith({
+        // Keeps the name and type:
+        type: "material-sample",
+        materialSampleName: "test-sample",
+        // Sets the default association because it's enabled and there are no values set in the other tabs:
+        associations: [{}],
+        // Sets the default organism because it's enabled and there are no values set in the other tabs:
+        organism: [{}],
+        organismsQuantity: 1
+      });
     });
   });
 
@@ -278,7 +295,13 @@ describe("Material sample bulk edit tab", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("combobox", {
+          name: /add new/i
+        })
+      ).toBeInTheDocument();
+    });
 
     const managedAttributesVisible = wrapper.getByRole("combobox", {
       name: /add new/i
@@ -290,12 +313,15 @@ describe("Material sample bulk edit tab", () => {
       target: { value: "Managed Attribute 2" }
     });
     fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
-    await new Promise(setImmediate);
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("option", { name: /managed attribute 2/i })
+      ).toBeInTheDocument();
+    });
     fireEvent.click(
       wrapper.getByRole("option", { name: /managed attribute 2/i })
     );
-    await new Promise(setImmediate);
 
     // Select the "C" managed attribute to display.
     fireEvent.focus(managedAttributesVisible);
@@ -303,37 +329,37 @@ describe("Material sample bulk edit tab", () => {
       target: { value: "Managed Attribute 3" }
     });
     fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
-    await new Promise(setImmediate);
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("option", { name: /managed attribute 3/i })
+      ).toBeInTheDocument();
+    });
     fireEvent.click(
       wrapper.getByRole("option", { name: /managed attribute 3/i })
     );
-    await new Promise(setImmediate);
 
-    const textboxB = wrapper.container.querySelector(
-      ".managedAttributes_b-field input"
-    );
-    const textboxC = wrapper.container.querySelector(
-      ".managedAttributes_c-field input"
-    );
-    if (!textboxB || !textboxC) {
-      fail("The managed attribute textboxes need to exist at this point.");
-    }
+    const textboxB = (await waitFor(() =>
+      wrapper.container.querySelector(".managedAttributes_b-field input")
+    )) as Element;
+    const textboxC = (await waitFor(() =>
+      wrapper.container.querySelector(".managedAttributes_c-field input")
+    )) as Element;
     fireEvent.change(textboxB, { target: { value: "new-b-value" } });
     fireEvent.change(textboxC, { target: { value: "new-c-value" } });
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
-    await new Promise(setImmediate);
 
-    expect(mockSubmitOverride).lastCalledWith({
-      // Keeps the name and type:
-      type: "material-sample",
-      materialSampleName: "test-sample",
-      managedAttributes: {
-        a: "value A",
-        b: "new-b-value",
-        c: "new-c-value"
-      }
+    await waitFor(() => {
+      expect(mockSubmitOverride).lastCalledWith({
+        // Keeps the name and type:
+        type: "material-sample",
+        materialSampleName: "test-sample",
+        managedAttributes: {
+          a: "value A",
+          b: "new-b-value",
+          c: "new-c-value"
+        }
+      });
     });
   });
 });

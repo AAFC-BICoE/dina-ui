@@ -11,7 +11,12 @@ const mockOnChange = jest.fn((val, form) =>
 );
 
 const mockFetchJson = jest.fn(async () => {
-  return { names: TEST_GLOBAL_NAME_SEARCH_RESULT };
+  return {
+    names: TEST_GLOBAL_NAME_SEARCH_RESULT.map((result) => ({
+      ...result,
+      results: [result.bestResult]
+    }))
+  };
 });
 
 const mockOnSubmit = jest.fn();
@@ -39,11 +44,12 @@ describe("GlobalNamesField component", () => {
     const input = container.querySelector("input.global-name-input");
     fireEvent.change(input!, { target: { value: "  monodon  " } });
 
-    await new Promise(setImmediate);
-
     // Simulate clicking the search button
     const searchButton = screen.getByRole("button", {
       name: /search/i
+    });
+    await waitFor(() => {
+      expect(searchButton).toBeInTheDocument();
     });
     fireEvent.click(searchButton);
 
@@ -82,7 +88,7 @@ describe("GlobalNamesField component", () => {
     ]);
 
     expect(mockFetchJson).lastCalledWith(
-      "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false"
+      "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false&all_matches=true"
     );
 
     // Submit the form

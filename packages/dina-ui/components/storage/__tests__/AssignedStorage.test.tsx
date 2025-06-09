@@ -5,6 +5,7 @@ import { StorageUnit } from "../../../types/collection-api";
 import { AssignedStorage } from "../AssignedStorage";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const STORAGE_A_SHALLOW: PersistedResource<StorageUnit> = {
   id: "A",
@@ -85,7 +86,10 @@ describe("AssignedStorage component", () => {
       </DinaForm>,
       { apiContext }
     );
-    await new Promise(setImmediate);
+
+    await waitFor(() => {
+      expect(wrapper.getByRole("img")).toBeInTheDocument();
+    });
     userEvent.hover(wrapper.getByRole("img"));
 
     expect(
@@ -102,9 +106,12 @@ describe("AssignedStorage component", () => {
       </DinaForm>,
       { apiContext }
     );
-    await new Promise(setImmediate);
 
+    await waitFor(() => {
+      expect(wrapper.getByRole("button")).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getByRole("button"));
+
     expect(mockOnChange).lastCalledWith({ id: null });
   });
 });

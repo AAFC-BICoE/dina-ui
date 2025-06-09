@@ -16,11 +16,7 @@ const PRODUCT_TABLE_COLUMNS: ColumnDefinition<Product>[] = [
       row: {
         original: { id, name }
       }
-    }) => (
-      <Link href={`/seqdb/product/view?id=${id}`}>
-        <a>{name}</a>
-      </Link>
-    ),
+    }) => <Link href={`/seqdb/product/view?id=${id}`}>{name}</Link>,
     accessorKey: "name"
   },
   {

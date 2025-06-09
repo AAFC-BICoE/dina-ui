@@ -1,7 +1,7 @@
 import { mountWithAppContext } from "common-ui";
 import { DateField } from "../DateField";
 import { DinaForm } from "../DinaForm";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { SubmitButton } from "../SubmitButton";
 import "@testing-library/jest-dom";
 
@@ -69,9 +69,9 @@ describe("DateField component", () => {
 
     fireEvent.change(textbox, { target: { value: "" } });
     fireEvent.click(wrapper.getByRole("button"));
-    await new Promise(setImmediate);
-
-    expect(mockOnSubmit).lastCalledWith({ testField: "" });
+    await waitFor(() => {
+      expect(mockOnSubmit).lastCalledWith({ testField: "" });
+    });
   });
 
   it("Shows an error on non-existing dates.", () => {

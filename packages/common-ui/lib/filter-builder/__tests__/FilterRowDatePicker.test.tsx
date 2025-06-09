@@ -1,6 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import { FilterRowDatePicker } from "../FilterRowDatePicker";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 
 // The state to pass in to the datepicker:
 const TEST_DATE_VALUE1 =
@@ -25,16 +25,18 @@ describe("FilterRowDatePicker", () => {
       />
     );
 
-    await new Promise(setImmediate);
-
     const datepicker = wrapper.getByRole("textbox") as HTMLInputElement;
-    expect(datepicker.value).toEqual("10/12/2020"); // User friendly version.
 
+    await waitFor(() => {
+      expect(datepicker.value).toEqual("10/12/2020"); // User friendly version.
+    });
     const TEST_SINGLE_DATE_CHANGE =
       "Tue Oct 20 2020 21:05:30 GMT+0000 (Coordinated Universal Time)";
 
     fireEvent.change(datepicker, { target: { value: "10/20/2020" } });
-    expect(mockOnChanged).lastCalledWith(TEST_SINGLE_DATE_CHANGE);
+    await waitFor(() => {
+      expect(mockOnChanged).lastCalledWith(TEST_SINGLE_DATE_CHANGE);
+    });
   });
 
   it("Renders the date range picker.", async () => {
@@ -48,22 +50,23 @@ describe("FilterRowDatePicker", () => {
       />
     );
 
-    await new Promise(setImmediate);
     const datepickers = wrapper.getAllByRole("textbox") as HTMLInputElement[];
 
     // Passes the selected dates as a string to react-datepicker:
     fireEvent.change(datepickers[0], { target: { value: "10/20/2020" } });
-    await new Promise(setImmediate);
-    expect(mockOnChanged).lastCalledWith({
-      high: "Thu Oct 15 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
-      low: "Tue Oct 20 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"
+    await waitFor(() => {
+      expect(mockOnChanged).lastCalledWith({
+        high: "Thu Oct 15 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
+        low: "Tue Oct 20 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"
+      });
     });
 
     fireEvent.change(datepickers[1], { target: { value: "10/25/2020" } });
-    await new Promise(setImmediate);
-    expect(mockOnChanged).lastCalledWith({
-      high: "Sun Oct 25 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
-      low: "Mon Oct 12 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"
+    await waitFor(() => {
+      expect(mockOnChanged).lastCalledWith({
+        high: "Sun Oct 25 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
+        low: "Mon Oct 12 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"
+      });
     });
   });
 });

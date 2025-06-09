@@ -1,7 +1,7 @@
 import RegionListPage from "../../../../pages/seqdb/region/list";
 import { mountWithAppContext } from "common-ui";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -39,18 +39,15 @@ describe("Region list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
 
-    await new Promise(setImmediate);
-
     // Check that the table contains the links to region details pages.
-    expect(wrapper.getByText(/test region 1/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/test region 2/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/test region 1/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/test region 2/i)).toBeInTheDocument();
+    });
   });
 
   it("Allows a filterable search.", async () => {
     const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
-
-    // Wait for the default search to finish.
-    await new Promise(setImmediate);
 
     // Enter a search value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /filter/i }), {
@@ -62,14 +59,14 @@ describe("Region list page", () => {
     // Submit the search form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API call and UI elements
-    expect(mockGet).toHaveBeenCalledWith(
-      "seqdb-api/region",
-      expect.objectContaining({ filter: { rsql: "name==*omni*" } })
-    );
-    expect(wrapper.getByText(/test region 1/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/test region 2/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(
+        "seqdb-api/region",
+        expect.objectContaining({ filter: { rsql: "name==*omni*" } })
+      );
+      expect(wrapper.getByText(/test region 1/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/test region 2/i)).toBeInTheDocument();
+    });
   });
 });

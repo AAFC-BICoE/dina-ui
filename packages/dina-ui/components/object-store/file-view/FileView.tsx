@@ -252,7 +252,7 @@ export function FileView({
                               style={{
                                 fontSize: "0.75rem",
                                 padding: "0.35em 0.5em",
-                                marginLeft: "2em"
+                                marginLeft: "auto"
                               }}
                             >
                               {formatBytes(objectUpload.sizeInBytes)}

@@ -2,6 +2,7 @@ import IndexSetListPage from "../../../../pages/seqdb/index-set/list";
 import { mountWithAppContext } from "common-ui";
 import { IndexSet } from "../../../../types/seqdb-api";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -42,9 +43,8 @@ describe("Index set list page", () => {
   it("Renders the list page", async () => {
     const wrapper = getWrapper();
 
-    // Wait for data to load:
-    await new Promise(setImmediate);
-
-    expect(wrapper.getByText(/index set 1/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/index set 1/i)).toBeInTheDocument();
+    });
   });
 });
