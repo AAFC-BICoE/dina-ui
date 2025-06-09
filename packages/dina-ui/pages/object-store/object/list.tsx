@@ -104,19 +104,17 @@ export default function MetadataListPage() {
         (original as any)?.data?.attributes?.resourceExternalURL ? (
           <Link
             href={`/object-store/object/external-resource-view?id=${original?.id}`}
+            className="m-auto"
           >
-            <a className="m-auto">
-              <DinaMessage id="viewDetails" />
-            </a>
+            <DinaMessage id="viewDetails" />
           </Link>
         ) : (original as any).data?.attributes?.originalFilename ? (
           <Link
             href={`/object-store/object/view?id=${original.id}`}
             passHref={true}
+            id={`file-name-${original.id}`}
           >
-            <a id={`file-name-${original.id}`}>
-              <DinaMessage id="viewDetails" />
-            </a>
+            <DinaMessage id="viewDetails" />
           </Link>
         ) : null,
       accessorKey: "data.attributes.id",
@@ -147,7 +145,7 @@ export default function MetadataListPage() {
       }) =>
         included?.acMetadataCreator?.id ? (
           <Link href={`/person/view?id=${included?.acMetadataCreator?.id}`}>
-            <a>{included?.acMetadataCreator?.attributes?.displayName}</a>
+            {included?.acMetadataCreator?.attributes?.displayName}
           </Link>
         ) : null,
       header: () => <FieldHeader name="acMetadataCreator.displayName" />,
@@ -165,7 +163,7 @@ export default function MetadataListPage() {
       }) =>
         included?.dcCreator?.id ? (
           <Link href={`/person/view?id=${included?.dcCreator?.id}`}>
-            <a>{included?.dcCreator?.attributes?.displayName}</a>
+            {included?.dcCreator?.attributes?.displayName}
           </Link>
         ) : null,
       header: () => <FieldHeader name="dcCreator.displayName" />,
@@ -231,9 +229,7 @@ export default function MetadataListPage() {
           </div>
           <div className="list-inline-item float-end">
             <Link href="/object-store/upload">
-              <a>
-                <DinaMessage id="uploadPageTitle" />
-              </a>
+              <DinaMessage id="uploadPageTitle" />
             </Link>
           </div>
         </div>

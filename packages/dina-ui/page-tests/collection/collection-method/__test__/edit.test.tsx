@@ -4,7 +4,7 @@ import CollectionMethodEditPage, {
 } from "../../../../pages/collection/collection-method/edit";
 import { mountWithAppContext } from "common-ui";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
-import { screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -88,11 +88,12 @@ describe("collection-method edit page", () => {
       }
     );
 
-    // Wait for asynchronous updates
-    await new Promise(setImmediate);
-
     // Simulate changing the name input
     const nameInput = getByLabelText(/name/i);
+    await waitFor(() => {
+      expect(nameInput).toBeInTheDocument();
+    });
+
     fireEvent.change(nameInput, { target: { value: "updated Name" } });
     // Simulate changing the English description textarea
     const descriptionTextarea = screen.getByRole("textbox", {
@@ -107,28 +108,30 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for async updates after submission
-    await new Promise(setImmediate);
-
-    expect(mockPatch).lastCalledWith(
-      "/collection-api/operations",
-      [
-        {
-          op: "POST",
-          path: "collection-method",
-          value: {
-            attributes: {
-              multilingualDescription: {
-                descriptions: [{ lang: "en", desc: "test english description" }]
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/operations",
+        [
+          {
+            op: "POST",
+            path: "collection-method",
+            value: {
+              attributes: {
+                multilingualDescription: {
+                  descriptions: [
+                    { lang: "en", desc: "test english description" }
+                  ]
+                },
+                name: "updated Name"
               },
-              name: "updated Name"
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "collection-method"
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "collection-method"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // Check that the user is redirected to the new collection-method's details page
     expect(mockPush).lastCalledWith("/collection/collection-method/view?id=1");
@@ -150,13 +153,13 @@ describe("collection-method edit page", () => {
       { apiContext }
     );
 
-    // Wait for asynchronous updates
-    await new Promise(setImmediate);
-
     // Check the initial value of the English description textarea
     const descriptionTextarea = getByLabelText(
       /english description/i
     ) as HTMLTextAreaElement;
+    await waitFor(() => {
+      expect(descriptionTextarea).toBeInTheDocument();
+    });
     expect(descriptionTextarea.value).toEqual("test english description");
 
     // Simulate changing the French description textarea
@@ -176,38 +179,38 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Wait for async updates after submission
-    await new Promise(setImmediate);
-
-    // Check the last called patch request
-    expect(mockPatch).lastCalledWith(
-      "/collection-api/operations",
-      [
-        {
-          op: "PATCH",
-          path: "collection-method/1",
-          value: {
-            attributes: {
-              multilingualDescription: {
-                descriptions: [
-                  {
-                    desc: "test english description",
-                    lang: "en"
-                  },
-                  {
-                    desc: "test french description",
-                    lang: "fr"
-                  }
-                ]
+    await waitFor(() => {
+      // Check the last called patch request
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/operations",
+        [
+          {
+            op: "PATCH",
+            path: "collection-method/1",
+            value: {
+              attributes: {
+                multilingualDescription: {
+                  descriptions: [
+                    {
+                      desc: "test english description",
+                      lang: "en"
+                    },
+                    {
+                      desc: "test french description",
+                      lang: "fr"
+                    }
+                  ]
+                },
+                name: "updated Name"
               },
-              name: "updated Name"
-            },
-            id: "1",
-            type: "collection-method"
+              id: "1",
+              type: "collection-method"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
   });
 
   it("Renders an error after form submit without specifying mandatory field.", async () => {
@@ -238,16 +241,15 @@ describe("collection-method edit page", () => {
     const form = container.querySelector("form");
     fireEvent.submit(form!);
 
-    // Wait for asynchronous updates
-    await new Promise(setImmediate);
-
     // Check that the error message is displayed
-    expect(
-      getByText("Constraint violation: Name is mandatory")
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        getByText("Constraint violation: Name is mandatory")
+      ).toBeInTheDocument();
 
-    // Ensure no redirection happened
-    expect(mockPush).toBeCalledTimes(0);
+      // Ensure no redirection happened
+      expect(mockPush).toBeCalledTimes(0);
+    });
   });
 });
 

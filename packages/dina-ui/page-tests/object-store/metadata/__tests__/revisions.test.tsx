@@ -1,6 +1,7 @@
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import MetadataRevisionListPage from "../../../../pages/object-store/metadata/revisions";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const TEST_SNAPSHOTS = [
   {
@@ -50,16 +51,17 @@ describe("MetadataRevisionListPage", () => {
       apiContext: { apiClient: { get: mockGet } as any }
     });
 
-    // Await metadata query:
-    await new Promise(setImmediate);
+    await waitForLoadingToDisappear();
 
     // Renders the title:
-    expect(
-      wrapper.getByRole("heading", { name: /revisions for my\-image\.png/i })
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("heading", { name: /revisions for my\-image\.png/i })
+      ).toBeInTheDocument();
 
-    // Renders the 2 revision rows:
-    expect(wrapper.getByRole("cell", { name: "1" })).toBeInTheDocument();
-    expect(wrapper.getByRole("cell", { name: "2" })).toBeInTheDocument();
+      // Renders the 2 revision rows:
+      expect(wrapper.getByRole("cell", { name: "1" })).toBeInTheDocument();
+      expect(wrapper.getByRole("cell", { name: "2" })).toBeInTheDocument();
+    });
   });
 });

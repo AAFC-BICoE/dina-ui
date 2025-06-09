@@ -3,7 +3,7 @@ import PreparationMethodEditPage, {
   PreparationMethodForm
 } from "../../../../pages/collection/preparation-method/edit";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -121,29 +121,31 @@ describe("preparation-method edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API response
-    expect(mockPatch).lastCalledWith(
-      "/collection-api/operations",
-      [
-        {
-          op: "POST",
-          path: "preparation-method",
-          value: {
-            attributes: {
-              multilingualDescription: {
-                descriptions: [{ lang: "en", desc: "test english description" }]
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/operations",
+        [
+          {
+            op: "POST",
+            path: "preparation-method",
+            value: {
+              attributes: {
+                multilingualDescription: {
+                  descriptions: [
+                    { lang: "en", desc: "test english description" }
+                  ]
+                },
+                name: "updated Name"
               },
-              name: "updated Name"
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "preparation-method"
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "preparation-method"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the new preparation-method's details page.
     expect(mockPush).lastCalledWith("/collection/preparation-method/view?id=1");
@@ -166,20 +168,12 @@ describe("preparation-method edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /english description/i })
+      ).toHaveDisplayValue("test english description");
+    });
 
-    // Test default Eng Description value
-    // expect(wrapper.find(".en-description textarea").prop("value")).toEqual(
-    //   "test english description"
-    // );
-    expect(
-      wrapper.getByRole("textbox", { name: /english description/i })
-    ).toHaveDisplayValue("test english description");
-
-    // Change Fr Description value
-    // wrapper.find(".fr-description textarea").simulate("change", {
-    //   target: { value: "test french description" }
-    // });
     fireEvent.change(
       wrapper.getByRole("textbox", { name: /french description/i }),
       {
@@ -190,41 +184,40 @@ describe("preparation-method edit page", () => {
     );
 
     // Submit form
-    // wrapper.find("form").simulate("submit");
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API response
-    expect(mockPatch).lastCalledWith(
-      "/collection-api/operations",
-      [
-        {
-          op: "POST",
-          path: "preparation-method",
-          value: {
-            attributes: {
-              multilingualDescription: {
-                descriptions: [
-                  {
-                    desc: "test english description",
-                    lang: "en"
-                  },
-                  {
-                    desc: "test french description",
-                    lang: "fr"
-                  }
-                ]
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/operations",
+        [
+          {
+            op: "POST",
+            path: "preparation-method",
+            value: {
+              attributes: {
+                multilingualDescription: {
+                  descriptions: [
+                    {
+                      desc: "test english description",
+                      lang: "en"
+                    },
+                    {
+                      desc: "test french description",
+                      lang: "fr"
+                    }
+                  ]
+                },
+                name: "test-prep-method"
               },
-              name: "test-prep-method"
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "preparation-method"
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "preparation-method"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
   });
 
   it("Renders an error after form submit without specifying mandatory field.", async () => {
@@ -253,12 +246,12 @@ describe("preparation-method edit page", () => {
     // Submit default form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected error
-    expect(
-      wrapper.getByText(/constraint violation: name is mandatory/i)
-    ).toBeInTheDocument();
-    expect(mockPush).toBeCalledTimes(0);
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/constraint violation: name is mandatory/i)
+      ).toBeInTheDocument();
+      expect(mockPush).toBeCalledTimes(0);
+    });
   });
 });

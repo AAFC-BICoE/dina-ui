@@ -10,7 +10,7 @@ import {
   Tooltip
 } from "common-ui";
 import { useFormikContext } from "formik";
-import { find, get } from "lodash";
+import _ from "lodash";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import {
   DinaMessage,
@@ -63,7 +63,7 @@ export function DataRow({
     if (isVocabularyBasedEnabledForType) {
       formikCtx.setFieldValue(
         vocabularyBasedFieldName,
-        !!find(typeOptions, (item) => item.value === value)
+        !!_.find(typeOptions, (item) => item.value === value)
       );
     }
   }
@@ -78,7 +78,7 @@ export function DataRow({
   }, [name]);
 
   function onTypeSelectFieldChange(value) {
-    setSelectedType(find(typeOptions, (item) => item.value === value));
+    setSelectedType(_.find(typeOptions, (item) => item.value === value));
   }
 
   // Load initial values
@@ -93,7 +93,7 @@ export function DataRow({
   }, [typeOptions]);
 
   const rowsPath = name.substring(0, name.lastIndexOf("."));
-  const currentRows = get(formik.values, rowsPath);
+  const currentRows = _.get(formik.values, rowsPath);
   function addRow() {
     const newRows = {
       ...currentRows,
@@ -173,7 +173,7 @@ export function DataRow({
                     >
                       <Tooltip
                         directText={
-                          find(
+                          _.find(
                             typeOptions,
                             (item) => item.value === value
                           )?.descriptions?.find((desc) => desc.lang === locale)

@@ -14,7 +14,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FormikContextType } from "formik";
-import { isEmpty } from "lodash";
+import _ from "lodash";
 import { NgsIndex } from "packages/dina-ui/types/seqdb-api";
 import { ReactNode, useState } from "react";
 import * as yup from "yup";
@@ -244,7 +244,7 @@ export function NgsIndexSubForm({
   const submitNgsIndex: OnFormikSubmit<any> = async (newNgsIndex, formik) => {
     // Return if the sub-form has errors:
     const formErrors = await formik.validateForm();
-    if (!isEmpty(formErrors)) {
+    if (!_.isEmpty(formErrors)) {
       formik.setErrors({ ...formik.errors, ...formErrors });
       return;
     }

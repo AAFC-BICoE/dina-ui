@@ -1,5 +1,5 @@
 import { DateView } from "../date/DateView";
-import { get } from "lodash";
+import _ from "lodash";
 import { TableColumn } from "../list-page/types";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { KitsuResource } from "kitsu";
@@ -14,12 +14,12 @@ export function dateCell<TData extends KitsuResource>(
 ): TableColumn<TData> {
   return {
     cell: ({ row: { original } }) => {
-      let value = get(original, accessorKey ?? label);
+      let value = _.get(original, accessorKey ?? label);
       if (relationshipType) {
         const relationshipAccessor = accessorKey?.split(".");
         relationshipAccessor?.splice(1, 0, relationshipType);
         const relationshipAccessorKey = relationshipAccessor?.join(".");
-        value = get(original, relationshipAccessorKey ?? label);
+        value = _.get(original, relationshipAccessorKey ?? label);
       }
       return <DateView date={value} />;
     },

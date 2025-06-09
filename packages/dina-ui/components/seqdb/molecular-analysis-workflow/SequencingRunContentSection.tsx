@@ -62,6 +62,7 @@ export default function SequencingRunContentSection({
           columns={columns}
           data={sequencingRunItems ?? []}
           sort={[{ id: "materialSampleName", desc: false }]}
+          showPagination={true}
         />
         {editMode && (
           <div className="mt-3">

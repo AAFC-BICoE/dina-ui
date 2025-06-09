@@ -9,7 +9,7 @@ import {
   useStringComparator
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { compact } from "lodash";
+import _ from "lodash";
 import { useEffect, useState } from "react";
 import { MaterialSampleSummary } from "../../../types/collection-api";
 import {
@@ -103,7 +103,7 @@ export function usePcrReactionData(pcrBatchId?: string) {
         returnNullForMissingResource: true
       }
     );
-    const sampleSummaries = compact(fetchedMaterialSampleSummary ?? []);
+    const sampleSummaries = _.compact(fetchedMaterialSampleSummary ?? []);
     processedPcrBatchItems = processedPcrBatchItems.filter(
       (item) =>
         !!sampleSummaries.find(

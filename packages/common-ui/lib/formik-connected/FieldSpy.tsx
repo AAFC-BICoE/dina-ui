@@ -1,5 +1,5 @@
 import { FastField, FastFieldProps } from "formik";
-import { get, isEqual } from "lodash";
+import _ from "lodash";
 import { ReactNode } from "react";
 import { isBlankResourceAttribute, useBulkEditTabFieldIndicators } from "..";
 
@@ -29,9 +29,9 @@ export function FieldSpy<T = unknown>({
   function shouldRender(next, prev) {
     const formStateChanged = ["values", "errors", "touched"].some(
       (formikStateField) =>
-        !isEqual(
-          get(prev.formik[formikStateField], fieldName),
-          get(next.formik[formikStateField], fieldName)
+        !_.isEqual(
+          _.get(prev.formik[formikStateField], fieldName),
+          _.get(next.formik[formikStateField], fieldName)
         )
     );
 
@@ -73,7 +73,7 @@ function FieldSpyInternal<T>({
     currentValue: formikValue
   });
 
-  const isChanged = !isEqual(
+  const isChanged = !_.isEqual(
     isBlankResourceAttribute(formikValue) ? null : formikValue,
     isBlankResourceAttribute(initialValue) ? null : initialValue
   );

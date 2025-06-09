@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { noop } from "lodash";
+import _ from "lodash";
 import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
 import { useEffect } from "react";
 
@@ -104,7 +104,7 @@ export function SangerPcrBatchItemGridStep({
                       className={`${mode}-radio`}
                       type="radio"
                       checked={fillMode === mode}
-                      onChange={noop}
+                      onChange={_.noop}
                       onClick={() =>
                         setFillMode(mode === "ROW" ? "ROW" : "COLUMN")
                       }

@@ -1,7 +1,7 @@
 import ProductListPage from "../../../../pages/seqdb/product/list";
 import { mountWithAppContext } from "common-ui";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -35,18 +35,15 @@ describe("Product list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
 
-    await new Promise(setImmediate);
-
     // Check that the table contains the links to product details pages.
-    expect(wrapper.getByText(/test product 1/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/test product 2/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/test product 1/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/test product 2/i)).toBeInTheDocument();
+    });
   });
 
   it("Allows a filterable search.", async () => {
     const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
-
-    // Wait for the default search to finish.
-    await new Promise(setImmediate);
 
     // Enter a search value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
@@ -56,13 +53,13 @@ describe("Product list page", () => {
     // Submit the search form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
-    expect(mockGet).toHaveBeenCalledWith(
-      "seqdb-api/product",
-      expect.objectContaining({ filter: { rsql: "name==*omni*" } })
-    );
-    expect(wrapper.getByText(/test product 1/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/test product 2/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(
+        "seqdb-api/product",
+        expect.objectContaining({ filter: { rsql: "name==*omni*" } })
+      );
+      expect(wrapper.getByText(/test product 1/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/test product 2/i)).toBeInTheDocument();
+    });
   });
 });

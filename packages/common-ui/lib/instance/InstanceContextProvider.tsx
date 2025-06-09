@@ -7,6 +7,8 @@ export interface InstanceContextI {
   instanceName: string;
   supportedGeographicReferences: string;
   tgnSearchBaseUrl?: string;
+  scientificNamesSearchEndpoint?: string;
+  scientificNamesDatasetsEndpoint?: string;
 }
 
 export const InstanceContext = createContext<InstanceContextI | undefined>(
@@ -45,7 +47,17 @@ export function DefaultInstanceContextProvider({
               : "OSM",
             tgnSearchBaseUrl: !!response["tgn-search-base-url"]
               ? response["tgn-search-base-url"]
-              : ""
+              : "",
+            scientificNamesSearchEndpoint: !!response[
+              "scientific-names-search-endpoint"
+            ]
+              ? response["scientific-names-search-endpoint"]
+              : "https://verifier.globalnames.org/api/v1/verifications/",
+            scientificNamesDatasetsEndpoint: !!response[
+              "scientific-names-datasets-endpoint"
+            ]
+              ? response["scientific-names-datasets-endpoint"]
+              : "https://verifier.globalnames.org/api/v1/data_sources"
           });
         } else {
           setInstanceJson({

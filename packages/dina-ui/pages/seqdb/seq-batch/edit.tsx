@@ -18,7 +18,7 @@ import {
 } from "common-ui";
 import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
-import { cloneDeep, pick } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { SeqReactionDndTable } from "packages/dina-ui/components/seqdb/seq-workflow/seq-reaction-step/SeqReactionDndTable";
 import {
@@ -132,7 +132,7 @@ export function SeqBatchForm({
         ...(submittedValues.experimenters && {
           experimenters: {
             data: submittedValues?.experimenters?.map((collector) =>
-              pick(collector, "id", "type")
+              _.pick(collector, "id", "type")
             )
           }
         })
@@ -183,7 +183,7 @@ export function LoadExternalDataForSeqBatchForm({
   buttonBar
 }: LoadExternalDataForSeqBatchFormProps) {
   // Create a copy of the initial value so we don't change the prop version.
-  const initialValues = cloneDeep(dinaFormProps.initialValues);
+  const initialValues = _.cloneDeep(dinaFormProps.initialValues);
   const { selectedResources: seqReactions } = useSeqReactionState(
     initialValues.id
   );

@@ -13,7 +13,7 @@ import {
   SelectField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import { fromPairs, toPairs } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import { Footer, Head, Nav } from "../../../components";
@@ -92,7 +92,7 @@ export function ReportTemplateForm({
   const initialValues: ReportTemplateFormValues = fetchedReportTemplate
     ? {
         ...fetchedReportTemplate,
-        multilingualDescription: fromPairs<string | undefined>(
+        multilingualDescription: _.fromPairs<string | undefined>(
           fetchedReportTemplate.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
           )
@@ -112,7 +112,7 @@ export function ReportTemplateForm({
     const input: InputResource<ReportTemplate> = {
       ...submittedValues,
       multilingualDescription: {
-        descriptions: toPairs(submittedValues.multilingualDescription).map(
+        descriptions: _.toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc })
         )
       }
@@ -140,10 +140,11 @@ export function ReportTemplateForm({
     >
       <ButtonBar className="mb-3">
         <div className="col-md-6 col-sm-12 mt-2">
-          <Link href={"/export/report-template/upload"}>
-            <a className={`back-button my-auto`}>
-              <DinaMessage id={"backToUpload"} />
-            </a>
+          <Link
+            href={"/export/report-template/upload"}
+            className={`back-button my-auto`}
+          >
+            <DinaMessage id={"backToUpload"} />
           </Link>
         </div>
         <div className="col-md-6 col-sm-12 d-flex">

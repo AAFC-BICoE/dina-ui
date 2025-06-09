@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { noop } from "lodash";
+import _ from "lodash";
 import { mountWithAppContext } from "common-ui";
 import { FileUploader } from "../FileUploader";
 import { screen, waitFor } from "@testing-library/react";
@@ -25,7 +25,7 @@ describe("FileUploader component", () => {
   it("Converts the API's max file size from a gigabytes string to bytes.", async () => {
     mountWithAppContext(
       <DinaForm initialValues={{}}>
-        <FileUploader onSubmit={noop} />
+        <FileUploader onSubmit={_.noop} />
       </DinaForm>,
       { apiContext: mockCtx }
     );

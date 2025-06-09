@@ -1,4 +1,4 @@
-import { uniq } from "lodash";
+import _ from "lodash";
 import {
   createContext,
   ReactNode,
@@ -158,7 +158,7 @@ export function checkIsAdmin(roles: string[]): boolean {
  * Convert from Keycloak's format ( ["/cnc", "/cnc/user"] to just the group name ["cnc"] )
  */
 export function keycloakGroupNamesToBareGroupNames(keycloakGroups: string[]) {
-  return uniq(
+  return _.uniq(
     keycloakGroups
       // Add leading slash if absent:
       .map((groupName) =>

@@ -2,7 +2,7 @@ import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
 import { ColumnSort, Row, SortingState } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { toPairs, uniqBy } from "lodash";
+import _ from "lodash";
 import React, {
   useCallback,
   useEffect,
@@ -531,7 +531,7 @@ export function QueryPage<TData extends KitsuResource>({
       );
     }
 
-    const combinedColumns = uniqBy([...columns, ...displayedColumns], "id");
+    const combinedColumns = _.uniqBy([...columns, ...displayedColumns], "id");
 
     queryDSL = applyRootQuery(queryDSL);
 
@@ -669,7 +669,7 @@ export function QueryPage<TData extends KitsuResource>({
 
     const itemIdsToSelect = formValues.itemIdsToSelect;
 
-    const ids = toPairs(itemIdsToSelect)
+    const ids = _.toPairs(itemIdsToSelect)
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
 
@@ -680,7 +680,7 @@ export function QueryPage<TData extends KitsuResource>({
     });
 
     // Append the newly selected resources with the current resources.
-    const selectedResourcesAppended = uniqBy(
+    const selectedResourcesAppended = _.uniqBy(
       [...selectedResources, ...selectedObjects],
       "id"
     );
@@ -713,7 +713,7 @@ export function QueryPage<TData extends KitsuResource>({
 
     const itemIdsToDelete = formValues.itemIdsToDelete;
 
-    const ids = toPairs(itemIdsToDelete)
+    const ids = _.toPairs(itemIdsToDelete)
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
 
@@ -823,7 +823,7 @@ export function QueryPage<TData extends KitsuResource>({
         ]
       : [];
 
-    return uniqBy([...selectColumn, ...displayedColumns], "id");
+    return _.uniqBy([...selectColumn, ...displayedColumns], "id");
   }, [showRowCheckboxes, selectionMode, displayedColumns, searchResults]);
 
   // Columns generated for the selected resources, only in selection mode.

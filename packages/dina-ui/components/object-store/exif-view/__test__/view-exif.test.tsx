@@ -1,5 +1,5 @@
 import { AccountContextI } from "common-ui";
-import { noop } from "lodash";
+import _ from "lodash";
 import { mountWithAppContext } from "common-ui";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import { ExifView } from "../ExifView";
@@ -42,8 +42,8 @@ const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   authenticated: true,
   groupNames: ["example-group"],
   initialized: true,
-  login: noop,
-  logout: noop,
+  login: _.noop,
+  logout: _.noop,
   roles: [],
   // Mock for a successful token update.
   getCurrentToken: () => Promise.resolve("test-token"),

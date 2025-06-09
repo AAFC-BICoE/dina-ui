@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { PersistedResource } from "kitsu";
-import { get, set, zipWith } from "lodash";
+import _ from "lodash";
 import { ApiClientI } from "./ApiClientContext";
 
 export interface ClientSideJoinSpec {
@@ -35,7 +35,7 @@ export class ClientSideJoiner {
   public async join() {
     // Only join on the resources that have the idField set:
     const baseResources = this.resources.filter((resource) =>
-      get(resource, this.joinSpec.idField)
+      _.get(resource, this.joinSpec.idField)
     );
 
     const paths = baseResources.map((resource) => this.joinSpec.path(resource));
@@ -44,14 +44,18 @@ export class ClientSideJoiner {
     const joinedResources = await this.joinLoader.loadMany(paths);
 
     // Join the resources:
-    zipWith(baseResources, joinedResources, (baseResource, joinedResource) => {
-      // DataLoader#loadMany doesn't throw errors; throw here if there are any:
-      if (joinedResource instanceof Error) {
-        throw joinedResource;
-      }
+    _.zipWith(
+      baseResources,
+      joinedResources,
+      (baseResource, joinedResource) => {
+        // DataLoader#loadMany doesn't throw errors; throw here if there are any:
+        if (joinedResource instanceof Error) {
+          throw joinedResource;
+        }
 
-      // Otherwise attach the joined resource:
-      set(baseResource, this.joinSpec.joinField, joinedResource);
-    });
+        // Otherwise attach the joined resource:
+        _.set(baseResource, this.joinSpec.joinField, joinedResource);
+      }
+    );
   }
 }

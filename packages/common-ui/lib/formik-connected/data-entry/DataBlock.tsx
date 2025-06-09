@@ -1,5 +1,5 @@
 import { useFormikContext } from "formik";
-import { find } from "lodash";
+import _ from "lodash";
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import {
@@ -98,7 +98,7 @@ export function DataBlock({
     if (isVocabularyBasedEnabledForBlock) {
       formik.setFieldValue(
         `${props.name}.vocabularyBased`,
-        !!find(blockOptions, (item) => item.value === value)
+        !!_.find(blockOptions, (item) => item.value === value)
       );
     }
     if (onBlockSelectChange) {

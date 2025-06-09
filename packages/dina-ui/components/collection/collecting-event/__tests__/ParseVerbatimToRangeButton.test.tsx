@@ -25,8 +25,6 @@ describe("ParseVerbatimToRangeButton component", () => {
     const button = screen.getByRole("button");
     fireEvent.click(button);
 
-    await new Promise(setImmediate);
-
     // Submit the form using querySelector
     const form = container.querySelector("form");
     fireEvent.submit(form!);
@@ -57,8 +55,6 @@ describe("ParseVerbatimToRangeButton component", () => {
     // Simulate button click
     const button = screen.getByRole("button");
     fireEvent.click(button);
-
-    await new Promise(setImmediate);
 
     // Submit the form using querySelector
     const form = container.querySelector("form");

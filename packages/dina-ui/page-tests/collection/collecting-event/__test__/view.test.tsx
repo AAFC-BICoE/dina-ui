@@ -3,6 +3,7 @@ import CollectingEventDetailsPage from "../../../../pages/collection/collecting-
 import { mountWithAppContext } from "common-ui";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 /** Test Collecting Event with all fields defined. */
 const TEST_COLLECTION_EVENT: CollectingEvent = {
@@ -76,15 +77,11 @@ describe("CollectingEvent details page", () => {
       apiContext
     });
 
-    // Wait for the page to load.
-    await new Promise(setImmediate);
-
-    // expect(wrapper.find(".spinner-border").exists()).toEqual(false);
-    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
-
     // The collecting-event's start, end and verbatim time should be rendered in a FieldView.
-    expect(wrapper.getByText(/2019_01_01_10_10_10/i)).toBeInTheDocument();
-    expect(wrapper.getByText(/2019_01_06_10_10_10/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/2019_01_01_10_10_10/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/2019_01_06_10_10_10/i)).toBeInTheDocument();
+    });
 
     // The collecting-event's verbatim datetime should be rendered in a FieldView.
     expect(

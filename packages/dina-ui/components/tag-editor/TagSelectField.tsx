@@ -8,15 +8,13 @@ import {
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
-import { compact, get, last, uniq } from "lodash";
+import _ from "lodash";
 import { useRef, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
-import { components as reactSelectComponents } from "react-select";
-import CreatableSelect from "react-select/creatable";
-import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDebounce } from "use-debounce";
 import { useElasticSearchDistinctTerm } from "../../../common-ui/lib/list-page/useElasticSearchDistinctTerm";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { SortableSelect } from "common-ui";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
@@ -120,7 +118,7 @@ function TagSelect({
   const tagOptions = useRef<TagSelectOption[]>([]);
   const isLoading = useRef<boolean>(false);
 
-  const typeName = last(resourcePath?.split("/"));
+  const typeName = _.last(resourcePath?.split("/"));
 
   if (indexName) {
     const suggestions = useElasticSearchDistinctTerm({
@@ -184,8 +182,8 @@ function TagSelect({
             internalTagFieldName != undefined
           ) {
             // handle the situation when tagsFieldName is something like this "contributors[0].roles"
-            const dataArray = uniq(
-              compact(
+            const dataArray = _.uniq(
+              _.compact(
                 response.data
                   .flatMap((it) => it[parsedFieldname])
                   .flatMap((it) => it[internalTagFieldName])
@@ -196,9 +194,11 @@ function TagSelect({
               .map((tag: string) => toOption(tag));
             tagOptions.current = tags;
           } else {
-            const tags = uniq(
-              compact(
-                (response?.data ?? []).flatMap((it) => get(it, parsedFieldname))
+            const tags = _.uniq(
+              _.compact(
+                (response?.data ?? []).flatMap((it) =>
+                  _.get(it, parsedFieldname)
+                )
               )
             )
               .filter((tag) => tag.includes(inputValue))
@@ -233,10 +233,6 @@ function TagSelect({
     onChange(selected.map((option) => option.value));
   }
 
-  const onSortEnd = ({ oldIndex, newIndex }) => {
-    onChange(arrayMove(value ?? [], oldIndex, newIndex));
-  };
-
   return (
     <SortableSelect
       // Input value:
@@ -264,25 +260,10 @@ function TagSelect({
       }
       noOptionsMessage={() => formatMessage("typeNewTagOrSearchPreviousTags")}
       formatCreateLabel={(input) => `${formatMessage("add")} "${input}"`}
-      // react-sortable-hoc config:
-      axis="xy"
-      onSortEnd={onSortEnd}
-      components={{
-        MultiValue: SortableMultiValue
-      }}
-      distance={4}
+      isCreatable={true}
     />
   );
 }
-
-// Drag/drop re-ordering support copied from https://github.com/JedWatson/react-select/pull/3645/files
-function arrayMove(array: any[], from: number, to: number) {
-  array = array.slice();
-  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
-  return array;
-}
-const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
-const SortableSelect = SortableContainer(CreatableSelect);
 
 export interface TagSelectReadOnlyProps {
   resourcePath?: string;

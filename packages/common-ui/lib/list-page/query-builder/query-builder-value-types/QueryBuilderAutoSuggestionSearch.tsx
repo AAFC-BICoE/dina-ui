@@ -3,7 +3,7 @@ import { useElasticSearchDistinctTerm } from "../../useElasticSearchDistinctTerm
 import AutoSuggest, { InputProps } from "react-autosuggest";
 import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
-import { noop } from "lodash";
+import _ from "lodash";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 
 interface QueryBuilderAutoSuggestionTextSearchProps {
@@ -162,7 +162,7 @@ function QueryBuilderAutoSuggestionTextSearch({
               onSuggestionSelected={(_event, data) =>
                 setValue?.(data.suggestion)
               }
-              onSuggestionsClearRequested={noop}
+              onSuggestionsClearRequested={_.noop}
               renderSuggestion={(text) => <div>{text}</div>}
               inputProps={inputProps}
               alwaysRenderSuggestions={focus}

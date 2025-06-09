@@ -11,7 +11,7 @@ import {
   useFieldLabels
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
-import { get, isEmpty, keys } from "lodash";
+import _ from "lodash";
 import { useEffect } from "react";
 import { BulkEditTabWarning, OrganismStateField } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -88,7 +88,7 @@ export function OrganismsField({
         <FieldArray name={name}>
           {({ form, remove, move }) => {
             const organisms: (Organism | null | undefined)[] =
-              get(form.values, name) || [];
+              _.get(form.values, name) || [];
 
             const organismsQuantity = readOnly
               ? organisms.length
@@ -375,8 +375,8 @@ function OrganismExpanderComponent({ row }: { row: Row<Organism> }) {
   const isExpanded = row.getIsExpanded();
 
   const hasError =
-    !isEmpty(get(errors, prefix)) ||
-    keys(errors).some((key) => key.startsWith(prefix));
+    !_.isEmpty(_.get(errors, prefix)) ||
+    _.keys(errors).some((key) => key.startsWith(prefix));
 
   return (
     <button

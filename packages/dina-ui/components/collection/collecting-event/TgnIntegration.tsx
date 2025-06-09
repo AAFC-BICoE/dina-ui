@@ -89,10 +89,14 @@ export function TgnDetails(props: { formik: FormikProps<any> }) {
     <div>
       <div className="row mb-2">
         <div className="col-sm">
-          <strong>{formatMessage("tgnPreferredTerm")}</strong> {preferredTerm}
+          <>
+            <strong>{formatMessage("tgnPreferredTerm")}</strong> {preferredTerm}
+          </>
         </div>
         <div className="col-sm">
-          <strong>{formatMessage("tgnId")}</strong> {subjectId}
+          <>
+            <strong>{formatMessage("tgnId")}</strong> {subjectId}
+          </>
         </div>
       </div>
       <div className="mb-2">

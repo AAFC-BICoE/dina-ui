@@ -40,7 +40,7 @@ import {
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
 import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
-import { get } from "lodash";
+import _ from "lodash";
 
 export type FieldMapType = {
   columnHeader: string;
@@ -493,8 +493,13 @@ export function WorkbookColumnMapping({
       if (existingPair) {
         existingPair.localDuplicate = true;
       } else {
-        const collectionRelationshipHeader = collectionNameColumn.columnHeader.replace(" ", "_");
-        const collectionUuid = get(relationshipMapping, [collectionRelationshipHeader, collectionName, 'id']);
+        const collectionRelationshipHeader =
+          collectionNameColumn.columnHeader.replace(" ", "_");
+        const collectionUuid = _.get(relationshipMapping, [
+          collectionRelationshipHeader,
+          collectionName,
+          "id"
+        ]);
         if (collectionUuid) {
           uniqueSampleCollections.push({
             materialSampleName,
@@ -522,9 +527,7 @@ export function WorkbookColumnMapping({
       // Generate the path for the current pair
       const path = `collection-api/resource-name-identifier?filter[type][EQ]=material-sample&filter[group][EQ]=${encodeURIComponent(
         group ?? ""
-      )}&filter[name][EQ]=${encodeURIComponent(
-        pair.materialSampleName
-      )}`;
+      )}&filter[name][EQ]=${encodeURIComponent(pair.materialSampleName)}`;
 
       try {
         const response = await apiClient.get(path, {
