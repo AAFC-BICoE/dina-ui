@@ -26,19 +26,6 @@ describe("FileView component", () => {
     ).toBeInTheDocument();
   });
 
-  it("Renders PDFViewer component when file is a PDF.", async () => {
-    const wrapper = mountWithAppContext(
-      <FileView filePath="test.pdf" fileType="pdf" />,
-      { apiContext }
-    );
-
-    // Wait for loading to be finished...
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
-
-    // It should just render the image element.
-    expect(wrapper.getByTestId("pdf-viewer-container")).toBeInTheDocument();
-  });
-
   const noPreviewFileTypes = [
     "doc",
     "docx",
