@@ -3,7 +3,7 @@ import * as echarts from "echarts";
 import "./TaxonomyTree.css";
 import { useApiClient } from "..";
 import useVocabularyOptions from "../../../dina-ui/components/collection/useVocabularyOptions";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 
 interface TreeNode {
   name: string;
