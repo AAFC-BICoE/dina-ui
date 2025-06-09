@@ -1,10 +1,9 @@
 import React, { useState, ReactNode } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
+import { Document, Page } from "react-pdf";
 import { Button, ButtonGroup } from "react-bootstrap";
 import { LoadingSpinner } from "common-ui";
 import RcTooltip from "rc-tooltip";
-
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
+import "pdfjs-dist/build/pdf.worker.min.mjs";
 
 interface PDFViewerProps {
   objectUrl: string;
