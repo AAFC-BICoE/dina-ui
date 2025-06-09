@@ -16,7 +16,10 @@ const PROJECT_TABLE_COLUMNS: TableColumn<any>[] = [
     id: "name",
     cell: ({ row: { original } }) => {
       return (
-        <Link href={`/collection/project/view?id=${original.id}`} legacyBehavior>
+        <Link
+          href={`/collection/project/view?id=${original.id}`}
+          legacyBehavior
+        >
           {original.data.attributes.name}
         </Link>
       );
@@ -72,6 +75,19 @@ export default function collectionMethodListPage() {
         bulkDeleteButtonProps={{
           typeName: "project",
           apiBaseUrl: "/collection-api"
+        }}
+        dynamicFieldMapping={{
+          fields: [
+            // Field Extensions
+            {
+              type: "fieldExtension",
+              label: "fieldExtensions",
+              component: "PROJECT",
+              path: "data.attributes.extensionValues",
+              apiEndpoint: "collection-api/extension"
+            }
+          ],
+          relationshipFields: []
         }}
       />
     </PageLayout>
