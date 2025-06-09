@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import {
   fireEvent,
   waitFor,
@@ -443,13 +443,19 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading of the existing objects to attach...
-    await new Promise(setImmediate);
-
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("checkbox", { name: /select/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("button", { name: /attach selected/i })
+      ).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
     userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
     // Wait for attachments to be displayed on the page.
-    await new Promise(setImmediate);
+    await waitForLoadingToDisappear();
 
     // Add another quality control.
     userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
@@ -782,8 +788,14 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
 
-    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[2]);
-
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("checkbox", { name: /select/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("button", { name: /attach selected/i })
+      ).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
     userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
@@ -795,8 +807,14 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
 
-    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[2]);
-
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("checkbox", { name: /select/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("button", { name: /attach selected/i })
+      ).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
     userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
@@ -1204,7 +1222,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.click(
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
-    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("checkbox", { name: /select/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("button", { name: /attach selected/i })
+      ).toBeInTheDocument();
+    });
     userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
     userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
