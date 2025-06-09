@@ -110,6 +110,10 @@ export function MetadataFileView({
     downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
   }
 
+  // If the file is a derivative, add the derivative to the link.
+  if (metadata.type === "derivative")
+    downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/derivative/${metadata.fileIdentifier}`;
+
   // fileExtension should always be available when getting the Metadata from the back-end:
   const fileType = React.useMemo(() => {
     if (fileToDisplay?.fileExtension) {
