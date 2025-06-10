@@ -1538,11 +1538,6 @@
     "@typescript-eslint/types" "8.19.1"
     eslint-visitor-keys "^4.2.0"
 
-"@wojtekmaj/react-hooks@^1.20.0":
-  version "1.22.0"
-  resolved "https://registry.yarnpkg.com/@wojtekmaj/react-hooks/-/react-hooks-1.22.0.tgz#3793c3a68dc97bf32462edaaceb25fd681979e59"
-  integrity sha512-DtYasEbduZqTjlZRcAuX9CafESUtNwhO2eCPJ5/r8HfXqqUbsUDoRg4IecCNRaPEdiqC6V2syhAWaW0J3Ry4uw==
-
 "@xmldom/xmldom@^0.8.6":
   version "0.8.10"
   resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.10.tgz#a1337ca426aa61cef9fe15b5b28e340a72f6fa99"

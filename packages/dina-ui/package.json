@@ -11,7 +11,6 @@
     "a11y-generate-report": "pa11y-ci-reporter-html -s pa11y-result.json --destination ./pa11y-html-report"
   },
   "dependencies": {
-    "@wojtekmaj/react-hooks": "^1.20.0",
     "alphanumeric-encoder": "^1.6.1",
     "blob": "0.1.0",
     "bootstrap": "5.1.3",
