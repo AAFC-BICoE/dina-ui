@@ -78,7 +78,6 @@ export default function MetadataViewPage() {
               href={`/object-store/metadata/edit?id=${uuid}`}
               className="btn btn-primary ms-auto"
               style={{ width: "5rem" }}
-              legacyBehavior
             >
               <DinaMessage id="editButtonText" />
             </Link>
@@ -88,7 +87,6 @@ export default function MetadataViewPage() {
         <Link
           href={`/object-store/metadata/revisions?id=${uuid}`}
           className="btn btn-info"
-          legacyBehavior
         >
           <DinaMessage id="revisionsButtonText" />
         </Link>

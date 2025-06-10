@@ -112,11 +112,10 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
                 <Link
                   href={`/object-store/derivative/view?id=${id}`}
                   passHref={true}
+                  className="btn btn-primary"
                 >
-                  <a className="btn btn-primary">
-                    <FaUpRightFromSquare className="me-2" />
-                    <DinaMessage id="view" />
-                  </a>
+                  <FaUpRightFromSquare className="me-2" />
+                  <DinaMessage id="view" />
                 </Link>
 
                 {/* Download Button */}

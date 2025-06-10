@@ -43,7 +43,7 @@ export default function DerivativeViewPage() {
         <Link
           href={`/object-store/object/view?id=${derivative?.acDerivedFrom?.id}`}
         >
-          <a>Back to parent file: {parentFileName}</a>
+          Back to parent file: {parentFileName}
         </Link>
       </div>
     </ButtonBar>
