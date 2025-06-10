@@ -1,6 +1,7 @@
 import DerivativeViewPage from "../../../../pages/object-store/derivative/view";
 import { mountWithAppContext } from "common-ui";
 import "@testing-library/jest-dom";
+import { waitForElementToBeRemoved } from "@testing-library/react";
 
 const TEST_METADATA = {
   id: "dummy-metadata-id",
@@ -118,8 +119,7 @@ describe("Derivative details page", () => {
   it("Renders the page and the derivative's tags.", async () => {
     const wrapper = mountWithAppContext(<DerivativeViewPage />, { apiContext });
 
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
 
     expect(wrapper.getByText(/derivative_tag_1/i)).toBeInTheDocument();
     expect(wrapper.getByText(/derivative_tag_2/i)).toBeInTheDocument();
