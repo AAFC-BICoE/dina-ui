@@ -1,10 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FormikButton,
   LoadingSpinner,
   useThrottledFetch,
   useInstanceContext,
-  Tooltip
+  Tooltip,
+  useAccount,
+  useApiClient,
+  SaveArgs
 } from "common-ui";
 import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
@@ -17,8 +20,10 @@ import {
 } from "./global-names-search-result-type";
 import Select from "react-select";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { FaExclamationCircle } from "react-icons/fa";
+import { FaExclamationCircle, FaRegSadTear } from "react-icons/fa";
 import { ListGroup } from "react-bootstrap";
+import { FilterParam } from "kitsu";
+import { UserPreference } from "packages/dina-ui/types/user-api";
 
 export type Selection =
   | string
@@ -67,6 +72,8 @@ export function GlobalNamesSearchBox({
   dateSupplier = () => moment().format("YYYY-MM-DD") // Today
 }: GlobalNamesSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
+  const { save, apiClient } = useApiClient();
+  const { subject } = useAccount();
   const instanceContext = useInstanceContext();
   const scientificNamesSearchEndpoint: string =
     instanceContext?.scientificNamesSearchEndpoint ??
@@ -82,9 +89,43 @@ export function GlobalNamesSearchBox({
     "scientificNameDatasetsLastUpdated"
   );
   const datasetsCacheDuration = 86_400_000; // 24 hours in milliseconds
-  const [selectedDatasets, setSelectedDatasets] = useLocalStorage<Option[]>(
-    "scientificNameSelectedNameDatasets"
-  );
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>();
+
+  // Users saved preferences.
+  const [userPreferences, setUserPreferences] = useState<UserPreference>();
+  const [userPreferencesLastLoaded, setUserPreferencesLastLoaded] =
+    useState<number>(Date.now());
+
+  /**
+   * Retrieve the user preference for the logged in user. This is used for the SavedSearch
+   * functionality since the saved searches are stored in the user preferences.
+   */
+  async function retrieveUserPreferences() {
+    // Retrieve user preferences...
+    await apiClient
+      .get<UserPreference[]>("user-api/user-preference", {
+        filter: {
+          userId: subject as FilterParam
+        }
+      })
+      ?.then((response) => {
+        // Set the user preferences to be a state for the QueryPage.
+        setUserPreferences(response?.data?.[0]);
+        setLoading(false);
+      })
+      .catch((userPreferenceError) => {
+        setError(userPreferenceError);
+        setUserPreferences(undefined);
+        setLoading(false);
+      });
+  }
+
+  // Every time the last loaded is changed, retrieve the user preferences.
+  useEffect(() => {
+    retrieveUserPreferences();
+  }, [userPreferencesLastLoaded]);
 
   // the default value for selectedDatasets will be set below
   useEffect(() => {
@@ -177,9 +218,17 @@ export function GlobalNamesSearchBox({
         }`,
         params: {
           capitalize: "false",
-          ...(selectedDatasets && selectedDatasets?.length !== 0
+          ...(userPreferences?.uiPreference?.[
+            "scientificNameSelectedNameDatasets"
+          ] &&
+          userPreferences?.uiPreference?.["scientificNameSelectedNameDatasets"]
+            ?.length !== 0
             ? {
-                data_sources: selectedDatasets.map((ds) => ds.value).join("|")
+                data_sources: userPreferences?.uiPreference?.[
+                  "scientificNameSelectedNameDatasets"
+                ]
+                  .map((ds) => ds.value)
+                  .join("|")
               }
             : {}),
           all_matches: true
@@ -190,7 +239,9 @@ export function GlobalNamesSearchBox({
     },
     timeoutMs: 1000,
     initSearchValue,
-    dependencies: [selectedDatasets]
+    dependencies: [
+      userPreferences?.uiPreference?.["scientificNameSelectedNameDatasets"]
+    ]
   });
 
   const onInputChange = (value) => {
@@ -233,23 +284,57 @@ export function GlobalNamesSearchBox({
                   <DinaMessage id="searchButton" />
                 </button>
               </div>
-              {datasetOptions && (
-                <div className="d-flex align-items-center justify-content-end mb-2">
-                  <Select
-                    isMulti
-                    name="globalNameSources"
-                    options={datasetOptions}
-                    value={selectedDatasets}
-                    onChange={(newValue) => {
-                      setSelectedDatasets(Array.from(newValue));
-                    }}
-                    placeholder={formatMessage("globalNameSources")}
-                    className="flex-fill mt-2"
-                    components={{
-                      Option: CustomDataSourceOption
-                    }}
-                  />
+              {loading ? (
+                <LoadingSpinner loading={true} />
+              ) : error ? (
+                <div style={{ textAlign: "center" }}>
+                  <h2>
+                    <FaRegSadTear />
+                  </h2>
+                  <p>
+                    <DinaMessage id="savedSearchError" />
+                  </p>
                 </div>
+              ) : (
+                datasetOptions && (
+                  <div className="d-flex align-items-center justify-content-end mb-2">
+                    <Select
+                      isMulti
+                      name="globalNameSources"
+                      options={datasetOptions}
+                      value={
+                        userPreferences?.uiPreference?.[
+                          "scientificNameSelectedNameDatasets"
+                        ]
+                      }
+                      onChange={async (newValue) => {
+                        // Perform saving request.
+                        const saveArgs: SaveArgs<UserPreference> = {
+                          resource: {
+                            id: userPreferences?.id ?? null,
+                            userId: subject,
+                            uiPreference: {
+                              scientificNameSelectedNameDatasets: newValue
+                            }
+                          } as any,
+                          type: "user-preference"
+                        };
+                        await save([saveArgs], {
+                          apiBaseUrl: "/user-api",
+                          skipOperationForSingleRequest: true
+                        });
+
+                        // Trigger a reload of the user preferences.
+                        setUserPreferencesLastLoaded(Date.now());
+                      }}
+                      placeholder={formatMessage("globalNameSources")}
+                      className="flex-fill mt-2"
+                      components={{
+                        Option: CustomDataSourceOption
+                      }}
+                    />
+                  </div>
+                )
               )}
             </div>
           ) : (
