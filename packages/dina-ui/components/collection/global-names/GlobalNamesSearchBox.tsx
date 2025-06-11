@@ -110,7 +110,7 @@ export function GlobalNamesSearchBox({
           userId: subject as FilterParam
         }
       })
-      .then((response) => {
+      ?.then((response) => {
         // Set the user preferences to be a state for the QueryPage.
         setUserPreferences(response?.data?.[0]);
         setLoading(false);
