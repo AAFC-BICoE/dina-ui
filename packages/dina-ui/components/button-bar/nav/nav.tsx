@@ -248,7 +248,10 @@ function NavCollectionDropdown({ formatMessage }) {
           <DinaMessage id="projectListTitle" />
         </NavDropdown.Item>
       </Link>
-      <Link href="/collection/classification/taxonomy-tree" passHref={true}>
+      <Link
+        href="/collection/classification/taxonomy-hierarchy"
+        passHref={true}
+      >
         <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
           <DinaMessage id="taxonomicHierarchy" />
         </NavDropdown.Item>
