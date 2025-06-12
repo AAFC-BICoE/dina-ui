@@ -249,7 +249,7 @@ function NavCollectionDropdown({ formatMessage }) {
         </NavDropdown.Item>
       </Link>
       <Link
-        href="/collection/classification/taxonomy-hierarchy"
+        href="/collection/classification/taxonomic-hierarchy"
         passHref={true}
       >
         <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
