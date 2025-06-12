@@ -3,6 +3,7 @@ import ObjectSubtypeListPage from "../../../pages/object-store/object-subtype/li
 import { mountWithAppContext } from "common-ui";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/react";
 
 const TEST_OBJECTSUBTYPES: PersistedResource<ObjectSubtype>[] = [
   {
@@ -45,13 +46,15 @@ describe("Object subtype list page", () => {
       apiContext
     });
 
-    await new Promise(setImmediate);
-
     // Test link element in table
-    expect(wrapper.getByRole("link", { name: /drawing/i })).toBeInTheDocument();
-    expect(wrapper.getByRole("link", { name: /drawing/i })).toHaveAttribute(
-      "href",
-      "/object-store/object-subtype/edit?id=6c524135-3c3e-41c1-a057-45afb4e3e7be"
-    );
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("link", { name: /drawing/i })
+      ).toBeInTheDocument();
+      expect(wrapper.getByRole("link", { name: /drawing/i })).toHaveAttribute(
+        "href",
+        "/object-store/object-subtype/edit?id=6c524135-3c3e-41c1-a057-45afb4e3e7be"
+      );
+    });
   });
 });

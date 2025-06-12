@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { compact } from "lodash";
+import _ from "lodash";
 import { Promisable } from "type-fest";
 import { MaterialSampleBulkEditor, useMaterialSampleQuery } from "..";
 import { MaterialSample } from "../../types/collection-api";
@@ -24,7 +24,7 @@ export function ExistingMaterialSampleBulkEditor({
     false
   );
 
-  const errors = compact(sampleQueries.map((query) => query.error));
+  const errors = _.compact(sampleQueries.map((query) => query.error));
 
   if (isLoading) {
     return <LoadingSpinner loading={true} />;
@@ -42,7 +42,7 @@ export function ExistingMaterialSampleBulkEditor({
     );
   }
 
-  const samples = compact(sampleQueries.map((query) => query.response?.data));
+  const samples = _.compact(sampleQueries.map((query) => query.response?.data));
 
   if (samples.length) {
     return (

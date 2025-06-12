@@ -13,7 +13,7 @@ import {
 } from "../object-store-utils";
 import RcTooltip from "rc-tooltip";
 import { DownloadButton } from "../derivative-list/DerivativeList";
-import { Dropdown } from "react-bootstrap";
+import { Badge, Dropdown } from "react-bootstrap";
 import {
   FaDownload,
   FaFile,
@@ -30,6 +30,8 @@ import {
 import { FaFileCode } from "react-icons/fa";
 import { MdOutlineRawOn } from "react-icons/md";
 import { IconType } from "react-icons/lib";
+import { PDFViewer } from "./PDFViewer";
+import { formatBytes } from "../object-store-utils";
 
 export type DownLoadLinks = {
   original?: string;
@@ -56,7 +58,8 @@ export const IMG_TAG_SUPPORTED_FORMATS = [
   "jpeg",
   "jpg",
   "png",
-  "svg"
+  "svg",
+  "pdf"
 ];
 
 export function FileView({
@@ -102,6 +105,7 @@ export function FileView({
   });
 
   const errorStatus = (error as any)?.cause?.status;
+  const objectUpload = (metadata as any)?.objectUpload;
 
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
@@ -111,43 +115,51 @@ export function FileView({
         <>
           {isImage ? (
             errorStatus === undefined ? (
-              <a
-                href={objectUrl as any}
-                target="_blank"
-                style={{
-                  color: "inherit",
-                  textDecoration: "none",
-                  pointerEvents: clickToDownload ? undefined : "none",
-                  display: "block",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  width: "fit-content"
-                }}
-              >
-                <RcTooltip
-                  overlay={<>{shownTypeIndicator}</>}
-                  placement="top"
-                  align={{
-                    points: ["bc", "bc"],
-                    offset: [0, -20]
-                  }}
-                  motion={{
-                    motionName: "rc-tooltip-zoom",
-                    motionAppear: true,
-                    motionEnter: true,
-                    motionLeave: true
+              fileType === "pdf" ? (
+                <PDFViewer
+                  objectUrl={objectUrl as any}
+                  shownTypeIndicator={shownTypeIndicator as any}
+                />
+              ) : (
+                <a
+                  href={objectUrl as any}
+                  target="_blank"
+                  style={{
+                    color: "inherit",
+                    textDecoration: "none",
+                    pointerEvents:
+                      clickToDownload && fileType != "pdf" ? undefined : "none",
+                    display: "block",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    width: "fit-content"
                   }}
                 >
-                  <img
-                    alt={imgAlt ?? `File path : ${filePath}`}
-                    src={objectUrl as any}
-                    style={{ height: imgHeight }}
-                    onError={(event) =>
-                      (event.currentTarget.style.display = "none")
-                    }
-                  />
-                </RcTooltip>
-              </a>
+                  <RcTooltip
+                    overlay={<>{shownTypeIndicator}</>}
+                    placement="top"
+                    align={{
+                      points: ["bc", "bc"],
+                      offset: [0, -20]
+                    }}
+                    motion={{
+                      motionName: "rc-tooltip-zoom",
+                      motionAppear: true,
+                      motionEnter: true,
+                      motionLeave: true
+                    }}
+                  >
+                    <img
+                      alt={imgAlt ?? `File path : ${filePath}`}
+                      src={objectUrl as any}
+                      style={{ height: imgHeight }}
+                      onError={(event) =>
+                        (event.currentTarget.style.display = "none")
+                      }
+                    />
+                  </RcTooltip>
+                </a>
+              )
             ) : errorStatus === 403 ? (
               <DinaMessage id="unauthorized" />
             ) : (
@@ -238,6 +250,20 @@ export function FileView({
                               {metadata?.fileExtension?.toUpperCase()}
                             </small>
                           </div>
+
+                          {objectUpload && (
+                            <Badge
+                              bg="light"
+                              text="dark"
+                              style={{
+                                fontSize: "0.75rem",
+                                padding: "0.35em 0.5em",
+                                marginLeft: "auto"
+                              }}
+                            >
+                              {formatBytes(objectUpload.sizeInBytes)}
+                            </Badge>
+                          )}
                         </div>
                       </Dropdown.Item>
                     )}
@@ -248,7 +274,8 @@ export function FileView({
                       const fileType = derivative.fileExtension;
                       const derivativeType = derivative.derivativeType;
                       const filePath = `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`;
-
+                      const fileSize = (derivative as any).objectUpload
+                        ?.sizeInBytes;
                       return (
                         <Dropdown.Item
                           key={fileIdentifier}
@@ -262,7 +289,10 @@ export function FileView({
                             )
                           }
                         >
-                          <div className="d-flex align-items-center">
+                          <div
+                            className="d-flex align-items-center"
+                            style={{ minWidth: "250px" }}
+                          >
                             {fileExtensionToIcon(
                               fileType,
                               "me-3 text-secondary dropdown-icon"
@@ -278,6 +308,19 @@ export function FileView({
                                 {fileType.toUpperCase()}
                               </small>
                             </div>
+                            {fileSize && (
+                              <Badge
+                                bg="light"
+                                text="dark"
+                                style={{
+                                  fontSize: "0.75rem",
+                                  padding: "0.35em 0.5em",
+                                  marginLeft: "auto"
+                                }}
+                              >
+                                {formatBytes(fileSize)}
+                              </Badge>
+                            )}
                           </div>
                         </Dropdown.Item>
                       );

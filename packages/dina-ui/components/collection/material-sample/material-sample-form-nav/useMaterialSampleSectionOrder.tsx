@@ -1,4 +1,4 @@
-import { uniq, compact } from "lodash";
+import _ from "lodash";
 import { useDinaIntl } from "../../../../intl/dina-ui-intl";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
@@ -33,7 +33,7 @@ export function useMaterialSampleSectionOrder({
   const { formatMessage, messages } = useDinaIntl();
 
   /** An array with all section IDs, beginning with the user-defined order. */
-  const navOrderWithAllSections: string[] = uniq([
+  const navOrderWithAllSections: string[] = _.uniq([
     ...(navOrder ?? []),
     ...MATERIAL_SAMPLE_FORM_LEGEND.filter((component) =>
       isTemplate ? true : !component.formTemplateOnly
@@ -101,8 +101,8 @@ export function useMaterialSampleSectionOrder({
     }))
   ];
 
-  const sortedScrollTargets: ScrollTarget[] = compact(
-    uniq(
+  const sortedScrollTargets: ScrollTarget[] = _.compact(
+    _.uniq(
       navOrderWithAllSections.map(
         (id) => scrollTargets.filter((target) => target.id === id)[0]
       )

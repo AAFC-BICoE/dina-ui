@@ -26,7 +26,9 @@ export default function MaterialSampleFormTemplateListPage() {
           original: { id, name }
         }
       }) => (
-        <Link href={`/collection/form-template/edit?id=${id}`}>{name}</Link>
+        <Link href={`/collection/form-template/edit?id=${id}`} legacyBehavior>
+          {name}
+        </Link>
       ),
       accessorKey: "name",
       header: () => <FieldHeader name="name" />
@@ -43,10 +45,11 @@ export default function MaterialSampleFormTemplateListPage() {
       }) => (
         <div className="list-inline">
           {createdBy === username ? (
-            <Link href={`/collection/form-template/edit?id=${id}`}>
-              <a className="list-inline-item btn btn-dark">
-                <DinaMessage id="editButtonText" />
-              </a>
+            <Link
+              href={`/collection/form-template/edit?id=${id}`}
+              className="list-inline-item btn btn-dark"
+            >
+              <DinaMessage id="editButtonText" />
             </Link>
           ) : (
             <Tooltip
@@ -63,10 +66,11 @@ export default function MaterialSampleFormTemplateListPage() {
               }
             />
           )}
-          <Link href={`/collection/material-sample/edit/?formTemplateId=${id}`}>
-            <a className="list-inline-item btn btn-primary">
-              <DinaMessage id="createSampleWithFormTemplate" />
-            </a>
+          <Link
+            href={`/collection/material-sample/edit/?formTemplateId=${id}`}
+            className="list-inline-item btn btn-primary"
+          >
+            <DinaMessage id="createSampleWithFormTemplate" />
           </Link>
         </div>
       ),

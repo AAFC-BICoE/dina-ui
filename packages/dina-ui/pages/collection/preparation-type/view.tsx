@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { fromPairs } from "lodash";
+import _ from "lodash";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 import { ViewPageLayout } from "../../../components";
 import { PreparationTypeFormLayout } from "./edit";
@@ -13,7 +13,7 @@ export default function PreparationTypeDetailsPage() {
           initialValues={{
             ...props.initialValues,
             // Convert multilingualDescription to editable Dictionary format:
-            multilingualDescription: fromPairs<string | undefined>(
+            multilingualDescription: _.fromPairs<string | undefined>(
               props.initialValues.multilingualDescription?.descriptions?.map(
                 ({ desc, lang }) => [lang ?? "", desc ?? ""]
               )

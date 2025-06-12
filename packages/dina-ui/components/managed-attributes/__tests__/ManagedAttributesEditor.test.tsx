@@ -174,20 +174,21 @@ describe("ManagedAttributesEditor component", () => {
     if (removeButton) {
       fireEvent.click(removeButton);
     }
-    await new Promise(setImmediate);
 
     // Verify the field is removed
-    expect(queryByText("Example Attribute 2")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(queryByText("Example Attribute 2")).not.toBeInTheDocument();
+    });
 
     // Submit the form
     const form = container.querySelector("form");
     fireEvent.submit(form!);
 
-    await new Promise(setImmediate);
-
     // Verify the mockSubmit was called without example_attribute_2
-    expect(mockSubmit).toHaveBeenCalledWith({
-      managedAttributes: { ...exampleValues, example_attribute_2: undefined }
+    await waitFor(() => {
+      expect(mockSubmit).toHaveBeenCalledWith({
+        managedAttributes: { ...exampleValues, example_attribute_2: undefined }
+      });
     });
   });
 });

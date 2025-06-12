@@ -11,7 +11,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { fromPairs, toPairs } from "lodash";
+import _ from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import { useState } from "react";
 import { GroupSelectField } from "..";
@@ -46,7 +46,7 @@ export function ManagedAttributeForm({
     ? {
         ...fetchedManagedAttribute,
         // Convert multilingualDescription to editable Dictionary format:
-        multilingualDescription: fromPairs<string | undefined>(
+        multilingualDescription: _.fromPairs<string | undefined>(
           fetchedManagedAttribute.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
           )
@@ -86,7 +86,7 @@ export function ManagedAttributeForm({
 
     // Convert the editable format to the stored format:
     submittedValues.multilingualDescription = {
-      descriptions: toPairs(submittedValues.multilingualDescription).map(
+      descriptions: _.toPairs(submittedValues.multilingualDescription).map(
         ([lang, desc]) => ({ lang, desc })
       )
     };

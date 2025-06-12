@@ -1,4 +1,4 @@
-import lodash, { startCase, flatMapDeep } from "lodash";
+import _ from "lodash";
 import { DinaMessage } from "../../../../../dina-ui/intl/dina-ui-intl";
 import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
@@ -86,7 +86,7 @@ export function QueryFieldSelector({
       ?.map((prop) => ({
         label: messages["field_" + prop.label]
           ? formatMessage({ id: "field_" + prop.label })
-          : startCase(prop.label),
+          : _.startCase(prop.label),
         value: prop.value
       }))
       ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
@@ -111,21 +111,20 @@ export function QueryFieldSelector({
               })
             : messages["field_" + prop.label]
             ? formatMessage({ id: "field_" + prop.label })
-            : startCase(prop.label),
+            : _.startCase(prop.label),
           value: prop.value
         };
       })
       ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
 
     // Using the parent name, group the relationships into sections.
-    const groupedNestRowOptions = lodash
-      .chain(nestedRowOptions)
+    const groupedNestRowOptions = _.chain(nestedRowOptions)
       .groupBy((prop) => prop.parentName)
       .map((group, key) => {
         return {
           label: messages["title_" + key]
             ? formatMessage({ id: "title_" + key })
-            : startCase(key),
+            : _.startCase(key),
           options: group
         };
       })
@@ -172,7 +171,7 @@ export function QueryFieldSelector({
               content: `'${
                 messages["title_" + data.parentName]
                   ? formatMessage({ id: "title_" + data.parentName })
-                  : startCase(data.parentName)
+                  : _.startCase(data.parentName)
               } - '`
             }
           };
@@ -193,13 +192,13 @@ export function QueryFieldSelector({
       if ((dropdownItem as any)?.options) {
         return [
           dropdownItem,
-          flatMapDeep(dropdownItem.options, getNestedOptions)
+          _.flatMapDeep(dropdownItem.options, getNestedOptions)
         ];
       }
       return dropdownItem;
     };
 
-    return flatMapDeep(queryRowOptions, getNestedOptions).find(
+    return _.flatMapDeep(queryRowOptions, getNestedOptions).find(
       (dropdownItem) => {
         if ((dropdownItem as any)?.value) {
           return (dropdownItem as any).value === currentField;

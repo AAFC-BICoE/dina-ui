@@ -5,7 +5,7 @@ import {
   VocabularyOption,
   VocabularySelectField
 } from "../VocabularySelectField";
-import { find } from "lodash";
+import _ from "lodash";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
@@ -19,7 +19,7 @@ const mockToOption = (value: string | VocabularyElement): VocabularyOption => {
     };
   }
   const label =
-    find(value?.multilingualTitle?.titles || [], (item) => item.lang === "en")
+    _.find(value?.multilingualTitle?.titles || [], (item) => item.lang === "en")
       ?.title ||
     value.name ||
     "";

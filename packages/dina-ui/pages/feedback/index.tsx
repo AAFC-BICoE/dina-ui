@@ -30,14 +30,13 @@ export function Feedback() {
               instanceContext?.instanceName ?? "AAFC"
             }%5D%20`}
             passHref={true}
+            target="_blank"
           >
-            <a target="_blank">
-              <>
-                <DinaMessage id="feedbackLinkTitle" />
-                {"  "}
-                <FaExternalLinkAlt />
-              </>
-            </a>
+            <>
+              <DinaMessage id="feedbackLinkTitle" />
+              {"  "}
+              <FaExternalLinkAlt />
+            </>
           </Link>{" "}
           <DinaMessage id="feedbackExternal" />
         </p>

@@ -10,7 +10,7 @@ import {
   withResponse
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { castArray, get, upperCase } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { Footer, GroupLabel, Head, Nav } from "..";
@@ -126,7 +126,6 @@ export function ViewPageLayout<T extends KitsuResource>({
   return (
     <div>
       <Nav marginBottom={false} />
-
       {withResponse(resourceQuery, ({ data }) => {
         const resource = data as PersistedResource<T>;
 
@@ -145,16 +144,16 @@ export function ViewPageLayout<T extends KitsuResource>({
           ? data.meta?.permissions?.includes("delete") ?? false
           : true;
 
-        const nameFields = castArray(nameField);
+        const nameFields = _.castArray(nameField);
         let title = [...nameFields, "id"].reduce(
           (lastValue, currentField) =>
             lastValue ||
             (typeof currentField === "function"
               ? currentField(resource)
-              : get(data, currentField)),
+              : _.get(data, currentField)),
           ""
         );
-        const group = upperCase(get(data, "group") as string);
+        const group = _.upperCase(_.get(data, "group") as string);
 
         // if title is array, only take first element
         if (Array.isArray(title)) {
@@ -167,17 +166,17 @@ export function ViewPageLayout<T extends KitsuResource>({
         return (
           <>
             <Head title={title} />
-
             <ButtonBar>
               <div className="col-md-2 mt-2">
                 {showBackButton &&
                   (backButton ? (
                     backButton
                   ) : specialListUrl ? (
-                    <Link href={specialListUrl}>
-                      <a className="back-button my-auto me-auto">
-                        <DinaMessage id="backToList" />
-                      </a>
+                    <Link
+                      href={specialListUrl}
+                      className="back-button my-auto me-auto"
+                    >
+                      <DinaMessage id="backToList" />
                     </Link>
                   ) : (
                     <BackButton
@@ -199,10 +198,11 @@ export function ViewPageLayout<T extends KitsuResource>({
                     <EditButton entityId={id} entityLink={entityLink} />
                   ))}
                 {showRevisionsLink && (
-                  <Link href={`${entityLink}/revisions?id=${id}`}>
-                    <a className="btn btn-info">
-                      <DinaMessage id="revisionsButtonText" />
-                    </a>
+                  <Link
+                    href={`${entityLink}/revisions?id=${id}`}
+                    className="btn btn-info"
+                  >
+                    <DinaMessage id="revisionsButtonText" />
                   </Link>
                 )}
                 {showDeleteButton &&
@@ -221,7 +221,6 @@ export function ViewPageLayout<T extends KitsuResource>({
                   ))}
               </div>
             </ButtonBar>
-
             <main className={mainClass}>
               <h1 id="wb-cont" className="d-flex justify-content-between">
                 <span>
@@ -238,9 +237,7 @@ export function ViewPageLayout<T extends KitsuResource>({
               {form(formProps)}
               {showRevisionsLinkAtBottom && (
                 <Link href={`${entityLink}/revisions?id=${id}`}>
-                  <a>
-                    <DinaMessage id="revisionsButtonText" />
-                  </a>
+                  <DinaMessage id="revisionsButtonText" />
                 </Link>
               )}
             </main>

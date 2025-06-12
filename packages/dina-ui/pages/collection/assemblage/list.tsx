@@ -19,7 +19,11 @@ const ASSEMBLAGE_TABLE_COLUMNS: ColumnDefinition<Assemblage>[] = [
       row: {
         original: { id, name }
       }
-    }) => <Link href={`/collection/assemblage/view?id=${id}`}>{name}</Link>,
+    }) => (
+      <Link href={`/collection/assemblage/view?id=${id}`} legacyBehavior>
+        {name}
+      </Link>
+    ),
     accessorKey: "name",
     header: () => <FieldHeader name="name" />
   },

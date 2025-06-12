@@ -1,4 +1,4 @@
-import { get } from "lodash";
+import _ from "lodash";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { KitsuResource } from "kitsu";
@@ -21,7 +21,7 @@ export function booleanCell<TData extends KitsuResource>(
   return {
     id: label,
     cell: ({ row: { original } }) => {
-      const booleanValue = get(original, accessorKey ?? label)?.toString();
+      const booleanValue = _.get(original, accessorKey ?? label)?.toString();
       if (booleanValue === "true") {
         return <FaCheckSquare />;
       } else if (booleanValue === "false") {

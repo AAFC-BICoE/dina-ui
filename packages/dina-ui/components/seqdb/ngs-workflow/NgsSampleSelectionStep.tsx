@@ -8,7 +8,7 @@ import {
   useApiClient
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { compact, concat, difference, pick, uniq } from "lodash";
+import _ from "lodash";
 import { useEffect, useState } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
@@ -80,7 +80,9 @@ export function NgsSampleSelectionStep({
     materialSamples: MaterialSampleSummary[]
   ) {
     setSelectedResources(materialSamples);
-    setMaterialSampleSortOrder(compact(materialSamples.map((item) => item.id)));
+    setMaterialSampleSortOrder(
+      _.compact(materialSamples.map((item) => item.id))
+    );
   }
 
   // Sort MaterialSamples based on the preserved order in local storage
@@ -94,16 +96,16 @@ export function NgsSampleSelectionStep({
           sorted.push(item);
         }
       });
-      return compact(sorted);
+      return _.compact(sorted);
     } else {
-      return compact(samples);
+      return _.compact(samples);
     }
   }
 
   function onSelectMaterial(selected: MaterialSample[]) {
-    const ids = compact(
-      uniq(
-        concat(
+    const ids = _.compact(
+      _.uniq(
+        _.concat(
           materialSampleSortOrder,
           selected.map((material) => material.id)
         )
@@ -113,10 +115,10 @@ export function NgsSampleSelectionStep({
   }
 
   function onDeselectMaterial(unselected: MaterialSample[]) {
-    const ids = uniq(
-      difference(
+    const ids = _.uniq(
+      _.difference(
         materialSampleSortOrder,
-        compact(unselected.map((material) => material.id))
+        _.compact(unselected.map((material) => material.id))
       )
     );
     setMaterialSampleSortOrder(ids);
@@ -183,10 +185,10 @@ export function NgsSampleSelectionStep({
       );
 
       // Convert to UUID arrays to compare the two arrays.
-      const selectedResourceUUIDs = compact(
+      const selectedResourceUUIDs = _.compact(
         selectedResources?.map((material) => material.id)
       );
-      const previouslySelectedResourcesUUIDs = compact(
+      const previouslySelectedResourcesUUIDs = _.compact(
         previouslySelectedResources?.map((item) => ({
           materialSampleUUID: item?.materialSample?.id,
           libraryPrepUUID: item?.id
@@ -194,7 +196,7 @@ export function NgsSampleSelectionStep({
       );
 
       // UUIDs of Library Prep that need to be created.
-      const itemsToCreate = uniq(
+      const itemsToCreate = _.uniq(
         selectedResourceUUIDs.filter(
           (uuid) =>
             !previouslySelectedResourcesUUIDs.some(
@@ -204,7 +206,7 @@ export function NgsSampleSelectionStep({
       );
 
       // UUIDs of Library Prep that need to be deleted.
-      const itemsToDelete = uniq(
+      const itemsToDelete = _.uniq(
         previouslySelectedResourcesUUIDs.filter(
           (uuid) =>
             !selectedResourceUUIDs.includes(uuid.materialSampleUUID as string)
@@ -219,7 +221,7 @@ export function NgsSampleSelectionStep({
               type: "library-prep",
               group: libraryPrepBatch.group ?? "",
               createdBy: username ?? "",
-              libraryPrepBatch: pick(libraryPrepBatch, "id", "type"),
+              libraryPrepBatch: _.pick(libraryPrepBatch, "id", "type"),
               relationships: {
                 materialSample: {
                   data: {

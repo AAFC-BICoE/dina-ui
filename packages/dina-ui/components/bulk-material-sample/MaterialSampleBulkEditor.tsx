@@ -11,9 +11,8 @@ import {
   useApiClient,
   withoutBlankFields
 } from "common-ui";
-import { isEmpty, cloneDeep } from "lodash";
+import _ from "lodash";
 import { InputResource, PersistedResource, KitsuResource } from "kitsu";
-import { keys, omit, pick, pickBy } from "lodash";
 import { useEffect, useMemo, useRef, useState, RefObject } from "react";
 import { Promisable } from "type-fest";
 import {
@@ -109,7 +108,7 @@ export function MaterialSampleBulkEditor({
     setSelectedTab(bulkEditTab);
   }, []);
 
-  const { saveAll } = useBulkSampleSave({
+  const { saveAll, submissionError } = useBulkSampleSave({
     onSaved,
     samplePreProcessor: sampleBulkOverrider,
     bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef },
@@ -159,6 +158,7 @@ export function MaterialSampleBulkEditor({
           onSelectTab={setSelectedTab}
           resources={sampleHooks}
           extraTabs={[bulkEditTab]}
+          submissionError={submissionError}
           tabNameConfig={(materialSample: ResourceWithHooks<MaterialSample>) =>
             materialSample?.resource?.materialSampleName
           }
@@ -312,10 +312,10 @@ export function getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook) {
     const newSample: InputResource<MaterialSample> = {
       ...baseSample,
       ...overrides,
-      ...(!isEmpty(newManagedAttributes) && {
+      ...(!_.isEmpty(newManagedAttributes) && {
         managedAttributes: newManagedAttributes
       }),
-      ...(!isEmpty(newHostOrganism) && {
+      ...(!_.isEmpty(newHostOrganism) && {
         hostOrganism: newHostOrganism
       })
     };
@@ -377,19 +377,19 @@ function useBulkSampleSave({
   bulkEditSampleHook
 }: BulkSampleSaveParams) {
   // Force re-render when there is a bulk submission error:
-  const [_error, setError] = useState<unknown | null>(null);
+  const [submissionError, setSubmissionError] = useState<unknown | null>(null);
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
   const { bulkEditFormRef, resourceHooks: sampleHooks } = bulkEditCtx;
 
   async function saveAll() {
-    setError(null);
+    setSubmissionError(null);
     bulkEditFormRef.current?.setStatus(null);
     bulkEditFormRef.current?.setErrors({});
     const bulkEditCollectingEventRefPermanent = bulkEditSampleHook
       ?.colEventFormRef?.current?.values
-      ? cloneDeep(bulkEditCollectingEvtFormRef)
+      ? _.cloneDeep(bulkEditCollectingEvtFormRef)
       : undefined;
 
     try {
@@ -433,6 +433,7 @@ function useBulkSampleSave({
                     }))
                   );
                 }
+                setSubmissionError(error);
                 throw error;
               }
             },
@@ -457,6 +458,7 @@ function useBulkSampleSave({
               }))
             );
           }
+          setSubmissionError(error);
           throw error;
         }
       }
@@ -513,8 +515,8 @@ function useBulkSampleSave({
         }
         // Any errored field that was edited in the Edit All tab should
         // get the red indicator in the Edit All tab.
-        const badBulkEditedFields = keys(
-          pickBy(
+        const badBulkEditedFields = _.keys(
+          _.pickBy(
             error.fieldErrors,
             (_, fieldName) =>
               getBulkEditTabFieldInfo({ bulkEditCtx, fieldName })
@@ -523,18 +525,20 @@ function useBulkSampleSave({
         );
         bulkEditFormRef.current?.setErrors({
           ...bulkEditFormRef.current?.errors,
-          ...pick(error.fieldErrors, badBulkEditedFields)
+          ..._.pick(error.fieldErrors, badBulkEditedFields)
         });
         // Don't show the bulk edited fields' errors in the individual sample tabs
         // because the user can't fix them there:
         sampleHooks
           .map((it) => it.formRef?.current)
-          .forEach((it) => it?.setErrors(omit(it.errors, badBulkEditedFields)));
+          .forEach((it) =>
+            it?.setErrors(_.omit(it.errors, badBulkEditedFields))
+          );
       }
-      setError(error);
+      setSubmissionError(error);
       throw new Error(formatMessage("bulkSubmissionErrorInfo"));
     }
   }
 
-  return { saveAll };
+  return { saveAll, submissionError };
 }

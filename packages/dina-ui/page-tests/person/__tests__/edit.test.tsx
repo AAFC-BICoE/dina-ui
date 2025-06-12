@@ -2,7 +2,7 @@ import { Person } from "../../../types/agent-api/resources/Person";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import PersonEditPage from "../../../pages/person/edit";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -81,22 +81,23 @@ describe("person edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
-    await new Promise(setImmediate);
 
     // Test expected response
-    expect(mockPost).lastCalledWith(
-      "/agent-api/person",
-      {
-        data: {
-          attributes: {
-            displayName: "test person updated"
-          },
-          id: "00000000-0000-0000-0000-000000000000",
-          type: "person"
-        }
-      },
-      expect.anything()
-    );
+    await waitFor(() => {
+      expect(mockPost).lastCalledWith(
+        "/agent-api/person",
+        {
+          data: {
+            attributes: {
+              displayName: "test person updated"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "person"
+          }
+        },
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the person list page.
     expect(mockPush).lastCalledWith("/person/list");
@@ -120,12 +121,12 @@ describe("person edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
-    await new Promise(setImmediate);
-
-    // Check that the existing displayName value is in the field.
-    expect(
-      wrapper.getByRole("textbox", { name: /display name/i })
-    ).toHaveDisplayValue("person a");
+    await waitFor(() => {
+      // Check that the existing displayName value is in the field.
+      expect(
+        wrapper.getByRole("textbox", { name: /display name/i })
+      ).toHaveDisplayValue("person a");
+    });
 
     // Modify the displayName value.
     fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
@@ -138,22 +139,22 @@ describe("person edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // "patch" should have been called with the updated person data
-    expect(mockPatch).lastCalledWith(
-      "/agent-api/person/1",
-      {
-        data: {
-          attributes: expect.objectContaining({
-            displayName: "new test person"
-          }),
-          id: "1",
-          type: "person"
-        }
-      },
-      expect.anything()
-    );
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/agent-api/person/1",
+        {
+          data: {
+            attributes: expect.objectContaining({
+              displayName: "new test person"
+            }),
+            id: "1",
+            type: "person"
+          }
+        },
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to person's list page.
     expect(mockPush).lastCalledWith("/person/list");

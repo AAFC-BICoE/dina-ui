@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
-import { isEqual } from "lodash";
+import _ from "lodash";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { DataExportTemplate } from "packages/dina-ui/types/dina-export-api/resources/DataExportTemplate";
 import {
@@ -323,8 +323,8 @@ export default function useSavedExports<TData extends KitsuResource>({
     const columnsToExportAliases = convertColumnsToAliases(columnsToExport);
 
     setChangesMade(
-      !isEqual(columnsToExportPaths, selectedSavedExport?.columns ?? []) ||
-        !isEqual(
+      !_.isEqual(columnsToExportPaths, selectedSavedExport?.columns ?? []) ||
+        !_.isEqual(
           columnsToExportAliases,
           selectedSavedExport?.columnAliases ?? []
         )

@@ -2,7 +2,7 @@ import { OperationsResponse } from "common-ui";
 import { ObjectSubtypeEditPage } from "../../../pages/object-store/object-subtype/edit";
 import { mountWithAppContext } from "common-ui";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -70,26 +70,27 @@ describe("Object subtype edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
-    await new Promise(setImmediate);
 
     // Test expected response
-    expect(mockPatch).lastCalledWith(
-      "/objectstore-api/operations",
-      [
-        {
-          op: "POST",
-          path: "object-subtype",
-          value: {
-            attributes: {
-              acSubtype: "libre office word"
-            },
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "object-subtype"
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/objectstore-api/operations",
+        [
+          {
+            op: "POST",
+            path: "object-subtype",
+            value: {
+              attributes: {
+                acSubtype: "libre office word"
+              },
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "object-subtype"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to the new object subtype's details page.
     expect(mockPush).lastCalledWith("/object-store/object-subtype/list");
@@ -120,12 +121,12 @@ describe("Object subtype edit page", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
-    await new Promise(setImmediate);
-
-    // Check that the existing existing subtype value is in the field.
-    expect(
-      wrapper.getByRole("textbox", { name: /object subtype/i })
-    ).toHaveValue("word file");
+    await waitFor(() => {
+      // Check that the existing existing subtype value is in the field.
+      expect(
+        wrapper.getByRole("textbox", { name: /object subtype/i })
+      ).toHaveValue("word file");
+    });
 
     // Modify the acSubtype value.
     fireEvent.change(
@@ -141,27 +142,27 @@ describe("Object subtype edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
-    expect(mockPatch).lastCalledWith(
-      "/objectstore-api/operations",
-      [
-        {
-          op: "PATCH",
-          path: "object-subtype/1",
-          value: {
-            attributes: expect.objectContaining({
-              acSubtype: "new subtype value"
-            }),
-            id: "1",
-            type: "object-subtype"
+    await waitFor(() => {
+      expect(mockPatch).lastCalledWith(
+        "/objectstore-api/operations",
+        [
+          {
+            op: "PATCH",
+            path: "object-subtype/1",
+            value: {
+              attributes: expect.objectContaining({
+                acSubtype: "new subtype value"
+              }),
+              id: "1",
+              type: "object-subtype"
+            }
           }
-        }
-      ],
-      expect.anything()
-    );
+        ],
+        expect.anything()
+      );
+    });
 
     // The user should be redirected to object subtype's list page.
     expect(mockPush).lastCalledWith("/object-store/object-subtype/list");
@@ -192,15 +193,15 @@ describe("Object subtype edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected error
-    expect(
-      wrapper.getByText(
-        "Constraint violation: DcType and subtype combination should be unique"
-      )
-    ).toBeInTheDocument();
-    expect(mockPush).toBeCalledTimes(0);
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          "Constraint violation: DcType and subtype combination should be unique"
+        )
+      ).toBeInTheDocument();
+      expect(mockPush).toBeCalledTimes(0);
+    });
   });
 });
 

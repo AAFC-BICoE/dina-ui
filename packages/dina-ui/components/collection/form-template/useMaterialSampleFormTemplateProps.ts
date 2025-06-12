@@ -1,5 +1,5 @@
 import { InputResource, KitsuResource } from "kitsu";
-import { isNil, set, toPairs } from "lodash";
+import _ from "lodash";
 import { useMemo } from "react";
 import { VisibleManagedAttributesConfig } from "../..";
 import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
@@ -103,7 +103,7 @@ export function useMaterialSampleFormTemplateProps<
         id: collectingEvent.id
       };
     } else {
-      set(collectingEvent, "geoReferenceAssertions[0].isPrimary", true);
+      _.set(collectingEvent, "geoReferenceAssertions[0].isPrimary", true);
     }
 
     const collectingEventInitialValues = collectingEvent.id
@@ -131,9 +131,9 @@ function getInitialValuesFromTemplateFields<TResource extends KitsuResource>(
   templateFields?: TemplateFieldMap
 ): InputResource<TResource> {
   const initialValues = { type } as InputResource<TResource>;
-  for (const [key, val] of toPairs(templateFields)) {
-    if (val?.enabled && !isNil(val.defaultValue)) {
-      set(initialValues, key, val.defaultValue);
+  for (const [key, val] of _.toPairs(templateFields)) {
+    if (val?.enabled && !_.isNil(val.defaultValue)) {
+      _.set(initialValues, key, val.defaultValue);
     }
   }
   return initialValues;

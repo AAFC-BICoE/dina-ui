@@ -17,10 +17,11 @@ export function BackToListButton({
   children
 }: PropsWithChildren<BackToListButtonProps>) {
   return (
-    <Link href={`${entityLink}/list`}>
-      <a className={`btn btn-secondary ${className}`}>
-        {children || <CommonMessage id="backToList" />}
-      </a>
+    <Link
+      href={`${entityLink}/list`}
+      className={`btn btn-secondary ${className}`}
+    >
+      {children || <CommonMessage id="backToList" />}
     </Link>
   );
 }

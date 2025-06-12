@@ -15,17 +15,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import {
-  cloneDeep,
-  compact,
-  isEmpty,
-  isEqual,
-  mapKeys,
-  pick,
-  pickBy,
-  range,
-  find
-} from "lodash";
+import _ from "lodash";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import {
@@ -92,7 +82,7 @@ export function useMaterialSampleQuery(id?: string | null) {
             // Retrieve determiner arrays on determination.
             for (const determination of organism.determination) {
               if (determination.determiner) {
-                determination.determiner = compact(
+                determination.determiner = _.compact(
                   await bulkGet<Person, true>(
                     determination.determiner.map(
                       (personId: string) => `/person/${personId}`
@@ -236,13 +226,13 @@ export function useMaterialSampleSave({
   // For editing existing templates:
   const hasColEventTemplate =
     isTemplate &&
-    (!isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
+    (!_.isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
       colEventTemplateInitialValues?.id);
 
   const hasPreparationsTemplate =
     isTemplate &&
-    !isEmpty(
-      pickBy(
+    !_.isEmpty(
+      _.pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
         (_, key) => key.startsWith(PREPARATIONS_COMPONENT_NAME)
       )
@@ -250,8 +240,8 @@ export function useMaterialSampleSave({
 
   const hasOrganismsTemplate =
     isTemplate &&
-    !isEmpty(
-      pickBy(
+    !_.isEmpty(
+      _.pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
         (_, key) => key.startsWith(ORGANISMS_COMPONENT_NAME)
       )
@@ -259,8 +249,8 @@ export function useMaterialSampleSave({
 
   const hasStorageTemplate =
     isTemplate &&
-    !isEmpty(
-      pickBy(
+    !_.isEmpty(
+      _.pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
         (_, key) => key.startsWith(STORAGE_COMPONENT_NAME)
       )
@@ -268,8 +258,8 @@ export function useMaterialSampleSave({
 
   const hasScheduledActionsTemplate =
     isTemplate &&
-    !isEmpty(
-      pickBy(
+    !_.isEmpty(
+      _.pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
         (_, key) => key.startsWith(SCHEDULED_ACTIONS_COMPONENT_NAME)
       )
@@ -277,8 +267,8 @@ export function useMaterialSampleSave({
 
   const hasAssociationsTemplate =
     isTemplate &&
-    !isEmpty(
-      pickBy(
+    !_.isEmpty(
+      _.pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
         (_, key) => key.startsWith(ASSOCIATIONS_COMPONENT_NAME)
       )
@@ -286,8 +276,8 @@ export function useMaterialSampleSave({
 
   const hasRestrictionsTemplate =
     isTemplate &&
-    !isEmpty(
-      pickBy(
+    !_.isEmpty(
+      _.pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
         (_, key) => key.startsWith(RESTRICTION_COMPONENT_NAME)
       )
@@ -339,7 +329,7 @@ export function useMaterialSampleSave({
         hasColEventTemplate
           ? true
           : formTemplate
-          ? find(formTemplate?.components, {
+          ? _.find(formTemplate?.components, {
               name: COLLECTING_EVENT_COMPONENT_NAME
             })?.visible ?? false
           : materialSample?.collectingEvent
@@ -351,11 +341,11 @@ export function useMaterialSampleSave({
         hasPreparationsTemplate
           ? true
           : formTemplate
-          ? find(formTemplate?.components, {
+          ? _.find(formTemplate?.components, {
               name: PREPARATIONS_COMPONENT_NAME
             })?.visible ?? false
           : PREPARATION_FIELDS.some(
-              (prepFieldName) => !isEmpty(materialSample?.[prepFieldName])
+              (prepFieldName) => !_.isEmpty(materialSample?.[prepFieldName])
             )
       )
     );
@@ -365,7 +355,7 @@ export function useMaterialSampleSave({
         hasOrganismsTemplate
           ? true
           : formTemplate
-          ? find(formTemplate?.components, {
+          ? _.find(formTemplate?.components, {
               name: ORGANISMS_COMPONENT_NAME
             })?.visible ?? false
           : materialSample?.organism?.length
@@ -378,7 +368,7 @@ export function useMaterialSampleSave({
         hasStorageTemplate
           ? true
           : formTemplate
-          ? find(formTemplate?.components, {
+          ? _.find(formTemplate?.components, {
               name: STORAGE_COMPONENT_NAME
             })?.visible ?? false
           : materialSample?.storageUnitUsage?.id
@@ -391,7 +381,7 @@ export function useMaterialSampleSave({
         hasScheduledActionsTemplate
           ? true
           : formTemplate
-          ? find(formTemplate?.components, {
+          ? _.find(formTemplate?.components, {
               name: SCHEDULED_ACTIONS_COMPONENT_NAME
             })?.visible ?? false
           : materialSample?.scheduledActions?.length
@@ -404,12 +394,12 @@ export function useMaterialSampleSave({
         hasAssociationsTemplate
           ? true
           : formTemplate
-          ? find(formTemplate?.components, {
+          ? _.find(formTemplate?.components, {
               name: ASSOCIATIONS_COMPONENT_NAME
             })?.visible ?? false
           : materialSample?.associations?.length ||
-            !isEmpty(materialSample?.hostOrganism) ||
-            !isEmpty(materialSample?.associations)
+            !_.isEmpty(materialSample?.hostOrganism) ||
+            !_.isEmpty(materialSample?.associations)
       )
     );
 
@@ -418,12 +408,12 @@ export function useMaterialSampleSave({
         hasRestrictionsTemplate
           ? true
           : formTemplate
-          ? find(formTemplate?.components, {
+          ? _.find(formTemplate?.components, {
               name: RESTRICTION_COMPONENT_NAME
             })?.visible ?? false
           : RESTRICTIONS_FIELDS.some(
               (restrictFieldName) =>
-                !isEmpty(materialSample?.[restrictFieldName])
+                !_.isEmpty(materialSample?.[restrictFieldName])
             )
       )
     );
@@ -727,19 +717,19 @@ export function useMaterialSampleSave({
       colEventFormRefToUse?.current
     ) {
       // Save the linked CollectingEvent if included:
-      const submittedCollectingEvent = cloneDeep(
+      const submittedCollectingEvent = _.cloneDeep(
         colEventFormRefToUse.current.values
       );
 
       const collectingEventWasEdited =
         !submittedCollectingEvent.id ||
-        !isEqual(submittedCollectingEvent, collectingEventInitialValues);
+        !_.isEqual(submittedCollectingEvent, collectingEventInitialValues);
 
       try {
         // Throw if the Collecting Event sub-form has errors:
         const colEventErrors =
           await colEventFormRefToUse?.current?.validateForm();
-        if (!isEmpty(colEventErrors)) {
+        if (!_.isEmpty(colEventErrors)) {
           throw new DoOperationsError("", colEventErrors);
         }
         // Only send the save request if the Collecting Event was edited:
@@ -773,7 +763,10 @@ export function useMaterialSampleSave({
           colEventFormRefToUse.current.setErrors(error.fieldErrors);
           const newOpError = new DoOperationsError(
             error.message,
-            mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)
+            _.mapKeys(
+              error.fieldErrors,
+              (_, field) => `collectingEvent.${field}`
+            )
           );
           throw newOpError;
         }
@@ -788,13 +781,13 @@ export function useMaterialSampleSave({
         {
           type: "storage-unit-usage",
           resource: {
-            ...(pick(
+            ...(_.pick(
               msDiff.storageUnitUsage,
               "wellRow",
               "wellColumn"
             ) as StorageUnitUsage),
             storageUnit: msPreprocessed?.storageUnit?.id
-              ? pick(msPreprocessed.storageUnit, "id", "type")
+              ? _.pick(msPreprocessed.storageUnit, "id", "type")
               : undefined,
             type: "storage-unit-usage",
             id: msPreprocessed.storageUnitUsage?.id ?? undefined,
@@ -844,52 +837,52 @@ export function useMaterialSampleSave({
         ...(msDiffWithOrganisms.attachment && {
           attachment: {
             data: msDiffWithOrganisms.attachment.map((it) =>
-              pick(it, "id", "type")
+              _.pick(it, "id", "type")
             )
           }
         }),
         ...(msDiffWithOrganisms.projects && {
           projects: {
             data: msDiffWithOrganisms.projects.map((it) =>
-              pick(it, "id", "type")
+              _.pick(it, "id", "type")
             )
           }
         }),
         ...(msDiffWithOrganisms.assemblages && {
           assemblages: {
             data: msDiffWithOrganisms.assemblages.map((it) =>
-              pick(it, "id", "type")
+              _.pick(it, "id", "type")
             )
           }
         }),
         ...(msDiffWithOrganisms.organism && {
           organism: {
             data: msDiffWithOrganisms.organism.map((it) =>
-              pick(it, "id", "type")
+              _.pick(it, "id", "type")
             )
           }
         }),
         ...(msDiffWithOrganisms.preparedBy && {
           preparedBy: {
             data: msDiffWithOrganisms.preparedBy.map((it) =>
-              pick(it, "id", "type")
+              _.pick(it, "id", "type")
             )
           }
         }),
         ...(msDiffWithOrganisms.preparationType?.id && {
           preparationType: {
-            data: pick(msDiffWithOrganisms.preparationType, "id", "type")
+            data: _.pick(msDiffWithOrganisms.preparationType, "id", "type")
           }
         }),
         ...(msDiffWithOrganisms.collection?.id && {
           collection: {
-            data: pick(msDiffWithOrganisms.collection, "id", "type")
+            data: _.pick(msDiffWithOrganisms.collection, "id", "type")
           }
         }),
         ...(msDiffWithOrganisms.storageUnitUsage && {
           storageUnitUsage: {
             data: msDiffWithOrganisms.storageUnitUsage?.id
-              ? pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
+              ? _.pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
               : null
           }
         })
@@ -936,7 +929,7 @@ export function useMaterialSampleSave({
   async function saveAndAttachOrganisms(
     sample: InputResource<MaterialSample>
   ): Promise<PersistedResource<Organism>[]> {
-    const preparedOrganisms: Organism[] = range(
+    const preparedOrganisms: Organism[] = _.range(
       0,
       sample.organismsQuantity ?? undefined
     )
@@ -989,7 +982,7 @@ export function useMaterialSampleSave({
     } catch (error: unknown) {
       if (error instanceof DoOperationsError) {
         const newErrors = error.individualErrors.map<OperationError>((err) => ({
-          fieldErrors: mapKeys(
+          fieldErrors: _.mapKeys(
             err.fieldErrors,
             (_, field) => `organism[${err.index}].${field}`
           ),
@@ -1177,7 +1170,7 @@ export function withOrganismEditorValues<
       ...thisOrgValues
     } = org ?? {};
 
-    return !isEqual(firstOrgValues, thisOrgValues);
+    return !_.isEqual(firstOrgValues, thisOrgValues);
   });
 
   return {
