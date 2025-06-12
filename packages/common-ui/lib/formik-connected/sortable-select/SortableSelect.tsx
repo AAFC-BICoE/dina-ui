@@ -103,7 +103,11 @@ export function SortableSelect<
         onDragEnd={handleOnDragEnd}
       >
         <SortableContext
-          items={selectedValues.map((opt) => opt.value)}
+          items={
+            selectedValues.length > 0
+              ? selectedValues.map((opt) => opt?.value)
+              : []
+          }
           strategy={rectSortingStrategy}
         >
           <SelectComponent<Option, IsMulti, Group>
