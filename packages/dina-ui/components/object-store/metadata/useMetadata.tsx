@@ -131,6 +131,27 @@ export function useDerivativeMetadataViewQuery(id?: string) {
   return query;
 }
 
+export function useDerivativeEditQuery(id?: string | null) {
+  const derivativeQuery = useQuery<Metadata>(
+    {
+      path: `objectstore-api/derivative/${id}`,
+      include: "derivative,acDerivedFrom,generatedFromDerivative,acTags"
+    },
+    {
+      disabled: !id,
+      joinSpecs: [
+        {
+          apiBaseUrl: "/objectstore-api",
+          idField: "fileIdentifier",
+          joinField: "objectUpload",
+          path: (derivative) => `object-upload/${derivative.fileIdentifier}`
+        }
+      ]
+    }
+  );
+  return derivativeQuery;
+}
+
 export interface UseMetadataSaveParams {
   /** Metadata form initial values. */
   initialValues?: any;
@@ -245,5 +266,93 @@ export function useMetadataSave({
     onSubmit,
     prepareMetadataSaveOperation,
     initialValues: metadataInitialValues
+  };
+}
+
+export interface UseDerivativeSaveParams {
+  /** Derivative form initial values. */
+  initialValues?: any;
+
+  // Redirect to next page
+  onSaved?: (id: string) => Promise<void>;
+}
+
+export interface PrepareDerivativeSaveOperationParams {
+  submittedValues: any;
+  preProcessMetadata?: (
+    sample: InputResource<Metadata>
+  ) => Promise<InputResource<Metadata>>;
+}
+
+export function useDerivativeSave({
+  initialValues,
+  onSaved
+}: UseDerivativeSaveParams) {
+  const { save } = useApiClient();
+  const { ...initialDerivativeValues } = initialValues;
+
+  const defaultValues: InputResource<Metadata> = {
+    type: "metadata",
+    group: ""
+  };
+
+  const derivativeInitialValues: InputResource<Metadata> = initialValues
+    ? {
+        ...initialValues,
+        // Convert the string to an object for the dropdown:
+        acSubtype: initialValues?.acSubtype
+          ? {
+              id: "id-unavailable",
+              type: "object-subtype",
+              acSubtype: initialValues.acSubtype
+            }
+          : undefined
+      }
+    : defaultValues;
+
+  /**
+   * Gets the diff of the form's initial values to the new sample state,
+   * so only edited values are submitted to the back-end.
+   */
+  async function prepareDerivativeSaveOperation({
+    submittedValues,
+    preProcessMetadata
+  }: PrepareDerivativeSaveOperationParams): Promise<SaveArgs<Derivative>> {
+    const preprocessed =
+      (await preProcessMetadata?.(submittedValues)) ?? submittedValues;
+
+    // Only submit the changed values to the back-end:
+    const diff = initialDerivativeValues.id
+      ? resourceDifference({
+          original: initialDerivativeValues,
+          updated: preprocessed
+        })
+      : preprocessed;
+
+    const saveOperation = {
+      resource: diff,
+      type: "derivative"
+    };
+    return saveOperation;
+  }
+
+  async function onSubmit({ submittedValues }) {
+    const { ...derivativeValues } = submittedValues;
+
+    const saveOperation = await prepareDerivativeSaveOperation({
+      submittedValues: derivativeValues
+    });
+
+    const savedDerivative = await save<Derivative>([saveOperation], {
+      apiBaseUrl: "/objectstore-api"
+    });
+
+    await onSaved?.(savedDerivative[0].id);
+  }
+
+  return {
+    onSubmit,
+    prepareDerivativeSaveOperation,
+    initialValues: derivativeInitialValues
   };
 }

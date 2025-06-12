@@ -13,6 +13,7 @@ import {
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DerivativeDetails } from "../../../components/object-store/derivative/DerivativeDetails";
 import { Metadata } from "../../../types/objectstore-api";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -39,12 +40,23 @@ export default function DerivativeViewPage() {
 
   const buttonBar = (
     <ButtonBar className="mb-3">
-      <div className="col-md-4 mt-2">
+      <div className="col-md-8 mt-2">
         <Link
           href={`/object-store/object/view?id=${derivative?.acDerivedFrom?.id}`}
         >
           Back to parent file: {parentFileName}
         </Link>
+      </div>
+      <div className="col-md-4 flex d-flex gap-2">
+        <>
+          <Link
+            href={`/object-store/derivative/edit?id=${uuid}`}
+            className="btn btn-primary ms-auto"
+            style={{ width: "5rem" }}
+          >
+            <DinaMessage id="editButtonText" />
+          </Link>
+        </>
       </div>
     </ButtonBar>
   );

@@ -202,6 +202,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editCollectionMethodTitle: "Edit Collection Method",
   editCollectionTitle: "Edit Collection",
   editDinaUserTitle: "Edit User",
+  editDerivativeMetadata: "Edit Derivative Metadata",
   editExternalResourceTitle: "Edit External Resource",
   editInstitutionTitle: "Edit Institution",
   editManagedAttributeTitle: "Edit Managed Attribute",
