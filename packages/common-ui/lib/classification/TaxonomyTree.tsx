@@ -435,7 +435,7 @@ export default function TaxonomyTree() {
       <div className="taxonomy-ranks">
         <strong>
           <DinaMessage id="classificationlevels" />
-        </strong>
+        </strong>{" "}
         {taxonomicRanks.map(capitalizeFirstLetter).join(" → ")}
       </div>
       <div className="chart-instructions">
