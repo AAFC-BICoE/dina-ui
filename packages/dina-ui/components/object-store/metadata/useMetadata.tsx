@@ -132,7 +132,7 @@ export function useDerivativeMetadataViewQuery(id?: string) {
 }
 
 export function useDerivativeEditQuery(id?: string | null) {
-  const derivativeQuery = useQuery<Metadata>(
+  const derivativeQuery = useQuery<Derivative>(
     {
       path: `objectstore-api/derivative/${id}`,
       include: "derivative,acDerivedFrom,generatedFromDerivative,acTags"

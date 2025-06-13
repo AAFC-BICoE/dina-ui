@@ -2,7 +2,7 @@ import { withResponse, BackButton, ButtonBar, SubmitButton } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Metadata } from "../../../types/objectstore-api";
+import { Derivative } from "../../../types/objectstore-api";
 import { useDerivativeEditQuery } from "../../../components/object-store/metadata/useMetadata";
 import { InputResource } from "kitsu";
 import { DerivativeForm } from "../../../components/object-store/derivative/DerivativeForm";
@@ -38,7 +38,7 @@ export default function DerivativeEditPage() {
         <div>
           {withResponse(query, ({ data: editDerivative }) => (
             <DerivativeForm
-              metadata={editDerivative as InputResource<Metadata>}
+              derivative={editDerivative as InputResource<Derivative>}
               onSaved={redirectToSingleDerivativePage}
               buttonBar={buttonBar}
             />

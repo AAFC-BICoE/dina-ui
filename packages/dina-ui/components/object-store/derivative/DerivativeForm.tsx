@@ -5,7 +5,7 @@ import {
 } from "../..";
 import { MetadataFileView } from "../metadata/MetadataFileView";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { Metadata, Derivative } from "../../../types/objectstore-api";
+import { Derivative } from "../../../types/objectstore-api";
 import { useDerivativeSave } from "../metadata/useMetadata";
 import { DCTYPE_OPTIONS } from "../../../pages/object-store/metadata/edit";
 import { ReactNode, Ref } from "react";
@@ -14,7 +14,7 @@ import { FormikProps } from "formik";
 import MetadataBadges from "../metadata/MetadataBadges";
 
 export interface MetadataFormProps {
-  metadata?: InputResource<Metadata>;
+  derivative?: InputResource<Derivative>;
 
   // Function to redirect to next page after saving metadata
   onSaved?: (id: string) => Promise<void>;
@@ -25,20 +25,20 @@ export interface MetadataFormProps {
   derivativeSaveHook?: ReturnType<typeof useDerivativeSave>;
 
   // Form ref from parent component
-  metadataFormRef?: Ref<FormikProps<InputResource<Metadata>>>;
+  derivativeFormRef?: Ref<FormikProps<InputResource<Derivative>>>;
 }
 
 export function DerivativeForm({
-  metadata,
+  derivative,
   onSaved,
   buttonBar,
   derivativeSaveHook,
-  metadataFormRef
+  derivativeFormRef
 }: MetadataFormProps) {
   const { initialValues, onSubmit } =
     derivativeSaveHook ??
     useDerivativeSave({
-      initialValues: metadata,
+      initialValues: derivative,
       onSaved
     });
 
@@ -50,13 +50,15 @@ export function DerivativeForm({
     <DinaForm<InputResource<Derivative>>
       initialValues={{ ...initialValues, type: "derivative" }}
       onSubmit={derivativeOnSubmit}
-      innerRef={metadataFormRef as Ref<FormikProps<InputResource<Derivative>>>}
+      innerRef={
+        derivativeFormRef as Ref<FormikProps<InputResource<Derivative>>>
+      }
     >
       <NotPubliclyReleasableWarning />
       {buttonBar}
       <div className="mb-3">
         <MetadataFileView
-          metadata={metadata as Derivative}
+          metadata={derivative as Derivative}
           imgHeight="15rem"
           hideDownload={true}
         />
