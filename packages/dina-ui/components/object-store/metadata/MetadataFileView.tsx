@@ -35,7 +35,8 @@ export function getFileToDisplay(metadata) {
       "svg",
       "ico",
       "webp",
-      "bmp" // Browser supported image formats
+      "bmp",
+      "pdf" // Browser supported image formats
     ];
 
     // Check if extension is in the previewable list

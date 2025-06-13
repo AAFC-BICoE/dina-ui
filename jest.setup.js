@@ -30,3 +30,7 @@ Object.defineProperty(Element.prototype, "scroll", {
 });
 
 jest.setTimeout(40000);
+
+if (!HTMLElement.prototype.scroll) {
+  HTMLElement.prototype.scroll = () => {};
+}
