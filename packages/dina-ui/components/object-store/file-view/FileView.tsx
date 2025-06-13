@@ -323,6 +323,36 @@ export function FileView({
               )}
             </>
           )}
+
+          {!hideDownload && metadata?.type === "derivative" && (
+            <>
+              {downloadLinks?.thumbNail ? (
+                <div className="d-flex justify-content-center">
+                  <DownloadButton
+                    id="downloadFile"
+                    path={downloadLinks?.thumbNail}
+                    isDownloading={isDownloading}
+                    handleDownloadLink={handleDownloadLink}
+                    apiClient={apiClient}
+                    setIsDownloading={setIsDownloading}
+                    classname="p-2 mt-3"
+                  />
+                </div>
+              ) : downloadLinks?.largeData ? (
+                <div className="d-flex justify-content-center">
+                  <DownloadButton
+                    id="downloadFile"
+                    path={downloadLinks?.largeData}
+                    isDownloading={isDownloading}
+                    handleDownloadLink={handleDownloadLink}
+                    apiClient={apiClient}
+                    setIsDownloading={setIsDownloading}
+                    classname="p-2 mt-3"
+                  />
+                </div>
+              ) : null}
+            </>
+          )}
         </>
       )}
     </div>

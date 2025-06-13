@@ -112,10 +112,6 @@ const apiContext: any = {
 };
 
 describe("Derivative details page", () => {
-  // beforeEach(() => {
-  //   jest.resetAllMocks()
-  // });
-
   it("Renders the page and the derivative's tags.", async () => {
     const wrapper = mountWithAppContext(<DerivativeViewPage />, { apiContext });
 

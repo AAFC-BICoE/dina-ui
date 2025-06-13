@@ -1,5 +1,10 @@
-import { ButtonBar, DinaForm, LoadingSpinner, withResponse } from "common-ui";
-import Link from "next/link";
+import {
+  BackButton,
+  ButtonBar,
+  DinaForm,
+  LoadingSpinner,
+  withResponse
+} from "common-ui";
 import { useRouter } from "next/router";
 import { useDerivativeMetadataViewQuery } from "../../../components/object-store/metadata/useMetadata";
 import {
@@ -13,6 +18,8 @@ import {
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DerivativeDetails } from "../../../components/object-store/derivative/DerivativeDetails";
 import { Metadata } from "../../../types/objectstore-api";
+import { derivativeTypeToLabel } from "../../../components/object-store";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -24,6 +31,7 @@ const OBJECT_DETAILS_PAGE_CSS = `
 export default function DerivativeViewPage() {
   const router = useRouter();
   const uuid = String(router.query.id);
+  const { messages } = useDinaIntl();
   const derivativeQuery = useDerivativeMetadataViewQuery(uuid);
   if (derivativeQuery?.loading || derivativeQuery?.loading) {
     return <LoadingSpinner loading={true} />;
@@ -35,16 +43,21 @@ export default function DerivativeViewPage() {
     ?.originalFilename;
 
   const fileName =
-    derivative?.objectUpload?.originalFilename || `${parentFileName} Thumbnail`;
+    derivative?.objectUpload?.originalFilename ||
+    `${parentFileName} ${derivativeTypeToLabel(
+      derivative?.derivativeType ?? "",
+      messages
+    )}`;
 
   const buttonBar = (
     <ButtonBar className="mb-3">
       <div className="col-md-4 mt-2">
-        <Link
-          href={`/object-store/object/view?id=${derivative?.acDerivedFrom?.id}`}
-        >
-          Back to parent file: {parentFileName}
-        </Link>
+        <BackButton
+          entityLink="/object-store/object/"
+          entityId={`${derivative?.acDerivedFrom?.id}`}
+          buttonMsg="backToParentFile"
+          buttonMsgValues={{ parentFilename: parentFileName }}
+        />
       </div>
     </ButtonBar>
   );

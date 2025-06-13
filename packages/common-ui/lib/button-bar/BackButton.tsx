@@ -14,6 +14,7 @@ interface BackButtonProps {
 
   className?: string;
   buttonMsg?: string;
+  buttonMsgValues?: Record<string, any>;
 }
 
 /**
@@ -24,7 +25,8 @@ export function BackButton({
   entityLink,
   byPassView,
   className,
-  buttonMsg
+  buttonMsg,
+  buttonMsgValues
 }: BackButtonProps) {
   // When editing an existing entity, the link points to the entity details page.
   // When editing a new entity, the link points to the list page.
@@ -45,7 +47,10 @@ export function BackButton({
       href={href}
       className={`back-button my-auto ${className ? className : ""}`}
     >
-      <CommonMessage id={(buttonMsg as any) ?? message} />
+      <CommonMessage
+        id={(buttonMsg as any) ?? message}
+        values={buttonMsgValues}
+      />
     </Link>
   );
 }
