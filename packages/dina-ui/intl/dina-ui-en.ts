@@ -172,6 +172,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteThisView: "Delete This View",
   deleted: "Deleted",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
+  derivativeDetailsLabel: "Derivative Details",
   depthInMeters: "Depth in Meters",
   destroyOriginal: 'Tag Original as "Destroyed"',
   detachCollectingEvent: "Detach Collecting Event",
@@ -292,6 +293,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dcType: "Stored Object Type",
   field_dcSize: "File Size",
   field_description: "Description",
+
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
   "field_description.de": "German Description",

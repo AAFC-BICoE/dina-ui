@@ -1,11 +1,12 @@
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Metadata } from "../../../types/objectstore-api";
+import { Derivative, Metadata } from "../../../types/objectstore-api";
 import { DownLoadLinks, FileView } from "../file-view/FileView";
 import { LoadingSpinner } from "common-ui";
+import { derivativeTypeToLabel } from "../object-store-utils";
 
 export interface MetadataFileViewProps {
-  metadata: Metadata;
+  metadata: Metadata | Derivative;
   imgHeight?: string;
   hideDownload?: boolean;
 }
@@ -70,7 +71,7 @@ export function MetadataFileView({
   imgHeight,
   hideDownload
 }: MetadataFileViewProps) {
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, messages } = useDinaIntl();
 
   const fileToDisplay = React.useMemo(() => {
     if (metadata) {
@@ -96,13 +97,31 @@ export function MetadataFileView({
     return null;
   }, [fileToDisplay, fileId]);
 
+  const caption =
+    metadata.type === "derivative"
+      ? metadata.objectUpload?.originalFilename ??
+        `${
+          (metadata.acDerivedFrom as Metadata)?.originalFilename
+        } ${derivativeTypeToLabel(metadata?.derivativeType ?? "", messages)}`
+      : metadata.acCaption;
+
   const downloadLinks: DownLoadLinks = {};
 
   const COMMON_LINK_ROOT = "/objectstore-api/file/";
 
   // External resources do not have original files.
-  if (!metadata.resourceExternalURL) {
+  if (!(metadata as any).resourceExternalURL) {
     downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
+  }
+
+  // If the file is a derivative, add the derivative to the link.
+  if (metadata.type === "derivative") {
+    delete downloadLinks.original;
+    if (metadata.derivativeType === "LARGE_IMAGE") {
+      downloadLinks.largeData = `${COMMON_LINK_ROOT}${metadata.bucket}/derivative/${metadata.fileIdentifier}`;
+    } else if (metadata.derivativeType === "THUMBNAIL_IMAGE") {
+      downloadLinks.thumbNail = `${COMMON_LINK_ROOT}${metadata.bucket}/derivative/${metadata.fileIdentifier}`;
+    }
   }
 
   // fileExtension should always be available when getting the Metadata from the back-end:
@@ -134,11 +153,8 @@ export function MetadataFileView({
     <div>
       <div className="mb-3">
         <FileView
-          imgAlt={
-            metadata?.acCaption
-              ? metadata.acCaption
-              : metadata?.originalFilename
-          }
+          imgAlt={caption}
+          caption={caption}
           clickToDownload={true}
           filePath={filePath}
           fileType={fileType}
