@@ -77,6 +77,19 @@ export interface ApiClientI {
       ? PersistedResource<T> | null
       : PersistedResource<T>)[]
   >;
+
+  bulkLoadResources: <
+    T extends KitsuResource,
+    TReturnNull extends boolean = false
+  >(
+    baseUrl,
+    resourceType,
+    ids: string[]
+  ) => Promise<
+    (TReturnNull extends true
+      ? PersistedResource<T> | null
+      : PersistedResource<T>)[]
+  >;
 }
 
 /** Config for creating an API client. */
@@ -157,6 +170,7 @@ export class ApiClientImpl implements ApiClientI {
     this.doOperations = this.doOperations.bind(this);
     this.save = this.save.bind(this);
     this.bulkGet = this.bulkGet.bind(this);
+    this.bulkLoadResources = this.bulkLoadResources.bind(this);
   }
 
   /**
@@ -357,6 +371,41 @@ export class ApiClientImpl implements ApiClientI {
     return kitsuResources;
   }
 
+  public async bulkLoadResources(
+    baseUrl: string,
+    resourceType: string,
+    ids: string[]
+  ) {
+    const requestBody = {
+      data: ids.map((id) => ({
+        type: resourceType,
+        id: id
+      }))
+    };
+
+    const { axios } = this.apiClient;
+
+    const response = await axios.post(
+      `${baseUrl}/${resourceType}/bulk-load`,
+      requestBody,
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json; ext=bulk",
+          Accept: "application/vnd.api+json"
+        }
+      }
+    );
+
+    if (!response.data) {
+      console.error("No data in response");
+      return null;
+    }
+    // Process the response like Kitsu would
+    const jsonApiData = response.data;
+
+    return jsonApiData;
+  }
+
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
   public async bulkGet<
     T extends KitsuResource,
@@ -383,6 +432,19 @@ export class ApiClientImpl implements ApiClientI {
           path
         }));
 
+        // Check parameters
+        const ids = uniquePaths.map((path) => path.split("/")[1]);
+
+        if (apiBaseUrl === "/agent-api") {
+          const response = await this.bulkLoadResources(
+            apiBaseUrl,
+            uniquePaths[0].split("/")[0],
+            ids
+          );
+
+          return response.data;
+        }
+
         return await this.doOperations(getOperations, {
           apiBaseUrl,
           returnNullForMissingResource
@@ -394,14 +456,16 @@ export class ApiClientImpl implements ApiClientI {
 
     const resources: (TReturnNull extends true
       ? PersistedResource<T> | null
-      : PersistedResource<T>)[] = (
-      await Promise.all(responses.map(deserialise))
-    ).map((res) => res.data);
+      : PersistedResource<T>)[] =
+      apiBaseUrl === "/agent-api"
+        ? responses
+        : (await Promise.all(responses.map(deserialise))).map(
+            (res) => res.data
+          );
 
     for (const joinSpec of joinSpecs) {
       await new ClientSideJoiner(this.bulkGet, resources, joinSpec).join();
     }
-
     return resources;
   }
 }
