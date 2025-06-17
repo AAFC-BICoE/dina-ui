@@ -41,11 +41,11 @@ export function useThrottledFetch<TData>({
   // Create the SWR key with search value and dependencies
   const swrKey = searchValue ? [searchValue, ...dependencies] : null;
 
-  const { isValidating: searchIsLoading, data: mySearchResult } = useSWR(
+  const { isLoading: searchIsLoading, data: mySearchResult } = useSWR(
     swrKey,
     () => fetcher(searchValue, ...dependencies),
     {
-      shouldRetryOnError: false,
+      errorRetryCount: 0,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }
@@ -98,11 +98,11 @@ export function useDebouncedFetch<TData>({
   const swrKey = searchValue ? [searchValue, ...dependencies] : null;
 
   const {
-    isValidating: searchIsLoading,
+    isLoading: searchIsLoading,
     data: searchResult,
     error
   } = useSWR(swrKey, () => fetcher(searchValue, ...dependencies), {
-    shouldRetryOnError: false,
+    errorRetryCount: 0,
     revalidateOnFocus: false,
     revalidateOnReconnect: false
   });

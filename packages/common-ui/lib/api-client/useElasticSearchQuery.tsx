@@ -65,9 +65,9 @@ export function useElasticSearchQuery({
   const {
     data: apiResponse,
     error,
-    isValidating: loading
+    isLoading: loading
   } = useSWR([queryKey, cacheId], fetchData, {
-    shouldRetryOnError: false,
+    errorRetryCount: 0,
     revalidateOnFocus: false,
     revalidateOnReconnect: false
   });

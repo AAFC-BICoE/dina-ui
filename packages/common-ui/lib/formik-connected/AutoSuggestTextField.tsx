@@ -374,7 +374,13 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
       setBackend("elastic-search");
       return;
     }
-  }, [elasticSearchError, jsonApiError]);
+  }, [
+    backend,
+    elasticSearchError,
+    jsonApiError,
+    elasticSearchBackend,
+    jsonApiBackend
+  ]);
 
   const isLoading: boolean =
     elasticSearchLoading || (jsonApiLoading && !jsonApiIsDisabled);
