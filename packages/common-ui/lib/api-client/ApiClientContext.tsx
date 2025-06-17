@@ -373,6 +373,9 @@ export class ApiClientImpl implements ApiClientI {
     return kitsuResources;
   }
 
+  /**
+   *  Bulk GET operations: Run many find-by-id queries in a single HTTP request.
+   */
   public async bulkLoadResources(
     baseUrl: string,
     resourceType: string,
@@ -408,7 +411,20 @@ export class ApiClientImpl implements ApiClientI {
               }
             );
       const jsonApiData = response.data.data;
-      return jsonApiData;
+
+      // flatten the attributes into the resource object if they exist
+      if (jsonApiData[0].hasOwnProperty("attributes")) {
+        const flattened = jsonApiData.map((resource: any) => {
+          resource = {
+            ..._.omit(resource, "attributes"),
+            ...resource.attributes
+          };
+          return resource;
+        });
+        return flattened;
+      } else {
+        return jsonApiData;
+      }
     } catch (error) {
       if (returnNullForMissingResource) {
         // returns a len(id) length array of nulls if any resource is not found
