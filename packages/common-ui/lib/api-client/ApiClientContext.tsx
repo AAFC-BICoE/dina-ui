@@ -8,7 +8,7 @@ import Kitsu, {
   PersistedResource
 } from "kitsu";
 import { deserialise, error as kitsuError } from "kitsu-core";
-import _ from "lodash";
+import _, { map } from "lodash";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { OperationsResponse } from "..";
@@ -84,7 +84,9 @@ export interface ApiClientI {
   >(
     baseUrl,
     resourceType,
-    ids: string[]
+    ids: string[],
+    returnNullForMissingResource?: boolean,
+    skipBulkLoadForSingleRequest?: boolean
   ) => Promise<
     (TReturnNull extends true
       ? PersistedResource<T> | null
@@ -374,7 +376,9 @@ export class ApiClientImpl implements ApiClientI {
   public async bulkLoadResources(
     baseUrl: string,
     resourceType: string,
-    ids: string[]
+    ids: string[],
+    returnNullForMissingResource?: boolean,
+    skipBulkLoadForSingleRequest?: boolean
   ) {
     const requestBody = {
       data: ids.map((id) => ({
@@ -385,25 +389,38 @@ export class ApiClientImpl implements ApiClientI {
 
     const { axios } = this.apiClient;
 
-    const response = await axios.post(
-      `${baseUrl}/${resourceType}/bulk-load`,
-      requestBody,
-      {
-        headers: {
-          "Content-Type": "application/vnd.api+json; ext=bulk",
-          Accept: "application/vnd.api+json"
-        }
+    try {
+      const response =
+        ids.length === 1 && skipBulkLoadForSingleRequest
+          ? await axios.get(`${baseUrl}/${resourceType}/${ids[0]}`, {
+              headers: {
+                Accept: "application/vnd.api+json"
+              }
+            })
+          : await axios.post(
+              `${baseUrl}/${resourceType}/bulk-load`,
+              requestBody,
+              {
+                headers: {
+                  "Content-Type": "application/vnd.api+json; ext=bulk",
+                  Accept: "application/vnd.api+json"
+                }
+              }
+            );
+      const jsonApiData = response.data.data;
+      return jsonApiData;
+    } catch (error) {
+      if (returnNullForMissingResource) {
+        // returns a len(id) length array of nulls if any resource is not found
+        console.error(
+          `Error bulk loading resources from ${resourceType}`,
+          error
+        );
+        return map(ids, () => null);
+      } else {
+        throw error;
       }
-    );
-
-    if (!response.data) {
-      console.error("No data in response");
-      return null;
     }
-    // Process the response like Kitsu would
-    const jsonApiData = response.data;
-
-    return jsonApiData;
   }
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
@@ -439,10 +456,11 @@ export class ApiClientImpl implements ApiClientI {
           const response = await this.bulkLoadResources(
             apiBaseUrl,
             uniquePaths[0].split("/")[0],
-            ids
+            ids,
+            returnNullForMissingResource
           );
 
-          return response.data;
+          return response;
         }
 
         return await this.doOperations(getOperations, {
