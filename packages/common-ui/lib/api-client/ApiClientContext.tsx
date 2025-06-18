@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { FormikErrors } from "formik";
 import Kitsu, {
   GetParams,
@@ -21,12 +21,25 @@ import {
 } from "./operations-types";
 import DataLoader from "dataloader";
 import { buildMemoryStorage, setupCache } from "axios-cache-interceptor";
+import { ResourceObject } from "jsonapi-typescript";
 
 export interface BulkGetOptions {
   apiBaseUrl?: string;
   joinSpecs?: ClientSideJoinSpec[];
 
   /** Return null for missing resource instead of throwing an Error. */
+  returnNullForMissingResource?: boolean;
+}
+
+export interface BulkCreateResourcesOptions {
+  apiBaseUrl?: string;
+  resourceType: string;
+  returnNullForMissingResource?: boolean;
+}
+
+export interface BulkUpdateResourcesOptions {
+  apiBaseUrl?: string;
+  resourceType: string;
   returnNullForMissingResource?: boolean;
 }
 
@@ -92,6 +105,16 @@ export interface ApiClientI {
       ? PersistedResource<T> | null
       : PersistedResource<T>)[]
   >;
+
+  bulkCreateResources: (
+    resources: InputResource<KitsuResource>[],
+    options?: BulkCreateResourcesOptions
+  ) => Promise<AxiosResponse>;
+
+  bulkUpdateResources: (
+    resources: InputResource<KitsuResource>[],
+    options?: BulkUpdateResourcesOptions
+  ) => Promise<AxiosResponse>;
 }
 
 /** Config for creating an API client. */
@@ -173,6 +196,8 @@ export class ApiClientImpl implements ApiClientI {
     this.save = this.save.bind(this);
     this.bulkGet = this.bulkGet.bind(this);
     this.bulkLoadResources = this.bulkLoadResources.bind(this);
+    this.bulkCreateResources = this.bulkCreateResources.bind(this);
+    this.bulkUpdateResources = this.bulkUpdateResources.bind(this);
   }
 
   /**
@@ -200,7 +225,7 @@ export class ApiClientImpl implements ApiClientI {
     const { axios } = this.apiClient;
 
     // This array will hold the responses from either the single or bulk request
-    let responses: OperationsResponse | BulkGetOperation[];
+    let responses: OperationsResponse | BulkGetOperation[] = [];
 
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
@@ -271,20 +296,66 @@ export class ApiClientImpl implements ApiClientI {
           throw new Error(`Unsupported single operation: ${operation.op}`);
       }
     } else {
-      // Perform operations
-      const axiosResponse = await axios.patch(
-        `${apiBaseUrl}/operations`,
-        operations,
-        {
-          headers: {
-            Accept: "application/json-patch+json",
-            "Content-Type": "application/json-patch+json",
-            "Crnk-Compact": "true"
-          }
-        }
-      );
+      if (
+        apiBaseUrl === "agent-api" &&
+        ["POST", "PATCH"].includes(operations[0].op.toUpperCase())
+      ) {
+        switch (operations[0].op.toUpperCase()) {
+          case "POST":
+            // For agent-api, we need to do a bulk create
+            const postResources: ResourceObject[] = operations
+              .map((op) => op.value)
+              .filter((value): value is ResourceObject => value !== undefined);
+            const postResourceType = operations[0].path.split("/")[0];
+            const postResponse = await this.bulkCreateResources(postResources, {
+              apiBaseUrl,
+              resourceType: postResourceType,
+              returnNullForMissingResource
+            });
+            responses = postResponse.data.data.map((response) => ({
+              data: response,
+              included: [],
+              status: postResponse.status
+            }));
 
-      responses = axiosResponse.data;
+            break;
+          case "PATCH":
+            const patchResources: ResourceObject[] = operations
+              .map((op) => op.value)
+              .filter((value): value is ResourceObject => value !== undefined);
+            const patchResourceType = operations[0].path.split("/")[0];
+            const patchResponse = await this.bulkUpdateResources(
+              patchResources,
+              {
+                apiBaseUrl,
+                resourceType: patchResourceType,
+                returnNullForMissingResource
+              }
+            );
+
+            responses = patchResponse.data.data.map((response) => ({
+              data: response,
+              included: [],
+              status: patchResponse.status
+            }));
+
+            break;
+        }
+      } else {
+        const axiosResponse = await axios.patch(
+          `${apiBaseUrl}/operations`,
+          operations,
+          {
+            headers: {
+              Accept: "application/json-patch+json",
+              "Content-Type": "application/json-patch+json",
+              "Crnk-Compact": "true"
+            }
+          }
+        );
+
+        responses = axiosResponse.data;
+      }
     }
 
     // Optionally return null instead of throwing an error for missing resources:
@@ -439,6 +510,68 @@ export class ApiClientImpl implements ApiClientI {
     }
   }
 
+  public async bulkCreateResources(
+    resources: ResourceObject[],
+    options?: BulkCreateResourcesOptions
+  ): Promise<AxiosResponse> {
+    const { apiBaseUrl = "", resourceType } = options || {};
+    const requestBody = {
+      data: resources.map((resource) => ({
+        ...resource
+      }))
+    };
+
+    const { axios } = this.apiClient;
+
+    try {
+      const response = await axios.post(
+        `${apiBaseUrl}/${resourceType}/bulk`,
+        requestBody,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json; ext=bulk",
+            Accept: "application/vnd.api+json"
+          }
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error(`Error bulk creating resources for ${resourceType}`, error);
+      throw error;
+    }
+  }
+
+  public async bulkUpdateResources(
+    resources: InputResource<KitsuResource>[],
+    options?: BulkUpdateResourcesOptions
+  ): Promise<AxiosResponse> {
+    const { apiBaseUrl = "", resourceType } = options || {};
+    const requestBody = {
+      data: resources.map((resource) => ({
+        ...resource
+      }))
+    };
+
+    const { axios } = this.apiClient;
+
+    try {
+      const response = await axios.patch(
+        `${apiBaseUrl}/${resourceType}/bulk`,
+        requestBody,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json; ext=bulk",
+            Accept: "application/vnd.api+json"
+          }
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error(`Error bulk updating resources for ${resourceType}`, error);
+      throw error;
+    }
+  }
+
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
   public async bulkGet<
     T extends KitsuResource,
@@ -465,20 +598,6 @@ export class ApiClientImpl implements ApiClientI {
           path
         }));
 
-        // Check parameters
-        const ids = uniquePaths.map((path) => path.split("/")[1]);
-
-        if (apiBaseUrl === "/agent-api") {
-          const response = await this.bulkLoadResources(
-            apiBaseUrl,
-            uniquePaths[0].split("/")[0],
-            ids,
-            returnNullForMissingResource
-          );
-
-          return response;
-        }
-
         return await this.doOperations(getOperations, {
           apiBaseUrl,
           returnNullForMissingResource
@@ -490,16 +609,14 @@ export class ApiClientImpl implements ApiClientI {
 
     const resources: (TReturnNull extends true
       ? PersistedResource<T> | null
-      : PersistedResource<T>)[] =
-      apiBaseUrl === "/agent-api"
-        ? responses
-        : (await Promise.all(responses.map(deserialise))).map(
-            (res) => res.data
-          );
+      : PersistedResource<T>)[] = (
+      await Promise.all(responses.map(deserialise))
+    ).map((res) => res.data);
 
     for (const joinSpec of joinSpecs) {
       await new ClientSideJoiner(this.bulkGet, resources, joinSpec).join();
     }
+
     return resources;
   }
 }
