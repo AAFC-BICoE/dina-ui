@@ -143,11 +143,11 @@ export function GeographySearchBox({
   /** Whether the Geo Api is on hold. Just to make sure we don't send more requests than we are allowed to. */
   const [geoApiRequestsOnHold, setGeoApiRequestsOnHold] = useState(false);
 
-  const { isLoading: geoSearchIsLoading, data: searchResults } = useSWR(
+  const { isValidating: geoSearchIsLoading, data: searchResults } = useSWR(
     [searchValue, "nominatum-search"],
     nominatimSearch,
     {
-      errorRetryCount: 0,
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }

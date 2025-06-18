@@ -114,9 +114,9 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   const {
     data: apiResponse,
     error,
-    isLoading: loading
+    isValidating: loading
   } = useSWR([queryKey, cacheId], fetchData, {
-    errorRetryCount: 0,
+    shouldRetryOnError: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false
   });

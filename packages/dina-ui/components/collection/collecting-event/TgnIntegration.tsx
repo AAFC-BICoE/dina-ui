@@ -156,11 +156,11 @@ function TgnSearchBox({
       });
   }
 
-  const { isLoading: tgnSearchIsLoading, data: tgnSearchResults } = useSWR(
+  const { isValidating: tgnSearchIsLoading, data: tgnSearchResults } = useSWR(
     [searchValue],
     fetchSoapValues,
     {
-      errorRetryCount: 0,
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }
@@ -307,11 +307,11 @@ export function TgnSourceSelection() {
   }
 
   // Fetch additional parents
-  const { isLoading: tgnResultsIsLoading } = useSWR(
+  const { isValidating: tgnResultsIsLoading } = useSWR(
     [tgnResultSelection],
     fetchTgnParents,
     {
-      errorRetryCount: 0,
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }

@@ -123,11 +123,11 @@ export function CollectingEventFormLayout({
     setCustomGeographicPlaceCheckboxState
   ] = useState(false);
 
-  const { isLoading: detailResultsIsLoading } = useSWR(
+  const { isValidating: detailResultsIsLoading } = useSWR(
     [selectedSearchResult, "nominatimAddressDetailSearch"],
     nominatimAddressDetailSearch,
     {
-      errorRetryCount: 0,
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }
