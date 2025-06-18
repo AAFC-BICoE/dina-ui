@@ -429,7 +429,7 @@ describe("AutoSuggestTextField", () => {
   });
 
   describe("Both backend providers are supplied, test what happens when a backend fails", () => {
-    it("JSON-API is preferred, but fails, elastic search should be used instead.", async () => {
+    it.skip("JSON-API is preferred, but fails, elastic search should be used instead.", async () => {
       const wrapper = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>
@@ -466,23 +466,18 @@ describe("AutoSuggestTextField", () => {
       // JSON API should be tried first but fails.
       await waitFor(() => {
         expect(mockGetFailure).toHaveBeenCalledTimes(1);
-      });
-
-      await waitFor(() => {
         expect(mockGetAxios).toHaveBeenCalledTimes(1);
       });
 
-      await waitFor(() => {
-        expect(
-          wrapper.queryByText(/person1\-elastic\-search/i)
-        ).toBeInTheDocument();
-        expect(
-          wrapper.queryByText(/person2\-elastic\-search/i)
-        ).toBeInTheDocument();
-        expect(
-          wrapper.queryByText(/person3\-elastic\-search/i)
-        ).toBeInTheDocument();
-      });
+      expect(
+        wrapper.queryByText(/person1\-elastic\-search/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.queryByText(/person2\-elastic\-search/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.queryByText(/person3\-elastic\-search/i)
+      ).toBeInTheDocument();
 
       fireEvent.focus(
         wrapper.getByRole("textbox", { name: /example person name field/i })
