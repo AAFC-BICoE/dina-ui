@@ -91,6 +91,10 @@ export interface UseGenericMolecularAnalysisRunReturn {
    */
   sequencingRunItems?: SequencingRunItem[];
 
+  setSequencingRunItems?: Dispatch<
+    SetStateAction<SequencingRunItem[] | undefined>
+  >;
+
   /**
    * UUID of the sequencing run.
    */
@@ -722,8 +726,9 @@ export function useGenericMolecularAnalysisRun({
       const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
         sequencingRunItems
           .map((item) => {
-            const molecularAnalysisRunItemName = item.materialSampleSummary?.id
-              ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
+            const sampleId = item.materialSampleSummary?.id;
+            const molecularAnalysisRunItemName = sampleId
+              ? molecularAnalysisRunItemNames[sampleId]
               : undefined;
 
             const resource = {
@@ -749,9 +754,10 @@ export function useGenericMolecularAnalysisRun({
                 : {}),
 
               // Run item name is likely the thing that has changed.
-              ...(molecularAnalysisRunItemName && {
-                name: molecularAnalysisRunItemName
-              })
+              ...(sampleId &&
+                sampleId in molecularAnalysisRunItemNames && {
+                  name: molecularAnalysisRunItemName
+                })
             } as any;
 
             // Check if the resource only contains the id and type.
@@ -1296,6 +1302,7 @@ export function useGenericMolecularAnalysisRun({
     sequencingRunName,
     setSequencingRunName,
     sequencingRunItems,
+    setSequencingRunItems,
     attachments,
     qualityControls,
     qualityControlTypes,
