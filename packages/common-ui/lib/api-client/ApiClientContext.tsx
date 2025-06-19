@@ -32,8 +32,9 @@ export interface BulkGetOptions {
 }
 
 export interface BulkLoadResourcesOptions {
-  apiBaseUrl?: string;
+  apiBaseUrl: string;
   resourceType: string;
+  include?: string[];
   returnNullForMissingResource?: boolean;
 }
 
@@ -313,14 +314,12 @@ export class ApiClientImpl implements ApiClientI {
       // use new bulk functions if using the new api
       if (
         ["/agent-api"].includes(apiBaseUrl) &&
-        ["POST", "PATCH", "DELETE"].includes(operations[0].op.toUpperCase())
+        ["POST", "PATCH", "DELETE", "GET"].includes(
+          operations[0].op.toUpperCase()
+        )
       ) {
         const resourceType = operations[0].path.split("/")[0];
-        const unsupportedResourceTypes = [
-          "organization",
-          "identifier",
-          "identifier-type"
-        ];
+        const unsupportedResourceTypes = ["organization", "identifier-type"];
 
         if (unsupportedResourceTypes.includes(resourceType)) {
           throw new Error(
@@ -330,31 +329,33 @@ export class ApiClientImpl implements ApiClientI {
 
         switch (operations[0].op.toUpperCase()) {
           case "GET":
-            const include = new Set();
+            const includeSet = new Set<string>();
 
             const ids = operations.map((operation) => {
               // Split path by "?"
               const pathParts = operation.path.split("?");
 
               // Get the "include" part, after '?', if exists
-              const includePart = pathParts[1] || null;
+              const includePart = pathParts[1]
+                ? pathParts[1].split("=")[1]
+                : null;
               if (includePart) {
                 // Split by comma and add each to the Set
                 includePart.split(",").forEach((includeItem) => {
-                  include.add(includeItem);
+                  includeSet.add(includeItem);
                 });
               }
 
               // Extract the ID from before the '?' by splitting by '/' and getting the second item
               return pathParts[0].split("/")[1];
             });
-
+            const include: string[] = [...includeSet];
             const getResponse = await this.bulkLoadResources(ids, {
               apiBaseUrl,
               resourceType,
+              include,
               returnNullForMissingResource
             });
-
             responses = getResponse.data.data.map((response) => ({
               data: response,
               included: getResponse.data.included || [],
@@ -531,6 +532,7 @@ export class ApiClientImpl implements ApiClientI {
     {
       apiBaseUrl,
       resourceType,
+      include,
       returnNullForMissingResource = false
     }: BulkLoadResourcesOptions
   ) {
@@ -542,18 +544,17 @@ export class ApiClientImpl implements ApiClientI {
     };
 
     const { axios } = this.apiClient;
+    const url = include
+      ? `${apiBaseUrl}/${resourceType}/bulk-load?include=${include.join(",")}`
+      : `${apiBaseUrl}/${resourceType}/bulk-load`;
 
     try {
-      const response = await axios.post(
-        `${apiBaseUrl}/${resourceType}/bulk-load`,
-        requestBody,
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json; ext=bulk",
-            Accept: "application/vnd.api+json"
-          }
+      const response = await axios.post(url, requestBody, {
+        headers: {
+          "Content-Type": "application/vnd.api+json; ext=bulk",
+          Accept: "application/vnd.api+json"
         }
-      );
+      });
       const jsonApiData = response.data.data;
 
       // flatten the attributes into the resource object if they exist
@@ -697,22 +698,6 @@ export class ApiClientImpl implements ApiClientI {
           }
         }
       );
-      // const jsonApiData = response.data.data;
-
-      // flatten the attributes into the resource object if they exist
-      // if (jsonApiData[0].hasOwnProperty("attributes")) {
-      //   const flattened = jsonApiData.map((resource: any) => {
-      //     resource = {
-      //       ..._.omit(resource, "attributes"),
-      //       ...resource.attributes
-      //     };
-      //     return resource;
-      //   });
-      //   response.data.data = flattened;
-      //   return response;
-      // } else {
-      //   return response;
-      // }
       return response;
     } catch (error) {
       if (returnNullForMissingResource) {
