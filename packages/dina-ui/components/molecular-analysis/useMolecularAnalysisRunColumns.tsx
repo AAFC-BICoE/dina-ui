@@ -86,7 +86,7 @@ export function useMolecularAnalysisRunColumns({
           <input
             type="text"
             className="w-100 form-control"
-            defaultValue={original.molecularAnalysisRunItem?.name}
+            value={original.molecularAnalysisRunItem?.name || ""}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setMolecularAnalysisRunItemNames?.(
                 handleMolecularAnalysisRunItemNames(original, event)
@@ -187,7 +187,7 @@ export function useMolecularAnalysisRunColumns({
           <input
             type="text"
             className="w-100 form-control"
-            defaultValue={original.molecularAnalysisRunItem?.name}
+            value={original.molecularAnalysisRunItem?.name || ""}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setMolecularAnalysisRunItemNames?.(
                 handleMolecularAnalysisRunItemNames(original, event)
@@ -289,7 +289,7 @@ export function useMolecularAnalysisRunColumns({
             <input
               type="text"
               className="w-100 form-control"
-              defaultValue={original.molecularAnalysisRunItem?.name}
+              value={original.molecularAnalysisRunItem?.name || ""}
               onChange={(event: ChangeEvent<HTMLInputElement>) => {
                 setMolecularAnalysisRunItemNames?.(
                   (molecularAnalysisRunItemNames) => {
@@ -659,7 +659,7 @@ export function useMolecularAnalysisRunColumns({
           <input
             type="text"
             className="w-100 form-control"
-            defaultValue={original.molecularAnalysisRunItem?.name}
+            value={original.molecularAnalysisRunItem?.name || ""}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setMolecularAnalysisRunItemNames?.(
                 handleMolecularAnalysisRunItemNames(original, event)

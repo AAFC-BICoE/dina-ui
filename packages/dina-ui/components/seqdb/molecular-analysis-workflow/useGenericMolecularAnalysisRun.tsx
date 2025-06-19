@@ -749,9 +749,9 @@ export function useGenericMolecularAnalysisRun({
                 : {}),
 
               // Run item name is likely the thing that has changed.
-              ...(molecularAnalysisRunItemName && {
+              ...{
                 name: molecularAnalysisRunItemName
-              })
+              }
             } as any;
 
             // Check if the resource only contains the id and type.
@@ -774,7 +774,6 @@ export function useGenericMolecularAnalysisRun({
           .filter(
             (item): item is SaveArgs<MolecularAnalysisRunItem> => item !== null
           );
-
       // Check if any updates are required.
       if (molecularAnalysisRunItemSaveArgs.length !== 0) {
         const savedMolecularAnalysisRunItem = await save(

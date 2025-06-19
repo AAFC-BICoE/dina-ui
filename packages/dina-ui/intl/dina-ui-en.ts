@@ -1248,5 +1248,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   taxonomyHierarchyChartInstructions:
     "Interactions: Scroll to zoom, drag to pan, click on nodes to fetch child taxonomic ranks",
   taxonomyHierarchySubtitle:
-    "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination."
+    "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination.",
+  clearAllNamesButtonText: "Clear All Names"
 };
