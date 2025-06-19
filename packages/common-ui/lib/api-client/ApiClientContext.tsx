@@ -297,7 +297,7 @@ export class ApiClientImpl implements ApiClientI {
       }
     } else {
       if (
-        apiBaseUrl === "agent-api" &&
+        apiBaseUrl === "/agent-api" &&
         ["POST", "PATCH"].includes(operations[0].op.toUpperCase())
       ) {
         switch (operations[0].op.toUpperCase()) {
@@ -314,7 +314,7 @@ export class ApiClientImpl implements ApiClientI {
             });
             responses = postResponse.data.data.map((response) => ({
               data: response,
-              included: [],
+              included: postResponse.data.included || [],
               status: postResponse.status
             }));
 
@@ -335,7 +335,7 @@ export class ApiClientImpl implements ApiClientI {
 
             responses = patchResponse.data.data.map((response) => ({
               data: response,
-              included: [],
+              included: patchResponse.data.included || [],
               status: patchResponse.status
             }));
 
