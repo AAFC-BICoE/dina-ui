@@ -91,6 +91,10 @@ export interface UseGenericMolecularAnalysisRunReturn {
    */
   sequencingRunItems?: SequencingRunItem[];
 
+  setSequencingRunItems?: Dispatch<
+    SetStateAction<SequencingRunItem[] | undefined>
+  >;
+
   /**
    * UUID of the sequencing run.
    */
@@ -1295,6 +1299,7 @@ export function useGenericMolecularAnalysisRun({
     sequencingRunName,
     setSequencingRunName,
     sequencingRunItems,
+    setSequencingRunItems,
     attachments,
     qualityControls,
     qualityControlTypes,
