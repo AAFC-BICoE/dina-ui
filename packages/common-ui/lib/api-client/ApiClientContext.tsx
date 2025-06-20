@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { FormikErrors } from "formik";
 import Kitsu, {
   GetParams,
@@ -21,12 +21,37 @@ import {
 } from "./operations-types";
 import DataLoader from "dataloader";
 import { buildMemoryStorage, setupCache } from "axios-cache-interceptor";
+import { ResourceObject } from "jsonapi-typescript";
 
 export interface BulkGetOptions {
   apiBaseUrl?: string;
   joinSpecs?: ClientSideJoinSpec[];
 
   /** Return null for missing resource instead of throwing an Error. */
+  returnNullForMissingResource?: boolean;
+}
+
+export interface BulkLoadResourcesOptions {
+  apiBaseUrl: string;
+  resourceType: string;
+  include?: string[];
+  returnNullForMissingResource?: boolean;
+}
+
+export interface BulkDeleteResourcesOptions {
+  apiBaseUrl?: string;
+  resourceType: string;
+  returnNullForMissingResource?: boolean;
+}
+
+export interface BulkCreateResourcesOptions {
+  apiBaseUrl?: string;
+  resourceType: string;
+}
+
+export interface BulkUpdateResourcesOptions {
+  apiBaseUrl?: string;
+  resourceType: string;
   returnNullForMissingResource?: boolean;
 }
 
@@ -77,6 +102,26 @@ export interface ApiClientI {
       ? PersistedResource<T> | null
       : PersistedResource<T>)[]
   >;
+
+  bulkLoadResources: (
+    ids: string[],
+    options?: BulkLoadResourcesOptions
+  ) => Promise<AxiosResponse>;
+
+  bulkCreateResources: (
+    resources: InputResource<KitsuResource>[],
+    options?: BulkCreateResourcesOptions
+  ) => Promise<AxiosResponse>;
+
+  bulkUpdateResources: (
+    resources: InputResource<KitsuResource>[],
+    options?: BulkUpdateResourcesOptions
+  ) => Promise<AxiosResponse>;
+
+  bulkDeleteResources: (
+    ids: string[],
+    options?: BulkDeleteResourcesOptions
+  ) => Promise<AxiosResponse>;
 }
 
 /** Config for creating an API client. */
@@ -157,6 +202,10 @@ export class ApiClientImpl implements ApiClientI {
     this.doOperations = this.doOperations.bind(this);
     this.save = this.save.bind(this);
     this.bulkGet = this.bulkGet.bind(this);
+    this.bulkLoadResources = this.bulkLoadResources.bind(this);
+    this.bulkCreateResources = this.bulkCreateResources.bind(this);
+    this.bulkUpdateResources = this.bulkUpdateResources.bind(this);
+    this.bulkDeleteResources = this.bulkDeleteResources.bind(this);
   }
 
   /**
@@ -184,10 +233,11 @@ export class ApiClientImpl implements ApiClientI {
     const { axios } = this.apiClient;
 
     // This array will hold the responses from either the single or bulk request
-    let responses: OperationsResponse | BulkGetOperation[];
+    let responses: OperationsResponse | BulkGetOperation[] = [];
 
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
+
     if (operations.length === 1 && skipOperationForSingleRequest) {
       // Single Request Only
       const operation = operations[0];
@@ -255,7 +305,6 @@ export class ApiClientImpl implements ApiClientI {
           throw new Error(`Unsupported single operation: ${operation.op}`);
       }
     } else {
-      // Perform operations
       const axiosResponse = await axios.patch(
         `${apiBaseUrl}/operations`,
         operations,
@@ -355,6 +404,195 @@ export class ApiClientImpl implements ApiClientI {
     const kitsuResources = deserialized.map(({ data }) => data);
 
     return kitsuResources;
+  }
+
+  /**
+   *  Bulk GET operations: Run many find-by-id queries in a single HTTP request.
+   */
+  public async bulkLoadResources(
+    ids: string[],
+    {
+      apiBaseUrl,
+      resourceType,
+      include,
+      returnNullForMissingResource = false
+    }: BulkLoadResourcesOptions
+  ) {
+    const requestBody = {
+      data: ids.map((id) => ({
+        type: resourceType,
+        id: id
+      }))
+    };
+
+    const { axios } = this.apiClient;
+    const url = include
+      ? `${apiBaseUrl}/${resourceType}/bulk-load?include=${include.join(",")}`
+      : `${apiBaseUrl}/${resourceType}/bulk-load`;
+
+    try {
+      const response = await axios.post(url, requestBody, {
+        headers: {
+          "Content-Type": "application/vnd.api+json; ext=bulk",
+          Accept: "application/vnd.api+json"
+        }
+      });
+      const jsonApiData = response.data.data;
+
+      // flatten the attributes into the resource object if they exist
+      if (jsonApiData[0].hasOwnProperty("attributes")) {
+        const flattened = jsonApiData.map((resource: any) => {
+          resource = {
+            ..._.omit(resource, "attributes"),
+            ...resource.attributes
+          };
+          return resource;
+        });
+        response.data.data = flattened;
+        return response;
+      } else {
+        return response;
+      }
+    } catch (error) {
+      if (returnNullForMissingResource) {
+        throw error; // placeholder for future implementation
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  public async bulkCreateResources(
+    resources: ResourceObject[],
+    { apiBaseUrl = "", resourceType }: BulkCreateResourcesOptions
+  ): Promise<AxiosResponse> {
+    const requestBody = {
+      data: resources.map((resource) => ({
+        ...resource
+      }))
+    };
+
+    const { axios } = this.apiClient;
+
+    try {
+      const response = await axios.post(
+        `${apiBaseUrl}/${resourceType}/bulk`,
+        requestBody,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json; ext=bulk",
+            Accept: "application/vnd.api+json"
+          }
+        }
+      );
+      const jsonApiData = response.data.data;
+
+      if (jsonApiData[0].hasOwnProperty("attributes")) {
+        const flattened = jsonApiData.map((resource: any) => {
+          resource = {
+            ..._.omit(resource, "attributes"),
+            ...resource.attributes
+          };
+          return resource;
+        });
+        response.data.data = flattened;
+        return response;
+      } else {
+        return response;
+      }
+    } catch (error) {
+      console.error(`Error bulk creating resources for ${resourceType}`, error);
+      throw error;
+    }
+  }
+
+  public async bulkUpdateResources(
+    resources: InputResource<KitsuResource>[],
+    {
+      apiBaseUrl = "",
+      resourceType,
+      returnNullForMissingResource = false
+    }: BulkUpdateResourcesOptions
+  ): Promise<AxiosResponse> {
+    const requestBody = {
+      data: resources.map((resource) => ({
+        ...resource
+      }))
+    };
+
+    const { axios } = this.apiClient;
+
+    try {
+      const response = await axios.patch(
+        `${apiBaseUrl}/${resourceType}/bulk`,
+        requestBody,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json; ext=bulk",
+            Accept: "application/vnd.api+json"
+          }
+        }
+      );
+      const jsonApiData = response.data.data;
+
+      if (jsonApiData[0].hasOwnProperty("attributes")) {
+        const flattened = jsonApiData.map((resource: any) => {
+          resource = {
+            ..._.omit(resource, "attributes"),
+            ...resource.attributes
+          };
+          return resource;
+        });
+        response.data.data = flattened;
+        return response;
+      } else {
+        return response;
+      }
+    } catch (error) {
+      if (returnNullForMissingResource) {
+        throw error; // placeholder for future implementation
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  public async bulkDeleteResources(
+    ids: string[],
+    {
+      apiBaseUrl,
+      resourceType,
+      returnNullForMissingResource = false
+    }: BulkLoadResourcesOptions
+  ) {
+    const data = {
+      data: ids.map((id) => ({
+        type: resourceType,
+        id: id
+      }))
+    };
+
+    const { axios } = this.apiClient;
+
+    try {
+      const response = await axios.delete(
+        `${apiBaseUrl}/${resourceType}/bulk`,
+        {
+          data: data,
+          headers: {
+            "Content-Type": "application/vnd.api+json; ext=bulk",
+            Accept: "application/vnd.api+json"
+          }
+        }
+      );
+      return response;
+    } catch (error) {
+      if (returnNullForMissingResource) {
+        throw error; // placeholder for future implementation
+      } else {
+        throw error;
+      }
+    }
   }
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
