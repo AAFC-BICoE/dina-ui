@@ -7,7 +7,7 @@ import {
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { castArray, compact, uniq } from "lodash";
+import _ from "lodash";
 import React, {
   ChangeEvent,
   InputHTMLAttributes,
@@ -387,11 +387,11 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
       : jsonApiResponse?.data;
 
   // Finally, the suggestions to be displayed on the dropdown.
-  const allSuggestions = compact([
+  const allSuggestions = _.compact([
     ...(customOptions?.(searchValue, formik) || []),
     ...(searchResult && !isLoading && focus
-      ? uniq(
-          castArray(searchResult).flatMap((item) => {
+      ? _.uniq(
+          _.castArray(searchResult).flatMap((item) => {
             if (performProviderSearch("elastic-search")) {
               return elasticSearchBackend?.option(item, debouncedSearchValue);
             }

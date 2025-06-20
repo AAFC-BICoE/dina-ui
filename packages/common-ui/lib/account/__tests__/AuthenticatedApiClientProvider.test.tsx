@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
-import { noop } from "lodash";
+import _ from "lodash";
 import { ApiClientProvider } from "../../api-client/ApiClientContext";
 import { useQuery } from "../../api-client/useQuery";
 import { AccountContextI, AccountProvider } from "../AccountProvider";
@@ -59,8 +59,8 @@ describe("AuthenticatedApiClientProvider", () => {
 const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   authenticated: true,
   initialized: true,
-  login: noop,
-  logout: noop,
+  login: _.noop,
+  logout: _.noop,
   roles: ["user"],
   // Mock for a successful token update.
   getCurrentToken: () => Promise.resolve("test-token"),

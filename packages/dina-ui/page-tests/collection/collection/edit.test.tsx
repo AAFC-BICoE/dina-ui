@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import { CollectionForm } from "../../../pages/collection/collection/edit";
 import { mountWithAppContext } from "common-ui";
 import { Collection } from "../../../types/collection-api";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const TEST_COLLECTION: PersistedResource<Collection> = {
@@ -53,7 +53,14 @@ describe("Collection edit page", () => {
       <CollectionForm router={mockRouter as any} />,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("textbox", { name: /code/i })
+      ).toBeInTheDocument();
+    });
 
     // Fill in name information
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -72,23 +79,23 @@ describe("Collection edit page", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API response
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: expect.objectContaining({
-            code: "test-code",
-            name: "test-name",
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: expect.objectContaining({
+              code: "test-code",
+              name: "test-name",
+              type: "collection"
+            }),
             type: "collection"
-          }),
-          type: "collection"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-    expect(mockPush).lastCalledWith("/collection/collection/view?id=123");
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+      expect(mockPush).lastCalledWith("/collection/collection/view?id=123");
+    });
   });
 
   it("Lets you edit an existing Collection", async () => {
@@ -99,12 +106,13 @@ describe("Collection edit page", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
 
     // Test default name value
-    expect(wrapper.getByRole("textbox", { name: /name/i })).toHaveDisplayValue(
-      "test collection"
-    );
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toHaveDisplayValue("test collection");
+    });
 
     // Change code field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /code/i }), {
@@ -116,26 +124,26 @@ describe("Collection edit page", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
     // Test expected API response
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: expect.objectContaining({
-            ...TEST_COLLECTION,
-            institution: {
-              id: "1",
-              name: "test institution",
-              type: "institution"
-            },
-            code: "edited code" // Only this was edited.
-          }),
-          type: "collection"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-    expect(mockPush).lastCalledWith("/collection/collection/view?id=123");
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: expect.objectContaining({
+              ...TEST_COLLECTION,
+              institution: {
+                id: "1",
+                name: "test institution",
+                type: "institution"
+              },
+              code: "edited code" // Only this was edited.
+            }),
+            type: "collection"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+      expect(mockPush).lastCalledWith("/collection/collection/view?id=123");
+    });
   });
 });

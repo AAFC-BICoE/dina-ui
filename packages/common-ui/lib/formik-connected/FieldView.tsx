@@ -1,4 +1,4 @@
-import { isDate, isNumber } from "lodash";
+import _ from "lodash";
 import moment from "moment";
 import Link from "next/link";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
@@ -22,9 +22,7 @@ export function ReadOnlyValue({ value, link, bold }: ReadOnlyValueProps) {
       style={{ whiteSpace: "pre-wrap", fontWeight: bold ? "bold" : undefined }}
     >
       {link ? (
-        <Link href={link}>
-          <a>{value}</a>
-        </Link>
+        <Link href={link}>{value}</Link>
       ) : Array.isArray(value) ? (
         value.map((val, idx) => {
           const displayString = val.name
@@ -45,9 +43,9 @@ export function ReadOnlyValue({ value, link, bold }: ReadOnlyValueProps) {
         })
       ) : typeof value === "string" ? (
         value
-      ) : isDate(value) ? (
+      ) : _.isDate(value) ? (
         moment(value).format()
-      ) : isNumber(value) ? (
+      ) : _.isNumber(value) ? (
         value.toString()
       ) : value ? (
         JSON.stringify(value)

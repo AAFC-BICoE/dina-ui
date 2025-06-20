@@ -3,7 +3,7 @@ import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { StorageUnit } from "../../../types/collection-api";
 import { BrowseStorageTree } from "../BrowseStorageTree";
-import { within } from "@testing-library/react";
+import { waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -121,26 +121,33 @@ describe("BrowseStorageTree component", () => {
       </DinaForm>,
       { apiContext }
     );
-    await new Promise(setImmediate);
+    await waitFor(() => {
+      expect(
+        wrapper.getByTestId("collapser-button-A").children[0]
+      ).toBeInTheDocument();
+    });
 
     // Open the top-level unit to show the nested units "B" and "C":
     userEvent.click(wrapper.getByTestId("collapser-button-A").children[0]);
-    await new Promise(setImmediate);
 
     // Shows the nested storage units:
-    expect(
-      wrapper.getByRole("link", { name: /b \(type\)/i })
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("link", { name: /c \(type\)/i })
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("link", { name: /b \(type\)/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: /c \(type\)/i })
+      ).toBeInTheDocument();
+    });
 
     // Select a storage:
     userEvent.click(
       within(wrapper.getByTestId("collapser-button-C")).getByRole("button")
     );
 
-    expect(mockOnSelect).lastCalledWith(STORAGE_C);
+    await waitFor(() => {
+      expect(mockOnSelect).lastCalledWith(STORAGE_C);
+    });
   });
 
   it("Filters the list based on a text filter.", async () => {
@@ -150,19 +157,20 @@ describe("BrowseStorageTree component", () => {
       </DinaForm>,
       { apiContext }
     );
-    await new Promise(setImmediate);
 
     // With no filter, gets the top-level units:
-    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
-      filter: {
-        rsql: "group=in=(aafc,cnc)"
-      },
-      include: "storageUnitChildren,storageUnitType",
-      page: {
-        limit: 100,
-        offset: 0
-      },
-      sort: "storageUnitType.name,name"
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+        filter: {
+          rsql: "group=in=(aafc,cnc)"
+        },
+        include: "storageUnitChildren,storageUnitType",
+        page: {
+          limit: 100,
+          offset: 0
+        },
+        sort: "storageUnitType.name,name"
+      });
     });
 
     userEvent.type(
@@ -170,36 +178,38 @@ describe("BrowseStorageTree component", () => {
       "test-search-text"
     );
     userEvent.click(wrapper.getByRole("button", { name: /search/i }));
-    await new Promise(setImmediate);
 
     // With a filter, gets units from any level matching the search text:
-    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
-      filter: {
-        rsql: "name==*test-search-text*;group=in=(aafc,cnc)"
-      },
-      include: "storageUnitChildren,storageUnitType",
-      page: {
-        limit: 100,
-        offset: 0
-      },
-      sort: "storageUnitType.name,name"
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+        filter: {
+          rsql: "name==*test-search-text*;group=in=(aafc,cnc)"
+        },
+        include: "storageUnitChildren,storageUnitType",
+        page: {
+          limit: 100,
+          offset: 0
+        },
+        sort: "storageUnitType.name,name"
+      });
     });
 
     // Reset the search:
     userEvent.click(wrapper.getByRole("button", { name: /reset/i }));
-    await new Promise(setImmediate);
 
     // No filter again:
-    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
-      filter: {
-        rsql: "group=in=(aafc,cnc)"
-      },
-      include: "storageUnitChildren,storageUnitType",
-      page: {
-        limit: 100,
-        offset: 0
-      },
-      sort: "storageUnitType.name,name"
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+        filter: {
+          rsql: "group=in=(aafc,cnc)"
+        },
+        include: "storageUnitChildren,storageUnitType",
+        page: {
+          limit: 100,
+          offset: 0
+        },
+        sort: "storageUnitType.name,name"
+      });
     });
   });
 });

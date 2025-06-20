@@ -1,4 +1,4 @@
-import { take } from "lodash";
+import _ from "lodash";
 import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { WorkbookJSON, WorkbookRow } from "./types/Workbook";
@@ -13,7 +13,7 @@ export function WorkbookDisplay({
   workbookJsonData?: WorkbookJSON;
   sheetIndex: number;
 }) {
-  const dataToDisplay = take(workbookJsonData?.[sheetIndex]?.rows, 11);
+  const dataToDisplay = _.take(workbookJsonData?.[sheetIndex]?.rows, 11);
   const numOfColumns = dataToDisplay[0].content.length;
   const numOfRows = dataToDisplay.length - 1;
   const headerRow = dataToDisplay[0].content.map((col) => (

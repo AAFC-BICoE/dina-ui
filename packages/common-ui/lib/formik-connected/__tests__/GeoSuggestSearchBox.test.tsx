@@ -56,20 +56,18 @@ describe("GeoSuggestTextField component", () => {
     const input = wrapper.getByRole("textbox");
     fireEvent.change(input, { target: { value: "ottawa" } });
 
-    await new Promise(setImmediate);
-
     // Simulate clicking the search button
     const geosuggestButton = wrapper.getByRole("button", {
       name: /geo\-suggest/i
     });
     fireEvent.click(geosuggestButton);
 
-    await new Promise(setImmediate);
-
     // The button should become disabled after the API request
-    expect(
-      wrapper.container.querySelector(".geo-suggest-button")
-    ).toBeDisabled();
+    await waitFor(() => {
+      expect(
+        wrapper.container.querySelector(".geo-suggest-button")
+      ).toBeDisabled();
+    });
 
     // Verify that suggestions are rendered correctly
     const result1Button = wrapper.getByRole("button", {

@@ -11,7 +11,7 @@ import {
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import { fromPairs, toPairs } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import PageLayout from "../../../components/page/PageLayout";
@@ -84,7 +84,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
     ? {
         ...fetchedProject,
         // Convert multilingualDescription to editable Dictionary format:
-        multilingualDescription: fromPairs<string | undefined>(
+        multilingualDescription: _.fromPairs<string | undefined>(
           fetchedProject.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
           )
@@ -105,7 +105,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
       ...submittedValues,
       // Convert the editable format to the stored format:
       multilingualDescription: {
-        descriptions: toPairs(submittedValues.multilingualDescription).map(
+        descriptions: _.toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc })
         )
       },

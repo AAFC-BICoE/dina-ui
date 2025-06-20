@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "common-ui";
 import { InputResource } from "kitsu";
-import { compact } from "lodash";
+import _ from "lodash";
 import { Metadata } from "../../types/objectstore-api";
 import { useMetadataEditQuery } from "../object-store/metadata/useMetadata";
 import { MetadataBulkEditor } from "./MetadataBulkEditor";
@@ -24,7 +24,7 @@ export function ExistingMetadataBulkEditor({
     false
   );
 
-  const errors = compact(metadataQueries.map((query) => query.error));
+  const errors = _.compact(metadataQueries.map((query) => query.error));
 
   if (isLoading) {
     return <LoadingSpinner loading={true} />;
@@ -42,7 +42,7 @@ export function ExistingMetadataBulkEditor({
     );
   }
 
-  const metadatas = compact(
+  const metadatas = _.compact(
     metadataQueries.map(
       (query) => query.response?.data as InputResource<Metadata>
     )

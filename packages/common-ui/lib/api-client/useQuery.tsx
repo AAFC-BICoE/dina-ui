@@ -1,6 +1,6 @@
 import { DocWithErrors } from "jsonapi-typescript";
 import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
-import { isArray, isUndefined, omitBy } from "lodash";
+import _ from "lodash";
 import { useContext, useDebugValue, useMemo } from "react";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
@@ -78,9 +78,9 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       responseType,
       timeout
     } = querySpec;
-    const getParams = omitBy<GetParams>(
+    const getParams = _.omitBy<GetParams>(
       { fields, filter, sort, include, page, header, responseType, timeout },
-      isUndefined
+      _.isUndefined
     );
     const response = await apiClient.get<TData, TMeta>(path, getParams);
 
@@ -94,7 +94,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
 
     if (joinSpecs) {
       const { data } = response;
-      const resources = isArray(data) ? data : [data];
+      const resources = _.isArray(data) ? data : [data];
 
       for (const joinSpec of joinSpecs) {
         await new ClientSideJoiner(bulkGet, resources, joinSpec).join();

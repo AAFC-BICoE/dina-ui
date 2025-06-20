@@ -137,7 +137,11 @@ describe("PcrBatch edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument()
+    );
 
     // Change textbox value to "test new batch"
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -146,14 +150,23 @@ describe("PcrBatch edit page", () => {
 
     // Select person 1 from Experimenters Combo Box
     userEvent.click(wrapper.getByRole("combobox", { name: /experimenters/i }));
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /person 1/i })
+      ).toBeInTheDocument()
+    );
     userEvent.click(wrapper.getByRole("option", { name: /person 1/i }));
+
     // Select person 2 from Experimenters Combo Box
     userEvent.click(
       wrapper.getByRole("combobox", { name: /experimenters person 1/i })
     );
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /person 2/i })
+      ).toBeInTheDocument()
+    );
     userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
-
-    await new Promise(setImmediate);
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -198,53 +211,57 @@ describe("PcrBatch edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument()
+    );
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
-    // Test for expected API Response
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            createdBy: "poffm",
-            group: "cnc",
-            isCompleted: false,
-            id: PCR_BATCH_UUID,
-            name: "test pcr batch",
-            primerForward: {
-              id: FORWARD_PRIMER_UUID,
-              type: "pcr-primer"
-            },
-            primerReverse: {
-              id: REVERSE_PRIMER_UUID,
-              type: "pcr-primer"
-            },
-            storageUnit: {
-              id: null,
-              type: "storage-unit"
-            },
-            type: "pcr-batch",
-            relationships: {
-              experimenters: {
-                data: [
-                  { id: AGENT_1_UUID, type: "person" },
-                  { id: AGENT_2_UUID, type: "person" },
-                  { id: AGENT_3_UUID, type: "person" }
-                ]
+    await waitFor(() =>
+      // Test for expected API Response
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              createdBy: "poffm",
+              group: "cnc",
+              isCompleted: false,
+              id: PCR_BATCH_UUID,
+              name: "test pcr batch",
+              primerForward: {
+                id: FORWARD_PRIMER_UUID,
+                type: "pcr-primer"
               },
-              attachment: {
-                data: [{ id: ATTACHMENT_UUID, type: "metadata" }]
+              primerReverse: {
+                id: REVERSE_PRIMER_UUID,
+                type: "pcr-primer"
+              },
+              storageUnit: {
+                id: null,
+                type: "storage-unit"
+              },
+              type: "pcr-batch",
+              relationships: {
+                experimenters: {
+                  data: [
+                    { id: AGENT_1_UUID, type: "person" },
+                    { id: AGENT_2_UUID, type: "person" },
+                    { id: AGENT_3_UUID, type: "person" }
+                  ]
+                },
+                attachment: {
+                  data: [{ id: ATTACHMENT_UUID, type: "metadata" }]
+                }
               }
-            }
-          },
-          type: "pcr-batch"
-        }
-      ],
-      { apiBaseUrl: "/seqdb-api" }
+            },
+            type: "pcr-batch"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      )
     );
   });
 
@@ -254,7 +271,11 @@ describe("PcrBatch edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument()
+    );
 
     // Change textbox value to "test new batch"
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -267,36 +288,40 @@ describe("PcrBatch edit page", () => {
         name: /storage unit type type here to search\./i
       })
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /undefined/i })
+      ).toBeInTheDocument()
+    );
     userEvent.click(wrapper.getByRole("option", { name: /undefined/i }));
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
-    // Test for expected API Response
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            createdBy: "test-user",
-            name: "test new batch",
-            type: "pcr-batch",
-            storageUnit: {
-              id: null,
-              type: "storage-unit"
-            },
-            relationships: {
-              attachment: {
-                data: []
+    await waitFor(() =>
+      // Test for expected API Response
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              createdBy: "test-user",
+              name: "test new batch",
+              type: "pcr-batch",
+              storageUnit: {
+                id: null,
+                type: "storage-unit"
+              },
+              relationships: {
+                attachment: {
+                  data: []
+                }
               }
-            }
-          },
-          type: "pcr-batch"
-        }
-      ],
-      { apiBaseUrl: "/seqdb-api" }
+            },
+            type: "pcr-batch"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      )
     );
   });
 
@@ -306,7 +331,11 @@ describe("PcrBatch edit page", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /name/i })
+      ).toBeInTheDocument()
+    );
 
     // Change textbox value to "test new batch"
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
@@ -319,46 +348,52 @@ describe("PcrBatch edit page", () => {
         name: /storage unit type type here to search\./i
       })
     );
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("option", { name: /undefined/i })
+      ).toBeInTheDocument()
+    );
     userEvent.click(wrapper.getByRole("option", { name: /undefined/i }));
 
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(wrapper.getByText(/<none>/i)).toBeInTheDocument()
+    );
 
     // Select a storage unit.
     userEvent.click(wrapper.getByText(/<none>/i));
-    await new Promise(setImmediate);
+    await waitFor(() =>
+      expect(wrapper.getByRole("option", { name: "" })).toBeInTheDocument()
+    );
     userEvent.click(wrapper.getByRole("option", { name: "" }));
-
-    await new Promise(setImmediate);
 
     // Submit Form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-
-    // Test expected API Response
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            createdBy: "test-user",
-            name: "test new batch",
-            type: "pcr-batch",
-            // Storage Unit / Storage Unit type are always set for each request.
-            storageUnit: {
-              id: STORAGE_UNIT_UUID,
-              type: "storage-unit"
-            },
-            relationships: {
-              attachment: {
-                data: []
+    await waitFor(() =>
+      // Test expected API Response
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              createdBy: "test-user",
+              name: "test new batch",
+              type: "pcr-batch",
+              // Storage Unit / Storage Unit type are always set for each request.
+              storageUnit: {
+                id: STORAGE_UNIT_UUID,
+                type: "storage-unit"
+              },
+              relationships: {
+                attachment: {
+                  data: []
+                }
               }
-            }
-          },
-          type: "pcr-batch"
-        }
-      ],
-      { apiBaseUrl: "/seqdb-api" }
+            },
+            type: "pcr-batch"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      )
     );
   });
 });

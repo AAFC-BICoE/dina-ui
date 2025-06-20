@@ -1,4 +1,4 @@
-import { chain, find, get, has, startCase, trim, max } from "lodash";
+import _ from "lodash";
 import { ValidationError } from "yup";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 import {
@@ -7,7 +7,6 @@ import {
   WorkbookJSON,
   WorkbookRow
 } from "../types/Workbook";
-import _ from "lodash";
 import { WorkbookDataTypeEnum } from "../types/WorkbookDataTypeEnum";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
@@ -46,7 +45,7 @@ export function getColumnHeaders(
   );
 
   const maxLength =
-    max([
+    _.max([
       data?.content?.length ?? 0,
       spreadsheetData?.[sheetNumber]?.originalColumns?.length ?? 0,
       spreadsheetData?.[sheetNumber]?.columnAliases?.length ?? 0
@@ -218,7 +217,7 @@ export function generateWorkbookFieldOptions(
           formatMessage(fieldPath as any)?.trim() ||
           formatMessage(`field_${labelPath}` as any)?.trim() ||
           formatMessage(labelPath as any)?.trim() ||
-          startCase(labelPath);
+          _.startCase(labelPath);
         const option = {
           label,
           value: fieldPath,
@@ -230,7 +229,7 @@ export function generateWorkbookFieldOptions(
         const label =
           formatMessage(`field_${fieldPath}` as any)?.trim() ||
           formatMessage(fieldPath as any)?.trim() ||
-          startCase(fieldPath);
+          _.startCase(fieldPath);
         const option = {
           label,
           value: fieldPath
@@ -242,7 +241,7 @@ export function generateWorkbookFieldOptions(
   nonNestedRowOptions.sort((a, b) => a.label.localeCompare(b.label));
 
   // Using the parent name, group the relationships into sections.
-  const groupedNestRowOptions = chain(nestedRowOptions)
+  const groupedNestRowOptions = _.chain(nestedRowOptions)
     .groupBy((prop) => prop.parentPath)
     .map((group, key) => {
       const keyArr = key.split(".");
@@ -251,8 +250,8 @@ export function generateWorkbookFieldOptions(
         const k = keyArr[i];
         label =
           label === undefined
-            ? formatMessage(k as any).trim() || startCase(k)
-            : label + (formatMessage(k as any).trim() || startCase(k));
+            ? formatMessage(k as any).trim() || _.startCase(k)
+            : label + (formatMessage(k as any).trim() || _.startCase(k));
         if (i < keyArr.length - 1) {
           label = label + ".";
         }
@@ -304,19 +303,19 @@ export function getFlattenedConfig(
   entityName: string
 ) {
   const config = {};
-  if (has(mappingConfig, entityName)) {
+  if (_.has(mappingConfig, entityName)) {
     const flattened = flattenObject(mappingConfig[entityName]);
     for (const key of Object.keys(flattened)) {
       const lastPos = key.lastIndexOf(".");
       if (lastPos > -1) {
         const path = key.substring(0, lastPos);
         if (!path.endsWith(".relationshipConfig")) {
-          const value = get(mappingConfig, entityName + "." + path);
+          const value = _.get(mappingConfig, entityName + "." + path);
           config[path.replaceAll(".attributes.", ".")] = value;
         }
       } else {
         const path = key;
-        const value = get(mappingConfig, entityName + "." + path);
+        const value = _.get(mappingConfig, entityName + "." + path);
         config[path] = value;
       }
     }
@@ -357,7 +356,7 @@ export function findMatchField(
     prefix = columnHeader2.substring(0, prefixPos + 1);
   }
 
-  const option = find(plainOptions, (item) => {
+  const option = _.find(plainOptions, (item) => {
     if (prefix) {
       if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
         prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
@@ -539,8 +538,8 @@ export function isBoolean(value: string): boolean {
 export function isBooleanArray(value: string): boolean {
   const arr = value.split(",");
   return (
-    arr.map((item) => trim(item)).filter((item) => !isBoolean(item)).length ===
-    0
+    arr.map((item) => _.trim(item)).filter((item) => !isBoolean(item))
+      .length === 0
   );
 }
 
@@ -635,7 +634,7 @@ export function convertBoolean(value: any, _fieldName?: string): boolean {
  */
 export function convertStringArray(value: any, _fieldName?: string): string[] {
   const arr = value.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
-  return arr.map((str) => trim(trim(str, '"')));
+  return arr.map((str) => _.trim(_.trim(str, '"')));
 }
 
 /**
@@ -647,7 +646,7 @@ export function convertStringArray(value: any, _fieldName?: string): string[] {
 export function convertNumberArray(value: any, fieldName?: string): number[] {
   const arr = value.split(",");
   return arr
-    .map((item) => trim(item))
+    .map((item) => _.trim(item))
     .filter((item) => item !== "")
     .map((item) => convertNumber(item.trim(), fieldName))
     .filter((item) => typeof item === "number" && !isNaN(item)) as number[];
@@ -660,7 +659,7 @@ export function convertNumberArray(value: any, fieldName?: string): number[] {
 export function convertBooleanArray(value: any, fieldName?: string): boolean[] {
   const arr = value.split(",");
   return arr
-    .map((item) => trim(item))
+    .map((item) => _.trim(item))
     .filter((item) => item !== "")
     .map((item) => convertBoolean(item.trim(), fieldName)) as boolean[];
 }
@@ -685,13 +684,13 @@ export function convertMap(
   const regx = /:(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/;
   const items = value
     .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
-    .map((str) => trim(str));
+    .map((str) => _.trim(str));
   const map = {} as { [key: string]: any };
   for (const keyValue of items) {
     if (keyValue) {
       const arr = keyValue
         .split(regx)
-        .map((str) => trim(trim(str, '"').replace('"', "")));
+        .map((str) => _.trim(_.trim(str, '"').replace('"', "")));
       if (arr && arr.length === 2 && arr[0] !== "" && arr[1] !== "") {
         const key = arr[0];
         const strVal = arr[1];

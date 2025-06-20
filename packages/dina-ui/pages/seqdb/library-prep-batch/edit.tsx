@@ -17,7 +17,7 @@ import {
 } from "common-ui";
 import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
-import { cloneDeep } from "lodash";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import {
@@ -226,7 +226,7 @@ export function LoadExternalDataForLibraryPrepBatchForm({
   buttonBar
 }: LoadExternalDataForLibraryPrepBatchFormProps) {
   // Create a copy of the initial value so we don't change the prop version.
-  const initialValues = cloneDeep(dinaFormProps.initialValues);
+  const initialValues = _.cloneDeep(dinaFormProps.initialValues);
 
   return (
     <DinaForm<Partial<LibraryPrepBatch>>

@@ -5,7 +5,7 @@ import {
   useApiClient,
   useModal
 } from "common-ui";
-import { fromPairs } from "lodash";
+import _ from "lodash";
 import { ViewPageLayout } from "../../components";
 import { AgentIdentifierType } from "../../types/agent-api/resources/AgentIdentifierType";
 import { IdentifierTypeFormLayout } from "./edit";
@@ -24,7 +24,7 @@ export default function IdentifierTypeDetailsPage() {
           initialValues={{
             ...props.initialValues,
             // Convert multilingualTitle to editable Dictionary format:
-            multilingualTitle: fromPairs<string | undefined>(
+            multilingualTitle: _.fromPairs<string | undefined>(
               props.initialValues.multilingualTitle?.titles?.map(
                 ({ title, lang }) => [lang ?? "", title ?? ""]
               )

@@ -1,5 +1,5 @@
 import { FormikContextType } from "formik";
-import { find, isArray, castArray, compact } from "lodash";
+import _ from "lodash";
 import { ComponentProps, RefObject } from "react";
 import Select, { StylesConfig } from "react-select";
 import { ReadOnlyValue } from "./FieldView";
@@ -54,11 +54,11 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
   } = props;
 
   const defaultReadOnlyRender = (value?: SingleOrArray<T | null>) => {
-    const values = compact(castArray(value));
-    const labels = compact(
+    const values = _.compact(_.castArray(value));
+    const labels = _.compact(
       values.map(
         (item) =>
-          find(options, (option) => option.value === item)?.label ?? item
+          _.find(options, (option) => option.value === item)?.label ?? item
       )
     );
     return (
@@ -86,7 +86,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
             change = [];
           }
 
-          const newValue = isArray(change)
+          const newValue = _.isArray(change)
             ? change.map((option) => option.value)
             : change?.value;
           setValue(newValue);

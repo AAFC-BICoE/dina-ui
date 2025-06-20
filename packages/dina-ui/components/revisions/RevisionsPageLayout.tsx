@@ -11,7 +11,7 @@ import {
   useQuery
 } from "common-ui";
 import { KitsuResource } from "kitsu";
-import { get, pick, startCase } from "lodash";
+import _ from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "..";
@@ -91,7 +91,7 @@ export function RevisionsPageLayout({
             cell: ({ row: { original } }) => {
               const snapshot: AuditSnapshot = original;
               const [type] = snapshot.instanceId.split("/");
-              return typeof type === "string" ? startCase(type) : "";
+              return typeof type === "string" ? _.startCase(type) : "";
             },
             accessorKey: "resourceType",
             header: () => <FieldHeader name="resourceType" />,
@@ -138,7 +138,10 @@ export function RevisionsPageLayout({
             // Pop-out component to show the changes for a single revision:
             renderSubComponent: ({ row: { original } }) => {
               const snapshot: AuditSnapshot = original as any;
-              const changed = pick(snapshot.state, snapshot.changedProperties);
+              const changed = _.pick(
+                snapshot.state,
+                snapshot.changedProperties
+              );
 
               const [type] = snapshot.instanceId.split("/");
 
@@ -205,7 +208,7 @@ export function RevisionsPage({
   const resource = query?.response?.data;
 
   const pageTitle = formatMessage("revisionsListTitle", {
-    name: get(resource, nameField) ?? id
+    name: _.get(resource, nameField) ?? id
   });
   if (query?.loading) {
     return <LoadingSpinner loading={true} />;
@@ -219,13 +222,11 @@ export function RevisionsPage({
           href={`${detailsPageLink}/${
             isExternalResourceMetadata ? "external-resource-view" : "view"
           }?id=${id}`}
+          className="back-button my-auto me-auto mt-2"
         >
-          <a className="back-button my-auto me-auto mt-2">
-            <DinaMessage id="detailsPageLink" />
-          </a>
+          <DinaMessage id="detailsPageLink" />
         </Link>
       </ButtonBar>
-
       <main className="container-fluid">
         <h1 id="wb-cont">{pageTitle}</h1>
         <RevisionsPageLayout

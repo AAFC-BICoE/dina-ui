@@ -20,7 +20,7 @@ import { Organization } from "../../../dina-ui/types/agent-api/resources/Organiz
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
-import { mapKeys, pick } from "lodash";
+import _ from "lodash";
 
 interface PersonFormProps {
   person?: Person;
@@ -73,7 +73,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     } catch (error: unknown) {
       if (error instanceof DoOperationsError) {
         const newErrors = error.individualErrors.map<OperationError>((err) => ({
-          fieldErrors: mapKeys(
+          fieldErrors: _.mapKeys(
             err.fieldErrors,
             (_, field) => `identifier[${err.index}].${field}`
           ),
@@ -117,7 +117,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     } catch (error: unknown) {
       if (error instanceof DoOperationsError) {
         const newErrors = error.individualErrors.map<OperationError>((err) => ({
-          fieldErrors: mapKeys(
+          fieldErrors: _.mapKeys(
             err.fieldErrors,
             (_, field) => `identifier[${err.index}].${field}`
           ),
@@ -154,7 +154,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       ...(submittedPerson.identifiers && {
         identifiers: {
           data: (await saveIdentifiers(submittedPerson)).map((it) => {
-            return pick(it, "id", "type");
+            return _.pick(it, "id", "type");
           })
         }
       })

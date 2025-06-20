@@ -1,4 +1,4 @@
-import { capitalize } from "lodash";
+import _ from "lodash";
 import { useContext } from "react";
 import Button from "react-bootstrap/Button";
 import { useInstanceContext } from "../instance/useInstanceContext";
@@ -35,7 +35,7 @@ export function LanguageSelector() {
               key={key}
               className="px-0"
             >
-              {capitalize(
+              {_.capitalize(
                 new Intl.DisplayNames(key, { type: "language" }).of(key)
               )}
             </Button>

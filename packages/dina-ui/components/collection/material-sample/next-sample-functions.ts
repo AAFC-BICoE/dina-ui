@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { padStart } from "lodash";
+import _ from "lodash";
 import { MaterialSample } from "../../../types/collection-api";
 import { createContext, useContext } from "react";
 import { FormikContextType } from "formik";
@@ -18,7 +18,7 @@ export function nextSampleName(previousName?: string | null): string {
   }
 
   const suffixLength = originalNumberSuffix.length;
-  const nextNumberSuffix = padStart(
+  const nextNumberSuffix = _.padStart(
     (Number(originalNumberSuffix) + 1).toString(),
     suffixLength,
     "0"
