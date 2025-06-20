@@ -30,6 +30,7 @@ import {
 import { FaFileCode } from "react-icons/fa";
 import { MdOutlineRawOn } from "react-icons/md";
 import { IconType } from "react-icons/lib";
+import { PDFViewer } from "./PDFViewer";
 import { formatBytes } from "../object-store-utils";
 
 export type DownLoadLinks = {
@@ -58,7 +59,8 @@ export const IMG_TAG_SUPPORTED_FORMATS = [
   "jpeg",
   "jpg",
   "png",
-  "svg"
+  "svg",
+  "pdf"
 ];
 
 export function FileView({
@@ -115,43 +117,51 @@ export function FileView({
         <>
           {isImage ? (
             errorStatus === undefined ? (
-              <a
-                href={objectUrl as any}
-                target="_blank"
-                style={{
-                  color: "inherit",
-                  textDecoration: "none",
-                  pointerEvents: clickToDownload ? undefined : "none",
-                  display: "block",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  width: "fit-content"
-                }}
-              >
-                <RcTooltip
-                  overlay={<>{shownTypeIndicator}</>}
-                  placement="top"
-                  align={{
-                    points: ["bc", "bc"],
-                    offset: [0, -20]
-                  }}
-                  motion={{
-                    motionName: "rc-tooltip-zoom",
-                    motionAppear: true,
-                    motionEnter: true,
-                    motionLeave: true
+              fileType === "pdf" ? (
+                <PDFViewer
+                  objectUrl={objectUrl as any}
+                  shownTypeIndicator={shownTypeIndicator as any}
+                />
+              ) : (
+                <a
+                  href={objectUrl as any}
+                  target="_blank"
+                  style={{
+                    color: "inherit",
+                    textDecoration: "none",
+                    pointerEvents:
+                      clickToDownload && fileType != "pdf" ? undefined : "none",
+                    display: "block",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    width: "fit-content"
                   }}
                 >
-                  <img
-                    alt={imgAlt ?? `File path : ${filePath}`}
-                    src={objectUrl as any}
-                    style={{ height: imgHeight }}
-                    onError={(event) =>
-                      (event.currentTarget.style.display = "none")
-                    }
-                  />
-                </RcTooltip>
-              </a>
+                  <RcTooltip
+                    overlay={<>{shownTypeIndicator}</>}
+                    placement="top"
+                    align={{
+                      points: ["bc", "bc"],
+                      offset: [0, -20]
+                    }}
+                    motion={{
+                      motionName: "rc-tooltip-zoom",
+                      motionAppear: true,
+                      motionEnter: true,
+                      motionLeave: true
+                    }}
+                  >
+                    <img
+                      alt={imgAlt ?? `File path : ${filePath}`}
+                      src={objectUrl as any}
+                      style={{ height: imgHeight }}
+                      onError={(event) =>
+                        (event.currentTarget.style.display = "none")
+                      }
+                    />
+                  </RcTooltip>
+                </a>
+              )
             ) : errorStatus === 403 ? (
               <DinaMessage id="unauthorized" />
             ) : (
@@ -321,6 +331,36 @@ export function FileView({
                   </Dropdown.Menu>
                 </Dropdown>
               )}
+            </>
+          )}
+
+          {!hideDownload && metadata?.type === "derivative" && (
+            <>
+              {downloadLinks?.thumbNail ? (
+                <div className="d-flex justify-content-center">
+                  <DownloadButton
+                    id="downloadFile"
+                    path={downloadLinks?.thumbNail}
+                    isDownloading={isDownloading}
+                    handleDownloadLink={handleDownloadLink}
+                    apiClient={apiClient}
+                    setIsDownloading={setIsDownloading}
+                    classname="p-2 mt-3"
+                  />
+                </div>
+              ) : downloadLinks?.largeData ? (
+                <div className="d-flex justify-content-center">
+                  <DownloadButton
+                    id="downloadFile"
+                    path={downloadLinks?.largeData}
+                    isDownloading={isDownloading}
+                    handleDownloadLink={handleDownloadLink}
+                    apiClient={apiClient}
+                    setIsDownloading={setIsDownloading}
+                    classname="p-2 mt-3"
+                  />
+                </div>
+              ) : null}
             </>
           )}
         </>

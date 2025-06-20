@@ -18,6 +18,8 @@ import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resour
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import React from "react";
 import { SequencingRunItem } from "./useMolecularAnalysisRun";
+import { QualityControlWithAttachment } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
+import { VocabularyOption } from "../collection/VocabularySelectField";
 
 interface UseMolecularAnalysisRunColumnsProps {
   type: string;
@@ -26,13 +28,21 @@ interface UseMolecularAnalysisRunColumnsProps {
   >;
   readOnly?: boolean;
   setReloadGenericMolecularAnalysisRun?: Dispatch<SetStateAction<number>>;
+  qualityControls?: QualityControlWithAttachment[];
+  updateExistingQualityControls?: (
+    updatedQualityControlsCopy?: QualityControlWithAttachment[]
+  ) => Promise<void>;
+  qualityControlTypes?: VocabularyOption[];
 }
 
 export function useMolecularAnalysisRunColumns({
   type,
   setMolecularAnalysisRunItemNames,
   readOnly,
-  setReloadGenericMolecularAnalysisRun
+  setReloadGenericMolecularAnalysisRun,
+  qualityControls,
+  updateExistingQualityControls,
+  qualityControlTypes
 }: UseMolecularAnalysisRunColumnsProps) {
   const { compareByStringAndNumber } = useStringComparator();
   const { save } = useApiClient();
@@ -332,7 +342,7 @@ export function useMolecularAnalysisRunColumns({
             <>{attachmentElements?.length > 0 ? attachmentElements : null}</>
           );
         },
-        header: () => <FieldHeader name={"resultAttachment"} />,
+        header: () => <FieldHeader name={"attachments"} />,
         accessorKey: "resultAttachment",
         sortingFn: (a: any, b: any): number =>
           compareByStringAndNumber(
@@ -488,6 +498,133 @@ export function useMolecularAnalysisRunColumns({
       }
     ];
 
+  const QUALITY_CONTROL_COLUMNS: ColumnDef<QualityControlWithAttachment>[] = [
+    {
+      id: "name",
+      cell: ({ row: { original } }) => {
+        return <>{original?.name}</>;
+      },
+      header: () => <FieldHeader name="name" />,
+      accessorKey: "name",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(a?.original?.name, b?.original?.name),
+      enableSorting: true
+    },
+    {
+      id: "qcType",
+      cell: ({ row: { original } }) => {
+        const qcType = qualityControlTypes?.find(
+          (qcT) => qcT.value === original.qcType
+        );
+        return <>{qcType?.label}</>;
+      },
+      header: () => <FieldHeader name="qualityControlType" />,
+      accessorKey: "qcType",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(a?.original?.qcType, b?.original?.qcType),
+      enableSorting: true
+    },
+    {
+      id: "resultAttachment",
+      cell: ({ row: { original } }) => {
+        const attachments = original.attachments ?? [];
+        const attachmentElements = attachments?.map((attachment, index) => {
+          return attachment ? (
+            <React.Fragment key={attachment?.id}>
+              <Link href={`/object-store/object/view?id=${attachment?.id}`}>
+                {(attachment as any)?.originalFilename}
+              </Link>
+              {index < attachments?.length - 1 && ", "}
+            </React.Fragment>
+          ) : null;
+        });
+
+        return (
+          <>{attachmentElements?.length > 0 ? attachmentElements : null}</>
+        );
+      },
+      header: () => <FieldHeader name={"attachments"} />,
+      accessorKey: "resultAttachment",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
+    },
+    {
+      id: "action",
+      cell: ({ row: { original, index } }) => {
+        return (
+          <div className="settings-button-container">
+            <SettingsButton
+              menuItems={[
+                <AddAttachmentsButton
+                  key={0}
+                  removeMargin={true}
+                  style={{
+                    paddingLeft: "15px",
+                    paddingRight: "15px",
+                    width: "6rem"
+                  }}
+                  buttonTextElement={<DinaMessage id="addButtonText" />}
+                  value={original.attachments ?? []}
+                  onChange={async (newMetadatas) => {
+                    const updatedQualityControlsCopy = [
+                      ...(qualityControls ?? [])
+                    ] as QualityControlWithAttachment[];
+                    const updatedQc = {
+                      ...updatedQualityControlsCopy[index],
+                      attachments: newMetadatas as ResourceIdentifierObject[]
+                    };
+                    updatedQualityControlsCopy[index] = updatedQc;
+
+                    await updateExistingQualityControls?.(
+                      updatedQualityControlsCopy
+                    );
+                    setReloadGenericMolecularAnalysisRun?.(Date.now());
+                  }}
+                />,
+                <button
+                  className="btn btn-danger delete-button"
+                  style={{
+                    paddingLeft: "15px",
+                    paddingRight: "15px",
+                    width: "6rem"
+                  }}
+                  type="button"
+                  key={1}
+                  onClick={async () => {
+                    const updatedQualityControlsCopy = [
+                      ...(qualityControls ?? [])
+                    ] as QualityControlWithAttachment[];
+                    updatedQualityControlsCopy[index] = {
+                      ...updatedQualityControlsCopy[index],
+                      attachments: []
+                    };
+
+                    await updateExistingQualityControls?.(
+                      updatedQualityControlsCopy
+                    );
+                    setReloadGenericMolecularAnalysisRun?.(Date.now());
+                  }}
+                >
+                  <DinaMessage id="removeButtonText" />
+                </button>
+              ]}
+            />
+          </div>
+        );
+      },
+      header: () => <FieldHeader name={"action"} />,
+      accessorKey: "action",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
+    }
+  ];
+
   const METAGENOMICS_BATCH_ITEM_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
       id: "materialSampleName",
@@ -593,7 +730,8 @@ export function useMolecularAnalysisRunColumns({
     "generic-molecular-analysis-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS,
     "metagenomics-batch-item": METAGENOMICS_BATCH_ITEM_COLUMNS,
     "generic-molecular-analysis-results":
-      GENERIC_MOLECULAR_ANALYSIS_RESULTS_COLUMNS
+      GENERIC_MOLECULAR_ANALYSIS_RESULTS_COLUMNS,
+    "quality-control": QUALITY_CONTROL_COLUMNS
   };
   return MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP[type];
 

@@ -27,7 +27,6 @@ describe("FileView component", () => {
   });
 
   const noPreviewFileTypes = [
-    "pdf",
     "doc",
     "docx",
     "ods",
