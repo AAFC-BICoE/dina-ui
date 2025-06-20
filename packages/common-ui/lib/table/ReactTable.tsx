@@ -15,7 +15,7 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import classnames from "classnames";
-import { Fragment, useEffect, useState } from "react";
+import { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
@@ -79,6 +79,8 @@ export interface ReactTableProps<TData> {
 
   // Hides the table rendering. Useful for accessing table states but don't want to render table
   hideTable?: boolean;
+
+  setResourceRowModel?: Dispatch<SetStateAction<Row<TData>[] | undefined>>;
 }
 
 const DEFAULT_SORT: SortingState = [
@@ -123,7 +125,8 @@ export function ReactTable<TData>({
   manualFiltering = false,
   onColumnFiltersChange,
   defaultColumnFilters = [],
-  hideTable = false
+  hideTable = false,
+  setResourceRowModel
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>(sort ?? DEFAULT_SORT);
@@ -239,6 +242,10 @@ export function ReactTable<TData>({
   };
 
   const table = useReactTable<TData>(tableOption);
+
+  useEffect(() => {
+    setResourceRowModel?.(table.getRowModel().rows);
+  }, table.getRowModel().rows);
 
   return !hideTable ? (
     <div

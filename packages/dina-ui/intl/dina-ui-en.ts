@@ -172,6 +172,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteThisView: "Delete This View",
   deleted: "Deleted",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
+  derivativeDetailsLabel: "Derivative Details",
   depthInMeters: "Depth in Meters",
   destroyOriginal: 'Tag Original as "Destroyed"',
   detachCollectingEvent: "Detach Collecting Event",
@@ -292,6 +293,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dcType: "Stored Object Type",
   field_dcSize: "File Size",
   field_description: "Description",
+
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
   "field_description.de": "German Description",
@@ -1241,5 +1243,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   existingTemplates: "Existing Templates",
   viewMaterialSamplesInCollection: "View material samples in this collection",
   generateURLButtonText: "Generate URL",
-  taxonomyTree: "Taxonomy Tree"
+  taxonomicHierarchy: "Taxonomic Hierarchy",
+  classificationlevels: "Classification levels:",
+  taxonomyHierarchyChartInstructions:
+    "Interactions: Scroll to zoom, drag to pan, click on nodes to fetch child taxonomic ranks",
+  taxonomyHierarchySubtitle:
+    "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination."
 };
