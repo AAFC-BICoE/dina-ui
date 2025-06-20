@@ -1,7 +1,8 @@
 import { DinaForm, FieldSet, SelectField } from "common-ui";
 import {
   NotPubliclyReleasableWarning,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  NotPubliclyReleasableSection
 } from "../..";
 import { MetadataFileView } from "../metadata/MetadataFileView";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -64,6 +65,7 @@ export function DerivativeForm({
         />
       </div>
       <MetadataBadges />
+      <NotPubliclyReleasableSection />
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/derivative"
         tagsFieldName="acTags"

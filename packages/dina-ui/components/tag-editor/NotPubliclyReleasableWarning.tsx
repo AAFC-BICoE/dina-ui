@@ -15,6 +15,7 @@ export function NotPubliclyReleasableWarning() {
     <div className="align-items-center not-publicly-releasable-alert">
       <Tooltip
         id="notPubliclyReleasable"
+        directText={values.notPubliclyReleasableReason}
         setVisible={setVisible}
         visible={visible}
         placement="left"

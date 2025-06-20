@@ -34,7 +34,8 @@ import {
   ParseVerbatimToRangeButton,
   PersonSelectField,
   TagsAndRestrictionsSection,
-  TagSelectReadOnly
+  TagSelectReadOnly,
+  NotPubliclyReleasableSection
 } from "../..";
 import { ManagedAttributesEditor } from "../../";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -615,21 +616,26 @@ export function CollectingEventFormLayout({
         componentName={COLLECTING_EVENT_COMPONENT_NAME}
         sectionName="general-section"
       >
-        <NotPubliclyReleasableWarning />
         {readOnly ? (
-          <TagSelectReadOnly />
+          <>
+            <NotPubliclyReleasableWarning />
+            <TagSelectReadOnly />
+          </>
         ) : (
-          <Tooltip
-            id="collecting_event_tag_info"
-            disableSpanMargin={true}
-            visibleElement={
-              <TagsAndRestrictionsSection
-                resourcePath="collection-api/collecting-event"
-                indexName="dina_material_sample_index"
-                tagIncludedType="collecting-event"
-              />
-            }
-          />
+          <>
+            <NotPubliclyReleasableSection />
+            <Tooltip
+              id="collecting_event_tag_info"
+              disableSpanMargin={true}
+              visibleElement={
+                <TagsAndRestrictionsSection
+                  resourcePath="collection-api/collecting-event"
+                  indexName="dina_material_sample_index"
+                  tagIncludedType="collecting-event"
+                />
+              }
+            />
+          </>
         )}
       </DinaFormSection>
       <div className="row mb-3">

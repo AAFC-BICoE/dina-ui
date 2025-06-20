@@ -26,7 +26,8 @@ import {
   useCollectingEventQuery,
   AssemblageSelectSection,
   OrganismsField,
-  useCopyToNextSample
+  useCopyToNextSample,
+  NotPubliclyReleasableSection
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
@@ -471,6 +472,7 @@ export function MaterialSampleForm({
                   <CollectionSelectSection resourcePath="collection-api/collection" />
                   <ProjectSelectSection resourcePath="collection-api/project" />
                   <AssemblageSelectSection resourcePath="collection-api/assemblage" />
+                  <NotPubliclyReleasableSection />
                   <TagsAndRestrictionsSection
                     resourcePath="collection-api/material-sample"
                     indexName="dina_material_sample_index"

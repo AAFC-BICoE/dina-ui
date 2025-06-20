@@ -4,7 +4,6 @@ import { AiFillTags } from "react-icons/ai";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { TagSelectField } from "./TagSelectField";
 import { RestrictionWarning } from "../collection/material-sample/RestrictionWarning";
-import { NotPubliclyReleasableSection } from "./NotPubliclyReleasableSection";
 
 export const TAG_SECTION_FIELDS: (keyof MaterialSample)[] = [
   "tags",
@@ -64,7 +63,6 @@ export function TagsAndRestrictionsSection({
             </span>
           }
         />
-        <NotPubliclyReleasableSection />
       </DinaFormSection>
     </div>
   );
