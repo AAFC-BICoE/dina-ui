@@ -3,6 +3,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Derivative, Metadata } from "../../../types/objectstore-api";
 import { DownLoadLinks, FileView } from "../file-view/FileView";
 import { LoadingSpinner } from "common-ui";
+import { derivativeTypeToLabel } from "../object-store-utils";
 
 export interface MetadataFileViewProps {
   metadata: Metadata | Derivative;
@@ -34,7 +35,8 @@ export function getFileToDisplay(metadata) {
       "svg",
       "ico",
       "webp",
-      "bmp" // Browser supported image formats
+      "bmp",
+      "pdf" // Browser supported image formats
     ];
 
     // Check if extension is in the previewable list
@@ -69,7 +71,7 @@ export function MetadataFileView({
   imgHeight,
   hideDownload
 }: MetadataFileViewProps) {
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, messages } = useDinaIntl();
 
   const fileToDisplay = React.useMemo(() => {
     if (metadata) {
@@ -98,7 +100,9 @@ export function MetadataFileView({
   const caption =
     metadata.type === "derivative"
       ? metadata.objectUpload?.originalFilename ??
-        `${(metadata.acDerivedFrom as Metadata)?.originalFilename} Thumbnail`
+        `${
+          (metadata.acDerivedFrom as Metadata)?.originalFilename
+        } ${derivativeTypeToLabel(metadata?.derivativeType ?? "", messages)}`
       : metadata.acCaption;
 
   const downloadLinks: DownLoadLinks = {};
@@ -111,8 +115,14 @@ export function MetadataFileView({
   }
 
   // If the file is a derivative, add the derivative to the link.
-  if (metadata.type === "derivative")
-    downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/derivative/${metadata.fileIdentifier}`;
+  if (metadata.type === "derivative") {
+    delete downloadLinks.original;
+    if (metadata.derivativeType === "LARGE_IMAGE") {
+      downloadLinks.largeData = `${COMMON_LINK_ROOT}${metadata.bucket}/derivative/${metadata.fileIdentifier}`;
+    } else if (metadata.derivativeType === "THUMBNAIL_IMAGE") {
+      downloadLinks.thumbNail = `${COMMON_LINK_ROOT}${metadata.bucket}/derivative/${metadata.fileIdentifier}`;
+    }
+  }
 
   // fileExtension should always be available when getting the Metadata from the back-end:
   const fileType = React.useMemo(() => {

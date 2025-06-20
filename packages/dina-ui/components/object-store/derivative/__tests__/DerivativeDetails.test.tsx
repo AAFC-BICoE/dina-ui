@@ -155,7 +155,6 @@ describe("Derivative details page", () => {
     );
 
     await new Promise(setImmediate);
-    await new Promise(setImmediate);
 
     expect(
       wrapper.getByRole("cell", {
