@@ -47,7 +47,6 @@ export interface BulkDeleteResourcesOptions {
 export interface BulkCreateResourcesOptions {
   apiBaseUrl?: string;
   resourceType: string;
-  returnNullForMissingResource?: boolean;
 }
 
 export interface BulkUpdateResourcesOptions {
@@ -239,11 +238,6 @@ export class ApiClientImpl implements ApiClientI {
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
 
-    // If the apiBaseUrl is agent-api, we will skip the operation for single requests.
-    if (["/agent-api"].includes(apiBaseUrl)) {
-      skipOperationForSingleRequest = true;
-    }
-
     if (operations.length === 1 && skipOperationForSingleRequest) {
       // Single Request Only
       const operation = operations[0];
@@ -311,131 +305,19 @@ export class ApiClientImpl implements ApiClientI {
           throw new Error(`Unsupported single operation: ${operation.op}`);
       }
     } else {
-      // use new bulk functions if using the new api
-      if (
-        ["/agent-api"].includes(apiBaseUrl) &&
-        ["POST", "PATCH", "DELETE", "GET"].includes(
-          operations[0].op.toUpperCase()
-        )
-      ) {
-        const resourceType = operations[0].path.split("/")[0];
-        const unsupportedResourceTypes = ["organization", "identifier-type"];
-
-        if (unsupportedResourceTypes.includes(resourceType)) {
-          throw new Error(
-            `Unsupported resource type for bulk operations: ${resourceType}`
-          );
-        }
-
-        switch (operations[0].op.toUpperCase()) {
-          case "GET":
-            const includeSet = new Set<string>();
-
-            const ids = operations.map((operation) => {
-              // Split path by "?"
-              const pathParts = operation.path.split("?");
-
-              // Get the "include" part, after '?', if exists
-              const includePart = pathParts[1]
-                ? pathParts[1].split("=")[1]
-                : null;
-              if (includePart) {
-                // Split by comma and add each to the Set
-                includePart.split(",").forEach((includeItem) => {
-                  includeSet.add(includeItem);
-                });
-              }
-
-              // Extract the ID from before the '?' by splitting by '/' and getting the second item
-              return pathParts[0].split("/")[1];
-            });
-            const include: string[] = [...includeSet];
-            const getResponse = await this.bulkLoadResources(ids, {
-              apiBaseUrl,
-              resourceType,
-              include,
-              returnNullForMissingResource
-            });
-            responses = getResponse.data.data.map((response) => ({
-              data: response,
-              included: getResponse.data.included || [],
-              status: getResponse.status
-            }));
-            break;
-
-          case "DELETE":
-            const deleteIds = operations.map((operation) => {
-              // Split path by "?"
-              const pathParts = operation.path.split("/");
-
-              // Extract the ID from before the '?' by splitting by '/' and getting the second item
-              return pathParts[1];
-            });
-
-            const deleteResponse = await this.bulkDeleteResources(deleteIds, {
-              apiBaseUrl,
-              resourceType,
-              returnNullForMissingResource
-            });
-
-            responses = deleteIds.map(() => ({
-              status: deleteResponse.status
-            })) as any;
-            break;
-
-          case "POST":
-            // For agent-api, we need to do a bulk create
-            const postResources: ResourceObject[] = operations
-              .map((op) => op.value)
-              .filter((value): value is ResourceObject => value !== undefined);
-            const postResponse = await this.bulkCreateResources(postResources, {
-              apiBaseUrl,
-              resourceType,
-              returnNullForMissingResource
-            });
-            responses = postResponse.data.data.map((response) => ({
-              data: response,
-              included: postResponse.data.included || [],
-              status: postResponse.status
-            }));
-
-            break;
-          case "PATCH":
-            const patchResources: ResourceObject[] = operations
-              .map((op) => op.value)
-              .filter((value): value is ResourceObject => value !== undefined);
-            const patchResponse = await this.bulkUpdateResources(
-              patchResources,
-              {
-                apiBaseUrl,
-                resourceType,
-                returnNullForMissingResource
-              }
-            );
-
-            responses = patchResponse.data.data.map((response) => ({
-              data: response,
-              included: patchResponse.data.included || [],
-              status: patchResponse.status
-            }));
-
-            break;
-        }
-      } else {
-        const axiosResponse = await axios.patch(
-          `${apiBaseUrl}/operations`,
-          operations,
-          {
-            headers: {
-              Accept: "application/json-patch+json",
-              "Content-Type": "application/json-patch+json",
-              "Crnk-Compact": "true"
-            }
+      const axiosResponse = await axios.patch(
+        `${apiBaseUrl}/operations`,
+        operations,
+        {
+          headers: {
+            Accept: "application/json-patch+json",
+            "Content-Type": "application/json-patch+json",
+            "Crnk-Compact": "true"
           }
-        );
+        }
+      );
 
-        responses = axiosResponse.data;
-      }
+      responses = axiosResponse.data;
     }
 
     // Optionally return null instead of throwing an error for missing resources:
@@ -582,9 +464,8 @@ export class ApiClientImpl implements ApiClientI {
 
   public async bulkCreateResources(
     resources: ResourceObject[],
-    options?: BulkCreateResourcesOptions
+    { apiBaseUrl = "", resourceType }: BulkCreateResourcesOptions
   ): Promise<AxiosResponse> {
-    const { apiBaseUrl = "", resourceType } = options || {};
     const requestBody = {
       data: resources.map((resource) => ({
         ...resource
@@ -627,9 +508,12 @@ export class ApiClientImpl implements ApiClientI {
 
   public async bulkUpdateResources(
     resources: InputResource<KitsuResource>[],
-    options?: BulkUpdateResourcesOptions
+    {
+      apiBaseUrl = "",
+      resourceType,
+      returnNullForMissingResource = false
+    }: BulkUpdateResourcesOptions
   ): Promise<AxiosResponse> {
-    const { apiBaseUrl = "", resourceType } = options || {};
     const requestBody = {
       data: resources.map((resource) => ({
         ...resource
@@ -665,8 +549,11 @@ export class ApiClientImpl implements ApiClientI {
         return response;
       }
     } catch (error) {
-      console.error(`Error bulk updating resources for ${resourceType}`, error);
-      throw error;
+      if (returnNullForMissingResource) {
+        throw error; // placeholder for future implementation
+      } else {
+        throw error;
+      }
     }
   }
 
