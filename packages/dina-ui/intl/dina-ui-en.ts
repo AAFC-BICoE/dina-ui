@@ -202,6 +202,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editCollectionMethodTitle: "Edit Collection Method",
   editCollectionTitle: "Edit Collection",
   editDinaUserTitle: "Edit User",
+  editDerivativeMetadata: "Edit Derivative Metadata",
   editExternalResourceTitle: "Edit External Resource",
   editInstitutionTitle: "Edit Institution",
   editManagedAttributeTitle: "Edit Managed Attribute",
@@ -1249,5 +1250,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Interactions: Scroll to zoom, drag to pan, click on nodes to fetch child taxonomic ranks",
   taxonomyHierarchySubtitle:
     "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination.",
+  notPubliclyReleasableWithReason: "Not Publicly Releasable: {reason}",
   clearAllNamesButtonText: "Clear All Names"
 };
