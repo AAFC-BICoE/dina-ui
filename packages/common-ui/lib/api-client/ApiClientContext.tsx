@@ -406,7 +406,9 @@ export class ApiClientImpl implements ApiClientI {
   }
 
   /**
-   *  Bulk GET operations: Run many find-by-id queries in a single HTTP request.
+   * Bulk load resources by their IDs.
+   * @param ids - The IDs of the resources to load.
+   * @param options - Options for the bulk load operation.
    */
   public async bulkLoadResources(
     ids: string[],
@@ -436,22 +438,8 @@ export class ApiClientImpl implements ApiClientI {
           Accept: "application/vnd.api+json"
         }
       });
-      const jsonApiData = response.data.data;
-
-      // flatten the attributes into the resource object if they exist
-      if (jsonApiData[0].hasOwnProperty("attributes")) {
-        const flattened = jsonApiData.map((resource: any) => {
-          resource = {
-            ..._.omit(resource, "attributes"),
-            ...resource.attributes
-          };
-          return resource;
-        });
-        response.data.data = flattened;
-        return response;
-      } else {
-        return response;
-      }
+      response.data = deserialise(response.data);
+      return response;
     } catch (error) {
       if (returnNullForMissingResource) {
         throw error; // placeholder for future implementation
@@ -461,6 +449,11 @@ export class ApiClientImpl implements ApiClientI {
     }
   }
 
+  /**
+   * Bulk create resources.
+   * @param resources - The resources to create.
+   * @param options - Options for the bulk create operation.
+   */
   public async bulkCreateResources(
     resources: InputResource<KitsuResource>[],
     { apiBaseUrl = "", resourceType }: BulkCreateResourcesOptions
@@ -488,27 +481,19 @@ export class ApiClientImpl implements ApiClientI {
           }
         }
       );
-      const jsonApiData = response.data.data;
-
-      if (jsonApiData[0].hasOwnProperty("attributes")) {
-        const flattened = jsonApiData.map((resource: any) => {
-          resource = {
-            ..._.omit(resource, "attributes"),
-            ...resource.attributes
-          };
-          return resource;
-        });
-        response.data.data = flattened;
-        return response;
-      } else {
-        return response;
-      }
+      response.data = deserialise(response.data);
+      return response;
     } catch (error) {
       console.error(`Error bulk creating resources for ${resourceType}`, error);
       throw error;
     }
   }
 
+  /**
+   * Bulk update resources.
+   * @param resources - The resources to update.
+   * @param options - Options for the bulk update operation.
+   */
   public async bulkUpdateResources(
     resources: InputResource<KitsuResource>[],
     {
@@ -517,8 +502,12 @@ export class ApiClientImpl implements ApiClientI {
       returnNullForMissingResource = false
     }: BulkUpdateResourcesOptions
   ): Promise<AxiosResponse> {
+    const serializedResources = await Promise.all(
+      resources.map((resource) => serialize({ resource, type: resourceType }))
+    );
+
     const requestBody = {
-      data: resources.map((resource) => ({
+      data: serializedResources.map((resource) => ({
         ...resource
       }))
     };
@@ -536,21 +525,8 @@ export class ApiClientImpl implements ApiClientI {
           }
         }
       );
-      const jsonApiData = response.data.data;
-
-      if (jsonApiData[0].hasOwnProperty("attributes")) {
-        const flattened = jsonApiData.map((resource: any) => {
-          resource = {
-            ..._.omit(resource, "attributes"),
-            ...resource.attributes
-          };
-          return resource;
-        });
-        response.data.data = flattened;
-        return response;
-      } else {
-        return response;
-      }
+      response.data = deserialise(response.data);
+      return response;
     } catch (error) {
       if (returnNullForMissingResource) {
         throw error; // placeholder for future implementation
@@ -560,6 +536,11 @@ export class ApiClientImpl implements ApiClientI {
     }
   }
 
+  /**
+   * Bulk delete resources.
+   * @param ids - The IDs of the resources to delete.
+   * @param options - Options for the bulk delete operation.
+   */
   public async bulkDeleteResources(
     ids: string[],
     {
@@ -588,6 +569,7 @@ export class ApiClientImpl implements ApiClientI {
           }
         }
       );
+      response.data = deserialise(response.data);
       return response;
     } catch (error) {
       if (returnNullForMissingResource) {
