@@ -11,7 +11,7 @@ import {
   OperationsResponse,
   SuccessfulOperation
 } from "../operations-types";
-
+import { isEqual } from "lodash";
 interface TestPcrPrimer {
   name: string;
   lotNumber: number;
@@ -163,6 +163,168 @@ const MOCK_AXIOS_RESPONSE_ACCESS_DENIED = {
   ] as OperationsResponse
 };
 
+const MOCK_BULK_GET_DATA = {
+  data: [
+    {
+      id: "1",
+      type: "person"
+    },
+    {
+      id: "2",
+      type: "person"
+    },
+    {
+      id: "3",
+      type: "person"
+    }
+  ]
+};
+
+const MOCK_BULK_GET_RESPONSE = {
+  data: [
+    {
+      data: {
+        attributes: { displayName: "person 1" },
+        id: "1",
+        type: "person"
+      }
+    },
+    {
+      data: {
+        attributes: { displayName: "person 2" },
+        id: "2",
+        type: "person"
+      }
+    },
+    {
+      data: {
+        attributes: { displayName: "person 3" },
+        id: "3",
+        type: "person"
+      }
+    }
+  ],
+  status: 200
+};
+
+const MOCK_BULK_CREATE_DATA = [
+  {
+    attributes: {
+      displayName: "person 1"
+    },
+
+    type: "person"
+  },
+  {
+    attributes: {
+      displayName: "person 2"
+    },
+
+    type: "person"
+  },
+  {
+    attributes: {
+      displayName: "person 3"
+    },
+
+    type: "person"
+  }
+];
+
+const MOCK_BULK_CREATE_INPUT = [
+  {
+    displayName: "person 1",
+
+    type: "person"
+  },
+  {
+    displayName: "person 2",
+
+    type: "person"
+  },
+  {
+    displayName: "person 3",
+
+    type: "person"
+  }
+];
+
+const MOCK_BULK_UPDATE_DATA = {
+  data: [
+    {
+      id: "1",
+      attributes: {
+        displayName: "updated person 1"
+      },
+      type: "person"
+    },
+    {
+      id: "2",
+      attributes: {
+        displayName: "updated person 2"
+      },
+      type: "person"
+    },
+    {
+      id: "3",
+      attributes: {
+        displayName: "updated person 3"
+      },
+      type: "person"
+    }
+  ]
+};
+
+const MOCK_BULK_UPDATE_INPUT = [
+  {
+    id: "1",
+    displayName: "updated person 1",
+    type: "person"
+  },
+  {
+    id: "2",
+    displayName: "updated person 2",
+    type: "person"
+  },
+  {
+    id: "3",
+    displayName: "updated person 3",
+    type: "person"
+  }
+];
+
+const MOCK_BULK_UPDATE_RESPONSE = {
+  data: [
+    {
+      data: {
+        attributes: { displayName: "updated person 1" },
+        id: "1",
+        type: "person"
+      }
+    },
+    {
+      data: {
+        attributes: { displayName: "updated person 2" },
+        id: "2",
+        type: "person"
+      }
+    },
+    {
+      data: {
+        attributes: { displayName: "updated person 3" },
+        id: "3",
+        type: "person"
+      }
+    }
+  ],
+  status: 200
+};
+
+const MOCK_BULK_DELETE_RESPONSE = {
+  data: undefined,
+  status: 204
+};
+
 /** Mock of Axios' patch function. */
 const mockPatch = jest.fn((_, data) => {
   if (data === TODO_INSERT_OPERATION) {
@@ -174,14 +336,48 @@ const mockPatch = jest.fn((_, data) => {
   if (data === TODO_OPERATION_DENY_ACCESS) {
     return MOCK_AXIOS_RESPONSE_ACCESS_DENIED;
   }
+  if (isEqual(data, MOCK_BULK_UPDATE_DATA)) {
+    return MOCK_BULK_UPDATE_RESPONSE;
+  }
 });
 
-const { apiClient, bulkGet, doOperations, save } = new ApiClientImpl({
+const mockPost = jest.fn((url, data) => {
+  if (url.includes("bulk-load")) {
+    if (isEqual(data, MOCK_BULK_GET_DATA)) {
+      return MOCK_BULK_GET_RESPONSE;
+    }
+  } else {
+    if (isEqual(data.data, MOCK_BULK_CREATE_DATA)) {
+      return MOCK_BULK_GET_RESPONSE;
+    }
+  }
+});
+
+const mockDelete = jest.fn((_, data) => {
+  if (isEqual(data.data, MOCK_BULK_GET_DATA)) {
+    return MOCK_BULK_DELETE_RESPONSE;
+  }
+});
+
+const {
+  apiClient,
+  bulkGet,
+  doOperations,
+  save,
+  bulkLoadResources,
+  bulkDeleteResources,
+  bulkCreateResources,
+  bulkUpdateResources
+} = new ApiClientImpl({
   newId: () => "00000000-0000-0000-0000-000000000000"
 });
 
 // Add the mocked "patch" method to the Axios instance:
-apiClient.axios = { patch: mockPatch } as any;
+apiClient.axios = {
+  patch: mockPatch,
+  post: mockPost,
+  delete: mockDelete
+} as any;
 
 describe("API client context", () => {
   beforeEach(jest.clearAllMocks);
@@ -848,5 +1044,36 @@ Constraint violation: description size must be between 1 and 10`;
         }
       ]
     });
+  });
+  it("Provides a bulkLoadResources function that can get multiple objects by id", async () => {
+    const response = await bulkLoadResources(["1", "2", "3"], {
+      resourceType: "person",
+      apiBaseUrl: "/agent-api"
+    });
+    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+  });
+
+  it("Provides a bulkDeleteResources function that can delete multiple objects by id", async () => {
+    const response = await bulkDeleteResources(["1", "2", "3"], {
+      resourceType: "person",
+      apiBaseUrl: "/agent-api"
+    });
+    expect(response).toEqual(MOCK_BULK_DELETE_RESPONSE);
+  });
+
+  it("Provides a bulkCreateResources function that can create multiple objects", async () => {
+    const response = await bulkCreateResources(MOCK_BULK_CREATE_INPUT, {
+      resourceType: "person",
+      apiBaseUrl: "/agent-api"
+    });
+    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+  });
+
+  it("Provides a bulkUpdateResources function that can update multiple objects", async () => {
+    const response = await bulkUpdateResources(MOCK_BULK_UPDATE_INPUT, {
+      resourceType: "person",
+      apiBaseUrl: "/agent-api"
+    });
+    expect(response).toEqual(MOCK_BULK_UPDATE_RESPONSE);
   });
 });
