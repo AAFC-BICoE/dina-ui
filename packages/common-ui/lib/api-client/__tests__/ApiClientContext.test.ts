@@ -185,6 +185,63 @@ const MOCK_BULK_GET_RESPONSE = {
     {
       data: {
         attributes: { displayName: "person 1" },
+        relationships: {
+          organizations: {
+            data: [
+              {
+                id: "12345678-1234-1234-1234-123456789012",
+                type: "organization"
+              }
+            ]
+          }
+        },
+        id: "1",
+        type: "person"
+      }
+    },
+    {
+      data: {
+        attributes: { displayName: "person 2" },
+        id: "2",
+        type: "person"
+      }
+    },
+    {
+      data: {
+        attributes: { displayName: "person 3" },
+        id: "3",
+        type: "person"
+      }
+    }
+  ],
+  status: 200
+};
+
+const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS = {
+  data: [
+    {
+      data: {
+        attributes: { displayName: "person 1" },
+        relationships: {
+          organizations: {
+            data: [
+              {
+                id: "12345678-1234-1234-1234-123456789012",
+                type: "organization",
+                attributes: {
+                  createdBy: "dina-admin",
+                  createdOn: "2023-10-01T00:00:00Z",
+                  names: [
+                    {
+                      languageCode: "EN",
+                      name: "Test Organization"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
         id: "1",
         type: "person"
       }
@@ -343,6 +400,12 @@ const mockPatch = jest.fn((_, data) => {
 
 const mockPost = jest.fn((url, data) => {
   if (url.includes("bulk-load")) {
+    if (url.includes("include=")) {
+      const includes = url.split("=").slice(-1)[0].split(",");
+      if (includes === "organizations") {
+        return MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS;
+      }
+    }
     if (isEqual(data, MOCK_BULK_GET_DATA)) {
       return MOCK_BULK_GET_RESPONSE;
     }
@@ -1049,6 +1112,15 @@ Constraint violation: description size must be between 1 and 10`;
     const response = await bulkLoadResources(["1", "2", "3"], {
       resourceType: "person",
       apiBaseUrl: "/agent-api"
+    });
+    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+  });
+
+  it("Provides a bulkLoadResources function that can get multiple objects by id with includes", async () => {
+    const response = await bulkLoadResources(["1", "2", "3"], {
+      resourceType: "person",
+      apiBaseUrl: "/agent-api",
+      include: ["organizations"]
     });
     expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
   });
