@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { FormikErrors } from "formik";
 import Kitsu, {
   GetParams,
@@ -27,6 +27,30 @@ export interface BulkGetOptions {
   joinSpecs?: ClientSideJoinSpec[];
 
   /** Return null for missing resource instead of throwing an Error. */
+  returnNullForMissingResource?: boolean;
+}
+
+export interface BulkLoadResourcesOptions {
+  apiBaseUrl: string;
+  resourceType: string;
+  include?: string[];
+  returnNullForMissingResource?: boolean;
+}
+
+export interface BulkDeleteResourcesOptions {
+  apiBaseUrl?: string;
+  resourceType: string;
+  returnNullForMissingResource?: boolean;
+}
+
+export interface BulkCreateResourcesOptions {
+  apiBaseUrl?: string;
+  resourceType: string;
+}
+
+export interface BulkUpdateResourcesOptions {
+  apiBaseUrl?: string;
+  resourceType: string;
   returnNullForMissingResource?: boolean;
 }
 
@@ -77,6 +101,26 @@ export interface ApiClientI {
       ? PersistedResource<T> | null
       : PersistedResource<T>)[]
   >;
+
+  bulkLoadResources: (
+    ids: string[],
+    options?: BulkLoadResourcesOptions
+  ) => Promise<AxiosResponse>;
+
+  bulkCreateResources: (
+    resources: InputResource<KitsuResource>[],
+    options?: BulkCreateResourcesOptions
+  ) => Promise<AxiosResponse>;
+
+  bulkUpdateResources: (
+    resources: InputResource<KitsuResource>[],
+    options?: BulkUpdateResourcesOptions
+  ) => Promise<AxiosResponse>;
+
+  bulkDeleteResources: (
+    ids: string[],
+    options?: BulkDeleteResourcesOptions
+  ) => Promise<AxiosResponse>;
 }
 
 /** Config for creating an API client. */
@@ -157,6 +201,10 @@ export class ApiClientImpl implements ApiClientI {
     this.doOperations = this.doOperations.bind(this);
     this.save = this.save.bind(this);
     this.bulkGet = this.bulkGet.bind(this);
+    this.bulkLoadResources = this.bulkLoadResources.bind(this);
+    this.bulkCreateResources = this.bulkCreateResources.bind(this);
+    this.bulkUpdateResources = this.bulkUpdateResources.bind(this);
+    this.bulkDeleteResources = this.bulkDeleteResources.bind(this);
   }
 
   /**
@@ -184,10 +232,11 @@ export class ApiClientImpl implements ApiClientI {
     const { axios } = this.apiClient;
 
     // This array will hold the responses from either the single or bulk request
-    let responses: OperationsResponse | BulkGetOperation[];
+    let responses: OperationsResponse | BulkGetOperation[] = [];
 
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
+
     if (operations.length === 1 && skipOperationForSingleRequest) {
       // Single Request Only
       const operation = operations[0];
@@ -255,7 +304,6 @@ export class ApiClientImpl implements ApiClientI {
           throw new Error(`Unsupported single operation: ${operation.op}`);
       }
     } else {
-      // Perform operations
       const axiosResponse = await axios.patch(
         `${apiBaseUrl}/operations`,
         operations,
@@ -355,6 +403,177 @@ export class ApiClientImpl implements ApiClientI {
     const kitsuResources = deserialized.map(({ data }) => data);
 
     return kitsuResources;
+  }
+
+  /**
+   * Bulk load resources by their IDs.
+   * @param ids - The IDs of the resources to load.
+   * @param options - Options for the bulk load operation.
+   */
+  public async bulkLoadResources(
+    ids: string[],
+    {
+      apiBaseUrl,
+      resourceType,
+      include,
+      returnNullForMissingResource = false
+    }: BulkLoadResourcesOptions
+  ) {
+    const requestBody = {
+      data: ids.map((id) => ({
+        type: resourceType,
+        id: id
+      }))
+    };
+
+    const { axios } = this.apiClient;
+    const url = include
+      ? `${apiBaseUrl}/${resourceType}/bulk-load?include=${include.join(",")}`
+      : `${apiBaseUrl}/${resourceType}/bulk-load`;
+
+    try {
+      const response = await axios.post(url, requestBody, {
+        headers: {
+          "Content-Type": "application/vnd.api+json; ext=bulk",
+          Accept: "application/vnd.api+json"
+        }
+      });
+      response.data = deserialise(response.data);
+      return response;
+    } catch (error) {
+      if (returnNullForMissingResource) {
+        throw error; // placeholder for future implementation
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Bulk create resources.
+   * @param resources - The resources to create.
+   * @param options - Options for the bulk create operation.
+   */
+  public async bulkCreateResources(
+    resources: InputResource<KitsuResource>[],
+    { apiBaseUrl = "", resourceType }: BulkCreateResourcesOptions
+  ): Promise<AxiosResponse> {
+    const serializedResources = await Promise.all(
+      resources.map((resource) => serialize({ resource, type: resourceType }))
+    );
+
+    const requestBody = {
+      data: serializedResources
+    };
+
+    const { axios } = this.apiClient;
+
+    try {
+      const response = await axios.post(
+        `${apiBaseUrl}/${resourceType}/bulk`,
+        requestBody,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json; ext=bulk",
+            Accept: "application/vnd.api+json"
+          }
+        }
+      );
+      response.data = deserialise(response.data);
+      return response;
+    } catch (error) {
+      console.error(`Error bulk creating resources for ${resourceType}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Bulk update resources.
+   * @param resources - The resources to update.
+   * @param options - Options for the bulk update operation.
+   */
+  public async bulkUpdateResources(
+    resources: InputResource<KitsuResource>[],
+    {
+      apiBaseUrl = "",
+      resourceType,
+      returnNullForMissingResource = false
+    }: BulkUpdateResourcesOptions
+  ): Promise<AxiosResponse> {
+    const serializedResources = await Promise.all(
+      resources.map((resource) => serialize({ resource, type: resourceType }))
+    );
+
+    const requestBody = {
+      data: serializedResources
+    };
+
+    const { axios } = this.apiClient;
+
+    try {
+      const response = await axios.patch(
+        `${apiBaseUrl}/${resourceType}/bulk`,
+        requestBody,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json; ext=bulk",
+            Accept: "application/vnd.api+json"
+          }
+        }
+      );
+      response.data = deserialise(response.data);
+      return response;
+    } catch (error) {
+      if (returnNullForMissingResource) {
+        throw error; // placeholder for future implementation
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Bulk delete resources.
+   * @param ids - The IDs of the resources to delete.
+   * @param options - Options for the bulk delete operation.
+   */
+  public async bulkDeleteResources(
+    ids: string[],
+    {
+      apiBaseUrl,
+      resourceType,
+      returnNullForMissingResource = false
+    }: BulkDeleteResourcesOptions
+  ) {
+    const data = {
+      data: ids.map((id) => ({
+        type: resourceType,
+        id: id
+      }))
+    };
+
+    const { axios } = this.apiClient;
+
+    try {
+      const response = await axios.delete(
+        `${apiBaseUrl}/${resourceType}/bulk`,
+        {
+          data: data,
+          headers: {
+            "Content-Type": "application/vnd.api+json; ext=bulk",
+            Accept: "application/vnd.api+json"
+          }
+        }
+      );
+      response.data = deserialise(response.data);
+      return response;
+    } catch (error) {
+      if (returnNullForMissingResource) {
+        throw error; // placeholder for future implementation
+      } else {
+        throw error;
+      }
+    }
   }
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
