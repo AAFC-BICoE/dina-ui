@@ -463,9 +463,7 @@ export class ApiClientImpl implements ApiClientI {
     );
 
     const requestBody = {
-      data: serializedResources.map((resource) => ({
-        ...resource
-      }))
+      data: serializedResources
     };
 
     const { axios } = this.apiClient;
@@ -507,9 +505,7 @@ export class ApiClientImpl implements ApiClientI {
     );
 
     const requestBody = {
-      data: serializedResources.map((resource) => ({
-        ...resource
-      }))
+      data: serializedResources
     };
 
     const { axios } = this.apiClient;
@@ -547,7 +543,7 @@ export class ApiClientImpl implements ApiClientI {
       apiBaseUrl,
       resourceType,
       returnNullForMissingResource = false
-    }: BulkLoadResourcesOptions
+    }: BulkDeleteResourcesOptions
   ) {
     const data = {
       data: ids.map((id) => ({
