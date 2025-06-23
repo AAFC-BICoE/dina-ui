@@ -1,7 +1,7 @@
 import { CollapsibleSection, ReactTable } from "../../../../common-ui/lib";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SequencingRunItem } from "./useGenericMolecularAnalysisRun";
-import { ColumnDef, Row } from "@tanstack/table-core";
+import { ColumnDef } from "@tanstack/table-core";
 import DataPasteZone from "../../molecular-analysis/DataPasteZone";
 import { Dispatch, SetStateAction, useState } from "react";
 
@@ -20,32 +20,31 @@ export default function SequencingRunContentSection({
   editMode,
   setMolecularAnalysisRunItemNames
 }: SequencingRunContentSectionProps) {
-  const [rowModel, setRowModel] = useState<
-    Row<SequencingRunItem>[] | undefined
-  >([]);
+  const [sequencingRunItemsInternal, setSequencingRunItemsInternal] = useState<
+    SequencingRunItem[] | undefined
+  >(sequencingRunItems);
   const onDataPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const clipboardData = event.clipboardData.getData("text/plain");
     const names = clipboardData.trim().split("\n");
     const molecularAnalysisRunItemNamesMap = {};
-    if (rowModel) {
-      const newSequencingRunItems = [...rowModel];
+    if (sequencingRunItemsInternal) {
+      const newSequencingRunItems = [...sequencingRunItemsInternal];
       newSequencingRunItems?.forEach((sequencingRunitem, index) => {
-        const materialSampleId = sequencingRunitem.original.materialSampleId;
+        const materialSampleId = sequencingRunitem.materialSampleId;
         if (materialSampleId) {
           molecularAnalysisRunItemNamesMap[materialSampleId] = names[index];
-          if (!sequencingRunitem.original.molecularAnalysisRunItem) {
-            sequencingRunitem.original.molecularAnalysisRunItem = {
+          if (!sequencingRunitem.molecularAnalysisRunItem) {
+            sequencingRunitem.molecularAnalysisRunItem = {
               type: "molecular-analysis-run-item",
               name: names[index],
               usageType: ""
             };
           } else {
-            sequencingRunitem.original.molecularAnalysisRunItem.name =
-              names[index];
+            sequencingRunitem.molecularAnalysisRunItem.name = names[index];
           }
         }
       });
-      setRowModel(newSequencingRunItems);
+      setSequencingRunItemsInternal(newSequencingRunItems);
       setMolecularAnalysisRunItemNames?.(molecularAnalysisRunItemNamesMap);
     }
   };
@@ -64,7 +63,6 @@ export default function SequencingRunContentSection({
           data={sequencingRunItems ?? []}
           sort={[{ id: "materialSampleName", desc: false }]}
           showPagination={true}
-          setResourceRowModel={setRowModel}
         />
         {editMode && (
           <div className="mt-3">

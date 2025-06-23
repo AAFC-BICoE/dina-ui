@@ -15,7 +15,6 @@ import {
 } from "../object-store-utils";
 import Kitsu from "kitsu";
 import { formatBytes } from "../object-store-utils";
-import Link from "next/link";
 
 export interface DerivativeListProps {
   metadata: Metadata;
@@ -104,19 +103,23 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
             header: () => <DinaMessage id="actions" />,
             cell: ({
               row: {
-                original: { id, bucket, fileIdentifier }
+                original: { fileIdentifier, bucket }
               }
             }) => (
               <div className="d-flex justify-content-center">
                 {/* View Button */}
-                <Link
-                  href={`/object-store/derivative/view?id=${id}`}
-                  passHref={true}
+                <a
+                  onClick={() => {
+                    setSelectedDerivativePath(
+                      `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`
+                    );
+                    setIsDownloading(false);
+                  }}
                   className="btn btn-primary"
                 >
                   <FaUpRightFromSquare className="me-2" />
                   <DinaMessage id="view" />
-                </Link>
+                </a>
 
                 {/* Download Button */}
                 <DownloadButton

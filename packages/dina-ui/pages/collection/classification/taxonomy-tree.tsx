@@ -6,7 +6,7 @@ export default function TaxonomyTreePage() {
   return (
     <>
       <PageLayout
-        titleId="taxonomicHierarchy"
+        titleId="scientificName"
         buttonBarContent={
           <>
             <div className="col-md-6 col-sm-12 mt-2">
@@ -20,7 +20,7 @@ export default function TaxonomyTreePage() {
         }
       >
         <DinaForm initialValues={{}}>
-          <TaxonomyTree />
+          <TaxonomyTree></TaxonomyTree>
         </DinaForm>
       </PageLayout>
     </>
