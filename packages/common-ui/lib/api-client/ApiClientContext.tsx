@@ -21,7 +21,6 @@ import {
 } from "./operations-types";
 import DataLoader from "dataloader";
 import { buildMemoryStorage, setupCache } from "axios-cache-interceptor";
-import { ResourceObject } from "jsonapi-typescript";
 
 export interface BulkGetOptions {
   apiBaseUrl?: string;
@@ -463,11 +462,15 @@ export class ApiClientImpl implements ApiClientI {
   }
 
   public async bulkCreateResources(
-    resources: ResourceObject[],
+    resources: InputResource<KitsuResource>[],
     { apiBaseUrl = "", resourceType }: BulkCreateResourcesOptions
   ): Promise<AxiosResponse> {
+    const serializedResources = await Promise.all(
+      resources.map((resource) => serialize({ resource, type: resourceType }))
+    );
+
     const requestBody = {
-      data: resources.map((resource) => ({
+      data: serializedResources.map((resource) => ({
         ...resource
       }))
     };
