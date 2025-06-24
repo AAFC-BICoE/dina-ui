@@ -220,8 +220,7 @@ export function StorageUnitFormFields({
           readOnlyRender={(_, form) => (
             <StorageUnitBreadCrumb
               storageUnit={form.values}
-              // Don't show this storage unit in the breadcrumb:
-              hideThisUnit={true}
+              hideThisUnit={false}
             />
           )}
         />
