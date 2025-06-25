@@ -30,16 +30,16 @@ const columns: TableColumn<any>[] = [
         original: { included }
       }
     }) => {
-      if (!included?.["storage-unit-type"]?.id) {
+      if (!included?.storageUnitType?.id) {
         return null;
       }
 
       return (
         <Link
-          href={`/collection/storage-unit-type/view?id=${included?.["storage-unit-type"]?.id}`}
+          href={`/collection/storage-unit-type/view?id=${included?.storageUnitType?.id}`}
           passHref={true}
         >
-          {included?.["storage-unit-type"]?.attributes?.name}
+          {included?.storageUnitType?.attributes?.name}
         </Link>
       );
     },
