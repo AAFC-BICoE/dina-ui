@@ -714,9 +714,8 @@ export class DoOperationsError extends Error {
 export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   if (error.isAxiosError) {
     let errorMessage = `${error.config?.url}: ${error.response?.statusText}`;
-
-    // If the error is a 404 or 410, and the URL ends with "bulk", throw full error for handling in function.
-    if (error.request.responseURL.split("/") === "bulk-load") {
+    // If the error is a 404 or 410, and the endpoint is "bulk-load", throw full error for handling in function.
+    if (error.request.responseURL.split("/").at(-1) === "bulk-load") {
       if ([404, 410].includes(error.response?.status as number)) {
         throw error;
       }
