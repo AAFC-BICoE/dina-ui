@@ -419,34 +419,71 @@ export class ApiClientImpl implements ApiClientI {
       returnNullForMissingResource = false
     }: BulkLoadResourcesOptions
   ) {
-    const requestBody = {
-      data: ids.map((id) => ({
-        type: resourceType,
-        id: id
-      }))
-    };
-
     const { axios } = this.apiClient;
     const url = include
       ? `${apiBaseUrl}/${resourceType}/bulk-load?include=${include.join(",")}`
       : `${apiBaseUrl}/${resourceType}/bulk-load`;
+    let response: AxiosResponse = undefined as any;
+    const missingIds: string[] = [];
+    const originalIds = [...ids]; // Keep the original IDs for later reference.
 
-    try {
-      const response = await axios.post(url, requestBody, {
-        headers: {
-          "Content-Type": "application/vnd.api+json; ext=bulk",
-          Accept: "application/vnd.api+json"
+    let counter = 0;
+    while (counter < 3) {
+      const requestBody = {
+        data: ids.map((id) => ({
+          type: resourceType,
+          id: id
+        }))
+      };
+      try {
+        response = await axios.post(url, requestBody, {
+          headers: {
+            "Content-Type": "application/vnd.api+json; ext=bulk",
+            Accept: "application/vnd.api+json"
+          }
+        });
+        break;
+      } catch (error) {
+        // if returnNullForMissingResource is true, we will handle the error
+        // by returning null for the missing resources instead of throwing an error.
+        if (returnNullForMissingResource) {
+          const errors = error.response.data.errors;
+          const missingIdsThisRun = errors.map((err: any) =>
+            err.source.pointer.split("/").at(-1)
+          );
+          missingIds.push(...missingIdsThisRun);
+          ids = ids.filter((id) => !missingIds.includes(id));
+        } else {
+          throw error;
         }
-      });
-      response.data = deserialise(response.data);
-      return response;
-    } catch (error) {
-      if (returnNullForMissingResource) {
-        throw error; // placeholder for future implementation
-      } else {
-        throw error;
       }
+      counter++;
     }
+
+    let responseCounter = 0;
+    const newResponseData: any[] = [];
+
+    // If there are missing IDs, we need to fill in the gaps with nulls.
+    if (missingIds.length != 0) {
+      for (const id of originalIds) {
+        if (missingIds.includes(id)) {
+          newResponseData.push(null);
+        } else {
+          newResponseData.push(
+            deserialise(response?.data.data[responseCounter])
+          );
+          responseCounter++;
+        }
+      }
+
+      (response as AxiosResponse).data.data = newResponseData;
+      return response;
+    }
+
+    (response as AxiosResponse).data = deserialise(
+      (response as AxiosResponse).data
+    );
+    return response;
   }
 
   /**
@@ -712,6 +749,12 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   if (error.isAxiosError) {
     let errorMessage = `${error.config?.url}: ${error.response?.statusText}`;
 
+    // If the error is a 404 or 410, and the URL ends with "bulk", throw full error for handling in function.
+    if (error.request.responseURL.split("/").at(-1).includes("bulk")) {
+      if ([404, 410].includes(error.response?.status as number)) {
+        throw error;
+      }
+    }
     // Special case: Make 502 "bad gateway" messages more user-friendly:
     if (error.response?.status === 502) {
       errorMessage = `Service unavailable:\n${errorMessage}`;
