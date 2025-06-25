@@ -1,6 +1,5 @@
 import { CreateButton, FieldHeader, QueryPage, dateCell } from "common-ui";
 import Link from "next/link";
-import { StorageUnitBreadCrumb } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
 import { TableColumn } from "common-ui/lib/list-page/types";
 
@@ -58,15 +57,16 @@ const columns: TableColumn<any>[] = [
       row: {
         original: { data }
       }
-    }) => (
-      <StorageUnitBreadCrumb
-        storageUnit={data?.attributes}
-        hideThisUnit={true}
-      />
-    ),
+    }) => {
+      const parentRank = data?.attributes?.hierarchy?.find(
+        (item) => item.rank === 2
+      );
+      return <>{parentRank?.name}</>;
+    },
     header: () => <FieldHeader name="location" />,
     enableSorting: false,
-    isKeyword: true
+    isKeyword: true,
+    additionalAccessors: ["data.attributes.hierarchy"]
   },
 
   // Group
