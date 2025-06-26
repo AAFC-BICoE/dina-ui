@@ -30,7 +30,7 @@ import "../components/button-bar/nav/nav.css";
 import "../components/button-bar/nav/wet-beow-bootstrap-4.css";
 import "../components/button-bar/nav/wet-beow-override.css";
 import "./bootstrap-print.css";
-import "react-awesome-query-builder/lib/css/styles.css";
+import "@react-awesome-query-builder/ui/css/styles.css";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
 

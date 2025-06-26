@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
+import {
+  ImmutableTree,
+  JsonTree,
+  Utils
+} from "@react-awesome-query-builder/ui";
 import { useSessionStorage } from "usehooks-ts";
 import { defaultJsonTree } from "../..";
 import { createSessionStorageLastUsedTreeKey } from "../saved-searches/SavedSearch";

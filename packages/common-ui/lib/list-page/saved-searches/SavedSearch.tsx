@@ -19,7 +19,7 @@ import {
   ImmutableTree,
   Utils,
   JsonTree
-} from "react-awesome-query-builder";
+} from "@react-awesome-query-builder/ui";
 import {
   SavedSearchStructure,
   SingleSavedSearch,
