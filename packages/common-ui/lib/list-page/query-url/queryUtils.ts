@@ -3,7 +3,7 @@ import {
   ImmutableTree,
   JsonTree,
   Utils
-} from "react-awesome-query-builder";
+} from "@react-awesome-query-builder/ui";
 import { SimpleQueryGroup, SimpleQueryRow } from "./types";
 import { isDynamicFieldType } from "../types";
 import { ManagedAttributeSearchStates } from "../query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";

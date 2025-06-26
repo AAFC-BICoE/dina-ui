@@ -1,7 +1,7 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { KitsuResource } from "kitsu";
 import { useMemo, useState } from "react";
-import { JsonTree } from "react-awesome-query-builder";
+import { JsonTree } from "@react-awesome-query-builder/ui";
 import Select from "react-select";
 import { FieldSet, QueryPage, QueryPageProps } from "..";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../dina-ui/intl/dina-ui-en";

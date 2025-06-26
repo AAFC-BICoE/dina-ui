@@ -1,12 +1,12 @@
 import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import { useState } from "react";
-import { FieldItems } from "react-awesome-query-builder";
+import { FieldItem } from "@react-awesome-query-builder/ui";
 import { QueryOperatorSelector } from "../QueryOperatorSelector";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-const OPERATOR_OPTIONS: FieldItems = [
+const OPERATOR_OPTIONS: FieldItem[] = [
   {
     key: "contains",
     label: "Contains"

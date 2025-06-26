@@ -1,9 +1,9 @@
 import Select from "react-select";
-import { FieldItems } from "react-awesome-query-builder";
+import { FieldItem } from "@react-awesome-query-builder/ui";
 import { ESIndexMapping } from "../../types";
 
 interface QueryOperatorSelectorProps {
-  options?: FieldItems;
+  options?: FieldItem[];
 
   /**
    * Operator selected from Query Builder.

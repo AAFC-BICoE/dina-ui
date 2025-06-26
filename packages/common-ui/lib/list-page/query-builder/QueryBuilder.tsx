@@ -1,11 +1,14 @@
 import { LoadingSpinner } from "../..";
-import { Query, Builder, Utils, JsonTree } from "react-awesome-query-builder";
 import { createContext, useCallback, useContext, useState } from "react";
 import {
   Config,
   ImmutableTree,
-  BuilderProps
-} from "react-awesome-query-builder";
+  BuilderProps,
+  Query,
+  Builder,
+  Utils,
+  JsonTree
+} from "@react-awesome-query-builder/ui";
 import React from "react";
 import { Button } from "react-bootstrap";
 import { SavedSearch } from "../saved-searches/SavedSearch";
@@ -214,8 +217,8 @@ const ruleId = "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6";
 export const defaultJsonTree = {
   id: groupId,
   type: "group",
-  children1: {
-    "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6": {
+  children1: [
+    {
       type: "rule",
       id: ruleId,
       properties: {
@@ -224,10 +227,9 @@ export const defaultJsonTree = {
         value: [],
         valueSrc: [],
         valueError: []
-      },
-      path: [groupId, ruleId]
+      }
     }
-  },
+  ],
   properties: { conjunction: "AND" },
   path: [groupId]
 } as JsonTree;
@@ -263,8 +265,8 @@ export function generateUUIDTree(uuid: string, path: string): JsonTree {
   return {
     id: Utils.uuid(),
     type: "group",
-    children1: {
-      [Utils.uuid()]: {
+    children1: [
+      {
         type: "rule",
         properties: {
           field: path,
@@ -272,7 +274,7 @@ export function generateUUIDTree(uuid: string, path: string): JsonTree {
           value: [uuid]
         }
       }
-    }
+    ]
   };
 }
 

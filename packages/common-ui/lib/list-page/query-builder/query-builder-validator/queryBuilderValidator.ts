@@ -1,4 +1,4 @@
-import { JsonTree, Config } from "react-awesome-query-builder";
+import { JsonTree, Config } from "@react-awesome-query-builder/ui";
 
 /**
  * The purpose of this function is to check for any issues with the query.

@@ -1,7 +1,7 @@
 import { ColumnSort } from "@tanstack/react-table";
 import { KitsuResource } from "kitsu";
 import _ from "lodash";
-import { Config, ImmutableTree } from "react-awesome-query-builder";
+import { Config, ImmutableTree } from "@react-awesome-query-builder/ui";
 import { TableColumn } from "../../types";
 import {
   SupportedBetweenTypes,
@@ -48,7 +48,7 @@ export function elasticSearchFormatExport(
   const type = queryTree.get("type");
   const properties = queryTree.get("properties") || new Map();
 
-  if (type === "rule" && properties.get("field")) {
+  if (properties.get("field")) {
     const operator = properties.get("operator");
     const field = properties.get("field");
     const value = properties.get("value").toJS();
@@ -56,7 +56,7 @@ export function elasticSearchFormatExport(
     return buildEsRule(field, value, operator, config);
   }
 
-  if (type === "group" || type === "rule_group") {
+  if (type === "group" || type === "switch_group") {
     let conjunction = properties.get("conjunction");
     if (!conjunction) conjunction = "AND";
 

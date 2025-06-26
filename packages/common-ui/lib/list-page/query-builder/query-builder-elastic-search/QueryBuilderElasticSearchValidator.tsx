@@ -1,4 +1,4 @@
-import { Config, ImmutableTree } from "react-awesome-query-builder";
+import { Config, ImmutableTree } from "@react-awesome-query-builder/ui";
 import { validateDate } from "../query-builder-value-types/QueryBuilderDateSearch";
 import { validateNumber } from "../query-builder-value-types/QueryBuilderNumberSearch";
 import { validateManagedAttribute } from "../query-builder-value-types/QueryBuilderManagedAttributeSearch";
@@ -68,14 +68,14 @@ function elasticSearchFormatValidator(
   const type = queryTree.get("type");
   const properties = queryTree.get("properties") || new Map();
 
-  if (type === "rule" && properties.get("field")) {
+  if (properties.get("field")) {
     const operator = properties.get("operator");
     const field = properties.get("field");
     const value = properties.get("value").toJS();
     return validateEsRule(field, value, operator, config, formatMessage);
   }
 
-  if (type === "group" || type === "rule_group") {
+  if (type === "group" || type === "switch_group") {
     let conjunction = properties.get("conjunction");
     if (!conjunction) conjunction = "AND";
     const children = queryTree.get("children1");
