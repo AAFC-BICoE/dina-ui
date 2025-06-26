@@ -29,7 +29,10 @@ import {
   MOCK_TODO_INSERT_AXIOS_RESPONSE,
   TODO_OPERATION_1_VALID_2_INVALID,
   TODO_OPERATION_DENY_ACCESS,
-  AXIOS_JSONPATCH_REQUEST_CONFIG
+  AXIOS_JSONPATCH_REQUEST_CONFIG,
+  MOCK_BULK_GET_RESPONSE_DESERIALIZED,
+  MOCK_BULK_UPDATE_RESPONSE_DESERIALIZED,
+  MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS_DESERIALIZED
 } from "../__mocks__/ApiClientContextMocks";
 
 /** Mock of Axios' patch function. */
@@ -52,7 +55,7 @@ const mockPost = jest.fn((url, data) => {
   if (url.includes("bulk-load")) {
     if (url.includes("include=")) {
       const includes = url.split("=").slice(-1)[0].split(",");
-      if (includes === "organizations") {
+      if (includes.includes("organizations")) {
         return MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS;
       }
     }
@@ -763,7 +766,7 @@ Constraint violation: description size must be between 1 and 10`;
       resourceType: "person",
       apiBaseUrl: "/agent-api"
     });
-    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+    expect(response).toEqual(MOCK_BULK_GET_RESPONSE_DESERIALIZED);
   });
 
   it("Provides a bulkLoadResources function that can get multiple objects by id with includes", async () => {
@@ -772,7 +775,9 @@ Constraint violation: description size must be between 1 and 10`;
       apiBaseUrl: "/agent-api",
       include: ["organizations"]
     });
-    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+    expect(response).toEqual(
+      MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS_DESERIALIZED
+    );
   });
 
   it("Provides a bulkDeleteResources function that can delete multiple objects by id", async () => {
@@ -788,7 +793,7 @@ Constraint violation: description size must be between 1 and 10`;
       resourceType: "person",
       apiBaseUrl: "/agent-api"
     });
-    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+    expect(response).toEqual(MOCK_BULK_GET_RESPONSE_DESERIALIZED);
   });
 
   it("Provides a bulkUpdateResources function that can update multiple objects", async () => {
@@ -796,6 +801,6 @@ Constraint violation: description size must be between 1 and 10`;
       resourceType: "person",
       apiBaseUrl: "/agent-api"
     });
-    expect(response).toEqual(MOCK_BULK_UPDATE_RESPONSE);
+    expect(response).toEqual(MOCK_BULK_UPDATE_RESPONSE_DESERIALIZED);
   });
 });

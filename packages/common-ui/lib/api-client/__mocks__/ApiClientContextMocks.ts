@@ -196,6 +196,39 @@ export const MOCK_BULK_GET_RESPONSE = {
   status: 200
 };
 
+export const MOCK_BULK_GET_RESPONSE_DESERIALIZED = {
+  data: {
+    data: [
+      {
+        displayName: "person 1",
+        relationships: {
+          organizations: {
+            data: [
+              {
+                id: "12345678-1234-1234-1234-123456789012",
+                type: "organization"
+              }
+            ]
+          }
+        },
+        id: "1",
+        type: "person"
+      },
+      {
+        displayName: "person 2",
+        id: "2",
+        type: "person"
+      },
+      {
+        displayName: "person 3",
+        id: "3",
+        type: "person"
+      }
+    ]
+  },
+  status: 200
+};
+
 export const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS = {
   data: {
     data: [
@@ -225,12 +258,55 @@ export const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS = {
         type: "person"
       },
       {
-        attributes: { displayName: "person 2" },
+        displayName: "person 2",
         id: "2",
         type: "person"
       },
       {
-        attributes: { displayName: "person 3" },
+        displayName: "person 3",
+        id: "3",
+        type: "person"
+      }
+    ]
+  },
+  status: 200
+};
+
+export const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS_DESERIALIZED = {
+  data: {
+    data: [
+      {
+        displayName: "person 1",
+        relationships: {
+          organizations: {
+            data: [
+              {
+                id: "12345678-1234-1234-1234-123456789012",
+                type: "organization",
+                attributes: {
+                  createdBy: "dina-admin",
+                  createdOn: "2023-10-01T00:00:00Z",
+                  names: [
+                    {
+                      languageCode: "EN",
+                      name: "Test Organization"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        id: "1",
+        type: "person"
+      },
+      {
+        displayName: "person 2",
+        id: "2",
+        type: "person"
+      },
+      {
+        displayName: "person 3",
         id: "3",
         type: "person"
       }
@@ -340,6 +416,29 @@ export const MOCK_BULK_UPDATE_RESPONSE = {
       },
       {
         attributes: { displayName: "updated person 3" },
+        id: "3",
+        type: "person"
+      }
+    ]
+  },
+  status: 200
+};
+
+export const MOCK_BULK_UPDATE_RESPONSE_DESERIALIZED = {
+  data: {
+    data: [
+      {
+        displayName: "updated person 1",
+        id: "1",
+        type: "person"
+      },
+      {
+        displayName: "updated person 2",
+        id: "2",
+        type: "person"
+      },
+      {
+        displayName: "updated person 3",
         id: "3",
         type: "person"
       }
