@@ -36,9 +36,12 @@ import {
   MOCK_BULK_GET_410_ERROR_OBJECT,
   MOCK_BULK_GET_410_404_ERROR_INPUT,
   MOCK_BULK_GET_404_ERROR_INPUT_2,
-  MOCK_BULK_GET_404_RESPONSE,
-  MOCK_BULK_GET_410_RESPONSE,
-  MOCK_BULK_GET_410_404_RESPONSE
+  MOCK_BULK_GET_RESPONSE_DESERIALIZED,
+  MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS_DESERIALIZED,
+  MOCK_BULK_UPDATE_RESPONSE_DESERIALIZED,
+  MOCK_BULK_GET_404_RESPONSE_DESERIALIZED,
+  MOCK_BULK_GET_410_RESPONSE_DESERIALIZED,
+  MOCK_BULK_GET_410_404_RESPONSE_DESERIALIZED
 } from "../__mocks__/ApiClientContextMocks";
 
 /** Mock of Axios' patch function. */
@@ -61,24 +64,24 @@ const mockPost = jest.fn((url, data) => {
   if (url.includes("bulk-load")) {
     if (url.includes("include=")) {
       const includes = url.split("=").slice(-1)[0].split(",");
-      if (includes === "organizations") {
-        return MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS;
+      if (includes.includes("organizations")) {
+        return Promise.resolve(MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS);
       }
     }
     if (isEqual(data, MOCK_BULK_GET_DATA)) {
-      return MOCK_BULK_GET_RESPONSE;
+      return Promise.resolve(MOCK_BULK_GET_RESPONSE);
     }
     if (isEqual(data, MOCK_BULK_GET_404_ERROR_INPUT)) {
-      throw MOCK_BULK_GET_404_ERROR_OBJECT;
+      return Promise.reject(MOCK_BULK_GET_404_ERROR_OBJECT);
     }
     if (isEqual(data, MOCK_BULK_GET_410_ERROR_INPUT)) {
-      throw MOCK_BULK_GET_410_ERROR_OBJECT;
+      return Promise.reject(MOCK_BULK_GET_410_ERROR_OBJECT);
     }
     if (isEqual(data, MOCK_BULK_GET_410_404_ERROR_INPUT)) {
-      throw MOCK_BULK_GET_410_ERROR_OBJECT;
+      return Promise.reject(MOCK_BULK_GET_410_ERROR_OBJECT);
     }
     if (isEqual(data, MOCK_BULK_GET_404_ERROR_INPUT_2)) {
-      throw MOCK_BULK_GET_404_ERROR_OBJECT;
+      return Promise.reject(MOCK_BULK_GET_404_ERROR_OBJECT);
     }
   } else {
     if (isEqual(data.data, MOCK_BULK_CREATE_DATA)) {
@@ -114,7 +117,9 @@ apiClient.axios = {
 } as any;
 
 describe("API client context", () => {
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it("Provides an API client instance.", () => {
     expect(apiClient instanceof Kitsu).toEqual(true);
@@ -784,7 +789,7 @@ Constraint violation: description size must be between 1 and 10`;
       resourceType: "person",
       apiBaseUrl: "/agent-api"
     });
-    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+    expect(response).toEqual(MOCK_BULK_GET_RESPONSE_DESERIALIZED);
   });
 
   it("Provides a bulkLoadResources function that can get multiple objects by id with includes", async () => {
@@ -793,7 +798,9 @@ Constraint violation: description size must be between 1 and 10`;
       apiBaseUrl: "/agent-api",
       include: ["organizations"]
     });
-    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+    expect(response).toEqual(
+      MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS_DESERIALIZED
+    );
   });
 
   it("Provides a bulkDeleteResources function that can delete multiple objects by id", async () => {
@@ -809,7 +816,7 @@ Constraint violation: description size must be between 1 and 10`;
       resourceType: "person",
       apiBaseUrl: "/agent-api"
     });
-    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+    expect(response).toEqual(MOCK_BULK_GET_RESPONSE_DESERIALIZED);
   });
 
   it("Provides a bulkUpdateResources function that can update multiple objects", async () => {
@@ -817,7 +824,7 @@ Constraint violation: description size must be between 1 and 10`;
       resourceType: "person",
       apiBaseUrl: "/agent-api"
     });
-    expect(response).toEqual(MOCK_BULK_UPDATE_RESPONSE);
+    expect(response).toEqual(MOCK_BULK_UPDATE_RESPONSE_DESERIALIZED);
   });
 
   it("Provides a bulkLoadResources function that can handle 404 errors and fill in missing resources with nulls", async () => {
@@ -830,7 +837,7 @@ Constraint violation: description size must be between 1 and 10`;
       }
     );
 
-    expect(response).toEqual(MOCK_BULK_GET_404_RESPONSE);
+    expect(response).toEqual(MOCK_BULK_GET_404_RESPONSE_DESERIALIZED);
   });
 
   it("Provides a bulkLoadResources function that can handle 410 errors and fill in missing resources with nulls", async () => {
@@ -843,7 +850,7 @@ Constraint violation: description size must be between 1 and 10`;
       }
     );
 
-    expect(response).toEqual(MOCK_BULK_GET_410_RESPONSE);
+    expect(response).toEqual(MOCK_BULK_GET_410_RESPONSE_DESERIALIZED);
   });
 
   it("Provides a bulkLoadResources function that can handle 410 and 404 errors and fill in missing resources with nulls", async () => {
@@ -864,6 +871,6 @@ Constraint violation: description size must be between 1 and 10`;
       }
     );
 
-    expect(response).toEqual(MOCK_BULK_GET_410_404_RESPONSE);
+    expect(response).toEqual(MOCK_BULK_GET_410_404_RESPONSE_DESERIALIZED);
   });
 });

@@ -455,7 +455,6 @@ export class ApiClientImpl implements ApiClientI {
           throw error;
         }
       }
-      i++;
     }
 
     let responseCounter = 0;
@@ -715,7 +714,11 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   if (error.isAxiosError) {
     let errorMessage = `${error.config?.url}: ${error.response?.statusText}`;
     // If the error is a 404 or 410, and the endpoint is "bulk-load", throw full error for handling in function.
-    if (error.request.responseURL.split("/").at(-1).includes("bulk-load")) {
+
+    if (
+      error.request &&
+      error.request.responseURL.split("/").at(-1).includes("bulk-load")
+    ) {
       if ([404, 410].includes(error.response?.status as number)) {
         throw error;
       }
