@@ -425,8 +425,8 @@ export class ApiClientImpl implements ApiClientI {
     const missingIds: string[] = [];
     const originalIds = [...ids]; // Keep the original IDs for later reference.
 
-    let counter = 0;
-    while (counter < 3) {
+    // run this max 3 times, worst case is 410 error, then 404 error, then success.
+    for (let i = 0; i < 3; i++) {
       const requestBody = {
         data: ids.map((id) => ({
           type: resourceType,
@@ -455,7 +455,7 @@ export class ApiClientImpl implements ApiClientI {
           throw error;
         }
       }
-      counter++;
+      i++;
     }
 
     let responseCounter = 0;
@@ -715,7 +715,7 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   if (error.isAxiosError) {
     let errorMessage = `${error.config?.url}: ${error.response?.statusText}`;
     // If the error is a 404 or 410, and the endpoint is "bulk-load", throw full error for handling in function.
-    if (error.request.responseURL.split("/").at(-1) === "bulk-load") {
+    if (error.request.responseURL.split("/").at(-1).includes("bulk-load")) {
       if ([404, 410].includes(error.response?.status as number)) {
         throw error;
       }

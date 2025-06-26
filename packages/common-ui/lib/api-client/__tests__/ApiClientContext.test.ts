@@ -29,7 +29,16 @@ import {
   MOCK_TODO_INSERT_AXIOS_RESPONSE,
   TODO_OPERATION_1_VALID_2_INVALID,
   TODO_OPERATION_DENY_ACCESS,
-  AXIOS_JSONPATCH_REQUEST_CONFIG
+  AXIOS_JSONPATCH_REQUEST_CONFIG,
+  MOCK_BULK_GET_404_ERROR_OBJECT,
+  MOCK_BULK_GET_404_ERROR_INPUT,
+  MOCK_BULK_GET_410_ERROR_INPUT,
+  MOCK_BULK_GET_410_ERROR_OBJECT,
+  MOCK_BULK_GET_410_404_ERROR_INPUT,
+  MOCK_BULK_GET_404_ERROR_INPUT_2,
+  MOCK_BULK_GET_404_RESPONSE,
+  MOCK_BULK_GET_410_RESPONSE,
+  MOCK_BULK_GET_410_404_RESPONSE
 } from "../__mocks__/ApiClientContextMocks";
 
 /** Mock of Axios' patch function. */
@@ -58,6 +67,18 @@ const mockPost = jest.fn((url, data) => {
     }
     if (isEqual(data, MOCK_BULK_GET_DATA)) {
       return MOCK_BULK_GET_RESPONSE;
+    }
+    if (isEqual(data, MOCK_BULK_GET_404_ERROR_INPUT)) {
+      throw MOCK_BULK_GET_404_ERROR_OBJECT;
+    }
+    if (isEqual(data, MOCK_BULK_GET_410_ERROR_INPUT)) {
+      throw MOCK_BULK_GET_410_ERROR_OBJECT;
+    }
+    if (isEqual(data, MOCK_BULK_GET_410_404_ERROR_INPUT)) {
+      throw MOCK_BULK_GET_410_ERROR_OBJECT;
+    }
+    if (isEqual(data, MOCK_BULK_GET_404_ERROR_INPUT_2)) {
+      throw MOCK_BULK_GET_404_ERROR_OBJECT;
     }
   } else {
     if (isEqual(data.data, MOCK_BULK_CREATE_DATA)) {
@@ -797,5 +818,52 @@ Constraint violation: description size must be between 1 and 10`;
       apiBaseUrl: "/agent-api"
     });
     expect(response).toEqual(MOCK_BULK_UPDATE_RESPONSE);
+  });
+
+  it("Provides a bulkLoadResources function that can handle 404 errors and fill in missing resources with nulls", async () => {
+    const response = await bulkLoadResources(
+      ["1", "doesn't_exist", "2", "doesn't_exist_2", "3"],
+      {
+        resourceType: "person",
+        apiBaseUrl: "/agent-api",
+        returnNullForMissingResource: true
+      }
+    );
+
+    expect(response).toEqual(MOCK_BULK_GET_404_RESPONSE);
+  });
+
+  it("Provides a bulkLoadResources function that can handle 410 errors and fill in missing resources with nulls", async () => {
+    const response = await bulkLoadResources(
+      ["1", "deleted", "2", "deleted_2", "3"],
+      {
+        resourceType: "person",
+        apiBaseUrl: "/agent-api",
+        returnNullForMissingResource: true
+      }
+    );
+
+    expect(response).toEqual(MOCK_BULK_GET_410_RESPONSE);
+  });
+
+  it("Provides a bulkLoadResources function that can handle 410 and 404 errors and fill in missing resources with nulls", async () => {
+    const response = await bulkLoadResources(
+      [
+        "doesn't_exist",
+        "1",
+        "doesn't_exist_2",
+        "2",
+        "deleted",
+        "3",
+        "deleted_2"
+      ],
+      {
+        resourceType: "person",
+        apiBaseUrl: "/agent-api",
+        returnNullForMissingResource: true
+      }
+    );
+
+    expect(response).toEqual(MOCK_BULK_GET_410_404_RESPONSE);
   });
 });

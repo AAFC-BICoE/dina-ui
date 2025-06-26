@@ -164,9 +164,9 @@ export const MOCK_BULK_GET_DATA = {
 };
 
 export const MOCK_BULK_GET_RESPONSE = {
-  data: [
-    {
-      data: {
+  data: {
+    data: [
+      {
         attributes: { displayName: "person 1" },
         relationships: {
           organizations: {
@@ -180,30 +180,26 @@ export const MOCK_BULK_GET_RESPONSE = {
         },
         id: "1",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "person 2" },
         id: "2",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "person 3" },
         id: "3",
         type: "person"
       }
-    }
-  ],
+    ]
+  },
   status: 200
 };
 
 export const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS = {
-  data: [
-    {
-      data: {
+  data: {
+    data: [
+      {
         attributes: { displayName: "person 1" },
         relationships: {
           organizations: {
@@ -227,23 +223,19 @@ export const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS = {
         },
         id: "1",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "person 2" },
         id: "2",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "person 3" },
         id: "3",
         type: "person"
       }
-    }
-  ],
+    ]
+  },
   status: 200
 };
 
@@ -334,33 +326,309 @@ export const MOCK_BULK_UPDATE_INPUT = [
 ];
 
 export const MOCK_BULK_UPDATE_RESPONSE = {
-  data: [
-    {
-      data: {
+  data: {
+    data: [
+      {
         attributes: { displayName: "updated person 1" },
         id: "1",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "updated person 2" },
         id: "2",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "updated person 3" },
         id: "3",
         type: "person"
       }
-    }
-  ],
+    ]
+  },
   status: 200
 };
 
 export const MOCK_BULK_DELETE_RESPONSE = {
   data: undefined,
   status: 204
+};
+export const MOCK_BULK_GET_404_ERROR_INPUT = {
+  data: [
+    {
+      id: "1",
+      type: "person"
+    },
+    {
+      id: "doesn't_exist",
+      type: "person"
+    },
+    {
+      id: "2",
+      type: "person"
+    },
+    {
+      id: "doesn't_exist_2",
+      type: "person"
+    },
+    {
+      id: "3",
+      type: "person"
+    }
+  ]
+};
+
+export const MOCK_BULK_GET_404_ERROR_INPUT_2 = {
+  data: [
+    {
+      id: "doesn't_exist",
+      type: "person"
+    },
+    {
+      id: "1",
+      type: "person"
+    },
+    {
+      id: "doesn't_exist_2",
+      type: "person"
+    },
+    {
+      id: "2",
+      type: "person"
+    },
+    {
+      id: "3",
+      type: "person"
+    }
+  ]
+};
+
+export const MOCK_BULK_GET_404_ERROR_OBJECT = (() => {
+  const error = new Error("Request failed with status code 404") as any;
+
+  // Add axios-specific properties
+  error.config = {
+    url: ""
+  };
+
+  error.response = {
+    statusText: "Not Found",
+    status: 404,
+    responseURL: "/agent-api/person/bulk-load?include=organizations",
+    data: {
+      errors: [
+        {
+          source: {
+            pointer: "/data/id/doesn't_exist"
+          }
+        },
+        {
+          source: {
+            pointer: "/data/id/doesn't_exist_2"
+          }
+        }
+      ]
+    }
+  };
+
+  error.isAxiosError = true;
+
+  return error;
+})();
+
+export const MOCK_BULK_GET_404_RESPONSE = {
+  data: {
+    data: [
+      {
+        attributes: { displayName: "person 1" },
+        relationships: {
+          organizations: {
+            data: [
+              {
+                id: "12345678-1234-1234-1234-123456789012",
+                type: "organization"
+              }
+            ]
+          }
+        },
+        id: "1",
+        type: "person"
+      },
+      null,
+      {
+        attributes: { displayName: "person 2" },
+        id: "2",
+        type: "person"
+      },
+      null,
+      {
+        attributes: { displayName: "person 3" },
+        id: "3",
+        type: "person"
+      }
+    ]
+  },
+  status: 200
+};
+
+export const MOCK_BULK_GET_410_ERROR_INPUT = {
+  data: [
+    {
+      id: "1",
+      type: "person"
+    },
+    {
+      id: "deleted",
+      type: "person"
+    },
+    {
+      id: "2",
+      type: "person"
+    },
+    {
+      id: "deleted_2",
+      type: "person"
+    },
+    {
+      id: "3",
+      type: "person"
+    }
+  ]
+};
+
+export const MOCK_BULK_GET_410_ERROR_OBJECT = (() => {
+  const error = new Error("Request failed with status code 404") as any;
+
+  // Add axios-specific properties
+  error.config = {
+    url: ""
+  };
+
+  error.response = {
+    statusText: "Not Found",
+    status: 404,
+    responseURL: "/agent-api/person/bulk-load?include=organizations",
+    data: {
+      errors: [
+        {
+          source: {
+            pointer: "/data/id/deleted"
+          }
+        },
+        {
+          source: {
+            pointer: "/data/id/deleted_2"
+          }
+        }
+      ]
+    }
+  };
+
+  error.isAxiosError = true;
+
+  return error;
+})();
+
+export const MOCK_BULK_GET_410_RESPONSE = {
+  data: {
+    data: [
+      {
+        attributes: { displayName: "person 1" },
+        relationships: {
+          organizations: {
+            data: [
+              {
+                id: "12345678-1234-1234-1234-123456789012",
+                type: "organization"
+              }
+            ]
+          }
+        },
+        id: "1",
+        type: "person"
+      },
+      null,
+      {
+        attributes: { displayName: "person 2" },
+        id: "2",
+        type: "person"
+      },
+      null,
+      {
+        attributes: { displayName: "person 3" },
+        id: "3",
+        type: "person"
+      }
+    ]
+  },
+  status: 200
+};
+
+export const MOCK_BULK_GET_410_404_ERROR_INPUT = {
+  data: [
+    {
+      id: "doesn't_exist",
+      type: "person"
+    },
+    {
+      id: "1",
+      type: "person"
+    },
+    {
+      id: "doesn't_exist_2",
+      type: "person"
+    },
+    {
+      id: "2",
+      type: "person"
+    },
+    {
+      id: "deleted",
+      type: "person"
+    },
+    {
+      id: "3",
+      type: "person"
+    },
+    {
+      id: "deleted_2",
+      type: "person"
+    }
+  ]
+};
+
+export const MOCK_BULK_GET_410_404_RESPONSE = {
+  data: {
+    data: [
+      null,
+      {
+        attributes: { displayName: "person 1" },
+        relationships: {
+          organizations: {
+            data: [
+              {
+                id: "12345678-1234-1234-1234-123456789012",
+                type: "organization"
+              }
+            ]
+          }
+        },
+        id: "1",
+        type: "person"
+      },
+      null,
+      {
+        attributes: { displayName: "person 2" },
+        id: "2",
+        type: "person"
+      },
+      null,
+      {
+        attributes: { displayName: "person 3" },
+        id: "3",
+        type: "person"
+      },
+      null
+    ]
+  },
+  status: 200
 };
