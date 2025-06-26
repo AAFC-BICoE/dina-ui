@@ -3,7 +3,7 @@ import { Person } from "../../agent-api/resources/Person";
 import { DinaJsonMetaInfo } from "../../DinaJsonMetaInfo";
 import { Derivative } from "./Derivative";
 import { License } from "./License";
-import { DcType, ObjectUpload } from "./ObjectUpload";
+import { DcType } from "./ObjectUpload";
 
 export interface MetadataAttributes {
   type: "metadata";
@@ -48,10 +48,7 @@ export interface MetadataRelationships {
   acMetadataCreator?: Person | KitsuResource;
   dcCreator?: Person | KitsuResource | null;
   managedAttributes?: Record<string, string | null | undefined>;
-  derivatives?:
-    | PersistedResource<Derivative & { objectUpload: ObjectUpload }>[]
-    | PersistedResource<Derivative>[]
-    | null;
+  derivatives?: PersistedResource<Derivative>[] | null;
 }
 
 export type Metadata = KitsuResource &

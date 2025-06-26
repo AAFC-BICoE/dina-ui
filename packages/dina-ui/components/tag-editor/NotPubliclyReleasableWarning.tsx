@@ -14,8 +14,7 @@ export function NotPubliclyReleasableWarning() {
   return (
     <div className="align-items-center not-publicly-releasable-alert">
       <Tooltip
-        id="notPubliclyReleasableWithReason"
-        intlValues={{ reason: values.notPubliclyReleasableReason }}
+        id="notPubliclyReleasable"
         setVisible={setVisible}
         visible={visible}
         placement="left"

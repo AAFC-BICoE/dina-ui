@@ -237,9 +237,6 @@ describe("ResourceSelect component", () => {
       });
     });
 
-    await waitFor(() => {
-      expect(wrapper.getAllByRole("option")).toHaveLength(3);
-    });
     const options = wrapper.getAllByRole("option");
 
     // The <None> option should be hidden when a search value is specified.

@@ -10,8 +10,7 @@ import { Field } from "formik";
 import {
   NotPubliclyReleasableWarning,
   PersonSelectField,
-  TagsAndRestrictionsSection,
-  NotPubliclyReleasableSection
+  TagsAndRestrictionsSection
 } from "../..";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { MetadataFileView } from "./MetadataFileView";
@@ -84,7 +83,6 @@ export function MetadataForm({
         )}
       </div>
       <MetadataBadges />
-      <NotPubliclyReleasableSection />
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"

@@ -256,12 +256,12 @@ function NavCollectionDropdown({ formatMessage }) {
         </NavDropdown.Item>
       </Link>
       <Link
-        href="/collection/classification/taxonomic-hierarchy"
+        href="/collection/classification/taxonomy-tree"
         passHref={true}
         legacyBehavior
       >
         <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
-          <DinaMessage id="taxonomicHierarchy" />
+          <DinaMessage id="taxonomyTree" />
         </NavDropdown.Item>
       </Link>
       <Link href="/workbook/upload" passHref={true} legacyBehavior>
