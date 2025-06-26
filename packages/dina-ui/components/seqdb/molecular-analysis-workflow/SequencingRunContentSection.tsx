@@ -1,9 +1,10 @@
 import { CollapsibleSection, ReactTable } from "../../../../common-ui/lib";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SequencingRunItem } from "./useGenericMolecularAnalysisRun";
-import { ColumnDef } from "@tanstack/table-core";
+import { ColumnDef, Row } from "@tanstack/table-core";
 import DataPasteZone from "../../molecular-analysis/DataPasteZone";
 import { Dispatch, SetStateAction, useState } from "react";
+import { Button } from "react-bootstrap";
 
 interface SequencingRunContentSectionProps {
   columns: ColumnDef<SequencingRunItem>[];
@@ -20,31 +21,32 @@ export default function SequencingRunContentSection({
   editMode,
   setMolecularAnalysisRunItemNames
 }: SequencingRunContentSectionProps) {
-  const [sequencingRunItemsInternal, setSequencingRunItemsInternal] = useState<
-    SequencingRunItem[] | undefined
-  >(sequencingRunItems);
+  const [rowModel, setRowModel] = useState<
+    Row<SequencingRunItem>[] | undefined
+  >([]);
   const onDataPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const clipboardData = event.clipboardData.getData("text/plain");
     const names = clipboardData.trim().split("\n");
     const molecularAnalysisRunItemNamesMap = {};
-    if (sequencingRunItemsInternal) {
-      const newSequencingRunItems = [...sequencingRunItemsInternal];
-      newSequencingRunItems?.forEach((sequencingRunitem, index) => {
-        const materialSampleId = sequencingRunitem.materialSampleId;
+    if (rowModel) {
+      const newSequencingRunItemRows = [...rowModel];
+      newSequencingRunItemRows?.forEach((sequencingRunitem, index) => {
+        const materialSampleId = sequencingRunitem.original.materialSampleId;
         if (materialSampleId) {
           molecularAnalysisRunItemNamesMap[materialSampleId] = names[index];
-          if (!sequencingRunitem.molecularAnalysisRunItem) {
-            sequencingRunitem.molecularAnalysisRunItem = {
+          if (!sequencingRunitem.original.molecularAnalysisRunItem) {
+            sequencingRunitem.original.molecularAnalysisRunItem = {
               type: "molecular-analysis-run-item",
               name: names[index],
               usageType: ""
             };
           } else {
-            sequencingRunitem.molecularAnalysisRunItem.name = names[index];
+            sequencingRunitem.original.molecularAnalysisRunItem.name =
+              names[index];
           }
         }
       });
-      setSequencingRunItemsInternal(newSequencingRunItems);
+      setRowModel(newSequencingRunItemRows);
       setMolecularAnalysisRunItemNames?.(molecularAnalysisRunItemNamesMap);
     }
   };
@@ -56,6 +58,42 @@ export default function SequencingRunContentSection({
           <h2 className="fieldset-h2-adjustment">
             <DinaMessage id="molecularAnalysisRunStep_sequencingRunContent" />
           </h2>
+          {editMode && (
+            <Button
+              className="btn btn-primary"
+              onClick={() => {
+                if (rowModel) {
+                  const molecularAnalysisRunItemNamesMap = {};
+                  const newSequencingRunItemRows = [...rowModel];
+                  newSequencingRunItemRows?.forEach((sequencingRunitem) => {
+                    const materialSampleId =
+                      sequencingRunitem.original.materialSampleId;
+                    if (materialSampleId) {
+                      molecularAnalysisRunItemNamesMap[materialSampleId] = "";
+                      if (
+                        !sequencingRunitem.original.molecularAnalysisRunItem
+                      ) {
+                        sequencingRunitem.original.molecularAnalysisRunItem = {
+                          type: "molecular-analysis-run-item",
+                          name: "",
+                          usageType: ""
+                        };
+                      } else {
+                        sequencingRunitem.original.molecularAnalysisRunItem.name =
+                          "";
+                      }
+                    }
+                  });
+                  setRowModel(newSequencingRunItemRows);
+                  setMolecularAnalysisRunItemNames?.(
+                    molecularAnalysisRunItemNamesMap
+                  );
+                }
+              }}
+            >
+              <DinaMessage id="clearAllNamesButtonText" />
+            </Button>
+          )}
         </div>
         <ReactTable<SequencingRunItem>
           className="-striped mt-2"
@@ -63,6 +101,7 @@ export default function SequencingRunContentSection({
           data={sequencingRunItems ?? []}
           sort={[{ id: "materialSampleName", desc: false }]}
           showPagination={true}
+          setResourceRowModel={setRowModel}
         />
         {editMode && (
           <div className="mt-3">

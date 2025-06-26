@@ -1241,5 +1241,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   existingTemplates: "Existing Templates",
   viewMaterialSamplesInCollection: "View material samples in this collection",
   generateURLButtonText: "Generate URL",
-  taxonomyTree: "Taxonomy Tree"
+  taxonomicHierarchy: "Taxonomic Hierarchy",
+  classificationlevels: "Classification levels:",
+  taxonomyHierarchyChartInstructions:
+    "Interactions: Scroll to zoom, drag to pan, click on nodes to fetch child taxonomic ranks",
+  taxonomyHierarchySubtitle:
+    "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination.",
+  notPubliclyReleasableWithReason: "Not Publicly Releasable: {reason}",
+  clearAllNamesButtonText: "Clear All Names"
 };
