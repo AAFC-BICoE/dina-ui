@@ -221,15 +221,16 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .rule--field {
-  flex: 0.5;
+  flex: 1;
 }
 
 .rule--operator {
-  flex: 0.5;
+  flex: 1;
 }
 
 .rule--operator:empty {
   display: none;
+  flex: 0;
 }
 
 .rule--value {
@@ -240,6 +241,10 @@ input[type="number"]::-webkit-outer-spin-button {
 .rule--widget, .widget--widget {
   width: 100%;
   display: inline-block !important;
+}
+
+.widget--widget > .react-datepicker-wrapper {
+  width: 100%;
 }
 
 .group--drag-handler:not(:only-child) {
@@ -253,6 +258,10 @@ input[type="number"]::-webkit-outer-spin-button {
 // Hide the query builder line if only one item is in the group (toggled by hide--line)
 .group--children.hide--line > .group-or-rule-container > .group-or-rule::before {
   border-color: transparent !important;
+}
+
+.query-builder .rule--body {
+  text-align: left !important;
 }
 
 /* 
