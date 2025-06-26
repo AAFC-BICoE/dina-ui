@@ -1,4 +1,4 @@
-import { AxiosError, AxiosRequestConfig } from "axios";
+import { AxiosError } from "axios";
 import Kitsu from "kitsu";
 import {
   ApiClientImpl,
@@ -6,162 +6,31 @@ import {
   getErrorMessages,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
-import {
-  Operation,
-  OperationsResponse,
-  SuccessfulOperation
-} from "../operations-types";
-
+import { SuccessfulOperation } from "../operations-types";
+import { isEqual } from "lodash";
 interface TestPcrPrimer {
   name: string;
   lotNumber: number;
   type: string;
 }
-
-const AXIOS_JSONPATCH_REQUEST_CONFIG: AxiosRequestConfig = {
-  headers: {
-    Accept: "application/json-patch+json",
-    "Content-Type": "application/json-patch+json",
-    "Crnk-Compact": "true"
-  }
-};
-
-const TODO_INSERT_OPERATION: Operation[] = [
-  {
-    op: "POST",
-    path: "todo",
-    value: {
-      attributes: {
-        description: "description",
-        name: "todo 1"
-      },
-      id: "123",
-      type: "todo"
-    }
-  }
-];
-
-const MOCK_TODO_INSERT_AXIOS_RESPONSE = {
-  data: [
-    {
-      data: {
-        attributes: {
-          description: "description",
-          name: "todo 1"
-        },
-        id: "123",
-        type: "todo"
-      },
-      status: 201
-    }
-  ] as OperationsResponse
-};
-
-const TODO_OPERATION_1_VALID_2_INVALID: Operation[] = [
-  {
-    op: "POST",
-    path: "todo",
-    value: {
-      attributes: {
-        name: "valid-name"
-      },
-      id: "1",
-      type: "todo"
-    }
-  },
-  {
-    op: "POST",
-    path: "todo",
-    value: {
-      attributes: {
-        name: "this-name-is-too-long"
-      },
-      id: "2",
-      type: "todo"
-    }
-  },
-  {
-    op: "POST",
-    path: "todo",
-    value: {
-      attributes: {
-        description: "this-description-is-too-long"
-      },
-      id: "3",
-      type: "todo"
-    }
-  }
-];
-
-const TODO_OPERATION_DENY_ACCESS: Operation[] = [
-  {
-    op: "POST",
-    path: "todo",
-    value: {
-      attributes: {
-        name: "this will fail with an 'access denied' error."
-      },
-      id: "1",
-      type: "todo"
-    }
-  }
-];
-
-const MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID = {
-  data: [
-    {
-      data: {
-        attributes: {
-          name: "valid-name"
-        },
-        id: "1",
-        links: { self: "/api/region/1" },
-        type: "todo"
-      },
-      status: 201
-    },
-    {
-      errors: [
-        {
-          detail: "name size must be between 1 and 10",
-          status: "422",
-          title: "Constraint violation"
-        }
-      ],
-      status: 422
-    },
-    {
-      errors: [
-        {
-          detail: "description size must be between 1 and 10",
-          status: "422",
-          title: "Constraint violation"
-        }
-      ],
-      status: 422
-    },
-    {
-      // The client should be able to ignore a response with no 'errors' field.
-      status: 500
-    }
-  ] as OperationsResponse
-};
-
-const MOCK_AXIOS_RESPONSE_ACCESS_DENIED = {
-  data: [
-    {
-      errors: [
-        {
-          status: "403",
-          code: "Access is denied",
-          title: "Access is denied",
-          meta: { type: "AccessDeniedException" }
-        }
-      ],
-      status: 403
-    }
-  ] as OperationsResponse
-};
+import {
+  MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID,
+  MOCK_AXIOS_RESPONSE_ACCESS_DENIED,
+  MOCK_BULK_CREATE_DATA,
+  MOCK_BULK_CREATE_INPUT,
+  MOCK_BULK_DELETE_RESPONSE,
+  MOCK_BULK_GET_DATA,
+  MOCK_BULK_GET_RESPONSE,
+  MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS,
+  MOCK_BULK_UPDATE_DATA,
+  MOCK_BULK_UPDATE_INPUT,
+  MOCK_BULK_UPDATE_RESPONSE,
+  TODO_INSERT_OPERATION,
+  MOCK_TODO_INSERT_AXIOS_RESPONSE,
+  TODO_OPERATION_1_VALID_2_INVALID,
+  TODO_OPERATION_DENY_ACCESS,
+  AXIOS_JSONPATCH_REQUEST_CONFIG
+} from "../__mocks__/ApiClientContextMocks";
 
 /** Mock of Axios' patch function. */
 const mockPatch = jest.fn((_, data) => {
@@ -174,14 +43,54 @@ const mockPatch = jest.fn((_, data) => {
   if (data === TODO_OPERATION_DENY_ACCESS) {
     return MOCK_AXIOS_RESPONSE_ACCESS_DENIED;
   }
+  if (isEqual(data, MOCK_BULK_UPDATE_DATA)) {
+    return MOCK_BULK_UPDATE_RESPONSE;
+  }
 });
 
-const { apiClient, bulkGet, doOperations, save } = new ApiClientImpl({
+const mockPost = jest.fn((url, data) => {
+  if (url.includes("bulk-load")) {
+    if (url.includes("include=")) {
+      const includes = url.split("=").slice(-1)[0].split(",");
+      if (includes === "organizations") {
+        return MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS;
+      }
+    }
+    if (isEqual(data, MOCK_BULK_GET_DATA)) {
+      return MOCK_BULK_GET_RESPONSE;
+    }
+  } else {
+    if (isEqual(data.data, MOCK_BULK_CREATE_DATA)) {
+      return MOCK_BULK_GET_RESPONSE;
+    }
+  }
+});
+
+const mockDelete = jest.fn((_, data) => {
+  if (isEqual(data.data, MOCK_BULK_GET_DATA)) {
+    return MOCK_BULK_DELETE_RESPONSE;
+  }
+});
+
+const {
+  apiClient,
+  bulkGet,
+  doOperations,
+  save,
+  bulkLoadResources,
+  bulkDeleteResources,
+  bulkCreateResources,
+  bulkUpdateResources
+} = new ApiClientImpl({
   newId: () => "00000000-0000-0000-0000-000000000000"
 });
 
 // Add the mocked "patch" method to the Axios instance:
-apiClient.axios = { patch: mockPatch } as any;
+apiClient.axios = {
+  patch: mockPatch,
+  post: mockPost,
+  delete: mockDelete
+} as any;
 
 describe("API client context", () => {
   beforeEach(jest.clearAllMocks);
@@ -848,5 +757,45 @@ Constraint violation: description size must be between 1 and 10`;
         }
       ]
     });
+  });
+  it("Provides a bulkLoadResources function that can get multiple objects by id", async () => {
+    const response = await bulkLoadResources(["1", "2", "3"], {
+      resourceType: "person",
+      apiBaseUrl: "/agent-api"
+    });
+    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+  });
+
+  it("Provides a bulkLoadResources function that can get multiple objects by id with includes", async () => {
+    const response = await bulkLoadResources(["1", "2", "3"], {
+      resourceType: "person",
+      apiBaseUrl: "/agent-api",
+      include: ["organizations"]
+    });
+    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+  });
+
+  it("Provides a bulkDeleteResources function that can delete multiple objects by id", async () => {
+    const response = await bulkDeleteResources(["1", "2", "3"], {
+      resourceType: "person",
+      apiBaseUrl: "/agent-api"
+    });
+    expect(response).toEqual(MOCK_BULK_DELETE_RESPONSE);
+  });
+
+  it("Provides a bulkCreateResources function that can create multiple objects", async () => {
+    const response = await bulkCreateResources(MOCK_BULK_CREATE_INPUT, {
+      resourceType: "person",
+      apiBaseUrl: "/agent-api"
+    });
+    expect(response).toEqual(MOCK_BULK_GET_RESPONSE);
+  });
+
+  it("Provides a bulkUpdateResources function that can update multiple objects", async () => {
+    const response = await bulkUpdateResources(MOCK_BULK_UPDATE_INPUT, {
+      resourceType: "person",
+      apiBaseUrl: "/agent-api"
+    });
+    expect(response).toEqual(MOCK_BULK_UPDATE_RESPONSE);
   });
 });
