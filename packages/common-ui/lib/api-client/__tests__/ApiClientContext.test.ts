@@ -181,9 +181,9 @@ const MOCK_BULK_GET_DATA = {
 };
 
 const MOCK_BULK_GET_RESPONSE = {
-  data: [
-    {
-      data: {
+  data: {
+    data: [
+      {
         attributes: { displayName: "person 1" },
         relationships: {
           organizations: {
@@ -197,30 +197,26 @@ const MOCK_BULK_GET_RESPONSE = {
         },
         id: "1",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "person 2" },
         id: "2",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "person 3" },
         id: "3",
         type: "person"
       }
-    }
-  ],
+    ]
+  },
   status: 200
 };
 
 const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS = {
-  data: [
-    {
-      data: {
+  data: {
+    data: [
+      {
         attributes: { displayName: "person 1" },
         relationships: {
           organizations: {
@@ -244,23 +240,19 @@ const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS = {
         },
         id: "1",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "person 2" },
         id: "2",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "person 3" },
         id: "3",
         type: "person"
       }
-    }
-  ],
+    ]
+  },
   status: 200
 };
 
@@ -351,29 +343,26 @@ const MOCK_BULK_UPDATE_INPUT = [
 ];
 
 const MOCK_BULK_UPDATE_RESPONSE = {
-  data: [
-    {
-      data: {
+  data: {
+    data: [
+      {
         attributes: { displayName: "updated person 1" },
         id: "1",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "updated person 2" },
         id: "2",
         type: "person"
-      }
-    },
-    {
-      data: {
+      },
+      {
         attributes: { displayName: "updated person 3" },
         id: "3",
         type: "person"
       }
-    }
-  ],
+    ]
+  },
+
   status: 200
 };
 
