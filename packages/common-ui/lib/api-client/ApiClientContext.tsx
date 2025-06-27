@@ -460,15 +460,18 @@ export class ApiClientImpl implements ApiClientI {
     let responseCounter = 0;
     const newResponseData: any[] = [];
 
+    // Deserialize the response data.
+    (response as AxiosResponse).data = deserialise(
+      (response as AxiosResponse).data
+    );
+
     // If there are missing IDs, we need to fill in the gaps with nulls.
     if (missingIds.length != 0) {
       for (const id of originalIds) {
         if (missingIds.includes(id)) {
           newResponseData.push(null);
         } else {
-          newResponseData.push(
-            deserialise(response?.data.data[responseCounter])
-          );
+          newResponseData.push(response?.data.data[responseCounter]);
           responseCounter++;
         }
       }
