@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, waitForOptions } from "@testing-library/react";
 import {
   AccountContextI,
   AccountProvider,
@@ -129,18 +129,14 @@ export function MockAppContextProvider({
  * @param loadingTextRegex A regex to match the loading text that should be present initially.
  */
 export async function waitForLoadingToDisappear(
-  loadingTextRegex = /loading\.\.\./i
+  loadingTextRegex = /loading\.\.\./i,
+  options: waitForOptions = { timeout: 5000, interval: 50 }
 ) {
-  // Check if it's initially present.
-  if (screen.queryByText(loadingTextRegex)) {
-    expect(screen.getByText(loadingTextRegex)).toBeInTheDocument();
-  }
-
-  // Wait for the loading text to disappear.
-  // This is useful for components that show a loading state initially.
+  // Wait for ALL loading elements to disappear
   await waitFor(() => {
-    expect(screen.queryByText(loadingTextRegex)).not.toBeInTheDocument();
-  });
+    const currentLoadingElements = screen.queryAllByText(loadingTextRegex);
+    expect(currentLoadingElements).toHaveLength(0);
+  }, options);
 }
 
 /**

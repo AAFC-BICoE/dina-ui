@@ -76,13 +76,13 @@ export function MolecularAnalysisGridStep({
 
   // Automatically go into edit mode if no storage units exist.
   useEffect(() => {
-    if (loading === false && pageLoaded === false) {
-      if (isStorage === false) {
+    if (!loading && !pageLoaded) {
+      if (!storageUnit?.id) {
         setEditMode(true);
       }
       setPageLoaded(true);
     }
-  }, [loading, isStorage, pageLoaded]);
+  }, [loading, storageUnit, pageLoaded]);
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
