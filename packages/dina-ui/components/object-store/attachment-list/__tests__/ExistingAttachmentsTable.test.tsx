@@ -1,4 +1,4 @@
-import { DinaForm } from "common-ui";
+import { DinaForm, waitForLoadingToDisappear } from "common-ui";
 import { mountWithAppContext } from "common-ui";
 import { ExistingAttachmentsTable } from "../ExistingAttachmentsTable";
 import { screen, fireEvent, within, waitFor } from "@testing-library/react";
@@ -216,6 +216,8 @@ describe("ExistingAttachmentsTable component", () => {
       />,
       { apiContext }
     );
+
+    await waitForLoadingToDisappear();
 
     // Get row 1
     await waitFor(() => {
