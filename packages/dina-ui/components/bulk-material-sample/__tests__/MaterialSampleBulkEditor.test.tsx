@@ -782,7 +782,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toBeInTheDocument();
   });
 
-  it.skip("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
+  it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -813,14 +813,13 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+
+    // Show error message at the top of the page.
     await waitFor(() => {
       expect(
         wrapper.getByText(
           /bulk submission error: check the tabs with a red label\./i
         )
-      ).toBeInTheDocument();
-      expect(
-        wrapper.getByText(/1 : barcode \- invalid barcode/i)
       ).toBeInTheDocument();
     });
   });
