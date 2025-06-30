@@ -452,7 +452,7 @@ export class ApiClientImpl implements ApiClientI {
           missingIds.push(...missingIdsThisRun);
           ids = ids.filter((id) => !missingIds.includes(id));
         } else {
-          makeAxiosErrorMoreReadable(error);
+          throw error;
         }
       }
     }
