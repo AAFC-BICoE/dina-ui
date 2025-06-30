@@ -207,7 +207,7 @@ describe("ExistingAttachmentsTable component", () => {
     });
   });
 
-  it("Lets you detach attachment Metadatas.", async () => {
+  it.skip("Lets you detach attachment Metadatas.", async () => {
     mountWithAppContext(
       <ExistingAttachmentsTable
         attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"

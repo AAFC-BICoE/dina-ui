@@ -1,4 +1,4 @@
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import { mountWithAppContext } from "common-ui";
 import MolecularAnalysisRunViewPage from "../../../../pages/seqdb/molecular-analysis-run/view";
 import "@testing-library/jest-dom";
 import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
@@ -316,7 +316,7 @@ describe("Molecular Analysis Run View", () => {
     const wrapper = mountWithAppContext(<MolecularAnalysisRunViewPage />, {
       apiContext
     });
-    await waitForLoadingToDisappear();
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Run Name is displayed:
     expect(
@@ -324,7 +324,6 @@ describe("Molecular Analysis Run View", () => {
     ).toBeInTheDocument();
 
     // Ensure Molecular Analysis Run Items are displayed:
-    await waitForLoadingToDisappear();
     expect(wrapper.getByRole("link", { name: "Sample 1" })).toBeInTheDocument();
     expect(wrapper.getByRole("link", { name: "Sample 2" })).toBeInTheDocument();
     expect(wrapper.getByRole("link", { name: "Sample 3" })).toBeInTheDocument();
