@@ -1,6 +1,5 @@
 import { KitsuResource } from "kitsu";
 import { Metadata } from "./Metadata";
-import { ObjectUpload } from "./ObjectUpload";
 
 export interface DerivativeAttributes {
   type: "derivative";
@@ -14,13 +13,11 @@ export interface DerivativeAttributes {
   createdBy: string;
   createdOn: string;
   derivativeType: string;
-  acTags?: string[];
 }
 
 export interface DerivativeRelationships {
   generatedFromDerivative?: Derivative | KitsuResource | null;
   acDerivedFrom?: Metadata | KitsuResource | null;
-  objectUpload?: ObjectUpload | null;
 }
 
 export type Derivative = KitsuResource &

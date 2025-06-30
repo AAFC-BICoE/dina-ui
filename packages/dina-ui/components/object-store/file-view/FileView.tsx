@@ -6,7 +6,7 @@ import {
 } from "../../../../common-ui";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ReactNode, useState, useRef } from "react";
-import { Metadata, Derivative } from "../../../types/objectstore-api";
+import { Metadata } from "../../../types/objectstore-api";
 import {
   derivativeTypeToLabel,
   handleDownloadLink
@@ -42,13 +42,12 @@ export interface FileViewProps {
   clickToDownload?: boolean;
   filePath: string;
   fileType: string;
-  caption?: string;
   imgAlt?: string;
   imgHeight?: string;
   downloadLinks?: DownLoadLinks;
   shownTypeIndicator?: ReactNode;
   hideDownload?: boolean;
-  metadata?: Metadata | Derivative;
+  metadata?: Metadata;
 }
 
 export const IMG_TAG_SUPPORTED_FORMATS = [
@@ -67,7 +66,6 @@ export function FileView({
   clickToDownload,
   filePath,
   fileType,
-  caption,
   imgAlt,
   imgHeight,
   downloadLinks,
@@ -189,17 +187,15 @@ export function FileView({
               <DinaMessage id="previewNotAvailable" />
             </div>
           )}
-          {caption && (
+          {metadata?.acCaption && (
             <strong style={{ display: "block", marginTop: "10px" }}>
-              {caption}
+              {metadata?.acCaption}
             </strong>
           )}
 
           {!hideDownload && downloadLinks?.original && (
             <>
-              {metadata?.type != "derivative" &&
-              metadata?.derivatives &&
-              metadata?.derivatives?.length === 0 ? (
+              {metadata?.derivatives && metadata?.derivatives?.length === 0 ? (
                 <>
                   <div className="d-flex justify-content-center">
                     {downloadLinks?.original && (
@@ -272,95 +268,66 @@ export function FileView({
                       </Dropdown.Item>
                     )}
                     <Dropdown.Divider />
-                    {metadata?.type !== "derivative" &&
-                      metadata?.derivatives?.map((derivative) => {
-                        const fileIdentifier = derivative.fileIdentifier;
-                        const bucket = derivative.bucket;
-                        const fileType = derivative.fileExtension;
-                        const derivativeType = derivative.derivativeType;
-                        const filePath = `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`;
-                        const fileSize = (derivative as any).objectUpload
-                          ?.sizeInBytes;
-
-                        return (
-                          <Dropdown.Item
-                            key={fileIdentifier}
-                            as="button"
-                            className="d-flex justify-content-between align-items-center"
-                            onClick={() =>
-                              handleDownloadLink(
-                                filePath,
-                                apiClient,
-                                setIsDownloading
-                              )
-                            }
+                    {metadata?.derivatives?.map((derivative) => {
+                      const fileIdentifier = derivative.fileIdentifier;
+                      const bucket = derivative.bucket;
+                      const fileType = derivative.fileExtension;
+                      const derivativeType = derivative.derivativeType;
+                      const filePath = `/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`;
+                      const fileSize = (derivative as any).objectUpload
+                        ?.sizeInBytes;
+                      return (
+                        <Dropdown.Item
+                          key={fileIdentifier}
+                          as="button"
+                          className="d-flex justify-content-between align-items-center"
+                          onClick={() =>
+                            handleDownloadLink(
+                              filePath,
+                              apiClient,
+                              setIsDownloading
+                            )
+                          }
+                        >
+                          <div
+                            className="d-flex align-items-center"
+                            style={{ minWidth: "250px" }}
                           >
-                            <div className="d-flex align-items-center">
-                              {fileExtensionToIcon(
-                                fileType,
-                                "me-3 text-secondary dropdown-icon"
-                              )}
-                              <div>
-                                <div className="fw-semibold">
-                                  {derivativeTypeToLabel(
-                                    derivativeType,
-                                    messages
-                                  )}
-                                </div>
-                                <small className="text-muted">
-                                  {fileType.toUpperCase()}
-                                </small>
+                            {fileExtensionToIcon(
+                              fileType,
+                              "me-3 text-secondary dropdown-icon"
+                            )}
+                            <div>
+                              <div className="fw-semibold">
+                                {derivativeTypeToLabel(
+                                  derivativeType,
+                                  messages
+                                )}
                               </div>
-                              {fileSize && (
-                                <Badge
-                                  bg="light"
-                                  text="dark"
-                                  style={{
-                                    fontSize: "0.75rem",
-                                    padding: "0.35em 0.5em",
-                                    marginLeft: "2em"
-                                  }}
-                                >
-                                  {formatBytes(fileSize)}
-                                </Badge>
-                              )}
+                              <small className="text-muted">
+                                {fileType.toUpperCase()}
+                              </small>
                             </div>
-                          </Dropdown.Item>
-                        );
-                      })}
+                            {fileSize && (
+                              <Badge
+                                bg="light"
+                                text="dark"
+                                style={{
+                                  fontSize: "0.75rem",
+                                  padding: "0.35em 0.5em",
+                                  marginLeft: "auto"
+                                }}
+                              >
+                                {formatBytes(fileSize)}
+                              </Badge>
+                            )}
+                          </div>
+                        </Dropdown.Item>
+                      );
+                    })}
                   </Dropdown.Menu>
                 </Dropdown>
               )}
-            </>
-          )}
-
-          {!hideDownload && metadata?.type === "derivative" && (
-            <>
-              {downloadLinks?.thumbNail ? (
-                <div className="d-flex justify-content-center">
-                  <DownloadButton
-                    id="downloadFile"
-                    path={downloadLinks?.thumbNail}
-                    isDownloading={isDownloading}
-                    handleDownloadLink={handleDownloadLink}
-                    apiClient={apiClient}
-                    setIsDownloading={setIsDownloading}
-                    classname="p-2 mt-3"
-                  />
-                </div>
-              ) : downloadLinks?.largeData ? (
-                <div className="d-flex justify-content-center">
-                  <DownloadButton
-                    id="downloadFile"
-                    path={downloadLinks?.largeData}
-                    isDownloading={isDownloading}
-                    handleDownloadLink={handleDownloadLink}
-                    apiClient={apiClient}
-                    setIsDownloading={setIsDownloading}
-                    classname="p-2 mt-3"
-                  />
-                </div>
-              ) : null}
             </>
           )}
         </>

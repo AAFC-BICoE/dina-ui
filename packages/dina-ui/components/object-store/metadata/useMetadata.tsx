@@ -8,8 +8,7 @@ import { InputResource } from "kitsu";
 import {
   License,
   Metadata,
-  ObjectUpload,
-  Derivative
+  ObjectUpload
 } from "../../../types/objectstore-api";
 import _ from "lodash";
 
@@ -103,29 +102,6 @@ export function useMetadataViewQuery(id?: string) {
           })
         );
       }
-    }
-  );
-  return query;
-}
-
-export function useDerivativeMetadataViewQuery(id?: string) {
-  const query = useQuery<
-    Derivative & { derivedFrom: Metadata } & { objectUpload: ObjectUpload }
-  >(
-    {
-      include: "derivative,acDerivedFrom,generatedFromDerivative,acTags",
-      path: `objectstore-api/derivative/${id}`,
-      header: { "include-dina-permission": "true" }
-    },
-    {
-      joinSpecs: [
-        {
-          apiBaseUrl: "/objectstore-api",
-          idField: "fileIdentifier",
-          joinField: "objectUpload",
-          path: (derivative) => `object-upload/${derivative.fileIdentifier}`
-        }
-      ]
     }
   );
   return query;
