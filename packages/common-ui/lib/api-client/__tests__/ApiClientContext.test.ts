@@ -70,7 +70,9 @@ const mockPost = jest.fn((url, data) => {
       }
     }
     if (isEqual(data, MOCK_BULK_GET_DATA)) {
-      return Promise.resolve(MOCK_BULK_GET_RESPONSE);
+      return Promise.resolve(
+        JSON.parse(JSON.stringify(MOCK_BULK_GET_RESPONSE))
+      ); // make a deep copy to avoid mutating the original mock data
     }
     if (isEqual(data, MOCK_BULK_GET_404_ERROR_INPUT)) {
       return Promise.reject(MOCK_BULK_GET_404_ERROR_OBJECT);
@@ -86,7 +88,9 @@ const mockPost = jest.fn((url, data) => {
     }
   } else {
     if (isEqual(data.data, MOCK_BULK_CREATE_DATA)) {
-      return MOCK_BULK_GET_RESPONSE;
+      return Promise.resolve(
+        JSON.parse(JSON.stringify(MOCK_BULK_GET_RESPONSE))
+      ); // make a deep copy to avoid mutating the original mock data
     }
   }
 });
