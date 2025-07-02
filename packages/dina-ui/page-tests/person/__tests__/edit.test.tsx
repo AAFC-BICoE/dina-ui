@@ -204,7 +204,11 @@ describe("person edit page", () => {
 
     // Test expected error
     await waitFor(() => {
-      expect(wrapper.getByText("The display name field is required."));
+      expect(
+        wrapper.getByText(
+          /1 : display name \- the display name field is required\./i
+        )
+      );
       expect(mockPush).toBeCalledTimes(0);
     });
   });
