@@ -12,10 +12,7 @@ import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";
-import {
-  StorageUnitBreadCrumb,
-  storageUnitDisplayName
-} from "./StorageUnitBreadCrumb";
+import { storageUnitDisplayName } from "./StorageUnitBreadCrumb";
 
 export interface StorageSearchSelectorProps {
   /**
@@ -48,13 +45,10 @@ export function StorageSearchSelector({
       accessorKey: "name"
     },
     {
-      cell: ({ row: { original } }) => (
-        <StorageUnitBreadCrumb
-          storageUnit={original}
-          // Do not repeat the unit name because it's in the "name" column:
-          hideThisUnit={true}
-        />
-      ),
+      cell: ({ row: { original } }) =>
+        // Display location if storage unit has a parent
+        original.hierarchy &&
+        original.hierarchy.length > 1 && <>{original.hierarchy[1].name}</>,
       accessorKey: "location",
       enableSorting: false
     },
