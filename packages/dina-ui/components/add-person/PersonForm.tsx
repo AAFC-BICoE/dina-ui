@@ -7,8 +7,6 @@ import {
   useModal,
   StringArrayField,
   ResourceSelectField,
-  DoOperationsError,
-  OperationError,
   SaveArgs,
   useApiClient,
   BackButton,
@@ -103,37 +101,15 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
         .filter((deleteArg) => {
           return !submittedIdentifierIds.includes(deleteArg.delete.id);
         }) ?? [];
-    try {
-      let deletedIdentifiers: PersistedResource<Identifier>[] = [];
-      // Don't call the API with an empty Save array:
-      if (identifierDeleteArgs.length) {
-        deletedIdentifiers = await save<Identifier>(identifierDeleteArgs, {
-          apiBaseUrl: "/agent-api"
-        });
-      }
-
-      return deletedIdentifiers;
-    } catch (error: unknown) {
-      if (error instanceof DoOperationsError) {
-        const newErrors = error.individualErrors.map<OperationError>((err) => ({
-          fieldErrors: _.mapKeys(
-            err.fieldErrors,
-            (_, field) => `identifier[${err.index}].${field}`
-          ),
-          errorMessage: err.errorMessage,
-          index: err.index
-        }));
-
-        const overallFieldErrors = newErrors.reduce(
-          (total, curr) => ({ ...total, ...curr.fieldErrors }),
-          {}
-        );
-
-        throw new DoOperationsError(error.message, overallFieldErrors);
-      } else {
-        throw error;
-      }
+    let deletedIdentifiers: PersistedResource<Identifier>[] = [];
+    // Don't call the API with an empty Save array:
+    if (identifierDeleteArgs.length) {
+      deletedIdentifiers = await save<Identifier>(identifierDeleteArgs, {
+        apiBaseUrl: "/agent-api"
+      });
     }
+
+    return deletedIdentifiers;
   }
 
   const onSubmit: DinaFormOnSubmit = async ({
