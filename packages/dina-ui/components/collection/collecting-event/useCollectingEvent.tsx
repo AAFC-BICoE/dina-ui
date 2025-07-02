@@ -42,7 +42,7 @@ export function useCollectingEventQuery(id?: string | null) {
               assertion.georeferencedBy = _.compact(
                 await bulkGet<Person, true>(
                   assertion.georeferencedBy.map(
-                    (personId: string) => `/person/${personId}`
+                    (personId: string) => `person/${personId}`
                   ),
                   {
                     apiBaseUrl: "/agent-api",
