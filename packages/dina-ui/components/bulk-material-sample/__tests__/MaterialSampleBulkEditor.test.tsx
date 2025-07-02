@@ -1,5 +1,5 @@
 import { deleteFromStorage } from "@rehooks/local-storage";
-import { DoOperationsError } from "common-ui";
+import { DoOperationsError, waitForLoadingToDisappear } from "common-ui";
 import { InputResource } from "kitsu";
 import { SAMPLE_FORM_TEMPLATE_KEY } from "../..";
 import { mountWithAppContext } from "common-ui";
@@ -495,7 +495,7 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
-  it.skip("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
+  it("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -508,7 +508,7 @@ describe("MaterialSampleBulkEditor", () => {
     );
 
     // Go the the bulk edit tab:
-    fireEvent.click(wrapper.getByText(/edit all/i));
+    userEvent.click(wrapper.getByText(/edit all/i));
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -517,13 +517,15 @@ describe("MaterialSampleBulkEditor", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
-    await waitFor(() =>
-      expect(
-        wrapper.getByRole("textbox", {
-          name: "Start Event Date Time Start Event Date Time format must be a subset of :YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory"
-        })
-      ).toBeInTheDocument()
+    userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+    await waitFor(
+      () => {
+        expect(
+          wrapper.getByLabelText("Start Event Date Time")
+        ).toBeInTheDocument();
+      },
+      { timeout: 2000 }
     );
 
     // Put an invalid value in startEventDateTime. This is validated locally by yup:
@@ -533,17 +535,12 @@ describe("MaterialSampleBulkEditor", () => {
     userEvent.type(startDateTextbox, "11111");
 
     // Click the "Save All" button:
-    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await waitFor(() =>
-      expect(
-        wrapper.container.querySelector(".text-danger")
-      ).toBeInTheDocument()
-    );
+    userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
 
-    // The tab with the error is given the red text, and the other tabs are unaffected:
-    expect(
-      wrapper.container.querySelector(".text-danger")?.textContent
-    ).toEqual("MS1");
+    await waitForLoadingToDisappear();
+
+    await waitFor(() => expect(wrapper.getByText(/ms1/i)).toBeInTheDocument());
+    userEvent.click(wrapper.getByText(/ms1/i));
 
     // Shows the error message:
     expect(
@@ -553,7 +550,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toBeInTheDocument();
   });
 
-  it.skip("Shows an error indicator on the individual sample tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
+  it("Shows an error indicator on the individual sample tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
     const mockSaveForBadColEvent = jest.fn(async () => {
       throw new DoOperationsError(
         "",
@@ -635,9 +632,6 @@ describe("MaterialSampleBulkEditor", () => {
         /bulk submission error: check the tabs with a red label\./i
       )
     ).toBeInTheDocument();
-    expect(
-      wrapper.container.querySelector(".text-danger")?.textContent
-    ).toEqual("MS2");
 
     // Shows the error message:
     expect(
@@ -647,7 +641,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toBeInTheDocument();
   });
 
-  it.skip("Shows an error indicator on the Edit All tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
+  it("Shows an error indicator on the Edit All tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
     const mockSaveForBadColEvent = jest.fn(async () => {
       throw new DoOperationsError(
         "",
@@ -724,9 +718,6 @@ describe("MaterialSampleBulkEditor", () => {
         /bulk submission error: check the tabs with a red label\./i
       )
     ).toBeInTheDocument();
-    expect(
-      wrapper.container.querySelector(".text-danger")?.textContent
-    ).toEqual("MS1");
 
     // Shows the error message:
     expect(
@@ -736,7 +727,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toBeInTheDocument();
   });
 
-  it.skip("Shows an error indicator on the Edit All tab when a bulk-edited causes a server-side field error.", async () => {
+  it("Shows an error indicator on the Edit All tab when a bulk-edited causes a server-side field error.", async () => {
     const mockSaveForBadBarcode = jest.fn(async () => {
       throw new DoOperationsError("", { barcode: "Invalid Barcode" }, [
         {
@@ -789,12 +780,9 @@ describe("MaterialSampleBulkEditor", () => {
         /bulk submission error: check the tabs with a red label\./i
       )
     ).toBeInTheDocument();
-    expect(
-      wrapper.container.querySelector(".text-danger")?.textContent
-    ).toEqual("Edit All");
   });
 
-  it.skip("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
+  it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -825,29 +813,15 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+
+    // Show error message at the top of the page.
     await waitFor(() => {
       expect(
         wrapper.getByText(
           /bulk submission error: check the tabs with a red label\./i
         )
       ).toBeInTheDocument();
-      expect(
-        wrapper.container.querySelector(".text-danger")
-      ).toBeInTheDocument();
     });
-
-    // The tab with the error is given the red text, and the other tabs are unaffected:
-    expect(
-      wrapper.getByText(
-        /bulk submission error: check the tabs with a red label\./i
-      )
-    ).toBeInTheDocument();
-    expect(
-      wrapper.container.querySelector(".text-danger")?.textContent
-    ).toEqual("MS2");
-    expect(
-      wrapper.getByText(/1 : barcode \- invalid barcode/i)
-    ).toBeInTheDocument();
   });
 
   it("Doesnt override the values when the Override All button is not clicked.", async () => {

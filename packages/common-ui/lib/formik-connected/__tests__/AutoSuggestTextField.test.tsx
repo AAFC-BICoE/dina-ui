@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 import { mountWithAppContext } from "common-ui";
 import { AutoSuggestTextField } from "../AutoSuggestTextField";
 import { DinaForm } from "../DinaForm";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { act, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 interface Person extends KitsuResource {
@@ -429,7 +429,7 @@ describe("AutoSuggestTextField", () => {
   });
 
   describe("Both backend providers are supplied, test what happens when a backend fails", () => {
-    it.skip("JSON-API is preferred, but fails, elastic search should be used instead.", async () => {
+    it("JSON-API is preferred, but fails, elastic search should be used instead.", async () => {
       const wrapper = mountWithAppContext(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>
@@ -449,26 +449,31 @@ describe("AutoSuggestTextField", () => {
               option: (person) => person?.name
             }}
             preferredBackend={"json-api"}
-            timeoutMs={0}
+            timeoutMs={5}
           />
         </DinaForm>,
         { apiContext: apiContextJsonAPIFailure }
       );
 
-      fireEvent.focus(
-        wrapper.getByRole("textbox", { name: /example person name field/i })
-      );
-      fireEvent.change(
-        wrapper.getByRole("textbox", { name: /example person name field/i }),
-        { target: { value: "p" } }
-      );
+      const textField = wrapper.getByRole("textbox", {
+        name: /example person name field/i
+      });
 
-      // JSON API should be tried first but fails.
+      // Simulate typing "p"
+      await act(async () => {
+        fireEvent.focus(textField);
+        fireEvent.change(textField, { target: { value: "p" } });
+      });
+
+      // JSON API should be tried first but fails, then Elastic Search is used.
       await waitFor(() => {
+        // mockGetFailure should be called once for "p"
         expect(mockGetFailure).toHaveBeenCalledTimes(1);
+        // mockGetAxios should be called once as the fallback for "p"
         expect(mockGetAxios).toHaveBeenCalledTimes(1);
       });
 
+      // Assert suggestions after the first search term
       expect(
         wrapper.queryByText(/person1\-elastic\-search/i)
       ).toBeInTheDocument();
@@ -479,19 +484,16 @@ describe("AutoSuggestTextField", () => {
         wrapper.queryByText(/person3\-elastic\-search/i)
       ).toBeInTheDocument();
 
-      fireEvent.focus(
-        wrapper.getByRole("textbox", { name: /example person name field/i })
-      );
-      fireEvent.change(
-        wrapper.getByRole("textbox", { name: /example person name field/i }),
-        { target: { value: "pe" } }
-      );
+      // Simulate typing "pe" (change from "p" to "pe")
+      await act(async () => {
+        fireEvent.change(textField, { target: { value: "pe" } });
+      });
 
-      // JSON API should not be called again at this point. Already failed and should have switched to
-      // elastic search.
+      // JSON API should *not* be called again for "pe" because it failed previously and should have switched permanently to Elastic Search.
+      // Elastic Search should be called a second time for the new "pe" search term.
       await waitFor(() => {
-        expect(mockGetFailure).toHaveBeenCalledTimes(1);
-        expect(mockGetAxios).toHaveBeenCalledTimes(2);
+        expect(mockGetFailure).toHaveBeenCalledTimes(1); // Still 1 call for the failed JSON API
+        expect(mockGetAxios).toHaveBeenCalledTimes(2); // Elastic Search should be called a second time
       });
     });
 
