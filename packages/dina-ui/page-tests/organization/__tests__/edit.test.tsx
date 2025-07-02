@@ -205,6 +205,28 @@ describe("organization edit page", () => {
       expect(mockPush).toBeCalledTimes(0);
     });
   });
+
+  it("Renders an error if an organization name is not entered.", async () => {
+    // The patch request will return an error.
+    mockPost.mockImplementationOnce(() => {
+      throw new Error("test error");
+    });
+
+    mockQuery = {};
+
+    const wrapper = mountWithAppContext(<OrganizationEditPage />, {
+      apiContext
+    });
+
+    // Submit the form.
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    // Test expected error
+    await waitFor(() => {
+      expect(wrapper.getByText("At least one organization name is required"));
+      expect(mockPush).toBeCalledTimes(0);
+    });
+  });
 });
 
 it("Verify trim aliases.", () => {
