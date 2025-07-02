@@ -21,6 +21,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
 import _ from "lodash";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 
 interface PersonFormProps {
   person?: Person;
@@ -32,6 +33,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   const initialValues: Partial<Person> = person || {
     type: "person"
   };
+  const { formatMessage } = useDinaIntl();
   const id = person?.id;
   const { save } = useApiClient();
   let submittedIdentifierIds: any[] = [];
@@ -160,8 +162,13 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       })
     };
     delete submittedPerson.organizations;
+
     if (Object.keys(submittedPerson.relationships).length === 0) {
       delete submittedPerson.relationships;
+    }
+
+    if (!submittedPerson.displayName) {
+      throw new Error(formatMessage("field_personMandatoryFieldsError"));
     }
 
     const [savedPerson] = await save<Person>(
