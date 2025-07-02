@@ -38,20 +38,18 @@ export interface BulkLoadResourcesOptions {
 }
 
 export interface BulkDeleteResourcesOptions {
-  apiBaseUrl?: string;
+  apiBaseUrl: string;
   resourceType: string;
-  returnNullForMissingResource?: boolean;
 }
 
 export interface BulkCreateResourcesOptions {
-  apiBaseUrl?: string;
+  apiBaseUrl: string;
   resourceType: string;
 }
 
 export interface BulkUpdateResourcesOptions {
-  apiBaseUrl?: string;
+  apiBaseUrl: string;
   resourceType: string;
-  returnNullForMissingResource?: boolean;
 }
 
 export type BulkGetOperation =
@@ -419,34 +417,73 @@ export class ApiClientImpl implements ApiClientI {
       returnNullForMissingResource = false
     }: BulkLoadResourcesOptions
   ) {
-    const requestBody = {
-      data: ids.map((id) => ({
-        type: resourceType,
-        id: id
-      }))
-    };
-
     const { axios } = this.apiClient;
     const url = include
       ? `${apiBaseUrl}/${resourceType}/bulk-load?include=${include.join(",")}`
       : `${apiBaseUrl}/${resourceType}/bulk-load`;
+    let response: AxiosResponse = undefined as any;
+    const missingIds: string[] = [];
+    const originalIds = [...ids]; // Keep the original IDs for later reference.
 
-    try {
-      const response = await axios.post(url, requestBody, {
-        headers: {
-          "Content-Type": "application/vnd.api+json; ext=bulk",
-          Accept: "application/vnd.api+json"
+    // run this max 3 times, worst case is 410 error, then 404 error, then success.
+    for (let i = 0; i < 3; i++) {
+      const requestBody = {
+        data: ids.map((id) => ({
+          type: resourceType,
+          id: id
+        }))
+      };
+      try {
+        response = await axios.post(url, requestBody, {
+          headers: {
+            "Content-Type": "application/vnd.api+json; ext=bulk",
+            Accept: "application/vnd.api+json"
+          }
+        });
+        break;
+      } catch (error) {
+        // if returnNullForMissingResource is true, we will handle the error
+        // by returning null for the missing resources instead of throwing an error.
+        if (returnNullForMissingResource) {
+          const errors = error.response.data.errors;
+          const missingIdsThisRun = errors.map((err: any) =>
+            err.source.pointer.split("/").at(-1)
+          );
+          missingIds.push(...missingIdsThisRun);
+          ids = ids.filter((id) => !missingIds.includes(id));
+        } else {
+          throw error;
         }
-      });
-      response.data = deserialise(response.data);
-      return response;
-    } catch (error) {
-      if (returnNullForMissingResource) {
-        throw error; // placeholder for future implementation
-      } else {
-        throw error;
       }
     }
+
+    let responseCounter = 0;
+    const newResponseData: any[] = [];
+
+    // Deserialize the response data.
+    (response as AxiosResponse).data = deserialise(
+      (response as AxiosResponse).data
+    );
+
+    // If there are missing IDs, we need to fill in the gaps with nulls.
+    if (missingIds.length != 0) {
+      for (const id of originalIds) {
+        if (missingIds.includes(id)) {
+          newResponseData.push(null);
+        } else {
+          newResponseData.push(response?.data.data[responseCounter]);
+          responseCounter++;
+        }
+      }
+
+      (response as AxiosResponse).data.data = newResponseData;
+      return response;
+    }
+
+    (response as AxiosResponse).data = deserialise(
+      (response as AxiosResponse).data
+    );
+    return response;
   }
 
   /**
@@ -456,35 +493,32 @@ export class ApiClientImpl implements ApiClientI {
    */
   public async bulkCreateResources(
     resources: InputResource<KitsuResource>[],
-    { apiBaseUrl = "", resourceType }: BulkCreateResourcesOptions
+    { apiBaseUrl, resourceType }: BulkCreateResourcesOptions
   ): Promise<AxiosResponse> {
     const serializedResources = await Promise.all(
       resources.map((resource) => serialize({ resource, type: resourceType }))
     );
 
     const requestBody = {
-      data: serializedResources
+      data: serializedResources.map((resource) => ({
+        ...resource
+      }))
     };
 
     const { axios } = this.apiClient;
 
-    try {
-      const response = await axios.post(
-        `${apiBaseUrl}/${resourceType}/bulk`,
-        requestBody,
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json; ext=bulk",
-            Accept: "application/vnd.api+json"
-          }
+    const response = await axios.post(
+      `${apiBaseUrl}/${resourceType}/bulk`,
+      requestBody,
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json; ext=bulk",
+          Accept: "application/vnd.api+json"
         }
-      );
-      response.data = deserialise(response.data);
-      return response;
-    } catch (error) {
-      console.error(`Error bulk creating resources for ${resourceType}`, error);
-      throw error;
-    }
+      }
+    );
+    response.data = deserialise(response.data);
+    return response;
   }
 
   /**
@@ -494,42 +528,32 @@ export class ApiClientImpl implements ApiClientI {
    */
   public async bulkUpdateResources(
     resources: InputResource<KitsuResource>[],
-    {
-      apiBaseUrl = "",
-      resourceType,
-      returnNullForMissingResource = false
-    }: BulkUpdateResourcesOptions
+    { apiBaseUrl, resourceType }: BulkUpdateResourcesOptions
   ): Promise<AxiosResponse> {
     const serializedResources = await Promise.all(
       resources.map((resource) => serialize({ resource, type: resourceType }))
     );
 
     const requestBody = {
-      data: serializedResources
+      data: serializedResources.map((resource) => ({
+        ...resource
+      }))
     };
 
     const { axios } = this.apiClient;
 
-    try {
-      const response = await axios.patch(
-        `${apiBaseUrl}/${resourceType}/bulk`,
-        requestBody,
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json; ext=bulk",
-            Accept: "application/vnd.api+json"
-          }
+    const response = await axios.patch(
+      `${apiBaseUrl}/${resourceType}/bulk`,
+      requestBody,
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json; ext=bulk",
+          Accept: "application/vnd.api+json"
         }
-      );
-      response.data = deserialise(response.data);
-      return response;
-    } catch (error) {
-      if (returnNullForMissingResource) {
-        throw error; // placeholder for future implementation
-      } else {
-        throw error;
       }
-    }
+    );
+    response.data = deserialise(response.data);
+    return response;
   }
 
   /**
@@ -539,11 +563,7 @@ export class ApiClientImpl implements ApiClientI {
    */
   public async bulkDeleteResources(
     ids: string[],
-    {
-      apiBaseUrl,
-      resourceType,
-      returnNullForMissingResource = false
-    }: BulkDeleteResourcesOptions
+    { apiBaseUrl, resourceType }: BulkDeleteResourcesOptions
   ) {
     const data = {
       data: ids.map((id) => ({
@@ -554,26 +574,15 @@ export class ApiClientImpl implements ApiClientI {
 
     const { axios } = this.apiClient;
 
-    try {
-      const response = await axios.delete(
-        `${apiBaseUrl}/${resourceType}/bulk`,
-        {
-          data: data,
-          headers: {
-            "Content-Type": "application/vnd.api+json; ext=bulk",
-            Accept: "application/vnd.api+json"
-          }
-        }
-      );
-      response.data = deserialise(response.data);
-      return response;
-    } catch (error) {
-      if (returnNullForMissingResource) {
-        throw error; // placeholder for future implementation
-      } else {
-        throw error;
+    const response = await axios.delete(`${apiBaseUrl}/${resourceType}/bulk`, {
+      data: data,
+      headers: {
+        "Content-Type": "application/vnd.api+json; ext=bulk",
+        Accept: "application/vnd.api+json"
       }
-    }
+    });
+
+    return response;
   }
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
@@ -707,7 +716,16 @@ export class DoOperationsError extends Error {
 export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   if (error.isAxiosError) {
     let errorMessage = `${error.config?.url}: ${error.response?.statusText}`;
+    // If the error is a 404 or 410, and the endpoint is "bulk-load", throw full error for handling in function.
 
+    if (
+      error.request &&
+      error.request.responseURL.split("/").at(-1).includes("bulk-load")
+    ) {
+      if ([404, 410].includes(error.response?.status as number)) {
+        throw error;
+      }
+    }
     // Special case: Make 502 "bad gateway" messages more user-friendly:
     if (error.response?.status === 502) {
       errorMessage = `Service unavailable:\n${errorMessage}`;
