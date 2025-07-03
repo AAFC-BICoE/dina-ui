@@ -129,7 +129,7 @@ export default function QueryRowManagedAttributeSearch({
     if (value) {
       setManagedAttributeState(JSON.parse(value));
     }
-  }, [managedAttributeConfig]);
+  }, [managedAttributeConfig, value]);
 
   const managedAttributeSelected =
     managedAttributeState.selectedManagedAttribute;
