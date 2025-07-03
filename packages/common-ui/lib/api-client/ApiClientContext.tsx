@@ -493,9 +493,8 @@ export class ApiClientImpl implements ApiClientI {
       path: `${deleteArg.delete.type}/${deleteArg.delete.id}`
     }));
 
-    // Create the jsonpatch operations objects.
-
-    if (options?.apiBaseUrl === "/agent-api") {
+    // If using repository v2, split different operation types into separate requests.
+    if (options?.apiBaseUrl && ["/agent-api"].includes(options?.apiBaseUrl)) {
       const postOperations: any = [];
       const patchOperations: any = [];
 
@@ -521,6 +520,7 @@ export class ApiClientImpl implements ApiClientI {
         }
       }
 
+      // only do the operations if there are any.
       const postResponses = postOperations.length
         ? await this.doOperations(postOperations, options)
         : [];
@@ -892,7 +892,7 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
       error.request &&
       error.request.responseURL.split("/").at(-1).includes("bulk-load")
     ) {
-      if ([404, 410, 500].includes(error.response?.status as number)) {
+      if ([404, 410].includes(error.response?.status as number)) {
         throw error;
       }
     }
