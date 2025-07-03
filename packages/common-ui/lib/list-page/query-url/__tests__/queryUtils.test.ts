@@ -1,4 +1,4 @@
-import { Utils } from "react-awesome-query-builder";
+import { Utils } from "@react-awesome-query-builder/ui";
 import { parseQueryTreeFromURL, serializeQueryTreeToURL } from "../queryUtils";
 import { ManagedAttributeSearchStates } from "../../query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import { FieldExtensionSearchStates } from "../../query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
@@ -6,8 +6,8 @@ import { IdentifierSearchStates } from "../../query-builder/query-builder-value-
 import { ClassificationSearchStates } from "../../query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 import { RelationshipPresenceSearchStates } from "../../query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
 
-// Mock the react-awesome-query-builder module
-jest.mock("react-awesome-query-builder", () => ({
+// Mock the @react-awesome-query-builder/ui module
+jest.mock("@react-awesome-query-builder/ui", () => ({
   Utils: {
     getTree: jest.fn(),
     loadTree: jest.fn(),

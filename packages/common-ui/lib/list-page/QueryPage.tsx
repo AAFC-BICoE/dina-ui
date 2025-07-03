@@ -11,7 +11,11 @@ import React, {
   useRef,
   CSSProperties
 } from "react";
-import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
+import {
+  ImmutableTree,
+  JsonTree,
+  Utils
+} from "@react-awesome-query-builder/ui";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
@@ -503,7 +507,7 @@ export function QueryPage<TData extends KitsuResource>({
     }
 
     // Check the tree for any validation issues. Do not submit query if issues exist.
-    if (!Utils.isValidTree(submittedQueryBuilderTree)) {
+    if (!Utils.isValidTree(submittedQueryBuilderTree, queryBuilderConfig)) {
       return;
     }
 

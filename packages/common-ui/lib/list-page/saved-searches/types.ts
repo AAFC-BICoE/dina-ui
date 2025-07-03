@@ -1,4 +1,4 @@
-import { JsonTree } from "react-awesome-query-builder";
+import { JsonTree } from "@react-awesome-query-builder/ui";
 
 /**
  * The current version of the saved search, this should change if the structure changes.

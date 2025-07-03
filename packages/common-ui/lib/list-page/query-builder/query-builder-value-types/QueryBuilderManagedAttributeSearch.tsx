@@ -129,7 +129,7 @@ export default function QueryRowManagedAttributeSearch({
     if (value) {
       setManagedAttributeState(JSON.parse(value));
     }
-  }, [managedAttributeConfig]);
+  }, [managedAttributeConfig, value]);
 
   const managedAttributeSelected =
     managedAttributeState.selectedManagedAttribute;
@@ -322,7 +322,7 @@ export default function QueryRowManagedAttributeSearch({
   }
 
   return (
-    <div className={isInColumnSelector ? "" : "row"}>
+    <div className={isInColumnSelector ? "" : "row d-flex flex-row"}>
       {/* Managed Attribute Selection */}
       <ResourceSelect<ManagedAttribute>
         filter={(input) => ({
@@ -381,7 +381,9 @@ export default function QueryRowManagedAttributeSearch({
         selectProps={{
           controlShouldRenderValue: true,
           isClearable: false,
-          className: isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0",
+          className: isInColumnSelector
+            ? "ps-0 mt-2"
+            : "col me-1 ms-2 ps-0 flex-grow-1",
           onKeyDown,
           captureMenuScroll: true,
           menuPlacement: isInColumnSelector ? "bottom" : "auto",
@@ -401,7 +403,7 @@ export default function QueryRowManagedAttributeSearch({
       {!isInColumnSelector && operatorOptions.length !== 0 ? (
         <Select<SelectOption<string>>
           options={operatorOptions}
-          className={`col me-1 ps-0`}
+          className={`col me-1 ps-0 flex-grow-1`}
           value={selectedOperator}
           onChange={(selected) =>
             setManagedAttributeState({
@@ -420,7 +422,7 @@ export default function QueryRowManagedAttributeSearch({
 
       {/* Value Searching (changes based ont he type selected) */}
       {!isInColumnSelector && (
-        <div className="col ps-0">
+        <div className="col ps-0 flex-grow-1">
           {supportedValueForType(managedAttributeType)}
         </div>
       )}

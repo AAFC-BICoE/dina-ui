@@ -1,4 +1,4 @@
-import { JsonTree } from "react-awesome-query-builder";
+import { JsonTree } from "@react-awesome-query-builder/ui";
 import { validateQueryTree } from "../queryBuilderValidator";
 import { generateBuilderConfig } from "../../useQueryBuilderConfig";
 import { ESIndexMapping } from "../../../types";

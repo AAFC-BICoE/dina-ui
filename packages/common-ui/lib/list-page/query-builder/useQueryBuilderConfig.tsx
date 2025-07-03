@@ -10,7 +10,7 @@ import {
   Settings,
   Types,
   Widgets
-} from "react-awesome-query-builder";
+} from "@react-awesome-query-builder/ui";
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
@@ -943,6 +943,7 @@ export function generateBuilderConfig(
   );
 
   return {
+    ctx: BasicConfig.ctx,
     conjunctions,
     operators,
     widgets,
