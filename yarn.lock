@@ -2422,7 +2422,7 @@ commander@~3.0.2:
     fast-xml-parser "^4.3.2"
     flat "^5.0.2"
     formik "^2.2.7"
-    keycloak-js "21.1.2"
+    keycloak-js "22.0.5"
     kitsu "8.3.1"
     kitsu-core "8.3.1"
     lodash "^4.17.21"
@@ -4995,10 +4995,10 @@ jszip@^3.7.1:
     readable-stream "~2.3.6"
     setimmediate "^1.0.5"
 
-keycloak-js@21.1.2:
-  version "21.1.2"
-  resolved "https://registry.yarnpkg.com/keycloak-js/-/keycloak-js-21.1.2.tgz#949889848c024c2a585c177875e012f0163a1d6a"
-  integrity sha512-+6r1BvmutWGJBtibo7bcFbHWIlA7XoXRCwcA4vopeJh59Nv2Js0ju2u+t8AYth+C6Cg7/BNfO3eCTbsl/dTBHw==
+keycloak-js@22.0.5:
+  version "22.0.5"
+  resolved "https://registry.yarnpkg.com/keycloak-js/-/keycloak-js-22.0.5.tgz#8264cec1ff27015e1e53310e108cef3f796a5809"
+  integrity sha512-a7ZwCZeHl8tpeJBy102tZtAnHslDUOA1Nf/sHNF3HYLchKpwoDuaitwIUiS2GnNUe+tlNKLlCqZS+Mi5K79m1w==
   dependencies:
     base64-js "^1.5.1"
     js-sha256 "^0.9.0"
