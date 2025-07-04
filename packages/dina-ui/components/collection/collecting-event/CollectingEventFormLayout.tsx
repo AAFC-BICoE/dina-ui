@@ -243,9 +243,7 @@ export function CollectingEventFormLayout({
         detail.id = addr.osm_id;
         detail.element = addr.osm_type;
         detail.placeType = addr.place_type ?? addr.class;
-        detail.name = detail.placeType
-          ? addr.localname + " [ " + detail.placeType + " ] "
-          : addr.localname;
+        detail.name = addr.localname;
         editableSrcAdmnLevels.push(detail);
       }
       // fill in the country code
@@ -520,21 +518,21 @@ export function CollectingEventFormLayout({
                 </DinaFormSection>
                 <div className="row">
                   {!readOnly && (
-                    <div className="col-md-4">
+                    <div className="col-md-6">
                       <FormikButton
-                        className="btn btn-dark"
+                        className="btn btn-dark w-100"
                         onClick={(_, formik) => removeThisPlace(formik)}
                       >
                         <DinaMessage id="removeThisPlaceLabel" />
                       </FormikButton>
                     </div>
                   )}
-                  <div className="col-md-4">
+                  <div className="col-md-6">
                     {detail.sourceUrl && (
                       <Link
                         href={`${detail.sourceUrl}`}
                         passHref={true}
-                        className="btn btn-info"
+                        className="btn btn-info w-100 mb-2"
                         target="_blank"
                       >
                         <DinaMessage id="viewDetailButtonLabel" />

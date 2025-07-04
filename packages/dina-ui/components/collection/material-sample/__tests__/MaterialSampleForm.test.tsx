@@ -2830,13 +2830,13 @@ describe("Material Sample Edit Page", () => {
       );
       await waitFor(() =>
         expect(
-          wrapper.getByRole("cell", { name: /test building \[ building \]/i })
+          wrapper.getByRole("cell", { name: /test building/i })
         ).toBeInTheDocument()
       );
 
       // Ensure the geographic place is populated.
       expect(
-        wrapper.getByRole("cell", { name: /test building \[ building \]/i })
+        wrapper.getByRole("cell", { name: /test building/i })
       ).toBeInTheDocument();
 
       // No changes to the geographic details

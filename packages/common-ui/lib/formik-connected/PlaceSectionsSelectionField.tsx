@@ -6,6 +6,7 @@ import { FieldHeader } from "../field-header/FieldHeader";
 import { ReactTable } from "../table/ReactTable";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { useGroupedCheckBoxes } from "./GroupedCheckBoxFields";
+import _ from "lodash";
 
 export interface PlaceSectionsSelectionFieldProps extends FieldWrapperProps {
   isDisabled?: boolean;
@@ -46,6 +47,12 @@ export function PlaceSectionsSelectionField(
         accessorKey: "name",
         header: () => <FieldHeader name="name" />,
         enableSorting: false
+      },
+      {
+        id: "placeType",
+        accessorKey: "placeType",
+        header: () => <FieldHeader name="type" />,
+        enableSorting: false
       }
     ];
 
@@ -83,9 +90,16 @@ export function PlaceSectionsSelectionField(
   ) => (
     <div className="read-only-view">
       {value?.map((val) => (
-        <div key={val?.id ?? val.shortId ?? val?.name} className="mb-1">
-          {" "}
-          {val?.name ?? val?.id ?? val?.toString()}{" "}
+        <div
+          key={val?.id ?? val.shortId ?? val?.name}
+          className="mb-1 d-flex align-items-center"
+        >
+          <span>{val?.name ?? val?.id ?? val?.toString()}</span>
+          {val?.placeType && (
+            <span className="badge bg-secondary ms-2">
+              {_.startCase(val.placeType)}
+            </span>
+          )}
         </div>
       ))}
     </div>

@@ -76,11 +76,6 @@ export function useCollectingEventQuery(id?: string | null) {
           srcAdminLevels = srcAdminLevels.concat(
             data.geographicPlaceNameSourceDetail?.higherGeographicPlaces
           );
-
-        srcAdminLevels?.map(
-          (admn) =>
-            (admn.name += admn.placeType ? " [ " + admn.placeType + " ] " : "")
-        );
         data.srcAdminLevels = srcAdminLevels;
 
         // Process loaded back-end data into data structure that Forkmiks can use
