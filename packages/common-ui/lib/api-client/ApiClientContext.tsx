@@ -356,8 +356,8 @@ export class ApiClientImpl implements ApiClientI {
             });
             responses = getResponse.data.data.map((response) => ({
               data: response,
-              included: getResponse.data.included || [],
-              status: getResponse.status
+              included: getResponse.data.included,
+              status: response ? getResponse.status : 404
             }));
             break;
 
@@ -394,8 +394,8 @@ export class ApiClientImpl implements ApiClientI {
             });
             responses = postResponse.data.data.map((response) => ({
               data: response,
-              included: postResponse.data.included || [],
-              status: postResponse.status
+              included: postResponse.data.included,
+              status: response ? postResponse.status : 404
             }));
 
             break;
@@ -416,8 +416,8 @@ export class ApiClientImpl implements ApiClientI {
 
             responses = patchResponse.data.data.map((response) => ({
               data: response,
-              included: patchResponse.data.included || [],
-              status: patchResponse.status
+              included: patchResponse.data.included,
+              status: response ? patchResponse.status : 404
             }));
 
             break;
