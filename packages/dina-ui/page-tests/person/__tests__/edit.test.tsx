@@ -2,7 +2,7 @@ import { Person } from "../../../types/agent-api/resources/Person";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import PersonEditPage from "../../../pages/person/edit";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -158,6 +158,59 @@ describe("person edit page", () => {
 
     // The user should be redirected to person's list page.
     expect(mockPush).lastCalledWith("/person/list");
+  });
+
+  it("Renders an error after form submit if one is returned from the back-end.", async () => {
+    // The patch request will return an error.
+    mockPost.mockImplementationOnce(() => {
+      throw new Error("test error");
+    });
+
+    mockQuery = {};
+
+    const wrapper = mountWithAppContext(<PersonEditPage />, {
+      apiContext
+    });
+
+    const displayNameField = screen.getByRole("textbox", {
+      name: /display name/i
+    }); // adjust label as needed
+    fireEvent.change(displayNameField, { target: { value: "John Doe" } });
+
+    // Submit the form.
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    // Test expected error
+    await waitFor(() => {
+      expect(wrapper.getByText("test error"));
+      expect(mockPush).toBeCalledTimes(0);
+    });
+  });
+
+  it("Renders an error if a display name is not entered.", async () => {
+    // The patch request will return an error.
+    mockPost.mockImplementationOnce(() => {
+      throw new Error("test error");
+    });
+
+    mockQuery = {};
+
+    const wrapper = mountWithAppContext(<PersonEditPage />, {
+      apiContext
+    });
+
+    // Submit the form.
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    // Test expected error
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /1 : display name \- the display name field is required\./i
+        )
+      );
+      expect(mockPush).toBeCalledTimes(0);
+    });
   });
 });
 

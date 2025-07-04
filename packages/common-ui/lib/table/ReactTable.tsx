@@ -245,7 +245,7 @@ export function ReactTable<TData>({
 
   useEffect(() => {
     setResourceRowModel?.(table.getRowModel().rows);
-  }, [table.getRowModel().rows, setResourceRowModel]);
+  }, table.getRowModel().rows);
 
   return !hideTable ? (
     <div

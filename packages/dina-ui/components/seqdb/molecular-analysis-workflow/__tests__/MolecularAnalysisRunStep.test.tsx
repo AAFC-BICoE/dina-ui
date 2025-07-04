@@ -1452,14 +1452,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       fireEvent.change(dataPasteZone, { target: { value: pasteData } });
 
       // Items should be populated in:
-      await waitFor(() => {
-        expect(
-          wrapper.getAllByDisplayValue(/run item name 1/i)[0]
-        ).toBeInTheDocument();
-        expect(
-          wrapper.getAllByDisplayValue(/run item name 2/i)[0]
-        ).toBeInTheDocument();
-      });
+      const textbox1 = wrapper
+        .getAllByDisplayValue(/run item name 1/i)
+        .find((el) => el.tagName === "INPUT");
+      expect(textbox1).toBeInTheDocument();
+
+      const textbox2 = wrapper
+        .getAllByDisplayValue(/run item name 2/i)
+        .find((el) => el.tagName === "INPUT");
+      expect(textbox2).toBeInTheDocument();
     });
   });
 });

@@ -3,6 +3,7 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
+  FieldWrapper,
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
@@ -18,6 +19,7 @@ import * as yup from "yup";
 import {
   GroupSelectField,
   StorageLinkerField,
+  StorageUnitBreadCrumb,
   StorageUnitChildrenViewer
 } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
@@ -212,13 +214,26 @@ export function StorageUnitFormFields({
             materialSamples={materialSamplesQuery.response?.data}
           />
         )}
-      {!reduceRendering && (
-        <StorageLinkerField
-          name="parentStorageUnit"
-          targetType="storage-unit"
-          parentIdInURL={parentIdInURL}
-          parentStorageUnitUUID={initialValues.id}
+      {readOnly ? (
+        <FieldWrapper
+          name="location"
+          readOnlyRender={(_, form) => (
+            <StorageUnitBreadCrumb
+              storageUnit={form.values}
+              // Don't show this storage unit in the breadcrumb:
+              hideThisUnit={true}
+            />
+          )}
         />
+      ) : (
+        !reduceRendering && (
+          <StorageLinkerField
+            name="parentStorageUnit"
+            targetType="storage-unit"
+            parentIdInURL={parentIdInURL}
+            parentStorageUnitUUID={initialValues.id}
+          />
+        )
       )}
       {readOnly && (
         <StorageUnitChildrenViewer

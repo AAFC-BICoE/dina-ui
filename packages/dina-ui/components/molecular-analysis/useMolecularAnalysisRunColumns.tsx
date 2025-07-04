@@ -33,9 +33,6 @@ interface UseMolecularAnalysisRunColumnsProps {
     updatedQualityControlsCopy?: QualityControlWithAttachment[]
   ) => Promise<void>;
   qualityControlTypes?: VocabularyOption[];
-  setSequencingRunItems?: Dispatch<
-    SetStateAction<SequencingRunItem[] | undefined>
-  >;
 }
 
 export function useMolecularAnalysisRunColumns({
@@ -45,40 +42,11 @@ export function useMolecularAnalysisRunColumns({
   setReloadGenericMolecularAnalysisRun,
   qualityControls,
   updateExistingQualityControls,
-  qualityControlTypes,
-  setSequencingRunItems
+  qualityControlTypes
 }: UseMolecularAnalysisRunColumnsProps) {
   const { compareByStringAndNumber } = useStringComparator();
   const { save } = useApiClient();
   const { groupNames } = useAccount();
-
-  function handleNameChange(materialSampleId: string, newName: string) {
-    setSequencingRunItems?.((prev) => {
-      if (!prev) return prev;
-
-      const updatedItems = prev.map((item) => {
-        if (item.materialSampleId === materialSampleId) {
-          if (item.molecularAnalysisRunItem) {
-            item.molecularAnalysisRunItem.name = newName;
-          }
-
-          const updatedRunItem: SequencingRunItem = {
-            ...item,
-            molecularAnalysisRunItem: item.molecularAnalysisRunItem
-          };
-          return updatedRunItem;
-        }
-        return item;
-      });
-
-      return updatedItems;
-    });
-
-    setMolecularAnalysisRunItemNames?.((prev) => ({
-      ...prev,
-      [materialSampleId]: newName
-    }));
-  }
 
   // Table columns to display for the sequencing run.
   const SEQ_REACTION_COLUMNS: ColumnDef<SequencingRunItem>[] = [
@@ -219,11 +187,11 @@ export function useMolecularAnalysisRunColumns({
           <input
             type="text"
             className="w-100 form-control"
-            value={original.molecularAnalysisRunItem?.name}
+            defaultValue={original.molecularAnalysisRunItem?.name}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              if (original.materialSampleId) {
-                handleNameChange(original.materialSampleId, event.target.value);
-              }
+              setMolecularAnalysisRunItemNames?.(
+                handleMolecularAnalysisRunItemNames(original, event)
+              );
             }}
           />
         );

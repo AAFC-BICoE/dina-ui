@@ -235,6 +235,11 @@ export class ApiClientImpl implements ApiClientI {
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
 
+    // If the apiBaseUrl is agent-api, we will skip the operation for single requests.
+    if (["/agent-api"].includes(apiBaseUrl)) {
+      skipOperationForSingleRequest = true;
+    }
+
     if (operations.length === 1 && skipOperationForSingleRequest) {
       // Single Request Only
       const operation = operations[0];
@@ -302,19 +307,136 @@ export class ApiClientImpl implements ApiClientI {
           throw new Error(`Unsupported single operation: ${operation.op}`);
       }
     } else {
-      const axiosResponse = await axios.patch(
-        `${apiBaseUrl}/operations`,
-        operations,
-        {
-          headers: {
-            Accept: "application/json-patch+json",
-            "Content-Type": "application/json-patch+json",
-            "Crnk-Compact": "true"
-          }
-        }
-      );
+      // use new bulk functions if using the new api
+      if (
+        ["/agent-api"].includes(apiBaseUrl) &&
+        ["POST", "PATCH", "DELETE", "GET"].includes(
+          operations[0].op.toUpperCase()
+        )
+      ) {
+        const resourceType = operations[0].path.split("/")[0];
 
-      responses = axiosResponse.data;
+        const unsupportedResourceTypes = ["organization", "identifier-type"];
+
+        if (unsupportedResourceTypes.includes(resourceType)) {
+          throw new Error(
+            `Unsupported resource type for bulk operations: ${resourceType}`
+          );
+        }
+
+        switch (operations[0].op.toUpperCase()) {
+          case "GET":
+            const includeSet = new Set<string>();
+
+            const ids = operations.map((operation) => {
+              // Split path by "?"
+              const pathParts = operation.path.split("?");
+
+              // Get the "include" part, after '?', if exists
+              const includePart =
+                pathParts.length > 1 ? pathParts[1].split("=")[1] : null;
+              if (includePart) {
+                // Split by comma and add each to the Set
+                includePart.split(",").forEach((includeItem) => {
+                  includeSet.add(includeItem);
+                });
+              }
+
+              // Extract the ID from before the '?' by splitting by '/' and getting the second item
+              return pathParts[0].split("/")[1];
+            });
+
+            const include: string[] | undefined =
+              includeSet.size > 0 ? [...includeSet] : undefined;
+            const getResponse = await this.bulkLoadResources(ids, {
+              apiBaseUrl,
+              resourceType,
+              include,
+              returnNullForMissingResource
+            });
+            responses = getResponse.data.data.map((response) => ({
+              data: response,
+              included: getResponse.data.included,
+              status: response ? getResponse.status : 404
+            }));
+            break;
+
+          case "DELETE":
+            const deleteIds = operations.map((operation) => {
+              // Split path by "?"
+              const pathParts = operation.path.split("/");
+
+              // Extract the ID from before the '?' by splitting by '/' and getting the second item
+              return pathParts[1];
+            });
+
+            const deleteResponse = await this.bulkDeleteResources(deleteIds, {
+              apiBaseUrl,
+              resourceType
+            });
+
+            responses = deleteIds.map(() => ({
+              status: deleteResponse.status
+            })) as any;
+            break;
+
+          case "POST":
+            // For agent-api, we need to do a bulk create
+            const postResources: InputResource<KitsuResource>[] = operations
+              .map((op) => op.value)
+              .filter(
+                (value): value is InputResource<KitsuResource> =>
+                  value !== undefined
+              );
+            const postResponse = await this.bulkCreateResources(postResources, {
+              apiBaseUrl,
+              resourceType
+            });
+            responses = postResponse.data.data.map((response) => ({
+              data: response,
+              included: postResponse.data.included,
+              status: response ? postResponse.status : 404
+            }));
+
+            break;
+          case "PATCH":
+            const patchResources: InputResource<KitsuResource>[] = operations
+              .map((op) => op.value)
+              .filter(
+                (value): value is InputResource<KitsuResource> =>
+                  value !== undefined
+              );
+            const patchResponse = await this.bulkUpdateResources(
+              patchResources,
+              {
+                apiBaseUrl,
+                resourceType
+              }
+            );
+
+            responses = patchResponse.data.data.map((response) => ({
+              data: response,
+              included: patchResponse.data.included,
+              status: response ? patchResponse.status : 404
+            }));
+
+            break;
+        }
+      } else {
+        const axiosResponse = await axios.patch(
+          `${apiBaseUrl}/operations`,
+          operations,
+          {
+            headers: {
+              Accept: "application/json-patch+json",
+              "Content-Type": "application/json-patch+json",
+              "Crnk-Compact": "true"
+            }
+          }
+        );
+
+        responses = axiosResponse.data;
+      }
     }
 
     // Optionally return null instead of throwing an error for missing resources:
@@ -359,48 +481,104 @@ export class ApiClientImpl implements ApiClientI {
     const deleteArgs = args.filter(
       (arg) => (arg as any).delete
     ) as DeleteArgs[];
+
     const saveArgs = args.filter((arg) => !(arg as any).delete) as SaveArgs[];
 
     // Serialize the resources to JSONAPI format.
     const serializePromises = saveArgs.map((saveArg) => serialize(saveArg));
     const serialized = await Promise.all(serializePromises);
 
-    // Create the jsonpatch operations objects.
-    const saveOperations = serialized.map<Operation>((jsonapiResource) => ({
-      op: options?.overridePatchOperation
-        ? "POST"
-        : jsonapiResource.id
-        ? "PATCH"
-        : "POST",
-      path: options?.overridePatchOperation
-        ? jsonapiResource.type
-        : jsonapiResource.id
-        ? `${jsonapiResource.type}/${jsonapiResource.id}`
-        : jsonapiResource.type,
-      value: {
-        ...jsonapiResource,
-        id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-      }
-    }));
-
     const deleteOperations = deleteArgs.map<Operation>((deleteArg) => ({
       op: "DELETE",
       path: `${deleteArg.delete.type}/${deleteArg.delete.id}`
     }));
 
-    const operations = [...saveOperations, ...deleteOperations];
+    // If using repository v2, split different operation types into separate requests.
+    if (options?.apiBaseUrl && ["/agent-api"].includes(options?.apiBaseUrl)) {
+      const postOperations: any = [];
+      const patchOperations: any = [];
 
-    // Do the operations request.
-    const responses = await this.doOperations(operations, options);
+      for (const jsonapiResource of serialized) {
+        if (jsonapiResource.id) {
+          patchOperations.push({
+            op: "PATCH",
+            path: `${jsonapiResource.type}/${jsonapiResource.id}`,
+            value: {
+              ...jsonapiResource,
+              id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
+            }
+          });
+        } else {
+          postOperations.push({
+            op: "POST",
+            path: jsonapiResource.type,
+            value: {
+              ...jsonapiResource,
+              id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
+            }
+          });
+        }
+      }
 
-    // Deserialize the responses to Kitsu format.
-    const deserializePromises = responses.map((response) =>
-      deserialise(response)
-    );
-    const deserialized = await Promise.all(deserializePromises);
-    const kitsuResources = deserialized.map(({ data }) => data);
+      // only do the operations if there are any.
+      const postResponses = postOperations.length
+        ? await this.doOperations(postOperations, options)
+        : [];
+      const patchResponses = patchOperations.length
+        ? await this.doOperations(patchOperations, options)
+        : [];
+      const deleteResponses = deleteOperations.length
+        ? await this.doOperations(deleteOperations, options)
+        : [];
 
-    return kitsuResources;
+      // Deserialize the responses to Kitsu format.
+      const deserializedPostPromises = postResponses.map((response) =>
+        deserialise(response)
+      );
+      const deserializedPatchPromises = patchResponses.map((response) =>
+        deserialise(response)
+      );
+      const deserializedDeletePromises = deleteResponses.map((response) =>
+        deserialise(response)
+      );
+      const deserialized = await Promise.all([
+        ...deserializedPostPromises,
+        ...deserializedPatchPromises,
+        ...deserializedDeletePromises
+      ]);
+      const kitsuResources = deserialized.map(({ data }) => data);
+      return kitsuResources;
+    } else {
+      const saveOperations = serialized.map<Operation>((jsonapiResource) => ({
+        op: options?.overridePatchOperation
+          ? "POST"
+          : jsonapiResource.id
+          ? "PATCH"
+          : "POST",
+        path: options?.overridePatchOperation
+          ? jsonapiResource.type
+          : jsonapiResource.id
+          ? `${jsonapiResource.type}/${jsonapiResource.id}`
+          : jsonapiResource.type,
+        value: {
+          ...jsonapiResource,
+          id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
+        }
+      }));
+
+      const operations = [...saveOperations, ...deleteOperations];
+
+      // Do the operations request.
+      const responses = await this.doOperations(operations, options);
+
+      // Deserialize the responses to Kitsu format.
+      const deserializePromises = responses.map((response) =>
+        deserialise(response)
+      );
+      const deserialized = await Promise.all(deserializePromises);
+      const kitsuResources = deserialized.map(({ data }) => data);
+      return kitsuResources;
+    }
   }
 
   /**
@@ -495,12 +673,8 @@ export class ApiClientImpl implements ApiClientI {
     resources: InputResource<KitsuResource>[],
     { apiBaseUrl, resourceType }: BulkCreateResourcesOptions
   ): Promise<AxiosResponse> {
-    const serializedResources = await Promise.all(
-      resources.map((resource) => serialize({ resource, type: resourceType }))
-    );
-
     const requestBody = {
-      data: serializedResources.map((resource) => ({
+      data: resources.map((resource) => ({
         ...resource
       }))
     };
@@ -530,12 +704,8 @@ export class ApiClientImpl implements ApiClientI {
     resources: InputResource<KitsuResource>[],
     { apiBaseUrl, resourceType }: BulkUpdateResourcesOptions
   ): Promise<AxiosResponse> {
-    const serializedResources = await Promise.all(
-      resources.map((resource) => serialize({ resource, type: resourceType }))
-    );
-
     const requestBody = {
-      data: serializedResources.map((resource) => ({
+      data: resources.map((resource) => ({
         ...resource
       }))
     };

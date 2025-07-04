@@ -26,8 +26,7 @@ import {
   useCollectingEventQuery,
   AssemblageSelectSection,
   OrganismsField,
-  useCopyToNextSample,
-  NotPubliclyReleasableSection
+  useCopyToNextSample
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
@@ -61,6 +60,7 @@ import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
 import { CollectionSelectSection } from "../CollectionSelectSection";
+import { NotPubliclyReleasableSection } from "../../tag-editor/NotPubliclyReleasableSection";
 import { ShowParentAttributesField } from "./ShowParentAttributesField";
 import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
 
@@ -472,11 +472,13 @@ export function MaterialSampleForm({
                   <CollectionSelectSection resourcePath="collection-api/collection" />
                   <ProjectSelectSection resourcePath="collection-api/project" />
                   <AssemblageSelectSection resourcePath="collection-api/assemblage" />
-                  <NotPubliclyReleasableSection />
                   <TagsAndRestrictionsSection
                     resourcePath="collection-api/material-sample"
                     indexName="dina_material_sample_index"
                   />
+                </div>
+                <div className="col-md-4">
+                  <NotPubliclyReleasableSection />
                 </div>
               </div>
             </>

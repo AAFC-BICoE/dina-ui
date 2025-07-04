@@ -68,7 +68,6 @@ export * from "./table/thumbnail-cell";
 export * from "./tag-editor/NotPubliclyReleasableWarning";
 export * from "./tag-editor/TagsAndRestrictionsSection";
 export * from "./tag-editor/TagSelectField";
-export * from "./tag-editor/NotPubliclyReleasableSection";
 export * from "./collection/material-sample/RestrictionField";
 export * from "./page/PageLayout";
 export * from "./seqdb/ngs-index/NgsIndexField";

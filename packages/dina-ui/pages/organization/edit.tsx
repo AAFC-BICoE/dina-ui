@@ -115,14 +115,13 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
           languageCode: "FR",
           name: submittedValues.name.FR
         };
-      } else {
-        throw new Error(
-          formatMessage("field_organizationMandatoryFieldsError")
-        );
       }
-
       submittedValues.names = multiligualName;
       delete submittedValues.name;
+    }
+
+    if (submittedValues.names.length === 0) {
+      throw new Error(formatMessage("field_organizationMandatoryFieldsError"));
     }
 
     await save(
@@ -133,7 +132,8 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
         }
       ],
       {
-        apiBaseUrl: "/agent-api"
+        apiBaseUrl: "/agent-api",
+        skipOperationForSingleRequest: true
       }
     );
 

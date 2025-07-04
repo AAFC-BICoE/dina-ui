@@ -15,8 +15,6 @@ export interface DerivativeAttributes {
   createdOn: string;
   derivativeType: string;
   acTags?: string[];
-  publiclyReleasable?: boolean;
-  notPubliclyReleasableReason: any;
 }
 
 export interface DerivativeRelationships {

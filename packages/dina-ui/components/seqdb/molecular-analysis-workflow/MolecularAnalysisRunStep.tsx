@@ -44,7 +44,6 @@ export function MolecularAnalysisRunStep({
     setSequencingRunName,
     sequencingRunName,
     sequencingRunItems,
-    setSequencingRunItems,
     qualityControls,
     qualityControlTypes,
     createNewQualityControl,
@@ -70,8 +69,7 @@ export function MolecularAnalysisRunStep({
       useMolecularAnalysisRunColumns({
         type: "generic-molecular-analysis-item",
         setMolecularAnalysisRunItemNames,
-        readOnly: !editMode,
-        setSequencingRunItems: setSequencingRunItems
+        readOnly: !editMode
       }),
     [setMolecularAnalysisRunItemNames, editMode]
   );

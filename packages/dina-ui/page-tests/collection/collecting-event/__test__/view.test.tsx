@@ -44,9 +44,9 @@ const mockBulkGet = jest.fn(async (paths) => {
   if (!paths.length) {
     return [];
   }
-  if ((paths[0] as string).startsWith("/person/")) {
+  if ((paths[0] as string).startsWith("person/")) {
     return paths.map((path) => ({
-      id: path.replace("/person/", ""),
+      id: path.replace("person/", ""),
       type: "agent",
       displayName: "person a"
     }));

@@ -1,5 +1,6 @@
 import { CreateButton, FieldHeader, QueryPage, dateCell } from "common-ui";
 import Link from "next/link";
+import { StorageUnitBreadCrumb } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
 import { TableColumn } from "common-ui/lib/list-page/types";
 
@@ -30,16 +31,16 @@ const columns: TableColumn<any>[] = [
         original: { included }
       }
     }) => {
-      if (!included?.storageUnitType?.id) {
+      if (!included?.["storage-unit-type"]?.id) {
         return null;
       }
 
       return (
         <Link
-          href={`/collection/storage-unit-type/view?id=${included?.storageUnitType?.id}`}
+          href={`/collection/storage-unit-type/view?id=${included?.["storage-unit-type"]?.id}`}
           passHref={true}
         >
-          {included?.storageUnitType?.attributes?.name}
+          {included?.["storage-unit-type"]?.attributes?.name}
         </Link>
       );
     },
@@ -57,16 +58,15 @@ const columns: TableColumn<any>[] = [
       row: {
         original: { data }
       }
-    }) => {
-      const parentRank = data?.attributes?.hierarchy?.find(
-        (item) => item.rank === 2
-      );
-      return <>{parentRank?.name}</>;
-    },
+    }) => (
+      <StorageUnitBreadCrumb
+        storageUnit={data?.attributes}
+        hideThisUnit={true}
+      />
+    ),
     header: () => <FieldHeader name="location" />,
     enableSorting: false,
-    isKeyword: true,
-    additionalAccessors: ["data.attributes.hierarchy"]
+    isKeyword: true
   },
 
   // Group
