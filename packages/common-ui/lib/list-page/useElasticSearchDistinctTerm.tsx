@@ -1,7 +1,7 @@
 import Bodybuilder from "bodybuilder";
 import _ from "lodash";
 import { useEffect, useState } from "react";
-import { useApiClient, useQueryBuilderContext } from "..";
+import { useAccount, useApiClient } from "..";
 const TOTAL_SUGGESTIONS: number = 100;
 const FILTER_AGGREGATION_NAME: string = "included_type_filter";
 const AGGREGATION_NAME: string = "term_aggregation";
@@ -39,10 +39,13 @@ export function useElasticSearchDistinctTerm({
   size
 }: QuerySuggestionFieldProps) {
   const { apiClient } = useApiClient();
+
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const { groups } = groupNames
-    ? { groups: groupNames }
-    : useQueryBuilderContext();
+
+  // Groups to be applied to the query, groupNames can be explictly set to an empty array.
+  const { groupNames: accountGroupNames } = useAccount();
+  const groups = groupNames ?? accountGroupNames;
+
   // Every time the textEntered has changed, perform a new request for new suggestions.
   useEffect(() => {
     if (!fieldName) return;
