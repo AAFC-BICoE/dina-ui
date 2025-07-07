@@ -235,8 +235,8 @@ export class ApiClientImpl implements ApiClientI {
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
 
-    // If the apiBaseUrl is agent-api, we will skip the operation for single requests.
-    if (["/agent-api"].includes(apiBaseUrl)) {
+    // If the apiBaseUrl is an api using a repository that doesn't support operations, we will skip the operation for single requests.
+    if (["/agent-api", "/dina-export-api"].includes(apiBaseUrl)) {
       skipOperationForSingleRequest = true;
     }
 
