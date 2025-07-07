@@ -26,9 +26,14 @@ const QueryBuilderContext = createContext<QueryBuilderContextI | null>(null);
 export const QueryBuilderContextProvider = QueryBuilderContext.Provider;
 
 /** Exposes the needed features from the query page provider. */
-export function useQueryBuilderContext(): QueryBuilderContextI {
+export function useQueryBuilderContext(
+  throwOnMissing = true
+): QueryBuilderContextI | null {
   const ctx = useContext(QueryBuilderContext);
   if (!ctx) {
+    if (!throwOnMissing) {
+      return null;
+    }
     throw new Error(
       "No QueryBuilderContext available, is this component inside of a QueryPage?"
     );
