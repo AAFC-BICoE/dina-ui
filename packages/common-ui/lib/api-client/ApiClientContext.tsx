@@ -235,8 +235,16 @@ export class ApiClientImpl implements ApiClientI {
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
 
-    // If the apiBaseUrl is an api using a repository that doesn't support operations, we will skip the operation for single requests.
-    if (["/agent-api", "/dina-export-api"].includes(apiBaseUrl)) {
+    const resourceType = operations[0].path.split("/")[0];
+
+    // APIs using Repository V2.
+    const supportedBaseApis = ["/agent-api", "/dina-export-api"];
+
+    // Resource types that are supported for bulk operations.
+    const supportedResourceTypes = ["person", "identifier"];
+
+    // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
+    if (supportedBaseApis.includes(apiBaseUrl)) {
       skipOperationForSingleRequest = true;
     }
 
@@ -307,31 +315,11 @@ export class ApiClientImpl implements ApiClientI {
           throw new Error(`Unsupported single operation: ${operation.op}`);
       }
     } else {
-      // use new bulk functions if using the new api
+      // use new bulk functions if using the new api and using a supported resource type.
       if (
-        ["/agent-api", "/dina-export-api"].includes(apiBaseUrl) &&
-        ["POST", "PATCH", "DELETE", "GET"].includes(
-          operations[0].op.toUpperCase()
-        )
+        supportedBaseApis.includes(apiBaseUrl) &&
+        supportedResourceTypes.includes(resourceType)
       ) {
-        const resourceType = operations[0].path.split("/")[0];
-
-        // Resource types that are not supported for bulk operations.
-        const unsupportedResourceTypes = ["organization", "identifier-type"];
-
-        // APIs that do not support operations and have no bulk or bulk-load endpoints.
-        const unsupportedBaseApis = ["/dina-export-api"];
-
-        if (unsupportedResourceTypes.includes(resourceType)) {
-          throw new Error(
-            `Unsupported resource type for bulk operations: ${resourceType}`
-          );
-        }
-
-        if (unsupportedBaseApis.includes(apiBaseUrl)) {
-          throw new Error(`Unsupported API for bulk operations: ${apiBaseUrl}`);
-        }
-
         switch (operations[0].op.toUpperCase()) {
           case "GET":
             const includeSet = new Set<string>();
