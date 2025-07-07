@@ -309,19 +309,27 @@ export class ApiClientImpl implements ApiClientI {
     } else {
       // use new bulk functions if using the new api
       if (
-        ["/agent-api"].includes(apiBaseUrl) &&
+        ["/agent-api", "/dina-export-api"].includes(apiBaseUrl) &&
         ["POST", "PATCH", "DELETE", "GET"].includes(
           operations[0].op.toUpperCase()
         )
       ) {
         const resourceType = operations[0].path.split("/")[0];
 
+        // Resource types that are not supported for bulk operations.
         const unsupportedResourceTypes = ["organization", "identifier-type"];
+
+        // APIs that do not support operations and have no bulk or bulk-load endpoints.
+        const unsupportedBaseApis = ["/dina-export-api"];
 
         if (unsupportedResourceTypes.includes(resourceType)) {
           throw new Error(
             `Unsupported resource type for bulk operations: ${resourceType}`
           );
+        }
+
+        if (unsupportedBaseApis.includes(apiBaseUrl)) {
+          throw new Error(`Unsupported API for bulk operations: ${apiBaseUrl}`);
         }
 
         switch (operations[0].op.toUpperCase()) {
