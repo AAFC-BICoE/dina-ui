@@ -22,7 +22,8 @@ import {
   Nav,
   NotPubliclyReleasableWarning,
   PersonSelectField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  NotPubliclyReleasableSection
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -195,6 +196,7 @@ function ExternalResourceMetadataForm({
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <NotPubliclyReleasableWarning />
       {buttonBar}
+      <NotPubliclyReleasableSection />
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"
