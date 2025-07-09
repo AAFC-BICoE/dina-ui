@@ -23,10 +23,12 @@ export interface GeoSuggestProps {
 export interface NominatumApiSearchResult {
   osm_type: string;
   osm_id: number;
+  name: string;
   display_name: string;
   category: string;
   type: string;
   address?: { [key: string]: string | undefined };
+  addresstype: string;
 }
 
 export function GeoSuggestSearchBox({

@@ -192,6 +192,16 @@ export function CollectingEventFormLayout({
 
     // Go through each "address" available.
     for (const [key, value] of Object.entries(searchResult.address)) {
+      // Ignore state/province and country as they are already handled.
+      if (
+        key === "state" ||
+        key === "province" ||
+        key === "country" ||
+        key === "country_code"
+      ) {
+        continue;
+      }
+
       if (value) {
         adminLevels.push({
           id: "test",
