@@ -20,10 +20,18 @@ const mockGet = jest.fn(async (model) => {
   }
 });
 
+const mockPost = jest.fn(async (model) => {
+  // The post request will return the existing object subtype.
+  if (model === "objectstore-api/object-subtype") {
+    // The request returns the test subtype.
+    return { data: TEST_OBJECT_SUBTYPE };
+  }
+});
+
 // Mock API requests:
 const mockPatch = jest.fn();
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: { get: mockGet, axios: { patch: mockPatch, post: mockPost } }
 };
 
 describe("Object subtype edit page", () => {
@@ -73,21 +81,15 @@ describe("Object subtype edit page", () => {
 
     // Test expected response
     await waitFor(() => {
-      expect(mockPatch).lastCalledWith(
-        "/objectstore-api/operations",
-        [
-          {
-            op: "POST",
-            path: "object-subtype",
-            value: {
-              attributes: {
-                acSubtype: "libre office word"
-              },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "object-subtype"
-            }
+      expect(mockPost).lastCalledWith(
+        "/objectstore-api/object-subtype",
+        {
+          data: {
+            attributes: { acSubtype: "libre office word" },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "object-subtype"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -146,20 +148,18 @@ describe("Object subtype edit page", () => {
     // and the modified one.
     await waitFor(() => {
       expect(mockPatch).lastCalledWith(
-        "/objectstore-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "object-subtype/1",
-            value: {
-              attributes: expect.objectContaining({
-                acSubtype: "new subtype value"
-              }),
-              id: "1",
-              type: "object-subtype"
-            }
+        "/objectstore-api/object-subtype/1",
+        {
+          data: {
+            attributes: {
+              acSubtype: "new subtype value",
+              dcType: "Text",
+              uuid: "323423-23423-234"
+            },
+            id: "1",
+            type: "object-subtype"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -170,20 +170,11 @@ describe("Object subtype edit page", () => {
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
-      data: [
-        {
-          errors: [
-            {
-              detail: "DcType and subtype combination should be unique",
-              status: "422",
-              title: "Constraint violation"
-            }
-          ],
-          status: 422
-        }
-      ] as OperationsResponse
-    }));
+    mockPost.mockImplementationOnce(() => {
+      throw new Error(
+        `Constraint violation: DcType and subtype combination should be unique`
+      );
+    });
 
     const wrapper = mountWithAppContext(
       <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />,
