@@ -44,15 +44,25 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       .array()
       .of(
         yup.object({
-          namespace: yup.string().required("Identifier type is required."),
-          value: yup.string().required("Identifier value is required.")
+          namespace: yup
+            .string()
+            .required(formatMessage("field_personIdentifierTypeError")),
+          value: yup
+            .string()
+            .required(formatMessage("field_personIdentifierValueError"))
         })
       )
-      .test("unique-values", "Identifiers must be unique.", (identifiers) => {
-        if (!identifiers) return true; // No error if empty
-        const values = identifiers.map((i) => i.value?.trim()).filter(Boolean);
-        return values.length === new Set(values).size;
-      })
+      .test(
+        "unique-values",
+        formatMessage("field_personIdentifierUniqueError"),
+        (identifiers) => {
+          if (!identifiers) return true; // No error if empty
+          const values = identifiers
+            .map((i) => i.value?.trim())
+            .filter(Boolean);
+          return values.length === new Set(values).size;
+        }
+      )
   });
 
   /**
