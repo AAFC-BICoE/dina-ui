@@ -5,6 +5,7 @@ import {
   LoadingSpinner,
   withResponse
 } from "common-ui";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useDerivativeMetadataViewQuery } from "../../../components/object-store/metadata/useMetadata";
 import {
@@ -19,7 +20,7 @@ import { MetadataFileView } from "../../../components/object-store/metadata/Meta
 import { DerivativeDetails } from "../../../components/object-store/derivative/DerivativeDetails";
 import { Metadata } from "../../../types/objectstore-api";
 import { derivativeTypeToLabel } from "../../../components/object-store";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useDinaIntl, DinaMessage } from "../../../intl/dina-ui-intl";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -51,13 +52,24 @@ export default function DerivativeViewPage() {
 
   const buttonBar = (
     <ButtonBar className="mb-3">
-      <div className="col-md-4 mt-2">
+      <div className="col-md-8 mt-2">
         <BackButton
           entityLink="/object-store/object/"
           entityId={`${derivative?.acDerivedFrom?.id}`}
           buttonMsg="backToParentFile"
           buttonMsgValues={{ parentFilename: parentFileName }}
         />
+      </div>
+      <div className="col-md-4 flex d-flex gap-2">
+        <>
+          <Link
+            href={`/object-store/derivative/edit?id=${uuid}`}
+            className="btn btn-primary ms-auto"
+            style={{ width: "5rem" }}
+          >
+            <DinaMessage id="editButtonText" />
+          </Link>
+        </>
       </div>
     </ButtonBar>
   );

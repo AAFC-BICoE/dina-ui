@@ -7,6 +7,8 @@ import {
   useModal,
   StringArrayField,
   ResourceSelectField,
+  DoOperationsError,
+  OperationError,
   SaveArgs,
   useApiClient,
   BackButton,
@@ -19,8 +21,6 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
 import _ from "lodash";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
-import * as yup from "yup";
 
 interface PersonFormProps {
   person?: Person;
@@ -32,28 +32,9 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   const initialValues: Partial<Person> = person || {
     type: "person"
   };
-  const { formatMessage } = useDinaIntl();
   const id = person?.id;
   const { save } = useApiClient();
   let submittedIdentifierIds: any[] = [];
-  const personFormValidationSchema = yup.object({
-    displayName: yup
-      .string()
-      .required(formatMessage("field_personMandatoryFieldsError")),
-    identifiers: yup
-      .array()
-      .of(
-        yup.object({
-          namespace: yup.string().required("Identifier type is required."),
-          value: yup.string().required("Identifier value is required.")
-        })
-      )
-      .test("unique-values", "Identifiers must be unique.", (identifiers) => {
-        if (!identifiers) return true; // No error if empty
-        const values = identifiers.map((i) => i.value?.trim()).filter(Boolean);
-        return values.length === new Set(values).size;
-      })
-  });
 
   /**
    * Handle creating, updating Identifiers
@@ -78,16 +59,37 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
         }) ?? [];
 
     delete submitted.identifiers;
+    try {
+      let savedIdentifiers: PersistedResource<Identifier>[] = [];
+      // Don't call the API with an empty Save array:
+      if (identifierSaveArgs.length) {
+        savedIdentifiers = await save<Identifier>(identifierSaveArgs, {
+          apiBaseUrl: "/agent-api"
+        });
+      }
 
-    let savedIdentifiers: PersistedResource<Identifier>[] = [];
-    // Don't call the API with an empty Save array:
-    if (identifierSaveArgs.length) {
-      savedIdentifiers = await save<Identifier>(identifierSaveArgs, {
-        apiBaseUrl: "/agent-api",
-        skipOperationForSingleRequest: true
-      });
+      return savedIdentifiers;
+    } catch (error: unknown) {
+      if (error instanceof DoOperationsError) {
+        const newErrors = error.individualErrors.map<OperationError>((err) => ({
+          fieldErrors: _.mapKeys(
+            err.fieldErrors,
+            (_, field) => `identifier[${err.index}].${field}`
+          ),
+          errorMessage: err.errorMessage,
+          index: err.index
+        }));
+
+        const overallFieldErrors = newErrors.reduce(
+          (total, curr) => ({ ...total, ...curr.fieldErrors }),
+          {}
+        );
+
+        throw new DoOperationsError(error.message, overallFieldErrors);
+      } else {
+        throw error;
+      }
     }
-    return savedIdentifiers;
   }
 
   async function deleteIdentifiers() {
@@ -101,15 +103,37 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
         .filter((deleteArg) => {
           return !submittedIdentifierIds.includes(deleteArg.delete.id);
         }) ?? [];
-    let deletedIdentifiers: PersistedResource<Identifier>[] = [];
-    // Don't call the API with an empty Save array:
-    if (identifierDeleteArgs.length) {
-      deletedIdentifiers = await save<Identifier>(identifierDeleteArgs, {
-        apiBaseUrl: "/agent-api"
-      });
-    }
+    try {
+      let deletedIdentifiers: PersistedResource<Identifier>[] = [];
+      // Don't call the API with an empty Save array:
+      if (identifierDeleteArgs.length) {
+        deletedIdentifiers = await save<Identifier>(identifierDeleteArgs, {
+          apiBaseUrl: "/agent-api"
+        });
+      }
 
-    return deletedIdentifiers;
+      return deletedIdentifiers;
+    } catch (error: unknown) {
+      if (error instanceof DoOperationsError) {
+        const newErrors = error.individualErrors.map<OperationError>((err) => ({
+          fieldErrors: _.mapKeys(
+            err.fieldErrors,
+            (_, field) => `identifier[${err.index}].${field}`
+          ),
+          errorMessage: err.errorMessage,
+          index: err.index
+        }));
+
+        const overallFieldErrors = newErrors.reduce(
+          (total, curr) => ({ ...total, ...curr.fieldErrors }),
+          {}
+        );
+
+        throw new DoOperationsError(error.message, overallFieldErrors);
+      } else {
+        throw error;
+      }
+    }
   }
 
   const onSubmit: DinaFormOnSubmit = async ({
@@ -135,7 +159,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       })
     };
     delete submittedPerson.organizations;
-
     if (Object.keys(submittedPerson.relationships).length === 0) {
       delete submittedPerson.relationships;
     }
@@ -174,11 +197,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   );
 
   return (
-    <DinaForm
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-      validationSchema={personFormValidationSchema}
-    >
+    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       {buttonBar}
       <div style={{ width: "30rem" }}>
         <TextField name="displayName" />

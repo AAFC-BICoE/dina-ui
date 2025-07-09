@@ -74,6 +74,7 @@ const TEST_METADATA: PersistedResource<Metadata> = {
     "https://open.canada.ca/en/open-government-licence-canada",
   id: "25f81de5-bbee-430c-b5fa-71986b70e612",
   type: "metadata",
+  publiclyReleasable: true,
   managedAttributes: {
     test_managed_attribute: "test-managed-attribute-value"
   },
@@ -174,6 +175,23 @@ describe("Metadata single record edit page.", () => {
       }
     );
 
+    userEvent.click(
+      wrapper.getByRole("switch", { name: /not publicly releasable/i })
+    );
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/not publicly releasable reason/i)
+      ).toBeInTheDocument();
+    });
+
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /not publicly releasable reason/i }),
+      {
+        target: { value: "new reason for not publicly releasable" }
+      }
+    );
+
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
@@ -189,6 +207,9 @@ describe("Metadata single record edit page.", () => {
               managedAttributes: {
                 test_managed_attribute: "new-managed-attribute-value"
               },
+              publiclyReleasable: false,
+              notPubliclyReleasableReason:
+                "new reason for not publicly releasable",
               type: "metadata",
               xmpRightsUsageTerms: ""
             },

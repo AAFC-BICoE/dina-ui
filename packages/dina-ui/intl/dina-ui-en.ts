@@ -202,6 +202,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editCollectionMethodTitle: "Edit Collection Method",
   editCollectionTitle: "Edit Collection",
   editDinaUserTitle: "Edit User",
+  editDerivativeMetadata: "Edit Derivative Metadata",
   editExternalResourceTitle: "Edit External Resource",
   editInstitutionTitle: "Edit Institution",
   editManagedAttributeTitle: "Edit Managed Attribute",
@@ -434,7 +435,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Leave this OFF to copy the same data for every Organism. Toggle ON to enter different data for each Organism.",
   field_organismsQuantity: "Organisms quantity",
   field_organizationMandatoryFieldsError:
-    "At least one organization name is required.",
+    "At least one orgnization name is required",
   field_orientation: "Orientation",
   field_orientation_tooltip:
     "Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8.",
@@ -445,7 +446,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_otherRecordNumbers_tooltip:
     "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",
   field_parentStorageUnit: "Location",
-  field_personMandatoryFieldsError: "The display name field is required.",
   field_preparationDate: "Preparation Date",
   field_preparationFixative: "Preparation Fixative",
   field_preparationFixative_tooltip:
@@ -1249,5 +1249,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   taxonomyHierarchyChartInstructions:
     "Interactions: Scroll to zoom, drag to pan, click on nodes to fetch child taxonomic ranks",
   taxonomyHierarchySubtitle:
-    "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination."
+    "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination.",
+  notPubliclyReleasableWithReason: "Not Publicly Releasable: {reason}",
+  clearAllNamesButtonText: "Clear All Names"
 };

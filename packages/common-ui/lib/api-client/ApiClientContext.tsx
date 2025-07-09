@@ -430,7 +430,6 @@ export class ApiClientImpl implements ApiClientI {
             }
           }
         );
-
         responses = axiosResponse.data;
       }
     }
@@ -477,104 +476,48 @@ export class ApiClientImpl implements ApiClientI {
     const deleteArgs = args.filter(
       (arg) => (arg as any).delete
     ) as DeleteArgs[];
-
     const saveArgs = args.filter((arg) => !(arg as any).delete) as SaveArgs[];
 
     // Serialize the resources to JSONAPI format.
     const serializePromises = saveArgs.map((saveArg) => serialize(saveArg));
     const serialized = await Promise.all(serializePromises);
 
+    // Create the jsonpatch operations objects.
+    const saveOperations = serialized.map<Operation>((jsonapiResource) => ({
+      op: options?.overridePatchOperation
+        ? "POST"
+        : jsonapiResource.id
+        ? "PATCH"
+        : "POST",
+      path: options?.overridePatchOperation
+        ? jsonapiResource.type
+        : jsonapiResource.id
+        ? `${jsonapiResource.type}/${jsonapiResource.id}`
+        : jsonapiResource.type,
+      value: {
+        ...jsonapiResource,
+        id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
+      }
+    }));
+
     const deleteOperations = deleteArgs.map<Operation>((deleteArg) => ({
       op: "DELETE",
       path: `${deleteArg.delete.type}/${deleteArg.delete.id}`
     }));
 
-    // If using repository v2, split different operation types into separate requests.
-    if (options?.apiBaseUrl && ["/agent-api"].includes(options?.apiBaseUrl)) {
-      const postOperations: any = [];
-      const patchOperations: any = [];
+    const operations = [...saveOperations, ...deleteOperations];
 
-      for (const jsonapiResource of serialized) {
-        if (jsonapiResource.id) {
-          patchOperations.push({
-            op: "PATCH",
-            path: `${jsonapiResource.type}/${jsonapiResource.id}`,
-            value: {
-              ...jsonapiResource,
-              id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-            }
-          });
-        } else {
-          postOperations.push({
-            op: "POST",
-            path: jsonapiResource.type,
-            value: {
-              ...jsonapiResource,
-              id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-            }
-          });
-        }
-      }
+    // Do the operations request.
+    const responses = await this.doOperations(operations, options);
 
-      // only do the operations if there are any.
-      const postResponses = postOperations.length
-        ? await this.doOperations(postOperations, options)
-        : [];
-      const patchResponses = patchOperations.length
-        ? await this.doOperations(patchOperations, options)
-        : [];
-      const deleteResponses = deleteOperations.length
-        ? await this.doOperations(deleteOperations, options)
-        : [];
+    // Deserialize the responses to Kitsu format.
+    const deserializePromises = responses.map((response) =>
+      deserialise(response)
+    );
+    const deserialized = await Promise.all(deserializePromises);
+    const kitsuResources = deserialized.map(({ data }) => data);
 
-      // Deserialize the responses to Kitsu format.
-      const deserializedPostPromises = postResponses.map((response) =>
-        deserialise(response)
-      );
-      const deserializedPatchPromises = patchResponses.map((response) =>
-        deserialise(response)
-      );
-      const deserializedDeletePromises = deleteResponses.map((response) =>
-        deserialise(response)
-      );
-      const deserialized = await Promise.all([
-        ...deserializedPostPromises,
-        ...deserializedPatchPromises,
-        ...deserializedDeletePromises
-      ]);
-      const kitsuResources = deserialized.map(({ data }) => data);
-      return kitsuResources;
-    } else {
-      const saveOperations = serialized.map<Operation>((jsonapiResource) => ({
-        op: options?.overridePatchOperation
-          ? "POST"
-          : jsonapiResource.id
-          ? "PATCH"
-          : "POST",
-        path: options?.overridePatchOperation
-          ? jsonapiResource.type
-          : jsonapiResource.id
-          ? `${jsonapiResource.type}/${jsonapiResource.id}`
-          : jsonapiResource.type,
-        value: {
-          ...jsonapiResource,
-          id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-        }
-      }));
-
-      const operations = [...saveOperations, ...deleteOperations];
-
-      // Do the operations request.
-      const responses = await this.doOperations(operations, options);
-
-      // Deserialize the responses to Kitsu format.
-      const deserializePromises = responses.map((response) =>
-        deserialise(response)
-      );
-      const deserialized = await Promise.all(deserializePromises);
-      const kitsuResources = deserialized.map(({ data }) => data);
-      return kitsuResources;
-    }
+    return kitsuResources;
   }
 
   /**
@@ -669,8 +612,12 @@ export class ApiClientImpl implements ApiClientI {
     resources: InputResource<KitsuResource>[],
     { apiBaseUrl, resourceType }: BulkCreateResourcesOptions
   ): Promise<AxiosResponse> {
+    const serializedResources = await Promise.all(
+      resources.map((resource) => serialize({ resource, type: resourceType }))
+    );
+
     const requestBody = {
-      data: resources.map((resource) => ({
+      data: serializedResources.map((resource) => ({
         ...resource
       }))
     };
@@ -700,8 +647,12 @@ export class ApiClientImpl implements ApiClientI {
     resources: InputResource<KitsuResource>[],
     { apiBaseUrl, resourceType }: BulkUpdateResourcesOptions
   ): Promise<AxiosResponse> {
+    const serializedResources = await Promise.all(
+      resources.map((resource) => serialize({ resource, type: resourceType }))
+    );
+
     const requestBody = {
-      data: resources.map((resource) => ({
+      data: serializedResources.map((resource) => ({
         ...resource
       }))
     };
