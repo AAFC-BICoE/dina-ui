@@ -238,7 +238,11 @@ export class ApiClientImpl implements ApiClientI {
     const resourceType = operations[0].path.split("/")[0];
 
     // APIs using Repository V2.
-    const supportedBaseApis = ["/agent-api", "/dina-export-api"];
+    const supportedBaseApis = [
+      "/agent-api",
+      "/dina-export-api",
+      "/objectstore-api"
+    ];
 
     // Resource types that are supported for bulk operations.
     const supportedResourceTypes = ["person", "identifier"];
