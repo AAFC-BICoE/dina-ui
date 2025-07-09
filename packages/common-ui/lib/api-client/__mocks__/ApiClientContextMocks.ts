@@ -340,18 +340,23 @@ export const MOCK_BULK_CREATE_DATA = [
 
 export const MOCK_BULK_CREATE_INPUT = [
   {
-    displayName: "person 1",
+    attributes: {
+      displayName: "person 1"
+    },
 
     type: "person"
   },
   {
-    displayName: "person 2",
+    attributes: {
+      displayName: "person 2"
+    },
 
     type: "person"
   },
   {
-    displayName: "person 3",
-
+    attributes: {
+      displayName: "person 3"
+    },
     type: "person"
   }
 ];
@@ -384,18 +389,24 @@ export const MOCK_BULK_UPDATE_DATA = {
 
 export const MOCK_BULK_UPDATE_INPUT = [
   {
+    attributes: {
+      displayName: "updated person 1"
+    },
     id: "1",
-    displayName: "updated person 1",
     type: "person"
   },
   {
+    attributes: {
+      displayName: "updated person 2"
+    },
     id: "2",
-    displayName: "updated person 2",
     type: "person"
   },
   {
+    attributes: {
+      displayName: "updated person 3"
+    },
     id: "3",
-    displayName: "updated person 3",
     type: "person"
   }
 ];
@@ -533,36 +544,6 @@ export const MOCK_BULK_GET_404_ERROR_OBJECT = (() => {
   return error;
 })();
 
-// export const MOCK_BULK_GET_404_ERROR_OBJECT = {
-
-//   // Add axios-specific properties
-//  config : {
-//     url: ""
-//   },
-
-//   response : {
-//     statusText: "Not Found",
-//     status: 404,
-//     responseURL: "/agent-api/person/bulk-load?include=organizations",
-//     data: {
-//       errors: [
-//         {
-//           source: {
-//             pointer: "/data/id/doesn't_exist"
-//           }
-//         },
-//         {
-//           source: {
-//             pointer: "/data/id/doesn't_exist_2"
-//           }
-//         }
-//       ]
-//     }
-//   },
-
-//   isAxiosError: true
-// } as any
-
 export const MOCK_BULK_GET_404_RESPONSE = {
   data: {
     data: [
@@ -692,34 +673,6 @@ export const MOCK_BULK_GET_410_ERROR_OBJECT = (() => {
 
   return error;
 })();
-
-// export const MOCK_BULK_GET_410_ERROR_OBJECT = {
-//   config:{
-//     url: ""
-//   },
-//   name: "AxiosError",
-//   message: "Request failed with status code 410",
-//   response:{
-//     statusText: "Not Found",
-//     status: 410,
-//     responseURL: "/agent-api/person/bulk-load?include=organizations",
-//     data: {
-//       errors: [
-//         {
-//           source: {
-//             pointer: "/data/id/deleted"
-//           }
-//         },
-//         {
-//           source: {
-//             pointer: "/data/id/deleted_2"
-//           }
-//         }
-//       ]
-//     }
-//   },
-//   isAxiosError: true,
-// } as any
 
 export const MOCK_BULK_GET_410_RESPONSE = {
   data: {

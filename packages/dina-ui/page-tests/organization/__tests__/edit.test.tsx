@@ -4,7 +4,7 @@ import OrganizationEditPage, {
 } from "../../../pages/organization/edit";
 import { mountWithAppContext } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -33,8 +33,9 @@ const mockGet = jest.fn(async (model) => {
 
 // Mock API requests:
 const mockPatch = jest.fn();
+const mockPost = jest.fn();
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: { get: mockGet, axios: { patch: mockPatch, post: mockPost } }
 };
 
 describe("organization edit page", () => {
@@ -93,26 +94,22 @@ describe("organization edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await waitFor(() => {
-      expect(mockPatch).lastCalledWith(
-        "/agent-api/operations",
-        [
-          {
-            op: "POST",
-            path: "organization",
-            value: {
-              attributes: {
-                names: [
-                  {
-                    languageCode: "EN",
-                    name: "test org new"
-                  }
-                ]
-              },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "organization"
-            }
+      expect(mockPost).lastCalledWith(
+        "/agent-api/organization",
+        {
+          data: {
+            attributes: {
+              names: [
+                {
+                  languageCode: "EN",
+                  name: "test org new"
+                }
+              ]
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "organization"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -164,20 +161,16 @@ describe("organization edit page", () => {
     // and the modified one.
     await waitFor(() => {
       expect(mockPatch).lastCalledWith(
-        "/agent-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "organization/1",
-            value: {
-              attributes: expect.objectContaining({
-                aliases: ["DEW"]
-              }),
-              id: "1",
-              type: "organization"
-            }
+        "/agent-api/organization/1",
+        {
+          data: {
+            attributes: expect.objectContaining({
+              aliases: ["DEW"]
+            }),
+            id: "1",
+            type: "organization"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -188,20 +181,36 @@ describe("organization edit page", () => {
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
-      data: [
-        {
-          errors: [
-            {
-              detail: "Name should not be blank",
-              status: "422",
-              title: "Constraint violation"
-            }
-          ],
-          status: 422
-        }
-      ] as OperationsResponse
-    }));
+    mockPost.mockImplementationOnce(() => {
+      throw new Error("test error");
+    });
+
+    mockQuery = {};
+
+    const wrapper = mountWithAppContext(<OrganizationEditPage />, {
+      apiContext
+    });
+
+    const displayNameField = screen.getByRole("textbox", {
+      name: /english name/i
+    }); // adjust label as needed
+    fireEvent.change(displayNameField, { target: { value: "John Doe" } });
+
+    // Submit the form.
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    // Test expected error
+    await waitFor(() => {
+      expect(wrapper.getByText("test error"));
+      expect(mockPush).toBeCalledTimes(0);
+    });
+  });
+
+  it("Renders an error if an organization name is not entered.", async () => {
+    // The patch request will return an error.
+    mockPost.mockImplementationOnce(() => {
+      throw new Error("test error");
+    });
 
     mockQuery = {};
 
@@ -214,9 +223,7 @@ describe("organization edit page", () => {
 
     // Test expected error
     await waitFor(() => {
-      expect(
-        wrapper.getByText("Constraint violation: Name should not be blank")
-      );
+      expect(wrapper.getByText("At least one organization name is required."));
       expect(mockPush).toBeCalledTimes(0);
     });
   });
