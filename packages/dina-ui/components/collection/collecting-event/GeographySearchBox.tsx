@@ -32,57 +32,6 @@ export interface AddressDetail {
   place_id?: string;
 }
 
-export interface NominatumApiAddressDetailSearchResult {
-  place_id?: string;
-  osm_type?: string;
-  osm_id?: string;
-  category?: string;
-  localname?: string;
-  address?: AddressDetail[];
-}
-
-export interface NominatimAddressDetailSearchProps {
-  urlValue: {};
-  updateAdminLevels: (detailResult, formik, stateProvinceName) => void;
-  formik: FormikContextType<any>;
-  stateProvinceName: string | null;
-}
-export async function nominatimAddressDetailSearch(
-  props: NominatimAddressDetailSearchProps
-) {
-  const { urlValue, updateAdminLevels, formik, stateProvinceName } = props;
-  if (!Object.keys(urlValue)) {
-    return null;
-  }
-  const url = new URL(`https://nominatim.openstreetmap.org/details.php`);
-
-  url.search = new URLSearchParams({
-    ...urlValue,
-    addressdetails: "1",
-    hierarchy: "0",
-    group_hierarchy: "1",
-    polygon_geojson: "1",
-    format: "json"
-  }).toString();
-
-  const fetchJson = (urlArg) => window.fetch(urlArg).then((res) => res.json());
-
-  try {
-    const response = await fetchJson(url.toString());
-
-    if (response.error) {
-      throw new Error(String(response.error));
-    }
-    updateAdminLevels(
-      response as NominatumApiAddressDetailSearchResult,
-      formik,
-      stateProvinceName
-    );
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 async function nominatimSearch(
   searchValue: string
 ): Promise<NominatumApiSearchResult[] | null> {
@@ -99,7 +48,7 @@ async function nominatimSearch(
   }
 
   const url = new URL(
-    `https://nominatim.openstreetmap.org/${coords ? "reverse" : "search"}.php`
+    `https://nominatim.openstreetmap.org/${coords ? "reverse" : "search"}`
   );
   url.search = new URLSearchParams({
     ...(coords
