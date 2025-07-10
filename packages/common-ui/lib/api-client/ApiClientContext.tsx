@@ -263,60 +263,72 @@ export class ApiClientImpl implements ApiClientI {
         "Content-Type": "application/vnd.api+json",
         "Crnk-Compact": "true"
       };
-
-      switch (operation.op.toUpperCase()) {
-        case "GET":
-          const getResponse = await axios.get(url, { headers });
+      try {
+        switch (operation.op.toUpperCase()) {
+          case "GET":
+            const getResponse = await axios.get(url, { headers });
+            responses = [
+              {
+                data: getResponse?.data?.data,
+                included: getResponse?.data?.included,
+                status: getResponse?.status
+              }
+            ];
+            break;
+          case "POST":
+            const postResponse = await axios.post(
+              url,
+              { data: operation.value },
+              { headers }
+            );
+            responses = [
+              {
+                data: postResponse?.data?.data,
+                included: postResponse?.data?.included,
+                status: postResponse?.status
+              }
+            ];
+            break;
+          case "PATCH":
+            const patchResponse = await axios.patch(
+              url,
+              { data: operation.value },
+              { headers }
+            );
+            responses = [
+              {
+                data: patchResponse?.data?.data,
+                included: patchResponse?.data?.included,
+                status: patchResponse?.status
+              }
+            ];
+            break;
+          case "DELETE":
+            const deleteResponse = await axios.delete(url, {
+              headers: {
+                "Content-Type": "application/vnd.api+json"
+              }
+            });
+            responses = [
+              {
+                status: deleteResponse.status
+              } as any
+            ];
+            break;
+          default:
+            throw new Error(`Unsupported single operation: ${operation.op}`);
+        }
+      } catch (error) {
+        if (returnNullForMissingResource) {
           responses = [
             {
-              data: getResponse?.data?.data,
-              included: getResponse?.data?.included,
-              status: getResponse?.status
+              data: null,
+              status: 404
             }
           ];
-          break;
-        case "POST":
-          const postResponse = await axios.post(
-            url,
-            { data: operation.value },
-            { headers }
-          );
-          responses = [
-            {
-              data: postResponse?.data?.data,
-              included: postResponse?.data?.included,
-              status: postResponse?.status
-            }
-          ];
-          break;
-        case "PATCH":
-          const patchResponse = await axios.patch(
-            url,
-            { data: operation.value },
-            { headers }
-          );
-          responses = [
-            {
-              data: patchResponse?.data?.data,
-              included: patchResponse?.data?.included,
-              status: patchResponse?.status
-            }
-          ];
-          break;
-        case "DELETE":
-          const deleteResponse = await axios.delete(url, {
-            headers: {
-              "Content-Type": "application/vnd.api+json"
-            }
-          });
-          responses = [
-            {
-              status: deleteResponse.status
-            } as any
-          ];
-          break;
-        default:
-          throw new Error(`Unsupported single operation: ${operation.op}`);
+        } else {
+          throw error;
+        }
       }
     } else {
       // use new bulk functions if using the new api and using a supported resource type.
@@ -466,7 +478,6 @@ export class ApiClientImpl implements ApiClientI {
         individualErrors
       );
     }
-
     // Return the successful jsonpatch response.
     return responses as SuccessfulOperation[];
   }
