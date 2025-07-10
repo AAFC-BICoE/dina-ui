@@ -676,7 +676,7 @@ export const MOCK_BULK_GET_410_ERROR_OBJECT = (() => {
 
 export const MOCK_GET_ERROR = (() => {
   const error = new Error() as any;
-  error.cause = {
+  error.response = {
     data: {
       errors: [
         {

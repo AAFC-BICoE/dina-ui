@@ -321,7 +321,8 @@ export class ApiClientImpl implements ApiClientI {
       } catch (error) {
         if (
           returnNullForMissingResource &&
-          [404, 410].includes(error.cause.data.errors[0].code)
+          (error.cause.data.errors[0].status.includes("404") ||
+            error.cause.data.errors[0].status.includes("410"))
         ) {
           responses = [
             {
@@ -637,7 +638,7 @@ export class ApiClientImpl implements ApiClientI {
         // if returnNullForMissingResource is true, we will handle the error
         // by returning null for the missing resources instead of throwing an error.
         if (returnNullForMissingResource) {
-          const errors = error.response.data.errors;
+          const errors = error.cause.data.errors;
           const missingIdsThisRun = errors.map((err: any) =>
             err.source.pointer.split("/").at(-1)
           );
@@ -901,15 +902,6 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   if (error.isAxiosError) {
     let errorMessage = `${error.config?.url}: ${error.response?.statusText}`;
     // If the error is a 404 or 410, and the endpoint is "bulk-load", throw full error for handling in function.
-
-    if (
-      error.request &&
-      error.request.responseURL.split("/").at(-1).includes("bulk-load")
-    ) {
-      if ([404, 410].includes(error.response?.status as number)) {
-        throw error;
-      }
-    }
     // Special case: Make 502 "bad gateway" messages more user-friendly:
     if (error.response?.status === 502) {
       errorMessage = `Service unavailable:\n${errorMessage}`;
