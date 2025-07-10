@@ -638,7 +638,7 @@ export class ApiClientImpl implements ApiClientI {
         // if returnNullForMissingResource is true, we will handle the error
         // by returning null for the missing resources instead of throwing an error.
         if (returnNullForMissingResource) {
-          const errors = error.cause.data.errors;
+          const errors = error.response.data.errors;
           const missingIdsThisRun = errors.map((err: any) =>
             err.source.pointer.split("/").at(-1)
           );
@@ -905,6 +905,15 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
     // Special case: Make 502 "bad gateway" messages more user-friendly:
     if (error.response?.status === 502) {
       errorMessage = `Service unavailable:\n${errorMessage}`;
+    }
+
+    if (
+      error.request &&
+      error.request.responseURL.split("/").at(-1).includes("bulk-load")
+    ) {
+      if ([404, 410].includes(error.response?.status as number)) {
+        throw error;
+      }
     }
 
     // Handle errors coming from Spring Boot:
