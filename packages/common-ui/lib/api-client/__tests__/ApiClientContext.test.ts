@@ -6,7 +6,7 @@ import {
   getErrorMessages,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
-import { SuccessfulOperation } from "../operations-types";
+import { OperationVerb, SuccessfulOperation } from "../operations-types";
 import { isEqual } from "lodash";
 interface TestPcrPrimer {
   name: string;
@@ -41,7 +41,8 @@ import {
   MOCK_BULK_UPDATE_RESPONSE_DESERIALIZED,
   MOCK_BULK_GET_404_RESPONSE_DESERIALIZED,
   MOCK_BULK_GET_410_RESPONSE_DESERIALIZED,
-  MOCK_BULK_GET_410_404_RESPONSE_DESERIALIZED
+  MOCK_BULK_GET_410_404_RESPONSE_DESERIALIZED,
+  MOCK_GET_ERROR
 } from "../__mocks__/ApiClientContextMocks";
 import { waitFor } from "@testing-library/dom";
 
@@ -101,6 +102,12 @@ const mockDelete = jest.fn((_, data) => {
   }
 });
 
+const mockGet = jest.fn((url, _) => {
+  if (isEqual(url, "/agent-api/person/doesn't-exist")) {
+    return Promise.reject(MOCK_GET_ERROR);
+  }
+});
+
 const {
   apiClient,
   bulkGet,
@@ -118,7 +125,8 @@ const {
 apiClient.axios = {
   patch: mockPatch,
   post: mockPost,
-  delete: mockDelete
+  delete: mockDelete,
+  get: mockGet
 } as any;
 
 describe("API client context", () => {
@@ -172,6 +180,26 @@ describe("API client context", () => {
         actualError = error;
       }
       expect(actualError.message).toEqual(expectedErrorMessage);
+    });
+
+    it("Returns a null response if returnNullForMissingResource is true and an error is thrown.", async () => {
+      const operations = [
+        {
+          op: "GET" as OperationVerb,
+          path: "person/doesn't-exist"
+        }
+      ];
+      const response = await doOperations(operations, {
+        returnNullForMissingResource: true,
+        apiBaseUrl: "/agent-api"
+      });
+
+      expect(response).toEqual([
+        {
+          data: null,
+          status: 404
+        }
+      ]);
     });
   });
 

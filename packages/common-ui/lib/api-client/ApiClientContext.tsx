@@ -319,7 +319,10 @@ export class ApiClientImpl implements ApiClientI {
             throw new Error(`Unsupported single operation: ${operation.op}`);
         }
       } catch (error) {
-        if (returnNullForMissingResource) {
+        if (
+          returnNullForMissingResource &&
+          [404, 410].includes(error.cause.data.errors[0].code)
+        ) {
           responses = [
             {
               data: null,
