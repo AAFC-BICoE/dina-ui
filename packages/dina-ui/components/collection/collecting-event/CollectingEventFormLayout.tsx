@@ -456,7 +456,7 @@ export function CollectingEventFormLayout({
         style={{
           overflowY: "auto",
           overflowX: "hidden",
-          maxHeight: 520
+          maxHeight: 925
         }}
       >
         <Field name="geographicPlaceNameSourceDetail">

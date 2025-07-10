@@ -11,7 +11,7 @@ import _ from "lodash";
 import { ReactNode, useState } from "react";
 import useSWR from "swr";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-
+import { TbMapPinX } from "react-icons/tb";
 interface GeographySearchBoxProps {
   inputValue: string;
   onInputChange: (value: string) => void;
@@ -170,16 +170,21 @@ export function GeographySearchBox({
           <LoadingSpinner loading={true} />
         ) : searchResults?.length === 0 ? (
           <div className="list-group-item">
-            <DinaMessage id="noResultsFound" />
+            <center>
+              <p style={{ fontSize: "3em" }}>
+                <TbMapPinX />
+              </p>
+              <DinaMessage id="noResultsFound" />
+            </center>
           </div>
         ) : (
           searchResults?.map((place) => (
             <div
-              className="list-group-item d-flex justify-content-between align-items-center"
+              className="list-group-item justify-content-between align-items-center"
               key={place.osm_id}
             >
               {/* Text content on the left */}
-              <div className="me-3">
+              <div className="ms-2 mt-2 mb-2">
                 <h5 className="mb-1">
                   {place.name}
                   <span className="badge bg-secondary ms-2 fw-normal">
@@ -190,7 +195,7 @@ export function GeographySearchBox({
               </div>
 
               {/* Action buttons on the right */}
-              <div className="ms-auto text-nowrap">
+              <div className="ms-2 mt-2 mb-2">
                 <FormikButton
                   className="btn btn-primary btn-sm"
                   onClick={(_, formik) => selectGeoResult(place, formik)}
