@@ -76,16 +76,17 @@ const mockPost = jest.fn((url, data) => {
       ); // make a deep copy to avoid mutating the original mock data
     }
     if (isEqual(data, MOCK_BULK_GET_404_ERROR_INPUT)) {
-      return Promise.reject(MOCK_BULK_GET_404_ERROR_OBJECT);
+      // Simulate an error being intercepted by the API client, since it does not with Promise.reject.
+      makeAxiosErrorMoreReadable(MOCK_BULK_GET_404_ERROR_OBJECT);
     }
     if (isEqual(data, MOCK_BULK_GET_410_ERROR_INPUT)) {
-      return Promise.reject(MOCK_BULK_GET_410_ERROR_OBJECT);
+      makeAxiosErrorMoreReadable(MOCK_BULK_GET_410_ERROR_OBJECT);
     }
     if (isEqual(data, MOCK_BULK_GET_410_404_ERROR_INPUT)) {
-      return Promise.reject(MOCK_BULK_GET_410_ERROR_OBJECT);
+      makeAxiosErrorMoreReadable(MOCK_BULK_GET_410_ERROR_OBJECT);
     }
     if (isEqual(data, MOCK_BULK_GET_404_ERROR_INPUT_2)) {
-      return Promise.reject(MOCK_BULK_GET_404_ERROR_OBJECT);
+      makeAxiosErrorMoreReadable(MOCK_BULK_GET_404_ERROR_OBJECT);
     }
   } else {
     if (isEqual(data.data, MOCK_BULK_CREATE_DATA)) {
@@ -104,7 +105,7 @@ const mockDelete = jest.fn((_, data) => {
 
 const mockGet = jest.fn((url, _) => {
   if (isEqual(url, "/agent-api/person/doesn't-exist")) {
-    return Promise.reject(MOCK_GET_ERROR);
+    makeAxiosErrorMoreReadable(MOCK_GET_ERROR);
   }
 });
 
