@@ -67,34 +67,54 @@ export function ManagedAttributesEditor({
             _.get(sample.formRef.current?.values, valuesPath)
           ) || [currentValue];
 
-          // Get all unique ManagedAttribute keys in the given value maps:
-          const initialVisibleKeys = _.uniq(
-            _.flatMap(managedAttributeMaps.map(_.keys))
-          );
-
-          return initialVisibleKeys;
+          return managedAttributeMaps;
         }
 
-        const [visibleAttributeKeys, setVisibleAttributeKeys] = useState(
+        const [visibleAttributeObjects, setVisibleAttributeObjects] = useState(
           getAttributeKeysInUse
         );
 
+        let visibleAttributes =
+          (values as PersistedResource<ManagedAttribute>[]) || [];
+
         // When the visibleAttributeKeys prop changes, update the internal visible keys state:
         useEffect(() => {
-          setVisibleAttributeKeys(
+          setVisibleAttributeObjects(
             visibleAttributeKeysProp ?? getAttributeKeysInUse()
           );
+          // Fetch the attributes, but omit any that are missing e.g. were deleted.
         }, [visibleAttributeKeysProp]);
+        let ids = [];
 
-        // Fetch the attributes, but omit any that are missing e.g. were deleted.
-        const { dataWithNullForMissing: fetchedAttributes, loading } =
+        try {
+          ids = visibleAttributeObjects.map((key) => key.id) as any;
+        } catch {
+          ids = [];
+        }
+
+        let { dataWithNullForMissing: fetchedAttributes, loading } =
           useBulkGet<ManagedAttribute>({
-            ids: visibleAttributeKeys.map((key) =>
-              // Use the component prefix if needed by the back-end:
-              _.compact([managedAttributeComponent, key]).join(".")
-            ),
-            listPath: managedAttributeApiPath
+            ids: ids,
+            listPath: managedAttributeApiPath,
+            disabled: ids.length === 0
           });
+
+        loading = false;
+
+        if (
+          fetchedAttributes &&
+          !fetchedAttributes[0] &&
+          visibleAttributeObjects &&
+          visibleAttributeObjects[0]
+        ) {
+          fetchedAttributes = Object.keys(visibleAttributeObjects[0]).map(
+            (key) =>
+              ({
+                key,
+                name: key // Fallback to using the key as the name.
+              } as PersistedResource<ManagedAttribute>)
+          );
+        }
 
         // Store the last fetched Attributes in a ref instead of showing a
         // loading state when the visible attributes change.
@@ -104,8 +124,7 @@ export function ManagedAttributesEditor({
         if (fetchedAttributes) {
           lastFetchedAttributes.current = _.compact(fetchedAttributes);
         }
-
-        const visibleAttributes = lastFetchedAttributes.current;
+        visibleAttributes = lastFetchedAttributes.current;
 
         return (
           <>
@@ -132,7 +151,7 @@ export function ManagedAttributesEditor({
                             values={values}
                             valuesPath={valuesPath}
                             onRemoveClick={(attributeKey) =>
-                              setVisibleAttributeKeys((current) =>
+                              setVisibleAttributeObjects((current) =>
                                 current.filter((it) => it !== attributeKey)
                               )
                             }
@@ -148,7 +167,7 @@ export function ManagedAttributesEditor({
                             managedAttributeComponent={
                               managedAttributeComponent
                             }
-                            onChange={setVisibleAttributeKeys}
+                            onChange={setVisibleAttributeObjects}
                             visibleAttributes={visibleAttributes}
                             loading={loading}
                           />
@@ -182,7 +201,7 @@ export interface ManagedAttributeMultiSelectProps {
   managedAttributeComponent?: string;
   managedAttributeApiPath: string;
 
-  onChange: (newValue: string[]) => void;
+  onChange: (newValue: PersistedResource<ManagedAttribute>[]) => void;
   visibleAttributes: PersistedResource<ManagedAttribute>[];
   loading?: boolean;
 }
@@ -202,8 +221,10 @@ export function ManagedAttributeMultiSelect({
       | PersistedResource<ManagedAttribute>[]
   ) {
     const newAttributes = _.castArray(newValues);
-    const newKeys = newAttributes.map((it) => _.get(it, "key"));
-    onChange(newKeys);
+
+    // const newAttributeIds = newAttributes.map((attr) => attr.id);
+    // Remove any attributes that are already visible:
+    onChange(newAttributes);
   }
 
   return (

@@ -245,7 +245,11 @@ export class ApiClientImpl implements ApiClientI {
     ];
 
     // Resource types that are supported for bulk operations.
-    const supportedResourceTypes = ["person", "identifier"];
+    const supportedResourceTypes = [
+      "person",
+      "identifier",
+      "managed-attribute"
+    ];
 
     // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
     if (supportedBaseApis.includes(apiBaseUrl)) {
