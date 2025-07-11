@@ -170,7 +170,7 @@ export function GeographySearchBox({
           <LoadingSpinner loading={true} />
         ) : searchResults?.length === 0 ? (
           <div className="list-group-item">
-            <center>
+            <center className="mb-2">
               <p style={{ fontSize: "3em" }}>
                 <TbMapPinX />
               </p>
