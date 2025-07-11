@@ -6,7 +6,7 @@ import {
   getErrorMessages,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
-import { SuccessfulOperation } from "../operations-types";
+import { OperationVerb, SuccessfulOperation } from "../operations-types";
 import { isEqual } from "lodash";
 interface TestPcrPrimer {
   name: string;
@@ -41,7 +41,8 @@ import {
   MOCK_BULK_UPDATE_RESPONSE_DESERIALIZED,
   MOCK_BULK_GET_404_RESPONSE_DESERIALIZED,
   MOCK_BULK_GET_410_RESPONSE_DESERIALIZED,
-  MOCK_BULK_GET_410_404_RESPONSE_DESERIALIZED
+  MOCK_BULK_GET_410_404_RESPONSE_DESERIALIZED,
+  MOCK_GET_ERROR
 } from "../__mocks__/ApiClientContextMocks";
 import { waitFor } from "@testing-library/dom";
 
@@ -75,16 +76,17 @@ const mockPost = jest.fn((url, data) => {
       ); // make a deep copy to avoid mutating the original mock data
     }
     if (isEqual(data, MOCK_BULK_GET_404_ERROR_INPUT)) {
-      return Promise.reject(MOCK_BULK_GET_404_ERROR_OBJECT);
+      // Simulate an error being intercepted by the API client, since it does not with Promise.reject.
+      makeAxiosErrorMoreReadable(MOCK_BULK_GET_404_ERROR_OBJECT);
     }
     if (isEqual(data, MOCK_BULK_GET_410_ERROR_INPUT)) {
-      return Promise.reject(MOCK_BULK_GET_410_ERROR_OBJECT);
+      makeAxiosErrorMoreReadable(MOCK_BULK_GET_410_ERROR_OBJECT);
     }
     if (isEqual(data, MOCK_BULK_GET_410_404_ERROR_INPUT)) {
-      return Promise.reject(MOCK_BULK_GET_410_ERROR_OBJECT);
+      makeAxiosErrorMoreReadable(MOCK_BULK_GET_410_ERROR_OBJECT);
     }
     if (isEqual(data, MOCK_BULK_GET_404_ERROR_INPUT_2)) {
-      return Promise.reject(MOCK_BULK_GET_404_ERROR_OBJECT);
+      makeAxiosErrorMoreReadable(MOCK_BULK_GET_404_ERROR_OBJECT);
     }
   } else {
     if (isEqual(data.data, MOCK_BULK_CREATE_DATA)) {
@@ -98,6 +100,12 @@ const mockPost = jest.fn((url, data) => {
 const mockDelete = jest.fn((_, data) => {
   if (isEqual(data.data, MOCK_BULK_GET_DATA)) {
     return MOCK_BULK_DELETE_RESPONSE;
+  }
+});
+
+const mockGet = jest.fn((url, _) => {
+  if (isEqual(url, "/agent-api/person/doesn't-exist")) {
+    makeAxiosErrorMoreReadable(MOCK_GET_ERROR);
   }
 });
 
@@ -118,7 +126,8 @@ const {
 apiClient.axios = {
   patch: mockPatch,
   post: mockPost,
-  delete: mockDelete
+  delete: mockDelete,
+  get: mockGet
 } as any;
 
 describe("API client context", () => {
@@ -172,6 +181,26 @@ describe("API client context", () => {
         actualError = error;
       }
       expect(actualError.message).toEqual(expectedErrorMessage);
+    });
+
+    it("Returns a null response if returnNullForMissingResource is true and an error is thrown.", async () => {
+      const operations = [
+        {
+          op: "GET" as OperationVerb,
+          path: "person/doesn't-exist"
+        }
+      ];
+      const response = await doOperations(operations, {
+        returnNullForMissingResource: true,
+        apiBaseUrl: "/agent-api"
+      });
+
+      expect(response).toEqual([
+        {
+          data: null,
+          status: 404
+        }
+      ]);
     });
   });
 

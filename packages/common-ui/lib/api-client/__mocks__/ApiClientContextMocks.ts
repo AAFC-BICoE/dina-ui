@@ -674,6 +674,25 @@ export const MOCK_BULK_GET_410_ERROR_OBJECT = (() => {
   return error;
 })();
 
+export const MOCK_GET_ERROR = (() => {
+  const error = new Error() as any;
+  error.isAxiosError = true;
+  error.response = {
+    data: {
+      errors: [
+        {
+          code: 404,
+          status: "404 NOT_FOUND",
+          detail: "PersonDto with ID 'doesn't-exist' Not Found",
+          title: "Not Found"
+        }
+      ]
+    }
+  };
+
+  return error;
+})();
+
 export const MOCK_BULK_GET_410_RESPONSE = {
   data: {
     data: [
