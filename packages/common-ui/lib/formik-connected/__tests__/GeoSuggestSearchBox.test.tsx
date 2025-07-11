@@ -84,7 +84,7 @@ describe("GeoSuggestTextField component", () => {
     // Wait for any asynchronous behavior
     await waitFor(() => {
       expect(mockFetchJson).toHaveBeenCalledWith(
-        "https://nominatim.openstreetmap.org/search.php?q=ottawa&addressdetails=1&format=jsonv2"
+        "https://nominatim.openstreetmap.org/search?q=ottawa&addressdetails=1&format=jsonv2"
       );
     });
   });

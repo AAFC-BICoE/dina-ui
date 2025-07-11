@@ -23,24 +23,12 @@ export interface GeoSuggestProps {
 export interface NominatumApiSearchResult {
   osm_type: string;
   osm_id: number;
+  name: string;
   display_name: string;
   category: string;
   type: string;
-  address?: {
-    city?: string;
-    city_district?: string;
-    construction?: string;
-    continent?: string;
-    country?: string;
-    country_code?: string;
-    house_number?: string;
-    neighbourhood?: string;
-    postcode?: string;
-    public_building?: string;
-    state?: string;
-    suburb?: string;
-    county?: string;
-  };
+  address?: { [key: string]: string | undefined };
+  addresstype: string;
 }
 
 export function GeoSuggestSearchBox({
@@ -62,7 +50,7 @@ export function GeoSuggestSearchBox({
       return [];
     }
 
-    const url = new URL("https://nominatim.openstreetmap.org/search.php");
+    const url = new URL("https://nominatim.openstreetmap.org/search");
     url.search = new URLSearchParams({
       q: searchValue,
       addressdetails: "1",

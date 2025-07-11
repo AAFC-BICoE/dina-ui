@@ -15,7 +15,7 @@ async function nominatimSearch(
     return [];
   }
 
-  const url = new URL("https://nominatim.openstreetmap.org/search.php");
+  const url = new URL("https://nominatim.openstreetmap.org/search");
   url.search = new URLSearchParams({
     q: searchValue,
     addressdetails: "1",

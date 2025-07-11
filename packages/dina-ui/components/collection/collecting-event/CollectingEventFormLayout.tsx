@@ -7,7 +7,6 @@ import {
   FieldSpy,
   FormattedTextField,
   FormikButton,
-  LoadingSpinner,
   NominatumApiSearchResult,
   NumberRangeFields,
   PlaceSectionsSelectionField,
@@ -24,7 +23,6 @@ import { Field, FormikContextType } from "formik";
 import _ from "lodash";
 import Link from "next/link";
 import { ChangeEvent, useRef, useState } from "react";
-import useSWR from "swr";
 import {
   AttachmentsField,
   CollectionMethodSelectField,
@@ -59,11 +57,6 @@ import {
 } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
-import {
-  NominatimAddressDetailSearchProps,
-  NominatumApiAddressDetailSearchResult,
-  nominatimAddressDetailSearch
-} from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { TgnSourceSelection } from "./TgnIntegration";
 
@@ -118,21 +111,10 @@ export function CollectingEventFormLayout({
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
   const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
-  const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
   const [
     customGeographicPlaceCheckboxState,
     setCustomGeographicPlaceCheckboxState
   ] = useState(false);
-
-  const { isValidating: detailResultsIsLoading } = useSWR(
-    [selectedSearchResult, "nominatimAddressDetailSearch"],
-    nominatimAddressDetailSearch,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
 
   const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
 
@@ -194,25 +176,8 @@ export function CollectingEventFormLayout({
       );
     }
 
-    // get the address detail with another nomiature call
-
-    const detailSearchProps: NominatimAddressDetailSearchProps = {
-      urlValue: {
-        osmid: result.osm_id,
-        osmtype: osmTypeForSearch,
-        class: result.category
-      },
-      updateAdminLevels,
-      formik,
-      stateProvinceName
-    };
-
-    setSelectedSearchResult(detailSearchProps);
-  }
-
-  function updateAdminLevels(detailResults, formik, stateProvinceName) {
     const geoNameParsed = parseGeoAdminLevels(
-      detailResults as any,
+      result,
       formik,
       stateProvinceName
     );
@@ -222,58 +187,61 @@ export function CollectingEventFormLayout({
   }
 
   function parseGeoAdminLevels(
-    detailResults: NominatumApiAddressDetailSearchResult | null,
-    formik,
-    stateProvinceName
+    searchResult: NominatumApiSearchResult,
+    formik: any,
+    stateProvinceName: string | null
   ) {
-    const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
-    let detail: SourceAdministrativeLevel = {};
-    detailResults?.address?.map((addr) => {
-      const isTargetType =
-        addr.type !== "country" &&
-        addr.type !== "state" &&
-        addr.type !== "country_code" &&
-        addr.place_type !== "province" &&
-        addr.place_type !== "state" &&
-        addr.place_type !== "country" &&
-        addr.isaddress &&
-        (addr.osm_id || addr.place_id);
+    const adminLevels: SourceAdministrativeLevel[] = [];
 
-      // omitting country and state
-      if (isTargetType) {
-        detail.id = addr.osm_id;
-        detail.element = addr.osm_type;
-        detail.placeType = addr.place_type ?? addr.class;
-        detail.name = addr.localname;
-        editableSrcAdmnLevels.push(detail);
-      }
-      // fill in the country code
-      if (addr.type === "country_code")
-        formik.setFieldValue(
-          `${commonSrcDetailRoot}.country.code`,
-          addr.localname
-        );
+    // If no address, just return an empty object.
+    if (!searchResult?.address) {
+      return adminLevels;
+    }
 
-      // fill in the state/province name and placeType if it is not yet filled up
-      // use name match if this result has empty/null state province placeType
+    // Go through each "address" available.
+    for (const [key, value] of Object.entries(searchResult.address)) {
+      // Ignore state/province and country as they are already handled.
       if (
-        addr.place_type === "province" ||
-        addr.place_type === "state" ||
-        stateProvinceName === addr.localname
+        key === "state" ||
+        key === "province" ||
+        key === "country" ||
+        key === "country_code"
       ) {
-        formik.setFieldValue(
-          `${commonSrcDetailRoot}.stateProvince.name`,
-          addr.localname
-        );
-        formik.setFieldValue(
-          `${commonSrcDetailRoot}.stateProvince.placeType`,
-          addr.place_type ?? addr.class
-        );
+        // fill in the country code
+        if (key === "country_code")
+          formik.setFieldValue(`${commonSrcDetailRoot}.country.code`, value);
+
+        // fill in the state/province name and placeType if it is not yet filled up
+        // use name match if this result has empty/null state province placeType
+        if (
+          key === "province" ||
+          key === "state" ||
+          stateProvinceName === value
+        ) {
+          formik.setFieldValue(
+            `${commonSrcDetailRoot}.stateProvince.name`,
+            value
+          );
+          formik.setFieldValue(
+            `${commonSrcDetailRoot}.stateProvince.placeType`,
+            key
+          );
+        }
+
+        continue;
       }
 
-      detail = {};
-    });
-    return editableSrcAdmnLevels;
+      if (value) {
+        adminLevels.push({
+          id: "test",
+          element: searchResult.osm_type,
+          placeType: key,
+          name: value
+        });
+      }
+    }
+
+    return adminLevels;
   }
 
   function removeThisPlace(formik: FormikContextType<{}>) {
@@ -451,7 +419,7 @@ export function CollectingEventFormLayout({
         style={{
           overflowY: "auto",
           overflowX: "hidden",
-          maxHeight: 520
+          maxHeight: 925
         }}
       >
         <Field name="geographicPlaceNameSourceDetail">
@@ -491,18 +459,14 @@ export function CollectingEventFormLayout({
                     </div>
                   </div>
                 )}
-                {detailResultsIsLoading ? (
-                  <LoadingSpinner loading={true} />
-                ) : form.values.srcAdminLevels?.length ? (
-                  <PlaceSectionsSelectionField
-                    name="srcAdminLevels"
-                    hideSelectionCheckBox={hideSelectionCheckBox}
-                    setCustomGeographicPlaceCheckboxState={
-                      setCustomGeographicPlaceCheckboxState
-                    }
-                    customPlaceValue={customPlaceValue}
-                  />
-                ) : null}
+                <PlaceSectionsSelectionField
+                  name="srcAdminLevels"
+                  hideSelectionCheckBox={hideSelectionCheckBox}
+                  setCustomGeographicPlaceCheckboxState={
+                    setCustomGeographicPlaceCheckboxState
+                  }
+                  customPlaceValue={customPlaceValue}
+                />
                 <DinaFormSection horizontal={[3, 9]}>
                   <TextField
                     name={`${commonSrcDetailRoot}.stateProvince.name`}
