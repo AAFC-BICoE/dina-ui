@@ -176,13 +176,21 @@ export function CollectingEventFormLayout({
       );
     }
 
-    const geoNameParsed = parseGeoAdminLevels(result);
+    const geoNameParsed = parseGeoAdminLevels(
+      result,
+      formik,
+      stateProvinceName
+    );
     formik.setFieldValue("srcAdminLevels", geoNameParsed);
     setHideCustomPlace(false);
     setHideSelectionCheckBox(false);
   }
 
-  function parseGeoAdminLevels(searchResult: NominatumApiSearchResult) {
+  function parseGeoAdminLevels(
+    searchResult: NominatumApiSearchResult,
+    formik: any,
+    stateProvinceName: string | null
+  ) {
     const adminLevels: SourceAdministrativeLevel[] = [];
 
     // If no address, just return an empty object.
@@ -199,6 +207,27 @@ export function CollectingEventFormLayout({
         key === "country" ||
         key === "country_code"
       ) {
+        // fill in the country code
+        if (key === "country_code")
+          formik.setFieldValue(`${commonSrcDetailRoot}.country.code`, value);
+
+        // fill in the state/province name and placeType if it is not yet filled up
+        // use name match if this result has empty/null state province placeType
+        if (
+          key === "province" ||
+          key === "state" ||
+          stateProvinceName === value
+        ) {
+          formik.setFieldValue(
+            `${commonSrcDetailRoot}.stateProvince.name`,
+            value
+          );
+          formik.setFieldValue(
+            `${commonSrcDetailRoot}.stateProvince.placeType`,
+            key
+          );
+        }
+
         continue;
       }
 
@@ -214,72 +243,6 @@ export function CollectingEventFormLayout({
 
     return adminLevels;
   }
-
-  // function updateAdminLevels(detailResults, formik, stateProvinceName) {
-  //   const geoNameParsed = parseGeoAdminLevels(
-  //     detailResults as any,
-  //     formik,
-  //     stateProvinceName
-  //   );
-  //   formik.setFieldValue("srcAdminLevels", geoNameParsed);
-  //   setHideCustomPlace(false);
-  //   setHideSelectionCheckBox(false);
-  // }
-
-  // function parseGeoAdminLevels(
-  //   detailResults: NominatumApiAddressDetailSearchResult | null,
-  //   formik,
-  //   stateProvinceName
-  // ) {
-  //   const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
-  //   let detail: SourceAdministrativeLevel = {};
-  //   detailResults?.address?.map((addr) => {
-  //     const isTargetType =
-  //       addr.type !== "country" &&
-  //       addr.type !== "state" &&
-  //       addr.type !== "country_code" &&
-  //       addr.place_type !== "province" &&
-  //       addr.place_type !== "state" &&
-  //       addr.place_type !== "country" &&
-  //       addr.isaddress &&
-  //       (addr.osm_id || addr.place_id);
-
-  //     // omitting country and state
-  //     if (isTargetType) {
-  //       detail.id = addr.osm_id;
-  //       detail.element = addr.osm_type;
-  //       detail.placeType = addr.place_type ?? addr.class;
-  //       detail.name = addr.localname;
-  //       editableSrcAdmnLevels.push(detail);
-  //     }
-  //     // fill in the country code
-  //     if (addr.type === "country_code")
-  //       formik.setFieldValue(
-  //         `${commonSrcDetailRoot}.country.code`,
-  //         addr.localname
-  //       );
-
-  //     // fill in the state/province name and placeType if it is not yet filled up
-  //     // use name match if this result has empty/null state province placeType
-  //     if (
-  //       addr.place_type === "province" ||
-  //       addr.place_type === "state" ||
-  //       stateProvinceName === addr.localname
-  //     ) {
-  //       formik.setFieldValue(
-  //         `${commonSrcDetailRoot}.stateProvince.name`,
-  //         addr.localname
-  //       );
-  //       formik.setFieldValue(
-  //         `${commonSrcDetailRoot}.stateProvince.placeType`,
-  //         addr.place_type ?? addr.class
-  //       );
-  //     }
-
-  //     detail = {};
-  //   });
-  //   return editableSrcAdmnLevels;
-  // }
 
   function removeThisPlace(formik: FormikContextType<{}>) {
     // reset the source fields when user remove the place
