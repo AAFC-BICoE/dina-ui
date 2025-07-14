@@ -5,16 +5,16 @@ import {
   filterBy,
   ResourceSelect,
   useBulkEditTabContext,
-  useBulkGet,
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import _ from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../types/collection-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
 import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
+import { useManagedAttributeQueries } from "./useManagedAttributeQueries";
+import _ from "lodash";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -88,12 +88,11 @@ export function ManagedAttributesEditor({
 
         // Fetch the attributes, but omit any that are missing e.g. were deleted.
         const { dataWithNullForMissing: fetchedAttributes, loading } =
-          useBulkGet<ManagedAttribute>({
-            ids: visibleAttributeKeys.map((key) =>
-              // Use the component prefix if needed by the back-end:
-              _.compact([managedAttributeComponent, key]).join(".")
-            ),
-            listPath: managedAttributeApiPath
+          useManagedAttributeQueries({
+            keys: visibleAttributeKeys,
+            managedAttributeApiPath,
+            managedAttributeComponent,
+            disabled: false
           });
 
         // Store the last fetched Attributes in a ref instead of showing a

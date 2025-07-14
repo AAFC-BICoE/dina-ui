@@ -241,7 +241,8 @@ export class ApiClientImpl implements ApiClientI {
     const supportedBaseApis = [
       "/agent-api",
       "/dina-export-api",
-      "/objectstore-api"
+      "/objectstore-api",
+      "/collection-api"
     ];
 
     // Resource types that are supported for bulk operations.
