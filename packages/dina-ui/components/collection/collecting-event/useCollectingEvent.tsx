@@ -273,10 +273,20 @@ export function useCollectingEventSave({
       if (Object.keys(newSourceDetail).length > 0) {
         collectingEventDiff.geographicPlaceNameSourceDetail =
           _.cloneDeep(newSourceDetail);
-      } else if (
-        collectingEventFormik?.values?.geographicPlaceNameSourceDetail === null
-      ) {
-        (collectingEventDiff.geographicPlaceNameSourceDetail as any) = null;
+      } else {
+        const initialSourceDetail =
+          collectingEventInitialValues.geographicPlaceNameSourceDetail ?? null;
+        const submittedSourceDetail =
+          submittedValues.geographicPlaceNameSourceDetail ?? null;
+
+        // Check if the record has been deleted locally.
+        if (
+          !_.isEqual(initialSourceDetail, submittedSourceDetail) &&
+          submittedSourceDetail === null
+        ) {
+          (collectingEventDiff.geographicPlaceNameSourceDetail as any) = null;
+          (collectingEventDiff.geographicPlaceNameSource as any) = null;
+        }
       }
     } else {
       // If no changes, remove this field from the diff

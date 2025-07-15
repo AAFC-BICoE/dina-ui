@@ -2909,12 +2909,34 @@ describe("Material Sample Edit Page", () => {
                   geographicPlaceNameSource: "OSM",
                   geographicPlaceNameSourceDetail: {
                     country: {
-                      name: "Canada"
+                      name: "Canada",
+                      code: "ca"
                     },
+                    selectedGeographicPlace: {
+                      element: "R",
+                      id: "test",
+                      name: "Ottawa",
+                      placeType: "city"
+                    },
+                    higherGeographicPlaces: [
+                      {
+                        element: "R",
+                        id: "test",
+                        name: "Eastern Ontario",
+                        placeType: "state_district"
+                      },
+                      {
+                        element: "R",
+                        id: "test",
+                        name: "CA-ON",
+                        placeType: "ISO3166-2-lvl4"
+                      }
+                    ],
                     stateProvince: {
                       element: "relation",
                       id: 4136816,
-                      name: "Ontario"
+                      name: "Ontario",
+                      placeType: "state"
                     },
                     sourceUrl:
                       "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
