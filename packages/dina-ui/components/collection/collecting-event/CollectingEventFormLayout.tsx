@@ -232,9 +232,12 @@ export function CollectingEventFormLayout({
       }
 
       if (value) {
+        // Determine the osm type for the admin level. Must be a single letter.
+        const osmType = searchResult.osm_type.charAt(0).toUpperCase();
+
         adminLevels.push({
           id: "test",
-          element: searchResult.osm_type,
+          element: osmType,
           placeType: key,
           name: value
         });
