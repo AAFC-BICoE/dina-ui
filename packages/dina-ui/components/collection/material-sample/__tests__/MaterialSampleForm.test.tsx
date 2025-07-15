@@ -2998,13 +2998,13 @@ describe("Material Sample Edit Page", () => {
       userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
       await waitFor(() =>
         expect(
-          wrapper.getByRole("textbox", { name: /customplace/i })
+          wrapper.getByRole("textbox", { name: /custom place name/i })
         ).toBeInTheDocument()
       );
 
       // Set a custom geographic place name:
       userEvent.type(
-        wrapper.getByRole("textbox", { name: /customplace/i }),
+        wrapper.getByRole("textbox", { name: /custom place name/i }),
         "Neatby Building"
       );
       userEvent.click(wrapper.getByTestId("addCustomPlaceNameButton"));
@@ -3279,13 +3279,13 @@ describe("Material Sample Edit Page", () => {
       userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
       await waitFor(() =>
         expect(
-          wrapper.getByRole("textbox", { name: /customplace/i })
+          wrapper.getByRole("textbox", { name: /custom place name/i })
         ).toBeInTheDocument()
       );
 
       // Set a custom geographic place name:
       userEvent.type(
-        wrapper.getByRole("textbox", { name: /customplace/i }),
+        wrapper.getByRole("textbox", { name: /custom place name/i }),
         "Neatby Building"
       );
       userEvent.click(wrapper.getByTestId("addCustomPlaceNameButton"));
