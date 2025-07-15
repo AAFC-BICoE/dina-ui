@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import { useApiClient } from "common-ui";
 import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
+import _ from "lodash";
 
 export interface UseBulkGetParams {
   managedAttributeApiPath: string;
@@ -27,16 +28,19 @@ export interface UseBulkGetParams {
  */
 export function useManagedAttributeQueries({
   managedAttributeApiPath,
-  managedAttributeComponent,
+  managedAttributeComponent = "",
   keys,
   disabled = false
 }: UseBulkGetParams) {
   const { apiClient } = useApiClient();
 
   const fetchResources = async (keys: string[]) => {
-    const paths = keys.map(
-      (key) => `${managedAttributeApiPath}/${managedAttributeComponent}.${key}`
-    );
+    const paths = managedAttributeComponent
+      ? keys.map(
+          (key) =>
+            `${managedAttributeApiPath}/${managedAttributeComponent}.${key}`
+        )
+      : keys.map((key) => `${managedAttributeApiPath}/${key}`);
 
     const headers = {
       Accept: "application/vnd.api+json",
@@ -57,9 +61,7 @@ export function useManagedAttributeQueries({
     const results = await Promise.all(caught_promises);
 
     // Filter out any null results (e.g. if the resource was not found).
-    return results
-      .filter((result) => result !== null)
-      .map((result) => result.data);
+    return _.compact(results).map((result) => result.data);
   };
 
   const shouldFetch = keys?.length > 0 && !disabled;

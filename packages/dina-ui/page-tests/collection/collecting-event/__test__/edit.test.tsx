@@ -98,22 +98,24 @@ describe("collecting-event edit page", () => {
     mockQuery = {};
   });
   it("Provides a form to add a collecting-event.", async () => {
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
+    mockPost
+      .mockReturnValueOnce(Promise.resolve("default"))
+      .mockReturnValueOnce(
+        Promise.resolve({
           data: {
-            attributes: {
-              startEventDateTime: "12/21/2019T16:00",
-              endEventDateTime: "12/22/2019T16:00",
-              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
-            },
-            id: "1",
-            type: "collecting-event"
+            data: {
+              attributes: {
+                startEventDateTime: "12/21/2019T16:00",
+                endEventDateTime: "12/22/2019T16:00",
+                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
+              },
+              id: "1",
+              type: "collecting-event"
+            }
           },
           status: 201
-        }
-      ] as OperationsResponse
-    });
+        })
+      );
 
     mockQuery = {};
 
@@ -162,26 +164,23 @@ describe("collecting-event edit page", () => {
 
     // Test expected API Response
     await waitFor(() => {
-      expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "POST",
-            path: "collecting-event",
-            value: {
-              attributes: {
-                dwcVerbatimCoordinateSystem: null,
-                dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-                publiclyReleasable: true, // Default value
-                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
-                otherRecordNumbers: ["12", "23"],
-                geoReferenceAssertions: [{ isPrimary: true }]
-              },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "collecting-event"
-            }
+      expect(mockPost).lastCalledWith(
+        "/collection-api/collecting-event",
+
+        {
+          data: {
+            attributes: {
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              publiclyReleasable: true, // Default value
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
+              otherRecordNumbers: ["12", "23"],
+              geoReferenceAssertions: [{ isPrimary: true }]
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "collecting-event"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -192,20 +191,19 @@ describe("collecting-event edit page", () => {
 
   it("Lets you add georeference assertions on a new Collecting Event.", async () => {
     // Return the collecting event so it can then be attached to the new georeference assertion:
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
+    mockGet.mockReturnValueOnce(
+      Promise.resolve({
+        data: {
           data: {
             attributes: {
               startEventDateTime: "12/21/2019T16:00"
             },
             id: "1",
             type: "collecting-event"
-          },
-          status: 201
+          }
         }
-      ] as OperationsResponse
-    });
+      } as any)
+    );
 
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext

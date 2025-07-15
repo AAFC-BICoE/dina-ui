@@ -129,6 +129,34 @@ const mockGeographicSearchResults = [
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_1":
+      return Promise.resolve({
+        data: { id: "1", key: "attribute_1", name: "Attribute 1" }
+      });
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_2":
+      return Promise.resolve({
+        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
+      });
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_3":
+      return Promise.resolve({
+        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
+      });
+    case "collection-api/managed-attribute/COLLECTING_EVENT.attribute_2":
+      return Promise.resolve({
+        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
+      });
+    case "collection-api/managed-attribute/COLLECTING_EVENT.attribute_3":
+      return Promise.resolve({
+        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
+      });
+    case "collection-api/managed-attribute/DETERMINATION.attribute_2":
+      return Promise.resolve({
+        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
+      });
+    case "collection-api/managed-attribute/DETERMINATION.attribute_3":
+      return Promise.resolve({
+        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
+      });
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
     case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol":
@@ -191,30 +219,8 @@ const mockSave = jest.fn<any, any>(async (saves) => {
   });
 });
 
-const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
-  paths.map((path) => {
-    switch (path) {
-      case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
-        return { id: "1", key: "attribute_1", name: "Attribute 1" };
-      case "managed-attribute/MATERIAL_SAMPLE.attribute_2":
-        return { id: "2", key: "attribute_2", name: "Attribute 2" };
-      case "managed-attribute/MATERIAL_SAMPLE.attribute_3":
-        return { id: "3", key: "attribute_3", name: "Attribute 3" };
-      case "managed-attribute/COLLECTING_EVENT.attribute_2":
-        return { id: "2", key: "attribute_2", name: "Attribute 2" };
-      case "managed-attribute/COLLECTING_EVENT.attribute_3":
-        return { id: "3", key: "attribute_3", name: "Attribute 3" };
-      case "managed-attribute/DETERMINATION.attribute_2":
-        return { id: "2", key: "attribute_2", name: "Attribute 2" };
-      case "managed-attribute/DETERMINATION.attribute_3":
-        return { id: "3", key: "attribute_3", name: "Attribute 3" };
-    }
-  })
-);
-
 const testCtx = {
   apiContext: {
-    bulkGet: mockBulkGet,
     save: mockSave,
     apiClient: {
       get: mockGet
