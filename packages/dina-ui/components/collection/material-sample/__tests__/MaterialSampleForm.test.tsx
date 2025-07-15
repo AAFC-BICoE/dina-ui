@@ -2953,6 +2953,125 @@ describe("Material Sample Edit Page", () => {
       );
     });
 
+    it("Updates geographicPlaceNameSourceDetail with a customGeographicPlace when previously added and changes are made", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "2",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /remove this place/i })
+        ).toBeInTheDocument()
+      );
+
+      // Click the remove this place button.
+      userEvent.click(
+        wrapper.getByRole("button", { name: /remove this place/i })
+      );
+      await waitFor(() =>
+        expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
+      );
+
+      // Enter a search value:
+      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+
+      // Click the search button.
+      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await waitFor(() =>
+        expect(
+          wrapper.getAllByRole("button", { name: "Select" })[0]
+        ).toBeInTheDocument()
+      );
+
+      // Click the first search option.
+      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("textbox", { name: /customplace/i })
+        ).toBeInTheDocument()
+      );
+
+      // Set a custom geographic place name:
+      userEvent.type(
+        wrapper.getByRole("textbox", { name: /customplace/i }),
+        "Neatby Building"
+      );
+      userEvent.click(wrapper.getByTestId("addCustomPlaceNameButton"));
+
+      // Wait for it to appear in the table:
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("cell", { name: /neatby building/i })
+        ).toBeInTheDocument()
+      );
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  geographicPlaceNameSource: "OSM",
+                  geographicPlaceNameSourceDetail: {
+                    country: {
+                      name: "Canada",
+                      code: "ca"
+                    },
+                    customGeographicPlace: "Neatby Building",
+                    higherGeographicPlaces: [
+                      {
+                        element: "R",
+                        id: "test",
+                        name: "Ottawa",
+                        placeType: "city"
+                      },
+                      {
+                        element: "R",
+                        id: "test",
+                        name: "Eastern Ontario",
+                        placeType: "state_district"
+                      },
+                      {
+                        element: "R",
+                        id: "test",
+                        name: "CA-ON",
+                        placeType: "ISO3166-2-lvl4"
+                      }
+                    ],
+                    stateProvince: {
+                      element: "relation",
+                      id: 4136816,
+                      name: "Ontario",
+                      placeType: "state"
+                    },
+                    sourceUrl:
+                      "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                  },
+                  id: "2",
+                  type: "collecting-event"
+                },
+                type: "collecting-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+    });
+
     it("Removes geographicPlaceNameSourceDetail when previously added and deleted", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleForm
@@ -3074,6 +3193,139 @@ describe("Material Sample Edit Page", () => {
                       placeType: "city"
                     },
                     higherGeographicPlaces: [
+                      {
+                        element: "R",
+                        id: "test",
+                        name: "Eastern Ontario",
+                        placeType: "state_district"
+                      },
+                      {
+                        element: "R",
+                        id: "test",
+                        name: "CA-ON",
+                        placeType: "ISO3166-2-lvl4"
+                      }
+                    ],
+                    stateProvince: {
+                      element: "relation",
+                      id: 4136816,
+                      name: "Ontario",
+                      placeType: "state"
+                    },
+                    sourceUrl:
+                      "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                  },
+                  group: "aafc",
+                  publiclyReleasable: true,
+                  type: "collecting-event"
+                },
+                type: "collecting-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ],
+          [
+            [
+              {
+                resource: {
+                  collectingEvent: {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "collecting-event"
+                  },
+                  publiclyReleasable: true,
+                  type: "material-sample"
+                },
+                type: "material-sample"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+    });
+
+    it("Creates a geographicPlaceNameSourceDetail with a customGeographicPlaceName to a new collecting event", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm onSaved={mockOnSaved} />,
+        testCtx
+      );
+      await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+      // Enable the collecting event section:
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        fail("Collecting event toggle needs to exist at this point.");
+      }
+      fireEvent.click(collectingEventToggle[0]);
+
+      await waitFor(() =>
+        expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
+      );
+
+      // Enter a search value:
+      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+
+      // Click the search button.
+      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await waitFor(() =>
+        expect(
+          wrapper.getAllByRole("button", { name: "Select" })[0]
+        ).toBeInTheDocument()
+      );
+
+      // Click the first search option.
+      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("textbox", { name: /customplace/i })
+        ).toBeInTheDocument()
+      );
+
+      // Set a custom geographic place name:
+      userEvent.type(
+        wrapper.getByRole("textbox", { name: /customplace/i }),
+        "Neatby Building"
+      );
+      userEvent.click(wrapper.getByTestId("addCustomPlaceNameButton"));
+
+      // Wait for it to appear in the table:
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("cell", { name: /neatby building/i })
+        ).toBeInTheDocument()
+      );
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  dwcVerbatimCoordinateSystem: null,
+                  dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+                  geoReferenceAssertions: [
+                    {
+                      isPrimary: true
+                    }
+                  ],
+                  geographicPlaceNameSource: "OSM",
+                  geographicPlaceNameSourceDetail: {
+                    country: {
+                      code: "ca",
+                      name: "Canada"
+                    },
+                    customGeographicPlace: "Neatby Building",
+                    higherGeographicPlaces: [
+                      {
+                        element: "R",
+                        id: "test",
+                        name: "Ottawa",
+                        placeType: "city"
+                      },
                       {
                         element: "R",
                         id: "test",

@@ -430,18 +430,26 @@ export function CollectingEventFormLayout({
             detail ? (
               <div>
                 {!hideCustomPlace && !readOnly && (
-                  <div className="m-3">
-                    <div className="d-flex flex-row">
-                      <label className="p-2" style={{ marginLeft: -20 }}>
-                        <strong>
-                          <DinaMessage id="customPlaceName" />
-                        </strong>
-                      </label>
+                  <div className="mb-3">
+                    <label
+                      htmlFor="customPlaceNameInput"
+                      className="form-label"
+                    >
+                      <strong>
+                        <DinaMessage id="customPlaceName" />
+                      </strong>
+                    </label>
+
+                    <div className="input-group">
                       <input
+                        id="customPlaceNameInput"
                         disabled={customGeographicPlaceCheckboxState}
-                        aria-label="customPlace"
-                        className="p-2 form-control"
-                        style={{ width: "60%" }}
+                        aria-label="Custom Place Name"
+                        className="form-control"
+                        placeholder={formatMessage(
+                          "customPlaceNamePlaceholder"
+                        )}
+                        value={customPlaceValue}
                         onChange={(e) => setCustomPlaceValue(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
@@ -453,9 +461,14 @@ export function CollectingEventFormLayout({
                         }}
                       />
                       <button
-                        className="mb-2 btn btn-primary"
+                        className="btn btn-primary"
                         type="button"
+                        data-testid="addCustomPlaceNameButton"
                         onClick={() => addCustomPlaceName(form)}
+                        disabled={
+                          !customPlaceValue ||
+                          customGeographicPlaceCheckboxState
+                        }
                       >
                         <DinaMessage id="addCustomPlaceName" />
                       </button>

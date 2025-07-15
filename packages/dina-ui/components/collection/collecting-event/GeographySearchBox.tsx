@@ -129,17 +129,20 @@ export function GeographySearchBox({
 
   return (
     <div className="m-2">
-      <div className="d-flex mb-3">
-        <label className="pt-2">
+      <div className="mb-3">
+        <label htmlFor="geographySearchBoxInput" className="form-label">
           <strong>
             <DinaMessage id="locationLabel" />
           </strong>
           <Tooltip id="geographySearchBoxTooltip" />
         </label>
-        <div className="flex-grow-1">
+
+        <div className="input-group">
           <input
+            id="geographySearchBoxInput"
             aria-label={formatMessage("locationLabel")}
             className="form-control"
+            placeholder={formatMessage("locationPlaceholder")}
             onChange={(e) => onInputChange(e.target.value)}
             onFocus={(e) => e.target.select()}
             onKeyDown={(e) => {
@@ -151,19 +154,18 @@ export function GeographySearchBox({
             value={inputValue}
             data-testid="geographySearchBox"
           />
+          <button
+            onClick={doSearch}
+            className="btn btn-primary geo-search-button"
+            type="button"
+            disabled={suggestButtonIsDisabled}
+          >
+            <DinaMessage id="searchButton" />
+          </button>
         </div>
       </div>
-      <div className="mb-3 d-flex">
-        <button
-          style={{ width: "10rem" }}
-          onClick={doSearch}
-          className="btn btn-primary ms-auto geo-search-button"
-          type="button"
-          disabled={suggestButtonIsDisabled}
-        >
-          <DinaMessage id="searchButton" />
-        </button>
-      </div>
+
+      {/* The rest of your component logic remains unchanged. */}
       {renderUnderSearchBar}
       <div className="list-group mb-3">
         {geoSearchIsLoading ? (
@@ -186,7 +188,7 @@ export function GeographySearchBox({
               {/* Text content on the left */}
               <div className="ms-2 mt-2 mb-2">
                 <h5 className="mb-1">
-                  {place.name}
+                  {place.name === "" ? inputValue : place.name}
                   <span className="badge bg-secondary ms-2 fw-normal">
                     {_.startCase(place.addresstype)}
                   </span>
