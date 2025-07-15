@@ -88,13 +88,14 @@ export function ManagedAttributesEditor({
 
         // Fetch the attributes, but omit any that are missing e.g. were deleted.
 
-        const { dataWithNullForMissing: fetchedAttributes, loading } =
-          useManagedAttributeQueries({
+        const { data: fetchedAttributes, loading } = useManagedAttributeQueries(
+          {
             keys: visibleAttributeKeys,
             managedAttributeApiPath,
             managedAttributeComponent,
             disabled: !visibleAttributeKeys.length
-          });
+          }
+        );
 
         // Store the last fetched Attributes in a ref instead of showing a
         // loading state when the visible attributes change.
@@ -105,7 +106,7 @@ export function ManagedAttributesEditor({
         if (!visibleAttributeKeys.length) {
           lastFetchedAttributes.current = [];
         } else if (fetchedAttributes) {
-          lastFetchedAttributes.current = _.compact(fetchedAttributes);
+          lastFetchedAttributes.current = fetchedAttributes;
         }
 
         const visibleAttributes = lastFetchedAttributes.current;
@@ -135,9 +136,9 @@ export function ManagedAttributesEditor({
                             values={values}
                             valuesPath={valuesPath}
                             onRemoveClick={(attributeKey) =>
-                              setVisibleAttributeKeys((current) => {
-                                current.filter((it) => it != attributeKey);
-                              })
+                              setVisibleAttributeKeys((current) =>
+                                current.filter((it) => it != attributeKey)
+                              )
                             }
                           />
                         ))}
