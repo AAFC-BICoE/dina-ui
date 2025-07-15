@@ -104,9 +104,41 @@ export function DateField(props: DateFieldProps) {
         function onBlur(event: FocusEvent<HTMLInputElement>) {
           const newText = event.target.value;
 
+          // Run the existing validation first.
           const error = validate?.(newText);
-          if (error !== undefined) {
+          if (error) {
             formik.setFieldError(props.name, error);
+            return;
+          }
+
+          // If the input text is not empty, try to parse and reformat it.
+          if (newText) {
+            const parsedDate = moment(newText);
+            if (parsedDate.isValid()) {
+              // If parsing is successful, format the date into the canonical ISO string.
+              // Use the full string if showTime is true, otherwise use only the date part.
+              const formattedValue = parsedDate
+                .toDate()
+                .toISOString()
+                .slice(0, showTime ? undefined : 10);
+
+              // Update the form's state with the correctly formatted value.
+              setValue(formattedValue);
+
+              // Clear any previous validation errors for this field.
+              if (formik.errors[props.name]) {
+                formik.setFieldError(props.name, undefined);
+              }
+            } else {
+              // If the input is not a valid date, set a field error.
+              formik.setFieldError(
+                props.name,
+                `${formatMessage({ id: "invalidDate" })}: ${newText}`
+              );
+            }
+          } else {
+            // If the field was cleared, set the value to null.
+            setValue(null);
           }
         }
 
