@@ -45,6 +45,59 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           materialSampleName: "material-sample-500"
         }
       };
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.m1":
+      return Promise.resolve({
+        data: {
+          type: "managed-attribute",
+          id: "1",
+          key: "m1",
+          vocabularyElementType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          name: "Managed Attribute 1"
+        }
+      });
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.m2":
+      return Promise.resolve({
+        data: {
+          type: "managed-attribute",
+          id: "2",
+          key: "m2",
+          vocabularyElementType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          name: "Managed Attribute 2"
+        }
+      });
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.m3":
+      return Promise.resolve({
+        data: {
+          type: "managed-attribute",
+          id: "3",
+          key: "m3",
+          vocabularyElementType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          name: "Managed Attribute 3"
+        }
+      });
+    case "managed-attribute/MATERIAL_SAMPLE.sample_attribute_1":
+      return Promise.resolve({
+        id: "1",
+        key: "sample_attribute_1",
+        name: "Attribute 1"
+      });
+    case "managed-attribute/DETERMINATION.determination_attribute_1":
+      return Promise.resolve({
+        id: "1",
+        key: "determination_attribute_1",
+        name: "Attribute 1"
+      });
+    case "managed-attribute/COLLECTING_EVENT.collecting_event_attribute_1":
+      return Promise.resolve({
+        data: {
+          id: "1",
+          key: "collecting_event_attribute_1",
+          name: "Attribute 1"
+        }
+      });
     case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod,protocol":
       return { data: TEST_COLLECTING_EVENT };
     case "collection-api/storage-unit":
@@ -128,49 +181,8 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           id: "initial-attachment-2",
           originalFileName: "initial-attachment-2"
         };
-      case "managed-attribute/MATERIAL_SAMPLE.m1":
-        return {
-          type: "managed-attribute",
-          id: "1",
-          key: "m1",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          name: "Managed Attribute 1"
-        };
-      case "managed-attribute/MATERIAL_SAMPLE.m2":
-        return {
-          type: "managed-attribute",
-          id: "2",
-          key: "m2",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          name: "Managed Attribute 2"
-        };
-      case "managed-attribute/MATERIAL_SAMPLE.m3":
-        return {
-          type: "managed-attribute",
-          id: "3",
-          key: "m3",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          name: "Managed Attribute 3"
-        };
       case "collection/1":
         return TEST_COLLECTION_1;
-      case "managed-attribute/MATERIAL_SAMPLE.sample_attribute_1":
-        return { id: "1", key: "sample_attribute_1", name: "Attribute 1" };
-      case "managed-attribute/DETERMINATION.determination_attribute_1":
-        return {
-          id: "1",
-          key: "determination_attribute_1",
-          name: "Attribute 1"
-        };
-      case "managed-attribute/COLLECTING_EVENT.collecting_event_attribute_1":
-        return {
-          id: "1",
-          key: "collecting_event_attribute_1",
-          name: "Attribute 1"
-        };
     }
   });
 });
@@ -194,7 +206,10 @@ const mockOnSaved = jest.fn();
 
 describe("MaterialSampleBulkEditor", () => {
   beforeEach(() => deleteFromStorage("test-user." + SAMPLE_FORM_TEMPLATE_KEY));
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
 
   it("Bulk creates material samples.", async () => {
     const wrapper = mountWithAppContext(
