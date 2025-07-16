@@ -191,7 +191,7 @@ describe("collecting-event edit page", () => {
 
   it("Lets you add georeference assertions on a new Collecting Event.", async () => {
     // Return the collecting event so it can then be attached to the new georeference assertion:
-    mockGet.mockReturnValueOnce(
+    mockPost.mockReturnValueOnce(
       Promise.resolve({
         data: {
           data: {
@@ -205,8 +205,6 @@ describe("collecting-event edit page", () => {
       } as any)
     );
 
-    mockQuery = { id: 1 };
-
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
     });
@@ -216,7 +214,6 @@ describe("collecting-event edit page", () => {
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
       {
         target: {
-          name: "verbatimEventDateTime",
           value: "From 2019,12,21 4pm to 2019,12,22 5pm"
         }
       }
@@ -256,29 +253,30 @@ describe("collecting-event edit page", () => {
     // Saves the collecting event and the georeference assertion in separate requests:
     // (The collecting event id is required to save the georeference assertion)
     await waitFor(() => {
-      expect(mockPost.mock.calls).toEqual([
-        [
-          "/collection-api/collecting-event/1",
-          {
-            value: {
-              attributes: expect.objectContaining({
-                geoReferenceAssertions: [
-                  {
-                    isPrimary: true,
-                    dwcCoordinateUncertaintyInMeters: "5",
-                    dwcDecimalLatitude: "45.394728",
-                    dwcDecimalLongitude: "-75.701452"
-                  }
-                ],
-                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
-              }),
-              id: "1",
-              type: "collecting-event"
-            }
-          },
-          expect.anything()
-        ]
-      ]);
+      expect(mockPost).lastCalledWith(
+        "/collection-api/collecting-event",
+        {
+          data: {
+            attributes: {
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true,
+                  dwcCoordinateUncertaintyInMeters: "5",
+                  dwcDecimalLatitude: "45.394728",
+                  dwcDecimalLongitude: "-75.701452"
+                }
+              ],
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              dwcVerbatimCoordinateSystem: null,
+              publiclyReleasable: true,
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "collecting-event"
+          }
+        },
+        expect.anything()
+      );
     });
   });
 
