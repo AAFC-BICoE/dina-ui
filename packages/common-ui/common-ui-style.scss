@@ -325,6 +325,77 @@ input[type="number"]::-webkit-outer-spin-button {
   overflow: visible !important;
 }
 
+.table-top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.table-top-controls .pagination-top {
+  flex-grow: 1;
+}
+
+.fullscreen-toggle-btn {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-left: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.fullscreen-toggle-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.ReactTable.fullscreen-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 0 !important;
+  width: 100%;
+  height: 100%;
+  z-index: 1050;
+  background: white;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
+  width: calc(100% - 500px);
+  transition: width .3s ease-in-out;
+}
+
+.ReactTable.fullscreen-mode .table-responsive-wrapper {
+  flex-grow: 1;
+  height: 0;
+  max-height: none;
+}
+
+.table-responsive-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.ReactTable thead tr {
+  position: sticky;
+  top: 0;
+}
+
+.ReactTable thead th {
+  background: white;
+  z-index: 1;
+  white-space: nowrap;
+}
+
 .form-check-horizontal {
   display: inline;
   min-height: 1.5rem;

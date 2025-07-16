@@ -447,6 +447,9 @@ export function QueryPage<TData extends KitsuResource>({
     []
   );
 
+  // Fullscreen state
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
   const defaultGroups = useMemo(() => {
     return { group: groups };
   }, [groups]);
@@ -1233,6 +1236,9 @@ export function QueryPage<TData extends KitsuResource>({
                   showPagination={true}
                   showPaginationTop={true}
                   smallPaginationButtons={selectionMode}
+                  enableFullscreen={true}
+                  isFullscreen={isFullScreen}
+                  setIsFullscreen={setIsFullScreen}
                 />
               )}
               <div className="mt-2">
@@ -1288,6 +1294,7 @@ export function QueryPage<TData extends KitsuResource>({
                     showPagination={!enableDnd}
                     manualPagination={true}
                     smallPaginationButtons={true}
+                    enableFullscreen={true}
                   />
                 </div>
               </>

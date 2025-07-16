@@ -15,13 +15,20 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import classnames from "classnames";
-import { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  Fragment,
+  MouseEvent,
+  SetStateAction,
+  useEffect,
+  useState
+} from "react";
 import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
-import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+import { FaArrowDown, FaArrowUp, FaExpand, FaCompress } from "react-icons/fa";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500, 1000];
 
@@ -81,6 +88,13 @@ export interface ReactTableProps<TData> {
   hideTable?: boolean;
 
   setResourceRowModel?: Dispatch<SetStateAction<Row<TData>[] | undefined>>;
+
+  // Show a button to toggle fullscreen mode for the table.
+  enableFullscreen?: boolean;
+
+  // Fullscreen mode state, this should be controlled by the parent component.
+  isFullscreen?: boolean;
+  setIsFullscreen?: Dispatch<SetStateAction<boolean>>;
 }
 
 const DEFAULT_SORT: SortingState = [
@@ -126,7 +140,10 @@ export function ReactTable<TData>({
   onColumnFiltersChange,
   defaultColumnFilters = [],
   hideTable = false,
-  setResourceRowModel
+  setResourceRowModel,
+  enableFullscreen = false,
+  isFullscreen = false,
+  setIsFullscreen
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>(sort ?? DEFAULT_SORT);
@@ -165,6 +182,12 @@ export function ReactTable<TData>({
     const newState = updator(table.getState().columnFilters);
     onColumnFiltersChange?.(newState);
     setColumnFilters(newState);
+  }
+
+  function handleFullScreenToggle(e: MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation(); // Prevents the click from bubbling up.
+    e.preventDefault(); // Prevents any default browser action.
+    setIsFullscreen?.((p) => !p);
   }
 
   const onSortingChangeOption = manualSorting
@@ -253,153 +276,171 @@ export function ReactTable<TData>({
       className={classnames(
         "ReactTable",
         className,
-        highlightRow && !TbodyComponent ? "-highlight" : ""
+        highlightRow && !TbodyComponent ? "-highlight" : "",
+        isFullscreen && "fullscreen-mode"
       )}
     >
-      {showPagination && showPaginationTop && (
-        <div className="pagination-top">
-          <Pagination
-            table={table}
-            pageSizeOptions={pageSizeOptions}
-            isTop={true}
-            displayFirstAndLastOptions={
-              enableSorting && !!sorting && sorting?.length > 0
-            }
-            smallPaginationButtons={smallPaginationButtons}
-          />
+      {(showPaginationTop || enableFullscreen) && (
+        <div className="table-top-controls">
+          <div className="pagination-top">
+            {showPagination && showPaginationTop && (
+              <Pagination
+                table={table}
+                pageSizeOptions={pageSizeOptions}
+                isTop={true}
+                displayFirstAndLastOptions={
+                  enableSorting && !!sorting && sorting?.length > 0
+                }
+                smallPaginationButtons={smallPaginationButtons}
+              />
+            )}
+          </div>
+          {enableFullscreen && (
+            <button
+              onClick={handleFullScreenToggle}
+              className="fullscreen-toggle-btn me-2"
+              title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+            >
+              {isFullscreen ? <FaCompress /> : <FaExpand />}
+            </button>
+          )}
         </div>
       )}
-      <table className="w-100">
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                const defaultSortRule = sorting?.find(
-                  (sortRule) => sortRule.id === header.id
-                );
 
-                const isSortedDesc =
-                  header.column.getIsSorted() === "asc" ||
-                  defaultSortRule?.desc === false;
-                const isSortedAsc =
-                  header.column.getIsSorted() === "desc" ||
-                  defaultSortRule?.desc === true;
+      <div className="table-responsive-wrapper">
+        <table className="w-100">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const defaultSortRule = sorting?.find(
+                    (sortRule) => sortRule.id === header.id
+                  );
 
-                return (
-                  <th
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    className={classnames(
-                      header.column.getCanSort() && "-cursor-pointer"
-                    )}
-                    style={{
-                      width:
-                        header.column.columnDef.size === 0
-                          ? "auto"
-                          : header.column.columnDef.size
-                    }}
-                    onClick={header.column.getToggleSortingHandler()}
-                  >
-                    {header.isPlaceholder ? null : (
-                      <div
-                        className={
-                          header.column.getCanSort()
-                            ? "-cursor-pointer select-none column-header"
-                            : "column-header"
-                        }
-                      >
-                        <span className="d-flex align-items-center justify-content-center">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                          {isSortedAsc && (
-                            <FaArrowDown
-                              className="-sort-asc"
-                              onClick={header.column.getToggleSortingHandler()}
-                            />
-                          )}
-                          {isSortedDesc && (
-                            <FaArrowUp
-                              className="-sort-desc"
-                              onClick={header.column.getToggleSortingHandler()}
-                            />
-                          )}
-                        </span>
-                      </div>
-                    )}
-                    {header.column.getCanFilter() ? (
-                      <div>
-                        <FilterInput column={header.column} />
-                      </div>
-                    ) : null}
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td
-                colSpan={table.getAllColumns().length}
-                className="text-center"
-              >
-                <LoadingSpinner loading={true} />
-              </td>
-            </tr>
-          ) : !!TbodyComponent ? (
-            <tr>
-              <td colSpan={table.getAllColumns().length}>
-                <TbodyComponent />
-              </td>
-            </tr>
-          ) : table.getRowModel().rows.length === 0 ? (
-            <tr>
-              <td
-                colSpan={table.getAllColumns().length}
-                className="text-center"
-              >
-                {formatMessage({ id: "noRowsFound" })}
-              </td>
-            </tr>
-          ) : (
-            table.getRowModel().rows.map((row, index) => (
-              <Fragment key={row.id ?? index}>
-                {enableDnd ? (
-                  <DraggableRow
-                    row={row}
-                    reorderRow={onRowMove}
-                    className={classnames(
-                      `index-${index}`,
-                      index % 2 === 0 ? "-odd" : "-even"
-                    )}
-                    style={rowStyling ? rowStyling(row) : undefined}
-                  />
-                ) : (
-                  <DefaultRow
-                    row={row}
-                    className={classnames(
-                      `index-${index}`,
-                      index % 2 === 0 ? "-odd" : "-even"
-                    )}
-                    style={rowStyling ? rowStyling(row) : undefined}
-                  />
-                )}
-                {row.getIsExpanded() && (
-                  <tr>
-                    {/* 2nd row is a custom 1 cell row that contains the extended area */}
-                    <td colSpan={row.getVisibleCells().length}>
-                      {renderSubComponent?.({ row, index })}
-                    </td>
-                  </tr>
-                )}
-              </Fragment>
-            ))
-          )}
-        </tbody>
-      </table>
+                  const isSortedDesc =
+                    header.column.getIsSorted() === "asc" ||
+                    defaultSortRule?.desc === false;
+
+                  const isSortedAsc =
+                    header.column.getIsSorted() === "desc" ||
+                    defaultSortRule?.desc === true;
+
+                  return (
+                    <th
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className={classnames(
+                        header.column.getCanSort() && "-cursor-pointer"
+                      )}
+                      style={{
+                        width:
+                          header.column.columnDef.size === 0
+                            ? "auto"
+                            : header.column.columnDef.size
+                      }}
+                      onClick={header.column.getToggleSortingHandler()}
+                    >
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={
+                            header.column.getCanSort()
+                              ? "-cursor-pointer select-none column-header"
+                              : "column-header"
+                          }
+                        >
+                          <span className="d-flex align-items-center justify-content-center">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            {isSortedAsc && (
+                              <FaArrowDown
+                                className="-sort-asc"
+                                onClick={header.column.getToggleSortingHandler()}
+                              />
+                            )}
+                            {isSortedDesc && (
+                              <FaArrowUp
+                                className="-sort-desc"
+                                onClick={header.column.getToggleSortingHandler()}
+                              />
+                            )}
+                          </span>
+                        </div>
+                      )}
+                      {header.column.getCanFilter() ? (
+                        <div>
+                          <FilterInput column={header.column} />
+                        </div>
+                      ) : null}
+                    </th>
+                  );
+                })}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td
+                  colSpan={table.getAllColumns().length}
+                  className="text-center"
+                >
+                  <LoadingSpinner loading={true} />
+                </td>
+              </tr>
+            ) : !!TbodyComponent ? (
+              <tr>
+                <td colSpan={table.getAllColumns().length}>
+                  <TbodyComponent />
+                </td>
+              </tr>
+            ) : table.getRowModel().rows.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={table.getAllColumns().length}
+                  className="text-center"
+                >
+                  {formatMessage({ id: "noRowsFound" })}
+                </td>
+              </tr>
+            ) : (
+              table.getRowModel().rows.map((row, index) => (
+                <Fragment key={row.id ?? index}>
+                  {enableDnd ? (
+                    <DraggableRow
+                      row={row}
+                      reorderRow={onRowMove}
+                      className={classnames(
+                        `index-${index}`,
+                        index % 2 === 0 ? "-odd" : "-even"
+                      )}
+                      style={rowStyling ? rowStyling(row) : undefined}
+                    />
+                  ) : (
+                    <DefaultRow
+                      row={row}
+                      className={classnames(
+                        `index-${index}`,
+                        index % 2 === 0 ? "-odd" : "-even"
+                      )}
+                      style={rowStyling ? rowStyling(row) : undefined}
+                    />
+                  )}
+                  {row.getIsExpanded() && (
+                    <tr>
+                      {/* 2nd row is a custom 1 cell row that contains the extended area */}
+                      <td colSpan={row.getVisibleCells().length}>
+                        {renderSubComponent?.({ row, index })}
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
       {showPagination && (
         <div className="pagination-bottom">
           <Pagination
