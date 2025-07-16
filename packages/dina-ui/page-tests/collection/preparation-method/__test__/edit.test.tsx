@@ -3,7 +3,7 @@ import PreparationMethodEditPage, {
   PreparationMethodForm
 } from "../../../../pages/collection/preparation-method/edit";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent, waitFor, screen } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -232,7 +232,7 @@ describe("preparation-method edit page", () => {
         url: "/collection-api/preparation-method"
       };
       error.response = {
-        responseURL: "/collection-api/preparation-method",
+        statusText: "422",
         data: {
           errors: [
             {
@@ -262,10 +262,9 @@ describe("preparation-method edit page", () => {
 
     // Test expected error
     await waitFor(() => {
-      screen.logTestingPlaygroundURL();
       expect(
-        screen.getByText(
-          /: undefined constraint violation: name must not be blank/i
+        wrapper.getByText(
+          /\/collection\-api\/preparation\-method: 422 constraint violation: name must not be blank/i
         )
       ).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
