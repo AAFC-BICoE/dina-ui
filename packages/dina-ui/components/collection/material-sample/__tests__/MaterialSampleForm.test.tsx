@@ -9,7 +9,9 @@ import {
 import {
   fireEvent,
   waitFor,
-  waitForElementToBeRemoved
+  waitForElementToBeRemoved,
+  screen,
+  within
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
@@ -146,6 +148,14 @@ const mockGet = jest.fn<any, any>(async (path) => {
         data: { id: "2", key: "attribute_2", name: "Attribute 2" }
       });
     case "collection-api/managed-attribute/COLLECTING_EVENT.attribute_3":
+      return Promise.resolve({
+        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
+      });
+    case "collection-api/managed-attribute/ORGANISM.attribute_2":
+      return Promise.resolve({
+        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
+      });
+    case "collection-api/managed-attribute/ORGANISM.attribute_3":
       return Promise.resolve({
         data: { id: "3", key: "attribute_3", name: "Attribute 3" }
       });
@@ -2545,14 +2555,12 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await waitFor(() => {
-      expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
-    });
 
-    // Attributes 2 and 3 are visible and empty:
-    expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
-    expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
+    const tabpanel = screen.getByRole("tabpanel");
+    await waitFor(() => {
+      expect(within(tabpanel).getByText(/attribute 2/i)).toBeInTheDocument();
+      expect(within(tabpanel).getByText(/attribute 3/i)).toBeInTheDocument();
+    });
   });
 
   describe("Collecting event permissions", () => {
