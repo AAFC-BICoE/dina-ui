@@ -1,4 +1,4 @@
-import { OperationsResponse } from "common-ui";
+import { OperationsResponse, makeAxiosErrorMoreReadable } from "common-ui";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../../types/agent-api/resources/Person";
@@ -82,9 +82,35 @@ const mockBulkGet = jest.fn(async (paths) => {
   }
   console.warn("No mock value for bulkGet paths: ", paths);
 });
+
+const MOCK_POST_ERROR = (() => {
+  const error = new Error() as any;
+  error.isAxiosError = true;
+  error.config = {
+    url: "/collection-api/collecting-event"
+  };
+  error.response = {
+    statusText: "500",
+    status: 500,
+    data: {
+      errors: [
+        {
+          status: 500,
+          detail: "test error detail",
+          title: "Bad Request"
+        }
+      ]
+    }
+  };
+
+  return error;
+})();
+
 const mockPost = jest.fn((path) => {
   if (path === "search-api/search-ws/search") {
     return new Promise((resolve) => resolve);
+  } else {
+    makeAxiosErrorMoreReadable(MOCK_POST_ERROR);
   }
 });
 const apiContext: any = {
@@ -398,35 +424,6 @@ describe("collecting-event edit page", () => {
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
 
-    const MOCK_POST_ERROR = (() => {
-      const error = new Error() as any;
-      error.isAxiosError = true;
-      error.config = {
-        url: "/collection-api/collecting-event"
-      };
-      error.response = {
-        statusText: "500",
-        status: 500,
-        data: {
-          errors: [
-            {
-              status: 500,
-              detail: "test error detail",
-              title: "Bad Request"
-            }
-          ]
-        }
-      };
-
-      return error;
-    })();
-
-    mockPost.mockImplementationOnce(() => {
-      return Promise.reject(MOCK_POST_ERROR);
-    });
-
-    mockQuery = {};
-
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
     });
@@ -452,13 +449,10 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    // Test for expected error
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
     await waitFor(() => {
       expect(
         wrapper.getByText(
-          /\/collection\-api\/collecting\-event: 500 constraint violation: test error detail/i
+          /\/collection\-api\/collecting\-event: 500 bad request: test error detail/i
         )
       );
       expect(mockPush).toBeCalledTimes(0);
