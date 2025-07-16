@@ -2914,20 +2914,20 @@ describe("Material Sample Edit Page", () => {
                     },
                     selectedGeographicPlace: {
                       element: "R",
-                      id: "test",
+                      id: "4136816",
                       name: "Ottawa",
                       placeType: "city"
                     },
                     higherGeographicPlaces: [
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "Eastern Ontario",
                         placeType: "state_district"
                       },
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "CA-ON",
                         placeType: "ISO3166-2-lvl4"
                       }
@@ -3034,19 +3034,19 @@ describe("Material Sample Edit Page", () => {
                     higherGeographicPlaces: [
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "Ottawa",
                         placeType: "city"
                       },
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "Eastern Ontario",
                         placeType: "state_district"
                       },
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "CA-ON",
                         placeType: "ISO3166-2-lvl4"
                       }
@@ -3188,20 +3188,20 @@ describe("Material Sample Edit Page", () => {
                     },
                     selectedGeographicPlace: {
                       element: "R",
-                      id: "test", // Todo - this needs to be a proper ID.
+                      id: "4136816",
                       name: "Ottawa",
                       placeType: "city"
                     },
                     higherGeographicPlaces: [
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "Eastern Ontario",
                         placeType: "state_district"
                       },
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "CA-ON",
                         placeType: "ISO3166-2-lvl4"
                       }
@@ -3322,19 +3322,19 @@ describe("Material Sample Edit Page", () => {
                     higherGeographicPlaces: [
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "Ottawa",
                         placeType: "city"
                       },
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "Eastern Ontario",
                         placeType: "state_district"
                       },
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "CA-ON",
                         placeType: "ISO3166-2-lvl4"
                       }
@@ -3432,20 +3432,20 @@ describe("Material Sample Edit Page", () => {
                     },
                     selectedGeographicPlace: {
                       element: "R",
-                      id: "test", // Todo - this needs to be a proper ID.
+                      id: "4136816",
                       name: "Ottawa",
                       placeType: "city"
                     },
                     higherGeographicPlaces: [
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "Eastern Ontario",
                         placeType: "state_district"
                       },
                       {
                         element: "R",
-                        id: "test",
+                        id: "4136816",
                         name: "CA-ON",
                         placeType: "ISO3166-2-lvl4"
                       }

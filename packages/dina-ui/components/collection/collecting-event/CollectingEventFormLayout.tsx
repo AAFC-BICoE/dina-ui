@@ -236,8 +236,12 @@ export function CollectingEventFormLayout({
         const osmType = searchResult.osm_type.charAt(0).toUpperCase();
 
         adminLevels.push({
-          id: "test",
+          // Please note this is the TOP level ID.
+          id: String(searchResult.osm_id),
+
+          // Please note this is the TOP level element type.
           element: osmType,
+
           placeType: key,
           name: value
         });
