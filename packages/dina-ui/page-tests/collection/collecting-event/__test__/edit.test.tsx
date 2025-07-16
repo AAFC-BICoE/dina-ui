@@ -1,11 +1,11 @@
-import { makeAxiosErrorMoreReadable, OperationsResponse } from "common-ui";
+import { OperationsResponse } from "common-ui";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../../types/agent-api/resources/Person";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
-import { fireEvent, waitFor, screen } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -211,7 +211,6 @@ describe("collecting-event edit page", () => {
       apiContext
     });
 
-    screen.logTestingPlaygroundURL(); // For debugging purposes --- IGNORE ---
     // Edit the verbatim datetime
     fireEvent.change(
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
@@ -329,20 +328,16 @@ describe("collecting-event edit page", () => {
     await waitFor(() => {
       expect(mockPatch).toBeCalledTimes(1);
       expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "collecting-event/1",
-            value: {
-              attributes: {
-                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
-              },
-              id: "1",
-              type: "collecting-event"
-            }
+        "/collection-api/collecting-event/1",
+        {
+          data: {
+            attributes: {
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
+            },
+            id: "1",
+            type: "collecting-event"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -387,20 +382,16 @@ describe("collecting-event edit page", () => {
     await waitFor(() => {
       expect(mockPatch).toBeCalledTimes(1);
       expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "collecting-event/1",
-            value: {
-              attributes: {
-                otherRecordNumbers: null
-              },
-              id: "1",
-              type: "collecting-event"
-            }
+        "/collection-api/collecting-event/1",
+        {
+          data: {
+            attributes: {
+              otherRecordNumbers: null
+            },
+            id: "1",
+            type: "collecting-event"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -433,7 +424,7 @@ describe("collecting-event edit page", () => {
     })();
 
     mockPost.mockImplementationOnce(() => {
-      return Promise.reject(makeAxiosErrorMoreReadable(MOCK_POST_ERROR));
+      return Promise.reject(MOCK_POST_ERROR);
     });
 
     mockQuery = {};
@@ -466,7 +457,6 @@ describe("collecting-event edit page", () => {
     // Test for expected error
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    screen.logTestingPlaygroundURL(); // For debugging purposes --- IGNORE ---
     await waitFor(() => {
       expect(
         wrapper.getByText(
@@ -526,12 +516,15 @@ describe("collecting-event edit page", () => {
         "/collection-api/collecting-event",
         {
           data: {
-            attributes: expect.objectContaining({
-              dwcVerbatimCoordinateSystem: null
-            })
-          },
-          id: "00000000-0000-0000-0000-000000000000",
-          type: "collecting-event"
+            attributes: {
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              publiclyReleasable: true, // Default value
+              geoReferenceAssertions: [{ isPrimary: true }]
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "collecting-event"
+          }
         },
         expect.anything()
       );
