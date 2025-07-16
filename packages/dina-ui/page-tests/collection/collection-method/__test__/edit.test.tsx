@@ -1,4 +1,4 @@
-import { OperationsResponse } from "common-ui";
+import { OperationsResponse, makeAxiosErrorMoreReadable } from "common-ui";
 import CollectionMethodEditPage, {
   CollectionMethodForm
 } from "../../../../pages/collection/collection-method/edit";
@@ -71,8 +71,13 @@ const mockGetAxios = jest.fn(async (_path) => {
   return INSTANCE_DATA;
 });
 
+const mockPost = jest.fn();
+
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch, get: mockGetAxios } }
+  apiClient: {
+    get: mockGet,
+    axios: { patch: mockPatch, get: mockGetAxios, post: mockPost }
+  }
 };
 
 describe("collection-method edit page", () => {
@@ -87,6 +92,22 @@ describe("collection-method edit page", () => {
         apiContext
       }
     );
+
+    mockPost.mockReturnValueOnce({
+      data: {
+        data: {
+          type: "collection-method",
+          id: "1",
+          attributes: {
+            multilingualDescription: {
+              descriptions: [{ lang: "en", desc: "test english description" }]
+            },
+            name: "updated Name"
+          }
+        }
+      },
+      status: 201
+    });
 
     // Simulate changing the name input
     const nameInput = getByLabelText(/name/i);
@@ -109,26 +130,21 @@ describe("collection-method edit page", () => {
 
     // Wait for async updates after submission
     await waitFor(() => {
-      expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "POST",
-            path: "collection-method",
-            value: {
-              attributes: {
-                multilingualDescription: {
-                  descriptions: [
-                    { lang: "en", desc: "test english description" }
-                  ]
-                },
-                name: "updated Name"
+      expect(mockPost).lastCalledWith(
+        "/collection-api/collection-method",
+        {
+          data: {
+            type: "collection-method",
+            id: "00000000-0000-0000-0000-000000000000",
+            attributes: {
+              multilingualDescription: {
+                descriptions: [{ lang: "en", desc: "test english description" }]
               },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "collection-method"
+              name: "updated Name"
             }
           }
-        ],
+        },
+
         expect.anything()
       );
     });
@@ -182,32 +198,28 @@ describe("collection-method edit page", () => {
     await waitFor(() => {
       // Check the last called patch request
       expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "collection-method/1",
-            value: {
-              attributes: {
-                multilingualDescription: {
-                  descriptions: [
-                    {
-                      desc: "test english description",
-                      lang: "en"
-                    },
-                    {
-                      desc: "test french description",
-                      lang: "fr"
-                    }
-                  ]
-                },
-                name: "updated Name"
+        "/collection-api/collection-method/1",
+        {
+          data: {
+            attributes: {
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test english description",
+                    lang: "en"
+                  },
+                  {
+                    desc: "test french description",
+                    lang: "fr"
+                  }
+                ]
               },
-              id: "1",
-              type: "collection-method"
-            }
+              name: "updated Name"
+            },
+            id: "1",
+            type: "collection-method"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -215,20 +227,31 @@ describe("collection-method edit page", () => {
 
   it("Renders an error after form submit without specifying mandatory field.", async () => {
     // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
-      data: [
-        {
+    const MOCK_POST_ERROR = (() => {
+      const error = new Error() as any;
+      error.isAxiosError = true;
+      error.config = {
+        url: "/collection-api/collection-method"
+      };
+      error.response = {
+        statusText: "422",
+        data: {
           errors: [
             {
-              detail: "Name is mandatory",
-              status: "422",
+              status: 422,
+              detail: "name must not be blank",
               title: "Constraint violation"
             }
-          ],
-          status: 422
+          ]
         }
-      ] as OperationsResponse
-    }));
+      };
+
+      return error;
+    })();
+
+    mockPost.mockImplementationOnce(() => {
+      makeAxiosErrorMoreReadable(MOCK_POST_ERROR);
+    });
 
     mockQuery = {};
 
@@ -242,9 +265,12 @@ describe("collection-method edit page", () => {
     fireEvent.submit(form!);
 
     // Check that the error message is displayed
+
     await waitFor(() => {
       expect(
-        getByText("Constraint violation: Name is mandatory")
+        getByText(
+          /\/collection\-api\/collection\-method: 422 constraint violation: name must not be blank/i
+        )
       ).toBeInTheDocument();
 
       // Ensure no redirection happened
