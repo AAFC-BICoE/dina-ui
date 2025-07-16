@@ -17,6 +17,15 @@ const mockGet = jest.fn(async (path) => {
       return { data: TEST_LICENSES };
     case "objectstore-api/license/open-government-license-canada":
       return { data: TEST_LICENSES[0] };
+    case "objectstore-api/managed-attribute/test_managed_attribute":
+      return Promise.resolve({
+        data: {
+          id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
+          name: "test-managed-attribute",
+          key: "test_managed_attribute",
+          vocabularyElementType: "STRING"
+        }
+      });
     case "agent-api/person":
     case "objectstore-api/metadata":
     case "objectstore-api/object-subtype":
@@ -32,13 +41,6 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
           id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
           type: "person",
           displayName: "Mat Poff"
-        };
-      case "managed-attribute/test_managed_attribute":
-        return {
-          id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
-          name: "test-managed-attribute",
-          key: "test_managed_attribute",
-          vocabularyElementType: "STRING"
         };
     }
   })

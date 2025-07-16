@@ -112,6 +112,39 @@ const mockGet = jest.fn<any, any>(async (path) => {
           }
         ]
       };
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.a":
+      return {
+        data: {
+          id: "1",
+          type: "managed-attribute",
+          vocabularyElementType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          key: "a",
+          name: "Managed Attribute 1"
+        }
+      };
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.b":
+      return {
+        data: {
+          id: "2",
+          type: "managed-attribute",
+          vocabularyElementType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          key: "b",
+          name: "Managed Attribute 2"
+        }
+      };
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.c":
+      return {
+        data: {
+          id: "3",
+          type: "managed-attribute",
+          vocabularyElementType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          key: "c",
+          name: "Managed Attribute 3"
+        }
+      };
     case "agent-api/person":
     case "collection-api/collection":
     case "collection-api/collection-method":
@@ -134,40 +167,6 @@ const mockGet = jest.fn<any, any>(async (path) => {
   }
 });
 
-const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
-  return paths.map((path) => {
-    switch (path) {
-      case "managed-attribute/MATERIAL_SAMPLE.a":
-        return {
-          id: "1",
-          type: "managed-attribute",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          key: "a",
-          name: "Managed Attribute 1"
-        };
-      case "managed-attribute/MATERIAL_SAMPLE.b":
-        return {
-          id: "2",
-          type: "managed-attribute",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          key: "b",
-          name: "Managed Attribute 2"
-        };
-      case "managed-attribute/MATERIAL_SAMPLE.c":
-        return {
-          id: "3",
-          type: "managed-attribute",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          key: "c",
-          name: "Managed Attribute 3"
-        };
-    }
-  });
-});
-
 const mockSave = jest.fn<any, any>((ops) =>
   ops.map((op) => ({
     ...op.resource,
@@ -178,8 +177,7 @@ const mockSave = jest.fn<any, any>((ops) =>
 const testCtx = {
   apiContext: {
     apiClient: { get: mockGet },
-    save: mockSave,
-    bulkGet: mockBulkGet
+    save: mockSave
   }
 };
 

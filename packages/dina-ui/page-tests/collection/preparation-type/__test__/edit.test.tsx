@@ -1,4 +1,4 @@
-import { OperationsResponse } from "common-ui";
+import { makeAxiosErrorMoreReadable } from "common-ui";
 import PreparationTypeEditPage, {
   PreparationTypeForm
 } from "../../../../pages/collection/preparation-type/edit";
@@ -70,10 +70,15 @@ const mockGet = jest.fn(async (path) => {
   }
 });
 
+const mockPost = jest.fn();
+
 // Mock API requests:
 const mockPatch = jest.fn();
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch, get: mockGetAxios } }
+  apiClient: {
+    get: mockGet,
+    axios: { patch: mockPatch, get: mockGetAxios, post: mockPost }
+  }
 };
 
 describe("preparation-type edit page", () => {
@@ -82,16 +87,14 @@ describe("preparation-type edit page", () => {
     mockQuery = {};
   });
   it("Provides a form to add a preparation-type.", async () => {
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            id: "1",
-            type: "preparation-type"
-          },
-          status: 201
+    mockPost.mockReturnValueOnce({
+      data: {
+        data: {
+          id: "1",
+          type: "preparation-type"
         }
-      ] as OperationsResponse
+      },
+      status: 201
     });
 
     mockQuery = {};
@@ -123,26 +126,27 @@ describe("preparation-type edit page", () => {
 
     // Test expected API response
     await waitFor(() => {
-      expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "POST",
-            path: "preparation-type",
-            value: {
-              attributes: {
-                multilingualDescription: {
-                  descriptions: [
-                    { lang: "en", desc: "test english description" }
-                  ]
-                },
-                name: "updated Name"
+      expect(mockPost).lastCalledWith(
+        "/collection-api/preparation-type",
+
+        {
+          data: {
+            attributes: {
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test english description",
+                    lang: "en"
+                  }
+                ]
               },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "preparation-type"
-            }
+              name: "updated Name"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "preparation-type"
           }
-        ],
+        },
+
         expect.anything()
       );
     });
@@ -159,6 +163,7 @@ describe("preparation-type edit page", () => {
         onSaved={mockOnSaved}
         fetchedPrepType={{
           name: "test-prep-type",
+          id: "00000000-0000-0000-0000-000000000000",
           type: "preparation-type",
           multilingualDescription: {
             descriptions: [{ lang: "en", desc: "test english description" }]
@@ -192,53 +197,62 @@ describe("preparation-type edit page", () => {
     // Test expected API response
     await waitFor(() => {
       expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "POST",
-            path: "preparation-type",
-            value: {
-              attributes: {
-                multilingualDescription: {
-                  descriptions: [
-                    {
-                      desc: "test english description",
-                      lang: "en"
-                    },
-                    {
-                      desc: "test french description",
-                      lang: "fr"
-                    }
-                  ]
-                },
-                name: "test-prep-type"
+        "/collection-api/preparation-type/00000000-0000-0000-0000-000000000000",
+
+        {
+          data: {
+            attributes: {
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test english description",
+                    lang: "en"
+                  },
+                  {
+                    desc: "test french description",
+                    lang: "fr"
+                  }
+                ]
               },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "preparation-type"
-            }
+              name: "test-prep-type"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "preparation-type"
           }
-        ],
+        },
+
         expect.anything()
       );
     });
   });
 
-  it("Renders an error after form submit without specifying madatory field.", async () => {
+  it("Renders an error after form submit without specifying mandatory field.", async () => {
     // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
-      data: [
-        {
+    const MOCK_POST_ERROR = (() => {
+      const error = new Error() as any;
+      error.isAxiosError = true;
+      error.config = {
+        url: "/collection-api/preparation-type"
+      };
+      error.response = {
+        statusText: "422",
+        data: {
           errors: [
             {
-              detail: "Name is mandatory",
-              status: "422",
+              status: 422,
+              detail: "name must not be blank",
               title: "Constraint violation"
             }
-          ],
-          status: 422
+          ]
         }
-      ] as OperationsResponse
-    }));
+      };
+
+      return error;
+    })();
+
+    mockPost.mockImplementationOnce(() => {
+      makeAxiosErrorMoreReadable(MOCK_POST_ERROR);
+    });
 
     mockQuery = {};
 
@@ -252,7 +266,9 @@ describe("preparation-type edit page", () => {
     // Test expected error
     await waitFor(() => {
       expect(
-        wrapper.getByText(/constraint violation: name is mandatory/i)
+        wrapper.getByText(
+          /\/collection\-api\/preparation\-type: 422 constraint violation: name must not be blank/i
+        )
       ).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
     });
