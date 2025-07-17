@@ -642,117 +642,121 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                   class="ReactTable -striped -highlight"
                   data-testid="ReactTable"
                 >
-                  <table
-                    class="w-100"
+                  <div
+                    class="table-responsive-wrapper"
                   >
-                    <thead>
-                      <tr>
-                        <th
-                          class="-cursor-pointer"
-                          colspan="1"
-                          style="width: auto;"
-                        >
-                          <div
-                            class="-cursor-pointer select-none column-header"
+                    <table
+                      class="w-100"
+                    >
+                      <thead>
+                        <tr>
+                          <th
+                            class="-cursor-pointer"
+                            colspan="1"
+                            style="width: auto;"
                           >
-                            <span
-                              class="d-flex align-items-center justify-content-center"
+                            <div
+                              class="-cursor-pointer select-none column-header"
                             >
-                              <div
-                                class="originalFilename-field-header"
+                              <span
+                                class="d-flex align-items-center justify-content-center"
                               >
-                                Original Filename
-                              </div>
-                            </span>
-                          </div>
-                        </th>
-                        <th
-                          class="-cursor-pointer"
-                          colspan="1"
-                          style="width: auto;"
-                        >
-                          <div
-                            class="-cursor-pointer select-none column-header"
+                                <div
+                                  class="originalFilename-field-header"
+                                >
+                                  Original Filename
+                                </div>
+                              </span>
+                            </div>
+                          </th>
+                          <th
+                            class="-cursor-pointer"
+                            colspan="1"
+                            style="width: auto;"
                           >
-                            <span
-                              class="d-flex align-items-center justify-content-center"
+                            <div
+                              class="-cursor-pointer select-none column-header"
                             >
-                              <div
-                                class="createdBy-field-header"
+                              <span
+                                class="d-flex align-items-center justify-content-center"
                               >
-                                Created By
-                              </div>
-                            </span>
-                          </div>
-                        </th>
-                        <th
-                          class="-cursor-pointer"
-                          colspan="1"
-                          style="width: auto;"
-                        >
-                          <div
-                            class="-cursor-pointer select-none column-header"
+                                <div
+                                  class="createdBy-field-header"
+                                >
+                                  Created By
+                                </div>
+                              </span>
+                            </div>
+                          </th>
+                          <th
+                            class="-cursor-pointer"
+                            colspan="1"
+                            style="width: auto;"
                           >
-                            <span
-                              class="d-flex align-items-center justify-content-center"
+                            <div
+                              class="-cursor-pointer select-none column-header"
                             >
-                              <div
-                                class="createdOn-field-header"
+                              <span
+                                class="d-flex align-items-center justify-content-center"
                               >
-                                Created On
-                              </div>
-                              <svg
-                                class="-sort-asc"
-                                fill="currentColor"
-                                height="1em"
-                                stroke="currentColor"
-                                stroke-width="0"
-                                viewBox="0 0 448 512"
-                                width="1em"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M413.1 222.5l22.2 22.2c9.4 9.4 9.4 24.6 0 33.9L241 473c-9.4 9.4-24.6 9.4-33.9 0L12.7 278.6c-9.4-9.4-9.4-24.6 0-33.9l22.2-22.2c9.5-9.5 25-9.3 34.3.4L184 343.4V56c0-13.3 10.7-24 24-24h32c13.3 0 24 10.7 24 24v287.4l114.8-120.5c9.3-9.8 24.8-10 34.3-.4z"
-                                />
-                              </svg>
-                            </span>
-                          </div>
-                        </th>
-                        <th
-                          class=""
-                          colspan="1"
-                          style="width: auto;"
-                        >
-                          <div
-                            class="column-header"
+                                <div
+                                  class="createdOn-field-header"
+                                >
+                                  Created On
+                                </div>
+                                <svg
+                                  class="-sort-asc"
+                                  fill="currentColor"
+                                  height="1em"
+                                  stroke="currentColor"
+                                  stroke-width="0"
+                                  viewBox="0 0 448 512"
+                                  width="1em"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M413.1 222.5l22.2 22.2c9.4 9.4 9.4 24.6 0 33.9L241 473c-9.4 9.4-24.6 9.4-33.9 0L12.7 278.6c-9.4-9.4-9.4-24.6 0-33.9l22.2-22.2c9.5-9.5 25-9.3 34.3.4L184 343.4V56c0-13.3 10.7-24 24-24h32c13.3 0 24 10.7 24 24v287.4l114.8-120.5c9.3-9.8 24.8-10 34.3-.4z"
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+                          </th>
+                          <th
+                            class=""
+                            colspan="1"
+                            style="width: auto;"
                           >
-                            <span
-                              class="d-flex align-items-center justify-content-center"
-                            />
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td
-                          class="text-center"
-                          colspan="4"
-                        >
-                          <div
-                            class="spinner-border undefined"
-                            role="status"
-                          >
-                            <span
-                              class="visually-hidden mb-3"
+                            <div
+                              class="column-header"
                             >
-                              Loading...
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                              <span
+                                class="d-flex align-items-center justify-content-center"
+                              />
+                            </div>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td
+                            class="text-center"
+                            colspan="4"
+                          >
+                            <div
+                              class="spinner-border undefined"
+                              role="status"
+                            >
+                              <span
+                                class="visually-hidden mb-3"
+                              >
+                                Loading...
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
                 <div
                   class="mt-2"

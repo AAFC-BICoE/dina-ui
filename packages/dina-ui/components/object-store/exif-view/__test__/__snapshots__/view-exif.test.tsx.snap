@@ -36,433 +36,437 @@ exports[`View Exif page renders exif props when received file upload response 1`
         class="ReactTable -striped"
         data-testid="ReactTable"
       >
-        <table
-          class="w-100"
+        <div
+          class="table-responsive-wrapper"
         >
-          <thead>
-            <tr>
-              <th
-                class="-cursor-pointer"
-                colspan="1"
-                style="width: 200px;"
-              >
-                <div
-                  class="-cursor-pointer select-none column-header"
+          <table
+            class="w-100"
+          >
+            <thead>
+              <tr>
+                <th
+                  class="-cursor-pointer"
+                  colspan="1"
+                  style="width: 200px;"
                 >
-                  <span
-                    class="d-flex align-items-center justify-content-center"
-                  >
-                    Attribute
-                  </span>
-                </div>
-              </th>
-              <th
-                class="-cursor-pointer"
-                colspan="1"
-                style="width: auto;"
-              >
-                <div
-                  class="-cursor-pointer select-none column-header"
-                >
-                  <span
-                    class="d-flex align-items-center justify-content-center"
-                  >
-                    Value
-                  </span>
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              class="index-0 -odd"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
                   <div
-                    class="date original created-field-header"
+                    class="-cursor-pointer select-none column-header"
                   >
-                    Date Original Created
-                  </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
-                >
-                  2000, Jan 8
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-1 -even"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
-                  <div
-                    class="shutter speed-field-header"
-                  >
-                    Shutter Speed
-                  </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
-                >
-                  1/200
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-2 -odd"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
-                  <div
-                    class="exposure-field-header"
-                  >
-                    Exposure
-                  </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
-                >
-                  0.5
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-3 -even"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
-                  <div
-                    class="compensation-field-header"
-                  >
-                    Compensation
-                  </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
-                >
-                  -0.5
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-4 -odd"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
-                  <div
-                    class="aperture-field-header"
-                  >
-                    Aperture
-                  </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
-                >
-                  f/8
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-5 -even"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
-                  <div
-                    class="frame rate-field-header"
-                  >
-                    Frame Rate
-                  </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
-                >
-                  30fps
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-6 -odd"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
-                  <div
-                    class="f-number-field-header"
-                  >
-                    F Number
-                  </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
-                >
-                  f/2.8
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-7 -even"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
-                  <div
-                    class="resolution-field-header"
-                  >
-                    Resolution
-                  </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
-                >
-                  300dpi
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-8 -odd"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
-                  <div
-                    class="self-time mode usage-field-header"
-                  >
-                    Self Time Mode Usage
-                  </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
-                >
-                  10s
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-9 -even"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
-                  <div
-                    class="camera model-field-header"
-                  >
-                    Camera Model
-                  </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
-                >
-                  Canon EOS R5
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-10 -odd"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
-                  <div
-                    class="orientation-field-header"
-                  >
-                    Orientation
                     <span
-                      class="m-2"
+                      class="d-flex align-items-center justify-content-center"
                     >
-                      <span>
-                        <img
-                          alt="Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8."
-                          aria-describedby="field_orientation_tooltip"
-                          src="/static/images/iconInformation.gif"
-                          tabindex="0"
-                        />
-                      </span>
+                      Attribute
                     </span>
                   </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
-              >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
+                </th>
+                <th
+                  class="-cursor-pointer"
+                  colspan="1"
+                  style="width: auto;"
                 >
-                  landscape
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-11 -even"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
                   <div
-                    class="metering mode-field-header"
+                    class="-cursor-pointer select-none column-header"
                   >
-                    Metering Mode
+                    <span
+                      class="d-flex align-items-center justify-content-center"
+                    >
+                      Value
+                    </span>
                   </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                class="index-0 -odd"
               >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
+                <td
+                  class="key-cell"
                 >
-                  evaluative
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-12 -odd"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
+                  <strong>
+                    <div
+                      class="date original created-field-header"
+                    >
+                      Date Original Created
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
                   <div
-                    class="ISO speed information-field-header"
+                    class="field-view"
+                    style="white-space: pre-wrap;"
                   >
-                    ISO Speed Information
+                    2000, Jan 8
                   </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
+                </td>
+              </tr>
+              <tr
+                class="index-1 -even"
               >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
+                <td
+                  class="key-cell"
                 >
-                  100
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-13 -even"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
+                  <strong>
+                    <div
+                      class="shutter speed-field-header"
+                    >
+                      Shutter Speed
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
                   <div
-                    class="pixel dimensions-field-header"
+                    class="field-view"
+                    style="white-space: pre-wrap;"
                   >
-                    Pixel Dimensions
+                    1/200
                   </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
+                </td>
+              </tr>
+              <tr
+                class="index-2 -odd"
               >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
+                <td
+                  class="key-cell"
                 >
-                  6720x4480
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="index-14 -odd"
-            >
-              <td
-                class="key-cell"
-              >
-                <strong>
+                  <strong>
+                    <div
+                      class="exposure-field-header"
+                    >
+                      Exposure
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
                   <div
-                    class="copyright information-field-header"
+                    class="field-view"
+                    style="white-space: pre-wrap;"
                   >
-                    Copyright Information
+                    0.5
                   </div>
-                </strong>
-              </td>
-              <td
-                class="value-cell"
+                </td>
+              </tr>
+              <tr
+                class="index-3 -even"
               >
-                <div
-                  class="field-view"
-                  style="white-space: pre-wrap;"
+                <td
+                  class="key-cell"
                 >
-                  John Doe
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  <strong>
+                    <div
+                      class="compensation-field-header"
+                    >
+                      Compensation
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    -0.5
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-4 -odd"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="aperture-field-header"
+                    >
+                      Aperture
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    f/8
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-5 -even"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="frame rate-field-header"
+                    >
+                      Frame Rate
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    30fps
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-6 -odd"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="f-number-field-header"
+                    >
+                      F Number
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    f/2.8
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-7 -even"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="resolution-field-header"
+                    >
+                      Resolution
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    300dpi
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-8 -odd"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="self-time mode usage-field-header"
+                    >
+                      Self Time Mode Usage
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    10s
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-9 -even"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="camera model-field-header"
+                    >
+                      Camera Model
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    Canon EOS R5
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-10 -odd"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="orientation-field-header"
+                    >
+                      Orientation
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <img
+                            alt="Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8."
+                            aria-describedby="field_orientation_tooltip"
+                            src="/static/images/iconInformation.gif"
+                            tabindex="0"
+                          />
+                        </span>
+                      </span>
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    landscape
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-11 -even"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="metering mode-field-header"
+                    >
+                      Metering Mode
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    evaluative
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-12 -odd"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="ISO speed information-field-header"
+                    >
+                      ISO Speed Information
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    100
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-13 -even"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="pixel dimensions-field-header"
+                    >
+                      Pixel Dimensions
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    6720x4480
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="index-14 -odd"
+              >
+                <td
+                  class="key-cell"
+                >
+                  <strong>
+                    <div
+                      class="copyright information-field-header"
+                    >
+                      Copyright Information
+                    </div>
+                  </strong>
+                </td>
+                <td
+                  class="value-cell"
+                >
+                  <div
+                    class="field-view"
+                    style="white-space: pre-wrap;"
+                  >
+                    John Doe
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
