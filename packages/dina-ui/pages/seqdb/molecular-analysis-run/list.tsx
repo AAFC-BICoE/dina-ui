@@ -41,7 +41,8 @@ export default function MolecularAnalysisListPage() {
         id="molecular-analysis-list"
         queryTableProps={{
           columns: MOLECULAR_ANALYSIS_RUN_TABLE_COLUMNS,
-          path: "seqdb-api/molecular-analysis-run"
+          path: "seqdb-api/molecular-analysis-run",
+          defaultPageSize: 100
         }}
       />
     </PageLayout>
