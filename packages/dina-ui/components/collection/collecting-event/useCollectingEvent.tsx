@@ -237,6 +237,9 @@ export function useCollectingEventSave({
           if (idx === 0) {
             if (!srcAdminLevel.id) {
               newSourceDetail.customGeographicPlace = srcAdminLevel.name;
+
+              // If a custom place is set, ensure selected place is null to avoid conflicts.
+              newSourceDetail.selectedGeographicPlace = null;
             } else {
               if (
                 sectionIds.filter(
@@ -247,6 +250,9 @@ export function useCollectingEventSave({
                   srcAdminLevel,
                   ["shortId", "type"]
                 );
+
+              // If a selected place is set, ensure custom place is null to avoid conflicts.
+              newSourceDetail.customGeographicPlace = null;
             }
           } else {
             if (

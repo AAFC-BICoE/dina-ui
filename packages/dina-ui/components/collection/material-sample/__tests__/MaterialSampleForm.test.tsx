@@ -76,6 +76,39 @@ function testCollectionEventWithPermissions(): Partial<CollectingEvent> {
   };
 }
 
+function testCollectionEventWithGeographicalPlaceCustomPlaceName(): Partial<CollectingEvent> {
+  return {
+    id: "4",
+    type: "collecting-event",
+    group: "test group",
+    geographicPlaceNameSourceDetail: {
+      sourceUrl:
+        "https://nominatim.openstreetmap.org/ui/details.html?osmtype=W&osmid=12345",
+      customGeographicPlace: "Custom Place Name",
+      higherGeographicPlaces: [
+        {
+          id: "1",
+          element: "W",
+          placeType: "building",
+          name: "Test Building 1"
+        },
+        {
+          id: "2",
+          element: "R",
+          placeType: "building",
+          name: "Test Building 2"
+        }
+      ],
+      country: {
+        code: "ca",
+        name: "Canada"
+      },
+      recordedOn: "2022-03-02T17:41:53.968198Z",
+      type: ""
+    }
+  };
+}
+
 function testMaterialSample(): InputResource<MaterialSample> {
   return {
     id: "1",
@@ -175,6 +208,10 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return { data: testCollectionEventWithGeographicalPlace() };
     case "collection-api/collecting-event/3?include=collectors,attachment,collectionMethod,protocol":
       return { data: testCollectionEventWithPermissions() };
+    case "collection-api/collecting-event/4?include=collectors,attachment,collectionMethod,protocol":
+      return {
+        data: testCollectionEventWithGeographicalPlaceCustomPlaceName()
+      };
     case "collection-api/material-sample/1":
       return { data: testMaterialSample() };
     case "collection-api/material-sample":
@@ -2871,7 +2908,7 @@ describe("Material Sample Edit Page", () => {
             id: "333",
             materialSampleName: "test-ms",
             collectingEvent: {
-              id: "2",
+              id: "4",
               type: "collecting-event"
             }
           }}
@@ -2932,6 +2969,7 @@ describe("Material Sample Edit Page", () => {
                       name: "Ottawa",
                       placeType: "city"
                     },
+                    customGeographicPlace: null,
                     higherGeographicPlaces: [
                       {
                         element: "R",
@@ -2955,7 +2993,7 @@ describe("Material Sample Edit Page", () => {
                     sourceUrl:
                       "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
                   },
-                  id: "2",
+                  id: "4",
                   type: "collecting-event"
                 },
                 type: "collecting-event"
@@ -2975,7 +3013,7 @@ describe("Material Sample Edit Page", () => {
             id: "333",
             materialSampleName: "test-ms",
             collectingEvent: {
-              id: "2",
+              id: "4",
               type: "collecting-event"
             }
           }}
@@ -3044,6 +3082,7 @@ describe("Material Sample Edit Page", () => {
                       name: "Canada",
                       code: "ca"
                     },
+                    selectedGeographicPlace: null,
                     customGeographicPlace: "Neatby Building",
                     higherGeographicPlaces: [
                       {
@@ -3074,7 +3113,7 @@ describe("Material Sample Edit Page", () => {
                     sourceUrl:
                       "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
                   },
-                  id: "2",
+                  id: "4",
                   type: "collecting-event"
                 },
                 type: "collecting-event"
@@ -3200,6 +3239,7 @@ describe("Material Sample Edit Page", () => {
                       code: "ca",
                       name: "Canada"
                     },
+                    customGeographicPlace: null,
                     selectedGeographicPlace: {
                       element: "R",
                       id: "4136816",
@@ -3332,6 +3372,7 @@ describe("Material Sample Edit Page", () => {
                       code: "ca",
                       name: "Canada"
                     },
+                    selectedGeographicPlace: null,
                     customGeographicPlace: "Neatby Building",
                     higherGeographicPlaces: [
                       {
@@ -3444,6 +3485,7 @@ describe("Material Sample Edit Page", () => {
                       code: "ca",
                       name: "Canada"
                     },
+                    customGeographicPlace: null,
                     selectedGeographicPlace: {
                       element: "R",
                       id: "4136816",
