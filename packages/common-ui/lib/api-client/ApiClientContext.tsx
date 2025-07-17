@@ -238,7 +238,12 @@ export class ApiClientImpl implements ApiClientI {
     const resourceType = operations[0].path.split("/")[0];
 
     // APIs using Repository V2.
-    const supportedBaseApis = ["/agent-api", "/dina-export-api"];
+    const supportedBaseApis = [
+      "/agent-api",
+      "/dina-export-api",
+      "/objectstore-api",
+      "/collection-api"
+    ];
 
     // Resource types that are supported for bulk operations.
     const supportedResourceTypes = ["person", "identifier"];
@@ -259,60 +264,76 @@ export class ApiClientImpl implements ApiClientI {
         "Content-Type": "application/vnd.api+json",
         "Crnk-Compact": "true"
       };
-
-      switch (operation.op.toUpperCase()) {
-        case "GET":
-          const getResponse = await axios.get(url, { headers });
+      try {
+        switch (operation.op.toUpperCase()) {
+          case "GET":
+            const getResponse = await axios.get(url, { headers });
+            responses = [
+              {
+                data: getResponse?.data?.data,
+                included: getResponse?.data?.included,
+                status: getResponse?.status
+              }
+            ];
+            break;
+          case "POST":
+            const postResponse = await axios.post(
+              url,
+              { data: operation.value },
+              { headers }
+            );
+            responses = [
+              {
+                data: postResponse?.data?.data,
+                included: postResponse?.data?.included,
+                status: postResponse?.status
+              }
+            ];
+            break;
+          case "PATCH":
+            const patchResponse = await axios.patch(
+              url,
+              { data: operation.value },
+              { headers }
+            );
+            responses = [
+              {
+                data: patchResponse?.data?.data,
+                included: patchResponse?.data?.included,
+                status: patchResponse?.status
+              }
+            ];
+            break;
+          case "DELETE":
+            const deleteResponse = await axios.delete(url, {
+              headers: {
+                "Content-Type": "application/vnd.api+json"
+              }
+            });
+            responses = [
+              {
+                status: deleteResponse.status
+              } as any
+            ];
+            break;
+          default:
+            throw new Error(`Unsupported single operation: ${operation.op}`);
+        }
+      } catch (error) {
+        if (
+          returnNullForMissingResource &&
+          (error.cause.data.errors[0].status.includes("404") ||
+            error.cause.data.errors[0].status.includes("410"))
+        ) {
           responses = [
             {
-              data: getResponse?.data?.data,
-              included: getResponse?.data?.included,
-              status: getResponse?.status
+              data: null,
+              status: 404
             }
           ];
-          break;
-        case "POST":
-          const postResponse = await axios.post(
-            url,
-            { data: operation.value },
-            { headers }
-          );
-          responses = [
-            {
-              data: postResponse?.data?.data,
-              included: postResponse?.data?.included,
-              status: postResponse?.status
-            }
-          ];
-          break;
-        case "PATCH":
-          const patchResponse = await axios.patch(
-            url,
-            { data: operation.value },
-            { headers }
-          );
-          responses = [
-            {
-              data: patchResponse?.data?.data,
-              included: patchResponse?.data?.included,
-              status: patchResponse?.status
-            }
-          ];
-          break;
-        case "DELETE":
-          const deleteResponse = await axios.delete(url, {
-            headers: {
-              "Content-Type": "application/vnd.api+json"
-            }
-          });
-          responses = [
-            {
-              status: deleteResponse.status
-            } as any
-          ];
-          break;
-        default:
-          throw new Error(`Unsupported single operation: ${operation.op}`);
+        } else {
+          throw error;
+        }
       }
     } else {
       // use new bulk functions if using the new api and using a supported resource type.
@@ -462,7 +483,6 @@ export class ApiClientImpl implements ApiClientI {
         individualErrors
       );
     }
-
     // Return the successful jsonpatch response.
     return responses as SuccessfulOperation[];
   }
@@ -619,7 +639,7 @@ export class ApiClientImpl implements ApiClientI {
         // if returnNullForMissingResource is true, we will handle the error
         // by returning null for the missing resources instead of throwing an error.
         if (returnNullForMissingResource) {
-          const errors = error.response.data.errors;
+          const errors = error.cause.data.errors;
           const missingIdsThisRun = errors.map((err: any) =>
             err.source.pointer.split("/").at(-1)
           );
@@ -883,15 +903,6 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   if (error.isAxiosError) {
     let errorMessage = `${error.config?.url}: ${error.response?.statusText}`;
     // If the error is a 404 or 410, and the endpoint is "bulk-load", throw full error for handling in function.
-
-    if (
-      error.request &&
-      error.request.responseURL.split("/").at(-1).includes("bulk-load")
-    ) {
-      if ([404, 410].includes(error.response?.status as number)) {
-        throw error;
-      }
-    }
     // Special case: Make 502 "bad gateway" messages more user-friendly:
     if (error.response?.status === 502) {
       errorMessage = `Service unavailable:\n${errorMessage}`;

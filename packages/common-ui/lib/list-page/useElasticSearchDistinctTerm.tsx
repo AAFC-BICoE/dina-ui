@@ -39,10 +39,14 @@ export function useElasticSearchDistinctTerm({
   size
 }: QuerySuggestionFieldProps) {
   const { apiClient } = useApiClient();
+
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const { groups } = groupNames
-    ? { groups: groupNames }
-    : useQueryBuilderContext();
+
+  // Groups to be applied to the query, groupNames can be explictly set to an empty array.
+  const { groups: queryBuilderGroupNames } =
+    useQueryBuilderContext(false) || {};
+  const groups = groupNames ?? queryBuilderGroupNames;
+
   // Every time the textEntered has changed, perform a new request for new suggestions.
   useEffect(() => {
     if (!fieldName) return;

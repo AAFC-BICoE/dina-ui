@@ -1,4 +1,4 @@
-import { OperationsResponse } from "common-ui";
+import { makeAxiosErrorMoreReadable } from "common-ui";
 import { ProtocolForm } from "../../../../../dina-ui/components/collection/protocol/ProtocolForm";
 import ProtocolEditPage from "../../../../pages/collection/protocol/edit";
 import { mountWithAppContext } from "common-ui";
@@ -45,6 +45,8 @@ jest.mock("next/router", () => ({
 
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
+
+const mockPost = jest.fn();
 
 /** The mock URL query string params. */
 let mockQuery: any = {};
@@ -193,7 +195,10 @@ const mockGetAxios = jest.fn(async (_path) => {
 // Mock API requests:
 const mockPatch = jest.fn();
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch, get: mockGetAxios } }
+  apiClient: {
+    get: mockGet,
+    axios: { patch: mockPatch, get: mockGetAxios, post: mockPost }
+  }
 };
 
 describe("protocol edit page", () => {
@@ -202,16 +207,14 @@ describe("protocol edit page", () => {
     mockQuery = {};
   });
   it("Provides a form to add a protocol.", async () => {
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            id: "1",
-            type: "protocol"
-          },
-          status: 201
+    mockPost.mockReturnValueOnce({
+      data: {
+        data: {
+          id: "1",
+          type: "protocol"
         }
-      ] as OperationsResponse
+      },
+      status: 201
     });
 
     mockQuery = {};
@@ -243,31 +246,32 @@ describe("protocol edit page", () => {
 
     // Test expected API response
     await waitFor(() => {
-      expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "POST",
-            path: "protocol",
-            value: {
-              attributes: {
-                multilingualDescription: {
-                  descriptions: [
-                    { lang: "en", desc: "test english description" }
-                  ]
-                },
-                name: "updated Name"
+      expect(mockPost).lastCalledWith(
+        "/collection-api/protocol",
+
+        {
+          data: {
+            attributes: {
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test english description",
+                    lang: "en"
+                  }
+                ]
               },
-              id: "00000000-0000-0000-0000-000000000000",
-              relationships: {
-                attachments: {
-                  data: []
-                }
-              },
-              type: "protocol"
+              name: "updated Name"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "protocol",
+            relationships: {
+              attachments: {
+                data: []
+              }
             }
           }
-        ],
+        },
+
         expect.anything()
       );
     });
@@ -285,6 +289,7 @@ describe("protocol edit page", () => {
         fetchedProtocol={{
           name: "test-protocol",
           type: "protocol",
+          id: "00000000-0000-0000-0000-000000000000",
           multilingualDescription: {
             descriptions: [{ lang: "en", desc: "test english description" }]
           }
@@ -316,37 +321,35 @@ describe("protocol edit page", () => {
     // Test expected API response
     await waitFor(() => {
       expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "POST",
-            path: "protocol",
-            value: {
-              attributes: {
-                multilingualDescription: {
-                  descriptions: [
-                    {
-                      desc: "test english description",
-                      lang: "en"
-                    },
-                    {
-                      desc: "test french description",
-                      lang: "fr"
-                    }
-                  ]
-                },
-                name: "test-protocol"
+        "/collection-api/protocol/00000000-0000-0000-0000-000000000000",
+
+        {
+          data: {
+            attributes: {
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test english description",
+                    lang: "en"
+                  },
+                  {
+                    desc: "test french description",
+                    lang: "fr"
+                  }
+                ]
               },
-              id: "00000000-0000-0000-0000-000000000000",
-              relationships: {
-                attachments: {
-                  data: []
-                }
-              },
-              type: "protocol"
+              name: "test-protocol"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "protocol",
+            relationships: {
+              attachments: {
+                data: []
+              }
             }
           }
-        ],
+        },
+
         expect.anything()
       );
     });
@@ -354,20 +357,32 @@ describe("protocol edit page", () => {
 
   it("Renders an error after form submit without specifying mandatory field.", async () => {
     // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
-      data: [
-        {
+
+    const MOCK_POST_ERROR = (() => {
+      const error = new Error() as any;
+      error.isAxiosError = true;
+      error.config = {
+        url: "/collection-api/protocol"
+      };
+      error.response = {
+        statusText: "422",
+        data: {
           errors: [
             {
-              detail: "Name is mandatory",
-              status: "422",
+              status: 422,
+              detail: "name must not be blank",
               title: "Constraint violation"
             }
-          ],
-          status: 422
+          ]
         }
-      ] as OperationsResponse
-    }));
+      };
+
+      return error;
+    })();
+
+    mockPost.mockImplementationOnce(() => {
+      makeAxiosErrorMoreReadable(MOCK_POST_ERROR);
+    });
 
     mockQuery = {};
 
@@ -381,7 +396,9 @@ describe("protocol edit page", () => {
     // Test expected error
     await waitFor(() => {
       expect(
-        wrapper.getByText(/constraint violation: name is mandatory/i)
+        wrapper.getByText(
+          /\/collection\-api\/protocol: 422 constraint violation: name must not be blank/i
+        )
       ).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
     });
