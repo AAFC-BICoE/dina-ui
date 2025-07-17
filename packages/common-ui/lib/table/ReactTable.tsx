@@ -299,7 +299,11 @@ export function ReactTable<TData>({
             <button
               onClick={handleFullScreenToggle}
               className="fullscreen-toggle-btn me-2"
-              title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+              title={
+                isFullscreen
+                  ? formatMessage({ id: "exitFullscreen" })
+                  : formatMessage({ id: "enterFullscreen" })
+              }
             >
               {isFullscreen ? <FaCompress /> : <FaExpand />}
             </button>
