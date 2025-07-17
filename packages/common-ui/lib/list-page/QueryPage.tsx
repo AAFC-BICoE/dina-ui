@@ -1198,7 +1198,14 @@ export function QueryPage<TData extends KitsuResource>({
                 </div>
               )}
               {loading || columnSelectorLoading ? (
-                <LoadingSpinner loading={true} />
+                <div
+                  className={
+                    "d-flex justify-content-center align-items-center h-100 query-page-loading-spinner " +
+                    (isFullScreen ? "fullscreen" : "")
+                  }
+                >
+                  <LoadingSpinner loading={true} />
+                </div>
               ) : (
                 <MemoizedReactTable
                   // Column and data props
