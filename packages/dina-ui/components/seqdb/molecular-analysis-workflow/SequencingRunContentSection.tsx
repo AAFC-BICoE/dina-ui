@@ -102,6 +102,7 @@ export default function SequencingRunContentSection({
           sort={[{ id: "materialSampleName", desc: false }]}
           showPagination={true}
           setResourceRowModel={setRowModel}
+          pageSize={100}
         />
         {editMode && (
           <div className="mt-3">
