@@ -152,6 +152,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createSplitWorkflow: "Create Split",
   createStorage: "Create Storage",
   customPlaceName: "Custom Place Name",
+  customPlaceNamePlaceholder: "Enter a custom place name...",
   dataComponents: "Data Components",
   dataEntryLabel: "Data Entry",
   dataType: "Type: ",
@@ -604,6 +605,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Loans and Transactions Managed Attributes",
   loanTransactionsSectionTitle: "Transactions",
   locationLabel: "Location",
+  locationPlaceholder: "Enter a location to search...",
   longitudeValidationError:
     "Invalid longitude: {longtitude},   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
   makeFiledAs: "Make Filed As",

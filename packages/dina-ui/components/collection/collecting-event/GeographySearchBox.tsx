@@ -7,10 +7,11 @@ import {
 } from "common-ui";
 import CoordinateParser from "coordinate-parser";
 import { FormikContextType } from "formik";
+import _ from "lodash";
 import { ReactNode, useState } from "react";
 import useSWR from "swr";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-
+import { TbMapPinX } from "react-icons/tb";
 interface GeographySearchBoxProps {
   inputValue: string;
   onInputChange: (value: string) => void;
@@ -32,57 +33,6 @@ export interface AddressDetail {
   place_id?: string;
 }
 
-export interface NominatumApiAddressDetailSearchResult {
-  place_id?: string;
-  osm_type?: string;
-  osm_id?: string;
-  category?: string;
-  localname?: string;
-  address?: AddressDetail[];
-}
-
-export interface NominatimAddressDetailSearchProps {
-  urlValue: {};
-  updateAdminLevels: (detailResult, formik, stateProvinceName) => void;
-  formik: FormikContextType<any>;
-  stateProvinceName: string | null;
-}
-export async function nominatimAddressDetailSearch(
-  props: NominatimAddressDetailSearchProps
-) {
-  const { urlValue, updateAdminLevels, formik, stateProvinceName } = props;
-  if (!Object.keys(urlValue)) {
-    return null;
-  }
-  const url = new URL(`https://nominatim.openstreetmap.org/details.php`);
-
-  url.search = new URLSearchParams({
-    ...urlValue,
-    addressdetails: "1",
-    hierarchy: "0",
-    group_hierarchy: "1",
-    polygon_geojson: "1",
-    format: "json"
-  }).toString();
-
-  const fetchJson = (urlArg) => window.fetch(urlArg).then((res) => res.json());
-
-  try {
-    const response = await fetchJson(url.toString());
-
-    if (response.error) {
-      throw new Error(String(response.error));
-    }
-    updateAdminLevels(
-      response as NominatumApiAddressDetailSearchResult,
-      formik,
-      stateProvinceName
-    );
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 async function nominatimSearch(
   searchValue: string
 ): Promise<NominatumApiSearchResult[] | null> {
@@ -99,7 +49,7 @@ async function nominatimSearch(
   }
 
   const url = new URL(
-    `https://nominatim.openstreetmap.org/${coords ? "reverse" : "search"}.php`
+    `https://nominatim.openstreetmap.org/${coords ? "reverse" : "search"}`
   );
   url.search = new URLSearchParams({
     ...(coords
@@ -179,17 +129,20 @@ export function GeographySearchBox({
 
   return (
     <div className="m-2">
-      <div className="d-flex mb-3 ">
-        <label className="pt-2">
+      <div className="mb-3">
+        <label htmlFor="geographySearchBoxInput" className="form-label">
           <strong>
             <DinaMessage id="locationLabel" />
           </strong>
           <Tooltip id="geographySearchBoxTooltip" />
         </label>
-        <div className="flex-grow-1">
+
+        <div className="input-group">
           <input
+            id="geographySearchBoxInput"
             aria-label={formatMessage("locationLabel")}
             className="form-control"
+            placeholder={formatMessage("locationPlaceholder")}
             onChange={(e) => onInputChange(e.target.value)}
             onFocus={(e) => e.target.select()}
             onKeyDown={(e) => {
@@ -201,63 +154,64 @@ export function GeographySearchBox({
             value={inputValue}
             data-testid="geographySearchBox"
           />
+          <button
+            onClick={doSearch}
+            className="btn btn-primary geo-search-button"
+            type="button"
+            disabled={suggestButtonIsDisabled}
+          >
+            <DinaMessage id="searchButton" />
+          </button>
         </div>
       </div>
-      <div className="mb-3 d-flex">
-        <button
-          style={{ width: "10rem" }}
-          onClick={doSearch}
-          className="btn btn-primary ms-auto geo-search-button"
-          type="button"
-          disabled={suggestButtonIsDisabled}
-        >
-          <DinaMessage id="searchButton" />
-        </button>
-      </div>
+
+      {/* The rest of your component logic remains unchanged. */}
       {renderUnderSearchBar}
       <div className="list-group mb-3">
         {geoSearchIsLoading ? (
           <LoadingSpinner loading={true} />
         ) : searchResults?.length === 0 ? (
-          <DinaMessage id="noResultsFound" />
+          <div className="list-group-item">
+            <center className="mb-2">
+              <p style={{ fontSize: "3em" }}>
+                <TbMapPinX />
+              </p>
+              <DinaMessage id="noResultsFound" />
+            </center>
+          </div>
         ) : (
           searchResults?.map((place) => (
-            <div className="list-group-item" key={place.osm_id}>
-              <style>{`
-                .searchResult {
-                  font-size:13pt; font-family:verdana,sans-serif;
-                }     
-                .searchResultCategory {
-                  font-size:13pt; font-family:verdana,sans-serif; color: grey;
-                }                     
-            `}</style>
-              <div className="row">
-                <div className="col-md-8 searchResult">
-                  {place.display_name}
-                </div>
-                <div className="col-md-4 searchResultCategory">
-                  {`[category: ${place.category}]`}
-                </div>
+            <div
+              className="list-group-item justify-content-between align-items-center"
+              key={place.osm_id}
+            >
+              {/* Text content on the left */}
+              <div className="ms-2 mt-2 mb-2">
+                <h5 className="mb-1">
+                  {place.name === "" ? inputValue : place.name}
+                  <span className="badge bg-secondary ms-2 fw-normal">
+                    {_.startCase(place.addresstype)}
+                  </span>
+                </h5>
+                <p className="mb-0 text-muted small">{place.display_name}</p>
               </div>
-              <div className="row">
-                <div className="col-md-4">
-                  <FormikButton
-                    className="btn btn-primary"
-                    onClick={(_, formik) => selectGeoResult(place, formik)}
-                  >
-                    <DinaMessage id="select" />
-                  </FormikButton>
-                </div>
 
-                <div className="col-md-4">
-                  <a
-                    href={`https://www.openstreetmap.org/${place.osm_type}/${place.osm_id}`}
-                    className="btn btn-info"
-                    target="_blank"
-                  >
-                    <DinaMessage id="viewDetailButtonLabel" />
-                  </a>
-                </div>
+              {/* Action buttons on the right */}
+              <div className="ms-2 mt-2 mb-2">
+                <FormikButton
+                  className="btn btn-primary btn-sm"
+                  onClick={(_, formik) => selectGeoResult(place, formik)}
+                >
+                  <DinaMessage id="select" />
+                </FormikButton>
+                <a
+                  href={`https://www.openstreetmap.org/${place.osm_type}/${place.osm_id}`}
+                  className="btn btn-info btn-sm ms-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <DinaMessage id="viewDetailButtonLabel" />
+                </a>
               </div>
             </div>
           ))
