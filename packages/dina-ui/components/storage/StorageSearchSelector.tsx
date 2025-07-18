@@ -3,13 +3,14 @@ import {
   FieldHeader,
   dateCell,
   FormikButton,
-  generateUUIDTree
+  Tooltip
 } from "common-ui";
 import { TableColumn } from "common-ui/lib/list-page/types";
 import { KitsuResourceLink } from "kitsu";
 import Link from "next/link";
 import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import { Button } from "react-bootstrap";
 
 export interface StorageSearchSelectorProps {
   /**
@@ -26,8 +27,6 @@ export function StorageSearchSelector({
   onChange,
   parentStorageUnitUUID
 }: StorageSearchSelectorProps) {
-  // const [filter, setFilter] = useState<FilterGroupModel | null>();
-
   // Columns for the elastic search list page.
   const columns: TableColumn<any>[] = [
     // Name
@@ -117,16 +116,33 @@ export function StorageSearchSelector({
       id: "select",
       header: () => <FieldHeader name="select" />,
       cell: ({ row: { original } }) => (
-        <FormikButton
-          className="btn btn-primary select-storage"
-          onClick={async () =>
-            await onChange({ id: original.id ?? "", type: original.type })
-          }
-        >
-          <DinaMessage id="select" />
-        </FormikButton>
+        <div className="d-flex justify-content-center">
+          {parentStorageUnitUUID && original.id === parentStorageUnitUUID ? (
+            <Tooltip
+              className="m-0"
+              id="storageUnitCannotBeOwnParent"
+              visibleElement={
+                // Fake disabled button with tooltip
+                <Button
+                  className="btn btn-primary select-storage"
+                  disabled={true}
+                >
+                  <DinaMessage id="select" />
+                </Button>
+              }
+            />
+          ) : (
+            <FormikButton
+              className="btn btn-primary select-storage"
+              onClick={async () =>
+                await onChange({ id: original.id ?? "", type: original.type })
+              }
+            >
+              <DinaMessage id="select" />
+            </FormikButton>
+          )}
+        </div>
       ),
-      size: 250,
       accessorKey: "select",
       enableSorting: false
     }
@@ -149,10 +165,6 @@ export function StorageSearchSelector({
         enableRelationshipPresence={true}
         columns={columns}
         mandatoryDisplayedColumns={["name", "select"]}
-        customViewQuery={generateUUIDTree(
-          parentStorageUnitUUID || "",
-          "data.id"
-        )} // this should be the opposite, just for testing.
       />
     </div>
   );
