@@ -407,12 +407,27 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 )}
                 {hasAssociations && <AssociationsField />}
                 {materialSample.storageUnit && (
-                  <div className="card card-body mb-3">
-                    <StorageLinkerField
-                      name="storageUnit"
-                      targetType="material-sample"
-                    />
-                  </div>
+                  <FieldSet legend={<DinaMessage id="storage" />}>
+                    <div className="mb-3 d-flex flex-row">
+                      <div className="col-md-6">
+                        <StorageLinkerField
+                          name="storageUnit"
+                          targetType="material-sample"
+                        />
+                      </div>
+                      {materialSample.storageUnit.parentStorageUnit && (
+                        <div className="col-md-6">
+                          <StorageLinkerField
+                            name="storageUnit.parentStorageUnit"
+                            targetType="material-sample"
+                            customName={formatMessage(
+                              "field_parentStorageUnit"
+                            )}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </FieldSet>
                 )}
                 {!!materialSample?.scheduledActions?.length && (
                   <ScheduledActionsField />

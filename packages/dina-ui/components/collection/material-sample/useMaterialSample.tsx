@@ -103,7 +103,7 @@ export function useMaterialSampleQuery(id?: string | null) {
           const storageUnit = await apiClient.get<StorageUnitUsage>(
             `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
             {
-              include: "storageUnit"
+              include: "storageUnit,storageUnit.parentStorageUnit"
             }
           );
 
