@@ -427,7 +427,7 @@ const MOCK_SEARCH_API_RESPONSE = {
 const mockPost = jest.fn<any, any>(async (path) => {
   switch (path) {
     // Elastic search response with object store mock metadata data.
-    case "search-api/search-ws/search?indexName=dina_storage_index":
+    case "search-api/search-ws/search":
       return Promise.resolve(MOCK_SEARCH_API_RESPONSE);
   }
 });
@@ -449,7 +449,16 @@ const mockSave = jest.fn((ops) =>
 
 const testCtx = {
   apiContext: {
-    apiClient: { get: mockGet, post: mockPost, patch: mockPatch },
+    apiClient: {
+      get: mockGet,
+      post: mockPost,
+      patch: mockPatch,
+      axios: {
+        get: mockGet,
+        post: mockPost,
+        patch: mockPatch
+      }
+    },
     save: mockSave,
     bulkGet: mockBulkGet
   }
@@ -1903,15 +1912,20 @@ describe("MaterialSampleBulkEditor", () => {
     });
 
     await waitFor(() => {
-      screen.logTestingPlaygroundURL();
       expect(
-        wrapper.getByRole("row", { name: /storage unit c \(box\) select/i })
+        wrapper.getByRole("link", { name: /^test unit$/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: /^test unit child$/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: /^test unit child 2$/i })
       ).toBeInTheDocument();
     });
 
     // Assign a different storage unit:
-    const row = wrapper.getByRole("row", {
-      name: /storage unit c \(box\) select/i
+    const row = screen.getByRole("row", {
+      name: /test unit child test test unit aafc dina\-admin 2025\-07\-17, 2:59:06 p\.m\. select/i
     });
     const selectStorageButton = within(row).getByRole("button", {
       name: /select/i
@@ -1933,9 +1947,11 @@ describe("MaterialSampleBulkEditor", () => {
     ).toBeInTheDocument();
 
     // New linked storage unit is indicated:
-    expect(
-      wrapper.getByRole("link", { name: /storage unit c \(box\)/i })
-    ).toBeInTheDocument();
+    waitFor(() => {
+      expect(
+        wrapper.getByRole("link", { name: /test unit child \(test\)/i })
+      ).toBeInTheDocument();
+    });
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
@@ -1948,7 +1964,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: undefined,
               storageUnit: {
-                id: "C",
+                id: "019818e5-7242-7e45-bcb1-0056d9fe6e34",
                 type: "storage-unit"
               },
               type: "storage-unit-usage",
@@ -1967,7 +1983,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: undefined,
               storageUnit: {
-                id: "C",
+                id: "019818e5-7242-7e45-bcb1-0056d9fe6e34",
                 type: "storage-unit"
               },
               type: "storage-unit-usage",
