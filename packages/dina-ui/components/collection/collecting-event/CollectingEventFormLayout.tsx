@@ -487,7 +487,7 @@ export function CollectingEventFormLayout({
                   }
                   customPlaceValue={customPlaceValue}
                 />
-                <DinaFormSection horizontal={[3, 9]}>
+                <DinaFormSection horizontal={[3, 9]} readOnly={true}>
                   <TextField
                     name={`${commonSrcDetailRoot}.stateProvince.name`}
                     templateCheckboxFieldName={`${commonSrcDetailRoot}.stateProvince`}
