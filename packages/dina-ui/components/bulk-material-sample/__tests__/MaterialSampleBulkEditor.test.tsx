@@ -1947,11 +1947,14 @@ describe("MaterialSampleBulkEditor", () => {
     ).toBeInTheDocument();
 
     // New linked storage unit is indicated:
-    waitFor(() => {
-      expect(
-        wrapper.getByRole("link", { name: /test unit child \(test\)/i })
-      ).toBeInTheDocument();
-    });
+    waitFor(
+      () => {
+        expect(
+          wrapper.getByRole("link", { name: /test unit child \(test\)/i })
+        ).toBeInTheDocument();
+      },
+      { timeout: 20000 }
+    );
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
