@@ -886,6 +886,7 @@ describe("MaterialSampleBulkEditor", () => {
                 isPrimary: true
               }
             ],
+            group: "cnc",
             publiclyReleasable: true
           },
           type: "collecting-event"
@@ -1684,6 +1685,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               type: "collecting-event",
               geoReferenceAssertions: [{ isPrimary: true }],
+              group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               publiclyReleasable: true,
@@ -1700,6 +1702,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               type: "collecting-event",
               geoReferenceAssertions: [{ isPrimary: true }],
+              group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               publiclyReleasable: true,
@@ -1716,6 +1719,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               type: "collecting-event",
               geoReferenceAssertions: [{ isPrimary: true }],
+              group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               publiclyReleasable: true,
@@ -1822,7 +1826,8 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "col-event-1",
               type: "collecting-event",
-              dwcVerbatimLocality: "bulk edited locality"
+              dwcVerbatimLocality: "bulk edited locality",
+              group: "cnc"
             },
             type: "collecting-event"
           }
@@ -1835,7 +1840,8 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "col-event-1",
               type: "collecting-event",
-              dwcVerbatimLocality: "bulk edited locality"
+              dwcVerbatimLocality: "bulk edited locality",
+              group: "cnc"
             },
             type: "collecting-event"
           }
@@ -2160,6 +2166,7 @@ describe("MaterialSampleBulkEditor", () => {
                   isPrimary: true
                 }
               ],
+              group: "cnc",
               publiclyReleasable: true
             },
             type: "collecting-event"
