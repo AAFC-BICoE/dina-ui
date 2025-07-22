@@ -329,7 +329,8 @@ export default function QueryRowManagedAttributeSearch({
           ...(managedAttributeState.preloadId !== undefined
             ? { uuid: managedAttributeState.preloadId } // Filter by UUID if preloadId exists
             : filterBy(["name"])(input)), // Otherwise filter by name as before
-          ...(managedAttributeConfig?.dynamicField?.component
+          ...(managedAttributeConfig?.dynamicField?.component &&
+          managedAttributeConfig.dynamicField.component !== "ENTITY"
             ? {
                 managedAttributeComponent:
                   managedAttributeConfig?.dynamicField?.component
