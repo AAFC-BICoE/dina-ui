@@ -242,7 +242,8 @@ export class ApiClientImpl implements ApiClientI {
       "/agent-api",
       "/dina-export-api",
       "/objectstore-api",
-      "/collection-api"
+      "/collection-api",
+      "/loan-transaction-api"
     ];
 
     // Resource types that are supported for bulk operations.
