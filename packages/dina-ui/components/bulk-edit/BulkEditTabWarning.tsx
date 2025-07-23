@@ -96,6 +96,7 @@ export function BulkEditTabWarning({
         <FieldSpy fieldName={fieldName}>
           {(fieldValue: Array<any>, { bulkContext }) =>
             bulkContext?.hasBulkEditValue && fieldValue.length ? (
+              // Show a different warning when there are multiple values
               <div className="alert alert-warning">
                 {fieldValue.length == 1 ? (
                   <DinaMessage id={messageIdSingle as any} />
