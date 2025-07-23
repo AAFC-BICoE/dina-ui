@@ -96,6 +96,27 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceSetWarningMulti:
     "These {fieldName}s will be set on all {targetType}s.",
+
+  bulkEditResourceLinkerWarning_Organisms_MaterialSample_Single:
+    "This Organism will be linked to all Material Samples.",
+  bulkEditResourceLinkerWarning_Attachments_MaterialSample_Single:
+    "This Attachment will be linked to all Material Samples.",
+
+  bulkEditResourceLinkerWarning_Organisms_MaterialSample_Multi:
+    "These Organisms will be linked to all Material Samples.",
+  bulkEditResourceLinkerWarning_Attachments_MaterialSample_Multi:
+    "These Attachments will be linked to all Material Samples.",
+
+  bulkEditResourceSetWarning_Associations_MaterialSample_Single:
+    "This Association will be set on all Material Samples.",
+  bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Single:
+    "This Scheduled Action will be set on all Material Samples.",
+
+  bulkEditResourceSetWarning_Associations_MaterialSample_Multi:
+    "These Associations will be set on all Material Samples.",
+  bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Multi:
+    "These Scheduled Actions will be set on all Material Samples.",
+
   bulkOperationCompleteTitle: "Bulk Operation Complete",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
