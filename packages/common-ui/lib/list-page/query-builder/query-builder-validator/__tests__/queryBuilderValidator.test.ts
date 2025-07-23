@@ -59,7 +59,40 @@ describe("validateQueryTree", () => {
     ).toBe(false);
   });
 
-  test("Given invalid operator in query tree, return false", async () => {
+  test("Given a valid empty query tree, return true", async () => {
+    expect(
+      validateQueryTree(
+        {
+          id: "8c6dc2c8-4070-48ce-b700-13a931f9ebaf",
+          type: "group",
+          children1: [
+            {
+              id: "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6",
+              type: "rule",
+              properties: {
+                field: null,
+                value: [],
+                operator: null,
+                valueSrc: [],
+                valueError: []
+              }
+            }
+          ],
+          properties: {
+            conjunction: "AND"
+          }
+        } as JsonTree,
+        generateBuilderConfig(
+          testIndexMap,
+          "dina-material-sample-index",
+          mockFormatMessage,
+          []
+        )
+      )
+    ).toBe(true);
+  });
+
+  test("Given invalid field in query tree, return false", async () => {
     expect(
       validateQueryTree(
         {

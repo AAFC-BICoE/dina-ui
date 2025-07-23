@@ -27,7 +27,7 @@ export function validateQueryTree(
   // Validate operators
   const validOperators = Object.keys(config.operators);
   const invalidOperators = operators.filter(
-    (operator) => !validOperators.includes(operator)
+    (operator) => !validOperators.includes(operator) && operator !== ""
   );
 
   if (invalidOperators.length > 0) {
@@ -56,12 +56,12 @@ export function findFields(queryTree: any): string[] {
   return scanObjectForKeys(queryTree, "field");
 }
 
-function scanObjectForKeys(object: any, keyValue: string) {
+function scanObjectForKeys(object: any, keyValue: string): string[] {
   let matches: string[] = [];
 
   if (typeof object === "object" && object !== null) {
     for (const key in object) {
-      if (key === keyValue) {
+      if (key === keyValue && object[key] !== null) {
         matches.push(object[key]);
       } else if (
         typeof object[key] === "object" ||
