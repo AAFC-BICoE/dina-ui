@@ -69,7 +69,7 @@ export function BulkEditTabWarning({
         );
       }
     }
-  }, [bulkEditCtx, bulkField]);
+  }, []);
 
   if (bulkEditCtx && bulkField) {
     const { hasBulkEditValue, hasNoValues, hasSameValues } = bulkField;
