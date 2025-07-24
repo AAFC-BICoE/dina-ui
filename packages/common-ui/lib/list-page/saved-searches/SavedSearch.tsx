@@ -698,34 +698,43 @@ export function SavedSearch({
       {/** Display out of date search query to the user with instructions on fixing it. */}
       {isOutOfDateQuery && selectedSavedSearch && (
         <Alert variant="warning">
-          <Alert.Heading>Review Your Saved Search</Alert.Heading>
+          <Alert.Heading>
+            <DinaMessage id="reviewSavedSearchHeading" />
+          </Alert.Heading>
           <p>
-            The way we save search filters and columns has been updated since
-            you last saved "<strong>{selectedSavedSearch}</strong>".
+            <DinaMessage
+              id="reviewSavedSearchMessage"
+              values={{ savedSearch: <strong>{selectedSavedSearch}</strong> }}
+            />
           </p>
           <hr />
           <p className="mb-2">
-            <strong>What to do:</strong>
+            <strong>
+              <DinaMessage id="reviewSavedSearchWhatToDo" />
+            </strong>
           </p>
           <ListGroup variant="flush" as="ol" numbered>
             <ListGroup.Item
               as="li"
               className="border-0 bg-transparent px-0 py-1"
+              style={{
+                color: "#664d03"
+              }}
             >
-              Check that your search query and visible columns are still
-              correct. Make any required changes to the search query and visible
-              columns.
+              <DinaMessage id="reviewSavedSearchCheck" />
             </ListGroup.Item>
             <ListGroup.Item
               as="li"
               className="border-0 bg-transparent px-0 py-1"
+              style={{
+                color: "#664d03"
+              }}
             >
-              Click the "Confirm and Update" button to update it to the latest
-              version.
+              <DinaMessage id="reviewSavedSearchConfirm" />
             </ListGroup.Item>
           </ListGroup>
           <p className="mt-3 mb-0">
-            This will ensure your search continues to work as expected.
+            <DinaMessage id="reviewSavedSearchEnsure" />
           </p>
           <hr />
           <div className="d-flex justify-content-end">
@@ -735,7 +744,7 @@ export function SavedSearch({
                 saveSavedSearch(selectedSavedSearch, currentIsDefault, true)
               }
             >
-              Confirm and Update
+              <DinaMessage id="reviewSavedSearchConfirmButton" />
             </Button>
           </div>
         </Alert>

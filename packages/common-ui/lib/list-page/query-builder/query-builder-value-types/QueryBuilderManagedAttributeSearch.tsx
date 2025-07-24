@@ -3,7 +3,7 @@ import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
-import { filterBy, ResourceSelect, SelectOption } from "common-ui";
+import { ResourceSelect, SelectOption } from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL,
@@ -328,7 +328,11 @@ export default function QueryRowManagedAttributeSearch({
         filter={(input) => ({
           ...(managedAttributeState.preloadId !== undefined
             ? { uuid: managedAttributeState.preloadId } // Filter by UUID if preloadId exists
-            : filterBy(["name"])(input)), // Otherwise filter by name as before
+            : {
+                name: {
+                  ILIKE: "%" + input + "%"
+                }
+              }), // Otherwise filter by name as before
           ...(managedAttributeConfig?.dynamicField?.component &&
           managedAttributeConfig.dynamicField.component !== "ENTITY"
             ? {

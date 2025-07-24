@@ -844,6 +844,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   revisionsListTitle: "Revisions for {name}",
+  reviewSavedSearchHeading: "Review Your Saved Search",
+  reviewSavedSearchMessage:
+    'The way we save search filters and columns has been updated since you last saved "{savedSearch}".',
+  reviewSavedSearchWhatToDo: "What to do:",
+  reviewSavedSearchCheck:
+    "Check that your search query and visible columns are still correct. Make any required changes to the search query and visible columns.",
+  reviewSavedSearchConfirm:
+    'Click the "Confirm and Update" button to update it to the latest version.',
+  reviewSavedSearchEnsure:
+    "This will ensure your saved search continues to work as expected.",
+  reviewSavedSearchConfirmButton: "Confirm and Update",
   role: "Role",
   roleAction: "Role/Action",
   roles: "Roles",
