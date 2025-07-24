@@ -193,15 +193,28 @@ export function SavedSearch({
 
   // List of all the saved searches for this index.
   const dropdownOptions: SingleSavedSearch[] = useMemo(() => {
-    if (!userPreferences) return [];
+    if (!userPreferences?.savedSearches?.[indexName]) {
+      return [];
+    }
 
-    return _.map(userPreferences?.savedSearches?.[indexName], (value, key) => {
-      return {
-        ...value,
-        savedSearchName: key
-      };
-    });
-  }, [userPreferences]);
+    // First, map the object to an array, adding the 'savedSearchName' property.
+    const mappedSearches = _.map(
+      userPreferences.savedSearches[indexName],
+      (value, key) => {
+        return {
+          ...value,
+          savedSearchName: key
+        };
+      }
+    );
+
+    // Next, sort the resulting array by 'savedSearchName' using localeCompare.
+    mappedSearches.sort((a, b) =>
+      a.savedSearchName.localeCompare(b.savedSearchName)
+    );
+
+    return mappedSearches;
+  }, [userPreferences, indexName]);
 
   // Once the selected save search is changed, we generate a string query representation of the
   // selected saved search query tree. We use this to compare it against the current tree.
