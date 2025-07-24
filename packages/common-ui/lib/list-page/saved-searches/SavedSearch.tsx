@@ -432,7 +432,24 @@ export function SavedSearch({
 
       // Load the displayed columns for this search.
       if (savedSearchToLoad.columnVisibility) {
-        setLocalStorageDisplayedColumns(savedSearchToLoad.columnVisibility);
+        // Legacy saved search migration for managed attribute visible columns.
+        // This could be removed once everything is converted over to the new format.
+        const visibleColumns = savedSearchToLoad.columnVisibility.map(
+          (item) => {
+            if (
+              indexName === "dina_object_store_index" &&
+              item.includes("managedAttributes.")
+            ) {
+              return item.replace(
+                "managedAttributes.",
+                "managedAttributes/ENTITY/"
+              );
+            }
+            return item;
+          }
+        );
+
+        setLocalStorageDisplayedColumns(visibleColumns);
       }
 
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));

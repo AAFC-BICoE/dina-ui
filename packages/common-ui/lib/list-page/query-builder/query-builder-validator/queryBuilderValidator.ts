@@ -63,6 +63,17 @@ export function validateSavedSearchVerison(savedSearch: SingleSavedSearch) {
   if (!savedSearch?.version || savedSearch.version < SAVED_SEARCH_VERSION) {
     return false;
   }
+
+  // The way column visibility is saved for managed attributes has changed, check if it's using
+  // the older way and report it as an older saved search to update it.
+  if (
+    savedSearch.columnVisibility?.some((column) =>
+      column.includes("managedAttributes.")
+    )
+  ) {
+    return false;
+  }
+
   return true;
 }
 

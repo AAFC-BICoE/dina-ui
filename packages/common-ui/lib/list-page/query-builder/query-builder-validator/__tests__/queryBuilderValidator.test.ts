@@ -197,7 +197,7 @@ describe("queryBuilderValidator", () => {
         version: SAVED_SEARCH_VERSION,
         default: false,
         groups: ["aafc"],
-        columnVisibility: [],
+        columnVisibility: ["managedAttributes/ENTITY/ocr"],
         queryTree: queryTreeTest,
         savedSearchName: "latestVerison"
       };
@@ -224,6 +224,19 @@ describe("queryBuilderValidator", () => {
         groups: ["aafc"],
         queryTree: queryTreeTest,
         savedSearchName: "noVerison"
+      };
+
+      expect(validateSavedSearchVerison(savedSearch)).toBe(false);
+    });
+
+    test("Managed attributes stored the legacy way, returns false", async () => {
+      const savedSearch: SingleSavedSearch = {
+        version: SAVED_SEARCH_VERSION,
+        default: false,
+        groups: ["aafc"],
+        columnVisibility: ["managedAttributes.ocr", "barcode"],
+        queryTree: queryTreeTest,
+        savedSearchName: "latestVerison"
       };
 
       expect(validateSavedSearchVerison(savedSearch)).toBe(false);
