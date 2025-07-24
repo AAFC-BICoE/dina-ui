@@ -1,4 +1,8 @@
 import { JsonTree, Config } from "@react-awesome-query-builder/ui";
+import {
+  SAVED_SEARCH_VERSION,
+  SingleSavedSearch
+} from "../../saved-searches/types";
 
 /**
  * The purpose of this function is to check for any issues with the query.
@@ -45,6 +49,20 @@ export function validateQueryTree(
   }
 
   // If all operators and fields are valid
+  return true;
+}
+
+/**
+ * Determines if a saved search is an older verison. This is used to indicate to the user that
+ * some features might be missing and to review and save their saved query.
+ *
+ * @param savedSearch Single Saved Search to validatate.
+ * @returns true if latest verison, false otherwise.
+ */
+export function validateSavedSearchVerison(savedSearch: SingleSavedSearch) {
+  if (!savedSearch?.version || savedSearch.version < SAVED_SEARCH_VERSION) {
+    return false;
+  }
   return true;
 }
 
