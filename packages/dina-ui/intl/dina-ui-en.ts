@@ -953,6 +953,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   stateProvinceLabel: "State/Province",
   status: "Status",
   storage: "Storage",
+  storageUnitCannotBeOwnParent: "A Storage Unit cannot be its own parent.",
   storageUnitListTitle: "Storage Units",
   storageUnitName: "Storage Unit Name",
   storageUnitType: "Storage Unit Type",
