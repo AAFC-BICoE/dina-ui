@@ -432,12 +432,6 @@ const mockPost = jest.fn<any, any>(async (path) => {
   }
 });
 
-// const mockPost = jest.fn((url, _) => {
-//   if (url === "search-api/search-ws/search?indexName=dina_storage_index") {
-//     return MOCK_SEARCH_API_RESPONSE;
-//   }
-// });
-
 const mockPatch = jest.fn();
 
 const mockSave = jest.fn((ops) =>
