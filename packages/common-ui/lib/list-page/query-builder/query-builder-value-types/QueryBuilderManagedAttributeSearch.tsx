@@ -3,7 +3,11 @@ import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
-import { ResourceSelect, SelectOption } from "common-ui";
+import {
+  ResourceSelect,
+  SelectOption,
+  SimpleSearchFilterBuilder
+} from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL,
@@ -325,22 +329,34 @@ export default function QueryRowManagedAttributeSearch({
     <div className={isInColumnSelector ? "" : "row d-flex flex-row"}>
       {/* Managed Attribute Selection */}
       <ResourceSelect<ManagedAttribute>
-        filter={(input) => ({
-          ...(managedAttributeState.preloadId !== undefined
-            ? { uuid: managedAttributeState.preloadId } // Filter by UUID if preloadId exists
-            : {
-                name: {
-                  ILIKE: "%" + input + "%"
-                }
-              }), // Otherwise filter by name as before
-          ...(managedAttributeConfig?.dynamicField?.component &&
-          managedAttributeConfig.dynamicField.component !== "ENTITY"
-            ? {
-                managedAttributeComponent:
+        filter={(input: string) =>
+          SimpleSearchFilterBuilder.create<ManagedAttribute>()
+            // Either preload by ID or search by name.
+            .when(
+              managedAttributeState.preloadId !== undefined,
+
+              // If TRUE (preloadId exists), filter by UUID.
+              (builder) =>
+                builder.where("uuid", "EQ", managedAttributeState.preloadId!),
+
+              // If FALSE (no preloadId), use the searchFilter for the input.
+              (builder) => builder.searchFilter("name", input)
+            )
+
+            // Managed attribute component is not used for object store for example.
+            .when(
+              !!managedAttributeConfig?.dynamicField?.component &&
+                managedAttributeConfig?.dynamicField?.component !== "ENTITY",
+              // If TRUE, add the component filter.
+              (builder) =>
+                builder.where(
+                  "managedAttributeComponent",
+                  "EQ",
                   managedAttributeConfig?.dynamicField?.component
-              }
-            : {})
-        })}
+                )
+            )
+            .build()
+        }
         model={managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""}
         optionLabel={(attribute) =>
           _.get(attribute, "name") ||
