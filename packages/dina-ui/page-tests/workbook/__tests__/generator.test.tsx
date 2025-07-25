@@ -16,12 +16,12 @@ const mockPost = jest.fn();
 const mockGet = jest.fn<any, any>(async (path, options) => {
   switch (path) {
     case "collection-api/managed-attribute":
-      switch (options?.filter?.rsql) {
-        case "managedAttributeComponent==MATERIAL_SAMPLE":
+      switch (options?.filter?.managedAttributeComponent?.EQ) {
+        case "MATERIAL_SAMPLE":
           return { data: [TEST_MANAGED_ATTRIBUTE_MATERIAL_SAMPLE] };
-        case "managedAttributeComponent==PREPARATION":
+        case "PREPARATION":
           return { data: [TEST_MANAGED_ATTRIBUTE_PREPARATION] };
-        case "managedAttributeComponent==COLLECTING_EVENT":
+        case "COLLECTING_EVENT":
           return { data: [TEST_MANAGED_ATTRIBUTE_COLLECTING_EVENT] };
       }
     case "collection-api/vocabulary2/taxonomicRank":

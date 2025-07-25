@@ -54,7 +54,7 @@ export function SavedSearchListDropdown({
 
           <Modal.Body
             style={{
-              maxHeight: "300px",
+              maxHeight: "30rem",
               overflowY: "auto",
               background: "#f9f9f9"
             }}
