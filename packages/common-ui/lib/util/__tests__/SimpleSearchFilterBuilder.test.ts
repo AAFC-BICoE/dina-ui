@@ -34,6 +34,13 @@ describe("SimpleSearchFilterBuilder", () => {
       expect(filter).toEqual({ id: { GT: "18" } });
     });
 
+    it("should add a IN (list) filter", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .where("group", "IN", ["group1", "group2", "group3"])
+        .build();
+      expect(filter).toEqual({ group: { IN: "group1,group2,group3" } });
+    });
+
     it("should allow chaining multiple .where() calls", () => {
       const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
         .where("key", "EQ", "test")

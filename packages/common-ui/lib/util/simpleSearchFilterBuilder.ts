@@ -42,9 +42,14 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
   public where<K extends keyof T>(
     field: K | "uuid",
     op: FilterOperation,
-    value: T[K]
+    value: T[K] | T[K][]
   ): this {
-    this.filter[String(field)] = { [op]: value } as any;
+    if (op === "IN" && Array.isArray(value)) {
+      this.filter[String(field)] = { [op]: value.join(",") } as any;
+    } else {
+      this.filter[String(field)] = { [op]: value } as any;
+    }
+
     return this;
   }
 
