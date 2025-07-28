@@ -3,8 +3,8 @@ import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import {
   SelectField,
+  SimpleSearchFilterBuilder,
   Tooltip,
-  filterBy,
   useApiClient,
   useQuery
 } from "../../../../common-ui/lib";
@@ -88,15 +88,13 @@ export function useColumnMapping() {
     response: attrRespMaterialSamplem
   } = useQuery<ManagedAttribute[]>({
     path: "collection-api/managed-attribute",
-    filter: filterBy([], {
-      extraFilters: [
-        {
-          selector: "managedAttributeComponent",
-          comparison: "=in=",
-          arguments: ["MATERIAL_SAMPLE", "PREPARATION", "COLLECTING_EVENT"]
-        }
-      ]
-    })(""),
+    filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
+      .where("managedAttributeComponent", "IN", [
+        "MATERIAL_SAMPLE",
+        "PREPARATION",
+        "COLLECTING_EVENT"
+      ])
+      .build(),
     page: { limit: 1000 }
   });
 

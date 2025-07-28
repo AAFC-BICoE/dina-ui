@@ -173,4 +173,43 @@ describe("GroupSelectField component", () => {
     // The default group was selected:
     expect(mockSubmit).lastCalledWith({ group: null });
   });
+
+  it("Calls the API with a name filter for the user's groups", async () => {
+    const mockGet = jest.fn();
+
+    // This mock user is NOT an admin and belongs to two specific groups.
+    const testCtxWithSpecificUser = {
+      apiContext: {
+        apiClient: {
+          get: mockGet as any
+        }
+      },
+      accountContext: {
+        groupNames: ["aafc", "ccfc"],
+        isAdmin: false
+      }
+    };
+
+    mockGet.mockRejectedValueOnce(undefined);
+
+    mountWithAppContext(
+      <DinaForm initialValues={{}} readOnly={false}>
+        <GroupSelectField name="group" showAllGroups={false} />
+      </DinaForm>,
+      testCtxWithSpecificUser
+    );
+
+    // Wait for the API call to be made.
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledTimes(1);
+      expect(mockGet).toHaveBeenCalledWith("user-api/group", {
+        filter: {
+          name: "aafc,ccfc"
+        },
+        page: {
+          limit: 1000
+        }
+      });
+    });
+  });
 });

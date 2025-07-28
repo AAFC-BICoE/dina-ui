@@ -1,18 +1,16 @@
 import {
-  ColumnDefinition,
-  FilterGroupModel,
+  QueryPage,
+  FieldHeader,
+  dateCell,
   FormikButton,
-  QueryTable,
-  rsql
+  Tooltip
 } from "common-ui";
+import { TableColumn } from "common-ui/lib/list-page/types";
 import { KitsuResourceLink } from "kitsu";
 import Link from "next/link";
-import { useState } from "react";
 import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { StorageUnit } from "../../types/collection-api";
-import { StorageFilter } from "./StorageFilter";
-import { storageUnitDisplayName } from "./StorageUnitBreadCrumb";
+import { Button } from "react-bootstrap";
 
 export interface StorageSearchSelectorProps {
   /**
@@ -29,41 +27,122 @@ export function StorageSearchSelector({
   onChange,
   parentStorageUnitUUID
 }: StorageSearchSelectorProps) {
-  const [filter, setFilter] = useState<FilterGroupModel | null>();
-
-  const tableColumns: ColumnDefinition<StorageUnit>[] = [
+  // Columns for the elastic search list page.
+  const columns: TableColumn<any>[] = [
+    // Name
     {
-      cell: ({ row: { original } }) => (
-        <Link
-          href={`/collection/storage-unit/view?id=${original.id}`}
-          target="_blank"
-        >
-          {storageUnitDisplayName(original)}
+      id: "name",
+      cell: ({
+        row: {
+          original: { id, data }
+        }
+      }) => (
+        <Link href={`/collection/storage-unit/view?id=${id}`} passHref={true}>
+          {data?.attributes?.name}
         </Link>
       ),
-      size: 400,
-      accessorKey: "name"
+      header: () => <FieldHeader name="name" />,
+      accessorKey: "data.attributes.name",
+      isKeyword: true
     },
+
+    // Storage Unit Type
     {
-      cell: ({ row: { original } }) =>
-        // Display location if storage unit has a parent
-        original.hierarchy &&
-        original.hierarchy.length > 1 && <>{original.hierarchy[1].name}</>,
-      accessorKey: "location",
-      enableSorting: false
+      id: "storageUnitType.name",
+      cell: ({
+        row: {
+          original: { included }
+        }
+      }) => {
+        if (!included?.storageUnitType?.id) {
+          return null;
+        }
+
+        return (
+          <Link
+            href={`/collection/storage-unit-type/view?id=${included?.storageUnitType?.id}`}
+            passHref={true}
+          >
+            {included?.storageUnitType?.attributes?.name}
+          </Link>
+        );
+      },
+      header: () => <FieldHeader name="storageUnitType" />,
+      accessorKey: "included.attributes.name",
+      relationshipType: "storage-unit-type",
+      enableSorting: false,
+      isKeyword: true
     },
+
+    // Location
     {
+      id: "location",
+      cell: ({
+        row: {
+          original: { data }
+        }
+      }) => {
+        const parentRank = data?.attributes?.hierarchy?.find(
+          (item) => item.rank === 2
+        );
+        return <>{parentRank?.name}</>;
+      },
+      header: () => <FieldHeader name="location" />,
+      enableSorting: false,
+      isKeyword: true,
+      additionalAccessors: ["data.attributes.hierarchy"]
+    },
+
+    // Group
+    {
+      id: "group",
+      header: () => <FieldHeader name="group" />,
+      accessorKey: "data.attributes.group",
+      isKeyword: true
+    },
+
+    // Created By
+    {
+      id: "createdBy",
+      header: () => <FieldHeader name="createdBy" />,
+      accessorKey: "data.attributes.createdBy",
+      isKeyword: true
+    },
+
+    // Created On
+    dateCell("createdOn", "data.attributes.createdOn"),
+
+    {
+      id: "select",
+      header: () => <FieldHeader name="select" />,
       cell: ({ row: { original } }) => (
-        <FormikButton
-          className="btn btn-primary select-storage"
-          onClick={async () =>
-            await onChange({ id: original.id ?? "", type: original.type })
-          }
-        >
-          <DinaMessage id="select" />
-        </FormikButton>
+        <div className="d-flex justify-content-center">
+          {parentStorageUnitUUID && original.id === parentStorageUnitUUID ? (
+            <Tooltip
+              className="m-0"
+              id="storageUnitCannotBeOwnParent"
+              visibleElement={
+                // Fake disabled button with tooltip
+                <Button
+                  className="btn btn-primary select-storage"
+                  disabled={true}
+                >
+                  <DinaMessage id="select" />
+                </Button>
+              }
+            />
+          ) : (
+            <FormikButton
+              className="btn btn-primary select-storage"
+              onClick={async () =>
+                await onChange({ id: original.id ?? "", type: original.type })
+              }
+            >
+              <DinaMessage id="select" />
+            </FormikButton>
+          )}
+        </div>
       ),
-      size: 250,
       accessorKey: "select",
       enableSorting: false
     }
@@ -76,25 +155,16 @@ export function StorageSearchSelector({
           background-color: rgb(222, 252, 222) !important;
         }
       `}</style>
-      <StorageFilter
-        onChange={setFilter}
-        parentStorageUnitUUID={parentStorageUnitUUID}
-      />
-      <QueryTable
-        columns={tableColumns}
-        path="collection-api/storage-unit"
-        include="hierarchy,storageUnitType"
-        // Sort by newest:
-        defaultSort={[{ id: "createdOn", desc: true }]}
-        reactTableProps={() => ({ enableSorting: false })}
-        filter={{
-          rsql: rsql({
-            type: "FILTER_GROUP",
-            id: -123,
-            operator: "AND",
-            children: [...(filter ? [filter] : [])]
-          })
+      <QueryPage
+        indexName={"dina_storage_index"}
+        uniqueName="storage-unit-list"
+        reactTableProps={{
+          enableSorting: true,
+          enableMultiSort: true
         }}
+        enableRelationshipPresence={true}
+        columns={columns}
+        mandatoryDisplayedColumns={["name", "select"]}
       />
     </div>
   );

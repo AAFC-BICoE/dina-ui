@@ -1,4 +1,4 @@
-import { FieldSet, filterBy, useQuery } from "common-ui";
+import { FieldSet, SimpleSearchFilterBuilder, useQuery } from "common-ui";
 import { InputResource } from "kitsu";
 import _ from "lodash";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -28,15 +28,9 @@ export function ShowParentMaterialSample({
     (materialSample?.parentMaterialSample ?? {}) as MaterialSample;
   const { response: attrResp } = useQuery<ManagedAttribute[]>({
     path: "collection-api/managed-attribute",
-    filter: filterBy([], {
-      extraFilters: [
-        {
-          selector: "managedAttributeComponent",
-          comparison: "==",
-          arguments: "ORGANISM"
-        }
-      ]
-    })(""),
+    filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
+      .where("managedAttributeComponent", "EQ", "ORGANISM")
+      .build(),
     page: { limit: 1000 }
   });
 

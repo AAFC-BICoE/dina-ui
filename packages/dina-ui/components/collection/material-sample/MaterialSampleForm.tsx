@@ -335,7 +335,8 @@ export function MaterialSampleForm({
           id={id}
           wrapContent={(content) => (
             <BulkEditTabWarning
-              targetType="material-sample"
+              messageIdSingle="bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Single"
+              messageIdMultiple="bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Multi"
               fieldName="scheduledActions"
             >
               {content}
@@ -404,7 +405,8 @@ export function MaterialSampleForm({
             attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
             wrapContent={(content) => (
               <BulkEditTabWarning
-                targetType="material-sample"
+                messageIdSingle="bulkEditResourceLinkerWarning_Attachments_MaterialSample_Single"
+                messageIdMultiple="bulkEditResourceLinkerWarning_Attachments_MaterialSample_Multi"
                 fieldName={attachmentsField}
               >
                 {content}

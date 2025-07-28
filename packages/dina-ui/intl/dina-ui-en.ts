@@ -96,6 +96,27 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceSetWarningMulti:
     "These {fieldName}s will be set on all {targetType}s.",
+
+  bulkEditResourceLinkerWarning_Organisms_MaterialSample_Single:
+    "This Organism will be linked to all Material Samples.",
+  bulkEditResourceLinkerWarning_Attachments_MaterialSample_Single:
+    "This Attachment will be linked to all Material Samples.",
+
+  bulkEditResourceLinkerWarning_Organisms_MaterialSample_Multi:
+    "These Organisms will be linked to all Material Samples.",
+  bulkEditResourceLinkerWarning_Attachments_MaterialSample_Multi:
+    "These Attachments will be linked to all Material Samples.",
+
+  bulkEditResourceSetWarning_Associations_MaterialSample_Single:
+    "This Association will be set on all Material Samples.",
+  bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Single:
+    "This Scheduled Action will be set on all Material Samples.",
+
+  bulkEditResourceSetWarning_Associations_MaterialSample_Multi:
+    "These Associations will be set on all Material Samples.",
+  bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Multi:
+    "These Scheduled Actions will be set on all Material Samples.",
+
   bulkOperationCompleteTitle: "Bulk Operation Complete",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
@@ -152,6 +173,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createSplitWorkflow: "Create Split",
   createStorage: "Create Storage",
   customPlaceName: "Custom Place Name",
+  customPlaceNamePlaceholder: "Enter a custom place name...",
   dataComponents: "Data Components",
   dataEntryLabel: "Data Entry",
   dataType: "Type: ",
@@ -241,6 +263,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   feedbackLinkHeader: "Submit GitHub Issue here:",
   feedbackLinkTitle: "GitHub Issues",
   feedbackExternal: "(external, GitHub account required)",
+  enterFullscreen: "Enter Fullscreen",
+  exitFullscreen: "Exit Fullscreen",
   pageSizeError:
     "Page number exceeds system limit. To get more relevant results, please modify your search query or change the sort order.",
   fieldExtensions: "Field Extensions",
@@ -604,6 +628,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Loans and Transactions Managed Attributes",
   loanTransactionsSectionTitle: "Transactions",
   locationLabel: "Location",
+  locationPlaceholder: "Enter a location to search...",
   longitudeValidationError:
     "Invalid longitude: {longtitude},   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
   makeFiledAs: "Make Filed As",
@@ -842,6 +867,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   revisionsListTitle: "Revisions for {name}",
+  reviewSavedSearchHeading: "Review Your Saved Search",
+  reviewSavedSearchMessage:
+    'The way we save search filters and columns has been updated since you last saved "{savedSearch}".',
+  reviewSavedSearchWhatToDo: "What to do:",
+  reviewSavedSearchCheck:
+    "Check that your search query and visible columns are still correct. Make any required changes to the search query and visible columns.",
+  reviewSavedSearchConfirm:
+    'Click the "Confirm and Update" button to update it to the latest version.',
+  reviewSavedSearchEnsure:
+    "This will ensure your saved search continues to work as expected.",
+  reviewSavedSearchConfirmButton: "Confirm and Update",
   role: "Role",
   roleAction: "Role/Action",
   roles: "Roles",
@@ -949,6 +985,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   stateProvinceLabel: "State/Province",
   status: "Status",
   storage: "Storage",
+  storageUnitCannotBeOwnParent: "A Storage Unit cannot be its own parent.",
   storageUnitListTitle: "Storage Units",
   storageUnitName: "Storage Unit Name",
   storageUnitType: "Storage Unit Type",

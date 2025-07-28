@@ -7,7 +7,7 @@ import { useModal } from "../../modal/modal";
 import { SaveArgs, useApiClient } from "../../api-client/ApiClientContext";
 import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
-import { Alert, Dropdown } from "react-bootstrap";
+import { Alert, Button, Dropdown, ListGroup } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
 import {
   LoadingSpinner,
@@ -29,8 +29,10 @@ import _ from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
-import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
-import { useIntl } from "react-intl";
+import {
+  validateQueryTree,
+  validateSavedSearchVerison
+} from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useSessionStorage } from "usehooks-ts";
 import { useLocalStorage } from "@rehooks/local-storage";
 import CopyToClipboardButton from "../CopyToClipboardButton";
@@ -147,7 +149,6 @@ export function SavedSearch({
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
   const { subject } = useAccount();
-  const { formatMessage } = useIntl();
 
   // Users saved preferences.
   const [userPreferences, setUserPreferences] = useState<UserPreference>();
@@ -160,7 +161,7 @@ export function SavedSearch({
 
   const [error, setError] = useState<string>();
 
-  const [queryError, setQueryError] = useState<string>();
+  const [isOutOfDateQuery, setIsOutOfDateQuery] = useState<boolean>(false);
 
   const [lastLoaded, setLastLoaded] = useState<number>(Date.now());
 
@@ -192,15 +193,28 @@ export function SavedSearch({
 
   // List of all the saved searches for this index.
   const dropdownOptions: SingleSavedSearch[] = useMemo(() => {
-    if (!userPreferences) return [];
+    if (!userPreferences?.savedSearches?.[indexName]) {
+      return [];
+    }
 
-    return _.map(userPreferences?.savedSearches?.[indexName], (value, key) => {
-      return {
-        ...value,
-        savedSearchName: key
-      };
-    });
-  }, [userPreferences]);
+    // First, map the object to an array, adding the 'savedSearchName' property.
+    const mappedSearches = _.map(
+      userPreferences.savedSearches[indexName],
+      (value, key) => {
+        return {
+          ...value,
+          savedSearchName: key
+        };
+      }
+    );
+
+    // Next, sort the resulting array by 'savedSearchName' using localeCompare.
+    mappedSearches.sort((a, b) =>
+      a.savedSearchName.localeCompare(b.savedSearchName)
+    );
+
+    return mappedSearches;
+  }, [userPreferences, indexName]);
 
   // Once the selected save search is changed, we generate a string query representation of the
   // selected saved search query tree. We use this to compare it against the current tree.
@@ -237,7 +251,7 @@ export function SavedSearch({
   // When a new saved search is selected.
   useEffect(() => {
     if (!selectedSavedSearch || !userPreferences) return;
-    setQueryError(undefined);
+    setIsOutOfDateQuery(false);
     loadSavedSearch(selectedSavedSearch);
     triggerSearch.current = true;
   }, [selectedSavedSearch, lastSelected]);
@@ -272,8 +286,9 @@ export function SavedSearch({
 
   // Detect if any changes have been made to the query tree.
   useEffect(() => {
-    if (queryError) {
-      setChangesMade(true);
+    if (isOutOfDateQuery) {
+      setChangesMade(false);
+      return;
     }
 
     if (!userPreferences || !selectedSavedSearch || !queryBuilderTree) return;
@@ -413,7 +428,10 @@ export function SavedSearch({
       savedSearchToLoad.queryTree
     ) {
       // Check if the query tree is valid against the current config.
-      if (validateQueryTree(savedSearchToLoad.queryTree, queryBuilderConfig)) {
+      if (
+        validateQueryTree(savedSearchToLoad.queryTree, queryBuilderConfig) &&
+        validateSavedSearchVerison(savedSearchToLoad)
+      ) {
         // Valid saved search, submit and load the search.
         setSubmittedQueryBuilderTree(
           Utils.loadTree(savedSearchToLoad.queryTree)
@@ -421,13 +439,30 @@ export function SavedSearch({
         setPageOffset(0);
         setSessionStorageQueryTree(savedSearchToLoad.queryTree);
       } else {
-        setQueryError(formatMessage({ id: "queryBuilder_invalid_query" }));
+        setIsOutOfDateQuery(true);
         setChangesMade(true);
       }
 
       // Load the displayed columns for this search.
       if (savedSearchToLoad.columnVisibility) {
-        setLocalStorageDisplayedColumns(savedSearchToLoad.columnVisibility);
+        // Legacy saved search migration for managed attribute visible columns.
+        // This could be removed once everything is converted over to the new format.
+        const visibleColumns = savedSearchToLoad.columnVisibility.map(
+          (item) => {
+            if (
+              indexName === "dina_object_store_index" &&
+              item.includes("managedAttributes.")
+            ) {
+              return item.replace(
+                "managedAttributes.",
+                "managedAttributes/ENTITY/"
+              );
+            }
+            return item;
+          }
+        );
+
+        setLocalStorageDisplayedColumns(visibleColumns);
       }
 
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
@@ -524,7 +559,7 @@ export function SavedSearch({
       setSelectedSavedSearch(savedSearchName);
       setCurrentIsDefault(setAsDefault);
       setChangesMade(false);
-      setQueryError(undefined);
+      setIsOutOfDateQuery(false);
     },
     [userPreferences, queryBuilderTree, groups, localStorageDisplayedColumns]
   );
@@ -689,7 +724,61 @@ export function SavedSearch({
         }}
         onSavedSearchDelete={deleteSavedSearch}
       />
-      {queryError && <Alert variant={"danger"}>{queryError}</Alert>}
+
+      {/** Display out of date search query to the user with instructions on fixing it. */}
+      {isOutOfDateQuery && selectedSavedSearch && (
+        <Alert variant="warning">
+          <Alert.Heading>
+            <DinaMessage id="reviewSavedSearchHeading" />
+          </Alert.Heading>
+          <p>
+            <DinaMessage
+              id="reviewSavedSearchMessage"
+              values={{ savedSearch: <strong>{selectedSavedSearch}</strong> }}
+            />
+          </p>
+          <hr />
+          <p className="mb-2">
+            <strong>
+              <DinaMessage id="reviewSavedSearchWhatToDo" />
+            </strong>
+          </p>
+          <ListGroup variant="flush" as="ol" numbered>
+            <ListGroup.Item
+              as="li"
+              className="border-0 bg-transparent px-0 py-1"
+              style={{
+                color: "#664d03"
+              }}
+            >
+              <DinaMessage id="reviewSavedSearchCheck" />
+            </ListGroup.Item>
+            <ListGroup.Item
+              as="li"
+              className="border-0 bg-transparent px-0 py-1"
+              style={{
+                color: "#664d03"
+              }}
+            >
+              <DinaMessage id="reviewSavedSearchConfirm" />
+            </ListGroup.Item>
+          </ListGroup>
+          <p className="mt-3 mb-0">
+            <DinaMessage id="reviewSavedSearchEnsure" />
+          </p>
+          <hr />
+          <div className="d-flex justify-content-end">
+            <Button
+              variant="warning"
+              onClick={() =>
+                saveSavedSearch(selectedSavedSearch, currentIsDefault, true)
+              }
+            >
+              <DinaMessage id="reviewSavedSearchConfirmButton" />
+            </Button>
+          </div>
+        </Alert>
+      )}
     </>
   );
 }
