@@ -63,6 +63,7 @@ export function StorageLinker({
    *
    * @param type - The storage unit type object to generate the query for.
    * @returns An Elasticsearch query object:
+   *   - Always filters out the current storage unit by its UUID.
    *   - If the `type` has a `gridLayoutDefinition`, returns a query that matches storage units with the
    *     same type.
    *   - If the `type` does not have a `gridLayoutDefinition`, returns a query that matches non-grid storage units.
@@ -71,6 +72,11 @@ export function StorageLinker({
     if (type.gridLayoutDefinition) {
       return {
         bool: {
+          must_not: {
+            term: {
+              "data.id": parentStorageUnitUUID
+            }
+          },
           must: [
             {
               nested: {
@@ -99,6 +105,11 @@ export function StorageLinker({
     } else {
       return {
         bool: {
+          must_not: {
+            term: {
+              "data.id": parentStorageUnitUUID
+            }
+          },
           must: [
             {
               nested: {

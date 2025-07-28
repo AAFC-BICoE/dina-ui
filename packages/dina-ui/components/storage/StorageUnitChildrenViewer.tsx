@@ -153,6 +153,7 @@ export function StorageUnitChildrenViewer({
               onChange={moveAllContent}
               actionMode="MOVE_ALL"
               storageUnitType={storageUnit?.storageUnitType}
+              parentStorageUnitUUID={storageUnit?.id}
             />
           )}
           {actionMode === "ADD_EXISTING_AS_CHILD" && (
