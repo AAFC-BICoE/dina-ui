@@ -34,7 +34,7 @@ export interface StorageLinkerProps {
   actionMode?: StorageActionMode;
   parentIdInURL?: string;
   createStorageMode?: boolean;
-  parentStorageUnitUUID?: string;
+  currentStorageUnitUUID?: string;
   storageUnitType?: StorageUnitType;
 }
 
@@ -46,7 +46,7 @@ export function StorageLinker({
   actionMode,
   parentIdInURL,
   createStorageMode,
-  parentStorageUnitUUID,
+  currentStorageUnitUUID,
   storageUnitType
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
@@ -74,7 +74,7 @@ export function StorageLinker({
         bool: {
           must_not: {
             term: {
-              "data.id": parentStorageUnitUUID
+              "data.id": currentStorageUnitUUID
             }
           },
           must: [
@@ -107,7 +107,7 @@ export function StorageLinker({
         bool: {
           must_not: {
             term: {
-              "data.id": parentStorageUnitUUID
+              "data.id": currentStorageUnitUUID
             }
           },
           must: [
@@ -197,7 +197,7 @@ export function StorageLinker({
                 {actionMode === "MOVE_ALL" && storageUnitType ? (
                   <StorageSearchSelector
                     onChange={changeStorageAndResetTab}
-                    parentStorageUnitUUID={parentStorageUnitUUID}
+                    currentStorageUnitUUID={currentStorageUnitUUID}
                     customViewElasticSearchQuery={storageUnitTypeQuery(
                       storageUnitType
                     )}
@@ -205,7 +205,7 @@ export function StorageLinker({
                 ) : (
                   <StorageSearchSelector
                     onChange={changeStorageAndResetTab}
-                    parentStorageUnitUUID={parentStorageUnitUUID}
+                    currentStorageUnitUUID={currentStorageUnitUUID}
                   />
                 )}
               </TabPanel>
@@ -215,7 +215,7 @@ export function StorageLinker({
                 <BrowseStorageTree
                   onSelect={changeStorageAndResetTab}
                   readOnly={readOnly}
-                  parentStorageUnitUUID={parentStorageUnitUUID}
+                  currentStorageUnitUUID={currentStorageUnitUUID}
                 />
               </TabPanel>
             )}
@@ -249,7 +249,7 @@ export interface StorageLinkerFieldProps {
   hideLabel?: boolean;
   parentIdInURL?: string;
   createStorageMode?: boolean;
-  parentStorageUnitUUID?: string;
+  currentStorageUnitUUID?: string;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
@@ -260,7 +260,7 @@ export function StorageLinkerField({
   targetType,
   parentIdInURL,
   createStorageMode,
-  parentStorageUnitUUID
+  currentStorageUnitUUID
 }: StorageLinkerFieldProps) {
   const { getFieldLabel } = useFieldLabels();
 
@@ -300,7 +300,7 @@ export function StorageLinkerField({
             placeholder={placeholder}
             parentIdInURL={parentIdInURL}
             createStorageMode={createStorageMode}
-            parentStorageUnitUUID={parentStorageUnitUUID}
+            currentStorageUnitUUID={currentStorageUnitUUID}
           />
         </div>
       )}
