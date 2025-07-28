@@ -1210,16 +1210,16 @@ describe("MaterialSampleBulkEditor", () => {
     }
 
     // Organisms section opens with an initial value, so it has the green indicator on the fieldset:
-    await waitFor(() =>
+    await waitFor(() => {
       expect(
         wrapper.getByText(
-          /these organisms will be set on all material samples\./i
+          /this organism will be linked to all material samples\./i
         )
-      ).toBeInTheDocument()
-    );
+      ).toBeInTheDocument();
+    });
     expect(
       wrapper.getByText(
-        /these organisms will be set on all material samples\./i
+        /this organism will be linked to all material samples\./i
       )
     ).toBeInTheDocument();
 
@@ -1227,21 +1227,22 @@ describe("MaterialSampleBulkEditor", () => {
     // so they don't initially show the green indicator on the fieldset:
     expect(
       wrapper.queryByText(
-        /these attachments will be set on all material samples\./i
+        /this attachment will be linked to all material samples\./i
       )
     ).not.toBeInTheDocument();
 
     // Associations list section opens with an initial value, so it has the green indicator on the fieldset:
+
     expect(
       wrapper.getByText(
-        /these associationss will be set on all material samples\./i
+        /this association will be set on all material samples\./i
       )
     ).toBeInTheDocument();
 
     // Scheduled should not display it as well:
     expect(
       wrapper.queryByText(
-        /these scheduled actions will be set on all material samples\./i
+        /this attachment will be linked to all material samples\./i
       )
     ).not.toBeInTheDocument();
 
