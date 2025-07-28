@@ -20,12 +20,16 @@ export interface StorageSearchSelectorProps {
   parentStorageUnitUUID?: string;
 
   onChange: (newValue: KitsuResourceLink) => Promisable<void>;
+
+  /** Custom query to filter selectable storage units. */
+  customViewElasticSearchQuery?: any;
 }
 
 /** Table UI to search for and select a Storage Unit. */
 export function StorageSearchSelector({
   onChange,
-  parentStorageUnitUUID
+  parentStorageUnitUUID,
+  customViewElasticSearchQuery
 }: StorageSearchSelectorProps) {
   // Columns for the elastic search list page.
   const columns: TableColumn<any>[] = [
@@ -165,6 +169,7 @@ export function StorageSearchSelector({
         enableRelationshipPresence={true}
         columns={columns}
         mandatoryDisplayedColumns={["name", "select"]}
+        customViewElasticSearchQuery={customViewElasticSearchQuery}
       />
     </div>
   );

@@ -148,8 +148,12 @@ export function StorageUnitChildrenViewer({
             </div>
           }
         >
-          {actionMode === "MOVE_ALL" && (
-            <StorageLinker onChange={moveAllContent} />
+          {actionMode === "MOVE_ALL" && storageUnit.storageUnitType && (
+            <StorageLinker
+              onChange={moveAllContent}
+              actionMode="MOVE_ALL"
+              storageUnitType={storageUnit?.storageUnitType}
+            />
           )}
           {actionMode === "ADD_EXISTING_AS_CHILD" && (
             <StorageLinker
