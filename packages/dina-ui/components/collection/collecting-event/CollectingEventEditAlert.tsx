@@ -1,5 +1,5 @@
 import { AreYouSureModal } from "common-ui";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 
