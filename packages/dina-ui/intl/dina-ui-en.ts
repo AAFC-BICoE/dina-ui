@@ -136,6 +136,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
+  collectingEventPartOfExpedition: "Collecting Event part of Expedition",
   collectingEventPermissionAlert:
     "You do not have permission to edit this collecting event. All fields are in read-only mode.",
   collection: "Collection",
@@ -250,6 +251,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   exact: "Exact",
   exifProperties: "Exif Properties",
   existingAttachments: "Existing Attachments",
+  expeditionListTitle: "Expedition",
   extensionListTitle: " Field Extensions",
   externalResourceListTitle: "External Resources",
   feedbackButtonText: "Feedback",
@@ -407,6 +409,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_fieldExtensions: "Field Extensions",
   field_fileIdentifier: "File Identifier",
   field_fileSize: "File Size",
+  field_geographicContext: "Geographic context",
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
   field__globalSearch: "Global search",
