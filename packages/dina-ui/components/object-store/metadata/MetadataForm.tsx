@@ -118,7 +118,7 @@ export function MetadataForm({
                 className="col-md-6"
                 filter={(input) =>
                   SimpleSearchFilterBuilder.create<ObjectSubtype>()
-                    .where("acSubtype", "LIKE", `${input}%`)
+                    .searchFilter("acSubtype", input)
                     // if dcType is set, filter by it as well
                     .when(dcType, (builder) =>
                       builder.where("dcType", "EQ", dcType)
