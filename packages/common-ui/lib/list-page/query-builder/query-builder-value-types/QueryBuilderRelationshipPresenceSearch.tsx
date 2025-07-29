@@ -4,7 +4,10 @@ import { SelectOption } from "common-ui";
 import { ESIndexMapping, TransformToDSLProps } from "../../types";
 import Select from "react-select";
 import _ from "lodash";
-import { existsQuery } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import {
+  existsQuery,
+  termQuery
+} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 export interface QueryRowRelationshipPresenceSearchProps {
   /**
@@ -35,8 +38,8 @@ export interface RelationshipPresenceSearchStates {
   /** Operator to be used on the relationship (presence, absent, etc) */
   selectedOperator: string;
 
-  /** For future use, when we want to display count searching... */
-  selectedValue: number;
+  /** Used for UUID searching or other future operators */
+  selectedValue: string;
 }
 
 export default function QueryRowRelationshipPresenceSearch({
@@ -78,12 +81,12 @@ export default function QueryRowRelationshipPresenceSearch({
     ) ?? null;
 
   // Generate the operator options
-  const operatorOptions = ["presence", "absence"].map<SelectOption<string>>(
-    (option) => ({
-      label: formatMessage({ id: "queryBuilder_operator_" + option }),
-      value: option
-    })
-  );
+  const operatorOptions = ["presence", "absence", "uuid"].map<
+    SelectOption<string>
+  >((option) => ({
+    label: formatMessage({ id: "queryBuilder_operator_" + option }),
+    value: option
+  }));
 
   // Currently selected option, if no option can be found just select the first one.
   const selectedOperator =
@@ -114,7 +117,7 @@ export default function QueryRowRelationshipPresenceSearch({
           setRelationshipPresenceState({
             selectedRelationship: selected?.value ?? "",
             selectedOperator: "",
-            selectedValue: 0
+            selectedValue: ""
           })
         }
         onInputChange={(inputValue) => setRelationshipSearchValue(inputValue)}
@@ -138,6 +141,28 @@ export default function QueryRowRelationshipPresenceSearch({
                 selectedOperator: selected?.value ?? ""
               })
             }
+          />
+        </>
+      )}
+
+      {/* If UUID operator is selected, display textbox to enter UUID */}
+      {selectedOperator?.value === "uuid" && (
+        <>
+          <input
+            type="text"
+            value={relationshipPresenceState.selectedValue ?? ""}
+            onChange={(newValue) =>
+              setRelationshipPresenceState({
+                ...relationshipPresenceState,
+                selectedValue: newValue?.target?.value ?? ""
+              })
+            }
+            className={
+              isInColumnSelector
+                ? "form-control ps-0 mt-2"
+                : "form-control col me-1 ms-2 ps-0"
+            }
+            placeholder={"Enter UUID..."}
           />
         </>
       )}
@@ -188,7 +213,8 @@ export function transformRelationshipPresenceToDSL({
     // Parse the field extension search options.
     const {
       selectedRelationship,
-      selectedOperator
+      selectedOperator,
+      selectedValue
     }: RelationshipPresenceSearchStates = JSON.parse(value);
 
     // Determine if we have all the required fields to perform a search.
@@ -212,6 +238,17 @@ export function transformRelationshipPresenceToDSL({
           bool: {
             must_not: existsQuery(
               "data.relationships." + selectedRelationship + ".data.id"
+            )
+          }
+        };
+
+      case "uuid":
+        return {
+          bool: {
+            must: termQuery(
+              "data.relationships." + selectedRelationship + ".data.id",
+              selectedValue,
+              false
             )
           }
         };

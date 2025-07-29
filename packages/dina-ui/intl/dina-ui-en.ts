@@ -813,6 +813,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select identifier type to search against...",
   queryBuilder_operator_presence: "Presence",
   queryBuilder_operator_absence: "Absence",
+  queryBuilder_operator_uuid: "UUID",
   queryBuilder_operator_containsDate: "Contains",
   queryBuilder_operator_between: "Between",
   queryBuilder_operator_between_tooltip:
