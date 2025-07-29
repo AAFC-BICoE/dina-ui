@@ -139,19 +139,8 @@ export function useCollectingEventSave({
 
   async function saveCollectingEvent(
     submittedValues: CollectingEvent,
-    collectingEventFormik: FormikContextType<any>,
-    materialSampleUsageCount: number | undefined
+    collectingEventFormik: FormikContextType<any>
   ) {
-    if (materialSampleUsageCount && materialSampleUsageCount > 1) {
-      if (
-        !window.confirm(
-          `You are about to update a Collecting Event that is linked to ${materialSampleUsageCount} other material samples. Do you still want to proceed?`
-        )
-      ) {
-        return undefined;
-      }
-    }
-
     // Only submit the changed values to the back-end:
     const collectingEventDiff = collectingEventInitialValues.id
       ? resourceDifference({

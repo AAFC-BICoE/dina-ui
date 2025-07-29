@@ -5,6 +5,8 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   SubmitButton,
+  useApiClient,
+  useRelationshipUsagesCount,
   withResponse
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -56,12 +58,21 @@ export default function CollectingEventEditPage() {
 
 function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const router = useRouter();
+  const { apiClient } = useApiClient();
 
   const {
     collectingEventInitialValues,
     saveCollectingEvent,
     collectingEventFormSchema
   } = useCollectingEventSave({ fetchedCollectingEvent: collectingEvent });
+
+  // Hook to check for material sample usages.
+  const { usageCount: materialSampleUsageCount } = useRelationshipUsagesCount({
+    apiClient,
+    resourcePath: "collection-api/material-sample",
+    relationshipName: "collectingEvent",
+    relationshipId: collectingEvent?.id
+  });
 
   const [, setDefaultVerbatimCoordSys] = useLocalStorage<
     string | null | undefined
@@ -75,13 +86,23 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     submittedValues,
     formik
   }) => {
+    if (materialSampleUsageCount && materialSampleUsageCount > 1) {
+      if (
+        !window.confirm(
+          `You are about to update a Collecting Event that is linked to ${materialSampleUsageCount} other material samples. Do you still want to proceed?`
+        )
+      ) {
+        return undefined;
+      }
+    }
+
     const savedCollectingEvent = await saveCollectingEvent(
       submittedValues,
       formik
     );
 
     await router.push(
-      `/collection/collecting-event/view?id=${savedCollectingEvent.id}`
+      `/collection/collecting-event/view?id=${savedCollectingEvent?.id}`
     );
   };
 
@@ -115,6 +136,7 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
       <CollectingEventFormLayout
         setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
         setDefaultVerbatimSRS={setDefaultVerbatimSRS}
+        materialSampleUsageCount={materialSampleUsageCount}
       />
     </DinaForm>
   );

@@ -16,10 +16,8 @@ import {
   TextFieldWithCoordButtons,
   Tooltip,
   filterBy,
-  useApiClient,
   useDinaFormContext,
-  useInstanceContext,
-  useRelationshipUsagesCount
+  useInstanceContext
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import _ from "lodash";
@@ -61,7 +59,7 @@ import { AllowAttachmentsConfig } from "../../object-store";
 import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { TgnSourceSelection } from "./TgnIntegration";
-import { FaExclamationTriangle } from "react-icons/fa";
+import CollectingEventEditAlert from "./CollectingEventEditAlert";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -70,6 +68,9 @@ interface CollectingEventFormLayoutProps {
   attachmentsConfig?: AllowAttachmentsConfig;
   /** Forwarded to ManagedAttributesEditor */
   visibleManagedAttributeKeys?: string[];
+
+  /** Pass the number of material sample usages to display a warning. */
+  materialSampleUsageCount?: number;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
@@ -77,28 +78,13 @@ export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
   setDefaultVerbatimSRS,
   attachmentsConfig,
-  visibleManagedAttributeKeys
+  visibleManagedAttributeKeys,
+  materialSampleUsageCount
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
-  const { apiClient } = useApiClient();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
-
-  // Hook to check for material sample usages.
-  const {
-    // error: usageCheckError,
-    // isLoading: usageCheckLoading,
-    usageCount: materialSampleUsageCount
-  } = useRelationshipUsagesCount({
-    apiClient,
-    resourcePath: "collection-api/material-sample",
-    relationshipName: "collectingEvent",
-    relationshipId: initialValues.id
-  });
-
-  // Debugging purposes.
-  // console.log(usageCheckError, usageCheckLoading, materialSampleUsageCount);
 
   // Only show geo reference systems that are set. Use open street map as fallback
   const instanceContext = useInstanceContext();
@@ -625,21 +611,9 @@ export function CollectingEventFormLayout({
         ) : (
           <>
             {/* Alert for multiple material sample usages when editing */}
-            {materialSampleUsageCount && materialSampleUsageCount > 1 && (
-              <div className="alert alert-warning" role="alert">
-                <div className="d-flex gap-3">
-                  <FaExclamationTriangle
-                    style={{ width: "24px", height: "24px" }}
-                  />
-                  <span>
-                    This collecting event is linked to{" "}
-                    <strong>{materialSampleUsageCount} material samples</strong>
-                    . Please ensure that any changes made here are appropriate
-                    for all linked material samples.
-                  </span>
-                </div>
-              </div>
-            )}
+            <CollectingEventEditAlert
+              materialSampleUsageCount={materialSampleUsageCount}
+            />
 
             <NotPubliclyReleasableSection />
             <Tooltip
