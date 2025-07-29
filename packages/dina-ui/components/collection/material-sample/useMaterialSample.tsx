@@ -11,6 +11,7 @@ import {
   SaveArgs,
   useApiClient,
   useQuery,
+  useRelationshipUsagesCount,
   withoutBlankFields
 } from "common-ui";
 import { FormikProps } from "formik";
@@ -50,6 +51,7 @@ import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
 import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { Alert } from "react-bootstrap";
+import CollectingEventEditAlert from "../collecting-event/CollectingEventEditAlert";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet, apiClient } = useApiClient();
@@ -220,7 +222,7 @@ export function useMaterialSampleSave({
   showChangedIndicatorsInNestedForms,
   visibleManagedAttributeKeys
 }: UseMaterialSampleSaveParams) {
-  const { save } = useApiClient();
+  const { save, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
   // For editing existing templates:
@@ -310,6 +312,14 @@ export function useMaterialSampleSave({
   //   useState<boolean>(false);
   const [deleteAssociations, setDeleteAssociations] = useState<boolean>(false);
   const [deleteRestrictions, setDeleteRestrictions] = useState<boolean>(false);
+
+  // Hook to check for material sample usages.
+  const { usageCount: materialSampleUsageCount } = useRelationshipUsagesCount({
+    apiClient,
+    resourcePath: "collection-api/material-sample",
+    relationshipName: "collectingEvent",
+    relationshipId: materialSample?.collectingEvent?.id ?? undefined
+  });
 
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
@@ -1097,12 +1107,22 @@ export function useMaterialSampleSave({
       validationSchema: collectingEventFormSchema,
       isTemplate,
       // In bulk-edit and workflow run, disable editing existing Col events:
-      readOnly: disableNestedFormEdits || isTemplate ? !!colEventId : false,
+      readOnly:
+        (materialSampleUsageCount && materialSampleUsageCount > 1) ||
+        disableNestedFormEdits ||
+        isTemplate
+          ? !!colEventId
+          : false,
       formTemplate,
       children: reduceRendering ? (
         <div />
       ) : (
         <div className={nestedFormClassName}>
+          {materialSampleUsageCount && materialSampleUsageCount > 1 && (
+            <CollectingEventEditAlert
+              materialSampleUsageCount={materialSampleUsageCount}
+            />
+          )}
           <CollectingEventFormLayout
             visibleManagedAttributeKeys={
               visibleManagedAttributeKeys?.collectingEvent

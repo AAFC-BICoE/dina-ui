@@ -8,7 +8,6 @@ import {
   useApiClient,
   useRelationshipUsagesCount,
   withResponse,
-  AreYouSureModal,
   useModal
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -21,10 +20,11 @@ import {
   useCollectingEventQuery,
   useCollectingEventSave
 } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import PageLayout from "../../../components/page/PageLayout";
 import React from "react";
+import { renderConfirmationModal } from "packages/dina-ui/components/collection/collecting-event/CollectingEventEditAlert";
 
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;
@@ -90,31 +90,23 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     submittedValues,
     formik
   }) => {
-    if (materialSampleUsageCount && materialSampleUsageCount > 1) {
-      openModal(
-        <AreYouSureModal
-          actionMessage={<DinaMessage id="collectingEventEditAlertTitle" />}
-          messageBody={
-            <DinaMessage
-              id="collectingEventEditAlertMessage"
-              values={{ count: materialSampleUsageCount }}
-            />
-          }
-          noButtonText={<DinaMessage id="cancelButtonText" />}
-          yesButtonText={<DinaMessage id="update" />}
-          onYesButtonClicked={async () => {
-            const savedCollectingEvent = await saveCollectingEvent(
-              submittedValues,
-              formik
-            );
-            await router.push(
-              `/collection/collecting-event/view?id=${savedCollectingEvent?.id}`
-            );
-          }}
-        />
+    const performSave = async () => {
+      const savedCollectingEvent = await saveCollectingEvent(
+        submittedValues,
+        formik
       );
-      return undefined;
+      await router.push(
+        `/collection/collecting-event/view?id=${savedCollectingEvent?.id}`
+      );
+    };
+
+    // Check if multiple material sample usages exist to display an confirmation.
+    if (materialSampleUsageCount && materialSampleUsageCount > 1) {
+      openModal(renderConfirmationModal(materialSampleUsageCount, performSave));
+      return;
     }
+
+    await performSave();
   };
 
   const buttonBar = (

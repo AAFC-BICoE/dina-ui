@@ -1,3 +1,4 @@
+import { AreYouSureModal } from "common-ui";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
@@ -33,6 +34,30 @@ function CollectingEventEditAlert({
         </span>
       </div>
     </div>
+  );
+}
+
+/**
+ * Renders the confirmation modal to be displayed when editing a Collecting Event
+ * linked to multiple Material Samples.
+ *
+ * @param count The number of linked material samples.
+ * @param onYesButtonClicked The action to perform when the user confirms.
+ */
+export function renderConfirmationModal(
+  count: number,
+  onYesButtonClicked: () => Promise<void>
+) {
+  return (
+    <AreYouSureModal
+      actionMessage={<DinaMessage id="collectingEventEditAlertTitle" />}
+      messageBody={
+        <DinaMessage id="collectingEventEditAlertMessage" values={{ count }} />
+      }
+      noButtonText={<DinaMessage id="cancelButtonText" />}
+      yesButtonText={<DinaMessage id="update" />}
+      onYesButtonClicked={onYesButtonClicked}
+    />
   );
 }
 
