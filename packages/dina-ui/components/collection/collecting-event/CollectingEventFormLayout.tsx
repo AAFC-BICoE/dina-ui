@@ -41,7 +41,8 @@ import {
   COLLECTING_EVENT_COMPONENT_NAME,
   GeographicThesaurusSource,
   Protocol,
-  Vocabulary
+  Vocabulary,
+  Expedition
 } from "../../../types/collection-api";
 import {
   CollectingEvent,
@@ -1040,6 +1041,29 @@ export function CollectingEventFormLayout({
               </div>
             </div>
           ) : null}
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-md-6">
+          <div className="row">
+            <div className="col">
+              <FieldSet
+                legend={<DinaMessage id="collectingEventPartOfExpedition" />}
+                className="non-strip h-100"
+                componentName={COLLECTING_EVENT_COMPONENT_NAME}
+                sectionName="collecting-event-details"
+              >
+                <ResourceSelectField<Expedition>
+                  name="expedition"
+                  filter={filterBy(["name"])}
+                  model="collection-api/expedition"
+                  optionLabel={(expedition) => expedition.name}
+                  omitNullOption={false}
+                  readOnlyLink="/collection/expedition/view?id="
+                />
+              </FieldSet>
+            </div>
+          </div>
         </div>
       </div>
       <div>
