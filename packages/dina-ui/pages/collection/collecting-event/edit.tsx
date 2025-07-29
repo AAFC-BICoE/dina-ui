@@ -24,7 +24,7 @@ import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import PageLayout from "../../../components/page/PageLayout";
 import React from "react";
-import { renderConfirmationModal } from "packages/dina-ui/components/collection/collecting-event/CollectingEventEditAlert";
+import { renderConfirmationModal } from "../../../components/collection/collecting-event/CollectingEventEditAlert";
 
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;

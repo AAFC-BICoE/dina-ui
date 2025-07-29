@@ -1121,6 +1121,8 @@ export function useMaterialSampleSave({
           {materialSampleUsageCount && materialSampleUsageCount > 1 && (
             <CollectingEventEditAlert
               materialSampleUsageCount={materialSampleUsageCount}
+              alertMessage="collectingEventEditErrorMessage"
+              collectingEventUUID={initialValues?.id}
             />
           )}
           <CollectingEventFormLayout

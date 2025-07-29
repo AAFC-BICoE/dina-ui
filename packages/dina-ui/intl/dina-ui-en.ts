@@ -140,7 +140,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "You do not have permission to edit this collecting event. All fields are in read-only mode.",
   collectingEventEditAlertMessage:
     "This collecting event is linked to {count} material samples. Please ensure that any changes made here are appropriate for all linked material samples.",
+  collectingEventEditErrorMessage:
+    "This collecting event is linked to {count} material samples. Editing is only available on the Collecting Event Details page.",
   collectingEventEditAlertTitle: "Update Collecting Event?",
+  collectingEventGoToDetails: "Go to Collecting Event details page",
   collection: "Collection",
   collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
