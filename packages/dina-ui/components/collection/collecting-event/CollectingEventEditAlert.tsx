@@ -1,3 +1,4 @@
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 
@@ -25,10 +26,10 @@ function CollectingEventEditAlert({
           style={{ width: "24px", height: "24px", flexShrink: 0 }}
         />
         <span>
-          This collecting event is linked to{" "}
-          <strong>{materialSampleUsageCount} material samples</strong>. Please
-          ensure that any changes made here are appropriate for all linked
-          material samples.
+          <DinaMessage
+            id="collectingEventEditAlertMessage"
+            values={{ count: materialSampleUsageCount }}
+          />
         </span>
       </div>
     </div>

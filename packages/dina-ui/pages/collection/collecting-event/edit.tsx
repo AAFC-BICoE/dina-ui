@@ -7,7 +7,9 @@ import {
   SubmitButton,
   useApiClient,
   useRelationshipUsagesCount,
-  withResponse
+  withResponse,
+  AreYouSureModal,
+  useModal
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
@@ -19,9 +21,10 @@ import {
   useCollectingEventQuery,
   useCollectingEventSave
 } from "../../../components";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import PageLayout from "../../../components/page/PageLayout";
+import React from "react";
 
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;
@@ -59,6 +62,7 @@ export default function CollectingEventEditPage() {
 function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const router = useRouter();
   const { apiClient } = useApiClient();
+  const { openModal } = useModal();
 
   const {
     collectingEventInitialValues,
@@ -87,23 +91,30 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     formik
   }) => {
     if (materialSampleUsageCount && materialSampleUsageCount > 1) {
-      if (
-        !window.confirm(
-          `You are about to update a Collecting Event that is linked to ${materialSampleUsageCount} other material samples. Do you still want to proceed?`
-        )
-      ) {
-        return undefined;
-      }
+      openModal(
+        <AreYouSureModal
+          actionMessage={<DinaMessage id="collectingEventEditAlertTitle" />}
+          messageBody={
+            <DinaMessage
+              id="collectingEventEditAlertMessage"
+              values={{ count: materialSampleUsageCount }}
+            />
+          }
+          noButtonText={<DinaMessage id="cancelButtonText" />}
+          yesButtonText={<DinaMessage id="update" />}
+          onYesButtonClicked={async () => {
+            const savedCollectingEvent = await saveCollectingEvent(
+              submittedValues,
+              formik
+            );
+            await router.push(
+              `/collection/collecting-event/view?id=${savedCollectingEvent?.id}`
+            );
+          }}
+        />
+      );
+      return undefined;
     }
-
-    const savedCollectingEvent = await saveCollectingEvent(
-      submittedValues,
-      formik
-    );
-
-    await router.push(
-      `/collection/collecting-event/view?id=${savedCollectingEvent?.id}`
-    );
   };
 
   const buttonBar = (

@@ -138,6 +138,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingLocationLegend: "Collecting Location",
   collectingEventPermissionAlert:
     "You do not have permission to edit this collecting event. All fields are in read-only mode.",
+  collectingEventEditAlertMessage:
+    "This collecting event is linked to {count} material samples. Please ensure that any changes made here are appropriate for all linked material samples.",
+  collectingEventEditAlertTitle: "Update Collecting Event?",
   collection: "Collection",
   collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
