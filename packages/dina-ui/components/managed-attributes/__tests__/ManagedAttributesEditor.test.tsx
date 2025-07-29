@@ -127,7 +127,9 @@ describe("ManagedAttributesEditor component", () => {
           "collection-api/managed-attribute",
           {
             filter: {
-              managedAttributeComponent: "COLLECTING_EVENT"
+              managedAttributeComponent: {
+                EQ: "COLLECTING_EVENT"
+              }
             },
             page: {
               limit: 6

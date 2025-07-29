@@ -143,7 +143,7 @@ export function useAvailableGroupOptions({
   const { locale } = useDinaIntl();
   const { readOnly } = useContext(DinaFormContext) ?? {};
 
-  const selectableGroupNames = _.uniq([
+  const selectableGroupNames: string[] = _.uniq([
     // If the value is already set, include it in the dropdown regardless of user permissions.
     ...(initialGroupName
       ? Array.isArray(initialGroupName)
@@ -160,9 +160,7 @@ export function useAvailableGroupOptions({
       page: { limit: 1000 },
       // Get the group from backend when groupName is not within current user's group
       filter:
-        showAllGroups || isAdmin
-          ? undefined
-          : JSON.stringify({ name: selectableGroupNames })
+        showAllGroups || isAdmin ? {} : { name: selectableGroupNames.join(",") }
     },
     {
       disabled: readOnly

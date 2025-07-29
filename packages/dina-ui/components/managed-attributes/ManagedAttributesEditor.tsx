@@ -2,8 +2,8 @@ import {
   FieldSet,
   FieldSetProps,
   FieldSpy,
-  filterBy,
   ResourceSelect,
+  SimpleSearchFilterBuilder,
   useBulkEditTabContext,
   useDinaFormContext
 } from "common-ui";
@@ -212,10 +212,18 @@ export function ManagedAttributeMultiSelect({
 
   return (
     <ResourceSelect<ManagedAttribute>
-      filter={(input) => ({
-        ...filterBy(["name"])(input),
-        ...(managedAttributeComponent ? { managedAttributeComponent } : {})
-      })}
+      filter={(input: string) =>
+        SimpleSearchFilterBuilder.create<ManagedAttribute>()
+          .searchFilter("name", input)
+          .when(!!managedAttributeComponent, (builder) =>
+            builder.where(
+              "managedAttributeComponent",
+              "EQ",
+              managedAttributeComponent
+            )
+          )
+          .build()
+      }
       model={managedAttributeApiPath}
       optionLabel={(attribute) => managedAttributeLabel(attribute)}
       isMulti={true}

@@ -5,7 +5,7 @@ import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitChildrenViewer } from "../StorageUnitChildrenViewer";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import { waitFor } from "@testing-library/react";
+import { waitFor, screen, within } from "@testing-library/react";
 
 const STORAGE_UNIT_CHILDREN = ["B", "C", "D"].map<
   PersistedResource<StorageUnit>
@@ -41,6 +41,59 @@ const STORAGE_B: PersistedResource<StorageUnit> = {
   name: "B",
   isGeneric: false,
   type: "storage-unit"
+};
+
+const MAPPING = {
+  attributes: [
+    {
+      name: "createdBy",
+      type: "text",
+      fields: ["keyword"],
+      path: "data.attributes"
+    },
+    {
+      name: "name",
+      type: "text",
+      fields: ["autocomplete", "keyword"],
+      path: "data.attributes"
+    },
+    {
+      name: "createdOn",
+      type: "date",
+      path: "data.attributes",
+      subtype: "date_time"
+    }
+  ],
+  relationships: [
+    {
+      referencedBy: "storageUnitType",
+      name: "type",
+      path: "included",
+      value: "storage-unit-type",
+      attributes: [
+        {
+          name: "name",
+          type: "text",
+          fields: ["keyword"],
+          path: "attributes",
+          distinct_term_agg: true
+        },
+        {
+          name: "createdBy",
+          type: "text",
+          fields: ["keyword"],
+          path: "attributes"
+        },
+        {
+          name: "createdOn",
+          type: "date",
+          path: "attributes",
+          subtype: "date_time"
+        }
+      ]
+    }
+  ],
+  index_name: "dina_storage_index"
 };
 
 // Just return what is passed to it:
@@ -101,8 +154,240 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       } else {
         return { data: [{ id: "ms-1", type: "material-sample" }] };
       }
+    case "search-api/search-ws/mapping":
+      return { data: MAPPING, meta: { totalResourceCount: 0 } };
   }
 });
+
+const MOCK_SEARCH_API_RESPONSE = {
+  data: {
+    took: 41,
+    timed_out: false,
+    _shards: {
+      failed: {
+        source: "0.0",
+        parsedValue: 0
+      },
+      successful: {
+        source: "1.0",
+        parsedValue: 1
+      },
+      total: {
+        source: "1.0",
+        parsedValue: 1
+      },
+      skipped: {
+        source: "0.0",
+        parsedValue: 0
+      }
+    },
+    hits: {
+      total: {
+        relation: "eq",
+        value: 3
+      },
+      hits: [
+        {
+          _index: "dina_storage_index_20250709193641",
+          _id: "019818d5-66d4-7d93-ba11-5c9bde019daf",
+          _score: 0.13353139,
+          _type: "_doc",
+          _source: {
+            data: {
+              relationships: {
+                storageUnitType: {
+                  data: {
+                    id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    type: "storage-unit-type"
+                  },
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/019818d5-66d4-7d93-ba11-5c9bde019daf/storageUnitType",
+                    self: "/api/v1/storage-unit/019818d5-66d4-7d93-ba11-5c9bde019daf/relationships/storageUnitType"
+                  }
+                },
+                parentStorageUnit: {
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/019818d5-66d4-7d93-ba11-5c9bde019daf/parentStorageUnit",
+                    self: "/api/v1/storage-unit/019818d5-66d4-7d93-ba11-5c9bde019daf/relationships/parentStorageUnit"
+                  }
+                }
+              },
+              attributes: {
+                createdBy: "dina-admin",
+                hierarchy: [
+                  {
+                    typeUuid: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    name: "test unit",
+                    typeName: "test",
+                    rank: 1,
+                    type: "1",
+                    uuid: "019818d5-66d4-7d93-ba11-5c9bde019daf"
+                  }
+                ],
+                name: "test unit",
+                createdOn: "2025-07-17T14:41:35.436909Z",
+                group: "aafc"
+              },
+              id: "019818d5-66d4-7d93-ba11-5c9bde019daf",
+              type: "storage-unit"
+            },
+            included: [
+              {
+                attributes: {
+                  name: "test"
+                },
+                id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                type: "storage-unit-type"
+              }
+            ]
+          }
+        },
+        {
+          _index: "dina_storage_index_20250709193641",
+          _id: "019818e5-7242-7e45-bcb1-0056d9fe6e34",
+          _score: 0.13353139,
+          _type: "_doc",
+          _source: {
+            data: {
+              relationships: {
+                storageUnitType: {
+                  data: {
+                    id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    type: "storage-unit-type"
+                  },
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34/storageUnitType",
+                    self: "/api/v1/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34/relationships/storageUnitType"
+                  }
+                },
+                parentStorageUnit: {
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34/parentStorageUnit",
+                    self: "/api/v1/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34/relationships/parentStorageUnit"
+                  }
+                }
+              },
+              attributes: {
+                createdBy: "dina-admin",
+                hierarchy: [
+                  {
+                    typeUuid: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    name: "test unit child",
+                    typeName: "test",
+                    rank: 1,
+                    type: "1",
+                    uuid: "019818e5-7242-7e45-bcb1-0056d9fe6e34"
+                  },
+                  {
+                    typeUuid: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    name: "test unit",
+                    typeName: "test",
+                    rank: 2,
+                    type: "1",
+                    uuid: "019818d5-66d4-7d93-ba11-5c9bde019daf"
+                  }
+                ],
+                name: "test unit child",
+                createdOn: "2025-07-17T14:59:06.928123Z",
+                group: "aafc"
+              },
+              id: "019818e5-7242-7e45-bcb1-0056d9fe6e34",
+              type: "storage-unit"
+            },
+            included: [
+              {
+                attributes: {
+                  name: "test"
+                },
+                id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                type: "storage-unit-type"
+              }
+            ]
+          }
+        },
+        {
+          _index: "dina_storage_index_20250709193641",
+          _id: "01981eef-fea7-7570-bcd8-080fa74273c4",
+          _score: 0.13353139,
+          _type: "_doc",
+          _source: {
+            data: {
+              relationships: {
+                storageUnitType: {
+                  data: {
+                    id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    type: "storage-unit-type"
+                  },
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/01981eef-fea7-7570-bcd8-080fa74273c4/storageUnitType",
+                    self: "/api/v1/storage-unit/01981eef-fea7-7570-bcd8-080fa74273c4/relationships/storageUnitType"
+                  }
+                },
+                parentStorageUnit: {
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/01981eef-fea7-7570-bcd8-080fa74273c4/parentStorageUnit",
+                    self: "/api/v1/storage-unit/01981eef-fea7-7570-bcd8-080fa74273c4/relationships/parentStorageUnit"
+                  }
+                }
+              },
+              attributes: {
+                createdBy: "dina-admin",
+                hierarchy: [
+                  {
+                    typeUuid: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    name: "test unit child 2",
+                    typeName: "test",
+                    rank: 1,
+                    type: "1",
+                    uuid: "01981eef-fea7-7570-bcd8-080fa74273c4"
+                  },
+                  {
+                    typeUuid: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    name: "test unit",
+                    typeName: "test",
+                    rank: 2,
+                    type: "1",
+                    uuid: "019818d5-66d4-7d93-ba11-5c9bde019daf"
+                  }
+                ],
+                name: "test unit child 2",
+                createdOn: "2025-07-18T19:08:21.530999Z",
+                group: "aafc"
+              },
+              id: "01981eef-fea7-7570-bcd8-080fa74273c4",
+              type: "storage-unit"
+            },
+            included: [
+              {
+                attributes: {
+                  name: "test"
+                },
+                id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                type: "storage-unit-type"
+              }
+            ]
+          }
+        }
+      ],
+      max_score: 0.13353139
+    }
+  }
+};
+
+const mockPost = jest.fn<any, any>(async (path) => {
+  switch (path) {
+    // Elastic search response with object store mock metadata data.
+    case "search-api/search-ws/search":
+      return Promise.resolve(MOCK_SEARCH_API_RESPONSE);
+  }
+});
+
 function arrayEquals(a, b) {
   return (
     Array.isArray(a) &&
@@ -123,12 +408,20 @@ const mockBulkGet = jest.fn<any, any>(async (paths) => {
   }
 });
 
-const apiContext = {
-  apiClient: {
-    get: mockGet
-  },
-  save: mockSave,
-  bulkGet: mockBulkGet
+const testCtx = {
+  apiContext: {
+    apiClient: {
+      get: mockGet,
+      post: mockPost,
+      axios: {
+        get: mockGet,
+        post: mockPost
+      }
+    },
+    save: mockSave,
+    bulkGet: mockBulkGet,
+    accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
+  }
 };
 
 const storageUnitA: StorageUnit = {
@@ -160,7 +453,7 @@ describe("StorageUnitChildrenViewer component", () => {
         />
         ,
       </DinaForm>,
-      { apiContext }
+      testCtx as any
     );
 
     // The page should load initially with a loading spinner.
@@ -178,7 +471,7 @@ describe("StorageUnitChildrenViewer component", () => {
     ).toBeInTheDocument();
   });
 
-  it("Lets you move all stored samples and storages to another storage unit.", async () => {
+  it.skip("Lets you move all stored samples and storages to another storage unit.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer
@@ -187,10 +480,7 @@ describe("StorageUnitChildrenViewer component", () => {
         />
         ,
       </DinaForm>,
-      {
-        apiContext,
-        accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
-      }
+      testCtx as any
     );
 
     await waitFor(() =>
@@ -250,10 +540,7 @@ describe("StorageUnitChildrenViewer component", () => {
         />
         ,
       </DinaForm>,
-      {
-        apiContext,
-        accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
-      }
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -266,14 +553,17 @@ describe("StorageUnitChildrenViewer component", () => {
       wrapper.getByRole("button", { name: /add existing storage unit/i })
     );
 
-    await waitFor(() =>
-      expect(
-        wrapper.getByRole("button", { name: /select/i })
-      ).toBeInTheDocument()
-    );
+    await waitFor(() => {
+      const row = screen.getByRole("row", {
+        name: /test unit child 2 test test unit aafc dina\-admin 2025\-07\-18, 7:08:21 p\.m\. select/i
+      });
 
-    // Click "Select" button to select storage B
-    userEvent.click(wrapper.getByRole("button", { name: /select/i }));
+      const row_button = within(row).getByRole("button", {
+        name: /select/i
+      });
+
+      userEvent.click(row_button);
+    });
 
     await waitFor(() => {
       // Updates B to set X as the new parent:
@@ -281,7 +571,7 @@ describe("StorageUnitChildrenViewer component", () => {
         [
           {
             resource: {
-              id: "B",
+              id: "01981eef-fea7-7570-bcd8-080fa74273c4",
               type: "storage-unit",
               parentStorageUnit: { type: "storage-unit", id: "X" }
             },

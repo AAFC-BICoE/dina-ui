@@ -21,7 +21,7 @@ export interface SingleSavedSearch {
   /**
    * Current version of the saved search structured.
    */
-  version: number;
+  version?: number;
 
   /**
    * Mark as the default search.

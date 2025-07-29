@@ -74,7 +74,8 @@ export function OrganismsField({
       componentName={ORGANISMS_COMPONENT_NAME}
     >
       <BulkEditTabWarning
-        targetType="material-sample"
+        messageIdSingle="bulkEditResourceLinkerWarning_Organisms_MaterialSample_Single"
+        messageIdMultiple="bulkEditResourceLinkerWarning_Organisms_MaterialSample_Multi"
         fieldName={name}
         setDefaultValue={(ctx) => {
           // Auto-create the first organism:

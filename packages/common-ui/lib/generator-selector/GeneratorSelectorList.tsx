@@ -1,8 +1,8 @@
 import {
-  filterBy,
   LoadingSpinner,
   ResourceSelectField,
   SelectField,
+  SimpleSearchFilterBuilder,
   TooltipSelectOption
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
@@ -300,17 +300,17 @@ export function GeneratorSelectorList({
                   menuPortalTarget: document.body,
                   styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
                 }}
-                filter={filterBy(["name"], {
-                  extraFilters: [
-                    {
-                      selector: "managedAttributeComponent",
-                      comparison: "==",
-                      arguments:
-                        selectedField?.dynamicConfig?.component ??
+                filter={(input) =>
+                  SimpleSearchFilterBuilder.create<ManagedAttribute>()
+                    .searchFilter("name", input)
+                    .where(
+                      "managedAttributeComponent",
+                      "EQ",
+                      selectedField?.dynamicConfig?.component ??
                         "MATERIAL_SAMPLE"
-                    }
-                  ]
-                })}
+                    )
+                    .build()
+                }
                 isDisabled={disabled}
                 omitNullOption={true}
                 additionalSort={"name"}
