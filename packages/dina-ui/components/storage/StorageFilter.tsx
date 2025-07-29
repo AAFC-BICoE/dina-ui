@@ -14,14 +14,14 @@ export interface StorageFilterProps {
    * To prevent displaying itself in the search results, this UUID will be filtered from the
    * results.
    */
-  parentStorageUnitUUID?: string;
+  currentStorageUnitUUID?: string;
 
   onChange: (newValue: FilterGroupModel | null) => void;
 }
 
 export function StorageFilter({
   onChange,
-  parentStorageUnitUUID
+  currentStorageUnitUUID
 }: StorageFilterProps) {
   const [searchText, setSearchText] = useState<string>("");
   const [storageTypeFilter, setStorageTypeFilter] =
@@ -56,7 +56,7 @@ export function StorageFilter({
             ]
           : []),
         // Hide the parent storage unit, to prevent linking of itself.
-        ...(parentStorageUnitUUID
+        ...(currentStorageUnitUUID
           ? [
               {
                 id: -432,
@@ -64,7 +64,7 @@ export function StorageFilter({
                 attribute: "uuid",
                 predicate: "IS NOT" as const,
                 searchType: "EXACT_MATCH" as const,
-                value: parentStorageUnitUUID
+                value: currentStorageUnitUUID
               }
             ]
           : []),

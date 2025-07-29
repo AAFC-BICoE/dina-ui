@@ -1,32 +1,41 @@
-import {
-  QueryPage,
-  FieldHeader,
-  dateCell,
-  FormikButton,
-  Tooltip
-} from "common-ui";
+import { QueryPage, FieldHeader, dateCell, FormikButton } from "common-ui";
 import { TableColumn } from "common-ui/lib/list-page/types";
 import { KitsuResourceLink } from "kitsu";
 import Link from "next/link";
 import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { Button } from "react-bootstrap";
 
 export interface StorageSearchSelectorProps {
   /**
    * To prevent displaying itself in the search results, this UUID will be filtered from the
    * results.
    */
-  parentStorageUnitUUID?: string;
+  currentStorageUnitUUID?: string;
 
   onChange: (newValue: KitsuResourceLink) => Promisable<void>;
+
+  /** Custom query to filter selectable storage units. */
+  customViewElasticSearchQuery?: any;
 }
 
 /** Table UI to search for and select a Storage Unit. */
 export function StorageSearchSelector({
   onChange,
-  parentStorageUnitUUID
+  currentStorageUnitUUID,
+  customViewElasticSearchQuery
 }: StorageSearchSelectorProps) {
+  // If a current storage unit UUID is provided and no custom query is specified, filter out the current storage unit from the search results.
+  if (currentStorageUnitUUID && !customViewElasticSearchQuery) {
+    customViewElasticSearchQuery = {
+      bool: {
+        must_not: {
+          term: {
+            "data.id": currentStorageUnitUUID
+          }
+        }
+      }
+    };
+  }
   // Columns for the elastic search list page.
   const columns: TableColumn<any>[] = [
     // Name
@@ -117,30 +126,14 @@ export function StorageSearchSelector({
       header: () => <FieldHeader name="select" />,
       cell: ({ row: { original } }) => (
         <div className="d-flex justify-content-center">
-          {parentStorageUnitUUID && original.id === parentStorageUnitUUID ? (
-            <Tooltip
-              className="m-0"
-              id="storageUnitCannotBeOwnParent"
-              visibleElement={
-                // Fake disabled button with tooltip
-                <Button
-                  className="btn btn-primary select-storage"
-                  disabled={true}
-                >
-                  <DinaMessage id="select" />
-                </Button>
-              }
-            />
-          ) : (
-            <FormikButton
-              className="btn btn-primary select-storage"
-              onClick={async () =>
-                await onChange({ id: original.id ?? "", type: original.type })
-              }
-            >
-              <DinaMessage id="select" />
-            </FormikButton>
-          )}
+          <FormikButton
+            className="btn btn-primary select-storage"
+            onClick={async () =>
+              await onChange({ id: original.id ?? "", type: original.type })
+            }
+          >
+            <DinaMessage id="select" />
+          </FormikButton>
         </div>
       ),
       accessorKey: "select",
@@ -165,6 +158,7 @@ export function StorageSearchSelector({
         enableRelationshipPresence={true}
         columns={columns}
         mandatoryDisplayedColumns={["name", "select"]}
+        customViewElasticSearchQuery={customViewElasticSearchQuery}
       />
     </div>
   );

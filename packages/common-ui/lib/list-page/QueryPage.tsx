@@ -274,7 +274,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
   onDeselect?: (deselectedData: TData[]) => void;
 
   /**
-   * Boolean flag to display only the result table when true
+   * Boolean flag to display the QueryPage in view mode (no query builder and search bar).
    */
   viewMode?: boolean;
 

@@ -26,7 +26,7 @@ import {
 export interface BrowseStorageTreeProps {
   onSelect?: (storageUnit: PersistedResource<StorageUnit>) => Promisable<void>;
   readOnly?: boolean;
-  parentStorageUnitUUID?: string;
+  currentStorageUnitUUID?: string;
 }
 
 /** Hierarchy of nodes UI to search for and find a Storage Unit. */
@@ -50,7 +50,7 @@ export function BrowseStorageTree(props: BrowseStorageTreeProps) {
         {...props}
         filter={filter}
         showPathInName={isFiltered}
-        parentStorageUnitUUID={props.parentStorageUnitUUID}
+        currentStorageUnitUUID={props.currentStorageUnitUUID}
       />
     </div>
   );
@@ -70,7 +70,7 @@ export interface StorageTreeListProps {
   /** Show the hierarchy path in the name. (Top-level only). */
   showPathInName?: boolean;
 
-  parentStorageUnitUUID?: string;
+  currentStorageUnitUUID?: string;
 }
 
 export function StorageTreeList({
@@ -80,7 +80,7 @@ export function StorageTreeList({
   disabled,
   filter,
   showPathInName,
-  parentStorageUnitUUID
+  currentStorageUnitUUID
 }: StorageTreeListProps) {
   const limit = 100;
   const [pageNumber, setPageNumber] = useState(1);
@@ -169,12 +169,12 @@ export function StorageTreeList({
               storageUnit={unit as PersistedResource<StorageUnit>}
               onSelect={onSelect}
               disabled={
-                disabled || parentStorageUnitUUID
-                  ? unit.id === parentStorageUnitUUID
+                disabled || currentStorageUnitUUID
+                  ? unit.id === currentStorageUnitUUID
                   : false
               }
               checkForChildren={false}
-              parentStorageUnitUUID={parentStorageUnitUUID}
+              currentStorageUnitUUID={currentStorageUnitUUID}
             />
           </div>
         ))}
@@ -200,12 +200,12 @@ export function StorageTreeList({
                   storageUnit={unit}
                   onSelect={onSelect}
                   disabled={
-                    disabled || parentStorageUnitUUID
-                      ? unit.id === parentStorageUnitUUID
+                    disabled || currentStorageUnitUUID
+                      ? unit.id === currentStorageUnitUUID
                       : false
                   }
                   checkForChildren={true}
-                  parentStorageUnitUUID={parentStorageUnitUUID}
+                  currentStorageUnitUUID={currentStorageUnitUUID}
                 />
               </div>
             ))}
@@ -236,7 +236,7 @@ interface StorageUnitCollapserProps {
   /** If the storage unit has  */
   checkForChildren?: boolean;
 
-  parentStorageUnitUUID?: string;
+  currentStorageUnitUUID?: string;
 }
 
 function StorageUnitCollapser({
@@ -245,7 +245,7 @@ function StorageUnitCollapser({
   disabled,
   showPathInName,
   checkForChildren,
-  parentStorageUnitUUID
+  currentStorageUnitUUID
 }: StorageUnitCollapserProps) {
   const [isOpen, setOpen] = useState(false);
   const { formatMessage } = useDinaIntl();
@@ -309,7 +309,7 @@ function StorageUnitCollapser({
             parentId={storageUnit.id}
             onSelect={onSelect}
             disabled={disabled}
-            parentStorageUnitUUID={parentStorageUnitUUID}
+            currentStorageUnitUUID={currentStorageUnitUUID}
           />
         )}
       </div>
