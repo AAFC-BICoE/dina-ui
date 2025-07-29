@@ -1,8 +1,13 @@
-import { DinaForm } from "common-ui";
+import { DinaForm, FieldSet, QueryTable } from "common-ui";
 import _ from "lodash";
 import { ViewPageLayout } from "../../../components";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { getColumnDefinition } from "../collecting-event/list";
 import { ExpeditionFormLayout } from "../../../components/collection/expedition/ExpeditionFormLayout";
-import { Expedition } from "../../../types/collection-api/resources/Expedition";
+import {
+  Expedition,
+  CollectingEvent
+} from "packages/dina-ui/types/collection-api";
 
 export default function ExpeditionDetailsPage() {
   return (
@@ -21,6 +26,16 @@ export default function ExpeditionDetailsPage() {
           }}
         >
           <ExpeditionFormLayout />
+          <FieldSet legend={<DinaMessage id="collectingEvents" />}>
+            <QueryTable<CollectingEvent>
+              path="collection-api/collecting-event"
+              include="collection"
+              columns={getColumnDefinition()}
+              filter={{
+                rsql: `expedition.uuid==${props.initialValues.id}`
+              }}
+            />
+          </FieldSet>
         </DinaForm>
       )}
       query={(id) => ({

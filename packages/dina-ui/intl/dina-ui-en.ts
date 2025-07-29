@@ -131,6 +131,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingAgentsLegend: "Collecting Agents",
   collectingDateLegend: "Collecting Date",
   collectingEvent: "Collecting Event",
+  collectingEvents: "Collecting Events",
   collectingEventAttachments: "Collecting Event Attachments",
   collectingEventDetails: "Collecting Event Details",
   collectingEventListTitle: "Collecting Event",
