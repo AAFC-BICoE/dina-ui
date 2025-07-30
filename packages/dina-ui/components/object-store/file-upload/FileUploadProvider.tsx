@@ -62,7 +62,13 @@ export function FileUploadProviderImpl({ children }) {
           timeout: 0
         }
       );
-      uploadRespsT.push(response.data);
+
+      uploadRespsT.push({
+        id: response?.data?.data?.id,
+        type: response?.data?.data?.type,
+        meta: response?.data?.data?.meta,
+        ...response?.data?.data?.attributes
+      });
     }
 
     return uploadRespsT;

@@ -56,7 +56,7 @@ export default function UploadPage() {
             attributes: {
               bucket: derivativeObjectUpload.bucket,
               derivativeType: router.query.derivativeType,
-              fileIdentifier: derivativeObjectUpload.fileIdentifier,
+              fileIdentifier: derivativeObjectUpload.id,
               dcType: derivativeObjectUpload.dcType
             },
             relationships: {
@@ -86,9 +86,7 @@ export default function UploadPage() {
         .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
 
       const navigateToEditMetadata = async () => {
-        const objectUploadIds = uploadRespsT.map(
-          ({ fileIdentifier }) => fileIdentifier
-        );
+        const objectUploadIds = uploadRespsT.map(({ id }) => id);
         deleteFromStorage(BULK_EDIT_IDS_KEY);
         writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
         if (objectUploadIds.length === 1) {
