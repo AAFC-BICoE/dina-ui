@@ -23,3 +23,15 @@ Object {
   },
 }
 `;
+
+exports[`QueryBuilderRelationshipPresenceSearch transformRelationshipPresenceToDSL function UUID operation 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "term": Object {
+        "data.relationships.organism.data.id": "897201dd-f10b-42a7-ad7f-fb3e6d4f8ee2",
+      },
+    },
+  },
+}
+`;
