@@ -23,6 +23,7 @@ export interface AssignedStorageProps {
   ) => Promisable<void>;
   noneMessage?: JSX.Element;
   parentIdInURL?: string;
+  isParentStorageUnit?: boolean;
 }
 
 /** Displays the currently assigned Storage, and lets you unlink it. */
@@ -31,7 +32,8 @@ export function AssignedStorage({
   readOnly,
   value,
   noneMessage,
-  parentIdInURL
+  parentIdInURL,
+  isParentStorageUnit
 }: AssignedStorageProps) {
   const storageQuery = useStorageUnit(value?.id);
   const encoder = new AlphanumericEncoder();
@@ -80,7 +82,8 @@ export function AssignedStorage({
               )}
             </div>
             {!!storageUnit.storageUnitType?.gridLayoutDefinition &&
-              !isBulkEditAllTab && (
+              !isBulkEditAllTab &&
+              !isParentStorageUnit && (
                 <div className="list-inline mb-3">
                   <SelectField
                     options={options}

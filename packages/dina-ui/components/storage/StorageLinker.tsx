@@ -176,7 +176,11 @@ export function StorageLinkerField({
     <FieldWrapper
       name={name}
       readOnlyRender={(value) => (
-        <AssignedStorage readOnly={true} value={value} />
+        <AssignedStorage
+          readOnly={true}
+          value={value}
+          isParentStorageUnit={parentStorageUnitUUID !== undefined}
+        />
       )}
       disableLabelClick={true}
       customName={customName}
