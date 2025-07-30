@@ -86,7 +86,7 @@ export default function UploadPage() {
         .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
 
       const navigateToEditMetadata = async () => {
-        const objectUploadIds = uploadRespsT.map(({ id }) => id);
+        const objectUploadIds = uploadRespsT.map((item) => item.id);
         deleteFromStorage(BULK_EDIT_IDS_KEY);
         writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
         if (objectUploadIds.length === 1) {

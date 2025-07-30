@@ -42,10 +42,13 @@ describe("Upload page", () => {
     const mockPost = jest.fn(() => {
       return {
         data: {
-          dateTimeDigitized: "2003-12-14T12:01:44",
-          fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-          fileType: "text",
-          size: "500"
+          id: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+          type: "object-upload",
+          attributes: {
+            dateTimeDigitized: "2003-12-14T12:01:44",
+            fileType: "text",
+            size: "500"
+          }
         }
       };
     });
