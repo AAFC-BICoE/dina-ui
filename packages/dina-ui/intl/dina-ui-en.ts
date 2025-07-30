@@ -811,6 +811,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select managed attribute to search against...",
   queryBuilder_identifier_placeholder:
     "Select identifier type to search against...",
+  queryBuilder_uuid_placeholder: "Enter UUID to search against...",
   queryBuilder_operator_presence: "Presence",
   queryBuilder_operator_absence: "Absence",
   queryBuilder_operator_uuid: "UUID",

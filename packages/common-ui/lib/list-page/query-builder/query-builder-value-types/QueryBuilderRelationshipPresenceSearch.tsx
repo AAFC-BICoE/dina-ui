@@ -159,10 +159,10 @@ export default function QueryRowRelationshipPresenceSearch({
             }
             className={
               isInColumnSelector
-                ? "form-control ps-0 mt-2"
-                : "form-control col me-1 ms-2 ps-0"
+                ? "form-control mt-2"
+                : "form-control col me-1 ms-2"
             }
-            placeholder={"Enter UUID..."}
+            placeholder={formatMessage({ id: "queryBuilder_uuid_placeholder" })}
           />
         </>
       )}

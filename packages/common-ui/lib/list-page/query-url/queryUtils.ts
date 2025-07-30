@@ -161,7 +161,8 @@ function serializeDynamicFields(
         f: field,
         o: relationshipPresenceStates.selectedOperator,
         v: relationshipPresenceStates.selectedRelationship,
-        t: type
+        t: type,
+        d: relationshipPresenceStates.selectedValue
       };
 
     // Treat all other types as just a string. No special rules.
@@ -328,7 +329,7 @@ function parseDynamicFields(simpleQueryRow: SimpleQueryRow): any {
     // For relationshipPresence type, reconstruct the state object
     case "relationshipPresence":
       const relationshipPresenceState: RelationshipPresenceSearchStates = {
-        selectedValue: 0,
+        selectedValue: simpleQueryRow.d ?? "",
         selectedOperator: simpleQueryRow.o,
         selectedRelationship: simpleQueryRow.v
       };
