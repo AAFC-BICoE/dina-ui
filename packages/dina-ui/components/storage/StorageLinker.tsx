@@ -80,6 +80,8 @@ export function StorageLinker({
           value={value}
           parentIdInURL={parentIdInURL}
           onChange={changeStorageAndResetTab}
+          // if editing or creating a new storage unit, don't show row and column fields since they don't have coordinates
+          showRowAndColumnFields={!createStorageMode}
         />
       ) : (
         <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
@@ -179,7 +181,7 @@ export function StorageLinkerField({
         <AssignedStorage
           readOnly={true}
           value={value}
-          isParentStorageUnit={parentStorageUnitUUID !== undefined}
+          showRowAndColumnFields={parentStorageUnitUUID === undefined} // if displaying the parent storage unit, don't show row and column fields
         />
       )}
       disableLabelClick={true}
