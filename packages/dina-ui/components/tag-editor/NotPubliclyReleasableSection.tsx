@@ -1,32 +1,29 @@
 import {
   DinaFormSection,
   InverseToggleField,
-  RadioButtonsField,
+  SelectField,
   TextField,
   useBulkEditTabContext
 } from "common-ui";
 import { useFormikContext } from "formik";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export function NotPubliclyReleasableSection() {
   const isInBulkEditTab = !!useBulkEditTabContext();
   const formik = useFormikContext<any>();
-
+  const { formatMessage } = useDinaIntl();
   return (
     <>
       {isInBulkEditTab ? (
-        <RadioButtonsField<boolean | null>
+        <SelectField<boolean | null>
           name="publiclyReleasable"
           label={<DinaMessage id="notPubliclyReleasable" />}
           options={[
-            // null values are ignored when bulk editing:
-            {
-              value: null,
-              label: <DinaMessage id="dontChangeValues" />
-            },
+            // null values are ignored when bulk editing
+            { label: formatMessage("dontChangeValues"), value: null },
             // True and false are reversed to show "publiclyReleasable" as "notPubliclyReleasable".
-            { value: false, label: <DinaMessage id="true" /> },
-            { value: true, label: <DinaMessage id="false" /> }
+            { label: formatMessage("true"), value: false },
+            { label: formatMessage("false"), value: true }
           ]}
         />
       ) : (
