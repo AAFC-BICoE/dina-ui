@@ -1408,7 +1408,11 @@ describe("MaterialSampleBulkEditor", () => {
     expect(wrapper.getByDisplayValue("test barcode")).toBeInTheDocument();
 
     // Publicly Releasable
-    expect(wrapper.getByLabelText("True")).toHaveProperty("checked", true);
+    expect(
+      screen.getByRole("combobox", {
+        name: /not publicly releasable true/i
+      })
+    ).toBeInTheDocument();
 
     // Material Sample State
     expect(wrapper.getByDisplayValue("test-ms-state")).toBeInTheDocument();
