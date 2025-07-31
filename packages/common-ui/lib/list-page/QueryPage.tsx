@@ -107,8 +107,8 @@ const MAX_OFFSET: number = 10000;
 /**
  * Generates a consistent storage key for a component's group filter.
  *
- * @param uniqueName - A unique identifier for the component or page,
- *                     e.g., "material-sample-list".
+ * @param indexName - A unique identifier for the component or page,
+ *                    e.g., "material-sample-list".
  * @returns The formatted storage key string, e.g., "dina-material-sample-index_groupStorage".
  */
 export const getGroupStorageKey = (indexName: string): string => {

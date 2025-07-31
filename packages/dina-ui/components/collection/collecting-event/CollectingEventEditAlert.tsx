@@ -77,7 +77,7 @@ function CollectingEventEditAlert({
  * linked to multiple Material Samples.
  *
  * @param count The number of linked material samples.
- * @param onYesButtonClicked The action to perform when the user confirms.
+ * @param onYesButtonClicked An async function to perform when the user confirms.
  */
 export function renderConfirmationModal(
   count: number,
