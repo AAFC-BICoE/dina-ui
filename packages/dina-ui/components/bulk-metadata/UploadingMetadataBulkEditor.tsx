@@ -27,7 +27,7 @@ export function UploadingMetadataBulkEditor({
   const router = useRouter();
   const group = inputGroup ? inputGroup : (router?.query?.group as string);
   const { agentId } = useAccount();
-  const { bulkGet, apiClient } = useContext(ApiClientContext);
+  const { bulkLoadResources, apiClient } = useContext(ApiClientContext);
 
   const [uploadMetadata, setMetadata] = useState<Metadata[]>();
   useEffect(() => {
@@ -39,12 +39,12 @@ export function UploadingMetadataBulkEditor({
   async function loadData() {
     let objectUploads: PersistedResource<ObjectUpload>[] = [];
     if (group && objectUploadIds) {
-      objectUploads = await bulkGet<ObjectUpload>(
-        objectUploadIds.map((metadataId) => `/object-upload/${metadataId}`),
-        {
-          apiBaseUrl: "/objectstore-api"
-        }
-      );
+      objectUploads = (
+        await bulkLoadResources(objectUploadIds, {
+          apiBaseUrl: "/objectstore-api",
+          resourceType: "object-upload"
+        })
+      ).data;
     }
     // Set default values for the new Metadatas:
     const {

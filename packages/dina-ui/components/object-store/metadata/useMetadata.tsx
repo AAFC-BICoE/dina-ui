@@ -49,7 +49,7 @@ export function useMetadataEditQuery(id?: string | null) {
 }
 
 export function useMetadataViewQuery(id?: string) {
-  const { bulkGet } = useApiClient();
+  const { bulkLoadResources } = useApiClient();
   const query = useQuery<Metadata & { objectUpload: ObjectUpload }>(
     {
       include: "managedAttributeMap,acMetadataCreator,dcCreator,derivatives",
@@ -79,21 +79,28 @@ export function useMetadataViewQuery(id?: string) {
       ],
       onSuccess: async (response) => {
         // fetch the uploadObject for each derivative and add it to the derivative object.
-
         if (!response.data.derivatives) return; // If no derivatives, return early.
         const derivativeIdentifiers =
           response.data?.derivatives?.map(
-            (derivative) => `object-upload/${derivative.fileIdentifier}`
+            (derivative) => derivative.fileIdentifier
           ) ?? [];
 
-        const objectUploadResponse = (
-          await bulkGet(derivativeIdentifiers, {
+        const objectUploadResponse = await bulkLoadResources(
+          derivativeIdentifiers,
+          {
             apiBaseUrl: "/objectstore-api",
+            resourceType: "object-upload",
             returnNullForMissingResource: true
-          })
-        ).filter((item) => item !== null);
+          }
+        );
+        if (!objectUploadResponse) {
+          return;
+        }
+
         const changesMap = new Map(
-          objectUploadResponse.map((change) => [change.id, change])
+          objectUploadResponse.data
+            .filter((change) => change !== null)
+            .map((change) => [change?.id, change])
         );
 
         response.data.derivatives = response.data.derivatives.map(
