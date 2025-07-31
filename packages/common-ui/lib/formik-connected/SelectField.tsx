@@ -100,9 +100,13 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
             value?.includes(option.value)
           );
         } else {
-          selectedOption = options?.find(
-            (option) => option.value === value
-          ) as any;
+          selectedOption = options?.find((option) => {
+            if (value === undefined) {
+              // If the value is undefined, only select the option if its value is null, otherwise treat is as unselected.
+              return option.value === null;
+            }
+            return option.value === value;
+          }) as any;
 
           // also search in possible nested options
           if (!selectedOption || Object.keys(selectedOption).length === 0) {
