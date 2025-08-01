@@ -107,7 +107,7 @@ export function useRelationshipUsagesCount({
       setUsageCount(undefined);
       setIsLoading(false);
     }
-  }, [fetchUsages, apiClient, resourcePath]);
+  }, [fetchUsages, apiClient, resourcePath, relationshipId, relationshipName]);
 
   return {
     usageCount,

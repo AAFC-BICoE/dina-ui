@@ -14,6 +14,14 @@ interface CollectingEventEditAlertProps {
 
   /** Populate if you want the "Go to collecting event details" link to appear. */
   collectingEventUUID?: string;
+
+  /**
+   * Override the don't render condition. Helpful if the condition is already being checked by
+   * the parent component.
+   *
+   * Default is false so it will use the internal check.
+   */
+  override?: boolean;
 }
 
 /**
@@ -22,10 +30,14 @@ interface CollectingEventEditAlertProps {
 function CollectingEventEditAlert({
   materialSampleUsageCount,
   alertMessage = "collectingEventEditAlertMessage",
-  collectingEventUUID
+  collectingEventUUID,
+  override = false
 }: CollectingEventEditAlertProps) {
   // Don't render if there are not multiple usages.
-  if (!materialSampleUsageCount || materialSampleUsageCount <= 1) {
+  if (
+    !override &&
+    (!materialSampleUsageCount || materialSampleUsageCount <= 1)
+  ) {
     return null;
   }
 
@@ -39,7 +51,13 @@ function CollectingEventEditAlert({
         <div>
           <span>
             <DinaMessage
-              id={alertMessage as any}
+              id={
+                (alertMessage +
+                  (alertMessage === "collectingEventEditErrorMessage" &&
+                  materialSampleUsageCount === 1
+                    ? "Single"
+                    : "")) as any
+              }
               values={{ count: materialSampleUsageCount }}
             />
           </span>

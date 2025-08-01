@@ -313,14 +313,6 @@ export function useMaterialSampleSave({
   const [deleteAssociations, setDeleteAssociations] = useState<boolean>(false);
   const [deleteRestrictions, setDeleteRestrictions] = useState<boolean>(false);
 
-  // Hook to check for material sample usages.
-  const { usageCount: materialSampleUsageCount } = useRelationshipUsagesCount({
-    apiClient,
-    resourcePath: "collection-api/material-sample",
-    relationshipName: "collectingEvent",
-    relationshipId: materialSample?.collectingEvent?.id ?? undefined
-  });
-
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
     setEnableShowParentAttributes(
@@ -517,6 +509,14 @@ export function useMaterialSampleSave({
   });
 
   const { withDuplicateSampleNameCheck } = useDuplicateSampleNameDetection();
+
+  // Hook to check for material sample usages.
+  const { usageCount: materialSampleUsageCount } = useRelationshipUsagesCount({
+    apiClient,
+    resourcePath: "collection-api/material-sample",
+    relationshipName: "collectingEvent",
+    relationshipId: colEventId ?? undefined
+  });
 
   /** Gets the new state of the sample before submission to the back-end, given the form state. */
   async function prepareSampleInput(
@@ -1108,7 +1108,7 @@ export function useMaterialSampleSave({
       isTemplate,
       // In bulk-edit and workflow run, disable editing existing Col events:
       readOnly:
-        (materialSampleUsageCount && materialSampleUsageCount > 1) ||
+        (materialSampleUsageCount && materialSampleUsageCount >= 1) ||
         disableNestedFormEdits ||
         isTemplate
           ? !!colEventId
@@ -1118,11 +1118,12 @@ export function useMaterialSampleSave({
         <div />
       ) : (
         <div className={nestedFormClassName}>
-          {materialSampleUsageCount && materialSampleUsageCount > 1 && (
+          {materialSampleUsageCount && materialSampleUsageCount >= 1 && (
             <CollectingEventEditAlert
               materialSampleUsageCount={materialSampleUsageCount}
               alertMessage="collectingEventEditErrorMessage"
               collectingEventUUID={initialValues?.id}
+              override={true}
             />
           )}
           <CollectingEventFormLayout
