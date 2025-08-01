@@ -1410,7 +1410,7 @@ describe("MaterialSampleBulkEditor", () => {
     // Publicly Releasable
     expect(
       screen.getByRole("combobox", {
-        name: /not publicly releasable true/i
+        name: /keep current values/i
       })
     ).toBeInTheDocument();
 

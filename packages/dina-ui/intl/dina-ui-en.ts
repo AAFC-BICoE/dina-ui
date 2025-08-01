@@ -91,7 +91,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   browseStorageTree: "Browse Storage Tree",
   bulkCreate: "Create Multiple New",
   bulkEditNotPubliclyReleasableTooltip:
-    'Any changes made here will be applied to all selected items. Is set to "{keepCurrentValues}" by default.',
+    'The current status of the selected items - is set to "{keepCurrentValues}" by default. Any changes made here will be applied to all selected items.',
   bulkEditResourceLinkerWarningMulti:
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceLinkerWarningSingle:
