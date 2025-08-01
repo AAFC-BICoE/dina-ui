@@ -1118,7 +1118,7 @@ export function useMaterialSampleSave({
         <div />
       ) : (
         <div className={nestedFormClassName}>
-          {materialSampleUsageCount && materialSampleUsageCount >= 1 && (
+          {!!materialSampleUsageCount && materialSampleUsageCount >= 1 && (
             <CollectingEventEditAlert
               materialSampleUsageCount={materialSampleUsageCount}
               alertMessage="collectingEventEditErrorMessage"
