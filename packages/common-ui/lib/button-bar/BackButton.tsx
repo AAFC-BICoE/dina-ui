@@ -28,17 +28,20 @@ export function BackButton({
   buttonMsg,
   buttonMsgValues
 }: BackButtonProps) {
+  // Remove leading / characters.
+  const cleanEntityLink = entityLink.replace(/\/+$/, "");
+
   // When editing an existing entity, the link points to the entity details page.
   // When editing a new entity, the link points to the list page.
   // When placed in view page, will accept url to navigate to
   const { href, message } =
     byPassView || !entityId
       ? {
-          href: entityLink + "/list",
+          href: `${cleanEntityLink}/list`,
           message: "backToList" as const
         }
       : {
-          href: `${entityLink}/view?id=${entityId}`,
+          href: `${cleanEntityLink}/view?id=${entityId}`,
           message: "backToReadOnlyPage" as const
         };
 

@@ -146,7 +146,16 @@ export function ReactTable<TData>({
   setIsFullscreen
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
-  const [sorting, setSorting] = useState<SortingState>(sort ?? DEFAULT_SORT);
+
+  // Sorting to be applied.
+  // By default the "createdOn", if it exists as a column, is used.
+  const [sorting, setSorting] = useState<SortingState>(
+    sort ??
+      (columns.find((item) => item.id === DEFAULT_SORT?.at(0)?.id)
+        ? DEFAULT_SORT
+        : [])
+  );
+
   const [columnFilters, setColumnFilters] =
     useState<ColumnFiltersState>(defaultColumnFilters);
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({

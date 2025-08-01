@@ -39,13 +39,27 @@ describe("Upload page", () => {
   });
 
   it("Uploads files when you click the Upload button", async () => {
+    // Generate a mock UUID for each file being uploaded.
+    const objectUploadUUIDs = [
+      "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+      "5d02a84b-1dce-44e3-9df2-dd72e0d5b02f",
+      "990edfd7-7393-47c5-b195-61583c8ec0ce"
+    ];
+
+    let currentUuid = 0;
+
     const mockPost = jest.fn(() => {
       return {
         data: {
-          dateTimeDigitized: "2003-12-14T12:01:44",
-          fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-          fileType: "text",
-          size: "500"
+          data: {
+            id: objectUploadUUIDs[currentUuid++],
+            type: "object-upload",
+            attributes: {
+              dateTimeDigitized: "2003-12-14T12:01:44",
+              fileType: "text",
+              size: "500"
+            }
+          }
         }
       };
     });
@@ -139,7 +153,7 @@ describe("Upload page", () => {
     });
 
     expect(localStorage.getItem(BULK_ADD_IDS_KEY)).toEqual(
-      '["c0f78fce-1825-4c4e-89c7-92fe0ed9dc73","c0f78fce-1825-4c4e-89c7-92fe0ed9dc73","c0f78fce-1825-4c4e-89c7-92fe0ed9dc73"]'
+      JSON.stringify(objectUploadUUIDs)
     );
   });
 

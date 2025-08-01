@@ -37,7 +37,7 @@ export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
     let objectUploads: PersistedResource<ObjectUpload>[] = [];
     if (group && objectUploadIds) {
       objectUploads = await bulkGet<ObjectUpload>(
-        objectUploadIds.map((metadataId) => `/object-upload/${metadataId}`),
+        objectUploadIds.map((metadataId) => `object-upload/${metadataId}`),
         {
           apiBaseUrl: "/objectstore-api"
         }

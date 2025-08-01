@@ -16,9 +16,9 @@ export function ExifView({ objectUpload }: ObjectUploadProps) {
     const { formatMessage } = useDinaIntl();
     return (
       <CollapsableSection
-        collapserId={objectUpload.fileIdentifier}
+        collapserId={objectUpload?.id ?? ""}
         title={formatMessage("exifProperties")}
-        key={objectUpload.fileIdentifier}
+        key={objectUpload.id}
       >
         <KeyValueTable data={objectUpload.exif} />
       </CollapsableSection>

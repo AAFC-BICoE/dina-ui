@@ -1,5 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import { BackButton } from "../BackButton";
+import "@testing-library/jest-dom";
 
 const ENTITY_ID = "108559ed-e000-49c4-95e0-03dee7bfce9b";
 const ENTITY_LINK = "/collection/material-sample";
@@ -54,5 +55,19 @@ describe("BackButton", () => {
     );
 
     expect(reloadLastSearchWrapper.container).toMatchSnapshot();
+  });
+
+  it("Remove trailing forward slashes from entity link if provided", () => {
+    // Entity link with a "/" added to the end.
+    const wrapper = mountWithAppContext(
+      <BackButton entityLink={ENTITY_LINK + "/"} />
+    );
+
+    // Ensure it's not /collection/material-sample//list
+    const backLink = wrapper.getByRole("link", { name: /back to list page/i });
+    expect(backLink).toHaveAttribute(
+      "href",
+      "/collection/material-sample/list"
+    );
   });
 });
