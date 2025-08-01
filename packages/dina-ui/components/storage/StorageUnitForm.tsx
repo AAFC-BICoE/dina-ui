@@ -218,6 +218,7 @@ export function StorageUnitFormFields({
           targetType="storage-unit"
           parentIdInURL={parentIdInURL}
           parentStorageUnitUUID={initialValues.id}
+          createStorageMode={true}
         />
       )}
       {readOnly && (
