@@ -90,6 +90,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   browseContents: "Browse Contents",
   browseStorageTree: "Browse Storage Tree",
   bulkCreate: "Create Multiple New",
+  bulkEditNotPubliclyReleasableTooltip:
+    'The current status of the selected items - is set to "{keepCurrentValues}" by default. Any changes made here will be applied to all selected items.',
   bulkEditResourceLinkerWarningMulti:
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceLinkerWarningSingle:
@@ -116,7 +118,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "These Associations will be set on all Material Samples.",
   bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Multi:
     "These Scheduled Actions will be set on all Material Samples.",
-
   bulkOperationCompleteTitle: "Bulk Operation Complete",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
