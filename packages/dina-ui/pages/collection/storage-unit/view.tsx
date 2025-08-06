@@ -6,7 +6,7 @@ import {
   StorageUnitFormFields,
   ViewPageLayout
 } from "../../../components";
-import { StorageUnit } from "../../../types/collection-api";
+import { StorageUnit, storageUnitParser } from "../../../types/collection-api";
 
 export default function StorageUnitDetailsPage() {
   return (
@@ -19,6 +19,7 @@ export default function StorageUnitDetailsPage() {
       query={(id) => ({
         path: `collection-api/storage-unit/${id}?include=parentStorageUnit,storageUnitChildren,storageUnitType,hierarchy,storageUnitUsage`
       })}
+      queryOptions={{ parser: storageUnitParser }}
       entityLink="/collection/storage-unit"
       type="storage-unit"
       apiBaseUrl="/collection-api"

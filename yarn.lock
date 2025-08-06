@@ -2423,8 +2423,8 @@ commander@~3.0.2:
     flat "^5.0.2"
     formik "^2.2.7"
     keycloak-js "22.0.5"
-    kitsu "8.3.1"
-    kitsu-core "8.3.1"
+    kitsu "9.0.0"
+    kitsu-core "9.0.0"
     lodash "^4.17.21"
     mathjs "^10.0.0"
     next "^13.5.11"
@@ -5010,18 +5010,23 @@ keyv@^4.5.4:
   dependencies:
     json-buffer "3.0.1"
 
-kitsu-core@8.3.1, kitsu-core@^8.3.1:
-  version "8.3.1"
-  resolved "https://registry.yarnpkg.com/kitsu-core/-/kitsu-core-8.3.1.tgz#89b8848694c371afca38d81333e4225fdf77cb33"
-  integrity sha512-Zf3sqz//9C8Kq9LVoBP4D8dQpaeeDqM+TWO38y/emmr3JiHMz3fNlDva5IK0bchsU3AshtXD5Z83FZxnLglkig==
+kitsu-core@9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/kitsu-core/-/kitsu-core-9.0.0.tgz#a8551f392bcf92af16dcb3fa7272e1748915930f"
+  integrity sha512-8L98Br8HiqAx1CsjAbyJx4FFdtGNRMo7GyR+6abcvCWnjbFJuUTQjdXJ6Dtpgpze/vhzo0koNQbGr4P3rOVx9Q==
 
-kitsu@8.3.1:
-  version "8.3.1"
-  resolved "https://registry.yarnpkg.com/kitsu/-/kitsu-8.3.1.tgz#9c1e8fedd59eb2ce3569b6605bd6e472d45c9301"
-  integrity sha512-0JKkSgh1I1umq7VH4TXcxQpz4R0VijB2g4nWxBXy+B/5CLLVocmlkcEW8eylVx7A2u0misjn+t8baEGLLrwOVQ==
+kitsu-core@^9.0.0:
+  version "9.1.29"
+  resolved "https://registry.yarnpkg.com/kitsu-core/-/kitsu-core-9.1.29.tgz#7285d1f29a636edd3599780b8199eefb5e95cfd1"
+  integrity sha512-1YJieHdVrg6kkiUaga8F6j6Pfn9zU1CmlYdSxGxVhMp+Ns6zxH0JO/Z+cMm6z1RRd2EUVL9swtgL6htO/o+Nfw==
+
+kitsu@9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/kitsu/-/kitsu-9.0.0.tgz#1433d81cba0ae8588e764f2c76d1f0b2af9c5b22"
+  integrity sha512-9d7jTQWVaHX3zP+W+OzJk5YKhno5IXTIz+K2G18O45UVJPrHISQdjYbli+LhqnZo/RqsNRBz2lh3sYACxDQGWQ==
   dependencies:
     axios "^0.19.0"
-    kitsu-core "^8.3.1"
+    kitsu-core "^9.0.0"
     pluralize "^8.0.0"
 
 kleur@^3.0.3:

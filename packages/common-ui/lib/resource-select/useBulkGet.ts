@@ -8,6 +8,7 @@ export interface UseBulkGetParams {
   ids: string[];
   listPath: string;
   disabled?: boolean;
+  parser?: any;
   /** onSuccess callback. */
   onSuccess?: (response) => void;
 }
@@ -25,6 +26,7 @@ export function useBulkGet<TData extends KitsuResource>({
   ids,
   listPath,
   disabled,
+  parser,
   onSuccess
 }: UseBulkGetParams) {
   const { bulkGet } = useApiClient();
@@ -78,8 +80,12 @@ export function useBulkGet<TData extends KitsuResource>({
     }
   );
 
-  const data = fetchResponse?.fetchedWithoutNulls;
-  const dataWithNullForMissing = fetchResponse?.fetchedWithNulls;
+  const data = parser
+    ? fetchResponse?.fetchedWithoutNulls.map((item) => parser(item))
+    : fetchResponse?.fetchedWithoutNulls;
+  const dataWithNullForMissing = parser
+    ? fetchResponse?.fetchedWithNulls.map((item) => parser(item))
+    : fetchResponse?.fetchedWithNulls;
 
   return { data, dataWithNullForMissing, loading: isValidating };
 }

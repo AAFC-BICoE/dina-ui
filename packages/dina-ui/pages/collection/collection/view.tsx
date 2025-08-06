@@ -2,7 +2,7 @@ import { DinaForm } from "common-ui";
 import _ from "lodash";
 import Link from "next/link";
 import { ViewPageLayout } from "../../../components";
-import { Collection } from "../../../types/collection-api";
+import { Collection, collectionParser } from "../../../types/collection-api";
 import { CollectionFormFields } from "./edit";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 
@@ -55,6 +55,7 @@ export default function CollectionDetailsPage() {
         path: `collection-api/collection/${id}`,
         include: "institution,parentCollection"
       })}
+      queryOptions={{ parser: collectionParser }}
       entityLink="/collection/collection"
       type="collection"
       apiBaseUrl="/collection-api"

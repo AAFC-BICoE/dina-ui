@@ -57,3 +57,11 @@ export interface MetadataRelationships {
 export type Metadata = KitsuResource &
   MetadataAttributes &
   MetadataRelationships;
+
+export function metadataParser(metadata) {
+  metadata.derivatives = metadata.derivatives?.data;
+  metadata.acMetadataCreator = metadata.acMetadataCreator?.data;
+  metadata.dcCreator = metadata.dcCreator?.data;
+  metadata.managedAttributes = metadata.managedAttributes?.data;
+  return metadata;
+}

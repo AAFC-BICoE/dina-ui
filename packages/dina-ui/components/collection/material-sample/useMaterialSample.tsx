@@ -34,6 +34,7 @@ import {
   Collection,
   FormTemplate,
   MaterialSample,
+  materialSampleParser,
   Organism,
   ORGANISMS_COMPONENT_NAME,
   PREPARATIONS_COMPONENT_NAME,
@@ -76,6 +77,7 @@ export function useMaterialSampleQuery(id?: string | null) {
     },
     {
       disabled: !id,
+      parser: materialSampleParser,
       onSuccess: async ({ data }) => {
         for (const organism of data.organism ?? []) {
           if (organism?.determination) {

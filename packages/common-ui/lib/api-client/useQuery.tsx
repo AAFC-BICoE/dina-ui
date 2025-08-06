@@ -43,6 +43,9 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
 
   /** Disables the query. */
   disabled?: boolean;
+
+  /** Optional parser to transform the response data. */
+  parser?: any;
 }
 
 /**
@@ -55,7 +58,8 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     deps = [],
     joinSpecs = [],
     onSuccess,
-    disabled = false
+    disabled = false,
+    parser
   }: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
   const { apiClient, bulkGet } = useContext(ApiClientContext);
@@ -83,6 +87,11 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       _.isUndefined
     );
     const response = await apiClient.get<TData, TMeta>(path, getParams);
+
+    if (parser) {
+      // Parse the response data if a parser is provided.
+      response.data = parser(response.data);
+    }
 
     if (!response) {
       // This warning may appear in tests where apiClient.get hasn't been mocked:

@@ -13,7 +13,10 @@ import _ from "lodash";
 import { useMemo } from "react";
 import * as yup from "yup";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../../types/collection-api";
+import {
+  CollectingEvent,
+  collectingEventParser
+} from "../../../types/collection-api";
 import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
 import { SourceAdministrativeLevel } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
@@ -33,6 +36,7 @@ export function useCollectingEventQuery(id?: string | null) {
     {
       // Return undefined when ID is undefined:
       disabled: !id,
+      parser: collectingEventParser,
       onSuccess: async ({ data }) => {
         // Do client-side multi-API joins on one-to-many fields:
         if (data.geoReferenceAssertions) {

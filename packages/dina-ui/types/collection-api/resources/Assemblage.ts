@@ -19,3 +19,9 @@ export interface AssemblageRelationships {
 export type Assemblage = KitsuResource &
   AssemblageAttributes &
   AssemblageRelationships;
+
+export function assemblageParser(assemblage) {
+  assemblage.attachment = assemblage.attachment?.data;
+
+  return assemblage;
+}

@@ -19,3 +19,9 @@ export interface StorageUnitUsageRelationships {
 export type StorageUnitUsage = KitsuResource &
   StorageUnitUsageAttributes &
   StorageUnitUsageRelationships;
+
+export function storageUnitUsageParser(storageUnitUsage) {
+  storageUnitUsage.storageUnit = storageUnitUsage.storageUnit?.data;
+
+  return storageUnitUsage;
+}

@@ -96,6 +96,8 @@ export interface QueryTableProps<TData extends KitsuResource> {
   /** Client-side joins across multiple back-end APIs. */
   joinSpecs?: ClientSideJoinSpec[];
 
+  parser?;
+
   /** Overrides the inner loading state if set to true. */
   loading?: boolean;
 
@@ -146,6 +148,7 @@ export function QueryTable<TData extends KitsuResource>({
   filter,
   include,
   joinSpecs,
+  parser,
   loading: loadingProp,
   omitPaging,
   onSuccess,
@@ -289,7 +292,8 @@ export function QueryTable<TData extends KitsuResource>({
   const queryState = useQuery<TData[], MetaWithTotal>(query, {
     deps,
     joinSpecs,
-    onSuccess
+    onSuccess,
+    parser
   });
 
   const { error, loading: queryIsLoading, response } = queryState;

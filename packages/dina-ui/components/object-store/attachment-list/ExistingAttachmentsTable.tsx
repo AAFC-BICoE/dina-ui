@@ -14,6 +14,7 @@ import Link from "next/link";
 import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
+import { metadataParser } from "../../../types/objectstore-api";
 
 export interface ExistingAttachmentsTableProps {
   attachmentPath: string;
@@ -193,6 +194,7 @@ export function ExistingAttachmentsTable({
         reactTableProps={{ enableSorting: false }}
         defaultPageSize={10000}
         onSuccess={(res) => setAvailableMetadatas(res.data)}
+        parser={metadataParser}
         ariaLabel="Existing attachments"
       />
     </DinaForm>

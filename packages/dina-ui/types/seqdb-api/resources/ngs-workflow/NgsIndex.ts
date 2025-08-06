@@ -31,3 +31,9 @@ export interface NgsIndexRelationships {
 export type NgsIndex = KitsuResource &
   NgsIndexAttributes &
   NgsIndexRelationships;
+
+export function ngsIndexParser(ngsIndex) {
+  ngsIndex.indexSet = ngsIndex.indexSet?.data;
+
+  return ngsIndex;
+}

@@ -18,7 +18,7 @@ import { CSSProperties, ReactNode } from "react";
 import { AllowAttachmentsConfig, AttachmentSection } from "..";
 import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Metadata } from "../../../types/objectstore-api";
+import { Metadata, metadataParser } from "../../../types/objectstore-api";
 import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
 import classNames from "classnames";
 import { KitsuResource, PersistedResource } from "kitsu";
@@ -101,7 +101,8 @@ export function AttachmentsEditor({
 
   const { data: metadatas, loading } = useBulkGet<Metadata>({
     ids: value.map((it) => it.id),
-    listPath: "objectstore-api/metadata?include=derivatives"
+    listPath: "objectstore-api/metadata?include=derivatives",
+    parser: metadataParser
   });
 
   function removeMetadata(removedId: string) {

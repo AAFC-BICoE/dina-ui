@@ -35,3 +35,12 @@ export interface StorageUnitRelationships {
 export type StorageUnit = KitsuResource &
   StorageUnitAttributes &
   StorageUnitRelationships;
+
+export function storageUnitParser(storageUnit) {
+  storageUnit.storageUnitType = storageUnit.storageUnitType?.data;
+  storageUnit.parentStorageUnit = storageUnit.parentStorageUnit?.data;
+  storageUnit.hierarchy = storageUnit.hierarchy?.data;
+  storageUnit.storageUnitChildren = storageUnit.storageUnitChildren?.data;
+
+  return storageUnit;
+}

@@ -28,3 +28,11 @@ export interface DerivativeRelationships {
 export type Derivative = KitsuResource &
   DerivativeAttributes &
   DerivativeRelationships;
+
+export function derivativeParser(derivative) {
+  derivative.generatedFromDerivative = derivative.generatedFromDerivative?.data;
+  derivative.acDerivedFrom = derivative.acDerivedFrom?.data;
+  derivative.objectUpload = derivative.objectUpload?.data;
+
+  return derivative;
+}

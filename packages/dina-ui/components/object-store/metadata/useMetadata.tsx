@@ -9,7 +9,9 @@ import {
   License,
   Metadata,
   ObjectUpload,
-  Derivative
+  Derivative,
+  metadataParser,
+  derivativeParser
 } from "../../../types/objectstore-api";
 import _ from "lodash";
 
@@ -42,7 +44,8 @@ export function useMetadataEditQuery(id?: string | null) {
             })
           ).data[0];
         }
-      }
+      },
+      parser: metadataParser
     }
   );
   return metadataQuery;
@@ -102,7 +105,8 @@ export function useMetadataViewQuery(id?: string) {
             objectUpload: changesMap.get(derivative.fileIdentifier)
           })
         );
-      }
+      },
+      parser: metadataParser
     }
   );
   return query;
@@ -125,7 +129,8 @@ export function useDerivativeMetadataViewQuery(id?: string) {
           joinField: "objectUpload",
           path: (derivative) => `object-upload/${derivative.fileIdentifier}`
         }
-      ]
+      ],
+      parser: derivativeParser
     }
   );
   return query;
@@ -146,7 +151,8 @@ export function useDerivativeEditQuery(id?: string | null) {
           joinField: "objectUpload",
           path: (derivative) => `object-upload/${derivative.fileIdentifier}`
         }
-      ]
+      ],
+      parser: derivativeParser
     }
   );
   return derivativeQuery;

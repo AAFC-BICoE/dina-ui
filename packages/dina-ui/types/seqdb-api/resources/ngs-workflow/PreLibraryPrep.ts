@@ -27,3 +27,11 @@ export interface PreLibraryPrep2Relationships {
 export type PreLibraryPrep = KitsuResource &
   PreLibraryPrep2Attributes &
   PreLibraryPrep2Relationships;
+
+export function preLibraryPrepParser(preLibraryPrep) {
+  preLibraryPrep.libraryPrep = preLibraryPrep.libraryPrep?.data;
+  preLibraryPrep.protocol = preLibraryPrep.protocol?.data;
+  preLibraryPrep.product = preLibraryPrep.product?.data;
+
+  return preLibraryPrep;
+}

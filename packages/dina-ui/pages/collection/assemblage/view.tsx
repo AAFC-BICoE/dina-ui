@@ -1,7 +1,10 @@
 import { DinaForm, Tooltip } from "common-ui";
 import _ from "lodash";
 import { ViewPageLayout } from "../../../components";
-import { Assemblage } from "../../../types/collection-api/resources/Assemblage";
+import {
+  Assemblage,
+  assemblageParser
+} from "../../../types/collection-api/resources/Assemblage";
 import { AssemblageFormLayout } from "./edit";
 
 export default function AssemblageDetailsPage() {
@@ -35,6 +38,7 @@ export default function AssemblageDetailsPage() {
       type="assemblage"
       apiBaseUrl="/collection-api"
       showRevisionsLink={true}
+      queryOptions={{ parser: assemblageParser }}
       tooltipNode={
         <Tooltip
           id={"assemblage_tooltip"}
