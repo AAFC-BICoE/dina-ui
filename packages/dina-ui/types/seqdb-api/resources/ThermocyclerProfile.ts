@@ -18,3 +18,8 @@ export interface ThermocyclerProfileRelationships {
 export type ThermocyclerProfile = KitsuResource &
   ThermocyclerProfileAttributes &
   ThermocyclerProfileRelationships;
+
+export function thermocyclerProfileParser(data) {
+  data.region = data.region?.data;
+  return data;
+}

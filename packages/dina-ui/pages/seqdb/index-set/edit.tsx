@@ -22,7 +22,7 @@ import {
   NgsIndexField
 } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { IndexSet, NgsIndex } from "../../../types/seqdb-api";
+import { IndexSet, NgsIndex, ngsIndexParser } from "../../../types/seqdb-api";
 
 export interface IndexSetFormProps {
   dinaFormProps: DinaFormProps<IndexSet>;
@@ -43,7 +43,7 @@ export default function IndexSetEditPage() {
       path: `seqdb-api/index-set/${id}`,
       include: "ngsIndexes"
     },
-    { disabled: !id, deps: [] }
+    { disabled: !id, deps: [], parser: ngsIndexParser }
   );
 
   const buttonBar = (

@@ -31,3 +31,14 @@ interface LibraryPrepBatchRelationships {
 export type LibraryPrepBatch = KitsuResource &
   LibraryPrepBatchAttributes &
   LibraryPrepBatchRelationships;
+
+export function libraryPrepBatchParser(libraryPrepBatch) {
+  libraryPrepBatch.product = libraryPrepBatch.product?.data;
+  libraryPrepBatch.protocol = libraryPrepBatch.protocol?.data;
+  libraryPrepBatch.indexSet = libraryPrepBatch.indexSet?.data;
+  libraryPrepBatch.thermocyclerProfile =
+    libraryPrepBatch.thermocyclerProfile?.data;
+  libraryPrepBatch.storageUnit = libraryPrepBatch.storageUnit?.data;
+
+  return libraryPrepBatch;
+}

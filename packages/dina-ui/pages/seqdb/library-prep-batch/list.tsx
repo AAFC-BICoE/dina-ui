@@ -15,7 +15,10 @@ import {
   Nav
 } from "../../../components";
 import { useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { LibraryPrepBatch } from "../../../types/seqdb-api";
+import {
+  LibraryPrepBatch,
+  libraryPrepBatchParser
+} from "../../../types/seqdb-api";
 
 const TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] = [
   {
@@ -69,7 +72,8 @@ export default function LibraryPrepBatchListPage() {
           queryTableProps={{
             columns: TABLE_COLUMNS,
             path: "seqdb-api/library-prep-batch",
-            include: ""
+            include: "",
+            parser: libraryPrepBatchParser
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

@@ -14,7 +14,11 @@ import {
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { NgsIndex, pcrBatchItemParser } from "packages/dina-ui/types/seqdb-api";
+import {
+  NgsIndex,
+  ngsIndexParser,
+  pcrBatchItemParser
+} from "packages/dina-ui/types/seqdb-api";
 import { MetagenomicsIndexAssignmentStepProps } from "../metagenomics-workflow/MetagenomicsIndexAssignmentStep";
 import {
   MetagenomicsBatchItem,
@@ -187,6 +191,7 @@ export function useMetagenomicsIndexAssignmentAPI({
     },
     {
       deps: [lastSave],
+      parser: ngsIndexParser,
       async onSuccess(response) {
         setNgsIndexes(response.data as NgsIndex[]);
       },

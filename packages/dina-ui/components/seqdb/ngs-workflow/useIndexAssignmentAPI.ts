@@ -15,7 +15,11 @@ import {
 } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
-import { LibraryPrep, NgsIndex } from "packages/dina-ui/types/seqdb-api";
+import {
+  LibraryPrep,
+  NgsIndex,
+  ngsIndexParser
+} from "packages/dina-ui/types/seqdb-api";
 
 export interface UseIndexAssignmentReturn {
   libraryPrepsLoading: boolean;
@@ -143,6 +147,7 @@ export function useIndexAssignmentAPI({
     },
     {
       deps: [lastSave],
+      parser: ngsIndexParser,
       async onSuccess(response) {
         setNgsIndexes(response.data as NgsIndex[]);
       },

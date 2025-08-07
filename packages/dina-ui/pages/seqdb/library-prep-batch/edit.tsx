@@ -32,6 +32,7 @@ import { Protocol, StorageUnitType } from "../../../types/collection-api";
 import {
   IndexSet,
   LibraryPrepBatch,
+  libraryPrepBatchParser,
   Product,
   ThermocyclerProfile
 } from "../../../types/seqdb-api";
@@ -43,7 +44,7 @@ export function useLibraryPrepBatchQuery(id?: string, deps?: any[]) {
       include:
         "product,protocol,thermocyclerProfile,storageUnit,storageUnitType,indexSet"
     },
-    { disabled: !id, deps }
+    { disabled: !id, deps, parser: libraryPrepBatchParser }
   );
 }
 export default function LibraryPrepBatchEditPage() {

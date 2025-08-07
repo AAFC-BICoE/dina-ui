@@ -12,7 +12,11 @@ import {
   StorageUnit
 } from "packages/dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { LibraryPrep, LibraryPrepBatch } from "../../../../types/seqdb-api";
+import {
+  LibraryPrep,
+  LibraryPrepBatch,
+  libraryPrepBatchParser
+} from "../../../../types/seqdb-api";
 import { CellGrid } from "../../container-grid/ContainerGrid";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
@@ -221,6 +225,7 @@ export function useNsgSelectCoordinatesControls({
     },
     {
       deps: [lastSave],
+      parser: libraryPrepBatchParser,
       onSuccess: async ({ data: libraryPreps }) => {
         setItemsLoading(true);
 

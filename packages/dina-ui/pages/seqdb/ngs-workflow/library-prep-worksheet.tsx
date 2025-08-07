@@ -3,7 +3,8 @@ import { useRouter } from "next/router";
 import { useIndexAssignmentAPI } from "packages/dina-ui/components/seqdb/ngs-workflow/useIndexAssignmentAPI";
 import {
   LibraryPrep,
-  LibraryPrepBatch
+  LibraryPrepBatch,
+  libraryPrepBatchParser
 } from "packages/dina-ui/types/seqdb-api";
 import {
   MaterialSampleSummary,
@@ -19,15 +20,18 @@ export default function LibraryPrepWorksheetPage() {
   } = useRouter();
 
   const { loading: batchLoading, response: batchResponse } =
-    useQuery<LibraryPrepBatch>({
-      include: [
-        "protocol",
-        "thermocyclerProfile",
-        "indexSet",
-        "storageUnit"
-      ].join(","),
-      path: `seqdb-api/library-prep-batch/${batchId}`
-    });
+    useQuery<LibraryPrepBatch>(
+      {
+        include: [
+          "protocol",
+          "thermocyclerProfile",
+          "indexSet",
+          "storageUnit"
+        ].join(","),
+        path: `seqdb-api/library-prep-batch/${batchId}`
+      },
+      { parser: libraryPrepBatchParser }
+    );
 
   const batch = batchResponse && batchResponse.data;
 

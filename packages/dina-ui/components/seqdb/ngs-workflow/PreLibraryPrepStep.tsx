@@ -15,7 +15,8 @@ import { MaterialSample } from "../../../types/collection-api";
 import {
   LibraryPrep,
   LibraryPrepBatch,
-  PreLibraryPrep
+  PreLibraryPrep,
+  preLibraryPrepParser
 } from "../../../types/seqdb-api";
 import { PreLibraryPrepTable } from "./PreLibraryPrepTable";
 
@@ -72,7 +73,7 @@ export function PreLibraryPrepStep({
 
   async function fetchPreLibraryPreps() {
     // fetch all libraryPrep IDs
-    const libraryPreps = (
+    const libraryPreps = preLibraryPrepParser(
       await apiClient.get<LibraryPrep[]>("/seqdb-api/library-prep", {
         filter: filterBy([], {
           extraFilters: [
