@@ -1,11 +1,5 @@
 import { DocWithErrors } from "jsonapi-typescript";
-import {
-  GetParams,
-  KitsuResource,
-  KitsuResponse,
-  KitsuResponseData,
-  PersistedResource
-} from "kitsu";
+import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
 import _ from "lodash";
 import { useContext, useDebugValue, useMemo } from "react";
 import useSWR from "swr";
@@ -51,9 +45,7 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
   disabled?: boolean;
 
   /** Optional parser to transform the response data. Currently only needed if the query has includes.*/
-  parser?: <T extends KitsuResource>(
-    data: PersistedResource<T>
-  ) => PersistedResource<T>;
+  parser?: (data: any) => any;
 }
 
 /**

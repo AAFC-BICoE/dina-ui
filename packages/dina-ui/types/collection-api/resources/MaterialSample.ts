@@ -1,6 +1,11 @@
+import {
+  KitsuResource,
+  KitsuResourceLink,
+  PersistedResource,
+  InputResource
+} from "kitsu";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { InputResource, KitsuResource, KitsuResourceLink } from "kitsu";
-import { BLANK_PREPARATION, BLANK_RESTRICTION } from "../../../components";
+import { Person } from "../../objectstore-api";
 import { ManagedAttributeValues } from "./ManagedAttribute";
 import { Assemblage } from "./Assemblage";
 import { CollectingEvent } from "./CollectingEvent";
@@ -11,8 +16,8 @@ import { Organism } from "./Organism";
 import { PreparationType } from "./PreparationType";
 import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
-import { Person } from "../../objectstore-api";
 import { StorageUnitUsage } from "./StorageUnitUsage";
+import { omit } from "lodash";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -43,14 +48,11 @@ export interface MaterialSampleAttributes {
 
   materialSampleState?: string;
   materialSampleRemarks?: string;
-  materialSampleType?: MaterialSampleType;
-  organism?: (Organism | null | undefined)[] | null;
 
   // Client-side only fields for the organism section:
   organismsQuantity?: number;
   organismsIndividualEntry?: boolean;
   useTargetOrganism?: boolean;
-  storageUnit?: StorageUnit;
 
   publiclyReleasable?: boolean | null;
   notPubliclyReleasableReason?: string;
@@ -115,65 +117,47 @@ export interface MaterialSampleRelationships {
   projects?: Project[];
   assemblages?: Assemblage[];
   storageUnitUsage?: StorageUnitUsage;
+  organism?: (Organism | null | undefined)[] | null;
+  materialSampleType?: MaterialSampleType;
+  storageUnit?: StorageUnit;
 }
 
 interface MaterialSampleChildren extends MaterialSample {
   ordinal: number;
 }
 
-export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
-  return {
-    ...BLANK_PREPARATION,
-    ...BLANK_RESTRICTION,
-    associations: [],
-    hostOrganism: null,
-    organism: []
-  };
-}
-
 export type MaterialSample = KitsuResource &
   MaterialSampleAttributes &
   MaterialSampleRelationships;
 
-export interface MaterialSampleResponse {
-  id: string;
-  type: "material-sample";
-  attributes?: MaterialSampleResponseAttributes;
-  relationships?: MaterialSampleResponseRelationships;
-}
-
+// Response types (what comes from API)
 export interface MaterialSampleResponseAttributes {
-  // Required fields
-  materialSampleName: string;
-  group: string;
-  createdOn: string;
-  createdBy: string;
+  type: "material-sample";
 
-  // Optional core fields
+  materialSampleName?: string;
+
+  group?: string;
+  createdOn?: string;
+  createdBy?: string;
   sourceSet?: string;
   dwcCatalogNumber?: string;
   dwcOtherCatalogNumbers?: string[];
 
-  // Identifiers
   identifiers?: Record<string, string>;
   barcode?: string;
 
-  // State and status with specific values
   materialSampleState?: string;
   materialSampleRemarks?: string;
 
-  // Preparation fields
   preservationType?: string | null;
   preparationFixative?: string | null;
   preparationMaterials?: string | null;
   preparationSubstrate?: string | null;
-  preparationDate?: string | null; // ISO date string
+  preparationDate?: string | null;
   preparationRemarks?: string | null;
 
-  // Descriptive fields
   description?: string;
 
-  // DwC fields
   dwcDegreeOfEstablishment?:
     | "native"
     | "introduced"
@@ -182,17 +166,14 @@ export interface MaterialSampleResponseAttributes {
     | "uncertain"
     | null;
 
-  // Managed attributes (API returns as object)
   managedAttributes?: Record<string, any>;
   preparationManagedAttributes?: Record<string, any>;
 
-  // Privacy and restrictions
   publiclyReleasable?: boolean;
   notPubliclyReleasableReason?: string;
   isRestricted?: boolean;
   restrictionRemarks?: string;
 
-  // Extension fields
   phac_human_rg?: ExtensionValue | null;
   phac_cl?: ExtensionValue | null;
   phac_animal_rg?: ExtensionValue | null;
@@ -200,34 +181,24 @@ export interface MaterialSampleResponseAttributes {
   restrictionFieldsExtension?: Record<string, any> | null;
   extensionValues?: Record<string, any>;
 
-  // Metadata
   version?: string;
   tags?: string[];
 
-  // State tracking
-  stateChangedOn?: string; // ISO date string
+  stateChangedOn?: string;
   stateChangeRemarks?: string;
 
-  // Host organism (structured)
   hostOrganism?: HostOrganism | null;
-
-  // Associations (array of structured objects)
   associations?: MaterialSampleAssociation[];
-
-  // Scheduled actions
   scheduledActions?: ScheduledAction[];
-
-  // Hierarchy (if returned as attributes)
   hierarchy?: HierarchyItem[];
 }
 
-// Relationships as they come from API
 export interface MaterialSampleResponseRelationships {
   collection?: {
-    data?: Collection;
+    data?: PersistedResource<Collection>;
   };
   collectingEvent?: {
-    data?: CollectingEvent;
+    data?: PersistedResource<CollectingEvent>;
   };
   attachment?: {
     data?: ResourceIdentifierObject[];
@@ -239,103 +210,89 @@ export interface MaterialSampleResponseRelationships {
     data?: ResourceIdentifierObject;
   };
   preparationType?: {
-    data?: PreparationType;
+    data?: PersistedResource<PreparationType>;
   };
   preparedBy?: {
-    data?: Person[];
+    data?: PersistedResource<Person>[];
   };
   parentMaterialSample?: {
-    data?: MaterialSample;
+    data?: PersistedResource<MaterialSample>;
   };
   projects?: {
-    data?: Project[];
+    data?: PersistedResource<Project>[];
   };
   assemblages?: {
-    data?: Assemblage[];
+    data?: PersistedResource<Assemblage>[];
   };
   storageUnitUsage?: {
-    data?: StorageUnitUsage;
+    data?: PersistedResource<StorageUnitUsage>;
   };
   organism?: {
-    data?: (Organism | undefined)[];
+    data?: PersistedResource<Organism>[];
   };
   materialSampleType?: {
     data?: MaterialSampleType;
   };
   storageUnit?: {
-    data?: StorageUnit;
+    data?: PersistedResource<StorageUnit>;
   };
 }
 
+export type MaterialSampleResponse = KitsuResource &
+  MaterialSampleResponseAttributes &
+  MaterialSampleResponseRelationships;
+
 /**
- * Parses the relationships object from a material sample API response and extracts
- * the relationship data.
+ * Parses a `PersistedResource<MaterialSampleResponse>` object and transforms it into a `PersistedResource<MaterialSample>`.
  *
- * @param relationships - The relationships object from the material sample API response.
- * @returns An object containing the relationship data.
+ * This function omits specific relationship properties from the input material sample and restructures the relationships
+ * to use their `.data` subfields as their values.
+ *
+ * @param data - The response.data object to parse, of type `PersistedResource<MaterialSampleResponse>`.
+ * @returns The parsed material sample resource, of type `PersistedResource<MaterialSample>`.
  */
-export function MaterialSampleRelationshipParser(
-  relationships: MaterialSampleResponseRelationships
-): MaterialSampleRelationships {
+export function materialSampleParser(
+  data: PersistedResource<MaterialSampleResponse>
+): PersistedResource<MaterialSample> {
+  const parsedMaterialSample: PersistedResource<MaterialSample> = {
+    ...omit(data, [
+      "collection",
+      "collectingEvent",
+      "attachment",
+      "preparationProtocol",
+      "preparationMethod",
+      "preparationType",
+      "preparedBy",
+      "parentMaterialSample",
+      "projects",
+      "assemblages",
+      "storageUnitUsage",
+      "organism",
+      "materialSampleType",
+      "storageUnit"
+    ]),
+    collection: data.collection?.data,
+    collectingEvent: data.collectingEvent?.data,
+    attachment: data.attachment?.data,
+    preparationProtocol: data.preparationProtocol?.data,
+    preparationMethod: data.preparationMethod?.data,
+    preparationType: data.preparationType?.data,
+    preparedBy: data.preparedBy?.data,
+    parentMaterialSample: data.parentMaterialSample?.data,
+    projects: data.projects?.data,
+    assemblages: data.assemblages?.data,
+    storageUnitUsage: data.storageUnitUsage?.data,
+    organism: data.organism?.data,
+    materialSampleType: data.materialSampleType?.data,
+    storageUnit: data.storageUnit?.data
+  };
+  return parsedMaterialSample;
+}
+
+export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
   return {
-    collection: relationships.collection?.data,
-    collectingEvent: relationships.collectingEvent?.data,
-    attachment: relationships.attachment?.data,
-    preparationProtocol: relationships.preparationProtocol?.data,
-    preparationMethod: relationships.preparationMethod?.data,
-    preparationType: relationships.preparationType?.data,
-    preparedBy: relationships.preparedBy?.data,
-    parentMaterialSample: relationships.parentMaterialSample?.data,
-    projects: relationships.projects?.data,
-    assemblages: relationships.assemblages?.data,
-    storageUnitUsage: relationships.storageUnitUsage?.data
+    associations: [],
+    hostOrganism: null,
+    organism: []
   };
-}
-
-/**
- * Parses a MaterialSampleResponse object and transforms it into a MaterialSample object.
- *
- * @param materialSample - The MaterialSampleResponse object to parse.
- * @returns The parsed MaterialSample object, including its attributes and relationships.
- */
-// export function MaterialSampleParser(
-//   materialSample: MaterialSampleResponse
-// ): MaterialSample {
-//   const relationships = materialSample.relationships ? MaterialSampleRelationshipParser(materialSample.relationships) : {};
-//   // Attributes that are handled as relationships in the API response.
-//   const nonRelationshipAttributes = {
-//     organism: materialSample.relationships?.organism?.data,
-//     materialSampleType: materialSample.relationships?.materialSampleType?.data,
-//     storageUnit: materialSample.relationships?.storageUnit?.data
-//   }
-
-//   const parsedMaterialSample: MaterialSample = {
-//     id: materialSample.id,
-//     type: materialSample.type,
-//     ...(materialSample.attributes || {}),
-//     ...relationships,
-//     ...nonRelationshipAttributes
-//   };
-
-//   return parsedMaterialSample;
-// }
-
-export function materialSampleParser(materialSample) {
-  materialSample.collection = materialSample.collection?.data;
-  materialSample.collectingEvent = materialSample.collectingEvent?.data;
-  materialSample.attachment = materialSample.attachment?.data;
-  materialSample.preparationProtocol = materialSample.preparationProtocol?.data;
-  materialSample.preparationMethod = materialSample.preparationMethod?.data;
-  materialSample.preparationType = materialSample.preparationType?.data;
-  materialSample.preparedBy = materialSample.preparedBy?.data;
-  materialSample.parentMaterialSample =
-    materialSample.parentMaterialSample?.data;
-  materialSample.projects = materialSample.projects?.data;
-  materialSample.assemblages = materialSample.assemblages?.data;
-  materialSample.storageUnitUsage = materialSample.storageUnitUsage?.data;
-  materialSample.organism = materialSample.organism?.data;
-  materialSample.materialSampleType = materialSample.materialSampleType?.data;
-  materialSample.storageUnit = materialSample.storageUnit?.data;
-
-  return materialSample;
 }
