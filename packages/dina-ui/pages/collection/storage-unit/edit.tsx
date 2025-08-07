@@ -6,7 +6,7 @@ import {
   storageUnitDisplayName,
   StorageUnitForm
 } from "../../../components";
-import { StorageUnit } from "../../../types/collection-api";
+import { StorageUnit, storageUnitParser } from "../../../types/collection-api";
 import { writeStorage } from "@rehooks/local-storage";
 import PageLayout from "../../../components/page/PageLayout";
 
@@ -23,6 +23,7 @@ export function useStorageUnit(id?: string) {
         {
           apiBaseUrl: "/collection-api",
           idField: "parentStorageUnit.id",
+          parser: storageUnitParser,
           joinField: "parentStorageUnit",
           path: (storageUnit) =>
             `storage-unit/${storageUnit.parentStorageUnit?.id}?include=hierarchy`

@@ -22,3 +22,9 @@ export interface PersonRelationships {
 }
 
 export type Person = KitsuResource & PersonAttributes & PersonRelationships;
+
+export function personParser(data) {
+  data.organizations = data.organizations?.data;
+  data.identifiers = data.identifiers?.data;
+  return data;
+}

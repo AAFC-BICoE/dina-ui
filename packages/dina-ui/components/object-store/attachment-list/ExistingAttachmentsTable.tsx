@@ -178,6 +178,7 @@ export function ExistingAttachmentsTable({
             apiBaseUrl: "/objectstore-api",
             idField: "id",
             joinField: "metadata",
+            parser: metadataParser,
             path: (metadataRef) =>
               `metadata/${metadataRef.id}?include=acMetadataCreator,derivatives`
           },
@@ -194,7 +195,6 @@ export function ExistingAttachmentsTable({
         reactTableProps={{ enableSorting: false }}
         defaultPageSize={10000}
         onSuccess={(res) => setAvailableMetadatas(res.data)}
-        parser={metadataParser}
         ariaLabel="Existing attachments"
       />
     </DinaForm>

@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import { Footer, GroupLabel, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Person } from "../../types/objectstore-api";
+import { Person, personParser } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
 import classNames from "classnames";
 
@@ -38,6 +38,7 @@ export default function DinaUserDetailsPage() {
           apiBaseUrl: "/agent-api",
           idField: "agentId",
           joinField: "agent",
+          parser: personParser,
           path: (user) => `person/${user.agentId}?include=organizations`
         }
       ]

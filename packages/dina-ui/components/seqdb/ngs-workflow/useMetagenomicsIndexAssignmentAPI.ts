@@ -14,9 +14,12 @@ import {
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { NgsIndex } from "packages/dina-ui/types/seqdb-api";
+import { NgsIndex, pcrBatchItemParser } from "packages/dina-ui/types/seqdb-api";
 import { MetagenomicsIndexAssignmentStepProps } from "../metagenomics-workflow/MetagenomicsIndexAssignmentStep";
-import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
+import {
+  MetagenomicsBatchItem,
+  metagenomicsBatchItemParser
+} from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 
 export interface UseMetagenomicsIndexAssignmentReturn {
   loading: boolean;
@@ -79,11 +82,13 @@ export function useMetagenomicsIndexAssignmentAPI({
     },
     {
       deps: [lastSave],
+      parser: metagenomicsBatchItemParser,
       joinSpecs: [
         {
           apiBaseUrl: "/seqdb-api",
           idField: "pcrBatchItem.id",
           joinField: "pcrBatchItem",
+          parser: pcrBatchItemParser,
           path: (metagenomicsBatchItem: MetagenomicsBatchItem) =>
             `pcr-batch-item/${metagenomicsBatchItem.pcrBatchItem?.id}?include=materialSample,storageUnitUsage`
         }

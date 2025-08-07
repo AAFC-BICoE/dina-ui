@@ -21,3 +21,13 @@ export interface MetagenomicsBatchItemRelationships {
 export type MetagenomicsBatchItem = KitsuResource &
   MetagenomicsBatchItemAttributes &
   MetagenomicsBatchItemRelationships;
+
+export function metagenomicsBatchItemParser(data) {
+  data.metagenomicsBatch = data.metagenomicsBatch?.data;
+  data.indexI5 = data.indexI5?.data;
+  data.indexI7 = data.indexI7?.data;
+  data.pcrBatchItem = data.pcrBatchItem?.data;
+  data.molecularAnalysisRunItem = data.molecularAnalysisRunItem?.data;
+
+  return data;
+}

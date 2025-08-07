@@ -1,5 +1,11 @@
 import { DocWithErrors } from "jsonapi-typescript";
-import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
+import {
+  GetParams,
+  KitsuResource,
+  KitsuResponse,
+  KitsuResponseData,
+  PersistedResource
+} from "kitsu";
 import _ from "lodash";
 import { useContext, useDebugValue, useMemo } from "react";
 import useSWR from "swr";
@@ -45,7 +51,9 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
   disabled?: boolean;
 
   /** Optional parser to transform the response data. */
-  parser?: any;
+  parser?: (
+    data: PersistedResource<KitsuResource>
+  ) => PersistedResource<KitsuResource>;
 }
 
 /**
@@ -88,9 +96,24 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     );
     const response = await apiClient.get<TData, TMeta>(path, getParams);
 
+    // Define helper types
+    type ArrayBranch<T> = T extends (infer R)[]
+      ? PersistedResource<R>[]
+      : never;
+    type SingleBranch<T> = T extends (infer _)[]
+      ? never
+      : T extends KitsuResource
+      ? PersistedResource<T>
+      : never;
+
     if (parser) {
-      // Parse the response data if a parser is provided.
-      response.data = parser(response.data);
+      if (Array.isArray(response.data)) {
+        response.data = response.data.map((item) =>
+          parser(item)
+        ) as ArrayBranch<TData>;
+      } else {
+        response.data = parser(response.data) as SingleBranch<TData>;
+      }
     }
 
     if (!response) {

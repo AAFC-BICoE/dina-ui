@@ -7,6 +7,7 @@ export interface ClientSideJoinSpec {
   apiBaseUrl?: string;
   idField: string;
   joinField: string;
+  parser?: any;
   path: (resource: any) => string;
 }
 
@@ -41,7 +42,13 @@ export class ClientSideJoiner {
     const paths = baseResources.map((resource) => this.joinSpec.path(resource));
 
     // Load the joined resources from the back-end:
-    const joinedResources = await this.joinLoader.loadMany(paths);
+    let joinedResources = await this.joinLoader.loadMany(paths);
+    if (this.joinSpec.parser) {
+      // Parse the joined resources if a parser is provided:
+      joinedResources = joinedResources.map((resource) =>
+        resource ? this.joinSpec.parser(resource) : null
+      );
+    }
 
     // Join the resources:
     _.zipWith(

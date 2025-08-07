@@ -57,3 +57,10 @@ export interface PcrBatchItemRelationships {
 export type PcrBatchItem = KitsuResource &
   PcrBatchItemAttributes &
   PcrBatchItemRelationships;
+
+export function pcrBatchItemParser(data) {
+  data.pcrBatch = data.pcrBatch?.data;
+  data.materialSample = data.materialSample?.data;
+  data.storageUnitUsage = data.storageUnitUsage?.data;
+  return data;
+}
