@@ -50,10 +50,10 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
   /** Disables the query. */
   disabled?: boolean;
 
-  /** Optional parser to transform the response data. */
-  parser?: (
-    data: PersistedResource<KitsuResource>
-  ) => PersistedResource<KitsuResource>;
+  /** Optional parser to transform the response data. Currently only needed if the query has includes.*/
+  parser?: <T extends KitsuResource>(
+    data: PersistedResource<T>
+  ) => PersistedResource<T>;
 }
 
 /**
@@ -96,23 +96,13 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     );
     const response = await apiClient.get<TData, TMeta>(path, getParams);
 
-    // Define helper types
-    type ArrayBranch<T> = T extends (infer R)[]
-      ? PersistedResource<R>[]
-      : never;
-    type SingleBranch<T> = T extends (infer _)[]
-      ? never
-      : T extends KitsuResource
-      ? PersistedResource<T>
-      : never;
-
     if (parser) {
       if (Array.isArray(response.data)) {
         response.data = response.data.map((item) =>
           parser(item)
-        ) as ArrayBranch<TData>;
+        ) as typeof response.data;
       } else {
-        response.data = parser(response.data) as SingleBranch<TData>;
+        response.data = parser(response.data) as typeof response.data;
       }
     }
 

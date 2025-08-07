@@ -59,6 +59,7 @@ export type Metadata = KitsuResource &
   MetadataAttributes &
   MetadataRelationships;
 
+// Does not contain the license field, which is client-side only.
 export interface MetadataResponseAttributes {
   type: "metadata";
   bucket: string;
@@ -94,7 +95,7 @@ export interface MetadataResponseAttributes {
   // Used for permission information included on the request.
   meta?: DinaJsonMetaInfo;
 }
-
+// This interface is used to represent how relationships are structured in the response from the API.
 export interface MetadataResponseRelationships {
   derivatives?: {
     data?: PersistedResource<Derivative & { objectUpload: ObjectUpload }>[];
@@ -114,18 +115,30 @@ export type MetadataResponse = KitsuResource &
   MetadataResponseAttributes &
   MetadataResponseRelationships;
 
-export function metadataParser(metadata: any): any {
-  const parsedMetadata = {
-    ...omit(metadata, [
+/**
+ * Parses a `PersistedResource<MetadataResponse>` object and transforms it into a `PersistedResource<Metadata>`.
+ *
+ * This function omits specific properties from the input metadata and restructures the relationships
+ * (`derivatives`, `acMetadataCreator`, `dcCreator`, `managedAttributes`) to use their `.data` subfields as their values.
+ *
+ *
+ * @param data - The response.data object to parse, of type `PersistedResource<MetadataResponse>`.
+ * @returns The parsed metadata resource, of type `PersistedResource<Metadata>`.
+ */
+export function metadataParser(
+  data: PersistedResource<MetadataResponse>
+): PersistedResource<Metadata> {
+  const parsedMetadata: PersistedResource<Metadata> = {
+    ...omit(data, [
       "derivatives",
       "acMetadataCreator",
       "dcCreator",
       "managedAttributes"
     ]),
-    derivatives: metadata.derivatives?.data,
-    acMetadataCreator: metadata.acMetadataCreator?.data,
-    dcCreator: metadata.dcCreator?.data,
-    managedAttributes: metadata.managedAttributes.data
+    derivatives: data.derivatives?.data,
+    acMetadataCreator: data.acMetadataCreator?.data,
+    dcCreator: data.dcCreator?.data,
+    managedAttributes: data.managedAttributes?.data
   };
-  return parsedMetadata as any;
+  return parsedMetadata;
 }
