@@ -7,7 +7,7 @@ import { createSessionStorageLastUsedTreeKey } from "common-ui/lib/list-page/sav
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
 import { useEffect } from "react";
-import { Tooltip } from "common-ui/lib";
+import { getGroupStorageKey, Tooltip } from "common-ui";
 
 interface WorkbookConfirmationProps {
   /** The total number of resources in the workbook. */
@@ -46,7 +46,7 @@ export function WorkbookConfirmation({
   );
 
   // Groups selected for the search.
-  const GROUP_STORAGE_KEY = uniqueName + "_groupStorage";
+  const GROUP_STORAGE_KEY = getGroupStorageKey(uniqueName);
 
   const onViewWorkbook = () => {
     // Stop rendering this page since we will be redirecting and don't need to see updates anymore.

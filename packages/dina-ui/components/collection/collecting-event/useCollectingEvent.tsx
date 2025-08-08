@@ -42,7 +42,7 @@ export function useCollectingEventQuery(id?: string | null) {
               assertion.georeferencedBy = _.compact(
                 await bulkGet<Person, true>(
                   assertion.georeferencedBy.map(
-                    (personId: string) => `person/${personId}`
+                    (personId: string) => `/person/${personId}`
                   ),
                   {
                     apiBaseUrl: "/agent-api",
@@ -237,6 +237,9 @@ export function useCollectingEventSave({
           if (idx === 0) {
             if (!srcAdminLevel.id) {
               newSourceDetail.customGeographicPlace = srcAdminLevel.name;
+
+              // If a custom place is set, ensure selected place is null to avoid conflicts.
+              newSourceDetail.selectedGeographicPlace = null;
             } else {
               if (
                 sectionIds.filter(
@@ -247,6 +250,9 @@ export function useCollectingEventSave({
                   srcAdminLevel,
                   ["shortId", "type"]
                 );
+
+              // If a selected place is set, ensure custom place is null to avoid conflicts.
+              newSourceDetail.customGeographicPlace = null;
             }
           } else {
             if (
@@ -271,62 +277,25 @@ export function useCollectingEventSave({
       )
     ) {
       if (Object.keys(newSourceDetail).length > 0) {
-        // Clean place names before saving
-        const cleanedSourceDetail = _.cloneDeep(newSourceDetail);
-
-        // Clean the selectedGeographicPlace name
-        if (cleanedSourceDetail.selectedGeographicPlace?.name) {
-          const name = cleanedSourceDetail.selectedGeographicPlace.name;
-          const typeStart = name.indexOf("[");
-          cleanedSourceDetail.selectedGeographicPlace.name =
-            typeStart !== -1 ? name.slice(0, typeStart).trim() : name.trim();
-        }
-
-        // Clean the higherGeographicPlaces names
-        if (cleanedSourceDetail.higherGeographicPlaces?.length) {
-          cleanedSourceDetail.higherGeographicPlaces =
-            cleanedSourceDetail.higherGeographicPlaces.map((place) => {
-              if (place.name) {
-                const typeStart = place.name.indexOf("[");
-                place.name =
-                  typeStart !== -1
-                    ? place.name.slice(0, typeStart).trim()
-                    : place.name.trim();
-              }
-              return place;
-            });
-        }
-
-        // Save the cleaned data
         collectingEventDiff.geographicPlaceNameSourceDetail =
-          cleanedSourceDetail;
-      } else if (
-        collectingEventFormik?.values?.geographicPlaceNameSourceDetail === null
-      ) {
-        (collectingEventDiff.geographicPlaceNameSourceDetail as any) = null;
+          _.cloneDeep(newSourceDetail);
+      } else {
+        const initialSourceDetail =
+          collectingEventInitialValues.geographicPlaceNameSourceDetail ?? null;
+        const submittedSourceDetail =
+          submittedValues.geographicPlaceNameSourceDetail ?? null;
+
+        // Check if the record has been deleted locally.
+        if (
+          !_.isEqual(initialSourceDetail, submittedSourceDetail) &&
+          submittedSourceDetail === null
+        ) {
+          (collectingEventDiff.geographicPlaceNameSourceDetail as any) = null;
+          (collectingEventDiff.geographicPlaceNameSource as any) = null;
+        }
       }
     } else {
       // If no changes, remove this field from the diff
-      delete collectingEventDiff.geographicPlaceNameSourceDetail;
-    }
-
-    // Handle geographicPlaceNameSourceDetail comparison
-    const initialSourceDetail =
-      collectingEventInitialValues.geographicPlaceNameSourceDetail ?? null;
-    const submittedSourceDetail =
-      submittedValues.geographicPlaceNameSourceDetail ?? null;
-
-    if (!_.isEqual(initialSourceDetail, submittedSourceDetail)) {
-      (collectingEventDiff.geographicPlaceNameSourceDetail as any) =
-        submittedSourceDetail ?? null;
-
-      // If being deleted, the source should also be deleted.
-      if (
-        (collectingEventDiff.geographicPlaceNameSourceDetail as any) === null
-      ) {
-        (collectingEventDiff.geographicPlaceNameSource as any) = null;
-      }
-    } else {
       delete collectingEventDiff.geographicPlaceNameSourceDetail;
     }
 

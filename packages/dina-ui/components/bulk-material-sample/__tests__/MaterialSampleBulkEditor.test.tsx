@@ -45,6 +45,59 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           materialSampleName: "material-sample-500"
         }
       };
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.m1":
+      return Promise.resolve({
+        data: {
+          type: "managed-attribute",
+          id: "1",
+          key: "m1",
+          vocabularyElementType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          name: "Managed Attribute 1"
+        }
+      });
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.m2":
+      return Promise.resolve({
+        data: {
+          type: "managed-attribute",
+          id: "2",
+          key: "m2",
+          vocabularyElementType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          name: "Managed Attribute 2"
+        }
+      });
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.m3":
+      return Promise.resolve({
+        data: {
+          type: "managed-attribute",
+          id: "3",
+          key: "m3",
+          vocabularyElementType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          name: "Managed Attribute 3"
+        }
+      });
+    case "managed-attribute/MATERIAL_SAMPLE.sample_attribute_1":
+      return Promise.resolve({
+        id: "1",
+        key: "sample_attribute_1",
+        name: "Attribute 1"
+      });
+    case "managed-attribute/DETERMINATION.determination_attribute_1":
+      return Promise.resolve({
+        id: "1",
+        key: "determination_attribute_1",
+        name: "Attribute 1"
+      });
+    case "managed-attribute/COLLECTING_EVENT.collecting_event_attribute_1":
+      return Promise.resolve({
+        data: {
+          id: "1",
+          key: "collecting_event_attribute_1",
+          name: "Attribute 1"
+        }
+      });
     case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod,protocol":
       return { data: TEST_COLLECTING_EVENT };
     case "collection-api/storage-unit":
@@ -87,6 +140,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           }
         }
       };
+    case "search-api/search-ws/mapping":
     case "collection-api/storage-unit-type":
     case "collection-api/collection":
     case "collection-api/collection-method":
@@ -102,6 +156,21 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/material-sample-type":
     case "collection-api/project":
     case "user-api/group":
+      return {
+        data: [
+          {
+            id: "2b4549e9-9a95-489f-8e30-74c2d877d8a8",
+            type: "group",
+            name: "cnc",
+            labels: { en: "CNC" }
+          }
+        ],
+        links: {
+          first: "/api/v1/group?page[limit]=1000&filter[name]=cnc",
+          last: "/api/v1/group?page[limit]=1000&filter[name]=cnc"
+        },
+        meta: { totalResourceCount: 1, moduleVersion: "0.16" }
+      };
     case "collection-api/vocabulary2/associationType":
     case "collection-api/vocabulary2/srs":
     case "collection-api/vocabulary2/coordinateSystem":
@@ -128,52 +197,242 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           id: "initial-attachment-2",
           originalFileName: "initial-attachment-2"
         };
-      case "managed-attribute/MATERIAL_SAMPLE.m1":
-        return {
-          type: "managed-attribute",
-          id: "1",
-          key: "m1",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          name: "Managed Attribute 1"
-        };
-      case "managed-attribute/MATERIAL_SAMPLE.m2":
-        return {
-          type: "managed-attribute",
-          id: "2",
-          key: "m2",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          name: "Managed Attribute 2"
-        };
-      case "managed-attribute/MATERIAL_SAMPLE.m3":
-        return {
-          type: "managed-attribute",
-          id: "3",
-          key: "m3",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          name: "Managed Attribute 3"
-        };
       case "collection/1":
         return TEST_COLLECTION_1;
-      case "managed-attribute/MATERIAL_SAMPLE.sample_attribute_1":
-        return { id: "1", key: "sample_attribute_1", name: "Attribute 1" };
-      case "managed-attribute/DETERMINATION.determination_attribute_1":
-        return {
-          id: "1",
-          key: "determination_attribute_1",
-          name: "Attribute 1"
-        };
-      case "managed-attribute/COLLECTING_EVENT.collecting_event_attribute_1":
-        return {
-          id: "1",
-          key: "collecting_event_attribute_1",
-          name: "Attribute 1"
-        };
     }
   });
 });
+
+const MOCK_SEARCH_API_RESPONSE = {
+  data: {
+    took: 41,
+    timed_out: false,
+    _shards: {
+      failed: {
+        source: "0.0",
+        parsedValue: 0
+      },
+      successful: {
+        source: "1.0",
+        parsedValue: 1
+      },
+      total: {
+        source: "1.0",
+        parsedValue: 1
+      },
+      skipped: {
+        source: "0.0",
+        parsedValue: 0
+      }
+    },
+    hits: {
+      total: {
+        relation: "eq",
+        value: 3
+      },
+      hits: [
+        {
+          _index: "dina_storage_index_20250709193641",
+          _id: "019818d5-66d4-7d93-ba11-5c9bde019daf",
+          _score: 0.13353139,
+          _type: "_doc",
+          _source: {
+            data: {
+              relationships: {
+                storageUnitType: {
+                  data: {
+                    id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    type: "storage-unit-type"
+                  },
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/019818d5-66d4-7d93-ba11-5c9bde019daf/storageUnitType",
+                    self: "/api/v1/storage-unit/019818d5-66d4-7d93-ba11-5c9bde019daf/relationships/storageUnitType"
+                  }
+                },
+                parentStorageUnit: {
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/019818d5-66d4-7d93-ba11-5c9bde019daf/parentStorageUnit",
+                    self: "/api/v1/storage-unit/019818d5-66d4-7d93-ba11-5c9bde019daf/relationships/parentStorageUnit"
+                  }
+                }
+              },
+              attributes: {
+                createdBy: "dina-admin",
+                hierarchy: [
+                  {
+                    typeUuid: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    name: "test unit",
+                    typeName: "test",
+                    rank: 1,
+                    type: "1",
+                    uuid: "019818d5-66d4-7d93-ba11-5c9bde019daf"
+                  }
+                ],
+                name: "test unit",
+                createdOn: "2025-07-17T14:41:35.436909Z",
+                group: "aafc"
+              },
+              id: "019818d5-66d4-7d93-ba11-5c9bde019daf",
+              type: "storage-unit"
+            },
+            included: [
+              {
+                attributes: {
+                  name: "test"
+                },
+                id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                type: "storage-unit-type"
+              }
+            ]
+          }
+        },
+        {
+          _index: "dina_storage_index_20250709193641",
+          _id: "019818e5-7242-7e45-bcb1-0056d9fe6e34",
+          _score: 0.13353139,
+          _type: "_doc",
+          _source: {
+            data: {
+              relationships: {
+                storageUnitType: {
+                  data: {
+                    id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    type: "storage-unit-type"
+                  },
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34/storageUnitType",
+                    self: "/api/v1/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34/relationships/storageUnitType"
+                  }
+                },
+                parentStorageUnit: {
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34/parentStorageUnit",
+                    self: "/api/v1/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34/relationships/parentStorageUnit"
+                  }
+                }
+              },
+              attributes: {
+                createdBy: "dina-admin",
+                hierarchy: [
+                  {
+                    typeUuid: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    name: "test unit child",
+                    typeName: "test",
+                    rank: 1,
+                    type: "1",
+                    uuid: "019818e5-7242-7e45-bcb1-0056d9fe6e34"
+                  },
+                  {
+                    typeUuid: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    name: "test unit",
+                    typeName: "test",
+                    rank: 2,
+                    type: "1",
+                    uuid: "019818d5-66d4-7d93-ba11-5c9bde019daf"
+                  }
+                ],
+                name: "test unit child",
+                createdOn: "2025-07-17T14:59:06.928123Z",
+                group: "aafc"
+              },
+              id: "019818e5-7242-7e45-bcb1-0056d9fe6e34",
+              type: "storage-unit"
+            },
+            included: [
+              {
+                attributes: {
+                  name: "test"
+                },
+                id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                type: "storage-unit-type"
+              }
+            ]
+          }
+        },
+        {
+          _index: "dina_storage_index_20250709193641",
+          _id: "01981eef-fea7-7570-bcd8-080fa74273c4",
+          _score: 0.13353139,
+          _type: "_doc",
+          _source: {
+            data: {
+              relationships: {
+                storageUnitType: {
+                  data: {
+                    id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    type: "storage-unit-type"
+                  },
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/01981eef-fea7-7570-bcd8-080fa74273c4/storageUnitType",
+                    self: "/api/v1/storage-unit/01981eef-fea7-7570-bcd8-080fa74273c4/relationships/storageUnitType"
+                  }
+                },
+                parentStorageUnit: {
+                  links: {
+                    related:
+                      "/api/v1/storage-unit/01981eef-fea7-7570-bcd8-080fa74273c4/parentStorageUnit",
+                    self: "/api/v1/storage-unit/01981eef-fea7-7570-bcd8-080fa74273c4/relationships/parentStorageUnit"
+                  }
+                }
+              },
+              attributes: {
+                createdBy: "dina-admin",
+                hierarchy: [
+                  {
+                    typeUuid: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    name: "test unit child 2",
+                    typeName: "test",
+                    rank: 1,
+                    type: "1",
+                    uuid: "01981eef-fea7-7570-bcd8-080fa74273c4"
+                  },
+                  {
+                    typeUuid: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                    name: "test unit",
+                    typeName: "test",
+                    rank: 2,
+                    type: "1",
+                    uuid: "019818d5-66d4-7d93-ba11-5c9bde019daf"
+                  }
+                ],
+                name: "test unit child 2",
+                createdOn: "2025-07-18T19:08:21.530999Z",
+                group: "aafc"
+              },
+              id: "01981eef-fea7-7570-bcd8-080fa74273c4",
+              type: "storage-unit"
+            },
+            included: [
+              {
+                attributes: {
+                  name: "test"
+                },
+                id: "019818d2-e799-7972-b1b1-74cb3cc0efc4",
+                type: "storage-unit-type"
+              }
+            ]
+          }
+        }
+      ],
+      max_score: 0.13353139
+    }
+  }
+};
+
+const mockPost = jest.fn<any, any>(async (path) => {
+  switch (path) {
+    // Elastic search response with object store mock metadata data.
+    case "search-api/search-ws/search":
+      return Promise.resolve(MOCK_SEARCH_API_RESPONSE);
+  }
+});
+
+const mockPatch = jest.fn();
 
 const mockSave = jest.fn((ops) =>
   ops.map((op) => ({
@@ -184,7 +443,16 @@ const mockSave = jest.fn((ops) =>
 
 const testCtx = {
   apiContext: {
-    apiClient: { get: mockGet },
+    apiClient: {
+      get: mockGet,
+      post: mockPost,
+      patch: mockPatch,
+      axios: {
+        get: mockGet,
+        post: mockPost,
+        patch: mockPatch
+      }
+    },
     save: mockSave,
     bulkGet: mockBulkGet
   }
@@ -194,7 +462,10 @@ const mockOnSaved = jest.fn();
 
 describe("MaterialSampleBulkEditor", () => {
   beforeEach(() => deleteFromStorage("test-user." + SAMPLE_FORM_TEMPLATE_KEY));
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
 
   it("Bulk creates material samples.", async () => {
     const wrapper = mountWithAppContext(
@@ -618,6 +889,7 @@ describe("MaterialSampleBulkEditor", () => {
                 isPrimary: true
               }
             ],
+            group: "cnc",
             publiclyReleasable: true
           },
           type: "collecting-event"
@@ -938,16 +1210,16 @@ describe("MaterialSampleBulkEditor", () => {
     }
 
     // Organisms section opens with an initial value, so it has the green indicator on the fieldset:
-    await waitFor(() =>
+    await waitFor(() => {
       expect(
         wrapper.getByText(
-          /these organisms will be set on all material samples\./i
+          /this organism will be linked to all material samples\./i
         )
-      ).toBeInTheDocument()
-    );
+      ).toBeInTheDocument();
+    });
     expect(
       wrapper.getByText(
-        /these organisms will be set on all material samples\./i
+        /this organism will be linked to all material samples\./i
       )
     ).toBeInTheDocument();
 
@@ -955,21 +1227,22 @@ describe("MaterialSampleBulkEditor", () => {
     // so they don't initially show the green indicator on the fieldset:
     expect(
       wrapper.queryByText(
-        /these attachments will be set on all material samples\./i
+        /this attachment will be linked to all material samples\./i
       )
     ).not.toBeInTheDocument();
 
     // Associations list section opens with an initial value, so it has the green indicator on the fieldset:
+
     expect(
       wrapper.getByText(
-        /these associationss will be set on all material samples\./i
+        /this association will be set on all material samples\./i
       )
     ).toBeInTheDocument();
 
     // Scheduled should not display it as well:
     expect(
       wrapper.queryByText(
-        /these scheduled actions will be set on all material samples\./i
+        /this attachment will be linked to all material samples\./i
       )
     ).not.toBeInTheDocument();
 
@@ -1135,7 +1408,11 @@ describe("MaterialSampleBulkEditor", () => {
     expect(wrapper.getByDisplayValue("test barcode")).toBeInTheDocument();
 
     // Publicly Releasable
-    expect(wrapper.getByLabelText("True")).toHaveProperty("checked", true);
+    expect(
+      screen.getByRole("combobox", {
+        name: /keep current values/i
+      })
+    ).toBeInTheDocument();
 
     // Material Sample State
     expect(wrapper.getByDisplayValue("test-ms-state")).toBeInTheDocument();
@@ -1416,6 +1693,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               type: "collecting-event",
               geoReferenceAssertions: [{ isPrimary: true }],
+              group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               publiclyReleasable: true,
@@ -1432,6 +1710,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               type: "collecting-event",
               geoReferenceAssertions: [{ isPrimary: true }],
+              group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               publiclyReleasable: true,
@@ -1448,6 +1727,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               type: "collecting-event",
               geoReferenceAssertions: [{ isPrimary: true }],
+              group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               publiclyReleasable: true,
@@ -1554,7 +1834,8 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "col-event-1",
               type: "collecting-event",
-              dwcVerbatimLocality: "bulk edited locality"
+              dwcVerbatimLocality: "bulk edited locality",
+              group: "cnc"
             },
             type: "collecting-event"
           }
@@ -1567,7 +1848,8 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "col-event-1",
               type: "collecting-event",
-              dwcVerbatimLocality: "bulk edited locality"
+              dwcVerbatimLocality: "bulk edited locality",
+              group: "cnc"
             },
             type: "collecting-event"
           }
@@ -1616,15 +1898,33 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Remove existing storage button doesn't exist on the page.");
     }
     fireEvent.click(removeStorageButton);
-    await waitFor(() =>
+    const search = screen.getByRole("search", {
+      name: /query table/i
+    });
+    await waitFor(() => {
+      if (mockPost.mock.calls.length != 0) {
+      }
+
       expect(
-        wrapper.getByRole("row", { name: /storage unit c \(box\) select/i })
-      ).toBeInTheDocument()
-    );
+        within(search).queryByText(/loading\.\.\./i)
+      ).not.toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("link", { name: /^test unit$/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: /^test unit child$/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: /^test unit child 2$/i })
+      ).toBeInTheDocument();
+    });
 
     // Assign a different storage unit:
-    const row = wrapper.getByRole("row", {
-      name: /storage unit c \(box\) select/i
+    const row = screen.getByRole("row", {
+      name: /test unit child test test unit aafc dina\-admin 2025\-07\-17, 2:59:06 p\.m\. select/i
     });
     const selectStorageButton = within(row).getByRole("button", {
       name: /select/i
@@ -1646,9 +1946,14 @@ describe("MaterialSampleBulkEditor", () => {
     ).toBeInTheDocument();
 
     // New linked storage unit is indicated:
-    expect(
-      wrapper.getByRole("link", { name: /storage unit c \(box\)/i })
-    ).toBeInTheDocument();
+    waitFor(
+      () => {
+        expect(
+          wrapper.getByRole("link", { name: /test unit child \(test\)/i })
+        ).toBeInTheDocument();
+      },
+      { timeout: 20000 }
+    );
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
@@ -1661,7 +1966,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: undefined,
               storageUnit: {
-                id: "C",
+                id: "019818e5-7242-7e45-bcb1-0056d9fe6e34",
                 type: "storage-unit"
               },
               type: "storage-unit-usage",
@@ -1680,7 +1985,7 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: undefined,
               storageUnit: {
-                id: "C",
+                id: "019818e5-7242-7e45-bcb1-0056d9fe6e34",
                 type: "storage-unit"
               },
               type: "storage-unit-usage",
@@ -1879,6 +2184,7 @@ describe("MaterialSampleBulkEditor", () => {
                   isPrimary: true
                 }
               ],
+              group: "cnc",
               publiclyReleasable: true
             },
             type: "collecting-event"

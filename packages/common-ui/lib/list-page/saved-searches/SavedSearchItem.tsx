@@ -33,6 +33,9 @@ export function SavedSearchItem({
     >
       <Card.Body
         onClick={() => onSavedSearchSelected(savedSearch.savedSearchName ?? "")}
+        style={{
+          padding: "0.35rem 1rem"
+        }}
       >
         <Card.Text>
           <Stack direction="horizontal" gap={3}>

@@ -52,6 +52,12 @@ export function PlaceSectionsSelectionField(
         id: "placeType",
         accessorKey: "placeType",
         header: () => <FieldHeader name="type" />,
+        cell: ({ getValue }) => {
+          // Uppercase the first letter of the place type.
+          const value = getValue<string>();
+          if (!value) return null;
+          return <span>{value.charAt(0).toUpperCase() + value.slice(1)}</span>;
+        },
         enableSorting: false
       }
     ];

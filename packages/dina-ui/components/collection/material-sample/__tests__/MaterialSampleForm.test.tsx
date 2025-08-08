@@ -9,7 +9,9 @@ import {
 import {
   fireEvent,
   waitFor,
-  waitForElementToBeRemoved
+  waitForElementToBeRemoved,
+  screen,
+  within
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
@@ -74,6 +76,39 @@ function testCollectionEventWithPermissions(): Partial<CollectingEvent> {
   };
 }
 
+function testCollectionEventWithGeographicalPlaceCustomPlaceName(): Partial<CollectingEvent> {
+  return {
+    id: "4",
+    type: "collecting-event",
+    group: "test group",
+    geographicPlaceNameSourceDetail: {
+      sourceUrl:
+        "https://nominatim.openstreetmap.org/ui/details.html?osmtype=W&osmid=12345",
+      customGeographicPlace: "Custom Place Name",
+      higherGeographicPlaces: [
+        {
+          id: "1",
+          element: "W",
+          placeType: "building",
+          name: "Test Building 1"
+        },
+        {
+          id: "2",
+          element: "R",
+          placeType: "building",
+          name: "Test Building 2"
+        }
+      ],
+      country: {
+        code: "ca",
+        name: "Canada"
+      },
+      recordedOn: "2022-03-02T17:41:53.968198Z",
+      type: ""
+    }
+  };
+}
+
 function testMaterialSample(): InputResource<MaterialSample> {
   return {
     id: "1",
@@ -129,6 +164,42 @@ const mockGeographicSearchResults = [
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_1":
+      return Promise.resolve({
+        data: { id: "1", key: "attribute_1", name: "Attribute 1" }
+      });
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_2":
+      return Promise.resolve({
+        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
+      });
+    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_3":
+      return Promise.resolve({
+        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
+      });
+    case "collection-api/managed-attribute/COLLECTING_EVENT.attribute_2":
+      return Promise.resolve({
+        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
+      });
+    case "collection-api/managed-attribute/COLLECTING_EVENT.attribute_3":
+      return Promise.resolve({
+        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
+      });
+    case "collection-api/managed-attribute/ORGANISM.attribute_2":
+      return Promise.resolve({
+        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
+      });
+    case "collection-api/managed-attribute/ORGANISM.attribute_3":
+      return Promise.resolve({
+        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
+      });
+    case "collection-api/managed-attribute/DETERMINATION.attribute_2":
+      return Promise.resolve({
+        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
+      });
+    case "collection-api/managed-attribute/DETERMINATION.attribute_3":
+      return Promise.resolve({
+        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
+      });
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
     case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol":
@@ -137,6 +208,10 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return { data: testCollectionEventWithGeographicalPlace() };
     case "collection-api/collecting-event/3?include=collectors,attachment,collectionMethod,protocol":
       return { data: testCollectionEventWithPermissions() };
+    case "collection-api/collecting-event/4?include=collectors,attachment,collectionMethod,protocol":
+      return {
+        data: testCollectionEventWithGeographicalPlaceCustomPlaceName()
+      };
     case "collection-api/material-sample/1":
       return { data: testMaterialSample() };
     case "collection-api/material-sample":
@@ -191,30 +266,8 @@ const mockSave = jest.fn<any, any>(async (saves) => {
   });
 });
 
-const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
-  paths.map((path) => {
-    switch (path) {
-      case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
-        return { id: "1", key: "attribute_1", name: "Attribute 1" };
-      case "managed-attribute/MATERIAL_SAMPLE.attribute_2":
-        return { id: "2", key: "attribute_2", name: "Attribute 2" };
-      case "managed-attribute/MATERIAL_SAMPLE.attribute_3":
-        return { id: "3", key: "attribute_3", name: "Attribute 3" };
-      case "managed-attribute/COLLECTING_EVENT.attribute_2":
-        return { id: "2", key: "attribute_2", name: "Attribute 2" };
-      case "managed-attribute/COLLECTING_EVENT.attribute_3":
-        return { id: "3", key: "attribute_3", name: "Attribute 3" };
-      case "managed-attribute/DETERMINATION.attribute_2":
-        return { id: "2", key: "attribute_2", name: "Attribute 2" };
-      case "managed-attribute/DETERMINATION.attribute_3":
-        return { id: "3", key: "attribute_3", name: "Attribute 3" };
-    }
-  })
-);
-
 const testCtx = {
   apiContext: {
-    bulkGet: mockBulkGet,
     save: mockSave,
     apiClient: {
       get: mockGet
@@ -2539,14 +2592,12 @@ describe("Material Sample Edit Page", () => {
     userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
-    await waitFor(() => {
-      expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
-      expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
-    });
 
-    // Attributes 2 and 3 are visible and empty:
-    expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
-    expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
+    const tabpanel = screen.getByRole("tabpanel");
+    await waitFor(() => {
+      expect(within(tabpanel).getByText(/attribute 2/i)).toBeInTheDocument();
+      expect(within(tabpanel).getByText(/attribute 3/i)).toBeInTheDocument();
+    });
   });
 
   describe("Collecting event permissions", () => {
@@ -2857,7 +2908,7 @@ describe("Material Sample Edit Page", () => {
             id: "333",
             materialSampleName: "test-ms",
             collectingEvent: {
-              id: "2",
+              id: "4",
               type: "collecting-event"
             }
           }}
@@ -2909,17 +2960,160 @@ describe("Material Sample Edit Page", () => {
                   geographicPlaceNameSource: "OSM",
                   geographicPlaceNameSourceDetail: {
                     country: {
-                      name: "Canada"
+                      name: "Canada",
+                      code: "ca"
                     },
+                    selectedGeographicPlace: {
+                      element: "R",
+                      id: "4136816",
+                      name: "Ottawa",
+                      placeType: "city"
+                    },
+                    customGeographicPlace: null,
+                    higherGeographicPlaces: [
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "Eastern Ontario",
+                        placeType: "state_district"
+                      },
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "CA-ON",
+                        placeType: "ISO3166-2-lvl4"
+                      }
+                    ],
                     stateProvince: {
                       element: "relation",
                       id: 4136816,
-                      name: "Ontario"
+                      name: "Ontario",
+                      placeType: "state"
                     },
                     sourceUrl:
                       "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
                   },
-                  id: "2",
+                  id: "4",
+                  type: "collecting-event"
+                },
+                type: "collecting-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+    });
+
+    it("Updates geographicPlaceNameSourceDetail with a customGeographicPlace when previously added and changes are made", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "4",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /remove this place/i })
+        ).toBeInTheDocument()
+      );
+
+      // Click the remove this place button.
+      userEvent.click(
+        wrapper.getByRole("button", { name: /remove this place/i })
+      );
+      await waitFor(() =>
+        expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
+      );
+
+      // Enter a search value:
+      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+
+      // Click the search button.
+      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await waitFor(() =>
+        expect(
+          wrapper.getAllByRole("button", { name: "Select" })[0]
+        ).toBeInTheDocument()
+      );
+
+      // Click the first search option.
+      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("textbox", { name: /custom place name/i })
+        ).toBeInTheDocument()
+      );
+
+      // Set a custom geographic place name:
+      userEvent.type(
+        wrapper.getByRole("textbox", { name: /custom place name/i }),
+        "Neatby Building"
+      );
+      userEvent.click(wrapper.getByTestId("addCustomPlaceNameButton"));
+
+      // Wait for it to appear in the table:
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("cell", { name: /neatby building/i })
+        ).toBeInTheDocument()
+      );
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  geographicPlaceNameSource: "OSM",
+                  geographicPlaceNameSourceDetail: {
+                    country: {
+                      name: "Canada",
+                      code: "ca"
+                    },
+                    selectedGeographicPlace: null,
+                    customGeographicPlace: "Neatby Building",
+                    higherGeographicPlaces: [
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "Ottawa",
+                        placeType: "city"
+                      },
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "Eastern Ontario",
+                        placeType: "state_district"
+                      },
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "CA-ON",
+                        placeType: "ISO3166-2-lvl4"
+                      }
+                    ],
+                    stateProvince: {
+                      element: "relation",
+                      id: 4136816,
+                      name: "Ontario",
+                      placeType: "state"
+                    },
+                    sourceUrl:
+                      "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                  },
+                  id: "4",
                   type: "collecting-event"
                 },
                 type: "collecting-event"
@@ -2985,7 +3179,260 @@ describe("Material Sample Edit Page", () => {
       );
     });
 
-    it("Adds geographicPlaceNameSourceDetail when not previously added", async () => {
+    it("Creates a geographicPlaceNameSourceDetail to a new collecting event", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm onSaved={mockOnSaved} />,
+        testCtx
+      );
+      await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+      // Enable the collecting event section:
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        fail("Collecting event toggle needs to exist at this point.");
+      }
+      fireEvent.click(collectingEventToggle[0]);
+
+      await waitFor(() =>
+        expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
+      );
+
+      // Enter a search value:
+      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+
+      // Click the search button.
+      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await waitFor(() =>
+        expect(
+          wrapper.getAllByRole("button", { name: "Select" })[0]
+        ).toBeInTheDocument()
+      );
+
+      // Click the first search option.
+      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /save/i })
+        ).toBeInTheDocument()
+      );
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  dwcVerbatimCoordinateSystem: null,
+                  dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+                  geoReferenceAssertions: [
+                    {
+                      isPrimary: true
+                    }
+                  ],
+                  geographicPlaceNameSource: "OSM",
+                  geographicPlaceNameSourceDetail: {
+                    country: {
+                      code: "ca",
+                      name: "Canada"
+                    },
+                    customGeographicPlace: null,
+                    selectedGeographicPlace: {
+                      element: "R",
+                      id: "4136816",
+                      name: "Ottawa",
+                      placeType: "city"
+                    },
+                    higherGeographicPlaces: [
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "Eastern Ontario",
+                        placeType: "state_district"
+                      },
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "CA-ON",
+                        placeType: "ISO3166-2-lvl4"
+                      }
+                    ],
+                    stateProvince: {
+                      element: "relation",
+                      id: 4136816,
+                      name: "Ontario",
+                      placeType: "state"
+                    },
+                    sourceUrl:
+                      "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                  },
+                  group: "aafc",
+                  publiclyReleasable: true,
+                  type: "collecting-event"
+                },
+                type: "collecting-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ],
+          [
+            [
+              {
+                resource: {
+                  collectingEvent: {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "collecting-event"
+                  },
+                  publiclyReleasable: true,
+                  type: "material-sample"
+                },
+                type: "material-sample"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+    });
+
+    it("Creates a geographicPlaceNameSourceDetail with a customGeographicPlaceName to a new collecting event", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm onSaved={mockOnSaved} />,
+        testCtx
+      );
+      await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+      // Enable the collecting event section:
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        fail("Collecting event toggle needs to exist at this point.");
+      }
+      fireEvent.click(collectingEventToggle[0]);
+
+      await waitFor(() =>
+        expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
+      );
+
+      // Enter a search value:
+      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+
+      // Click the search button.
+      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await waitFor(() =>
+        expect(
+          wrapper.getAllByRole("button", { name: "Select" })[0]
+        ).toBeInTheDocument()
+      );
+
+      // Click the first search option.
+      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("textbox", { name: /custom place name/i })
+        ).toBeInTheDocument()
+      );
+
+      // Set a custom geographic place name:
+      userEvent.type(
+        wrapper.getByRole("textbox", { name: /custom place name/i }),
+        "Neatby Building"
+      );
+      userEvent.click(wrapper.getByTestId("addCustomPlaceNameButton"));
+
+      // Wait for it to appear in the table:
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("cell", { name: /neatby building/i })
+        ).toBeInTheDocument()
+      );
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  dwcVerbatimCoordinateSystem: null,
+                  dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+                  geoReferenceAssertions: [
+                    {
+                      isPrimary: true
+                    }
+                  ],
+                  geographicPlaceNameSource: "OSM",
+                  geographicPlaceNameSourceDetail: {
+                    country: {
+                      code: "ca",
+                      name: "Canada"
+                    },
+                    selectedGeographicPlace: null,
+                    customGeographicPlace: "Neatby Building",
+                    higherGeographicPlaces: [
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "Ottawa",
+                        placeType: "city"
+                      },
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "Eastern Ontario",
+                        placeType: "state_district"
+                      },
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "CA-ON",
+                        placeType: "ISO3166-2-lvl4"
+                      }
+                    ],
+                    stateProvince: {
+                      element: "relation",
+                      id: 4136816,
+                      name: "Ontario",
+                      placeType: "state"
+                    },
+                    sourceUrl:
+                      "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
+                  },
+                  group: "aafc",
+                  publiclyReleasable: true,
+                  type: "collecting-event"
+                },
+                type: "collecting-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ],
+          [
+            [
+              {
+                resource: {
+                  collectingEvent: {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "collecting-event"
+                  },
+                  publiclyReleasable: true,
+                  type: "material-sample"
+                },
+                type: "material-sample"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+    });
+
+    it("Adds geographicPlaceNameSourceDetail to an existing collecting event when not previously added", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleForm
           materialSample={{
@@ -3035,12 +3482,35 @@ describe("Material Sample Edit Page", () => {
                   geographicPlaceNameSource: "OSM",
                   geographicPlaceNameSourceDetail: {
                     country: {
+                      code: "ca",
                       name: "Canada"
                     },
+                    customGeographicPlace: null,
+                    selectedGeographicPlace: {
+                      element: "R",
+                      id: "4136816",
+                      name: "Ottawa",
+                      placeType: "city"
+                    },
+                    higherGeographicPlaces: [
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "Eastern Ontario",
+                        placeType: "state_district"
+                      },
+                      {
+                        element: "R",
+                        id: "4136816",
+                        name: "CA-ON",
+                        placeType: "ISO3166-2-lvl4"
+                      }
+                    ],
                     stateProvince: {
                       element: "relation",
                       id: 4136816,
-                      name: "Ontario"
+                      name: "Ontario",
+                      placeType: "state"
                     },
                     sourceUrl:
                       "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"

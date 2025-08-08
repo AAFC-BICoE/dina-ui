@@ -122,15 +122,39 @@ describe("ManagedAttributesEditor component", () => {
 
     // Wait for the data to load and ensure mockBulkGet was called with expected arguments.
     await waitFor(() => {
-      expect(mockBulkGet.mock.calls).toEqual([
+      expect(mockGet.mock.calls).toEqual([
         [
-          [
-            "managed-attribute/COLLECTING_EVENT.example_attribute_1",
-            "managed-attribute/COLLECTING_EVENT.example_attribute_2"
-          ],
+          "collection-api/managed-attribute",
           {
-            apiBaseUrl: "/collection-api",
-            returnNullForMissingResource: true
+            filter: {
+              managedAttributeComponent: {
+                EQ: "COLLECTING_EVENT"
+              }
+            },
+            page: {
+              limit: 6
+            },
+            sort: "-createdOn"
+          }
+        ],
+        [
+          "collection-api/managed-attribute/COLLECTING_EVENT.example_attribute_1",
+          {
+            header: {
+              Accept: "application/vnd.api+json",
+              "Content-Type": "application/vnd.api+json",
+              "Crnk-Compact": "true"
+            }
+          }
+        ],
+        [
+          "collection-api/managed-attribute/COLLECTING_EVENT.example_attribute_2",
+          {
+            header: {
+              Accept: "application/vnd.api+json",
+              "Content-Type": "application/vnd.api+json",
+              "Crnk-Compact": "true"
+            }
           }
         ]
       ]);

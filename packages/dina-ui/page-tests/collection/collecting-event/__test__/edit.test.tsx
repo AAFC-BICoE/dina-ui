@@ -1,4 +1,4 @@
-import { OperationsResponse } from "common-ui";
+import { OperationsResponse, makeAxiosErrorMoreReadable } from "common-ui";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "common-ui";
 import { Person } from "../../../../types/agent-api/resources/Person";
@@ -82,9 +82,35 @@ const mockBulkGet = jest.fn(async (paths) => {
   }
   console.warn("No mock value for bulkGet paths: ", paths);
 });
+
+const MOCK_POST_ERROR = (() => {
+  const error = new Error() as any;
+  error.isAxiosError = true;
+  error.config = {
+    url: "/collection-api/collecting-event"
+  };
+  error.response = {
+    statusText: "500",
+    status: 500,
+    data: {
+      errors: [
+        {
+          status: 500,
+          detail: "test error detail",
+          title: "Bad Request"
+        }
+      ]
+    }
+  };
+
+  return error;
+})();
+
 const mockPost = jest.fn((path) => {
   if (path === "search-api/search-ws/search") {
     return new Promise((resolve) => resolve);
+  } else {
+    makeAxiosErrorMoreReadable(MOCK_POST_ERROR);
   }
 });
 const apiContext: any = {
@@ -98,22 +124,24 @@ describe("collecting-event edit page", () => {
     mockQuery = {};
   });
   it("Provides a form to add a collecting-event.", async () => {
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
+    mockPost
+      .mockReturnValueOnce(Promise.resolve("default"))
+      .mockReturnValueOnce(
+        Promise.resolve({
           data: {
-            attributes: {
-              startEventDateTime: "12/21/2019T16:00",
-              endEventDateTime: "12/22/2019T16:00",
-              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
-            },
-            id: "1",
-            type: "collecting-event"
+            data: {
+              attributes: {
+                startEventDateTime: "12/21/2019T16:00",
+                endEventDateTime: "12/22/2019T16:00",
+                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
+              },
+              id: "1",
+              type: "collecting-event"
+            }
           },
           status: 201
-        }
-      ] as OperationsResponse
-    });
+        })
+      );
 
     mockQuery = {};
 
@@ -162,26 +190,23 @@ describe("collecting-event edit page", () => {
 
     // Test expected API Response
     await waitFor(() => {
-      expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "POST",
-            path: "collecting-event",
-            value: {
-              attributes: {
-                dwcVerbatimCoordinateSystem: null,
-                dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-                publiclyReleasable: true, // Default value
-                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
-                otherRecordNumbers: ["12", "23"],
-                geoReferenceAssertions: [{ isPrimary: true }]
-              },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "collecting-event"
-            }
+      expect(mockPost).lastCalledWith(
+        "/collection-api/collecting-event",
+
+        {
+          data: {
+            attributes: {
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              publiclyReleasable: true, // Default value
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
+              otherRecordNumbers: ["12", "23"],
+              geoReferenceAssertions: [{ isPrimary: true }]
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "collecting-event"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -192,20 +217,19 @@ describe("collecting-event edit page", () => {
 
   it("Lets you add georeference assertions on a new Collecting Event.", async () => {
     // Return the collecting event so it can then be attached to the new georeference assertion:
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
+    mockPost.mockReturnValueOnce(
+      Promise.resolve({
+        data: {
           data: {
             attributes: {
               startEventDateTime: "12/21/2019T16:00"
             },
             id: "1",
             type: "collecting-event"
-          },
-          status: 201
+          }
         }
-      ] as OperationsResponse
-    });
+      } as any)
+    );
 
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
@@ -216,7 +240,6 @@ describe("collecting-event edit page", () => {
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
       {
         target: {
-          name: "verbatimEventDateTime",
           value: "From 2019,12,21 4pm to 2019,12,22 5pm"
         }
       }
@@ -256,33 +279,30 @@ describe("collecting-event edit page", () => {
     // Saves the collecting event and the georeference assertion in separate requests:
     // (The collecting event id is required to save the georeference assertion)
     await waitFor(() => {
-      expect(mockPatch.mock.calls).toEqual([
-        [
-          "/collection-api/operations",
-          [
-            {
-              op: "POST",
-              path: "collecting-event",
-              value: {
-                attributes: expect.objectContaining({
-                  geoReferenceAssertions: [
-                    {
-                      isPrimary: true,
-                      dwcCoordinateUncertaintyInMeters: "5",
-                      dwcDecimalLatitude: "45.394728",
-                      dwcDecimalLongitude: "-75.701452"
-                    }
-                  ],
-                  verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
-                }),
-                id: "00000000-0000-0000-0000-000000000000",
-                type: "collecting-event"
-              }
-            }
-          ],
-          expect.anything()
-        ]
-      ]);
+      expect(mockPost).lastCalledWith(
+        "/collection-api/collecting-event",
+        {
+          data: {
+            attributes: {
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true,
+                  dwcCoordinateUncertaintyInMeters: "5",
+                  dwcDecimalLatitude: "45.394728",
+                  dwcDecimalLongitude: "-75.701452"
+                }
+              ],
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              dwcVerbatimCoordinateSystem: null,
+              publiclyReleasable: true,
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "collecting-event"
+          }
+        },
+        expect.anything()
+      );
     });
   });
 
@@ -332,20 +352,16 @@ describe("collecting-event edit page", () => {
     await waitFor(() => {
       expect(mockPatch).toBeCalledTimes(1);
       expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "collecting-event/1",
-            value: {
-              attributes: {
-                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
-              },
-              id: "1",
-              type: "collecting-event"
-            }
+        "/collection-api/collecting-event/1",
+        {
+          data: {
+            attributes: {
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
+            },
+            id: "1",
+            type: "collecting-event"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -390,20 +406,16 @@ describe("collecting-event edit page", () => {
     await waitFor(() => {
       expect(mockPatch).toBeCalledTimes(1);
       expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "collecting-event/1",
-            value: {
-              attributes: {
-                otherRecordNumbers: null
-              },
-              id: "1",
-              type: "collecting-event"
-            }
+        "/collection-api/collecting-event/1",
+        {
+          data: {
+            attributes: {
+              otherRecordNumbers: null
+            },
+            id: "1",
+            type: "collecting-event"
           }
-        ],
+        },
         expect.anything()
       );
     });
@@ -411,22 +423,6 @@ describe("collecting-event edit page", () => {
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
-      data: [
-        {
-          errors: [
-            {
-              detail: "Test Error Detail",
-              status: "422",
-              title: "Test Error Title"
-            }
-          ],
-          status: 422
-        }
-      ] as OperationsResponse
-    }));
-
-    mockQuery = {};
 
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
@@ -452,11 +448,13 @@ describe("collecting-event edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
-    await new Promise((resolve) => setTimeout(resolve, 50));
 
-    // Test for expected error
     await waitFor(() => {
-      expect(wrapper.getByText(/test error title: test error detail/i));
+      expect(
+        wrapper.getByText(
+          /\/collection\-api\/collecting\-event: 500 bad request: test error detail/i
+        )
+      );
       expect(mockPush).toBeCalledTimes(0);
     });
   });
@@ -491,23 +489,6 @@ describe("collecting-event edit page", () => {
   });
 
   it("Removes the coordinate system if there are no coordinates set.", async () => {
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            attributes: {
-              startEventDateTime: "12/21/2019T16:00",
-              endEventDateTime: "12/22/2019T16:00",
-              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
-            },
-            id: "1",
-            type: "collecting-event"
-          },
-          status: 201
-        }
-      ] as OperationsResponse
-    });
-
     mockQuery = {};
 
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
@@ -523,21 +504,20 @@ describe("collecting-event edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await waitFor(() => {
-      expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "POST",
-            path: "collecting-event",
-            value: {
-              attributes: expect.objectContaining({
-                dwcVerbatimCoordinateSystem: null
-              }),
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "collecting-event"
-            }
+      expect(mockPost).lastCalledWith(
+        "/collection-api/collecting-event",
+        {
+          data: {
+            attributes: {
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              publiclyReleasable: true, // Default value
+              geoReferenceAssertions: [{ isPrimary: true }]
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "collecting-event"
           }
-        ],
+        },
         expect.anything()
       );
     });

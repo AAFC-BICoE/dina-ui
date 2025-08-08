@@ -43,7 +43,6 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     destroyedLabel: "Détruit",
     detach: "Détacher",
     done: "Terminé",
-    dontChangeValues: "Ne pas modifier les valeurs",
     dropdownSearchResults: "Rechercher résultats",
     editAll: "Éditer tout",
     editButtonText: "Modifier",

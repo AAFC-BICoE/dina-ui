@@ -34,6 +34,19 @@ describe("DateField component", () => {
     );
   }
 
+  // Helper function for the new test cases with showTime enabled.
+  function getTimeWrapper(testDate: string | null = null) {
+    return mountWithAppContext(
+      <DinaForm
+        initialValues={{ testField: testDate }}
+        onSubmit={(props) => mockOnSubmit(props.submittedValues)}
+      >
+        <DateField name="testField" showTime={true} />
+        <SubmitButton />
+      </DinaForm>
+    );
+  }
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -142,5 +155,51 @@ describe("DateField component", () => {
     fireEvent.blur(textbox);
 
     expect(wrapper.queryByRole("status")).toBeInTheDocument();
+  });
+
+  it("Correctly formats a manually typed date on blur when showTime is enabled.", async () => {
+    const wrapper = getTimeWrapper();
+    const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
+
+    // Manually type a date without time.
+    fireEvent.change(textbox, { target: { value: "2018-01-03" } });
+
+    // When the field loses focus, it should reformat.
+    fireEvent.blur(textbox);
+
+    // The date-picker's display format will update visually.
+    await waitFor(() => {
+      expect(textbox.value).toEqual("01/03/2018, 12:00 AM");
+    });
+
+    // Check that the submitted value is a full ISO string.
+    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => {
+      expect(mockOnSubmit).lastCalledWith({
+        testField: expect.stringMatching(
+          /^2018-01-03T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+        )
+      });
+    });
+  });
+
+  it("Shows an error for an invalid date format when showTime is enabled.", async () => {
+    const wrapper = getTimeWrapper();
+    const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
+
+    // Type an invalid date string.
+    fireEvent.change(textbox, { target: { value: "this-is-not-a-date" } });
+    fireEvent.blur(textbox);
+
+    // An error message should be displayed.
+    await waitFor(() => {
+      expect(
+        wrapper.getAllByText(/invalid date: this-is-not-a-date/i)
+      ).toHaveLength(2);
+    });
+
+    // Ensure form submission is not triggered with the invalid value.
+    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 });

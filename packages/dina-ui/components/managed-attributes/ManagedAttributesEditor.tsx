@@ -2,19 +2,19 @@ import {
   FieldSet,
   FieldSetProps,
   FieldSpy,
-  filterBy,
   ResourceSelect,
+  SimpleSearchFilterBuilder,
   useBulkEditTabContext,
-  useBulkGet,
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import _ from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../types/collection-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
 import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
+import { useManagedAttributeQueries } from "./useManagedAttributeQueries";
+import _ from "lodash";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -87,22 +87,26 @@ export function ManagedAttributesEditor({
         }, [visibleAttributeKeysProp]);
 
         // Fetch the attributes, but omit any that are missing e.g. were deleted.
-        const { dataWithNullForMissing: fetchedAttributes, loading } =
-          useBulkGet<ManagedAttribute>({
-            ids: visibleAttributeKeys.map((key) =>
-              // Use the component prefix if needed by the back-end:
-              _.compact([managedAttributeComponent, key]).join(".")
-            ),
-            listPath: managedAttributeApiPath
-          });
+
+        const { data: fetchedAttributes, loading } = useManagedAttributeQueries(
+          {
+            keys: visibleAttributeKeys,
+            managedAttributeApiPath,
+            managedAttributeComponent,
+            disabled: !visibleAttributeKeys.length
+          }
+        );
 
         // Store the last fetched Attributes in a ref instead of showing a
         // loading state when the visible attributes change.
         const lastFetchedAttributes = useRef<
           PersistedResource<ManagedAttribute>[]
         >([]);
-        if (fetchedAttributes) {
-          lastFetchedAttributes.current = _.compact(fetchedAttributes);
+
+        if (!visibleAttributeKeys.length) {
+          lastFetchedAttributes.current = [];
+        } else if (fetchedAttributes) {
+          lastFetchedAttributes.current = fetchedAttributes;
         }
 
         const visibleAttributes = lastFetchedAttributes.current;
@@ -133,7 +137,7 @@ export function ManagedAttributesEditor({
                             valuesPath={valuesPath}
                             onRemoveClick={(attributeKey) =>
                               setVisibleAttributeKeys((current) =>
-                                current.filter((it) => it !== attributeKey)
+                                current.filter((it) => it != attributeKey)
                               )
                             }
                           />
@@ -208,10 +212,18 @@ export function ManagedAttributeMultiSelect({
 
   return (
     <ResourceSelect<ManagedAttribute>
-      filter={(input) => ({
-        ...filterBy(["name"])(input),
-        ...(managedAttributeComponent ? { managedAttributeComponent } : {})
-      })}
+      filter={(input: string) =>
+        SimpleSearchFilterBuilder.create<ManagedAttribute>()
+          .searchFilter("name", input)
+          .when(!!managedAttributeComponent, (builder) =>
+            builder.where(
+              "managedAttributeComponent",
+              "EQ",
+              managedAttributeComponent
+            )
+          )
+          .build()
+      }
       model={managedAttributeApiPath}
       optionLabel={(attribute) => managedAttributeLabel(attribute)}
       isMulti={true}

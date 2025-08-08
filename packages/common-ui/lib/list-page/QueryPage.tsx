@@ -104,6 +104,22 @@ const MAX_COUNT_SIZE: number = 10000;
  */
 const MAX_OFFSET: number = 10000;
 
+/**
+ * Generates a consistent storage key for a component's group filter.
+ *
+ * @param indexName - A unique identifier for the component or page,
+ *                    e.g., "material-sample-list".
+ * @returns The formatted storage key string, e.g., "dina-material-sample-index_groupStorage".
+ */
+export const getGroupStorageKey = (indexName: string): string => {
+  if (!indexName) {
+    console.error("getGroupStorageKey was called with an empty indexName.");
+    return "indexName";
+  }
+
+  return `${indexName}_groupStorage`;
+};
+
 export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Columns to render on the table. This will also be used to map the data to a specific column.
@@ -425,7 +441,7 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   // Groups selected for the search.
-  const GROUP_STORAGE_KEY = uniqueName + "_groupStorage";
+  const GROUP_STORAGE_KEY = getGroupStorageKey(uniqueName);
   const [groups, setGroups] = useLocalStorage<string[]>(
     GROUP_STORAGE_KEY,
     groupNames ?? []
@@ -446,6 +462,9 @@ export function QueryPage<TData extends KitsuResource>({
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
     []
   );
+
+  // Fullscreen state
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const defaultGroups = useMemo(() => {
     return { group: groups };
@@ -1195,7 +1214,14 @@ export function QueryPage<TData extends KitsuResource>({
                 </div>
               )}
               {loading || columnSelectorLoading ? (
-                <LoadingSpinner loading={true} />
+                <div
+                  className={
+                    "d-flex justify-content-center align-items-center h-100 query-page-loading-spinner " +
+                    (isFullScreen ? "fullscreen" : "")
+                  }
+                >
+                  <LoadingSpinner loading={true} />
+                </div>
               ) : (
                 <MemoizedReactTable
                   // Column and data props
@@ -1233,6 +1259,9 @@ export function QueryPage<TData extends KitsuResource>({
                   showPagination={true}
                   showPaginationTop={true}
                   smallPaginationButtons={selectionMode}
+                  enableFullscreen={true}
+                  isFullscreen={isFullScreen}
+                  setIsFullscreen={setIsFullScreen}
                 />
               )}
               <div className="mt-2">
@@ -1288,6 +1317,7 @@ export function QueryPage<TData extends KitsuResource>({
                     showPagination={!enableDnd}
                     manualPagination={true}
                     smallPaginationButtons={true}
+                    enableFullscreen={true}
                   />
                 </div>
               </>

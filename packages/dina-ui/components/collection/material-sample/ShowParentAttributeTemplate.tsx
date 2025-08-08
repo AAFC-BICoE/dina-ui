@@ -2,7 +2,7 @@ import {
   FieldSet,
   SelectField,
   SelectOption,
-  filterBy,
+  SimpleSearchFilterBuilder,
   useQuery
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
@@ -110,15 +110,9 @@ export function ShowParentAttributeTemplate({
   useQuery<ManagedAttribute[]>(
     {
       path: "collection-api/managed-attribute",
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "managedAttributeComponent",
-            comparison: "==",
-            arguments: "ORGANISM"
-          }
-        ]
-      })(""),
+      filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .where("managedAttributeComponent", "EQ", "ORGANISM")
+        .build(),
       page: { limit: 1000 }
     },
     {

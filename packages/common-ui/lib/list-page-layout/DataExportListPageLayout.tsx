@@ -58,6 +58,7 @@ export function DataExportListPageLayout({
       header: ""
     }
   ];
+
   return (
     <DinaForm initialValues={{}}>
       {" "}
@@ -66,9 +67,7 @@ export function DataExportListPageLayout({
           typeName: "data-export",
           apiBaseUrl: "/dina-export-api"
         }}
-        additionalFilters={{
-          rsql: `createdBy==${username}`
-        }}
+        additionalFilters={{ createdBy: username || "" }}
         id="data-export-list"
         queryTableProps={{
           columns: TABLE_COLUMNS,

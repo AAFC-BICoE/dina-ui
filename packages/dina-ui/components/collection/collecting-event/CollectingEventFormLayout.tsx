@@ -7,7 +7,6 @@ import {
   FieldSpy,
   FormattedTextField,
   FormikButton,
-  LoadingSpinner,
   NominatumApiSearchResult,
   NumberRangeFields,
   PlaceSectionsSelectionField,
@@ -24,7 +23,6 @@ import { Field, FormikContextType } from "formik";
 import _ from "lodash";
 import Link from "next/link";
 import { ChangeEvent, useRef, useState } from "react";
-import useSWR from "swr";
 import {
   AttachmentsField,
   CollectionMethodSelectField,
@@ -34,7 +32,8 @@ import {
   ParseVerbatimToRangeButton,
   PersonSelectField,
   TagsAndRestrictionsSection,
-  TagSelectReadOnly
+  TagSelectReadOnly,
+  NotPubliclyReleasableSection
 } from "../..";
 import { ManagedAttributesEditor } from "../../";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -58,13 +57,9 @@ import {
 } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
-import {
-  NominatimAddressDetailSearchProps,
-  NominatumApiAddressDetailSearchResult,
-  nominatimAddressDetailSearch
-} from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { TgnSourceSelection } from "./TgnIntegration";
+import CollectingEventEditAlert from "./CollectingEventEditAlert";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -73,6 +68,9 @@ interface CollectingEventFormLayoutProps {
   attachmentsConfig?: AllowAttachmentsConfig;
   /** Forwarded to ManagedAttributesEditor */
   visibleManagedAttributeKeys?: string[];
+
+  /** Pass the number of material sample usages to display a warning. */
+  materialSampleUsageCount?: number;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
@@ -80,7 +78,8 @@ export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
   setDefaultVerbatimSRS,
   attachmentsConfig,
-  visibleManagedAttributeKeys
+  visibleManagedAttributeKeys,
+  materialSampleUsageCount
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
@@ -117,21 +116,10 @@ export function CollectingEventFormLayout({
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
   const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
-  const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
   const [
     customGeographicPlaceCheckboxState,
     setCustomGeographicPlaceCheckboxState
   ] = useState(false);
-
-  const { isValidating: detailResultsIsLoading } = useSWR(
-    [selectedSearchResult, "nominatimAddressDetailSearch"],
-    nominatimAddressDetailSearch,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
 
   const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
 
@@ -193,25 +181,8 @@ export function CollectingEventFormLayout({
       );
     }
 
-    // get the address detail with another nomiature call
-
-    const detailSearchProps: NominatimAddressDetailSearchProps = {
-      urlValue: {
-        osmid: result.osm_id,
-        osmtype: osmTypeForSearch,
-        class: result.category
-      },
-      updateAdminLevels,
-      formik,
-      stateProvinceName
-    };
-
-    setSelectedSearchResult(detailSearchProps);
-  }
-
-  function updateAdminLevels(detailResults, formik, stateProvinceName) {
     const geoNameParsed = parseGeoAdminLevels(
-      detailResults as any,
+      result,
       formik,
       stateProvinceName
     );
@@ -221,58 +192,68 @@ export function CollectingEventFormLayout({
   }
 
   function parseGeoAdminLevels(
-    detailResults: NominatumApiAddressDetailSearchResult | null,
-    formik,
-    stateProvinceName
+    searchResult: NominatumApiSearchResult,
+    formik: any,
+    stateProvinceName: string | null
   ) {
-    const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
-    let detail: SourceAdministrativeLevel = {};
-    detailResults?.address?.map((addr) => {
-      const isTargetType =
-        addr.type !== "country" &&
-        addr.type !== "state" &&
-        addr.type !== "country_code" &&
-        addr.place_type !== "province" &&
-        addr.place_type !== "state" &&
-        addr.place_type !== "country" &&
-        addr.isaddress &&
-        (addr.osm_id || addr.place_id);
+    const adminLevels: SourceAdministrativeLevel[] = [];
 
-      // omitting country and state
-      if (isTargetType) {
-        detail.id = addr.osm_id;
-        detail.element = addr.osm_type;
-        detail.placeType = addr.place_type ?? addr.class;
-        detail.name = addr.localname;
-        editableSrcAdmnLevels.push(detail);
-      }
-      // fill in the country code
-      if (addr.type === "country_code")
-        formik.setFieldValue(
-          `${commonSrcDetailRoot}.country.code`,
-          addr.localname
-        );
+    // If no address, just return an empty object.
+    if (!searchResult?.address) {
+      return adminLevels;
+    }
 
-      // fill in the state/province name and placeType if it is not yet filled up
-      // use name match if this result has empty/null state province placeType
+    // Go through each "address" available.
+    for (const [key, value] of Object.entries(searchResult.address)) {
+      // Ignore state/province and country as they are already handled.
       if (
-        addr.place_type === "province" ||
-        addr.place_type === "state" ||
-        stateProvinceName === addr.localname
+        key === "state" ||
+        key === "province" ||
+        key === "country" ||
+        key === "country_code"
       ) {
-        formik.setFieldValue(
-          `${commonSrcDetailRoot}.stateProvince.name`,
-          addr.localname
-        );
-        formik.setFieldValue(
-          `${commonSrcDetailRoot}.stateProvince.placeType`,
-          addr.place_type ?? addr.class
-        );
+        // fill in the country code
+        if (key === "country_code")
+          formik.setFieldValue(`${commonSrcDetailRoot}.country.code`, value);
+
+        // fill in the state/province name and placeType if it is not yet filled up
+        // use name match if this result has empty/null state province placeType
+        if (
+          key === "province" ||
+          key === "state" ||
+          stateProvinceName === value
+        ) {
+          formik.setFieldValue(
+            `${commonSrcDetailRoot}.stateProvince.name`,
+            value
+          );
+          formik.setFieldValue(
+            `${commonSrcDetailRoot}.stateProvince.placeType`,
+            key
+          );
+        }
+
+        continue;
       }
 
-      detail = {};
-    });
-    return editableSrcAdmnLevels;
+      if (value) {
+        // Determine the osm type for the admin level. Must be a single letter.
+        const osmType = searchResult.osm_type.charAt(0).toUpperCase();
+
+        adminLevels.push({
+          // Please note this is the TOP level ID.
+          id: String(searchResult.osm_id),
+
+          // Please note this is the TOP level element type.
+          element: osmType,
+
+          placeType: key,
+          name: value
+        });
+      }
+    }
+
+    return adminLevels;
   }
 
   function removeThisPlace(formik: FormikContextType<{}>) {
@@ -450,7 +431,7 @@ export function CollectingEventFormLayout({
         style={{
           overflowY: "auto",
           overflowX: "hidden",
-          maxHeight: 520
+          maxHeight: 925
         }}
       >
         <Field name="geographicPlaceNameSourceDetail">
@@ -458,18 +439,26 @@ export function CollectingEventFormLayout({
             detail ? (
               <div>
                 {!hideCustomPlace && !readOnly && (
-                  <div className="m-3">
-                    <div className="d-flex flex-row">
-                      <label className="p-2" style={{ marginLeft: -20 }}>
-                        <strong>
-                          <DinaMessage id="customPlaceName" />
-                        </strong>
-                      </label>
+                  <div className="mb-3">
+                    <label
+                      htmlFor="customPlaceNameInput"
+                      className="form-label"
+                    >
+                      <strong>
+                        <DinaMessage id="customPlaceName" />
+                      </strong>
+                    </label>
+
+                    <div className="input-group">
                       <input
+                        id="customPlaceNameInput"
                         disabled={customGeographicPlaceCheckboxState}
-                        aria-label="customPlace"
-                        className="p-2 form-control"
-                        style={{ width: "60%" }}
+                        aria-label="Custom Place Name"
+                        className="form-control"
+                        placeholder={formatMessage(
+                          "customPlaceNamePlaceholder"
+                        )}
+                        value={customPlaceValue}
                         onChange={(e) => setCustomPlaceValue(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
@@ -481,28 +470,29 @@ export function CollectingEventFormLayout({
                         }}
                       />
                       <button
-                        className="mb-2 btn btn-primary"
+                        className="btn btn-primary"
                         type="button"
+                        data-testid="addCustomPlaceNameButton"
                         onClick={() => addCustomPlaceName(form)}
+                        disabled={
+                          !customPlaceValue ||
+                          customGeographicPlaceCheckboxState
+                        }
                       >
                         <DinaMessage id="addCustomPlaceName" />
                       </button>
                     </div>
                   </div>
                 )}
-                {detailResultsIsLoading ? (
-                  <LoadingSpinner loading={true} />
-                ) : form.values.srcAdminLevels?.length ? (
-                  <PlaceSectionsSelectionField
-                    name="srcAdminLevels"
-                    hideSelectionCheckBox={hideSelectionCheckBox}
-                    setCustomGeographicPlaceCheckboxState={
-                      setCustomGeographicPlaceCheckboxState
-                    }
-                    customPlaceValue={customPlaceValue}
-                  />
-                ) : null}
-                <DinaFormSection horizontal={[3, 9]}>
+                <PlaceSectionsSelectionField
+                  name="srcAdminLevels"
+                  hideSelectionCheckBox={hideSelectionCheckBox}
+                  setCustomGeographicPlaceCheckboxState={
+                    setCustomGeographicPlaceCheckboxState
+                  }
+                  customPlaceValue={customPlaceValue}
+                />
+                <DinaFormSection horizontal={[3, 9]} readOnly={true}>
                   <TextField
                     name={`${commonSrcDetailRoot}.stateProvince.name`}
                     templateCheckboxFieldName={`${commonSrcDetailRoot}.stateProvince`}
@@ -613,21 +603,31 @@ export function CollectingEventFormLayout({
         componentName={COLLECTING_EVENT_COMPONENT_NAME}
         sectionName="general-section"
       >
-        <NotPubliclyReleasableWarning />
         {readOnly ? (
-          <TagSelectReadOnly />
+          <>
+            <NotPubliclyReleasableWarning />
+            <TagSelectReadOnly />
+          </>
         ) : (
-          <Tooltip
-            id="collecting_event_tag_info"
-            disableSpanMargin={true}
-            visibleElement={
-              <TagsAndRestrictionsSection
-                resourcePath="collection-api/collecting-event"
-                indexName="dina_material_sample_index"
-                tagIncludedType="collecting-event"
-              />
-            }
-          />
+          <>
+            {/* Alert for multiple material sample usages when editing */}
+            <CollectingEventEditAlert
+              materialSampleUsageCount={materialSampleUsageCount}
+            />
+
+            <NotPubliclyReleasableSection />
+            <Tooltip
+              id="collecting_event_tag_info"
+              disableSpanMargin={true}
+              visibleElement={
+                <TagsAndRestrictionsSection
+                  resourcePath="collection-api/collecting-event"
+                  indexName="dina_material_sample_index"
+                  tagIncludedType="collecting-event"
+                />
+              }
+            />
+          </>
         )}
       </DinaFormSection>
       <div className="row mb-3">

@@ -1,9 +1,9 @@
 import {
   DinaFormSection,
   FieldSpy,
-  filterBy,
   FormikButton,
   ResourceSelect,
+  SimpleSearchFilterBuilder,
   useBulkGet,
   useDinaFormContext
 } from "common-ui";
@@ -93,12 +93,18 @@ export function ManagedAttributesSorter({
                 style={{ maxWidth: "30rem" }}
               >
                 <ResourceSelect<ManagedAttribute>
-                  filter={(input) => ({
-                    ...filterBy(["name"])(input),
-                    ...(managedAttributeComponent
-                      ? { managedAttributeComponent }
-                      : {})
-                  })}
+                  filter={(input: string) =>
+                    SimpleSearchFilterBuilder.create<ManagedAttribute>()
+                      .searchFilter("name", input)
+                      .when(!!managedAttributeComponent, (builder) =>
+                        builder.where(
+                          "managedAttributeComponent",
+                          "EQ",
+                          managedAttributeComponent
+                        )
+                      )
+                      .build()
+                  }
                   model={managedAttributeApiPath}
                   onChange={(ma) => {
                     if (

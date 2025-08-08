@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import {
   ResourceSelectField,
   SelectField,
-  TooltipSelectOption,
-  filterBy
+  SimpleSearchFilterBuilder,
+  TooltipSelectOption
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -134,15 +134,12 @@ export function WorkbookFieldSelectField({
               menuPortalTarget: document.body,
               styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
             }}
-            filter={filterBy(["name"], {
-              extraFilters: [
-                {
-                  selector: "managedAttributeComponent",
-                  comparison: "==",
-                  arguments: "MATERIAL_SAMPLE"
-                }
-              ]
-            })}
+            filter={(input: string) =>
+              SimpleSearchFilterBuilder.create<ManagedAttribute>()
+                .where("managedAttributeComponent", "EQ", "MATERIAL_SAMPLE")
+                .searchFilter("name", input)
+                .build()
+            }
             isDisabled={disabled}
             additionalSort={"name"}
             showGroupCategary={true}
@@ -185,15 +182,12 @@ export function WorkbookFieldSelectField({
               menuPortalTarget: document.body,
               styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
             }}
-            filter={filterBy(["name"], {
-              extraFilters: [
-                {
-                  selector: "managedAttributeComponent",
-                  comparison: "==",
-                  arguments: "PREPARATION"
-                }
-              ]
-            })}
+            filter={(input: string) =>
+              SimpleSearchFilterBuilder.create<ManagedAttribute>()
+                .where("managedAttributeComponent", "EQ", "PREPARATION")
+                .searchFilter("name", input)
+                .build()
+            }
             model="collection-api/managed-attribute"
             optionLabel={(cm) => cm.name}
           />
@@ -212,15 +206,12 @@ export function WorkbookFieldSelectField({
               menuPortalTarget: document.body,
               styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
             }}
-            filter={filterBy(["name"], {
-              extraFilters: [
-                {
-                  selector: "managedAttributeComponent",
-                  comparison: "==",
-                  arguments: "COLLECTING_EVENT"
-                }
-              ]
-            })}
+            filter={(input: string) =>
+              SimpleSearchFilterBuilder.create<ManagedAttribute>()
+                .where("managedAttributeComponent", "EQ", "COLLECTING_EVENT")
+                .searchFilter("name", input)
+                .build()
+            }
             model="collection-api/managed-attribute"
             optionLabel={(cm) => cm.name}
           />

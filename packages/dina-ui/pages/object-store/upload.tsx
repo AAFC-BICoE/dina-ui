@@ -38,14 +38,6 @@ export default function UploadPage() {
     if (!group) {
       throw new Error(formatMessage("groupMustBeSelected"));
     }
-    const navigateToList = async () => {
-      await router.push({
-        pathname: `/object-store/object/list`,
-        query: {
-          group
-        }
-      });
-    };
 
     const uploadRespsT = await uploadFiles({
       files: acceptedFiles,
@@ -56,7 +48,7 @@ export default function UploadPage() {
     // Handle linking derivative to metadata object
     if (router?.query?.derivativeType) {
       const derivativeObjectUpload = uploadRespsT[0];
-      await apiClient.axios.post(
+      const response = await apiClient.axios.post(
         `/objectstore-api/derivative`,
         {
           data: {
@@ -83,7 +75,10 @@ export default function UploadPage() {
           }
         }
       );
-      await navigateToList();
+      await router.push({
+        pathname: "/object-store/derivative/edit",
+        query: { id: response.data.data.id }
+      });
     } else {
       // Handle redirecting to metadata edit page for creating metadata objects
       const objectUploadDuplicates = uploadRespsT
