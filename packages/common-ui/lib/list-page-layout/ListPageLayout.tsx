@@ -34,6 +34,7 @@ export enum ListLayoutFilterType {
 }
 
 export interface ListPageLayoutProps<TData extends KitsuResource> {
+  // if useFiql is true, additionalFilters should be a FIQL string or a function that returns a FIQL string.
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
   defaultSort?: ColumnSort[];
   filterType?: ListLayoutFilterType;
