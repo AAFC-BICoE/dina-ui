@@ -52,7 +52,7 @@ export function useMetadataViewQuery(id?: string) {
   const { bulkGet } = useApiClient();
   const query = useQuery<Metadata & { objectUpload: ObjectUpload }>(
     {
-      include: "managedAttributeMap,acMetadataCreator,dcCreator,derivatives",
+      include: "acMetadataCreator,dcCreator,derivatives",
       path: `objectstore-api/metadata/${id}`,
       header: { "include-dina-permission": "true" }
     },
@@ -237,6 +237,14 @@ export function useMetadataSave({
       metadataValues.xmpRightsWebStatement = license?.url ?? "";
       // No need to store this ; The url should be enough.
       metadataValues.xmpRightsUsageTerms = "";
+    }
+
+    if (metadataValues.dcCreator) {
+      // Only include the id and type for this relationship.
+      metadataValues.dcCreator = {
+        id: metadataValues.dcCreator.id,
+        type: "person"
+      };
     }
 
     const saveOperation = await prepareMetadataSaveOperation({
