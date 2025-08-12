@@ -112,7 +112,7 @@ export function useDerivativeMetadataViewQuery(id?: string) {
     Derivative & { derivedFrom: Metadata } & { objectUpload: ObjectUpload }
   >(
     {
-      include: "derivative,acDerivedFrom,generatedFromDerivative,acTags",
+      include: "acDerivedFrom,generatedFromDerivative",
       path: `objectstore-api/derivative/${id}`,
       header: { "include-dina-permission": "true" }
     },
@@ -134,7 +134,7 @@ export function useDerivativeEditQuery(id?: string | null) {
   const derivativeQuery = useQuery<Derivative>(
     {
       path: `objectstore-api/derivative/${id}`,
-      include: "derivative,acDerivedFrom,generatedFromDerivative,acTags"
+      include: "acDerivedFrom,generatedFromDerivative"
     },
     {
       disabled: !id,
@@ -243,6 +243,13 @@ export function useMetadataSave({
       // Only include the id and type for this relationship.
       metadataValues.dcCreator = {
         id: metadataValues.dcCreator.id,
+        type: "person"
+      };
+    }
+    if (metadataValues.acMetadataCreator) {
+      // Only include the id and type for this relationship.
+      metadataValues.acMetadataCreator = {
+        id: metadataValues.acMetadataCreator.id,
         type: "person"
       };
     }
