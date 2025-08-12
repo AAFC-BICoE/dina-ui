@@ -76,10 +76,21 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       header,
       responseType,
       timeout,
-      fiql
+      fiql,
+      sort
     } = querySpec;
     const getParams = _.omitBy<GetParams>(
-      { fields, fiql, filter, include, page, header, responseType, timeout },
+      {
+        fields,
+        fiql,
+        filter,
+        include,
+        page,
+        header,
+        responseType,
+        timeout,
+        sort
+      },
       _.isUndefined
     );
 
