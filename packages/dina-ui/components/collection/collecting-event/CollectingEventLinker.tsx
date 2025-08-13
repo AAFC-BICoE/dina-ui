@@ -34,6 +34,21 @@ export function CollectingEventLinker({
   onCollectingEventSelect
 }: CollectingEventLinkerProps) {
   const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
+    {
+      id: "viewDetails",
+      cell: ({ row: { original: collectingEvent } }) => (
+        <div className="d-flex">
+          <Link
+            href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
+            className="flex-grow-1 my-auto"
+          >
+            <DinaMessage id="viewDetails" />
+          </Link>
+        </div>
+      ),
+      header: () => <DinaMessage id="viewDetails" />,
+      enableSorting: false
+    },
     "dwcFieldNumber",
     stringArrayCell("otherRecordNumbers"),
     "createdBy",
@@ -50,17 +65,11 @@ export function CollectingEventLinker({
     "startEventDateTime",
     {
       id: "action",
+      enableSorting: false,
       cell: ({ row: { original: collectingEvent } }) => (
         <div className="d-flex">
-          <Link
-            href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
-            className="flex-grow-1 my-auto"
-          >
-            <DinaMessage id="viewDetails" />
-          </Link>
           <FormikButton
-            className="flex-grow-1 btn btn-link collecting-event-link-button"
-            buttonProps={() => ({ style: { textDecorationLine: "underline" } })}
+            className="flex-grow-1 btn btn-primary collecting-event-link-button"
             onClick={(_, formik) =>
               onCollectingEventSelect(collectingEvent, formik)
             }
@@ -69,8 +78,7 @@ export function CollectingEventLinker({
           </FormikButton>
         </div>
       ),
-      header: () => null,
-      enableSorting: false
+      header: () => <DinaMessage id="select" />
     }
   ];
 

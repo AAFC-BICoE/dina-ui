@@ -42,7 +42,6 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   destroyedLabel: "zerstört",
   detach: "Trennen",
   done: "Erledigt",
-  dontChangeValues: "Nicht veränderbarer Inhalt",
   dropdownSearchResults: "Suchergebnisse",
   editAll: "Alle bearbeiten",
   editButtonText: "Bearbeiten",

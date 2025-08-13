@@ -90,6 +90,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   browseContents: "Browse Contents",
   browseStorageTree: "Browse Storage Tree",
   bulkCreate: "Create Multiple New",
+  bulkEditNotPubliclyReleasableTooltip:
+    'The current status of the selected items - is set to "{keepCurrentValues}" by default. Any changes made here will be applied to all selected items.',
   bulkEditResourceLinkerWarningMulti:
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceLinkerWarningSingle:
@@ -116,7 +118,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "These Associations will be set on all Material Samples.",
   bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Multi:
     "These Scheduled Actions will be set on all Material Samples.",
-
   bulkOperationCompleteTitle: "Bulk Operation Complete",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
@@ -138,6 +139,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingLocationLegend: "Collecting Location",
   collectingEventPermissionAlert:
     "You do not have permission to edit this collecting event. All fields are in read-only mode.",
+  collectingEventEditAlertMessage:
+    "This collecting event is currently linked to {count} material samples. Please ensure that any changes made here are appropriate for all linked material samples.",
+  collectingEventEditErrorMessage:
+    "This collecting event is currently linked to {count} material samples. Editing is only available on the Collecting Event Details page.",
+  collectingEventEditErrorMessageSingle:
+    "This collecting event is currently linked to a material sample. Editing is only available on the Collecting Event Details page.",
+  collectingEventEditAlertTitle: "Update Collecting Event?",
+  collectingEventGoToDetails: "Go to Collecting Event details page",
   collection: "Collection",
   collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",

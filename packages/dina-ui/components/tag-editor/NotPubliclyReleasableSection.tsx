@@ -1,33 +1,48 @@
 import {
   DinaFormSection,
   InverseToggleField,
-  RadioButtonsField,
+  SelectField,
   TextField,
-  useBulkEditTabContext
+  useBulkEditTabContext,
+  Tooltip
 } from "common-ui";
 import { useFormikContext } from "formik";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export function NotPubliclyReleasableSection() {
   const isInBulkEditTab = !!useBulkEditTabContext();
   const formik = useFormikContext<any>();
+  const { formatMessage } = useDinaIntl();
 
+  if (
+    isInBulkEditTab &&
+    !formik.touched.publiclyReleasable &&
+    formik.values.publiclyReleasable !== null
+  ) {
+    // In bulk edit, set publiclyReleasable to null by default.
+    formik.setFieldValue("publiclyReleasable", null);
+  }
   return (
     <>
       {isInBulkEditTab ? (
-        <RadioButtonsField<boolean | null>
-          name="publiclyReleasable"
-          label={<DinaMessage id="notPubliclyReleasable" />}
-          options={[
-            // null values are ignored when bulk editing:
-            {
-              value: null,
-              label: <DinaMessage id="dontChangeValues" />
-            },
-            // True and false are reversed to show "publiclyReleasable" as "notPubliclyReleasable".
-            { value: false, label: <DinaMessage id="true" /> },
-            { value: true, label: <DinaMessage id="false" /> }
-          ]}
+        <Tooltip
+          id="bulkEditNotPubliclyReleasableTooltip"
+          intlValues={{
+            keepCurrentValues: formatMessage("keepCurrentValues")
+          }}
+          visibleElement={
+            <SelectField<boolean | null>
+              name="publiclyReleasable"
+              label={<DinaMessage id="notPubliclyReleasable" />}
+              options={[
+                // null values are ignored when bulk editing
+                { label: formatMessage("keepCurrentValues"), value: null },
+                // True and false are reversed to show "publiclyReleasable" as "notPubliclyReleasable".
+                { label: formatMessage("true"), value: false },
+                { label: formatMessage("false"), value: true }
+              ]}
+            />
+          }
         />
       ) : (
         <InverseToggleField
