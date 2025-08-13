@@ -77,7 +77,7 @@
   padding: 5px 5px;
   line-height: normal;
   position: relative;
-  border-right: 1px solid rgba(0, 0, 0, 0.05);
+  border-right: rgb(174, 174, 174);
   transition: box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: inset 0 0 0 0 transparent;
 }
@@ -258,7 +258,7 @@
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.15);
 }
 .ReactTable .rt-tfoot .rt-td {
-  border-right: 1px solid rgba(0, 0, 0, 0.05);
+  border-right: rgb(174, 174, 174);
 }
 .ReactTable .rt-tfoot .rt-td:last-child {
   border-right: 0;
