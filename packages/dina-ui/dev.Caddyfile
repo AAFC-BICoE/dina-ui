@@ -95,3 +95,10 @@ route /api/dina-export-api/* {
     uri replace /api/dina-export-api /api/v1
     reverse_proxy {$REPORT_LABEL_API_ADDRESS}
 }
+
+# Handle static files
+handle_path /static/* {
+root * /srv/ui-static
+try_files {path} {path}.html
+file_server
+}
