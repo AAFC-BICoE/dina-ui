@@ -17,6 +17,7 @@ import {
   QueryTableProps,
   useGroupedCheckBoxes
 } from "..";
+import { fiql } from "../filter-builder/fiql";
 import { rsql } from "../filter-builder/rsql";
 import {
   BulkDeleteButton,
@@ -33,10 +34,12 @@ export enum ListLayoutFilterType {
 }
 
 export interface ListPageLayoutProps<TData extends KitsuResource> {
+  // if useFiql is true, additionalFilters should be a FIQL string or a function that returns a FIQL string.
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
   defaultSort?: ColumnSort[];
   filterType?: ListLayoutFilterType;
   enableInMemoryFilter?: boolean;
+  useFiql?: boolean; // Uses a FIQL string for filtering instead of RSQL.
   filterFn?: (
     filterForm: any,
     value: PersistedResource<TData>,
@@ -71,6 +74,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   defaultSort: defaultSortProp,
   filterType = ListLayoutFilterType.FILTER_BUILDER,
   enableInMemoryFilter = false,
+  useFiql = false,
   filterFn = () => true,
   filterAttributes,
   filterFormchildren,
@@ -115,10 +119,33 @@ export function ListPageLayout<TData extends KitsuResource>({
     ) => {
       return filterFn(filterForm, value, index, array);
     };
-  } else {
-    let filterBuilderRsql = "";
+  } else if (useFiql) {
+    let filterBuilderFiql = "";
     try {
-      filterBuilderRsql = rsql(filterForm.filterBuilderModel);
+      filterBuilderFiql = fiql(filterForm.filterBuilderModel);
+    } catch (error) {
+      // If there is an error, ignore the filter form rsql instead of crashing the page.
+      console.error(error);
+      setImmediate(() => setFilterForm({}));
+    }
+
+    const additionalFilters = (
+      typeof additionalFiltersProp === "function"
+        ? additionalFiltersProp(filterForm)
+        : additionalFiltersProp
+    ) as string;
+
+    if (filterBuilderFiql && additionalFilters) {
+      filterParam = `(${filterBuilderFiql});(${additionalFilters})`;
+    } else if (filterBuilderFiql) {
+      filterParam = filterBuilderFiql;
+    } else if (additionalFilters) {
+      filterParam = additionalFilters as string;
+    }
+  } else {
+    let filterBuilder = "";
+    try {
+      filterBuilder = rsql(filterForm.filterBuilderModel);
     } catch (error) {
       // If there is an error, ignore the filter form rsql instead of crashing the page.
       console.error(error);
@@ -132,8 +159,8 @@ export function ListPageLayout<TData extends KitsuResource>({
     ) as Record<string, string>;
 
     // Combine the inner rsql with the passed additionalFilters?.rsql filter if they are set:
-    const combinedRsql = [
-      ...(filterBuilderRsql ? [filterBuilderRsql] : []),
+    const combinedFilter = [
+      ...(filterBuilder ? [filterBuilder] : []),
       ...(additionalFilters?.rsql ? [additionalFilters?.rsql] : [])
     ].join(" and ");
 
@@ -141,9 +168,10 @@ export function ListPageLayout<TData extends KitsuResource>({
     filterParam = {
       ...additionalFilters,
       // Only include rsql if it's not blank:
-      ...(combinedRsql && { rsql: combinedRsql })
+      ...(combinedFilter && { rsql: combinedFilter })
     };
   }
+
   const {
     CheckBoxField,
     CheckBoxHeader,
@@ -187,7 +215,9 @@ export function ListPageLayout<TData extends KitsuResource>({
       filterFn={inMemoryFilter}
       defaultPageSize={defaultPageSize ?? undefined}
       defaultSort={defaultSort ?? undefined}
-      filter={filterParam}
+      // if useFiql is true, use fiql for filtering:
+      filter={useFiql ? undefined : filterParam}
+      fiql={useFiql ? (filterParam as string) : undefined}
       onPageSizeChange={(newSize) => setDefaultPageSize(newSize)}
       onSortedChange={(newSort) => setStoredDefaultSort(newSort)}
       topRightCorner={

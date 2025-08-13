@@ -13,15 +13,33 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface BulkEditTabWarningProps {
   fieldName: string;
-  targetType: string;
+  messageIdSingle: string;
+  messageIdMultiple: string;
   setDefaultValue?: (ctx: BulkEditTabContextI) => void;
   showWarningWhenValuesAreTheSame?: boolean;
 }
 
+/**
+ * Displays a warning and override option in bulk edit tabs when multiple values are detected for a field.
+ *
+ * This component checks the bulk edit context and field state to determine whether to show a warning
+ * about multiple values, and provides an "Override All" button to set a default value for all items.
+ * The warning and override button are conditionally rendered based on the field's state and props.
+ *
+ * @param fieldName - The name of the field being edited in bulk.
+ * @param setDefaultValue - Optional callback to set the default value for the field in the bulk edit context.
+ * @param messageIdSingle - DinaMessage ID to display when only one value is present.
+ * @param messageIdMultiple - DinaMessage ID to display when multiple values are present.
+ * @param children - Child components to render within the warning container.
+ * @param showWarningWhenValuesAreTheSame - If false, suppresses the warning when all values are the same.
+ *
+ * @returns JSX element displaying the warning and override button, or just children if no warning is needed.
+ */
 export function BulkEditTabWarning({
   fieldName,
   setDefaultValue,
-  targetType,
+  messageIdSingle,
+  messageIdMultiple,
   children,
   showWarningWhenValuesAreTheSame
 }: PropsWithChildren<BulkEditTabWarningProps>) {
@@ -76,16 +94,15 @@ export function BulkEditTabWarning({
     return skipBulkEditWarning || override ? (
       <div>
         <FieldSpy fieldName={fieldName}>
-          {(_, { bulkContext }) =>
-            bulkContext?.hasBulkEditValue ? (
+          {(fieldValue: Array<any>, { bulkContext }) =>
+            bulkContext?.hasBulkEditValue && fieldValue.length ? (
+              // Show a different warning when there are multiple values
               <div className="alert alert-warning">
-                <DinaMessage
-                  id="bulkEditResourceSetWarningMulti"
-                  values={{
-                    targetType: getFieldLabel({ name: targetType }).fieldLabel,
-                    fieldName: getFieldLabel({ name: fieldName }).fieldLabel
-                  }}
-                />
+                {fieldValue.length == 1 ? (
+                  <DinaMessage id={messageIdSingle as any} />
+                ) : (
+                  <DinaMessage id={messageIdMultiple as any} />
+                )}
               </div>
             ) : null
           }
@@ -123,6 +140,7 @@ export function BulkEditTabWarning({
             <DinaMessage id="overrideAll" />
           </FormikButton>
         </div>
+        <div>{children}</div>
       </div>
     );
   }

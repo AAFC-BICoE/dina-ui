@@ -12,7 +12,8 @@ import {
   useAccount,
   useApiClient,
   useQuery,
-  withResponse
+  withResponse,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { NextRouter, useRouter } from "next/router";
 import { Field } from "formik";
@@ -241,11 +242,15 @@ function ExternalResourceMetadataForm({
               <ResourceSelectField<ObjectSubtype>
                 name="acSubtype"
                 className="col-md-6"
-                filter={(input) => ({
-                  rsql:
-                    `acSubtype=='${input}*'` +
-                    (dcType ? ` and dcType==${dcType}` : "")
-                })}
+                filter={(input) =>
+                  SimpleSearchFilterBuilder.create<ObjectSubtype>()
+                    .searchFilter("acSubtype", input)
+                    // if dcType is set, filter by it as well
+                    .when(dcType, (builder) =>
+                      builder.where("dcType", "EQ", dcType)
+                    )
+                    .build()
+                }
                 model="objectstore-api/object-subtype"
                 optionLabel={(ost) => ost.acSubtype}
               />

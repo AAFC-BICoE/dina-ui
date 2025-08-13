@@ -90,12 +90,34 @@ export const DINAUI_MESSAGES_ENGLISH = {
   browseContents: "Browse Contents",
   browseStorageTree: "Browse Storage Tree",
   bulkCreate: "Create Multiple New",
+  bulkEditNotPubliclyReleasableTooltip:
+    'The current status of the selected items - is set to "{keepCurrentValues}" by default. Any changes made here will be applied to all selected items.',
   bulkEditResourceLinkerWarningMulti:
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceLinkerWarningSingle:
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceSetWarningMulti:
     "These {fieldName}s will be set on all {targetType}s.",
+
+  bulkEditResourceLinkerWarning_Organisms_MaterialSample_Single:
+    "This Organism will be linked to all Material Samples.",
+  bulkEditResourceLinkerWarning_Attachments_MaterialSample_Single:
+    "This Attachment will be linked to all Material Samples.",
+
+  bulkEditResourceLinkerWarning_Organisms_MaterialSample_Multi:
+    "These Organisms will be linked to all Material Samples.",
+  bulkEditResourceLinkerWarning_Attachments_MaterialSample_Multi:
+    "These Attachments will be linked to all Material Samples.",
+
+  bulkEditResourceSetWarning_Associations_MaterialSample_Single:
+    "This Association will be set on all Material Samples.",
+  bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Single:
+    "This Scheduled Action will be set on all Material Samples.",
+
+  bulkEditResourceSetWarning_Associations_MaterialSample_Multi:
+    "These Associations will be set on all Material Samples.",
+  bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Multi:
+    "These Scheduled Actions will be set on all Material Samples.",
   bulkOperationCompleteTitle: "Bulk Operation Complete",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
@@ -117,6 +139,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingLocationLegend: "Collecting Location",
   collectingEventPermissionAlert:
     "You do not have permission to edit this collecting event. All fields are in read-only mode.",
+  collectingEventEditAlertMessage:
+    "This collecting event is currently linked to {count} material samples. Please ensure that any changes made here are appropriate for all linked material samples.",
+  collectingEventEditErrorMessage:
+    "This collecting event is currently linked to {count} material samples. Editing is only available on the Collecting Event Details page.",
+  collectingEventEditErrorMessageSingle:
+    "This collecting event is currently linked to a material sample. Editing is only available on the Collecting Event Details page.",
+  collectingEventEditAlertTitle: "Update Collecting Event?",
+  collectingEventGoToDetails: "Go to Collecting Event details page",
   collection: "Collection",
   collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
@@ -846,6 +876,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   revisionsListTitle: "Revisions for {name}",
+  reviewSavedSearchHeading: "Review Your Saved Search",
+  reviewSavedSearchMessage:
+    'The way we save search filters and columns has been updated since you last saved "{savedSearch}".',
+  reviewSavedSearchWhatToDo: "What to do:",
+  reviewSavedSearchCheck:
+    "Check that your search query and visible columns are still correct. Make any required changes to the search query and visible columns.",
+  reviewSavedSearchConfirm:
+    'Click the "Confirm and Update" button to update it to the latest version.',
+  reviewSavedSearchEnsure:
+    "This will ensure your saved search continues to work as expected.",
+  reviewSavedSearchConfirmButton: "Confirm and Update",
   role: "Role",
   roleAction: "Role/Action",
   roles: "Roles",
