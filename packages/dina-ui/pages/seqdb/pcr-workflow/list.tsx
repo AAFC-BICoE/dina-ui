@@ -71,7 +71,7 @@ export default function PCRWorkflowListPage() {
           additionalFilters={(filterForm) => ({
             isCompleted: false,
             // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+            ...(filterForm.group && { group: filterForm.group })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
           id="pcr-workflow-list"

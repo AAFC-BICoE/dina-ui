@@ -44,6 +44,9 @@ declare module "kitsu" {
     /** Resource filter */
     filter?: FilterParam;
 
+    /** FIQL filter */
+    fiql?: string;
+
     /**
      * Sort order + attribute.
      * Examples:

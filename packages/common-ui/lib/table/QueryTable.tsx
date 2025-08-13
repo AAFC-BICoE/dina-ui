@@ -79,6 +79,9 @@ export interface QueryTableProps<TData extends KitsuResource> {
   /** JSONAPI filter spec. */
   filter?: FilterParam;
 
+  /** JSONAPI fiql spec. */
+  fiql?: string;
+
   /** Related resources to include in the request. */
   include?: string;
 
@@ -143,6 +146,7 @@ export function QueryTable<TData extends KitsuResource>({
   defaultSort = [],
   deps,
   fields,
+  fiql,
   filter,
   include,
   joinSpecs,
@@ -258,6 +262,7 @@ export function QueryTable<TData extends KitsuResource>({
     query = {
       path,
       fields,
+      fiql,
       filter,
       include,
       ...(!omitPaging && { page }),
