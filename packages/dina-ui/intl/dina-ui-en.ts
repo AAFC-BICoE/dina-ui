@@ -147,6 +147,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "This collecting event is currently linked to a material sample. Editing is only available on the Collecting Event Details page.",
   collectingEventEditAlertTitle: "Update Collecting Event?",
   collectingEventGoToDetails: "Go to Collecting Event details page",
+  collectingEventViewMaterialSamplesAttached:
+    "View Current Material Samples Attached",
   collection: "Collection",
   collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",

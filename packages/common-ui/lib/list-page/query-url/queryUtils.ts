@@ -229,6 +229,32 @@ export function generateJsonTreeFromSimpleQueryGroup(
 }
 
 /**
+ * Generates a serialized query string from an array of SimpleQueryRow objects.
+ * This is a generic and flexible helper for creating any kind of search link
+ * from other parts of the application.
+ *
+ * @param queryRows An array of one or more `SimpleQueryRow` objects defining the search rules.
+ * @param conjunction The conjunction to use between rows ('AND' or 'OR'). Defaults to 'AND'.
+ * @returns A JSON string representing the query, ready to be used as a queryTree parameter.
+ */
+export function generateSearchURLFromSimpleRows(
+  queryRows: SimpleQueryRow[],
+  conjunction: "AND" | "OR" = "AND"
+): string | null {
+  if (!queryRows || queryRows.length === 0) {
+    console.error("Cannot generate a search URL with no query rows.");
+    return null;
+  }
+
+  const simpleQueryGroup: SimpleQueryGroup = {
+    c: serializeConjunction(conjunction), // Serialize 'AND'/'OR' to 'a'/'o'
+    p: queryRows
+  };
+
+  return JSON.stringify(simpleQueryGroup);
+}
+
+/**
  * Parse the simplified dynamic fields back to their original format
  *
  * @param simpleQueryRow The simplified query row to parse
