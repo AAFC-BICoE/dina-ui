@@ -273,7 +273,7 @@ export function StorageLinkerField({
         <AssignedStorage
           readOnly={true}
           value={value}
-          showRowAndColumnFields={parentStorageUnitUUID === undefined} // if displaying the parent storage unit, don't show row and column fields
+          showRowAndColumnFields={currentStorageUnitUUID === undefined} // if displaying the parent storage unit, don't show row and column fields
         />
       )}
       disableLabelClick={true}
