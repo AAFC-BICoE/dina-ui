@@ -4,7 +4,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
-import { generateSearchURLFromSimpleRows } from "packages/common-ui/lib/list-page/query-url/queryUtils";
+import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
 
 interface CollectingEventEditAlertProps {
   /** The number of material samples linked. Shows if > 1. */
