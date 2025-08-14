@@ -102,6 +102,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   max: "Max",
   min: "Min",
   multipleValues: "Multiple Values",
+  cleared: "Cleared",
   multipleValuesFound: "Multiple Values Found",
   name: "Name",
   navigation: "Navigation",

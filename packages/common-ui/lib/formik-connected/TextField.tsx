@@ -6,6 +6,10 @@ import TextareaAutosize, {
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import classnames from "classnames";
 import React from "react";
+import { useBulkEditTabContext } from "../bulk-edit/bulk-context";
+import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
+import { FaEraser } from "react-icons/fa";
+import { Tooltip } from "../tooltip/Tooltip";
 
 export interface TextFieldProps extends FieldWrapperProps {
   readOnly?: boolean;
@@ -25,6 +29,7 @@ export interface TextFieldProps extends FieldWrapperProps {
     name: string,
     value: string | null
   ) => void;
+  multipleValueClearIcon?: boolean;
 }
 
 /**
@@ -45,12 +50,31 @@ export function TextField(props: TextFieldProps) {
     ...fieldWrapperProps
   } = props;
 
+  const bulkCtx = useBulkEditTabContext();
+
   return (
     <FieldWrapper {...fieldWrapperProps}>
       {({ formik, setValue, value, invalid, placeholder }) => {
+        const bulkTab = useBulkEditTabFieldIndicators({
+          fieldName: props.name,
+          currentValue: value
+        });
+
         function onChangeInternal(newValue: string) {
           setValue(newValue);
           onChangeExternal?.(formik, props.name, newValue);
+        }
+
+        function onClearField() {
+          if (bulkCtx) {
+            // Mark field as explicitly cleared
+            const newClearedFields = new Set(bulkCtx.clearedFields);
+            newClearedFields.add(props.name);
+            bulkCtx.setClearedFields(newClearedFields);
+
+            // Set the actual field value to empty
+            setValue("");
+          }
         }
 
         const onKeyDown = (e) => {
@@ -85,21 +109,34 @@ export function TextField(props: TextFieldProps) {
           onKeyDown
         };
 
-        // The default Field component's inner text input needs to be replaced with our own
-        // controlled input that we manually pass the "onChange" and "value" props. Otherwise
-        // we will get React's warning about switching from an uncontrolled to controlled input.
+        const clearButton = bulkTab?.showClearIcon ? (
+          <Tooltip
+            directText="Clear this field for all selected resources. All items will have an empty value for this field after saving."
+            placement="right"
+            visibleElement={
+              <button type="button" className="btn" onClick={onClearField}>
+                <FaEraser />
+              </button>
+            }
+          />
+        ) : null;
+
         return (
-          customInput?.(inputPropsInternal, formik) ??
-          (multiLines ? (
-            <TextareaAutosize
-              minRows={
-                (inputPropsExternal as TextareaHTMLAttributes<any>)?.rows || 2
-              }
-              {...(inputPropsInternal as TextareaAutosizeProps)}
-            />
-          ) : (
-            <input type="text" {...inputPropsInternal} />
-          ))
+          <div className="d-flex align-items-center gap-2">
+            {customInput?.(inputPropsInternal, formik) ??
+              (multiLines ? (
+                <TextareaAutosize
+                  minRows={
+                    (inputPropsExternal as TextareaHTMLAttributes<any>)?.rows ||
+                    2
+                  }
+                  {...(inputPropsInternal as TextareaAutosizeProps)}
+                />
+              ) : (
+                <input type="text" {...inputPropsInternal} />
+              ))}
+            {clearButton}
+          </div>
         );
       }}
     </FieldWrapper>
