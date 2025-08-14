@@ -1,0 +1,24 @@
+{
+  "defaults": {
+    "useIncognitoBrowserContext": false,
+    "reporters": [
+      [
+        "pa11y-ci-reporter-html",
+        { "destination": "./reports", "includeZeroIssues": true }
+      ]
+    ]
+  },
+  "urls" : [
+    {
+      "actions" : [
+        "wait for element #kc-login to be visible",
+        "set field #username to dina-admin",
+        "set field #password to dina-admin",
+        "click element #kc-login",
+        "wait for path to be /"
+      ],
+      "url": "https://dina.local"
+    }
+,"https://dina.local"  
+	]
+}
