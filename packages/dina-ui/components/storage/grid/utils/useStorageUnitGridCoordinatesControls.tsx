@@ -68,14 +68,14 @@ export function useGridCoordinatesControls({
 
             if (existingEntry) {
               existingEntry.samples.push(
-                materialSample.materialSampleName ?? ""
+                materialSample.materialSampleName ?? materialSample.id
               );
             } else {
               multipleSamplesWellCoordinates.current.push({
                 coordinate: key,
                 samples: [
-                  newCellGrid[key].sampleName,
-                  materialSample.materialSampleName
+                  newCellGrid[key].sampleName ?? materialSample.id,
+                  materialSample.materialSampleName ?? materialSample.id
                 ]
               });
             }

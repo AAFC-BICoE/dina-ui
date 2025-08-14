@@ -16,7 +16,11 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Promisable } from "type-fest";
 import { StorageActionMode, StorageUnitForm } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { MaterialSample, StorageUnit } from "../../types/collection-api";
+import {
+  MaterialSample,
+  StorageUnit,
+  StorageUnitType
+} from "../../types/collection-api";
 import { AssignedStorage } from "./AssignedStorage";
 import { BrowseStorageTree } from "./BrowseStorageTree";
 import { StorageSearchSelector } from "./StorageSearchSelector";
@@ -30,7 +34,8 @@ export interface StorageLinkerProps {
   actionMode?: StorageActionMode;
   parentIdInURL?: string;
   createStorageMode?: boolean;
-  parentStorageUnitUUID?: string;
+  currentStorageUnitUUID?: string;
+  storageUnitType?: StorageUnitType;
 }
 
 /** Multi-Tab Storage Assignment UI. */
@@ -41,7 +46,8 @@ export function StorageLinker({
   actionMode,
   parentIdInURL,
   createStorageMode,
-  parentStorageUnitUUID
+  currentStorageUnitUUID,
+  storageUnitType
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
   const { readOnly } = useDinaFormContext();
@@ -50,6 +56,82 @@ export function StorageLinker({
   const formType = useField<string | undefined>("type")[0].value;
 
   const { promptToDeleteEmptyStorage } = usePromptToDeleteEmptyStorage();
+
+  /**
+   * Generates an Elasticsearch query object for filtering storage units by type
+   * based on the current storage unit type.
+   *
+   * @param type - The storage unit type object to generate the query for.
+   * @returns An Elasticsearch query object:
+   *   - Always filters out the current storage unit by its UUID.
+   *   - If the `type` has a `gridLayoutDefinition`, returns a query that matches storage units with the
+   *     same type.
+   *   - If the `type` does not have a `gridLayoutDefinition`, returns a query that matches non-grid storage units.
+   */
+  function storageUnitTypeQuery(type: StorageUnitType): any {
+    if (type.gridLayoutDefinition) {
+      return {
+        bool: {
+          must_not: {
+            term: {
+              "data.id": currentStorageUnitUUID
+            }
+          },
+          must: [
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    filter: [
+                      {
+                        term: {
+                          "included.type": "storage-unit-type"
+                        }
+                      },
+                      {
+                        term: {
+                          "included.id": type.id
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      };
+    } else {
+      return {
+        bool: {
+          must_not: {
+            term: {
+              "data.id": currentStorageUnitUUID
+            }
+          },
+          must: [
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must_not: [
+                      {
+                        exists: {
+                          field: "included.attributes.gridLayoutDefinition"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      };
+    }
+  }
 
   async function changeStorageAndResetTab(
     newValue: PersistedResource<StorageUnit> | { id: null }
@@ -80,6 +162,8 @@ export function StorageLinker({
           value={value}
           parentIdInURL={parentIdInURL}
           onChange={changeStorageAndResetTab}
+          // if editing or creating a new storage unit, don't show row and column fields since they don't have coordinates
+          showRowAndColumnFields={!createStorageMode}
         />
       ) : (
         <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
@@ -112,10 +196,20 @@ export function StorageLinker({
           >
             {!value?.id && (
               <TabPanel>
-                <StorageSearchSelector
-                  onChange={changeStorageAndResetTab}
-                  parentStorageUnitUUID={parentStorageUnitUUID}
-                />
+                {actionMode === "MOVE_ALL" && storageUnitType ? (
+                  <StorageSearchSelector
+                    onChange={changeStorageAndResetTab}
+                    currentStorageUnitUUID={currentStorageUnitUUID}
+                    customViewElasticSearchQuery={storageUnitTypeQuery(
+                      storageUnitType
+                    )}
+                  />
+                ) : (
+                  <StorageSearchSelector
+                    onChange={changeStorageAndResetTab}
+                    currentStorageUnitUUID={currentStorageUnitUUID}
+                  />
+                )}
               </TabPanel>
             )}
             {!value?.id && (
@@ -123,7 +217,7 @@ export function StorageLinker({
                 <BrowseStorageTree
                   onSelect={changeStorageAndResetTab}
                   readOnly={readOnly}
-                  parentStorageUnitUUID={parentStorageUnitUUID}
+                  currentStorageUnitUUID={currentStorageUnitUUID}
                 />
               </TabPanel>
             )}
@@ -157,7 +251,7 @@ export interface StorageLinkerFieldProps {
   hideLabel?: boolean;
   parentIdInURL?: string;
   createStorageMode?: boolean;
-  parentStorageUnitUUID?: string;
+  currentStorageUnitUUID?: string;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
@@ -168,7 +262,7 @@ export function StorageLinkerField({
   targetType,
   parentIdInURL,
   createStorageMode,
-  parentStorageUnitUUID
+  currentStorageUnitUUID
 }: StorageLinkerFieldProps) {
   const { getFieldLabel } = useFieldLabels();
 
@@ -176,7 +270,11 @@ export function StorageLinkerField({
     <FieldWrapper
       name={name}
       readOnlyRender={(value) => (
-        <AssignedStorage readOnly={true} value={value} />
+        <AssignedStorage
+          readOnly={true}
+          value={value}
+          showRowAndColumnFields={currentStorageUnitUUID === undefined} // if displaying the parent storage unit, don't show row and column fields
+        />
       )}
       disableLabelClick={true}
       customName={customName}
@@ -208,7 +306,7 @@ export function StorageLinkerField({
             placeholder={placeholder}
             parentIdInURL={parentIdInURL}
             createStorageMode={createStorageMode}
-            parentStorageUnitUUID={parentStorageUnitUUID}
+            currentStorageUnitUUID={currentStorageUnitUUID}
           />
         </div>
       )}

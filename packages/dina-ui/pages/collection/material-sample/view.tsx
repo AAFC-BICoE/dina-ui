@@ -423,6 +423,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                             customName={formatMessage(
                               "field_parentStorageUnit"
                             )}
+                            currentStorageUnitUUID={
+                              materialSample.storageUnit.parentStorageUnit.id
+                            }
                           />
                         </div>
                       )}

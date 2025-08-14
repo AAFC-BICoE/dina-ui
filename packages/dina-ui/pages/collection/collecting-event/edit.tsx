@@ -5,7 +5,10 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   SubmitButton,
-  withResponse
+  useApiClient,
+  useRelationshipUsagesCount,
+  withResponse,
+  useModal
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
@@ -20,6 +23,8 @@ import {
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import PageLayout from "../../../components/page/PageLayout";
+import React from "react";
+import { renderConfirmationModal } from "../../../components/collection/collecting-event/CollectingEventEditAlert";
 
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;
@@ -56,12 +61,22 @@ export default function CollectingEventEditPage() {
 
 function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const router = useRouter();
+  const { apiClient } = useApiClient();
+  const { openModal } = useModal();
 
   const {
     collectingEventInitialValues,
     saveCollectingEvent,
     collectingEventFormSchema
   } = useCollectingEventSave({ fetchedCollectingEvent: collectingEvent });
+
+  // Hook to check for material sample usages.
+  const { usageCount: materialSampleUsageCount } = useRelationshipUsagesCount({
+    apiClient,
+    resourcePath: "collection-api/material-sample",
+    relationshipName: "collectingEvent",
+    relationshipId: collectingEvent?.id
+  });
 
   const [, setDefaultVerbatimCoordSys] = useLocalStorage<
     string | null | undefined
@@ -75,14 +90,23 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     submittedValues,
     formik
   }) => {
-    const savedCollectingEvent = await saveCollectingEvent(
-      submittedValues,
-      formik
-    );
+    const performSave = async () => {
+      const savedCollectingEvent = await saveCollectingEvent(
+        submittedValues,
+        formik
+      );
+      await router.push(
+        `/collection/collecting-event/view?id=${savedCollectingEvent?.id}`
+      );
+    };
 
-    await router.push(
-      `/collection/collecting-event/view?id=${savedCollectingEvent.id}`
-    );
+    // Check if multiple material sample usages exist to display an confirmation.
+    if (materialSampleUsageCount && materialSampleUsageCount > 1) {
+      openModal(renderConfirmationModal(materialSampleUsageCount, performSave));
+      return;
+    }
+
+    await performSave();
   };
 
   const buttonBar = (
@@ -115,6 +139,7 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
       <CollectingEventFormLayout
         setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
         setDefaultVerbatimSRS={setDefaultVerbatimSRS}
+        materialSampleUsageCount={materialSampleUsageCount}
       />
     </DinaForm>
   );

@@ -59,6 +59,7 @@ import { AllowAttachmentsConfig } from "../../object-store";
 import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { TgnSourceSelection } from "./TgnIntegration";
+import CollectingEventEditAlert from "./CollectingEventEditAlert";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -67,6 +68,9 @@ interface CollectingEventFormLayoutProps {
   attachmentsConfig?: AllowAttachmentsConfig;
   /** Forwarded to ManagedAttributesEditor */
   visibleManagedAttributeKeys?: string[];
+
+  /** Pass the number of material sample usages to display a warning. */
+  materialSampleUsageCount?: number;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
@@ -74,7 +78,8 @@ export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
   setDefaultVerbatimSRS,
   attachmentsConfig,
-  visibleManagedAttributeKeys
+  visibleManagedAttributeKeys,
+  materialSampleUsageCount
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
@@ -605,6 +610,11 @@ export function CollectingEventFormLayout({
           </>
         ) : (
           <>
+            {/* Alert for multiple material sample usages when editing */}
+            <CollectingEventEditAlert
+              materialSampleUsageCount={materialSampleUsageCount}
+            />
+
             <NotPubliclyReleasableSection />
             <Tooltip
               id="collecting_event_tag_info"

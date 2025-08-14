@@ -4,7 +4,8 @@ import {
   FieldSet,
   ResourceSelectField,
   SelectField,
-  TextField
+  TextField,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { Field } from "formik";
 import {
@@ -115,11 +116,15 @@ export function MetadataForm({
               <ResourceSelectField<ObjectSubtype>
                 name="acSubtype"
                 className="col-md-6"
-                filter={(input) => ({
-                  rsql:
-                    `acSubtype=='${input}*'` +
-                    (dcType ? ` and dcType==${dcType}` : "")
-                })}
+                filter={(input) =>
+                  SimpleSearchFilterBuilder.create<ObjectSubtype>()
+                    .searchFilter("acSubtype", input)
+                    // if dcType is set, filter by it as well
+                    .when(dcType, (builder) =>
+                      builder.where("dcType", "EQ", dcType)
+                    )
+                    .build()
+                }
                 model="objectstore-api/object-subtype"
                 optionLabel={(ost) => ost.acSubtype}
               />

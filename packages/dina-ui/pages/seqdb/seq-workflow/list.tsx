@@ -69,7 +69,7 @@ export default function SangerWorkflowSequencingListPage() {
           additionalFilters={(filterForm) => ({
             isCompleted: false,
             // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+            ...(filterForm.group && { group: filterForm.group })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
           id="seq-workflow-list"

@@ -29,7 +29,7 @@ export function ManagedAttributesViewer({
     async function fetchAllManagedAttributes() {
       try {
         const { data } = await apiClient.get<ManagedAttribute[]>(
-          `${managedAttributeApiPath}?fields=key,name,multilingualDescription`,
+          `${managedAttributeApiPath}`,
           {}
         );
         const attrKeyNameMap = data.reduce(

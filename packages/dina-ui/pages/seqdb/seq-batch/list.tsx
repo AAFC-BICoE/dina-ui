@@ -61,7 +61,7 @@ export default function SeqBatchListPage() {
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+            ...(filterForm.group && { group: filterForm.group })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
           id="seq-batch-list"

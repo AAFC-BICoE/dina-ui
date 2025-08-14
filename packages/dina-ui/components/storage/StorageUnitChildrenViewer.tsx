@@ -64,11 +64,32 @@ export function StorageUnitChildrenViewer({
       ...(nestedStorages?.map((it) => ({
         id: it.uuid ?? it.id,
         type: "storage-unit"
-      })) ?? []),
-      ...childSamples
+      })) ?? [])
     ];
 
-    // Set first level children to new parent
+    if (childSamples?.length) {
+      // Get unique storage unit usage IDs from the child samples:
+      const storageUnitUsageIds = Array.from(
+        new Set(
+          childSamples.map((sample) => (sample.storageUnitUsage as any).id)
+        )
+      );
+
+      // Update the storage unit usage to point to the new target unit:
+      await save(
+        storageUnitUsageIds.map((id) => ({
+          resource: {
+            id: id,
+            type: "storage-unit-usage",
+            storageUnit: { type: targetUnit.type, id: targetUnit.id }
+          },
+          type: "storage-unit-usage"
+        })),
+        { apiBaseUrl: "/collection-api" }
+      );
+    }
+
+    // Set first level storage unit children to new parent
     if (children) {
       await save(
         children.map((child) => ({
@@ -127,15 +148,20 @@ export function StorageUnitChildrenViewer({
             </div>
           }
         >
-          {actionMode === "MOVE_ALL" && (
-            <StorageLinker onChange={moveAllContent} />
+          {actionMode === "MOVE_ALL" && storageUnit.storageUnitType && (
+            <StorageLinker
+              onChange={moveAllContent}
+              actionMode="MOVE_ALL"
+              storageUnitType={storageUnit?.storageUnitType}
+              currentStorageUnitUUID={storageUnit?.id}
+            />
           )}
           {actionMode === "ADD_EXISTING_AS_CHILD" && (
             <StorageLinker
               actionMode="ADD_EXISTING_AS_CHILD"
               onChange={addExistingStorageUnitAsChild}
               createStorageMode={false}
-              parentStorageUnitUUID={storageUnit?.id}
+              currentStorageUnitUUID={storageUnit?.id}
             />
           )}
         </FieldSet>

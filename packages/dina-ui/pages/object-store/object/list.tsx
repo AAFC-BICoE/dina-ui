@@ -228,7 +228,10 @@ export default function MetadataListPage() {
             />
           </div>
           <div className="list-inline-item float-end">
-            <Link href="/object-store/upload">
+            <Link
+              href="/object-store/upload"
+              className="btn btn-primary ms-auto"
+            >
               <DinaMessage id="uploadPageTitle" />
             </Link>
           </div>
