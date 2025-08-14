@@ -59,7 +59,7 @@ export default function UploadPage() {
     });
 
     const input: InputResource<ReportTemplateUpload> = {
-      fileIdentifier: uploadRespsT?.[0]?.fileIdentifier,
+      fileIdentifier: uploadRespsT?.[0]?.id,
       type: "report-template-upload"
     };
 
@@ -81,9 +81,7 @@ export default function UploadPage() {
       .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
 
     const navigateToEditReportTemplate = async () => {
-      const objectUploadIds = uploadRespsT.map(
-        ({ fileIdentifier }) => fileIdentifier
-      );
+      const objectUploadIds = uploadRespsT.map((item) => item.id);
       if (objectUploadIds.length === 1) {
         await router.push({
           pathname: "/export/report-template/edit",
