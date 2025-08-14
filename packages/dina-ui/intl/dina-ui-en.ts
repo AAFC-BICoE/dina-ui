@@ -147,6 +147,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "This collecting event is currently linked to a material sample. Editing is only available on the Collecting Event Details page.",
   collectingEventEditAlertTitle: "Update Collecting Event?",
   collectingEventGoToDetails: "Go to Collecting Event details page",
+  collectingEventViewMaterialSamplesAttached:
+    "View Current Material Samples Attached",
   collection: "Collection",
   collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
@@ -820,8 +822,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select managed attribute to search against...",
   queryBuilder_identifier_placeholder:
     "Select identifier type to search against...",
+  queryBuilder_uuid_placeholder: "Enter UUID to search against...",
   queryBuilder_operator_presence: "Presence",
   queryBuilder_operator_absence: "Absence",
+  queryBuilder_operator_uuid: "UUID",
   queryBuilder_operator_containsDate: "Contains",
   queryBuilder_operator_between: "Between",
   queryBuilder_operator_between_tooltip:

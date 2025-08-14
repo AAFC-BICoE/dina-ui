@@ -613,6 +613,7 @@ export function CollectingEventFormLayout({
             {/* Alert for multiple material sample usages when editing */}
             <CollectingEventEditAlert
               materialSampleUsageCount={materialSampleUsageCount}
+              collectingEventUUID={initialValues.id}
             />
 
             <NotPubliclyReleasableSection />
