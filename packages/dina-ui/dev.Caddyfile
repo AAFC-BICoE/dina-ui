@@ -96,9 +96,9 @@ route /api/dina-export-api/* {
     reverse_proxy {$REPORT_LABEL_API_ADDRESS}
 }
 
-# Handle static files
-handle_path /static/* {
-root * /srv/ui-static
+# Handle static mounted pages
+handle_path /static-ui/* {
+root * /srv/static-ui
 try_files {path} {path}.html
 file_server
 }
