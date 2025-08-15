@@ -1,5 +1,6 @@
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { StorageUnit } from "./StorageUnit";
+import { baseRelationshipParser } from "../../baseRelationshipParser";
 
 export interface StorageUnitUsageAttributes {
   type: "storage-unit-usage";
@@ -20,8 +21,32 @@ export type StorageUnitUsage = KitsuResource &
   StorageUnitUsageAttributes &
   StorageUnitUsageRelationships;
 
-export function storageUnitUsageParser(storageUnitUsage) {
-  storageUnitUsage.storageUnit = storageUnitUsage.storageUnit?.data;
+export interface StorageUnitUsageResponseRelationships {
+  storageUnit?: {
+    data?: StorageUnit;
+  };
+}
 
-  return storageUnitUsage;
+export type StorageUnitUsageResponse = KitsuResource &
+  StorageUnitUsageAttributes &
+  StorageUnitUsageResponseRelationships;
+
+/**
+ * Parses a `PersistedResource<StorageUnitUsage>` object and transforms it into a `PersistedResource<StorageUnitUsage>`.
+ *
+ * This function omits specific relationship properties from the input StorageUnitUsage and restructures the relationships
+ * to use their `.data` subfields as their values.
+ *
+ * @param data - The response.data object to parse, of type `PersistedResource<StorageUnitUsageResponse>`.
+ * @returns The parsed StorageUnitUsage resource, of type `PersistedResource<StorageUnitUsage>`.
+ */
+export function storageUnitUsageParser(
+  storageUnitUsage: PersistedResource<StorageUnitUsageResponse>
+): PersistedResource<StorageUnitUsage> {
+  const parsedStorageUnitUsage = baseRelationshipParser(
+    ["storageUnit"],
+    storageUnitUsage
+  ) as PersistedResource<StorageUnitUsage>;
+
+  return parsedStorageUnitUsage;
 }

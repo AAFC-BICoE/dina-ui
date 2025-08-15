@@ -17,7 +17,7 @@ import { PreparationType } from "./PreparationType";
 import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { StorageUnitUsage } from "./StorageUnitUsage";
-import { omit } from "lodash";
+import { baseRelationshipParser } from "../..//baseRelationshipParser";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -254,8 +254,8 @@ export type MaterialSampleResponse = KitsuResource &
 export function materialSampleParser(
   data: PersistedResource<MaterialSampleResponse>
 ): PersistedResource<MaterialSample> {
-  const parsedMaterialSample: PersistedResource<MaterialSample> = {
-    ...omit(data, [
+  const parsedMaterialSample = baseRelationshipParser(
+    [
       "collection",
       "collectingEvent",
       "attachment",
@@ -270,22 +270,10 @@ export function materialSampleParser(
       "organism",
       "materialSampleType",
       "storageUnit"
-    ]),
-    collection: data.collection?.data,
-    collectingEvent: data.collectingEvent?.data,
-    attachment: data.attachment?.data,
-    preparationProtocol: data.preparationProtocol?.data,
-    preparationMethod: data.preparationMethod?.data,
-    preparationType: data.preparationType?.data,
-    preparedBy: data.preparedBy?.data,
-    parentMaterialSample: data.parentMaterialSample?.data,
-    projects: data.projects?.data,
-    assemblages: data.assemblages?.data,
-    storageUnitUsage: data.storageUnitUsage?.data,
-    organism: data.organism?.data,
-    materialSampleType: data.materialSampleType?.data,
-    storageUnit: data.storageUnit?.data
-  };
+    ],
+    data
+  ) as PersistedResource<MaterialSample>;
+
   return parsedMaterialSample;
 }
 

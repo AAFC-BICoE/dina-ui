@@ -1,7 +1,8 @@
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { Institution } from "..";
 import { MultilingualDescription } from "../../common";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
+import { baseRelationshipParser } from "../../baseRelationshipParser";
 
 export interface CollectionAttributes {
   type: "collection" | string;
@@ -50,52 +51,26 @@ export interface CollectionResponseRelationships {
   };
 }
 
-export interface CollectionResponse {
-  type: "collection";
-  id: string; // ID is required for all resources
-  attributes: CollectionResponseAttributes;
-  relationships?: CollectionResponseRelationships;
-}
+export type CollectionResponse = KitsuResource &
+  CollectionResponseAttributes &
+  CollectionResponseRelationships;
 
 /**
- * Parses the relationships object from a collection API response and extracts
- * the relationship data.
+ * Parses a `PersistedResource<CollectionResponse>` object and transforms it into a `PersistedResource<Collection>`.
  *
- * @param relationships - The relationships object from the collection API response.
- * @returns An object containing the relationship data.
+ * This function omits specific relationship properties from the input collection and restructures the relationships
+ * to use their `.data` subfields as their values.
+ *
+ * @param data - The response.data object to parse, of type `PersistedResource<CollectionResponse>`.
+ * @returns The parsed collection resource, of type `PersistedResource<Collection>`.
  */
-export function CollectionRelationshipParser(
-  relationships: CollectionResponseRelationships
-): CollectionRelationships {
-  return {
-    institution: relationships?.institution?.data,
-    parentCollection: relationships?.parentCollection?.data
-  };
-}
+export function collectionParser(
+  data: PersistedResource<CollectionResponse>
+): PersistedResource<Collection> {
+  const parsedCollection = baseRelationshipParser(
+    ["institution", "parentCollection"],
+    data
+  ) as PersistedResource<Collection>;
 
-// /**
-//  * Parses a CollectionResponse object and transforms it into a Collection object.
-//  *
-//  * @param collection - The CollectionResponse object to parse.
-//  * @returns The parsed Collection object, including its attributes and relationships.
-//  */
-// export function CollectionParser(collection: CollectionResponse): Collection {
-//   const relationships = collection.relationships
-//     ? CollectionRelationshipParser(collection.relationships)
-//     : {};
-//   const parsedCollection: Collection = {
-//     id: collection.id,
-//     type: collection.type,
-//     ...(collection.attributes || {}),
-//     ...relationships
-//   };
-
-//   return parsedCollection;
-// }
-
-export function collectionParser(collection) {
-  collection.institution = collection.institution?.data;
-  collection.parentCollection = collection.parentCollection?.data;
-
-  return collection;
+  return parsedCollection;
 }

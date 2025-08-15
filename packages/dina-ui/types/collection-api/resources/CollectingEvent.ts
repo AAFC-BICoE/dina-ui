@@ -1,5 +1,5 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import {
   GeographicPlaceNameSourceDetail,
   SourceAdministrativeLevel
@@ -12,6 +12,7 @@ import { ManagedAttributeValues } from "./ManagedAttribute";
 import { JsonValue } from "type-fest";
 import { Protocol } from "./Protocol";
 import { DinaJsonMetaInfo } from "../../DinaJsonMetaInfo";
+import { baseRelationshipParser } from "../../baseRelationshipParser";
 
 export interface CollectingEventAttributes {
   type: "collecting-event";
@@ -186,32 +187,22 @@ export function CollectingEventRelationshipParser(
   };
 }
 
-// /**
-//  * Parses a CollectingEventResponse object and transforms it into a CollectingEvent object.
-//  *
-//  * @param response - The CollectingEventResponse object to parse.
-//  * @returns The parsed CollectingEvent object, including its attributes and relationships.
-//  */
-// export function CollectingEventParser(
-//   response: CollectingEventResponse
-// ): CollectingEvent {
-//   const relationships = CollectingEventRelationshipParser(
-//     response.relationships || {}
-//   );
-//   return {
-//     id: response.id,
-//     type: response.type,
-//     ...(response.attributes || {}),
-//     ...relationships
-//   };
-// }
+/**
+ * Parses a `PersistedResource<CollectingEventResponse>` object and transforms it into a `PersistedResource<CollectingEvent>`.
+ *
+ * This function omits specific relationship properties from the input collecting event and restructures the relationships
+ * to use their `.data` subfields as their values.
+ *
+ * @param data - The response.data object to parse, of type `PersistedResource<CollectingEventResponse>`.
+ * @returns The parsed collecting event resource, of type `PersistedResource<CollectingEvent>`.
+ */
+export function collectingEventParser(
+  data: PersistedResource<CollectingEventResponse>
+): PersistedResource<CollectingEvent> {
+  const parsedCollectingEvent = baseRelationshipParser(
+    ["attachment", "collectors", "collectorGroups", "geoReferenceAssertions"],
+    data
+  ) as PersistedResource<CollectingEvent>;
 
-export function collectingEventParser(collectingEvent) {
-  collectingEvent.attachment = collectingEvent.attachment?.data;
-  collectingEvent.collectors = collectingEvent.collectors?.data;
-  collectingEvent.collectorGroups = collectingEvent.collectorGroups?.data;
-  collectingEvent.geoReferenceAssertions =
-    collectingEvent.geoReferenceAssertions?.data;
-
-  return collectingEvent;
+  return parsedCollectingEvent;
 }

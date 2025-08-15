@@ -1,6 +1,7 @@
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { MultilingualDescription } from "../../common";
+import { baseRelationshipParser } from "../../baseRelationshipParser";
 
 /* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum ProtocolDataUnitEnum {
@@ -44,3 +45,33 @@ export interface ProtocolRelationships {
 export type Protocol = KitsuResource &
   ProtocolAttributes &
   ProtocolRelationships;
+
+export interface ProtocolResponseRelationships {
+  attachments?: {
+    data?: PersistedResource<ResourceIdentifierObject>[];
+  };
+}
+
+export type ProtocolResponse = KitsuResource &
+  ProtocolAttributes &
+  ProtocolResponseRelationships;
+
+/**
+ * Parses a `PersistedResource<ProtocolResponse>` object and transforms it into a `PersistedResource<Protocol>`.
+ *
+ * This function omits specific relationship properties from the input protocol and restructures the relationships
+ * to use their `.data` subfields as their values.
+ *
+ * @param data - The response.data object to parse, of type `PersistedResource<ProtocolResponse>`.
+ * @returns The parsed protocol resource, of type `PersistedResource<Protocol>`.
+ */
+export function protocolParser(
+  data: PersistedResource<ProtocolResponse>
+): PersistedResource<Protocol> {
+  const parsedProtocol = baseRelationshipParser(
+    ["attachments"],
+    data
+  ) as PersistedResource<Protocol>;
+
+  return parsedProtocol;
+}
