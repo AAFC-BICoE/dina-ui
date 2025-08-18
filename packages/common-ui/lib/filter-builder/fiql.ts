@@ -48,7 +48,10 @@ function transformToFIQL(operand: FiqlOperand | FiqlOperandGroup): string {
     const operandStrings = operand.operands.map((op) => {
       const transformed = transformToFIQL(op);
       // Only wrap in parentheses if it contains operators and we're not at the root level
-      if (transformed.includes(";") || transformed.includes(",")) {
+      if (
+        (transformed.includes(";") || transformed.includes(",")) &&
+        operand.operands.length > 1
+      ) {
         return `(${transformed})`;
       }
       return transformed;
@@ -110,16 +113,11 @@ function toPredicate(
     const comparison = predicate === "IS" ? "==" : "!=";
     const operator = predicate === "IS" ? "OR" : "AND";
 
-    // A blank field could be either a null value or an empty string.
+    // The rsql version checks for both null and empty string, but FIQL does not support empty string checks.
     return {
       operands: [
         {
           arguments: "null",
-          comparison,
-          selector
-        },
-        {
-          arguments: "",
           comparison,
           selector
         }
@@ -129,30 +127,11 @@ function toPredicate(
   }
 
   // Allow list/range filters.
-  if (
-    typeof value === "string" &&
-    (attributeConfig?.allowList || attributeConfig?.allowRange)
-  ) {
+  if (typeof value === "string" && attributeConfig?.allowRange) {
     const commaSplit = value.split(",");
-
-    const singleNumbers = attributeConfig?.allowRange
-      ? commaSplit.filter((e) => !e.includes("-"))
-      : commaSplit;
     const ranges = attributeConfig?.allowRange
       ? commaSplit.filter((e) => e.includes("-"))
       : commaSplit;
-
-    const listOperands = attributeConfig.allowList
-      ? singleNumbers.length
-        ? [
-            {
-              arguments: singleNumbers,
-              comparison: predicate === "IS NOT" ? "!==" : "==", // FIQL uses different operators
-              selector
-            }
-          ]
-        : []
-      : [];
 
     const rangeOperands = attributeConfig.allowRange
       ? ranges.map((range) => {
@@ -167,7 +146,7 @@ function toPredicate(
       : [];
 
     return {
-      operands: [...listOperands, ...rangeOperands],
+      operands: [...rangeOperands],
       operator: predicate === "IS NOT" ? "AND" : "OR"
     };
   }

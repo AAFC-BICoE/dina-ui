@@ -124,4 +124,72 @@ describe("ListPageLayout component", () => {
       });
     });
   });
+
+  it("Uses fiql for additionalFilters when the parameter is set.", async () => {
+    mountWithAppContext(
+      <ListPageLayout
+        id="test-layout"
+        additionalFilters={"group==testGroup"}
+        useFiql={true}
+        defaultSort={[{ id: "createdOn", desc: true }]}
+        filterAttributes={["name"]}
+        queryTableProps={{
+          columns: ["name", "type"],
+          path: "pcrPrimer"
+        }}
+      />,
+      { apiContext: mockApiCtx }
+    );
+
+    // Ensure the additional filters are included in the request:
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith("pcrPrimer", {
+        fiql: "group==testGroup",
+        page: { limit: 25, offset: 0 },
+        sort: "-createdOn"
+      });
+    });
+  });
+
+  it("Uses fiql for filtering when the parameter is set.", async () => {
+    const wrapper = mountWithAppContext(
+      <ListPageLayout
+        id="test-layout"
+        useFiql={true}
+        filterAttributes={["name"]}
+        queryTableProps={{
+          columns: ["name", "type"],
+          path: "pcrPrimer"
+        }}
+      />,
+      { apiContext: mockApiCtx }
+    );
+
+    // Wait for the default search to finish.
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /filter value/i })
+      ).toBeInTheDocument();
+    });
+
+    // Do a filtered search.
+    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
+      target: { value: "101F" }
+    });
+    fireEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
+
+    // There should be a fiql filter.
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          fiql: "name==*101F*"
+        })
+      );
+
+      // check that only fiql is used.
+      const [, args] = mockGet.mock.lastCall;
+      expect(args).not.toHaveProperty("filter");
+    });
+  });
 });

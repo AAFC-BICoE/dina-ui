@@ -275,9 +275,9 @@ describe("queryUtils", () => {
 
       it("Should correctly serialize relationship presence rule", () => {
         const relationshipPresenceStates: RelationshipPresenceSearchStates = {
-          selectedOperator: "exists",
+          selectedOperator: "presence",
           selectedRelationship: "collecting-event",
-          selectedValue: 0 // Future use.
+          selectedValue: ""
         };
 
         const mockJsonTree = {
@@ -300,9 +300,49 @@ describe("queryUtils", () => {
           p: [
             {
               f: "data.relationships",
-              o: "exists",
+              o: "presence",
               v: relationshipPresenceStates.selectedRelationship,
-              t: "relationshipPresence"
+              t: "relationshipPresence",
+              d: ""
+            }
+          ]
+        });
+
+        const result = serializeQueryTreeToURL({} as any);
+        expect(result).toEqual(expected);
+      });
+
+      it("Should correctly serialize relationship uuid rule", () => {
+        const relationshipPresenceStates: RelationshipPresenceSearchStates = {
+          selectedOperator: "uuid",
+          selectedRelationship: "collecting-event",
+          selectedValue: "27db4d3e-d203-40c8-b8bc-b2e64f4dd673"
+        };
+
+        const mockJsonTree = {
+          properties: { conjunction: "AND" },
+          children1: [
+            {
+              properties: {
+                field: "data.relationships",
+                operator: "noOperator",
+                value: [JSON.stringify(relationshipPresenceStates)],
+                valueType: ["relationshipPresence"]
+              }
+            }
+          ]
+        };
+        (Utils.getTree as jest.Mock).mockReturnValue(mockJsonTree);
+
+        const expected = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.relationships",
+              o: "uuid",
+              v: relationshipPresenceStates.selectedRelationship,
+              t: "relationshipPresence",
+              d: "27db4d3e-d203-40c8-b8bc-b2e64f4dd673"
             }
           ]
         });
@@ -709,7 +749,7 @@ describe("queryUtils", () => {
           p: [
             {
               f: "data.relationships",
-              o: "exists",
+              o: "presence",
               v: "collecting-event",
               t: "relationshipPresence"
             }
@@ -726,7 +766,52 @@ describe("queryUtils", () => {
                 field: "data.relationships",
                 operator: "noOperator",
                 value: [
-                  '{"selectedValue":0,"selectedOperator":"exists","selectedRelationship":"collecting-event"}'
+                  '{"selectedValue":"","selectedOperator":"presence","selectedRelationship":"collecting-event"}'
+                ],
+                valueSrc: ["value"],
+                valueType: ["relationshipPresence"]
+              },
+              type: "rule"
+            }
+          ],
+          id: "mock-uuid",
+          properties: {
+            conjunction: "AND"
+          },
+          type: "group"
+        });
+
+        expect(result).toBe(mockImmutableTree);
+      });
+
+      it("Should parse a query string with relationship uuid correctly", () => {
+        const mockImmutableTree = { id: "mock-complex-tree" };
+        (Utils.loadTree as jest.Mock).mockReturnValue(mockImmutableTree);
+
+        const queryString = JSON.stringify({
+          c: "a",
+          p: [
+            {
+              f: "data.relationships",
+              o: "uuid",
+              v: "collecting-event",
+              t: "relationshipPresence",
+              d: "21fbee11-09fb-4d63-a18a-7bc4a8116082"
+            }
+          ]
+        });
+
+        const result = parseQueryTreeFromURL(queryString);
+
+        expect(Utils.loadTree).toHaveBeenCalledWith({
+          children1: [
+            {
+              id: "mock-uuid",
+              properties: {
+                field: "data.relationships",
+                operator: "noOperator",
+                value: [
+                  '{"selectedValue":"21fbee11-09fb-4d63-a18a-7bc4a8116082","selectedOperator":"uuid","selectedRelationship":"collecting-event"}'
                 ],
                 valueSrc: ["value"],
                 valueType: ["relationshipPresence"]

@@ -71,7 +71,7 @@ export default function NgsWorkflowListPage() {
           additionalFilters={(filterForm) => ({
             isCompleted: false,
             // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+            ...(filterForm.group && { group: filterForm.group })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
           id="ngs-workflow-list"

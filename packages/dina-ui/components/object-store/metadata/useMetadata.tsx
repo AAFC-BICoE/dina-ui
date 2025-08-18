@@ -55,7 +55,7 @@ export function useMetadataViewQuery(id?: string) {
   const { bulkGet } = useApiClient();
   const query = useQuery<Metadata & { objectUpload: ObjectUpload }>(
     {
-      include: "managedAttributeMap,acMetadataCreator,dcCreator,derivatives",
+      include: "acMetadataCreator,dcCreator,derivatives",
       path: `objectstore-api/metadata/${id}`,
       header: { "include-dina-permission": "true" }
     },
@@ -82,7 +82,6 @@ export function useMetadataViewQuery(id?: string) {
       ],
       onSuccess: async (response) => {
         // fetch the uploadObject for each derivative and add it to the derivative object.
-
         if (!response.data.derivatives) return; // If no derivatives, return early.
         const derivativeIdentifiers =
           response.data?.derivatives?.map(
@@ -117,7 +116,7 @@ export function useDerivativeMetadataViewQuery(id?: string) {
     Derivative & { derivedFrom: Metadata } & { objectUpload: ObjectUpload }
   >(
     {
-      include: "derivative,acDerivedFrom,generatedFromDerivative,acTags",
+      include: "acDerivedFrom,generatedFromDerivative",
       path: `objectstore-api/derivative/${id}`,
       header: { "include-dina-permission": "true" }
     },
@@ -140,7 +139,7 @@ export function useDerivativeEditQuery(id?: string | null) {
   const derivativeQuery = useQuery<Derivative>(
     {
       path: `objectstore-api/derivative/${id}`,
-      include: "derivative,acDerivedFrom,generatedFromDerivative,acTags"
+      include: "acDerivedFrom,generatedFromDerivative"
     },
     {
       disabled: !id,
@@ -244,6 +243,21 @@ export function useMetadataSave({
       metadataValues.xmpRightsWebStatement = license?.url ?? "";
       // No need to store this ; The url should be enough.
       metadataValues.xmpRightsUsageTerms = "";
+    }
+
+    if (metadataValues.dcCreator) {
+      // Only include the id and type for this relationship.
+      metadataValues.dcCreator = {
+        id: metadataValues.dcCreator.id,
+        type: "person"
+      };
+    }
+    if (metadataValues.acMetadataCreator) {
+      // Only include the id and type for this relationship.
+      metadataValues.acMetadataCreator = {
+        id: metadataValues.acMetadataCreator.id,
+        type: "person"
+      };
     }
 
     const saveOperation = await prepareMetadataSaveOperation({

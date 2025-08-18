@@ -321,7 +321,6 @@ export function MaterialSampleForm({
             name="storageUnit"
             hideLabel={true}
             targetType="material-sample"
-            createStorageMode={true}
           />
         </FieldSet>
       ),

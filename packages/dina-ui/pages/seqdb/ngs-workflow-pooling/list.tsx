@@ -69,7 +69,7 @@ export default function NgsWorkflowPoolingListPage() {
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+            ...(filterForm.group && { group: filterForm.group })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
           id="ngs-workflow-pooling-list"

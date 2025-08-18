@@ -282,6 +282,22 @@ function useBulkMetadataSave({
               }
             }
           });
+
+          if (saveOp.resource.dcCreator) {
+            // Only include the id and type for this relationship.
+            saveOp.resource.dcCreator = {
+              id: saveOp.resource.dcCreator.id,
+              type: "person"
+            };
+          }
+          if (saveOp.resource.acMetadataCreator) {
+            // Only include the id and type for this relationship.
+            saveOp.resource.acMetadataCreator = {
+              id: saveOp.resource.acMetadataCreator.id,
+              type: "person"
+            };
+          }
+
           if (saveOp.resource.license) {
             // The Metadata's xmpRightsWebStatement field stores the license's url.
             saveOp.resource.xmpRightsWebStatement =

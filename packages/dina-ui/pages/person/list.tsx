@@ -45,6 +45,7 @@ export default function AgentListPage() {
       <ListPageLayout
         filterAttributes={AGENT_FILTER_ATTRIBUTES}
         id="person-list"
+        useFiql={true}
         queryTableProps={{
           columns: AGENT_TABLE_COLUMNS,
           path: "agent-api/person",

@@ -99,10 +99,15 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
           selectedOption = options?.filter((option) =>
             value?.includes(option.value)
           );
-        } else if (value) {
-          selectedOption = options
-            ?.filter((opt) => !!opt.value)
-            ?.find((option) => option.value === value) as any;
+        } else {
+          selectedOption = options?.find((option) => {
+            if (value === undefined) {
+              // If the value is undefined, only select the option if its value is null, otherwise treat is as unselected.
+              return option.value === null;
+            }
+            return option.value === value;
+          }) as any;
+
           // also search in possible nested options
           if (!selectedOption || Object.keys(selectedOption).length === 0) {
             const optionWithNested = options?.filter((opt) => !!opt["options"]);
@@ -117,10 +122,12 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
           }
 
           if (!selectedOption || Object.keys(selectedOption).length === 0) {
-            selectedOption = { label: String(value), value };
+            if (!value) {
+              selectedOption = null;
+            } else {
+              selectedOption = { label: String(value), value };
+            }
           }
-        } else {
-          selectedOption = null;
         }
 
         const customStyle = {

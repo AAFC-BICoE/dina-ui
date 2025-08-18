@@ -5,7 +5,9 @@ Array [
   Array [
     Array [
       Object {
-        "resource": Object {},
+        "resource": Object {
+          "publiclyReleasable": null,
+        },
         "type": "material-sample",
       },
     ],
