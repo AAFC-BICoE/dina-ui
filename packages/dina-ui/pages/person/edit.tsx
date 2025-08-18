@@ -1,7 +1,7 @@
 import { useQuery, withResponse } from "common-ui";
 import { useRouter } from "next/router";
 import { PersonForm } from "../../components";
-import { Person } from "../../types/agent-api/resources/Person";
+import { Person, personParser } from "../../types/agent-api/resources/Person";
 import PageLayout from "../../components/page/PageLayout";
 
 export default function PersonEditPage() {
@@ -21,6 +21,7 @@ export default function PersonEditPage() {
       path: `agent-api/person/${id}?include=organizations,identifiers`
     },
     {
+      parser: personParser,
       disabled: !id
     }
   );

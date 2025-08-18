@@ -31,6 +31,7 @@ import {
   License,
   MediaType,
   Metadata,
+  metadataParser,
   ObjectSubtype
 } from "../../../types/objectstore-api";
 import { DCTYPE_OPTIONS, ORIENTATION_OPTIONS } from "../metadata/edit";
@@ -50,6 +51,7 @@ export default function ExternalResourceMetadataPage() {
     },
     {
       disabled: !id,
+      parser: metadataParser,
       onSuccess: async ({ data: metadata }) => {
         // Get the License resource based on the Metadata's xmpRightsWebStatement field:
         if (metadata.xmpRightsWebStatement) {

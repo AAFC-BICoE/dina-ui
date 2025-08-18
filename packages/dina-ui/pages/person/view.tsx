@@ -1,7 +1,7 @@
 import { DinaForm, FieldView } from "common-ui";
 import { PersonFormFields } from "../../../dina-ui/components/add-person/PersonFormFields";
 import { ViewPageLayout } from "../../components";
-import { Person } from "../../types/agent-api/resources/Person";
+import { Person, personParser } from "../../types/agent-api/resources/Person";
 
 export default function PersonDetailsPage() {
   return (
@@ -47,6 +47,7 @@ export default function PersonDetailsPage() {
       query={(id) => ({
         path: `agent-api/person/${id}?include=organizations,identifiers`
       })}
+      queryOptions={{ parser: personParser }}
       entityLink="/person"
       type="person"
       apiBaseUrl="/agent-api"
