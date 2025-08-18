@@ -1,4 +1,5 @@
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
+import { baseRelationshipParser } from "../../baseRelationshipParser";
 import { PcrBatch } from "./PcrBatch";
 import { MaterialSample } from "../../collection-api";
 import { StorageUnitUsage } from "../../collection-api/resources/StorageUnitUsage";
@@ -49,18 +50,56 @@ export interface PcrBatchItemAttributes {
 }
 
 export interface PcrBatchItemRelationships {
-  pcrBatch?: PcrBatch;
-  materialSample?: MaterialSample;
-  storageUnitUsage?: StorageUnitUsage;
+  pcrBatch?: PcrBatch | null;
+  materialSample?: MaterialSample | null;
+  storageUnitUsage?: StorageUnitUsage | null;
 }
 
 export type PcrBatchItem = KitsuResource &
   PcrBatchItemAttributes &
   PcrBatchItemRelationships;
 
-export function pcrBatchItemParser(data) {
-  data.pcrBatch = data.pcrBatch?.data;
-  data.materialSample = data.materialSample?.data;
-  data.storageUnitUsage = data.storageUnitUsage?.data;
-  return data;
+// Response types (what comes from API)
+export interface PcrBatchItemResponseAttributes {
+  type: "pcr-batch-item";
+  createdBy?: string;
+  createdOn?: string;
+  group?: string;
+  result?: string;
+}
+
+export interface PcrBatchItemResponseRelationships {
+  pcrBatch?: {
+    data?: PersistedResource<PcrBatch>;
+  };
+  materialSample?: {
+    data?: PersistedResource<MaterialSample>;
+  };
+  storageUnitUsage?: {
+    data?: PersistedResource<StorageUnitUsage>;
+  };
+}
+
+export type PcrBatchItemResponse = KitsuResource &
+  PcrBatchItemResponseAttributes &
+  PcrBatchItemResponseRelationships;
+
+/**
+ * Parses a `PersistedResource<PcrBatchItemResponse>` object and transforms it into a `PersistedResource<PcrBatchItem>`.
+ *
+ * This function omits specific relationship properties from the input PCR batch item and restructures the relationships
+ * to use their `.data` subfields as their values.
+ *
+ * @param data - The response.data object to parse, of type `PersistedResource<PcrBatchItemResponse>`.
+ * @returns The parsed PCR batch item resource, of type `PersistedResource<PcrBatchItem>`.
+ */
+export function pcrBatchItemParser(
+  data: PersistedResource<PcrBatchItemResponse>
+): PersistedResource<PcrBatchItem> {
+  const parsedPcrBatchItem = baseRelationshipParser(
+    ["pcrBatch", "materialSample", "storageUnitUsage"],
+    data
+  ) as PersistedResource<PcrBatchItem>;
+
+  return parsedPcrBatchItem;
 }

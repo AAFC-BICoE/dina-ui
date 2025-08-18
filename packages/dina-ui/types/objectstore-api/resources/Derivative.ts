@@ -1,4 +1,5 @@
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
+import { baseRelationshipParser } from "../../baseRelationshipParser";
 import { Metadata } from "./Metadata";
 import { ObjectUpload } from "./ObjectUpload";
 
@@ -16,12 +17,12 @@ export interface DerivativeAttributes {
   derivativeType: string;
   acTags?: string[];
   publiclyReleasable?: boolean;
-  notPubliclyReleasableReason: any;
+  notPubliclyReleasableReason?: string;
 }
 
 export interface DerivativeRelationships {
-  generatedFromDerivative?: Derivative | KitsuResource | null;
-  acDerivedFrom?: Metadata | KitsuResource | null;
+  generatedFromDerivative?: Derivative | null;
+  acDerivedFrom?: Metadata | null;
   objectUpload?: ObjectUpload | null;
 }
 
@@ -29,10 +30,56 @@ export type Derivative = KitsuResource &
   DerivativeAttributes &
   DerivativeRelationships;
 
-export function derivativeParser(derivative) {
-  derivative.generatedFromDerivative = derivative.generatedFromDerivative?.data;
-  derivative.acDerivedFrom = derivative.acDerivedFrom?.data;
-  derivative.objectUpload = derivative.objectUpload?.data;
+// Response types (what comes from API)
+export interface DerivativeResponseAttributes {
+  type: "derivative";
 
-  return derivative;
+  bucket: string;
+  fileIdentifier: string;
+  fileExtension: string;
+  dcType: string;
+  acHashFunction: string;
+  acHashValue: string;
+  createdBy: string;
+  createdOn: string;
+  derivativeType: string;
+  acTags?: string[];
+  publiclyReleasable?: boolean;
+  notPubliclyReleasableReason?: string;
+}
+
+export interface DerivativeResponseRelationships {
+  generatedFromDerivative?: {
+    data?: PersistedResource<Derivative>;
+  };
+  acDerivedFrom?: {
+    data?: PersistedResource<Metadata>;
+  };
+  objectUpload?: {
+    data?: PersistedResource<ObjectUpload>;
+  };
+}
+
+export type DerivativeResponse = KitsuResource &
+  DerivativeResponseAttributes &
+  DerivativeResponseRelationships;
+
+/**
+ * Parses a `PersistedResource<DerivativeResponse>` object and transforms it into a `PersistedResource<Derivative>`.
+ *
+ * This function omits specific relationship properties from the input derivative and restructures the relationships
+ * to use their `.data` subfields as their values.
+ *
+ * @param data - The response.data object to parse, of type `PersistedResource<DerivativeResponse>`.
+ * @returns The parsed derivative resource, of type `PersistedResource<Derivative>`.
+ */
+export function derivativeParser(
+  data: PersistedResource<DerivativeResponse>
+): PersistedResource<Derivative> {
+  const parsedDerivative = baseRelationshipParser(
+    ["generatedFromDerivative", "acDerivedFrom", "objectUpload"],
+    data
+  ) as PersistedResource<Derivative>;
+
+  return parsedDerivative;
 }

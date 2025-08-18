@@ -4,8 +4,7 @@ import { DinaJsonMetaInfo } from "../../DinaJsonMetaInfo";
 import { Derivative } from "./Derivative";
 import { License } from "./License";
 import { DcType, ObjectUpload } from "./ObjectUpload";
-import { omit } from "lodash";
-
+import { baseRelationshipParser } from "../../baseRelationshipParser";
 export interface MetadataAttributes {
   type: "metadata";
   bucket: string;
@@ -128,17 +127,10 @@ export type MetadataResponse = KitsuResource &
 export function metadataParser(
   data: PersistedResource<MetadataResponse>
 ): PersistedResource<Metadata> {
-  const parsedMetadata: PersistedResource<Metadata> = {
-    ...omit(data, [
-      "derivatives",
-      "acMetadataCreator",
-      "dcCreator",
-      "managedAttributes"
-    ]),
-    derivatives: data.derivatives?.data,
-    acMetadataCreator: data.acMetadataCreator?.data,
-    dcCreator: data.dcCreator?.data,
-    managedAttributes: data.managedAttributes?.data
-  };
+  const parsedMetadata = baseRelationshipParser(
+    ["derivatives", "acMetadataCreator", "dcCreator", "managedAttributes"],
+    data
+  ) as PersistedResource<Metadata>;
+
   return parsedMetadata;
 }
