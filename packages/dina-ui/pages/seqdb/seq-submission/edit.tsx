@@ -1,5 +1,8 @@
 import { useQuery, withResponse } from "common-ui";
-import { SeqSubmission } from "../../../../dina-ui/types/seqdb-api/resources/SeqSubmission";
+import {
+  SeqSubmission,
+  seqSubmissionParser
+} from "../../../../dina-ui/types/seqdb-api/resources/SeqSubmission";
 import { Footer, Head, Nav } from "../../../components";
 import { useRouter } from "next/router";
 import { SeqdbMessage, useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
@@ -10,10 +13,13 @@ export default function SeqSubmissionEditPage() {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
 
-  const query = useQuery<SeqSubmission>({
-    path: `seqdb-api/seq-submission/${id}`,
-    include: "seqBatch,submittedBy,sequencingFacility"
-  });
+  const query = useQuery<SeqSubmission>(
+    {
+      path: `seqdb-api/seq-submission/${id}`,
+      include: "seqBatch,submittedBy,sequencingFacility"
+    },
+    { parser: seqSubmissionParser }
+  );
 
   const title = id ? "editSeqSubmissionTitle" : "addSeqSubmissionTitle";
   return (

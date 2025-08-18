@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { LibraryPool } from "../../../types/seqdb-api";
+import { LibraryPool, libraryPoolParser } from "../../../types/seqdb-api";
 
 export function useLibraryPoolQuery(id?: string, deps?: any[]) {
   return useQuery<LibraryPool>(
@@ -24,7 +24,7 @@ export function useLibraryPoolQuery(id?: string, deps?: any[]) {
       path: `seqdb-api/library-pool/${id}`,
       include: "contents"
     },
-    { disabled: !id, deps }
+    { disabled: !id, deps, parser: libraryPoolParser }
   );
 }
 export default function LibraryPoolEditPage() {

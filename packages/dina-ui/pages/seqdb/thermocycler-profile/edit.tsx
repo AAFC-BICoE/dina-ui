@@ -3,7 +3,10 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { ThermocyclerProfile } from "../../../types/seqdb-api/resources/ThermocyclerProfile";
+import {
+  ThermocyclerProfile,
+  thermocyclerProfileParser
+} from "../../../types/seqdb-api/resources/ThermocyclerProfile";
 import { ThermocyclerProfileForm } from "../../../components/thermocycler-profile/ThermocyclerProfileForm";
 
 export function ThermocyclerProfileEditPage({ router }: WithRouterProps) {
@@ -13,10 +16,13 @@ export function ThermocyclerProfileEditPage({ router }: WithRouterProps) {
     ? "editThermocyclerProfileTitle"
     : "addThermocyclerProfileTitle";
 
-  const query = useQuery<ThermocyclerProfile>({
-    include: "region",
-    path: `seqdb-api/thermocycler-profile/${id}`
-  });
+  const query = useQuery<ThermocyclerProfile>(
+    {
+      include: "region",
+      path: `seqdb-api/thermocycler-profile/${id}`
+    },
+    { parser: thermocyclerProfileParser }
+  );
 
   return (
     <div>

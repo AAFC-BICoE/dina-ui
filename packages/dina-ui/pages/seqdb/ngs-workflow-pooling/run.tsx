@@ -11,7 +11,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { LibraryPool } from "../../../types/seqdb-api";
+import { LibraryPool, libraryPoolParser } from "../../../types/seqdb-api";
 
 export function useLibraryPoolQuery(id?: string, deps?: any[]) {
   return useQuery<LibraryPool>(
@@ -20,7 +20,7 @@ export function useLibraryPoolQuery(id?: string, deps?: any[]) {
       include:
         "product,protocol,thermocyclerProfile,storageUnit,storageUnitType"
     },
-    { disabled: !id, deps }
+    { disabled: !id, deps, parser: libraryPoolParser }
   );
 }
 

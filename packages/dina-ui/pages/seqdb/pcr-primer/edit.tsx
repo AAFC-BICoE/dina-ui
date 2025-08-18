@@ -19,7 +19,10 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
+import {
+  PcrPrimer,
+  pcrPrimerParser
+} from "../../../types/seqdb-api/resources/PcrPrimer";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
 interface PcrPrimerFormProps {
@@ -32,10 +35,13 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
   const { formatMessage } = useSeqdbIntl();
   const title = id ? "editPcrPrimerTitle" : "addPcrPrimerTitle";
 
-  const query = useQuery<PcrPrimer>({
-    include: "region",
-    path: `seqdb-api/pcr-primer/${id}`
-  });
+  const query = useQuery<PcrPrimer>(
+    {
+      include: "region",
+      path: `seqdb-api/pcr-primer/${id}`
+    },
+    { parser: pcrPrimerParser }
+  );
 
   return (
     <div>

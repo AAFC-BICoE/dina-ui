@@ -47,6 +47,7 @@ import {
 } from "../../../types/collection-api";
 import {
   PcrBatch,
+  pcrBatchParser,
   PcrBatchItem,
   PcrPrimer,
   Region,
@@ -60,7 +61,7 @@ export function usePcrBatchQuery(id?: string, deps?: any[]) {
       include:
         "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit,storageUnitType,protocol"
     },
-    { disabled: !id, deps }
+    { disabled: !id, deps, parser: pcrBatchParser }
   );
 }
 

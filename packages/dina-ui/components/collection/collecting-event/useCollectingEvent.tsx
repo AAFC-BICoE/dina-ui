@@ -30,8 +30,10 @@ export function useCollectingEventQuery(id?: string | null) {
 
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
-      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod,protocol`,
-      header: { "include-dina-permission": "true" }
+      path: `collection-api/collecting-event/${id}`,
+      header: { "include-dina-permission": "true" },
+      include:
+        "collectors,collectorGroups,attachment,geoReferenceAssertions,geoReferenceAssertions.georeferencedBy,geographicPlaceNameSourceDetail.selectedGeographicPlace,geographicPlaceNameSourceDetail.higherGeographicPlaces,geographicPlaceNameSourceDetail.customGeographicPlace"
     },
     {
       // Return undefined when ID is undefined:
