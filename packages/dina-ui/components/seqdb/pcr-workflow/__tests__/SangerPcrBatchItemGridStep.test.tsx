@@ -363,32 +363,32 @@ describe("SangerPcrBatchItemGridStep component", () => {
       expect(
         wrapper.getByText(/selected material samples \(3 in list\)/i)
       ).toBeInTheDocument();
+
+      // Alert should not appear at this point.
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+
+      // Expect material sample list to be populated with material samples not in the container yet.
+      expect(
+        wrapper.getByText(/selected material samples \(3 in list\)/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: MATERIAL_SAMPLE_NAME_1 })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: MATERIAL_SAMPLE_NAME_2 })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: MATERIAL_SAMPLE_NAME_3 })
+      ).toBeInTheDocument();
+
+      // Expect material samples already saved to the grid to be rendered on it.
+      expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
+        MATERIAL_SAMPLE_NAME_4
+      );
+      expect(wrapper.container.querySelector(".well-A_2")?.textContent).toEqual(
+        MATERIAL_SAMPLE_NAME_5
+      );
     });
-
-    // Alert should not appear at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-
-    // Expect material sample list to be populated with material samples not in the container yet.
-    expect(
-      wrapper.getByText(/selected material samples \(3 in list\)/i)
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("link", { name: MATERIAL_SAMPLE_NAME_1 })
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("link", { name: MATERIAL_SAMPLE_NAME_2 })
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("link", { name: MATERIAL_SAMPLE_NAME_3 })
-    ).toBeInTheDocument();
-
-    // Expect material samples already saved to the grid to be rendered on it.
-    expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
-      MATERIAL_SAMPLE_NAME_4
-    );
-    expect(wrapper.container.querySelector(".well-A_2")?.textContent).toEqual(
-      MATERIAL_SAMPLE_NAME_5
-    );
   });
 
   it("Switch between view and edit mode", async () => {
@@ -460,18 +460,17 @@ describe("SangerPcrBatchItemGridStep component", () => {
       expect(wrapper.getByRole("radio", { name: /column/i })).toHaveProperty(
         "checked"
       );
+      // The fill by column should be pre-selected.
+      expect(wrapper.getByRole("radio", { name: /column/i })).toHaveProperty(
+        "checked"
+      );
+
+      // Should be 8 (+1 for the column displaying the row letters)
+      expect(wrapper.getByText("8")).toBeInTheDocument();
+
+      // Should be 5 (React Table renders the header separately so it's not counted here.)
+      expect(wrapper.getByText("E")).toBeInTheDocument();
     });
-
-    // The fill by column should be pre-selected.
-    expect(wrapper.getByRole("radio", { name: /column/i })).toHaveProperty(
-      "checked"
-    );
-
-    // Should be 8 (+1 for the column displaying the row letters)
-    expect(wrapper.getByText("8")).toBeInTheDocument();
-
-    // Should be 5 (React Table renders the header separately so it's not counted here.)
-    expect(wrapper.getByText("E")).toBeInTheDocument();
   });
 
   it("Move all functionality", async () => {
