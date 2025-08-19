@@ -108,8 +108,6 @@ export function FileView({
 
   const errorStatus = (error as any)?.cause?.status;
   const objectUpload = (metadata as any)?.objectUpload;
-  // Link to the file viewer page without metadata.
-  const fileViewerUrl = `/object-store/object/file-view?id=${metadata?.id}`;
 
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
@@ -126,7 +124,7 @@ export function FileView({
                 />
               ) : (
                 <a
-                  href={fileViewerUrl as any}
+                  href={objectUrl as any}
                   target="_blank"
                   style={{
                     color: "inherit",
