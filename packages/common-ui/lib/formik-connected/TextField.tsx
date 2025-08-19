@@ -70,7 +70,7 @@ export function TextField(props: TextFieldProps) {
             // Mark field as explicitly cleared
             const newClearedFields = new Set(bulkCtx.clearedFields);
             newClearedFields.add(props.name);
-            bulkCtx.setClearedFields(newClearedFields);
+            bulkCtx?.setClearedFields?.(newClearedFields);
 
             // Set the actual field value to empty
             setValue("");

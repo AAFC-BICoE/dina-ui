@@ -233,6 +233,7 @@ function useBulkMetadataSave({
     setError(null);
     bulkEditFormRef.current?.setStatus(null);
     bulkEditFormRef.current?.setErrors({});
+
     try {
       // First clear all tab errors:
       for (const { formRef } of metadataHooks) {
