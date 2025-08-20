@@ -1,7 +1,7 @@
 import { LoadingSpinner } from "common-ui";
 import { useRouter } from "next/router";
 import { useBlobLoad } from "common-ui";
-import { DinaMessage } from "../../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 /**
  * ImageViewer component displays an image fetched from the object store based on the route parameters.
  *
