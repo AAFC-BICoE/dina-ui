@@ -13,16 +13,31 @@ header /* {
 
 # Serve the unsupported-browser.html page when requesting from IE
 @internetexplorer  {
-	# Allow disabling the IE blocker using the  DISABLE_BROWSER_CHECK environment variable:
+	# Allow disabling the IE blocker using the DISABLE_BROWSER_CHECK environment variable:
 	not {
 		expression {$DISABLE_BROWSER_CHECK:false}
 	}
 	header_regexp User-Agent .*(MSIE|Trident).*
 }
-rewrite @internetexplorer  /static/unsupported-browser.html
+rewrite @internetexplorer /static/unsupported-browser.html
 
-# Routes to static HTML files e.g. { URL /list } -> { File /list.html }
-try_files {path}.html {path}
+# Serve /static from the mounted config dir first, then fall back to the nextjs static folder.
+route /static/* {
+  @static_local {
+    file {
+      root /srv/static-ui
+      try_files {path} {path}.html
+    }
+  }
+  handle @static_local {
+    root * /srv/static-ui
+    file_server
+  }
+  handle {
+    root * /www/html
+    file_server
+  }
+}
 
 # Provide the Keycloak config to the front-end code:
 respond /keycloak.json "{ 
@@ -44,13 +59,13 @@ respond /api/instance.json "{
 	\"scientific-names-datasets-endpoint\": \"{$SCIENTIFIC_NAMES_DATASETS_ENDPOINT}\"
 }"
 
-# Proxy to the main back-end API:
+# Proxy to the back-end Object Store API:
 route /api/objectstore-api/* {
 	uri replace /api/objectstore-api /api/v1
 	reverse_proxy {$OBJECTSTORE_API_ADDRESS}
 }
 
-# Proxy to the additional Agent API:
+# Proxy to the back-end Agent API:
 route /api/agent-api/* {
 	uri replace /api/agent-api /api/v1
 	reverse_proxy {$AGENT_API_ADDRESS}
