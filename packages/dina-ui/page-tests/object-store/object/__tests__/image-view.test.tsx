@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import ImageViewer from "../../../../pages/object-store/object/image-view/[id]";
+import ImageViewer from "../../../../pages/object-store/object/image-view";
 import { useRouter } from "next/router";
 import { useBlobLoad } from "common-ui";
 import "@testing-library/jest-dom";
