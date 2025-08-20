@@ -34,7 +34,11 @@ export default function ImageViewer() {
       ) : error ? (
         <DinaMessage id="previewNotAvailable" />
       ) : (
-        <img src={objectUrl || ""} alt={id as string} />
+        <img
+          src={objectUrl || ""}
+          alt={id as string}
+          style={{ maxHeight: "100dvh" }}
+        />
       )}
     </div>
   );
