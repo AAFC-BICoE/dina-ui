@@ -15,25 +15,9 @@ header /* {
 }
 rewrite @internetexplorer /static/unsupported-browser.html
 
-# Serve /static from the mounted config dir first, then fall back to the nextjs static folder.
-route /static/* {
-  @static_local {
-    file {
-      root /srv/static-ui
-      try_files {path} {path}.html
-    }
-  }
-  handle @static_local {
-    root * /srv/static-ui
-    file_server
-  }
-  handle {
-    reverse_proxy {$UI_DEV_SERVER_ADDRESS}
-  }
-}
-
 # Proxy to the front-end:
 reverse_proxy / {$UI_DEV_SERVER_ADDRESS}
+reverse_proxy /static/favicon.ico {$UI_DEV_SERVER_ADDRESS}
 reverse_proxy /_next/* {$UI_DEV_SERVER_ADDRESS}
 reverse_proxy /* {$UI_DEV_SERVER_ADDRESS}
 
@@ -110,4 +94,11 @@ route /api/search-api/* {
 route /api/dina-export-api/* {
     uri replace /api/dina-export-api /api/v1
     reverse_proxy {$REPORT_LABEL_API_ADDRESS}
+}
+
+# Mount static-ui folder (customizable from configuration)
+handle_path /static-ui/* {
+  root * /srv/static-ui
+  try_files {path} {path}.html
+  file_server
 }
