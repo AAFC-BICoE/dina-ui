@@ -1124,6 +1124,7 @@ export function useMaterialSampleSave({
               alertMessage="collectingEventEditErrorMessage"
               collectingEventUUID={initialValues?.id}
               override={true}
+              displayCollectingEventDetailsLink={true}
             />
           )}
           <CollectingEventFormLayout

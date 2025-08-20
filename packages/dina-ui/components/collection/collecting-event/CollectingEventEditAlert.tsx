@@ -4,6 +4,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
+import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
 
 interface CollectingEventEditAlertProps {
   /** The number of material samples linked. Shows if > 1. */
@@ -12,8 +13,14 @@ interface CollectingEventEditAlertProps {
   /** Localized text id for the warning message. Warning always assumes a count is provided. */
   alertMessage?: string;
 
-  /** Populate if you want the "Go to collecting event details" link to appear. */
+  /**
+   * Used for the collecting event details link and generating the query to display the current
+   * material samples linked.
+   */
   collectingEventUUID?: string;
+
+  /** Whether to display the link to the Collecting Event Details page. */
+  displayCollectingEventDetailsLink?: boolean;
 
   /**
    * Override the don't render condition. Helpful if the condition is already being checked by
@@ -31,6 +38,7 @@ function CollectingEventEditAlert({
   materialSampleUsageCount,
   alertMessage = "collectingEventEditAlertMessage",
   collectingEventUUID,
+  displayCollectingEventDetailsLink = false,
   override = false
 }: CollectingEventEditAlertProps) {
   // Don't render if there are not multiple usages.
@@ -40,6 +48,17 @@ function CollectingEventEditAlert({
   ) {
     return null;
   }
+
+  // Generate the search URL for Material Samples linked to this Collecting Event.
+  const relationshipPresenceUUIDSearch = generateSearchURLFromSimpleRows([
+    {
+      f: "_relationshipPresence",
+      o: "uuid",
+      v: "collectingEvent",
+      t: "relationshipPresence",
+      d: collectingEventUUID ?? ""
+    }
+  ]);
 
   return (
     <div className="alert alert-warning" role="alert">
@@ -62,6 +81,29 @@ function CollectingEventEditAlert({
             />
           </span>
           {collectingEventUUID && (
+            <span>
+              <br />
+              <Link
+                className="mt-2"
+                href={{
+                  pathname: `/collection/material-sample/list`,
+                  query: {
+                    queryTree: relationshipPresenceUUIDSearch
+                  }
+                }}
+                target="_blank"
+              >
+                <DinaMessage id="collectingEventViewMaterialSamplesAttached" />{" "}
+                <FaArrowUpRightFromSquare
+                  style={{
+                    marginLeft: "0.25em"
+                  }}
+                  aria-label="Opens in new tab"
+                />
+              </Link>
+            </span>
+          )}
+          {displayCollectingEventDetailsLink && collectingEventUUID && (
             <span>
               <br />
               <Link

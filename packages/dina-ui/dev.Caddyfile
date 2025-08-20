@@ -7,17 +7,17 @@ header /* {
 
 # Serve the unsupported-browser.html page when requesting from IE
 @internetexplorer  {
-	# Allow disabling the IE blocker using the  DISABLE_BROWSER_CHECK environment variable:
+	# Allow disabling the IE blocker using the DISABLE_BROWSER_CHECK environment variable:
 	not {
 		expression {$DISABLE_BROWSER_CHECK:false}
 	}
 	header_regexp User-Agent .*(MSIE|Trident).*
 }
-rewrite @internetexplorer  /static/unsupported-browser.html
+rewrite @internetexplorer /static/unsupported-browser.html
 
 # Proxy to the front-end:
 reverse_proxy / {$UI_DEV_SERVER_ADDRESS}
-reverse_proxy /favicon.ico {$UI_DEV_SERVER_ADDRESS}
+reverse_proxy /static/favicon.ico {$UI_DEV_SERVER_ADDRESS}
 reverse_proxy /_next/* {$UI_DEV_SERVER_ADDRESS}
 reverse_proxy /* {$UI_DEV_SERVER_ADDRESS}
 
@@ -94,4 +94,11 @@ route /api/search-api/* {
 route /api/dina-export-api/* {
     uri replace /api/dina-export-api /api/v1
     reverse_proxy {$REPORT_LABEL_API_ADDRESS}
+}
+
+# Mount public folder (customizable from configuration)
+handle_path /public/* {
+  root * /srv/public
+  try_files {path} {path}.html
+  file_server
 }

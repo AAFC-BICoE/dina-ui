@@ -25,6 +25,7 @@ export interface ObjectUploadAttributes {
   sizeInBytes: number;
   exif: Map<string, string>;
   dateTimeDigitized?: string;
+  isDerivative?: boolean;
 
   // Not stored in the attributes but moved here for reading purposes.
   meta?: DinaJsonMetaInfo;
