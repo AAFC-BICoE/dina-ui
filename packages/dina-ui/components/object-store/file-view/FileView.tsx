@@ -108,10 +108,18 @@ export function FileView({
 
   const errorStatus = (error as any)?.cause?.status;
   const objectUpload = (metadata as any)?.objectUpload;
+
   // Link to the file viewer page without metadata.
-  const fileViewerUrl = objectUpload
-    ? `/object-store/object/file-view?id=${objectUpload.id}`
-    : undefined;
+  // For thumbnails, don't use the objectUpload, but rather the metadata.
+  const imageViewerUrl = isLoading
+    ? undefined
+    : objectUpload
+    ? objectUpload.isDerivative
+      ? `/object-store/object/image-view/${objectUpload.id}?bucket=${objectUpload.bucket}&type=DERIVATIVE`
+      : `/object-store/object/image-view/${objectUpload.id}?bucket=${objectUpload.bucket}`
+    : `/object-store/object/image-view/${
+        (metadata as any)?.fileIdentifier
+      }?bucket=${(metadata as any)?.bucket}&type=DERIVATIVE`;
 
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
@@ -128,7 +136,7 @@ export function FileView({
                 />
               ) : (
                 <a
-                  href={fileViewerUrl as any}
+                  href={imageViewerUrl as any}
                   target="_blank"
                   style={{
                     color: "inherit",
