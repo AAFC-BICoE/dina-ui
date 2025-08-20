@@ -115,11 +115,11 @@ export function FileView({
     ? undefined
     : objectUpload
     ? objectUpload.isDerivative
-      ? `/object-store/object/image-view/${objectUpload.id}?bucket=${objectUpload.bucket}&type=DERIVATIVE`
-      : `/object-store/object/image-view/${objectUpload.id}?bucket=${objectUpload.bucket}`
-    : `/object-store/object/image-view/${
+      ? `/object-store/object/image-view?id=${objectUpload.id}&bucket=${objectUpload.bucket}&type=DERIVATIVE`
+      : `/object-store/object/image-view?id=${objectUpload.id}&bucket=${objectUpload.bucket}`
+    : `/object-store/object/image-view?id=${
         (metadata as any)?.fileIdentifier
-      }?bucket=${(metadata as any)?.bucket}&type=DERIVATIVE`;
+      }&bucket=${(metadata as any)?.bucket}&type=DERIVATIVE`;
 
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>

@@ -21,6 +21,9 @@ header /* {
 }
 rewrite @internetexplorer /static/unsupported-browser.html
 
+# Routes to static HTML files e.g. { URL /list } -> { File /list.html }
+try_files {path}.html {path}
+
 # Provide the Keycloak config to the front-end code:
 respond /keycloak.json "{ 
 	\"realm\": \"{$KEYCLOAK_REALM}\", 
