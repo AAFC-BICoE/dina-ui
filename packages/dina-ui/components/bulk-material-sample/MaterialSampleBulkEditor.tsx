@@ -96,7 +96,7 @@ export function MaterialSampleBulkEditor({
     return getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook);
   }
   const [initialized, setInitialized] = useState(false);
-  const { bulkEditTab } = useBulkEditTab({
+  const { bulkEditTab, clearedFields } = useBulkEditTab({
     resourceHooks: sampleHooks,
     hideBulkEditTab: !initialized,
     resourceForm: materialSampleForm,
@@ -111,7 +111,7 @@ export function MaterialSampleBulkEditor({
   const { saveAll, submissionError } = useBulkSampleSave({
     onSaved,
     samplePreProcessor: sampleBulkOverrider,
-    bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef },
+    bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef, clearedFields },
     bulkEditCollectingEvtFormRef,
     bulkEditSampleHook
   });
