@@ -9,7 +9,8 @@ import {
   ReactTable,
   SaveArgs,
   useAccount,
-  useApiClient
+  useApiClient,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { Alert, Dropdown, DropdownButton } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
@@ -150,9 +151,13 @@ export function MolecularAnalysisResultsStep({
                           const metadataResp = await apiClient.get<Metadata[]>(
                             `objectstore-api/metadata`,
                             {
-                              filter: {
-                                rsql: `originalFilename=="${sequencingRunItem.molecularAnalysisRunItem?.name}*"`
-                              }
+                              filter: SimpleSearchFilterBuilder.create<any>()
+                                .searchFilter(
+                                  "originalFilename",
+                                  sequencingRunItem.molecularAnalysisRunItem
+                                    ?.name
+                                )
+                                .build()
                             }
                           );
                           if (metadataResp.data.length > 0) {
