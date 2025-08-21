@@ -381,7 +381,11 @@ function useBulkSampleSave({
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const { bulkEditFormRef, resourceHooks: sampleHooks } = bulkEditCtx;
+  const {
+    bulkEditFormRef,
+    resourceHooks: sampleHooks,
+    clearedFields
+  } = bulkEditCtx;
 
   async function saveAll() {
     setSubmissionError(null);
@@ -397,6 +401,16 @@ function useBulkSampleSave({
       for (const { formRef } of sampleHooks) {
         formRef.current?.setStatus(null);
         formRef.current?.setErrors({});
+      }
+
+      // Clear flagged fields across all sample forms.
+      if (clearedFields?.size) {
+        const refs = [bulkEditFormRef, ...sampleHooks.map((h) => h.formRef)];
+        for (const field of clearedFields) {
+          for (const ref of refs) {
+            ref.current?.setFieldValue(field, "", false);
+          }
+        }
       }
 
       const preProcessSample = samplePreProcessor?.();
