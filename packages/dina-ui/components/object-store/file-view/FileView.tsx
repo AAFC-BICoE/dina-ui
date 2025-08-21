@@ -109,17 +109,12 @@ export function FileView({
   const errorStatus = (error as any)?.cause?.status;
   const objectUpload = (metadata as any)?.objectUpload;
 
-  // Link to the file viewer page without metadata.
-  // For thumbnails, don't use the objectUpload, but rather the metadata.
-  const imageViewerUrl = isLoading
-    ? undefined
-    : objectUpload
-    ? objectUpload.isDerivative
-      ? `/object-store/object/image-view?id=${objectUpload.id}&bucket=${objectUpload.bucket}&type=DERIVATIVE`
-      : `/object-store/object/image-view?id=${objectUpload.id}&bucket=${objectUpload.bucket}`
-    : `/object-store/object/image-view?id=${
-        (metadata as any)?.fileIdentifier
-      }&bucket=${(metadata as any)?.bucket}&type=DERIVATIVE`;
+  const filePathContents = filePath.split("/");
+
+  // Generate the image viewer url using the current displayed image's filepath.
+  const imageViewerUrl = filePathContents.includes("derivative")
+    ? `/object-store/object/image-view?id=${filePathContents[5]}&bucket=${filePathContents[3]}&type=DERIVATIVE`
+    : `/object-store/object/image-view?id=${filePathContents[4]}&bucket=${filePathContents[3]}`;
 
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
