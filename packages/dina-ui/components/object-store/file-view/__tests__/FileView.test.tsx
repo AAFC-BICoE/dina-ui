@@ -26,6 +26,42 @@ describe("FileView component", () => {
     ).toBeInTheDocument();
   });
 
+  it("Links to the image viewer page.", async () => {
+    const wrapper = mountWithAppContext(
+      <FileView
+        filePath="/objectstore-api/file/bucket/0198a952-20e2-7f25-b8c7-a2ef0aa1f183"
+        fileType="png"
+      />,
+      { apiContext }
+    );
+
+    // Wait for loading to be finished...
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    const link = document.querySelector(".file-viewer-wrapper a");
+    expect(link?.getAttribute("href")).toBe(
+      "/object-store/object/image-view?id=0198a952-20e2-7f25-b8c7-a2ef0aa1f183&bucket=bucket"
+    );
+  });
+
+  it("Links to the image viewer page for derivatives.", async () => {
+    const wrapper = mountWithAppContext(
+      <FileView
+        filePath="/objectstore-api/file/bucket/0198a952-20e2-7f25-b8c7-a2ef0aa1f183"
+        fileType="png"
+      />,
+      { apiContext }
+    );
+
+    // Wait for loading to be finished...
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    const link = document.querySelector(".file-viewer-wrapper a");
+    expect(link?.getAttribute("href")).toBe(
+      "/object-store/object/image-view?id=0198a952-20e2-7f25-b8c7-a2ef0aa1f183&bucket=bucket"
+    );
+  });
+
   const noPreviewFileTypes = [
     "doc",
     "docx",
