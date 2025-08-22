@@ -109,17 +109,18 @@ export function TextField(props: TextFieldProps) {
           onKeyDown
         };
 
-        const clearButton = bulkTab?.showClearIcon ? (
-          <Tooltip
-            directText="Clear this field for all selected resources. All items will have an empty value for this field after saving."
-            placement="right"
-            visibleElement={
-              <button type="button" className="btn" onClick={onClearField}>
-                <FaEraser />
-              </button>
-            }
-          />
-        ) : null;
+        const clearButton =
+          !readOnly && bulkTab?.showClearIcon ? (
+            <Tooltip
+              directText="Clear this field for all selected resources. All items will have an empty value for this field after saving."
+              placement="right"
+              visibleElement={
+                <button type="button" className="btn" onClick={onClearField}>
+                  <FaEraser />
+                </button>
+              }
+            />
+          ) : null;
 
         return (
           <div className="d-flex align-items-center gap-2">

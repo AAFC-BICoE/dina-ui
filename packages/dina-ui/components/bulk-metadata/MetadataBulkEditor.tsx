@@ -86,7 +86,7 @@ export function MetadataBulkEditor({
 
   const [initialized, setInitialized] = useState(false);
 
-  const { bulkEditTab } = useBulkEditTab({
+  const { bulkEditTab, clearedFields } = useBulkEditTab({
     resourceHooks: metadataHooks,
     hideBulkEditTab: !initialized,
     resourceForm: metadataForm,
@@ -101,7 +101,11 @@ export function MetadataBulkEditor({
   const { saveAll } = useBulkMetadataSave({
     onSaved,
     metadataPreProcessor: metadataBulkOverrider,
-    bulkEditCtx: { resourceHooks: metadataHooks, bulkEditFormRef }
+    bulkEditCtx: {
+      resourceHooks: metadataHooks,
+      bulkEditFormRef,
+      clearedFields
+    }
   });
 
   return (
@@ -227,7 +231,11 @@ function useBulkMetadataSave({
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const { bulkEditFormRef, resourceHooks: metadataHooks } = bulkEditCtx;
+  const {
+    bulkEditFormRef,
+    resourceHooks: metadataHooks,
+    clearedFields
+  } = bulkEditCtx;
 
   async function saveAll() {
     setError(null);
@@ -293,6 +301,13 @@ function useBulkMetadataSave({
           delete saveOp.resource.license;
           saveOp.resource.acSubtype =
             saveOp.resource.acSubtype?.acSubtype ?? null;
+
+          // Check if cleared fields have been requested, make the changes for each operation.
+          if (clearedFields?.size) {
+            for (const fieldName of clearedFields) {
+              _.set(saveOp.resource as any, fieldName, "");
+            }
+          }
 
           saveOperations.push(saveOp);
         } catch (error: unknown) {

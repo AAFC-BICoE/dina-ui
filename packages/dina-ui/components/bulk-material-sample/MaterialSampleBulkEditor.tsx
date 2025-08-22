@@ -403,16 +403,6 @@ function useBulkSampleSave({
         formRef.current?.setErrors({});
       }
 
-      // Clear flagged fields across all sample forms.
-      if (clearedFields?.size) {
-        const refs = [bulkEditFormRef, ...sampleHooks.map((h) => h.formRef)];
-        for (const field of clearedFields) {
-          for (const ref of refs) {
-            ref.current?.setFieldValue(field, "", false);
-          }
-        }
-      }
-
       const preProcessSample = samplePreProcessor?.();
 
       const saveOperations: SaveArgs<MaterialSample>[] = [];
@@ -456,6 +446,14 @@ function useBulkSampleSave({
               ? bulkEditCollectingEventRefPermanent
               : undefined
           });
+
+          // Check if cleared fields have been requested, make the changes for each operation.
+          if (clearedFields?.size) {
+            for (const fieldName of clearedFields) {
+              _.set(saveOp.resource as any, fieldName, "");
+            }
+          }
+
           saveOperations.push(saveOp);
         } catch (error: unknown) {
           if (error instanceof DoOperationsError) {
