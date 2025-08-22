@@ -20,7 +20,7 @@ export interface ClearAllButtonProps {
 export function ClearAllButton({
   fieldName,
   onClearLocal,
-  visible = true,
+  visible = false,
   readOnly
 }: ClearAllButtonProps) {
   const bulkCtx = useBulkEditTabContext();
