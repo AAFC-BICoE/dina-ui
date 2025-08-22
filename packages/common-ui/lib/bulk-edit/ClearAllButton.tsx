@@ -43,7 +43,12 @@ export function ClearAllButton({
       directText={formatMessage({ id: "clearedTooltip" as any })}
       placement="right"
       visibleElement={
-        <button type="button" className="btn" onClick={handleClick}>
+        <button
+          type="button"
+          className="btn"
+          onClick={handleClick}
+          data-testid={`clear-all-button-${fieldName}`}
+        >
           <FaEraser />
         </button>
       }
