@@ -406,6 +406,10 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   return (
     <>
       <style>{`
+        .autosuggest {
+          position: relative;
+          width: 100%;        
+        }
         .autosuggest-container {
           position: relative;
         }

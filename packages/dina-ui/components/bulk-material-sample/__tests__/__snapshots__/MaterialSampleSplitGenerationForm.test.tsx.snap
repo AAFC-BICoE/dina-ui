@@ -520,11 +520,15 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                   class="field-col"
                   style="cursor: auto;"
                 >
-                  <input
-                    class="form-control"
-                    type="text"
-                    value=""
-                  />
+                  <div
+                    class="d-flex align-items-center gap-2"
+                  >
+                    <input
+                      class="form-control"
+                      type="text"
+                      value=""
+                    />
+                  </div>
                 </div>
               </label>
             </div>
@@ -1149,11 +1153,15 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                   class="field-col"
                   style="cursor: auto;"
                 >
-                  <input
-                    class="form-control"
-                    type="text"
-                    value=""
-                  />
+                  <div
+                    class="d-flex align-items-center gap-2"
+                  >
+                    <input
+                      class="form-control"
+                      type="text"
+                      value=""
+                    />
+                  </div>
                 </div>
               </label>
             </div>

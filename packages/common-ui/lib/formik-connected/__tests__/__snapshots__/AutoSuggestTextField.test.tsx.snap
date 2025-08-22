@@ -30,8 +30,15 @@ exports[`AutoSuggestTextField Elastic Search only provided, results are fetched 
             class="field-col"
             style="cursor: auto;"
           >
-            <style>
-              
+            <div
+              class="d-flex align-items-center gap-2"
+            >
+              <style>
+                
+        .autosuggest {
+          position: relative;
+          width: 100%;        
+        }
         .autosuggest-container {
           position: relative;
         }
@@ -49,69 +56,70 @@ exports[`AutoSuggestTextField Elastic Search only provided, results are fetched 
           cursor: pointer;
         }
       
-            </style>
-            <div
-              class="autosuggest"
-            >
+              </style>
               <div
-                aria-expanded="true"
-                aria-haspopup="listbox"
-                aria-owns="react-autowhatever-examplePersonNameField"
-                class="autosuggest-container"
-                role=""
+                class="autosuggest"
               >
-                <input
-                  aria-autocomplete="list"
-                  aria-controls="react-autowhatever-examplePersonNameField"
-                  autocomplete="none"
-                  class="form-control"
-                  placeholder="Type here to search."
-                  type="text"
-                  value="p"
-                />
                 <div
-                  class="suggestions-container suggestions-container-open"
-                  id="react-autowhatever-examplePersonNameField"
+                  aria-expanded="true"
+                  aria-haspopup="listbox"
+                  aria-owns="react-autowhatever-examplePersonNameField"
+                  class="autosuggest-container"
                   role=""
                 >
-                  <ul
-                    class="list-group"
-                    role="listbox"
+                  <input
+                    aria-autocomplete="list"
+                    aria-controls="react-autowhatever-examplePersonNameField"
+                    autocomplete="none"
+                    class="form-control"
+                    placeholder="Type here to search."
+                    type="text"
+                    value="p"
+                  />
+                  <div
+                    class="suggestions-container suggestions-container-open"
+                    id="react-autowhatever-examplePersonNameField"
+                    role=""
                   >
-                    <li
-                      aria-selected="false"
-                      class="list-group-item"
-                      data-suggestion-index="0"
-                      id="react-autowhatever-examplePersonNameField--item-0"
-                      role="option"
+                    <ul
+                      class="list-group"
+                      role="listbox"
                     >
-                      <div>
-                        person1-elastic-search
-                      </div>
-                    </li>
-                    <li
-                      aria-selected="false"
-                      class="list-group-item"
-                      data-suggestion-index="1"
-                      id="react-autowhatever-examplePersonNameField--item-1"
-                      role="option"
-                    >
-                      <div>
-                        person2-elastic-search
-                      </div>
-                    </li>
-                    <li
-                      aria-selected="false"
-                      class="list-group-item"
-                      data-suggestion-index="2"
-                      id="react-autowhatever-examplePersonNameField--item-2"
-                      role="option"
-                    >
-                      <div>
-                        person3-elastic-search
-                      </div>
-                    </li>
-                  </ul>
+                      <li
+                        aria-selected="false"
+                        class="list-group-item"
+                        data-suggestion-index="0"
+                        id="react-autowhatever-examplePersonNameField--item-0"
+                        role="option"
+                      >
+                        <div>
+                          person1-elastic-search
+                        </div>
+                      </li>
+                      <li
+                        aria-selected="false"
+                        class="list-group-item"
+                        data-suggestion-index="1"
+                        id="react-autowhatever-examplePersonNameField--item-1"
+                        role="option"
+                      >
+                        <div>
+                          person2-elastic-search
+                        </div>
+                      </li>
+                      <li
+                        aria-selected="false"
+                        class="list-group-item"
+                        data-suggestion-index="2"
+                        id="react-autowhatever-examplePersonNameField--item-2"
+                        role="option"
+                      >
+                        <div>
+                          person3-elastic-search
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
@@ -153,8 +161,15 @@ exports[`AutoSuggestTextField Snapshot test 1`] = `
             class="field-col"
             style="cursor: auto;"
           >
-            <style>
-              
+            <div
+              class="d-flex align-items-center gap-2"
+            >
+              <style>
+                
+        .autosuggest {
+          position: relative;
+          width: 100%;        
+        }
         .autosuggest-container {
           position: relative;
         }
@@ -172,31 +187,32 @@ exports[`AutoSuggestTextField Snapshot test 1`] = `
           cursor: pointer;
         }
       
-            </style>
-            <div
-              class="autosuggest"
-            >
+              </style>
               <div
-                aria-expanded="false"
-                aria-haspopup="listbox"
-                aria-owns="react-autowhatever-examplePersonNameField"
-                class="autosuggest-container"
-                role=""
+                class="autosuggest"
               >
-                <input
-                  aria-autocomplete="list"
-                  aria-controls="react-autowhatever-examplePersonNameField"
-                  autocomplete="none"
-                  class="form-control"
-                  placeholder="Type here to search."
-                  type="text"
-                  value=""
-                />
                 <div
-                  class="suggestions-container"
-                  id="react-autowhatever-examplePersonNameField"
+                  aria-expanded="false"
+                  aria-haspopup="listbox"
+                  aria-owns="react-autowhatever-examplePersonNameField"
+                  class="autosuggest-container"
                   role=""
-                />
+                >
+                  <input
+                    aria-autocomplete="list"
+                    aria-controls="react-autowhatever-examplePersonNameField"
+                    autocomplete="none"
+                    class="form-control"
+                    placeholder="Type here to search."
+                    type="text"
+                    value=""
+                  />
+                  <div
+                    class="suggestions-container"
+                    id="react-autowhatever-examplePersonNameField"
+                    role=""
+                  />
+                </div>
               </div>
             </div>
           </div>
