@@ -30,9 +30,7 @@ export function AttachmentUploader({
 
     const objectUploads = await uploadFiles({ files: acceptedFiles, group });
 
-    const objectUploadIds = objectUploads.map(
-      ({ fileIdentifier }) => fileIdentifier
-    );
+    const objectUploadIds = objectUploads.map((item) => item.id ?? "");
 
     openMetadataEditorModal({
       afterMetadatasSaved,

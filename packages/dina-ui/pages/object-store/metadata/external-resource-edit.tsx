@@ -167,6 +167,21 @@ function ExternalResourceMetadataForm({
         : undefined
     };
 
+    if (metadataEdit.dcCreator) {
+      // Only include the id and type for this relationship.
+      metadataEdit.dcCreator = {
+        id: metadataEdit.dcCreator.id,
+        type: "person"
+      };
+    }
+    if (metadataEdit.acMetadataCreator) {
+      // Only include the id and type for this relationship.
+      metadataEdit.acMetadataCreator = {
+        id: metadataEdit.acMetadataCreator.id,
+        type: "person"
+      };
+    }
+
     const savedMeta = await save(
       [
         {

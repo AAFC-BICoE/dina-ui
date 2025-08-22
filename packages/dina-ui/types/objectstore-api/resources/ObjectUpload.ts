@@ -14,7 +14,6 @@ export interface ObjectUploadAttributes {
   createdBy?: string;
   createdOn?: string;
   dcType?: DcType;
-  fileIdentifier: string;
   metaFileEntryVersion: string;
   originalFilename: string;
   sha1Hex: string;
@@ -26,6 +25,9 @@ export interface ObjectUploadAttributes {
   sizeInBytes: number;
   exif: Map<string, string>;
   dateTimeDigitized?: string;
+  isDerivative?: boolean;
+
+  // Not stored in the attributes but moved here for reading purposes.
   meta?: DinaJsonMetaInfo;
 }
 

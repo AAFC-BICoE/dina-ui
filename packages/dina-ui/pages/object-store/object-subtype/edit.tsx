@@ -9,7 +9,8 @@ import {
   SubmitButton,
   TextField,
   useQuery,
-  withResponse
+  withResponse,
+  QueryState
 } from "common-ui";
 import { connect } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -29,9 +30,11 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
 
   const title = id ? "editObjectSubtypeTitle" : "addObjectSubtypeTitle";
 
-  const query = useQuery<ObjectSubtype>({
-    path: `objectstore-api/object-subtype/${id}`
-  });
+  const query = id
+    ? useQuery<ObjectSubtype>({
+        path: `objectstore-api/object-subtype/${id}`
+      })
+    : null;
 
   return (
     <div>
@@ -43,9 +46,16 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <DinaMessage id="editObjectSubtypeTitle" />
             </h1>
-            {withResponse(query, ({ data }) => (
-              <ObjectSubtypeForm objectSubtype={data} router={router} />
-            ))}
+            {id ? (
+              withResponse(
+                query as QueryState<ObjectSubtype, undefined>,
+                ({ data }) => (
+                  <ObjectSubtypeForm objectSubtype={data} router={router} />
+                )
+              )
+            ) : (
+              <ObjectSubtypeForm router={router} />
+            )}
           </div>
         ) : (
           <div>
