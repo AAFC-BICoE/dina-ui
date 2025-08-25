@@ -41,6 +41,7 @@ exports[`AutoSuggestTextField Elastic Search only provided, results are fetched 
         }
         .autosuggest-container {
           position: relative;
+          width: 100%;
         }
         .autosuggest .suggestions-container {
           display: none;
@@ -172,6 +173,7 @@ exports[`AutoSuggestTextField Snapshot test 1`] = `
         }
         .autosuggest-container {
           position: relative;
+          width: 100%;
         }
         .autosuggest .suggestions-container {
           display: none;
