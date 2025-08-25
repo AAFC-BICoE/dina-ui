@@ -1275,6 +1275,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editIdentifierTitle: "Edit Identifier",
   field_uriTemplate: "URI Template",
   attachmentsFoundBannerText: "{numAttachmentsFound} attachments were found.",
+  singleAttachmentFoundBannerText: "1 attachment was found.",
   extractedData: "Extracted Data",
   dataPasteZone: "Data Paste Zone",
   mappedData: "Mapped Data",
