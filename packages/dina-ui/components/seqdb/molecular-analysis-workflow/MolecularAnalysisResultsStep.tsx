@@ -330,7 +330,7 @@ export function MolecularAnalysisResultsStep({
         <div className="row">
           <div className="col-12">
             <Alert variant="info" className="mb-0">
-              <DinaMessage id="molecularAnalysisRunStep_noRunExists" />
+              <DinaMessage id="molecularAnalysisRunStep_noQualityControlsExists" />
             </Alert>
           </div>
         </div>
