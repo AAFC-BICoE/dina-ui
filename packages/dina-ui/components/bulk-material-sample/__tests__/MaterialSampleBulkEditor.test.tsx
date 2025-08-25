@@ -30,7 +30,8 @@ import {
   TEST_STORAGE_UNIT,
   TEST_STORAGE_UNITS,
   TEST_COLLECTING_ORGANISM_SAMPLES,
-  TEST_FORM_TEMPLATE_COMPONENTS_DISABLED
+  TEST_FORM_TEMPLATE_COMPONENTS_DISABLED,
+  TEST_MATERIAL_SAMPLES_MULTIPLE_VALUES
 } from "../__mocks__/MaterialSampleBulkMocks";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
@@ -2259,6 +2260,68 @@ describe("MaterialSampleBulkEditor", () => {
           }
         ],
         { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Ability to clear fields in the edit all tab.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_MATERIAL_SAMPLES_MULTIPLE_VALUES}
+      />,
+      testCtx
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /barcode/i })
+      ).toBeInTheDocument()
+    );
+
+    // Click the clear all button for the barcode field
+    userEvent.click(wrapper.getByTestId("clear-all-button-barcode"));
+
+    // It should say cleared as the placeholder.
+    await waitFor(() => {
+      expect(wrapper.getByPlaceholderText("Cleared")).toBeInTheDocument();
+    });
+
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Saves the new material samples with the barcode field emptied.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              barcode: "",
+              id: "1",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              barcode: "",
+              id: "2",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              barcode: "",
+              id: "3",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
       ]
     ]);
   });

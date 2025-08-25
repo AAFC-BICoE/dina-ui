@@ -83,6 +83,7 @@ export interface FieldWrapperRenderProps {
   value: any;
   setValue: (newValue: any) => void;
   placeholder?: string;
+  multipleValueClearIcon?: boolean;
 
   /** A value to render when there is no value stored in form state. */
   formik: FormikProps<any>;
@@ -348,7 +349,8 @@ function FormikConnectedField({
     formik: form,
 
     // Only used within the bulk editor's "Edit All" tab:
-    placeholder: bulkTab?.placeholder
+    placeholder: bulkTab?.placeholder,
+    multipleValueClearIcon: bulkTab?.showClearIcon
   };
   return (
     <ErrorBoundary

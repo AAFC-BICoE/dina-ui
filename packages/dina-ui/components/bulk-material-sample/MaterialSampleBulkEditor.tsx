@@ -96,7 +96,7 @@ export function MaterialSampleBulkEditor({
     return getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook);
   }
   const [initialized, setInitialized] = useState(false);
-  const { bulkEditTab } = useBulkEditTab({
+  const { bulkEditTab, clearedFields } = useBulkEditTab({
     resourceHooks: sampleHooks,
     hideBulkEditTab: !initialized,
     resourceForm: materialSampleForm,
@@ -111,7 +111,7 @@ export function MaterialSampleBulkEditor({
   const { saveAll, submissionError } = useBulkSampleSave({
     onSaved,
     samplePreProcessor: sampleBulkOverrider,
-    bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef },
+    bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef, clearedFields },
     bulkEditCollectingEvtFormRef,
     bulkEditSampleHook
   });
@@ -381,7 +381,11 @@ function useBulkSampleSave({
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const { bulkEditFormRef, resourceHooks: sampleHooks } = bulkEditCtx;
+  const {
+    bulkEditFormRef,
+    resourceHooks: sampleHooks,
+    clearedFields
+  } = bulkEditCtx;
 
   async function saveAll() {
     setSubmissionError(null);
@@ -442,6 +446,14 @@ function useBulkSampleSave({
               ? bulkEditCollectingEventRefPermanent
               : undefined
           });
+
+          // Check if cleared fields have been requested, make the changes for each operation.
+          if (clearedFields?.size) {
+            for (const fieldName of clearedFields) {
+              _.set(saveOp.resource as any, fieldName, "");
+            }
+          }
+
           saveOperations.push(saveOp);
         } catch (error: unknown) {
           if (error instanceof DoOperationsError) {

@@ -27,7 +27,7 @@ export interface BulkEditTabFieldInfoParams {
 
 export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
   const {
-    bulkEditCtx: { bulkEditFormRef, resourceHooks: sampleHooks },
+    bulkEditCtx: { bulkEditFormRef, resourceHooks: sampleHooks, clearedFields },
     fieldName
   } = params;
 
@@ -80,11 +80,14 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
     !isBlankResourceAttribute(bulkEditValue) &&
     !_.isEqual(bulkEditValue, commonValue);
 
+  const isExplicitlyCleared = clearedFields?.has(fieldName) || false;
+
   return {
     hasNoValues,
     hasMultipleValues,
     hasSameValues,
     hasBulkEditValue,
+    isExplicitlyCleared,
     commonValue
   };
 }
@@ -99,10 +102,17 @@ export function useBulkEditTabFieldIndicators(
   const { formatMessage } = useIntl();
 
   if (field) {
-    const { hasMultipleValues, hasSameValues, commonValue, hasBulkEditValue } =
-      field;
+    const {
+      hasMultipleValues,
+      hasSameValues,
+      commonValue,
+      hasBulkEditValue,
+      isExplicitlyCleared
+    } = field;
 
-    const placeholder = hasMultipleValues
+    const placeholder = isExplicitlyCleared
+      ? formatMessage({ id: "cleared" })
+      : hasMultipleValues
       ? formatMessage({ id: "multipleValues" })
       : undefined;
 
@@ -110,10 +120,21 @@ export function useBulkEditTabFieldIndicators(
 
     const bulkEditClasses = classNames(
       hasBulkEditValue && "has-bulk-edit-value",
-      hasMultipleValues && "has-multiple-values"
+      hasMultipleValues && "has-multiple-values",
+      isExplicitlyCleared && "is-explicitly-cleared"
     );
 
-    return { placeholder, defaultValue, bulkEditClasses, hasBulkEditValue };
+    const showClearIcon =
+      hasMultipleValues && !hasBulkEditValue && !isExplicitlyCleared;
+
+    return {
+      placeholder,
+      defaultValue,
+      bulkEditClasses,
+      hasBulkEditValue,
+      showClearIcon,
+      isExplicitlyCleared
+    };
   }
 
   return null;

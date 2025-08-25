@@ -118,7 +118,7 @@ input[id^="react-select"] {
 }
 
 /* Give the "Multiple Values" placeholders an italic font. */
-.has-multiple-values {
+.has-multiple-values, .is-explicitly-cleared {
   :placeholder-shown,
   .placeholder-text,
   .react-select__placeholder {
@@ -157,6 +157,32 @@ input[id^="react-select"] {
 
 .has-bulk-edit-value input[type="checkbox"] {
   color: rgb(175, 255, 175) !important;
+}
+
+/* Highlight the Edit All tab's cleared fields in yellow. */
+.is-explicitly-cleared .field-label {
+  color: rgb(184, 134, 11);
+}
+
+/** Cleared inputs should have a light yellow background and yellow border. */
+.is-explicitly-cleared {
+  input[type="text"]:not([readonly]):not(.react-select__input, .search-input),
+  input[type="text"]:not([readonly]):focus:not(.react-select__input, .search-input),
+  input[type="text"]:not(.react-select__input, .search-input):not([readonly]),
+  input[type="text"]:focus:not(.react-select__input, .search-input):not([readonly]),
+  input[type="search"]:not([readonly]),
+  input[type="search"]:focus:not([readonly]),
+  textarea,
+  textarea:focus,
+  .associated-sample-link,
+  .react-select__control {
+    border-color: #fbbf24;
+    background-color: rgb(255, 255, 175) !important;
+  }
+}
+
+.is-explicitly-cleared input[type="checkbox"] {
+  color: rgb(255, 255, 175) !important;
 }
 
 /*

@@ -102,6 +102,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   max: "Max",
   min: "Min",
   multipleValues: "Multiple Values",
+  cleared: "Cleared",
+  clearedTooltip:
+    "Clear this field for all selected resources. All items will have an empty value for this field after saving.",
   multipleValuesFound: "Multiple Values Found",
   name: "Name",
   navigation: "Navigation",
