@@ -15,6 +15,8 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../types/collection-api";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { BulkEditBadge } from "packages/common-ui/lib/bulk-edit/BulkEditBadge";
+import { useFormikContext } from "formik";
+import _ from "lodash";
 
 export interface ManagedAttributeFieldProps {
   attribute: PersistedResource<ManagedAttribute>;
@@ -42,9 +44,10 @@ export function ManagedAttributeFieldWithLabel(
     formatMessage
   );
 
+  const { values } = useFormikContext<any>();
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: attributePath,
-    currentValue: props.values?.[attributeKey]
+    currentValue: _.get(values, attributePath)
   });
   const bulkCtx = useBulkEditTabContext();
 
@@ -54,13 +57,13 @@ export function ManagedAttributeFieldWithLabel(
       className={`${attributeKey}-field col-sm-6 mb-3`}
       htmlFor="none"
     >
-      <div className="d-flex align-items-center">
+      <div className="d-flex align-items-center mb-2">
         <strong className="me-auto">
           {attribute.name ?? attributeKey}
           <Tooltip directText={tooltipText} />
         </strong>
         <BulkEditBadge bulkTab={bulkTab} />
-        {!readOnly && (
+        {!readOnly && !bulkTab?.isExplicitlyDeleted && (
           <Tooltip
             directText={"Delete managed attribute."}
             placement="right"
