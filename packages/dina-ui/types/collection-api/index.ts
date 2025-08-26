@@ -24,3 +24,4 @@ export * from "./resources/ProtocolElement";
 export * from "./resources/ManagedAttribute";
 export * from "./resources/MaterialSampleSummary";
 export * from "./resources/GeographicThesaurus";
+export * from "./resources/Expedition";

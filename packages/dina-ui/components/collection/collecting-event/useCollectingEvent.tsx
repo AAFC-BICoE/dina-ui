@@ -27,7 +27,7 @@ export function useCollectingEventQuery(id?: string | null) {
 
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
-      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod,protocol`,
+      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod,protocol,expedition`,
       header: { "include-dina-permission": "true" }
     },
     {
