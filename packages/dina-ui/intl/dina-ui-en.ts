@@ -252,7 +252,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   exact: "Exact",
   exifProperties: "Exif Properties",
   existingAttachments: "Existing Attachments",
-  expeditionListTitle: "Expedition",
+  expeditionListTitle: "Expeditions",
   extensionListTitle: " Field Extensions",
   externalResourceListTitle: "External Resources",
   feedbackButtonText: "Feedback",
@@ -405,6 +405,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_endEventDateTime: "End Event Date Time",
   field_endEventDateTime_tooltip:
     "End Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
+  field_expeditionName: "Expedition name",
   field_familyNames: "Family Names",
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_fieldExtensions: "Field Extensions",
@@ -474,6 +475,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_otherRecordNumbers_tooltip:
     "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",
   field_parentStorageUnit: "Location",
+  field_participants: "Participants",
   field_personMandatoryFieldsError: "The display name field is required.",
   field_personIdentifierTypeError: "Identifier type is required.",
   field_personIdentifierValueError: "Identifier value is required.",

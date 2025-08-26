@@ -17,7 +17,7 @@ export function ExpeditionFormLayout() {
         <TextField
           className="col-md-6 name"
           name="name"
-          label={formatMessage("field_projectName")}
+          label={formatMessage("field_expeditionName")}
         />
         {!readOnly && (
           <GroupSelectField
@@ -48,13 +48,6 @@ export function ExpeditionFormLayout() {
         />
       </div>
       <PersonSelectField name="participants" isMulti={true} />
-
-      {/* TODO: Add here something like a CustomQueryPageView to show
-      all CollectingEvents which are linked to this expedition
-
-      {readOnly && (
-      )}
-       */}
     </div>
   );
 }
