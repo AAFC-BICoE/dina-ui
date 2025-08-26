@@ -124,8 +124,7 @@ export function useBulkEditTabFieldIndicators(
       isExplicitlyCleared && "is-explicitly-cleared"
     );
 
-    const showClearIcon =
-      hasMultipleValues && !hasBulkEditValue && !isExplicitlyCleared;
+    const showClearIcon = !isExplicitlyCleared;
 
     return {
       placeholder,

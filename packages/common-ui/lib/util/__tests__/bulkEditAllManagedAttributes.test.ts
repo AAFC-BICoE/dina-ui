@@ -34,16 +34,14 @@ describe("bulkEditAllManagedAttributes", () => {
     it("Sample 1 - With value 1", () => {
       const sample = { key1: "old value 1", key2: "value2" };
       expect(bulkEditAllManagedAttributes(editAll, sample, clearAll)).toEqual({
-        key1: "old value 1",
-        key2: null
+        key1: "old value 1"
       });
     });
 
     it("Sample 2 - With value 2", () => {
       const sample = { key1: "old value 2", key3: "value3" };
       expect(bulkEditAllManagedAttributes(editAll, sample, clearAll)).toEqual({
-        key1: "old value 2",
-        key3: null
+        key1: "old value 2"
       });
     });
 

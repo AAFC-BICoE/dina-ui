@@ -3,13 +3,14 @@ import { FormikProps } from "formik";
 import _ from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { FieldSpyRenderProps } from "..";
+import { FieldSpyRenderProps, Tooltip } from "..";
 import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { FieldSpy } from "./FieldSpy";
 import { ReadOnlyValue } from "./FieldView";
+import { useIntl } from "react-intl";
 
 export interface FieldWrapperProps {
   /** The CSS classes of the div wrapper. */
@@ -190,8 +191,11 @@ function LabelWrapper({
   },
   children
 }: PropsWithChildren<FieldWrapperInternalProps>) {
+  const { formatMessage } = useIntl();
+
   const { horizontal, isTemplate, componentName, sectionName } =
     useDinaFormContext();
+
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
     currentValue: value
@@ -233,6 +237,51 @@ function LabelWrapper({
     (it) => it && `${it.replaceAll(/[\.\[\]]/g, "_")}-field`
   );
 
+  const badge = useMemo(() => {
+    // Show Cleared badge if explicitly cleared
+    if (bulkTab?.isExplicitlyCleared) {
+      return (
+        <Tooltip
+          directText={formatMessage({ id: "clearedFieldTooltip" })}
+          className="ms-auto"
+          visibleElement={
+            <span className="badge pill bg-warning">
+              <i>{formatMessage({ id: "cleared" })}</i>
+            </span>
+          }
+        />
+      );
+    }
+
+    // Show Changes made badge if bulk edit value is set (and not cleared)
+    if (bulkTab?.hasBulkEditValue) {
+      return (
+        <Tooltip
+          directText={formatMessage({ id: "changesMadeTooltip" })}
+          className="ms-auto"
+          visibleElement={
+            <span className="badge pill bg-success">
+              <i>{formatMessage({ id: "changesMade" })}</i>
+            </span>
+          }
+        />
+      );
+    }
+
+    // Default: No changes badge
+    return (
+      <Tooltip
+        directText={formatMessage({ id: "noChangesMadeTooltip" })}
+        className="ms-auto"
+        visibleElement={
+          <span className="badge pill bg-secondary">
+            <i>{formatMessage({ id: "noChangesMade" })}</i>
+          </span>
+        }
+      />
+    );
+  }, [bulkTab]);
+
   return (
     <div
       className={classNames(
@@ -269,7 +318,12 @@ function LabelWrapper({
                   !horizontal && "mb-2"
                 )}
               >
-                {!hideLabel && <strong>{fieldLabel}</strong>}
+                {!hideLabel && (
+                  <div className="d-flex align-items-center w-100">
+                    <strong>{fieldLabel}</strong>
+                    {badge}
+                  </div>
+                )}
               </div>
             )}
             <div className={valueClass} style={{ cursor: "auto" }}>
@@ -300,7 +354,12 @@ function LabelWrapper({
               )}
               style={labelStyle}
             >
-              {!hideLabel && <strong>{fieldLabel}</strong>}
+              {!hideLabel && (
+                <div className="d-flex align-items-center w-100">
+                  <strong>{fieldLabel}</strong>
+                  {badge}
+                </div>
+              )}
             </div>
           )}
           <div className={valueClass} style={{ ...valueStyle, cursor: "auto" }}>

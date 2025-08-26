@@ -9,8 +9,8 @@
  *
  * 1.  Edit-all changes have priority over the original sample.
  * 2.  If an edit-all value is "", leave it untouched, if the sample has the key. Otherwise omit the key.
- * 3.  Keys existing on the sample but not present in editAll must be deleted (set to null).
- * 4.  Any key contained in clearAll is **always** set to "".
+ * 3.  Keys existing on the sample but not present in editAll must be deleted from the object.
+ * 4.  Any key contained in clearAll is always set to "".
  */
 export function bulkEditAllManagedAttributes(
   editAll: Record<string, any>,
@@ -22,8 +22,8 @@ export function bulkEditAllManagedAttributes(
 
   // Create a set of all the unique possible keys.
   const keys = new Set<string>([
-    ...Object.keys(sample),
-    ...Object.keys(editAll),
+    ...Object.keys(sample || {}),
+    ...Object.keys(editAll || {}),
     ...clearAll
   ]);
 
@@ -46,12 +46,6 @@ export function bulkEditAllManagedAttributes(
         result[key] = sample[key];
       }
       return;
-    }
-
-    // If managed attribute key is absent from editAll but present on sample then it should be
-    // deleted. (Set to null)
-    if (key in sample) {
-      result[key] = null;
     }
   });
 

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Metadata } from "../../types/objectstore-api";
 import { InputResource } from "kitsu";
 import {
+  bulkEditAllManagedAttributes,
   BulkEditTabContextI,
   ButtonBar,
   DinaForm,
@@ -79,11 +80,6 @@ export function MetadataBulkEditor({
     />
   );
 
-  function metadataBulkOverrider() {
-    /** Metadata input including blank/empty fields. */
-    return getMetadataBulkOverrider(bulkEditFormRef);
-  }
-
   const [initialized, setInitialized] = useState(false);
 
   const { bulkEditTab, clearedFields } = useBulkEditTab({
@@ -92,6 +88,11 @@ export function MetadataBulkEditor({
     resourceForm: metadataForm,
     bulkEditFormRef
   });
+
+  const metadataBulkOverrider = useCallback(
+    () => getMetadataBulkOverrider(bulkEditFormRef, clearedFields),
+    [bulkEditFormRef, clearedFields]
+  );
 
   useEffect(() => {
     // Set the initial tab to the Edit All tab:
@@ -170,7 +171,10 @@ export function MetadataBulkEditor({
   );
 }
 
-export function getMetadataBulkOverrider(bulkEditFormRef) {
+export function getMetadataBulkOverrider(
+  bulkEditFormRef,
+  clearedFields?: Set<string>
+) {
   let bulkEditMetadata: InputResource<Metadata> | undefined;
 
   /** Returns an object with the overridden values. */
@@ -188,21 +192,28 @@ export function getMetadataBulkOverrider(bulkEditFormRef) {
       bulkEditMetadata = formik.values;
     }
 
-    /** Override object with only the non-empty fields. */
-    const overrides = withoutBlankFields(bulkEditMetadata);
+    const overrides = withoutBlankFields({ ...bulkEditMetadata });
+    delete overrides.managedAttributes; // handled separately below
 
-    // Combine the managed attributes dictionaries:
-    const newManagedAttributes = {
-      ...withoutBlankFields(baseMetadata.managedAttributes),
-      ...withoutBlankFields(bulkEditMetadata?.managedAttributes)
-    };
+    const sampleManaged = baseMetadata.managedAttributes ?? {};
+    const editAllManaged = bulkEditMetadata?.managedAttributes ?? {};
+
+    const clearAllKeys = clearedFields
+      ? Array.from(clearedFields)
+          .filter((f) => f.startsWith("managedAttributes."))
+          .map((f) => f.replace("managedAttributes.", ""))
+      : [];
+
+    const newManagedAttributes = bulkEditAllManagedAttributes(
+      editAllManaged,
+      sampleManaged,
+      clearAllKeys
+    );
 
     const newMetadata: InputResource<Metadata> = {
       ...baseMetadata,
       ...overrides,
-      ...(!_.isEmpty(newManagedAttributes) && {
-        managedAttributes: newManagedAttributes
-      })
+      managedAttributes: newManagedAttributes
     };
 
     return newMetadata;
