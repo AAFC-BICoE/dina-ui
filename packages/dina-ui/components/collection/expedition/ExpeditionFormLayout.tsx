@@ -1,15 +1,25 @@
 import {
   DateField,
   MultilingualDescription,
+  SelectOption,
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { GroupSelectField, PersonSelectField } from "../..";
+import { Field } from "formik";
+import { GroupSelectField, PersonSelectField, IdentifierFields } from "../..";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ExpeditionIdentifierType } from "../../../types/collection-api/resources/ExpeditionIdentifier";
 
 export function ExpeditionFormLayout() {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
+
+  const typeOptions: SelectOption<string | undefined>[] = [
+    {
+      label: ExpeditionIdentifierType.WIKIDATA,
+      value: ExpeditionIdentifierType.WIKIDATA
+    }
+  ];
 
   return (
     <div>
@@ -48,6 +58,15 @@ export function ExpeditionFormLayout() {
         />
       </div>
       <PersonSelectField name="participants" isMulti={true} />
+      <Field name="identifiers">
+        {({ form: { values: formState } }) =>
+          !readOnly ? (
+            <IdentifierFields typeOptions={typeOptions} />
+          ) : !!formState.identifiers?.length ? (
+            <IdentifierFields typeOptions={typeOptions} />
+          ) : null
+        }
+      </Field>
     </div>
   );
 }
