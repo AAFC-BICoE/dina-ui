@@ -111,6 +111,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
     "This field will be cleared and set to an empty value for all selected records. Any existing data for this field will be removed.",
   multipleValues: "Multiple Values",
   cleared: "Cleared",
+  deleted: "Deleted",
+  deletedTooltip: "This field will be deleted for all selected records.",
   clearedTooltip:
     "Clear this field for all selected resources. All items will have an empty value for this field after saving.",
   undoClearedTooltip:

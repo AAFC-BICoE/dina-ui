@@ -26,12 +26,15 @@ export function useBulkEditTab({
   const { formatMessage } = useDinaIntl();
 
   const [clearedFields, setClearedFields] = useState<Set<string>>(new Set());
+  const [deletedFields, setDeletedFields] = useState<Set<string>>(new Set());
 
   const ctx: BulkEditTabContextI = {
     resourceHooks,
     bulkEditFormRef,
     clearedFields,
-    setClearedFields
+    deletedFields,
+    setClearedFields,
+    setDeletedFields
   };
 
   const bulkEditTab: BulkNavigatorTab = {

@@ -6,12 +6,15 @@ import {
   StringToggleField,
   TextField,
   Tooltip,
+  useBulkEditTabContext,
+  useBulkEditTabFieldIndicators,
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { RiDeleteBinLine } from "react-icons/ri";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../types/collection-api";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { BulkEditBadge } from "packages/common-ui/lib/bulk-edit/BulkEditBadge";
 
 export interface ManagedAttributeFieldProps {
   attribute: PersistedResource<ManagedAttribute>;
@@ -39,28 +42,48 @@ export function ManagedAttributeFieldWithLabel(
     formatMessage
   );
 
+  const bulkTab = useBulkEditTabFieldIndicators({
+    fieldName: attributePath,
+    currentValue: props.values?.[attributeKey]
+  });
+  const bulkCtx = useBulkEditTabContext();
+
   return (
     <label
       key={attributeKey}
       className={`${attributeKey}-field col-sm-6 mb-3`}
       htmlFor="none"
     >
-      <div className="mb-2 d-flex align-items-center">
+      <div className="d-flex align-items-center">
         <strong className="me-auto">
           {attribute.name ?? attributeKey}
           <Tooltip directText={tooltipText} />
         </strong>
+        <BulkEditBadge bulkTab={bulkTab} />
         {!readOnly && (
-          <FormikButton
-            className="btn remove-attribute"
-            onClick={(_, form) => {
-              // Delete the value and hide the managed attribute:
-              form.setFieldValue(attributePath, undefined);
-              onRemoveClick?.(attributeKey);
-            }}
-          >
-            <RiDeleteBinLine size="1.8em" />
-          </FormikButton>
+          <Tooltip
+            directText={"Delete managed attribute."}
+            placement="right"
+            visibleElement={
+              <FormikButton
+                className="btn remove-attribute"
+                onClick={(_, form) => {
+                  // Depending if we are in the bulk edit view, changes the deleted behaviour.
+                  if (!bulkTab) {
+                    // Delete the value and hide the managed attribute:
+                    form.setFieldValue(attributePath, undefined);
+                    onRemoveClick?.(attributeKey);
+                  } else {
+                    const deleted = new Set(bulkCtx?.deletedFields);
+                    deleted.add(attributePath);
+                    bulkCtx?.setDeletedFields?.(deleted);
+                  }
+                }}
+              >
+                <FaRegTrashAlt size="1.3em" />
+              </FormikButton>
+            }
+          />
         )}
       </div>
       <ManagedAttributeField {...props} />

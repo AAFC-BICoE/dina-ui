@@ -27,7 +27,12 @@ export interface BulkEditTabFieldInfoParams {
 
 export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
   const {
-    bulkEditCtx: { bulkEditFormRef, resourceHooks: sampleHooks, clearedFields },
+    bulkEditCtx: {
+      bulkEditFormRef,
+      resourceHooks: sampleHooks,
+      clearedFields,
+      deletedFields
+    },
     fieldName
   } = params;
 
@@ -82,12 +87,15 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
 
   const isExplicitlyCleared = clearedFields?.has(fieldName) || false;
 
+  const isExplicitlyDeleted = deletedFields?.has(fieldName) || false;
+
   return {
     hasNoValues,
     hasMultipleValues,
     hasSameValues,
     hasBulkEditValue,
     isExplicitlyCleared,
+    isExplicitlyDeleted,
     commonValue
   };
 }
@@ -107,10 +115,13 @@ export function useBulkEditTabFieldIndicators(
       hasSameValues,
       commonValue,
       hasBulkEditValue,
-      isExplicitlyCleared
+      isExplicitlyCleared,
+      isExplicitlyDeleted
     } = field;
 
-    const placeholder = isExplicitlyCleared
+    const placeholder = isExplicitlyDeleted
+      ? formatMessage({ id: "deleted" })
+      : isExplicitlyCleared
       ? formatMessage({ id: "cleared" })
       : hasMultipleValues
       ? formatMessage({ id: "multipleValues" })
@@ -121,7 +132,8 @@ export function useBulkEditTabFieldIndicators(
     const bulkEditClasses = classNames(
       hasBulkEditValue && "has-bulk-edit-value",
       hasMultipleValues && "has-multiple-values",
-      isExplicitlyCleared && "is-explicitly-cleared"
+      isExplicitlyCleared && "is-explicitly-cleared",
+      isExplicitlyDeleted && "is-explicitly-deleted"
     );
 
     const showClearIcon = !isExplicitlyCleared;
@@ -132,7 +144,8 @@ export function useBulkEditTabFieldIndicators(
       bulkEditClasses,
       hasBulkEditValue,
       showClearIcon,
-      isExplicitlyCleared
+      isExplicitlyCleared,
+      isExplicitlyDeleted
     };
   }
 

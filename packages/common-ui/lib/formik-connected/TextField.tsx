@@ -78,8 +78,11 @@ export function TextField(props: TextFieldProps) {
           }
         };
 
-        // Disable while the field is in the cleared (yellow) state
-        const isDisabled = disabled || bulkTab?.isExplicitlyCleared;
+        // Disable while the field when it's in a special state like cleared or deleted.
+        const isDisabled =
+          disabled ||
+          bulkTab?.isExplicitlyCleared ||
+          bulkTab?.isExplicitlyDeleted;
 
         const inputPropsInternal: InputHTMLAttributes<HTMLInputElement> = {
           ...inputPropsExternal,
@@ -110,7 +113,7 @@ export function TextField(props: TextFieldProps) {
               ) : (
                 <input type="text" {...inputPropsInternal} />
               ))}
-            {bulkTab && (
+            {bulkTab && !bulkTab?.isExplicitlyDeleted && (
               <ClearAllButton
                 fieldName={props.name}
                 onClearLocal={() => setValue("")}
