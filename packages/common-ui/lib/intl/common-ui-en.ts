@@ -113,6 +113,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   cleared: "Cleared",
   clearedTooltip:
     "Clear this field for all selected resources. All items will have an empty value for this field after saving.",
+  undoClearedTooltip:
+    "Undo clearing this field. The original values will not be emptied.",
   multipleValuesFound: "Multiple Values Found",
   name: "Name",
   navigation: "Navigation",

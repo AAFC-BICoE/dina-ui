@@ -238,6 +238,10 @@ function LabelWrapper({
   );
 
   const badge = useMemo(() => {
+    if (!bulkTab) {
+      return <></>;
+    }
+
     // Show Cleared badge if explicitly cleared
     if (bulkTab?.isExplicitlyCleared) {
       return (
@@ -320,7 +324,7 @@ function LabelWrapper({
               >
                 {!hideLabel && (
                   <div className="d-flex align-items-center w-100">
-                    <strong>{fieldLabel}</strong>
+                    <strong className="me-2">{fieldLabel}</strong>
                     {badge}
                   </div>
                 )}
@@ -356,7 +360,7 @@ function LabelWrapper({
             >
               {!hideLabel && (
                 <div className="d-flex align-items-center w-100">
-                  <strong>{fieldLabel}</strong>
+                  <strong className="me-2">{fieldLabel}</strong>
                   {badge}
                 </div>
               )}

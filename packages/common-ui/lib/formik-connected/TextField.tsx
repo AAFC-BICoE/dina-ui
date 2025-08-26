@@ -110,12 +110,14 @@ export function TextField(props: TextFieldProps) {
               ) : (
                 <input type="text" {...inputPropsInternal} />
               ))}
-            <ClearAllButton
-              fieldName={props.name}
-              onClearLocal={() => setValue("")}
-              visible={bulkTab?.showClearIcon}
-              readOnly={readOnly}
-            />
+            {bulkTab && (
+              <ClearAllButton
+                fieldName={props.name}
+                onClearLocal={() => setValue("")}
+                isCleared={!bulkTab?.showClearIcon}
+                readOnly={readOnly}
+              />
+            )}
           </div>
         );
       }}
