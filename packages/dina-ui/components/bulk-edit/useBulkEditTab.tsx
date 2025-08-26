@@ -52,6 +52,7 @@ export function useBulkEditTab({
   return {
     bulkEditTab,
     bulkEditFormRef,
-    clearedFields
+    clearedFields,
+    deletedFields
   };
 }

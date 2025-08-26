@@ -82,7 +82,7 @@ export function MetadataBulkEditor({
 
   const [initialized, setInitialized] = useState(false);
 
-  const { bulkEditTab, clearedFields } = useBulkEditTab({
+  const { bulkEditTab, clearedFields, deletedFields } = useBulkEditTab({
     resourceHooks: metadataHooks,
     hideBulkEditTab: !initialized,
     resourceForm: metadataForm,
@@ -90,8 +90,9 @@ export function MetadataBulkEditor({
   });
 
   const metadataBulkOverrider = useCallback(
-    () => getMetadataBulkOverrider(bulkEditFormRef, clearedFields),
-    [bulkEditFormRef, clearedFields]
+    () =>
+      getMetadataBulkOverrider(bulkEditFormRef, clearedFields, deletedFields),
+    [bulkEditFormRef, clearedFields, deletedFields]
   );
 
   useEffect(() => {
@@ -173,7 +174,8 @@ export function MetadataBulkEditor({
 
 export function getMetadataBulkOverrider(
   bulkEditFormRef,
-  clearedFields?: Set<string>
+  clearedFields?: Set<string>,
+  deletedFields?: Set<string>
 ) {
   let bulkEditMetadata: InputResource<Metadata> | undefined;
 
@@ -204,10 +206,17 @@ export function getMetadataBulkOverrider(
           .map((f) => f.replace("managedAttributes.", ""))
       : [];
 
+    const deleteAllKeys = deletedFields
+      ? Array.from(deletedFields)
+          .filter((f) => f.startsWith("managedAttributes."))
+          .map((f) => f.replace("managedAttributes.", ""))
+      : [];
+
     const newManagedAttributes = bulkEditAllManagedAttributes(
       editAllManaged,
       sampleManaged,
-      clearAllKeys
+      clearAllKeys,
+      deleteAllKeys
     );
 
     const newMetadata: InputResource<Metadata> = {
