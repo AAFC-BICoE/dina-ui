@@ -1,5 +1,6 @@
 import {
   ColumnDefinition,
+  CreateButton,
   dateCell,
   descriptionCell,
   FieldHeader,
@@ -8,8 +9,6 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DINAUI_MESSAGES_ENGLISH } from "../../intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -27,76 +26,75 @@ export default function ManagedAttributesListPage() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
-  const [currentStep, setCurrentStep] = useState<number>(
-    router.query.step ? Number(router.query.step) : 0
+  const [currentTab, setCurrentTab] = useState<number>(
+    router.query.tab ? Number(router.query.tab) : 0
+  );
+
+  /* Managed Attribute Tab Configuration */
+  const tabs = [
+    {
+      titleKey: "collectionListTitle",
+      apiPath: "/collection-api/managed-attribute",
+      prependLink: "/collection/managed-attribute",
+      componentSupport: true
+    },
+    {
+      titleKey: "objectStoreTitle",
+      apiPath: "/objectstore-api/managed-attribute",
+      prependLink: "/object-store/managed-attribute",
+      componentSupport: false
+    },
+    {
+      titleKey: "loanTransactionsSectionTitle",
+      apiPath: "/loan-transaction-api/managed-attribute",
+      prependLink: "/loan-transaction/managed-attribute",
+      componentSupport: false
+    },
+    {
+      titleKey: "seqdbManagedAttributeTitle",
+      apiPath: "/seqdb-api/managed-attribute",
+      prependLink: "/seqdb/managed-attribute",
+      componentSupport: false
+    }
+  ] as const;
+
+  // Create new button, generated for each tab.
+  const buttonBar = (
+    <div className="flex d-flex ms-auto">
+      <CreateButton entityLink={tabs[currentTab].prependLink} />
+    </div>
   );
 
   return (
-    <PageLayout titleId="managedAttributes">
+    <PageLayout titleId="managedAttributes" buttonBarContent={buttonBar}>
       <Tabs
-        selectedIndex={currentStep}
-        onSelect={setCurrentStep}
+        selectedIndex={currentTab}
+        onSelect={setCurrentTab}
         id="managedAttributeListTab"
         className="mb-3"
       >
         <TabList>
-          <Tab>{formatMessage("collectionListTitle")}</Tab>
-          <Tab>{formatMessage("objectStoreTitle")}</Tab>
-          <Tab>{formatMessage("loanTransactionsSectionTitle")}</Tab>
-          <Tab>{formatMessage("seqdbManagedAttributeTitle")}</Tab>
+          {tabs.map((tab) => (
+            <Tab key={tab.titleKey}>{formatMessage(tab.titleKey)}</Tab>
+          ))}
         </TabList>
-        <TabPanel>
-          <GenericManagedAttributeListView
-            apiPath="/collection-api/managed-attribute"
-            prependLink="/collection/managed-attribute"
-            componentSupport={true}
-            titleKey="collectionListTitle"
-          />
-        </TabPanel>
-        <TabPanel>
-          <GenericManagedAttributeListView
-            apiPath="/objectstore-api/managed-attribute"
-            prependLink="/object-store/managed-attribute"
-            componentSupport={false}
-            titleKey="objectStoreTitle"
-          />
-        </TabPanel>
-        <TabPanel>
-          <GenericManagedAttributeListView
-            apiPath="/loan-transaction-api/managed-attribute"
-            prependLink="/loan-transaction/managed-attribute"
-            componentSupport={false}
-            titleKey="loanTransactionsSectionTitle"
-          />
-        </TabPanel>
-        <TabPanel>
-          <GenericManagedAttributeListView
-            apiPath="/seqdb-api/managed-attribute"
-            prependLink="/seqdb/managed-attribute"
-            componentSupport={false}
-            titleKey="seqdbManagedAttributeTitle"
-          />
-        </TabPanel>
+
+        {tabs.map((tab) => (
+          <TabPanel key={tab.titleKey}>
+            <h3 className="mb-3">
+              <DinaMessage id={tab.titleKey as any} />
+            </h3>
+
+            <GenericManagedAttributeListView
+              apiPath={tab.apiPath}
+              prependLink={tab.prependLink}
+              componentSupport={tab.componentSupport}
+              titleKey={tab.titleKey}
+            />
+          </TabPanel>
+        ))}
       </Tabs>
     </PageLayout>
-  );
-}
-
-interface CreateButtonProps {
-  href: string;
-}
-
-function CreateNewSection({ href }: CreateButtonProps) {
-  return (
-    <Card bg="light" className="mb-4">
-      <Card.Body className="ms-auto">
-        <Link href={href} passHref={true} legacyBehavior>
-          <Button variant="info" className="mx-1 my-1">
-            <DinaMessage id="createNewLabel" />
-          </Button>
-        </Link>
-      </Card.Body>
-    </Card>
   );
 }
 
@@ -130,7 +128,13 @@ function GenericManagedAttributeListView({
 }: GenericManagedAttributeListViewProps) {
   const { formatMessage } = useDinaIntl();
 
-  const MANAGED_ATTRIBUTE_FILTER_COLUMNS = ["name", "key", "unit", "createdBy"];
+  const MANAGED_ATTRIBUTE_FILTER_COLUMNS = [
+    "name",
+    "key",
+    "unit",
+    "createdBy",
+    ...(componentSupport ? ["managedAttributeComponent"] : [])
+  ];
   const MANAGED_ATTRIBUTE_COLUMNS: ColumnDefinition<
     ManagedAttribute<CollectionModuleType>
   >[] = [
@@ -201,25 +205,14 @@ function GenericManagedAttributeListView({
   ];
 
   return (
-    <>
-      {/* Title */}
-      <h3 className="mb-3">
-        <DinaMessage id={titleKey as any} />
-      </h3>
-
-      {/* Quick create menu */}
-      <CreateNewSection href={`${prependLink}/edit`} />
-
-      {/* List Page */}
-      <ListPageLayout
-        filterAttributes={MANAGED_ATTRIBUTE_FILTER_COLUMNS}
-        id={`managed-attribute-${titleKey}-list`}
-        queryTableProps={{
-          columns: MANAGED_ATTRIBUTE_COLUMNS,
-          path: apiPath
-        }}
-        useFiql={true}
-      />
-    </>
+    <ListPageLayout
+      filterAttributes={MANAGED_ATTRIBUTE_FILTER_COLUMNS}
+      id={`managed-attribute-${titleKey}-list`}
+      queryTableProps={{
+        columns: MANAGED_ATTRIBUTE_COLUMNS,
+        path: apiPath
+      }}
+      useFiql={true}
+    />
   );
 }
