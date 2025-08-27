@@ -159,7 +159,7 @@ export function SaveWorkbookProgress({
               sameNameExistingResources.current = resp.data;
 
               // Save the chunkedResources up until current resource in the chunk before pausing
-              if (chunkedResources.slice(0, i - 1) > 0) {
+              if (chunkedResources.slice(0, i - 1).length > 0) {
                 for (const key of Object.keys(resource)) {
                   await linkRelationshipAttribute(
                     resource,
