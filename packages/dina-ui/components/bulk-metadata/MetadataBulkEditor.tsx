@@ -197,32 +197,18 @@ export function getMetadataBulkOverrider(
     const overrides = withoutBlankFields({ ...bulkEditMetadata });
     delete overrides.managedAttributes; // handled separately below
 
-    const sampleManaged = baseMetadata.managedAttributes ?? {};
-    const editAllManaged = bulkEditMetadata?.managedAttributes ?? {};
-
-    const clearAllKeys = clearedFields
-      ? Array.from(clearedFields)
-          .filter((f) => f.startsWith("managedAttributes."))
-          .map((f) => f.replace("managedAttributes.", ""))
-      : [];
-
-    const deleteAllKeys = deletedFields
-      ? Array.from(deletedFields)
-          .filter((f) => f.startsWith("managedAttributes."))
-          .map((f) => f.replace("managedAttributes.", ""))
-      : [];
-
-    const newManagedAttributes = bulkEditAllManagedAttributes(
-      editAllManaged,
-      sampleManaged,
-      clearAllKeys,
-      deleteAllKeys
+    const metadataManagedAttributes = bulkEditAllManagedAttributes(
+      baseMetadata.managedAttributes ?? {},
+      bulkEditMetadata?.managedAttributes ?? {},
+      clearedFields ?? new Set(),
+      deletedFields ?? new Set(),
+      "managedAttributes"
     );
 
     const newMetadata: InputResource<Metadata> = {
       ...baseMetadata,
       ...overrides,
-      managedAttributes: newManagedAttributes
+      managedAttributes: metadataManagedAttributes
     };
 
     return newMetadata;

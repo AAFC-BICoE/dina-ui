@@ -1,10 +1,13 @@
 /**
  * Bulk managed–attribute bulk updater.
  *
+ * This method is used for determining what fields need to be send in the PATCH/POST request.
+ *
  * @param editAll   – Edit-all tab form values coming from the bulk editor.
  * @param sample    – The current sample object that is being prepared for save.
  * @param clearAll  – Keys that must be hard-cleared (set to the empty string "").
  * @param deleteAll – Keys that must be removed from the result entirely.
+ * @param fieldName – Top-level property to operate on (default: "managedAttributes").
  *
  * Rules implemented:
  * 1.  deleteAll  → remove managed attribute completely
@@ -15,9 +18,20 @@
 export function bulkEditAllManagedAttributes(
   editAll: Record<string, any>,
   sample: Record<string, any>,
-  clearAll: string[] = [],
-  deleteAll: string[] = []
+  clearedFields: Set<string>,
+  deletedFields: Set<string>,
+  fieldName = "managedAttributes"
 ): Record<string, any> {
+  const prefix = `${fieldName}.`;
+
+  const clearAll: string[] = Array.from(clearedFields)
+    .filter((f) => f.startsWith(prefix))
+    .map((f) => f.slice(prefix.length));
+
+  const deleteAll: string[] = Array.from(deletedFields)
+    .filter((f) => f.startsWith(prefix))
+    .map((f) => f.slice(prefix.length));
+
   // The end network request to be made.
   const result: Record<string, any> = {};
 
