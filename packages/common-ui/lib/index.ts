@@ -9,6 +9,7 @@ export * from "./api-client/useQuery";
 export * from "./api-client/useElasticSearchQuery";
 export * from "./bulk-edit/useBulkEditTabField";
 export * from "./bulk-edit/bulk-context";
+export * from "./bulk-edit/BulkEditBadge";
 export * from "./collapser/Collapsible";
 export * from "./collapser/useCollapser";
 export * from "./field-header/FieldHeader";

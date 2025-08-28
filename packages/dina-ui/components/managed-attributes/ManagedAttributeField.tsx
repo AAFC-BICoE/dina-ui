@@ -1,4 +1,5 @@
 import {
+  BulkEditBadge,
   DateField,
   FormikButton,
   NumberField,
@@ -14,7 +15,6 @@ import { PersistedResource } from "kitsu";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../types/collection-api";
 import { FaRegTrashAlt } from "react-icons/fa";
-import { BulkEditBadge } from "packages/common-ui/lib/bulk-edit/BulkEditBadge";
 import { useFormikContext } from "formik";
 import _ from "lodash";
 
