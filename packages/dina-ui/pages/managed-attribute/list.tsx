@@ -36,25 +36,29 @@ export default function ManagedAttributesListPage() {
       titleKey: "collectionListTitle",
       apiPath: "/collection-api/managed-attribute",
       prependLink: "/collection/managed-attribute",
-      componentSupport: true
+      componentSupport: true,
+      useFiql: true
     },
     {
       titleKey: "objectStoreTitle",
       apiPath: "/objectstore-api/managed-attribute",
       prependLink: "/object-store/managed-attribute",
-      componentSupport: false
+      componentSupport: false,
+      useFiql: true
     },
     {
       titleKey: "loanTransactionsSectionTitle",
       apiPath: "/loan-transaction-api/managed-attribute",
       prependLink: "/loan-transaction/managed-attribute",
-      componentSupport: false
+      componentSupport: false,
+      useFiql: true
     },
     {
       titleKey: "seqdbManagedAttributeTitle",
       apiPath: "/seqdb-api/managed-attribute",
       prependLink: "/seqdb/managed-attribute",
-      componentSupport: false
+      componentSupport: false,
+      useFiql: false
     }
   ] as const;
 
@@ -87,6 +91,7 @@ export default function ManagedAttributesListPage() {
 
             <GenericManagedAttributeListView
               apiPath={tab.apiPath}
+              useFiql={tab.useFiql}
               prependLink={tab.prependLink}
               componentSupport={tab.componentSupport}
               titleKey={tab.titleKey}
@@ -103,6 +108,11 @@ interface GenericManagedAttributeListViewProps {
    * Example: "/collection-api/managed-attribute"
    */
   apiPath: string;
+
+  /**
+   * If FIQL is used for filtering.
+   */
+  useFiql: boolean;
 
   /**
    * Example: "/collection/managed-attribute" which will add /view?id=ID to the link
@@ -122,6 +132,7 @@ interface GenericManagedAttributeListViewProps {
 
 function GenericManagedAttributeListView({
   apiPath,
+  useFiql,
   prependLink,
   componentSupport,
   titleKey
@@ -212,7 +223,7 @@ function GenericManagedAttributeListView({
         columns: MANAGED_ATTRIBUTE_COLUMNS,
         path: apiPath
       }}
-      useFiql={true}
+      useFiql={useFiql}
     />
   );
 }
