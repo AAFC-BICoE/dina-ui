@@ -339,8 +339,12 @@ export function getSampleBulkOverrider(
     const newSample: InputResource<MaterialSample> = {
       ...baseSample,
       ...overrides,
-      managedAttributes: materialSampleManagedAttributes,
-      preparationManagedAttributes: preparedManagedAttributes,
+      ...(!_.isEmpty(materialSampleManagedAttributes) && {
+        managedAttributes: materialSampleManagedAttributes
+      }),
+      ...(!_.isEmpty(preparedManagedAttributes) && {
+        preparationManagedAttributes: preparedManagedAttributes
+      }),
       ...(!_.isEmpty(newHostOrganism) && {
         hostOrganism: newHostOrganism
       })

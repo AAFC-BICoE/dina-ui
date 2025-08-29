@@ -208,7 +208,9 @@ export function getMetadataBulkOverrider(
     const newMetadata: InputResource<Metadata> = {
       ...baseMetadata,
       ...overrides,
-      managedAttributes: metadataManagedAttributes
+      ...(!_.isEmpty(metadataManagedAttributes) && {
+        managedAttributes: metadataManagedAttributes
+      })
     };
 
     return newMetadata;

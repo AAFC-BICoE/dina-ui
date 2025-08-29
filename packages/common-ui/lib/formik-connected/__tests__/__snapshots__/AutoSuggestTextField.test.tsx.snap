@@ -18,13 +18,19 @@ exports[`AutoSuggestTextField Elastic Search only provided, results are fetched 
           <div
             class="field-label label-col mb-2"
           >
-            <strong>
-              <div
-                class="examplePersonNameField-field-header"
+            <div
+              class="d-flex align-items-center w-100"
+            >
+              <strong
+                class="me-2"
               >
-                Example Person Name Field
-              </div>
-            </strong>
+                <div
+                  class="examplePersonNameField-field-header"
+                >
+                  Example Person Name Field
+                </div>
+              </strong>
+            </div>
           </div>
           <div
             class="field-col"
@@ -150,13 +156,19 @@ exports[`AutoSuggestTextField Snapshot test 1`] = `
           <div
             class="field-label label-col mb-2"
           >
-            <strong>
-              <div
-                class="examplePersonNameField-field-header"
+            <div
+              class="d-flex align-items-center w-100"
+            >
+              <strong
+                class="me-2"
               >
-                Example Person Name Field
-              </div>
-            </strong>
+                <div
+                  class="examplePersonNameField-field-header"
+                >
+                  Example Person Name Field
+                </div>
+              </strong>
+            </div>
           </div>
           <div
             class="field-col"

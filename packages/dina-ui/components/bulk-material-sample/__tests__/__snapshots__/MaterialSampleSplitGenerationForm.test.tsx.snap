@@ -467,9 +467,15 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 <div
                   class="field-label label-col mb-2"
                 >
-                  <strong>
-                    Material Samples to Create
-                  </strong>
+                  <div
+                    class="d-flex align-items-center w-100"
+                  >
+                    <strong
+                      class="me-2"
+                    >
+                      Material Samples to Create
+                    </strong>
+                  </div>
                 </div>
                 <div
                   class="field-col"
@@ -496,25 +502,31 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 <div
                   class="field-label label-col mb-2"
                 >
-                  <strong>
-                    <div
-                      class="sourceSet-field-header"
+                  <div
+                    class="d-flex align-items-center w-100"
+                  >
+                    <strong
+                      class="me-2"
                     >
-                      Source Set
-                      <span
-                        class="m-2"
+                      <div
+                        class="sourceSet-field-header"
                       >
-                        <span>
-                          <img
-                            alt="User-defined name that can be used to retrieve all material samples that were created in the same batch."
-                            aria-describedby="field_sourceSet_tooltip"
-                            src="/static/images/iconInformation.gif"
-                            tabindex="0"
-                          />
+                        Source Set
+                        <span
+                          class="m-2"
+                        >
+                          <span>
+                            <img
+                              alt="User-defined name that can be used to retrieve all material samples that were created in the same batch."
+                              aria-describedby="field_sourceSet_tooltip"
+                              src="/static/images/iconInformation.gif"
+                              tabindex="0"
+                            />
+                          </span>
                         </span>
-                      </span>
-                    </div>
-                  </strong>
+                      </div>
+                    </strong>
+                  </div>
                 </div>
                 <div
                   class="field-col"
@@ -1100,9 +1112,15 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 <div
                   class="field-label label-col mb-2"
                 >
-                  <strong>
-                    Material Samples to Create
-                  </strong>
+                  <div
+                    class="d-flex align-items-center w-100"
+                  >
+                    <strong
+                      class="me-2"
+                    >
+                      Material Samples to Create
+                    </strong>
+                  </div>
                 </div>
                 <div
                   class="field-col"
@@ -1129,25 +1147,31 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 <div
                   class="field-label label-col mb-2"
                 >
-                  <strong>
-                    <div
-                      class="sourceSet-field-header"
+                  <div
+                    class="d-flex align-items-center w-100"
+                  >
+                    <strong
+                      class="me-2"
                     >
-                      Source Set
-                      <span
-                        class="m-2"
+                      <div
+                        class="sourceSet-field-header"
                       >
-                        <span>
-                          <img
-                            alt="User-defined name that can be used to retrieve all material samples that were created in the same batch."
-                            aria-describedby="field_sourceSet_tooltip"
-                            src="/static/images/iconInformation.gif"
-                            tabindex="0"
-                          />
+                        Source Set
+                        <span
+                          class="m-2"
+                        >
+                          <span>
+                            <img
+                              alt="User-defined name that can be used to retrieve all material samples that were created in the same batch."
+                              aria-describedby="field_sourceSet_tooltip"
+                              src="/static/images/iconInformation.gif"
+                              tabindex="0"
+                            />
+                          </span>
                         </span>
-                      </span>
-                    </div>
-                  </strong>
+                      </div>
+                    </strong>
+                  </div>
                 </div>
                 <div
                   class="field-col"
