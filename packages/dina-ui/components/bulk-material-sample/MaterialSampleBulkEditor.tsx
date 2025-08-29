@@ -315,8 +315,8 @@ export function getSampleBulkOverrider(
 
     // Material Sample Managed Attribute Handling:
     const materialSampleManagedAttributes = bulkEditAllManagedAttributes(
-      baseSample.managedAttributes ?? {},
       bulkEditSample?.managedAttributes ?? {},
+      baseSample.managedAttributes ?? {},
       clearedFields ?? new Set(),
       deletedFields ?? new Set(),
       "managedAttributes"
@@ -324,8 +324,8 @@ export function getSampleBulkOverrider(
 
     // Preparation Managed Attribute Handling
     const preparedManagedAttributes = bulkEditAllManagedAttributes(
-      baseSample.preparationManagedAttributes ?? {},
       bulkEditSample?.preparationManagedAttributes ?? {},
+      baseSample.preparationManagedAttributes ?? {},
       clearedFields ?? new Set(),
       deletedFields ?? new Set(),
       "preparationManagedAttributes"

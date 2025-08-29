@@ -155,6 +155,29 @@ describe("bulkEditAllManagedAttributes", () => {
     });
   });
 
+  describe("Edit multiple managed attributes, keep non-deleted fields", () => {
+    const editAll = { b: "new-b-value", c: "new-c-value" };
+    const clearAll: Set<string> = new Set([]);
+    const deleteAll: Set<string> = new Set([]);
+
+    it("Sample 1 - with key1 and key2", () => {
+      const sample = { a: "value A", b: "value B" };
+      expect(
+        bulkEditAllManagedAttributes(
+          editAll,
+          sample,
+          clearAll,
+          deleteAll,
+          MANAGED_ATTRIBUTES_PREFIX
+        )
+      ).toEqual({
+        a: "value A",
+        b: "new-b-value",
+        c: "new-c-value"
+      });
+    });
+  });
+
   describe("clearAll functionality", () => {
     const editAll = { key1: "", key2: "", key3: "" };
     const clearAll = new Set([`${MANAGED_ATTRIBUTES_PREFIX}.key1`]); // force-clear key1

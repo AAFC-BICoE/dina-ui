@@ -198,8 +198,8 @@ export function getMetadataBulkOverrider(
     delete overrides.managedAttributes; // handled separately below
 
     const metadataManagedAttributes = bulkEditAllManagedAttributes(
-      baseMetadata.managedAttributes ?? {},
       bulkEditMetadata?.managedAttributes ?? {},
+      baseMetadata.managedAttributes ?? {},
       clearedFields ?? new Set(),
       deletedFields ?? new Set(),
       "managedAttributes"

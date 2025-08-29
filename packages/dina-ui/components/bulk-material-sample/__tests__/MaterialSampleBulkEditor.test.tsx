@@ -1255,14 +1255,14 @@ describe("MaterialSampleBulkEditor", () => {
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", {
-          name: /verbatim scientific name × insert hybrid symbol/i
+          name: /verbatim scientific name no changes × insert hybrid symbol/i
         })
       ).toBeInTheDocument()
     );
     // Override the verbatim scientific name.
     fireEvent.change(
       wrapper.getByRole("textbox", {
-        name: /verbatim scientific name × insert hybrid symbol/i
+        name: /verbatim scientific name no changes × insert hybrid symbol/i
       }),
       { target: { value: "new-scientific-name" } }
     );
@@ -1356,20 +1356,29 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx as any
     );
+    await waitForLoadingToDisappear();
     await waitFor(() =>
       expect(
-        wrapper.getByRole("combobox", { name: /tags multiple values/i })
+        wrapper.getByRole("combobox", {
+          name: /tags no changes multiple values/i
+        })
       ).toBeInTheDocument()
     );
 
     expect(
-      wrapper.getByRole("combobox", { name: /tags multiple values/i })
+      wrapper.getByRole("combobox", {
+        name: /tags no changes multiple values/i
+      })
     ).toBeInTheDocument();
     expect(
-      wrapper.getByRole("combobox", { name: /collection multiple values/i })
+      wrapper.getByRole("combobox", {
+        name: /collection no changes multiple values/i
+      })
     ).toBeInTheDocument();
     expect(
-      wrapper.getByRole("combobox", { name: /projects multiple values/i })
+      wrapper.getByRole("combobox", {
+        name: /projects no changes multiple values/i
+      })
     ).toBeInTheDocument();
     expect(wrapper.getByRole("textbox", { name: /barcode/i })).toHaveAttribute(
       "placeholder",
@@ -1378,10 +1387,14 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Blank values should be rendered into these fields so the placeholder is visible:
     expect(
-      wrapper.getByRole("combobox", { name: /tags multiple values/i })
+      wrapper.getByRole("combobox", {
+        name: /tags no changes multiple values/i
+      })
     ).toHaveValue("");
     expect(
-      wrapper.getByRole("combobox", { name: /collection multiple values/i })
+      wrapper.getByRole("combobox", {
+        name: /collection no changes multiple values/i
+      })
     ).toHaveValue("");
   });
 
