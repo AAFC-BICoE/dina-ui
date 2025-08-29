@@ -57,7 +57,8 @@ export function MolecularAnalysisResultsStep({
     performSave,
     setPerformSave,
     molecularAnalysis,
-    molecularAnalysisId
+    molecularAnalysisId,
+    skipAutoEditMode: true
   });
 
   const [autoSelectAttachmentsClicked, setAutoSelectAttachmentsClicked] =
@@ -145,25 +146,27 @@ export function MolecularAnalysisResultsStep({
       )}
 
       {/* Run Information */}
-      {editMode ||
-      sequencingRunItems?.some((item) => item.molecularAnalysisRunItemId) ? (
-        <div className="row mt-4">
-          <div className="col-12 d-flex justify-content-between align-items-end">
-            <strong>
-              <DinaMessage id="molecularAnalysisRunStep_sequencingRunContent" />
-            </strong>
-            <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
-              <Dropdown.Item
-                onClick={async () => {
-                  setNumAttachmentsFound(0);
-                  let foundAttachments = 0;
-                  if (sequencingRunItems) {
-                    try {
-                      for (const sequencingRunItem of sequencingRunItems) {
-                        if (sequencingRunItem.molecularAnalysisRunItem?.name) {
-                          const metadataResp = await apiClient.get<Metadata[]>(
-                            `objectstore-api/metadata`,
-                            {
+      {sequencingRunItems?.some((item) => item.molecularAnalysisRunItemId) ? (
+        <>
+          <div className="row mt-4">
+            <div className="col-12 d-flex justify-content-between align-items-end">
+              <strong>
+                <DinaMessage id="molecularAnalysisRunStep_sequencingRunContent" />
+              </strong>
+              <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
+                <Dropdown.Item
+                  onClick={async () => {
+                    setNumAttachmentsFound(0);
+                    let foundAttachments = 0;
+                    if (sequencingRunItems) {
+                      try {
+                        for (const sequencingRunItem of sequencingRunItems) {
+                          if (
+                            sequencingRunItem.molecularAnalysisRunItem?.name
+                          ) {
+                            const metadataResp = await apiClient.get<
+                              Metadata[]
+                            >(`objectstore-api/metadata`, {
                               filter: SimpleSearchFilterBuilder.create<any>()
                                 .searchFilter(
                                   "originalFilename",
@@ -171,206 +174,208 @@ export function MolecularAnalysisResultsStep({
                                     ?.name
                                 )
                                 .build()
-                            }
-                          );
-                          if (metadataResp.data.length > 0) {
-                            const molecularAnalysisRunResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
-                              [
-                                {
-                                  type: "molecular-analysis-result",
-                                  resource: {
+                            });
+                            if (metadataResp.data.length > 0) {
+                              const molecularAnalysisRunResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
+                                [
+                                  {
                                     type: "molecular-analysis-result",
-                                    group: groupNames?.[0],
-                                    relationships: {
-                                      attachments: {
-                                        data: metadataResp.data as Metadata[]
-                                      }
-                                    }
-                                  }
-                                } as any
-                              ];
-
-                            const savedMolecularAnalysisResult =
-                              await save?.<MolecularAnalysisResult>(
-                                molecularAnalysisRunResultSaveArgs,
-                                {
-                                  apiBaseUrl:
-                                    "seqdb-api/molecular-analysis-result"
-                                }
-                              );
-                            const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-                              [
-                                {
-                                  type: "molecular-analysis-run-item",
-                                  resource: {
-                                    ...sequencingRunItem.molecularAnalysisRunItem,
-                                    relationships: {
-                                      result: {
-                                        data: {
-                                          id: savedMolecularAnalysisResult?.[0]
-                                            .id,
-                                          type: "molecular-analysis-result"
+                                    resource: {
+                                      type: "molecular-analysis-result",
+                                      group: groupNames?.[0],
+                                      relationships: {
+                                        attachments: {
+                                          data: metadataResp.data as Metadata[]
                                         }
                                       }
                                     }
+                                  } as any
+                                ];
+
+                              const savedMolecularAnalysisResult =
+                                await save?.<MolecularAnalysisResult>(
+                                  molecularAnalysisRunResultSaveArgs,
+                                  {
+                                    apiBaseUrl:
+                                      "seqdb-api/molecular-analysis-result"
                                   }
-                                } as any
-                              ];
-                            await save?.<MolecularAnalysisRunItem>(
-                              molecularAnalysisRunItemSaveArgs,
-                              {
-                                apiBaseUrl:
-                                  "seqdb-api/molecular-analysis-run-item"
-                              }
-                            );
-                            foundAttachments++;
+                                );
+                              const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+                                [
+                                  {
+                                    type: "molecular-analysis-run-item",
+                                    resource: {
+                                      ...sequencingRunItem.molecularAnalysisRunItem,
+                                      relationships: {
+                                        result: {
+                                          data: {
+                                            id: savedMolecularAnalysisResult?.[0]
+                                              .id,
+                                            type: "molecular-analysis-result"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  } as any
+                                ];
+                              await save?.<MolecularAnalysisRunItem>(
+                                molecularAnalysisRunItemSaveArgs,
+                                {
+                                  apiBaseUrl:
+                                    "seqdb-api/molecular-analysis-run-item"
+                                }
+                              );
+                              foundAttachments++;
+                            }
                           }
                         }
-                      }
 
-                      setReloadGenericMolecularAnalysisRun(Date.now());
-                    } catch (error) {
-                      console.error(error);
+                        setReloadGenericMolecularAnalysisRun(Date.now());
+                      } catch (error) {
+                        console.error(error);
+                      }
                     }
-                  }
-                  setAutoSelectAttachmentsClicked(true);
-                  setNumAttachmentsFound(foundAttachments);
-                }}
-              >
-                <DinaMessage id="attachmentsBasedOnItemNameButton" />
-              </Dropdown.Item>
-            </DropdownButton>
+                    setAutoSelectAttachmentsClicked(true);
+                    setNumAttachmentsFound(foundAttachments);
+                  }}
+                >
+                  <DinaMessage id="attachmentsBasedOnItemNameButton" />
+                </Dropdown.Item>
+              </DropdownButton>
+            </div>
+            <div className="col-12 mt-1">
+              <DinaForm initialValues={{}} readOnly={!editMode}>
+                {/* Sequencing Run Content */}
+                <div className="col-12 mb-3">
+                  <ReactTable<SequencingRunItem>
+                    className="-striped mt-2"
+                    columns={genericMolecularAnalysisResultsColumns}
+                    data={sequencingRunItems ?? []}
+                    sort={[{ id: "materialSampleName", desc: false }]}
+                    showPagination={true}
+                  />
+                </div>
+              </DinaForm>
+            </div>
           </div>
-          <div className="col-12 mt-1">
-            <DinaForm initialValues={{}} readOnly={!editMode}>
-              {/* Sequencing Run Content */}
-              <div className="col-12 mb-3">
-                <ReactTable<SequencingRunItem>
-                  className="-striped mt-2"
-                  columns={genericMolecularAnalysisResultsColumns}
-                  data={sequencingRunItems ?? []}
-                  sort={[{ id: "materialSampleName", desc: false }]}
-                  showPagination={true}
-                />
+
+          {/* Number of quality control attachments found message */}
+          {autoSelectQualityControlAttachmentsClicked && (
+            <div className="row">
+              <div className="col-12">
+                <Alert variant="info" className="mb-2">
+                  {numQualityControlAttachmentsFound == 1
+                    ? formatMessage("singleAttachmentFoundBannerText")
+                    : formatMessage("attachmentsFoundBannerText", {
+                        numAttachmentsFound: numQualityControlAttachmentsFound
+                      })}
+                </Alert>
               </div>
-            </DinaForm>
-          </div>
-        </div>
+            </div>
+          )}
+          {qualityControls?.some((item) => item.id) ? (
+            <div className="row mt-4">
+              <div className="col-12 d-flex justify-content-between align-items-end">
+                <strong>
+                  <DinaMessage id="molecularAnalysisRunStep_sequencingQualityControl" />
+                </strong>
+
+                <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
+                  <Dropdown.Item
+                    onClick={async () => {
+                      setNumQualityControlAttachmentsFound(0);
+                      if (qualityControls) {
+                        try {
+                          const updatedQualityControlsCopy = [
+                            ...qualityControls
+                          ];
+
+                          for (let i = 0; i < qualityControls.length; i++) {
+                            const qualityControl = qualityControls[i];
+
+                            if (qualityControl.name) {
+                              const metadataResp = await apiClient.get<
+                                Metadata[]
+                              >(`objectstore-api/metadata`, {
+                                filter: SimpleSearchFilterBuilder.create<any>()
+                                  .searchFilter(
+                                    "originalFilename",
+                                    qualityControl?.name
+                                  )
+                                  .build()
+                              });
+
+                              if (metadataResp.data.length > 0) {
+                                const existing =
+                                  qualityControl.attachments ?? [];
+                                const incoming = metadataResp.data as any[];
+
+                                const combined = [...existing, ...incoming];
+                                const uniqueById = Array.from(
+                                  new Map(
+                                    combined.map((item) => [item.id, item])
+                                  ).values()
+                                );
+
+                                updatedQualityControlsCopy[i] = {
+                                  ...qualityControl,
+                                  attachments: uniqueById
+                                };
+                                uniqueById.forEach(() => {
+                                  setNumQualityControlAttachmentsFound(
+                                    (prev) => prev + 1
+                                  );
+                                });
+                              }
+                            }
+                          }
+
+                          // Now this will reflect the correct state
+                          await updateExistingQualityControls?.(
+                            updatedQualityControlsCopy
+                          );
+
+                          setReloadGenericMolecularAnalysisRun(Date.now());
+                        } catch (error) {
+                          console.error(error);
+                        }
+                      }
+                      setAutoSelectQualityControlAttachmentsClicked(true);
+                    }}
+                  >
+                    <DinaMessage id="attachmentsBasedOnItemNameButton" />
+                  </Dropdown.Item>
+                </DropdownButton>
+              </div>
+              <div className="col-12 mt-1">
+                <DinaForm initialValues={{}} readOnly={!editMode}>
+                  {/* Quality Control Content */}
+                  <div className="col-12 mb-3">
+                    <ReactTable<QualityControlWithAttachment>
+                      className="-striped mt-2"
+                      columns={qualityControlColumns}
+                      data={qualityControls ?? []}
+                      sort={[{ id: "name", desc: false }]}
+                    />
+                  </div>
+                </DinaForm>
+              </div>
+            </div>
+          ) : (
+            <div className="row">
+              <div className="col-12">
+                <Alert variant="info" className="mb-0">
+                  <DinaMessage id="molecularAnalysisRunStep_noQualityControlsExists" />
+                </Alert>
+              </div>
+            </div>
+          )}
+        </>
       ) : (
         <div className="row">
           <div className="col-12">
             <Alert variant="info" className="mb-0">
               <DinaMessage id="molecularAnalysisRunStep_noRunExists" />
-            </Alert>
-          </div>
-        </div>
-      )}
-
-      {/* Number of quality control attachments found message */}
-      {autoSelectQualityControlAttachmentsClicked && (
-        <div className="row">
-          <div className="col-12">
-            <Alert variant="info" className="mb-2">
-              {numQualityControlAttachmentsFound == 1
-                ? formatMessage("singleAttachmentFoundBannerText")
-                : formatMessage("attachmentsFoundBannerText", {
-                    numAttachmentsFound: numQualityControlAttachmentsFound
-                  })}
-            </Alert>
-          </div>
-        </div>
-      )}
-      {editMode || qualityControls?.some((item) => item.id) ? (
-        <div className="row mt-4">
-          <div className="col-12 d-flex justify-content-between align-items-end">
-            <strong>
-              <DinaMessage id="molecularAnalysisRunStep_sequencingQualityControl" />
-            </strong>
-
-            <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
-              <Dropdown.Item
-                onClick={async () => {
-                  setNumQualityControlAttachmentsFound(0);
-                  if (qualityControls) {
-                    try {
-                      const updatedQualityControlsCopy = [...qualityControls];
-
-                      for (let i = 0; i < qualityControls.length; i++) {
-                        const qualityControl = qualityControls[i];
-
-                        if (qualityControl.name) {
-                          const metadataResp = await apiClient.get<Metadata[]>(
-                            `objectstore-api/metadata`,
-                            {
-                              filter: SimpleSearchFilterBuilder.create<any>()
-                                .searchFilter(
-                                  "originalFilename",
-                                  qualityControl?.name
-                                )
-                                .build()
-                            }
-                          );
-
-                          if (metadataResp.data.length > 0) {
-                            const existing = qualityControl.attachments ?? [];
-                            const incoming = metadataResp.data as any[];
-
-                            const combined = [...existing, ...incoming];
-                            const uniqueById = Array.from(
-                              new Map(
-                                combined.map((item) => [item.id, item])
-                              ).values()
-                            );
-
-                            updatedQualityControlsCopy[i] = {
-                              ...qualityControl,
-                              attachments: uniqueById
-                            };
-                            uniqueById.forEach(() => {
-                              setNumQualityControlAttachmentsFound(
-                                (prev) => prev + 1
-                              );
-                            });
-                          }
-                        }
-                      }
-
-                      // Now this will reflect the correct state
-                      await updateExistingQualityControls?.(
-                        updatedQualityControlsCopy
-                      );
-
-                      setReloadGenericMolecularAnalysisRun(Date.now());
-                    } catch (error) {
-                      console.error(error);
-                    }
-                  }
-                  setAutoSelectQualityControlAttachmentsClicked(true);
-                }}
-              >
-                <DinaMessage id="attachmentsBasedOnItemNameButton" />
-              </Dropdown.Item>
-            </DropdownButton>
-          </div>
-          <div className="col-12 mt-1">
-            <DinaForm initialValues={{}} readOnly={!editMode}>
-              {/* Quality Control Content */}
-              <div className="col-12 mb-3">
-                <ReactTable<QualityControlWithAttachment>
-                  className="-striped mt-2"
-                  columns={qualityControlColumns}
-                  data={qualityControls ?? []}
-                  sort={[{ id: "name", desc: false }]}
-                />
-              </div>
-            </DinaForm>
-          </div>
-        </div>
-      ) : (
-        <div className="row">
-          <div className="col-12">
-            <Alert variant="info" className="mb-0">
-              <DinaMessage id="molecularAnalysisRunStep_noQualityControlsExists" />
             </Alert>
           </div>
         </div>
