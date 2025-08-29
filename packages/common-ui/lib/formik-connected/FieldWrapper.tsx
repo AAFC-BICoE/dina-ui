@@ -77,6 +77,14 @@ export interface FieldWrapperProps {
 
   /** Optional flag to make label of the field StartCase. */
   startCaseLabel?: boolean;
+
+  /**
+   * Disables the clear button for the field. The clear button is only shown on the bulk edit "Edit all"
+   * version of the form. This allows the user to clear the fields for all the selected records.
+   *
+   * Some fields like field extensions cannot be saved empty and this option can be set.
+   */
+  disableClearButton?: boolean;
 }
 
 export interface FieldWrapperRenderProps {

@@ -17,6 +17,7 @@ export interface DataEntryFieldProps {
   blockOptionsFilter?: { [field: string]: string };
   typeOptionsEndpoint?: string;
   unitOptionsEndpoint?: string;
+  disableClearButton?: boolean;
 }
 
 export function DataEntryField({
@@ -34,7 +35,8 @@ export function DataEntryField({
   blockOptionsEndpoint,
   blockOptionsFilter,
   typeOptionsEndpoint,
-  unitOptionsEndpoint
+  unitOptionsEndpoint,
+  disableClearButton = false
 }: DataEntryFieldProps) {
   const defaultWidth = isTemplate ? "100%" : "70%";
   const dataEntry = (
@@ -52,6 +54,7 @@ export function DataEntryField({
       blockOptionsFilter={blockOptionsFilter}
       unitOptionsEndpoint={unitOptionsEndpoint}
       typeOptionsEndpoint={typeOptionsEndpoint}
+      disableClearButton={disableClearButton}
     />
   );
   return <div style={{ width: width ?? defaultWidth }}>{dataEntry}</div>;

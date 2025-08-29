@@ -45,6 +45,7 @@ export function TextField(props: TextFieldProps) {
     numberOnly,
     letterOnly,
     noSpace,
+    disableClearButton,
     ...fieldWrapperProps
   } = props;
 
@@ -113,14 +114,16 @@ export function TextField(props: TextFieldProps) {
               ) : (
                 <input type="text" {...inputPropsInternal} />
               ))}
-            {bulkTab && !bulkTab?.isExplicitlyDeleted && (
-              <ClearAllButton
-                fieldName={props.name}
-                onClearLocal={() => setValue("")}
-                isCleared={!bulkTab?.showClearIcon}
-                readOnly={readOnly}
-              />
-            )}
+            {bulkTab &&
+              !bulkTab?.isExplicitlyDeleted &&
+              !disableClearButton && (
+                <ClearAllButton
+                  fieldName={props.name}
+                  onClearLocal={() => setValue("")}
+                  isCleared={!bulkTab?.showClearIcon}
+                  readOnly={readOnly}
+                />
+              )}
           </div>
         );
       }}

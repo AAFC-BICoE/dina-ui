@@ -42,7 +42,8 @@ export function DataEntry({
   blockOptionsEndpoint,
   blockOptionsFilter,
   unitOptionsEndpoint,
-  typeOptionsEndpoint
+  typeOptionsEndpoint,
+  disableClearButton = false
 }: DataEntryProps) {
   const { apiClient } = useApiClient();
   const { locale } = useDinaIntl();
@@ -264,6 +265,7 @@ export function DataEntry({
                     typeOptions={
                       typeOptionsEndpoint ? queriedTypeOptions : undefined
                     }
+                    disableClearButton={disableClearButton}
                   />
                 );
               })
