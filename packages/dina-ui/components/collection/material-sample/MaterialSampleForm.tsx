@@ -360,6 +360,7 @@ export function MaterialSampleForm({
               "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
             }}
             width={"100%"}
+            disableClearButton={true}
           />
         </DinaFormSection>
       ),

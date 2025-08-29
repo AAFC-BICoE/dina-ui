@@ -279,6 +279,31 @@ export const TEST_SAMPLES_SAME_HOST_ORGANISM: InputResource<MaterialSample>[] =
     }
   ];
 
+export const TEST_MATERIAL_SAMPLES_MULTIPLE_VALUES: InputResource<MaterialSample>[] =
+  [
+    {
+      ...blankMaterialSample(),
+      id: "1",
+      type: "material-sample",
+      materialSampleName: "sample 1",
+      barcode: "Barcode 1"
+    },
+    {
+      ...blankMaterialSample(),
+      id: "2",
+      type: "material-sample",
+      materialSampleName: "sample 2",
+      barcode: "Barcode 2"
+    },
+    {
+      ...blankMaterialSample(),
+      id: "3",
+      type: "material-sample",
+      materialSampleName: "sample 3",
+      barcode: "Barcode 3"
+    }
+  ];
+
 export const TEST_FORM_TEMPLATE: PersistedResource<FormTemplate> = {
   id: "cd6d8297-43a0-45c6-b44e-983db917eb11",
   type: "form-template",

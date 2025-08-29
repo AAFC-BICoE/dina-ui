@@ -6,6 +6,8 @@ import TextareaAutosize, {
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import classnames from "classnames";
 import React from "react";
+import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
+import { ClearAllButton } from "../bulk-edit/ClearAllButton";
 
 export interface TextFieldProps extends FieldWrapperProps {
   readOnly?: boolean;
@@ -25,6 +27,7 @@ export interface TextFieldProps extends FieldWrapperProps {
     name: string,
     value: string | null
   ) => void;
+  multipleValueClearIcon?: boolean;
 }
 
 /**
@@ -42,12 +45,18 @@ export function TextField(props: TextFieldProps) {
     numberOnly,
     letterOnly,
     noSpace,
+    disableClearButton,
     ...fieldWrapperProps
   } = props;
 
   return (
     <FieldWrapper {...fieldWrapperProps}>
       {({ formik, setValue, value, invalid, placeholder }) => {
+        const bulkTab = useBulkEditTabFieldIndicators({
+          fieldName: props.name,
+          currentValue: value
+        });
+
         function onChangeInternal(newValue: string) {
           setValue(newValue);
           onChangeExternal?.(formik, props.name, newValue);
@@ -70,6 +79,12 @@ export function TextField(props: TextFieldProps) {
           }
         };
 
+        // Disable while the field when it's in a special state like cleared or deleted.
+        const isDisabled =
+          disabled ||
+          bulkTab?.isExplicitlyCleared ||
+          bulkTab?.isExplicitlyDeleted;
+
         const inputPropsInternal: InputHTMLAttributes<HTMLInputElement> = {
           ...inputPropsExternal,
           placeholder: placeholder || fieldWrapperProps.placeholder,
@@ -81,25 +96,35 @@ export function TextField(props: TextFieldProps) {
           onChange: (event) => onChangeInternal(event.target.value),
           value: value || "",
           readOnly,
-          disabled,
+          disabled: isDisabled,
           onKeyDown
         };
 
-        // The default Field component's inner text input needs to be replaced with our own
-        // controlled input that we manually pass the "onChange" and "value" props. Otherwise
-        // we will get React's warning about switching from an uncontrolled to controlled input.
         return (
-          customInput?.(inputPropsInternal, formik) ??
-          (multiLines ? (
-            <TextareaAutosize
-              minRows={
-                (inputPropsExternal as TextareaHTMLAttributes<any>)?.rows || 2
-              }
-              {...(inputPropsInternal as TextareaAutosizeProps)}
-            />
-          ) : (
-            <input type="text" {...inputPropsInternal} />
-          ))
+          <div className="d-flex align-items-center gap-2">
+            {customInput?.(inputPropsInternal, formik) ??
+              (multiLines ? (
+                <TextareaAutosize
+                  minRows={
+                    (inputPropsExternal as TextareaHTMLAttributes<any>)?.rows ||
+                    2
+                  }
+                  {...(inputPropsInternal as TextareaAutosizeProps)}
+                />
+              ) : (
+                <input type="text" {...inputPropsInternal} />
+              ))}
+            {bulkTab &&
+              !bulkTab?.isExplicitlyDeleted &&
+              !disableClearButton && (
+                <ClearAllButton
+                  fieldName={props.name}
+                  onClearLocal={() => setValue("")}
+                  isCleared={!bulkTab?.showClearIcon}
+                  readOnly={readOnly}
+                />
+              )}
+          </div>
         );
       }}
     </FieldWrapper>
