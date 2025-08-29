@@ -11,7 +11,8 @@ import {
   ListPageLayout,
   dateCell,
   LoadingSpinner,
-  ColumnDefinition
+  ColumnDefinition,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Alert, Button, Card, Form } from "react-bootstrap";
@@ -313,9 +314,11 @@ export function WorkbookTemplateGenerator() {
         <Card>
           <Card.Body>
             <ListPageLayout
-              additionalFilters={{
-                rsql: `acSubtype.acSubtype=='IMPORT TEMPLATE';bucket=in=(${groupNames})`
-              }}
+              additionalFilters={SimpleSearchFilterBuilder.create()
+                // acSubtype is a ObjectSubtype, which contains the 'acSubtype' field.
+                .where("acSubtype.acSubtype", "EQ", "IMPORT TEMPLATE")
+                .whereIn("bucket", groupNames)
+                .build()}
               id="data-export-list"
               queryTableProps={{
                 columns: TABLE_COLUMNS,

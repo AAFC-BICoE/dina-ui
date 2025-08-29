@@ -53,6 +53,36 @@ describe("SimpleSearchFilterBuilder", () => {
     });
   });
 
+  describe(".whereIn()", () => {
+    it("should add an IN filter when values are provided", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereIn("group", ["group1", "group2"])
+        .build();
+      expect(filter).toEqual({ group: { IN: "group1,group2" } });
+    });
+
+    it("should add an IN filter when one value is provided", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereIn("group", ["group1"])
+        .build();
+      expect(filter).toEqual({ group: { IN: "group1" } });
+    });
+
+    it("should not add a filter when the values array is empty", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereIn("group", [])
+        .build();
+      expect(filter).toEqual({});
+    });
+
+    it("should not add a filter when the values are undefined", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereIn("group", undefined)
+        .build();
+      expect(filter).toEqual({});
+    });
+  });
+
   describe(".searchFilter()", () => {
     it("should add an ILIKE filter when a valid value is provided", () => {
       const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
