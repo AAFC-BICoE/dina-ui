@@ -5,6 +5,7 @@
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
   height: 100%; /* Ensures full height for proper vertical alignment */
+  column-gap: 0.5rem;
 }
 
 .settings-container {

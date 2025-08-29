@@ -9,7 +9,8 @@ import {
   ReactTable,
   SaveArgs,
   useAccount,
-  useApiClient
+  useApiClient,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { Alert, Dropdown, DropdownButton } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
@@ -62,6 +63,15 @@ export function MolecularAnalysisResultsStep({
   const [autoSelectAttachmentsClicked, setAutoSelectAttachmentsClicked] =
     useState<boolean>(false);
   const [numAttachmentsFound, setNumAttachmentsFound] = useState<number>(0);
+
+  const [
+    autoSelectQualityControlAttachmentsClicked,
+    setAutoSelectQualityControlAttachmentsClicked
+  ] = useState<boolean>(false);
+  const [
+    numQualityControlAttachmentsFound,
+    setNumQualityControlAttachmentsFound
+  ] = useState<number>(0);
 
   // Table columns to display for the sequencing run.
   const genericMolecularAnalysisResultsColumns: ColumnDef<SequencingRunItem>[] =
@@ -124,9 +134,11 @@ export function MolecularAnalysisResultsStep({
         <div className="row">
           <div className="col-12">
             <Alert variant="info" className="mb-2">
-              {formatMessage("attachmentsFoundBannerText", {
-                numAttachmentsFound: numAttachmentsFound
-              })}
+              {numAttachmentsFound == 1
+                ? formatMessage("singleAttachmentFoundBannerText")
+                : formatMessage("attachmentsFoundBannerText", {
+                    numAttachmentsFound: numAttachmentsFound
+                  })}
             </Alert>
           </div>
         </div>
@@ -143,6 +155,8 @@ export function MolecularAnalysisResultsStep({
             <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
               <Dropdown.Item
                 onClick={async () => {
+                  setNumAttachmentsFound(0);
+                  let foundAttachments = 0;
                   if (sequencingRunItems) {
                     try {
                       for (const sequencingRunItem of sequencingRunItems) {
@@ -150,9 +164,13 @@ export function MolecularAnalysisResultsStep({
                           const metadataResp = await apiClient.get<Metadata[]>(
                             `objectstore-api/metadata`,
                             {
-                              filter: {
-                                rsql: `originalFilename=="${sequencingRunItem.molecularAnalysisRunItem?.name}*"`
-                              }
+                              filter: SimpleSearchFilterBuilder.create<any>()
+                                .searchFilter(
+                                  "originalFilename",
+                                  sequencingRunItem.molecularAnalysisRunItem
+                                    ?.name
+                                )
+                                .build()
                             }
                           );
                           if (metadataResp.data.length > 0) {
@@ -205,7 +223,7 @@ export function MolecularAnalysisResultsStep({
                                   "seqdb-api/molecular-analysis-run-item"
                               }
                             );
-                            setNumAttachmentsFound(numAttachmentsFound + 1);
+                            foundAttachments++;
                           }
                         }
                       }
@@ -216,6 +234,7 @@ export function MolecularAnalysisResultsStep({
                     }
                   }
                   setAutoSelectAttachmentsClicked(true);
+                  setNumAttachmentsFound(foundAttachments);
                 }}
               >
                 <DinaMessage id="attachmentsBasedOnItemNameButton" />
@@ -246,6 +265,21 @@ export function MolecularAnalysisResultsStep({
           </div>
         </div>
       )}
+
+      {/* Number of quality control attachments found message */}
+      {autoSelectQualityControlAttachmentsClicked && (
+        <div className="row">
+          <div className="col-12">
+            <Alert variant="info" className="mb-2">
+              {numQualityControlAttachmentsFound == 1
+                ? formatMessage("singleAttachmentFoundBannerText")
+                : formatMessage("attachmentsFoundBannerText", {
+                    numAttachmentsFound: numQualityControlAttachmentsFound
+                  })}
+            </Alert>
+          </div>
+        </div>
+      )}
       {editMode || qualityControls?.some((item) => item.id) ? (
         <div className="row mt-4">
           <div className="col-12 d-flex justify-content-between align-items-end">
@@ -256,6 +290,7 @@ export function MolecularAnalysisResultsStep({
             <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
               <Dropdown.Item
                 onClick={async () => {
+                  setNumQualityControlAttachmentsFound(0);
                   if (qualityControls) {
                     try {
                       const updatedQualityControlsCopy = [...qualityControls];
@@ -267,9 +302,12 @@ export function MolecularAnalysisResultsStep({
                           const metadataResp = await apiClient.get<Metadata[]>(
                             `objectstore-api/metadata`,
                             {
-                              filter: {
-                                rsql: `originalFilename=="${qualityControl.name}*"`
-                              }
+                              filter: SimpleSearchFilterBuilder.create<any>()
+                                .searchFilter(
+                                  "originalFilename",
+                                  qualityControl?.name
+                                )
+                                .build()
                             }
                           );
 
@@ -289,7 +327,9 @@ export function MolecularAnalysisResultsStep({
                               attachments: uniqueById
                             };
                             uniqueById.forEach(() => {
-                              setNumAttachmentsFound((prev) => prev + 1);
+                              setNumQualityControlAttachmentsFound(
+                                (prev) => prev + 1
+                              );
                             });
                           }
                         }
@@ -305,7 +345,7 @@ export function MolecularAnalysisResultsStep({
                       console.error(error);
                     }
                   }
-                  setAutoSelectAttachmentsClicked(true);
+                  setAutoSelectQualityControlAttachmentsClicked(true);
                 }}
               >
                 <DinaMessage id="attachmentsBasedOnItemNameButton" />
