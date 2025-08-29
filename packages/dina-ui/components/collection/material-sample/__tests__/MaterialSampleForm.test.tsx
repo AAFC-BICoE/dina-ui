@@ -916,6 +916,10 @@ describe("Material Sample Edit Page", () => {
         wrapper.getByRole("combobox", { name: /group select\.\.\./i })
       ).toBeInTheDocument()
     );
+
+    // Wait for a moment before clicking for stability.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
     userEvent.click(
       wrapper.getByRole("combobox", { name: /group select\.\.\./i })
     );

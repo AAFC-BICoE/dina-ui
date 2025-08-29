@@ -109,6 +109,13 @@ export function FileView({
   const errorStatus = (error as any)?.cause?.status;
   const objectUpload = (metadata as any)?.objectUpload;
 
+  const filePathContents = filePath.split("/");
+
+  // Generate the image viewer url using the current displayed image's filepath.
+  const imageViewerUrl = filePathContents.includes("derivative")
+    ? `/object-store/object/image-view?id=${filePathContents[5]}&bucket=${filePathContents[3]}&type=DERIVATIVE`
+    : `/object-store/object/image-view?id=${filePathContents[4]}&bucket=${filePathContents[3]}`;
+
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
       {isLoading ? (
@@ -124,7 +131,7 @@ export function FileView({
                 />
               ) : (
                 <a
-                  href={objectUrl as any}
+                  href={imageViewerUrl as any}
                   target="_blank"
                   style={{
                     color: "inherit",

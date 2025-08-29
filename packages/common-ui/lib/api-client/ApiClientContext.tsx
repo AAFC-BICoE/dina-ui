@@ -246,6 +246,11 @@ export class ApiClientImpl implements ApiClientI {
       "/loan-transaction-api"
     ];
 
+    // Remove leading slashes, so "/agent-api" and "agent-api" become identical after normalisation.
+    const stripLeadingSlash = (s: string) => s.replace(/^\/+/, "");
+    const supportedBaseApisNorm = supportedBaseApis.map(stripLeadingSlash);
+    const apiBaseUrlNorm = stripLeadingSlash(apiBaseUrl);
+
     // Resource types that are supported for bulk operations.
     const supportedResourceTypes = [
       "person",
@@ -255,7 +260,7 @@ export class ApiClientImpl implements ApiClientI {
     ];
 
     // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
-    if (supportedBaseApis.includes(apiBaseUrl)) {
+    if (supportedBaseApisNorm.includes(apiBaseUrlNorm)) {
       skipOperationForSingleRequest = true;
     }
 
@@ -344,7 +349,7 @@ export class ApiClientImpl implements ApiClientI {
     } else {
       // use new bulk functions if using the new api and using a supported resource type.
       if (
-        supportedBaseApis.includes(apiBaseUrl) &&
+        supportedBaseApisNorm.includes(apiBaseUrlNorm) &&
         supportedResourceTypes.includes(resourceType)
       ) {
         switch (operations[0].op.toUpperCase()) {
