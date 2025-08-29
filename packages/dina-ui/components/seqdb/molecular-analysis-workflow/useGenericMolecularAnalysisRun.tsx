@@ -34,6 +34,7 @@ export interface UseGenericMolecularAnalysisRunProps {
     nextStep: number,
     molecularAnalysisSaved?: PersistedResource<GenericMolecularAnalysis>
   ) => Promise<void>;
+  skipAutoEditMode?: boolean;
 }
 
 /**
@@ -171,7 +172,8 @@ export function useGenericMolecularAnalysisRun({
   setEditMode,
   performSave,
   setPerformSave,
-  onSaved
+  onSaved,
+  skipAutoEditMode = false
 }: UseGenericMolecularAnalysisRunProps): UseGenericMolecularAnalysisRunReturn {
   const { bulkGet, save, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
@@ -179,7 +181,8 @@ export function useGenericMolecularAnalysisRun({
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>();
-  const [automaticEditMode, setAutomaticEditMode] = useState<boolean>(false);
+  const [automaticEditMode, setAutomaticEditMode] =
+    useState<boolean>(skipAutoEditMode);
   const [multipleRunWarning, setMultipleRunWarning] = useState<boolean>(false);
   const [sequencingRunName, setSequencingRunName] = useState<string>();
 
