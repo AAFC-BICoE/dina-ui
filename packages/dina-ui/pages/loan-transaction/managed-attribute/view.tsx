@@ -33,7 +33,7 @@ export default function ManagedAttributesViewPage() {
           : { type: "managed-attribute" }
       }
       entityLink="/loan-transaction/managed-attribute"
-      specialListUrl="/managed-attribute/list?step=2"
+      specialListUrl="/managed-attribute/list?tab=2"
       type="managed-attribute"
       apiBaseUrl="/loan-transaction-api"
     />

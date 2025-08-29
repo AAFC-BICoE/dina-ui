@@ -54,7 +54,7 @@ export default function ManagedAttributesViewPage() {
           : { type: "managed-attribute" }
       }
       entityLink="/collection/managed-attribute"
-      specialListUrl="/managed-attribute/list?step=0"
+      specialListUrl="/managed-attribute/list?tab=0"
       type="managed-attribute"
       apiBaseUrl="/collection-api"
     />
