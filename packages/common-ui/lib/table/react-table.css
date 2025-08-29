@@ -47,7 +47,7 @@
   padding: 5px 5px;
   line-height: normal;
   position: relative;
-  border-right: 1px solid rgb(174, 174, 174);
+  border-right: 1px solid rgb(230, 230, 230);
   transition: box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: inset 0 0 0 0 transparent;
   font-weight: var(--bs-body-font-weight);

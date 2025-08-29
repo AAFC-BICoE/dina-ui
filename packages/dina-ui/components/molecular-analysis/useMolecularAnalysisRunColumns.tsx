@@ -3,7 +3,6 @@ import {
   DeleteArgs,
   FieldHeader,
   SaveArgs,
-  SettingsButton,
   useAccount,
   useApiClient,
   useStringComparator
@@ -384,139 +383,135 @@ export function useMolecularAnalysisRunColumns({
       },
       {
         id: "action",
+        enableSorting: false,
+        size: 300,
         cell: ({ row: { original } }) => {
           return (
             <div className="settings-button-container">
-              <SettingsButton
-                menuItems={[
-                  <AddAttachmentsButton
-                    key={0}
-                    removeMargin={true}
-                    style={{
-                      paddingLeft: "15px",
-                      paddingRight: "15px",
-                      width: "6rem"
-                    }}
-                    buttonTextElement={<DinaMessage id="addButtonText" />}
-                    value={
-                      (original.molecularAnalysisRunItem?.result
-                        ?.attachments as ResourceIdentifierObject[]) ?? []
-                    }
-                    onChange={async (newMetadatas) => {
-                      if (original.molecularAnalysisRunItem) {
-                        const molecularAnalysisRunResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
-                          [
-                            {
-                              type: "molecular-analysis-result",
-                              resource: {
-                                type: "molecular-analysis-result",
-                                group: groupNames?.[0],
-                                relationships: {
-                                  attachments: {
-                                    data: newMetadatas as Metadata[]
-                                  }
-                                }
+              <AddAttachmentsButton
+                key={0}
+                removeMargin={true}
+                style={{
+                  paddingLeft: "15px",
+                  paddingRight: "15px",
+                  width: "6rem"
+                }}
+                buttonTextElement={<DinaMessage id="addButtonText" />}
+                value={
+                  (original.molecularAnalysisRunItem?.result
+                    ?.attachments as ResourceIdentifierObject[]) ?? []
+                }
+                onChange={async (newMetadatas) => {
+                  if (original.molecularAnalysisRunItem) {
+                    const molecularAnalysisRunResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
+                      [
+                        {
+                          type: "molecular-analysis-result",
+                          resource: {
+                            type: "molecular-analysis-result",
+                            group: groupNames?.[0],
+                            relationships: {
+                              attachments: {
+                                data: newMetadatas as Metadata[]
                               }
-                            } as any
-                          ];
+                            }
+                          }
+                        } as any
+                      ];
 
-                        const savedMolecularAnalysisResult =
-                          await save?.<MolecularAnalysisResult>(
-                            molecularAnalysisRunResultSaveArgs,
-                            {
-                              apiBaseUrl: "seqdb-api/molecular-analysis-result"
-                            }
-                          );
-                        const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-                          [
-                            {
-                              type: "molecular-analysis-run-item",
-                              resource: {
-                                ...original.molecularAnalysisRunItem,
-                                relationships: {
-                                  result: {
-                                    data: {
-                                      id: savedMolecularAnalysisResult?.[0].id,
-                                      type: "molecular-analysis-result"
-                                    }
-                                  }
+                    const savedMolecularAnalysisResult =
+                      await save?.<MolecularAnalysisResult>(
+                        molecularAnalysisRunResultSaveArgs,
+                        {
+                          apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                        }
+                      );
+                    const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+                      [
+                        {
+                          type: "molecular-analysis-run-item",
+                          resource: {
+                            ...original.molecularAnalysisRunItem,
+                            relationships: {
+                              result: {
+                                data: {
+                                  id: savedMolecularAnalysisResult?.[0].id,
+                                  type: "molecular-analysis-result"
                                 }
                               }
-                            } as any
-                          ];
-                        await save?.<MolecularAnalysisRunItem>(
-                          molecularAnalysisRunItemSaveArgs,
-                          {
-                            apiBaseUrl: "seqdb-api/molecular-analysis-run-item"
-                          }
-                        );
-                        setReloadGenericMolecularAnalysisRun?.(Date.now());
-                      }
-                    }}
-                  />,
-                  <button
-                    className={`btn btn-danger delete-button`}
-                    style={{
-                      paddingLeft: "15px",
-                      paddingRight: "15px",
-                      width: "6rem"
-                    }}
-                    type="button"
-                    key={1}
-                    onClick={async () => {
-                      if (
-                        original.molecularAnalysisRunItem &&
-                        original.molecularAnalysisRunItem.result
-                      ) {
-                        try {
-                          const molecularAnalysisRunItemSaveArgs = [
-                            {
-                              resource: {
-                                id: original.molecularAnalysisRunItem.id,
-                                type: original.molecularAnalysisRunItem.type,
-                                relationships: {
-                                  result: {
-                                    data: null
-                                  }
-                                }
-                              },
-                              type: original.molecularAnalysisRunItem.type
                             }
-                          ];
-                          await save?.<MolecularAnalysisRunItem>(
-                            molecularAnalysisRunItemSaveArgs,
-                            {
-                              apiBaseUrl:
-                                "seqdb-api/molecular-analysis-run-item"
-                            }
-                          );
-                          if (original.molecularAnalysisRunItem.result.id) {
-                            const molecularAnalysisRunResultDeleteArgs: DeleteArgs[] =
-                              [
-                                {
-                                  delete: {
-                                    id: original.molecularAnalysisRunItem.result
-                                      .id,
-                                    type: original.molecularAnalysisRunItem
-                                      .result.type
-                                  }
-                                }
-                              ];
-                            await save?.(molecularAnalysisRunResultDeleteArgs, {
-                              apiBaseUrl: "seqdb-api/molecular-analysis-result"
-                            });
                           }
-                          setReloadGenericMolecularAnalysisRun?.(Date.now());
-                        } catch (error) {
-                          console.error(error);
-                        }
+                        } as any
+                      ];
+                    await save?.<MolecularAnalysisRunItem>(
+                      molecularAnalysisRunItemSaveArgs,
+                      {
+                        apiBaseUrl: "seqdb-api/molecular-analysis-run-item"
                       }
-                    }}
-                  >
-                    <DinaMessage id="removeButtonText" />
-                  </button>
-                ]}
+                    );
+                    setReloadGenericMolecularAnalysisRun?.(Date.now());
+                  }
+                }}
               />
+              <button
+                className={`btn btn-danger delete-button`}
+                style={{
+                  paddingLeft: "15px",
+                  paddingRight: "15px",
+                  width: "8rem"
+                }}
+                type="button"
+                key={1}
+                onClick={async () => {
+                  if (
+                    original.molecularAnalysisRunItem &&
+                    original.molecularAnalysisRunItem.result
+                  ) {
+                    try {
+                      const molecularAnalysisRunItemSaveArgs = [
+                        {
+                          resource: {
+                            id: original.molecularAnalysisRunItem.id,
+                            type: original.molecularAnalysisRunItem.type,
+                            relationships: {
+                              result: {
+                                data: null
+                              }
+                            }
+                          },
+                          type: original.molecularAnalysisRunItem.type
+                        }
+                      ];
+                      await save?.<MolecularAnalysisRunItem>(
+                        molecularAnalysisRunItemSaveArgs,
+                        {
+                          apiBaseUrl: "seqdb-api/molecular-analysis-run-item"
+                        }
+                      );
+                      if (original.molecularAnalysisRunItem.result.id) {
+                        const molecularAnalysisRunResultDeleteArgs: DeleteArgs[] =
+                          [
+                            {
+                              delete: {
+                                id: original.molecularAnalysisRunItem.result.id,
+                                type: original.molecularAnalysisRunItem.result
+                                  .type
+                              }
+                            }
+                          ];
+                        await save?.(molecularAnalysisRunResultDeleteArgs, {
+                          apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                        });
+                      }
+                      setReloadGenericMolecularAnalysisRun?.(Date.now());
+                    } catch (error) {
+                      console.error(error);
+                    }
+                  }
+                }}
+              >
+                <DinaMessage id="removeAllButtonText" />
+              </button>
             </div>
           );
         },
@@ -585,65 +580,63 @@ export function useMolecularAnalysisRunColumns({
     },
     {
       id: "action",
+      enableSorting: false,
+      size: 300,
       cell: ({ row: { original, index } }) => {
         return (
           <div className="settings-button-container">
-            <SettingsButton
-              menuItems={[
-                <AddAttachmentsButton
-                  key={0}
-                  removeMargin={true}
-                  style={{
-                    paddingLeft: "15px",
-                    paddingRight: "15px",
-                    width: "6rem"
-                  }}
-                  buttonTextElement={<DinaMessage id="addButtonText" />}
-                  value={original.attachments ?? []}
-                  onChange={async (newMetadatas) => {
-                    const updatedQualityControlsCopy = [
-                      ...(qualityControls ?? [])
-                    ] as QualityControlWithAttachment[];
-                    const updatedQc = {
-                      ...updatedQualityControlsCopy[index],
-                      attachments: newMetadatas as ResourceIdentifierObject[]
-                    };
-                    updatedQualityControlsCopy[index] = updatedQc;
+            <AddAttachmentsButton
+              key={0}
+              removeMargin={true}
+              style={{
+                paddingLeft: "15px",
+                paddingRight: "15px",
+                width: "6rem"
+              }}
+              buttonTextElement={<DinaMessage id="addButtonText" />}
+              value={original.attachments ?? []}
+              onChange={async (newMetadatas) => {
+                const updatedQualityControlsCopy = [
+                  ...(qualityControls ?? [])
+                ] as QualityControlWithAttachment[];
+                const updatedQc = {
+                  ...updatedQualityControlsCopy[index],
+                  attachments: newMetadatas as ResourceIdentifierObject[]
+                };
+                updatedQualityControlsCopy[index] = updatedQc;
 
-                    await updateExistingQualityControls?.(
-                      updatedQualityControlsCopy
-                    );
-                    setReloadGenericMolecularAnalysisRun?.(Date.now());
-                  }}
-                />,
-                <button
-                  className="btn btn-danger delete-button"
-                  style={{
-                    paddingLeft: "15px",
-                    paddingRight: "15px",
-                    width: "6rem"
-                  }}
-                  type="button"
-                  key={1}
-                  onClick={async () => {
-                    const updatedQualityControlsCopy = [
-                      ...(qualityControls ?? [])
-                    ] as QualityControlWithAttachment[];
-                    updatedQualityControlsCopy[index] = {
-                      ...updatedQualityControlsCopy[index],
-                      attachments: []
-                    };
-
-                    await updateExistingQualityControls?.(
-                      updatedQualityControlsCopy
-                    );
-                    setReloadGenericMolecularAnalysisRun?.(Date.now());
-                  }}
-                >
-                  <DinaMessage id="removeButtonText" />
-                </button>
-              ]}
+                await updateExistingQualityControls?.(
+                  updatedQualityControlsCopy
+                );
+                setReloadGenericMolecularAnalysisRun?.(Date.now());
+              }}
             />
+            <button
+              className="btn btn-danger delete-button"
+              style={{
+                paddingLeft: "15px",
+                paddingRight: "15px",
+                width: "8rem"
+              }}
+              type="button"
+              key={1}
+              onClick={async () => {
+                const updatedQualityControlsCopy = [
+                  ...(qualityControls ?? [])
+                ] as QualityControlWithAttachment[];
+                updatedQualityControlsCopy[index] = {
+                  ...updatedQualityControlsCopy[index],
+                  attachments: []
+                };
+
+                await updateExistingQualityControls?.(
+                  updatedQualityControlsCopy
+                );
+                setReloadGenericMolecularAnalysisRun?.(Date.now());
+              }}
+            >
+              <DinaMessage id="removeAllButtonText" />
+            </button>
           </div>
         );
       },
