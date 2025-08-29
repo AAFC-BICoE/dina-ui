@@ -95,6 +95,7 @@ export function ProjectFormLayout() {
           indexName={"dina_material_sample_index"}
           viewMode={readOnly}
           customViewQuery={readOnly ? customViewQuery : undefined}
+          customViewFilterGroups={false}
           customViewFields={
             readOnly
               ? [

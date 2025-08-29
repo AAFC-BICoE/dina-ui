@@ -1129,7 +1129,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   molecularAnalysisRunStep_invalidRunName:
     "A sequencing run name must be provided in order to generate a sequence run.",
   molecularAnalysisRunStep_noRunExists:
-    "No sequencing run created yet for this molecular analysis workflow. Click edit to create a new run.",
+    "There are no runs for this molecular analysis workflow. Select the Run tab to generate them.",
+  molecularAnalysisRunStep_noQualityControlsExists:
+    "There are no quality controls for this molecular analysis workflow. Select the Run tab to add quality controls.",
   molecularAnalysisRunStep_attachments: "Sequencing Run Attachments",
   mapRelationshipTitle: "Relationship Mapping",
   value: "Value",
@@ -1272,9 +1274,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachmentsBasedOnItemNameButton: "Attachments based on item name",
   addButtonText: "Add",
   removeButtonText: "Remove",
+  removeAllButtonText: "Remove All",
   editIdentifierTitle: "Edit Identifier",
   field_uriTemplate: "URI Template",
   attachmentsFoundBannerText: "{numAttachmentsFound} attachments were found.",
+  singleAttachmentFoundBannerText: "1 attachment was found.",
   extractedData: "Extracted Data",
   dataPasteZone: "Data Paste Zone",
   mappedData: "Mapped Data",
