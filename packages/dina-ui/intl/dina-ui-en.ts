@@ -1131,7 +1131,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   molecularAnalysisRunStep_noRunExists:
     "There are no runs for this molecular analysis workflow. Select the Run tab to generate them.",
   molecularAnalysisRunStep_noQualityControlsExists:
-    "There are no quality controls for this run.",
+    "There are no quality controls for this molecular analysis workflow. Select the Run tab to add quality controls.",
   molecularAnalysisRunStep_attachments: "Sequencing Run Attachments",
   mapRelationshipTitle: "Relationship Mapping",
   value: "Value",
