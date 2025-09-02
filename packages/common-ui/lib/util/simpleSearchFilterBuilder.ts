@@ -54,6 +54,26 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
   }
 
   /**
+   * Adds a filter for a specific field using the IN operator.
+   *
+   * If undefined or empty array, this filter is not provided.
+   *
+   * @param field The field to filter on.
+   * @param values The array of values to include in the filter.
+   * @returns The updated FilterBuilder instance.
+   */
+  public whereIn<K extends keyof T>(
+    field: K | "uuid",
+    values?: Array<T[K] | string>
+  ): this {
+    if (values && values.length) {
+      // Convert to comma-separated list:
+      this.filter[String(field)] = { IN: values.join(",") } as any;
+    }
+    return this;
+  }
+
+  /**
    * Generates a search filter.
    * e.g. .searchFilter('name', 'test') results in { name: { ILIKE: "%test%" }}
    */
