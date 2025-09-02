@@ -1293,6 +1293,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   visibleToUser: "Visible to user",
   visibleToGroup: "Visible to group",
   visibleToEveryone: "Visible to everyone",
+  viewAttachedMaterialSamples: "View Attached Material Samples",
+  viewAttachedItems: "View Attached Items",
   fileNameAliasField: "File Name Alias Field",
   downloadTemplate: "Download Template",
   existingTemplates: "Existing Templates",
