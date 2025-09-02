@@ -34,7 +34,7 @@ export function ManagedAttributeFieldWithLabel(
   props: ManagedAttributeFieldWithLabelProps
 ) {
   const { attribute, valuesPath, onRemoveClick } = props;
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, disableEditAllDelete } = useDinaFormContext();
   const { locale, formatMessage } = useDinaIntl();
   const attributeKey = attribute.key;
   const attributePath = `${valuesPath}.${attributeKey}`;
@@ -72,7 +72,7 @@ export function ManagedAttributeFieldWithLabel(
                 className="btn remove-attribute"
                 onClick={(_, form) => {
                   // Depending if we are in the bulk edit view, changes the deleted behaviour.
-                  if (!bulkTab) {
+                  if (disableEditAllDelete || !bulkTab) {
                     // Delete the value and hide the managed attribute:
                     form.setFieldValue(attributePath, undefined);
                     onRemoveClick?.(attributeKey);

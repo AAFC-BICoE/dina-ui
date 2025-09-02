@@ -71,6 +71,13 @@ export interface DinaFormContextI {
   isNestedForm?: boolean;
 
   isBulkEditAllTab?: boolean;
+
+  /**
+   * Some parts of the Edit All tab support an enhanced deleted experience which makes it more
+   * clear what the user is doing. By default this is enabled for everything. This is to override
+   * and disable this feature so the normal delete is performed.
+   */
+  disableEditAllDelete?: boolean;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
