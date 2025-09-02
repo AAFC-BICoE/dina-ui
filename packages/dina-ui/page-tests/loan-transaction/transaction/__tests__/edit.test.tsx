@@ -385,8 +385,6 @@ describe("Transaction Form", () => {
           roles: ["my-role-1"]
         }
       ],
-      attachment: undefined,
-      materialSamples: undefined,
       closedDate: "2022-01-02",
       dueDate: "2022-01-03",
       materialDirection: "OUT",
@@ -465,33 +463,29 @@ describe("Transaction Form", () => {
       expect(wrapper.getByText(/test person/i)).toBeInTheDocument();
     });
 
+    const transactionNumberField = wrapper.getByRole("textbox", {
+      name: /transaction number/i
+    });
+    userEvent.clear(transactionNumberField);
+    userEvent.type(transactionNumberField, "new transaction number");
+
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the mockSave to be called after form submission
     await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
-    // Test expected response
+    // Test expected response of only expected changes.
     expect(mockSave.mock.calls).toEqual([
       [
         [
           {
             resource: {
-              ...testExistingTransaction(),
-              attachment: undefined,
-              materialSamples: undefined,
-              // Moves the attachments into the relationships field:
-              relationships: {
-                attachment: {
-                  data: [
-                    { id: "attach-1", type: "metadata" },
-                    { id: "attach-2", type: "metadata" }
-                  ]
-                },
-                materialSamples: {
-                  data: []
-                }
-              }
+              id: "test-transaction-id",
+              type: "transaction",
+
+              // Only change made.
+              transactionNumber: "new transaction number"
             },
             type: "transaction"
           }
@@ -526,6 +520,68 @@ describe("Transaction Form", () => {
     ).toBeInTheDocument();
     expect(wrapper.getByText(/total selected records: 2/i)).toBeInTheDocument();
 
-    // Todo: Test the saving functionality at this point.
+    // Make a change to the transaction number.
+    const transactionNumberField = wrapper.getByRole("textbox", {
+      name: /transaction number/i
+    });
+    userEvent.clear(transactionNumberField);
+    userEvent.type(transactionNumberField, "new transaction number");
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    // Wait for the mockSave to be called after form submission
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Test expected response
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "test-transaction-broken-material-id",
+              type: "transaction",
+              transactionNumber: "new transaction number"
+            },
+            type: "transaction"
+          }
+        ],
+        { apiBaseUrl: "/loan-transaction-api" }
+      ]
+    ]);
+  });
+
+  it("Make no changes, expect no save request performed", async () => {
+    routerQuery.id = "test-transaction-broken-material-id";
+
+    const wrapper = mountWithAppContext(
+      <TransactionEditPage />,
+      testCtx as any
+    );
+    await waitForLoadingToDisappear();
+
+    await waitFor(() => {
+      // Ensure the proper transaction is loaded before proceeding.
+      expect(
+        wrapper.getByRole("textbox", { name: /transaction number/i })
+      ).toBeInTheDocument();
+    });
+
+    // The existing material samples should be displayed, while the missing one should not be included.
+    expect(
+      wrapper.getByRole("link", { name: /sample\-1/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("link", { name: /sample\-2/i })
+    ).toBeInTheDocument();
+    expect(wrapper.getByText(/total selected records: 2/i)).toBeInTheDocument();
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(mockSave).not.toHaveBeenCalled();
+    });
+    expect(mockSave.mock.calls).toHaveLength(0);
   });
 });
