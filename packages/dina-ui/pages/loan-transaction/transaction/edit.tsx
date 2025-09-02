@@ -70,7 +70,7 @@ export function useTransactionQuery(id?: string, showPermissions?: boolean) {
 
 export default function TransactionEditPage() {
   const router = useRouter();
-  const id = router.query.id?.toString?.();
+  const id = router?.query?.id?.toString?.();
   const { formatMessage } = useDinaIntl();
 
   async function goToViewPage(transaction: PersistedResource<Transaction>) {
@@ -232,7 +232,7 @@ export function TransactionFormLayout({
   async function fetchSamples(sampleIds: string[]) {
     await bulkGet<MaterialSample>(
       sampleIds.map((id) => `/material-sample/${id}?include=organism`),
-      { apiBaseUrl: "/collection-api" }
+      { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
     ).then((response) => {
       const materialSamplesTransformed = _.compact(response).map(
         (resource) => ({

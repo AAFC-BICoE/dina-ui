@@ -2,11 +2,20 @@ import { InputResource, PersistedResource } from "kitsu";
 import TransactionEditPage, {
   TransactionForm
 } from "../../../../pages/loan-transaction/transaction/edit";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { Transaction } from "../../../../types/loan-transaction-api";
-import { fireEvent, waitFor } from "@testing-library/react"; // Import waitFor
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
+
+const routerQuery: Record<string, string | undefined> = {};
+
+jest.mock("next/router", () => ({
+  useRouter: () => ({
+    query: routerQuery,
+    push: jest.fn()
+  })
+}));
 
 function testExistingTransaction(): PersistedResource<Transaction> {
   return {
@@ -27,12 +36,27 @@ function testExistingTransaction(): PersistedResource<Transaction> {
   };
 }
 
-jest.mock("next/router", () => ({
-  useRouter: () => ({
-    query: { id: "test-transaction-id" },
-    push: () => undefined
-  })
-}));
+function testExistingTransactionWithMaterialSamples(): PersistedResource<Transaction> {
+  return {
+    type: "transaction",
+    id: "test-transaction-broken-material-id",
+    transactionNumber: "test number",
+    materialSamples: [
+      {
+        id: "sample-1",
+        type: "material-sample"
+      },
+      {
+        id: "sample-2",
+        type: "material-sample"
+      },
+      {
+        id: "missing-sample-3",
+        type: "material-sample"
+      }
+    ]
+  };
+}
 
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
@@ -57,6 +81,8 @@ const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "loan-transaction-api/transaction/test-transaction-id":
       return { data: testExistingTransaction() };
+    case "loan-transaction-api/transaction/test-transaction-broken-material-id":
+      return { data: testExistingTransactionWithMaterialSamples() };
     case "user-api/group":
     case "loan-transaction-api/transaction":
     case "loan-transaction-api/managed-attribute":
@@ -88,6 +114,18 @@ const mockSave = jest.fn(async (saves) => {
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
   paths.map((path) => {
     switch (path) {
+      case "/material-sample/sample-1?include=organism":
+        return {
+          id: "sample-1",
+          type: "material-sample",
+          materialSampleName: "Sample-1"
+        };
+      case "/material-sample/sample-2?include=organism":
+        return {
+          id: "sample-2",
+          type: "material-sample",
+          materialSampleName: "Sample-2"
+        };
       case "metadata/attach-1":
         return { id: "metadata/attach-1", type: "metadata" };
       case "metadata/attach-2":
@@ -410,6 +448,8 @@ describe("Transaction Form", () => {
   });
 
   it("Edits an existing Transaction", async () => {
+    routerQuery.id = "test-transaction-id";
+
     // The Next.js router is mocked to provide the existing Transaction's ID
     const wrapper = mountWithAppContext(
       <TransactionEditPage />,
@@ -459,5 +499,33 @@ describe("Transaction Form", () => {
         { apiBaseUrl: "/loan-transaction-api" }
       ]
     ]);
+  });
+
+  it("Handle edit when an attached material sample doesn't exist anymore", async () => {
+    routerQuery.id = "test-transaction-broken-material-id";
+
+    const wrapper = mountWithAppContext(
+      <TransactionEditPage />,
+      testCtx as any
+    );
+    await waitForLoadingToDisappear();
+
+    await waitFor(() => {
+      // Ensure the proper transaction is loaded before proceeding.
+      expect(
+        wrapper.getByRole("textbox", { name: /transaction number/i })
+      ).toBeInTheDocument();
+    });
+
+    // The existing material samples should be displayed, while the missing one should not be included.
+    expect(
+      wrapper.getByRole("link", { name: /sample\-1/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("link", { name: /sample\-2/i })
+    ).toBeInTheDocument();
+    expect(wrapper.getByText(/total selected records: 2/i)).toBeInTheDocument();
+
+    // Todo: Test the saving functionality at this point.
   });
 });
