@@ -54,7 +54,7 @@ export default function ManagedAttributesViewPage() {
           : { type: "managed-attribute" }
       }
       entityLink="/seqdb/managed-attribute"
-      specialListUrl="/managed-attribute/list?step=3"
+      specialListUrl="/managed-attribute/list?tab=3"
       type="managed-attribute"
       apiBaseUrl="/seqdb-api"
       showDeleteButton={false}
