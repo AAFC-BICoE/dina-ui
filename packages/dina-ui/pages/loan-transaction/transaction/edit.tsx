@@ -7,9 +7,11 @@ import {
   DinaFormOnSubmit,
   FieldSet,
   FieldSpy,
+  isResourceEmpty,
   NumberField,
   QueryPage,
   RadioButtonsField,
+  resourceDifference,
   StringArrayField,
   SubmitButton,
   TextField,
@@ -70,7 +72,7 @@ export function useTransactionQuery(id?: string, showPermissions?: boolean) {
 
 export default function TransactionEditPage() {
   const router = useRouter();
-  const id = router.query.id?.toString?.();
+  const id = router?.query?.id?.toString?.();
   const { formatMessage } = useDinaIntl();
 
   async function goToViewPage(transaction: PersistedResource<Transaction>) {
@@ -130,13 +132,18 @@ export function TransactionForm({
   const onSubmit: DinaFormOnSubmit<InputResource<Transaction>> = async ({
     submittedValues
   }) => {
+    // Only save the differences, not untouched fields.
+    const transactionDiff = initialValues.id
+      ? resourceDifference({
+          original: initialValues,
+          updated: submittedValues
+        })
+      : submittedValues;
+
     const transactionInput: InputResource<Transaction> & {
       relationships: any;
     } = {
-      ...submittedValues,
-      // Convert the attachments to a 'relationships' array so it works with JSONAPI:
-      attachment: undefined,
-      materialSamples: undefined,
+      ...transactionDiff,
       relationships: {
         ...(submittedValues.attachment && {
           attachment: {
@@ -166,10 +173,20 @@ export function TransactionForm({
       }))
     };
 
+    // Remove the non-relationship versions.
+    delete (transactionInput as any).materialSamples;
+    delete (transactionInput as any).attachment;
+
+    // If the request contains no change, don't perform any request.
+    if (isResourceEmpty(transactionInput) && transactionInput?.id) {
+      await onSaved(transactionInput as any);
+      return;
+    }
+
     const [savedTransaction] = await save<Transaction>(
       [
         {
-          resource: transactionInput,
+          resource: transactionDiff,
           type: "transaction"
         }
       ],
@@ -232,7 +249,7 @@ export function TransactionFormLayout({
   async function fetchSamples(sampleIds: string[]) {
     await bulkGet<MaterialSample>(
       sampleIds.map((id) => `/material-sample/${id}?include=organism`),
-      { apiBaseUrl: "/collection-api" }
+      { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
     ).then((response) => {
       const materialSamplesTransformed = _.compact(response).map(
         (resource) => ({
