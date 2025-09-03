@@ -473,6 +473,10 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
         const resultIds: string[] = newQualityControlItems
           .filter((item) => item?.result?.id)
           .map((item) => item?.result?.id ?? "");
+        if (resultIds.length === 0) {
+          return;
+        }
+
         const { data: qualityControlResultsResponse } = await apiClient.get<
           MolecularAnalysisResult[]
         >("seqdb-api/molecular-analysis-result", {
