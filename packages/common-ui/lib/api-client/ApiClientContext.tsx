@@ -234,8 +234,7 @@ export class ApiClientImpl implements ApiClientI {
 
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
-
-    const resourceType = operations[0].path.split("/")[0];
+    const resourceType = operations[0].path.split("/").filter(Boolean)[0];
 
     // APIs using Repository V2.
     const supportedBaseApis = [
@@ -371,7 +370,7 @@ export class ApiClientImpl implements ApiClientI {
               }
 
               // Extract the ID from before the '?' by splitting by '/' and getting the second item
-              return pathParts[0].split("/")[1];
+              return pathParts[0].split("/").filter(Boolean)[1];
             });
 
             const include: string[] | undefined =
