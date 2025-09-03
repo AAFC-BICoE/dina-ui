@@ -341,11 +341,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
   async function retrieveRunAndItemAttachments() {
     // 1. Generate API paths for both run summaries and run items.
     const runAttachmentPaths = runSummaries.map((runSummary) => {
-      return (
-        "molecular-analysis-run/" +
-        runSummary.id +
-        "?include=attachments&page[limit]=1000"
-      );
+      return "molecular-analysis-run/" + runSummary.id + "?include=attachments";
     });
 
     const itemAttachmentPaths = runSummaries.flatMap((runSummary) =>
@@ -355,7 +351,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
           (item) =>
             "molecular-analysis-result/" +
             item.result.uuid +
-            "?include=attachments&page[limit]=1000"
+            "?include=attachments"
         )
     );
 
@@ -622,9 +618,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       return [];
     }
 
-    const metadataPaths = ids.map(
-      (id) => `metadata/${id}?include=derivatives&page[limit]=1000`
-    );
+    const metadataPaths = ids.map((id) => `metadata/${id}?include=derivatives`);
     const metadataResponses: PersistedResource<Metadata>[] = await bulkGet(
       metadataPaths,
       {
