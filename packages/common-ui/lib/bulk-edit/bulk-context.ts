@@ -21,6 +21,10 @@ export interface ResourceWithHooks<T extends KitsuResource = KitsuResource> {
 export interface BulkEditTabContextI<T extends KitsuResource = KitsuResource> {
   bulkEditFormRef: RefObject<FormikProps<InputResource<T>>>;
   resourceHooks: ResourceWithHooks<T>[];
+  clearedFields?: Set<string>;
+  setClearedFields?: React.Dispatch<React.SetStateAction<Set<string>>>;
+  deletedFields?: Set<string>;
+  setDeletedFields?: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
 export const BulkEditTabContext = createContext<BulkEditTabContextI | null>(

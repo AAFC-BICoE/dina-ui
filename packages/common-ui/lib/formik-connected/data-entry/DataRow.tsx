@@ -36,6 +36,7 @@ export interface DataRowProps {
   unitsAddable?: boolean;
   typesAddable?: boolean;
   isVocabularyBasedEnabledForType?: boolean;
+  disableClearButton?: boolean;
 }
 
 export function DataRow({
@@ -47,7 +48,8 @@ export function DataRow({
   readOnly,
   typesAddable = false,
   unitsAddable = false,
-  isVocabularyBasedEnabledForType = false
+  isVocabularyBasedEnabledForType = false,
+  disableClearButton = false
 }: DataRowProps) {
   const { locale, messages } = useDinaIntl();
   const valueTextFieldName = `${name}.value`;
@@ -114,7 +116,8 @@ export function DataRow({
     removeBottomMargin: true,
     label: <DinaMessage id="dataValue" />,
     disableTemplateCheckbox: true,
-    hideLabel: rowIndex !== 0
+    hideLabel: rowIndex !== 0,
+    disableClearButton: disableClearButton
   };
 
   const valueInputField =
@@ -226,6 +229,7 @@ export function DataRow({
             hideLabel={rowIndex !== 0}
             readOnly={true}
             placeholder={selectedType?.unit ?? ""}
+            disableClearButton={disableClearButton}
           />
         </div>
       )}

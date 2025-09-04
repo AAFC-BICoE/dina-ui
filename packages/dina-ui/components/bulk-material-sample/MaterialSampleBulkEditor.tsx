@@ -1,4 +1,5 @@
 import {
+  bulkEditAllManagedAttributes,
   BulkEditTabContextI,
   ButtonBar,
   DinaForm,
@@ -91,17 +92,24 @@ export function MaterialSampleBulkEditor({
     materialSampleInitialValues,
     collectingEventInitialValues
   );
-  function sampleBulkOverrider() {
-    /** Sample input including blank/empty fields. */
-    return getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook);
-  }
+
   const [initialized, setInitialized] = useState(false);
-  const { bulkEditTab } = useBulkEditTab({
+  const { bulkEditTab, clearedFields, deletedFields } = useBulkEditTab({
     resourceHooks: sampleHooks,
     hideBulkEditTab: !initialized,
     resourceForm: materialSampleForm,
     bulkEditFormRef
   });
+
+  function sampleBulkOverrider() {
+    /** Sample input including blank/empty fields. */
+    return getSampleBulkOverrider(
+      bulkEditFormRef,
+      bulkEditSampleHook,
+      clearedFields,
+      deletedFields
+    );
+  }
 
   useEffect(() => {
     // Set the initial tab to the Edit All tab:
@@ -111,7 +119,7 @@ export function MaterialSampleBulkEditor({
   const { saveAll, submissionError } = useBulkSampleSave({
     onSaved,
     samplePreProcessor: sampleBulkOverrider,
-    bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef },
+    bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef, clearedFields },
     bulkEditCollectingEvtFormRef,
     bulkEditSampleHook
   });
@@ -275,7 +283,12 @@ function getSampleHooks(
   });
 }
 
-export function getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook) {
+export function getSampleBulkOverrider(
+  bulkEditFormRef,
+  bulkEditSampleHook,
+  clearedFields?: Set<string>,
+  deletedFields?: Set<string>
+) {
   let bulkEditSample: InputResource<MaterialSample> | undefined;
 
   /** Returns a sample with the overridden values. */
@@ -297,12 +310,26 @@ export function getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook) {
 
     /** Sample override object with only the non-empty fields. */
     const overrides = withoutBlankFields(bulkEditSample, formik.values);
+    delete overrides.managedAttributes; // Handled separately below.
+    delete overrides.preparationManagedAttributes; // Handled separately below.
 
-    // Combine the managed attributes dictionaries:
-    const newManagedAttributes = {
-      ...withoutBlankFields(baseSample.managedAttributes),
-      ...withoutBlankFields(bulkEditSample?.managedAttributes)
-    };
+    // Material Sample Managed Attribute Handling:
+    const materialSampleManagedAttributes = bulkEditAllManagedAttributes(
+      bulkEditSample?.managedAttributes ?? {},
+      baseSample.managedAttributes ?? {},
+      clearedFields ?? new Set(),
+      deletedFields ?? new Set(),
+      "managedAttributes"
+    );
+
+    // Preparation Managed Attribute Handling
+    const preparedManagedAttributes = bulkEditAllManagedAttributes(
+      bulkEditSample?.preparationManagedAttributes ?? {},
+      baseSample.preparationManagedAttributes ?? {},
+      clearedFields ?? new Set(),
+      deletedFields ?? new Set(),
+      "preparationManagedAttributes"
+    );
 
     const newHostOrganism = {
       ...withoutBlankFields(baseSample.hostOrganism),
@@ -312,8 +339,11 @@ export function getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook) {
     const newSample: InputResource<MaterialSample> = {
       ...baseSample,
       ...overrides,
-      ...(!_.isEmpty(newManagedAttributes) && {
-        managedAttributes: newManagedAttributes
+      ...(!_.isEmpty(materialSampleManagedAttributes) && {
+        managedAttributes: materialSampleManagedAttributes
+      }),
+      ...(!_.isEmpty(preparedManagedAttributes) && {
+        preparationManagedAttributes: preparedManagedAttributes
       }),
       ...(!_.isEmpty(newHostOrganism) && {
         hostOrganism: newHostOrganism
@@ -381,7 +411,11 @@ function useBulkSampleSave({
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const { bulkEditFormRef, resourceHooks: sampleHooks } = bulkEditCtx;
+  const {
+    bulkEditFormRef,
+    resourceHooks: sampleHooks,
+    clearedFields
+  } = bulkEditCtx;
 
   async function saveAll() {
     setSubmissionError(null);
@@ -442,6 +476,14 @@ function useBulkSampleSave({
               ? bulkEditCollectingEventRefPermanent
               : undefined
           });
+
+          // Check if cleared fields have been requested, make the changes for each operation.
+          if (clearedFields?.size) {
+            for (const fieldName of clearedFields) {
+              _.set(saveOp.resource as any, fieldName, "");
+            }
+          }
+
           saveOperations.push(saveOp);
         } catch (error: unknown) {
           if (error instanceof DoOperationsError) {

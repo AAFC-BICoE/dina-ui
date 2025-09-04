@@ -10,6 +10,7 @@ import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { FieldSpy } from "./FieldSpy";
 import { ReadOnlyValue } from "./FieldView";
+import { BulkEditBadge } from "../bulk-edit/BulkEditBadge";
 
 export interface FieldWrapperProps {
   /** The CSS classes of the div wrapper. */
@@ -76,6 +77,14 @@ export interface FieldWrapperProps {
 
   /** Optional flag to make label of the field StartCase. */
   startCaseLabel?: boolean;
+
+  /**
+   * Disables the clear button for the field. The clear button is only shown on the bulk edit "Edit all"
+   * version of the form. This allows the user to clear the fields for all the selected records.
+   *
+   * Some fields like field extensions cannot be saved empty and this option can be set.
+   */
+  disableClearButton?: boolean;
 }
 
 export interface FieldWrapperRenderProps {
@@ -83,6 +92,7 @@ export interface FieldWrapperRenderProps {
   value: any;
   setValue: (newValue: any) => void;
   placeholder?: string;
+  multipleValueClearIcon?: boolean;
 
   /** A value to render when there is no value stored in form state. */
   formik: FormikProps<any>;
@@ -191,6 +201,7 @@ function LabelWrapper({
 }: PropsWithChildren<FieldWrapperInternalProps>) {
   const { horizontal, isTemplate, componentName, sectionName } =
     useDinaFormContext();
+
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
     currentValue: value
@@ -268,7 +279,12 @@ function LabelWrapper({
                   !horizontal && "mb-2"
                 )}
               >
-                {!hideLabel && <strong>{fieldLabel}</strong>}
+                {!hideLabel && (
+                  <div className="d-flex align-items-center w-100">
+                    <strong className="me-2">{fieldLabel}</strong>
+                    <BulkEditBadge bulkTab={bulkTab} />
+                  </div>
+                )}
               </div>
             )}
             <div className={valueClass} style={{ cursor: "auto" }}>
@@ -299,7 +315,12 @@ function LabelWrapper({
               )}
               style={labelStyle}
             >
-              {!hideLabel && <strong>{fieldLabel}</strong>}
+              {!hideLabel && (
+                <div className="d-flex align-items-center w-100">
+                  <strong className="me-2">{fieldLabel}</strong>
+                  <BulkEditBadge bulkTab={bulkTab} />
+                </div>
+              )}
             </div>
           )}
           <div className={valueClass} style={{ ...valueStyle, cursor: "auto" }}>
@@ -348,7 +369,8 @@ function FormikConnectedField({
     formik: form,
 
     // Only used within the bulk editor's "Edit All" tab:
-    placeholder: bulkTab?.placeholder
+    placeholder: bulkTab?.placeholder,
+    multipleValueClearIcon: bulkTab?.showClearIcon
   };
   return (
     <ErrorBoundary

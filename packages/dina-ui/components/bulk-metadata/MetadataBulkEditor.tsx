@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Metadata } from "../../types/objectstore-api";
 import { InputResource } from "kitsu";
 import {
+  bulkEditAllManagedAttributes,
   BulkEditTabContextI,
   ButtonBar,
   DinaForm,
@@ -79,19 +80,20 @@ export function MetadataBulkEditor({
     />
   );
 
-  function metadataBulkOverrider() {
-    /** Metadata input including blank/empty fields. */
-    return getMetadataBulkOverrider(bulkEditFormRef);
-  }
-
   const [initialized, setInitialized] = useState(false);
 
-  const { bulkEditTab } = useBulkEditTab({
+  const { bulkEditTab, clearedFields, deletedFields } = useBulkEditTab({
     resourceHooks: metadataHooks,
     hideBulkEditTab: !initialized,
     resourceForm: metadataForm,
     bulkEditFormRef
   });
+
+  const metadataBulkOverrider = useCallback(
+    () =>
+      getMetadataBulkOverrider(bulkEditFormRef, clearedFields, deletedFields),
+    [bulkEditFormRef, clearedFields, deletedFields]
+  );
 
   useEffect(() => {
     // Set the initial tab to the Edit All tab:
@@ -101,7 +103,11 @@ export function MetadataBulkEditor({
   const { saveAll } = useBulkMetadataSave({
     onSaved,
     metadataPreProcessor: metadataBulkOverrider,
-    bulkEditCtx: { resourceHooks: metadataHooks, bulkEditFormRef }
+    bulkEditCtx: {
+      resourceHooks: metadataHooks,
+      bulkEditFormRef,
+      clearedFields
+    }
   });
 
   return (
@@ -166,7 +172,11 @@ export function MetadataBulkEditor({
   );
 }
 
-export function getMetadataBulkOverrider(bulkEditFormRef) {
+export function getMetadataBulkOverrider(
+  bulkEditFormRef,
+  clearedFields?: Set<string>,
+  deletedFields?: Set<string>
+) {
   let bulkEditMetadata: InputResource<Metadata> | undefined;
 
   /** Returns an object with the overridden values. */
@@ -184,20 +194,22 @@ export function getMetadataBulkOverrider(bulkEditFormRef) {
       bulkEditMetadata = formik.values;
     }
 
-    /** Override object with only the non-empty fields. */
-    const overrides = withoutBlankFields(bulkEditMetadata);
+    const overrides = withoutBlankFields({ ...bulkEditMetadata });
+    delete overrides.managedAttributes; // handled separately below
 
-    // Combine the managed attributes dictionaries:
-    const newManagedAttributes = {
-      ...withoutBlankFields(baseMetadata.managedAttributes),
-      ...withoutBlankFields(bulkEditMetadata?.managedAttributes)
-    };
+    const metadataManagedAttributes = bulkEditAllManagedAttributes(
+      bulkEditMetadata?.managedAttributes ?? {},
+      baseMetadata.managedAttributes ?? {},
+      clearedFields ?? new Set(),
+      deletedFields ?? new Set(),
+      "managedAttributes"
+    );
 
     const newMetadata: InputResource<Metadata> = {
       ...baseMetadata,
       ...overrides,
-      ...(!_.isEmpty(newManagedAttributes) && {
-        managedAttributes: newManagedAttributes
+      ...(!_.isEmpty(metadataManagedAttributes) && {
+        managedAttributes: metadataManagedAttributes
       })
     };
 
@@ -227,12 +239,17 @@ function useBulkMetadataSave({
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const { bulkEditFormRef, resourceHooks: metadataHooks } = bulkEditCtx;
+  const {
+    bulkEditFormRef,
+    resourceHooks: metadataHooks,
+    clearedFields
+  } = bulkEditCtx;
 
   async function saveAll() {
     setError(null);
     bulkEditFormRef.current?.setStatus(null);
     bulkEditFormRef.current?.setErrors({});
+
     try {
       // First clear all tab errors:
       for (const { formRef } of metadataHooks) {
@@ -308,6 +325,13 @@ function useBulkMetadataSave({
           delete saveOp.resource.license;
           saveOp.resource.acSubtype =
             saveOp.resource.acSubtype?.acSubtype ?? null;
+
+          // Check if cleared fields have been requested, make the changes for each operation.
+          if (clearedFields?.size) {
+            for (const fieldName of clearedFields) {
+              _.set(saveOp.resource as any, fieldName, "");
+            }
+          }
 
           saveOperations.push(saveOp);
         } catch (error: unknown) {
