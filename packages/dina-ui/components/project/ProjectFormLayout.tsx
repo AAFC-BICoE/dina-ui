@@ -12,7 +12,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { AgentRolesField } from "../collection/AgentRolesField";
-import { generateSearchURLFromSimpleRows } from "packages/common-ui/lib/list-page/query-url/queryUtils";
+import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
 
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
