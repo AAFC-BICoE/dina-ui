@@ -1,10 +1,11 @@
 import { mountWithAppContext } from "common-ui";
-import { waitFor, screen, within } from "@testing-library/react";
+import { within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ProjectDetailsPage from "../../../../pages/collection/project/view";
 import { waitForLoadingToDisappear } from "common-ui";
 
-const mockPost = jest.fn<any, any>(async (path, _) => {
+// mock elasticsearch response
+const mockPost = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "search-api/search-ws/search":
       return {
@@ -166,6 +167,7 @@ const mockPost = jest.fn<any, any>(async (path, _) => {
   }
 });
 
+// Serialized responses since Kitsu automatically serializes responses
 const mockKitsuGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "user-api/group":
@@ -186,54 +188,54 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
         ]
       };
 
-    // case "collection-api/project/01990bc9-5b9b-7720-8ffa-a86f54d0b4df/attachment":
-    //   return {
-    //     data: [
-    //       {
-    //         id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
-    //         type: "metadata"
-    //       }
-    //     ]
-    //   };
-    // case "objectstore-api/metadata":
-    //   return {
-    //     data: [
-    //       {
-    //         id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
-    //         type: "metadata",
+    case "collection-api/project/01990bc9-5b9b-7720-8ffa-a86f54d0b4df/attachment":
+      return {
+        data: [
+          {
+            id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
+            type: "metadata"
+          }
+        ]
+      };
+    case "objectstore-api/metadata":
+      return {
+        data: [
+          {
+            id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
+            type: "metadata",
 
-    //         createdBy: "dina-admin",
-    //         createdOn: "2025-09-04T17:37:51.594164Z",
-    //         bucket: "aafc",
-    //         fileIdentifier: "019915ce-5677-7755-bd2b-e9d9729c11fe",
-    //         fileExtension: ".csv",
-    //         resourceExternalURL: null,
-    //         dcFormat: "text/csv",
-    //         dcType: "DATASET",
-    //         acCaption: "test mat sample export.csv",
-    //         acDigitizationDate: null,
-    //         xmpMetadataDate: "2025-09-04T17:37:51.626175Z",
-    //         xmpRightsWebStatement:
-    //           "https://open.canada.ca/en/open-government-licence-canada",
-    //         dcRights:
-    //           "© His Majesty The King in Right of Canada, as represented by the Minister of Agriculture and Agri-Food | © Sa Majesté le Roi du chef du Canada, représentée par le ministre de l’Agriculture et de l’Agroalimentaire",
-    //         xmpRightsOwner: "Government of Canada",
-    //         xmpRightsUsageTerms: "Government of Canada Usage Term",
-    //         orientation: null,
-    //         originalFilename: "test mat sample export.csv",
-    //         acHashFunction: "SHA-1",
-    //         acHashValue: "7969b23a2731b219a15ccc4fa3e6db2b0f8256e7",
-    //         publiclyReleasable: false,
-    //         notPubliclyReleasableReason: "default based on Type : Dataset",
-    //         group: "aafc",
-    //         managedAttributes: {}
-    //       }
-    //     ],
-    //     meta: {
-    //       totalResourceCount: 2,
-    //       moduleVersion: "1.28"
-    //     }
-    //   };
+            createdBy: "dina-admin",
+            createdOn: "2025-09-04T17:37:51.594164Z",
+            bucket: "aafc",
+            fileIdentifier: "019915ce-5677-7755-bd2b-e9d9729c11fe",
+            fileExtension: ".csv",
+            resourceExternalURL: null,
+            dcFormat: "text/csv",
+            dcType: "DATASET",
+            acCaption: "project attachment caption",
+            acDigitizationDate: null,
+            xmpMetadataDate: "2025-09-04T17:37:51.626175Z",
+            xmpRightsWebStatement:
+              "https://open.canada.ca/en/open-government-licence-canada",
+            dcRights:
+              "© His Majesty The King in Right of Canada, as represented by the Minister of Agriculture and Agri-Food | © Sa Majesté le Roi du chef du Canada, représentée par le ministre de l’Agriculture et de l’Agroalimentaire",
+            xmpRightsOwner: "Government of Canada",
+            xmpRightsUsageTerms: "Government of Canada Usage Term",
+            orientation: null,
+            originalFilename: "test mat sample export.csv",
+            acHashFunction: "SHA-1",
+            acHashValue: "7969b23a2731b219a15ccc4fa3e6db2b0f8256e7",
+            publiclyReleasable: false,
+            notPubliclyReleasableReason: "default based on Type : Dataset",
+            group: "aafc",
+            managedAttributes: {}
+          }
+        ],
+        meta: {
+          totalResourceCount: 2,
+          moduleVersion: "1.28"
+        }
+      };
     case "collection-api/project/01990bc9-5b9b-7720-8ffa-a86f54d0b4df?include=attachment":
       return {
         data: {
@@ -264,10 +266,10 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
           relationships: {
             attachment: {
               data: [
-                // {
-                //   id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
-                //   type: "metadata"
-                // }
+                {
+                  id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
+                  type: "metadata"
+                }
               ]
             }
           }
@@ -291,6 +293,8 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
       };
   }
 });
+
+// non-serialized responses
 const mockAxiosGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "search-api/search-ws/mapping":
@@ -456,12 +460,47 @@ const mockAxiosGet = jest.fn<any, any>(async (path) => {
   }
 });
 
+const mockBulkGet = jest.fn<any, any>(async () => {
+  return [
+    {
+      id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
+      type: "metadata",
+
+      createdBy: "dina-admin",
+      createdOn: "2025-09-04T17:37:51.594164Z",
+      bucket: "aafc",
+      fileIdentifier: "019915ce-5677-7755-bd2b-e9d9729c11fe",
+      fileExtension: ".csv",
+      resourceExternalURL: null,
+      dcFormat: "text/csv",
+      dcType: "DATASET",
+      acCaption: "project attachment caption",
+      acDigitizationDate: null,
+      xmpMetadataDate: "2025-09-04T17:37:51.626175Z",
+      xmpRightsWebStatement:
+        "https://open.canada.ca/en/open-government-licence-canada",
+      dcRights:
+        "© His Majesty The King in Right of Canada, as represented by the Minister of Agriculture and Agri-Food | © Sa Majesté le Roi du chef du Canada, représentée par le ministre de l’Agriculture et de l’Agroalimentaire",
+      xmpRightsOwner: "Government of Canada",
+      xmpRightsUsageTerms: "Government of Canada Usage Term",
+      orientation: null,
+      originalFilename: "test mat sample export.csv",
+      acHashFunction: "SHA-1",
+      acHashValue: "7969b23a2731b219a15ccc4fa3e6db2b0f8256e7",
+      publiclyReleasable: false,
+      notPubliclyReleasableReason: "default based on Type : Dataset",
+      group: "aafc",
+      managedAttributes: {}
+    }
+  ];
+});
+
 const apiContext: any = {
   apiClient: {
     get: mockKitsuGet,
     axios: { get: mockAxiosGet, post: mockPost }
   },
-  bulkGet: jest.fn()
+  bulkGet: mockBulkGet
 };
 
 const mockPush = jest.fn();
@@ -478,48 +517,84 @@ describe("Project View Page.", () => {
     jest.clearAllMocks();
   });
 
-  it("Displays all project attributes and attached material samples.", async () => {
+  it("Displays all project attributes.", async () => {
     const wrapper = mountWithAppContext(<ProjectDetailsPage />, {
       apiContext
     });
 
     await waitForLoadingToDisappear();
 
-    await waitFor(() => {
-      const heading = screen.getByRole("heading", {
-        name: /test project test new/i
-      });
-
-      // Project name
-      within(heading).getByText(/test project test new/i);
-      expect(heading).toBeInTheDocument();
-
-      // Group, status
-      expect(wrapper.getByText("AAFC")).toBeInTheDocument();
-      expect(wrapper.getByText("ongoing")).toBeInTheDocument();
-
-      // Start and End dates:
-      expect(wrapper.getByText("2025-09-03")).toBeInTheDocument();
-      expect(wrapper.getByText("2025-09-04")).toBeInTheDocument();
-
-      // Multilingual descriptions:
-      expect(wrapper.getByText("test english description")).toBeInTheDocument();
-      expect(wrapper.getByText("test french description")).toBeInTheDocument();
-
-      // No attachments for this project in the mock data:
-      // expect(wrapper.getByText("test mat sample export.csv")).toBeInTheDocument();
-
-      // Linked Material Sample:
-      expect(
-        wrapper.getByText("01990bcc-90fe-7e0a-a4ac-5acf559d9bdf")
-      ).toBeInTheDocument();
-
-      expect(
-        screen.getByRole("button", {
-          name: /view attached material samples/i
-        })
-      ).toBeInTheDocument();
+    const heading = wrapper.getByRole("heading", {
+      name: /test project test new/i
     });
+
+    // Project name
+    within(heading).getByText(/test project test new/i);
+    expect(heading).toBeInTheDocument();
+
+    // Group, status
+    expect(wrapper.getByText("AAFC")).toBeInTheDocument();
+    expect(wrapper.getByText("ongoing")).toBeInTheDocument();
+
+    // Start and End dates:
+    expect(wrapper.getByText("2025-09-03")).toBeInTheDocument();
+    expect(wrapper.getByText("2025-09-04")).toBeInTheDocument();
+
+    // Multilingual descriptions:
+    expect(wrapper.getByText("test english description")).toBeInTheDocument();
+    expect(wrapper.getByText("test french description")).toBeInTheDocument();
+  });
+
+  it("It displays the project's attachments.", async () => {
+    const wrapper = mountWithAppContext(<ProjectDetailsPage />, {
+      apiContext
+    });
+
+    await waitForLoadingToDisappear();
+
+    const attachmentLink = wrapper.getByRole("link", {
+      name: "test mat sample export.csv"
+    });
+    expect(attachmentLink).toBeInTheDocument();
+
+    // Attachment filename with link to object view page:
+    expect(attachmentLink).toHaveAttribute(
+      "href",
+      "/object-store/object/view?id=019915ce-63e7-7e10-b86a-3dd1d9f2db49"
+    );
+
+    // Attachment image (there is no image so it shows the placeholder icon)
+    expect(
+      wrapper.getByAltText("project attachment caption")
+    ).toBeInTheDocument();
+
+    // Attachment caption
+    expect(wrapper.getByText("project attachment caption")).toBeInTheDocument();
+
+    // Attachment last updated date and time:
+    expect(
+      wrapper.getByText(/2025\-09\-04, 5:37:51 p\.m\./i)
+    ).toBeInTheDocument();
+  });
+
+  it("It displays the project's attached material samples.", async () => {
+    const wrapper = mountWithAppContext(<ProjectDetailsPage />, {
+      apiContext
+    });
+
+    await waitForLoadingToDisappear();
+
+    // Linked Material Sample:
+    expect(
+      wrapper.getByText("01990bcc-90fe-7e0a-a4ac-5acf559d9bdf")
+    ).toBeInTheDocument();
+
+    // View attached material samples button:
+    expect(
+      wrapper.getByRole("button", {
+        name: /view attached material samples/i
+      })
+    ).toBeInTheDocument();
 
     const viewAttachedSamplesButton = wrapper.getByRole("link", {
       name: /view attached material samples/i
