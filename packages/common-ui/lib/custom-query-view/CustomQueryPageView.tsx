@@ -7,7 +7,8 @@ import { FieldSet, QueryPage, QueryPageProps } from "..";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../dina-ui/intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { CustomViewField } from "../list-page/query-builder/useQueryBuilderConfig";
-
+import Link from "next/link";
+import { Button } from "react-bootstrap";
 export interface CustomQueryOption {
   /**
    * Value to be saved when selecting the option.
@@ -55,6 +56,16 @@ export interface CustomQueryPageViewProps<TData extends KitsuResource>
 
   removePadding?: boolean;
 
+  // The link object for the button to view the items attached to the entity.
+  linkObject?: {
+    pathname: string;
+    query?: {
+      queryTree?: string | null;
+    } | null;
+  };
+
+  // The DinaMessage id for the link to view the items attached to the entity.
+  linkMessageId?: keyof typeof DINAUI_MESSAGES_ENGLISH;
   /**
    * If options are provided, a dropdown menu to the right of the legend title will be displayed
    * to allow the user to choose the query thats being displayed.
@@ -68,6 +79,8 @@ export function CustomQueryPageView<TData extends KitsuResource>({
   titleKey,
   customQueryOptions,
   removePadding,
+  linkObject,
+  linkMessageId,
   ...queryPageProps
 }: CustomQueryPageViewProps<TData>) {
   const CUSTOM_QUERY_PAGE_LOCAL_STORAGE_KEY = queryPageProps.uniqueName
@@ -148,6 +161,20 @@ export function CustomQueryPageView<TData extends KitsuResource>({
                 </label>
               </div>
             </>
+          ) : linkObject ? (
+            <div className="d-flex justify-content-between align-items-center">
+              <>{innerLegend}</>
+              <Link
+                className="mt-2 text-end"
+                href={linkObject}
+                passHref={true}
+                target="_blank"
+              >
+                <Button variant="info" className="mx-1 my-1">
+                  <DinaMessage id={linkMessageId || "viewAttachedItems"} />
+                </Button>
+              </Link>
+            </div>
           ) : (
             <>{innerLegend}</>
           )}
