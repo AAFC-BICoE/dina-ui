@@ -464,12 +464,19 @@ const apiContext: any = {
   bulkGet: jest.fn()
 };
 
+const mockPush = jest.fn();
+
 jest.mock("next/router", () => ({
-  useRouter: () => ({ query: { id: "01990bc9-5b9b-7720-8ffa-a86f54d0b4df" } })
+  useRouter: () => ({
+    query: { id: "01990bc9-5b9b-7720-8ffa-a86f54d0b4df" },
+    push: mockPush
+  })
 }));
 
 describe("Project View Page.", () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it("Displays all project attributes and attached material samples.", async () => {
     const wrapper = mountWithAppContext(<ProjectDetailsPage />, {
@@ -506,6 +513,23 @@ describe("Project View Page.", () => {
       expect(
         wrapper.getByText("01990bcc-90fe-7e0a-a4ac-5acf559d9bdf")
       ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole("button", {
+          name: /view attached material samples/i
+        })
+      ).toBeInTheDocument();
     });
+
+    const viewAttachedSamplesButton = wrapper.getByRole("link", {
+      name: /view attached material samples/i
+    });
+
+    // View attached material samples button has correct link:
+    expect(viewAttachedSamplesButton).toBeInTheDocument();
+    expect(viewAttachedSamplesButton).toHaveAttribute(
+      "href",
+      "/collection/material-sample/list?queryTree=%7B%22c%22%3A%22a%22%2C%22p%22%3A%5B%7B%22f%22%3A%22_relationshipPresence%22%2C%22o%22%3A%22uuid%22%2C%22v%22%3A%22projects%22%2C%22t%22%3A%22relationshipPresence%22%2C%22d%22%3A%2201990bc9-5b9b-7720-8ffa-a86f54d0b4df%22%7D%5D%7D"
+    );
   });
 });
