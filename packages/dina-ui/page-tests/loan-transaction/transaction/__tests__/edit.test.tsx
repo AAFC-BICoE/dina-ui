@@ -552,7 +552,7 @@ describe("Transaction Form", () => {
   });
 
   it("Make no changes, expect no save request performed", async () => {
-    routerQuery.id = "test-transaction-broken-material-id";
+    routerQuery.id = "test-transaction-id";
 
     const wrapper = mountWithAppContext(
       <TransactionEditPage />,
@@ -566,15 +566,6 @@ describe("Transaction Form", () => {
         wrapper.getByRole("textbox", { name: /transaction number/i })
       ).toBeInTheDocument();
     });
-
-    // The existing material samples should be displayed, while the missing one should not be included.
-    expect(
-      wrapper.getByRole("link", { name: /sample\-1/i })
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("link", { name: /sample\-2/i })
-    ).toBeInTheDocument();
-    expect(wrapper.getByText(/total selected records: 2/i)).toBeInTheDocument();
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);

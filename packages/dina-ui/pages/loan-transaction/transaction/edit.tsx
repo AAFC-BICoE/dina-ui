@@ -38,8 +38,9 @@ import { useMaterialSampleRelationshipColumns } from "../../../components/collec
 import { ManagedAttributesEditor } from "../../../components/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { Transaction } from "../../../types/loan-transaction-api";
+import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
 import { Person } from "../../../types/objectstore-api";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -132,45 +133,50 @@ export function TransactionForm({
   const onSubmit: DinaFormOnSubmit<InputResource<Transaction>> = async ({
     submittedValues
   }) => {
+    const submittedValuesWithRelationships = {
+      ...submittedValues,
+      materialSamples: selectedResources.map((it) => ({
+        id: it.id,
+        type: it.type
+      })) as ResourceIdentifierObject[],
+      agentRoles: formatAgentRoles(submittedValues.agentRoles)
+    };
+
+    const formattedInitialValues = {
+      ...initialValues,
+      agentRoles: formatAgentRoles(initialValues.agentRoles)
+    };
+
     // Only save the differences, not untouched fields.
     const transactionDiff = initialValues.id
       ? resourceDifference({
-          original: initialValues,
-          updated: submittedValues
+          original: formattedInitialValues as any,
+          updated: submittedValuesWithRelationships
         })
-      : submittedValues;
+      : submittedValuesWithRelationships;
 
     const transactionInput: InputResource<Transaction> & {
       relationships: any;
     } = {
       ...transactionDiff,
       relationships: {
-        ...(submittedValues.attachment && {
+        ...(transactionDiff.attachment && {
           attachment: {
-            data: submittedValues.attachment.map((it) => ({
+            data: transactionDiff.attachment.map((it) => ({
               id: it.id,
               type: it.type
             }))
           }
         }),
-        ...{
+        ...(transactionDiff.materialSamples && {
           materialSamples: {
-            data: selectedResources.map((it) => ({
+            data: transactionDiff.materialSamples.map((it) => ({
               id: it.id,
-              type: "material-sample"
+              type: it.type
             }))
           }
-        }
-      },
-
-      // Convert the Agent objects to UUIDs for submission to the back-end:
-      agentRoles: submittedValues.agentRoles?.map((agentRole) => ({
-        ...agentRole,
-        agent:
-          typeof agentRole.agent === "object"
-            ? agentRole.agent?.id
-            : agentRole.agent
-      }))
+        })
+      }
     };
 
     // Remove the non-relationship versions.
@@ -178,7 +184,7 @@ export function TransactionForm({
     delete (transactionInput as any).attachment;
 
     // If the request contains no change, don't perform any request.
-    if (isResourceEmpty(transactionInput) && transactionInput?.id) {
+    if (isResourceEmpty(transactionDiff) && transactionInput?.id) {
       await onSaved(transactionInput as any);
       return;
     }
@@ -194,6 +200,30 @@ export function TransactionForm({
     );
     await onSaved(savedTransaction);
   };
+
+  /**
+   * This function iterates through an array of agent roles and ensures that the
+   * 'agent' property is consistently an ID string. If 'agent' is an object,
+   * its 'id' is extracted. If it's already a string or null/undefined, it's used as is.
+   *
+   * @param agentRoles The array of agent roles to process. Can be null or undefined.
+   * @returns A new array with the formatted agent roles, or undefined if the input is falsy.
+   */
+  function formatAgentRoles(
+    agentRoles: AgentRole[] | undefined | null
+  ): AgentRole[] | undefined {
+    if (!agentRoles) {
+      return undefined;
+    }
+
+    return agentRoles.map((agentRole) => ({
+      ...agentRole,
+      agent:
+        typeof agentRole.agent === "object" && agentRole.agent
+          ? agentRole.agent.id
+          : agentRole.agent
+    }));
+  }
 
   const buttonBar = (
     <ButtonBar className="mb-4">
