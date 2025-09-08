@@ -4,7 +4,7 @@ import TransactionEditPage, {
 } from "../../../../pages/loan-transaction/transaction/edit";
 import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { Transaction } from "../../../../types/loan-transaction-api";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -526,6 +526,67 @@ describe("Transaction Form", () => {
     });
     userEvent.clear(transactionNumberField);
     userEvent.type(transactionNumberField, "new transaction number");
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    // Wait for the mockSave to be called after form submission
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Test expected response
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "test-transaction-broken-material-id",
+              type: "transaction",
+              transactionNumber: "new transaction number"
+            },
+            type: "transaction"
+          }
+        ],
+        { apiBaseUrl: "/loan-transaction-api" }
+      ]
+    ]);
+  });
+
+  it("Handle edit when an attached material sample doesn't exist anymore and adding a new material sample", async () => {
+    routerQuery.id = "test-transaction-broken-material-id";
+
+    const wrapper = mountWithAppContext(
+      <TransactionEditPage />,
+      testCtx as any
+    );
+    await waitForLoadingToDisappear();
+
+    await waitFor(() => {
+      // Ensure the proper transaction is loaded before proceeding.
+      expect(
+        wrapper.getByRole("textbox", { name: /transaction number/i })
+      ).toBeInTheDocument();
+    });
+
+    // The existing material samples should be displayed, while the missing one should not be included.
+    expect(
+      wrapper.getByRole("link", { name: /sample\-1/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("link", { name: /sample\-2/i })
+    ).toBeInTheDocument();
+    expect(wrapper.getByText(/total selected records: 2/i)).toBeInTheDocument();
+
+    // Remove an existing material sample that is loadable.
+    const rowToRemove = wrapper.getByRole("row", {
+      name: /select sample\-2/i
+    });
+    const checkboxToRemove = within(rowToRemove).getByRole("checkbox", {
+      name: /select/i
+    });
+    userEvent.click(checkboxToRemove);
+
+    // Todo: The "<" button needs a test id to make it easier to use. Probably the checkbox as well.
+    screen.logTestingPlaygroundURL();
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
