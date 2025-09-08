@@ -130,20 +130,33 @@ export function TransactionForm({
     []
   );
 
+  // Track samples that couldn't be loaded but should still be preserved
+  const [nonLoadableSamples, setNonLoadableSamples] = useState<
+    ResourceIdentifierObject[]
+  >([]);
+
   const onSubmit: DinaFormOnSubmit<InputResource<Transaction>> = async ({
     submittedValues
   }) => {
-    const submittedValuesWithRelationships = {
-      ...submittedValues,
-      materialSamples: selectedResources.map((it) => ({
+    // Combine loadable and non-loadable samples for saving
+    // Non-loadable samples should NEVER be altered.
+    const allMaterialSamples = [
+      ...selectedResources.map((it) => ({
         id: it.id,
         type: it.type
-      })) as ResourceIdentifierObject[],
+      })),
+      ...nonLoadableSamples
+    ];
+
+    const submittedValuesWithRelationships = {
+      ...submittedValues,
+      materialSamples: allMaterialSamples as ResourceIdentifierObject[],
       agentRoles: formatAgentRoles(submittedValues.agentRoles)
     };
 
     const formattedInitialValues = {
       ...initialValues,
+      materialSamples: allMaterialSamples,
       agentRoles: formatAgentRoles(initialValues.agentRoles)
     };
 
@@ -182,6 +195,9 @@ export function TransactionForm({
     // Remove the non-relationship versions.
     delete (transactionInput as any).materialSamples;
     delete (transactionInput as any).attachment;
+    if (Object.keys(transactionInput.relationships).length === 0) {
+      delete transactionInput.relationships;
+    }
 
     // If the request contains no change, don't perform any request.
     if (isResourceEmpty(transactionDiff) && transactionInput?.id) {
@@ -192,7 +208,7 @@ export function TransactionForm({
     const [savedTransaction] = await save<Transaction>(
       [
         {
-          resource: transactionDiff,
+          resource: transactionInput,
           type: "transaction"
         }
       ],
@@ -248,6 +264,7 @@ export function TransactionForm({
       <TransactionFormLayout
         selectedResources={selectedResources}
         setSelectedResources={setSelectedResources}
+        setNonLoadableSamples={setNonLoadableSamples}
       />
     </DinaForm>
   );
@@ -256,11 +273,13 @@ export function TransactionForm({
 export interface TransactionFormLayoutProps {
   selectedResources?: MaterialSample[];
   setSelectedResources?: Dispatch<SetStateAction<MaterialSample[]>>;
+  setNonLoadableSamples?: Dispatch<SetStateAction<ResourceIdentifierObject[]>>;
 }
 
 export function TransactionFormLayout({
   selectedResources,
-  setSelectedResources
+  setSelectedResources,
+  setNonLoadableSamples
 }: TransactionFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
@@ -293,8 +312,20 @@ export function TransactionFormLayout({
           }
         })
       );
+
+      // Track samples that couldn't be loaded
+      const nonLoadable: ResourceIdentifierObject[] = [];
+      sampleIds.forEach((id, index) => {
+        if (response[index] === null) {
+          nonLoadable.push({ id, type: "material-sample" });
+        }
+      });
+
       if (setSelectedResources !== undefined) {
         setSelectedResources(materialSamplesTransformed ?? []);
+      }
+      if (setNonLoadableSamples !== undefined) {
+        setNonLoadableSamples(nonLoadable);
       }
       setSelectedResourcesView(materialSamplesTransformed ?? []);
     });

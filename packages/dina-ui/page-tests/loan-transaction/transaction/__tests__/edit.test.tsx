@@ -552,7 +552,7 @@ describe("Transaction Form", () => {
   });
 
   it("Make no changes, expect no save request performed", async () => {
-    routerQuery.id = "test-transaction-id";
+    routerQuery.id = "test-transaction-broken-material-id";
 
     const wrapper = mountWithAppContext(
       <TransactionEditPage />,
