@@ -329,8 +329,12 @@ function useBulkMetadataSave({
 
           // Check if cleared fields have been requested, make the changes for each operation.
           if (clearedFields?.size) {
-            for (const fieldName of clearedFields) {
-              _.set(saveOp.resource as any, fieldName, "");
+            for (const [fieldName, clearType] of clearedFields) {
+              _.set(
+                saveOp.resource as any,
+                fieldName,
+                clearType === ClearType.EmptyString ? "" : null
+              );
             }
           }
 
