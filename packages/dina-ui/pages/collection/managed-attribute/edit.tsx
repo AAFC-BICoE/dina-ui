@@ -38,7 +38,7 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const backButton =
     id === undefined ? (
       <Link
-        href="/managed-attribute/list?step=0"
+        href="/managed-attribute/list?tab=0"
         className="back-button my-auto me-auto"
       >
         <DinaMessage id="backToList" />

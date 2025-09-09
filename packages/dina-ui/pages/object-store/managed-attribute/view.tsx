@@ -33,7 +33,7 @@ export default function ManagedAttributesViewPage() {
           : { type: "managed-attribute" }
       }
       entityLink="/object-store/managed-attribute"
-      specialListUrl="/managed-attribute/list?step=1"
+      specialListUrl="/managed-attribute/list?tab=1"
       type="managed-attribute"
       apiBaseUrl="/objectstore-api"
     />
