@@ -3,7 +3,11 @@ import moment from "moment";
 import { ComponentProps, FocusEvent, SyntheticEvent } from "react";
 import DatePicker from "react-datepicker";
 import { useIntl } from "react-intl";
-import { FieldWrapperProps, useBulkEditTabFieldIndicators } from "..";
+import {
+  ClearType,
+  FieldWrapperProps,
+  useBulkEditTabFieldIndicators
+} from "..";
 import { DateView } from "../date/DateView";
 import { FieldWrapper } from "./FieldWrapper";
 import { ClearAllButton } from "../bulk-edit/ClearAllButton";
@@ -206,6 +210,7 @@ export function DateField(props: DateFieldProps) {
               !disableClearButton && (
                 <ClearAllButton
                   fieldName={props.name}
+                  clearType={ClearType.Null}
                   onClearLocal={() => setValue(null)}
                   isCleared={!bulkTab?.showClearIcon}
                   readOnly={readOnly}

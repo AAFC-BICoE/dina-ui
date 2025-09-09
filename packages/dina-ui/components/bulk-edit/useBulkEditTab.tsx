@@ -1,6 +1,7 @@
 import {
   BulkEditTabContext,
   BulkEditTabContextI,
+  ClearType,
   ResourceWithHooks
 } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
@@ -25,7 +26,9 @@ export function useBulkEditTab({
 }: UseBulkEditTabParams) {
   const { formatMessage } = useDinaIntl();
 
-  const [clearedFields, setClearedFields] = useState<Set<string>>(new Set());
+  const [clearedFields, setClearedFields] = useState<Map<string, ClearType>>(
+    new Map()
+  );
   const [deletedFields, setDeletedFields] = useState<Set<string>>(new Set());
 
   const ctx: BulkEditTabContextI = {

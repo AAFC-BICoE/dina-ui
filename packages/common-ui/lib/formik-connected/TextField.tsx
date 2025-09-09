@@ -8,6 +8,7 @@ import classnames from "classnames";
 import React from "react";
 import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
 import { ClearAllButton } from "../bulk-edit/ClearAllButton";
+import { ClearType } from "../bulk-edit/bulk-context";
 
 export interface TextFieldProps extends FieldWrapperProps {
   readOnly?: boolean;
@@ -119,6 +120,7 @@ export function TextField(props: TextFieldProps) {
               !disableClearButton && (
                 <ClearAllButton
                   fieldName={props.name}
+                  clearType={ClearType.EmptyString}
                   onClearLocal={() => setValue("")}
                   isCleared={!bulkTab?.showClearIcon}
                   readOnly={readOnly}

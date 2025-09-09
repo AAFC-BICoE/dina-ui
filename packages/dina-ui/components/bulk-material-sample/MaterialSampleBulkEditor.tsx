@@ -2,6 +2,7 @@ import {
   bulkEditAllManagedAttributes,
   BulkEditTabContextI,
   ButtonBar,
+  ClearType,
   DinaForm,
   DoOperationsError,
   FormikButton,
@@ -286,7 +287,7 @@ function getSampleHooks(
 export function getSampleBulkOverrider(
   bulkEditFormRef,
   bulkEditSampleHook,
-  clearedFields?: Set<string>,
+  clearedFields?: Map<string, ClearType>,
   deletedFields?: Set<string>
 ) {
   let bulkEditSample: InputResource<MaterialSample> | undefined;
@@ -317,7 +318,7 @@ export function getSampleBulkOverrider(
     const materialSampleManagedAttributes = bulkEditAllManagedAttributes(
       bulkEditSample?.managedAttributes ?? {},
       baseSample.managedAttributes ?? {},
-      clearedFields ?? new Set(),
+      clearedFields ?? new Map([]),
       deletedFields ?? new Set(),
       "managedAttributes"
     );
@@ -326,7 +327,7 @@ export function getSampleBulkOverrider(
     const preparedManagedAttributes = bulkEditAllManagedAttributes(
       bulkEditSample?.preparationManagedAttributes ?? {},
       baseSample.preparationManagedAttributes ?? {},
-      clearedFields ?? new Set(),
+      clearedFields ?? new Map([]),
       deletedFields ?? new Set(),
       "preparationManagedAttributes"
     );

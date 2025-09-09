@@ -1,32 +1,40 @@
+import { ClearType } from "../bulk-edit/bulk-context";
+
 /**
  * Bulk managed–attribute bulk updater.
  *
  * This method is used for determining what fields need to be send in the PATCH/POST request.
  *
- * @param editAll   – Edit-all tab form values coming from the bulk editor.
- * @param sample    – The current sample object that is being prepared for save.
- * @param clearAll  – Keys that must be hard-cleared (set to the empty string "").
- * @param deleteAll – Keys that must be removed from the result entirely.
- * @param fieldName – Top-level property to operate on (default: "managedAttributes").
+ * @param editAll       – Edit-all tab form values coming from the bulk editor.
+ * @param sample        – The current sample object that is being prepared for save.
+ * @param clearFields   – Map of field names to their clear types.
+ * @param deleteFields  – Keys that must be removed from the result entirely.
+ * @param fieldName     – Top-level property to operate on (default: "managedAttributes").
  *
  * Rules implemented:
  * 1.  deleteAll  → remove managed attribute completely
- * 2.  clearAll   → set managed attribute to the empty string "".
+ * 2.  clearAll   → set managed attribute based on ClearType (empty string or null).
  * 3.  editAll    → non-empty value overrides; empty value keeps the sample’s value (if any).
  * 4.  Anything left on the sample is kept as-is.
  */
 export function bulkEditAllManagedAttributes(
   editAll: Record<string, any>,
   sample: Record<string, any>,
-  clearedFields: Set<string>,
+  clearedFields: Map<string, ClearType>,
   deletedFields: Set<string>,
   fieldName = "managedAttributes"
 ): Record<string, any> {
   const prefix = `${fieldName}.`;
 
-  const clearAll: string[] = Array.from(clearedFields)
-    .filter((f) => f.startsWith(prefix))
-    .map((f) => f.slice(prefix.length));
+  // Extract cleared fields that match the prefix and create a map of key -> clear value
+  const clearAll = new Map<string, any>();
+  clearedFields.forEach((clearType, fieldPath) => {
+    if (fieldPath.startsWith(prefix)) {
+      const key = fieldPath.slice(prefix.length);
+      const clearValue = clearType === ClearType.EmptyString ? "" : null;
+      clearAll.set(key, clearValue);
+    }
+  });
 
   const deleteAll: string[] = Array.from(deletedFields)
     .filter((f) => f.startsWith(prefix))
@@ -39,7 +47,7 @@ export function bulkEditAllManagedAttributes(
   const keys = new Set<string>([
     ...Object.keys(sample || {}),
     ...Object.keys(editAll || {}),
-    ...clearAll,
+    ...Array.from(clearAll.keys()),
     ...deleteAll
   ]);
 
@@ -49,9 +57,9 @@ export function bulkEditAllManagedAttributes(
       return;
     }
 
-    // If in the clearAll array, then it should be set to empty.
-    if (clearAll.includes(key)) {
-      result[key] = "";
+    // If in the clearAll map, then it should be set to empty.
+    if (clearAll.has(key)) {
+      result[key] = clearAll.get(key);
       return;
     }
 

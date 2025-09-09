@@ -5,6 +5,7 @@ import {
   bulkEditAllManagedAttributes,
   BulkEditTabContextI,
   ButtonBar,
+  ClearType,
   DinaForm,
   DoOperationsError,
   FormikButton,
@@ -174,7 +175,7 @@ export function MetadataBulkEditor({
 
 export function getMetadataBulkOverrider(
   bulkEditFormRef,
-  clearedFields?: Set<string>,
+  clearedFields?: Map<string, ClearType>,
   deletedFields?: Set<string>
 ) {
   let bulkEditMetadata: InputResource<Metadata> | undefined;
@@ -200,7 +201,7 @@ export function getMetadataBulkOverrider(
     const metadataManagedAttributes = bulkEditAllManagedAttributes(
       bulkEditMetadata?.managedAttributes ?? {},
       baseMetadata.managedAttributes ?? {},
-      clearedFields ?? new Set(),
+      clearedFields ?? new Map([]),
       deletedFields ?? new Set(),
       "managedAttributes"
     );

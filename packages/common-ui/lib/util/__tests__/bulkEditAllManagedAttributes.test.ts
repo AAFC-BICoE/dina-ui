@@ -1,3 +1,4 @@
+import { ClearType } from "../../bulk-edit/bulk-context";
 import { bulkEditAllManagedAttributes } from "../bulkEditAllManagedAttributes";
 
 const MANAGED_ATTRIBUTES_PREFIX = "managedAttributes";
@@ -5,7 +6,7 @@ const MANAGED_ATTRIBUTES_PREFIX = "managedAttributes";
 describe("bulkEditAllManagedAttributes", () => {
   describe("Edit all value change, override the value for all samples", () => {
     const editAll = { key1: "new value" };
-    const clearAll: Set<string> = new Set([]);
+    const clearAll: Map<string, ClearType> = new Map([]);
     const deleteAll: Set<string> = new Set([]);
 
     it("Sample 1 - With value 1", () => {
@@ -56,7 +57,7 @@ describe("bulkEditAllManagedAttributes", () => {
 
   describe("Delete a managed attribute from all samples", () => {
     const editAll = { key1: "", key2: "new 2" };
-    const clearAll: Set<string> = new Set([]);
+    const clearAll: Map<string, ClearType> = new Map([]);
     const deleteAll: Set<string> = new Set([
       `${MANAGED_ATTRIBUTES_PREFIX}.key2`,
       `${MANAGED_ATTRIBUTES_PREFIX}.key3`
@@ -104,7 +105,7 @@ describe("bulkEditAllManagedAttributes", () => {
 
   describe("Mixed overwrite/keep", () => {
     const editAll = { key1: "new value", key2: "", key3: "" };
-    const clearAll: Set<string> = new Set([]);
+    const clearAll: Map<string, ClearType> = new Map([]);
     const deleteAll: Set<string> = new Set([]);
 
     it("Sample 1 - with key1 and key2", () => {
@@ -157,7 +158,7 @@ describe("bulkEditAllManagedAttributes", () => {
 
   describe("Edit multiple managed attributes, keep non-deleted fields", () => {
     const editAll = { b: "new-b-value", c: "new-c-value" };
-    const clearAll: Set<string> = new Set([]);
+    const clearAll: Map<string, ClearType> = new Map([]);
     const deleteAll: Set<string> = new Set([]);
 
     it("Sample 1 - with key1 and key2", () => {
@@ -178,9 +179,11 @@ describe("bulkEditAllManagedAttributes", () => {
     });
   });
 
-  describe("clearAll functionality", () => {
+  describe("clearAll emptyString functionality", () => {
     const editAll = { key1: "", key2: "", key3: "" };
-    const clearAll = new Set([`${MANAGED_ATTRIBUTES_PREFIX}.key1`]); // force-clear key1
+    const clearAll = new Map<string, ClearType>([
+      [`${MANAGED_ATTRIBUTES_PREFIX}.key1`, ClearType.EmptyString]
+    ]); // force-clear key1
     const deleteAll: Set<string> = new Set([]);
 
     it("Sample 1 - with key1 and key2 (key1 cleared)", () => {
@@ -227,6 +230,61 @@ describe("bulkEditAllManagedAttributes", () => {
         )
       ).toEqual({
         key1: ""
+      });
+    });
+  });
+
+  describe("clearAll null functionality", () => {
+    const editAll = { key1: "", key2: "", key3: "" };
+    const clearAll = new Map<string, ClearType>([
+      [`${MANAGED_ATTRIBUTES_PREFIX}.key1`, ClearType.Null]
+    ]); // force-clear key1
+    const deleteAll: Set<string> = new Set([]);
+
+    it("Sample 1 - with key1 and key2 (key1 cleared)", () => {
+      const sample = { key1: "old value 1", key2: "value2" };
+      expect(
+        bulkEditAllManagedAttributes(
+          editAll,
+          sample,
+          clearAll,
+          deleteAll,
+          MANAGED_ATTRIBUTES_PREFIX
+        )
+      ).toEqual({
+        key1: null,
+        key2: "value2"
+      });
+    });
+
+    it("Sample 2 - with key1 and key3 (key1 cleared)", () => {
+      const sample = { key1: "old value 2", key3: "value3" };
+      expect(
+        bulkEditAllManagedAttributes(
+          editAll,
+          sample,
+          clearAll,
+          deleteAll,
+          MANAGED_ATTRIBUTES_PREFIX
+        )
+      ).toEqual({
+        key1: null,
+        key3: "value3"
+      });
+    });
+
+    it("Sample 3 - With no values", () => {
+      const sample = {};
+      expect(
+        bulkEditAllManagedAttributes(
+          editAll,
+          sample,
+          clearAll,
+          deleteAll,
+          MANAGED_ATTRIBUTES_PREFIX
+        )
+      ).toEqual({
+        key1: null
       });
     });
   });

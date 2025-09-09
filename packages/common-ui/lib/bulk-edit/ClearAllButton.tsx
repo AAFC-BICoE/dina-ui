@@ -1,11 +1,14 @@
 import { FaEraser, FaUndo } from "react-icons/fa";
 import { Tooltip } from "../tooltip/Tooltip";
-import { useBulkEditTabContext } from "./bulk-context";
+import { ClearType, useBulkEditTabContext } from "./bulk-context";
 import { useIntl } from "react-intl";
 
 export interface ClearAllButtonProps {
   /** Field’s full Formik path, e.g. "dwcDecimalLatitude". */
   fieldName: string;
+
+  /** How to clear the field. */
+  clearType: ClearType;
 
   /** Called after the field is blanked; usually `setValue("")`. */
   onClearLocal: () => void;
@@ -19,6 +22,7 @@ export interface ClearAllButtonProps {
 
 export function ClearAllButton({
   fieldName,
+  clearType,
   onClearLocal,
   isCleared = false,
   readOnly
@@ -32,15 +36,15 @@ export function ClearAllButton({
     onClearLocal();
 
     if (bulkCtx) {
-      const cleared = new Set(bulkCtx.clearedFields);
-      cleared.add(fieldName);
+      const cleared = new Map(bulkCtx.clearedFields);
+      cleared.set(fieldName, clearType);
       bulkCtx?.setClearedFields?.(cleared);
     }
   }
 
   function handleUndo() {
     if (bulkCtx) {
-      const cleared = new Set(bulkCtx.clearedFields);
+      const cleared = new Map(bulkCtx.clearedFields);
       cleared.delete(fieldName);
       bulkCtx?.setClearedFields?.(cleared);
     }
