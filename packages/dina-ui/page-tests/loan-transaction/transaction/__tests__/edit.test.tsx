@@ -4,7 +4,7 @@ import TransactionEditPage, {
 } from "../../../../pages/loan-transaction/transaction/edit";
 import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { Transaction } from "../../../../types/loan-transaction-api";
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -577,16 +577,9 @@ describe("Transaction Form", () => {
     expect(wrapper.getByText(/total selected records: 2/i)).toBeInTheDocument();
 
     // Remove an existing material sample that is loadable.
-    const rowToRemove = wrapper.getByRole("row", {
-      name: /select sample\-2/i
-    });
-    const checkboxToRemove = within(rowToRemove).getByRole("checkbox", {
-      name: /select/i
-    });
-    userEvent.click(checkboxToRemove);
-
-    // Todo: The "<" button needs a test id to make it easier to use. Probably the checkbox as well.
-    screen.logTestingPlaygroundURL();
+    userEvent.click(wrapper.getByTestId("checkbox-sample-2"));
+    userEvent.click(wrapper.getByTestId("remove-resources"));
+    await waitForLoadingToDisappear();
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -602,7 +595,20 @@ describe("Transaction Form", () => {
             resource: {
               id: "test-transaction-broken-material-id",
               type: "transaction",
-              transactionNumber: "new transaction number"
+              relationships: {
+                materialSamples: {
+                  data: [
+                    {
+                      id: "sample-1", // Sample 1 remains since Sample 2 was removed and missing-sample-3 was non-loadable.
+                      type: "material-sample"
+                    },
+                    {
+                      id: "missing-sample-3", // Important! This should be here since it was non-loadable.
+                      type: "material-sample"
+                    }
+                  ]
+                }
+              }
             },
             type: "transaction"
           }
@@ -631,9 +637,10 @@ describe("Transaction Form", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await waitFor(() => {
-      expect(mockSave).not.toHaveBeenCalled();
+    // Wait a moment to ensure no save call is made.
+    await act(async () => {
+      await new Promise(setImmediate);
     });
-    expect(mockSave.mock.calls).toHaveLength(0);
+    expect(mockSave).not.toHaveBeenCalled();
   });
 });

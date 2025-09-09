@@ -156,7 +156,6 @@ export function TransactionForm({
 
     const formattedInitialValues = {
       ...initialValues,
-      materialSamples: allMaterialSamples,
       agentRoles: formatAgentRoles(initialValues.agentRoles)
     };
 
@@ -316,7 +315,7 @@ export function TransactionFormLayout({
       // Track samples that couldn't be loaded
       const nonLoadable: ResourceIdentifierObject[] = [];
       sampleIds.forEach((id, index) => {
-        if (response[index] === null) {
+        if (!response[index]) {
           nonLoadable.push({ id, type: "material-sample" });
         }
       });
