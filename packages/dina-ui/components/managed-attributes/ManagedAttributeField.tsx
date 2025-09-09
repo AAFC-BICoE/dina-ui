@@ -22,6 +22,7 @@ export interface ManagedAttributeFieldProps {
   attribute: PersistedResource<ManagedAttribute>;
   values?: object;
   valuesPath: string;
+  disableClearButton?: boolean;
 }
 
 export interface ManagedAttributeFieldWithLabelProps
@@ -121,7 +122,8 @@ export function getManagedAttributeTooltipText(
 /** Formik-connected field for a single Managed Attribute. No surrounding label tag. */
 export function ManagedAttributeField({
   attribute,
-  valuesPath
+  valuesPath,
+  disableClearButton = false
 }: ManagedAttributeFieldProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -130,7 +132,8 @@ export function ManagedAttributeField({
   const props = {
     removeBottomMargin: true,
     removeLabel: true,
-    name: attributePath
+    name: attributePath,
+    disableClearButton: disableClearButton
   };
 
   const isSelectAttr = !!(

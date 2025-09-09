@@ -1,7 +1,7 @@
 import { ChangeEvent, FocusEvent } from "react";
 import { useIntl } from "react-intl";
 import * as yup from "yup";
-import { TextField, TextFieldProps } from "..";
+import { ClearType, TextField, TextFieldProps } from "..";
 
 export interface NumberFieldProps extends TextFieldProps {
   placeholder?: string;
@@ -48,6 +48,7 @@ export function NumberField(props: NumberFieldProps) {
     <TextField
       {...props}
       validate={validate}
+      clearType={ClearType.Null}
       customInput={(inputProps, formik) => {
         function onBlur(event: FocusEvent<HTMLInputElement>) {
           const error = validate?.(event.target.value);

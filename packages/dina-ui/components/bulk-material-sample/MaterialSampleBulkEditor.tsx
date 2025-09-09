@@ -107,7 +107,6 @@ export function MaterialSampleBulkEditor({
     return getSampleBulkOverrider(
       bulkEditFormRef,
       bulkEditSampleHook,
-      clearedFields,
       deletedFields
     );
   }
@@ -287,7 +286,6 @@ function getSampleHooks(
 export function getSampleBulkOverrider(
   bulkEditFormRef,
   bulkEditSampleHook,
-  clearedFields?: Map<string, ClearType>,
   deletedFields?: Set<string>
 ) {
   let bulkEditSample: InputResource<MaterialSample> | undefined;
@@ -318,7 +316,6 @@ export function getSampleBulkOverrider(
     const materialSampleManagedAttributes = bulkEditAllManagedAttributes(
       bulkEditSample?.managedAttributes ?? {},
       baseSample.managedAttributes ?? {},
-      clearedFields ?? new Map([]),
       deletedFields ?? new Set(),
       "managedAttributes"
     );
@@ -327,7 +324,6 @@ export function getSampleBulkOverrider(
     const preparedManagedAttributes = bulkEditAllManagedAttributes(
       bulkEditSample?.preparationManagedAttributes ?? {},
       baseSample.preparationManagedAttributes ?? {},
-      clearedFields ?? new Map([]),
       deletedFields ?? new Set(),
       "preparationManagedAttributes"
     );

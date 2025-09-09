@@ -129,6 +129,7 @@ export function MaterialSampleInfoSection({
               }}
               managedAttributeOrderFieldName="managedAttributesOrder"
               visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
+              disableClearButton={true}
             />
           </div>
         </div>

@@ -215,6 +215,7 @@ export function PreparationField({
             }}
             managedAttributeOrderFieldName="preparationManagedAttributesOrder"
             visibleAttributeKeys={visibleManagedAttributeKeys}
+            disableClearButton={true}
           />
         </div>
       </div>

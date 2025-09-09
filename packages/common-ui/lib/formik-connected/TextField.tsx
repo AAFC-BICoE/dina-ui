@@ -29,6 +29,7 @@ export interface TextFieldProps extends FieldWrapperProps {
     value: string | null
   ) => void;
   multipleValueClearIcon?: boolean;
+  clearType?: ClearType;
 }
 
 /**
@@ -47,6 +48,7 @@ export function TextField(props: TextFieldProps) {
     letterOnly,
     noSpace,
     disableClearButton,
+    clearType = ClearType.EmptyString,
     ...fieldWrapperProps
   } = props;
 
@@ -120,7 +122,7 @@ export function TextField(props: TextFieldProps) {
               !disableClearButton && (
                 <ClearAllButton
                   fieldName={props.name}
-                  clearType={ClearType.EmptyString}
+                  clearType={clearType}
                   onClearLocal={() => setValue("")}
                   isCleared={!bulkTab?.showClearIcon}
                   readOnly={readOnly}

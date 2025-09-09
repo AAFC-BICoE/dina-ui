@@ -150,6 +150,7 @@ export function MolecularAnalysisForm() {
             fieldSetProps={{
               legend: <DinaMessage id="managedAttributes" />
             }}
+            disableClearButton={true}
           />
         </div>
       </div>

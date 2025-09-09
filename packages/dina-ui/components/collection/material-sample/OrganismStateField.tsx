@@ -129,6 +129,7 @@ export function OrganismStateField({
             }}
             managedAttributeOrderFieldName="organismManagedAttributesOrder"
             visibleAttributeKeys={visibleManagedAttributeKeys}
+            disableClearButton={true}
           />
         </DinaFormSection>
         <FieldSpy<[]> fieldName={determinationFieldProps.name}>

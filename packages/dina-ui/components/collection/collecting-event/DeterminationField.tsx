@@ -343,6 +343,7 @@ export function DeterminationField({
                         }}
                         managedAttributeOrderFieldName="determinationManagedAttributesOrder"
                         visibleAttributeKeys={visibleManagedAttributeKeys}
+                        disableClearButton={true}
                       />
                     </DinaFormSection>
                   )}
@@ -363,6 +364,7 @@ export function DeterminationField({
                       }}
                       managedAttributeOrderFieldName="determinationManagedAttributesOrder"
                       visibleAttributeKeys={visibleManagedAttributeKeys}
+                      disableClearButton={true}
                     />
                   </DinaFormSection>
                 )}

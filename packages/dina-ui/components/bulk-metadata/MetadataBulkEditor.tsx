@@ -91,9 +91,8 @@ export function MetadataBulkEditor({
   });
 
   const metadataBulkOverrider = useCallback(
-    () =>
-      getMetadataBulkOverrider(bulkEditFormRef, clearedFields, deletedFields),
-    [bulkEditFormRef, clearedFields, deletedFields]
+    () => getMetadataBulkOverrider(bulkEditFormRef, deletedFields),
+    [bulkEditFormRef, deletedFields]
   );
 
   useEffect(() => {
@@ -175,7 +174,6 @@ export function MetadataBulkEditor({
 
 export function getMetadataBulkOverrider(
   bulkEditFormRef,
-  clearedFields?: Map<string, ClearType>,
   deletedFields?: Set<string>
 ) {
   let bulkEditMetadata: InputResource<Metadata> | undefined;
@@ -201,7 +199,6 @@ export function getMetadataBulkOverrider(
     const metadataManagedAttributes = bulkEditAllManagedAttributes(
       bulkEditMetadata?.managedAttributes ?? {},
       baseMetadata.managedAttributes ?? {},
-      clearedFields ?? new Map([]),
       deletedFields ?? new Set(),
       "managedAttributes"
     );

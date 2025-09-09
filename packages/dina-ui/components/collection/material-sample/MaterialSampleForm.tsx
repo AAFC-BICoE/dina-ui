@@ -384,6 +384,7 @@ export function MaterialSampleForm({
                 visibleAttributeKeys={
                   visibleManagedAttributeKeys?.materialSample
                 }
+                disableClearButton={true}
               />
             </div>
           </div>
