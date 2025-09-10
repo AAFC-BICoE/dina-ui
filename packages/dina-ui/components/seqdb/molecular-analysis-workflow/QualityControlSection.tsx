@@ -171,7 +171,9 @@ export function QualityControlSection({
               {qualityControl?.attachments?.length > 0 && (
                 <div style={{ marginTop: "15px" }}>
                   <AttachmentsEditor
-                    attachmentPath=""
+                    attachmentParentBaseApi="seqdb-api"
+                    attachmentParentType="quality-control"
+                    attachmentParentId={""}
                     name={`qualityControlAttachments_${index}}`}
                     onChange={(newMetadatas) => {
                       updateQualityControl?.(index, {

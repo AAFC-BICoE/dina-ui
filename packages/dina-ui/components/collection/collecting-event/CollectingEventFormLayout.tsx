@@ -401,7 +401,9 @@ export function CollectingEventFormLayout({
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
         allowAttachmentsConfig={attachmentsConfig}
-        attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
+        attachmentParentBaseApi="collection-api"
+        attachmentParentType="collecting-event"
+        attachmentParentId={initialValues.id}
       />
     </DinaFormSection>
   );

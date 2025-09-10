@@ -72,11 +72,13 @@ export function ProjectFormLayout() {
       />
       <AttachmentsField
         name="attachment"
+        attachmentParentBaseApi="collection-api"
+        attachmentParentType="project"
+        attachmentParentId={initialValues?.id}
         title={<DinaMessage id="projectAttachments" />}
-        id="project-attachments-section"
+        formId="project-attachments-section"
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
-        attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn={true}
       />
       <AgentRolesField

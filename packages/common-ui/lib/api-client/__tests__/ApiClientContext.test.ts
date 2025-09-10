@@ -814,7 +814,7 @@ describe("API client context", () => {
         resourceType: "person",
         apiBaseUrl: "/agent-api",
         include: ["organizations"],
-        optFields: {
+        optfields: {
           person: ["name", "age"]
         }
       });

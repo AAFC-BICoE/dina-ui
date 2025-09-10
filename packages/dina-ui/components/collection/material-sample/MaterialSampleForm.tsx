@@ -397,11 +397,13 @@ export function MaterialSampleForm({
           <AttachmentsField
             name={attachmentsField}
             title={<DinaMessage id="materialSampleAttachments" />}
-            id={id}
+            formId={id}
             allowNewFieldName="attachmentsConfig.allowNew"
             allowExistingFieldName="attachmentsConfig.allowExisting"
             allowAttachmentsConfig={attachmentsConfig?.materialSample}
-            attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+            attachmentParentBaseApi="collection-api"
+            attachmentParentType="material-sample"
+            attachmentParentId={materialSample?.id ?? ""}
             wrapContent={(content) => (
               <BulkEditTabWarning
                 messageIdSingle="bulkEditResourceLinkerWarning_Attachments_MaterialSample_Single"

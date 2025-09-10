@@ -62,9 +62,9 @@ declare module "kitsu" {
      * Certain fields are optional since they are computational expensive and not always needed.
      * They can be defined per resource type.
      *
-     * e.g.: { "material-sample": ["hierarchy"] }
+     * e.g.: { "material-sample": "hierarchy,targetDetermination" }
      */
-    optFields?: { [resourceType: string]: string[] };
+    optfields?: FieldsParam;
 
     /** Vendor-specific parameter for paginating listed data. */
     page?: any;

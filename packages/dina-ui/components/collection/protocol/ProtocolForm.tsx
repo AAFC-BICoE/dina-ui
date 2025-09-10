@@ -124,10 +124,12 @@ export function ProtocolFormLayout() {
       <AttachmentsField
         name="attachments"
         title={<DinaMessage id="protocolAttachments" />}
-        id="protocol-attachments-section"
+        formId="protocol-attachments-section"
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
-        attachmentPath={`collection-api/protocol/${initialValues?.id}/attachments`}
+        attachmentParentBaseApi="collection-api"
+        attachmentParentType="protocol"
+        attachmentParentId={initialValues?.id}
         hideAddAttchmentBtn={true}
       />
       <div className="row">

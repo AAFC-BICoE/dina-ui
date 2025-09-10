@@ -455,7 +455,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <Field name="id">
                     {({ field: { value: materialSampleId } }) => (
                       <AttachmentReadOnlySection
-                        attachmentPath={`collection-api/material-sample/${materialSampleId}/attachment`}
+                        name="attachment"
+                        attachmentParentBaseApi="collection-api"
+                        attachmentParentType="material-sample"
+                        attachmentParentId={materialSampleId}
                         detachTotalSelected={true}
                         title={<DinaMessage id="materialSampleAttachments" />}
                       />

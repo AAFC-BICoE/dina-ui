@@ -169,8 +169,10 @@ export function SangerPcrReactionStep({
       <AttachmentsField
         name="attachment"
         title={<DinaMessage id="pcrBatchAttachments" />}
-        attachmentPath={`seqdb-api/pcr-batch/${pcrBatchId}/attachment`}
-        id="pcr-batch-attachments"
+        attachmentParentBaseApi="seqdb-api"
+        attachmentParentId={pcrBatchId}
+        attachmentParentType="pcr-batch"
+        formId="pcr-batch-attachments"
         hideAddAttchmentBtn={true}
       />
     </DinaForm>

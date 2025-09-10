@@ -161,7 +161,9 @@ export function MolecularAnalysisRunStep({
               {/* Attachments */}
               {editMode ? (
                 <AttachmentsEditor
-                  attachmentPath={``}
+                  attachmentParentBaseApi="seqdb-api"
+                  attachmentParentType="molecular-analysis-run"
+                  attachmentParentId={sequencingRunId ?? ""}
                   name="attachments"
                   onChange={setAttachments}
                   value={attachments}
@@ -173,7 +175,10 @@ export function MolecularAnalysisRunStep({
                 <>
                   {sequencingRunId && (
                     <AttachmentReadOnlySection
-                      attachmentPath={`seqdb-api/molecular-analysis-run/${sequencingRunId}/attachments`}
+                      name="attachments"
+                      attachmentParentBaseApi="seqdb-api"
+                      attachmentParentType="molecular-analysis-run"
+                      attachmentParentId={sequencingRunId}
                       title={
                         <DinaMessage id="molecularAnalysisRunStep_attachments" />
                       }

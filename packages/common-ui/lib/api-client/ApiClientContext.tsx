@@ -41,7 +41,7 @@ export interface BulkLoadResourcesOptions {
    *
    * e.g.: { "material-sample": ["hierarchy"] }
    */
-  optFields?: { [resourceType: string]: string[] };
+  optfields?: { [resourceType: string]: string[] };
 
   returnNullForMissingResource?: boolean;
 }
@@ -629,7 +629,7 @@ export class ApiClientImpl implements ApiClientI {
       apiBaseUrl,
       resourceType,
       include,
-      optFields,
+      optfields,
       returnNullForMissingResource = false
     }: BulkLoadResourcesOptions
   ) {
@@ -642,8 +642,8 @@ export class ApiClientImpl implements ApiClientI {
     }
 
     // Handle optional field parameters.
-    if (optFields && Object.keys(optFields).length > 0) {
-      for (const [type, fields] of Object.entries(optFields)) {
+    if (optfields && Object.keys(optfields).length > 0) {
+      for (const [type, fields] of Object.entries(optfields)) {
         params.append(`optfields[${type}]`, fields.join(","));
       }
     }

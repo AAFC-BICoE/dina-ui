@@ -25,28 +25,72 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import { ColumnDef } from "@tanstack/react-table";
 
 export interface AttachmentsFieldProps {
+  /**
+   * Attachment field name.
+   *
+   * e.g. "attachment" for an Assemblage entity which has "attachment" relationship.
+   */
   name: string;
-  id?: string;
+
+  /**
+   * The base API of the parent entity to which the attachments will be associated.
+   *
+   * e.g. "collection-api" for an Assemblage entity which has "attachment" relationship.
+   */
+  attachmentParentBaseApi: string;
+
+  /**
+   * ID of the parent entity to which attachments will be associated.
+   *
+   * e.g. the ID of an Assemblage entity which has "attachment" relationship.
+   */
+  attachmentParentId: string;
+
+  /**
+   * Type of the parent entity to which attachments will be associated.
+   *
+   * e.g. "assemblages" for an Assemblage entity which has "attachment" relationship.
+   */
+  attachmentParentType: string;
+
+  /**
+   * Optional ID for the FieldSet surrounding this component.
+   */
+  formId?: string;
+
   title?: ReactNode;
+
   allowNewFieldName?: string;
+
   allowExistingFieldName?: string;
-  /** Manually set whether new/existing attachments can be added. By default allow both. */
+
+  /**
+   * Manually set whether new/existing attachments can be added. By default allow both.
+   */
   allowAttachmentsConfig?: AllowAttachmentsConfig;
-  /** Attachment API path for the read-only view. */
-  attachmentPath: string;
+
   hideAddAttchmentBtn?: boolean;
+
   hideRemoveBtn?: boolean;
+
   hideAttachmentForm?: boolean;
+
   hideTitle?: boolean;
+
   hideCard?: boolean;
+
   wrapContent?: (content: ReactNode) => ReactNode;
 }
 
 export function AttachmentsField(props: AttachmentsFieldProps) {
   const { readOnly } = useDinaFormContext();
+
   return readOnly ? (
     <AttachmentReadOnlySection
-      attachmentPath={props.attachmentPath}
+      name={props.name}
+      attachmentParentBaseApi={props.attachmentParentBaseApi}
+      attachmentParentType={props.attachmentParentType}
+      attachmentParentId={props.attachmentParentId}
       detachTotalSelected={true}
       title={props.title}
     />
@@ -77,7 +121,7 @@ export interface AttachmentsEditorProps extends AttachmentsFieldProps {
 export function AttachmentsEditor({
   value,
   onChange,
-  id,
+  formId,
   title,
   allowExistingFieldName,
   allowNewFieldName,
@@ -176,7 +220,7 @@ export function AttachmentsEditor({
 
   return (
     <FieldSet
-      id={id}
+      id={formId}
       legend={
         hideTitle ? (
           <></>

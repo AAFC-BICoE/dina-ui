@@ -457,11 +457,6 @@ function PcrBatchFormFields({
           />
         </FieldSet>
       )}
-      {/* <AttachmentsField
-        name="attachment"
-        attachmentPath={`seqdb-api/pcr-batch/${initialValues.id}/attachment`}
-        title={<DinaMessage id="attachments" />}
-      /> */}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />
