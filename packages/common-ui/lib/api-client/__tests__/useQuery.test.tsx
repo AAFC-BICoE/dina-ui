@@ -334,6 +334,7 @@ describe("useQuery hook", () => {
           fields: { todo: "name,description" },
           filter: { name: "todo 2" },
           include: "group",
+          optFields: { todo: ["detailedDescription"] },
           page: { offset: 200, limit: 100 },
           path: "todo",
           sort: "name"
@@ -355,6 +356,7 @@ describe("useQuery hook", () => {
       fields: { todo: "name,description" },
       filter: { name: "todo 2" },
       include: "group",
+      optFields: { todo: ["detailedDescription"] },
       page: { offset: 200, limit: 100 },
       sort: "name"
     });

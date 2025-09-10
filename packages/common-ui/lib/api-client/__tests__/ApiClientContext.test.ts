@@ -63,10 +63,11 @@ const mockPatch = jest.fn((_, data) => {
 });
 
 const mockPost = jest.fn((url, data) => {
+  const queryString = new URLSearchParams(url.substring(url.indexOf("?")));
   if (url.includes("bulk-load")) {
-    if (url.includes("include=")) {
-      const includes = url.split("=").slice(-1)[0].split(",");
-      if (includes.includes("organizations")) {
+    if (queryString.has("include")) {
+      const includes = queryString.get("include")?.split(",");
+      if (includes?.includes("organizations")) {
         return Promise.resolve(MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS);
       }
     }
@@ -772,6 +773,17 @@ describe("API client context", () => {
         resourceType: "person",
         apiBaseUrl: "/agent-api"
       });
+
+      // Ensure the correct request was sent
+      await waitFor(() => {
+        expect(mockPost).toHaveBeenCalledTimes(1);
+      });
+      expect(mockPost).toHaveBeenCalledWith(
+        "/agent-api/person/bulk-load",
+        MOCK_BULK_GET_DATA,
+        expect.anything()
+      );
+
       expect(response).toEqual(MOCK_BULK_GET_RESPONSE_DESERIALIZED);
     });
 
@@ -781,8 +793,40 @@ describe("API client context", () => {
         apiBaseUrl: "/agent-api",
         include: ["organizations"]
       });
+
+      // Ensure the correct request was sent
+      await waitFor(() => {
+        expect(mockPost).toHaveBeenCalledTimes(1);
+      });
+      expect(mockPost).toHaveBeenCalledWith(
+        "/agent-api/person/bulk-load?include=organizations",
+        MOCK_BULK_GET_DATA,
+        expect.anything()
+      );
+
       expect(response).toEqual(
         MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS_DESERIALIZED
+      );
+    });
+
+    it("Provides a bulkLoadResources function that can get multiple objects by id with includes and optional fields", async () => {
+      await bulkLoadResources(["1", "2", "3"], {
+        resourceType: "person",
+        apiBaseUrl: "/agent-api",
+        include: ["organizations"],
+        optFields: {
+          person: ["name", "age"]
+        }
+      });
+
+      // Ensure the correct request was sent
+      await waitFor(() => {
+        expect(mockPost).toHaveBeenCalledTimes(1);
+      });
+      expect(mockPost).toHaveBeenCalledWith(
+        "/agent-api/person/bulk-load?include=organizations&optfields%5Bperson%5D=name%2Cage",
+        MOCK_BULK_GET_DATA,
+        expect.anything()
       );
     });
 

@@ -34,6 +34,15 @@ export interface BulkLoadResourcesOptions {
   apiBaseUrl: string;
   resourceType: string;
   include?: string[];
+
+  /**
+   * Certain fields are optional since they are computational expensive and not always needed.
+   * They can be defined per resource type.
+   *
+   * e.g.: { "material-sample": ["hierarchy"] }
+   */
+  optFields?: { [resourceType: string]: string[] };
+
   returnNullForMissingResource?: boolean;
 }
 
@@ -255,7 +264,9 @@ export class ApiClientImpl implements ApiClientI {
       "person",
       "identifier",
       "object-upload",
-      "metadata"
+      "metadata",
+      "material-sample",
+      "collecting-event"
     ];
 
     // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
@@ -618,13 +629,30 @@ export class ApiClientImpl implements ApiClientI {
       apiBaseUrl,
       resourceType,
       include,
+      optFields,
       returnNullForMissingResource = false
     }: BulkLoadResourcesOptions
   ) {
     const { axios } = this.apiClient;
-    const url = include
-      ? `${apiBaseUrl}/${resourceType}/bulk-load?include=${include.join(",")}`
-      : `${apiBaseUrl}/${resourceType}/bulk-load`;
+    const params = new URLSearchParams();
+
+    // Handle include parameter.
+    if (include && include.length > 0) {
+      params.append("include", include.join(","));
+    }
+
+    // Handle optional field parameters.
+    if (optFields && Object.keys(optFields).length > 0) {
+      for (const [type, fields] of Object.entries(optFields)) {
+        params.append(`optfields[${type}]`, fields.join(","));
+      }
+    }
+
+    // Construct the URL for the bulk-load endpoint.
+    const url = `${apiBaseUrl}/${resourceType}/bulk-load${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+
     let response: AxiosResponse = undefined as any;
     const missingIds: string[] = [];
     const originalIds = [...ids]; // Keep the original IDs for later reference.

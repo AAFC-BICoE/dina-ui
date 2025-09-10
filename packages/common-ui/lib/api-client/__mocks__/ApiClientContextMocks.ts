@@ -314,6 +314,7 @@ export const MOCK_BULK_GET_RESPONSE_INCLUDE_ORGANIZATIONS_DESERIALIZED = {
   },
   status: 200
 };
+
 export const MOCK_BULK_CREATE_DATA = [
   {
     attributes: {
