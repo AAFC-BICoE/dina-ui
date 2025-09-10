@@ -169,6 +169,7 @@ export function MetadataForm({
         fieldSetProps={{
           legend: <DinaMessage id="managedAttributes" />
         }}
+        disableClearButton={true}
       />
       {buttonBar}
     </DinaForm>

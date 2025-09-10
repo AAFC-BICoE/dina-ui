@@ -18,9 +18,23 @@ export interface ResourceWithHooks<T extends KitsuResource = KitsuResource> {
   formRef: MutableRefObject<FormikProps<InputResource<T>> | null>;
 }
 
+/**
+ * The possible types a field can be cleared to.
+ */
+export enum ClearType {
+  EmptyString = "emptyString",
+  Null = "null"
+}
+
 export interface BulkEditTabContextI<T extends KitsuResource = KitsuResource> {
   bulkEditFormRef: RefObject<FormikProps<InputResource<T>>>;
   resourceHooks: ResourceWithHooks<T>[];
+  clearedFields?: Map<string, ClearType>;
+  setClearedFields?: React.Dispatch<
+    React.SetStateAction<Map<string, ClearType>>
+  >;
+  deletedFields?: Set<string>;
+  setDeletedFields?: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
 export const BulkEditTabContext = createContext<BulkEditTabContextI | null>(

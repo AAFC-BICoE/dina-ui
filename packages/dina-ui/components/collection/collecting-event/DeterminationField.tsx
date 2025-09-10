@@ -1,6 +1,7 @@
 import {
   AutoSuggestTextField,
   DateField,
+  DinaFormSection,
   FieldSet,
   TextField,
   TextFieldWithMultiplicationButton,
@@ -327,6 +328,28 @@ export function DeterminationField({
                     multiLines={true}
                   />
                   {readOnly && (
+                    <DinaFormSection disableEditAllDelete={true}>
+                      <ManagedAttributesEditor
+                        valuesPath={fieldProps("managedAttributes").name}
+                        managedAttributeApiPath="collection-api/managed-attribute"
+                        managedAttributeComponent="DETERMINATION"
+                        attributeSelectorWidth={12}
+                        fieldSetProps={{
+                          legend: (
+                            <DinaMessage id="determinationManagedAttributes" />
+                          ),
+                          className: "non-strip",
+                          sectionName: "organism-managed-attributes-section"
+                        }}
+                        managedAttributeOrderFieldName="determinationManagedAttributesOrder"
+                        visibleAttributeKeys={visibleManagedAttributeKeys}
+                        disableClearButton={true}
+                      />
+                    </DinaFormSection>
+                  )}
+                </FieldSet>
+                {!readOnly && (
+                  <DinaFormSection disableEditAllDelete={true}>
                     <ManagedAttributesEditor
                       valuesPath={fieldProps("managedAttributes").name}
                       managedAttributeApiPath="collection-api/managed-attribute"
@@ -341,25 +364,9 @@ export function DeterminationField({
                       }}
                       managedAttributeOrderFieldName="determinationManagedAttributesOrder"
                       visibleAttributeKeys={visibleManagedAttributeKeys}
+                      disableClearButton={true}
                     />
-                  )}
-                </FieldSet>
-                {!readOnly && (
-                  <ManagedAttributesEditor
-                    valuesPath={fieldProps("managedAttributes").name}
-                    managedAttributeApiPath="collection-api/managed-attribute"
-                    managedAttributeComponent="DETERMINATION"
-                    attributeSelectorWidth={12}
-                    fieldSetProps={{
-                      legend: (
-                        <DinaMessage id="determinationManagedAttributes" />
-                      ),
-                      className: "non-strip",
-                      sectionName: "organism-managed-attributes-section"
-                    }}
-                    managedAttributeOrderFieldName="determinationManagedAttributesOrder"
-                    visibleAttributeKeys={visibleManagedAttributeKeys}
-                  />
+                  </DinaFormSection>
                 )}
               </div>
             </div>

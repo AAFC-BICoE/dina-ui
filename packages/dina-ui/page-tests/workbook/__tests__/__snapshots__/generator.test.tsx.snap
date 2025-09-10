@@ -372,13 +372,19 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                   <div
                     class="field-label label-col mb-2"
                   >
-                    <strong>
-                      <div
-                        class="type-field-header"
+                    <div
+                      class="d-flex align-items-center w-100"
+                    >
+                      <strong
+                        class="me-2"
                       >
-                        Type
-                      </div>
-                    </strong>
+                        <div
+                          class="type-field-header"
+                        >
+                          Type
+                        </div>
+                      </strong>
+                    </div>
                   </div>
                   <div
                     class="field-col"

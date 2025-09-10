@@ -115,6 +115,7 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="COLLECTING_EVENT"
+          disableClearButton={true}
         />
       </DinaForm>,
       { apiContext }
@@ -183,6 +184,7 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="COLLECTING_EVENT"
+          disableClearButton={true}
         />
       </DinaForm>,
       { apiContext }

@@ -116,19 +116,22 @@ export function OrganismStateField({
             className="col-sm-12"
           />
         </div>
-        <ManagedAttributesEditor
-          valuesPath={fieldProps("managedAttributes").name}
-          managedAttributeApiPath="collection-api/managed-attribute"
-          managedAttributeComponent="ORGANISM"
-          attributeSelectorWidth={12}
-          fieldSetProps={{
-            legend: <DinaMessage id="organismManagedAttributes" />,
-            className: "non-strip",
-            sectionName: "organism-managed-attributes-section"
-          }}
-          managedAttributeOrderFieldName="organismManagedAttributesOrder"
-          visibleAttributeKeys={visibleManagedAttributeKeys}
-        />
+        <DinaFormSection disableEditAllDelete={true}>
+          <ManagedAttributesEditor
+            valuesPath={fieldProps("managedAttributes").name}
+            managedAttributeApiPath="collection-api/managed-attribute"
+            managedAttributeComponent="ORGANISM"
+            attributeSelectorWidth={12}
+            fieldSetProps={{
+              legend: <DinaMessage id="organismManagedAttributes" />,
+              className: "non-strip",
+              sectionName: "organism-managed-attributes-section"
+            }}
+            managedAttributeOrderFieldName="organismManagedAttributesOrder"
+            visibleAttributeKeys={visibleManagedAttributeKeys}
+            disableClearButton={true}
+          />
+        </DinaFormSection>
         <FieldSpy<[]> fieldName={determinationFieldProps.name}>
           {(determinations) =>
             // Hide in read-only mode when there are no determinations:

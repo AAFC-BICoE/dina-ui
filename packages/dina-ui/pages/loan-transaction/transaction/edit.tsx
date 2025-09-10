@@ -429,6 +429,7 @@ export function TransactionFormLayout({
         fieldSetProps={{
           legend: <DinaMessage id="managedAttributes" />
         }}
+        disableClearButton={true}
       />
       <div className="mb-3">
         <AttachmentsField
