@@ -12,7 +12,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api";
 import { Person } from "../../../types/objectstore-api";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
-import { fiql } from "packages/common-ui/lib/filter-builder/fiql";
+import { fiql } from "../../../../common-ui/lib/filter-builder/fiql";
 
 export interface CollectingEventFilterFormValues {
   createdBy?: string;

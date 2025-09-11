@@ -3,6 +3,7 @@ import {
   LoadingSpinner,
   QueryPage,
   SaveArgs,
+  SimpleSearchFilterBuilder,
   useApiClient,
   useQuery
 } from "../../../../common-ui/lib";
@@ -15,6 +16,7 @@ import _ from "lodash";
 import { useRouter } from "next/router";
 import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { SELECT_MATERIAL_SAMPLES_TAB_INDEX } from "../../../pages/collection/storage-unit/grid";
+import { simpleSearchFilterToFiql } from "packages/common-ui/lib/filter-builder/fiql";
 
 interface StorageUnitSampleSelectionStepProps {
   onSaved: (nextStep?: number) => Promise<void>;
@@ -48,7 +50,11 @@ export function StorageUnitSampleSelectionStep({
   useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
-      filter: { rsql: `storageUnitUsage.storageUnit.uuid==${storageUnit?.id}` },
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create()
+          .where("storageUnitUsage.storageUnit.uuid", "EQ", storageUnit?.id)
+          .build()
+      ),
       page: { limit: 1000 },
       include: "storageUnitUsage"
     },

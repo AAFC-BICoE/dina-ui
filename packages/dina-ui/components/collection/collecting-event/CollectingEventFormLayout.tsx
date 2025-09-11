@@ -61,7 +61,7 @@ import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
-import { simpleSearchFilterToFiql } from "packages/common-ui/lib/filter-builder/fiql";
+import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;

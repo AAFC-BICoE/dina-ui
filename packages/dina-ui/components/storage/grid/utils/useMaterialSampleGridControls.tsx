@@ -2,6 +2,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   SaveArgs,
+  SimpleSearchFilterBuilder,
   useQuery,
   useStringComparator
 } from "common-ui";
@@ -12,6 +13,7 @@ import { StorageUnitUsage } from "../../../../types/collection-api/resources/Sto
 import { CellGrid } from "../../../../components/seqdb/container-grid/ContainerGrid";
 import { SAMPLE_SELECTION_MATERIAL_SAMPLE_SORT_ORDER } from "../StorageUnitSampleSelectionStep";
 import { SELECT_COORDINATES_TAB_INDEX } from "../../../../pages/collection/storage-unit/grid";
+import { simpleSearchFilterToFiql } from "packages/common-ui/lib/filter-builder/fiql";
 
 interface MaterialSampleGridControlsProps {
   storageUnit: StorageUnit;
@@ -71,9 +73,11 @@ export function useMaterialSampleGridControls({
   const { loading: materialSamplesQueryLoading } = useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
-      filter: {
-        rsql: `storageUnitUsage.storageUnit.uuid==${storageUnit?.id}`
-      },
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create()
+          .where("storageUnitUsage.storageUnit.uuid", "EQ", storageUnit?.id)
+          .build()
+      ),
       include: "storageUnitUsage",
       page: { limit: 1000 }
     },

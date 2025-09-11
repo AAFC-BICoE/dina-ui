@@ -1,5 +1,5 @@
 import { fireEvent, waitFor } from "@testing-library/react";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, SimpleSearchFilterBuilder } from "common-ui";
 import { ListPageLayout } from "../ListPageLayout";
 import "@testing-library/jest-dom";
 
@@ -23,6 +23,7 @@ describe("ListPageLayout component", () => {
           columns: ["name", "type"],
           path: "pcrPrimer"
         }}
+        useFiql={true}
       />,
       { apiContext: mockApiCtx }
     );
@@ -40,12 +41,12 @@ describe("ListPageLayout component", () => {
     });
     fireEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
 
-    // There should be an RSQL filter.
+    // There should be an FIQL filter.
     await waitFor(() => {
       expect(mockGet).lastCalledWith(
         expect.anything(),
         expect.objectContaining({
-          filter: { rsql: "name==*101F*" }
+          fiql: "name==*101F*"
         })
       );
     });
@@ -53,13 +54,15 @@ describe("ListPageLayout component", () => {
     // Click the reset button.
     fireEvent.click(wrapper.getByRole("button", { name: /reset filters/i }));
 
-    // There should be no RSQL filter.
-    expect(mockGet).lastCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        filter: {}
-      })
-    );
+    // There should be no FIQL filter. Ensure it contains no fiql property.
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith(
+        expect.anything(),
+        expect.not.objectContaining({
+          fiql: expect.anything()
+        })
+      );
+    });
   });
 
   it("Stores the table's sort in localstorage.", async () => {
@@ -71,6 +74,7 @@ describe("ListPageLayout component", () => {
           columns: ["name", "type"],
           path: "pcrPrimer"
         }}
+        useFiql={true}
       />,
       { apiContext: mockApiCtx }
     );
@@ -83,10 +87,9 @@ describe("ListPageLayout component", () => {
     // Click the type header to trigger the sort.
     fireEvent.click(wrapper.getByText("Type"));
 
-    // There should be an RSQL filter.
+    // There should be an FIQL filter.
     await waitFor(() => {
       expect(mockGet).lastCalledWith("pcrPrimer", {
-        filter: {},
         page: { limit: 25, offset: 0 },
         sort: "-type"
       });
@@ -101,16 +104,17 @@ describe("ListPageLayout component", () => {
     mountWithAppContext(
       <ListPageLayout
         id="test-layout"
-        additionalFilters={{
-          attr1: "a",
-          rsql: "attr2==b"
-        }}
+        additionalFilters={SimpleSearchFilterBuilder.create()
+          .where("attr1", "EQ", "a")
+          .where("attr2", "EQ", "b")
+          .build()}
         defaultSort={[{ id: "createdOn", desc: true }]}
         filterAttributes={["name"]}
         queryTableProps={{
           columns: ["name", "type"],
           path: "pcrPrimer"
         }}
+        useFiql={true}
       />,
       { apiContext: mockApiCtx }
     );
@@ -118,7 +122,7 @@ describe("ListPageLayout component", () => {
     // Ensure the additional filters are included in the request:
     await waitFor(() => {
       expect(mockGet).lastCalledWith("pcrPrimer", {
-        filter: { attr1: "a", rsql: "attr2==b" },
+        fiql: "attr1==a;attr2==b",
         page: { limit: 25, offset: 0 },
         sort: "-createdOn"
       });
@@ -129,7 +133,9 @@ describe("ListPageLayout component", () => {
     mountWithAppContext(
       <ListPageLayout
         id="test-layout"
-        additionalFilters={"group==testGroup"}
+        additionalFilters={SimpleSearchFilterBuilder.create()
+          .where("group", "EQ", "testGroup")
+          .build()}
         useFiql={true}
         defaultSort={[{ id: "createdOn", desc: true }]}
         filterAttributes={["name"]}

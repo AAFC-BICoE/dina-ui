@@ -10,7 +10,7 @@ import {
 import { DeterminationField, ManagedAttributesEditor } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api";
-import { simpleSearchFilterToFiql } from "packages/common-ui/lib/filter-builder/fiql";
+import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 
 /**
  * List of field names in the OrganismStateField component.
