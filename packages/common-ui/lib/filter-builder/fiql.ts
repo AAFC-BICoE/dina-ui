@@ -1,4 +1,4 @@
-import { KitsuResource } from "kitsu";
+import { FilterParam, KitsuResource } from "kitsu";
 import moment from "moment";
 import { FilterAttributeConfig } from "./FilterBuilder";
 import { FilterGroupModel } from "./FilterGroup";
@@ -15,6 +15,30 @@ interface FiqlOperand {
 interface FiqlOperandGroup {
   operands: (FiqlOperand | FiqlOperandGroup)[];
   operator: string;
+}
+
+export function simpleSearchFilterToFiql(
+  filter: FilterParam | undefined
+): string {
+  const fiqlClauses: string[] = [];
+
+  // Loop over each field in the filter object (e.g., 'name', 'description', 'age').
+  for (const [fieldName, operators] of Object.entries(filter || {})) {
+    if (!operators) continue;
+
+    for (const [operator, value] of Object.entries(operators)) {
+      const fiqlOperator =
+        operator.toUpperCase() === "EQ"
+          ? "" // Empty string since the operator is implicit in FIQL for equality
+          : operator.toLowerCase();
+
+      const fiqlValue = value === null ? "null" : value;
+
+      fiqlClauses.push(`${fieldName}=${fiqlOperator}=${fiqlValue}`);
+    }
+  }
+
+  return fiqlClauses.join(";");
 }
 
 /** Converts a FilterGroupModel to a FIQL expression. */
