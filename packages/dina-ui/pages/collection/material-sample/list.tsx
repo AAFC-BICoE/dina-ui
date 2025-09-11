@@ -9,6 +9,7 @@ import {
   FilterAttribute,
   ListPageLayout,
   QueryPage,
+  SimpleSearchFilterBuilder,
   stringArrayCell
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -160,10 +161,12 @@ export function SampleListLayout({
   ];
   return (
     <ListPageLayout
-      additionalFilters={(filterForm) => ({
-        // Apply group filter:
-        ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-      })}
+      additionalFilters={(filterForm) =>
+        SimpleSearchFilterBuilder.create<MaterialSample>()
+          .whereProvided("group", "EQ", filterForm.group)
+          .build()
+      }
+      useFiql={true}
       filterAttributes={MATERIAL_SAMPLE_FILTER_ATTRIBUTES}
       id="material-sample-list"
       queryTableProps={{
