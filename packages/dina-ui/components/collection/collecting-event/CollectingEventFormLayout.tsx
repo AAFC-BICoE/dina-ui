@@ -11,6 +11,7 @@ import {
   NumberRangeFields,
   PlaceSectionsSelectionField,
   ResourceSelectField,
+  SimpleSearchFilterBuilder,
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
@@ -60,6 +61,7 @@ import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
+import { simpleSearchFilterToFiql } from "packages/common-ui/lib/filter-builder/fiql";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -726,12 +728,12 @@ export function CollectingEventFormLayout({
                   jsonApiBackend={{
                     query: (searchValue, ctx) => ({
                       path: "collection-api/collecting-event",
-                      filter: {
-                        ...(ctx.values.group && {
-                          group: { EQ: ctx.values.group }
-                        }),
-                        rsql: `dwcRecordedBy==*${searchValue}*`
-                      }
+                      fiql: simpleSearchFilterToFiql(
+                        SimpleSearchFilterBuilder.create<CollectingEvent>()
+                          .searchFilter("dwcRecordedBy", searchValue)
+                          .whereProvided("group", "EQ", ctx.values.group)
+                          .build()
+                      )
                     }),
                     option: (collEvent) => collEvent?.dwcRecordedBy ?? ""
                   }}
@@ -986,12 +988,12 @@ export function CollectingEventFormLayout({
               jsonApiBackend={{
                 query: (searchValue, ctx) => ({
                   path: "collection-api/collecting-event",
-                  filter: {
-                    ...(ctx.values.group && {
-                      group: { EQ: ctx.values.group }
-                    }),
-                    rsql: `substrate==${searchValue}*`
-                  }
+                  fiql: simpleSearchFilterToFiql(
+                    SimpleSearchFilterBuilder.create<CollectingEvent>()
+                      .searchFilter("substrate", searchValue)
+                      .whereProvided("group", "EQ", ctx.values.group)
+                      .build()
+                  )
                 }),
                 option: (collEvent) => collEvent?.substrate ?? ""
               }}

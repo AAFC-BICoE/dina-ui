@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   DinaFormSection,
   FieldSpy,
+  SimpleSearchFilterBuilder,
   TextField,
   ToggleField,
   useDinaFormContext
@@ -9,6 +10,7 @@ import {
 import { DeterminationField, ManagedAttributesEditor } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api";
+import { simpleSearchFilterToFiql } from "packages/common-ui/lib/filter-builder/fiql";
 
 /**
  * List of field names in the OrganismStateField component.
@@ -79,10 +81,12 @@ export function OrganismStateField({
             jsonApiBackend={{
               query: (search, ctx) => ({
                 path: "collection-api/organism",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `lifeStage==${search}*`
-                }
+                fiql: simpleSearchFilterToFiql(
+                  SimpleSearchFilterBuilder.create<Organism>()
+                    .searchFilter("lifeStage", search)
+                    .whereProvided("group", "EQ", ctx.values.group)
+                    .build()
+                )
               }),
               option: (org) => org?.lifeStage
             }}
@@ -95,10 +99,12 @@ export function OrganismStateField({
             jsonApiBackend={{
               query: (search, ctx) => ({
                 path: "collection-api/organism",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `sex==${search}*`
-                }
+                fiql: simpleSearchFilterToFiql(
+                  SimpleSearchFilterBuilder.create<Organism>()
+                    .searchFilter("sex", search)
+                    .whereProvided("group", "EQ", ctx.values.group)
+                    .build()
+                )
               }),
               option: (org) => org?.sex
             }}

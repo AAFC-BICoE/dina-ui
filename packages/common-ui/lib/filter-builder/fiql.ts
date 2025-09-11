@@ -28,11 +28,16 @@ export function simpleSearchFilterToFiql(
 
     for (const [operator, value] of Object.entries(operators)) {
       const fiqlOperator =
-        operator.toUpperCase() === "EQ"
+        operator.toUpperCase() === "EQ" || operator.toUpperCase() === "ILIKE"
           ? "" // Empty string since the operator is implicit in FIQL for equality
           : operator.toLowerCase();
 
-      const fiqlValue = value === null ? "null" : value;
+      let fiqlValue = value === null ? "null" : value;
+
+      // Replace "%" with "*" for ILIKE operations (FIQL partial matching)
+      if (operator.toUpperCase() === "ILIKE" && typeof fiqlValue === "string") {
+        fiqlValue = fiqlValue.replace(/%/g, "*");
+      }
 
       fiqlClauses.push(`${fieldName}=${fiqlOperator}=${fiqlValue}`);
     }

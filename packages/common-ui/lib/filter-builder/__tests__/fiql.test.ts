@@ -389,7 +389,7 @@ describe("fiql conversion", () => {
   describe("simpleSearchFilterToFiql", () => {
     it("Converts a FilterParam to fiql correctly.", () => {
       const filterParam: FilterParam = {
-        name: { ILIKE: "*test*" },
+        name: { ILIKE: "%test%" },
         description: { EQ: null },
         age: { GT: 18, LT: 65 },
         status: { IN: "active,pending" }
@@ -397,7 +397,7 @@ describe("fiql conversion", () => {
 
       const fiqlFilter = simpleSearchFilterToFiql(filterParam);
       expect(fiqlFilter).toEqual(
-        "name=ilike=*test*;description==null;age=gt=18;age=lt=65;status=in=active,pending"
+        "name==*test*;description==null;age=gt=18;age=lt=65;status=in=active,pending"
       );
     });
 
