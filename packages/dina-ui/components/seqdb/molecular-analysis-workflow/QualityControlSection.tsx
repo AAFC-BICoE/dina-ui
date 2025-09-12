@@ -151,7 +151,6 @@ export function QualityControlSection({
                           }}
                           value={qualityControl.attachments}
                           className="mb-0 me-4 mt-1"
-                          name="attachments"
                           readOnly={!editMode}
                         />
                         <Button

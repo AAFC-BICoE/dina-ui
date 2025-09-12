@@ -401,6 +401,7 @@ export function useMolecularAnalysisRunColumns({
                   (original.molecularAnalysisRunItem?.result
                     ?.attachments as ResourceIdentifierObject[]) ?? []
                 }
+                readOnly={readOnly ?? true}
                 onChange={async (newMetadatas) => {
                   if (original.molecularAnalysisRunItem) {
                     const molecularAnalysisRunResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
@@ -593,6 +594,7 @@ export function useMolecularAnalysisRunColumns({
                 paddingRight: "15px",
                 width: "6rem"
               }}
+              readOnly={readOnly ?? true}
               buttonTextElement={<DinaMessage id="addButtonText" />}
               value={original.attachments ?? []}
               onChange={async (newMetadatas) => {

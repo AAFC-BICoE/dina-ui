@@ -230,7 +230,6 @@ export function AttachmentsEditor({
                   value={value}
                   addingAttachmentsDisabled={addingAttachmentsDisabled}
                   allowAttachmentsConfig={allowAttachmentsConfig}
-                  name={name}
                   readOnly={readOnly ?? true}
                 />
               ) : (
@@ -283,7 +282,6 @@ interface AddAttachmentsButtonProps {
   style?: CSSProperties;
   className?: string;
   removeMargin?: boolean;
-  name: string;
   readOnly: boolean;
 }
 
@@ -296,7 +294,6 @@ export function AddAttachmentsButton({
   style,
   className,
   removeMargin,
-  name,
   readOnly
 }: AddAttachmentsButtonProps) {
   const { closeModal, openModal } = useModal();
@@ -318,7 +315,8 @@ export function AddAttachmentsButton({
         </div>
         <div className="modal-body">
           <AttachmentSection
-            name={name}
+            value={value}
+            onChange={onChange}
             allowAttachmentsConfig={allowAttachmentsConfig}
             afterMetadatasSaved={addAttachedMetadatas(
               onChange,
