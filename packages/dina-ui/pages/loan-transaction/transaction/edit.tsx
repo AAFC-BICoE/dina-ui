@@ -434,9 +434,6 @@ export function TransactionFormLayout({
         <AttachmentsField
           name="attachment"
           title={<DinaMessage id="transactionAttachments" />}
-          attachmentParentBaseApi="loan-transaction-api"
-          attachmentParentType="transaction"
-          attachmentParentId={initialValues?.id}
         />
       </div>
     </div>

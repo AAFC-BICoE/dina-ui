@@ -401,9 +401,6 @@ export function MaterialSampleForm({
             allowNewFieldName="attachmentsConfig.allowNew"
             allowExistingFieldName="attachmentsConfig.allowExisting"
             allowAttachmentsConfig={attachmentsConfig?.materialSample}
-            attachmentParentBaseApi="collection-api"
-            attachmentParentType="material-sample"
-            attachmentParentId={materialSample?.id ?? ""}
             wrapContent={(content) => (
               <BulkEditTabWarning
                 messageIdSingle="bulkEditResourceLinkerWarning_Attachments_MaterialSample_Single"

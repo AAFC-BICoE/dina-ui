@@ -25,33 +25,7 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import { ColumnDef } from "@tanstack/react-table";
 
 export interface AttachmentsFieldProps {
-  /**
-   * Attachment field name.
-   *
-   * e.g. "attachment" for an Assemblage entity which has "attachment" relationship.
-   */
   name: string;
-
-  /**
-   * The base API of the parent entity to which the attachments will be associated.
-   *
-   * e.g. "collection-api" for an Assemblage entity which has "attachment" relationship.
-   */
-  attachmentParentBaseApi: string;
-
-  /**
-   * ID of the parent entity to which attachments will be associated.
-   *
-   * e.g. the ID of an Assemblage entity which has "attachment" relationship.
-   */
-  attachmentParentId: string;
-
-  /**
-   * Type of the parent entity to which attachments will be associated.
-   *
-   * e.g. "assemblages" for an Assemblage entity which has "attachment" relationship.
-   */
-  attachmentParentType: string;
 
   /**
    * Optional ID for the FieldSet surrounding this component.
@@ -88,9 +62,6 @@ export function AttachmentsField(props: AttachmentsFieldProps) {
   return readOnly ? (
     <AttachmentReadOnlySection
       name={props.name}
-      attachmentParentBaseApi={props.attachmentParentBaseApi}
-      attachmentParentType={props.attachmentParentType}
-      attachmentParentId={props.attachmentParentId}
       detachTotalSelected={true}
       title={props.title}
     />
@@ -134,7 +105,7 @@ export function AttachmentsEditor({
   wrapContent = (content) => content,
   name
 }: AttachmentsEditorProps) {
-  const { isTemplate } = useDinaFormContext();
+  const { isTemplate, readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const { closeModal } = useModal();
 
@@ -259,17 +230,21 @@ export function AttachmentsEditor({
                   value={value}
                   addingAttachmentsDisabled={addingAttachmentsDisabled}
                   allowAttachmentsConfig={allowAttachmentsConfig}
+                  name={name}
+                  readOnly={readOnly ?? true}
                 />
               ) : (
                 <>
                   {!hideAttachmentForm && (
                     <AttachmentSection
+                      name={name}
                       allowAttachmentsConfig={allowAttachmentsConfig}
                       afterMetadatasSaved={addAttachedMetadatas(
                         onChange,
                         value,
                         closeModal
                       )}
+                      readOnly={readOnly ?? true}
                     />
                   )}
                 </>
@@ -308,6 +283,8 @@ interface AddAttachmentsButtonProps {
   style?: CSSProperties;
   className?: string;
   removeMargin?: boolean;
+  name: string;
+  readOnly: boolean;
 }
 
 export function AddAttachmentsButton({
@@ -318,7 +295,9 @@ export function AddAttachmentsButton({
   buttonTextElement,
   style,
   className,
-  removeMargin
+  removeMargin,
+  name,
+  readOnly
 }: AddAttachmentsButtonProps) {
   const { closeModal, openModal } = useModal();
   function openAttachmentsModal() {
@@ -339,12 +318,14 @@ export function AddAttachmentsButton({
         </div>
         <div className="modal-body">
           <AttachmentSection
+            name={name}
             allowAttachmentsConfig={allowAttachmentsConfig}
             afterMetadatasSaved={addAttachedMetadatas(
               onChange,
               value,
               closeModal
             )}
+            readOnly={readOnly}
           />
         </div>
       </div>

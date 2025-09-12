@@ -153,9 +153,6 @@ describe("AttachmentsField component", () => {
           name="attachment"
           allowNewFieldName="attachmentsConfig.allowNew"
           allowExistingFieldName="attachmentsConfig.allowExisting"
-          attachmentParentBaseApi="collection-api"
-          attachmentParentType="collecting-event"
-          attachmentParentId={"100"}
         />
       </DinaForm>,
       testCtx as any
@@ -236,9 +233,6 @@ describe("AttachmentsField component", () => {
           name="attachment"
           allowNewFieldName="attachmentsConfig.allowNew"
           allowExistingFieldName="attachmentsConfig.allowExisting"
-          attachmentParentBaseApi="collection-api"
-          attachmentParentType="collecting-event"
-          attachmentParentId={"100"}
         />
       </DinaForm>,
       testCtx as any
@@ -366,9 +360,6 @@ describe("AttachmentsField component", () => {
           name="attachment"
           allowNewFieldName="attachmentsConfig.allowNew"
           allowExistingFieldName="attachmentsConfig.allowExisting"
-          attachmentParentBaseApi="collection-api"
-          attachmentParentType="collecting-event"
-          attachmentParentId={"100"}
         />
       </DinaForm>,
       testCtx as any

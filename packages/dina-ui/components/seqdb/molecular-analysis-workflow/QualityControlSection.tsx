@@ -151,6 +151,8 @@ export function QualityControlSection({
                           }}
                           value={qualityControl.attachments}
                           className="mb-0 me-4 mt-1"
+                          name="attachments"
+                          readOnly={!editMode}
                         />
                         <Button
                           onClick={() => deleteQualityControl?.(index)}
@@ -171,9 +173,6 @@ export function QualityControlSection({
               {qualityControl?.attachments?.length > 0 && (
                 <div style={{ marginTop: "15px" }}>
                   <AttachmentsEditor
-                    attachmentParentBaseApi="seqdb-api"
-                    attachmentParentType="quality-control"
-                    attachmentParentId={""}
                     name={`qualityControlAttachments_${index}}`}
                     onChange={(newMetadatas) => {
                       updateQualityControl?.(index, {

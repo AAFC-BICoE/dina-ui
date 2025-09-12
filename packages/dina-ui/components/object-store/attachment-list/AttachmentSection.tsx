@@ -1,4 +1,4 @@
-import { FieldSet } from "common-ui";
+import { FieldSet, FieldSpy } from "common-ui";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -11,19 +11,21 @@ import {
   ExistingAttachmentsTableProps
 } from "./ExistingAttachmentsTable";
 import { ExistingObjectsAttacher } from "./ExistingObjectsAttacher";
-import { TotalAttachmentsIndicator } from "./TotalAttachmentsIndicator";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
+import _ from "lodash";
 
 export interface AttachmentListProps
   extends Omit<
       ExistingAttachmentsTableProps,
-      "onMetadatasEdited" | "attachmentPath"
+      "onMetadatasEdited" | "metadatas"
     >,
     AttachmentUploaderProps {
   /**
-   * API path to the attachment list.
-   * Omitting this gets rid of the Existing Attachments UI.
+   * Form field name for the attachments.
    */
-  attachmentPath?: string;
+  name: string;
+
+  readOnly: boolean;
 
   /** Manually set whether new/existing attachments can be added. By default allow both. */
   allowAttachmentsConfig?: AllowAttachmentsConfig;
@@ -36,7 +38,8 @@ export interface AllowAttachmentsConfig {
 
 /** UI section for reading and modifying file attachments. */
 export function AttachmentSection({
-  attachmentPath,
+  name,
+  readOnly,
   onDetachMetadataIds: onDetachMetadataIdsProp,
   afterMetadatasSaved: afterMetadatasSavedProp,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true }
@@ -58,62 +61,69 @@ export function AttachmentSection({
   }
 
   return (
-    <FieldSet
-      key={lastSave}
-      legend={
-        <>
-          <DinaMessage id="attachments" />{" "}
-          {attachmentPath && (
-            <TotalAttachmentsIndicator
-              attachmentPath={attachmentPath}
-              lastSave={lastSave}
-            />
-          )}
-        </>
-      }
-    >
-      <Tabs>
-        <TabList>
-          {attachmentPath && (
-            <Tab>
-              <DinaMessage id="existingAttachments" />
-            </Tab>
-          )}
-          {allowAttachmentsConfig.allowNew && (
-            <Tab>
-              <DinaMessage id="uploadNewAttachments" />
-            </Tab>
-          )}
-          {allowAttachmentsConfig.allowExisting && (
-            <Tab>
-              <DinaMessage id="attachExistingObjects" />
-            </Tab>
-          )}
-        </TabList>
-        {attachmentPath && (
-          <TabPanel>
-            <ExistingAttachmentsTable
-              attachmentPath={attachmentPath}
-              onDetachMetadataIds={onDetachMetadataIdsInternal}
-              onMetadatasEdited={resetComponent}
-            />
-          </TabPanel>
-        )}
-        {allowAttachmentsConfig.allowNew && (
-          <TabPanel>
-            <AttachmentUploader
-              afterMetadatasSaved={afterMetadatasSavedInternal}
-            />
-          </TabPanel>
-        )}
-        {allowAttachmentsConfig.allowExisting && (
-          <TabPanel>
-            <ExistingObjectsAttacher
-              onMetadataIdsSubmitted={afterMetadatasSavedInternal}
-            />
-          </TabPanel>
-        )}
-      </Tabs>
-    </FieldSet>
+    <FieldSpy fieldName={name}>
+      {(value) => {
+        const metadatas =
+          _.uniqBy(value as ResourceIdentifierObject[] | undefined, "id") ?? [];
+        const totalAttachments = metadatas.length;
+
+        return (
+          <FieldSet
+            key={lastSave}
+            legend={
+              <>
+                <DinaMessage id="attachments" />{" "}
+                {totalAttachments > 0 ? (
+                  <span>({totalAttachments})</span>
+                ) : null}
+              </>
+            }
+          >
+            <Tabs>
+              <TabList>
+                {readOnly && (
+                  <Tab>
+                    <DinaMessage id="existingAttachments" />
+                  </Tab>
+                )}
+                {allowAttachmentsConfig.allowNew && (
+                  <Tab>
+                    <DinaMessage id="uploadNewAttachments" />
+                  </Tab>
+                )}
+                {allowAttachmentsConfig.allowExisting && (
+                  <Tab>
+                    <DinaMessage id="attachExistingObjects" />
+                  </Tab>
+                )}
+              </TabList>
+              {readOnly && (
+                <TabPanel>
+                  <ExistingAttachmentsTable
+                    metadatas={metadatas}
+                    onDetachMetadataIds={onDetachMetadataIdsInternal}
+                    onMetadatasEdited={resetComponent}
+                  />
+                </TabPanel>
+              )}
+              {allowAttachmentsConfig.allowNew && (
+                <TabPanel>
+                  <AttachmentUploader
+                    afterMetadatasSaved={afterMetadatasSavedInternal}
+                  />
+                </TabPanel>
+              )}
+              {allowAttachmentsConfig.allowExisting && (
+                <TabPanel>
+                  <ExistingObjectsAttacher
+                    onMetadataIdsSubmitted={afterMetadatasSavedInternal}
+                  />
+                </TabPanel>
+              )}
+            </Tabs>
+          </FieldSet>
+        );
+      }}
+    </FieldSpy>
   );
 }

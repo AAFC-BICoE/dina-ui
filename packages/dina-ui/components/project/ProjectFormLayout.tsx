@@ -14,7 +14,7 @@ import { useMaterialSampleRelationshipColumns } from "../collection/material-sam
 import { AgentRolesField } from "../collection/AgentRolesField";
 
 export function ProjectFormLayout() {
-  const { readOnly, initialValues } = useDinaFormContext();
+  const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const uuid = String(router?.query?.id);
@@ -72,9 +72,6 @@ export function ProjectFormLayout() {
       />
       <AttachmentsField
         name="attachment"
-        attachmentParentBaseApi="collection-api"
-        attachmentParentType="project"
-        attachmentParentId={initialValues?.id}
         title={<DinaMessage id="projectAttachments" />}
         formId="project-attachments-section"
         allowNewFieldName="attachmentsConfig.allowNew"

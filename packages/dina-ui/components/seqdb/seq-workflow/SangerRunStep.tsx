@@ -134,9 +134,6 @@ export function SangerRunStep({
               {editMode ? (
                 <AttachmentsEditor
                   name="attachments"
-                  attachmentParentBaseApi="seqdb-api"
-                  attachmentParentType="molecular-analysis-run"
-                  attachmentParentId={sequencingRunId ?? ""}
                   onChange={setAttachments}
                   value={attachments}
                   title={
@@ -148,9 +145,6 @@ export function SangerRunStep({
                   {sequencingRunId && (
                     <AttachmentReadOnlySection
                       name="attachments"
-                      attachmentParentBaseApi="seqdb-api"
-                      attachmentParentType="molecular-analysis-run"
-                      attachmentParentId={sequencingRunId}
                       title={
                         <DinaMessage id="molecularAnalysisRunStep_attachments" />
                       }

@@ -63,9 +63,6 @@ export function MolecularAnalysisRunFormFields() {
       <div className="col-12 mt-3">
         <AttachmentReadOnlySection
           name="attachments"
-          attachmentParentBaseApi="seqdb-api"
-          attachmentParentType="molecular-analysis-run"
-          attachmentParentId={initialValues.id!}
           title={<DinaMessage id="molecularAnalysisRunStep_attachments" />}
         />
       </div>

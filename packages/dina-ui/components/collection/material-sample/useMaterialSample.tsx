@@ -60,6 +60,7 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       path: `collection-api/material-sample/${id}`,
       include: [
+        "attachment",
         "collection",
         "collectingEvent",
         "preparationProtocol",
