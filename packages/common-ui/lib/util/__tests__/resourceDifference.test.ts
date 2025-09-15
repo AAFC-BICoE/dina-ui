@@ -144,6 +144,17 @@ describe("resourceDifference", () => {
     });
   });
 
+  it("should ignore a new empty array field that was not present on the original object", () => {
+    const original = createMaterialSample();
+    const updated = createMaterialSample({ projects: [] });
+    const diff = resourceDifference({ updated, original });
+
+    expect(diff).toEqual({
+      type: "material-sample",
+      id: "1"
+    });
+  });
+
   it("should detect a changed managed attribute field", () => {
     const original = createMaterialSample({ preparationManagedAttributes: {} });
     const updated = createMaterialSample({
