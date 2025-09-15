@@ -203,20 +203,16 @@ describe("Metadata single record edit page.", () => {
         [
           {
             resource: {
+              id: "25f81de5-bbee-430c-b5fa-71986b70e612",
+              type: "metadata",
               acSubtype: "TEST_SUBTYPE",
               acTags: ["new tag 1", "new tag 2"],
-              dcCreator: {
-                id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
-                type: "person"
-              },
-              id: "25f81de5-bbee-430c-b5fa-71986b70e612",
               managedAttributes: {
                 test_managed_attribute: "new-managed-attribute-value"
               },
               publiclyReleasable: false,
               notPubliclyReleasableReason:
-                "new reason for not publicly releasable",
-              type: "metadata"
+                "new reason for not publicly releasable"
             },
             type: "metadata"
           }

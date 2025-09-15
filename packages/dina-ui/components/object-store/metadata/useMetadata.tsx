@@ -210,54 +210,65 @@ export function useMetadataSave({
     const preprocessed =
       (await preProcessMetadata?.(submittedValues)) ?? submittedValues;
 
+    // Before checking the difference, we need to parse some fields.
+    preprocessed.acSubtype =
+      (preprocessed as any)?.acSubtype?.acSubtype ?? undefined;
+    preprocessed.xmpRightsWebStatement =
+      (preprocessed as any)?.license?.url ?? "";
+    delete preprocessed.license;
+
     // Only submit the changed values to the back-end:
-    const diff = initialMetadataValues.id
+    const metadataDiff: InputResource<Metadata> = initialMetadataValues.id
       ? resourceDifference({
           original: initialMetadataValues,
           updated: preprocessed
         })
       : preprocessed;
 
+    const metadataWithRelationships: InputResource<Metadata> & {
+      relationships: any;
+    } = {
+      ...metadataDiff,
+      relationships: {
+        ...(metadataDiff.acMetadataCreator && {
+          acMetadataCreator: {
+            data: metadataDiff.acMetadataCreator?.id
+              ? _.pick(metadataDiff.acMetadataCreator, "id", "type")
+              : null
+          }
+        }),
+        ...(metadataDiff.dcCreator && {
+          dcCreator: {
+            data: metadataDiff.dcCreator?.id
+              ? _.pick(metadataDiff.dcCreator, "id", "type")
+              : null
+          }
+        })
+      }
+    };
+
+    // Delete relationships handled above.
+    delete metadataWithRelationships.acMetadataCreator;
+    delete metadataWithRelationships.dcCreator;
+
+    // If the relationship section is empty, remove it from the query.
+    if (Object.keys(metadataWithRelationships.relationships).length === 0) {
+      delete metadataWithRelationships.relationships;
+    }
+
     const saveOperation = {
-      resource: diff,
+      resource: metadataWithRelationships,
       type: "metadata"
     };
     return saveOperation;
   }
 
   async function onSubmit({ submittedValues }) {
-    const {
-      derivatives: _derivatives,
-      license,
-      acSubtype,
-      ...metadataValues
-    } = submittedValues;
-
-    if (license) {
-      // The Metadata's xmpRightsWebStatement field stores the license's url.
-      metadataValues.xmpRightsWebStatement = license?.url ?? "";
-    }
-    delete metadataValues.license;
-
-    if (metadataValues.dcCreator) {
-      // Only include the id and type for this relationship.
-      metadataValues.dcCreator = {
-        id: metadataValues.dcCreator.id,
-        type: "person"
-      };
-    }
-    if (metadataValues.acMetadataCreator) {
-      // Only include the id and type for this relationship.
-      metadataValues.acMetadataCreator = {
-        id: metadataValues.acMetadataCreator.id,
-        type: "person"
-      };
-    }
+    const { derivatives: _derivatives, ...metadataValues } = submittedValues;
 
     const saveOperation = await prepareMetadataSaveOperation({
       submittedValues: metadataValues
     });
-    saveOperation.resource.acSubtype = acSubtype?.acSubtype ?? undefined;
 
     // Remove blank managed attribute values from the map:
     const blankValues: any[] = ["", null];
