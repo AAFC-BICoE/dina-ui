@@ -216,8 +216,7 @@ describe("Metadata single record edit page.", () => {
               publiclyReleasable: false,
               notPubliclyReleasableReason:
                 "new reason for not publicly releasable",
-              type: "metadata",
-              xmpRightsUsageTerms: ""
+              type: "metadata"
             },
             type: "metadata"
           }

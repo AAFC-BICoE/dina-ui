@@ -153,8 +153,6 @@ function ExternalResourceMetadataForm({
         : null;
       // The Metadata's xmpRightsWebStatement field stores the license's url.
       metadataValues.xmpRightsWebStatement = selectedLicense?.url ?? "";
-      // No need to store this ; The url should be enough.
-      metadataValues.xmpRightsUsageTerms = "";
     }
 
     const metadataEdit = {

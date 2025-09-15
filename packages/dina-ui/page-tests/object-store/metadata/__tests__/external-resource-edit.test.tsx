@@ -226,7 +226,6 @@ describe("Metadata external resource edit page.", () => {
               id: "25f81de5-bbee-430c-b5fa-71986b70e612",
               type: "metadata",
               resourceExternalURL: "http://agr.gc.ca ",
-              xmpRightsUsageTerms: "",
               xmpRightsWebStatement:
                 "https://open.canada.ca/en/open-government-licence-canada",
               acCaption: "test caption"

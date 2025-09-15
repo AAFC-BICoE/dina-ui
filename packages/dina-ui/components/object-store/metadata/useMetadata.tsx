@@ -1,4 +1,5 @@
 import {
+  isResourceEmpty,
   resourceDifference,
   SaveArgs,
   useApiClient,
@@ -235,9 +236,8 @@ export function useMetadataSave({
     if (license) {
       // The Metadata's xmpRightsWebStatement field stores the license's url.
       metadataValues.xmpRightsWebStatement = license?.url ?? "";
-      // No need to store this ; The url should be enough.
-      metadataValues.xmpRightsUsageTerms = "";
     }
+    delete metadataValues.license;
 
     if (metadataValues.dcCreator) {
       // Only include the id and type for this relationship.
@@ -257,7 +257,7 @@ export function useMetadataSave({
     const saveOperation = await prepareMetadataSaveOperation({
       submittedValues: metadataValues
     });
-    saveOperation.resource.acSubtype = acSubtype?.acSubtype ?? null;
+    saveOperation.resource.acSubtype = acSubtype?.acSubtype ?? undefined;
 
     // Remove blank managed attribute values from the map:
     const blankValues: any[] = ["", null];
@@ -269,11 +269,19 @@ export function useMetadataSave({
       }
     }
 
-    const savedMetadata = await save<Metadata>([saveOperation], {
-      apiBaseUrl: "/objectstore-api"
-    });
+    // Do not perform an empty save request.
+    if (
+      isResourceEmpty(saveOperation?.resource) &&
+      saveOperation?.resource?.id
+    ) {
+      await onSaved?.(saveOperation.resource.id);
+    } else {
+      const savedMetadata = await save<Metadata>([saveOperation], {
+        apiBaseUrl: "/objectstore-api"
+      });
 
-    await onSaved?.(savedMetadata[0].id);
+      await onSaved?.(savedMetadata[0].id);
+    }
   }
 
   return {

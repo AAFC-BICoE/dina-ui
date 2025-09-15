@@ -316,13 +316,11 @@ function useBulkMetadataSave({
           if (saveOp.resource.license) {
             // The Metadata's xmpRightsWebStatement field stores the license's url.
             saveOp.resource.xmpRightsWebStatement =
-              saveOp.resource.license?.url ?? "";
-            // No need to store this ; The url should be enough.
-            saveOp.resource.xmpRightsUsageTerms = "";
+              saveOp.resource.license?.url ?? undefined;
           }
           delete saveOp.resource.license;
           saveOp.resource.acSubtype =
-            saveOp.resource.acSubtype?.acSubtype ?? null;
+            saveOp.resource.acSubtype?.acSubtype ?? undefined;
 
           // Check if cleared fields have been requested, make the changes for each operation.
           if (clearedFields?.size) {
