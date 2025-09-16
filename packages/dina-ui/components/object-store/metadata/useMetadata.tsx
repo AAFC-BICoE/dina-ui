@@ -176,7 +176,6 @@ export function useMetadataSave({
     // Don't include derivatives in the form submission:
     derivatives: _initialDerivatives,
     license: _initialLicense,
-    acSubtype: _initialAcSubtype,
     ...initialMetadataValues
   } = initialValues;
 
@@ -214,7 +213,7 @@ export function useMetadataSave({
     preprocessed.acSubtype =
       (preprocessed as any)?.acSubtype?.acSubtype ?? undefined;
     preprocessed.xmpRightsWebStatement =
-      (preprocessed as any)?.license?.url ?? preprocessed.xmpRightsWebStatement;
+      (preprocessed as any)?.license?.url ?? "";
     delete preprocessed.license;
 
     // Only submit the changed values to the back-end:
