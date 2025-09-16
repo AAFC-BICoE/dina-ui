@@ -14,7 +14,8 @@ import {
   useQuery,
   withResponse,
   SimpleSearchFilterBuilder,
-  resourceDifference
+  resourceDifference,
+  isResourceEmpty
 } from "common-ui";
 import { NextRouter, useRouter } from "next/router";
 import { Field } from "formik";
@@ -136,27 +137,13 @@ function ExternalResourceMetadataForm({
 
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
-    api: { apiClient, save }
+    api: { save }
   }) => {
     const {
       // Don't include derivatives in the form submission:
       derivatives: _derivatives,
-      license,
       ...metadataValues
     } = submittedValues;
-
-    if (license) {
-      const selectedLicense = license?.id
-        ? (
-            await apiClient.get<License>(
-              `objectstore-api/license/${license.id}`,
-              {}
-            )
-          ).data
-        : null;
-      // The Metadata's xmpRightsWebStatement field stores the license's url.
-      metadataValues.xmpRightsWebStatement = selectedLicense?.url ?? "";
-    }
 
     // Before checking the difference, we need to parse some fields.
     metadataValues.acSubtype =
@@ -211,14 +198,24 @@ function ExternalResourceMetadataForm({
       delete metadataWithRelationships.relationships;
     }
 
-    const savedMeta = await save(
-      [{ resource: metadataWithRelationships, type: "metadata" }],
-      { apiBaseUrl: "/objectstore-api" }
-    );
+    // Do not make a request if no changes were made.
+    if (
+      isResourceEmpty(metadataWithRelationships) &&
+      metadataWithRelationships?.id
+    ) {
+      await router.push(
+        `/object-store/object/external-resource-view?id=${metadataWithRelationships?.id}`
+      );
+    } else {
+      const savedMeta = await save(
+        [{ resource: metadataWithRelationships, type: "metadata" }],
+        { apiBaseUrl: "/objectstore-api" }
+      );
 
-    await router.push(
-      `/object-store/object/external-resource-view?id=${savedMeta?.[0].id}`
-    );
+      await router.push(
+        `/object-store/object/external-resource-view?id=${savedMeta?.[0].id}`
+      );
+    }
   };
 
   const buttonBar = (
