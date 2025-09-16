@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { Metadata } from "../../types/objectstore-api";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import {
   bulkEditAllManagedAttributes,
   BulkEditTabContextI,
@@ -10,6 +10,7 @@ import {
   DoOperationsError,
   FormikButton,
   getBulkEditTabFieldInfo,
+  isResourceEmpty,
   ResourceWithHooks,
   SaveArgs,
   useApiClient,
@@ -298,32 +299,6 @@ function useBulkMetadataSave({
             }
           });
 
-          if (saveOp.resource.dcCreator) {
-            // Only include the id and type for this relationship.
-            saveOp.resource.dcCreator = {
-              id: saveOp.resource.dcCreator.id,
-              type: "person"
-            };
-          }
-          if (saveOp.resource.acMetadataCreator) {
-            // Only include the id and type for this relationship.
-            saveOp.resource.acMetadataCreator = {
-              id: saveOp.resource.acMetadataCreator.id,
-              type: "person"
-            };
-          }
-
-          if (saveOp.resource.license) {
-            // The Metadata's xmpRightsWebStatement field stores the license's url.
-            saveOp.resource.xmpRightsWebStatement =
-              saveOp.resource.license?.url ?? "";
-            // No need to store this ; The url should be enough.
-            saveOp.resource.xmpRightsUsageTerms = "";
-          }
-          delete saveOp.resource.license;
-          saveOp.resource.acSubtype =
-            saveOp.resource.acSubtype?.acSubtype ?? null;
-
           // Check if cleared fields have been requested, make the changes for each operation.
           if (clearedFields?.size) {
             for (const [fieldName, clearType] of clearedFields) {
@@ -355,12 +330,42 @@ function useBulkMetadataSave({
         }
       }
 
-      const savedMetadata = await save<Metadata>(saveOperations, {
-        apiBaseUrl: "/objectstore-api"
-      });
-      const savedMetadataIds = savedMetadata.map((metadata) => metadata.id);
+      // Filter out empty resources but keep track of their positions
+      const nonEmptyOperations: SaveArgs<Metadata>[] = [];
+      const nonEmptyIndices: number[] = [];
+      const resultMetadata: PersistedResource<Metadata>[] = new Array(
+        saveOperations.length
+      );
 
-      await onSaved(savedMetadataIds);
+      // First pass: store empty resources and collect non-empty ones
+      for (let i = 0; i < saveOperations.length; i++) {
+        const operation = saveOperations[i];
+
+        if (isResourceEmpty(operation.resource)) {
+          // For empty resources, just store the original resource
+          resultMetadata[i] = operation.resource as any;
+        } else {
+          // For non-empty resources, collect for batch save
+          nonEmptyOperations.push(operation);
+          nonEmptyIndices.push(i);
+        }
+      }
+
+      // Make a single API call for all non-empty resources
+      if (nonEmptyOperations.length > 0) {
+        const savedMetadata = await save<Metadata>(nonEmptyOperations, {
+          apiBaseUrl: "/objectstore-api"
+        });
+
+        // Place the saved resources in their original positions
+        for (let i = 0; i < savedMetadata.length; i++) {
+          const originalIndex = nonEmptyIndices[i];
+          resultMetadata[originalIndex] = savedMetadata[i];
+        }
+      }
+
+      // Call onSaved with all samples in the original order
+      await onSaved(resultMetadata.map((metadata) => metadata.id));
     } catch (error: unknown) {
       // When there is an error from the bulk save-all operation, put it into the correct form:
       if (error instanceof DoOperationsError) {
