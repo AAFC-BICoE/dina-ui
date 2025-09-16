@@ -165,7 +165,6 @@ describe("Metadata external resource edit page.", () => {
               bucket: "aafc",
               dcFormat: "image/jpeg",
               fileExtension: ".jpg",
-              acSubtype: null,
               acCaption: "test caption",
               resourceExternalURL: "http://agr.gc.ca"
             },
@@ -215,21 +214,15 @@ describe("Metadata external resource edit page.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
+    // Expect only CHANGED fields to be included in the request.
     await waitFor(() => {
       expect(mockSave).lastCalledWith(
         [
           {
             resource: {
-              acSubtype: "TEST_SUBTYPE",
-              bucket: "testbucket",
-              dcType: "MOVING_IMAGE",
               id: "25f81de5-bbee-430c-b5fa-71986b70e612",
               type: "metadata",
-              resourceExternalURL: "http://agr.gc.ca ",
-              xmpRightsUsageTerms: "",
-              xmpRightsWebStatement:
-                "https://open.canada.ca/en/open-government-licence-canada",
-              acCaption: "test caption"
+              dcType: "MOVING_IMAGE"
             },
             type: "metadata"
           }
@@ -237,5 +230,43 @@ describe("Metadata external resource edit page.", () => {
         { apiBaseUrl: "/objectstore-api" }
       );
     });
+  });
+
+  it("Makes no changes when editing an existing external resource, no request made", async () => {
+    mockSave.mockImplementation((args) => args.map(({ resource }) => resource));
+    mockUseRouter.mockReturnValue({
+      push: () => undefined,
+      query: {
+        id: "25f81de5-bbee-430c-b5fa-71986b70e612"
+      }
+    });
+    const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
+      apiContext
+    });
+
+    // Check for the right initial values:
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("combobox", {
+          name: /object subtype test_subtype/i
+        })
+      ).toBeInTheDocument();
+
+      expect(
+        wrapper.getByRole("combobox", {
+          name: /stored object type image/i
+        })
+      ).toBeInTheDocument();
+    });
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await waitFor(
+      () => {
+        expect(mockSave).not.toHaveBeenCalled();
+      },
+      { timeout: 1000 }
+    );
   });
 });

@@ -228,7 +228,7 @@ describe("BulkEditTabWarning", () => {
       // Override the verbatim scientific name.
       fireEvent.change(
         wrapper.getByRole("textbox", {
-          name: /verbatim scientific name × insert hybrid symbol/i
+          name: /verbatim scientific name no changes × insert hybrid symbol/i
         }),
         { target: { value: "test-name-override" } }
       );
@@ -375,7 +375,7 @@ describe("BulkEditTabWarning", () => {
       // Override the verbatim scientific name.
       fireEvent.change(
         wrapper.getByRole("textbox", {
-          name: /verbatim scientific name × insert hybrid symbol/i
+          name: /verbatim scientific name no changes × insert hybrid symbol/i
         }),
         { target: { value: "test-name-override" } }
       );
@@ -487,7 +487,7 @@ describe("BulkEditTabWarning", () => {
     await waitFor(() => {
       expect(
         wrapper.getByRole("textbox", {
-          name: /verbatim scientific name × insert hybrid symbol/i
+          name: /verbatim scientific name no changes × insert hybrid symbol/i
         })
       ).toBeInTheDocument();
     });
@@ -495,7 +495,7 @@ describe("BulkEditTabWarning", () => {
     // Override the verbatim scientific name.
     fireEvent.change(
       wrapper.getByRole("textbox", {
-        name: /verbatim scientific name × insert hybrid symbol/i
+        name: /verbatim scientific name no changes × insert hybrid symbol/i
       }),
       { target: { value: "test-name-override" } }
     );

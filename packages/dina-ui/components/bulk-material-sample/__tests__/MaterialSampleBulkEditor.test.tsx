@@ -30,7 +30,8 @@ import {
   TEST_STORAGE_UNIT,
   TEST_STORAGE_UNITS,
   TEST_COLLECTING_ORGANISM_SAMPLES,
-  TEST_FORM_TEMPLATE_COMPONENTS_DISABLED
+  TEST_FORM_TEMPLATE_COMPONENTS_DISABLED,
+  TEST_MATERIAL_SAMPLES_MULTIPLE_VALUES
 } from "../__mocks__/MaterialSampleBulkMocks";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
@@ -473,7 +474,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() => expect(wrapper.getByText(/ms1/i)).toBeInTheDocument());
 
@@ -582,7 +583,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(wrapper.getByRole("tab", { name: /ms1/i })).toBeInTheDocument()
@@ -721,7 +722,7 @@ describe("MaterialSampleBulkEditor", () => {
           ] as InputResource<MaterialSample>[]
         }
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -772,7 +773,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(wrapper.getByText(/edit all/i)).toBeInTheDocument()
@@ -842,7 +843,7 @@ describe("MaterialSampleBulkEditor", () => {
         samples={TEST_NEW_SAMPLES}
       />,
       {
-        ...testCtx,
+        ...(testCtx as any),
         apiContext: {
           ...testCtx.apiContext,
           // Test save error: The second sample has an error on the barcode field:
@@ -934,7 +935,7 @@ describe("MaterialSampleBulkEditor", () => {
         samples={TEST_NEW_SAMPLES}
       />,
       {
-        ...testCtx,
+        ...(testCtx as any),
         apiContext: {
           ...testCtx.apiContext,
           // Test save error: The second sample has an error on the barcode field:
@@ -1016,7 +1017,7 @@ describe("MaterialSampleBulkEditor", () => {
         samples={TEST_NEW_SAMPLES}
       />,
       {
-        ...testCtx,
+        ...(testCtx as any),
         apiContext: {
           ...testCtx.apiContext,
           // Test save error: The second sample has an error on the barcode field:
@@ -1061,7 +1062,7 @@ describe("MaterialSampleBulkEditor", () => {
         samples={TEST_NEW_SAMPLES}
       />,
       {
-        ...testCtx,
+        ...(testCtx as any),
         apiContext: {
           ...testCtx.apiContext,
           // Test save error: The second sample has an error on the barcode field:
@@ -1102,7 +1103,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_ARRAY_VALUES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -1157,7 +1158,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_ARRAY_VALUES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -1254,14 +1255,14 @@ describe("MaterialSampleBulkEditor", () => {
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", {
-          name: /verbatim scientific name × insert hybrid symbol/i
+          name: /verbatim scientific name no changes × insert hybrid symbol/i
         })
       ).toBeInTheDocument()
     );
     // Override the verbatim scientific name.
     fireEvent.change(
       wrapper.getByRole("textbox", {
-        name: /verbatim scientific name × insert hybrid symbol/i
+        name: /verbatim scientific name no changes × insert hybrid symbol/i
       }),
       { target: { value: "new-scientific-name" } }
     );
@@ -1353,22 +1354,31 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES}
       />,
-      testCtx
+      testCtx as any
     );
+    await waitForLoadingToDisappear();
     await waitFor(() =>
       expect(
-        wrapper.getByRole("combobox", { name: /tags multiple values/i })
+        wrapper.getByRole("combobox", {
+          name: /tags no changes multiple values/i
+        })
       ).toBeInTheDocument()
     );
 
     expect(
-      wrapper.getByRole("combobox", { name: /tags multiple values/i })
+      wrapper.getByRole("combobox", {
+        name: /tags no changes multiple values/i
+      })
     ).toBeInTheDocument();
     expect(
-      wrapper.getByRole("combobox", { name: /collection multiple values/i })
+      wrapper.getByRole("combobox", {
+        name: /collection no changes multiple values/i
+      })
     ).toBeInTheDocument();
     expect(
-      wrapper.getByRole("combobox", { name: /projects multiple values/i })
+      wrapper.getByRole("combobox", {
+        name: /projects no changes multiple values/i
+      })
     ).toBeInTheDocument();
     expect(wrapper.getByRole("textbox", { name: /barcode/i })).toHaveAttribute(
       "placeholder",
@@ -1377,10 +1387,14 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Blank values should be rendered into these fields so the placeholder is visible:
     expect(
-      wrapper.getByRole("combobox", { name: /tags multiple values/i })
+      wrapper.getByRole("combobox", {
+        name: /tags no changes multiple values/i
+      })
     ).toHaveValue("");
     expect(
-      wrapper.getByRole("combobox", { name: /collection multiple values/i })
+      wrapper.getByRole("combobox", {
+        name: /collection no changes multiple values/i
+      })
     ).toHaveValue("");
   });
 
@@ -1390,7 +1404,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() => expect(wrapper.getByText(/tag1/i)).toBeInTheDocument());
 
@@ -1436,7 +1450,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -1519,7 +1533,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -1558,7 +1572,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -1596,7 +1610,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_MANAGED_ATTRIBUTES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() => {
       expect(
@@ -1651,7 +1665,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -1788,7 +1802,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -1865,7 +1879,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_STORAGE_UNIT}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -2044,7 +2058,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_HOST_ORGANISM}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -2122,7 +2136,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() => expect(wrapper.getByText(/ms1/i)).toBeInTheDocument());
 
@@ -2263,13 +2277,75 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
+  it("Ability to clear fields in the edit all tab.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_MATERIAL_SAMPLES_MULTIPLE_VALUES}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("textbox", { name: /barcode/i })
+      ).toBeInTheDocument()
+    );
+
+    // Click the clear all button for the barcode field
+    userEvent.click(wrapper.getByTestId("clear-all-button-barcode"));
+
+    // It should say cleared as the placeholder.
+    await waitFor(() => {
+      expect(wrapper.getByPlaceholderText("Cleared")).toBeInTheDocument();
+    });
+
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Saves the new material samples with the barcode field emptied.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              barcode: "",
+              id: "1",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              barcode: "",
+              id: "2",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              barcode: "",
+              id: "3",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
   it("Allows selecting a Form Template to show/hide fields in the bulk and single tabs for material sample section.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -2294,7 +2370,7 @@ describe("MaterialSampleBulkEditor", () => {
         samples={TEST_NEW_SAMPLES}
         initialFormTemplateUUID={TEST_FORM_TEMPLATE.id}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -2341,7 +2417,7 @@ describe("MaterialSampleBulkEditor", () => {
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(
@@ -2366,7 +2442,7 @@ describe("MaterialSampleBulkEditor", () => {
         samples={TEST_NEW_SAMPLES}
         initialFormTemplateUUID={TEST_FORM_TEMPLATE.id}
       />,
-      testCtx
+      testCtx as any
     );
     await waitFor(() =>
       expect(wrapper2.getByRole("textbox", { name: /barcode/i })).toHaveValue(
@@ -2412,7 +2488,7 @@ describe("MaterialSampleBulkEditor", () => {
         samples={TEST_COLLECTING_ORGANISM_SAMPLES}
         initialFormTemplateUUID={TEST_FORM_TEMPLATE_COMPONENTS_DISABLED.id}
       />,
-      testCtx
+      testCtx as any
     );
 
     // Continue the test after the data fetch is done.

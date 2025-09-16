@@ -101,7 +101,22 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   logoutBtn: "Logout",
   max: "Max",
   min: "Min",
+  noChangesMade: "No Changes",
+  noChangesMadeTooltip:
+    "No changes will be made to this field for the selected records. Any values that are already set for each record will remain as they are.",
+  changesMade: "Changes Made",
+  changesMadeTooltip:
+    "This field will be updated to the same value for all selected records. Any existing values in these records will be replaced.",
+  clearedFieldTooltip:
+    "This field will be cleared and set to an empty value for all selected records. Any existing data for this field will be removed.",
   multipleValues: "Multiple Values",
+  cleared: "Cleared",
+  deleted: "Deleted",
+  deletedTooltip: "This field will be deleted for all selected records.",
+  clearedTooltip:
+    "Clear this field for all selected resources. All items will have an empty value for this field after saving.",
+  undoClearedTooltip:
+    "Undo clearing this field. The original values will not be emptied.",
   multipleValuesFound: "Multiple Values Found",
   name: "Name",
   navigation: "Navigation",
