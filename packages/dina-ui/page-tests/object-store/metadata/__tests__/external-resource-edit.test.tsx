@@ -165,7 +165,6 @@ describe("Metadata external resource edit page.", () => {
               bucket: "aafc",
               dcFormat: "image/jpeg",
               fileExtension: ".jpg",
-              acSubtype: null,
               acCaption: "test caption",
               resourceExternalURL: "http://agr.gc.ca"
             },
@@ -215,20 +214,15 @@ describe("Metadata external resource edit page.", () => {
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
+    // Expect only CHANGED fields to be included in the request.
     await waitFor(() => {
       expect(mockSave).lastCalledWith(
         [
           {
             resource: {
-              acSubtype: "TEST_SUBTYPE",
-              bucket: "testbucket",
-              dcType: "MOVING_IMAGE",
               id: "25f81de5-bbee-430c-b5fa-71986b70e612",
               type: "metadata",
-              resourceExternalURL: "http://agr.gc.ca ",
-              xmpRightsWebStatement:
-                "https://open.canada.ca/en/open-government-licence-canada",
-              acCaption: "test caption"
+              dcType: "MOVING_IMAGE"
             },
             type: "metadata"
           }

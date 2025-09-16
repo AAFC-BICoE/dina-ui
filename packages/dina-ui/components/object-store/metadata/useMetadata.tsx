@@ -214,7 +214,7 @@ export function useMetadataSave({
     preprocessed.acSubtype =
       (preprocessed as any)?.acSubtype?.acSubtype ?? undefined;
     preprocessed.xmpRightsWebStatement =
-      (preprocessed as any)?.license?.url ?? "";
+      (preprocessed as any)?.license?.url ?? preprocessed.xmpRightsWebStatement;
     delete preprocessed.license;
 
     // Only submit the changed values to the back-end:
@@ -230,13 +230,15 @@ export function useMetadataSave({
     } = {
       ...metadataDiff,
       relationships: {
-        ...(metadataDiff.acMetadataCreator && {
-          acMetadataCreator: {
-            data: metadataDiff.acMetadataCreator?.id
-              ? _.pick(metadataDiff.acMetadataCreator, "id", "type")
-              : null
-          }
-        }),
+        // acMetadataCreator should only be saved on create, not edit.
+        ...(metadataDiff.acMetadataCreator &&
+          !metadataDiff.id && {
+            acMetadataCreator: {
+              data: metadataDiff.acMetadataCreator?.id
+                ? _.pick(metadataDiff.acMetadataCreator, "id", "type")
+                : null
+            }
+          }),
         ...(metadataDiff.dcCreator && {
           dcCreator: {
             data: metadataDiff.dcCreator?.id
