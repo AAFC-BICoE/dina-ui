@@ -1,4 +1,9 @@
-import { DinaForm, FieldSet, QueryTable } from "common-ui";
+import {
+  DinaForm,
+  FieldSet,
+  QueryTable,
+  SimpleSearchFilterBuilder
+} from "common-ui";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { ViewPageLayout, useCollectingEventQuery } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
@@ -17,9 +22,13 @@ export default function CollectingEventDetailsPage() {
               path="collection-api/material-sample"
               include="collection"
               columns={getColumnDefinition()}
-              filter={{
-                rsql: `collectingEvent.uuid==${props.initialValues.id}`
-              }}
+              filter={SimpleSearchFilterBuilder.create<MaterialSample>()
+                .where(
+                  "collectingEvent.uuid" as any,
+                  "EQ",
+                  `${props.initialValues.id}`
+                )
+                .build()}
             />
           </FieldSet>
         </DinaForm>

@@ -76,7 +76,8 @@ export const getColumnDefinition: () => ColumnDefinition<MaterialSample>[] =
               {collection?.name}
             </Link>
           ) : null,
-        accessorKey: "collection.name"
+        accessorKey: "collection.name",
+        enableSorting: false
       },
       stringArrayCell("dwcOtherCatalogNumbers"),
       { accessorKey: "materialSampleType" },

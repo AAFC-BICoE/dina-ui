@@ -16,7 +16,6 @@ import {
   TextField,
   TextFieldWithCoordButtons,
   Tooltip,
-  filterBy,
   useDinaFormContext,
   useInstanceContext
 } from "common-ui";
@@ -40,6 +39,7 @@ import { ManagedAttributesEditor } from "../../";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   COLLECTING_EVENT_COMPONENT_NAME,
+  CollectionMethod,
   GeographicThesaurusSource,
   Protocol,
   Vocabulary
@@ -947,31 +947,23 @@ export function CollectingEventFormLayout({
                   customName={"collectingEventCollectionMethod"}
                   tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#collection-method"
                   tooltipLinkText="fromDinaUserGuide"
-                  filter={filterBy(["name"], {
-                    extraFilters: group
-                      ? [
-                          {
-                            selector: "group",
-                            comparison: "==",
-                            arguments: group
-                          }
-                        ]
-                      : undefined
-                  })}
+                  filter={(searchValue: string) =>
+                    SimpleSearchFilterBuilder.create<CollectionMethod>()
+                      .searchFilter("name", searchValue)
+                      .whereProvided("group", "EQ", group)
+                      .build()
+                  }
                 />
               )}
             </Field>
             <ResourceSelectField<Protocol>
               name="protocol"
-              filter={filterBy(["name"], {
-                extraFilters: [
-                  {
-                    selector: "protocolType",
-                    comparison: "==",
-                    arguments: "collection_method"
-                  }
-                ]
-              })}
+              filter={(searchValue: string) =>
+                SimpleSearchFilterBuilder.create<Protocol>()
+                  .searchFilter("name", searchValue)
+                  .where("protocolType", "EQ", "collection_method")
+                  .build()
+              }
               model="collection-api/protocol"
               optionLabel={(protocol) => protocol.name}
               omitNullOption={false}

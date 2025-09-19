@@ -2,6 +2,7 @@ import {
   filterBy,
   ResourceSelectField,
   ResourceSelectFieldProps,
+  SimpleSearchFilterBuilder,
   useAccount,
   useAutocompleteSearchButFallbackToRsqlApiSearch
 } from "common-ui";
@@ -30,7 +31,11 @@ export function CollectionMethodSelectField(
   return (
     <ResourceSelectField<CollectionMethod>
       readOnlyLink="/collection/collection-method/view?id="
-      filter={filterBy(["name"])}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<CollectionMethod>()
+          .searchFilter("name", searchValue)
+          .build()
+      }
       model="collection-api/collection-method"
       optionLabel={(cm) => cm.name}
       {...props}
