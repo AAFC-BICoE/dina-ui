@@ -632,7 +632,6 @@ export function useMaterialSampleSave({
         ...(msInitialValues.hostOrganism && { hostOrganism: null })
       })
     };
-    delete materialSampleInput.scheduledActions;
 
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (
