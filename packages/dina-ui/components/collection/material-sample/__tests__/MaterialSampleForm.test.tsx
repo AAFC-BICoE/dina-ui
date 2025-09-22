@@ -3302,6 +3302,70 @@ describe("Material Sample Edit Page", () => {
         ])
       );
     });
+    it("Creates a scheduled action.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm onSaved={mockOnSaved} />,
+        testCtx
+      );
+      await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+      // Enable the scheduled action section:
+      const scheduledActionToggle = wrapper.container.querySelectorAll(
+        ".enable-scheduled-actions .react-switch-bg"
+      );
+
+      if (!scheduledActionToggle) {
+        fail("Scheduled action toggle needs to exist at this point.");
+      }
+      fireEvent.click(scheduledActionToggle[0]);
+
+      // Enter an action type:
+      userEvent.type(
+        wrapper.getByRole("textbox", { name: /action type/i }),
+        "Check Vouchers"
+      );
+
+      // Enter an action status:
+      userEvent.type(
+        wrapper.getByRole("textbox", { name: /action status/i }),
+        "ongoing"
+      );
+
+      screen.logTestingPlaygroundURL();
+      // Click the search button.
+      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+
+      await waitFor(() => {
+        expect(wrapper.getByText(/Check Vouchers/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/ongoing/i)).toBeInTheDocument();
+      });
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  scheduledActions: [
+                    {
+                      actionStatus: "ongoing",
+                      actionType: "Check Vouchers",
+                      date: "2025-09-22"
+                    }
+                  ],
+                  publiclyReleasable: true,
+                  type: "material-sample"
+                },
+                type: "material-sample"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+    });
 
     it("Creates a geographicPlaceNameSourceDetail with a customGeographicPlaceName to a new collecting event", async () => {
       const wrapper = mountWithAppContext(
