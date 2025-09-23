@@ -1,15 +1,22 @@
-import { LoadingSpinner, useBlobLoad, useQuery } from "common-ui";
+import {
+  LoadingSpinner,
+  useBlobLoad,
+  useQuery,
+  SimpleSearchFilterBuilder
+} from "common-ui";
 import { useRouter } from "next/router";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useState, useCallback, useRef } from "react";
-import { ObjectUpload } from "../../../types/objectstore-api";
+import { ObjectUpload, Derivative } from "../../../types/objectstore-api";
 
 /**
  * ImageViewer component displays an image fetched from the object store with simple zoom toggle.
  *
  * - Retrieves `id` from the router query.
  * - Fetches object upload data to get isDerivative and bucket information.
- * - Constructs the file URL depending on isDerivative.
+ * - If object upload fails, tries to fetch derivative data as fallback. This is mainly for
+ *   System Generated thumbnails since they would not contain an object-upload entity.
+ * - Constructs the file URL depending on available data.
  * - Uses the `useBlobLoad` hook to fetch the image blob.
  * - Click to zoom in at cursor position, click again to zoom out
  *
@@ -32,15 +39,43 @@ export default function ImageViewer() {
     }
   });
 
+  // Fallback query for derivative - only enabled if object-upload fails
+  const {
+    loading: derivativeLoading,
+    response: derivative,
+    error: derivativeError
+  } = useQuery<Derivative>(
+    {
+      path: `objectstore-api/derivative`,
+      filter: SimpleSearchFilterBuilder.create<Derivative>()
+        .where("fileIdentifier", "EQ", id ?? "")
+        .build(),
+      page: { limit: 1 }
+    },
+    {
+      disabled: !objectError || id === undefined
+    }
+  );
+
   const [isZoomed, setIsZoomed] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
 
   const ZOOM_SCALE = 4;
 
-  const fileUrl = objectUpload?.data?.isDerivative
-    ? `/objectstore-api/file/${objectUpload?.data?.bucket}/derivative/${id}`
-    : `/objectstore-api/file/${objectUpload?.data?.bucket}/${id}`;
+  // Determine file URL based on available data
+  const fileUrl = (() => {
+    if (objectUpload?.data) {
+      // Use object-upload data
+      return objectUpload.data.isDerivative
+        ? `/objectstore-api/file/${objectUpload.data.bucket}/derivative/${id}`
+        : `/objectstore-api/file/${objectUpload.data.bucket}/${id}`;
+    } else if (derivative?.data?.[0]) {
+      // Use derivative data as fallback
+      return `/objectstore-api/file/${derivative.data[0].bucket}/derivative/${id}`;
+    }
+    return "";
+  })();
 
   const {
     objectUrl,
@@ -49,10 +84,16 @@ export default function ImageViewer() {
   } = useBlobLoad({
     filePath: fileUrl,
     autoOpen: false,
-    disabled: id === undefined || objectUploadLoading || !objectUpload?.data
+    disabled:
+      id === undefined ||
+      objectUploadLoading ||
+      (objectError && derivativeLoading) ||
+      !fileUrl
   });
 
-  const isLoading = objectUploadLoading || blobLoading;
+  const isLoading =
+    objectUploadLoading || (objectError && derivativeLoading) || blobLoading;
+  const hasError = (objectError && derivativeError) || blobError;
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLImageElement>) => {
@@ -96,7 +137,7 @@ export default function ImageViewer() {
     >
       {isLoading ? (
         <LoadingSpinner loading={true} />
-      ) : blobError || objectError ? (
+      ) : hasError ? (
         <DinaMessage id="previewNotAvailable" />
       ) : (
         <img
