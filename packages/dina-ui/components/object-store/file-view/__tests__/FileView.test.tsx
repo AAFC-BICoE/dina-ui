@@ -40,7 +40,7 @@ describe("FileView component", () => {
 
     const link = document.querySelector(".file-viewer-wrapper a");
     expect(link?.getAttribute("href")).toBe(
-      "/object-store/object/image-view?id=0198a952-20e2-7f25-b8c7-a2ef0aa1f183&bucket=bucket"
+      "/object-store/object/image-view?id=0198a952-20e2-7f25-b8c7-a2ef0aa1f183"
     );
   });
 
@@ -58,7 +58,7 @@ describe("FileView component", () => {
 
     const link = document.querySelector(".file-viewer-wrapper a");
     expect(link?.getAttribute("href")).toBe(
-      "/object-store/object/image-view?id=0198a952-20e2-7f25-b8c7-a2ef0aa1f183&bucket=bucket"
+      "/object-store/object/image-view?id=0198a952-20e2-7f25-b8c7-a2ef0aa1f183"
     );
   });
 
