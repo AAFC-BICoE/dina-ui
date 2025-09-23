@@ -938,6 +938,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   columnSelector_selectManagedAttribute: "Select managed attribute:",
   columnSelector_selectClassification: "Select classification:",
   columnSelector_addColumnButton: "Add Column",
+  columnSelector_resetButton: "Reset Columns",
   field_columnFunction: "Functions",
   CONCAT: "Concatenate",
   CONVERT_COORDINATES_DD: "Coordinates to Decimal Degrees",

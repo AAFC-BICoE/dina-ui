@@ -143,7 +143,7 @@ export function ColumnSelector<TData extends KitsuResource>(
         setLocalStorageDisplayedColumns(updatedColumns);
       }
     }
-  }, [mandatoryDisplayedColumns]);
+  }, [props.displayedColumns]);
 
   useEffect(() => {
     let injectedMappings: (ESIndexMapping | undefined)[] = [];

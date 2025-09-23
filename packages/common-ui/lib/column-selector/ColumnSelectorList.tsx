@@ -35,6 +35,7 @@ import {
 import QueryRowClassificationSearch, {
   ClassificationSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
+import { FaArrowRotateLeft, FaPlus } from "react-icons/fa6";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -231,6 +232,17 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     setDisplayedColumns(newDisplayedColumns);
   };
 
+  const onColumnReset = async () => {
+    setSelectedField(undefined);
+
+    // This action can be not be performed in export mode.
+    if (!exportMode && defaultColumns) {
+      setLocalStorageDisplayedColumns(
+        defaultColumns.map((column) => column?.id ?? "")
+      );
+    }
+  };
+
   const onColumnItemInsert = async () => {
     if (isValidField && selectedField && indexMapping) {
       const generatedColumnPath = generateColumnPath({
@@ -418,6 +430,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               disabled={!isValidField}
               onClick={onColumnItemInsert}
             >
+              <FaPlus className="me-2" />
               <DinaMessage id="columnSelector_addColumnButton" />
             </Button>
           </div>
@@ -456,6 +469,22 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                   />
                 );
               })}
+            </>
+          )}
+
+          {!exportMode && (
+            <>
+              <br />
+              <div className="mt-2 d-grid">
+                <Button
+                  className="btn btn-secondary"
+                  onClick={onColumnReset}
+                  variant="secondary"
+                >
+                  <FaArrowRotateLeft className="me-2" />
+                  <DinaMessage id="columnSelector_resetButton" />
+                </Button>
+              </div>
             </>
           )}
         </>
