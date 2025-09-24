@@ -6,6 +6,7 @@ export interface DerivativeAttributes {
   type: "derivative";
 
   bucket: string;
+  filename?: string;
   fileIdentifier: string;
   fileExtension: string;
   dcType: string;
