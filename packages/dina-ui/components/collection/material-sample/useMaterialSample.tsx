@@ -15,7 +15,7 @@ import {
   withoutBlankFields
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, PersistedResource } from "kitsu";
+import { InputResource, KitsuResourceLink, PersistedResource } from "kitsu";
 import _ from "lodash";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
@@ -632,6 +632,23 @@ export function useMaterialSampleSave({
         ...(msInitialValues.hostOrganism && { hostOrganism: null })
       })
     };
+
+    // This is the form template provided scheduled action (since only one is supported). This
+    // should not be included in the request. "scheduledActions" plural should be in the request.
+    delete (materialSampleInput as any).scheduledAction;
+
+    // Go through the scheduled actions if they exist and do the _.pick on each assignedTo
+    materialSampleInput.scheduledActions =
+      materialSampleInput.scheduledActions?.map((scheduledAction) => ({
+        ...scheduledAction,
+        assignedTo: scheduledAction.assignedTo
+          ? (_.pick(
+              scheduledAction.assignedTo,
+              "type",
+              "id"
+            ) as KitsuResourceLink)
+          : scheduledAction.assignedTo
+      }));
 
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (

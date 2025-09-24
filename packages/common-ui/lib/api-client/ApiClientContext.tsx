@@ -239,6 +239,7 @@ export class ApiClientImpl implements ApiClientI {
     // APIs using Repository V2.
     const supportedBaseApis = [
       "/agent-api",
+      "/user-api",
       "/dina-export-api",
       "/objectstore-api",
       "/collection-api",
@@ -255,7 +256,8 @@ export class ApiClientImpl implements ApiClientI {
       "person",
       "identifier",
       "object-upload",
-      "metadata"
+      "metadata",
+      "user"
     ];
 
     // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
