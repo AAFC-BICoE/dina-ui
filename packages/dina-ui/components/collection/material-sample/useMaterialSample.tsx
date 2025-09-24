@@ -638,17 +638,22 @@ export function useMaterialSampleSave({
     delete (materialSampleInput as any).scheduledAction;
 
     // Go through the scheduled actions if they exist and do the _.pick on each assignedTo
-    materialSampleInput.scheduledActions =
-      materialSampleInput.scheduledActions?.map((scheduledAction) => ({
-        ...scheduledAction,
-        assignedTo: scheduledAction.assignedTo
-          ? (_.pick(
-              scheduledAction.assignedTo,
-              "type",
-              "id"
-            ) as KitsuResourceLink)
-          : scheduledAction.assignedTo
-      }));
+    if (
+      materialSampleInput.scheduledActions &&
+      materialSampleInput.scheduledActions.length > 0
+    ) {
+      materialSampleInput.scheduledActions =
+        materialSampleInput.scheduledActions?.map((scheduledAction) => ({
+          ...scheduledAction,
+          assignedTo: scheduledAction.assignedTo
+            ? (_.pick(
+                scheduledAction.assignedTo,
+                "type",
+                "id"
+              ) as KitsuResourceLink)
+            : scheduledAction.assignedTo
+        }));
+    }
 
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (
