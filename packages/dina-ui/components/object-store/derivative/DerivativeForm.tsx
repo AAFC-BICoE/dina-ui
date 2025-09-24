@@ -81,9 +81,7 @@ export function DerivativeForm({
           <TextField
             className="col-md-6"
             name="filename"
-            placeholder={
-              derivative?.fileIdentifier + "" + derivative?.fileExtension
-            }
+            placeholder={(derivative as any)?.objectUpload?.originalFilename}
           />
           <TextField
             className="col-md-6"
