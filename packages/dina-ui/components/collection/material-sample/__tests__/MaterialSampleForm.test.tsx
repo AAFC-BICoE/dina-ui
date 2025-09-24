@@ -3561,6 +3561,12 @@ describe("Material Sample Edit Page", () => {
         "ongoing"
       );
 
+      // Enter a date:
+      userEvent.type(
+        wrapper.getByPlaceholderText(/yyyy\-mm\-dd/i),
+        "2025-05-19"
+      );
+
       // Add the scheduled action.
       userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
 
@@ -3582,7 +3588,7 @@ describe("Material Sample Edit Page", () => {
                     {
                       actionStatus: "ongoing",
                       actionType: "Check Vouchers",
-                      date: "2025-09-22"
+                      date: "2025-05-19"
                     }
                   ],
                   publiclyReleasable: true,
