@@ -226,6 +226,11 @@ export default function MetadataListPage() {
                       path: "data.attributes.managedAttributes",
                       apiEndpoint: "objectstore-api/managed-attribute",
                       component: "ENTITY"
+                    },
+                    {
+                      type: "imageLink",
+                      label: "_imageLink",
+                      path: "_imageLink"
                     }
                   ],
                   relationshipFields: []

@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import _ from "lodash";
 import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
 import Select from "react-select";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
+import { TableColumn } from "../../types";
+import { KitsuResource } from "kitsu";
+import { useDinaIntl } from "../../../../../dina-ui/intl/dina-ui-intl";
 
 interface QueryRowImageLinkProps {
   /**
@@ -78,7 +82,7 @@ export default function QueryRowImageLink({
     <>
       <Select<SelectOption<string>>
         options={imageTypeOptions}
-        className={`col me-1 ps-0`}
+        className={`col ps-0 mt-2`}
         value={selectedImageType}
         onChange={(selected) =>
           setImageLinkState({
@@ -87,10 +91,113 @@ export default function QueryRowImageLink({
           })
         }
         captureMenuScroll={true}
-        menuPlacement={"auto"}
+        menuPlacement={"bottom"}
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
       />
+    </>
+  );
+}
+
+/**
+ * This column is mainly used for the metadata query page.
+ *
+ * This is used to display metadata image links. The user can decide what kind of image type
+ * should be used.
+ *
+ * For derivatives, it will display a link of the first found derivative matching the type.
+ *
+ * @param path Column path.
+ * @param imageType Image type to display the image for, for example: "LARGE_IMAGE"
+ * @returns Column to be displayed to the user.
+ */
+export function getImageLinkColumn<TData extends KitsuResource>(
+  path: string,
+  imageType: string
+): TableColumn<TData> {
+  return {
+    accessorKey: `data.attributes.fileIdentifier`,
+    id: `imageLink.${imageType}`,
+    header: () => <ImageLinkLabel imageType={imageType} />,
+    cell: ({ row: { original } }) => {
+      return <ImageLinkButton imageType={imageType} metadata={original} />;
+    },
+    isKeyword: true,
+    isColumnVisible: true,
+    enableSorting: false,
+    columnSelectorString: path
+  };
+}
+
+/**
+ * Component used for generating the image link label with locale support.
+ * @param imageType Image type to be used to generate the label (e.g. LARGE_IMAGE)
+ * @returns String with the label
+ */
+export interface ImageLinkLabelProps {
+  imageType: string;
+}
+
+export function ImageLinkLabel({ imageType }: ImageLinkLabelProps) {
+  const { formatMessage, messages } = useDinaIntl();
+
+  const imageLinkLabel = messages["queryBuilder_imageLink_" + imageType]
+    ? formatMessage(("queryBuilder_imageLink_" + imageType) as any)
+    : _.startCase(imageType);
+
+  return <>{imageLinkLabel}</>;
+}
+
+export const IMAGE_VIEW_LINK = "/object-store/object/image-view?id=";
+
+export interface ImageLinkButtonProps {
+  imageType: string;
+  metadata: any;
+}
+
+export function ImageLinkButton({ imageType, metadata }: ImageLinkButtonProps) {
+  const fileIdentifier = useMemo<string | undefined>(() => {
+    // If original, that can be retrieved from the metadata.
+    if (
+      imageType === "ORIGINAL" &&
+      metadata?.data?.attributes?.fileIdentifier
+    ) {
+      return metadata.data.attributes.fileIdentifier;
+    }
+
+    // Check if any derivatives exist...
+    if (
+      metadata?.included?.derivatives &&
+      metadata.included.derivatives.length > 0
+    ) {
+      const foundDerivative = metadata.included.derivatives.find(
+        (derivative) => {
+          return (
+            derivative?.attributes?.derivativeType === imageType &&
+            derivative?.attributes?.fileIdentifier
+          );
+        }
+      );
+
+      if (foundDerivative) {
+        return foundDerivative.attributes.fileIdentifier;
+      }
+    }
+
+    // No image found to link to.
+    return undefined;
+  }, [imageType, metadata]);
+
+  // Do not display anything in the column if no file identifier can be found for the image type.
+  if (fileIdentifier === undefined) {
+    return <></>;
+  }
+
+  return (
+    <>
+      <a href={IMAGE_VIEW_LINK + fileIdentifier}>
+        View Image <FaArrowUpRightFromSquare />
+      </a>
     </>
   );
 }

@@ -36,7 +36,9 @@ import QueryRowClassificationSearch, {
   ClassificationSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 import { FaArrowRotateLeft, FaPlus } from "react-icons/fa6";
-import QueryRowImageLink from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
+import QueryRowImageLink, {
+  ImageLinkStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -141,6 +143,13 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                 return;
               }
               break;
+            case "imageLink":
+              const imageLinkValues: ImageLinkStates =
+                JSON.parse(dynamicFieldValue);
+              if (imageLinkValues?.selectedImageType) {
+                setIsValidField(true);
+                return;
+              }
           }
         }
       } else {
