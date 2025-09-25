@@ -65,7 +65,7 @@ describe("ImageLinkButton", () => {
   describe("Derivative image types", () => {
     it("renders link when matching derivative exists", () => {
       const props: ImageLinkButtonProps = {
-        imageType: "THUMBNAIL",
+        imageType: "THUMBNAIL_IMAGE",
         metadata: {
           included: {
             derivatives: [
@@ -77,7 +77,7 @@ describe("ImageLinkButton", () => {
               },
               {
                 attributes: {
-                  derivativeType: "THUMBNAIL",
+                  derivativeType: "THUMBNAIL_IMAGE",
                   fileIdentifier: "thumbnail-file-456"
                 }
               }
@@ -110,7 +110,7 @@ describe("ImageLinkButton", () => {
               },
               {
                 attributes: {
-                  derivativeType: "THUMBNAIL",
+                  derivativeType: "THUMBNAIL_IMAGE",
                   fileIdentifier: "thumbnail-file-456"
                 }
               }
@@ -125,7 +125,7 @@ describe("ImageLinkButton", () => {
 
     it("does not render when derivatives array is empty", () => {
       const props: ImageLinkButtonProps = {
-        imageType: "THUMBNAIL",
+        imageType: "THUMBNAIL_IMAGE",
         metadata: {
           included: {
             derivatives: []
@@ -139,7 +139,7 @@ describe("ImageLinkButton", () => {
 
     it("does not render when derivatives is undefined", () => {
       const props: ImageLinkButtonProps = {
-        imageType: "THUMBNAIL",
+        imageType: "THUMBNAIL_IMAGE",
         metadata: {
           included: {}
         }
@@ -151,7 +151,7 @@ describe("ImageLinkButton", () => {
 
     it("does not render when included is undefined", () => {
       const props: ImageLinkButtonProps = {
-        imageType: "THUMBNAIL",
+        imageType: "THUMBNAIL_IMAGE",
         metadata: {}
       };
 
@@ -161,13 +161,13 @@ describe("ImageLinkButton", () => {
 
     it("does not render when derivative has no fileIdentifier", () => {
       const props: ImageLinkButtonProps = {
-        imageType: "THUMBNAIL",
+        imageType: "THUMBNAIL_IMAGE",
         metadata: {
           included: {
             derivatives: [
               {
                 attributes: {
-                  derivativeType: "THUMBNAIL"
+                  derivativeType: "THUMBNAIL_IMAGE"
                   // fileIdentifier is missing
                 }
               }
@@ -182,7 +182,7 @@ describe("ImageLinkButton", () => {
 
     it("does not render when derivative has no attributes", () => {
       const props: ImageLinkButtonProps = {
-        imageType: "THUMBNAIL",
+        imageType: "THUMBNAIL_IMAGE",
         metadata: {
           included: {
             derivatives: [
@@ -230,7 +230,7 @@ describe("ImageLinkButton", () => {
               derivatives: [
                 {
                   attributes: {
-                    derivativeType: "THUMBNAIL",
+                    derivativeType: "THUMBNAIL_IMAGE",
                     fileIdentifier: "thumb-456"
                   }
                 }
@@ -247,14 +247,14 @@ describe("ImageLinkButton", () => {
 
       rerender(
         <ImageLinkButton
-          imageType="THUMBNAIL"
+          imageType="THUMBNAIL_IMAGE"
           metadata={{
             data: { attributes: { fileIdentifier: "original-123" } },
             included: {
               derivatives: [
                 {
                   attributes: {
-                    derivativeType: "THUMBNAIL",
+                    derivativeType: "THUMBNAIL_IMAGE",
                     fileIdentifier: "thumb-456"
                   }
                 }

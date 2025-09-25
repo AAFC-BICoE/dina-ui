@@ -150,6 +150,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                 setIsValidField(true);
                 return;
               }
+              break;
           }
         }
       } else {

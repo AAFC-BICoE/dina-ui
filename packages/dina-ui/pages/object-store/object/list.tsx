@@ -24,7 +24,8 @@ export const OBJECT_STORE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
   "thumbnail",
   "objectStorePreview",
-  "viewDetails"
+  "viewDetails",
+  "imageLink."
 ];
 
 const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
@@ -239,7 +240,8 @@ export default function MetadataListPage() {
                 nonExportableColumns={OBJECT_STORE_NON_EXPORTABLE_COLUMNS}
                 nonSearchableColumns={[
                   "acMetadataCreator.displayName",
-                  "dcCreator.displayName"
+                  "dcCreator.displayName",
+                  "_imageLink"
                 ]}
                 enableRelationshipPresence={true}
                 columns={METADATA_TABLE_COLUMNS}

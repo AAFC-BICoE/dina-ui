@@ -24,7 +24,7 @@ interface QueryRowImageLinkProps {
 // Each of these options should have a translation provided: queryBuilder_imageLink_[TYPE]
 export const SUPPORTED_DERIVATIVE_TYPES: string[] = [
   "ORIGINAL",
-  "THUMBNAIL",
+  "THUMBNAIL_IMAGE",
   "LARGE_IMAGE"
 ];
 
@@ -80,6 +80,10 @@ export default function QueryRowImageLink({
 
   return (
     <>
+      {/* Image Type Selector */}
+      <label className={"ps-0 mt-2"}>
+        <strong>{formatMessage({ id: "selectImageTypeToUse" })}</strong>
+      </label>
       <Select<SelectOption<string>>
         options={imageTypeOptions}
         className={`col ps-0 mt-2`}
@@ -125,7 +129,8 @@ export function getImageLinkColumn<TData extends KitsuResource>(
     isKeyword: true,
     isColumnVisible: true,
     enableSorting: false,
-    columnSelectorString: path
+    columnSelectorString: path,
+    size: 350
   };
 }
 
@@ -194,10 +199,14 @@ export function ImageLinkButton({ imageType, metadata }: ImageLinkButtonProps) {
   }
 
   return (
-    <>
-      <a href={IMAGE_VIEW_LINK + fileIdentifier}>
+    <div className="text-center">
+      <a
+        href={IMAGE_VIEW_LINK + fileIdentifier}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         View Image <FaArrowUpRightFromSquare />
       </a>
-    </>
+    </div>
   );
 }
