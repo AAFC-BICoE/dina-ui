@@ -36,6 +36,7 @@ import QueryRowClassificationSearch, {
   ClassificationSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 import { FaArrowRotateLeft, FaPlus } from "react-icons/fa6";
+import QueryRowImageLink from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -422,6 +423,12 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               setValue={setDynamicFieldValue}
               value={dynamicFieldValue}
               isInColumnSelector={true}
+            />
+          )}
+          {selectedField?.dynamicField?.type === "imageLink" && (
+            <QueryRowImageLink
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
             />
           )}
           <div className="mt-2 d-grid">
