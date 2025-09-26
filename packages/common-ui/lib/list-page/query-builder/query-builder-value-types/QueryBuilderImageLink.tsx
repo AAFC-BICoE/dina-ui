@@ -6,7 +6,10 @@ import Select from "react-select";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { TableColumn } from "../../types";
 import { KitsuResource } from "kitsu";
-import { useDinaIntl } from "../../../../../dina-ui/intl/dina-ui-intl";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../../dina-ui/intl/dina-ui-intl";
 
 interface QueryRowImageLinkProps {
   /**
@@ -62,6 +65,10 @@ export default function QueryRowImageLink({
   useEffect(() => {
     if (value) {
       setImageLinkState(JSON.parse(value));
+    } else {
+      setImageLinkState({
+        selectedImageType: "ORIGINAL"
+      });
     }
   }, []);
 
@@ -205,7 +212,7 @@ export function ImageLinkButton({ imageType, metadata }: ImageLinkButtonProps) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        View Image <FaArrowUpRightFromSquare />
+        <DinaMessage id="viewImage" /> <FaArrowUpRightFromSquare />
       </a>
     </div>
   );

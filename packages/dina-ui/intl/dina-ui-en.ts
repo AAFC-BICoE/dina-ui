@@ -1275,6 +1275,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Tag suggestions are currently based on collecting event tags associated with Material Samples.",
   selectFunctionToUse: "Select function to use",
   selectImageTypeToUse: "Select image type to link:",
+  viewImage: "View Image",
   selectFieldToUseWithFunction: "Select a field to use with the function",
   autoSelectButtonTitle: "Auto Select",
   attachmentsBasedOnItemNameButton: "Attachments based on item name",
