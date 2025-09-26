@@ -1,17 +1,12 @@
-import { render, screen } from "@testing-library/react";
 import {
   ImageLinkButton,
   ImageLinkButtonProps,
   IMAGE_VIEW_LINK
 } from "../QueryBuilderImageLink";
 import "@testing-library/jest-dom";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
-// Mock the FontAwesome icon
-jest.mock("react-icons/fa6", () => ({
-  FaArrowUpRightFromSquare: () => <span data-testid="external-link-icon" />
-}));
-
-// Test coverage is AI generated.
+// Test coverage is AI assisted.
 describe("ImageLinkButton", () => {
   describe("ORIGINAL image type", () => {
     it("renders link when fileIdentifier exists in metadata for ORIGINAL type", () => {
@@ -26,15 +21,16 @@ describe("ImageLinkButton", () => {
         }
       };
 
-      render(<ImageLinkButton {...props} />);
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
 
-      const link = screen.getByRole("link", { name: /view image/i });
+      const link = wrapper.getByRole("link", { name: /view image/i });
       expect(link).toBeInTheDocument();
       expect(link).toHaveAttribute(
         "href",
         `${IMAGE_VIEW_LINK}original-file-123`
       );
-      expect(screen.getByTestId("external-link-icon")).toBeInTheDocument();
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
     });
 
     it("does not render when fileIdentifier is missing for ORIGINAL type", () => {
@@ -47,8 +43,8 @@ describe("ImageLinkButton", () => {
         }
       };
 
-      const { container } = render(<ImageLinkButton {...props} />);
-      expect(container).toBeEmptyDOMElement();
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
 
     it("does not render when metadata.data is undefined for ORIGINAL type", () => {
@@ -57,8 +53,8 @@ describe("ImageLinkButton", () => {
         metadata: {}
       };
 
-      const { container } = render(<ImageLinkButton {...props} />);
-      expect(container).toBeEmptyDOMElement();
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
   });
 
@@ -86,14 +82,16 @@ describe("ImageLinkButton", () => {
         }
       };
 
-      render(<ImageLinkButton {...props} />);
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
 
-      const link = screen.getByRole("link", { name: /view image/i });
+      const link = wrapper.getByRole("link", { name: /view image/i });
       expect(link).toBeInTheDocument();
       expect(link).toHaveAttribute(
         "href",
         `${IMAGE_VIEW_LINK}thumbnail-file-456`
       );
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
     });
 
     it("does not render when no matching derivative type found", () => {
@@ -119,8 +117,8 @@ describe("ImageLinkButton", () => {
         }
       };
 
-      const { container } = render(<ImageLinkButton {...props} />);
-      expect(container).toBeEmptyDOMElement();
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
 
     it("does not render when derivatives array is empty", () => {
@@ -133,8 +131,8 @@ describe("ImageLinkButton", () => {
         }
       };
 
-      const { container } = render(<ImageLinkButton {...props} />);
-      expect(container).toBeEmptyDOMElement();
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
 
     it("does not render when derivatives is undefined", () => {
@@ -145,8 +143,8 @@ describe("ImageLinkButton", () => {
         }
       };
 
-      const { container } = render(<ImageLinkButton {...props} />);
-      expect(container).toBeEmptyDOMElement();
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
 
     it("does not render when included is undefined", () => {
@@ -155,8 +153,8 @@ describe("ImageLinkButton", () => {
         metadata: {}
       };
 
-      const { container } = render(<ImageLinkButton {...props} />);
-      expect(container).toBeEmptyDOMElement();
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
 
     it("does not render when derivative has no fileIdentifier", () => {
@@ -176,8 +174,8 @@ describe("ImageLinkButton", () => {
         }
       };
 
-      const { container } = render(<ImageLinkButton {...props} />);
-      expect(container).toBeEmptyDOMElement();
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
 
     it("does not render when derivative has no attributes", () => {
@@ -194,8 +192,8 @@ describe("ImageLinkButton", () => {
         }
       };
 
-      const { container } = render(<ImageLinkButton {...props} />);
-      expect(container).toBeEmptyDOMElement();
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
   });
 
@@ -206,8 +204,8 @@ describe("ImageLinkButton", () => {
         metadata: null
       };
 
-      const { container } = render(<ImageLinkButton {...props} />);
-      expect(container).toBeEmptyDOMElement();
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
 
     it("handles undefined metadata", () => {
@@ -216,85 +214,77 @@ describe("ImageLinkButton", () => {
         metadata: undefined
       };
 
-      const { container } = render(<ImageLinkButton {...props} />);
-      expect(container).toBeEmptyDOMElement();
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
 
     it("re-renders when imageType changes", () => {
-      const { rerender } = render(
-        <ImageLinkButton
-          imageType="ORIGINAL"
-          metadata={{
-            data: { attributes: { fileIdentifier: "original-123" } },
-            included: {
-              derivatives: [
-                {
-                  attributes: {
-                    derivativeType: "THUMBNAIL_IMAGE",
-                    fileIdentifier: "thumb-456"
-                  }
+      const initialProps = {
+        imageType: "ORIGINAL",
+        metadata: {
+          data: { attributes: { fileIdentifier: "original-123" } },
+          included: {
+            derivatives: [
+              {
+                attributes: {
+                  derivativeType: "THUMBNAIL_IMAGE",
+                  fileIdentifier: "thumb-456"
                 }
-              ]
-            }
-          }}
-        />
+              }
+            ]
+          }
+        }
+      };
+
+      const wrapper = mountWithAppContext(
+        <ImageLinkButton {...initialProps} />
       );
 
-      expect(screen.getByRole("link")).toHaveAttribute(
+      expect(wrapper.getByRole("link")).toHaveAttribute(
         "href",
         `${IMAGE_VIEW_LINK}original-123`
       );
 
-      rerender(
-        <ImageLinkButton
-          imageType="THUMBNAIL_IMAGE"
-          metadata={{
-            data: { attributes: { fileIdentifier: "original-123" } },
-            included: {
-              derivatives: [
-                {
-                  attributes: {
-                    derivativeType: "THUMBNAIL_IMAGE",
-                    fileIdentifier: "thumb-456"
-                  }
-                }
-              ]
-            }
-          }}
-        />
-      );
+      const updatedProps = {
+        ...initialProps,
+        imageType: "THUMBNAIL_IMAGE"
+      };
 
-      expect(screen.getByRole("link")).toHaveAttribute(
+      wrapper.rerender(<ImageLinkButton {...updatedProps} />);
+
+      expect(wrapper.getByRole("link")).toHaveAttribute(
         "href",
         `${IMAGE_VIEW_LINK}thumb-456`
       );
     });
 
     it("re-renders when metadata changes", () => {
-      const { rerender } = render(
-        <ImageLinkButton
-          imageType="ORIGINAL"
-          metadata={{
-            data: { attributes: { fileIdentifier: "original-123" } }
-          }}
-        />
+      const initialProps = {
+        imageType: "ORIGINAL",
+        metadata: {
+          data: { attributes: { fileIdentifier: "original-123" } }
+        }
+      };
+
+      const wrapper = mountWithAppContext(
+        <ImageLinkButton {...initialProps} />
       );
 
-      expect(screen.getByRole("link")).toHaveAttribute(
+      expect(wrapper.getByRole("link")).toHaveAttribute(
         "href",
         `${IMAGE_VIEW_LINK}original-123`
       );
 
-      rerender(
-        <ImageLinkButton
-          imageType="ORIGINAL"
-          metadata={{
-            data: { attributes: { fileIdentifier: "original-456" } }
-          }}
-        />
-      );
+      const updatedProps = {
+        ...initialProps,
+        metadata: {
+          data: { attributes: { fileIdentifier: "original-456" } }
+        }
+      };
 
-      expect(screen.getByRole("link")).toHaveAttribute(
+      wrapper.rerender(<ImageLinkButton {...updatedProps} />);
+
+      expect(wrapper.getByRole("link")).toHaveAttribute(
         "href",
         `${IMAGE_VIEW_LINK}original-456`
       );
