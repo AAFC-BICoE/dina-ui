@@ -1,5 +1,11 @@
 import { InputResource } from "kitsu";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { DcType, Metadata } from "packages/dina-ui/types/objectstore-api";
+
+// -- Metadata Mocks --
+
+export const BUCKET: string = "aafc";
+
+export const DC_TYPE: DcType = "IMAGE";
 
 export const DC_RIGHTS: string =
   "© His Majesty The King in Right of Canada, as represented by the Minister of Agriculture and Agri-Food | © Sa Majesté le Roi du chef du Canada, représentée par le ministre de l’Agriculture et de l’Agroalimentaire";
@@ -19,8 +25,6 @@ export const XMP_RIGHTS_USAGE_TERMS: string = "Government of Canada Usage Term";
 export const XMP_RIGHTS_WEB_STATEMENT: string =
   "https://open.canada.ca/en/open-government-licence-canada";
 
-// -- Metadata Mocks --
-
 // Metadata without IDs:
 export const TEST_NEW_METADATA: InputResource<Metadata>[] = [
   {
@@ -31,9 +35,9 @@ export const TEST_NEW_METADATA: InputResource<Metadata>[] = [
       id: "ac-metadata-creator-id",
       type: "person"
     },
-    bucket: "aafc",
+    bucket: BUCKET,
     dcRights: DC_RIGHTS,
-    dcType: "IMAGE",
+    dcType: DC_TYPE,
     fileIdentifier: "upload-fileidentifier-1",
     license: LICENSE,
     xmpRightsOwner: XMP_RIGHTS_OWNER,
@@ -48,9 +52,9 @@ export const TEST_NEW_METADATA: InputResource<Metadata>[] = [
       id: "ac-metadata-creator-id",
       type: "person"
     },
-    bucket: "aafc",
+    bucket: BUCKET,
     dcRights: DC_RIGHTS,
-    dcType: "IMAGE",
+    dcType: DC_TYPE,
     fileIdentifier: "upload-fileidentifier-2",
     license: LICENSE,
     xmpRightsOwner: XMP_RIGHTS_OWNER,
@@ -65,9 +69,9 @@ export const TEST_NEW_METADATA: InputResource<Metadata>[] = [
       id: "ac-metadata-creator-id",
       type: "person"
     },
-    bucket: "aafc",
+    bucket: BUCKET,
     dcRights: DC_RIGHTS,
-    dcType: "IMAGE",
+    dcType: DC_TYPE,
     fileIdentifier: "upload-fileidentifier-3",
     license: LICENSE,
     xmpRightsOwner: XMP_RIGHTS_OWNER,
