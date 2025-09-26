@@ -176,6 +176,14 @@ describe("MetadataBulkEditor", () => {
         bucket: BUCKET,
         dcRights: DC_RIGHTS,
         dcType: DC_TYPE,
+        relationships: {
+          acMetadataCreator: {
+            data: {
+              id: "ac-metadata-creator-id",
+              type: "person"
+            }
+          }
+        },
         xmpRightsOwner: XMP_RIGHTS_OWNER,
         xmpRightsUsageTerms: XMP_RIGHTS_USAGE_TERMS,
         xmpRightsWebStatement: XMP_RIGHTS_WEB_STATEMENT
@@ -281,6 +289,14 @@ describe("MetadataBulkEditor", () => {
         bucket: BUCKET,
         dcRights: DC_RIGHTS,
         dcType: DC_TYPE,
+        relationships: {
+          acMetadataCreator: {
+            data: {
+              id: "ac-metadata-creator-id",
+              type: "person"
+            }
+          }
+        },
         xmpRightsOwner: XMP_RIGHTS_OWNER,
         xmpRightsUsageTerms: XMP_RIGHTS_USAGE_TERMS,
         xmpRightsWebStatement: XMP_RIGHTS_WEB_STATEMENT,
