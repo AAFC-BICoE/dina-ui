@@ -21,6 +21,7 @@ import { DerivativeDetails } from "../../../components/object-store/derivative/D
 import { Metadata } from "../../../types/objectstore-api";
 import { derivativeTypeToLabel } from "../../../components/object-store";
 import { useDinaIntl, DinaMessage } from "../../../intl/dina-ui-intl";
+import { useMemo } from "react";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -34,6 +35,13 @@ export default function DerivativeViewPage() {
   const uuid = String(router.query.id);
   const { messages } = useDinaIntl();
   const derivativeQuery = useDerivativeMetadataViewQuery(uuid);
+  const fileName = useMemo(
+    () =>
+      derivativeQuery?.response?.data?.filename ??
+      derivativeQuery?.response?.data?.objectUpload?.originalFilename,
+    [derivativeQuery]
+  );
+
   if (derivativeQuery?.loading || derivativeQuery?.loading) {
     return <LoadingSpinner loading={true} />;
   }
@@ -43,7 +51,7 @@ export default function DerivativeViewPage() {
   const parentFileName = (derivative?.acDerivedFrom as Metadata)
     ?.originalFilename;
 
-  const fileName =
+  const headTitle =
     derivative?.objectUpload?.originalFilename ||
     `${parentFileName} ${derivativeTypeToLabel(
       derivative?.derivativeType ?? "",
@@ -76,7 +84,7 @@ export default function DerivativeViewPage() {
 
   return (
     <div>
-      <Head title={fileName} />
+      <Head title={headTitle} />
       <Nav marginBottom={false} />
       <style>{OBJECT_DETAILS_PAGE_CSS}</style>
       {buttonBar}
@@ -93,13 +101,16 @@ export default function DerivativeViewPage() {
               <div className="col-md-8">
                 <DinaForm initialValues={derivative as any} readOnly={true}>
                   <div className="row d-flex">
-                    <div
-                      className="col-sm-1 mt-2"
-                      style={{ marginLeft: "-5px" }}
-                    >
-                      <NotPubliclyReleasableWarning />
-                    </div>
-                    <div className="col-sm-11">
+                    <div className="col-md-12">
+                      <h1
+                        style={{ marginTop: 0 }}
+                        className="d-inline-flex flex-row w-100"
+                      >
+                        {fileName}
+                        <div className="ms-auto">
+                          <NotPubliclyReleasableWarning />
+                        </div>
+                      </h1>
                       <TagSelectReadOnly tagsFieldName="acTags" />
                       <TagsAndRestrictionsSection
                         tagsFieldName="acTags"

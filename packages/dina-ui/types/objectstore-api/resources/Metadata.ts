@@ -31,6 +31,7 @@ export interface MetadataAttributes {
   xmpMetadataDate?: string;
   acTags?: string[];
   originalFilename?: string;
+  filename?: string;
   notPubliclyReleasableReason?: string;
   publiclyReleasable?: boolean;
   orientation?: number;

@@ -477,6 +477,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_orientation_tooltipAlt:
     "Diagram of all the possible orientation values.",
   field_originalFilename: "Original Filename",
+  field_filename: "Filename",
   field_otherRecordNumbers: "Additional Collection Numbers",
   field_otherRecordNumbers_tooltip:
     "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",

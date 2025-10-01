@@ -1,4 +1,4 @@
-import { DinaForm, FieldSet, SelectField } from "common-ui";
+import { DinaForm, FieldSet, SelectField, TextField } from "common-ui";
 import {
   NotPubliclyReleasableWarning,
   TagsAndRestrictionsSection,
@@ -13,6 +13,8 @@ import { ReactNode, Ref } from "react";
 import { InputResource } from "kitsu";
 import { FormikProps } from "formik";
 import MetadataBadges from "../metadata/MetadataBadges";
+import React from "react";
+import { useIntl } from "react-intl";
 
 export interface MetadataFormProps {
   derivative?: InputResource<Derivative>;
@@ -36,6 +38,8 @@ export function DerivativeForm({
   derivativeSaveHook,
   derivativeFormRef
 }: MetadataFormProps) {
+  const { formatMessage } = useIntl();
+
   const { initialValues, onSubmit } =
     derivativeSaveHook ??
     useDerivativeSave({
@@ -74,6 +78,17 @@ export function DerivativeForm({
       />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
+          <TextField
+            className="col-md-6"
+            name="filename"
+            placeholder={(derivative as any)?.objectUpload?.originalFilename}
+          />
+          <TextField
+            className="col-md-6"
+            name="objectUpload.originalFilename"
+            label={formatMessage({ id: "field_originalFilename" })}
+            readOnly={true}
+          />
           <SelectField
             className="col-md-6"
             name="dcType"
