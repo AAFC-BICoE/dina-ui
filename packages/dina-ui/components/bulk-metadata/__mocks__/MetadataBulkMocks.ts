@@ -80,6 +80,63 @@ export const TEST_NEW_METADATA: InputResource<Metadata>[] = [
   }
 ];
 
+export const TEST_BULK_EDIT_METADATA: InputResource<Metadata>[] = [
+  {
+    type: "metadata",
+    id: "bulk-edit-1",
+    acCaption: "Same Caption",
+    originalFilename: "bulkEdit1.jpg",
+    acMetadataCreator: {
+      id: "ac-metadata-creator-id",
+      type: "person"
+    },
+    bucket: BUCKET,
+    dcRights: DC_RIGHTS,
+    dcType: DC_TYPE,
+    fileIdentifier: "upload-fileidentifier-1",
+    license: LICENSE,
+    xmpRightsOwner: XMP_RIGHTS_OWNER,
+    xmpRightsUsageTerms: XMP_RIGHTS_USAGE_TERMS,
+    xmpRightsWebStatement: XMP_RIGHTS_WEB_STATEMENT
+  },
+  {
+    type: "metadata",
+    id: "bulk-edit-2",
+    acCaption: "Same Caption",
+    originalFilename: "bulkEdit2.jpg",
+    acMetadataCreator: {
+      id: "ac-metadata-creator-id",
+      type: "person"
+    },
+    bucket: BUCKET,
+    dcRights: DC_RIGHTS,
+    dcType: DC_TYPE,
+    fileIdentifier: "upload-fileidentifier-2",
+    license: LICENSE,
+    xmpRightsOwner: XMP_RIGHTS_OWNER,
+    xmpRightsUsageTerms: XMP_RIGHTS_USAGE_TERMS,
+    xmpRightsWebStatement: XMP_RIGHTS_WEB_STATEMENT
+  },
+  {
+    type: "metadata",
+    id: "bulk-edit-3",
+    acCaption: "Same Caption",
+    originalFilename: "bulkEdit3.jpg",
+    acMetadataCreator: {
+      id: "ac-metadata-creator-id",
+      type: "person"
+    },
+    bucket: BUCKET,
+    dcRights: DC_RIGHTS,
+    dcType: DC_TYPE,
+    fileIdentifier: "upload-fileidentifier-3",
+    license: LICENSE,
+    xmpRightsOwner: XMP_RIGHTS_OWNER,
+    xmpRightsUsageTerms: XMP_RIGHTS_USAGE_TERMS,
+    xmpRightsWebStatement: XMP_RIGHTS_WEB_STATEMENT
+  }
+];
+
 // -- Object Subtype --
 export const TEST_OBJECT_SUBTYPE_DATA: any = {
   id: "object-subtype-1",
