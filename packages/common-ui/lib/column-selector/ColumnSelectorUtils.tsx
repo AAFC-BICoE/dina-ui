@@ -19,6 +19,10 @@ import {
 } from "../list-page/types";
 import { ClassificationSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 import { VocabularyElement } from "packages/dina-ui/types/collection-api";
+import {
+  getImageLinkColumn,
+  ImageLinkStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
 
 export function convertColumnsToAliases(columns): string[] {
   if (!columns) {
@@ -161,6 +165,15 @@ export function generateColumnPath({
           dynamicFieldTypeWithRelationship +
           "/" +
           classificationValue.selectedClassificationRank
+        );
+
+      // Image Link (imageLink/[TYPE])
+      case "imageLink":
+        const imageLinkValue: ImageLinkStates = JSON.parse(dynamicFieldValue);
+        return (
+          dynamicFieldTypeWithRelationship +
+          "/" +
+          imageLinkValue.selectedImageType
         );
     }
   }
@@ -470,6 +483,15 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
         apiClient,
         dynamicFieldsMappingConfig
       );
+    }
+
+    // Handle image link paths
+    if (
+      dynamicFieldsMappingConfig &&
+      pathParts.length === 2 &&
+      pathParts[0] === "imageLink"
+    ) {
+      return getImageLinkColumn(path, pathParts[1]);
     }
   }
 

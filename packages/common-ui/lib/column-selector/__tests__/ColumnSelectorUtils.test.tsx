@@ -383,6 +383,33 @@ describe("ColumnSelectorUtils", () => {
         })
       ).toEqual("classification~parentMaterialSample/kingdom");
     });
+
+    it("Generate imageLink path", () => {
+      expect(
+        generateColumnPath({
+          indexMapping: {
+            dynamicField: {
+              apiEndpoint: "_imageLink",
+              label: "_imageLink",
+              path: "_imageLink",
+              type: "imageLink"
+            },
+            value: "_imageLink",
+            distinctTerm: false,
+            label: "_imageLink",
+            path: "_imageLink",
+            type: "imageLink",
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            containsSupport: false,
+            endsWithSupport: false,
+            hideField: false
+          },
+          dynamicFieldValue: `{ "selectedImageType": "LARGE_IMAGE" }`
+        })
+      ).toEqual("imageLink/LARGE_IMAGE");
+    });
   });
 
   describe("parseRelationshipNameFromType", () => {

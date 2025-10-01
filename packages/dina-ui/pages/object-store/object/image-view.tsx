@@ -8,6 +8,8 @@ import { useRouter } from "next/router";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useState, useCallback, useRef } from "react";
 import { ObjectUpload, Derivative } from "../../../types/objectstore-api";
+import { Head } from "../../../components/head";
+import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 
 /**
  * ImageViewer component displays an image fetched from the object store with simple zoom toggle.
@@ -25,6 +27,8 @@ import { ObjectUpload, Derivative } from "../../../types/objectstore-api";
  * @returns {JSX.Element} The image viewer UI with simple zoom capabilities.
  */
 export default function ImageViewer() {
+  const { formatMessage } = useDinaIntl();
+
   const router = useRouter();
   const { id } = router.query;
 
@@ -131,33 +135,36 @@ export default function ImageViewer() {
   );
 
   return (
-    <div
-      className="d-flex justify-content-center align-items-center vh-100 bg-dark text-white position-relative"
-      style={{ overflow: "hidden" }}
-    >
-      {isLoading ? (
-        <LoadingSpinner loading={true} />
-      ) : hasError ? (
-        <DinaMessage id="previewNotAvailable" />
-      ) : (
-        <img
-          ref={imageRef}
-          src={objectUrl || ""}
-          alt={id as string}
-          style={{
-            maxHeight: "100dvh",
-            maxWidth: "100dvw",
-            transform: `translate(${position.x}px, ${position.y}px) scale(${
-              isZoomed ? ZOOM_SCALE : 1
-            })`,
-            cursor: isZoomed ? "zoom-out" : "zoom-in",
-            userSelect: "none",
-            transition: "transform 0.4s ease-out"
-          }}
-          onClick={handleClick}
-          draggable={false}
-        />
-      )}
-    </div>
+    <>
+      <Head title={formatMessage("imagePreview")} />
+      <div
+        className="d-flex justify-content-center align-items-center vh-100 bg-dark text-white position-relative"
+        style={{ overflow: "hidden" }}
+      >
+        {isLoading ? (
+          <LoadingSpinner loading={true} />
+        ) : hasError ? (
+          <DinaMessage id="previewNotAvailable" />
+        ) : (
+          <img
+            ref={imageRef}
+            src={objectUrl || ""}
+            alt={id as string}
+            style={{
+              maxHeight: "100dvh",
+              maxWidth: "100dvw",
+              transform: `translate(${position.x}px, ${position.y}px) scale(${
+                isZoomed ? ZOOM_SCALE : 1
+              })`,
+              cursor: isZoomed ? "zoom-out" : "zoom-in",
+              userSelect: "none",
+              transition: "transform 0.4s ease-out"
+            }}
+            onClick={handleClick}
+            draggable={false}
+          />
+        )}
+      </div>
+    </>
   );
 }

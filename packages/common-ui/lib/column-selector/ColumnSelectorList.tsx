@@ -36,6 +36,9 @@ import QueryRowClassificationSearch, {
   ClassificationSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 import { FaArrowRotateLeft, FaPlus } from "react-icons/fa6";
+import QueryRowImageLink, {
+  ImageLinkStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -136,6 +139,14 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               const classificationValues: ClassificationSearchStates =
                 JSON.parse(dynamicFieldValue);
               if (classificationValues?.selectedClassificationRank) {
+                setIsValidField(true);
+                return;
+              }
+              break;
+            case "imageLink":
+              const imageLinkValues: ImageLinkStates =
+                JSON.parse(dynamicFieldValue);
+              if (imageLinkValues?.selectedImageType) {
                 setIsValidField(true);
                 return;
               }
@@ -422,6 +433,12 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               setValue={setDynamicFieldValue}
               value={dynamicFieldValue}
               isInColumnSelector={true}
+            />
+          )}
+          {selectedField?.dynamicField?.type === "imageLink" && (
+            <QueryRowImageLink
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
             />
           )}
           <div className="mt-2 d-grid">
