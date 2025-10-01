@@ -229,11 +229,17 @@ export function useMetadataSave({
     } = {
       ...metadataDiff,
       relationships: {
-        // acMetadataCreator should only be saved on upload not edit, so it's not included here.
         ...(metadataDiff.dcCreator && {
           dcCreator: {
             data: metadataDiff.dcCreator?.id
               ? _.pick(metadataDiff.dcCreator, "id", "type")
+              : null
+          }
+        }),
+        ...(metadataDiff.acMetadataCreator && {
+          acMetadataCreator: {
+            data: metadataDiff.acMetadataCreator?.id
+              ? _.pick(metadataDiff.acMetadataCreator, "id", "type")
               : null
           }
         })
