@@ -2,8 +2,6 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   dateCell,
   FieldHeader,
-  FilterAttribute,
-  filterBy,
   LoadingSpinner,
   QueryPage,
   stringArrayCell
@@ -17,7 +15,7 @@ import {
   StoredObjectGallery
 } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Metadata, Person } from "../../../types/objectstore-api";
+import { Metadata } from "../../../types/objectstore-api";
 import Offcanvas from "react-bootstrap/Offcanvas";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
@@ -26,34 +24,13 @@ export const OBJECT_STORE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
   "thumbnail",
   "objectStorePreview",
-  "viewDetails"
+  "viewDetails",
+  "imageLink."
 ];
 
 const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
 
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
-
-export const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
-  "originalFilename",
-  "dcFormat",
-  "xmpRightsWebStatement",
-  "dcRights",
-  {
-    name: "acDigitizationDate",
-    type: "DATE"
-  },
-  {
-    name: "xmpMetadataDate",
-    type: "DATE"
-  },
-  {
-    name: "acMetadataCreator",
-    type: "DROPDOWN",
-    resourcePath: "agent-api/person",
-    filter: filterBy(["displayName"]),
-    optionLabel: (person) => (person as Person).displayName ?? person.id
-  }
-];
 
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
@@ -250,6 +227,11 @@ export default function MetadataListPage() {
                       path: "data.attributes.managedAttributes",
                       apiEndpoint: "objectstore-api/managed-attribute",
                       component: "ENTITY"
+                    },
+                    {
+                      type: "imageLink",
+                      label: "_imageLink",
+                      path: "_imageLink"
                     }
                   ],
                   relationshipFields: []
@@ -258,7 +240,8 @@ export default function MetadataListPage() {
                 nonExportableColumns={OBJECT_STORE_NON_EXPORTABLE_COLUMNS}
                 nonSearchableColumns={[
                   "acMetadataCreator.displayName",
-                  "dcCreator.displayName"
+                  "dcCreator.displayName",
+                  "_imageLink"
                 ]}
                 enableRelationshipPresence={true}
                 columns={METADATA_TABLE_COLUMNS}

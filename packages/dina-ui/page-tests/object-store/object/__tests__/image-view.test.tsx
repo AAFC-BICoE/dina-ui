@@ -1,121 +1,232 @@
-import { render, screen } from "@testing-library/react";
 import ImageViewer from "../../../../pages/object-store/object/image-view";
 import { useRouter } from "next/router";
-import { useBlobLoad } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import "@testing-library/jest-dom";
+import { waitFor } from "@testing-library/dom";
 
 // Mock next/router
 jest.mock("next/router", () => ({
   useRouter: jest.fn()
 }));
 
-// Mock useBlobLoad
-jest.mock("common-ui", () => ({
-  useBlobLoad: jest.fn(),
-  LoadingSpinner: ({ loading }: { loading: boolean }) =>
-    loading ? <div data-testid="spinner" /> : null
-}));
+const mockGet = jest.fn<any, any>(async (path, params) => {
+  switch (path) {
+    // Successful object-upload cases
+    case "objectstore-api/object-upload/success-regular":
+      return {
+        data: {
+          id: "success-regular",
+          type: "object-upload",
+          isDerivative: false,
+          bucket: "test-bucket"
+        }
+      };
 
-// Mock DinaMessage
-jest.mock("../../../../intl/dina-ui-intl", () => ({
-  DinaMessage: ({ id }: { id: string }) => (
-    <div data-testid="dina-message">{id}</div>
-  )
-}));
+    // For blob loading failure test - object-upload succeeds
+    case "objectstore-api/object-upload/blob-failure":
+      return {
+        data: {
+          id: "blob-failure",
+          type: "object-upload",
+          isDerivative: false,
+          bucket: "test-bucket"
+        }
+      };
+
+    // Failed object-upload cases - these will trigger derivative fallback
+    case "objectstore-api/object-upload/fallback-to-derivative":
+    case "objectstore-api/object-upload/complete-failure":
+      throw new Error("Object upload not found");
+
+    // Loading case
+    case "objectstore-api/object-upload/loading":
+      return new Promise(() => {});
+
+    // Derivative fallback cases
+    case "objectstore-api/derivative":
+      const fileIdentifierValue = params?.filter?.fileIdentifier?.EQ;
+
+      if (fileIdentifierValue === "fallback-to-derivative") {
+        return {
+          data: [
+            {
+              id: "derivative-1",
+              type: "derivative",
+              bucket: "fallback-bucket"
+            }
+          ],
+          meta: { totalResourceCount: 1 }
+        };
+      }
+      if (fileIdentifierValue === "complete-failure") {
+        throw new Error("Derivative not found");
+      }
+      return { data: [], meta: { totalResourceCount: 0 } };
+
+    // Blob loading cases
+    case "/objectstore-api/file/test-bucket/success-regular":
+      if (params?.responseType === "blob") {
+        const mockBlob = new Blob(["mock image data"], { type: "image/jpeg" });
+        return { data: mockBlob };
+      }
+      return new Blob(["mock image data"], { type: "image/jpeg" });
+
+    case "/objectstore-api/file/test-bucket/blob-failure":
+      throw new Error("Blob loading failed");
+
+    case "/objectstore-api/file/fallback-bucket/derivative/fallback-to-derivative":
+      if (params?.responseType === "blob") {
+        const mockBlob = new Blob(["mock fallback derivative image data"], {
+          type: "image/jpeg"
+        });
+        return { data: mockBlob };
+      }
+      return new Blob(["mock fallback derivative image data"], {
+        type: "image/jpeg"
+      });
+  }
+
+  throw new Error(`Unmocked API call: ${path}`);
+});
+
+const mockObjectURL = "blob:mock-url-12345";
+global.URL.createObjectURL = jest.fn(() => mockObjectURL);
+global.URL.revokeObjectURL = jest.fn();
+
+const testCtx = {
+  apiContext: {
+    apiClient: {
+      get: mockGet,
+      axios: { get: mockGet }
+    }
+  }
+};
 
 describe("ImageViewer", () => {
   const mockUseRouter = useRouter as jest.Mock;
-  const mockUseBlobLoad = useBlobLoad as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("shows spinner when loading", () => {
+  it("shows spinner when object-upload is loading", async () => {
     mockUseRouter.mockReturnValue({
-      query: { id: "123", bucket: "bucket1", type: undefined }
-    });
-    mockUseBlobLoad.mockReturnValue({
-      objectUrl: null,
-      error: null,
-      isLoading: true
+      query: { id: "loading" }
     });
 
-    render(<ImageViewer />);
-    expect(screen.getByTestId("spinner")).toBeInTheDocument();
+    const wrapper = mountWithAppContext(<ImageViewer />, testCtx as any);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
-  it("shows error message when error occurs", () => {
+  it("shows spinner when blob is loading", () => {
     mockUseRouter.mockReturnValue({
-      query: { id: "123", bucket: "bucket1", type: undefined }
-    });
-    mockUseBlobLoad.mockReturnValue({
-      objectUrl: null,
-      error: "Some error",
-      isLoading: false
+      query: { id: "success-regular" }
     });
 
-    render(<ImageViewer />);
-    expect(screen.getByTestId("dina-message")).toHaveTextContent(
-      "previewNotAvailable"
+    const wrapper = mountWithAppContext(<ImageViewer />, testCtx as any);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
+  });
+
+  it("shows error message when both object-upload and derivative fail", async () => {
+    mockUseRouter.mockReturnValue({
+      query: { id: "complete-failure" }
+    });
+
+    const wrapper = mountWithAppContext(<ImageViewer />, testCtx as any);
+    await waitForLoadingToDisappear();
+
+    await waitFor(() => {
+      expect(wrapper.getByText("Preview Not Available")).toBeInTheDocument();
+    });
+  });
+
+  it("shows error message when blob loading fails", async () => {
+    mockUseRouter.mockReturnValue({
+      query: { id: "blob-failure" }
+    });
+
+    const wrapper = mountWithAppContext(<ImageViewer />, testCtx as any);
+    await waitForLoadingToDisappear();
+
+    await waitFor(
+      () => {
+        expect(wrapper.getByText("Preview Not Available")).toBeInTheDocument();
+      },
+      { timeout: 3000 }
     );
   });
 
-  it("shows image when loaded", () => {
+  it("shows image when loaded from object-upload", async () => {
     mockUseRouter.mockReturnValue({
-      query: { id: "123", bucket: "bucket1", type: undefined }
-    });
-    mockUseBlobLoad.mockReturnValue({
-      objectUrl: "http://example.com/image.jpg",
-      error: null,
-      isLoading: false
+      query: { id: "success-regular" }
     });
 
-    render(<ImageViewer />);
-    const img = screen.getByRole("img");
-    expect(img).toHaveAttribute("src", "http://example.com/image.jpg");
-    expect(img).toHaveAttribute("alt", "123");
+    const wrapper = mountWithAppContext(<ImageViewer />, testCtx as any);
+    await waitForLoadingToDisappear();
+
+    await waitFor(
+      () => {
+        const img = wrapper.getByRole("img");
+        expect(img).toHaveAttribute("src", mockObjectURL);
+        expect(img).toHaveAttribute("alt", "success-regular");
+      },
+      { timeout: 3000 }
+    );
   });
 
-  it("uses derivative file path when type is DERIVATIVE", () => {
+  it("shows image when loaded from derivative fallback", async () => {
     mockUseRouter.mockReturnValue({
-      query: { id: "abc", bucket: "bucket2", type: "DERIVATIVE" }
-    });
-    mockUseBlobLoad.mockReturnValue({
-      objectUrl: "http://example.com/derivative.jpg",
-      error: null,
-      isLoading: false
+      query: { id: "fallback-to-derivative" }
     });
 
-    render(<ImageViewer />);
-    expect(screen.getByRole("img")).toHaveAttribute(
-      "src",
-      "http://example.com/derivative.jpg"
+    const wrapper = mountWithAppContext(<ImageViewer />, testCtx as any);
+    await waitForLoadingToDisappear();
+
+    await waitFor(
+      () => {
+        const img = wrapper.getByRole("img");
+        expect(img).toHaveAttribute("src", mockObjectURL);
+        expect(img).toHaveAttribute("alt", "fallback-to-derivative");
+      },
+      { timeout: 3000 }
     );
-    // Check that useBlobLoad was called with the correct filePath
-    expect(mockUseBlobLoad).toHaveBeenCalledWith(
+  });
+
+  it("makes correct API calls for successful object-upload", async () => {
+    mockUseRouter.mockReturnValue({
+      query: { id: "success-regular" }
+    });
+
+    mountWithAppContext(<ImageViewer />, testCtx as any);
+    await waitForLoadingToDisappear();
+
+    expect(mockGet).toHaveBeenCalledWith(
+      "objectstore-api/object-upload/success-regular",
       expect.objectContaining({
-        filePath: "/objectstore-api/file/bucket2/derivative/abc",
-        autoOpen: false,
-        disabled: false
+        fields: { "object-upload": "isDerivative,bucket" }
       })
     );
   });
 
-  it("disables blob load if fileUrl is falsy", async () => {
+  it("makes correct API calls for derivative fallback", async () => {
     mockUseRouter.mockReturnValue({
-      query: { id: undefined, bucket: undefined, type: undefined }
-    });
-    mockUseBlobLoad.mockReturnValue({
-      objectUrl: null,
-      error: null,
-      isLoading: false
+      query: { id: "fallback-to-derivative" }
     });
 
-    render(<ImageViewer />);
-    expect(mockUseBlobLoad).toHaveBeenCalledWith(
+    mountWithAppContext(<ImageViewer />, testCtx as any);
+    await waitForLoadingToDisappear();
+
+    expect(mockGet).toHaveBeenCalledWith(
+      "objectstore-api/object-upload/fallback-to-derivative",
+      expect.any(Object)
+    );
+
+    // Since the object-upload failed, then the derivative should be called.
+    expect(mockGet).toHaveBeenCalledWith(
+      "objectstore-api/derivative",
       expect.objectContaining({
-        disabled: true
+        filter: { fileIdentifier: { EQ: "fallback-to-derivative" } },
+        page: { limit: 1 }
       })
     );
   });
