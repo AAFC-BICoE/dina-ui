@@ -1,4 +1,7 @@
-import { InstanceContext, InstanceContextI } from "../InstanceContextProvider";
+import {
+  InstanceContext,
+  InstanceContextValue
+} from "../InstanceContextProvider";
 
 import { render } from "@testing-library/react";
 import { useInstanceContext } from "../useInstanceContext";
@@ -6,7 +9,7 @@ import "@testing-library/jest-dom";
 import { ReactNode } from "react";
 
 function MockInstanceContextProvider({ children }: { children: ReactNode }) {
-  const instanceJson: InstanceContextI = {
+  const instanceJson = {
     supportedLanguages: "en,fr",
     instanceMode: "developer",
     instanceName: "",
@@ -14,7 +17,7 @@ function MockInstanceContextProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <InstanceContext.Provider value={instanceJson}>
+    <InstanceContext.Provider value={instanceJson as InstanceContextValue}>
       {children}
     </InstanceContext.Provider>
   );

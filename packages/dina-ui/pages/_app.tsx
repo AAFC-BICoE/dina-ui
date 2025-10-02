@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import {
   ApiClientImplProvider,
   AuthenticatedApiClientProvider,
-  DefaultInstanceContextProvider,
+  InstanceProvider,
   KeycloakAccountProvider,
   DevUserAccountProvider,
   ModalProvider
@@ -46,7 +46,7 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
 
   return (
     <ApiClientImplProvider>
-      <DefaultInstanceContextProvider>
+      <InstanceProvider>
         <DevUserAccountProvider>
           <KeycloakAccountProvider>
             <AuthenticatedApiClientProvider>
@@ -66,7 +66,7 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
             </AuthenticatedApiClientProvider>
           </KeycloakAccountProvider>
         </DevUserAccountProvider>
-      </DefaultInstanceContextProvider>
+      </InstanceProvider>
     </ApiClientImplProvider>
   );
 }
