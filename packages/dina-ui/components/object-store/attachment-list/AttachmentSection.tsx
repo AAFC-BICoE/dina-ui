@@ -148,7 +148,7 @@ function AttachmentSectionContent({
       legend={
         <>
           <DinaMessage id="attachments" />{" "}
-          {totalAttachments > 0 ? <span>{totalAttachments}</span> : null}
+          {totalAttachments > 0 ? <span>({totalAttachments})</span> : null}
         </>
       }
     >
