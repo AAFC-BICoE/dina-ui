@@ -29,8 +29,25 @@ import {
 } from "../../../pages/object-store/metadata/edit";
 import { ReactNode, Ref } from "react";
 import { InputResource } from "kitsu";
-import { FormikProps } from "formik";
+import { connect, FormikProps } from "formik";
 import MetadataBadges from "./MetadataBadges";
+
+// When the acDcType is changed, the acSubType needs to be cleared
+const DcTypeSelectorComponent = connect(({ formik }) => {
+  const { setFieldValue } = formik;
+
+  return (
+    <SelectField
+      name="dcType"
+      className="col-md-6"
+      options={DCTYPE_OPTIONS}
+      onChange={(selectedDcType) => {
+        setFieldValue("dcType", selectedDcType);
+        setFieldValue("acSubtype", null);
+      }}
+    />
+  );
+});
 
 export interface MetadataFormProps {
   metadata?: InputResource<Metadata>;
@@ -112,11 +129,7 @@ export function MetadataForm({
           />
         </div>
         <div className="row">
-          <SelectField
-            className="col-md-6"
-            name="dcType"
-            options={DCTYPE_OPTIONS}
-          />
+          <DcTypeSelectorComponent />
           <Field name="dcType">
             {({ field: { value: dcType } }) => (
               <ResourceSelectField<ObjectSubtype>
