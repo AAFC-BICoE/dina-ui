@@ -106,6 +106,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
                   }}
                   type="checkbox"
                   value={value || false}
+                  data-testid={`checkbox-${resource.id}`}
                 />
               </div>
             </div>

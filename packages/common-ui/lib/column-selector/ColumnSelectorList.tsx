@@ -35,6 +35,10 @@ import {
 import QueryRowClassificationSearch, {
   ClassificationSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
+import { FaArrowRotateLeft, FaPlus } from "react-icons/fa6";
+import QueryRowImageLink, {
+  ImageLinkStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -139,6 +143,14 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                 return;
               }
               break;
+            case "imageLink":
+              const imageLinkValues: ImageLinkStates =
+                JSON.parse(dynamicFieldValue);
+              if (imageLinkValues?.selectedImageType) {
+                setIsValidField(true);
+                return;
+              }
+              break;
           }
         }
       } else {
@@ -229,6 +241,17 @@ export function ColumnSelectorList<TData extends KitsuResource>({
 
     // Update the displayedColumns state with the modified array
     setDisplayedColumns(newDisplayedColumns);
+  };
+
+  const onColumnReset = async () => {
+    setSelectedField(undefined);
+
+    // This action can be not be performed in export mode.
+    if (!exportMode && defaultColumns) {
+      setLocalStorageDisplayedColumns(
+        defaultColumns.map((column) => column?.id ?? "")
+      );
+    }
   };
 
   const onColumnItemInsert = async () => {
@@ -412,12 +435,19 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               isInColumnSelector={true}
             />
           )}
+          {selectedField?.dynamicField?.type === "imageLink" && (
+            <QueryRowImageLink
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
+            />
+          )}
           <div className="mt-2 d-grid">
             <Button
               className="btn btn-primary"
               disabled={!isValidField}
               onClick={onColumnItemInsert}
             >
+              <FaPlus className="me-2" />
               <DinaMessage id="columnSelector_addColumnButton" />
             </Button>
           </div>
@@ -456,6 +486,22 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                   />
                 );
               })}
+            </>
+          )}
+
+          {!exportMode && (
+            <>
+              <br />
+              <div className="mt-2 d-grid">
+                <Button
+                  className="btn btn-secondary"
+                  onClick={onColumnReset}
+                  variant="secondary"
+                >
+                  <FaArrowRotateLeft className="me-2" />
+                  <DinaMessage id="columnSelector_resetButton" />
+                </Button>
+              </div>
             </>
           )}
         </>

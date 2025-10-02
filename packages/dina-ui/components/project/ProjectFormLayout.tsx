@@ -12,6 +12,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { AgentRolesField } from "../collection/AgentRolesField";
+import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
 
 export function ProjectFormLayout() {
   const { readOnly } = useDinaFormContext();
@@ -23,6 +24,23 @@ export function ProjectFormLayout() {
     "data.relationships.projects.data.id"
   );
   const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
+
+  const relationshipPresenceUUIDSearch = generateSearchURLFromSimpleRows([
+    {
+      f: "_relationshipPresence",
+      o: "uuid",
+      v: "projects",
+      t: "relationshipPresence",
+      d: uuid ?? ""
+    }
+  ]);
+
+  const linkObject = {
+    pathname: `/collection/material-sample/list`,
+    query: {
+      queryTree: relationshipPresenceUUIDSearch
+    }
+  };
 
   return (
     <div>
@@ -93,6 +111,8 @@ export function ProjectFormLayout() {
           columns={ELASTIC_SEARCH_COLUMN}
           indexName={"dina_material_sample_index"}
           viewMode={readOnly}
+          linkObject={linkObject}
+          linkMessageId="viewAttachedMaterialSamples"
           customViewQuery={readOnly ? customViewQuery : undefined}
           customViewFilterGroups={false}
           customViewFields={

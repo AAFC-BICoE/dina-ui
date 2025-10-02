@@ -1,6 +1,6 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import {
   blankMaterialSample,
   CollectingEvent,
@@ -434,6 +434,7 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
+    await waitForLoadingToDisappear();
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
@@ -3523,6 +3524,77 @@ describe("Material Sample Edit Page", () => {
                   type: "collecting-event"
                 },
                 type: "collecting-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+    });
+
+    it("Creates a scheduled action.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm onSaved={mockOnSaved} />,
+        testCtx
+      );
+      await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+      // Enable the scheduled action section:
+      const scheduledActionToggle = wrapper.container.querySelectorAll(
+        ".enable-scheduled-actions .react-switch-bg"
+      );
+
+      if (!scheduledActionToggle) {
+        fail("Scheduled action toggle needs to exist at this point.");
+      }
+      fireEvent.click(scheduledActionToggle[0]);
+
+      // Enter an action type:
+      userEvent.type(
+        wrapper.getByRole("textbox", { name: /action type/i }),
+        "Check Vouchers"
+      );
+
+      // Enter an action status:
+      userEvent.type(
+        wrapper.getByRole("textbox", { name: /action status/i }),
+        "ongoing"
+      );
+
+      // Enter a date:
+      userEvent.type(
+        wrapper.getByPlaceholderText(/yyyy\-mm\-dd/i),
+        "2025-05-19"
+      );
+
+      // Add the scheduled action.
+      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+
+      // Verify it appears in the table.
+      await waitFor(() => {
+        expect(wrapper.getByText(/Check Vouchers/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/ongoing/i)).toBeInTheDocument();
+      });
+
+      // Save the form
+      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  scheduledActions: [
+                    {
+                      actionStatus: "ongoing",
+                      actionType: "Check Vouchers",
+                      date: "2025-05-19"
+                    }
+                  ],
+                  publiclyReleasable: true,
+                  type: "material-sample"
+                },
+                type: "material-sample"
               }
             ],
             { apiBaseUrl: "/collection-api" }

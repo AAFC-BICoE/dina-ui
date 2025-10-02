@@ -1061,6 +1061,7 @@ export function CollectingEventFormLayout({
               "extension.fields.dinaComponent": "COLLECTING_EVENT"
             }}
             width={"100%"}
+            disableClearButton={true}
           />
         </DinaFormSection>
       </div>

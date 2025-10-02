@@ -203,21 +203,54 @@ describe("Metadata single record edit page.", () => {
         [
           {
             resource: {
-              acSubtype: "TEST_SUBTYPE",
-              acTags: ["new tag 1", "new tag 2"],
-              dcCreator: {
-                id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
-                type: "person"
-              },
               id: "25f81de5-bbee-430c-b5fa-71986b70e612",
+              type: "metadata",
+              acTags: ["new tag 1", "new tag 2"],
               managedAttributes: {
                 test_managed_attribute: "new-managed-attribute-value"
               },
               publiclyReleasable: false,
               notPubliclyReleasableReason:
-                "new reason for not publicly releasable",
+                "new reason for not publicly releasable"
+            },
+            type: "metadata"
+          }
+        ],
+        { apiBaseUrl: "/objectstore-api" }
+      );
+    });
+  });
+
+  it("Change the license to None should set the license to an empty string", async () => {
+    const wrapper = mountWithAppContext(<MetadataEditPage />, { apiContext });
+
+    // Check for the right initial values:
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /original filename/i })
+      ).toHaveDisplayValue("test-file.png");
+    });
+
+    // Set the license to <None> in the dropdown menu.
+    userEvent.click(
+      wrapper.getByRole("combobox", {
+        name: /license open government licence \- canada/i
+      })
+    );
+    userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    // Expect the xmpRightsWebStatement to be set to empty.
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              id: "25f81de5-bbee-430c-b5fa-71986b70e612",
               type: "metadata",
-              xmpRightsUsageTerms: ""
+              xmpRightsWebStatement: ""
             },
             type: "metadata"
           }

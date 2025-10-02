@@ -7,9 +7,11 @@ import {
   DinaFormOnSubmit,
   FieldSet,
   FieldSpy,
+  isResourceEmpty,
   NumberField,
   QueryPage,
   RadioButtonsField,
+  resourceDifference,
   StringArrayField,
   SubmitButton,
   TextField,
@@ -36,8 +38,9 @@ import { useMaterialSampleRelationshipColumns } from "../../../components/collec
 import { ManagedAttributesEditor } from "../../../components/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { Transaction } from "../../../types/loan-transaction-api";
+import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
 import { Person } from "../../../types/objectstore-api";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -70,7 +73,7 @@ export function useTransactionQuery(id?: string, showPermissions?: boolean) {
 
 export default function TransactionEditPage() {
   const router = useRouter();
-  const id = router.query.id?.toString?.();
+  const id = router?.query?.id?.toString?.();
   const { formatMessage } = useDinaIntl();
 
   async function goToViewPage(transaction: PersistedResource<Transaction>) {
@@ -127,44 +130,79 @@ export function TransactionForm({
     []
   );
 
+  // Track samples that couldn't be loaded but should still be preserved
+  const [nonLoadableSamples, setNonLoadableSamples] = useState<
+    ResourceIdentifierObject[]
+  >([]);
+
   const onSubmit: DinaFormOnSubmit<InputResource<Transaction>> = async ({
     submittedValues
   }) => {
+    // Combine loadable and non-loadable samples for saving
+    // Non-loadable samples should NEVER be altered.
+    const allMaterialSamples = [
+      ...selectedResources.map((it) => ({
+        id: it.id,
+        type: it.type
+      })),
+      ...nonLoadableSamples
+    ];
+
+    const submittedValuesWithRelationships = {
+      ...submittedValues,
+      materialSamples: allMaterialSamples as ResourceIdentifierObject[],
+      agentRoles: formatAgentRoles(submittedValues.agentRoles)
+    };
+
+    const formattedInitialValues = {
+      ...initialValues,
+      agentRoles: formatAgentRoles(initialValues.agentRoles)
+    };
+
+    // Only save the differences, not untouched fields.
+    const transactionDiff = initialValues.id
+      ? resourceDifference({
+          original: formattedInitialValues as any,
+          updated: submittedValuesWithRelationships
+        })
+      : submittedValuesWithRelationships;
+
     const transactionInput: InputResource<Transaction> & {
       relationships: any;
     } = {
-      ...submittedValues,
-      // Convert the attachments to a 'relationships' array so it works with JSONAPI:
-      attachment: undefined,
-      materialSamples: undefined,
+      ...transactionDiff,
       relationships: {
-        ...(submittedValues.attachment && {
+        ...(transactionDiff.attachment && {
           attachment: {
-            data: submittedValues.attachment.map((it) => ({
+            data: transactionDiff.attachment.map((it) => ({
               id: it.id,
               type: it.type
             }))
           }
         }),
-        ...{
+        ...(transactionDiff.materialSamples && {
           materialSamples: {
-            data: selectedResources.map((it) => ({
+            data: transactionDiff.materialSamples.map((it) => ({
               id: it.id,
-              type: "material-sample"
+              type: it.type
             }))
           }
-        }
-      },
-
-      // Convert the Agent objects to UUIDs for submission to the back-end:
-      agentRoles: submittedValues.agentRoles?.map((agentRole) => ({
-        ...agentRole,
-        agent:
-          typeof agentRole.agent === "object"
-            ? agentRole.agent?.id
-            : agentRole.agent
-      }))
+        })
+      }
     };
+
+    // Remove the non-relationship versions.
+    delete (transactionInput as any).materialSamples;
+    delete (transactionInput as any).attachment;
+    if (Object.keys(transactionInput.relationships).length === 0) {
+      delete transactionInput.relationships;
+    }
+
+    // If the request contains no change, don't perform any request.
+    if (isResourceEmpty(transactionDiff) && transactionInput?.id) {
+      await onSaved(transactionInput as any);
+      return;
+    }
 
     const [savedTransaction] = await save<Transaction>(
       [
@@ -177,6 +215,30 @@ export function TransactionForm({
     );
     await onSaved(savedTransaction);
   };
+
+  /**
+   * This function iterates through an array of agent roles and ensures that the
+   * 'agent' property is consistently an ID string. If 'agent' is an object,
+   * its 'id' is extracted. If it's already a string or null/undefined, it's used as is.
+   *
+   * @param agentRoles The array of agent roles to process. Can be null or undefined.
+   * @returns A new array with the formatted agent roles, or undefined if the input is falsy.
+   */
+  function formatAgentRoles(
+    agentRoles: AgentRole[] | undefined | null
+  ): AgentRole[] | undefined {
+    if (!agentRoles) {
+      return undefined;
+    }
+
+    return agentRoles.map((agentRole) => ({
+      ...agentRole,
+      agent:
+        typeof agentRole.agent === "object" && agentRole.agent
+          ? agentRole.agent.id
+          : agentRole.agent
+    }));
+  }
 
   const buttonBar = (
     <ButtonBar className="mb-4">
@@ -201,6 +263,7 @@ export function TransactionForm({
       <TransactionFormLayout
         selectedResources={selectedResources}
         setSelectedResources={setSelectedResources}
+        setNonLoadableSamples={setNonLoadableSamples}
       />
     </DinaForm>
   );
@@ -209,11 +272,13 @@ export function TransactionForm({
 export interface TransactionFormLayoutProps {
   selectedResources?: MaterialSample[];
   setSelectedResources?: Dispatch<SetStateAction<MaterialSample[]>>;
+  setNonLoadableSamples?: Dispatch<SetStateAction<ResourceIdentifierObject[]>>;
 }
 
 export function TransactionFormLayout({
   selectedResources,
-  setSelectedResources
+  setSelectedResources,
+  setNonLoadableSamples
 }: TransactionFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
@@ -232,7 +297,7 @@ export function TransactionFormLayout({
   async function fetchSamples(sampleIds: string[]) {
     await bulkGet<MaterialSample>(
       sampleIds.map((id) => `/material-sample/${id}?include=organism`),
-      { apiBaseUrl: "/collection-api" }
+      { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
     ).then((response) => {
       const materialSamplesTransformed = _.compact(response).map(
         (resource) => ({
@@ -246,8 +311,20 @@ export function TransactionFormLayout({
           }
         })
       );
+
+      // Track samples that couldn't be loaded
+      const nonLoadable: ResourceIdentifierObject[] = [];
+      sampleIds.forEach((id, index) => {
+        if (!response[index]) {
+          nonLoadable.push({ id, type: "material-sample" });
+        }
+      });
+
       if (setSelectedResources !== undefined) {
         setSelectedResources(materialSamplesTransformed ?? []);
+      }
+      if (setNonLoadableSamples !== undefined) {
+        setNonLoadableSamples(nonLoadable);
       }
       setSelectedResourcesView(materialSamplesTransformed ?? []);
     });
@@ -429,6 +506,7 @@ export function TransactionFormLayout({
         fieldSetProps={{
           legend: <DinaMessage id="managedAttributes" />
         }}
+        disableClearButton={true}
       />
       <div className="mb-3">
         <AttachmentsField

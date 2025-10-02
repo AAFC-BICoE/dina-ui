@@ -634,7 +634,10 @@ export function useMaterialSampleSave({
         ...(msInitialValues.hostOrganism && { hostOrganism: null })
       })
     };
-    delete materialSampleInput.scheduledActions;
+
+    // This is the form template provided scheduled action (since only one is supported). This
+    // should not be included in the request. "scheduledActions" plural should be in the request.
+    delete (materialSampleInput as any).scheduledAction;
 
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (

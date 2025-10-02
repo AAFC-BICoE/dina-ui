@@ -113,8 +113,8 @@ export function FileView({
 
   // Generate the image viewer url using the current displayed image's filepath.
   const imageViewerUrl = filePathContents.includes("derivative")
-    ? `/object-store/object/image-view?id=${filePathContents[5]}&bucket=${filePathContents[3]}&type=DERIVATIVE`
-    : `/object-store/object/image-view?id=${filePathContents[4]}&bucket=${filePathContents[3]}`;
+    ? `/object-store/object/image-view?id=${filePathContents[5]}`
+    : `/object-store/object/image-view?id=${filePathContents[4]}`;
 
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>

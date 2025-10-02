@@ -27,7 +27,12 @@ export interface BulkEditTabFieldInfoParams {
 
 export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
   const {
-    bulkEditCtx: { bulkEditFormRef, resourceHooks: sampleHooks },
+    bulkEditCtx: {
+      bulkEditFormRef,
+      resourceHooks: sampleHooks,
+      clearedFields,
+      deletedFields
+    },
     fieldName
   } = params;
 
@@ -80,11 +85,17 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
     !isBlankResourceAttribute(bulkEditValue) &&
     !_.isEqual(bulkEditValue, commonValue);
 
+  const isExplicitlyCleared = clearedFields?.has(fieldName) || false;
+
+  const isExplicitlyDeleted = deletedFields?.has(fieldName) || false;
+
   return {
     hasNoValues,
     hasMultipleValues,
     hasSameValues,
     hasBulkEditValue,
+    isExplicitlyCleared,
+    isExplicitlyDeleted,
     commonValue
   };
 }
@@ -99,10 +110,20 @@ export function useBulkEditTabFieldIndicators(
   const { formatMessage } = useIntl();
 
   if (field) {
-    const { hasMultipleValues, hasSameValues, commonValue, hasBulkEditValue } =
-      field;
+    const {
+      hasMultipleValues,
+      hasSameValues,
+      commonValue,
+      hasBulkEditValue,
+      isExplicitlyCleared,
+      isExplicitlyDeleted
+    } = field;
 
-    const placeholder = hasMultipleValues
+    const placeholder = isExplicitlyDeleted
+      ? formatMessage({ id: "deleted" })
+      : isExplicitlyCleared
+      ? formatMessage({ id: "cleared" })
+      : hasMultipleValues
       ? formatMessage({ id: "multipleValues" })
       : undefined;
 
@@ -110,10 +131,22 @@ export function useBulkEditTabFieldIndicators(
 
     const bulkEditClasses = classNames(
       hasBulkEditValue && "has-bulk-edit-value",
-      hasMultipleValues && "has-multiple-values"
+      hasMultipleValues && "has-multiple-values",
+      isExplicitlyCleared && "is-explicitly-cleared",
+      isExplicitlyDeleted && "is-explicitly-deleted"
     );
 
-    return { placeholder, defaultValue, bulkEditClasses, hasBulkEditValue };
+    const showClearIcon = !isExplicitlyCleared;
+
+    return {
+      placeholder,
+      defaultValue,
+      bulkEditClasses,
+      hasBulkEditValue,
+      showClearIcon,
+      isExplicitlyCleared,
+      isExplicitlyDeleted
+    };
   }
 
   return null;

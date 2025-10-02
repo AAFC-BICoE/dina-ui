@@ -1,10 +1,11 @@
 import {
   BulkEditTabContext,
   BulkEditTabContextI,
+  ClearType,
   ResourceWithHooks
 } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
-import React from "react";
+import React, { useState } from "react";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { BulkNavigatorTab } from "./BulkEditNavigator";
 import { FormikProps } from "formik";
@@ -25,10 +26,20 @@ export function useBulkEditTab({
 }: UseBulkEditTabParams) {
   const { formatMessage } = useDinaIntl();
 
+  const [clearedFields, setClearedFields] = useState<Map<string, ClearType>>(
+    new Map()
+  );
+  const [deletedFields, setDeletedFields] = useState<Set<string>>(new Set());
+
   const ctx: BulkEditTabContextI = {
     resourceHooks,
-    bulkEditFormRef
+    bulkEditFormRef,
+    clearedFields,
+    deletedFields,
+    setClearedFields,
+    setDeletedFields
   };
+
   const bulkEditTab: BulkNavigatorTab = {
     formRef: bulkEditFormRef,
     key: "EDIT_ALL",
@@ -43,6 +54,8 @@ export function useBulkEditTab({
 
   return {
     bulkEditTab,
-    bulkEditFormRef
+    bulkEditFormRef,
+    clearedFields,
+    deletedFields
   };
 }

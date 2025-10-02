@@ -13,7 +13,9 @@ import {
   useApiClient,
   useQuery,
   withResponse,
-  SimpleSearchFilterBuilder
+  SimpleSearchFilterBuilder,
+  resourceDifference,
+  isResourceEmpty
 } from "common-ui";
 import { NextRouter, useRouter } from "next/router";
 import { Field } from "formik";
@@ -35,6 +37,8 @@ import {
 } from "../../../types/objectstore-api";
 import { DCTYPE_OPTIONS, ORIENTATION_OPTIONS } from "../metadata/edit";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
+import { InputResource } from "kitsu";
+import _ from "lodash";
 
 export default function ExternalResourceMetadataPage() {
   const { formatMessage } = useDinaIntl();
@@ -133,68 +137,85 @@ function ExternalResourceMetadataForm({
 
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
-    api: { apiClient, save }
+    api: { save }
   }) => {
     const {
       // Don't include derivatives in the form submission:
       derivatives: _derivatives,
-      license,
-      acSubtype,
       ...metadataValues
     } = submittedValues;
-    if (license) {
-      const selectedLicense = license?.id
-        ? (
-            await apiClient.get<License>(
-              `objectstore-api/license/${license.id}`,
-              {}
-            )
-          ).data
-        : null;
-      // The Metadata's xmpRightsWebStatement field stores the license's url.
-      metadataValues.xmpRightsWebStatement = selectedLicense?.url ?? "";
-      // No need to store this ; The url should be enough.
-      metadataValues.xmpRightsUsageTerms = "";
-    }
 
-    const metadataEdit = {
-      ...metadataValues,
-      // Convert the object back to a string:
-      acSubtype: acSubtype?.acSubtype ?? null,
-      bucket: metadataValues.bucket ?? groupNames?.[0],
-      dcFormat: metadataValues?.dcFormat
-        ? metadataValues?.dcFormat?.mediaType
-        : undefined
+    // Before checking the difference, we need to parse some fields.
+    metadataValues.acSubtype =
+      (metadataValues as any)?.acSubtype?.acSubtype ?? undefined;
+    metadataValues.xmpRightsWebStatement =
+      (metadataValues as any)?.license?.url ??
+      metadataValues.xmpRightsWebStatement;
+    metadataValues.dcFormat = (metadataValues as any)?.dcFormat
+      ? metadataValues?.dcFormat?.mediaType
+      : undefined;
+    metadataValues.bucket = (metadataValues as any).bucket ?? groupNames?.[0];
+    delete metadataValues.license;
+
+    // Only submit the changed values to the back-end:
+    const metadataDiff: InputResource<Metadata> = metadata?.id
+      ? resourceDifference({
+          original: metadata,
+          updated: metadataValues
+        })
+      : metadataValues;
+
+    const metadataWithRelationships: InputResource<Metadata> & {
+      relationships: any;
+    } = {
+      ...metadataDiff,
+      relationships: {
+        // acMetadataCreator should only be saved on create, not edit.
+        ...(metadataDiff.acMetadataCreator &&
+          !metadataDiff.id && {
+            acMetadataCreator: {
+              data: metadataDiff.acMetadataCreator?.id
+                ? _.pick(metadataDiff.acMetadataCreator, "id", "type")
+                : null
+            }
+          }),
+        ...(metadataDiff.dcCreator && {
+          dcCreator: {
+            data: metadataDiff.dcCreator?.id
+              ? _.pick(metadataDiff.dcCreator, "id", "type")
+              : null
+          }
+        })
+      }
     };
 
-    if (metadataEdit.dcCreator) {
-      // Only include the id and type for this relationship.
-      metadataEdit.dcCreator = {
-        id: metadataEdit.dcCreator.id,
-        type: "person"
-      };
-    }
-    if (metadataEdit.acMetadataCreator) {
-      // Only include the id and type for this relationship.
-      metadataEdit.acMetadataCreator = {
-        id: metadataEdit.acMetadataCreator.id,
-        type: "person"
-      };
+    // Delete relationships handled above.
+    delete metadataWithRelationships.acMetadataCreator;
+    delete metadataWithRelationships.dcCreator;
+
+    // If the relationship section is empty, remove it from the query.
+    if (Object.keys(metadataWithRelationships.relationships).length === 0) {
+      delete metadataWithRelationships.relationships;
     }
 
-    const savedMeta = await save(
-      [
-        {
-          resource: metadataEdit,
-          type: "metadata"
-        }
-      ],
-      { apiBaseUrl: "/objectstore-api" }
-    );
+    // Do not make a request if no changes were made.
+    if (
+      isResourceEmpty(metadataWithRelationships) &&
+      metadataWithRelationships?.id
+    ) {
+      await router.push(
+        `/object-store/object/external-resource-view?id=${metadataWithRelationships?.id}`
+      );
+    } else {
+      const savedMeta = await save(
+        [{ resource: metadataWithRelationships, type: "metadata" }],
+        { apiBaseUrl: "/objectstore-api" }
+      );
 
-    await router.push(
-      `/object-store/object/external-resource-view?id=${savedMeta?.[0].id}`
-    );
+      await router.push(
+        `/object-store/object/external-resource-view?id=${savedMeta?.[0].id}`
+      );
+    }
   };
 
   const buttonBar = (

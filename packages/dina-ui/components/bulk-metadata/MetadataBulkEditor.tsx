@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Metadata } from "../../types/objectstore-api";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import {
+  bulkEditAllManagedAttributes,
   BulkEditTabContextI,
   ButtonBar,
+  ClearType,
   DinaForm,
   DoOperationsError,
   FormikButton,
   getBulkEditTabFieldInfo,
+  isResourceEmpty,
   ResourceWithHooks,
   SaveArgs,
   useApiClient,
@@ -79,19 +82,19 @@ export function MetadataBulkEditor({
     />
   );
 
-  function metadataBulkOverrider() {
-    /** Metadata input including blank/empty fields. */
-    return getMetadataBulkOverrider(bulkEditFormRef);
-  }
-
   const [initialized, setInitialized] = useState(false);
 
-  const { bulkEditTab } = useBulkEditTab({
+  const { bulkEditTab, clearedFields, deletedFields } = useBulkEditTab({
     resourceHooks: metadataHooks,
     hideBulkEditTab: !initialized,
     resourceForm: metadataForm,
     bulkEditFormRef
   });
+
+  const metadataBulkOverrider = useCallback(
+    () => getMetadataBulkOverrider(bulkEditFormRef, deletedFields),
+    [bulkEditFormRef, deletedFields]
+  );
 
   useEffect(() => {
     // Set the initial tab to the Edit All tab:
@@ -101,7 +104,11 @@ export function MetadataBulkEditor({
   const { saveAll } = useBulkMetadataSave({
     onSaved,
     metadataPreProcessor: metadataBulkOverrider,
-    bulkEditCtx: { resourceHooks: metadataHooks, bulkEditFormRef }
+    bulkEditCtx: {
+      resourceHooks: metadataHooks,
+      bulkEditFormRef,
+      clearedFields
+    }
   });
 
   return (
@@ -166,7 +173,10 @@ export function MetadataBulkEditor({
   );
 }
 
-export function getMetadataBulkOverrider(bulkEditFormRef) {
+export function getMetadataBulkOverrider(
+  bulkEditFormRef,
+  deletedFields?: Set<string>
+) {
   let bulkEditMetadata: InputResource<Metadata> | undefined;
 
   /** Returns an object with the overridden values. */
@@ -184,20 +194,21 @@ export function getMetadataBulkOverrider(bulkEditFormRef) {
       bulkEditMetadata = formik.values;
     }
 
-    /** Override object with only the non-empty fields. */
-    const overrides = withoutBlankFields(bulkEditMetadata);
+    const overrides = withoutBlankFields({ ...bulkEditMetadata });
+    delete overrides.managedAttributes; // handled separately below
 
-    // Combine the managed attributes dictionaries:
-    const newManagedAttributes = {
-      ...withoutBlankFields(baseMetadata.managedAttributes),
-      ...withoutBlankFields(bulkEditMetadata?.managedAttributes)
-    };
+    const metadataManagedAttributes = bulkEditAllManagedAttributes(
+      bulkEditMetadata?.managedAttributes ?? {},
+      baseMetadata.managedAttributes ?? {},
+      deletedFields ?? new Set(),
+      "managedAttributes"
+    );
 
     const newMetadata: InputResource<Metadata> = {
       ...baseMetadata,
       ...overrides,
-      ...(!_.isEmpty(newManagedAttributes) && {
-        managedAttributes: newManagedAttributes
+      ...(!_.isEmpty(metadataManagedAttributes) && {
+        managedAttributes: metadataManagedAttributes
       })
     };
 
@@ -227,12 +238,17 @@ function useBulkMetadataSave({
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const { bulkEditFormRef, resourceHooks: metadataHooks } = bulkEditCtx;
+  const {
+    bulkEditFormRef,
+    resourceHooks: metadataHooks,
+    clearedFields
+  } = bulkEditCtx;
 
   async function saveAll() {
     setError(null);
     bulkEditFormRef.current?.setStatus(null);
     bulkEditFormRef.current?.setErrors({});
+
     try {
       // First clear all tab errors:
       for (const { formRef } of metadataHooks) {
@@ -283,31 +299,16 @@ function useBulkMetadataSave({
             }
           });
 
-          if (saveOp.resource.dcCreator) {
-            // Only include the id and type for this relationship.
-            saveOp.resource.dcCreator = {
-              id: saveOp.resource.dcCreator.id,
-              type: "person"
-            };
+          // Check if cleared fields have been requested, make the changes for each operation.
+          if (clearedFields?.size) {
+            for (const [fieldName, clearType] of clearedFields) {
+              _.set(
+                saveOp.resource as any,
+                fieldName,
+                clearType === ClearType.EmptyString ? "" : null
+              );
+            }
           }
-          if (saveOp.resource.acMetadataCreator) {
-            // Only include the id and type for this relationship.
-            saveOp.resource.acMetadataCreator = {
-              id: saveOp.resource.acMetadataCreator.id,
-              type: "person"
-            };
-          }
-
-          if (saveOp.resource.license) {
-            // The Metadata's xmpRightsWebStatement field stores the license's url.
-            saveOp.resource.xmpRightsWebStatement =
-              saveOp.resource.license?.url ?? "";
-            // No need to store this ; The url should be enough.
-            saveOp.resource.xmpRightsUsageTerms = "";
-          }
-          delete saveOp.resource.license;
-          saveOp.resource.acSubtype =
-            saveOp.resource.acSubtype?.acSubtype ?? null;
 
           saveOperations.push(saveOp);
         } catch (error: unknown) {
@@ -329,12 +330,42 @@ function useBulkMetadataSave({
         }
       }
 
-      const savedMetadata = await save<Metadata>(saveOperations, {
-        apiBaseUrl: "/objectstore-api"
-      });
-      const savedMetadataIds = savedMetadata.map((metadata) => metadata.id);
+      // Filter out empty resources but keep track of their positions
+      const nonEmptyOperations: SaveArgs<Metadata>[] = [];
+      const nonEmptyIndices: number[] = [];
+      const resultMetadata: PersistedResource<Metadata>[] = new Array(
+        saveOperations.length
+      );
 
-      await onSaved(savedMetadataIds);
+      // First pass: store empty resources and collect non-empty ones
+      for (let i = 0; i < saveOperations.length; i++) {
+        const operation = saveOperations[i];
+
+        if (isResourceEmpty(operation.resource)) {
+          // For empty resources, just store the original resource
+          resultMetadata[i] = operation.resource as any;
+        } else {
+          // For non-empty resources, collect for batch save
+          nonEmptyOperations.push(operation);
+          nonEmptyIndices.push(i);
+        }
+      }
+
+      // Make a single API call for all non-empty resources
+      if (nonEmptyOperations.length > 0) {
+        const savedMetadata = await save<Metadata>(nonEmptyOperations, {
+          apiBaseUrl: "/objectstore-api"
+        });
+
+        // Place the saved resources in their original positions
+        for (let i = 0; i < savedMetadata.length; i++) {
+          const originalIndex = nonEmptyIndices[i];
+          resultMetadata[originalIndex] = savedMetadata[i];
+        }
+      }
+
+      // Call onSaved with all samples in the original order
+      await onSaved(resultMetadata.map((metadata) => metadata.id));
     } catch (error: unknown) {
       // When there is an error from the bulk save-all operation, put it into the correct form:
       if (error instanceof DoOperationsError) {

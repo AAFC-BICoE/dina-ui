@@ -24,6 +24,7 @@ export interface DataBlockProps extends FieldWrapperProps {
   blockOptions: any[];
   unitsOptions?: any[];
   typeOptions?: any[];
+  disableClearButton?: boolean;
 }
 
 export function DataBlock({
@@ -39,6 +40,7 @@ export function DataBlock({
   blockOptions,
   unitsOptions,
   typeOptions,
+  disableClearButton = false,
   ...props
 }: DataBlockProps) {
   const extensionKeys = extensionValues[blockKey].rows;
@@ -161,6 +163,7 @@ export function DataBlock({
                 isVocabularyBasedEnabledForType={
                   isVocabularyBasedEnabledForType
                 }
+                disableClearButton={disableClearButton}
               />
             );
           })}

@@ -44,6 +44,9 @@ export interface ManagedAttributesEditorProps {
   visibleAttributeKeys?: string[];
 
   values?: object;
+
+  /** Whether to show a clear button beside the managed attribute selector. Default false. */
+  disableClearButton?: boolean;
 }
 
 export function ManagedAttributesEditor({
@@ -54,6 +57,7 @@ export function ManagedAttributesEditor({
   fieldSetProps,
   managedAttributeOrderFieldName,
   visibleAttributeKeys: visibleAttributeKeysProp,
+  disableClearButton = false,
   values
 }: ManagedAttributesEditorProps) {
   const bulkCtx = useBulkEditTabContext();
@@ -140,6 +144,7 @@ export function ManagedAttributesEditor({
                                 current.filter((it) => it != attributeKey)
                               )
                             }
+                            disableClearButton={disableClearButton}
                           />
                         ))}
                       </div>
@@ -171,6 +176,7 @@ export function ManagedAttributesEditor({
                     attribute={attribute}
                     values={values}
                     valuesPath={valuesPath}
+                    disableClearButton={disableClearButton}
                   />
                 ))}
               </div>

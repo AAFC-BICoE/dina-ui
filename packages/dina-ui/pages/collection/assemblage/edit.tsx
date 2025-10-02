@@ -215,6 +215,7 @@ export function AssemblageFormLayout() {
         fieldSetProps={{
           legend: <DinaMessage id="assemblageManagedAttributes" />
         }}
+        disableClearButton={true}
       />
       <AttachmentsField
         name="attachment"

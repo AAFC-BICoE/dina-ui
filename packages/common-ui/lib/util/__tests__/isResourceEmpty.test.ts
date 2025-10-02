@@ -5,6 +5,16 @@ describe("isResourceEmpty", () => {
     expect(isResourceEmpty({ id: "123", type: "test" })).toBe(true);
   });
 
+  it("Should return true if the object only contains id and type with undefined keys", () => {
+    expect(
+      isResourceEmpty({
+        id: "019934d2-126a-73eb-808c-380b3b46f9ff",
+        type: "metadata",
+        acSubType: undefined
+      })
+    ).toBe(true);
+  });
+
   it("Should return false if the object has more than two properties", () => {
     expect(isResourceEmpty({ id: "123", type: "test", name: "John" })).toBe(
       false

@@ -288,7 +288,8 @@ export const DYNAMIC_FIELD_TYPES = [
   "relationshipPresence",
   "classification",
   "columnFunction",
-  "vocabulary"
+  "vocabulary",
+  "imageLink"
 ] as const;
 export type DynamicFieldType = (typeof DYNAMIC_FIELD_TYPES)[number];
 

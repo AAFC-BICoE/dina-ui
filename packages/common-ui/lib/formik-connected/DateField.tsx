@@ -3,11 +3,17 @@ import moment from "moment";
 import { ComponentProps, FocusEvent, SyntheticEvent } from "react";
 import DatePicker from "react-datepicker";
 import { useIntl } from "react-intl";
-import { FieldWrapperProps } from "..";
+import {
+  ClearType,
+  FieldWrapperProps,
+  useBulkEditTabFieldIndicators
+} from "..";
 import { DateView } from "../date/DateView";
 import { FieldWrapper } from "./FieldWrapper";
+import { ClearAllButton } from "../bulk-edit/ClearAllButton";
 
 export interface DateFieldProps extends FieldWrapperProps {
+  readOnly?: boolean;
   /**
    * While the date field requires a YYYY-MM-DD format, enabling this option will allow for
    * partial dates like: YYYY-MM or YYYY by itself.
@@ -27,11 +33,13 @@ export const DATE_REGEX_PARTIAL = /^\d{4}(-\d{2}){0,2}$/;
 /** Formik-connected date input. */
 export function DateField(props: DateFieldProps) {
   const {
+    readOnly,
     showTime,
     disabled,
     partialDate,
     showPlaceholder = true,
-    skipValidation = false
+    skipValidation = false,
+    disableClearButton = false
   } = props;
 
   const { formatMessage } = useIntl();
@@ -70,7 +78,12 @@ export function DateField(props: DateFieldProps) {
       validate={validate}
       disableLabelClick={true} // Stops the datepicker from staying open after choosing a date.
     >
-      {({ formik, invalid, setValue, value }) => {
+      {({ formik, invalid, setValue, value, placeholder }) => {
+        const bulkTab = useBulkEditTabFieldIndicators({
+          fieldName: props.name,
+          currentValue: value
+        });
+
         function onChange(
           date: Date | null,
           event?: SyntheticEvent<any, Event>
@@ -151,30 +164,58 @@ export function DateField(props: DateFieldProps) {
           showTime
             ? {
                 dateFormat: "Pp",
-                showTimeSelect: true
+                showTimeSelect: true,
+                placeholderText:
+                  placeholder ||
+                  (showPlaceholder ? "YYYY-MM-DD, HH:MM AM/PM" : "")
               }
             : {
                 dateFormat: "yyyy-MM-dd",
-                placeholderText: showPlaceholder ? "YYYY-MM-DD" : "",
+                placeholderText:
+                  placeholder || (showPlaceholder ? "YYYY-MM-DD" : ""),
                 value // The text value in the input element.
               };
 
+        // Disable while the field when it's in a special state like cleared or deleted.
+        const isDisabled =
+          disabled ||
+          bulkTab?.isExplicitlyCleared ||
+          bulkTab?.isExplicitlyDeleted;
+
         return (
-          <div className={classnames(invalid && "is-invalid")}>
+          <div
+            className={classnames(
+              "d-flex",
+              "align-items-center",
+              "gap-2",
+              invalid && "is-invalid"
+            )}
+          >
             <DatePicker
               className={classnames("form-control", invalid && "is-invalid")}
               wrapperClassName="w-100"
-              isClearable={!disabled}
+              isClearable={!isDisabled && !bulkTab}
               onChange={onChange}
               onChangeRaw={onChangeRaw}
               showYearDropdown={true}
               todayButton="Today"
-              disabled={disabled}
+              disabled={isDisabled}
               onBlur={onBlur}
               onFocus={(event) => event.target.select()}
               selected={dateObject}
               {...datePickerProps}
             />
+            {bulkTab &&
+              !bulkTab?.isExplicitlyDeleted &&
+              !disableClearButton && (
+                <ClearAllButton
+                  fieldName={props.name}
+                  clearType={ClearType.Null}
+                  onClearLocal={() => setValue(null)}
+                  isCleared={!bulkTab?.showClearIcon}
+                  readOnly={readOnly}
+                />
+              )}
           </div>
         );
       }}

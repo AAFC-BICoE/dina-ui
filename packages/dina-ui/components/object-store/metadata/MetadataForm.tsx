@@ -96,9 +96,15 @@ export function MetadataForm({
         <div className="row">
           <TextField
             className="col-md-6"
+            name="filename"
+            placeholder={initialValues?.originalFilename}
+          />
+          <TextField
+            className="col-md-6"
             name="originalFilename"
             readOnly={true}
           />
+          <TextField className="col-md-6" name="acCaption" />
           <DateField
             className="col-md-6"
             name="acDigitizationDate"
@@ -130,9 +136,6 @@ export function MetadataForm({
               />
             )}
           </Field>
-        </div>
-        <div className="row">
-          <TextField className="col-md-6" name="acCaption" />
         </div>
         <div className="row">
           <PersonSelectField
@@ -169,6 +172,7 @@ export function MetadataForm({
         fieldSetProps={{
           legend: <DinaMessage id="managedAttributes" />
         }}
+        disableClearButton={true}
       />
       {buttonBar}
     </DinaForm>
