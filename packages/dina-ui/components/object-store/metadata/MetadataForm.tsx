@@ -131,7 +131,7 @@ export function MetadataForm({
         <div className="row">
           <DcTypeSelectorComponent />
           <Field name="dcType">
-            {({ field: { value: dcType } }) => (
+            {({ field: { value: dcType }, form }) => (
               <ResourceSelectField<ObjectSubtype>
                 name="acSubtype"
                 className="col-md-6"
@@ -146,6 +146,15 @@ export function MetadataForm({
                 }
                 model="objectstore-api/object-subtype"
                 optionLabel={(ost) => ost.acSubtype}
+                onChange={(selected) => {
+                  // Normalize: when cleared or when <None> is selected, store null
+                  const normalized =
+                    selected == null || (selected as any)?.id == null
+                      ? null
+                      : selected;
+
+                  form.setFieldValue("acSubtype", normalized);
+                }}
               />
             )}
           </Field>

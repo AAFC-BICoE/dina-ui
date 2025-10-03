@@ -211,7 +211,9 @@ export function useMetadataSave({
 
     // Before checking the difference, we need to parse some fields.
     preprocessed.acSubtype =
-      (preprocessed as any)?.acSubtype?.acSubtype ?? null;
+      preprocessed.acSubtype === null
+        ? null
+        : (preprocessed as any)?.acSubtype?.acSubtype ?? undefined;
     preprocessed.xmpRightsWebStatement =
       (preprocessed as any)?.license?.url ?? "";
     delete preprocessed.license;
