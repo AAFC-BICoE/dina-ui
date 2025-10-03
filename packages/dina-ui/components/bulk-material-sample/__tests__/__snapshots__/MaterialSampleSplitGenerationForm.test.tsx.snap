@@ -154,6 +154,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
         </div>
         <nav
           class="app-bar navbar navbar-expand-lg navbar-light"
+          style="background-color: rgb(56, 65, 77);"
         >
           <div
             class="centered container-fluid"
@@ -793,6 +794,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
         </div>
         <nav
           class="app-bar navbar navbar-expand-lg navbar-light"
+          style="background-color: rgb(56, 65, 77);"
         >
           <div
             class="centered container-fluid"
