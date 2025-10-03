@@ -11,6 +11,7 @@ import {
   LoadingSpinner,
   Operation,
   ResourceSelectField,
+  SimpleSearchFilterBuilder,
   SubmitButton,
   TextField,
   useAccount,
@@ -309,7 +310,11 @@ function PcrBatchFormFields({
         <ResourceSelectField<StorageUnitType>
           className="col-md-6"
           name="storageUnitType"
-          filter={filterBy(["name"])}
+          filter={(searchValue: string) =>
+            SimpleSearchFilterBuilder.create<StorageUnitType>()
+              .searchFilter("name", searchValue)
+              .build()
+          }
           model="collection-api/storage-unit-type"
           optionLabel={(storageUnitType) => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
@@ -391,7 +396,11 @@ function PcrBatchFormFields({
         <ResourceSelectField<Protocol>
           className="col-md-6"
           name="protocol"
-          filter={filterBy(["name"])}
+          filter={(searchValue: string) =>
+            SimpleSearchFilterBuilder.create<Protocol>()
+              .searchFilter("name", searchValue)
+              .build()
+          }
           filterList={(resource) => resource.protocolType === "pcr_reaction"}
           model="collection-api/protocol"
           optionLabel={(protocol) => protocol.name}
@@ -431,17 +440,17 @@ function PcrBatchFormFields({
         <StorageUnitSelectField
           resourceProps={{
             name: "storageUnit",
-            filter: filterBy(["name"], {
-              extraFilters: values?.storageUnitType?.id
-                ? [
-                    {
-                      selector: "storageUnitType.uuid",
-                      comparison: "==",
-                      arguments: values?.storageUnitType?.id ?? ""
-                    }
-                  ]
-                : undefined
-            }),
+            filter: (searchValue: string) =>
+              SimpleSearchFilterBuilder.create()
+                .searchFilter("name", searchValue)
+                .when(values?.storageUnitType?.id, (builder) =>
+                  builder.whereProvided(
+                    "storageUnitType.uuid",
+                    "EQ",
+                    values?.storageUnitType?.id
+                  )
+                )
+                .build(),
             isDisabled: !values?.storageUnitType?.id,
             className: "col-md-6"
           }}

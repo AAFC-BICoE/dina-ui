@@ -4,9 +4,14 @@ import Button from "react-bootstrap/Button";
 import React, { useState } from "react";
 import { ReportTemplate } from "../../../types/dina-export-api";
 import Select from "react-select";
-import { useAccount, useQuery } from "../../../../common-ui/lib";
+import {
+  SimpleSearchFilterBuilder,
+  useAccount,
+  useQuery
+} from "../../../../common-ui/lib";
 import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
 import { downloadBlobFile } from "common-ui";
+import { simpleSearchFilterToFiql } from "packages/common-ui/lib/filter-builder/fiql";
 
 interface ReportTemplateOption {
   label: string;
@@ -40,9 +45,11 @@ export function GenerateLabelDropdownButton({
   useQuery<ReportTemplate[]>(
     {
       path: "dina-export-api/report-template",
-      filter: {
-        rsql: `group=in=(${groupNames})`
-      }
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create<ReportTemplate>()
+          .whereIn("group", groupNames)
+          .build()
+      )
     },
     {
       onSuccess: async ({ data }) => {

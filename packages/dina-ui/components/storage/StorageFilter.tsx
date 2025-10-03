@@ -1,7 +1,7 @@
 import {
-  filterBy,
   FilterGroupModel,
   ResourceSelect,
+  SimpleSearchFilterBuilder,
   useAccount
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -181,7 +181,11 @@ export function StorageFilter({
               <ResourceSelect<StorageUnitType>
                 model="collection-api/storage-unit-type"
                 optionLabel={(it) => it.name}
-                filter={filterBy(["name"])}
+                filter={(searchValue: string) =>
+                  SimpleSearchFilterBuilder.create<StorageUnitType>()
+                    .searchFilter("name", searchValue)
+                    .build()
+                }
                 onChange={setStorageTypeFilter as any}
                 value={storageTypeFilter}
                 styles={{ container: () => ({ flex: "auto" }) }}

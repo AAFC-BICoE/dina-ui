@@ -1,5 +1,4 @@
 import {
-  filterBy,
   ResourceSelectField,
   ResourceSelectFieldProps,
   SimpleSearchFilterBuilder,
@@ -49,27 +48,16 @@ export function CollectionSelectField(
 ) {
   const { isAdmin, groupNames } = useAccount();
 
-  const filter = filterBy(
-    ["name"],
-    !isAdmin
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: "group",
-              comparison: "=in=",
-              arguments: groupNames || []
-            }
-          ]
-        }
-      : undefined
-  );
-
   return (
     <ResourceSelectField<Collection>
       key={String(isAdmin)}
       readOnlyLink="/collection/collection/view?id="
-      filter={filter}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<Collection>()
+          .searchFilter("name", searchValue)
+          .when(!isAdmin, (builder) => builder.whereIn("group", groupNames))
+          .build()
+      }
       model="collection-api/collection"
       optionLabel={(coll) =>
         `${coll.name || coll.id}${coll.code ? ` (${coll.code})` : ""}`
@@ -91,7 +79,11 @@ export function InstitutionSelectField(
   return (
     <ResourceSelectField<Institution>
       readOnlyLink="/collection/institution/view?id="
-      filter={filterBy(["name"])}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<Institution>()
+          .searchFilter("name", searchValue)
+          .build()
+      }
       model="collection-api/institution"
       optionLabel={(inst) => inst.name || inst.id}
       {...props}
@@ -134,7 +126,11 @@ export function PersonSelectField(
         })
       }
       readOnlyLink="/person/view?id="
-      filter={filterBy(["displayName"])}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<Person>()
+          .searchFilter("displayName", searchValue)
+          .build()
+      }
       model="agent-api/person"
       // Show display name, and show aliases if any:
       optionLabel={(person) => {
@@ -184,7 +180,11 @@ export function StorageUnitSelectField({
         })
       }
       readOnlyLink="/collection/storage-unit/view?id="
-      filter={filterBy(["name"])}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<StorageUnit>()
+          .searchFilter("name", searchValue)
+          .build()
+      }
       model="collection-api/storage-unit"
       optionLabel={(storageUnit) => {
         return storageUnit.name;
@@ -202,27 +202,16 @@ export function CollectingEventSelectField(
 ) {
   const { isAdmin, groupNames } = useAccount();
 
-  const filter = filterBy(
-    ["dwcFieldNumber"],
-    !isAdmin
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: "group",
-              comparison: "=in=",
-              arguments: groupNames || []
-            }
-          ]
-        }
-      : undefined
-  );
-
   return (
     <ResourceSelectField<CollectingEvent>
       key={String(isAdmin)}
       readOnlyLink="/collection/collecting-event/view?id="
-      filter={filter}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<CollectingEvent>()
+          .searchFilter("dwcFieldNumber", searchValue)
+          .when(!isAdmin, (builder) => builder.whereIn("group", groupNames))
+          .build()
+      }
       model="collection-api/collecting-event"
       optionLabel={(coll) =>
         `${
@@ -243,24 +232,15 @@ export function ProtocolSelectField(
   props: SetOptional<ResourceSelectFieldProps<Protocol>, ProvidedProps>
 ) {
   const { isAdmin, groupNames } = useAccount();
-  const filter = filterBy(
-    ["name"],
-    !isAdmin
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: "group",
-              comparison: "=in=",
-              arguments: groupNames || []
-            }
-          ]
-        }
-      : undefined
-  );
+
   return (
     <ResourceSelectField<Protocol>
-      filter={filter}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<Protocol>()
+          .searchFilter("name", searchValue)
+          .when(!isAdmin, (builder) => builder.whereIn("group", groupNames))
+          .build()
+      }
       model="collection-api/protocol"
       optionLabel={(protocol) => protocol.name}
       omitNullOption={false}
@@ -277,21 +257,7 @@ export function PreparationTypeSelectField(
   props: SetOptional<ResourceSelectFieldProps<PreparationType>, ProvidedProps>
 ) {
   const { isAdmin, groupNames } = useAccount();
-  const filter = filterBy(
-    ["name"],
-    !isAdmin
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: "group",
-              comparison: "=in=",
-              arguments: groupNames || []
-            }
-          ]
-        }
-      : undefined
-  );
+
   return (
     <ResourceSelectField<PreparationType>
       {...props}
@@ -299,7 +265,12 @@ export function PreparationTypeSelectField(
       optionLabel={(it) => it.name}
       readOnlyLink="/collection/preparation-type/view?id="
       className="preparation-type"
-      filter={filter}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<PreparationType>()
+          .searchFilter("name", searchValue)
+          .when(!isAdmin, (builder) => builder.whereIn("group", groupNames))
+          .build()
+      }
       tooltipLink={
         props.tooltipLink ??
         "https://aafc-bicoe.github.io/dina-documentation/#preparation-type"
@@ -316,21 +287,7 @@ export function PreparationMethodSelectField(
   props: SetOptional<ResourceSelectFieldProps<PreparationMethod>, ProvidedProps>
 ) {
   const { isAdmin, groupNames } = useAccount();
-  const filter = filterBy(
-    ["name"],
-    !isAdmin
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: "group",
-              comparison: "=in=",
-              arguments: groupNames || []
-            }
-          ]
-        }
-      : undefined
-  );
+
   return (
     <ResourceSelectField<PreparationMethod>
       {...props}
@@ -338,7 +295,12 @@ export function PreparationMethodSelectField(
       optionLabel={(it) => it.name}
       readOnlyLink="/collection/preparation-method/view?id="
       className="preparation-method"
-      filter={filter}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<PreparationMethod>()
+          .searchFilter("name", searchValue)
+          .when(!isAdmin, (builder) => builder.whereIn("group", groupNames))
+          .build()
+      }
       tooltipLink={
         props.tooltipLink ??
         "https://aafc-bicoe.github.io/dina-documentation/#preparation-method"
@@ -355,26 +317,17 @@ export function ProjectSelectField(
   props: SetOptional<ResourceSelectFieldProps<Project>, ProvidedProps>
 ) {
   const { isAdmin, groupNames } = useAccount();
-  const filter = filterBy(
-    ["name"],
-    !isAdmin
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: "group",
-              comparison: "=in=",
-              arguments: groupNames || []
-            }
-          ]
-        }
-      : undefined
-  );
+
   return (
     <ResourceSelectField<Project>
       isMulti={true}
       readOnlyLink="/collection/project/view?id="
-      filter={filter}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<Project>()
+          .searchFilter("name", searchValue)
+          .when(!isAdmin, (builder) => builder.whereIn("group", groupNames))
+          .build()
+      }
       model={"collection-api/project"}
       optionLabel={(prj) => prj.name}
       {...props}
