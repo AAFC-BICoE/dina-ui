@@ -29,8 +29,25 @@ import {
 } from "../../../pages/object-store/metadata/edit";
 import { ReactNode, Ref } from "react";
 import { InputResource } from "kitsu";
-import { FormikProps } from "formik";
+import { connect, FormikProps } from "formik";
 import MetadataBadges from "./MetadataBadges";
+
+// When the acDcType is changed, the acSubType needs to be cleared
+const DcTypeSelectorComponent = connect(({ formik }) => {
+  const { setFieldValue } = formik;
+
+  return (
+    <SelectField
+      name="dcType"
+      className="col-md-6"
+      options={DCTYPE_OPTIONS}
+      onChange={(selectedDcType) => {
+        setFieldValue("dcType", selectedDcType);
+        setFieldValue("acSubtype", null);
+      }}
+    />
+  );
+});
 
 export interface MetadataFormProps {
   metadata?: InputResource<Metadata>;
@@ -112,13 +129,9 @@ export function MetadataForm({
           />
         </div>
         <div className="row">
-          <SelectField
-            className="col-md-6"
-            name="dcType"
-            options={DCTYPE_OPTIONS}
-          />
+          <DcTypeSelectorComponent />
           <Field name="dcType">
-            {({ field: { value: dcType } }) => (
+            {({ field: { value: dcType }, form }) => (
               <ResourceSelectField<ObjectSubtype>
                 name="acSubtype"
                 className="col-md-6"
@@ -133,6 +146,15 @@ export function MetadataForm({
                 }
                 model="objectstore-api/object-subtype"
                 optionLabel={(ost) => ost.acSubtype}
+                onChange={(selected) => {
+                  // Normalize: when cleared or when <None> is selected, store null
+                  const normalized =
+                    selected == null || (selected as any)?.id == null
+                      ? null
+                      : selected;
+
+                  form.setFieldValue("acSubtype", normalized);
+                }}
               />
             )}
           </Field>
