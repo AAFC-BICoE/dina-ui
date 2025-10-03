@@ -1,8 +1,13 @@
 import "@testing-library/jest-dom";
 import { render, waitFor } from "@testing-library/react";
-import { ApiClientProvider } from "../../api-client/ApiClientContext";
-import { useInstanceContext } from "../useInstanceContext";
-import { InstanceProvider } from "../InstanceContextProvider";
+import {
+  ApiClientProvider,
+  InstanceContextProvider,
+  InstanceContextValue,
+  mountWithAppContext,
+  useInstanceContext
+} from "common-ui";
+import { ReactNode } from "react";
 
 // Test component to access context values
 const TestComponent = () => {
@@ -46,9 +51,9 @@ const createMockApiContextWithError = (error: any) => ({
 const renderWithProvider = (apiContext: any) => {
   return render(
     <ApiClientProvider value={apiContext}>
-      <InstanceProvider>
+      <InstanceContextProvider>
         <TestComponent />
-      </InstanceProvider>
+      </InstanceContextProvider>
     </ApiClientProvider>
   );
 };
@@ -80,7 +85,7 @@ describe("InstanceContextProvider", () => {
     };
 
     const apiContext = createMockApiContext(mockResponse);
-    const { findByTestId } = renderWithProvider(apiContext);
+    const wrapper = renderWithProvider(apiContext);
 
     await waitFor(() =>
       expect(apiContext.apiClient.get).toHaveBeenCalledWith(
@@ -89,55 +94,65 @@ describe("InstanceContextProvider", () => {
       )
     );
 
-    expect(await findByTestId("supportedLanguages")).toHaveTextContent(
+    expect(await wrapper.findByTestId("supportedLanguages")).toHaveTextContent(
       "en,fr,es"
     );
-    expect(await findByTestId("instanceMode")).toHaveTextContent("production");
-    expect(await findByTestId("instanceName")).toHaveTextContent(
+    expect(await wrapper.findByTestId("instanceMode")).toHaveTextContent(
+      "production"
+    );
+    expect(await wrapper.findByTestId("instanceName")).toHaveTextContent(
       "Test Instance"
     );
-    expect(await findByTestId("instanceBannerColor")).toHaveTextContent(
+    expect(await wrapper.findByTestId("instanceBannerColor")).toHaveTextContent(
       "#FF5733"
     );
     expect(
-      await findByTestId("supportedGeographicReferences")
+      await wrapper.findByTestId("supportedGeographicReferences")
     ).toHaveTextContent("TGN");
-    expect(await findByTestId("tgnSearchBaseUrl")).toHaveTextContent(
+    expect(await wrapper.findByTestId("tgnSearchBaseUrl")).toHaveTextContent(
       "https://tgn.example.com"
     );
     expect(
-      await findByTestId("scientificNamesSearchEndpoint")
+      await wrapper.findByTestId("scientificNamesSearchEndpoint")
     ).toHaveTextContent("https://custom-search.example.com");
     expect(
-      await findByTestId("scientificNamesDatasetsEndpoint")
+      await wrapper.findByTestId("scientificNamesDatasetsEndpoint")
     ).toHaveTextContent("https://custom-datasets.example.com");
   });
 
   it("should use default values when API returns empty response", async () => {
     const apiContext = createMockApiContext({});
-    const { findByTestId } = renderWithProvider(apiContext);
+    const wrapper = renderWithProvider(apiContext);
 
     await waitFor(() =>
       expect(apiContext.apiClient.get).toHaveBeenCalledTimes(1)
     );
 
-    expect(await findByTestId("supportedLanguages")).toHaveTextContent("en");
-    expect(await findByTestId("instanceMode")).toHaveTextContent("developer");
-    expect(await findByTestId("instanceName")).toHaveTextContent("AAFC");
-    expect(await findByTestId("instanceBannerColor")).toHaveTextContent(
+    expect(await wrapper.findByTestId("supportedLanguages")).toHaveTextContent(
+      "en"
+    );
+    expect(await wrapper.findByTestId("instanceMode")).toHaveTextContent(
+      "developer"
+    );
+    expect(await wrapper.findByTestId("instanceName")).toHaveTextContent(
+      "AAFC"
+    );
+    expect(await wrapper.findByTestId("instanceBannerColor")).toHaveTextContent(
       "#38414d"
     );
     expect(
-      await findByTestId("supportedGeographicReferences")
+      await wrapper.findByTestId("supportedGeographicReferences")
     ).toHaveTextContent("OSM");
-    expect(await findByTestId("tgnSearchBaseUrl")).toHaveTextContent("");
+    expect(await wrapper.findByTestId("tgnSearchBaseUrl")).toHaveTextContent(
+      ""
+    );
     expect(
-      await findByTestId("scientificNamesSearchEndpoint")
+      await wrapper.findByTestId("scientificNamesSearchEndpoint")
     ).toHaveTextContent(
       "https://verifier.globalnames.org/api/v1/verifications/"
     );
     expect(
-      await findByTestId("scientificNamesDatasetsEndpoint")
+      await wrapper.findByTestId("scientificNamesDatasetsEndpoint")
     ).toHaveTextContent("https://verifier.globalnames.org/api/v1/data_sources");
   });
 
@@ -148,25 +163,29 @@ describe("InstanceContextProvider", () => {
     };
 
     const apiContext = createMockApiContext(mockResponse);
-    const { findByTestId } = renderWithProvider(apiContext);
+    const wrapper = renderWithProvider(apiContext);
 
     await waitFor(() =>
       expect(apiContext.apiClient.get).toHaveBeenCalledTimes(1)
     );
 
     // Custom values
-    expect(await findByTestId("supportedLanguages")).toHaveTextContent("de,it");
-    expect(await findByTestId("instanceName")).toHaveTextContent(
+    expect(await wrapper.findByTestId("supportedLanguages")).toHaveTextContent(
+      "de,it"
+    );
+    expect(await wrapper.findByTestId("instanceName")).toHaveTextContent(
       "Partial Config"
     );
 
     // Default values
-    expect(await findByTestId("instanceMode")).toHaveTextContent("developer");
-    expect(await findByTestId("instanceBannerColor")).toHaveTextContent(
+    expect(await wrapper.findByTestId("instanceMode")).toHaveTextContent(
+      "developer"
+    );
+    expect(await wrapper.findByTestId("instanceBannerColor")).toHaveTextContent(
       "#38414d"
     );
     expect(
-      await findByTestId("supportedGeographicReferences")
+      await wrapper.findByTestId("supportedGeographicReferences")
     ).toHaveTextContent("OSM");
   });
 
@@ -178,16 +197,22 @@ describe("InstanceContextProvider", () => {
     };
 
     const apiContext = createMockApiContext(mockResponse);
-    const { findByTestId } = renderWithProvider(apiContext);
+    const wrapper = renderWithProvider(apiContext);
 
     await waitFor(() =>
       expect(apiContext.apiClient.get).toHaveBeenCalledTimes(1)
     );
 
     // Empty strings are falsy, so defaults should be used
-    expect(await findByTestId("supportedLanguages")).toHaveTextContent("en");
-    expect(await findByTestId("instanceMode")).toHaveTextContent("developer");
-    expect(await findByTestId("instanceName")).toHaveTextContent("AAFC");
+    expect(await wrapper.findByTestId("supportedLanguages")).toHaveTextContent(
+      "en"
+    );
+    expect(await wrapper.findByTestId("instanceMode")).toHaveTextContent(
+      "developer"
+    );
+    expect(await wrapper.findByTestId("instanceName")).toHaveTextContent(
+      "AAFC"
+    );
   });
 
   it("should handle API error and use default values", async () => {
@@ -195,7 +220,7 @@ describe("InstanceContextProvider", () => {
     const apiContext = createMockApiContextWithError(
       new Error("Network error")
     );
-    const { findByTestId } = renderWithProvider(apiContext);
+    const wrapper = renderWithProvider(apiContext);
 
     await waitFor(() =>
       expect(apiContext.apiClient.get).toHaveBeenCalledTimes(1)
@@ -208,9 +233,15 @@ describe("InstanceContextProvider", () => {
     );
 
     // Should use default values
-    expect(await findByTestId("supportedLanguages")).toHaveTextContent("en");
-    expect(await findByTestId("instanceMode")).toHaveTextContent("developer");
-    expect(await findByTestId("instanceName")).toHaveTextContent("AAFC");
+    expect(await wrapper.findByTestId("supportedLanguages")).toHaveTextContent(
+      "en"
+    );
+    expect(await wrapper.findByTestId("instanceMode")).toHaveTextContent(
+      "developer"
+    );
+    expect(await wrapper.findByTestId("instanceName")).toHaveTextContent(
+      "AAFC"
+    );
 
     // Clean up
     consoleErrorSpy.mockRestore();
@@ -219,7 +250,7 @@ describe("InstanceContextProvider", () => {
   it("should handle API timeout error", async () => {
     const consoleErrorSpy = jest.spyOn(console, "error");
     const apiContext = createMockApiContextWithError(new Error("Timeout"));
-    const { findByTestId } = renderWithProvider(apiContext);
+    const wrapper = renderWithProvider(apiContext);
 
     await waitFor(() =>
       expect(apiContext.apiClient.get).toHaveBeenCalledWith(
@@ -229,29 +260,22 @@ describe("InstanceContextProvider", () => {
     );
 
     expect(consoleErrorSpy).toHaveBeenCalled();
-    expect(await findByTestId("supportedLanguages")).toHaveTextContent("en");
+    expect(await wrapper.findByTestId("supportedLanguages")).toHaveTextContent(
+      "en"
+    );
   });
 
   it("should only call API once on mount", async () => {
     const apiContext = createMockApiContext({
       "instance-name": "Test"
     });
-    const { rerender } = renderWithProvider(apiContext);
+    renderWithProvider(apiContext);
 
     await waitFor(() =>
       expect(apiContext.apiClient.get).toHaveBeenCalledTimes(1)
     );
 
-    // Rerender component
-    rerender(
-      <ApiClientProvider value={apiContext as any}>
-        <InstanceProvider>
-          <TestComponent />
-        </InstanceProvider>
-      </ApiClientProvider>
-    );
-
-    // Should still only be called once
+    // Should only be called once
     expect(apiContext.apiClient.get).toHaveBeenCalledTimes(1);
   });
 
@@ -267,23 +291,64 @@ describe("InstanceContextProvider", () => {
       );
     };
 
-    const { getByTestId, queryByTestId } = render(
-      <ApiClientProvider value={apiContext as any}>
-        <InstanceProvider>
-          <ComponentWithConditionalRender />
-        </InstanceProvider>
-      </ApiClientProvider>
-    );
+    const wrapper = mountWithAppContext(<ComponentWithConditionalRender />, {
+      apiContext
+    });
 
     // Initially context might be undefined
-    const loading = queryByTestId("loading");
+    const loading = wrapper.queryByTestId("loading");
     if (loading) {
       expect(loading).toBeInTheDocument();
     }
 
     // Wait for context to be loaded
     await waitFor(() => {
-      expect(getByTestId("loaded")).toBeInTheDocument();
+      expect(wrapper.getByTestId("loaded")).toBeInTheDocument();
     });
+  });
+
+  function MockInstanceContextProvider({ children }: { children: ReactNode }) {
+    const instanceJson: InstanceContextValue = {
+      supportedLanguages: "en,fr",
+      instanceMode: "developer",
+      instanceName: "",
+      supportedGeographicReferences: ""
+    };
+
+    return (
+      <InstanceContextProvider value={instanceJson}>
+        {children}
+      </InstanceContextProvider>
+    );
+  }
+
+  it("useInstanceContext", async () => {
+    // get instance context
+    const DummyComponent = () => {
+      const instanceContext = useInstanceContext();
+      return (
+        <>
+          <p data-testid="supportedLanguages">
+            {instanceContext?.supportedLanguages}
+          </p>
+          <p data-testid="instanceMode">{instanceContext?.instanceMode}</p>
+        </>
+      );
+    };
+
+    const component = render(
+      <ApiClientProvider value={{} as any}>
+        <MockInstanceContextProvider>
+          <DummyComponent />
+        </MockInstanceContextProvider>
+      </ApiClientProvider>
+    );
+
+    const p1 = await component.findByTestId("supportedLanguages");
+    expect(p1).toBeInTheDocument();
+    expect(p1.textContent).toBe("en,fr");
+    const p2 = await component.findByTestId("instanceMode");
+    expect(p2).toBeInTheDocument();
+    expect(p2.textContent).toBe("developer");
   });
 });

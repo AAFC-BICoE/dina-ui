@@ -1,4 +1,10 @@
-import { ReactNode, createContext, useEffect, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState
+} from "react";
 import { useApiClient } from "../api-client/ApiClientContext";
 
 // All the supported values from the Caddyfile.
@@ -38,7 +44,7 @@ const INSTANCE_CONFIG_MAP = {
 };
 
 export type InstanceContextValue = {
-  [K in keyof typeof INSTANCE_CONFIG_MAP]: string;
+  [K in keyof typeof INSTANCE_CONFIG_MAP]?: string;
 };
 
 const DEFAULT_INSTANCE_CONFIG = Object.entries(INSTANCE_CONFIG_MAP).reduce(
@@ -49,7 +55,7 @@ const DEFAULT_INSTANCE_CONFIG = Object.entries(INSTANCE_CONFIG_MAP).reduce(
   {} as InstanceContextValue
 );
 
-export const InstanceContext = createContext<InstanceContextValue | null>(null);
+const InstanceContext = createContext<InstanceContextValue | null>(null);
 
 /**
  * Parses the raw API response into our strongly-typed config object.
@@ -71,16 +77,30 @@ function parseInstanceResponse(response: any): InstanceContextValue {
   return config;
 }
 
+interface InstanceContextProviderProps {
+  children: ReactNode;
+  value?: InstanceContextValue;
+}
+
 /**
  * Provides instance-specific configuration to all child components.
  * It fetches the configuration and handles loading and error states.
  */
-export function InstanceProvider({ children }: { children: ReactNode }) {
+export function InstanceContextProvider({
+  children,
+  value
+}: InstanceContextProviderProps) {
   const { apiClient } = useApiClient();
   const [instanceConfig, setInstanceConfig] =
-    useState<InstanceContextValue | null>(null);
+    useState<InstanceContextValue | null>(value || null);
 
   useEffect(() => {
+    // If already supplied through the prop then we don't need a network request.
+    // Mainly used for testing purposes.
+    if (value) {
+      return;
+    }
+
     const fetchInstanceConfig = async () => {
       try {
         const response = await apiClient.get("/instance.json", {});
@@ -101,4 +121,12 @@ export function InstanceProvider({ children }: { children: ReactNode }) {
       {children}
     </InstanceContext.Provider>
   );
+}
+
+/**
+ * Hook to use to retrieve the values.
+ */
+export function useInstanceContext() {
+  const instanceContext = useContext(InstanceContext);
+  return instanceContext;
 }
