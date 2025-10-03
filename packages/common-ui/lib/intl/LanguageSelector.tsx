@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { useContext } from "react";
 import Button from "react-bootstrap/Button";
-import { useInstanceContext } from "../instance/useInstanceContext";
+import { useInstanceContext } from "../instance/InstanceContextProvider";
 import { intlContext } from "./IntlSupport";
 
 export function LanguageSelector() {

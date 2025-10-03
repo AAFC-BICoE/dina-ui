@@ -5,8 +5,8 @@ import {
   ApiClientI,
   ApiClientImpl,
   ApiClientProvider,
-  InstanceContextI,
   InstanceContextProvider,
+  InstanceContextValue,
   ModalProvider
 } from "common-ui";
 import _ from "lodash";
@@ -22,7 +22,7 @@ import { screen, waitFor } from "@testing-library/react";
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
   accountContext?: Partial<AccountContextI>;
-  instanceContext?: Partial<InstanceContextI>;
+  instanceContext?: Partial<InstanceContextValue>;
   children?: React.ReactNode;
 }
 /**
@@ -50,7 +50,7 @@ export function MockAppContextProvider({
     []
   );
 
-  const DEFAULT_INSTANCE_CONTEXT_VALUE: InstanceContextI = useMemo(
+  const DEFAULT_INSTANCE_CONTEXT_VALUE: InstanceContextValue = useMemo(
     () => ({
       supportedLanguages: "en,fr",
       instanceMode: "developer",

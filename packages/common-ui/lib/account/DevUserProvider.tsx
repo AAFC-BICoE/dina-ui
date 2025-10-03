@@ -4,7 +4,7 @@ import { AccountProvider } from "./AccountProvider";
 import _ from "lodash";
 import { DINA_ADMIN } from "common-ui/types/DinaRoles";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
-import { useInstanceContext } from "../instance/useInstanceContext";
+import { useInstanceContext } from "../instance/InstanceContextProvider";
 
 export function DevUserAccountProvider({
   children
@@ -32,7 +32,7 @@ export function DevUserAccountProvider({
       }
     };
 
-    if (instanceContext !== undefined && keycloakEnabled === null) {
+    if (instanceContext && keycloakEnabled === null) {
       // Dev-user should only be enabled if using "developer" instance mode.
       if (instanceContext.instanceMode === "developer") {
         getDevUserConfig();

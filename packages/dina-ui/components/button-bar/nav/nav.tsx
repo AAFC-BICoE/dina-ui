@@ -73,7 +73,13 @@ export function Nav({ marginBottom = true, centered = true }: NavProps) {
             </Col>
           </Row>
         </Container>
-        <Navbar className="app-bar" expand="lg">
+        <Navbar
+          className="app-bar"
+          expand="lg"
+          style={{
+            backgroundColor: instanceContext?.instanceBannerColor ?? "#38414d"
+          }}
+        >
           <Container fluid={true} className={centered ? "centered" : "px-5"}>
             <Link href="/" passHref={true} legacyBehavior>
               <Navbar.Brand href="/" className="app-name">

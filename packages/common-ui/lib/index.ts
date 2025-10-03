@@ -125,7 +125,6 @@ export * from "./generator-selector/GeneratorItem";
 export * from "./multilingual-components/MultilingualDescription";
 export * from "./multilingual-components/MultilingualTitle";
 export * from "./instance/InstanceContextProvider";
-export * from "./instance/useInstanceContext";
 export * from "./label/FieldLabel";
 export * from "./visibility/useIsVisible";
 export * from "./table/ScientificNameCell";
