@@ -1,5 +1,6 @@
+import { FilterParam } from "kitsu";
 import { FilterGroupModel } from "../FilterGroup";
-import { fiql } from "../fiql";
+import { fiql, simpleSearchFilterToFiql } from "../fiql";
 
 describe("fiql conversion", () => {
   it("Converts from a filter model to fiql.", () => {
@@ -133,6 +134,7 @@ describe("fiql conversion", () => {
     const fiqlFilter = fiql(model);
     expect(fiqlFilter).toEqual("description!=null");
   });
+
   it("Allows a range filter.", () => {
     const model: FilterGroupModel = {
       children: [
@@ -382,5 +384,31 @@ describe("fiql conversion", () => {
 
     const fiqlFilter = fiql(model);
     expect(fiqlFilter).toEqual("acMetadataCreator==null");
+  });
+
+  describe("simpleSearchFilterToFiql", () => {
+    it("Converts a FilterParam to fiql correctly.", () => {
+      const filterParam: FilterParam = {
+        name: { ILIKE: "%test%" },
+        description: { EQ: null },
+        age: { GT: 18, LT: 65 },
+        status: { IN: "active,pending" }
+      };
+
+      const fiqlFilter = simpleSearchFilterToFiql(filterParam);
+      expect(fiqlFilter).toEqual(
+        "name==*test*;description==null;age=gt=18;age=lt=65;status=in=active,pending"
+      );
+    });
+
+    it("Returns an empty string when no FilterParam is provided.", () => {
+      const fiqlFilter = simpleSearchFilterToFiql(undefined);
+      expect(fiqlFilter).toEqual("");
+    });
+
+    it("Returns an empty string when an empty FilterParam is provided.", () => {
+      const fiqlFilter = simpleSearchFilterToFiql({});
+      expect(fiqlFilter).toEqual("");
+    });
   });
 });

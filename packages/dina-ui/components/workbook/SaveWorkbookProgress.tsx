@@ -6,6 +6,7 @@ import {
   dateCell,
   DoOperationsError,
   QueryTable,
+  SimpleSearchFilterBuilder,
   useApiClient
 } from "../../../common-ui/lib";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
@@ -17,6 +18,7 @@ import { PersistedResource, KitsuResource } from "kitsu";
 import { MaterialSample } from "../../types/collection-api";
 import Link from "next/link";
 import { ErrorBanner } from "../error/ErrorBanner";
+import { simpleSearchFilterToFiql } from "../../../common-ui/lib/filter-builder/fiql";
 
 export interface SaveWorkbookProgressProps {
   onWorkbookCanceled: () => void;
@@ -147,9 +149,16 @@ export function SaveWorkbookProgress({
             const resp = await apiClient.get<MaterialSample[]>(
               "collection-api/material-sample",
               {
-                filter: {
-                  rsql: `materialSampleName=="${resource?.materialSampleName}";group==${group}`
-                },
+                fiql: simpleSearchFilterToFiql(
+                  SimpleSearchFilterBuilder.create<MaterialSample>()
+                    .where(
+                      "materialSampleName",
+                      "EQ",
+                      resource?.materialSampleName
+                    )
+                    .where("group", "EQ", group)
+                    .build()
+                ),
                 include: "attachment"
               }
             );
@@ -372,9 +381,11 @@ export function SaveWorkbookProgress({
       "/collection-api/material-sample",
       {
         include: "collectingEvent",
-        filter: {
-          rsql: `sourceSet==${sourceSet.current}`
-        }
+        fiql: simpleSearchFilterToFiql(
+          SimpleSearchFilterBuilder.create<MaterialSample>()
+            .where("sourceSet", "EQ", sourceSet.current)
+            .build()
+        )
       }
     );
     const collectingEventIds = fetchedMaterialSamples?.data
@@ -505,9 +516,17 @@ export function SaveWorkbookProgress({
                   <DinaMessage id="selectResourceAppendData" />
                 </b>
                 <QueryTable<any>
-                  filter={{
-                    rsql: `materialSampleName=="${sameNameExistingResources.current?.[0].materialSampleName}";group==${group}`
-                  }}
+                  fiql={simpleSearchFilterToFiql(
+                    SimpleSearchFilterBuilder.create<MaterialSample>()
+                      .where(
+                        "materialSampleName",
+                        "EQ",
+                        sameNameExistingResources.current?.[0]
+                          .materialSampleName
+                      )
+                      .where("group", "EQ", group)
+                      .build()
+                  )}
                   path={"collection-api/material-sample"}
                   columns={multipleMatchingResourcesColumns}
                   defaultSort={[{ desc: true, id: "createdOn" }]}
@@ -520,9 +539,16 @@ export function SaveWorkbookProgress({
                   <DinaMessage id="selectParentMaterialSample" />
                 </b>
                 <QueryTable<any>
-                  filter={{
-                    rsql: `materialSampleName=="${sameNameParentSamples.current?.[0].materialSampleName}";group==${group}`
-                  }}
+                  fiql={simpleSearchFilterToFiql(
+                    SimpleSearchFilterBuilder.create<MaterialSample>()
+                      .where(
+                        "materialSampleName",
+                        "EQ",
+                        sameNameParentSamples.current?.[0].materialSampleName
+                      )
+                      .where("group", "EQ", group)
+                      .build()
+                  )}
                   path={"collection-api/material-sample"}
                   columns={multipleMatchingResourcesColumns}
                   defaultSort={[{ desc: true, id: "createdOn" }]}

@@ -31,15 +31,15 @@ const ADMIN_GROUP = {
 const mockGet = jest.fn<any, any>(async (path, options) => {
   switch (path) {
     case "collection-api/collection":
-      switch (options.filter?.rsql) {
+      switch (options.filter?.group["IN"]) {
         // For users with 1 group / 1 collection:
-        case "group=in=(aafc)":
+        case "aafc":
           return {
             data: [COLL1],
             meta: { totalResourceCount: 1 }
           };
         // For users with 2 groups / 2 collections:
-        case "group=in=(aafc,cnc)":
+        case "aafc,cnc":
           return {
             data: [COLL1, COLL2],
             meta: { totalResourceCount: 2 }
@@ -118,7 +118,11 @@ describe("CollectionSelectField", () => {
         [
           "collection-api/collection",
           {
-            filter: { rsql: "group=in=(aafc)" },
+            filter: {
+              group: {
+                IN: "aafc"
+              }
+            },
             page: { limit: 6 },
             sort: "-createdOn"
           }
@@ -146,7 +150,11 @@ describe("CollectionSelectField", () => {
       [
         "collection-api/collection",
         {
-          filter: { rsql: "group=in=(aafc,cnc)" },
+          filter: {
+            group: {
+              IN: "aafc,cnc"
+            }
+          },
           page: { limit: 6 },
           sort: "-createdOn"
         }

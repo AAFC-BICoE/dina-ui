@@ -4,6 +4,7 @@ import {
   ReactTable,
   ReadOnlyResourceLink,
   ResourceSelect,
+  SimpleSearchFilterBuilder,
   filterBy
 } from "packages/common-ui/lib";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
@@ -142,7 +143,11 @@ export function PreLibraryPrepTable({
                   );
                   setProtocol(value as PersistedResource<Protocol>);
                 }}
-                filter={filterBy(["name"])}
+                filter={(searchValue: string) =>
+                  SimpleSearchFilterBuilder.create<Protocol>()
+                    .searchFilter("name", searchValue)
+                    .build()
+                }
                 model="collection-api/protocol"
                 optionLabel={(resource) => resource.name}
               />

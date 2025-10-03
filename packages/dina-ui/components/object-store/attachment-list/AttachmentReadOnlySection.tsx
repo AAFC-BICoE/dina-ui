@@ -1,17 +1,19 @@
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ExistingAttachmentsTable } from "./ExistingAttachmentsTable";
-import { TotalAttachmentsIndicator } from "./TotalAttachmentsIndicator";
 import { ReactNode, useState } from "react";
-import { FieldSet, useQuery } from "common-ui";
+import { FieldSet, useQuery, FieldSpy } from "common-ui";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
+import _ from "lodash";
 
 export interface AttachmentReadOnlySectionProps {
-  attachmentPath: string;
+  name: string;
   detachTotalSelected?: boolean;
+
   title?: ReactNode;
 }
 
 export function AttachmentReadOnlySection({
-  attachmentPath,
+  name,
   detachTotalSelected,
   title
 }: AttachmentReadOnlySectionProps) {
@@ -25,24 +27,36 @@ export function AttachmentReadOnlySection({
   );
 
   return (
-    <FieldSet
-      key={lastSave}
-      legend={
-        <>
-          {title ?? <DinaMessage id="attachments" />}{" "}
-          <TotalAttachmentsIndicator attachmentPath={attachmentPath} />
-        </>
-      }
-    >
-      {error ? (
-        <DinaMessage id="objectStoreDataUnavailable" />
-      ) : (
-        <ExistingAttachmentsTable
-          attachmentPath={attachmentPath}
-          onMetadatasEdited={() => setLastSave(Date.now())}
-          detachTotalSelected={detachTotalSelected}
-        />
-      )}
-    </FieldSet>
+    <FieldSpy fieldName={name}>
+      {(value) => {
+        const metadatas =
+          _.uniqBy(value as ResourceIdentifierObject[] | undefined, "id") ?? [];
+        const totalAttachments = metadatas.length;
+
+        return (
+          <FieldSet
+            key={lastSave}
+            legend={
+              <>
+                {title ?? <DinaMessage id="attachments" />}{" "}
+                {totalAttachments > 0 ? (
+                  <span>({totalAttachments})</span>
+                ) : null}
+              </>
+            }
+          >
+            {error ? (
+              <DinaMessage id="objectStoreDataUnavailable" />
+            ) : (
+              <ExistingAttachmentsTable
+                metadatas={metadatas}
+                onMetadatasEdited={() => setLastSave(Date.now())}
+                detachTotalSelected={detachTotalSelected}
+              />
+            )}
+          </FieldSet>
+        );
+      }}
+    </FieldSpy>
   );
 }

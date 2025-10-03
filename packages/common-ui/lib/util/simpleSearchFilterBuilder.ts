@@ -54,6 +54,30 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
   }
 
   /**
+   * Adds a filter only if the provided value is truthy.
+   * This is a convenience method to simplify the common pattern of:
+   * .when(value, builder => builder.where(field, op, value))
+   *
+   * A value is considered "truthy" if it is not null, undefined, or an empty string.
+   *
+   * @param field The field to filter on.
+   * @param op The comparison operator.
+   * @param value The value to check and use for the comparison.
+   */
+  public whereProvided<K extends keyof T>(
+    field: K | "uuid",
+    op: FilterOperation,
+    value: T[K] | T[K][] | undefined | null
+  ): this {
+    // Check for null, undefined, or empty string.
+    // This is a common requirement for optional form inputs.
+    if (value !== null && value !== undefined && value !== "") {
+      this.where(field, op, value);
+    }
+    return this;
+  }
+
+  /**
    * Adds a filter for a specific field using the IN operator.
    *
    * If undefined or empty array, this filter is not provided.

@@ -1,5 +1,5 @@
 import { mountWithAppContext } from "common-ui";
-import { within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ProjectDetailsPage from "../../../../pages/collection/project/view";
 import { waitForLoadingToDisappear } from "common-ui";
@@ -188,16 +188,7 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
         ]
       };
 
-    case "collection-api/project/01990bc9-5b9b-7720-8ffa-a86f54d0b4df/attachment":
-      return {
-        data: [
-          {
-            id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
-            type: "metadata"
-          }
-        ]
-      };
-    case "objectstore-api/metadata":
+    case "objectstore-api/metadata/019915ce-63e7-7e10-b86a-3dd1d9f2db49":
       return {
         data: [
           {
@@ -236,7 +227,7 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
           moduleVersion: "1.28"
         }
       };
-    case "collection-api/project/01990bc9-5b9b-7720-8ffa-a86f54d0b4df?include=attachment":
+    case "collection-api/project/01990bc9-5b9b-7720-8ffa-a86f54d0b4df":
       return {
         data: {
           id: "01990bc9-5b9b-7720-8ffa-a86f54d0b4df",
@@ -262,7 +253,6 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
             ]
           },
           extensionValues: {},
-
           relationships: {
             attachment: {
               data: [
@@ -521,7 +511,6 @@ describe("Project View Page.", () => {
     const wrapper = mountWithAppContext(<ProjectDetailsPage />, {
       apiContext
     });
-
     await waitForLoadingToDisappear();
 
     const heading = wrapper.getByRole("heading", {
@@ -549,8 +538,9 @@ describe("Project View Page.", () => {
     const wrapper = mountWithAppContext(<ProjectDetailsPage />, {
       apiContext
     });
-
     await waitForLoadingToDisappear();
+
+    screen.logTestingPlaygroundURL();
 
     const attachmentLink = wrapper.getByRole("link", {
       name: "test mat sample export.csv"

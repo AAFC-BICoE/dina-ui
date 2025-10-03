@@ -53,6 +53,36 @@ describe("SimpleSearchFilterBuilder", () => {
     });
   });
 
+  describe(".whereProvided()", () => {
+    it("should add a filter when a valid value is provided", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereProvided("key", "EQ", "barcode")
+        .build();
+      expect(filter).toEqual({ key: { EQ: "barcode" } });
+    });
+
+    it("should not add a filter when the value is an empty string", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereProvided("key", "EQ", "")
+        .build();
+      expect(filter).toEqual({});
+    });
+
+    it("should not add a filter when the value is null", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereProvided("key", "EQ", null as any)
+        .build();
+      expect(filter).toEqual({});
+    });
+
+    it("should not add a filter when the value is undefined", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereProvided("key", "EQ", undefined as any)
+        .build();
+      expect(filter).toEqual({});
+    });
+  });
+
   describe(".whereIn()", () => {
     it("should add an IN filter when values are provided", () => {
       const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()

@@ -3,9 +3,9 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
-  filterBy,
   LoadingSpinner,
   ResourceSelectField,
+  SimpleSearchFilterBuilder,
   StringArrayField,
   SubmitButton,
   TextField,
@@ -199,7 +199,11 @@ export function StorageUnitFormFields({
           model="collection-api/storage-unit-type"
           name="storageUnitType"
           optionLabel={(it) => it.name}
-          filter={filterBy(["name"])}
+          filter={(searchValue: string) =>
+            SimpleSearchFilterBuilder.create<StorageUnitType>()
+              .searchFilter("name", searchValue)
+              .build()
+          }
           omitNullOption={true}
           readOnlyLink="/collection/storage-unit-type/view?id="
         />

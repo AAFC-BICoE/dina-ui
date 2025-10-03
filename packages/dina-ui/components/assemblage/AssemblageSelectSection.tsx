@@ -1,7 +1,7 @@
 import {
   DinaFormSection,
-  filterBy,
   ResourceSelectField,
+  SimpleSearchFilterBuilder,
   Tooltip,
   useDinaFormContext
 } from "common-ui";
@@ -52,7 +52,11 @@ export function AssemblageSelectField({
         name="assemblages"
         isMulti={true}
         readOnlyLink="/collection/assemblage/view?id="
-        filter={filterBy(["name"])}
+        filter={(searchValue: string) =>
+          SimpleSearchFilterBuilder.create<Assemblage>()
+            .searchFilter("name", searchValue)
+            .build()
+        }
         model={resourcePath as any}
         className={"assemblages " + (className || "")}
         optionLabel={(assemblage) => assemblage.name}

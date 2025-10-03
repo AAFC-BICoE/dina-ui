@@ -49,7 +49,7 @@ describe("useRelationshipUsagesCount hook", () => {
     // Verify that the apiClient.get was called with the correct parameters.
     expect(mockGet).toHaveBeenCalledWith(resourcePath, {
       filter: {
-        [`${relationshipName}.id`]: {
+        [`${relationshipName}.uuid`]: {
           EQ: testUUID
         }
       },

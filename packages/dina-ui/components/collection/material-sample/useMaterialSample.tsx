@@ -60,21 +60,23 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       path: `collection-api/material-sample/${id}`,
       include: [
+        "attachment",
         "collection",
         "collectingEvent",
-        "attachment",
         "preparationProtocol",
         "preparationType",
         "preparationMethod",
         "preparedBy",
-        "hierarchy",
         "organism",
         "materialSampleChildren",
         "parentMaterialSample",
         "projects",
         "assemblages",
         "storageUnitUsage"
-      ].join(",")
+      ].join(","),
+      optfields: {
+        "material-sample": "hierarchy"
+      }
     },
     {
       disabled: !id,

@@ -512,7 +512,6 @@ export function TransactionFormLayout({
         <AttachmentsField
           name="attachment"
           title={<DinaMessage id="transactionAttachments" />}
-          attachmentPath={`loan-transaction-api/transaction/${initialValues.id}/attachment`}
         />
       </div>
     </div>

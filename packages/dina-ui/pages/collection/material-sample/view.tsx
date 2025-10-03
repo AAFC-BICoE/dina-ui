@@ -13,7 +13,6 @@ import {
   useElasticSearchQuery,
   withResponse
 } from "common-ui";
-import { Field } from "formik";
 import _ from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
@@ -452,15 +451,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </CollapsibleSection>
 
                 <div className="mb-3">
-                  <Field name="id">
-                    {({ field: { value: materialSampleId } }) => (
-                      <AttachmentReadOnlySection
-                        attachmentPath={`collection-api/material-sample/${materialSampleId}/attachment`}
-                        detachTotalSelected={true}
-                        title={<DinaMessage id="materialSampleAttachments" />}
-                      />
-                    )}
-                  </Field>
+                  <AttachmentReadOnlySection
+                    name="attachment"
+                    detachTotalSelected={true}
+                    title={<DinaMessage id="materialSampleAttachments" />}
+                  />
                 </div>
               </main>
             </DinaForm>

@@ -50,7 +50,8 @@ export default function ProjectEditPage() {
             };
           }
         }
-      }
+      },
+      disabled: !id
     }
   );
 
