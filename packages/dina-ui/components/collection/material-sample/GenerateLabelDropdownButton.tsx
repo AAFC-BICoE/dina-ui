@@ -7,11 +7,11 @@ import Select from "react-select";
 import {
   SimpleSearchFilterBuilder,
   useAccount,
-  useQuery
-} from "../../../../common-ui/lib";
-import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
-import { downloadBlobFile } from "common-ui";
-import { simpleSearchFilterToFiql } from "packages/common-ui/lib/filter-builder/fiql";
+  useQuery,
+  downloadBlobFile,
+  useApiClient,
+  simpleSearchFilterToFiql
+} from "common-ui";
 
 interface ReportTemplateOption {
   label: string;

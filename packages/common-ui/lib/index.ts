@@ -108,6 +108,7 @@ export * from "./table/EditableTable";
 export * from "./util/useStringArrayConverter";
 export * from "./util/useMaterialSampleNameComparator";
 export * from "./util/simpleSearchFilterBuilder";
+export * from "./filter-builder/fiql";
 export * from "./util/bulkEditAllManagedAttributes";
 export * from "./table/ReactTable";
 export * from "./table/Pagination";

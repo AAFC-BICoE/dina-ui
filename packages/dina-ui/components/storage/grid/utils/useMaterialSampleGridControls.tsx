@@ -4,7 +4,8 @@ import {
   SaveArgs,
   SimpleSearchFilterBuilder,
   useQuery,
-  useStringComparator
+  useStringComparator,
+  simpleSearchFilterToFiql
 } from "common-ui";
 import _ from "lodash";
 import { MaterialSample, StorageUnit } from "../../../../types/collection-api";
@@ -13,7 +14,6 @@ import { StorageUnitUsage } from "../../../../types/collection-api/resources/Sto
 import { CellGrid } from "../../../../components/seqdb/container-grid/ContainerGrid";
 import { SAMPLE_SELECTION_MATERIAL_SAMPLE_SORT_ORDER } from "../StorageUnitSampleSelectionStep";
 import { SELECT_COORDINATES_TAB_INDEX } from "../../../../pages/collection/storage-unit/grid";
-import { simpleSearchFilterToFiql } from "packages/common-ui/lib/filter-builder/fiql";
 
 interface MaterialSampleGridControlsProps {
   storageUnit: StorageUnit;

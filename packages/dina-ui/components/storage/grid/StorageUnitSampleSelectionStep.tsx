@@ -5,8 +5,9 @@ import {
   SaveArgs,
   SimpleSearchFilterBuilder,
   useApiClient,
-  useQuery
-} from "../../../../common-ui/lib";
+  useQuery,
+  simpleSearchFilterToFiql
+} from "common-ui";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { MaterialSample, StorageUnit } from "../../../types/collection-api";
 import { useEffect, useState } from "react";
@@ -16,7 +17,6 @@ import _ from "lodash";
 import { useRouter } from "next/router";
 import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { SELECT_MATERIAL_SAMPLES_TAB_INDEX } from "../../../pages/collection/storage-unit/grid";
-import { simpleSearchFilterToFiql } from "packages/common-ui/lib/filter-builder/fiql";
 
 interface StorageUnitSampleSelectionStepProps {
   onSaved: (nextStep?: number) => Promise<void>;
