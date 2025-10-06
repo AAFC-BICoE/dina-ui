@@ -12,6 +12,46 @@ describe("SimpleSearchFilterBuilder", () => {
     expect(filter).toEqual({});
   });
 
+  describe(".add()", () => {
+    it("should add a simple filter object", () => {
+      const existingFilter = { key: { EQ: "barcode" } };
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .add(existingFilter)
+        .build();
+      expect(filter).toEqual({ key: { EQ: "barcode" } });
+    });
+
+    it("should add multiple filters from a filter object", () => {
+      const existingFilters = {
+        key: { EQ: "barcode" },
+        name: { ILIKE: "%test%" },
+        group: { IN: "group1,group2" }
+      };
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .add(existingFilters)
+        .build();
+      expect(filter).toEqual({
+        key: { EQ: "barcode" },
+        name: { ILIKE: "%test%" },
+        group: { IN: "group1,group2" }
+      });
+    });
+
+    it("should merge with existing filters built using other methods", () => {
+      const existingFilters = { group: { EQ: "aafc" } };
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .where("key", "EQ", "barcode")
+        .add(existingFilters)
+        .searchFilter("name", "test")
+        .build();
+      expect(filter).toEqual({
+        key: { EQ: "barcode" },
+        group: { EQ: "aafc" },
+        name: { ILIKE: "%test%" }
+      });
+    });
+  });
+
   describe(".where()", () => {
     it("should add a simple EQ filter", () => {
       const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()

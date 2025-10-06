@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import {
-  FilterGroupModel,
   FormikButton,
   LoadingSpinner,
   MetaWithTotal,
@@ -9,7 +8,7 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { PersistedResource } from "kitsu";
+import { FilterParam, PersistedResource } from "kitsu";
 import Link from "next/link";
 import Pagination from "rc-pagination";
 import { useState, useEffect } from "react";
@@ -31,9 +30,9 @@ export interface BrowseStorageTreeProps {
 
 /** Hierarchy of nodes UI to search for and find a Storage Unit. */
 export function BrowseStorageTree(props: BrowseStorageTreeProps) {
-  const [filter, setFilter] = useState<FilterGroupModel | null>(null);
+  const [filter, setFilter] = useState<FilterParam | null>(null);
 
-  const isFiltered = !!filter?.children?.length;
+  const isFiltered = !!Object.keys(filter ?? {}).length;
 
   return (
     <div>
@@ -65,7 +64,7 @@ export interface StorageTreeListProps {
 
   disabled?: boolean;
 
-  filter?: FilterGroupModel | null;
+  filter?: FilterParam | null;
 
   /** Show the hierarchy path in the name. (Top-level only). */
   showPathInName?: boolean;
@@ -118,9 +117,13 @@ export function StorageTreeList({
         .when(!!parentId, (builder) =>
           builder.where("parentStorageUnit.uuid", "EQ", parentId)
         )
-        .when(!filter?.children?.length && !parentId, (builder) =>
+        .when(!Object.keys(filter ?? {}).length && !parentId, (builder) =>
           builder.where("parentStorageUnit", "EQ", null)
         )
+        // Supply the filters from the Storage Filter component.
+        .when(Object.keys(filter ?? {}).length > 0, (builder) => {
+          builder.add(filter!);
+        })
         .build()
     },
     { disabled: storageUnitChildren !== undefined }

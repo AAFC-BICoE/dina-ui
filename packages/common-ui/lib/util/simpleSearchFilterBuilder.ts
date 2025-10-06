@@ -32,6 +32,22 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
   }
 
   /**
+   * Adds pre-built filter conditions directly to the current filter.
+   * This is useful when you have existing FilterParam objects that need to be merged
+   * into the current filter being built, such as when filters are constructed elsewhere
+   * or when reusing common filter patterns.
+   *
+   * @param filterParam The FilterParam object to merge into the current filter.
+   * @returns The updated FilterBuilder instance for method chaining.
+   */
+  public add(filterParam: FilterParam): this {
+    if (filterParam && typeof filterParam === "object") {
+      Object.assign(this.filter, filterParam);
+    }
+    return this;
+  }
+
+  /**
    * Adds a filter with a specific operation (LIKE, ILIKE, GT, etc.).
    * e.g., .where('age', 'GT', 18) results in { age: { GT: 18 } }
    *
