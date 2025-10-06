@@ -4,7 +4,7 @@ import {
   FormikButton,
   LoadingSpinner,
   MetaWithTotal,
-  rsql,
+  SimpleSearchFilterBuilder,
   useApiClient,
   useQuery,
   withResponse
@@ -114,33 +114,14 @@ export function StorageTreeList({
       include: "storageUnitChildren,storageUnitType",
       page: { limit, offset },
       sort: "storageUnitType.name,name",
-      filter: {
-        rsql: rsql({
-          type: "FILTER_GROUP",
-          id: -123,
-          operator: "AND",
-          children: [
-            // For inner storage units:
-            ...(parentId
-              ? [
-                  {
-                    id: -321,
-                    type: "FILTER_ROW" as const,
-                    attribute: "parentStorageUnit.uuid",
-                    predicate: "IS" as const,
-                    searchType: "EXACT_MATCH" as const,
-                    value: parentId
-                  }
-                ]
-              : []),
-            ...(filter ? [filter] : [])
-          ]
-        }),
-        // For top-level storage units:
-        ...(!filter?.children?.length && !parentId
-          ? { parentStorageUnit: null }
-          : {})
-      }
+      filter: SimpleSearchFilterBuilder.create()
+        .when(!!parentId, (builder) =>
+          builder.where("parentStorageUnit.uuid", "EQ", parentId)
+        )
+        .when(!filter?.children?.length && !parentId, (builder) =>
+          builder.where("parentStorageUnit", "EQ", null)
+        )
+        .build()
     },
     { disabled: storageUnitChildren !== undefined }
   );

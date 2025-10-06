@@ -111,7 +111,6 @@ export function StorageUnitForm({
     </DinaForm>
   );
 }
-
 export interface StorageUnitFormFieldsProps {
   parentIdInURL?: string;
   /** Reduces the rendering to improve performance when bulk editing many resources. */
@@ -119,6 +118,7 @@ export interface StorageUnitFormFieldsProps {
 
   isBulkEditTabForm?: boolean;
 }
+
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields({
   parentIdInURL,
@@ -135,7 +135,9 @@ export function StorageUnitFormFields({
 
   const materialSamplesQuery = useQuery<MaterialSample[]>({
     path: "collection-api/material-sample",
-    filter: { rsql: `storageUnitUsage.storageUnit.uuid==${initialValues?.id}` },
+    filter: SimpleSearchFilterBuilder.create()
+      .where("storageUnitUsage.storageUnit.uuid", "EQ", initialValues?.id)
+      .build(),
     include: "storageUnitUsage",
     page: { limit: 1000 }
   });

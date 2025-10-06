@@ -1,7 +1,13 @@
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
-import { BULK_SPLIT_IDS, Tooltip, useAccount, useQuery } from "common-ui";
+import {
+  BULK_SPLIT_IDS,
+  SimpleSearchFilterBuilder,
+  Tooltip,
+  useAccount,
+  useQuery
+} from "common-ui";
 import Dropdown from "react-bootstrap/Dropdown";
 import Select from "react-select";
 import React, { CSSProperties, useState } from "react";
@@ -58,9 +64,10 @@ export function SplitMaterialSampleDropdownButton({
       },
 
       // Display all user form templates and public to the group templates.
-      filter: {
-        rsql: `group=in=(${groupNames});(createdBy==${username})`
-      }
+      filter: SimpleSearchFilterBuilder.create<SplitConfiguration>()
+        .whereIn("group", groupNames)
+        .where("createdBy", "EQ", username)
+        .build()
     },
     {
       disabled,
