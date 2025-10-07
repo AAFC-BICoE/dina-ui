@@ -107,7 +107,7 @@ export function useMaterialSampleQuery(id?: string | null) {
           const storageUnit = await apiClient.get<StorageUnitUsage>(
             `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
             {
-              include: "storageUnit,storageUnit.parentStorageUnit"
+              include: "storageUnit"
             }
           );
 
@@ -678,6 +678,9 @@ export function useMaterialSampleSave({
                   .join("|");
               }
             }
+
+            // Delete the scientificNameInput field which is only used for the editor.
+            delete (dtm as any).scientificNameInput;
           });
         }
       });
