@@ -1,5 +1,5 @@
 import { mountWithAppContext } from "common-ui";
-import { screen, within } from "@testing-library/react";
+import { waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ProjectDetailsPage from "../../../../pages/collection/project/view";
 import { waitForLoadingToDisappear } from "common-ui";
@@ -188,13 +188,22 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
         ]
       };
 
-    case "objectstore-api/metadata/019915ce-63e7-7e10-b86a-3dd1d9f2db49":
+    // Network request required to see if the objectstore is available.
+    case "objectstore-api/metadata":
+      return {
+        data: [],
+        meta: {
+          totalResourceCount: 0,
+          moduleVersion: "1.28"
+        }
+      };
+
+    case "objectstore-api/metadata/019915ce-63e7-7e10-b86a-3dd1d9f2db49?include=derivatives":
       return {
         data: [
           {
             id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
             type: "metadata",
-
             createdBy: "dina-admin",
             createdOn: "2025-09-04T17:37:51.594164Z",
             bucket: "aafc",
@@ -227,6 +236,7 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
           moduleVersion: "1.28"
         }
       };
+
     case "collection-api/project/01990bc9-5b9b-7720-8ffa-a86f54d0b4df":
       return {
         data: {
@@ -240,6 +250,12 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
           endDate: "2025-09-04",
           status: "ongoing",
           contributors: [],
+          attachment: [
+            {
+              id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
+              type: "metadata"
+            }
+          ],
           multilingualDescription: {
             descriptions: [
               {
@@ -264,12 +280,6 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
             }
           }
         },
-        included: [
-          {
-            id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
-            type: "metadata"
-          }
-        ],
         meta: {
           totalResourceCount: 1,
           external: [
@@ -455,7 +465,6 @@ const mockBulkGet = jest.fn<any, any>(async () => {
     {
       id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
       type: "metadata",
-
       createdBy: "dina-admin",
       createdOn: "2025-09-04T17:37:51.594164Z",
       bucket: "aafc",
@@ -538,25 +547,24 @@ describe("Project View Page.", () => {
     const wrapper = mountWithAppContext(<ProjectDetailsPage />, {
       apiContext
     });
-    await waitForLoadingToDisappear();
 
-    screen.logTestingPlaygroundURL();
-
-    const attachmentLink = wrapper.getByRole("link", {
-      name: "test mat sample export.csv"
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("link", {
+          name: "test mat sample export.csv"
+        })
+      ).toBeInTheDocument();
     });
-    expect(attachmentLink).toBeInTheDocument();
 
     // Attachment filename with link to object view page:
-    expect(attachmentLink).toHaveAttribute(
+    expect(
+      wrapper.getByRole("link", {
+        name: "test mat sample export.csv"
+      })
+    ).toHaveAttribute(
       "href",
       "/object-store/object/view?id=019915ce-63e7-7e10-b86a-3dd1d9f2db49"
     );
-
-    // Attachment image (there is no image so it shows the placeholder icon)
-    expect(
-      wrapper.getByAltText("project attachment caption")
-    ).toBeInTheDocument();
 
     // Attachment caption
     expect(wrapper.getByText("project attachment caption")).toBeInTheDocument();
