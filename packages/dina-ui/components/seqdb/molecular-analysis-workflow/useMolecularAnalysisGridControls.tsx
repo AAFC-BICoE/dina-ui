@@ -156,6 +156,14 @@ export function useMolecularAnalysisGridControls({
             setStorageUnit(storageUnitToLoad);
             setLoadedStorageUnit(storageUnitToLoad);
             setInitialStorageUnit(storageUnitToLoad);
+
+            // Now we need to load the storage unit type.
+            const storageUnitResponse = await apiClient.get<StorageUnit>(
+              `/collection-api/storage-unit/${storageUnitToLoad?.id}`,
+              { include: "storageUnitType" }
+            );
+
+            setStorageUnitType(storageUnitResponse.data.storageUnitType as any);
           }
 
           const molecularAnalysisItemsWithStorageUnitUsage =
@@ -255,38 +263,6 @@ export function useMolecularAnalysisGridControls({
   // See if the storage unit has been selected yet.
   useEffect(() => {
     if (loadingRelationships === false) {
-      // Fetch storageUnitType if we have a storageUnit but missing the type
-      if (storageUnit?.id && !storageUnitType?.gridLayoutDefinition) {
-        async function fetchStorageUnitTypeLayout() {
-          const storageUnitResponse = await apiClient.get<StorageUnit>(
-            `/collection-api/storage-unit/${storageUnit?.id}`,
-            { include: "storageUnitType" }
-          );
-          if (storageUnitResponse?.data.storageUnitType?.gridLayoutDefinition) {
-            const gridLayoutDefinition =
-              storageUnitResponse.data.storageUnitType.gridLayoutDefinition;
-            _.set(
-              molecularAnalysis,
-              "gridLayoutDefinition.numberOfColumns",
-              gridLayoutDefinition.numberOfColumns
-            );
-            _.set(
-              molecularAnalysis,
-              "gridLayoutDefinition.numberOfRows",
-              gridLayoutDefinition.numberOfRows
-            );
-            setNumberOfColumns(gridLayoutDefinition.numberOfColumns);
-            setNumberOfRows(gridLayoutDefinition.numberOfRows);
-            setFillMode(
-              gridLayoutDefinition.fillDirection === "BY_ROW" ? "ROW" : "COLUMN"
-            );
-            setIsStorage(true);
-          }
-        }
-        fetchStorageUnitTypeLayout();
-        return; // Exit early while fetching
-      }
-
       if (
         storageUnit?.id &&
         storageUnitType?.id &&
