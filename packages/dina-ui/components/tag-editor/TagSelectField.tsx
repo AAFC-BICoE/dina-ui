@@ -152,7 +152,7 @@ function TagSelect({
         sort: "-createdOn",
         fields: typeName ? { [typeName]: parsedFieldname } : undefined,
         filter: SimpleSearchFilterBuilder.create()
-          .where("tags", "NEQ", null)
+          .where("tags", "NEQ", "null")
           .when(!isAdmin, (builder) =>
             builder.whereProvided(groupSelectorName, "IN", groupNames)
           )
