@@ -8,7 +8,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../types/collection-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
@@ -197,6 +197,72 @@ export interface ManagedAttributeMultiSelectProps {
   loading?: boolean;
 }
 
+export function DynamicResourceSelect<TData extends PersistedResource<TData>>(
+  props
+) {
+  const {
+    pageSize: initialPageSize = 6,
+    onChange,
+    onDataLoaded,
+    value,
+    ...rest
+  } = props;
+
+  const [pageSize, setPageSize] = useState<number>(initialPageSize);
+  const [fetchedRecords, setFetchedRecords] = useState<
+    PersistedResource<TData>[]
+  >([]);
+
+  const handleInputChange = useCallback(
+    (newVal: string, { action }: any) => {
+      if (action !== "set-value") {
+        rest.selectProps?.onInputChange?.(newVal, { action }); // preserve any existing behavior
+      }
+    },
+    [rest.selectProps]
+  );
+
+  // Handle selection and increase pageSize
+  const handleChange = (newValue, actionMeta) => {
+    setPageSize((prev) => prev + 1);
+    onChange?.(newValue, actionMeta);
+  };
+
+  // Store fetched records for reuse
+  const handleDataLoaded = (data?: PersistedResource<TData>[]) => {
+    if (data) {
+      setFetchedRecords((prev) => _.uniqBy([...prev, ...data], "id"));
+    }
+    onDataLoaded?.(data);
+  };
+
+  // Filter out selected items from fetchedRecords
+  const selectedIds = _.castArray(value).map((v) => v?.id);
+  const filteredRecords = fetchedRecords.filter(
+    (item) => item?.id && !selectedIds.includes(item.id)
+  );
+
+  // Use filteredRecords in filterList to restrict dropdown options
+  const filterList = (item?: PersistedResource<TData>) => {
+    return filteredRecords.some((r) => r.id === item?.id);
+  };
+
+  return (
+    <ResourceSelect
+      {...rest}
+      pageSize={pageSize}
+      onChange={handleChange}
+      onDataLoaded={handleDataLoaded}
+      value={value}
+      filterList={filterList}
+      selectProps={{
+        ...rest.selectProps,
+        onInputChange: handleInputChange
+      }}
+    />
+  );
+}
+
 /** Select input to set the visible Managed Attributes. */
 export function ManagedAttributeMultiSelect({
   managedAttributeComponent,
@@ -204,52 +270,68 @@ export function ManagedAttributeMultiSelect({
   onChange,
   visibleAttributes,
   loading
-}: ManagedAttributeMultiSelectProps) {
-  /** Call onChange with the new keys (string array) */
-  function onChangeInternal(
-    newValues:
-      | PersistedResource<ManagedAttribute>
-      | PersistedResource<ManagedAttribute>[]
-  ) {
-    const newAttributes = _.castArray(newValues);
-    const newKeys = newAttributes.map((it) => _.get(it, "key"));
-    onChange(newKeys);
-  }
+}: {
+  managedAttributeComponent?: string;
+  managedAttributeApiPath: string;
+  onChange: (newKeys: string[]) => void;
+  visibleAttributes: PersistedResource<ManagedAttribute>[];
+  loading?: boolean;
+}) {
+  // Memoize the filter function
+  const filter = useCallback(
+    (input: string) =>
+      SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .searchFilter("name", input)
+        .when(!!managedAttributeComponent, (builder) =>
+          builder.where(
+            "managedAttributeComponent",
+            "EQ",
+            managedAttributeComponent!
+          )
+        )
+        .build(),
+    [managedAttributeComponent]
+  );
+
+  // Memoize the label function
+  const optionLabel = useCallback(
+    (attribute: ManagedAttribute) =>
+      _.get(attribute, "name") ||
+      _.get(attribute, "key") ||
+      _.get(attribute, "id") ||
+      "",
+    []
+  );
+
+  // Stable onChange handler
+  const onChangeInternal = useCallback(
+    (
+      newValues:
+        | PersistedResource<ManagedAttribute>
+        | PersistedResource<ManagedAttribute>[]
+    ) => {
+      const newAttributes = _.castArray(newValues);
+      const newKeys = newAttributes.map((it) => _.get(it, "key"));
+      onChange(newKeys);
+    },
+    [onChange]
+  );
 
   return (
-    <ResourceSelect<ManagedAttribute>
-      filter={(input: string) =>
-        SimpleSearchFilterBuilder.create<ManagedAttribute>()
-          .searchFilter("name", input)
-          .when(!!managedAttributeComponent, (builder) =>
-            builder.where(
-              "managedAttributeComponent",
-              "EQ",
-              managedAttributeComponent
-            )
-          )
-          .build()
-      }
+    <DynamicResourceSelect
       model={managedAttributeApiPath}
-      optionLabel={(attribute) => managedAttributeLabel(attribute)}
+      filter={filter}
+      optionLabel={optionLabel}
+      value={visibleAttributes}
+      onChange={onChangeInternal}
       isMulti={true}
       isLoading={loading}
-      onChange={onChangeInternal}
-      value={visibleAttributes}
       selectProps={{
         controlShouldRenderValue: false,
         isClearable: false,
-        placeholder: "Add new"
+        placeholder: "Add new",
+        noOptionsMessage: () => "No matching attributes found"
       }}
     />
-  );
-}
-
-function managedAttributeLabel(attribute: ManagedAttribute) {
-  return (
-    _.get(attribute, "name") ||
-    _.get(attribute, "key") ||
-    _.get(attribute, "id") ||
-    ""
   );
 }
