@@ -984,11 +984,23 @@ export class CustomDinaKitsu extends Kitsu {
 
       const deserialized = await deserialise(data);
 
-      // Omit relationships where: { data: null } because they do not deserialize properly:
+      // Handle relationships
       const relationships = deserialized?.data?.relationships;
       for (const key of _.keys(relationships)) {
         if (relationships?.[key]?.data === null) {
+          // Remove null relationships
           delete relationships[key];
+        } else if (relationships?.[key]?.data && !deserialized.data[key]) {
+          // If relationship exists but wasn't resolved, create basic object with id/type.
+          const relData = relationships[key].data;
+          if (Array.isArray(relData)) {
+            deserialized.data[key] = relData.map((item) => ({
+              id: item.id,
+              type: item.type
+            }));
+          } else {
+            deserialized.data[key] = { id: relData.id, type: relData.type };
+          }
         }
       }
 
