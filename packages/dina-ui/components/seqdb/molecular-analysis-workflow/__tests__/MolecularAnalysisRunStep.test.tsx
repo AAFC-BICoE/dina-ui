@@ -177,11 +177,17 @@ const mockBulkGet = jest.fn(async (paths) => {
   return paths.map((path: string) => {
     switch (path) {
       // Storage Unit Usage Requests
-      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_1.id:
+      case "/storage-unit-usage/" +
+        STORAGE_UNIT_USAGE_1.id +
+        "?optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_1;
-      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_2.id:
+      case "/storage-unit-usage/" +
+        STORAGE_UNIT_USAGE_2.id +
+        "?optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_2;
-      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_3.id:
+      case "/storage-unit-usage/" +
+        STORAGE_UNIT_USAGE_3.id +
+        "?optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_3;
 
       // Material Sample Summary

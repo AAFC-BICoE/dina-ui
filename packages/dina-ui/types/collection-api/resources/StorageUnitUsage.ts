@@ -5,11 +5,14 @@ export interface StorageUnitUsageAttributes {
   type: "storage-unit-usage";
   wellColumn?: number | null;
   wellRow?: string | null;
-  cellNumber?: number;
   storageUnitName?: string;
   usageType?: string;
   createdOn?: string;
   createdBy?: string;
+}
+
+export interface StorageUnitUsageCalculatedAttributes {
+  cellNumber?: number;
 }
 
 export interface StorageUnitUsageRelationships {
@@ -18,4 +21,5 @@ export interface StorageUnitUsageRelationships {
 
 export type StorageUnitUsage = KitsuResource &
   StorageUnitUsageAttributes &
+  StorageUnitUsageCalculatedAttributes &
   StorageUnitUsageRelationships;

@@ -61,11 +61,11 @@ const mockBulkGet = jest.fn(async (paths) => {
   return paths.map((path: string) => {
     switch (path) {
       // Storage Unit Usage Requests
-      case "/storage-unit-usage/0192fd01-90a6-75a2-a7a3-daf1a4718471":
+      case "/storage-unit-usage/0192fd01-90a6-75a2-a7a3-daf1a4718471?optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_1;
-      case "/storage-unit-usage/0192fd01-90c2-7e45-95a2-a5614f68052f":
+      case "/storage-unit-usage/0192fd01-90c2-7e45-95a2-a5614f68052f?optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_2;
-      case "/storage-unit-usage/0192fd01-9104-72fa-a18f-80d97da0c935":
+      case "/storage-unit-usage/0192fd01-9104-72fa-a18f-80d97da0c935?optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_3;
 
       // Pcr Batch Items

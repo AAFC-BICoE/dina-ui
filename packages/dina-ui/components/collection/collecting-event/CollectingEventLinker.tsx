@@ -3,17 +3,16 @@ import {
   FilterForm,
   FormikButton,
   QueryTable,
-  rsql,
   stringArrayCell
 } from "common-ui";
 import { FormikContextType } from "formik";
-import { FilterParam } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api";
 import { Person } from "../../../types/objectstore-api";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
+import { fiql } from "../../../../common-ui/lib/filter-builder/fiql";
 
 export interface CollectingEventFilterFormValues {
   createdBy?: string;
@@ -82,25 +81,26 @@ export function CollectingEventLinker({
     }
   ];
 
-  const [filterParam, setFilterParam] = useState<FilterParam>();
+  const [filterParam, setFilterParam] = useState<string>();
 
   function onFilterSubmit(values) {
-    const rsqlFilters: string[] = [];
+    const fiqlFilters: string[] = [];
 
     if (values && values.group) {
-      rsqlFilters.push(`group==${values.group}`);
+      fiqlFilters.push(`group==${values.group}`);
     }
 
-    const filterBuilderRsql = rsql(values.filterBuilderModel);
-    if (filterBuilderRsql) {
-      rsqlFilters.push(filterBuilderRsql);
+    const filterBuilderFiql = fiql(values.filterBuilderModel);
+    if (filterBuilderFiql) {
+      fiqlFilters.push(filterBuilderFiql);
     }
 
-    const filters: FilterParam = {
-      rsql: rsqlFilters.join(" and ")
-    };
+    if (fiqlFilters.length === 0) {
+      setFilterParam(undefined);
+      return;
+    }
 
-    setFilterParam(filters);
+    setFilterParam(fiqlFilters.join(";"));
   }
 
   return (
@@ -124,7 +124,7 @@ export function CollectingEventLinker({
         <QueryTable
           path="collection-api/collecting-event"
           columns={COLLECTING_EVENT_TABLE_COLUMNS}
-          filter={filterParam}
+          fiql={filterParam}
         />
       </div>
     </div>

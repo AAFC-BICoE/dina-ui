@@ -134,7 +134,9 @@ export async function attachStorageUnitUsageMetagenomics(
       .filter((item) => item?.pcrBatchItem?.storageUnitUsage?.id)
       .map(
         (item) =>
-          "/storage-unit-usage/" + item?.pcrBatchItem?.storageUnitUsage?.id
+          "/storage-unit-usage/" +
+          item?.pcrBatchItem?.storageUnitUsage?.id +
+          "?optfields[storage-unit-usage]=cellNumber"
       ),
     { apiBaseUrl: "/collection-api" }
   );

@@ -17,7 +17,7 @@ export default function StorageUnitDetailsPage() {
         </DinaForm>
       )}
       query={(id) => ({
-        path: `collection-api/storage-unit/${id}?include=parentStorageUnit,storageUnitChildren,storageUnitType,hierarchy,storageUnitUsage`
+        path: `collection-api/storage-unit/${id}?include=parentStorageUnit,storageUnitType`
       })}
       entityLink="/collection/storage-unit"
       type="storage-unit"

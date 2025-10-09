@@ -3,9 +3,11 @@ import {
   LoadingSpinner,
   QueryPage,
   SaveArgs,
+  SimpleSearchFilterBuilder,
   useApiClient,
-  useQuery
-} from "../../../../common-ui/lib";
+  useQuery,
+  simpleSearchFilterToFiql
+} from "common-ui";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { MaterialSample, StorageUnit } from "../../../types/collection-api";
 import { useEffect, useState } from "react";
@@ -48,7 +50,11 @@ export function StorageUnitSampleSelectionStep({
   useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
-      filter: { rsql: `storageUnitUsage.storageUnit.uuid==${storageUnit?.id}` },
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create()
+          .where("storageUnitUsage.storageUnit.uuid", "EQ", storageUnit?.id)
+          .build()
+      ),
       page: { limit: 1000 },
       include: "storageUnitUsage"
     },

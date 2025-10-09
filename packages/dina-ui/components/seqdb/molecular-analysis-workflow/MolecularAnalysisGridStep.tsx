@@ -1,8 +1,8 @@
 import {
   AreYouSureModal,
-  filterBy,
   LoadingSpinner,
   ResourceSelect,
+  SimpleSearchFilterBuilder,
   useModal
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -156,7 +156,11 @@ export function MolecularAnalysisGridStep({
               <ResourceSelect<StorageUnitType>
                 model="collection-api/storage-unit-type"
                 optionLabel={(it) => it.name}
-                filter={filterBy(["name"])}
+                filter={(searchValue: string) =>
+                  SimpleSearchFilterBuilder.create()
+                    .searchFilter("name", searchValue)
+                    .build()
+                }
                 onChange={(value) => {
                   if (storageUnitType?.id !== undefined) {
                     openModal(
@@ -204,15 +208,16 @@ export function MolecularAnalysisGridStep({
                   <ResourceSelect<StorageUnit>
                     model="collection-api/storage-unit"
                     optionLabel={(it) => it.name}
-                    filter={filterBy(["name"], {
-                      extraFilters: [
-                        {
-                          selector: "storageUnitType.uuid",
-                          comparison: "==",
-                          arguments: storageUnitType?.id ?? ""
-                        }
-                      ]
-                    })}
+                    filter={(searchValue: string) =>
+                      SimpleSearchFilterBuilder.create()
+                        .searchFilter("name", searchValue)
+                        .where(
+                          "storageUnitType.uuid",
+                          "EQ",
+                          storageUnitType?.id
+                        )
+                        .build()
+                    }
                     onChange={(value) =>
                       setStorageUnit(value as PersistedResource<StorageUnit>)
                     }

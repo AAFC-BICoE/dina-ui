@@ -100,7 +100,9 @@ export function useMetagenomicsIndexAssignmentAPI({
             .filter((item) => item.pcrBatchItem?.storageUnitUsage?.id)
             .map(
               (item) =>
-                "/storage-unit-usage/" + item.pcrBatchItem?.storageUnitUsage?.id
+                "/storage-unit-usage/" +
+                item.pcrBatchItem?.storageUnitUsage?.id +
+                "?optfields[storage-unit-usage]=cellNumber"
             );
           const storageUnitUsageQuery = await bulkGet<StorageUnitUsage>(paths, {
             apiBaseUrl: "/collection-api"

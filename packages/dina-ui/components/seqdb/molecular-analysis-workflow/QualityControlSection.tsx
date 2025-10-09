@@ -151,6 +151,7 @@ export function QualityControlSection({
                           }}
                           value={qualityControl.attachments}
                           className="mb-0 me-4 mt-1"
+                          readOnly={!editMode}
                         />
                         <Button
                           onClick={() => deleteQualityControl?.(index)}
@@ -171,7 +172,6 @@ export function QualityControlSection({
               {qualityControl?.attachments?.length > 0 && (
                 <div style={{ marginTop: "15px" }}>
                   <AttachmentsEditor
-                    attachmentPath=""
                     name={`qualityControlAttachments_${index}}`}
                     onChange={(newMetadatas) => {
                       updateQualityControl?.(index, {

@@ -156,7 +156,9 @@ export function useWorkbookConverter(
     return false;
   }
 
-  function getFieldDataType(fieldPath?: string): WorkbookDataTypeEnum {
+  function getFieldDataType(
+    fieldPath?: string
+  ): WorkbookDataTypeEnum | undefined {
     return fieldPath ? flattenedConfig[fieldPath]?.dataType : undefined;
   }
 
