@@ -848,6 +848,13 @@ export function useMaterialSampleSave({
     } = {
       ...msDiffWithOrganisms,
 
+      // Ensure assignedTo in scheduledActions is reduced to an object with just id and type.
+      scheduledActions:
+        msDiffWithOrganisms?.scheduledActions?.map((action) => ({
+          ...action,
+          assignedTo: _.pick(action.assignedTo, ["id", "type"])
+        })) || ([] as any),
+
       // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
       // Explicitly declare these fields as relationships here before saving:
       // One-to-many relationships go in the 'relationships' object:
@@ -890,6 +897,11 @@ export function useMaterialSampleSave({
         ...(msDiffWithOrganisms.preparationType?.id && {
           preparationType: {
             data: _.pick(msDiffWithOrganisms.preparationType, "id", "type")
+          }
+        }),
+        ...(msDiffWithOrganisms.preparationMethod?.id && {
+          preparationMethod: {
+            data: _.pick(msDiffWithOrganisms.preparationMethod, "id", "type")
           }
         }),
         ...(msDiffWithOrganisms.collection?.id && {
