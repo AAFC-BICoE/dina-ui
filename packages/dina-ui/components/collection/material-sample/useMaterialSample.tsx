@@ -853,7 +853,9 @@ export function useMaterialSampleSave({
         scheduledActions: msDiffWithOrganisms.scheduledActions.map(
           (action) => ({
             ...action,
-            assignedTo: _.pick(action.assignedTo, ["id", "type"])
+            ...(action.assignedTo && {
+              assignedTo: _.pick(action.assignedTo, ["id", "type"])
+            })
           })
         ) as any
       }),
