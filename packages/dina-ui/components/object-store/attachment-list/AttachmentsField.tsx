@@ -119,8 +119,8 @@ export function AttachmentsEditor({
       isJsonApiQuery: true
     }),
     {
-      id: "originalFilename",
-      header: () => <FieldHeader name="originalFilename" />,
+      id: "filename",
+      header: () => <FieldHeader name="filename" />,
       cell: ({ row: { original: metadata } }) => {
         // When this Metadata has been deleted, show a "deleted" message in this cell:
         if (Object.keys(metadata).length === 2) {
@@ -140,7 +140,7 @@ export function AttachmentsEditor({
             href={`/object-store/object/view?id=${metadata.id}`}
             legacyBehavior
           >
-            {(metadata as any)?.originalFilename ?? metadata.id}
+            {(metadata as any)?.filename ?? metadata.id}
           </Link>
         );
       }
