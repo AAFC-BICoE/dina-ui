@@ -8,7 +8,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../types/collection-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
@@ -90,7 +90,7 @@ export function ManagedAttributesEditor({
           );
         }, [visibleAttributeKeysProp]);
 
-        // Fetch the attributes, but omit any that are missing e.g. were deleted.
+        // Fetch the attributes (to display on the form, not the multiselect list), but omit any that are missing e.g. were deleted.
 
         const { data: fetchedAttributes, loading } = useManagedAttributeQueries(
           {
@@ -200,31 +200,27 @@ export interface ManagedAttributeMultiSelectProps {
 export function DynamicResourceSelect<TData extends PersistedResource<TData>>(
   props
 ) {
-  const {
-    pageSize: initialPageSize = 6,
-    onChange,
-    onDataLoaded,
-    value,
-    ...rest
-  } = props;
+  const { onChange, onDataLoaded, value, ...rest } = props;
 
-  const [pageSize, setPageSize] = useState<number>(initialPageSize);
   const [fetchedRecords, setFetchedRecords] = useState<
     PersistedResource<TData>[]
   >([]);
+  const [inputValue, setInputValue] = useState("");
+
+  // Handle input typing
 
   const handleInputChange = useCallback(
     (newVal: string, { action }: any) => {
       if (action !== "set-value") {
-        rest.selectProps?.onInputChange?.(newVal, { action }); // preserve any existing behavior
+        setInputValue(newVal);
+        rest.selectProps?.onInputChange?.(newVal, { action });
       }
     },
-    [rest.selectProps]
+    [rest.selectProps?.onInputChange] // more precise dependency
   );
 
-  // Handle selection and increase pageSize
+  // Handle selection
   const handleChange = (newValue, actionMeta) => {
-    setPageSize((prev) => prev + 1);
     onChange?.(newValue, actionMeta);
   };
 
@@ -236,29 +232,50 @@ export function DynamicResourceSelect<TData extends PersistedResource<TData>>(
     onDataLoaded?.(data);
   };
 
-  // Filter out selected items from fetchedRecords
-  const selectedIds = _.castArray(value).map((v) => v?.id);
-  const filteredRecords = fetchedRecords.filter(
-    (item) => item?.id && !selectedIds.includes(item.id)
+  // Filter logic
+  const searchFilteredRecords = useMemo(() => {
+    const selectedIds = _.castArray(value).map((v) => v?.id);
+
+    const unselectedRecords = fetchedRecords.filter(
+      (item) => item?.id && !selectedIds.includes(item.id)
+    );
+
+    const filtered = unselectedRecords.filter((item) => {
+      const name = (item as Record<string, any>).name;
+      return name?.toLowerCase().includes(inputValue.toLowerCase());
+    });
+
+    return filtered;
+  }, [fetchedRecords, value, inputValue]);
+
+  const limitedRecords = searchFilteredRecords.slice(0, 6);
+
+  const filterList = useCallback(
+    (item?: PersistedResource<TData>) => {
+      return limitedRecords.some((r) => r.id === item?.id);
+    },
+    [limitedRecords]
   );
 
-  // Use filteredRecords in filterList to restrict dropdown options
-  const filterList = (item?: PersistedResource<TData>) => {
-    return filteredRecords.some((r) => r.id === item?.id);
-  };
+  const finalSelectProps = useMemo(
+    () => ({
+      ...rest.selectProps,
+      isSearchable: true,
+      onInputChange: handleInputChange
+    }),
+    [rest.selectProps, handleInputChange]
+  );
 
   return (
     <ResourceSelect
       {...rest}
-      pageSize={pageSize}
       onChange={handleChange}
       onDataLoaded={handleDataLoaded}
+      pageSize={50}
       value={value}
+      filter={props.filter}
       filterList={filterList}
-      selectProps={{
-        ...rest.selectProps,
-        onInputChange: handleInputChange
-      }}
+      selectProps={finalSelectProps}
     />
   );
 }
@@ -303,7 +320,7 @@ export function ManagedAttributeMultiSelect({
     []
   );
 
-  // Stable onChange handler
+  // Stable onChange handler ( this handles on change for )
   const onChangeInternal = useCallback(
     (
       newValues:
@@ -317,6 +334,17 @@ export function ManagedAttributeMultiSelect({
     [onChange]
   );
 
+  const selectProps = useMemo(
+    () => ({
+      isSearchable: true,
+      controlShouldRenderValue: false,
+      isClearable: false,
+      placeholder: "Add new",
+      noOptionsMessage: () => "No matching attributes found"
+    }),
+    []
+  );
+
   return (
     <DynamicResourceSelect
       model={managedAttributeApiPath}
@@ -326,12 +354,7 @@ export function ManagedAttributeMultiSelect({
       onChange={onChangeInternal}
       isMulti={true}
       isLoading={loading}
-      selectProps={{
-        controlShouldRenderValue: false,
-        isClearable: false,
-        placeholder: "Add new",
-        noOptionsMessage: () => "No matching attributes found"
-      }}
+      selectProps={selectProps}
     />
   );
 }

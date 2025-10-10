@@ -384,7 +384,6 @@ export function ResourceSelect<TData extends KitsuResource>({
     <SortableSelect
       // react-select props:
       isMulti={isMulti}
-      onInputChange={(newVal) => setInputValue(newVal)}
       inputValue={inputValue}
       onChange={onChange}
       isLoading={isLoading}
@@ -398,6 +397,10 @@ export function ResourceSelect<TData extends KitsuResource>({
       filterOption={({ data }) => filterList?.((data as any)?.resource) ?? true}
       isDisabled={isDisabled}
       {...selectProps}
+      onInputChange={(newVal, actionMeta) => {
+        setInputValue(newVal);
+        selectProps?.onInputChange?.(newVal, actionMeta);
+      }}
     />
   );
 }
