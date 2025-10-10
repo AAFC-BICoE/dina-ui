@@ -29,6 +29,7 @@ export const TEST_METADATA_1: PersistedResource<Metadata> = {
   dcType: "IMAGE",
   acCaption: "japan.jpg",
   originalFilename: "japan.jpg",
+  filename: "japan.jpg",
   publiclyReleasable: true,
   group: "aafc"
 };
@@ -44,6 +45,7 @@ export const TEST_METADATA_2: PersistedResource<Metadata> = {
   dcType: "IMAGE",
   acCaption: "canada.jpg",
   originalFilename: "canada.jpg",
+  filename: "canada.jpg",
   publiclyReleasable: true,
   group: "aafc"
 };
