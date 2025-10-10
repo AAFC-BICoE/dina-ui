@@ -154,6 +154,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
         </div>
         <nav
           class="app-bar navbar navbar-expand-lg navbar-light"
+          style="background-color: rgb(56, 65, 77);"
         >
           <div
             class="centered container-fluid"

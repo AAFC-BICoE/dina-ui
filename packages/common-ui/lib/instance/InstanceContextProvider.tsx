@@ -1,82 +1,132 @@
-import { ReactNode, createContext, useEffect, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState
+} from "react";
 import { useApiClient } from "../api-client/ApiClientContext";
 
-export interface InstanceContextI {
-  supportedLanguages: string;
-  instanceMode: string;
-  instanceName: string;
-  supportedGeographicReferences: string;
-  tgnSearchBaseUrl?: string;
-  scientificNamesSearchEndpoint?: string;
-  scientificNamesDatasetsEndpoint?: string;
-}
+// All the supported values from the Caddyfile.
+const INSTANCE_CONFIG_MAP = {
+  supportedLanguages: {
+    apiField: "supported-languages-iso",
+    defaultValue: "en"
+  },
+  instanceMode: {
+    apiField: "instance-mode",
+    defaultValue: "developer"
+  },
+  instanceName: {
+    apiField: "instance-name",
+    defaultValue: "AAFC"
+  },
+  instanceBannerColor: {
+    apiField: "instance-banner-color",
+    defaultValue: "#38414d"
+  },
+  supportedGeographicReferences: {
+    apiField: "supported-geographic-references",
+    defaultValue: "OSM"
+  },
+  tgnSearchBaseUrl: {
+    apiField: "tgn-search-base-url",
+    defaultValue: ""
+  },
+  scientificNamesSearchEndpoint: {
+    apiField: "scientific-names-search-endpoint",
+    defaultValue: "https://verifier.globalnames.org/api/v1/verifications/"
+  },
+  scientificNamesDatasetsEndpoint: {
+    apiField: "scientific-names-datasets-endpoint",
+    defaultValue: "https://verifier.globalnames.org/api/v1/data_sources"
+  }
+};
 
-export const InstanceContext = createContext<InstanceContextI | undefined>(
-  undefined
+export type InstanceContextValue = {
+  [K in keyof typeof INSTANCE_CONFIG_MAP]?: string;
+};
+
+const DEFAULT_INSTANCE_CONFIG = Object.entries(INSTANCE_CONFIG_MAP).reduce(
+  (acc, [key, { defaultValue }]) => {
+    acc[key as keyof InstanceContextValue] = defaultValue;
+    return acc;
+  },
+  {} as InstanceContextValue
 );
 
-export const InstanceContextProvider = InstanceContext.Provider;
+const InstanceContext = createContext<InstanceContextValue | null>(null);
 
-export function DefaultInstanceContextProvider({
-  children
-}: {
+/**
+ * Parses the raw API response into our strongly-typed config object.
+ * @param response The raw JSON response from the /instance.json endpoint.
+ * @returns A fully populated instance configuration object.
+ */
+function parseInstanceResponse(response: any): InstanceContextValue {
+  const config = { ...DEFAULT_INSTANCE_CONFIG };
+
+  for (const key in INSTANCE_CONFIG_MAP) {
+    const contextKey = key as keyof InstanceContextValue;
+    const { apiField } = INSTANCE_CONFIG_MAP[contextKey];
+
+    if (response?.[apiField]) {
+      config[contextKey] = response[apiField];
+    }
+  }
+
+  return config;
+}
+
+interface InstanceContextProviderProps {
   children: ReactNode;
-}) {
+  value?: InstanceContextValue;
+}
+
+/**
+ * Provides instance-specific configuration to all child components.
+ * It fetches the configuration and handles loading and error states.
+ */
+export function InstanceContextProvider({
+  children,
+  value
+}: InstanceContextProviderProps) {
   const { apiClient } = useApiClient();
-  const [instanceJson, setInstanceJson] = useState<InstanceContextI>();
+  const [instanceConfig, setInstanceConfig] =
+    useState<InstanceContextValue | null>(value || null);
 
   useEffect(() => {
-    const getInstanceJSON = async () => {
+    // If already supplied through the prop then we don't need a network request.
+    // Mainly used for testing purposes.
+    if (value) {
+      return;
+    }
+
+    const fetchInstanceConfig = async () => {
       try {
         const response = await apiClient.get("/instance.json", {});
-        if (response) {
-          setInstanceJson({
-            supportedLanguages: !!response["supported-languages-iso"]
-              ? response["supported-languages-iso"]
-              : "en",
-            instanceMode: !!response["instance-mode"]
-              ? response["instance-mode"]
-              : "developer",
-            instanceName: !!response["instance-name"]
-              ? response["instance-name"]
-              : "AAFC",
-            supportedGeographicReferences: !!response[
-              "supported-geographic-references"
-            ]
-              ? response["supported-geographic-references"]
-              : "OSM",
-            tgnSearchBaseUrl: !!response["tgn-search-base-url"]
-              ? response["tgn-search-base-url"]
-              : "",
-            scientificNamesSearchEndpoint: !!response[
-              "scientific-names-search-endpoint"
-            ]
-              ? response["scientific-names-search-endpoint"]
-              : "https://verifier.globalnames.org/api/v1/verifications/",
-            scientificNamesDatasetsEndpoint: !!response[
-              "scientific-names-datasets-endpoint"
-            ]
-              ? response["scientific-names-datasets-endpoint"]
-              : "https://verifier.globalnames.org/api/v1/data_sources"
-          });
-        } else {
-          setInstanceJson({
-            supportedLanguages: "en",
-            instanceMode: "developer",
-            instanceName: "AAFC",
-            supportedGeographicReferences: "OSM",
-            tgnSearchBaseUrl: ""
-          });
-        }
+        setInstanceConfig(parseInstanceResponse(response));
       } catch (error) {
-        console.error(error);
+        console.error(
+          "Failed to fetch instance config, using defaults.",
+          error
+        );
+        setInstanceConfig(DEFAULT_INSTANCE_CONFIG);
       }
     };
-    getInstanceJSON();
-  }, []);
+    fetchInstanceConfig();
+  }, [apiClient]);
+
   return (
-    <InstanceContext.Provider value={instanceJson}>
+    <InstanceContext.Provider value={instanceConfig}>
       {children}
     </InstanceContext.Provider>
   );
+}
+
+/**
+ * Hook to use to retrieve the values.
+ */
+export function useInstanceContext() {
+  const instanceContext = useContext(InstanceContext);
+  return instanceContext;
 }

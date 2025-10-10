@@ -41,6 +41,7 @@ respond /dev-user.json "{
 respond /api/instance.json "{ 
 	\"instance-mode\": \"{$INSTANCE_MODE}\",
 	\"instance-name\": \"{$INSTANCE_NAME}\",
+	\"instance-banner-color\": \"{$INSTANCE_BANNER_COLOR}\",
 	\"supported-languages-iso\": \"{$SUPPORTED_LANGUAGES_ISO}\",
 	\"supported-geographic-references\": \"{$SUPPORTED_GEOINFORMATION_SYSTEMS}\",
 	\"tgn-search-base-url\": \"{$TGN_SEARCH_BASE_URL}\",
