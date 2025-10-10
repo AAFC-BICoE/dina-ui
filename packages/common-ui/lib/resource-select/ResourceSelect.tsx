@@ -397,10 +397,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       filterOption={({ data }) => filterList?.((data as any)?.resource) ?? true}
       isDisabled={isDisabled}
       {...selectProps}
-      onInputChange={(newVal, actionMeta) => {
-        setInputValue(newVal);
-        selectProps?.onInputChange?.(newVal, actionMeta);
-      }}
+      onInputChange={(newVal) => setInputValue(newVal)}
     />
   );
 }

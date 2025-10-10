@@ -207,63 +207,69 @@ export function DynamicResourceSelect<TData extends PersistedResource<TData>>(
   >([]);
   const [inputValue, setInputValue] = useState("");
 
-  // Handle input typing
+  // Stable onInputChange (no dependency on changing object literals)
+  const selectPropsRef = useRef(rest.selectProps);
+  useEffect(() => {
+    selectPropsRef.current = rest.selectProps;
+  }, [rest.selectProps]);
 
-  const handleInputChange = useCallback(
-    (newVal: string, { action }: any) => {
-      if (action !== "set-value") {
-        setInputValue(newVal);
-        rest.selectProps?.onInputChange?.(newVal, { action });
-      }
-    },
-    [rest.selectProps?.onInputChange] // more precise dependency
-  );
+  const handleInputChange = useCallback((newVal: string, { action }: any) => {
+    if (action !== "set-value") {
+      setInputValue(newVal);
+      selectPropsRef.current?.onInputChange?.(newVal, { action });
+    }
+  }, []);
 
-  // Handle selection
   const handleChange = (newValue, actionMeta) => {
     onChange?.(newValue, actionMeta);
   };
 
-  // Store fetched records for reuse
-  const handleDataLoaded = (data?: PersistedResource<TData>[]) => {
-    if (data) {
-      setFetchedRecords((prev) => _.uniqBy([...prev, ...data], "id"));
-    }
-    onDataLoaded?.(data);
-  };
-
-  // Filter logic
-  const searchFilteredRecords = useMemo(() => {
-    const selectedIds = _.castArray(value).map((v) => v?.id);
-
-    const unselectedRecords = fetchedRecords.filter(
-      (item) => item?.id && !selectedIds.includes(item.id)
-    );
-
-    const filtered = unselectedRecords.filter((item) => {
-      const name = (item as Record<string, any>).name;
-      return name?.toLowerCase().includes(inputValue.toLowerCase());
-    });
-
-    return filtered;
-  }, [fetchedRecords, value, inputValue]);
-
-  const limitedRecords = searchFilteredRecords.slice(0, 6);
-
-  const filterList = useCallback(
-    (item?: PersistedResource<TData>) => {
-      return limitedRecords.some((r) => r.id === item?.id);
+  const handleDataLoaded = useCallback(
+    (data?: PersistedResource<TData>[]) => {
+      if (data?.length) {
+        setFetchedRecords((prev) => {
+          const prevIds = new Set(prev.map((r) => r.id));
+          const newOnes = data.filter((r) => r.id && !prevIds.has(r.id));
+          return newOnes.length ? [...prev, ...newOnes] : prev;
+        });
+      }
+      onDataLoaded?.(data);
     },
-    [limitedRecords]
+    [onDataLoaded]
   );
 
-  const finalSelectProps = useMemo(
-    () => ({
-      ...rest.selectProps,
-      isSearchable: true,
-      onInputChange: handleInputChange
-    }),
-    [rest.selectProps, handleInputChange]
+  // ---- filtering, memoized ----
+  const selectedIds = useMemo(
+    () => _.castArray(value).map((v) => v?.id),
+    [value]
+  );
+
+  const unselectedRecords = useMemo(
+    () =>
+      fetchedRecords.filter(
+        (item) => item?.id && !selectedIds.includes(item.id)
+      ),
+    [fetchedRecords, selectedIds]
+  );
+
+  const searchFilteredRecords = useMemo(
+    () =>
+      unselectedRecords.filter((item) => {
+        const name = (item as Record<string, any>).name;
+        return name?.toLowerCase().includes(inputValue.toLowerCase());
+      }),
+    [unselectedRecords, inputValue]
+  );
+
+  const limitedRecords = useMemo(
+    () => searchFilteredRecords.slice(0, 6),
+    [searchFilteredRecords]
+  );
+
+  const filterList = useCallback(
+    (item?: PersistedResource<TData>) =>
+      !!item?.id && limitedRecords.some((r) => r.id === item.id),
+    [limitedRecords]
   );
 
   return (
@@ -275,7 +281,11 @@ export function DynamicResourceSelect<TData extends PersistedResource<TData>>(
       value={value}
       filter={props.filter}
       filterList={filterList}
-      selectProps={finalSelectProps}
+      selectProps={{
+        ...rest.selectProps,
+        isSearchable: true,
+        onInputChange: handleInputChange
+      }}
     />
   );
 }
