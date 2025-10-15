@@ -29,6 +29,7 @@ export default function ExpeditionListPage() {
       header: () => <DinaMessage id="viewDetails" />,
       enableSorting: false
     },
+    "name",
     "geographicContext",
     "startDate",
     "endDate",
