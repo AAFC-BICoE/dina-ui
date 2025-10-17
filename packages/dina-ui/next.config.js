@@ -19,7 +19,8 @@ const nextConfig = {
     "kitsu",
     "react-dnd",
     "react-dnd-html5-backend"
-  ]
+  ],
+  output: "export"
 };
 
 module.exports = nextConfig;
