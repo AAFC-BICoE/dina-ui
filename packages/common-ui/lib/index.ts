@@ -33,6 +33,7 @@ export * from "./formik-connected/GeoSuggestSearchBox";
 export * from "./formik-connected/GroupedCheckBoxFields";
 export * from "./formik-connected/MetersField";
 export * from "./formik-connected/NumberField";
+export * from "./formik-connected/ConceptUrlField";
 export * from "./formik-connected/ResourceSelectField";
 export * from "./formik-connected/safeSubmit";
 export * from "./formik-connected/SelectField";

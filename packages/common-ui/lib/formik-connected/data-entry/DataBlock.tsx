@@ -90,7 +90,9 @@ export function DataBlock({
         value: data.key,
         descriptions: data.multilingualDescription?.descriptions,
         unit: data.unit,
-        vocabularyElementType: data.vocabularyElementType
+        vocabularyElementType: data.vocabularyElementType,
+        conceptQueryEndpoint: data.conceptQueryEndpoint,
+        topLevelConcept: data.topLevelConcept
       })
     );
     return selectedExtensionFieldsOptions;
