@@ -3,7 +3,8 @@ import {
   ColumnDefinition,
   CreateButton,
   dateCell,
-  ListPageLayout
+  ListPageLayout,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -65,10 +66,12 @@ export default function protocolListPage() {
           <DinaMessage id="protocolListTitle" />
         </h1>
         <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-          })}
+          additionalFilters={(filterForm) =>
+            SimpleSearchFilterBuilder.create<Protocol>()
+              .whereProvided("group", "EQ", filterForm.group)
+              .build()
+          }
+          useFiql={true}
           filterAttributes={PROTOCOL_FILTER_ATTRIBUTES}
           id="protocol-list"
           queryTableProps={{

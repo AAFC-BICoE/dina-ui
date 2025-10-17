@@ -82,22 +82,26 @@ const STORAGE_D: PersistedResource<StorageUnit> = {
 const mockGet = jest.fn<any, any>(async (path, params = {}) => {
   switch (path) {
     case "collection-api/storage-unit":
+      const filter = params.filter || {};
+
+      // Top-level units (no filter or empty filter or parentStorageUnit EQ null)
       if (
-        params.filter?.parentStorageUnit === null ||
-        params.filter?.rsql === "group=in=(aafc,cnc)"
+        filter.parentStorageUnit?.EQ === null ||
+        filter?.group?.IN === "aafc,cnc"
       ) {
-        // Top-level units:
         return { data: [STORAGE_A], meta: { totalResourceCount: 1 } };
-      } else if (params.filter?.rsql === "parentStorageUnit.uuid==A") {
+      } else if (filter["parentStorageUnit.uuid"]?.EQ === "A") {
         return {
           data: [STORAGE_B, STORAGE_C],
           meta: { totalResourceCount: 2 }
         };
-      } else if (params.filter?.rsql === "parentStorageUnit.uuid==C") {
+      } else if (filter["parentStorageUnit.uuid"]?.EQ === "C") {
         return { data: [STORAGE_D], meta: { totalResourceCount: 1 } };
-      } else if (params.filter?.rsql === "name==*test-search-text*") {
+      } else if (filter.name?.ILIKE === "%test-search-text%") {
         return { data: [], meta: { totalResourceCount: 0 } };
       }
+      // Default case for filtered results
+      return { data: [], meta: { totalResourceCount: 0 } };
     case "collection-api/storage-unit-type":
       return { data: [], meta: { totalResourceCount: 0 } };
   }
@@ -162,7 +166,9 @@ describe("BrowseStorageTree component", () => {
     await waitFor(() => {
       expect(mockGet).lastCalledWith("collection-api/storage-unit", {
         filter: {
-          rsql: "group=in=(aafc,cnc)"
+          group: {
+            IN: "aafc,cnc"
+          }
         },
         include: "storageUnitChildren,storageUnitType",
         page: {
@@ -183,7 +189,10 @@ describe("BrowseStorageTree component", () => {
     await waitFor(() => {
       expect(mockGet).lastCalledWith("collection-api/storage-unit", {
         filter: {
-          rsql: "name==*test-search-text*;group=in=(aafc,cnc)"
+          name: { ILIKE: "%test-search-text%" },
+          group: {
+            IN: "aafc,cnc"
+          }
         },
         include: "storageUnitChildren,storageUnitType",
         page: {
@@ -197,12 +206,12 @@ describe("BrowseStorageTree component", () => {
     // Reset the search:
     userEvent.click(wrapper.getByRole("button", { name: /reset/i }));
 
-    // No filter again:
+    // No filter again (empty filter object):
     await waitFor(() => {
-      expect(mockGet).lastCalledWith("collection-api/storage-unit", {
-        filter: {
-          rsql: "group=in=(aafc,cnc)"
-        },
+      const lastCall = mockGet.mock.calls[mockGet.mock.calls.length - 1];
+      expect(lastCall[0]).toBe("collection-api/storage-unit");
+      expect(lastCall[1]).toMatchObject({
+        filter: {},
         include: "storageUnitChildren,storageUnitType",
         page: {
           limit: 100,

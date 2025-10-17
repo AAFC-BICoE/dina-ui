@@ -2,6 +2,7 @@ import {
   FieldHeader,
   FieldSet,
   ReactTable,
+  SimpleSearchFilterBuilder,
   useApiClient,
   useDinaFormContext
 } from "common-ui";
@@ -49,7 +50,9 @@ export function StorageUnitChildrenViewer({
     );
     const samplesQueryParams = {
       path: "collection-api/material-sample",
-      filter: { rsql: `storageUnitUsage.storageUnit.uuid==${storageUnit?.id}` }
+      filter: SimpleSearchFilterBuilder.create()
+        .where("storageUnitUsage.storageUnit.uuid", "EQ", storageUnit?.id)
+        .build()
     };
     const { data: childSamples } = await apiClient.get<MaterialSample[]>(
       samplesQueryParams.path,

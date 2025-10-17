@@ -32,6 +32,22 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
   }
 
   /**
+   * Adds pre-built filter conditions directly to the current filter.
+   * This is useful when you have existing FilterParam objects that need to be merged
+   * into the current filter being built, such as when filters are constructed elsewhere
+   * or when reusing common filter patterns.
+   *
+   * @param filterParam The FilterParam object to merge into the current filter.
+   * @returns The updated FilterBuilder instance for method chaining.
+   */
+  public add(filterParam: FilterParam): this {
+    if (filterParam && typeof filterParam === "object") {
+      Object.assign(this.filter, filterParam);
+    }
+    return this;
+  }
+
+  /**
    * Adds a filter with a specific operation (LIKE, ILIKE, GT, etc.).
    * e.g., .where('age', 'GT', 18) results in { age: { GT: 18 } }
    *
@@ -50,6 +66,30 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
       this.filter[String(field)] = { [op]: value } as any;
     }
 
+    return this;
+  }
+
+  /**
+   * Adds a filter only if the provided value is truthy.
+   * This is a convenience method to simplify the common pattern of:
+   * .when(value, builder => builder.where(field, op, value))
+   *
+   * A value is considered "truthy" if it is not null, undefined, or an empty string.
+   *
+   * @param field The field to filter on.
+   * @param op The comparison operator.
+   * @param value The value to check and use for the comparison.
+   */
+  public whereProvided<K extends keyof T>(
+    field: K | "uuid",
+    op: FilterOperation,
+    value: T[K] | T[K][] | undefined | null
+  ): this {
+    // Check for null, undefined, or empty string.
+    // This is a common requirement for optional form inputs.
+    if (value !== null && value !== undefined && value !== "") {
+      this.where(field, op, value);
+    }
     return this;
   }
 

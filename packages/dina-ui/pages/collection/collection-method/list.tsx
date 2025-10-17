@@ -4,7 +4,8 @@ import {
   CreateButton,
   dateCell,
   descriptionCell,
-  ListPageLayout
+  ListPageLayout,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -54,10 +55,11 @@ export default function collectionMethodListPage() {
           <DinaMessage id="collectionMethodListTitle" />
         </h1>
         <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-          })}
+          additionalFilters={(filterForm) =>
+            SimpleSearchFilterBuilder.create<CollectionMethod>()
+              .whereProvided("group", "EQ", filterForm.group)
+              .build()
+          }
           filterAttributes={COLLECTION_METHOD_FILTER_ATTRIBUTES}
           id="collection-method-list"
           queryTableProps={{
@@ -81,6 +83,7 @@ export default function collectionMethodListPage() {
               </div>
             </div>
           )}
+          useFiql={true}
         />
       </main>
       <Footer />

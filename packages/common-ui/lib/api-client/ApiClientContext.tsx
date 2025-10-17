@@ -34,6 +34,15 @@ export interface BulkLoadResourcesOptions {
   apiBaseUrl: string;
   resourceType: string;
   include?: string[];
+
+  /**
+   * Certain fields are optional since they are computational expensive and not always needed.
+   * They can be defined per resource type.
+   *
+   * e.g.: { "material-sample": ["hierarchy"] }
+   */
+  optfields?: { [resourceType: string]: string[] };
+
   returnNullForMissingResource?: boolean;
 }
 
@@ -257,7 +266,10 @@ export class ApiClientImpl implements ApiClientI {
       "identifier",
       "object-upload",
       "metadata",
-      "user"
+      "material-sample",
+      "collecting-event",
+      "user",
+      "storage-unit"
     ];
 
     // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
@@ -620,13 +632,30 @@ export class ApiClientImpl implements ApiClientI {
       apiBaseUrl,
       resourceType,
       include,
+      optfields,
       returnNullForMissingResource = false
     }: BulkLoadResourcesOptions
   ) {
     const { axios } = this.apiClient;
-    const url = include
-      ? `${apiBaseUrl}/${resourceType}/bulk-load?include=${include.join(",")}`
-      : `${apiBaseUrl}/${resourceType}/bulk-load`;
+    const params = new URLSearchParams();
+
+    // Handle include parameter.
+    if (include && include.length > 0) {
+      params.append("include", include.join(","));
+    }
+
+    // Handle optional field parameters.
+    if (optfields && Object.keys(optfields).length > 0) {
+      for (const [type, fields] of Object.entries(optfields)) {
+        params.append(`optfields[${type}]`, fields.join(","));
+      }
+    }
+
+    // Construct the URL for the bulk-load endpoint.
+    const url = `${apiBaseUrl}/${resourceType}/bulk-load${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+
     let response: AxiosResponse = undefined as any;
     const missingIds: string[] = [];
     const originalIds = [...ids]; // Keep the original IDs for later reference.
@@ -955,11 +984,23 @@ export class CustomDinaKitsu extends Kitsu {
 
       const deserialized = await deserialise(data);
 
-      // Omit relationships where: { data: null } because they do not deserialize properly:
+      // Handle relationships
       const relationships = deserialized?.data?.relationships;
       for (const key of _.keys(relationships)) {
         if (relationships?.[key]?.data === null) {
+          // Remove null relationships
           delete relationships[key];
+        } else if (relationships?.[key]?.data && !deserialized.data[key]) {
+          // If relationship exists but wasn't resolved, create basic object with id/type.
+          const relData = relationships[key].data;
+          if (Array.isArray(relData)) {
+            deserialized.data[key] = relData.map((item) => ({
+              id: item.id,
+              type: item.type
+            }));
+          } else {
+            deserialized.data[key] = { id: relData.id, type: relData.type };
+          }
         }
       }
 

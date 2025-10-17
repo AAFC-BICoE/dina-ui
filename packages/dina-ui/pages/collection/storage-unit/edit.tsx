@@ -25,7 +25,7 @@ export function useStorageUnit(id?: string) {
           idField: "parentStorageUnit.id",
           joinField: "parentStorageUnit",
           path: (storageUnit) =>
-            `storage-unit/${storageUnit.parentStorageUnit?.id}?include=hierarchy`
+            `storage-unit/${storageUnit.parentStorageUnit?.id}`
         }
       ]
     }

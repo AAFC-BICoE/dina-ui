@@ -37,7 +37,8 @@ export default function ProjectDetailsPage() {
         </DinaForm>
       )}
       query={(id) => ({
-        path: `collection-api/project/${id}?include=attachment`
+        path: `collection-api/project/${id}`,
+        include: "attachment"
       })}
       entityLink="/collection/project"
       type="project"

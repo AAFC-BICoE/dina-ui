@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import _ from "lodash";
-import { useApiClient } from "common-ui";
+import { SimpleSearchFilterBuilder, useApiClient } from "common-ui";
 import { MaterialSample } from "../../../../types/collection-api";
 import { StorageUnitUsage } from "../../../../types/collection-api/resources/StorageUnitUsage";
 import {
@@ -94,7 +94,9 @@ export function useGridCoordinatesControls({
         "collection-api/storage-unit-usage/",
         {
           include: "storageUnit",
-          filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` }
+          filter: SimpleSearchFilterBuilder.create()
+            .where("storageUnit.uuid", "EQ", storageUnit?.id)
+            .build()
         }
       );
 

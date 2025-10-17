@@ -15,7 +15,7 @@ import { AgentRolesField } from "../collection/AgentRolesField";
 import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
 
 export function ProjectFormLayout() {
-  const { readOnly, initialValues } = useDinaFormContext();
+  const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const uuid = String(router?.query?.id);
@@ -91,10 +91,9 @@ export function ProjectFormLayout() {
       <AttachmentsField
         name="attachment"
         title={<DinaMessage id="projectAttachments" />}
-        id="project-attachments-section"
+        formId="project-attachments-section"
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
-        attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn={true}
       />
       <AgentRolesField

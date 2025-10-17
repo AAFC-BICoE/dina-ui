@@ -49,7 +49,7 @@ export async function getNumberOfRelationshipUsages({
   // Generate the filter parameters based on the relationship name and ID.
   const params = {
     filter: {
-      [`${relationshipName}.id`]: {
+      [`${relationshipName}.uuid`]: {
         EQ: relationshipId
       }
     },

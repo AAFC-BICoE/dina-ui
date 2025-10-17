@@ -1,10 +1,9 @@
 import {
-  filterBy,
-  FilterGroupModel,
   ResourceSelect,
+  SimpleSearchFilterBuilder,
   useAccount
 } from "common-ui";
-import { PersistedResource } from "kitsu";
+import { FilterParam, PersistedResource } from "kitsu";
 import { useEffect, useState } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnitType } from "../../types/collection-api";
@@ -16,7 +15,7 @@ export interface StorageFilterProps {
    */
   currentStorageUnitUUID?: string;
 
-  onChange: (newValue: FilterGroupModel | null) => void;
+  onChange: (newValue: FilterParam | null) => void;
 }
 
 export function StorageFilter({
@@ -38,78 +37,21 @@ export function StorageFilter({
       return;
     }
 
-    onChange({
-      type: "FILTER_GROUP",
-      id: -123,
-      operator: "AND",
-      children: [
-        ...(searchText
-          ? [
-              {
-                id: -321,
-                type: "FILTER_ROW" as const,
-                attribute: "name",
-                predicate: "IS" as const,
-                searchType: "PARTIAL_MATCH" as const,
-                value: searchText
-              }
-            ]
-          : []),
-        // Hide the parent storage unit, to prevent linking of itself.
-        ...(currentStorageUnitUUID
-          ? [
-              {
-                id: -432,
-                type: "FILTER_ROW" as const,
-                attribute: "uuid",
-                predicate: "IS NOT" as const,
-                searchType: "EXACT_MATCH" as const,
-                value: currentStorageUnitUUID
-              }
-            ]
-          : []),
-        ...(createdByMeFilter && username
-          ? [
-              {
-                id: -987,
-                type: "FILTER_ROW" as const,
-                attribute: "createdBy",
-                predicate: "IS" as const,
-                searchType: "EXACT_MATCH" as const,
-                value: username
-              }
-            ]
-          : []),
-        ...(storageTypeFilter?.id
-          ? [
-              {
-                id: -1234321,
-                type: "FILTER_ROW" as const,
-                attribute: "storageUnitType.uuid",
-                predicate: "IS" as const,
-                searchType: "EXACT_MATCH" as const,
-                value: storageTypeFilter.id
-              }
-            ]
-          : []),
-        ...(groupNames
-          ? [
-              {
-                id: -1234,
-                type: "FILTER_ROW" as const,
-                predicate: "IS" as const,
-                searchType: "EXACT_MATCH" as const,
-                value: groupNames.join(","),
-                attribute: {
-                  allowRange: false,
-                  allowList: true,
-                  name: "group"
-                }
-              }
-            ]
-          : [])
-      ]
-    });
+    onChange(
+      SimpleSearchFilterBuilder.create()
+        .searchFilter("name", searchText)
+        .when(!!currentStorageUnitUUID, (builder) =>
+          builder.where("uuid", "NEQ", currentStorageUnitUUID)
+        )
+        .when(createdByMeFilter && !!username, (builder) =>
+          builder.where("createdBy", "EQ", username)
+        )
+        .when(!!storageTypeFilter?.id, (builder) =>
+          builder.where("storageUnitType.uuid", "EQ", storageTypeFilter?.id)
+        )
+        .whereIn("group", groupNames)
+        .build()
+    );
 
     setPerformSearch(false);
   }, [performSearch]);
@@ -181,7 +123,11 @@ export function StorageFilter({
               <ResourceSelect<StorageUnitType>
                 model="collection-api/storage-unit-type"
                 optionLabel={(it) => it.name}
-                filter={filterBy(["name"])}
+                filter={(searchValue: string) =>
+                  SimpleSearchFilterBuilder.create<StorageUnitType>()
+                    .searchFilter("name", searchValue)
+                    .build()
+                }
                 onChange={setStorageTypeFilter as any}
                 value={storageTypeFilter}
                 styles={{ container: () => ({ flex: "auto" }) }}

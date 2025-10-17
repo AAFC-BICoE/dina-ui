@@ -2,7 +2,8 @@ import {
   ColumnDefinition,
   CreateButton,
   dateCell,
-  ListPageLayout
+  ListPageLayout,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import { groupCell, GroupSelectField } from "../../../components";
@@ -42,10 +43,11 @@ export default function StorageUnitTypeListPage() {
       }
     >
       <ListPageLayout
-        additionalFilters={(filterForm) => ({
-          // Apply group filter:
-          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-        })}
+        additionalFilters={(filterForm) =>
+          SimpleSearchFilterBuilder.create<StorageUnitType>()
+            .whereProvided("group", "EQ", filterForm.group)
+            .build()
+        }
         filterAttributes={STORAGE_UNIT_TYPE_FILTER_ATTRIBUTES}
         id="storage-unit-type-list"
         queryTableProps={{
@@ -63,6 +65,7 @@ export default function StorageUnitTypeListPage() {
             </div>
           </div>
         )}
+        useFiql={true}
       />
     </PageLayout>
   );

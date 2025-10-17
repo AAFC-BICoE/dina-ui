@@ -50,7 +50,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
 const mockBulkGet = jest.fn(async (paths) =>
   paths.map((path) => {
     switch (path) {
-      case "storage-unit/B?include=hierarchy":
+      case "storage-unit/B":
         return {
           id: "B",
           group: "group",
