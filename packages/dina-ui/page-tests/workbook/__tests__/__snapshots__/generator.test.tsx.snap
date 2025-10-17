@@ -392,7 +392,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                     style="cursor: auto;"
                   >
                     <div
-                      class=" css-3iigni-container"
+                      class="css-3iigni-container"
                     >
                       <span
                         class="css-1f43avz-a11yText-A11yText"
@@ -407,18 +407,18 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                       />
                       <div
                         aria-disabled="true"
-                        class=" css-16xfy0z-control"
+                        class="css-16xfy0z-control"
                       >
                         <div
-                          class=" css-1fdsijx-ValueContainer"
+                          class="css-hlgwow"
                         >
                           <div
-                            class=" css-olqui2-singleValue"
+                            class="css-olqui2-singleValue"
                           >
                             Material Sample
                           </div>
                           <div
-                            class=" css-1h01tm3-Input"
+                            class="css-1mkvw8y"
                             data-value=""
                           >
                             <input
@@ -442,14 +442,14 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                           </div>
                         </div>
                         <div
-                          class=" css-1hb7zxy-IndicatorsContainer"
+                          class="css-1wy0on6"
                         >
                           <span
-                            class=" css-894a34-indicatorSeparator"
+                            class="css-894a34-indicatorSeparator"
                           />
                           <div
                             aria-hidden="true"
-                            class=" css-1xc3v61-indicatorContainer"
+                            class="css-1xc3v61-indicatorContainer"
                           >
                             <svg
                               aria-hidden="true"
@@ -504,7 +504,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                     class=""
                   >
                     <div
-                      class=" css-b62m3t-container"
+                      class="css-b62m3t-container"
                     >
                       <span
                         class="css-1f43avz-a11yText-A11yText"
@@ -521,7 +521,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                         class="react-select__control css-13cymwt-control"
                       >
                         <div
-                          class="react-select__value-container css-1fdsijx-ValueContainer"
+                          class="react-select__value-container css-hlgwow"
                         >
                           <div
                             class="react-select__placeholder css-ef8t06-placeholder"
@@ -530,7 +530,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                             Select...
                           </div>
                           <div
-                            class="react-select__input-container css-qbdosj-Input"
+                            class="react-select__input-container css-19bb58m"
                             data-value=""
                           >
                             <input
@@ -554,7 +554,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                           </div>
                         </div>
                         <div
-                          class="react-select__indicators css-1hb7zxy-IndicatorsContainer"
+                          class="react-select__indicators css-1wy0on6"
                         >
                           <span
                             class="react-select__indicator-separator css-1u9des2-indicatorSeparator"

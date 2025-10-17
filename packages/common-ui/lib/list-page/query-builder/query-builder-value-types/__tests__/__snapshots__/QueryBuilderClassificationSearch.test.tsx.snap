@@ -27,19 +27,19 @@ exports[`QueryBuilderClassificationSearch QueryBuilderClassificationSearch Compo
             role="log"
           />
           <div
-            class=" css-13cymwt-control"
+            class="css-13cymwt-control"
           >
             <div
-              class=" css-1fdsijx-ValueContainer"
+              class="css-hlgwow"
             >
               <div
-                class=" css-1jqq78o-placeholder"
+                class="css-1jqq78o-placeholder"
                 id="react-select-4-placeholder"
               >
                 Select classification rank...
               </div>
               <div
-                class=" css-qbdosj-Input"
+                class="css-19bb58m"
                 data-value=""
               >
                 <input
@@ -63,28 +63,28 @@ exports[`QueryBuilderClassificationSearch QueryBuilderClassificationSearch Compo
               </div>
             </div>
             <div
-              class=" css-1hb7zxy-IndicatorsContainer"
+              class="css-1wy0on6"
             >
               <div
                 aria-hidden="true"
-                class=" css-pogzpp-loadingIndicator"
+                class="css-pogzpp-loadingIndicator"
               >
                 <span
-                  class="css-1xtdfmb-LoadingDot"
+                  class="css-1icxkl9-LoadingDot"
                 />
                 <span
-                  class="css-zoievk-LoadingDot"
+                  class="css-1oazjx7-LoadingDot"
                 />
                 <span
-                  class="css-x748d8-LoadingDot"
+                  class="css-1wonz24-LoadingDot"
                 />
               </div>
               <span
-                class=" css-1u9des2-indicatorSeparator"
+                class="css-1u9des2-indicatorSeparator"
               />
               <div
                 aria-hidden="true"
-                class=" css-1xc3v61-indicatorContainer"
+                class="css-1xc3v61-indicatorContainer"
               >
                 <svg
                   aria-hidden="true"
@@ -117,18 +117,18 @@ exports[`QueryBuilderClassificationSearch QueryBuilderClassificationSearch Compo
             role="log"
           />
           <div
-            class=" css-13cymwt-control"
+            class="css-13cymwt-control"
           >
             <div
-              class=" css-1fdsijx-ValueContainer"
+              class="css-hlgwow"
             >
               <div
-                class=" css-1dimb5e-singleValue"
+                class="css-1dimb5e-singleValue"
               >
                 Empty
               </div>
               <div
-                class=" css-qbdosj-Input"
+                class="css-19bb58m"
                 data-value=""
               >
                 <input
@@ -151,14 +151,14 @@ exports[`QueryBuilderClassificationSearch QueryBuilderClassificationSearch Compo
               </div>
             </div>
             <div
-              class=" css-1hb7zxy-IndicatorsContainer"
+              class="css-1wy0on6"
             >
               <span
-                class=" css-1u9des2-indicatorSeparator"
+                class="css-1u9des2-indicatorSeparator"
               />
               <div
                 aria-hidden="true"
-                class=" css-1xc3v61-indicatorContainer"
+                class="css-1xc3v61-indicatorContainer"
               >
                 <svg
                   aria-hidden="true"
@@ -209,19 +209,19 @@ exports[`QueryBuilderClassificationSearch QueryBuilderClassificationSearch Compo
             role="log"
           />
           <div
-            class=" css-13cymwt-control"
+            class="css-13cymwt-control"
           >
             <div
-              class=" css-1fdsijx-ValueContainer"
+              class="css-hlgwow"
             >
               <div
-                class=" css-1jqq78o-placeholder"
+                class="css-1jqq78o-placeholder"
                 id="react-select-2-placeholder"
               >
                 Select classification rank...
               </div>
               <div
-                class=" css-qbdosj-Input"
+                class="css-19bb58m"
                 data-value=""
               >
                 <input
@@ -245,28 +245,28 @@ exports[`QueryBuilderClassificationSearch QueryBuilderClassificationSearch Compo
               </div>
             </div>
             <div
-              class=" css-1hb7zxy-IndicatorsContainer"
+              class="css-1wy0on6"
             >
               <div
                 aria-hidden="true"
-                class=" css-pogzpp-loadingIndicator"
+                class="css-pogzpp-loadingIndicator"
               >
                 <span
-                  class="css-1xtdfmb-LoadingDot"
+                  class="css-1icxkl9-LoadingDot"
                 />
                 <span
-                  class="css-zoievk-LoadingDot"
+                  class="css-1oazjx7-LoadingDot"
                 />
                 <span
-                  class="css-x748d8-LoadingDot"
+                  class="css-1wonz24-LoadingDot"
                 />
               </div>
               <span
-                class=" css-1u9des2-indicatorSeparator"
+                class="css-1u9des2-indicatorSeparator"
               />
               <div
                 aria-hidden="true"
-                class=" css-1xc3v61-indicatorContainer"
+                class="css-1xc3v61-indicatorContainer"
               >
                 <svg
                   aria-hidden="true"
@@ -299,18 +299,18 @@ exports[`QueryBuilderClassificationSearch QueryBuilderClassificationSearch Compo
             role="log"
           />
           <div
-            class=" css-13cymwt-control"
+            class="css-13cymwt-control"
           >
             <div
-              class=" css-1fdsijx-ValueContainer"
+              class="css-hlgwow"
             >
               <div
-                class=" css-1dimb5e-singleValue"
+                class="css-1dimb5e-singleValue"
               >
                 Exact match
               </div>
               <div
-                class=" css-qbdosj-Input"
+                class="css-19bb58m"
                 data-value=""
               >
                 <input
@@ -333,14 +333,14 @@ exports[`QueryBuilderClassificationSearch QueryBuilderClassificationSearch Compo
               </div>
             </div>
             <div
-              class=" css-1hb7zxy-IndicatorsContainer"
+              class="css-1wy0on6"
             >
               <span
-                class=" css-1u9des2-indicatorSeparator"
+                class="css-1u9des2-indicatorSeparator"
               />
               <div
                 aria-hidden="true"
-                class=" css-1xc3v61-indicatorContainer"
+                class="css-1xc3v61-indicatorContainer"
               >
                 <svg
                   aria-hidden="true"
