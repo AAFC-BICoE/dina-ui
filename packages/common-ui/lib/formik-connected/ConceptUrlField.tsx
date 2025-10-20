@@ -24,7 +24,6 @@ export async function conceptSPARQLQuery<T>({
 
   const query = `
   PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-  PREFIX agrovoc: <http://aims.fao.org/aos/agrovoc/>
 
   SELECT ?subject ?label
   WHERE {
