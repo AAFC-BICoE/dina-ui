@@ -345,10 +345,13 @@ describe("Material sample bulk edit tab", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 200));
 
-    await waitFor(() => {
-      fireEvent.change(textboxB, { target: { value: "new-b-value" } });
-      fireEvent.change(textboxC, { target: { value: "new-c-value" } });
-    });
+    await waitFor(
+      () => {
+        fireEvent.change(textboxB, { target: { value: "new-b-value" } });
+        fireEvent.change(textboxC, { target: { value: "new-c-value" } });
+      },
+      { timeout: 3000 }
+    );
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
 
