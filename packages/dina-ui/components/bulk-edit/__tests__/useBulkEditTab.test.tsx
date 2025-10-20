@@ -11,7 +11,7 @@ import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-
 import { MaterialSampleFormProps } from "../../collection/material-sample/MaterialSampleForm";
 import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockSubmitOverride = jest.fn();
@@ -344,8 +344,6 @@ describe("Material sample bulk edit tab", () => {
     const textboxC = (await waitFor(() =>
       wrapper.container.querySelector(".managedAttributes_c-field input")
     )) as Element;
-
-    screen.logTestingPlaygroundURL();
 
     fireEvent.change(textboxB, { target: { value: "new-b-value" } });
     fireEvent.change(textboxC, { target: { value: "new-c-value" } });
