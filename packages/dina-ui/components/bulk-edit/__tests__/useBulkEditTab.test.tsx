@@ -343,6 +343,8 @@ describe("Material sample bulk edit tab", () => {
       wrapper.container.querySelector(".managedAttributes_c-field input")
     )) as Element;
 
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     await waitFor(() => {
       fireEvent.change(textboxB, { target: { value: "new-b-value" } });
       fireEvent.change(textboxC, { target: { value: "new-c-value" } });
