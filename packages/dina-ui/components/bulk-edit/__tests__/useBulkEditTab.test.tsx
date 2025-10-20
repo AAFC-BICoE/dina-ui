@@ -11,7 +11,7 @@ import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-
 import { MaterialSampleFormProps } from "../../collection/material-sample/MaterialSampleForm";
 import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockSubmitOverride = jest.fn();
@@ -336,6 +336,8 @@ describe("Material sample bulk edit tab", () => {
       wrapper.getByRole("option", { name: /managed attribute 3/i })
     );
 
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
     const textboxB = (await waitFor(() =>
       wrapper.container.querySelector(".managedAttributes_b-field input")
     )) as Element;
@@ -343,15 +345,10 @@ describe("Material sample bulk edit tab", () => {
       wrapper.container.querySelector(".managedAttributes_c-field input")
     )) as Element;
 
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    screen.logTestingPlaygroundURL();
 
-    await waitFor(
-      () => {
-        fireEvent.change(textboxB, { target: { value: "new-b-value" } });
-        fireEvent.change(textboxC, { target: { value: "new-c-value" } });
-      },
-      { timeout: 3000 }
-    );
+    fireEvent.change(textboxB, { target: { value: "new-b-value" } });
+    fireEvent.change(textboxC, { target: { value: "new-c-value" } });
 
     fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
 
