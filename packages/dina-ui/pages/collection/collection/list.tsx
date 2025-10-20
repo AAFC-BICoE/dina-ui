@@ -4,7 +4,8 @@ import {
   dateCell,
   FieldHeader,
   FilterAttribute,
-  ListPageLayout
+  ListPageLayout,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
@@ -54,10 +55,11 @@ export default function CollectionListPage() {
       buttonBarContent={buttonBarContent}
     >
       <ListPageLayout
-        additionalFilters={(filterForm) => ({
-          // Apply group filter:
-          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-        })}
+        additionalFilters={(filterForm) =>
+          SimpleSearchFilterBuilder.create<Collection>()
+            .whereProvided("group", "EQ", filterForm.group)
+            .build()
+        }
         filterAttributes={COLLECTION_FILTER_ATTRIBUTES}
         id="collection-list"
         queryTableProps={{
@@ -76,6 +78,7 @@ export default function CollectionListPage() {
             </div>
           </div>
         )}
+        useFiql={true}
       />
     </PageLayout>
   );

@@ -11,7 +11,8 @@ import {
   DinaFormOnSubmit,
   useQuery,
   useAccount,
-  TextField
+  TextField,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -109,9 +110,10 @@ export function MaterialSampleSplitGenerationForm({
         limit: 1000
       },
       // Display all user split configurations.
-      filter: {
-        rsql: `group=in=(${groupNames});(createdBy==${username})`
-      }
+      filter: SimpleSearchFilterBuilder.create<SplitConfiguration>()
+        .whereIn("group", groupNames)
+        .where("createdBy", "EQ", username)
+        .build()
     },
     {
       disabled: splitFromMaterialSamples.length === 0,

@@ -122,9 +122,11 @@ To configure the JSON API auto-suggestions, you need to setup the `jsonApiBacken
   jsonApiBackend={{
     query: searchValue => ({
       path: "agent-api/person",
-      filter: {
-        rsql: `name==*${searchValue}*`
-      }
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create<Organism>()
+          .searchFilter("name", searchValue)
+          .build()
+      )
     }),
     option: person => person?.name
   }}
@@ -201,9 +203,11 @@ type it will not be parsed.
   jsonApiBackend={{
     query: searchValue => ({
       path: "agent-api/person",
-      filter: {
-        rsql: `name==*${searchValue}*`
-      }
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create<Organism>()
+          .searchFilter("name", searchValue)
+          .build()
+      )
     }),
     option: person => person?.name
   }}
@@ -282,9 +286,11 @@ If you would like blank searches to occur with the current provider you can use 
   jsonApiBackend={{
     query: searchValue => ({
       path: "agent-api/person",
-      filter: {
-        rsql: `name==*${searchValue}*`
-      }
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create<Organism>()
+          .searchFilter("name", searchValue)
+          .build()
+      )
     }),
     option: person => person?.name
   }}
@@ -311,9 +317,11 @@ Otherwise you can specify a specific backend to use for blank searches, even if 
   jsonApiBackend={{
     query: searchValue => ({
       path: "agent-api/person",
-      filter: {
-        rsql: `name==*${searchValue}*`
-      }
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create<Organism>()
+          .searchFilter("name", searchValue)
+          .build()
+      )
     }),
     option: person => person?.name
   }}

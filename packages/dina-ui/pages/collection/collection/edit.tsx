@@ -9,10 +9,10 @@ import {
   useQuery,
   withResponse,
   ResourceSelectField,
-  filterBy,
   SelectOption,
   MultilingualDescription,
-  ButtonBar
+  ButtonBar,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
@@ -135,25 +135,17 @@ export function CollectionFormFields() {
     }
   ];
 
-  const filter = filterBy(["name"], {
-    nullValueFilters: { parentCollection: null }
-  });
-
   return (
     <div>
       <div className="row">
-        {/* <ResourceSelectField<Institution>
-          name="institution"
-          readOnlyLink="/collection/institution/view?id="
-          filter={filterBy(["name"])}
-          model="collection-api/institution"
-          optionLabel={institution => institution.name as any}
-          className="col-md-6"
-        /> */}
         <ResourceSelectField<Collection>
           name="parentCollection"
           readOnlyLink="/collection/collection/view?id="
-          filter={filter}
+          filter={(searchValue: string) =>
+            SimpleSearchFilterBuilder.create<Collection>()
+              .searchFilter("name", searchValue)
+              .build()
+          }
           model="collection-api/collection"
           optionLabel={(collection) => collection.name as any}
           className="col-md-6"

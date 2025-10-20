@@ -3,8 +3,8 @@ import {
   DateField,
   FieldSet,
   FieldSpy,
-  filterBy,
   ResourceSelectField,
+  SimpleSearchFilterBuilder,
   TextField
 } from "common-ui";
 import { InputResource } from "kitsu";
@@ -100,13 +100,11 @@ export function PreparationField({
                   optionLabel={(it) => it.name}
                   readOnlyLink="/collection/preparation-type/view?id="
                   className="preparation-type"
-                  filter={(input) =>
-                    group
-                      ? {
-                          ...filterBy(["name"])(input),
-                          group: { EQ: `${group}` }
-                        }
-                      : { ...filterBy(["name"])(input) }
+                  filter={(searchValue: string) =>
+                    SimpleSearchFilterBuilder.create<PreparationType>()
+                      .searchFilter("name", searchValue)
+                      .whereProvided("group", "EQ", group)
+                      .build()
                   }
                   tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-type"
                   tooltipLinkText="fromDinaUserGuide"
@@ -117,13 +115,11 @@ export function PreparationField({
                   optionLabel={(it) => it.name}
                   readOnlyLink="/collection/preparation-method/view?id="
                   className="preparation-method"
-                  filter={(input) =>
-                    group
-                      ? {
-                          ...filterBy(["name"])(input),
-                          group: { EQ: `${group}` }
-                        }
-                      : { ...filterBy(["name"])(input) }
+                  filter={(searchValue: string) =>
+                    SimpleSearchFilterBuilder.create<PreparationMethod>()
+                      .searchFilter("name", searchValue)
+                      .whereProvided("group", "EQ", group)
+                      .build()
                   }
                   key={group}
                   tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-method"
@@ -187,13 +183,11 @@ export function PreparationField({
                 optionLabel={(it) => it.name}
                 readOnlyLink="/collection/protocol/view?id="
                 className="protocol"
-                filter={(input) =>
-                  group
-                    ? {
-                        ...filterBy(["name"])(input),
-                        group: { EQ: `${group}` }
-                      }
-                    : { ...filterBy(["name"])(input) }
+                filter={(searchValue: string) =>
+                  SimpleSearchFilterBuilder.create<Protocol>()
+                    .searchFilter("name", searchValue)
+                    .whereProvided("group", "EQ", group)
+                    .build()
                 }
                 key={group}
               />

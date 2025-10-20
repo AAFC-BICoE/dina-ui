@@ -58,6 +58,10 @@ export function SplitMaterialSampleDropdownButton({
       },
 
       // Display all user form templates and public to the group templates.
+      // filter: SimpleSearchFilterBuilder.create<SplitConfiguration>()
+      //   .whereIn("group", groupNames)
+      //   .where("createdBy", "EQ", username)
+      //   .build()
       filter: {
         rsql: `group=in=(${groupNames});(createdBy==${username})`
       }

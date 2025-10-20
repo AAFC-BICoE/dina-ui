@@ -2,6 +2,7 @@ import {
   ColumnDefinition,
   CreateButton,
   ListPageLayout,
+  SimpleSearchFilterBuilder,
   dateCell
 } from "common-ui";
 import Link from "next/link";
@@ -51,10 +52,12 @@ export default function preparationMethodListPage() {
       buttonBarContent={buttonBarContent}
     >
       <ListPageLayout
-        additionalFilters={(filterForm) => ({
-          // Apply group filter:
-          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-        })}
+        additionalFilters={(filterForm) =>
+          SimpleSearchFilterBuilder.create<PreparationMethod>()
+            .whereProvided("group", "EQ", filterForm.group)
+            .build()
+        }
+        useFiql={true}
         filterAttributes={PREPARATION_METHOD_FILTER_ATTRIBUTES}
         id="preparation-method-list"
         queryTableProps={{

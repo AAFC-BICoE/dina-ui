@@ -12,6 +12,46 @@ describe("SimpleSearchFilterBuilder", () => {
     expect(filter).toEqual({});
   });
 
+  describe(".add()", () => {
+    it("should add a simple filter object", () => {
+      const existingFilter = { key: { EQ: "barcode" } };
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .add(existingFilter)
+        .build();
+      expect(filter).toEqual({ key: { EQ: "barcode" } });
+    });
+
+    it("should add multiple filters from a filter object", () => {
+      const existingFilters = {
+        key: { EQ: "barcode" },
+        name: { ILIKE: "%test%" },
+        group: { IN: "group1,group2" }
+      };
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .add(existingFilters)
+        .build();
+      expect(filter).toEqual({
+        key: { EQ: "barcode" },
+        name: { ILIKE: "%test%" },
+        group: { IN: "group1,group2" }
+      });
+    });
+
+    it("should merge with existing filters built using other methods", () => {
+      const existingFilters = { group: { EQ: "aafc" } };
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .where("key", "EQ", "barcode")
+        .add(existingFilters)
+        .searchFilter("name", "test")
+        .build();
+      expect(filter).toEqual({
+        key: { EQ: "barcode" },
+        group: { EQ: "aafc" },
+        name: { ILIKE: "%test%" }
+      });
+    });
+  });
+
   describe(".where()", () => {
     it("should add a simple EQ filter", () => {
       const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
@@ -50,6 +90,36 @@ describe("SimpleSearchFilterBuilder", () => {
         key: { EQ: "test" },
         group: { EQ: "aafc" }
       });
+    });
+  });
+
+  describe(".whereProvided()", () => {
+    it("should add a filter when a valid value is provided", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereProvided("key", "EQ", "barcode")
+        .build();
+      expect(filter).toEqual({ key: { EQ: "barcode" } });
+    });
+
+    it("should not add a filter when the value is an empty string", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereProvided("key", "EQ", "")
+        .build();
+      expect(filter).toEqual({});
+    });
+
+    it("should not add a filter when the value is null", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereProvided("key", "EQ", null as any)
+        .build();
+      expect(filter).toEqual({});
+    });
+
+    it("should not add a filter when the value is undefined", () => {
+      const filter = SimpleSearchFilterBuilder.create<ManagedAttribute>()
+        .whereProvided("key", "EQ", undefined as any)
+        .build();
+      expect(filter).toEqual({});
     });
   });
 
