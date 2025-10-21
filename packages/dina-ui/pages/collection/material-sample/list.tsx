@@ -9,6 +9,7 @@ import {
   FilterAttribute,
   ListPageLayout,
   QueryPage,
+  SimpleSearchFilterBuilder,
   stringArrayCell
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -75,7 +76,8 @@ export const getColumnDefinition: () => ColumnDefinition<MaterialSample>[] =
               {collection?.name}
             </Link>
           ) : null,
-        accessorKey: "collection.name"
+        accessorKey: "collection.name",
+        enableSorting: false
       },
       stringArrayCell("dwcOtherCatalogNumbers"),
       { accessorKey: "materialSampleType" },
@@ -160,10 +162,12 @@ export function SampleListLayout({
   ];
   return (
     <ListPageLayout
-      additionalFilters={(filterForm) => ({
-        // Apply group filter:
-        ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-      })}
+      additionalFilters={(filterForm) =>
+        SimpleSearchFilterBuilder.create<MaterialSample>()
+          .whereProvided("group", "EQ", filterForm.group)
+          .build()
+      }
+      useFiql={true}
       filterAttributes={MATERIAL_SAMPLE_FILTER_ATTRIBUTES}
       id="material-sample-list"
       queryTableProps={{

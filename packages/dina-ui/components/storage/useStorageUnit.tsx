@@ -91,6 +91,22 @@ export function useStorageUnitSave({
         });
       }
 
+      // Clean up relationship objects to only include id and type.
+      savedArgs.forEach((arg) => {
+        if (arg.resource.storageUnitType) {
+          arg.resource.storageUnitType = _.pick(arg.resource.storageUnitType, [
+            "id",
+            "type"
+          ]) as typeof arg.resource.storageUnitType;
+        }
+        if (arg.resource.parentStorageUnit) {
+          arg.resource.parentStorageUnit = _.pick(
+            arg.resource.parentStorageUnit,
+            ["id", "type"]
+          ) as typeof arg.resource.parentStorageUnit;
+        }
+      });
+
       const savedStorage = await save<StorageUnit>(savedArgs, {
         apiBaseUrl: "/collection-api"
       });

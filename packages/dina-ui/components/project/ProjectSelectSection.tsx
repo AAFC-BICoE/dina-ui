@@ -1,7 +1,7 @@
 import {
   DinaFormSection,
-  filterBy,
   ResourceSelectField,
+  SimpleSearchFilterBuilder,
   Tooltip,
   useDinaFormContext
 } from "common-ui";
@@ -52,7 +52,11 @@ export function ProjectsSelectField({
         name="projects"
         isMulti={true}
         readOnlyLink="/collection/project/view?id="
-        filter={filterBy(["name"])}
+        filter={(searchValue: string) =>
+          SimpleSearchFilterBuilder.create<Project>()
+            .searchFilter("name", searchValue)
+            .build()
+        }
         model={resourcePath as any}
         className={"projects " + (className || "")}
         optionLabel={(prj) => prj.name}

@@ -79,7 +79,10 @@ export function useIndexAssignmentAPI({
             libraryPrepsArray
               .filter((item) => item.storageUnitUsage?.id)
               .map(
-                (item) => "/storage-unit-usage/" + item.storageUnitUsage?.id
+                (item) =>
+                  "/storage-unit-usage/" +
+                  item.storageUnitUsage?.id +
+                  "?optfields[storage-unit-usage]=cellNumber"
               ),
             {
               apiBaseUrl: "/collection-api"

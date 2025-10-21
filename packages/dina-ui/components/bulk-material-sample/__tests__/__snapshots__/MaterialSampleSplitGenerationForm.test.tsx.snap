@@ -375,19 +375,19 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 role="log"
               />
               <div
-                class=" css-t3ipsp-control"
+                class="css-t3ipsp-control"
               >
                 <div
-                  class=" css-1fdsijx-ValueContainer"
+                  class="css-hlgwow"
                 >
                   <div
-                    class=" css-1jqq78o-placeholder"
+                    class="css-1jqq78o-placeholder"
                     id="react-select-3-placeholder"
                   >
                     Select...
                   </div>
                   <div
-                    class=" css-qbdosj-Input"
+                    class="css-19bb58m"
                     data-value=""
                   >
                     <input
@@ -411,14 +411,14 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                   </div>
                 </div>
                 <div
-                  class=" css-1hb7zxy-IndicatorsContainer"
+                  class="css-1wy0on6"
                 >
                   <span
-                    class=" css-1u9des2-indicatorSeparator"
+                    class="css-1u9des2-indicatorSeparator"
                   />
                   <div
                     aria-hidden="true"
-                    class=" css-15lsz6c-indicatorContainer"
+                    class="css-15lsz6c-indicatorContainer"
                   >
                     <svg
                       aria-hidden="true"
@@ -1025,19 +1025,19 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 role="log"
               />
               <div
-                class=" css-t3ipsp-control"
+                class="css-t3ipsp-control"
               >
                 <div
-                  class=" css-1fdsijx-ValueContainer"
+                  class="css-hlgwow"
                 >
                   <div
-                    class=" css-1jqq78o-placeholder"
+                    class="css-1jqq78o-placeholder"
                     id="react-select-5-placeholder"
                   >
                     Select...
                   </div>
                   <div
-                    class=" css-qbdosj-Input"
+                    class="css-19bb58m"
                     data-value=""
                   >
                     <input
@@ -1061,14 +1061,14 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                   </div>
                 </div>
                 <div
-                  class=" css-1hb7zxy-IndicatorsContainer"
+                  class="css-1wy0on6"
                 >
                   <span
-                    class=" css-1u9des2-indicatorSeparator"
+                    class="css-1u9des2-indicatorSeparator"
                   />
                   <div
                     aria-hidden="true"
-                    class=" css-15lsz6c-indicatorContainer"
+                    class="css-15lsz6c-indicatorContainer"
                   >
                     <svg
                       aria-hidden="true"

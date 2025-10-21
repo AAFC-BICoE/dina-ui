@@ -5,6 +5,7 @@ import {
   filterBy,
   ResourceSelectField,
   SaveArgs,
+  SimpleSearchFilterBuilder,
   SubmitButton,
   TextField,
   useAccount,
@@ -183,15 +184,12 @@ export function MetagenomicsBatchForm() {
         <ResourceSelectField<Protocol>
           className="col-md-6"
           name="protocol"
-          filter={filterBy(["name"], {
-            extraFilters: [
-              {
-                selector: "protocolType",
-                comparison: "==",
-                arguments: "molecular_analysis"
-              }
-            ]
-          })}
+          filter={(searchValue: string) =>
+            SimpleSearchFilterBuilder.create<Protocol>()
+              .searchFilter("name", searchValue)
+              .where("protocolType", "EQ", "molecular_analysis")
+              .build()
+          }
           model="collection-api/protocol"
           optionLabel={(protocol) => protocol.name}
           readOnlyLink="/collection/protocol/view?id="

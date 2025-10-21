@@ -2,8 +2,10 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   SaveArgs,
+  SimpleSearchFilterBuilder,
   useQuery,
-  useStringComparator
+  useStringComparator,
+  simpleSearchFilterToFiql
 } from "common-ui";
 import _ from "lodash";
 import { MaterialSample, StorageUnit } from "../../../../types/collection-api";
@@ -71,9 +73,11 @@ export function useMaterialSampleGridControls({
   const { loading: materialSamplesQueryLoading } = useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
-      filter: {
-        rsql: `storageUnitUsage.storageUnit.uuid==${storageUnit?.id}`
-      },
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create()
+          .where("storageUnitUsage.storageUnit.uuid", "EQ", storageUnit?.id)
+          .build()
+      ),
       include: "storageUnitUsage",
       page: { limit: 1000 }
     },

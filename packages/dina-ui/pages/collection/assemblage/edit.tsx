@@ -49,9 +49,12 @@ export default function AssemblageEditPage() {
 
   const title = id ? "editAssemblageTitle" : "addAssemblageTitle";
 
-  const query = useQuery<Assemblage>({
-    path: `collection-api/assemblage/${id}?include=attachment`
-  });
+  const query = useQuery<Assemblage>(
+    {
+      path: `collection-api/assemblage/${id}?include=attachment`
+    },
+    { disabled: !id }
+  );
 
   return (
     <div>
@@ -177,7 +180,7 @@ export function AssemblageForm({
 }
 
 export function AssemblageFormLayout() {
-  const { initialValues, readOnly } = useDinaFormContext();
+  const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const uuid = String(router?.query?.id);
@@ -217,10 +220,9 @@ export function AssemblageFormLayout() {
       <AttachmentsField
         name="attachment"
         title={<DinaMessage id="assemblageAttachments" />}
-        id="assemblage-attachments-section"
+        formId="assemblage-attachments-section"
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
-        attachmentPath={`collection-api/assemblage/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn={true}
       />
       {readOnly && (
