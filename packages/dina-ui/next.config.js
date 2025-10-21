@@ -13,13 +13,15 @@ const appVersion = `${require("./package.json").version}${
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  allowedDevOrigins: ["dina.local"],
   env: { UI_APP_VERSION: appVersion },
   transpilePackages: [
     "common-ui",
     "kitsu",
     "react-dnd",
     "react-dnd-html5-backend"
-  ]
+  ],
+  output: "export"
 };
 
 module.exports = nextConfig;

@@ -24,7 +24,7 @@ const config: Config.InitialOptions = {
     "\\.css$": "identity-obj-proxy",
     "\\.scss$": "identity-obj-proxy",
     "^react-pdf$": "<rootDir>/__mocks__/empty.js",
-    "^pdfjs-dist/build/pdf\\.worker\\.min\\.mjs$":
+    "^pdfjs-dist/legacy/build/pdf\\.worker\\.min\\.mjs$":
       "<rootDir>/__mocks__/empty.js"
   },
   setupFiles: ["<rootDir>/jest.setup.js"],

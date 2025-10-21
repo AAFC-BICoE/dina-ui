@@ -12,7 +12,7 @@ React based user interface for AAFC-DINA.
 ## Dependencies
 
 - React (18)
-- NextJS (13)
+- NextJS (14)
 - Typescript (4.5)
 
 Other dependency versions can be found here: https://github.com/AAFC-BICoE/dina-ui/network/dependencies
