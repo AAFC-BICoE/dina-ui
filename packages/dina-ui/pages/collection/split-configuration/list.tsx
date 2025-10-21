@@ -3,12 +3,14 @@ import {
   CreateButton,
   dateCell,
   FieldHeader,
-  ListPageLayout
+  ListPageLayout,
+  SimpleSearchFilterBuilder
   // SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import { GroupSelectField } from "packages/dina-ui/components/group-select/GroupSelectField";
 import PageLayout from "../../../components/page/PageLayout";
+import { SplitConfiguration } from "packages/dina-ui/types/collection-api/resources/SplitConfiguration";
 // import { SplitConfiguration } from "packages/dina-ui/types/collection-api/resources/SplitConfiguration";
 
 const SPLIT_CONFIG_FILTER_ATTRIBUTES = ["name", "createdBy"];
@@ -64,17 +66,12 @@ export default function AgentListPage() {
             </div>
           </div>
         )}
-        additionalFilters={(filterForm) => ({
-          // Apply group filter:
-          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-        })}
-        // Once this backend supports fiql.
-        // additionalFilters={(filterForm) =>
-        //   SimpleSearchFilterBuilder.create<SplitConfiguration>()
-        //     .whereProvided("group", "EQ", filterForm.group)
-        //     .build()
-        // }
-        // useFiql={true}
+        additionalFilters={(filterForm) =>
+          SimpleSearchFilterBuilder.create<SplitConfiguration>()
+            .whereProvided("group", "EQ", filterForm.group)
+            .build()
+        }
+        useFiql={true}
       />
     </PageLayout>
   );
