@@ -11,8 +11,7 @@ import {
   DinaFormOnSubmit,
   useQuery,
   useAccount,
-  TextField,
-  SimpleSearchFilterBuilder
+  TextField
 } from "common-ui";
 import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -80,7 +79,7 @@ export function MaterialSampleSplitGenerationForm({
   const materialSamplesQuery = useBulkGet<MaterialSample>({
     ids,
     listPath:
-      "collection-api/material-sample?include=materialSampleChildren,collection,parentMaterialSample",
+      "collection-api/material-sample?include=collection,parentMaterialSample&optfields[material-sample]=materialSampleChildren",
     disabled: ids.length === 0,
     onSuccess(response) {
       setSplitFromMaterialSamples(response);
@@ -110,10 +109,14 @@ export function MaterialSampleSplitGenerationForm({
         limit: 1000
       },
       // Display all user split configurations.
-      filter: SimpleSearchFilterBuilder.create<SplitConfiguration>()
-        .whereIn("group", groupNames)
-        .where("createdBy", "EQ", username)
-        .build()
+      filter: {
+        rsql: `group=in=(${groupNames});(createdBy==${username})`
+      }
+      // Once SplitConfiguration is moved to v2, this can be used.
+      // filter: SimpleSearchFilterBuilder.create<SplitConfiguration>()
+      //   .whereIn("group", groupNames)
+      //   .where("createdBy", "EQ", username)
+      //   .build()
     },
     {
       disabled: splitFromMaterialSamples.length === 0,
