@@ -19,6 +19,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
+import { useMemo } from "react";
 
 export default function ExternalResourceMetadataViewPage() {
   const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
@@ -28,6 +29,11 @@ export default function ExternalResourceMetadataViewPage() {
 
   const { loading, response } = useMetadataViewQuery(id);
   const metadata = response?.data;
+
+  const fileName = useMemo(
+    () => response?.data?.filename ?? response?.data?.originalFilename,
+    [response]
+  );
 
   const { formatMessage } = useDinaIntl();
 
@@ -75,7 +81,7 @@ export default function ExternalResourceMetadataViewPage() {
 
     return (
       <div>
-        <Head title={metadata.originalFilename} />
+        <Head title={fileName} />
         <Nav marginBottom={false} />
         {buttonBar}
         <main className="container-fluid">

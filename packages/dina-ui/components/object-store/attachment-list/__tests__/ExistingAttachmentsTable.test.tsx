@@ -29,6 +29,7 @@ const mockBulkGet = jest.fn(async (paths) => {
           id: "00000000-0000-0000-0000-000000000000",
           type: "metadata",
           originalFilename: "test-file-1.png",
+          filename: "test-file-1.png",
           acMetadataCreator: {
             id: "00000000-0000-0000-0000-000000000000",
             type: "agent",
@@ -39,6 +40,7 @@ const mockBulkGet = jest.fn(async (paths) => {
         return {
           id: "11111111-1111-1111-1111-111111111111",
           originalFilename: "test-file-2.png",
+          filename: "test-file-2.png",
           type: "metadata"
         };
       case "person/00000000-0000-0000-0000-000000000000":
@@ -59,6 +61,7 @@ const mockSave = jest.fn(() => {
       createdBy: "dina-admin",
       createdOn: "2024-11-04T20:39:06.256239Z",
       originalFileName: "test-file-2.png",
+      filename: "test-file-2.png",
       type: "metadata",
       sha1Hex: "5bc8b250dea269fae9f4abab7ddec787aceff4c3",
       receivedMediaType: "application/pdf",
@@ -86,6 +89,7 @@ const mockGet = jest.fn(async (path) => {
         createdBy: "dina-admin",
         createdOn: "2024-11-04T20:39:06.256239Z",
         originalFileName: "test-file-2.png",
+        filename: "test-file-2.png",
         type: "metadata",
         sha1Hex: "5bc8b250dea269fae9f4abab7ddec787aceff4c3",
         receivedMediaType: "application/pdf",

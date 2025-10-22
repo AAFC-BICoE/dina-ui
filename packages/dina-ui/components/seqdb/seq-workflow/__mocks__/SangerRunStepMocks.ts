@@ -441,6 +441,7 @@ export const TEST_METADATA: PersistedResource<Metadata> = {
   dcType: "IMAGE",
   acCaption: "japan.jpg",
   originalFilename: "japan.jpg",
+  filename: "japan.jpg",
   publiclyReleasable: true,
   group: "aafc"
 };

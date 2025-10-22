@@ -484,6 +484,7 @@ const mockBulkGet = jest.fn<any, any>(async () => {
       xmpRightsUsageTerms: "Government of Canada Usage Term",
       orientation: null,
       originalFilename: "test mat sample export.csv",
+      filename: "test mat sample export.csv",
       acHashFunction: "SHA-1",
       acHashValue: "7969b23a2731b219a15ccc4fa3e6db2b0f8256e7",
       publiclyReleasable: false,
