@@ -84,18 +84,18 @@ export function ExistingAttachmentsTable({
           );
         }
 
-        return metadata?.originalFilename ? (
+        return metadata?.filename ? (
           <Link
             href={`/object-store/object/view?id=${id}`}
             passHref={true}
             legacyBehavior
           >
-            {metadata?.originalFilename}
+            {metadata?.filename}
           </Link>
         ) : null;
       },
-      accessorKey: "originalFilename",
-      header: () => <FieldHeader name="originalFilename" />
+      accessorKey: "filename",
+      header: () => <FieldHeader name="filename" />
     },
     {
       accessorKey: "acCaption",

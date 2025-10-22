@@ -113,7 +113,7 @@ export default function MetadataViewPage() {
 
   return (
     <div>
-      <Head title={metadata?.originalFilename} />
+      <Head title={fileName} />
       <Nav marginBottom={false} />
       <style>{OBJECT_DETAILS_PAGE_CSS}</style>
       {buttonBar}
