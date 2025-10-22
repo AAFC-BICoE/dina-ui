@@ -133,7 +133,7 @@ describe("ManagedAttributesEditor component", () => {
               }
             },
             page: {
-              limit: 50
+              limit: 20
             },
             sort: "-createdOn"
           }
