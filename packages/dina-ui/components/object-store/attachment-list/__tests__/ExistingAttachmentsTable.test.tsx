@@ -29,7 +29,7 @@ const mockBulkGet = jest.fn(async (paths) => {
           id: "00000000-0000-0000-0000-000000000000",
           type: "metadata",
           originalFilename: "test-file-1.png",
-          fileName: "test-file-1.png",
+          filename: "test-file-1.png",
           acMetadataCreator: {
             id: "00000000-0000-0000-0000-000000000000",
             type: "agent",
@@ -40,7 +40,7 @@ const mockBulkGet = jest.fn(async (paths) => {
         return {
           id: "11111111-1111-1111-1111-111111111111",
           originalFilename: "test-file-2.png",
-          fileName: "test-file-2.png",
+          filename: "test-file-2.png",
           type: "metadata"
         };
       case "person/00000000-0000-0000-0000-000000000000":
