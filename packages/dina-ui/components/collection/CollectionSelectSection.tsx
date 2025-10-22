@@ -1,10 +1,10 @@
 import {
   DinaFormSection,
-  filterBy,
   ResourceSelectField,
   useDinaFormContext,
   useAccount,
-  Tooltip
+  Tooltip,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { FaInbox } from "react-icons/fa";
 import { Collection } from "../../../dina-ui/types/collection-api/resources/Collection";
@@ -49,22 +49,6 @@ export function CollectionSelectField({
   const { readOnly } = useDinaFormContext();
   const { isAdmin, groupNames } = useAccount();
 
-  const filter = filterBy(
-    ["name"],
-    !isAdmin
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: "group",
-              comparison: "=in=",
-              arguments: groupNames || []
-            }
-          ]
-        }
-      : undefined
-  );
-
   return (
     <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
       <ResourceSelectField<Collection>
@@ -72,7 +56,12 @@ export function CollectionSelectField({
         name="collection"
         customName="collection"
         readOnlyLink="/collection/collection/view?id="
-        filter={filter}
+        filter={(searchValue: string) =>
+          SimpleSearchFilterBuilder.create<Collection>()
+            .searchFilter("name", searchValue)
+            .when(!isAdmin, (builder) => builder.whereIn("group", groupNames))
+            .build()
+        }
         model={resourcePath as any}
         className={"collection-field " + (className || "")}
         optionLabel={(coll) =>

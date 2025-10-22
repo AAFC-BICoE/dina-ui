@@ -29,7 +29,8 @@ export default function AssemblageDetailsPage() {
         </DinaForm>
       )}
       query={(id) => ({
-        path: `collection-api/assemblage/${id}?include=attachment`
+        path: `collection-api/assemblage/${id}`,
+        include: "attachment"
       })}
       entityLink="/collection/assemblage"
       type="assemblage"

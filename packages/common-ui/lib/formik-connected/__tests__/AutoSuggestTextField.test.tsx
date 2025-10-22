@@ -1,9 +1,10 @@
 import { KitsuResource } from "kitsu";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, SimpleSearchFilterBuilder } from "common-ui";
 import { AutoSuggestTextField } from "../AutoSuggestTextField";
 import { DinaForm } from "../DinaForm";
 import { act, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { simpleSearchFilterToFiql } from "../../filter-builder/fiql";
 
 interface Person extends KitsuResource {
   name: string;
@@ -136,9 +137,11 @@ describe("AutoSuggestTextField", () => {
           jsonApiBackend={{
             query: (searchValue) => ({
               path: "agent-api/person",
-              filter: {
-                rsql: `name==*${searchValue}*`
-              }
+              fiql: simpleSearchFilterToFiql(
+                SimpleSearchFilterBuilder.create<Person>()
+                  .searchFilter("name", searchValue)
+                  .build()
+              )
             }),
             option: (person) => person?.name
           }}
@@ -181,9 +184,11 @@ describe("AutoSuggestTextField", () => {
           jsonApiBackend={{
             query: (searchValue) => ({
               path: "agent-api/person",
-              filter: {
-                rsql: `name==*${searchValue}*`
-              }
+              fiql: simpleSearchFilterToFiql(
+                SimpleSearchFilterBuilder.create<Person>()
+                  .searchFilter("name", searchValue)
+                  .build()
+              )
             }),
             option: (person) => person?.name
           }}
@@ -204,7 +209,7 @@ describe("AutoSuggestTextField", () => {
 
     await waitFor(() => {
       expect(mockGet).lastCalledWith("agent-api/person", {
-        filter: { rsql: "name==*p*" },
+        fiql: "name==*p*",
         sort: "-createdOn"
       });
     });
@@ -381,9 +386,11 @@ describe("AutoSuggestTextField", () => {
           jsonApiBackend={{
             query: (searchValue) => ({
               path: "agent-api/person",
-              filter: {
-                rsql: `name==*${searchValue}*`
-              }
+              fiql: simpleSearchFilterToFiql(
+                SimpleSearchFilterBuilder.create<Person>()
+                  .searchFilter("name", searchValue)
+                  .build()
+              )
             }),
             option: (person) => person?.name
           }}
@@ -404,7 +411,7 @@ describe("AutoSuggestTextField", () => {
 
     await waitFor(() => {
       expect(mockGetAll).lastCalledWith("agent-api/person", {
-        filter: { rsql: "name==*p*" },
+        fiql: "name==*p*",
         sort: "-createdOn"
       });
     });
@@ -421,7 +428,7 @@ describe("AutoSuggestTextField", () => {
       [
         "agent-api/person",
         {
-          filter: { rsql: "name==*p*" },
+          fiql: "name==*p*",
           sort: "-createdOn"
         }
       ]
@@ -442,9 +449,11 @@ describe("AutoSuggestTextField", () => {
             jsonApiBackend={{
               query: (searchValue) => ({
                 path: "agent-api/person",
-                filter: {
-                  rsql: `name==*${searchValue}*`
-                }
+                fiql: simpleSearchFilterToFiql(
+                  SimpleSearchFilterBuilder.create<Person>()
+                    .searchFilter("name", searchValue)
+                    .build()
+                )
               }),
               option: (person) => person?.name
             }}
@@ -510,9 +519,11 @@ describe("AutoSuggestTextField", () => {
             jsonApiBackend={{
               query: (searchValue) => ({
                 path: "agent-api/person",
-                filter: {
-                  rsql: `name==*${searchValue}*`
-                }
+                fiql: simpleSearchFilterToFiql(
+                  SimpleSearchFilterBuilder.create<Person>()
+                    .searchFilter("name", searchValue)
+                    .build()
+                )
               }),
               option: (person) => person?.name
             }}
@@ -567,9 +578,11 @@ describe("AutoSuggestTextField", () => {
             jsonApiBackend={{
               query: (searchValue) => ({
                 path: "agent-api/person",
-                filter: {
-                  rsql: `name==*${searchValue}*`
-                }
+                fiql: simpleSearchFilterToFiql(
+                  SimpleSearchFilterBuilder.create<Person>()
+                    .searchFilter("name", searchValue)
+                    .build()
+                )
               }),
               option: (person) => person?.name
             }}
@@ -595,9 +608,11 @@ describe("AutoSuggestTextField", () => {
             jsonApiBackend={{
               query: (searchValue) => ({
                 path: "agent-api/person",
-                filter: {
-                  rsql: `name==*${searchValue}*`
-                }
+                fiql: simpleSearchFilterToFiql(
+                  SimpleSearchFilterBuilder.create<Person>()
+                    .searchFilter("name", searchValue)
+                    .build()
+                )
               }),
               option: (person) => person?.name
             }}

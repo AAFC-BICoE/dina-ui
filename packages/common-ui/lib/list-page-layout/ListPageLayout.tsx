@@ -17,7 +17,7 @@ import {
   QueryTableProps,
   useGroupedCheckBoxes
 } from "..";
-import { fiql } from "../filter-builder/fiql";
+import { fiql, simpleSearchFilterToFiql } from "../filter-builder/fiql";
 import { rsql } from "../filter-builder/rsql";
 import {
   BulkDeleteButton,
@@ -129,18 +129,18 @@ export function ListPageLayout<TData extends KitsuResource>({
       setImmediate(() => setFilterForm({}));
     }
 
-    const additionalFilters = (
+    const additionalFilters =
       typeof additionalFiltersProp === "function"
         ? additionalFiltersProp(filterForm)
-        : additionalFiltersProp
-    ) as string;
+        : additionalFiltersProp;
+    const additionalFiltersFiql = simpleSearchFilterToFiql(additionalFilters);
 
-    if (filterBuilderFiql && additionalFilters) {
-      filterParam = `(${filterBuilderFiql});(${additionalFilters})`;
+    if (filterBuilderFiql && additionalFiltersFiql) {
+      filterParam = `(${filterBuilderFiql});(${additionalFiltersFiql})`;
     } else if (filterBuilderFiql) {
       filterParam = filterBuilderFiql;
-    } else if (additionalFilters) {
-      filterParam = additionalFilters as string;
+    } else if (additionalFiltersFiql) {
+      filterParam = additionalFiltersFiql;
     }
   } else {
     let filterBuilder = "";

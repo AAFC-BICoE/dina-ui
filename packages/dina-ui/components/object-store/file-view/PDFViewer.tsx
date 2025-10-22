@@ -3,7 +3,7 @@ import { Document, Page } from "react-pdf";
 import { Button, ButtonGroup } from "react-bootstrap";
 import { LoadingSpinner } from "common-ui";
 import RcTooltip from "rc-tooltip";
-import "pdfjs-dist/build/pdf.worker.min.mjs";
+import "pdfjs-dist/legacy/build/pdf.worker.min.mjs";
 
 interface PDFViewerProps {
   objectUrl: string;

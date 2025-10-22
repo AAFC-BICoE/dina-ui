@@ -4,6 +4,7 @@ import {
   DoOperationsError,
   LoadingSpinner,
   QueryPage,
+  SimpleSearchFilterBuilder,
   filterBy,
   useAccount,
   useApiClient
@@ -377,9 +378,9 @@ export function MolecularAnalysisSampleSelectionStep({
           const materialSampleQuery = await apiClient.get<MaterialSample[]>(
             "collection-api/material-sample",
             {
-              filter: {
-                rsql: `materialSampleName=="${extractedMaterialSampleName}"`
-              },
+              filter: SimpleSearchFilterBuilder.create<MaterialSample>()
+                .where("materialSampleName", "EQ", extractedMaterialSampleName)
+                .build(),
               include: "organism"
             }
           );

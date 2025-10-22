@@ -60,21 +60,22 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       path: `collection-api/material-sample/${id}`,
       include: [
+        "attachment",
         "collection",
         "collectingEvent",
-        "attachment",
         "preparationProtocol",
         "preparationType",
         "preparationMethod",
         "preparedBy",
-        "hierarchy",
         "organism",
-        "materialSampleChildren",
         "parentMaterialSample",
         "projects",
         "assemblages",
         "storageUnitUsage"
-      ].join(",")
+      ].join(","),
+      optfields: {
+        "material-sample": ["hierarchy", "materialSampleChildren"].join(",")
+      }
     },
     {
       disabled: !id,
@@ -105,7 +106,7 @@ export function useMaterialSampleQuery(id?: string | null) {
           const storageUnit = await apiClient.get<StorageUnitUsage>(
             `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
             {
-              include: "storageUnit,storageUnit.parentStorageUnit"
+              include: "storageUnit"
             }
           );
 
@@ -676,6 +677,9 @@ export function useMaterialSampleSave({
                   .join("|");
               }
             }
+
+            // Delete the scientificNameInput field which is only used for the editor.
+            delete (dtm as any).scientificNameInput;
           });
         }
       });
@@ -843,6 +847,18 @@ export function useMaterialSampleSave({
     } = {
       ...msDiffWithOrganisms,
 
+      // Ensure assignedTo in scheduledActions is reduced to an object with just id and type.
+      ...(msDiffWithOrganisms?.scheduledActions && {
+        scheduledActions: msDiffWithOrganisms.scheduledActions.map(
+          (action) => ({
+            ...action,
+            ...(action.assignedTo && {
+              assignedTo: _.pick(action.assignedTo, ["id", "type"])
+            })
+          })
+        ) as any
+      }),
+
       // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
       // Explicitly declare these fields as relationships here before saving:
       // One-to-many relationships go in the 'relationships' object:
@@ -885,6 +901,11 @@ export function useMaterialSampleSave({
         ...(msDiffWithOrganisms.preparationType?.id && {
           preparationType: {
             data: _.pick(msDiffWithOrganisms.preparationType, "id", "type")
+          }
+        }),
+        ...(msDiffWithOrganisms.preparationMethod?.id && {
+          preparationMethod: {
+            data: _.pick(msDiffWithOrganisms.preparationMethod, "id", "type")
           }
         }),
         ...(msDiffWithOrganisms.collection?.id && {

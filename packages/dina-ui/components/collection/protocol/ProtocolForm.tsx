@@ -94,7 +94,7 @@ export function ProtocolForm({ fetchedProtocol, onSaved }: ProtocolFormProps) {
 }
 
 export function ProtocolFormLayout() {
-  const { readOnly, initialValues } = useDinaFormContext();
+  const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   return (
@@ -124,10 +124,9 @@ export function ProtocolFormLayout() {
       <AttachmentsField
         name="attachments"
         title={<DinaMessage id="protocolAttachments" />}
-        id="protocol-attachments-section"
+        formId="protocol-attachments-section"
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
-        attachmentPath={`collection-api/protocol/${initialValues?.id}/attachments`}
         hideAddAttchmentBtn={true}
       />
       <div className="row">

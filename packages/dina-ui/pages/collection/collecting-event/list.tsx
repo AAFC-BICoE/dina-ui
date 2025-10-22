@@ -3,6 +3,7 @@ import {
   CreateButton,
   dateCell,
   ListPageLayout,
+  SimpleSearchFilterBuilder,
   stringArrayCell
 } from "common-ui";
 import Link from "next/link";
@@ -19,6 +20,7 @@ export default function CollectingEventListPage() {
     "dwcFieldNumber",
     "dwcRecordNumber"
   ];
+
   const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
     {
       cell: ({
@@ -56,10 +58,11 @@ export default function CollectingEventListPage() {
     >
       <Head title={formatMessage("collectingEventListTitle")} />
       <ListPageLayout
-        additionalFilters={(filterForm) => ({
-          // Apply group filter:
-          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-        })}
+        additionalFilters={(filterForm) =>
+          SimpleSearchFilterBuilder.create<CollectingEvent>()
+            .whereProvided("group", "EQ", filterForm.group)
+            .build()
+        }
         filterAttributes={COLLECTING_EVENT_FILTER_ATTRIBUTES}
         id="collecting-event-list"
         queryTableProps={{
@@ -77,6 +80,7 @@ export default function CollectingEventListPage() {
             </div>
           </div>
         )}
+        useFiql={true}
       />
     </PageLayout>
   );
