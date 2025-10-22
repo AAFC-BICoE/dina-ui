@@ -68,14 +68,13 @@ export function useMaterialSampleQuery(id?: string | null) {
         "preparationMethod",
         "preparedBy",
         "organism",
-        "materialSampleChildren",
         "parentMaterialSample",
         "projects",
         "assemblages",
         "storageUnitUsage"
       ].join(","),
       optfields: {
-        "material-sample": "hierarchy"
+        "material-sample": ["hierarchy", "materialSampleChildren"].join(",")
       }
     },
     {
