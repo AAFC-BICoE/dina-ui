@@ -489,7 +489,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_sub_package_directories">9.2. Sub-package directories</a></li>
 </ul>
 </li>
-<li><a href="#_building_the_app_docker_images">10. Building the app Docker images</a></li>
+<li><a href="#_building_the_app_docker_images">10. Building the app Docker images</a>
+<ul class="sectlevel2">
+<li><a href="#_environment_variables">10.1. Environment variables</a></li>
+</ul>
+</li>
 <li><a href="#_react_components">11. React Components</a>
 <ul class="sectlevel2">
 <li><a href="#_forms">11.1. Forms</a></li>
@@ -1057,42 +1061,202 @@ into the "coverage" directory.</p>
 <h2 id="_building_the_app_docker_images">10. Building the app Docker images</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>From the top-level directory, run the yarn build and then the docker build:</p>
+<p>From the top-level directory, run the following commands to build the dina-ui Docker image:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">yarn
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Install dependencies
+yarn
+
+# Build the nextJS static pages and application.
 yarn workspace dina-ui build
+
+# Build the Docker image
 docker build -t dina-ui:dev .</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Docker environment variables required to run:</p>
+<div class="sect2">
+<h3 id="_environment_variables">10.1. Environment variables</h3>
+<div class="sect3">
+<h4 id="_required_addresses_for_back_end_apis">10.1.1. Required Addresses for Back-end APIs</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>OBJECTSTORE_API_ADDRESS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Object storage back-end API endpoint</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>objectstore-api:8080</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>USER_API_ADDRESS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User management back-end API endpoint</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user-api:8080</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>COLLECTION_API_ADDRESS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Collection management back-end API endpoint</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>collection-api:8080</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AGENT_API_ADDRESS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Agent management back-end API endpoint</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>agent-api:8080</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SEQDB_API_ADDRESS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sequence database back-end API endpoint</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>seqdb-api:8080</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SEARCH_API_ADDRESS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Search service endpoint</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>search-ws:8085</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LOAN_TRANSACTION_API_ADDRESS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Loan transaction back-end API endpoint</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>loan-transaction-api:8080</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>REPORT_LABEL_API_ADDRESS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Report and label export API endpoint</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dina-export-api:8080</code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
+<div class="sect3">
+<h4 id="_authentication_variables">10.1.2. Authentication Variables</h4>
 <div class="paragraph">
-<p>dina-ui:</p>
+<p>Configure these variables to enable Keycloak authentication:</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>OBJECTSTORE_API_ADDRESS: The back-end API URL and port. e.g. objectstore-api:8080</p>
-</li>
-<li>
-<p>USER_API_ADDRESS: The back-end API URL and port. e.g. user-api:8080</p>
-</li>
-<li>
-<p>COLLECTION_API_ADDRESS: The back-end API URL and port. e.g. collection-api:8080</p>
-</li>
-<li>
-<p>AGENT_API_ADDRESS: The back-end API URL and port. e.g. agent-api:8080</p>
-</li>
-<li>
-<p>SEQDB_API_ADDRESS: The back-end API URL and port. e.g. seqdb-api:8080</p>
-</li>
-<li>
-<p>DISABLE_BROWSER_CHECK: (optional) Whether to disable the browser check for blocking Internet Explorer. e.g. true</p>
-</li>
-</ul>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KEYCLOAK_ENABLED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable/disable Keycloak authentication</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KEYCLOAK_CLIENTID</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak client identifier</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dina-public</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KEYCLOAK_REALM</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak realm name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dina</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KEYCLOAK_PUBLIC_URL</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External-facing Keycloak URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://keycloak.example.com/auth" class="bare">https://keycloak.example.com/auth</a></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_instance_configuration">10.1.3. Instance Configuration</h4>
+<div class="paragraph">
+<p>Customize your DINA instance with these variables:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>INSTANCE_MODE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Deployment mode for the instance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>prod</code>, <code>dev</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>INSTANCE_NAME</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Display name shown in the UI header</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>My DINA Instance</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SUPPORTED_LANGUAGES_ISO</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma-separated language codes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>en,fr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DISABLE_BROWSER_CHECK</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Skip IE browser blocking check</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_external_services_optional">10.1.4. External Services (Optional)</h4>
+<div class="paragraph">
+<p>Configure external data sources and services:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SUPPORTED_GEOINFORMATION_SYSTEMS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma-separated coordinate systems</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>EPSG:4326,EPSG:3857</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SCIENTIFIC_NAMES_SEARCH_ENDPOINT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scientific name lookup service URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://api.gbif.org/v1/species/search" class="bare">https://api.gbif.org/v1/species/search</a></code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SCIENTIFIC_NAMES_DATASETS_ENDPOINT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scientific name datasets service URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://api.gbif.org/v1/datasets" class="bare">https://api.gbif.org/v1/datasets</a></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -1263,9 +1427,11 @@ field_metadataName_tooltip: "This will be the message that appears for the name 
   jsonApiBackend={{
     query: searchValue =&gt; ({
       path: "agent-api/person",
-      filter: {
-        rsql: `name==*${searchValue}*`
-      }
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create&lt;Organism&gt;()
+          .searchFilter("name", searchValue)
+          .build()
+      )
     }),
     option: person =&gt; person?.name
   }}
@@ -1353,9 +1519,11 @@ type it will not be parsed.</p>
   jsonApiBackend={{
     query: searchValue =&gt; ({
       path: "agent-api/person",
-      filter: {
-        rsql: `name==*${searchValue}*`
-      }
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create&lt;Organism&gt;()
+          .searchFilter("name", searchValue)
+          .build()
+      )
     }),
     option: person =&gt; person?.name
   }}
@@ -1453,9 +1621,11 @@ type it will not be parsed.</p>
   jsonApiBackend={{
     query: searchValue =&gt; ({
       path: "agent-api/person",
-      filter: {
-        rsql: `name==*${searchValue}*`
-      }
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create&lt;Organism&gt;()
+          .searchFilter("name", searchValue)
+          .build()
+      )
     }),
     option: person =&gt; person?.name
   }}
@@ -1485,9 +1655,11 @@ type it will not be parsed.</p>
   jsonApiBackend={{
     query: searchValue =&gt; ({
       path: "agent-api/person",
-      filter: {
-        rsql: `name==*${searchValue}*`
-      }
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create&lt;Organism&gt;()
+          .searchFilter("name", searchValue)
+          .build()
+      )
     }),
     option: person =&gt; person?.name
   }}
@@ -2172,7 +2344,7 @@ CSVFILE=messages.csv yarn import-intl-csv</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-10 14:33:26 UTC
+Last updated 2025-10-22 18:10:59 UTC
 </div>
 </div>
 </body>
