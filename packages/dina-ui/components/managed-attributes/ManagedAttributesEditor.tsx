@@ -197,15 +197,31 @@ export interface ManagedAttributeMultiSelectProps {
   loading?: boolean;
 }
 
-export function DynamicResourceSelect<TData extends PersistedResource<TData>>(
-  props
-) {
-  const { onChange, onDataLoaded, value, ...rest } = props;
+export function DynamicResourceSelect<TData extends PersistedResource<TData>>(props: {
+  model: string;
+  filter?: (input: string) => any;
+  optionLabel?: (item: PersistedResource<TData>) => string | React.ReactElement | null;
+  value?: PersistedResource<TData> | PersistedResource<TData>[] | null;
+  isMulti?: boolean;
+  isLoading?: boolean;
+  onChange?: (newValue: any, actionMeta?: any) => void;
+  onDataLoaded?: (data?: PersistedResource<TData>[]) => void;
+  selectProps?: any;
+  filterList?: (item?: PersistedResource<TData>) => boolean;
+  pageSize?: number;
+}) {
+  const {
+    onChange,
+    onDataLoaded,
+    value,
+    filter: filterProp,
+    optionLabel: optionLabelProp,
+    ...rest
+  } = props;
 
   const [fetchedRecords, setFetchedRecords] = useState<
     PersistedResource<TData>[]
   >([]);
-  const [inputValue, setInputValue] = useState("");
 
   // Stable onInputChange (no dependency on changing object literals)
   const selectPropsRef = useRef(rest.selectProps);
@@ -215,23 +231,21 @@ export function DynamicResourceSelect<TData extends PersistedResource<TData>>(
 
   const handleInputChange = useCallback((newVal: string, { action }: any) => {
     if (action !== "set-value") {
-      setInputValue(newVal);
+      // Just pass through to the original onInputChange if it exists
       selectPropsRef.current?.onInputChange?.(newVal, { action });
     }
   }, []);
 
-  const handleChange = (newValue, actionMeta) => {
+  const handleChange = (newValue: any, actionMeta: any) => {
     onChange?.(newValue, actionMeta);
   };
 
   const handleDataLoaded = useCallback(
     (data?: PersistedResource<TData>[]) => {
       if (data?.length) {
-        setFetchedRecords((prev) => {
-          const prevIds = new Set(prev.map((r) => r.id));
-          const newOnes = data.filter((r) => r.id && !prevIds.has(r.id));
-          return newOnes.length ? [...prev, ...newOnes] : prev;
-        });
+        // Clear previous records and use only the new search results
+        // This ensures fresh results for each search
+        setFetchedRecords(data);
       }
       onDataLoaded?.(data);
     },
@@ -240,7 +254,7 @@ export function DynamicResourceSelect<TData extends PersistedResource<TData>>(
 
   // ---- filtering, memoized ----
   const selectedIds = useMemo(
-    () => _.castArray(value).map((v) => v?.id),
+    () => _.castArray(value ?? []).map((v) => v?.id),
     [value]
   );
 
@@ -252,18 +266,11 @@ export function DynamicResourceSelect<TData extends PersistedResource<TData>>(
     [fetchedRecords, selectedIds]
   );
 
-  const searchFilteredRecords = useMemo(
-    () =>
-      unselectedRecords.filter((item) => {
-        const name = (item as Record<string, any>).name;
-        return name?.toLowerCase().includes(inputValue.toLowerCase());
-      }),
-    [unselectedRecords, inputValue]
-  );
-
+  // Limit to 6 records AFTER filtering out selected items
+  // This ensures up to 6 available options are always shown
   const limitedRecords = useMemo(
-    () => searchFilteredRecords.slice(0, 6),
-    [searchFilteredRecords]
+    () => unselectedRecords.slice(0, 6),
+    [unselectedRecords]
   );
 
   const filterList = useCallback(
@@ -272,15 +279,33 @@ export function DynamicResourceSelect<TData extends PersistedResource<TData>>(
     [limitedRecords]
   );
 
+  // Ensure ResourceSelect receives a non-optional filter function:
+  const effectiveFilter: (input: string) => any =
+    filterProp ??
+    ((_input) => SimpleSearchFilterBuilder.create<any>().build());
+
+  // Ensure ResourceSelect receives a non-optional optionLabel:
+  const defaultOptionLabel = useCallback(
+    (r: PersistedResource<TData>) =>
+      (r as any)?.name ?? (r as any)?.id ?? "",
+    []
+  );
+  
+  const effectiveOptionLabel: 
+    ((r: PersistedResource<TData>) => string | React.ReactElement | null) | undefined 
+    = optionLabelProp ?? defaultOptionLabel;
+
   return (
     <ResourceSelect
       {...rest}
       onChange={handleChange}
       onDataLoaded={handleDataLoaded}
-      pageSize={50}
-      value={value}
-      filter={props.filter}
+      pageSize={20}  // Fetch more records to account for filtering
+      // normalize null -> undefined (ResourceSelect doesn't accept null)
+      value={value ?? undefined}
+      filter={effectiveFilter}
       filterList={filterList}
+      optionLabel={effectiveOptionLabel}
       selectProps={{
         ...rest.selectProps,
         isSearchable: true,
@@ -337,9 +362,9 @@ export function ManagedAttributeMultiSelect({
         | PersistedResource<ManagedAttribute>
         | PersistedResource<ManagedAttribute>[]
     ) => {
-      const newAttributes = _.castArray(newValues);
-      const newKeys = newAttributes.map((it) => _.get(it, "key"));
-      onChange(newKeys);
+      const newAttributes = _.castArray(newValues); // Ensure it's always an array
+      const newKeys = newAttributes.map((it) => _.get(it, "key")); // Extract just the keys
+      onChange(newKeys); // Call the external onChange with the new keys
     },
     [onChange]
   );
