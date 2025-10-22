@@ -1,5 +1,5 @@
 import { mountWithAppContext } from "common-ui";
-import { within } from "@testing-library/react";
+import { waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ProjectDetailsPage from "../../../../pages/collection/project/view";
 import { waitForLoadingToDisappear } from "common-ui";
@@ -188,22 +188,22 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
         ]
       };
 
-    case "collection-api/project/01990bc9-5b9b-7720-8ffa-a86f54d0b4df/attachment":
-      return {
-        data: [
-          {
-            id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
-            type: "metadata"
-          }
-        ]
-      };
+    // Network request required to see if the objectstore is available.
     case "objectstore-api/metadata":
+      return {
+        data: [],
+        meta: {
+          totalResourceCount: 0,
+          moduleVersion: "1.28"
+        }
+      };
+
+    case "objectstore-api/metadata/019915ce-63e7-7e10-b86a-3dd1d9f2db49?include=derivatives":
       return {
         data: [
           {
             id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
             type: "metadata",
-
             createdBy: "dina-admin",
             createdOn: "2025-09-04T17:37:51.594164Z",
             bucket: "aafc",
@@ -236,7 +236,8 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
           moduleVersion: "1.28"
         }
       };
-    case "collection-api/project/01990bc9-5b9b-7720-8ffa-a86f54d0b4df?include=attachment":
+
+    case "collection-api/project/01990bc9-5b9b-7720-8ffa-a86f54d0b4df":
       return {
         data: {
           id: "01990bc9-5b9b-7720-8ffa-a86f54d0b4df",
@@ -249,6 +250,12 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
           endDate: "2025-09-04",
           status: "ongoing",
           contributors: [],
+          attachment: [
+            {
+              id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
+              type: "metadata"
+            }
+          ],
           multilingualDescription: {
             descriptions: [
               {
@@ -262,7 +269,6 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
             ]
           },
           extensionValues: {},
-
           relationships: {
             attachment: {
               data: [
@@ -274,12 +280,6 @@ const mockKitsuGet = jest.fn<any, any>(async (path) => {
             }
           }
         },
-        included: [
-          {
-            id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
-            type: "metadata"
-          }
-        ],
         meta: {
           totalResourceCount: 1,
           external: [
@@ -465,7 +465,6 @@ const mockBulkGet = jest.fn<any, any>(async () => {
     {
       id: "019915ce-63e7-7e10-b86a-3dd1d9f2db49",
       type: "metadata",
-
       createdBy: "dina-admin",
       createdOn: "2025-09-04T17:37:51.594164Z",
       bucket: "aafc",
@@ -485,6 +484,7 @@ const mockBulkGet = jest.fn<any, any>(async () => {
       xmpRightsUsageTerms: "Government of Canada Usage Term",
       orientation: null,
       originalFilename: "test mat sample export.csv",
+      filename: "test mat sample export.csv",
       acHashFunction: "SHA-1",
       acHashValue: "7969b23a2731b219a15ccc4fa3e6db2b0f8256e7",
       publiclyReleasable: false,
@@ -521,7 +521,6 @@ describe("Project View Page.", () => {
     const wrapper = mountWithAppContext(<ProjectDetailsPage />, {
       apiContext
     });
-
     await waitForLoadingToDisappear();
 
     const heading = wrapper.getByRole("heading", {
@@ -550,23 +549,23 @@ describe("Project View Page.", () => {
       apiContext
     });
 
-    await waitForLoadingToDisappear();
-
-    const attachmentLink = wrapper.getByRole("link", {
-      name: "test mat sample export.csv"
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("link", {
+          name: "test mat sample export.csv"
+        })
+      ).toBeInTheDocument();
     });
-    expect(attachmentLink).toBeInTheDocument();
 
     // Attachment filename with link to object view page:
-    expect(attachmentLink).toHaveAttribute(
+    expect(
+      wrapper.getByRole("link", {
+        name: "test mat sample export.csv"
+      })
+    ).toHaveAttribute(
       "href",
       "/object-store/object/view?id=019915ce-63e7-7e10-b86a-3dd1d9f2db49"
     );
-
-    // Attachment image (there is no image so it shows the placeholder icon)
-    expect(
-      wrapper.getByAltText("project attachment caption")
-    ).toBeInTheDocument();
 
     // Attachment caption
     expect(wrapper.getByText("project attachment caption")).toBeInTheDocument();

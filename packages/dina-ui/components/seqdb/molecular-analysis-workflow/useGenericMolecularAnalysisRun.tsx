@@ -265,7 +265,12 @@ export function useGenericMolecularAnalysisRun({
           const storageUnitUsageQuery = await bulkGet<StorageUnitUsage>(
             sequencingRunItem
               .filter((item) => item?.storageUnitUsageId)
-              .map((item) => "/storage-unit-usage/" + item?.storageUnitUsageId),
+              .map(
+                (item) =>
+                  "/storage-unit-usage/" +
+                  item?.storageUnitUsageId +
+                  "?optfields[storage-unit-usage]=cellNumber"
+              ),
             { apiBaseUrl: "/collection-api" }
           );
 

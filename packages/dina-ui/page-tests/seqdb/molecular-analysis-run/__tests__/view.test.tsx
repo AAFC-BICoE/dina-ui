@@ -164,11 +164,17 @@ const mockBulkGet = jest.fn(async (paths) => {
         return TEST_MATERIAL_SAMPLE_SUMMARY[2];
 
       // Storage Unit Usages
-      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_1.id:
+      case "/storage-unit-usage/" +
+        STORAGE_UNIT_USAGE_1.id +
+        "?optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_1;
-      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_2.id:
+      case "/storage-unit-usage/" +
+        STORAGE_UNIT_USAGE_2.id +
+        "?optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_2;
-      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_3.id:
+      case "/storage-unit-usage/" +
+        STORAGE_UNIT_USAGE_3.id +
+        "?optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_3;
 
       // PCR Batch Items

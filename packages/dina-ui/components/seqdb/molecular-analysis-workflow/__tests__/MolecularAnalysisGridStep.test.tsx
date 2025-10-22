@@ -53,6 +53,15 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           STORAGE_UNIT_USAGE_3.storageUnit
         ]
       };
+    // Add these cases to handle fetching storage units with their types
+    case "/collection-api/storage-unit/" +
+      STORAGE_UNIT_USAGE_1?.storageUnit?.id:
+      return {
+        data: {
+          ...STORAGE_UNIT_USAGE_1.storageUnit,
+          storageUnitType: STORAGE_UNIT_USAGE_1.storageUnit?.storageUnitType
+        }
+      };
   }
 });
 
@@ -62,19 +71,19 @@ const mockBulkGet = jest.fn(async (paths) => {
       // Storage Unit Usage Requests
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_1.id +
-        "?include=storageUnit,storageUnit.storageUnitType":
+        "?include=storageUnit":
         return STORAGE_UNIT_USAGE_1;
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_2.id +
-        "?include=storageUnit,storageUnit.storageUnitType":
+        "?include=storageUnit":
         return STORAGE_UNIT_USAGE_2;
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_3.id +
-        "?include=storageUnit,storageUnit.storageUnitType":
+        "?include=storageUnit":
         return STORAGE_UNIT_USAGE_3;
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_4.id +
-        "?include=storageUnit,storageUnit.storageUnitType":
+        "?include=storageUnit":
         return STORAGE_UNIT_USAGE_4;
 
       // Material Sample Summary
@@ -148,10 +157,12 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
 
     // Should see the storage unit type selected.
-    expect(wrapper.getByText(/storage unit type name/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(wrapper.getByText(/storage unit type name/i)).toBeInTheDocument()
+    );
 
     // Should see the storage unit selected.
-    expect(wrapper.getByText(/storage unit type name/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/storage unit name/i)).toBeInTheDocument();
 
     // Everything should be in the grid based on the mocked data:
     await waitFor(() => {

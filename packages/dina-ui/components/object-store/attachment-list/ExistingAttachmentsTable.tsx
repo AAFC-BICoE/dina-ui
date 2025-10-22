@@ -1,11 +1,12 @@
+import { ColumnDef } from "@tanstack/react-table";
 import {
-  ColumnDefinition,
   dateCell,
   DinaForm,
   FieldHeader,
   FormikButton,
-  QueryTable,
+  ReactTable,
   Tooltip,
+  useBulkGet,
   useGroupedCheckBoxes
 } from "common-ui";
 import { FormikContextType } from "formik";
@@ -14,9 +15,12 @@ import Link from "next/link";
 import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { useEffect } from "react";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
 
 export interface ExistingAttachmentsTableProps {
-  attachmentPath: string;
+  metadatas: ResourceIdentifierObject[];
   onDetachMetadataIds?: (metadataIds: string[]) => Promise<void>;
   onMetadatasEdited?: () => void | Promise<void>;
   detachTotalSelected?: boolean;
@@ -28,7 +32,7 @@ export interface AttachmentsTableFormValues {
 
 /** Table showing existing attachment */
 export function ExistingAttachmentsTable({
-  attachmentPath,
+  metadatas,
   onDetachMetadataIds,
   onMetadatasEdited,
   detachTotalSelected
@@ -42,11 +46,16 @@ export function ExistingAttachmentsTable({
     fieldName: "selectedMetadatas",
     detachTotalSelected
   });
+
   const { formatMessage } = useDinaIntl();
 
   const { openMetadataEditorModal } = useBulkMetadataEditModal();
 
-  const ATTACHMENT_TABLE_COLUMNS: ColumnDefinition<any>[] = [
+  useEffect(() => {
+    setAvailableMetadatas(metadatas.map((m) => ({ id: m.id, type: m.type })));
+  }, [metadatas, setAvailableMetadatas]);
+
+  const ATTACHMENT_TABLE_COLUMNS: ColumnDef<Metadata>[] = [
     {
       id: "select",
       cell: ({ row: { original: metadata } }) => (
@@ -56,13 +65,13 @@ export function ExistingAttachmentsTable({
       enableSorting: false
     },
     ThumbnailCell({
-      bucketField: "metadata.bucket",
+      bucketField: "bucket",
       isJsonApiQuery: true
     }),
     {
       cell: ({
         row: {
-          original: { id, metadata }
+          original: { id, ...metadata }
         }
       }) => {
         // When this Metadata has been deleted, show a "deleted" message in this cell:
@@ -75,35 +84,35 @@ export function ExistingAttachmentsTable({
           );
         }
 
-        return metadata?.originalFilename ? (
+        return metadata?.filename ? (
           <Link
             href={`/object-store/object/view?id=${id}`}
             passHref={true}
             legacyBehavior
           >
-            {metadata?.originalFilename}
+            {metadata?.filename}
           </Link>
         ) : null;
       },
-      accessorKey: "metadata.originalFilename",
-      header: () => <FieldHeader name="originalFilename" />
+      accessorKey: "filename",
+      header: () => <FieldHeader name="filename" />
     },
     {
-      accessorKey: "metadata.acCaption",
+      accessorKey: "acCaption",
       header: () => <FieldHeader name="acCaption" />
     },
     {
       id: "metataDate",
-      ...dateCell("metadata.xmpMetadataDate"),
+      ...dateCell("xmpMetadataDate"),
       header: () => <FieldHeader name="xmpMetadataDate" />
     },
     {
       cell: ({
         row: {
-          original: { metadata }
+          original: { ...metadata }
         }
       }) => <>{metadata?.acTags?.join(", ")}</>,
-      accessorKey: "metadata.acTags",
+      accessorKey: "acTags",
       header: () => <FieldHeader name="acTags" />
     }
   ];
@@ -143,6 +152,11 @@ export function ExistingAttachmentsTable({
     await onDetachMetadataIds?.(metadataIds);
   }
 
+  const { data: metadataObjects, loading } = useBulkGet<Metadata>({
+    ids: metadatas.map((m) => m.id),
+    listPath: "objectstore-api/metadata?include=derivatives"
+  });
+
   return (
     <DinaForm<AttachmentsTableFormValues>
       initialValues={{ selectedMetadatas: {} }}
@@ -170,30 +184,12 @@ export function ExistingAttachmentsTable({
           )}
         </div>
       </div>
-      <QueryTable
+      <ReactTable
         columns={ATTACHMENT_TABLE_COLUMNS}
-        joinSpecs={[
-          {
-            apiBaseUrl: "/objectstore-api",
-            idField: "id",
-            joinField: "metadata",
-            path: (metadataRef) =>
-              `metadata/${metadataRef.id}?include=acMetadataCreator,derivatives`
-          },
-          {
-            apiBaseUrl: "/agent-api",
-            idField: "metadata.acMetadataCreator.id",
-            joinField: "metadata.acMetadataCreator",
-            path: (metadataRef) =>
-              `person/${metadataRef.metadata?.acMetadataCreator?.id}`
-          }
-        ]}
-        omitPaging={true}
-        path={attachmentPath}
-        reactTableProps={{ enableSorting: false }}
-        defaultPageSize={10000}
-        onSuccess={(res) => setAvailableMetadatas(res.data)}
-        ariaLabel="Existing attachments"
+        data={metadataObjects ?? ([] as any)}
+        enableSorting={false}
+        pageSize={10000}
+        loading={loading}
       />
     </DinaForm>
   );

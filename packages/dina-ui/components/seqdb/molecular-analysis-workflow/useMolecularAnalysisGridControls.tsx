@@ -37,7 +37,7 @@ export function useMolecularAnalysisGridControls({
   molecularAnalysis,
   editMode
 }: ContainerGridProps) {
-  const { save, bulkGet } = useContext(ApiClientContext);
+  const { save, bulkGet, apiClient } = useContext(ApiClientContext);
 
   const { compareByStringAndNumber } = useStringComparator();
 
@@ -131,7 +131,7 @@ export function useMolecularAnalysisGridControls({
                 (item) =>
                   "/storage-unit-usage/" +
                   item.storageUnitUsage?.id +
-                  "?include=storageUnit,storageUnit.storageUnitType"
+                  "?include=storageUnit"
               ),
             { apiBaseUrl: "/collection-api" }
           );
@@ -156,7 +156,14 @@ export function useMolecularAnalysisGridControls({
             setStorageUnit(storageUnitToLoad);
             setLoadedStorageUnit(storageUnitToLoad);
             setInitialStorageUnit(storageUnitToLoad);
-            setStorageUnitType(storageUnitToLoad?.storageUnitType);
+
+            // Now we need to load the storage unit type.
+            const storageUnitResponse = await apiClient.get<StorageUnit>(
+              `/collection-api/storage-unit/${storageUnitToLoad?.id}`,
+              { include: "storageUnitType" }
+            );
+
+            setStorageUnitType(storageUnitResponse.data.storageUnitType as any);
           }
 
           const molecularAnalysisItemsWithStorageUnitUsage =

@@ -21,7 +21,7 @@ const mockOnGenerate = jest.fn();
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
   paths.map((path) => {
     switch (path) {
-      case `material-sample/${NO_CHILDREN_MATERIAL_SAMPLE_UUID}?include=materialSampleChildren,collection,parentMaterialSample`:
+      case `material-sample/${NO_CHILDREN_MATERIAL_SAMPLE_UUID}?include=collection,parentMaterialSample&optfields[material-sample]=materialSampleChildren`:
         return NO_CHILDREN_MATERIAL_SAMPLE;
       default:
         return {};

@@ -1,8 +1,8 @@
 import {
   FieldWrapper,
   FieldWrapperProps,
+  SimpleSearchFilterBuilder,
   Tooltip,
-  filterBy,
   useAccount,
   useQuery
 } from "common-ui";
@@ -135,21 +135,6 @@ function TagSelect({
     });
     tagOptions.current = suggestions.map((tag) => toOption(tag));
   } else {
-    const filter = filterBy(
-      [tagsFieldName],
-      !isAdmin
-        ? {
-            extraFilters: [
-              // Restrict the list to just the user's groups:
-              {
-                selector: groupSelectorName,
-                comparison: "=in=",
-                arguments: groupNames || []
-              }
-            ]
-          }
-        : undefined
-    );
     // handle the situation when tagsFieldName is something like this "contributors[0].roles"
     const match = tagsFieldName.match(/^(.+?)\[(\d+)\]\.(.+)$/);
     let parsedFieldname = tagsFieldName;
@@ -166,10 +151,12 @@ function TagSelect({
         path: resourcePath ?? "",
         sort: "-createdOn",
         fields: typeName ? { [typeName]: parsedFieldname } : undefined,
-        filter: {
-          tags: { NEQ: "null" },
-          ...filter("")
-        },
+        filter: SimpleSearchFilterBuilder.create()
+          .where("tags", "NEQ", "null")
+          .when(!isAdmin, (builder) =>
+            builder.whereProvided(groupSelectorName, "IN", groupNames)
+          )
+          .build(),
         page: { limit: 100 }
       },
       {

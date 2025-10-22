@@ -11,11 +11,11 @@ import {
   NumberRangeFields,
   PlaceSectionsSelectionField,
   ResourceSelectField,
+  SimpleSearchFilterBuilder,
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
   Tooltip,
-  filterBy,
   useDinaFormContext,
   useInstanceContext
 } from "common-ui";
@@ -39,6 +39,7 @@ import { ManagedAttributesEditor } from "../../";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   COLLECTING_EVENT_COMPONENT_NAME,
+  CollectionMethod,
   GeographicThesaurusSource,
   Protocol,
   Vocabulary
@@ -60,6 +61,7 @@ import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
+import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -401,7 +403,6 @@ export function CollectingEventFormLayout({
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
         allowAttachmentsConfig={attachmentsConfig}
-        attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
       />
     </DinaFormSection>
   );
@@ -724,12 +725,12 @@ export function CollectingEventFormLayout({
                   jsonApiBackend={{
                     query: (searchValue, ctx) => ({
                       path: "collection-api/collecting-event",
-                      filter: {
-                        ...(ctx.values.group && {
-                          group: { EQ: ctx.values.group }
-                        }),
-                        rsql: `dwcRecordedBy==*${searchValue}*`
-                      }
+                      fiql: simpleSearchFilterToFiql(
+                        SimpleSearchFilterBuilder.create<CollectingEvent>()
+                          .searchFilter("dwcRecordedBy", searchValue)
+                          .whereProvided("group", "EQ", ctx.values.group)
+                          .build()
+                      )
                     }),
                     option: (collEvent) => collEvent?.dwcRecordedBy ?? ""
                   }}
@@ -946,31 +947,23 @@ export function CollectingEventFormLayout({
                   customName={"collectingEventCollectionMethod"}
                   tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#collection-method"
                   tooltipLinkText="fromDinaUserGuide"
-                  filter={filterBy(["name"], {
-                    extraFilters: group
-                      ? [
-                          {
-                            selector: "group",
-                            comparison: "==",
-                            arguments: group
-                          }
-                        ]
-                      : undefined
-                  })}
+                  filter={(searchValue: string) =>
+                    SimpleSearchFilterBuilder.create<CollectionMethod>()
+                      .searchFilter("name", searchValue)
+                      .whereProvided("group", "EQ", group)
+                      .build()
+                  }
                 />
               )}
             </Field>
             <ResourceSelectField<Protocol>
               name="protocol"
-              filter={filterBy(["name"], {
-                extraFilters: [
-                  {
-                    selector: "protocolType",
-                    comparison: "==",
-                    arguments: "collection_method"
-                  }
-                ]
-              })}
+              filter={(searchValue: string) =>
+                SimpleSearchFilterBuilder.create<Protocol>()
+                  .searchFilter("name", searchValue)
+                  .where("protocolType", "EQ", "collection_method")
+                  .build()
+              }
               model="collection-api/protocol"
               optionLabel={(protocol) => protocol.name}
               omitNullOption={false}
@@ -984,12 +977,12 @@ export function CollectingEventFormLayout({
               jsonApiBackend={{
                 query: (searchValue, ctx) => ({
                   path: "collection-api/collecting-event",
-                  filter: {
-                    ...(ctx.values.group && {
-                      group: { EQ: ctx.values.group }
-                    }),
-                    rsql: `substrate==${searchValue}*`
-                  }
+                  fiql: simpleSearchFilterToFiql(
+                    SimpleSearchFilterBuilder.create<CollectingEvent>()
+                      .searchFilter("substrate", searchValue)
+                      .whereProvided("group", "EQ", ctx.values.group)
+                      .build()
+                  )
                 }),
                 option: (collEvent) => collEvent?.substrate ?? ""
               }}

@@ -1,21 +1,135 @@
 = Building the app Docker images
 
-From the top-level directory, run the yarn build and then the docker build:
+From the top-level directory, run the following commands to build the dina-ui Docker image:
 
 [source,bash]
 ----
+# Install dependencies
 yarn
+
+# Build the nextJS static pages and application.
 yarn workspace dina-ui build
+
+# Build the Docker image
 docker build -t dina-ui:dev .
 ----
 
-Docker environment variables required to run:
+== Environment variables
 
-dina-ui:
+=== Required Addresses for Back-end APIs
 
-* OBJECTSTORE_API_ADDRESS: The back-end API URL and port. e.g. objectstore-api:8080
-* USER_API_ADDRESS: The back-end API URL and port. e.g. user-api:8080
-* COLLECTION_API_ADDRESS: The back-end API URL and port. e.g. collection-api:8080
-* AGENT_API_ADDRESS: The back-end API URL and port. e.g. agent-api:8080
-* SEQDB_API_ADDRESS: The back-end API URL and port. e.g. seqdb-api:8080
-* DISABLE_BROWSER_CHECK: (optional) Whether to disable the browser check for blocking Internet Explorer. e.g. true
+[cols="1,2,1",options="header"]
+|===
+|Variable
+|Description
+|Example
+
+|`OBJECTSTORE_API_ADDRESS`
+|Object storage back-end API endpoint
+|`objectstore-api:8080`
+
+|`USER_API_ADDRESS`
+|User management back-end API endpoint
+|`user-api:8080`
+
+|`COLLECTION_API_ADDRESS`
+|Collection management back-end API endpoint
+|`collection-api:8080`
+
+|`AGENT_API_ADDRESS`
+|Agent management back-end API endpoint
+|`agent-api:8080`
+
+|`SEQDB_API_ADDRESS`
+|Sequence database back-end API endpoint
+|`seqdb-api:8080`
+
+|`SEARCH_API_ADDRESS`
+|Search service endpoint
+|`search-ws:8085`
+
+|`LOAN_TRANSACTION_API_ADDRESS`
+|Loan transaction back-end API endpoint
+|`loan-transaction-api:8080`
+
+|`REPORT_LABEL_API_ADDRESS`
+|Report and label export API endpoint
+|`dina-export-api:8080`
+|===
+
+=== Authentication Variables
+
+Configure these variables to enable Keycloak authentication:
+
+[cols="1,2,1",options="header"]
+|===
+|Variable
+|Description
+|Example
+
+|`KEYCLOAK_ENABLED`
+|Enable/disable Keycloak authentication
+|`true` or `false`
+
+|`KEYCLOAK_CLIENTID`
+|Keycloak client identifier
+|`dina-public`
+
+|`KEYCLOAK_REALM`
+|Keycloak realm name
+|`dina`
+
+|`KEYCLOAK_PUBLIC_URL`
+|External-facing Keycloak URL
+|`https://keycloak.example.com/auth`
+|===
+
+=== Instance Configuration
+
+Customize your DINA instance with these variables:
+
+[cols="1,2,1",options="header"]
+|===
+|Variable
+|Description
+|Example
+
+|`INSTANCE_MODE`
+|Deployment mode for the instance
+|`prod`, `dev`
+
+|`INSTANCE_NAME`
+|Display name shown in the UI header
+|`My DINA Instance`
+
+|`SUPPORTED_LANGUAGES_ISO`
+|Comma-separated language codes
+|`en,fr`
+
+|`DISABLE_BROWSER_CHECK`
+|Skip IE browser blocking check
+|`true` or `false`
+|===
+
+=== External Services (Optional)
+
+Configure external data sources and services:
+
+[cols="1,2,1",options="header"]
+|===
+|Variable
+|Description
+|Example
+
+|`SUPPORTED_GEOINFORMATION_SYSTEMS`
+|Comma-separated coordinate systems
+|`EPSG:4326,EPSG:3857`
+
+|`SCIENTIFIC_NAMES_SEARCH_ENDPOINT`
+|Scientific name lookup service URL
+|`https://api.gbif.org/v1/species/search`
+
+|`SCIENTIFIC_NAMES_DATASETS_ENDPOINT`
+|Scientific name datasets service URL
+|`https://api.gbif.org/v1/datasets`
+|===

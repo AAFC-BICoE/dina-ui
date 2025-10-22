@@ -3,6 +3,7 @@ import {
   ButtonBar,
   FieldSpy,
   FieldWrapper,
+  SimpleSearchFilterBuilder,
   SubmitButton,
   useApiClient,
   useDinaFormContext,
@@ -328,18 +329,26 @@ function usePromptToDeleteEmptyStorage() {
 
     const hasChildUnits = !!(
       await apiClient.get<StorageUnit[]>("collection-api/storage-unit", {
-        filter: {
-          rsql: `parentStorageUnit.uuid==${storageId}${currentContentFilter}`
-        },
+        filter: SimpleSearchFilterBuilder.create()
+          .where(
+            "parentStorageUnit.uuid",
+            "EQ",
+            storageId + currentContentFilter
+          )
+          .build(),
         page: { limit: 1 }
       })
     ).data.length;
 
     const hasChildSamples = !!(
       await apiClient.get<MaterialSample[]>("collection-api/material-sample", {
-        filter: {
-          rsql: `storageUnitUsage.storageUnit.uuid==${storageId}${currentContentFilter}`
-        },
+        filter: SimpleSearchFilterBuilder.create()
+          .where(
+            "storageUnitUsage.storageUnit.uuid",
+            "EQ",
+            storageId + currentContentFilter
+          )
+          .build(),
         page: { limit: 1 },
         include: "storageUnitUsage"
       })

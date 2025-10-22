@@ -26,27 +26,42 @@ import { ColumnDef } from "@tanstack/react-table";
 
 export interface AttachmentsFieldProps {
   name: string;
-  id?: string;
+
+  /**
+   * Optional ID for the FieldSet surrounding this component.
+   */
+  formId?: string;
+
   title?: ReactNode;
+
   allowNewFieldName?: string;
+
   allowExistingFieldName?: string;
-  /** Manually set whether new/existing attachments can be added. By default allow both. */
+
+  /**
+   * Manually set whether new/existing attachments can be added. By default allow both.
+   */
   allowAttachmentsConfig?: AllowAttachmentsConfig;
-  /** Attachment API path for the read-only view. */
-  attachmentPath: string;
+
   hideAddAttchmentBtn?: boolean;
+
   hideRemoveBtn?: boolean;
+
   hideAttachmentForm?: boolean;
+
   hideTitle?: boolean;
+
   hideCard?: boolean;
+
   wrapContent?: (content: ReactNode) => ReactNode;
 }
 
 export function AttachmentsField(props: AttachmentsFieldProps) {
   const { readOnly } = useDinaFormContext();
+
   return readOnly ? (
     <AttachmentReadOnlySection
-      attachmentPath={props.attachmentPath}
+      name={props.name}
       detachTotalSelected={true}
       title={props.title}
     />
@@ -77,7 +92,7 @@ export interface AttachmentsEditorProps extends AttachmentsFieldProps {
 export function AttachmentsEditor({
   value,
   onChange,
-  id,
+  formId,
   title,
   allowExistingFieldName,
   allowNewFieldName,
@@ -90,7 +105,7 @@ export function AttachmentsEditor({
   wrapContent = (content) => content,
   name
 }: AttachmentsEditorProps) {
-  const { isTemplate } = useDinaFormContext();
+  const { isTemplate, readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const { closeModal } = useModal();
 
@@ -119,8 +134,8 @@ export function AttachmentsEditor({
       isJsonApiQuery: true
     }),
     {
-      id: "originalFilename",
-      header: () => <FieldHeader name="originalFilename" />,
+      id: "filename",
+      header: () => <FieldHeader name="filename" />,
       cell: ({ row: { original: metadata } }) => {
         // When this Metadata has been deleted, show a "deleted" message in this cell:
         if (Object.keys(metadata).length === 2) {
@@ -140,7 +155,7 @@ export function AttachmentsEditor({
             href={`/object-store/object/view?id=${metadata.id}`}
             legacyBehavior
           >
-            {(metadata as any)?.originalFilename ?? metadata.id}
+            {(metadata as any)?.filename ?? metadata.id}
           </Link>
         );
       }
@@ -176,7 +191,7 @@ export function AttachmentsEditor({
 
   return (
     <FieldSet
-      id={id}
+      id={formId}
       legend={
         hideTitle ? (
           <></>
@@ -215,17 +230,20 @@ export function AttachmentsEditor({
                   value={value}
                   addingAttachmentsDisabled={addingAttachmentsDisabled}
                   allowAttachmentsConfig={allowAttachmentsConfig}
+                  readOnly={readOnly ?? true}
                 />
               ) : (
                 <>
                   {!hideAttachmentForm && (
                     <AttachmentSection
+                      name={name}
                       allowAttachmentsConfig={allowAttachmentsConfig}
                       afterMetadatasSaved={addAttachedMetadatas(
                         onChange,
                         value,
                         closeModal
                       )}
+                      readOnly={readOnly ?? true}
                     />
                   )}
                 </>
@@ -264,6 +282,7 @@ interface AddAttachmentsButtonProps {
   style?: CSSProperties;
   className?: string;
   removeMargin?: boolean;
+  readOnly: boolean;
 }
 
 export function AddAttachmentsButton({
@@ -274,7 +293,8 @@ export function AddAttachmentsButton({
   buttonTextElement,
   style,
   className,
-  removeMargin
+  removeMargin,
+  readOnly
 }: AddAttachmentsButtonProps) {
   const { closeModal, openModal } = useModal();
   function openAttachmentsModal() {
@@ -295,12 +315,15 @@ export function AddAttachmentsButton({
         </div>
         <div className="modal-body">
           <AttachmentSection
+            value={value}
+            onChange={onChange}
             allowAttachmentsConfig={allowAttachmentsConfig}
             afterMetadatasSaved={addAttachedMetadatas(
               onChange,
               value,
               closeModal
             )}
+            readOnly={readOnly}
           />
         </div>
       </div>

@@ -133,7 +133,6 @@ export function SangerRunStep({
             <DinaForm initialValues={{}}>
               {editMode ? (
                 <AttachmentsEditor
-                  attachmentPath={``}
                   name="attachments"
                   onChange={setAttachments}
                   value={attachments}
@@ -145,7 +144,7 @@ export function SangerRunStep({
                 <>
                   {sequencingRunId && (
                     <AttachmentReadOnlySection
-                      attachmentPath={`seqdb-api/molecular-analysis-run/${sequencingRunId}/attachments`}
+                      name="attachments"
                       title={
                         <DinaMessage id="molecularAnalysisRunStep_attachments" />
                       }
