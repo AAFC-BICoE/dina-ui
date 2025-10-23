@@ -27,12 +27,23 @@ export function Home() {
       
       {/* Add this toggle button */}
       <Container fluid={true} className="py-2">
-        <div className="d-flex justify-content-end">
-          <Link href="/feedback/home2" passHref legacyBehavior>
-            <Button variant="outline-primary" size="sm">
+        <div 
+        style={{
+            position: 'fixed',
+            top: '50px',
+            right: '500px',
+            zIndex: 1000
+        }}
+        >
+        <Link href="/" passHref legacyBehavior>
+            <Button 
+            variant="outline-secondary" 
+            size="sm"
+            className="shadow-sm"
+            >
               🎨 Try New Layout
             </Button>
-          </Link>
+        </Link>
         </div>
       </Container>
 

@@ -2,7 +2,6 @@
 import { useAccount } from "common-ui";
 import React from "react";
 import Container from "react-bootstrap/Container";
-import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { Footer, Head, Nav, CardGrid } from "../../components";
 import { NavigationCard } from "../../types/common";
@@ -88,13 +87,6 @@ export function Home2() {
       title: "materialSampleListTitle",
       icon: MdNature,
       href: "/collection/material-sample/list",
-      category: "collection"
-    },
-    {
-      id: "revisions-by-user-collection",
-      title: "revisionsByUserPageTitle",
-      icon: FaClockRotateLeft,
-      href: "/collection/revisions-by-user",
       category: "collection"
     },
     {
@@ -444,55 +436,28 @@ export function Home2() {
       
       {/* Toggle button */}
       <Container fluid={true} className="py-2">
-        <div className="d-flex justify-content-end">
-          <Link href="/" passHref legacyBehavior>
-            <Button variant="outline-secondary" size="sm">
-              📋 Back to Classic Layout
+        <div 
+        style={{
+            position: 'fixed',
+            top: '50px',
+            right: '500px',
+            zIndex: 1000
+        }}
+        >
+        <Link href="/" passHref legacyBehavior>
+            <Button 
+            variant="outline-secondary" 
+            size="sm"
+            className="shadow-sm"
+            >
+            📋 Back to Classic Layout
             </Button>
-          </Link>
+        </Link>
         </div>
       </Container>
 
       <main role="main">
         <Container fluid={true}>
-          {/* Quick create menu */}
-          <Card bg="light" className="mb-4">
-            <Card.Body>
-              <span className="mx-3">
-                <DinaMessage id="createNewLabel" />:
-              </span>
-
-              <Link href="/collection/material-sample/edit" passHref legacyBehavior>
-                <Button variant="info" className="mx-1 my-1">
-                  <DinaMessage id="materialSample" />
-                </Button>
-              </Link>
-
-              <Link href="/collection/material-sample/bulk-create" passHref legacyBehavior>
-                <Button variant="info" className="mx-1 my-1">
-                  <DinaMessage id="multipleMaterialSamples" />
-                </Button>
-              </Link>
-
-              <Link href="/collection/collecting-event/edit" passHref legacyBehavior>
-                <Button variant="info" className="mx-1 my-1">
-                  <DinaMessage id="collectingEvent" />
-                </Button>
-              </Link>
-
-              <Link href="/loan-transaction/transaction/edit" passHref legacyBehavior>
-                <Button variant="info" className="mx-1 my-1">
-                  <DinaMessage id="loanTransaction" />
-                </Button>
-              </Link>
-
-              <Link href="/object-store/upload" passHref legacyBehavior>
-                <Button variant="info" className="mx-1 my-1">
-                  <DinaMessage id="uploadPageTitle" />
-                </Button>
-              </Link>
-            </Card.Body>
-          </Card>
 
           {/* Collection Section */}
           <section className="mb-5">
