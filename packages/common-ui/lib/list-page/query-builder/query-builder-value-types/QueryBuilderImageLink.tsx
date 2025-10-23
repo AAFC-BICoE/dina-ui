@@ -168,6 +168,8 @@ export interface ImageLinkButtonProps {
 }
 
 export function ImageLinkButton({ imageType, metadata }: ImageLinkButtonProps) {
+  const RAW_EXTS = new Set(["cr2", "nef"]); // Raw file extensions that cannot be viewed directly
+
   const fileIdentifier = useMemo<string | undefined>(() => {
     // If original, that can be retrieved from the metadata.
     if (
@@ -202,6 +204,11 @@ export function ImageLinkButton({ imageType, metadata }: ImageLinkButtonProps) {
 
   // Do not display anything in the column if no file identifier can be found for the image type.
   if (fileIdentifier === undefined) {
+    return <></>;
+  } else if (
+    RAW_EXTS.has(metadata?.data?.attributes.acCaption.split(".").pop())
+  ) {
+    // If the file is a raw image format that cannot be viewed directly, do not show link
     return <></>;
   }
 
