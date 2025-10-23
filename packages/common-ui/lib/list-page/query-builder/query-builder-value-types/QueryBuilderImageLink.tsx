@@ -26,9 +26,9 @@ interface QueryRowImageLinkProps {
 // Supported derivative types for the image link selection.
 // Each of these options should have a translation provided: queryBuilder_imageLink_[TYPE]
 export const SUPPORTED_DERIVATIVE_TYPES: string[] = [
+  "LARGE_IMAGE",
   "ORIGINAL",
-  "THUMBNAIL_IMAGE",
-  "LARGE_IMAGE"
+  "THUMBNAIL_IMAGE"
 ];
 
 export interface ImageLinkStates {
