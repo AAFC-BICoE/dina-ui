@@ -25,17 +25,16 @@ export function Home() {
       <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
       <Nav />
       
-      {/* Add this toggle button */}
       <Container fluid={true} className="py-2">
-        <div 
+        <div className="d-flex justify-content-end"
         style={{
-            position: 'fixed',
-            top: '50px',
-            right: '500px',
+            position: 'relative',
+            top: '-160px',
+            right: '600px',
             zIndex: 1000
         }}
         >
-        <Link href="/" passHref legacyBehavior>
+        <Link href="/feedback/home2" passHref legacyBehavior>
             <Button 
             variant="outline-secondary" 
             size="sm"

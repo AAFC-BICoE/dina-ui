@@ -434,13 +434,12 @@ export function Home2() {
       <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
       <Nav />
       
-      {/* Toggle button */}
       <Container fluid={true} className="py-2">
-        <div 
+        <div className="d-flex justify-content-end"
         style={{
-            position: 'fixed',
-            top: '50px',
-            right: '500px',
+            position: 'relative',
+            top: '-160px',
+            right: '600px',
             zIndex: 1000
         }}
         >
