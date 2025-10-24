@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import moment from "moment";
-import { ComponentProps, FocusEvent, SyntheticEvent } from "react";
+import { ComponentProps, FocusEvent, SyntheticEvent, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import { useIntl } from "react-intl";
 import {
@@ -30,7 +30,17 @@ export interface DateFieldProps extends FieldWrapperProps {
 export const DATE_REGEX_NO_TIME = /^\d{4}-\d{2}-\d{2}$/;
 export const DATE_REGEX_PARTIAL = /^\d{4}(-\d{2}){0,2}$/;
 
-/** Formik-connected date input. */
+/**
+ * Formik-connected date input.
+ *
+ * Important note: When using showTime, the timezone handling is done by the browser via the toISOString method.
+ * This means that the date and time selected will be converted to UTC before being stored.
+ * For example, selecting "2023-10-05 10:00 AM" in a UTC+2 timezone will be stored as "2023-10-05T08:00:00.000Z".
+ *
+ * This behavior ensures consistency across different user timezones, but it's important to be aware of it
+ * when displaying or processing the stored date-time values. But be aware that if the Date being saved is a
+ * LocalDate, no timezone information should be saved. This component will need to be refactored to handle that case.
+ */
 export function DateField(props: DateFieldProps) {
   const {
     readOnly,
@@ -156,8 +166,30 @@ export function DateField(props: DateFieldProps) {
         }
 
         // Date object or null is needed by datepicker:
-        const parsedValue = value ? moment(value, true) : null;
-        const dateObject = parsedValue?.isValid() ? parsedValue.toDate() : null;
+        const dateObject = useMemo(() => {
+          if (!value) {
+            return null;
+          }
+
+          if (showTime) {
+            // With time, parse normally (will include timezone)
+            const parsedValue = moment(value, true);
+            return parsedValue.isValid() ? parsedValue.toDate() : null;
+          } else {
+            // For date-only, parse the YYYY-MM-DD string directly to avoid timezone shifts
+            const match =
+              typeof value === "string"
+                ? value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+                : null;
+            if (match) {
+              const year = parseInt(match[1], 10);
+              const month = parseInt(match[2], 10) - 1; // months are 0-indexed
+              const day = parseInt(match[3], 10);
+              return new Date(year, month, day, 12, 0, 0); // set to noon to avoid timezone issues
+            }
+            return null;
+          }
+        }, [value, showTime]);
 
         // Props that depend on "showTime":
         const datePickerProps: Partial<ComponentProps<typeof DatePicker>> =
