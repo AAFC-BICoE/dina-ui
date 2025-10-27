@@ -13,6 +13,7 @@ import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Person } from "../../objectstore-api";
 import { StorageUnitUsage } from "./StorageUnitUsage";
+import { DinaJsonMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -82,6 +83,9 @@ export interface MaterialSampleAttributes {
 
   // Client side for parent attributes
   parentAttributes?: any;
+
+  // Used for permission information included on the request.
+  meta?: DinaJsonMetaInfo;
 }
 
 export interface HostOrganism {

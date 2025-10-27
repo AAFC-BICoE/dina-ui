@@ -75,7 +75,8 @@ export function useMaterialSampleQuery(id?: string | null) {
       ].join(","),
       optfields: {
         "material-sample": ["hierarchy", "materialSampleChildren"].join(",")
-      }
+      },
+      header: { "include-dina-permission": "true" }
     },
     {
       disabled: !id,
