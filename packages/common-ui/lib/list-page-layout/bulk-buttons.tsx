@@ -117,11 +117,11 @@ export function BulkDeleteButton({
               ) {
                 const deleteOperations: Operation[] = materialSamples
                   .filter(
-                    (materialSample) => !!materialSample.storageUnitUsage?.id
+                    (materialSample) => !!materialSample?.storageUnitUsage?.id
                   )
                   .map((materialSample) => ({
                     op: "DELETE",
-                    path: `storage-unit-usage/${materialSample.storageUnitUsage?.id}`
+                    path: `storage-unit-usage/${materialSample?.storageUnitUsage?.id}`
                   }));
 
                 await doOperations(deleteOperations, {
@@ -130,7 +130,7 @@ export function BulkDeleteButton({
               }
 
               // Refresh the page:
-              await router.reload();
+              router.reload();
             }}
           />
         );
