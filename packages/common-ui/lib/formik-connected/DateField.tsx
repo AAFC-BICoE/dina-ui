@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import moment from "moment";
-import { ComponentProps, FocusEvent, SyntheticEvent, useMemo } from "react";
+import { ComponentProps, FocusEvent, SyntheticEvent } from "react";
 import DatePicker from "react-datepicker";
 import { useIntl } from "react-intl";
 import {
@@ -30,17 +30,7 @@ export interface DateFieldProps extends FieldWrapperProps {
 export const DATE_REGEX_NO_TIME = /^\d{4}-\d{2}-\d{2}$/;
 export const DATE_REGEX_PARTIAL = /^\d{4}(-\d{2}){0,2}$/;
 
-/**
- * Formik-connected date input.
- *
- * Important note: When using showTime, the timezone handling is done by the browser via the toISOString method.
- * This means that the date and time selected will be converted to UTC before being stored.
- * For example, selecting "2023-10-05 10:00 AM" in a UTC+2 timezone will be stored as "2023-10-05T08:00:00.000Z".
- *
- * This behavior ensures consistency across different user timezones, but it's important to be aware of it
- * when displaying or processing the stored date-time values. But be aware that if the Date being saved is a
- * LocalDate, no timezone information should be saved. This component will need to be refactored to handle that case.
- */
+/** Formik-connected date input. */
 export function DateField(props: DateFieldProps) {
   const {
     readOnly,
@@ -81,6 +71,26 @@ export function DateField(props: DateFieldProps) {
     }
   }
 
+  function stringToDate(value: string | null | undefined): Date | null {
+    if (!value) return null;
+    const parsed = moment(value, true);
+    return parsed.isValid() ? parsed.toDate() : null;
+  }
+
+  function dateToString(date: Date | null): string {
+    if (!date) return "";
+
+    if (showTime) {
+      return date.toISOString();
+    } else {
+      // Extract local date components to avoid timezone shifts
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+  }
+
   return (
     <FieldWrapper
       {...props}
@@ -94,15 +104,16 @@ export function DateField(props: DateFieldProps) {
           currentValue: value
         });
 
+        // String value (YYYY-MM-DD or empty string)
+        const stringValue = value || "";
+
         function onChange(
           date: Date | null,
           event?: SyntheticEvent<any, Event>
         ) {
           // When selecting from the date picker:
           if (!event || event?.type === "click" || event?.type === "keydown") {
-            setValue(
-              date && date.toISOString().slice(0, showTime ? undefined : 10)
-            );
+            setValue(dateToString(date));
           }
         }
 
@@ -111,6 +122,8 @@ export function DateField(props: DateFieldProps) {
           if (event?.type === "change") {
             let newText = event.target.value;
             const dashOccurences = newText.split("-").length - 1;
+
+            // Auto-format: 20210515 → 2021-05-15
             if (newText.length === 8 && dashOccurences === 0) {
               newText =
                 newText.slice(0, 4) +
@@ -138,14 +151,8 @@ export function DateField(props: DateFieldProps) {
           if (newText) {
             const parsedDate = moment(newText);
             if (parsedDate.isValid()) {
-              // If parsing is successful, format the date into the canonical ISO string.
-              // Use the full string if showTime is true, otherwise use only the date part.
-              const formattedValue = parsedDate
-                .toDate()
-                .toISOString()
-                .slice(0, showTime ? undefined : 10);
-
-              // Update the form's state with the correctly formatted value.
+              // Reformat to canonical ISO string
+              const formattedValue = dateToString(parsedDate.toDate());
               setValue(formattedValue);
 
               // Clear any previous validation errors for this field.
@@ -160,36 +167,13 @@ export function DateField(props: DateFieldProps) {
               );
             }
           } else {
-            // If the field was cleared, set the value to null.
-            setValue(null);
+            // If the field was cleared, set the value to empty string.
+            setValue("");
           }
         }
 
-        // Date object or null is needed by datepicker:
-        const dateObject = useMemo(() => {
-          if (!value) {
-            return null;
-          }
-
-          if (showTime) {
-            // With time, parse normally (will include timezone)
-            const parsedValue = moment(value, true);
-            return parsedValue.isValid() ? parsedValue.toDate() : null;
-          } else {
-            // For date-only, parse the YYYY-MM-DD string directly to avoid timezone shifts
-            const match =
-              typeof value === "string"
-                ? value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
-                : null;
-            if (match) {
-              const year = parseInt(match[1], 10);
-              const month = parseInt(match[2], 10) - 1; // months are 0-indexed
-              const day = parseInt(match[3], 10);
-              return new Date(year, month, day, 12, 0, 0); // set to noon to avoid timezone issues
-            }
-            return null;
-          }
-        }, [value, showTime]);
+        // Convert our string value to Date object for react-datepicker's `selected` prop
+        const selectedDate = stringToDate(stringValue);
 
         // Props that depend on "showTime":
         const datePickerProps: Partial<ComponentProps<typeof DatePicker>> =
@@ -205,7 +189,7 @@ export function DateField(props: DateFieldProps) {
                 dateFormat: "yyyy-MM-dd",
                 placeholderText:
                   placeholder || (showPlaceholder ? "YYYY-MM-DD" : ""),
-                value // The text value in the input element.
+                value: stringValue // The text value in the input element (for manual typing)
               };
 
         // Disable while the field when it's in a special state like cleared or deleted.
@@ -234,7 +218,7 @@ export function DateField(props: DateFieldProps) {
               disabled={isDisabled}
               onBlur={onBlur}
               onFocus={(event) => event.target.select()}
-              selected={dateObject}
+              selected={selectedDate}
               {...datePickerProps}
             />
             {bulkTab &&
@@ -243,7 +227,7 @@ export function DateField(props: DateFieldProps) {
                 <ClearAllButton
                   fieldName={props.name}
                   clearType={ClearType.Null}
-                  onClearLocal={() => setValue(null)}
+                  onClearLocal={() => setValue("")}
                   isCleared={!bulkTab?.showClearIcon}
                   readOnly={readOnly}
                 />
