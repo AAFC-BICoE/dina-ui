@@ -188,7 +188,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 onChange={setSampleFormTemplateUUID}
               />
             </div>
-            <div className="col-md-5 flex d-flex col-sm-12 gap-1">
+            <div className="col-md-5 flex d-flex col-sm-12 gap-1 justify-content-end">
               {canEdit && (
                 <EditButton
                   entityId={id}
