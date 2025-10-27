@@ -1,5 +1,9 @@
 import "@testing-library/jest-dom";
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  DinaForm,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { QueryPage } from "../QueryPage";
 import { Row } from "@tanstack/react-table";
 import { TableColumn } from "../types";
@@ -8,7 +12,7 @@ import { FieldHeader } from "../../field-header/FieldHeader";
 import { stringArrayCell } from "../../table/StringArrayCell";
 import { dateCell } from "../../table/DateCell";
 
-import { mockResponses } from "./__mocks__/QueryPageMocks";
+import { mockResponses } from "../__mocks__/QueryPageMocks";
 import { waitFor } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 
@@ -20,16 +24,25 @@ const mockPost = jest.fn<any, any>(async (path) => {
   return mockResponses[path];
 });
 
+const mockBulkGet = jest.fn<any, any>(async (paths) => {
+  return paths.map((path) => mockResponses[path] ?? { data: [] });
+});
+
+const mockDelete = jest.fn();
+const mockDoOperations = jest.fn();
+
 const testCtx = {
   apiContext: {
     apiClient: {
       get: mockGet,
       axios: {
         post: mockPost,
-        get: mockGet
+        get: mockGet,
+        delete: mockDelete
       }
     },
-    bulkGet: jest.fn()
+    bulkGet: mockBulkGet,
+    doOperations: mockDoOperations
   }
 } as any;
 
@@ -119,99 +132,101 @@ function createTestQueryPage() {
   ];
 
   return mountWithAppContext(
-    <QueryPage
-      rowStyling={rowStyling}
-      indexName={"dina_material_sample_index"}
-      uniqueName="material-sample-list"
-      reactTableProps={{
-        enableSorting: true,
-        enableMultiSort: true
-      }}
-      dynamicFieldMapping={{
-        fields: [
-          // Managed Attributes
-          {
-            type: "managedAttribute",
-            label: "managedAttributes",
-            component: "MATERIAL_SAMPLE",
-            path: "data.attributes.managedAttributes",
-            apiEndpoint: "collection-api/managed-attribute"
-          },
+    <DinaForm initialValues={{}}>
+      <QueryPage
+        rowStyling={rowStyling}
+        indexName={"dina_material_sample_index"}
+        uniqueName="material-sample-list"
+        reactTableProps={{
+          enableSorting: true,
+          enableMultiSort: true
+        }}
+        dynamicFieldMapping={{
+          fields: [
+            // Managed Attributes
+            {
+              type: "managedAttribute",
+              label: "managedAttributes",
+              component: "MATERIAL_SAMPLE",
+              path: "data.attributes.managedAttributes",
+              apiEndpoint: "collection-api/managed-attribute"
+            },
 
-          // Field Extensions
-          {
-            type: "fieldExtension",
-            label: "fieldExtensions",
-            component: "MATERIAL_SAMPLE",
-            path: "data.attributes.extensionValues",
-            apiEndpoint: "collection-api/extension"
-          },
+            // Field Extensions
+            {
+              type: "fieldExtension",
+              label: "fieldExtensions",
+              component: "MATERIAL_SAMPLE",
+              path: "data.attributes.extensionValues",
+              apiEndpoint: "collection-api/extension"
+            },
 
-          // Restrictions
-          {
-            type: "fieldExtension",
-            label: "restrictions",
-            component: "RESTRICTION",
-            path: "data.attributes.restrictionFieldsExtension",
-            apiEndpoint: "collection-api/extension"
-          }
-        ],
-        relationshipFields: [
-          // Assemblage
-          {
-            type: "managedAttribute",
-            label: "managedAttributes",
-            component: "ASSEMBLAGE",
-            path: "included.attributes.managedAttributes",
-            referencedBy: "assemblages",
-            referencedType: "assemblage",
-            apiEndpoint: "collection-api/managed-attribute"
-          },
+            // Restrictions
+            {
+              type: "fieldExtension",
+              label: "restrictions",
+              component: "RESTRICTION",
+              path: "data.attributes.restrictionFieldsExtension",
+              apiEndpoint: "collection-api/extension"
+            }
+          ],
+          relationshipFields: [
+            // Assemblage
+            {
+              type: "managedAttribute",
+              label: "managedAttributes",
+              component: "ASSEMBLAGE",
+              path: "included.attributes.managedAttributes",
+              referencedBy: "assemblages",
+              referencedType: "assemblage",
+              apiEndpoint: "collection-api/managed-attribute"
+            },
 
-          // Collecting Event
-          {
-            type: "managedAttribute",
-            label: "managedAttributes",
-            component: "COLLECTING_EVENT",
-            path: "included.attributes.managedAttributes",
-            referencedBy: "collectingEvent",
-            referencedType: "collecting-event",
-            apiEndpoint: "collection-api/managed-attribute"
-          },
-          {
-            type: "fieldExtension",
-            label: "fieldExtensions",
-            component: "COLLECTING_EVENT",
-            path: "included.attributes.extensionValues",
-            referencedBy: "collectingEvent",
-            referencedType: "collecting-event",
-            apiEndpoint: "collection-api/extension"
-          },
+            // Collecting Event
+            {
+              type: "managedAttribute",
+              label: "managedAttributes",
+              component: "COLLECTING_EVENT",
+              path: "included.attributes.managedAttributes",
+              referencedBy: "collectingEvent",
+              referencedType: "collecting-event",
+              apiEndpoint: "collection-api/managed-attribute"
+            },
+            {
+              type: "fieldExtension",
+              label: "fieldExtensions",
+              component: "COLLECTING_EVENT",
+              path: "included.attributes.extensionValues",
+              referencedBy: "collectingEvent",
+              referencedType: "collecting-event",
+              apiEndpoint: "collection-api/extension"
+            },
 
-          // Determination
-          {
-            type: "managedAttribute",
-            label: "managedAttributes",
-            component: "DETERMINATION",
-            path: "included.attributes.determination.managedAttributes",
-            referencedBy: "organism",
-            referencedType: "organism",
-            apiEndpoint: "collection-api/managed-attribute"
-          }
-        ]
-      }}
-      columns={columns}
-      bulkDeleteButtonProps={{
-        typeName: "material-sample",
-        apiBaseUrl: "/collection-api"
-      }}
-      bulkEditPath="/collection/material-sample/bulk-edit"
-      dataExportProps={{
-        dataExportPath: "/export/data-export/export",
-        entityLink: "/collection/material-sample"
-      }}
-      // bulkSplitPath="/collection/material-sample/bulk-split"
-    />,
+            // Determination
+            {
+              type: "managedAttribute",
+              label: "managedAttributes",
+              component: "DETERMINATION",
+              path: "included.attributes.determination.managedAttributes",
+              referencedBy: "organism",
+              referencedType: "organism",
+              apiEndpoint: "collection-api/managed-attribute"
+            }
+          ]
+        }}
+        columns={columns}
+        bulkDeleteButtonProps={{
+          typeName: "material-sample",
+          apiBaseUrl: "/collection-api"
+        }}
+        bulkEditPath="/collection/material-sample/bulk-edit"
+        dataExportProps={{
+          dataExportPath: "/export/data-export/export",
+          entityLink: "/collection/material-sample"
+        }}
+        // bulkSplitPath="/collection/material-sample/bulk-split"
+      />
+    </DinaForm>,
     testCtx
   );
 }
@@ -256,6 +271,27 @@ describe("QueryPage test", () => {
     userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
     await waitForLoadingToDisappear();
 
-    // screen.logTestingPlaygroundURL();
+    // Verify both material samples are deleted
+    expect(mockDelete).toHaveBeenNthCalledWith(
+      1,
+      "/collection-api/material-sample/074e745e-7ef1-449c-965a-9a4dc754391f"
+    );
+    expect(mockDelete).toHaveBeenNthCalledWith(
+      2,
+      "/collection-api/material-sample/7c2b6795-02bb-4edd-97af-589527ef3e7f"
+    );
+
+    // Verify that only one storage unit usage was deleted (since only one has an attached storage unit)
+    expect(mockDoOperations).lastCalledWith(
+      [
+        {
+          op: "DELETE",
+          path: "storage-unit-usage/01919485-ed65-7a79-9080-91445b897ef4"
+        }
+      ],
+      {
+        apiBaseUrl: "/collection-api"
+      }
+    );
   });
 });

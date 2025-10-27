@@ -236,5 +236,33 @@ export const mockResponses = {
         ]
       }
     }
-  }
+  },
+  "/material-sample/074e745e-7ef1-449c-965a-9a4dc754391f?include=storageUnitUsage":
+    {
+      id: "074e745e-7ef1-449c-965a-9a4dc754391f",
+      type: "material-sample",
+      attributes: {
+        materialSampleName: "Sample 1",
+        createdBy: "cnc-su",
+        createdOn: "2023-12-14T18:48:13.080841Z"
+      }
+    },
+  "/material-sample/7c2b6795-02bb-4edd-97af-589527ef3e7f?include=storageUnitUsage":
+    {
+      id: "7c2b6795-02bb-4edd-97af-589527ef3e7f",
+      type: "material-sample",
+      materialSampleName: "Sample 2",
+      createdBy: "cnc-su",
+      createdOn: "2023-12-09T16:53:14.363355Z",
+      storageUnitUsage: {
+        wellColumn: 1,
+        wellRow: "A",
+        storageUnitName: "Freezer 1",
+        usageType: "material-sample",
+        createdBy: "cnc-su",
+        createdOn: "2023-12-14T18:50:00.000000Z",
+        id: "01919485-ed65-7a79-9080-91445b897ef4",
+        type: "storage-unit-usage"
+      }
+    }
 };
