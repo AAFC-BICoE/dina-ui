@@ -115,7 +115,7 @@ export function AgentRolesField({
           {role.roles?.join?.(", ")}
         </span>
       )}
-      renderTabPanel={({ fieldProps, index }) => (
+      renderTabPanel={({ fieldProps }) => (
         <div>
           <div className="row">
             {forContributor ? (
@@ -130,7 +130,7 @@ export function AgentRolesField({
                 {...fieldProps("roles")}
                 resourcePath={resourcePath}
                 indexName={indexName}
-                tagsFieldName={`${fieldName}[${index}].roles`}
+                tagsFieldName={`${fieldName}.roles`}
                 className="col-sm-4"
                 label={<DinaMessage id="roleAction" />}
               />
