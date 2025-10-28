@@ -24,6 +24,7 @@ export interface AgentRolesFieldProps {
   resourcePath: string;
   readOnly?: boolean;
   forContributor?: boolean;
+  indexName?: string;
 }
 
 export function AgentRolesField({
@@ -31,7 +32,8 @@ export function AgentRolesField({
   title,
   resourcePath,
   forContributor = false,
-  readOnly
+  readOnly,
+  indexName
 }: AgentRolesFieldProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -127,6 +129,7 @@ export function AgentRolesField({
               <TagSelectField
                 {...fieldProps("roles")}
                 resourcePath={resourcePath}
+                indexName={indexName}
                 tagsFieldName={`${fieldName}[${index}].roles`}
                 className="col-sm-4"
                 label={<DinaMessage id="roleAction" />}

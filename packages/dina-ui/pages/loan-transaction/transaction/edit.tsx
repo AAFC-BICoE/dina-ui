@@ -498,6 +498,7 @@ export function TransactionFormLayout({
         readOnly={readOnly}
         resourcePath="loan-transaction-api/transaction"
         title={<DinaMessage id="agentRole" />}
+        indexName="dina_loan_transaction_index"
       />
       <ShipmentDetailsFieldSet fieldName="shipment" />
       <ManagedAttributesEditor
