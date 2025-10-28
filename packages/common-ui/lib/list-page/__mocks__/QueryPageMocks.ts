@@ -190,6 +190,7 @@ export const mockResponses = {
               data: {
                 attributes: {
                   materialSampleType: null,
+                  group: "cnc-su",
                   dwcOtherCatalogNumbers: null,
                   createdBy: "cnc-su",
                   materialSampleName: "Sample 1",
@@ -211,6 +212,7 @@ export const mockResponses = {
                 attributes: {
                   materialSampleType: null,
                   dwcOtherCatalogNumbers: null,
+                  group: "cnc-su",
                   createdBy: "cnc-su",
                   materialSampleName: "Sample 2",
                   createdOn: "2023-12-09T16:53:14.363355Z",
@@ -243,6 +245,7 @@ export const mockResponses = {
       type: "material-sample",
       attributes: {
         materialSampleName: "Sample 1",
+        group: "cnc-su",
         createdBy: "cnc-su",
         createdOn: "2023-12-14T18:48:13.080841Z"
       }
@@ -251,6 +254,7 @@ export const mockResponses = {
     {
       id: "7c2b6795-02bb-4edd-97af-589527ef3e7f",
       type: "material-sample",
+      group: "cnc-su",
       materialSampleName: "Sample 2",
       createdBy: "cnc-su",
       createdOn: "2023-12-09T16:53:14.363355Z",

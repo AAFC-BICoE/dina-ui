@@ -7,15 +7,13 @@ import {
   BulkSelectableFormValues,
   CommonMessage,
   FormikButton,
-  Operation,
   useApiClient,
   useModal
 } from "..";
 import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
-import { KitsuResource, PersistedResource } from "kitsu";
+import { KitsuResource } from "kitsu";
 import { useSessionStorage } from "usehooks-ts";
-import { MaterialSample } from "../../../dina-ui/types/collection-api";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -52,17 +50,22 @@ export function AttachSelectedButton({
 export interface BulkDeleteButtonProps {
   typeName: string;
   apiBaseUrl: string;
-  onDelete?: (resourceIds: string[]) => Promise<void>;
+  beforeDelete?: (resourceIds: string[]) => Promise<any>;
+  afterDelete?: (
+    resourceIds: string[],
+    beforeDeleteResult?: any
+  ) => Promise<void>;
 }
 
 export function BulkDeleteButton({
   apiBaseUrl,
   typeName,
-  onDelete
+  beforeDelete,
+  afterDelete
 }: BulkDeleteButtonProps) {
   const router = useRouter();
   const { openModal } = useModal();
-  const { apiClient, bulkGet, doOperations } = useApiClient();
+  const { apiClient } = useApiClient();
 
   return (
     <FormikButton
@@ -82,51 +85,31 @@ export function BulkDeleteButton({
               </span>
             }
             onYesButtonClicked={async () => {
-              if (onDelete) {
-                await onDelete(resourceIds);
-                return;
+              // Execute pre-deletion logic if provided (e.g., fetch related resources)
+              let beforeDeleteResult: any;
+              if (beforeDelete) {
+                beforeDeleteResult = await beforeDelete(resourceIds);
               }
 
-              // Fetch the resources linked with material-sample for deletion
-              let materialSamples: PersistedResource<MaterialSample>[] = [];
-              if (typeName === "material-sample") {
-                materialSamples = await bulkGet<MaterialSample>(
-                  resourceIds.map(
-                    (id) => `/material-sample/${id}?include=storageUnitUsage`
-                  ),
-                  { apiBaseUrl: "/collection-api" }
-                );
-              }
+              // Delete the records.
               for (const resourceId of resourceIds) {
                 try {
                   await apiClient.axios.delete(
                     `${apiBaseUrl}/${typeName}/${resourceId}`
                   );
                 } catch (e) {
-                  if (e.cause.status === 404) {
+                  // If it doesn't exist or has been deleted already, ignore it.
+                  if (e.cause.status === 404 || e.cause.status === 410) {
                     console.warn(e.cause);
                   } else {
                     throw e;
                   }
                 }
               }
-              // Delete resources linked to the deleted material samples
-              if (
-                typeName === "material-sample" &&
-                materialSamples.length > 0
-              ) {
-                const deleteOperations: Operation[] = materialSamples
-                  .filter(
-                    (materialSample) => !!materialSample.storageUnitUsage?.id
-                  )
-                  .map((materialSample) => ({
-                    op: "DELETE",
-                    path: `storage-unit-usage/${materialSample.storageUnitUsage?.id}`
-                  }));
 
-                await doOperations(deleteOperations, {
-                  apiBaseUrl: "/collection-api"
-                });
+              // Execute additional cleanup/related operations if provided
+              if (afterDelete) {
+                await afterDelete(resourceIds, beforeDeleteResult);
               }
 
               // Refresh the page:

@@ -4,17 +4,11 @@ import {
   mountWithAppContext,
   waitForLoadingToDisappear
 } from "common-ui";
-import { QueryPage } from "../QueryPage";
-import { Row } from "@tanstack/react-table";
-import { TableColumn } from "../types";
-import Link from "next/link";
-import { FieldHeader } from "../../field-header/FieldHeader";
-import { stringArrayCell } from "../../table/StringArrayCell";
-import { dateCell } from "../../table/DateCell";
 
 import { mockResponses } from "../__mocks__/QueryPageMocks";
 import { waitFor } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
+import MaterialSampleListPage from "../../../../dina-ui/pages/collection/material-sample/list";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   return mockResponses[path] ?? { data: [] };
@@ -27,6 +21,21 @@ const mockPost = jest.fn<any, any>(async (path) => {
 const mockBulkGet = jest.fn<any, any>(async (paths) => {
   return paths.map((path) => mockResponses[path] ?? { data: [] });
 });
+
+// Mock Next.js router
+const mockReload = jest.fn();
+const mockPush = jest.fn();
+const mockRouter = {
+  push: mockPush,
+  reload: mockReload,
+  pathname: "/collection/material-sample/list",
+  query: {},
+  asPath: "/collection/material-sample/list"
+};
+
+jest.mock("next/router", () => ({
+  useRouter: () => mockRouter
+}));
 
 const mockDelete = jest.fn();
 const mockDoOperations = jest.fn();
@@ -46,194 +55,14 @@ const testCtx = {
   }
 } as any;
 
-/** Helper function to create a test QueryPage component with standard configuration */
-function createTestQueryPage() {
-  const rowStyling = (row: Row<any>) =>
-    row?.original?.data?.attributes?.materialSampleState && {
-      opacity: 0.4
-    };
-
-  const columns: TableColumn<any>[] = [
-    // Material Sample Name
-    {
-      id: "materialSampleName",
-      cell: ({
-        row: {
-          original: { id, data }
-        }
-      }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-        >
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </Link>
-      ),
-      header: () => <FieldHeader name="materialSampleName" />,
-      accessorKey: "data.attributes.materialSampleName",
-      isKeyword: true
-    },
-
-    // Collection Name (External Relationship)
-    {
-      id: "collection.name",
-      cell: ({
-        row: {
-          original: { included }
-        }
-      }) =>
-        included?.collection?.id ? (
-          <Link
-            href={`/collection/collection/view?id=${included?.collection?.id}`}
-          >
-            {included?.collection?.attributes?.name}
-          </Link>
-        ) : null,
-      header: () => <FieldHeader name="collection.name" />,
-      accessorKey: "included.attributes.name",
-      relationshipType: "collection",
-      isKeyword: true
-    },
-
-    // List of catalogue numbers
-    stringArrayCell(
-      "dwcOtherCatalogNumbers",
-      "data.attributes.dwcOtherCatalogNumbers"
-    ),
-
-    // Material Sample Type
-    {
-      id: "materialSampleType",
-      header: () => <FieldHeader name="materialSampleType" />,
-      accessorKey: "data.attributes.materialSampleType",
-      isKeyword: true
-    },
-
-    // Material Sample State
-    {
-      id: "materialSampleState",
-      header: () => <FieldHeader name="materialSampleState" />,
-      accessorKey: "data.attributes.materialSampleState",
-      isKeyword: true
-    },
-
-    // Created By
-    {
-      id: "createdBy",
-      header: () => <FieldHeader name="createdBy" />,
-      accessorKey: "data.attributes.createdBy",
-      isKeyword: true
-    },
-
-    // Created On
-    dateCell("createdOn", "data.attributes.createdOn")
-  ];
-
-  return mountWithAppContext(
-    <DinaForm initialValues={{}}>
-      <QueryPage
-        rowStyling={rowStyling}
-        indexName={"dina_material_sample_index"}
-        uniqueName="material-sample-list"
-        reactTableProps={{
-          enableSorting: true,
-          enableMultiSort: true
-        }}
-        dynamicFieldMapping={{
-          fields: [
-            // Managed Attributes
-            {
-              type: "managedAttribute",
-              label: "managedAttributes",
-              component: "MATERIAL_SAMPLE",
-              path: "data.attributes.managedAttributes",
-              apiEndpoint: "collection-api/managed-attribute"
-            },
-
-            // Field Extensions
-            {
-              type: "fieldExtension",
-              label: "fieldExtensions",
-              component: "MATERIAL_SAMPLE",
-              path: "data.attributes.extensionValues",
-              apiEndpoint: "collection-api/extension"
-            },
-
-            // Restrictions
-            {
-              type: "fieldExtension",
-              label: "restrictions",
-              component: "RESTRICTION",
-              path: "data.attributes.restrictionFieldsExtension",
-              apiEndpoint: "collection-api/extension"
-            }
-          ],
-          relationshipFields: [
-            // Assemblage
-            {
-              type: "managedAttribute",
-              label: "managedAttributes",
-              component: "ASSEMBLAGE",
-              path: "included.attributes.managedAttributes",
-              referencedBy: "assemblages",
-              referencedType: "assemblage",
-              apiEndpoint: "collection-api/managed-attribute"
-            },
-
-            // Collecting Event
-            {
-              type: "managedAttribute",
-              label: "managedAttributes",
-              component: "COLLECTING_EVENT",
-              path: "included.attributes.managedAttributes",
-              referencedBy: "collectingEvent",
-              referencedType: "collecting-event",
-              apiEndpoint: "collection-api/managed-attribute"
-            },
-            {
-              type: "fieldExtension",
-              label: "fieldExtensions",
-              component: "COLLECTING_EVENT",
-              path: "included.attributes.extensionValues",
-              referencedBy: "collectingEvent",
-              referencedType: "collecting-event",
-              apiEndpoint: "collection-api/extension"
-            },
-
-            // Determination
-            {
-              type: "managedAttribute",
-              label: "managedAttributes",
-              component: "DETERMINATION",
-              path: "included.attributes.determination.managedAttributes",
-              referencedBy: "organism",
-              referencedType: "organism",
-              apiEndpoint: "collection-api/managed-attribute"
-            }
-          ]
-        }}
-        columns={columns}
-        bulkDeleteButtonProps={{
-          typeName: "material-sample",
-          apiBaseUrl: "/collection-api"
-        }}
-        bulkEditPath="/collection/material-sample/bulk-edit"
-        dataExportProps={{
-          dataExportPath: "/export/data-export/export",
-          entityLink: "/collection/material-sample"
-        }}
-        // bulkSplitPath="/collection/material-sample/bulk-split"
-      />
-    </DinaForm>,
-    testCtx
-  );
-}
-
 describe("QueryPage test", () => {
   it("Render QueryPage for material-samples", async () => {
-    const component = createTestQueryPage();
+    const component = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <MaterialSampleListPage />
+      </DinaForm>,
+      testCtx
+    );
     const reactTable = await component.findByTestId("ReactTable");
     expect(reactTable).toBeInTheDocument();
     expect(reactTable.querySelectorAll("table tbody tr").length).toBe(2);
@@ -246,7 +75,12 @@ describe("QueryPage test", () => {
   });
 
   it("Bulk Delete button works for material-samples", async () => {
-    const wrapper = createTestQueryPage();
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <MaterialSampleListPage />
+      </DinaForm>,
+      testCtx
+    );
 
     const reactTable = await wrapper.findByTestId("ReactTable");
     expect(reactTable).toBeInTheDocument();
@@ -293,5 +127,10 @@ describe("QueryPage test", () => {
         apiBaseUrl: "/collection-api"
       }
     );
+
+    // Verify router.reload() is called at the very end
+    await waitFor(() => {
+      expect(mockReload).toHaveBeenCalledTimes(1);
+    });
   });
 });
