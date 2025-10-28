@@ -51,7 +51,7 @@ export default function QueryRowImageLink({
     value
       ? JSON.parse(value)
       : {
-          selectedImageType: "ORIGINAL"
+          selectedImageType: "LARGE_IMAGE"
         }
   );
 
@@ -68,7 +68,7 @@ export default function QueryRowImageLink({
       setImageLinkState(JSON.parse(value));
     } else {
       setImageLinkState({
-        selectedImageType: "ORIGINAL"
+        selectedImageType: "LARGE_IMAGE"
       });
     }
   }, []);
@@ -205,7 +205,10 @@ export function ImageLinkButton({ imageType, metadata }: ImageLinkButtonProps) {
   // Do not display anything in the column if no file identifier can be found for the image type.
   if (fileIdentifier === undefined) {
     return <></>;
-  } else if (RAW_EXTS.has(metadata?.data?.attributes.fileExtension)) {
+  } else if (
+    imageType === "ORIGINAL" &&
+    RAW_EXTS.has(metadata?.data?.attributes.fileExtension)
+  ) {
     // If the file is a raw image format that cannot be viewed directly, do not show link
     return <></>;
   }
