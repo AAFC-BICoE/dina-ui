@@ -3,7 +3,20 @@ import { downloadBlobFile } from "common-ui";
 import { Dispatch, SetStateAction } from "react";
 import _ from "lodash";
 
-export const RAW_EXTS = new Set([".cr2", ".nef"]); // Raw file extensions that cannot be viewed directly
+// Raw file extensions that cannot be viewed directly
+export const RAW_EXTS = new Set([
+  ".cr2", // Canon
+  ".cr3", // Canon (newer)
+  ".nef", // Nikon
+  ".arw", // Sony
+  ".dng", // Adobe Digital Negative (universal)
+  ".orf", // Olympus
+  ".rw2", // Panasonic
+  ".pef", // Pentax
+  ".srw", // Samsung
+  ".raf", // Fujifilm
+  ".raw" // Generic/various
+]);
 
 /**
  * Util function to fetch file object as blob ready to be downloaded
