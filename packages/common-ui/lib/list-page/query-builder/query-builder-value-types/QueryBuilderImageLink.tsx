@@ -10,6 +10,7 @@ import {
   DinaMessage,
   useDinaIntl
 } from "../../../../../dina-ui/intl/dina-ui-intl";
+import { RAW_EXTS } from "dina-ui/components/object-store/object-store-utils";
 
 interface QueryRowImageLinkProps {
   /**
@@ -26,9 +27,9 @@ interface QueryRowImageLinkProps {
 // Supported derivative types for the image link selection.
 // Each of these options should have a translation provided: queryBuilder_imageLink_[TYPE]
 export const SUPPORTED_DERIVATIVE_TYPES: string[] = [
+  "LARGE_IMAGE",
   "ORIGINAL",
-  "THUMBNAIL_IMAGE",
-  "LARGE_IMAGE"
+  "THUMBNAIL_IMAGE"
 ];
 
 export interface ImageLinkStates {
@@ -50,7 +51,7 @@ export default function QueryRowImageLink({
     value
       ? JSON.parse(value)
       : {
-          selectedImageType: "ORIGINAL"
+          selectedImageType: "LARGE_IMAGE"
         }
   );
 
@@ -67,7 +68,7 @@ export default function QueryRowImageLink({
       setImageLinkState(JSON.parse(value));
     } else {
       setImageLinkState({
-        selectedImageType: "ORIGINAL"
+        selectedImageType: "LARGE_IMAGE"
       });
     }
   }, []);
@@ -137,7 +138,8 @@ export function getImageLinkColumn<TData extends KitsuResource>(
     isColumnVisible: true,
     enableSorting: false,
     columnSelectorString: path,
-    size: 350
+    size: 350,
+    additionalAccessors: ["data.attributes.fileExtension"]
   };
 }
 
@@ -202,6 +204,12 @@ export function ImageLinkButton({ imageType, metadata }: ImageLinkButtonProps) {
 
   // Do not display anything in the column if no file identifier can be found for the image type.
   if (fileIdentifier === undefined) {
+    return <></>;
+  } else if (
+    imageType === "ORIGINAL" &&
+    RAW_EXTS.has(metadata?.data?.attributes.fileExtension)
+  ) {
+    // If the file is a raw image format that cannot be viewed directly, do not show link
     return <></>;
   }
 
