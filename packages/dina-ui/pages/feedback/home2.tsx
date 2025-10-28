@@ -3,7 +3,7 @@ import { useAccount } from "common-ui";
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import { Footer, Head, Nav, CardGrid } from "../../components";
+import { Footer, Head, Nav, CustomizableCardGrid } from "../../components";
 import { NavigationCard } from "../../types/common";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
@@ -463,7 +463,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="collectionSectionTitle" />
             </h2>
-            <CardGrid cards={collectionCards} itemsPerRow={6} />
+              <CustomizableCardGrid initialCards={collectionCards} />
           </section>
 
           {/* Transaction Section */}
@@ -471,7 +471,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="loanTransactionsSectionTitle" />
             </h2>
-            <CardGrid cards={transactionCards} itemsPerRow={6} />
+            <CustomizableCardGrid initialCards={transactionCards}  />
           </section>
 
           {/* Object Store Section */}
@@ -479,7 +479,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="objectStoreTitle" />
             </h2>
-            <CardGrid cards={objectStoreCards} itemsPerRow={6} />
+            <CustomizableCardGrid initialCards={objectStoreCards}  />
           </section>
 
           {/* Agents Section */}
@@ -487,7 +487,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="agentsSectionTitle" />
             </h2>
-            <CardGrid cards={agentCards} itemsPerRow={6} />
+            <CustomizableCardGrid initialCards={agentCards}  />
           </section>
 
           {/* Sequencing Section */}
@@ -495,7 +495,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="seqdbTitle" />
             </h2>
-            <CardGrid cards={sequencingCards} itemsPerRow={6} />
+            <CustomizableCardGrid initialCards={sequencingCards}  />
           </section>
 
           {/* Controlled Vocabulary Section */}
@@ -503,7 +503,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="controlledVocabularyTitle" />
             </h2>
-            <CardGrid cards={controlledVocabularyCards} itemsPerRow={6} />
+            <CustomizableCardGrid initialCards={controlledVocabularyCards}  />
           </section>
 
           {/* Configuration Section */}
@@ -511,7 +511,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="dinaConfigurationSectionTitle" />
             </h2>
-            <CardGrid cards={configurationCards} itemsPerRow={6} />
+            <CustomizableCardGrid initialCards={configurationCards}  />
           </section>
 
           {/* Management Section - Only visible to collection managers/admins */}
@@ -520,7 +520,7 @@ export function Home2() {
               <h2 className="mb-4">
                 <DinaMessage id="dinaManagementSectionTitle" />
               </h2>
-              <CardGrid cards={managementCards} itemsPerRow={6} />
+              <CustomizableCardGrid initialCards={managementCards}  />
             </section>
           )}
 

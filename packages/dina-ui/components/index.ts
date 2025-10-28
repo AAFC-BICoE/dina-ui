@@ -77,3 +77,4 @@ export * from "./collection/material-sample/organismUtils";
 export * from "./molecular-analysis/MolecularAnalysisUtils";
 export * from "./home2/CardGrid";
 export * from "./home2/NavigationCard";
+export * from "./home2/CustomizableCardGrid";
