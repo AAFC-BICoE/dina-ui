@@ -101,7 +101,7 @@ export default function MolecularAnalysisWorkflowListPage() {
           bulkDeleteButtonProps={{
             apiBaseUrl: "/seqdb",
             typeName: "molecular-analysis-workflow",
-            onDelete: handleDeleteMolecularAnalysisWorkflows
+            beforeDelete: handleDeleteMolecularAnalysisWorkflows
           }}
           additionalFilters={(filterForm) => ({
             isCompleted: false,
