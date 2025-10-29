@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
@@ -19,13 +19,24 @@ import styles from "./NavigationCard.module.css";
 
 interface CustomizableCardGridProps {
   initialCards: NavigationCard[];
+  onSave: (cards: NavigationCard[]) => void;
 }
 
-export function CustomizableCardGrid({ initialCards }: CustomizableCardGridProps) {
+export function CustomizableCardGrid({ initialCards, onSave, isCustomizeMode }: CustomizableCardGridProps & { isCustomizeMode: boolean }) {
   const [gridCards, setGridCards] = useState<NavigationCard[]>(initialCards);
   const [availableCards, setAvailableCards] = useState<NavigationCard[]>([]);
 
+
+  useEffect(() => {
+    if (isCustomizeMode) {
+      // Saving gridCards to parent
+      onSave(gridCards);
+    }
+  }, [gridCards, onSave, isCustomizeMode]);
+
   function handleDragEnd(event: DragEndEvent) {
+
+    if (!isCustomizeMode) return; // Disable drag when not customizing
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
@@ -37,6 +48,7 @@ export function CustomizableCardGrid({ initialCards }: CustomizableCardGridProps
   }
 
   function removeCard(cardId: string) {
+    if (!isCustomizeMode) return;
     const card = gridCards.find((c) => c.id === cardId);
     if (card) {
       setGridCards((prev) => prev.filter((c) => c.id !== cardId));
@@ -45,9 +57,11 @@ export function CustomizableCardGrid({ initialCards }: CustomizableCardGridProps
   }
 
   function addCard(card: NavigationCard) {
+    if (!isCustomizeMode) return;
     setGridCards((prev) => [...prev, card]);
     setAvailableCards((prev) => prev.filter((c) => c.id !== card.id));
   }
+
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -57,11 +71,11 @@ export function CustomizableCardGrid({ initialCards }: CustomizableCardGridProps
       >
         <div className="d-flex flex-wrap gap-3">
           {gridCards.map((card) => (
-            <SortableCard key={card.id} card={card} onRemove={() => removeCard(card.id)} />
+            <SortableCard key={card.id} card={card} onRemove={() => removeCard(card.id)} isCustomizeMode={isCustomizeMode}/>
           ))}
 
           {/* Add placeholders for adding cards */}
-          {availableCards.length > 0 && (
+          {isCustomizeMode && availableCards.length > 0 && (
             <AddCardPlaceholder availableCards={availableCards} onAdd={addCard} />
           )}
         </div>
@@ -70,15 +84,14 @@ export function CustomizableCardGrid({ initialCards }: CustomizableCardGridProps
   );
 }
 
-function SortableCard({ card, onRemove }: { card: NavigationCard; onRemove: () => void }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: card.id });
+function SortableCard({ card, onRemove, isCustomizeMode }: { card: NavigationCard; onRemove: () => void; isCustomizeMode: boolean }) {
+  const { 
+    attributes, 
+    listeners, 
+    setNodeRef, 
+    transform, 
+    transition, 
+    isDragging } = useSortable({ id: card.id });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -86,62 +99,61 @@ function SortableCard({ card, onRemove }: { card: NavigationCard; onRemove: () =
     touchAction: "none",
     opacity: isDragging ? 0.5 : 1,
     width: "180px",
-    position: "relative",
+    position: "relative"
   };
 
   return (
     <div ref={setNodeRef} style={style} {...attributes}>
-      {/* Remove button */}
-        <Button
-        variant="outline-dark"
-        size="sm"
-        style={{
-            position: "absolute",
-            top: 6,
-            right: 6,
-            zIndex: 10,
-            borderRadius: "50%",
-            width: "24px",
-            height: "24px",
-            padding: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "14px",
-            lineHeight: "1",
-        }}
-        onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-        }}
-        >
-        ×
-        </Button>
+      {isCustomizeMode && (
+        <>
+          <Button
+            variant="outline-dark"
+            size="sm"
+            style={{
+              position: "absolute",
+              top: 6,
+              right: 6,
+              zIndex: 10,
+              borderRadius: "50%",
+              width: "24px",
+              height: "24px",
+              padding: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "14px",
+              lineHeight: "1"
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+          >
+            ×
+          </Button>
 
-      {/* Drag handle */}
-      <div
-        {...listeners}
-        style={{
-          position: "absolute",
-          top: 4,
-          left: 4,
-          cursor: "grab",
-          zIndex: 10,
-          background: "#eee",
-          borderRadius: "4px",
-          padding: "2px 6px",
-          fontSize: "12px",
-        }}
-      >
-        ☰
-      </div>
-
+          <div
+            {...listeners}
+            style={{
+              position: "absolute",
+              top: 4,
+              left: 4,
+              cursor: "grab",
+              zIndex: 10,
+              background: "#eee",
+              borderRadius: "4px",
+              padding: "2px 6px",
+              fontSize: "12px"
+            }}
+          >
+            ☰
+          </div>
+        </>
+      )}
       <NavigationCardComponent card={card} />
     </div>
   );
 }
-
-
 
 function AddCardPlaceholder({
   availableCards,

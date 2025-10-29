@@ -1,6 +1,6 @@
 // pages/feedback/home2.tsx (updated)
 import { useAccount } from "common-ui";
-import React from "react";
+import { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import { Footer, Head, Nav, CustomizableCardGrid } from "../../components";
@@ -51,6 +51,23 @@ import {
 
 import { MdNature } from "react-icons/md"; 
 
+function applySavedOrder(key: string, cards: NavigationCard[]): NavigationCard[] {
+  const saved = localStorage.getItem(key);
+  if (!saved) return cards;
+  try {
+    const ids = JSON.parse(saved) as string[];
+    const byId = new Map(cards.map(c => [c.id, c]));
+    // Keep only those that still exist:
+    const ordered = ids.map(id => byId.get(id)).filter(Boolean) as NavigationCard[];
+    // Append any new cards not present when the order was saved:
+    for (const c of cards) if (!ids.includes(c.id)) ordered.push(c);
+    return ordered;
+  } catch {
+    console.warn(`Invalid layout data for ${key}`);
+    return cards;
+  }
+}
+
 export function Home2() {
   const { isAdmin, rolesPerGroup, subject } = useAccount();
 
@@ -59,8 +76,24 @@ export function Home2() {
       ?.flatMap((it) => it)
       ?.includes(SUPER_USER) || isAdmin;
 
-  // Define your navigation cards with React Icons
-  const collectionCards: NavigationCard[] = [
+  const [isCustomizeMode, setIsCustomizeMode] = useState(false);
+
+
+function toggleCustomizeMode() {
+  if (isCustomizeMode) {
+    localStorage.setItem("collectionCardsOrder", JSON.stringify(collectionCards.map(c => c.id)));
+    localStorage.setItem("transactionCardsOrder", JSON.stringify(transactionCards.map(c => c.id)));
+    localStorage.setItem("objectStoreCardsOrder", JSON.stringify(objectStoreCards.map(c => c.id)));
+    localStorage.setItem("agentCardsOrder", JSON.stringify(agentCards.map(c => c.id)));
+    localStorage.setItem("sequencingCardsOrder", JSON.stringify(sequencingCards.map(c => c.id)));
+    localStorage.setItem("controlledVocabularyCardsOrder", JSON.stringify(controlledVocabularyCards.map(c => c.id)));
+    localStorage.setItem("configurationCardsOrder", JSON.stringify(configurationCards.map(c => c.id)));
+    localStorage.setItem("managementCardsOrder", JSON.stringify(managementCards.map(c => c.id)));
+  }
+  setIsCustomizeMode(!isCustomizeMode);
+}
+
+  const [collectionCards, setCollectionCards] = useState<NavigationCard[]>([
     {
       id: "assemblages",
       title: "title_assemblage",
@@ -110,9 +143,9 @@ export function Home2() {
       href: "/workbook/upload",
       category: "collection"
     }
-  ];
+  ]);
 
-  const transactionCards: NavigationCard[] = [
+  const [transactionCards, setTransactionCards] = useState<NavigationCard[]>([
     {
       id: "revisions-by-user-transactions",
       title: "revisionsByUserPageTitle",
@@ -127,9 +160,9 @@ export function Home2() {
       href: "/loan-transaction/transaction/list",
       category: "transactions"
     }
-  ];
+  ]);
 
-  const objectStoreCards: NavigationCard[] = [
+  const [objectStoreCards, setObjectStoreCards] = useState<NavigationCard[]>([
     {
       id: "external-resources",
       title: "externalResourceListTitle",
@@ -165,9 +198,9 @@ export function Home2() {
       href: "/object-store/upload",
       category: "object-store"
     }
-  ];
+  ]);
 
-  const agentCards: NavigationCard[] = [
+  const [agentCards, setAgentCards] = useState<NavigationCard[]>([
     {
       id: "organizations",
       title: "organizationListTitle",
@@ -182,9 +215,9 @@ export function Home2() {
       href: "/person/list",
       category: "agents"
     }
-  ];
+  ]);
 
-  const sequencingCards: NavigationCard[] = [
+  const [sequencingCards, setSequencingCards] = useState<NavigationCard[]>([
     {
       id: "index-sets",
       title: "indexSetListTitle",
@@ -304,9 +337,9 @@ export function Home2() {
       href: "/seqdb/thermocycler-profile/list",
       category: "sequencing"
     }
-  ];
+  ]);
 
-  const controlledVocabularyCards: NavigationCard[] = [
+  const [controlledVocabularyCards, setControlledVocabularyCards] = useState<NavigationCard[]>([
     {
       id: "collection-methods",
       title: "collectionMethodListTitle",
@@ -370,9 +403,9 @@ export function Home2() {
       href: "/collection/storage-unit-type/list",
       category: "controlled-vocabulary"
     }
-  ];
+  ]);
 
-  const configurationCards: NavigationCard[] = [
+  const [configurationCards, setConfigurationCards] = useState<NavigationCard[]>([
     {
       id: "form-templates",
       title: "formTemplates",
@@ -400,10 +433,9 @@ export function Home2() {
       },
       category: "configuration"
     }
-  ];
+  ]);
 
-  // Management cards - only shown to super users/admins
-  const managementCards: NavigationCard[] = [
+  const [managementCards, setManagementCards] = useState<NavigationCard[]>([
     {
       id: "groups",
       title: "groupListTitle",
@@ -427,7 +459,18 @@ export function Home2() {
         category: "management"
       }
     ] : [])
-  ];
+  ]);
+
+  useEffect(() => {
+    setCollectionCards(prev => applySavedOrder("collectionCardsOrder", prev));
+    setTransactionCards(prev => applySavedOrder("transactionCardsOrder", prev));
+    setObjectStoreCards(prev => applySavedOrder("objectStoreCardsOrder", prev));
+    setAgentCards(prev => applySavedOrder("agentCardsOrder", prev));
+    setSequencingCards(prev => applySavedOrder("sequencingCardsOrder", prev));
+    setControlledVocabularyCards(prev => applySavedOrder("controlledVocabularyCardsOrder", prev));
+    setConfigurationCards(prev => applySavedOrder("configurationCardsOrder", prev));
+    setManagementCards(prev => applySavedOrder("managementCardsOrder", prev));
+  }, []);   
 
   return (
     <div>
@@ -458,12 +501,22 @@ export function Home2() {
       <main role="main">
         <Container fluid={true}>
 
+          {/* Customize Mode Toggle */}
+          <div className="mb-4">
+            <Button
+              variant={isCustomizeMode ? "success" : "outline-secondary"}
+              onClick={toggleCustomizeMode}
+            >
+              {isCustomizeMode ? "Done" : "Customize"}
+            </Button>
+          </div>
+
           {/* Collection Section */}
           <section className="mb-5">
             <h2 className="mb-4">
               <DinaMessage id="collectionSectionTitle" />
             </h2>
-              <CustomizableCardGrid initialCards={collectionCards} />
+              <CustomizableCardGrid initialCards={collectionCards} onSave={setCollectionCards} isCustomizeMode={isCustomizeMode} />
           </section>
 
           {/* Transaction Section */}
@@ -471,7 +524,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="loanTransactionsSectionTitle" />
             </h2>
-            <CustomizableCardGrid initialCards={transactionCards}  />
+            <CustomizableCardGrid initialCards={transactionCards} onSave={setTransactionCards} isCustomizeMode={isCustomizeMode} />
           </section>
 
           {/* Object Store Section */}
@@ -479,7 +532,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="objectStoreTitle" />
             </h2>
-            <CustomizableCardGrid initialCards={objectStoreCards}  />
+            <CustomizableCardGrid initialCards={objectStoreCards} onSave={setObjectStoreCards} isCustomizeMode={isCustomizeMode} />
           </section>
 
           {/* Agents Section */}
@@ -487,7 +540,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="agentsSectionTitle" />
             </h2>
-            <CustomizableCardGrid initialCards={agentCards}  />
+            <CustomizableCardGrid initialCards={agentCards} onSave={setAgentCards} isCustomizeMode={isCustomizeMode} />
           </section>
 
           {/* Sequencing Section */}
@@ -495,7 +548,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="seqdbTitle" />
             </h2>
-            <CustomizableCardGrid initialCards={sequencingCards}  />
+            <CustomizableCardGrid initialCards={sequencingCards} onSave={setSequencingCards} isCustomizeMode={isCustomizeMode} />
           </section>
 
           {/* Controlled Vocabulary Section */}
@@ -503,7 +556,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="controlledVocabularyTitle" />
             </h2>
-            <CustomizableCardGrid initialCards={controlledVocabularyCards}  />
+            <CustomizableCardGrid initialCards={controlledVocabularyCards} onSave={setControlledVocabularyCards} isCustomizeMode={isCustomizeMode} />
           </section>
 
           {/* Configuration Section */}
@@ -511,7 +564,7 @@ export function Home2() {
             <h2 className="mb-4">
               <DinaMessage id="dinaConfigurationSectionTitle" />
             </h2>
-            <CustomizableCardGrid initialCards={configurationCards}  />
+            <CustomizableCardGrid initialCards={configurationCards} onSave={setConfigurationCards} isCustomizeMode={isCustomizeMode} />
           </section>
 
           {/* Management Section - Only visible to collection managers/admins */}
@@ -520,7 +573,7 @@ export function Home2() {
               <h2 className="mb-4">
                 <DinaMessage id="dinaManagementSectionTitle" />
               </h2>
-              <CustomizableCardGrid initialCards={managementCards}  />
+              <CustomizableCardGrid initialCards={managementCards} onSave={setManagementCards} isCustomizeMode={isCustomizeMode} />
             </section>
           )}
 
