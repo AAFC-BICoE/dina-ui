@@ -87,9 +87,27 @@
 .ReactTable.-striped tr.-odd {
   background: rgba(0, 0, 0, 0.03);
 }
+
+/* Row Background Transition */
+.ReactTable.-highlight tbody tr,
+.ReactTable.-highlight.-striped tr.-odd {
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Hover Effect */
 .ReactTable.-highlight tbody tr:hover,
 .ReactTable.-highlight.-striped tr.-odd:hover {
-  background-color: rgb(222, 252, 222);
+  background-color: rgb(241, 241, 241);
+}
+
+/* Row is Selected */
+.ReactTable.-highlight tbody tr:has(input[type="checkbox"]:checked) {
+  background-color: rgb(230, 240, 255);
+}
+
+/* Checked row hover (optional - darker shade on hover) */
+.ReactTable.-highlight tbody tr:has(input[type="checkbox"]:checked):hover {
+  background-color: rgb(220, 235, 255);
 }
 
 .ReactTable .pagination-top {

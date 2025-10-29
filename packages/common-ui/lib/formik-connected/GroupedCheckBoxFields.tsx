@@ -147,7 +147,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
               aria-label={formatMessage({ id: "checkAll" })}
               className="check-all-checkbox"
               onClick={onCheckAllCheckBoxClick}
-              style={{ height: "20px", width: "20px", marginLeft: "5px" }}
+              style={{ height: "20px", width: "20px" }}
               type="checkbox"
               defaultChecked={value || false}
             />
@@ -165,16 +165,23 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
     return (
       <div className="grouped-checkbox-header text-center">
         <div>
-          <span id="select-column-header">
-            <CommonMessage id="select" />
-          </span>
-          <CheckAllCheckBox />
-          <Tooltip id="checkAllTooltipMessage" />
-          {!detachTotalSelected && (
-            <div>
-              ({totalChecked} <CommonMessage id="selected" />)
-            </div>
-          )}
+          <Tooltip
+            visibleElement={<CheckAllCheckBox />}
+            placement="right"
+            directComponent={
+              <>
+                <CommonMessage id="checkAllTooltipMessage" />
+                {!detachTotalSelected && totalChecked > 0 && (
+                  <>
+                    <br />
+                    <strong>
+                      ({totalChecked} <CommonMessage id="selected" />)
+                    </strong>
+                  </>
+                )}
+              </>
+            }
+          />
         </div>
       </div>
     );
