@@ -29,8 +29,7 @@ export function CardGrid({ cards, itemsPerRow = 6 }: CardGridProps) {
         <Col key={card.id} {...colProps} className="mb-3">
           <div style={{
             width: '180px',
-            maxWidth: '180px',
-            margin: '0 auto'
+            maxWidth: '180px'
           }}>
             <NavigationCardComponent card={card} />
           </div>

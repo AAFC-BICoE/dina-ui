@@ -14,7 +14,6 @@ import {
   FaLayerGroup, 
   FaLocationDot, 
   FaBoxArchive, 
-  FaClockRotateLeft, 
   FaBoxesStacked, 
   FaDiagramProject, 
   FaFileCsv,
@@ -114,13 +113,6 @@ export function Home2() {
 
   const transactionCards: NavigationCard[] = [
     {
-      id: "revisions-by-user-transactions",
-      title: "revisionsByUserPageTitle",
-      icon: FaClockRotateLeft,
-      href: "/loan-transaction/revisions-by-user",
-      category: "transactions"
-    },
-    {
       id: "transactions",
       title: "transactions",
       icon: FaRightLeft,
@@ -142,13 +134,6 @@ export function Home2() {
       title: "objectSubtypeListTitle",
       icon: FaSitemap,
       href: "/object-store/object-subtype/list",
-      category: "object-store"
-    },
-    {
-      id: "revisions-by-user-object-store",
-      title: "revisionsByUserPageTitle",
-      icon: FaClockRotateLeft,
-      href: "/object-store/revisions-by-user",
       category: "object-store"
     },
     {
