@@ -323,18 +323,11 @@ function usePromptToDeleteEmptyStorage() {
     storageId: string,
     currentContent?: KitsuResource
   ) {
-    const currentContentFilter = currentContent?.id
-      ? ` and uuid!=${currentContent?.id}`
-      : "";
-
     const hasChildUnits = !!(
       await apiClient.get<StorageUnit[]>("collection-api/storage-unit", {
         filter: SimpleSearchFilterBuilder.create()
-          .where(
-            "parentStorageUnit.uuid",
-            "EQ",
-            storageId + currentContentFilter
-          )
+          .where("parentStorageUnit.uuid", "EQ", storageId)
+          .whereProvided("uuid", "NEQ", currentContent?.id)
           .build(),
         page: { limit: 1 }
       })
@@ -343,11 +336,8 @@ function usePromptToDeleteEmptyStorage() {
     const hasChildSamples = !!(
       await apiClient.get<MaterialSample[]>("collection-api/material-sample", {
         filter: SimpleSearchFilterBuilder.create()
-          .where(
-            "storageUnitUsage.storageUnit.uuid",
-            "EQ",
-            storageId + currentContentFilter
-          )
+          .where("storageUnitUsage.storageUnit.uuid", "EQ", storageId)
+          .whereProvided("uuid", "NEQ", currentContent?.id)
           .build(),
         page: { limit: 1 },
         include: "storageUnitUsage"

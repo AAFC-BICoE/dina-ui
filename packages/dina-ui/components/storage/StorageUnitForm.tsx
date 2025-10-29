@@ -133,6 +133,7 @@ export function StorageUnitFormFields({
     setShowTextAreaInput(checked);
   };
 
+  // Material sample query for displaying the grid.
   const materialSamplesQuery = useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
