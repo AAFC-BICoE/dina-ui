@@ -168,20 +168,19 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
           <Tooltip
             visibleElement={<CheckAllCheckBox />}
             placement="right"
+            disableSpanMargin={true}
             directComponent={
               <>
                 <CommonMessage id="checkAllTooltipMessage" />
-                {!detachTotalSelected && totalChecked > 0 && (
-                  <>
-                    <br />
-                    <strong>
-                      ({totalChecked} <CommonMessage id="selected" />)
-                    </strong>
-                  </>
-                )}
               </>
             }
           />
+          {!detachTotalSelected && (
+            <>
+              <br />
+              <i style={{ color: "#6e6e6eff" }}>{totalChecked}</i>
+            </>
+          )}
         </div>
       </div>
     );
