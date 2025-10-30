@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef} from "react";
 import {
   DndContext,
   closestCenter,
@@ -18,64 +18,99 @@ import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import styles from "./NavigationCard.module.css";
 
 interface CustomizableCardGridProps {
-  initialCards: NavigationCard[];
-  onSave: (cards: NavigationCard[]) => void;
+  cards: NavigationCard[];
+  allCards: NavigationCard[];
+  onChange: (gridCards: NavigationCard[]) => void;
+  isCustomizeMode: boolean;
 }
 
-export function CustomizableCardGrid({ initialCards, onSave, isCustomizeMode }: CustomizableCardGridProps & { isCustomizeMode: boolean }) {
-  const [gridCards, setGridCards] = useState<NavigationCard[]>(initialCards);
-  const [availableCards, setAvailableCards] = useState<NavigationCard[]>([]);
+export function CustomizableCardGrid({ 
+  cards, 
+  allCards, 
+  onChange, 
+  isCustomizeMode 
+}: CustomizableCardGridProps & { isCustomizeMode: boolean }) {
+  const [gridCards, setGridCards] = useState<NavigationCard[]>(cards);
 
+  // Track the previous mode to detect changes
+  const prevModeRef = useRef(isCustomizeMode);
 
+  // Seed draft only when entering customize mode (isCustomize false -> true)
   useEffect(() => {
-    if (isCustomizeMode) {
-      // Saving gridCards to parent
-      onSave(gridCards);
+    const was = prevModeRef.current;
+    const now = isCustomizeMode;
+    if (!was && now) {
+      setGridCards(cards);
     }
-  }, [gridCards, onSave, isCustomizeMode]);
+    prevModeRef.current = now;
+  }, [isCustomizeMode, cards]);
+
+  // Derived: cards available to add = allCards - gridCards
+  const availableCards = useMemo(() => {
+    const selected = new Set(gridCards.map(c => c.id));
+    return allCards.filter(c => !selected.has(c.id));
+  }, [allCards, gridCards]);
+
+
+  if (!isCustomizeMode) {
+    return (
+      <div className="d-flex flex-wrap gap-3">
+        {cards.map(card => (
+          <div key={card.id} style={{ width: 180 }}>
+            <NavigationCardComponent card={card} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
 
   function handleDragEnd(event: DragEndEvent) {
-
-    if (!isCustomizeMode) return; // Disable drag when not customizing
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    const oldIndex = gridCards.findIndex((c) => c.id === active.id);
-    const newIndex = gridCards.findIndex((c) => c.id === over.id);
-    if (oldIndex !== -1 && newIndex !== -1) {
-      setGridCards((items) => arrayMove(items, oldIndex, newIndex));
-    }
+    setGridCards(prev => {
+      const from = prev.findIndex(c => c.id === active.id);
+      const to   = prev.findIndex(c => c.id === over.id);
+      if (from === -1 || to === -1) return prev;
+      const next = arrayMove(prev, from, to);
+      onChange(next);
+      return next;
+    });
   }
 
-  function removeCard(cardId: string) {
-    if (!isCustomizeMode) return;
-    const card = gridCards.find((c) => c.id === cardId);
-    if (card) {
-      setGridCards((prev) => prev.filter((c) => c.id !== cardId));
-      setAvailableCards((prev) => [...prev, card]);
-    }
+  function removeCard(id: string) {
+    setGridCards(prev => {
+      const next = prev.filter(c => c.id !== id);
+      onChange(next);
+      return next;
+    });
   }
 
   function addCard(card: NavigationCard) {
-    if (!isCustomizeMode) return;
-    setGridCards((prev) => [...prev, card]);
-    setAvailableCards((prev) => prev.filter((c) => c.id !== card.id));
+    setGridCards(prev => {
+      if (prev.some(c => c.id === card.id)) return prev;
+      const next = [...prev, card];
+      onChange(next);
+      return next;
+    });
   }
-
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext
-        items={gridCards.map((card) => card.id)}
-        strategy={rectSortingStrategy}
-      >
+      <SortableContext items={gridCards.map(card => card.id)} strategy={rectSortingStrategy}>
         <div className="d-flex flex-wrap gap-3">
-          {gridCards.map((card) => (
-            <SortableCard key={card.id} card={card} onRemove={() => removeCard(card.id)} isCustomizeMode={isCustomizeMode}/>
+          {gridCards.map(card => (
+            <SortableCard
+              key={card.id}
+              card={card}
+              onRemove={() => removeCard(card.id)}
+              isCustomizeMode
+            />
           ))}
 
-          {/* Add placeholders for adding cards */}
-          {isCustomizeMode && availableCards.length > 0 && (
+          {/* menu shows derived available cards */}
+          {availableCards.length > 0 && (
             <AddCardPlaceholder availableCards={availableCards} onAdd={addCard} />
           )}
         </div>
@@ -84,14 +119,19 @@ export function CustomizableCardGrid({ initialCards, onSave, isCustomizeMode }: 
   );
 }
 
-function SortableCard({ card, onRemove, isCustomizeMode }: { card: NavigationCard; onRemove: () => void; isCustomizeMode: boolean }) {
-  const { 
-    attributes, 
-    listeners, 
-    setNodeRef, 
-    transform, 
-    transition, 
-    isDragging } = useSortable({ id: card.id });
+
+
+function SortableCard({
+  card,
+  onRemove,
+  isCustomizeMode
+}: {
+  card: NavigationCard;
+  onRemove: () => void;
+  isCustomizeMode: boolean;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: card.id });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -132,6 +172,7 @@ function SortableCard({ card, onRemove, isCustomizeMode }: { card: NavigationCar
             ×
           </Button>
 
+          {/* Drag handle */}
           <div
             {...listeners}
             style={{
@@ -150,20 +191,22 @@ function SortableCard({ card, onRemove, isCustomizeMode }: { card: NavigationCar
           </div>
         </>
       )}
+
       <NavigationCardComponent card={card} />
     </div>
   );
 }
 
+
+
 function AddCardPlaceholder({
   availableCards,
-  onAdd,
+  onAdd
 }: {
   availableCards: NavigationCard[];
   onAdd: (card: NavigationCard) => void;
 }) {
   const [showDropdown, setShowDropdown] = useState(false);
-
   return (
     <div className={styles.placeholderCard}>
       <Button
