@@ -14,7 +14,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { NavigationCard } from "../../types/common";
 import { NavigationCardComponent } from "./NavigationCard";
 import { Button } from "react-bootstrap";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import styles from "./NavigationCard.module.css";
 
 interface CustomizableCardGridProps {
