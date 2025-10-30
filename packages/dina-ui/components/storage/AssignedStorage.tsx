@@ -3,6 +3,7 @@ import {
   SelectField,
   SelectOption,
   TextField,
+  useBulkEditTabContext,
   useDinaFormContext,
   withResponse
 } from "common-ui";
@@ -37,6 +38,7 @@ export function AssignedStorage({
 }: AssignedStorageProps) {
   const storageQuery = useStorageUnit(value?.id);
   const encoder = new AlphanumericEncoder();
+  const bulkEditContext = useBulkEditTabContext();
   const { isTemplate, isBulkEditAllTab } = useDinaFormContext();
   return value?.id ? (
     <div>
@@ -72,7 +74,7 @@ export function AssignedStorage({
                   newTab={!readOnly}
                 />
               </div>
-              {!readOnly && !parentIdInURL && (
+              {!readOnly && !parentIdInURL && !bulkEditContext && (
                 <FormikButton
                   className="remove-storage btn mb-3 list-inline-item"
                   onClick={async () => await onChange?.({ id: null })}

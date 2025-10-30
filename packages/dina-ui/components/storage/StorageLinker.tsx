@@ -6,6 +6,7 @@ import {
   SimpleSearchFilterBuilder,
   SubmitButton,
   useApiClient,
+  useBulkEditTabContext,
   useDinaFormContext,
   useFieldLabels,
   useModal
@@ -25,8 +26,11 @@ import {
 import { AssignedStorage } from "./AssignedStorage";
 import { BrowseStorageTree } from "./BrowseStorageTree";
 import { StorageSearchSelector } from "./StorageSearchSelector";
+import { Button } from "react-bootstrap";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 export interface StorageLinkerProps {
+  name?: string;
   value?: PersistedResource<StorageUnit>;
   onChange?: (
     newValue: PersistedResource<StorageUnit> | { id: null }
@@ -41,6 +45,7 @@ export interface StorageLinkerProps {
 
 /** Multi-Tab Storage Assignment UI. */
 export function StorageLinker({
+  name,
   onChange: onChangeProp,
   value,
   placeholder,
@@ -52,6 +57,7 @@ export function StorageLinker({
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
   const { readOnly } = useDinaFormContext();
+  const bulkEditContext = useBulkEditTabContext();
 
   const formId = useField<string | undefined>("id")[0].value;
   const formType = useField<string | undefined>("type")[0].value;
@@ -148,8 +154,32 @@ export function StorageLinker({
       );
     }
 
+    // If being changed to a new value, the deleted state needs to be removed.
+    if (newValue?.id && name) {
+      const deleted = new Set(bulkEditContext?.deletedFields);
+      deleted.delete(name);
+      bulkEditContext?.setDeletedFields?.(deleted);
+    }
+
     setActiveTab(0);
   }
+
+  /**
+   * Handles the bulk edit delete location logic. Adds it as a deleted field.
+   */
+  async function bulkEditDeleteLocation() {
+    if (name) {
+      await changeStorageAndResetTab?.({ id: null });
+      const deleted = new Set(bulkEditContext?.deletedFields);
+      deleted.add(name);
+      bulkEditContext?.setDeletedFields?.(deleted);
+    }
+  }
+
+  const isDeleted =
+    bulkEditContext && name
+      ? bulkEditContext?.deletedFields?.has?.(name)
+      : false;
 
   return (
     <div>
@@ -157,6 +187,19 @@ export function StorageLinker({
         <div className="alert alert-secondary placeholder-text">
           {placeholder}
         </div>
+      )}
+      {/* Clear button */}
+      {bulkEditContext && !isDeleted && (
+        <>
+          <Button
+            variant="danger"
+            className="mb-3"
+            onClick={bulkEditDeleteLocation}
+          >
+            <RiDeleteBinLine className="me-2" /> Delete location from all
+            storage units
+          </Button>
+        </>
       )}
       {value?.id ? (
         <AssignedStorage
@@ -285,30 +328,33 @@ export function StorageLinkerField({
         <div>
           <FieldSpy fieldName={name}>
             {(_, { bulkContext }) => (
-              <div>
-                {bulkContext?.hasBulkEditValue ? (
-                  <div className="alert alert-warning">
-                    <DinaMessage
-                      id="bulkEditResourceLinkerWarningSingle"
-                      values={{
-                        targetType: getFieldLabel({ name: targetType })
-                          .fieldLabel,
-                        fieldName: getFieldLabel({ name }).fieldLabel
-                      }}
-                    />
-                  </div>
-                ) : null}
-              </div>
+              <>
+                <div>
+                  {bulkContext?.hasBulkEditValue ? (
+                    <div className="alert alert-warning">
+                      <DinaMessage
+                        id="bulkEditResourceLinkerWarningSingle"
+                        values={{
+                          targetType: getFieldLabel({ name: targetType })
+                            .fieldLabel,
+                          fieldName: getFieldLabel({ name }).fieldLabel
+                        }}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+                <StorageLinker
+                  value={value}
+                  name={name}
+                  onChange={setValue}
+                  placeholder={placeholder}
+                  parentIdInURL={parentIdInURL}
+                  createStorageMode={createStorageMode}
+                  currentStorageUnitUUID={currentStorageUnitUUID}
+                />
+              </>
             )}
           </FieldSpy>
-          <StorageLinker
-            value={value}
-            onChange={setValue}
-            placeholder={placeholder}
-            parentIdInURL={parentIdInURL}
-            createStorageMode={createStorageMode}
-            currentStorageUnitUUID={currentStorageUnitUUID}
-          />
         </div>
       )}
     </FieldWrapper>
