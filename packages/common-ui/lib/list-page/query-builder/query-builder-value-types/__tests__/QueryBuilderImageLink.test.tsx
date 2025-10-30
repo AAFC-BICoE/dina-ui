@@ -56,6 +56,46 @@ describe("ImageLinkButton", () => {
       const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
       expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
     });
+
+    it("does not render when fileExtension is a raw format for ORIGINAL type", () => {
+      const props: ImageLinkButtonProps = {
+        imageType: "ORIGINAL",
+        metadata: {
+          data: {
+            attributes: {
+              fileIdentifier: "original-file-123",
+              fileExtension: ".cr2"
+            }
+          }
+        }
+      };
+
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+      expect(wrapper.queryByRole("link")).not.toBeInTheDocument();
+    });
+
+    it("renders link when fileExtension is not a raw format for ORIGINAL type", () => {
+      const props: ImageLinkButtonProps = {
+        imageType: "ORIGINAL",
+        metadata: {
+          data: {
+            attributes: {
+              fileIdentifier: "original-file-123",
+              fileExtension: ".jpg"
+            }
+          }
+        }
+      };
+
+      const wrapper = mountWithAppContext(<ImageLinkButton {...props} />);
+
+      const link = wrapper.getByRole("link", { name: /view image/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute(
+        "href",
+        `${IMAGE_VIEW_LINK}original-file-123`
+      );
+    });
   });
 
   describe("Derivative image types", () => {

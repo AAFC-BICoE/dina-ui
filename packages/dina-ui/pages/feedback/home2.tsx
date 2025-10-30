@@ -15,7 +15,6 @@ import {
   FaLayerGroup, 
   FaLocationDot, 
   FaBoxArchive, 
-  FaClockRotateLeft, 
   FaBoxesStacked, 
   FaDiagramProject, 
   FaFileCsv,
@@ -64,14 +63,12 @@ const COLLECTION_DEFAULTS: NavigationCard[] = [
 ];
 
 const TRANSACTION_DEFAULTS: NavigationCard[] = [
-  { id: "revisions-by-user-transactions", title: "revisionsByUserPageTitle", icon: FaClockRotateLeft, href: "/loan-transaction/revisions-by-user", category: "transactions" },
   { id: "transactions", title: "transactions", icon: FaRightLeft, href: "/loan-transaction/transaction/list", category: "transactions" }
 ];
 
 const OBJECT_STORE_DEFAULTS: NavigationCard[] = [
   { id: "external-resources", title: "externalResourceListTitle", icon: FaLink, href: "/object-store/metadata/external-resource-edit", category: "object-store" },
   { id: "object-subtypes", title: "objectSubtypeListTitle", icon: FaSitemap, href: "/object-store/object-subtype/list", category: "object-store" },
-  { id: "revisions-by-user-object-store", title: "revisionsByUserPageTitle", icon: FaClockRotateLeft, href: "/object-store/revisions-by-user", category: "object-store" },
   { id: "stored-objects", title: "objectListTitle", icon: FaCube, href: "/object-store/object/list", category: "object-store" },
   { id: "upload-files", title: "uploadPageTitle", icon: FaFileArrowUp, href: "/object-store/upload", category: "object-store" }
 ];

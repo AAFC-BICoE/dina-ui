@@ -140,13 +140,18 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
   })
 );
 
+const mockPost = jest.fn<any, any>(async () => {
+  return {};
+});
+
 const apiContext = {
   save: mockSave,
   bulkGet: mockBulkGet,
   apiClient: {
     get: mockGet,
     axios: {
-      get: mockGet
+      get: mockGet,
+      post: mockPost
     }
   }
 };
