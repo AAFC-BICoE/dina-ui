@@ -1,6 +1,5 @@
 import { KitsuResource } from "kitsu";
 import { Person } from "../../agent-api/resources/Person";
-import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface CollectorGroupAttributes {
   uuid: string;
@@ -15,5 +14,4 @@ export interface CollectorGroupRelationships {
 }
 export type CollectorGroup = KitsuResource &
   CollectorGroupAttributes &
-  CollectorGroupRelationships &
-  HasDinaMetaInfo;
+  CollectorGroupRelationships;
