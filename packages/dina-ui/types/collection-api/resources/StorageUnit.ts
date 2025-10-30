@@ -1,5 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { StorageUnitType } from "./StorageUnitType";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface StorageUnitAttributes {
   type: "storage-unit";
@@ -34,4 +35,5 @@ export interface StorageUnitRelationships {
 
 export type StorageUnit = KitsuResource &
   StorageUnitAttributes &
-  StorageUnitRelationships;
+  StorageUnitRelationships &
+  HasDinaMetaInfo;

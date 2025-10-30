@@ -2,6 +2,7 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { MultilingualDescription } from "../../common";
 import { AgentRole } from "../../loan-transaction-api";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface ProjectAttributes {
   type: "project";
@@ -21,4 +22,7 @@ export interface ProjectRelationships {
   attachment?: ResourceIdentifierObject[];
 }
 
-export type Project = KitsuResource & ProjectAttributes & ProjectRelationships;
+export type Project = KitsuResource &
+  ProjectAttributes &
+  ProjectRelationships &
+  HasDinaMetaInfo;

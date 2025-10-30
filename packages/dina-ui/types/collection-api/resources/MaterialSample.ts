@@ -13,7 +13,7 @@ import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Person } from "../../objectstore-api";
 import { StorageUnitUsage } from "./StorageUnitUsage";
-import { DinaJsonMetaInfo } from "../../DinaJsonMetaInfo";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -83,9 +83,6 @@ export interface MaterialSampleAttributes {
 
   // Client side for parent attributes
   parentAttributes?: any;
-
-  // Used for permission information included on the request.
-  meta?: DinaJsonMetaInfo;
 }
 
 export interface HostOrganism {
@@ -137,4 +134,5 @@ export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
 
 export type MaterialSample = KitsuResource &
   MaterialSampleAttributes &
-  MaterialSampleRelationships;
+  MaterialSampleRelationships &
+  HasDinaMetaInfo;

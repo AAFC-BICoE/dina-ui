@@ -1,5 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { MultilingualDescription } from "../../common";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface CollectionMethodAttributes {
   type: "collection-method";
@@ -10,4 +11,6 @@ export interface CollectionMethodAttributes {
   multilingualDescription?: MultilingualDescription;
 }
 
-export type CollectionMethod = KitsuResource & CollectionMethodAttributes;
+export type CollectionMethod = KitsuResource &
+  CollectionMethodAttributes &
+  HasDinaMetaInfo;

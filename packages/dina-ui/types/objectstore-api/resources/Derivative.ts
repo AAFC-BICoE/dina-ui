@@ -1,7 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { Metadata } from "./Metadata";
 import { ObjectUpload } from "./ObjectUpload";
-import { DinaJsonMetaInfo } from "../../DinaJsonMetaInfo";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface DerivativeAttributes {
   type: "derivative";
@@ -19,9 +19,6 @@ export interface DerivativeAttributes {
   acTags?: string[];
   publiclyReleasable?: boolean;
   notPubliclyReleasableReason: any;
-
-  // Used for permission information included on the request.
-  meta?: DinaJsonMetaInfo;
 }
 
 export interface DerivativeRelationships {
@@ -32,4 +29,5 @@ export interface DerivativeRelationships {
 
 export type Derivative = KitsuResource &
   DerivativeAttributes &
-  DerivativeRelationships;
+  DerivativeRelationships &
+  HasDinaMetaInfo;
