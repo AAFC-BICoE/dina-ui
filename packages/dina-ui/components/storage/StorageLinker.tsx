@@ -196,8 +196,8 @@ export function StorageLinker({
             className="mb-3"
             onClick={bulkEditDeleteLocation}
           >
-            <RiDeleteBinLine className="me-2" /> Delete location from all
-            storage units
+            <RiDeleteBinLine className="me-2" />
+            <DinaMessage id="deleteAllStorageUnit" />
           </Button>
         </>
       )}
@@ -210,79 +210,81 @@ export function StorageLinker({
           showRowAndColumnFields={!createStorageMode}
         />
       ) : (
-        <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
-          <TabList className="react-tabs__tab-list mb-0">
-            {!value?.id && (
-              <Tab>
-                <DinaMessage id="searchStorage" />
-              </Tab>
-            )}
-            {!value?.id && (
-              <Tab>
-                <DinaMessage id="browseStorageTree" />
-              </Tab>
-            )}
-            {!value?.id &&
-              actionMode !== "ADD_EXISTING_AS_CHILD" &&
-              createStorageMode === true && (
+        <div className="ignore-explicitly-styles">
+          <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
+            <TabList className="react-tabs__tab-list mb-0">
+              {!value?.id && (
                 <Tab>
-                  <DinaMessage id="createStorage" />
+                  <DinaMessage id="searchStorage" />
                 </Tab>
               )}
-          </TabList>
-          <div
-            className="card-body border-top-0"
-            style={{
-              border: "1px solid rgb(170, 170, 170)",
-              height: "60rem",
-              overflowY: "scroll"
-            }}
-          >
-            {!value?.id && (
-              <TabPanel>
-                {actionMode === "MOVE_ALL" && storageUnitType ? (
-                  <StorageSearchSelector
-                    onChange={changeStorageAndResetTab}
-                    currentStorageUnitUUID={currentStorageUnitUUID}
-                    customViewElasticSearchQuery={storageUnitTypeQuery(
-                      storageUnitType
-                    )}
-                  />
-                ) : (
-                  <StorageSearchSelector
-                    onChange={changeStorageAndResetTab}
-                    currentStorageUnitUUID={currentStorageUnitUUID}
-                  />
+              {!value?.id && (
+                <Tab>
+                  <DinaMessage id="browseStorageTree" />
+                </Tab>
+              )}
+              {!value?.id &&
+                actionMode !== "ADD_EXISTING_AS_CHILD" &&
+                createStorageMode === true && (
+                  <Tab>
+                    <DinaMessage id="createStorage" />
+                  </Tab>
                 )}
-              </TabPanel>
-            )}
-            {!value?.id && (
-              <TabPanel>
-                <BrowseStorageTree
-                  onSelect={changeStorageAndResetTab}
-                  readOnly={readOnly}
-                  currentStorageUnitUUID={currentStorageUnitUUID}
-                />
-              </TabPanel>
-            )}
-            {!value?.id && (
-              <TabPanel>
-                <StorageUnitForm
-                  onSaved={(savedUnits) =>
-                    changeStorageAndResetTab(savedUnits[0])
-                  }
-                  buttonBar={
-                    <ButtonBar>
-                      <SubmitButton className="ms-auto">
-                        <DinaMessage id="createAndAssign" />
-                      </SubmitButton>
-                    </ButtonBar>
-                  }
-                />
-              </TabPanel>
-            )}
-          </div>
-        </Tabs>
+            </TabList>
+            <div
+              className="card-body border-top-0"
+              style={{
+                border: "1px solid rgb(170, 170, 170)",
+                height: "60rem",
+                overflowY: "scroll"
+              }}
+            >
+              {!value?.id && (
+                <TabPanel>
+                  {actionMode === "MOVE_ALL" && storageUnitType ? (
+                    <StorageSearchSelector
+                      onChange={changeStorageAndResetTab}
+                      currentStorageUnitUUID={currentStorageUnitUUID}
+                      customViewElasticSearchQuery={storageUnitTypeQuery(
+                        storageUnitType
+                      )}
+                    />
+                  ) : (
+                    <StorageSearchSelector
+                      onChange={changeStorageAndResetTab}
+                      currentStorageUnitUUID={currentStorageUnitUUID}
+                    />
+                  )}
+                </TabPanel>
+              )}
+              {!value?.id && (
+                <TabPanel>
+                  <BrowseStorageTree
+                    onSelect={changeStorageAndResetTab}
+                    readOnly={readOnly}
+                    currentStorageUnitUUID={currentStorageUnitUUID}
+                  />
+                </TabPanel>
+              )}
+              {!value?.id && (
+                <TabPanel>
+                  <StorageUnitForm
+                    onSaved={(savedUnits) =>
+                      changeStorageAndResetTab(savedUnits[0])
+                    }
+                    buttonBar={
+                      <ButtonBar>
+                        <SubmitButton className="ms-auto">
+                          <DinaMessage id="createAndAssign" />
+                        </SubmitButton>
+                      </ButtonBar>
+                    }
+                  />
+                </TabPanel>
+              )}
+            </div>
+          </Tabs>
+        </div>
       )}
     </div>
   );

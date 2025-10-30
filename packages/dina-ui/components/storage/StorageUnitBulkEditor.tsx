@@ -85,7 +85,7 @@ export function StorageUnitBulkEditor({
 
   const [initialized, setInitialized] = useState(false);
 
-  const { bulkEditTab, clearedFields } = useBulkEditTab({
+  const { bulkEditTab, clearedFields, deletedFields } = useBulkEditTab({
     resourceHooks: storageUnitHooks,
     hideBulkEditTab: !initialized,
     resourceForm: bulkEditTabStorageUnitForm,
@@ -103,7 +103,8 @@ export function StorageUnitBulkEditor({
     bulkEditCtx: {
       resourceHooks: storageUnitHooks,
       bulkEditFormRef,
-      clearedFields
+      clearedFields,
+      deletedFields
     }
   });
 
@@ -221,7 +222,8 @@ function useBulkStorageUnitSave({
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const { bulkEditFormRef, resourceHooks, clearedFields } = bulkEditCtx;
+  const { bulkEditFormRef, resourceHooks, clearedFields, deletedFields } =
+    bulkEditCtx;
 
   async function saveAll() {
     setError(null);
@@ -295,6 +297,19 @@ function useBulkStorageUnitSave({
               saveOp.resource.parentStorageUnit,
               ["id", "type"]
             ) as typeof saveOp.resource.parentStorageUnit;
+          }
+
+          // Check if any deleted fields have been requested, make the changes for each operation.
+          if (deletedFields?.size) {
+            deletedFields.forEach((deletedField) => {
+              if (deletedField === "parentStorageUnit") {
+                saveOp.resource.relationships = {
+                  parentStorageUnit: {
+                    data: null
+                  }
+                };
+              }
+            });
           }
 
           saveOperations.push(saveOp);
