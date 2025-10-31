@@ -106,7 +106,6 @@ export function CustomizableCardGrid({
             />
           ))}
 
-          {/* menu shows derived available cards */}
           {availableCards.length > 0 && (
             <AddCardPlaceholder availableCards={availableCards} onAdd={addCard} />
           )}
@@ -169,7 +168,6 @@ function SortableCard({
             ×
           </Button>
 
-          {/* Drag handle */}
           <div
             {...listeners}
             style={{

@@ -273,6 +273,4 @@ export function Home2() {
   );
 }
 
-// Making this page client-only for now to avoid any SSR/localStorage issues
-// Will need to be re-enabled for when storing on the server side
 export default Home2; 

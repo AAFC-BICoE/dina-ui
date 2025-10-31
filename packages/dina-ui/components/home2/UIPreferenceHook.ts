@@ -23,7 +23,7 @@ function orderByIds<T extends { id: string }>(defaults: T[], ids: string[]): T[]
   return ids.map((id) => byId.get(id)).filter(Boolean) as T[];
 }
 
-/* uiPreference type helper for friendlier casts. */
+// uiPreference type helper for friendlier casts.
 type UiPref = UserPreference["uiPreference"] extends object
   ? UserPreference["uiPreference"]
   : Record<string, any>;
@@ -36,7 +36,7 @@ type UiPref = UserPreference["uiPreference"] extends object
 export type SectionsDefaults = Record<string, NavigationCard[]>;
 
 export interface UIPreferenceAPI {
-  /* Ordered cards for a section. */
+  // Ordered cards for a section.
   getCards: (sectionKey: string) => NavigationCard[];
   
   /*
@@ -47,7 +47,7 @@ export interface UIPreferenceAPI {
 
   loading: boolean;
   error: unknown;
-  /** For debugging: raw userPref id. */
+  // For debugging: raw userPref id.
   prefId?: string | null;
 }
 
@@ -66,6 +66,7 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
 
   // Keep the latest sections defaults in a ref for stable access in callbacks
   const sectionsRef = useRef<SectionsDefaults>(sections);
+
   useEffect(() => {
     sectionsRef.current = sections;
   }, [sections]);
@@ -155,7 +156,7 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
     };
   }, [apiClient, save, subject]);
 
-  /** Returns a list of NavigationCard objects for a given sectionKey, ordered by ids
+  /* Returns a list of NavigationCard objects for a given sectionKey, ordered by ids
    * triggered by change in idsBySection
   */
   const getCards = useCallback(
@@ -168,7 +169,7 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
     [idsBySection]
   );
 
-  /** Persist a single section’s order; merges into uiPreference.homeLayout. */
+  // Persist a single section’s order; merges into uiPreference.homeLayout.
   const saveCards = useCallback(
     async (sectionKey: string, nextCards: NavigationCard[]) => {
       const nextIds = nextCards.map((c) => c.id);
@@ -206,7 +207,7 @@ export function UIPreferenceHook(sections: SectionsDefaults): UIPreferenceAPI {
     },
     [save, subject, userPref]
   );
-  /* Return a stable API object to prevent unnecessary re-renders*/
+  // Return a stable API object to prevent unnecessary re-renders
   return useMemo(
     () => ({
       getCards,
