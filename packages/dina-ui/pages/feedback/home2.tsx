@@ -2,14 +2,10 @@
 import { useAccount } from "common-ui";
 import { useState, useMemo } from "react";
 import Container from "react-bootstrap/Container";
-import Button from "react-bootstrap/Button";
-import { Footer, Head, Nav, CustomizableCardGrid } from "../../components";
+import { Footer, Head, Nav, CustomizableCardGrid, UIPreferenceHook } from "../../components";
 import { NavigationCard } from "../../types/common";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
-import Link from "next/link";
-import { useLocalStorage } from "@rehooks/local-storage";
-import dynamic from "next/dynamic";
 
 import { 
   FaLayerGroup, 
@@ -136,36 +132,6 @@ function managementDefaults(isAdmin?: boolean): NavigationCard[] {
   ];
 }
 
-
-function useCardOrder(key: string, defaults: NavigationCard[]) {
-  // initial value for localStorage the first time mounting
-  const defaultIds = useMemo(() => defaults.map(c => c.id), [defaults]);
-  
-  // on first render, ids are defaultIds
-  // when setIds is called, it writes to localStorage and update state, triggering re-render with new ids
-  const [ids, setIds] = useLocalStorage<string[]>(key, defaultIds);
-
-  // rebuild full cards list in saved order
-
-  const cards = useMemo(() => {
-
-  // lookup cards by id
-  const byId = new Map(defaults.map(c => [c.id, c]));
-
-  // Prefer the saved order; if `ids` is undefined/null, fall back to default order
-  const order = (ids ?? defaultIds);
-
-  // map ids back to full card objects
-  return order.map(id => byId.get(id)).filter(Boolean) as NavigationCard[];
-}, [ids, defaults, defaultIds]);
-
-  // helper passed to grid component, only ids persist
-  const saveFromCards = (next: NavigationCard[]) => setIds(next.map(c => c.id));
-
-  return { cards, saveFromCards };
-}
-
-
 export function Home2() {
   const { isAdmin, rolesPerGroup, subject } = useAccount();
 
@@ -175,52 +141,48 @@ export function Home2() {
       .includes(SUPER_USER) || isAdmin;
 
   const [isCustomizeMode, setIsCustomizeMode] = useState(false);
-  const toggleCustomizeMode = () => setIsCustomizeMode((v) => !v);
 
-  // Per-section persistence via useLocalStorage:
-  const { cards: collectionCards,            saveFromCards: saveCollection } = useCardOrder("collectionCardsOrder",            COLLECTION_DEFAULTS);
-  const { cards: transactionCards,           saveFromCards: saveTransactions } = useCardOrder("transactionCardsOrder",         TRANSACTION_DEFAULTS);
-  const { cards: objectStoreCards,           saveFromCards: saveObjectStore } = useCardOrder("objectStoreCardsOrder",          OBJECT_STORE_DEFAULTS);
-  const { cards: agentCards,                 saveFromCards: saveAgents } = useCardOrder("agentCardsOrder",                     AGENT_DEFAULTS);
-  const { cards: sequencingCards,            saveFromCards: saveSequencing } = useCardOrder("sequencingCardsOrder",            SEQUENCING_DEFAULTS);
-  const { cards: controlledVocabularyCards,  saveFromCards: saveControlledVocab } = useCardOrder("controlledVocabularyCardsOrder", CONTROLLED_VOCAB_DEFAULTS);
-  const { cards: configurationCards,         saveFromCards: saveConfiguration } = useCardOrder("configurationCardsOrder",      configDefaults(subject));
-  const { cards: managementCards,            saveFromCards: saveManagement } = useCardOrder("managementCardsOrder",            managementDefaults(isAdmin));
+  // Compute dynamic defaults (depend on subject/isAdmin):
+  const configurationDefaults = useMemo(() => configDefaults(subject), [subject]);
+  const management = useMemo(() => managementDefaults(isAdmin), [isAdmin]);
+
+  // Build one object with all sections so the hook can initialize in one PATCH/POST:
+  const sections = useMemo(
+    () => ({
+      collectionCardsOrder: COLLECTION_DEFAULTS,
+      transactionCardsOrder: TRANSACTION_DEFAULTS,
+      objectStoreCardsOrder: OBJECT_STORE_DEFAULTS,
+      agentCardsOrder: AGENT_DEFAULTS,
+      sequencingCardsOrder: SEQUENCING_DEFAULTS,
+      controlledVocabularyCardsOrder: CONTROLLED_VOCAB_DEFAULTS,
+      configurationCardsOrder: configurationDefaults,
+      managementCardsOrder: management
+    }),
+    [configurationDefaults, management]
+  );
+
+  const { getCards, saveCards, loading } = UIPreferenceHook(sections);
+
+  if (loading) {
+    return <div>Loading preferences...</div>;
+  }
 
   return (
     <div>
       <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
-      <Nav />
-
-      <Container fluid={true} className="py-2">
-        <div
-          className="d-flex justify-content-end"
-          style={{ position: "relative", top: "-160px", right: "600px", zIndex: 1000 }}
-        >
-          <Link href="/" passHref legacyBehavior>
-            <Button variant="outline-secondary" size="sm" className="shadow-sm">
-              📋 Back to Classic Layout
-            </Button>
-          </Link>
-        </div>
-      </Container>
-
+      <Nav 
+        isCustomizeMode={isCustomizeMode} 
+        setIsCustomizeMode={setIsCustomizeMode} 
+      />
       <main role="main">
         <Container fluid={true}>
-          {/* Customize Mode Toggle */}
-          <div className="mb-4">
-            <Button variant={isCustomizeMode ? "success" : "outline-secondary"} onClick={toggleCustomizeMode}>
-              {isCustomizeMode ? "Done" : "Customize"}
-            </Button>
-          </div>
-
           {/* Collection */}
           <section className="mb-5">
             <h2 className="mb-4"><DinaMessage id="collectionSectionTitle" /></h2>
             <CustomizableCardGrid
-              cards={collectionCards}
+              cards={getCards("collectionCardsOrder")}
               allCards={COLLECTION_DEFAULTS}
-              onChange={saveCollection}          // persists IDs immediately
+              onChange={(next) => saveCards("collectionCardsOrder", next)}
               isCustomizeMode={isCustomizeMode}
             />
           </section>
@@ -229,9 +191,9 @@ export function Home2() {
           <section className="mb-5">
             <h2 className="mb-4"><DinaMessage id="loanTransactionsSectionTitle" /></h2>
             <CustomizableCardGrid
-              cards={transactionCards}
+              cards={getCards("transactionCardsOrder")}
               allCards={TRANSACTION_DEFAULTS}
-              onChange={saveTransactions}
+              onChange={(next) => saveCards("transactionCardsOrder", next)}
               isCustomizeMode={isCustomizeMode}
             />
           </section>
@@ -240,20 +202,20 @@ export function Home2() {
           <section className="mb-5">
             <h2 className="mb-4"><DinaMessage id="objectStoreTitle" /></h2>
             <CustomizableCardGrid
-              cards={objectStoreCards}
+              cards={getCards("objectStoreCardsOrder")}
               allCards={OBJECT_STORE_DEFAULTS}
-              onChange={saveObjectStore}
+              onChange={(next) => saveCards("objectStoreCardsOrder", next)}
               isCustomizeMode={isCustomizeMode}
             />
           </section>
 
-          {/* Agents */}
+          {/* Agent */}
           <section className="mb-5">
             <h2 className="mb-4"><DinaMessage id="agentsSectionTitle" /></h2>
             <CustomizableCardGrid
-              cards={agentCards}
+              cards={getCards("agentCardsOrder")}
               allCards={AGENT_DEFAULTS}
-              onChange={saveAgents}
+              onChange={(next) => saveCards("agentCardsOrder", next)}
               isCustomizeMode={isCustomizeMode}
             />
           </section>
@@ -262,9 +224,9 @@ export function Home2() {
           <section className="mb-5">
             <h2 className="mb-4"><DinaMessage id="seqdbTitle" /></h2>
             <CustomizableCardGrid
-              cards={sequencingCards}
+              cards={getCards("sequencingCardsOrder")}
               allCards={SEQUENCING_DEFAULTS}
-              onChange={saveSequencing}
+              onChange={(next) => saveCards("sequencingCardsOrder", next)}
               isCustomizeMode={isCustomizeMode}
             />
           </section>
@@ -273,9 +235,9 @@ export function Home2() {
           <section className="mb-5">
             <h2 className="mb-4"><DinaMessage id="controlledVocabularyTitle" /></h2>
             <CustomizableCardGrid
-              cards={controlledVocabularyCards}
+              cards={getCards("controlledVocabularyCardsOrder")}
               allCards={CONTROLLED_VOCAB_DEFAULTS}
-              onChange={saveControlledVocab}
+              onChange={(next) => saveCards("controlledVocabularyCardsOrder", next)}
               isCustomizeMode={isCustomizeMode}
             />
           </section>
@@ -284,28 +246,28 @@ export function Home2() {
           <section className="mb-5">
             <h2 className="mb-4"><DinaMessage id="dinaConfigurationSectionTitle" /></h2>
             <CustomizableCardGrid
-              cards={configurationCards}
+              cards={getCards("configurationCardsOrder")}
               allCards={configDefaults(isAdmin ? subject : undefined)}
-              onChange={saveConfiguration}
+              onChange={(next) => saveCards("configurationCardsOrder", next)}
               isCustomizeMode={isCustomizeMode}
             />
           </section>
 
-          {/* Management (only for super user / admin) */}
+          {/* Management */}
           {showManagementNavigation && (
-            <section className="mb-5">
-              <h2 className="mb-4"><DinaMessage id="dinaManagementSectionTitle" /></h2>
-              <CustomizableCardGrid
-                cards={managementCards}
-                allCards={managementDefaults(isAdmin)}
-                onChange={saveManagement}
-                isCustomizeMode={isCustomizeMode}
-              />
-            </section>
+          <section className="mb-5">
+            <h2 className="mb-4"><DinaMessage id="dinaManagementSectionTitle" /></h2>
+            <CustomizableCardGrid
+              cards={getCards("managementCardsOrder")}
+              allCards={management}
+              onChange={(next) => saveCards("managementCardsOrder", next)}
+              isCustomizeMode={isCustomizeMode}
+            />
+          </section>
           )}
+
         </Container>
       </main>
-
       <Footer />
     </div>
   );
@@ -313,4 +275,4 @@ export function Home2() {
 
 // Making this page client-only for now to avoid any SSR/localStorage issues
 // Will need to be re-enabled for when storing on the server side
-export default dynamic(() => Promise.resolve(Home2), { ssr: false }); 
+export default Home2; 

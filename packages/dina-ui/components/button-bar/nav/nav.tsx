@@ -5,6 +5,7 @@ import {
   useAccount,
   useInstanceContext
 } from "common-ui";
+import { useRouter } from 'next/router';
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
 import { useContext, useState } from "react";
@@ -20,11 +21,18 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
   marginBottom?: boolean;
-
   centered?: boolean;
+  isCustomizeMode?: boolean;
+  setIsCustomizeMode?: (value: React.SetStateAction<boolean>) => void;
 }
 
-export function Nav({ marginBottom = true, centered = true }: NavProps) {
+export function Nav({
+  marginBottom = true, 
+  centered = true, 
+  isCustomizeMode, 
+  setIsCustomizeMode = () => {}  
+}: NavProps) {
+  const router = useRouter();
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
   const instanceContext = useInstanceContext();
@@ -67,7 +75,46 @@ export function Nav({ marginBottom = true, centered = true }: NavProps) {
               </ul>
               <ul className="list-inline">
                 <li className="list-inline-item my-auto">
-                  <NavbarUserControl />
+                  <div className="d-flex align-items-center">
+                    {router.pathname === '/feedback/home2' && (
+                      <Button
+                        variant={isCustomizeMode ? "success" : "outline-secondary"}
+                        size="sm"
+                        className="mr-2"
+                        onClick={() => setIsCustomizeMode(prev => !prev)}
+                      >
+                        {isCustomizeMode ? "Done" : "Customize"}
+                      </Button>
+                    )}
+                    {/* Conditional rendering of layout switch buttons */}
+                    <div style={{ marginLeft: '20px' }}>
+                    {router.pathname === '/' && (
+                      <Link href="/feedback/home2" passHref legacyBehavior>
+                        <Button 
+                          variant="outline-secondary" 
+                          size="sm" 
+                          className="mr-2 shadow-sm"
+                        >
+                          🎨 Try New Layout
+                        </Button>
+                      </Link>
+                    )}
+                    {router.pathname === '/feedback/home2' && (
+                      <Link href="/" passHref legacyBehavior>
+                        <Button 
+                          variant="outline-secondary" 
+                          size="sm" 
+                          className="mr-2 shadow-sm"
+                        >
+                          📋 Back to Classic Layout
+                        </Button>
+                      </Link>
+                    )}
+                    </div>
+                    <div style={{ marginLeft: '20px' }}>
+                      <NavbarUserControl />
+                    </div>
+                  </div>
                 </li>
               </ul>
             </Col>

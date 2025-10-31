@@ -36,21 +36,19 @@ export function CustomizableCardGrid({
   const prevModeRef = useRef(isCustomizeMode);
 
   // Seed draft only when entering customize mode (isCustomize false -> true)
+
   useEffect(() => {
-    const was = prevModeRef.current;
-    const now = isCustomizeMode;
-    if (!was && now) {
-      setGridCards(cards);
-    }
-    prevModeRef.current = now;
+    // Always set grid cards when customize mode changes
+    setGridCards(cards);
+    prevModeRef.current = isCustomizeMode;
   }, [isCustomizeMode, cards]);
+
 
   // Derived: cards available to add = allCards - gridCards
   const availableCards = useMemo(() => {
     const selected = new Set(gridCards.map(c => c.id));
     return allCards.filter(c => !selected.has(c.id));
   }, [allCards, gridCards]);
-
 
   if (!isCustomizeMode) {
     return (
@@ -63,7 +61,6 @@ export function CustomizableCardGrid({
       </div>
     );
   }
-
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
