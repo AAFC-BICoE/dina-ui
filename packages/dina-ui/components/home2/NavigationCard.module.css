@@ -15,7 +15,7 @@
 
 
 .placeholderCard {
-  position: relative; /* Important for dropdown positioning */
+  position: relative;
   width: 180px;
   min-height: 140px;
   max-height: 160px;

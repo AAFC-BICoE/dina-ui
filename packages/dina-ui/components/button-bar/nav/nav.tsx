@@ -104,7 +104,8 @@ export function Nav({
                         <Button 
                           variant="outline-secondary" 
                           size="sm" 
-                          className="mr-2 shadow-sm"
+                          className="mr-2 shadow-sm"                      
+                          style={{ whiteSpace: 'nowrap', width: 'auto' }}
                         >
                           📋 Back to Classic Layout
                         </Button>
