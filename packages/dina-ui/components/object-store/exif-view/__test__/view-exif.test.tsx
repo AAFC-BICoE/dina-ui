@@ -23,7 +23,7 @@ const exifData = new Map()
 
 /** Test ObjectUpload */
 const TEST_OBJECTUPLOAD: ObjectUpload = {
-  fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+  //fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
   sizeInBytes: 500,
   originalFilename: "test.png",
   metaFileEntryVersion: "1",
