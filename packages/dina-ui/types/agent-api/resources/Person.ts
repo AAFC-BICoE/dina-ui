@@ -1,7 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { Identifier } from "./Identifier";
 import { Organization } from "./Organization";
-
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 export interface PersonAttributes {
   type: "person";
   displayName?: string;
@@ -21,4 +21,7 @@ export interface PersonRelationships {
   identifiers?: Identifier[];
 }
 
-export type Person = KitsuResource & PersonAttributes & PersonRelationships;
+export type Person = KitsuResource &
+  PersonAttributes &
+  PersonRelationships &
+  HasDinaMetaInfo;

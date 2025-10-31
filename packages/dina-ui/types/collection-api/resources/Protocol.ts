@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { MultilingualDescription } from "../../common";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 /* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum ProtocolDataUnitEnum {
@@ -43,4 +44,5 @@ export interface ProtocolRelationships {
 
 export type Protocol = KitsuResource &
   ProtocolAttributes &
-  ProtocolRelationships;
+  ProtocolRelationships &
+  HasDinaMetaInfo;

@@ -67,6 +67,21 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   const materialSampleQuery = useMaterialSampleQuery(id);
 
+  // Check the request to see if a permission provider is present.
+  const permissionsProvided =
+    materialSampleQuery?.response?.data?.meta?.permissionsProvider;
+
+  const canEdit = permissionsProvided
+    ? materialSampleQuery?.response?.data?.meta?.permissions?.includes(
+        "update"
+      ) ?? false
+    : true;
+  const canDelete = permissionsProvided
+    ? materialSampleQuery?.response?.data?.meta?.permissions?.includes(
+        "delete"
+      ) ?? false
+    : true;
+
   // Get info of highest parent material sample if one exists
   const highestParentId =
     materialSampleQuery.response?.data.parentMaterialSample &&
@@ -173,11 +188,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 onChange={setSampleFormTemplateUUID}
               />
             </div>
-            <div className="col-md-5 flex d-flex col-sm-12 gap-1">
-              <EditButton
-                entityId={id}
-                entityLink="collection/material-sample"
-              />
+            <div className="col-md-5 flex d-flex col-sm-12 gap-1 justify-content-end">
+              {canEdit && (
+                <EditButton
+                  entityId={id}
+                  entityLink="collection/material-sample"
+                />
+              )}
               <SplitMaterialSampleDropdownButton
                 ids={[id]}
                 disabled={!materialSample.materialSampleName}
@@ -191,31 +208,34 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               >
                 <DinaMessage id="revisionsButtonText" />
               </Link>
-              <DeleteButton
-                id={id}
-                options={{ apiBaseUrl: "/collection-api" }}
-                postDeleteRedirect="/collection/material-sample/list"
-                type="material-sample"
-                className="ms-auto"
-                onDeleted={async () => {
-                  // Delete storageUnitUsage if there is one linked
-                  if (materialSampleData.storageUnitUsage?.id) {
-                    await save<StorageUnitUsage>(
-                      [
-                        {
-                          delete: {
-                            id: materialSampleData.storageUnitUsage?.id ?? null,
-                            type: "storage-unit-usage"
+              {canDelete && (
+                <DeleteButton
+                  id={id}
+                  options={{ apiBaseUrl: "/collection-api" }}
+                  postDeleteRedirect="/collection/material-sample/list"
+                  type="material-sample"
+                  className="ms-auto"
+                  onDeleted={async () => {
+                    // Delete storageUnitUsage if there is one linked
+                    if (materialSampleData.storageUnitUsage?.id) {
+                      await save<StorageUnitUsage>(
+                        [
+                          {
+                            delete: {
+                              id:
+                                materialSampleData.storageUnitUsage?.id ?? null,
+                              type: "storage-unit-usage"
+                            }
                           }
+                        ],
+                        {
+                          apiBaseUrl: "/collection-api"
                         }
-                      ],
-                      {
-                        apiBaseUrl: "/collection-api"
-                      }
-                    );
-                  }
-                }}
-              />
+                      );
+                    }
+                  }}
+                />
+              )}
             </div>
           </ButtonBar>
         );
