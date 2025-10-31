@@ -79,7 +79,7 @@ export default function MetadataViewPage() {
           entityLink="/object-store/object"
         />
       </div>
-      <div className="col-md-8 flex d-flex gap-2">
+      <div className="col-md-8 flex d-flex gap-2 justify-content-end">
         {canEdit && (
           <>
             <Link

@@ -51,6 +51,9 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
    * Adds a filter with a specific operation (LIKE, ILIKE, GT, etc.).
    * e.g., .where('age', 'GT', 18) results in { age: { GT: 18 } }
    *
+   * If value is undefined, an error will be reported. Use .whereProvided() instead to determine
+   * if the filter should be ignored.
+   *
    * @param key The field to filter on.
    * @param op The comparison operator.
    * @param value The value for the comparison.
@@ -60,6 +63,12 @@ export class SimpleSearchFilterBuilder<T extends Record<string, any>> {
     op: FilterOperation,
     value: T[K] | T[K][]
   ): this {
+    if (value === undefined) {
+      throw new Error(
+        `Where condition value undefined for field: ${String(field)}`
+      );
+    }
+
     if (op === "IN" && Array.isArray(value)) {
       this.filter[String(field)] = { [op]: value.join(",") } as any;
     } else {

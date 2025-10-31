@@ -3,6 +3,7 @@ import {
   SelectField,
   SelectOption,
   TextField,
+  useBulkEditTabContext,
   useDinaFormContext,
   withResponse
 } from "common-ui";
@@ -16,6 +17,7 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import AlphanumericEncoder from "alphanumeric-encoder";
 
 export interface AssignedStorageProps {
+  name?: string;
   readOnly?: boolean;
   value?: PersistedResource<StorageUnit>;
   onChange?: (
@@ -28,6 +30,7 @@ export interface AssignedStorageProps {
 
 /** Displays the currently assigned Storage, and lets you unlink it. */
 export function AssignedStorage({
+  name,
   onChange,
   readOnly,
   value,
@@ -37,6 +40,7 @@ export function AssignedStorage({
 }: AssignedStorageProps) {
   const storageQuery = useStorageUnit(value?.id);
   const encoder = new AlphanumericEncoder();
+  const bulkEditContext = useBulkEditTabContext();
   const { isTemplate, isBulkEditAllTab } = useDinaFormContext();
   return value?.id ? (
     <div>
@@ -72,14 +76,16 @@ export function AssignedStorage({
                   newTab={!readOnly}
                 />
               </div>
-              {!readOnly && !parentIdInURL && (
-                <FormikButton
-                  className="remove-storage btn mb-3 list-inline-item"
-                  onClick={async () => await onChange?.({ id: null })}
-                >
-                  <RiDeleteBinLine size="1.8em" />
-                </FormikButton>
-              )}
+              {!readOnly &&
+                !parentIdInURL &&
+                (name !== "parentStorageUnit" || !bulkEditContext) && (
+                  <FormikButton
+                    className="remove-storage btn mb-3 list-inline-item"
+                    onClick={async () => await onChange?.({ id: null })}
+                  >
+                    <RiDeleteBinLine size="1.8em" />
+                  </FormikButton>
+                )}
             </div>
             {!!storageUnit.storageUnitType?.gridLayoutDefinition &&
               !isBulkEditAllTab &&

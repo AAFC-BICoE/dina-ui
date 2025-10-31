@@ -1120,6 +1120,42 @@ Object {
 }
 `;
 
+exports[`QueryBuilderElasticSearchExport functionality applyRootQuery When customQuery is being applied, ensure it's being merged with the other one 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "bool": Object {
+            "must_not": Object {
+              "term": Object {
+                "data.id": "57768f57-047c-47cf-af1b-fb1e0e1861d4",
+              },
+            },
+          },
+        },
+        Object {
+          "bool": Object {
+            "must": Array [
+              Object {
+                "term": Object {
+                  "data.attributes.materialSampleName.keyword": "Test",
+                },
+              },
+              Object {
+                "term": Object {
+                  "data.attributes.preparationDate": "2022-11-30",
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Attempting to sort on a column that does not exist 1`] = `
 Object {
   "query": Object {

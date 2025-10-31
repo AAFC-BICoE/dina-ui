@@ -8,9 +8,11 @@ import {
   FieldHeader,
   FilterAttribute,
   ListPageLayout,
+  Operation,
   QueryPage,
   SimpleSearchFilterBuilder,
-  stringArrayCell
+  stringArrayCell,
+  useApiClient
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -381,6 +383,40 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
 
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
+  const { bulkGet, doOperations } = useApiClient();
+
+  const handleBeforeMaterialSampleDelete = async (resourceIds: string[]) => {
+    // Fetch the resources with their relationships BEFORE deletion
+    const materialSamples = await bulkGet<MaterialSample>(
+      resourceIds.map(
+        (id) => `/material-sample/${id}?include=storageUnitUsage`
+      ),
+      { apiBaseUrl: "/collection-api" }
+    );
+
+    return materialSamples;
+  };
+
+  const handleAfterMaterialSampleDelete = async (
+    _resourceIds: string[],
+    materialSamples: PersistedResource<MaterialSample>[]
+  ) => {
+    // Delete resources linked to the deleted material samples
+    if (materialSamples && materialSamples.length > 0) {
+      const deleteOperations: Operation[] = materialSamples
+        .filter((materialSample) => !!materialSample?.storageUnitUsage?.id)
+        .map((materialSample) => ({
+          op: "DELETE",
+          path: `storage-unit-usage/${materialSample?.storageUnitUsage?.id}`
+        }));
+
+      if (deleteOperations.length > 0) {
+        await doOperations(deleteOperations, {
+          apiBaseUrl: "/collection-api"
+        });
+      }
+    }
+  };
 
   // Columns for the elastic search list page.
   const columns: TableColumn<any>[] = [
@@ -510,7 +546,9 @@ export default function MaterialSampleListPage() {
           nonExportableColumns={MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS}
           bulkDeleteButtonProps={{
             typeName: "material-sample",
-            apiBaseUrl: "/collection-api"
+            apiBaseUrl: "/collection-api",
+            beforeDelete: handleBeforeMaterialSampleDelete,
+            afterDelete: handleAfterMaterialSampleDelete
           }}
           bulkEditPath="/collection/material-sample/bulk-edit"
           dataExportProps={{

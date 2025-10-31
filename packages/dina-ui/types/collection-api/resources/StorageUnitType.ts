@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface StorageUnitTypeAttributes {
   type: "storage-unit-type";
@@ -17,4 +18,6 @@ export interface GridLayoutDefinition {
   numberOfColumns: number;
   fillDirection: string;
 }
-export type StorageUnitType = KitsuResource & StorageUnitTypeAttributes;
+export type StorageUnitType = KitsuResource &
+  StorageUnitTypeAttributes &
+  HasDinaMetaInfo;

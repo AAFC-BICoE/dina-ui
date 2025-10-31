@@ -24,6 +24,28 @@ export function Home() {
     <div>
       <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
       <Nav />
+      
+      <Container fluid={true} className="py-2">
+        <div className="d-flex justify-content-end"
+        style={{
+            position: 'relative',
+            top: '-160px',
+            right: '600px',
+            zIndex: 1000
+        }}
+        >
+        <Link href="/feedback/home2" passHref legacyBehavior>
+            <Button 
+            variant="outline-secondary" 
+            size="sm"
+            className="shadow-sm"
+            >
+              🎨 Try New Layout
+            </Button>
+        </Link>
+        </div>
+      </Container>
+
       <main role="main">
         <Container fluid={true}>
           {/* Quick create menu */}

@@ -1,5 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { MultilingualDescription } from "../../common";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface PreparationMethodAttributes {
   type: "preparation-method";
@@ -10,4 +11,6 @@ export interface PreparationMethodAttributes {
   multilingualDescription?: MultilingualDescription;
 }
 
-export type PreparationMethod = KitsuResource & PreparationMethodAttributes;
+export type PreparationMethod = KitsuResource &
+  PreparationMethodAttributes &
+  HasDinaMetaInfo;

@@ -1,9 +1,17 @@
-import { QueryPage, FieldHeader, dateCell, FormikButton } from "common-ui";
+import {
+  QueryPage,
+  FieldHeader,
+  dateCell,
+  FormikButton,
+  useBulkEditTabContext,
+  BULK_EDIT_IDS_KEY
+} from "common-ui";
 import { TableColumn } from "common-ui/lib/list-page/types";
 import { KitsuResourceLink } from "kitsu";
 import Link from "next/link";
 import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import useLocalStorage from "@rehooks/local-storage";
 
 export interface StorageSearchSelectorProps {
   /**
@@ -24,6 +32,10 @@ export function StorageSearchSelector({
   currentStorageUnitUUID,
   customViewElasticSearchQuery
 }: StorageSearchSelectorProps) {
+  // If inside of a bulk editing context, we need to change the query for the current storage to be an array.
+  const bulkCtx = useBulkEditTabContext();
+  const [ids] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY);
+
   // If a current storage unit UUID is provided and no custom query is specified, filter out the current storage unit from the search results.
   if (currentStorageUnitUUID && !customViewElasticSearchQuery) {
     customViewElasticSearchQuery = {
@@ -35,7 +47,19 @@ export function StorageSearchSelector({
         }
       }
     };
+  } else if (bulkCtx?.bulkEditFormRef && ids?.length) {
+    // Pass an array of all the bulk edit ids since each of them cannot be a parent to itself.
+    customViewElasticSearchQuery = {
+      bool: {
+        must_not: {
+          terms: {
+            "data.id": ids
+          }
+        }
+      }
+    };
   }
+
   // Columns for the elastic search list page.
   const columns: TableColumn<any>[] = [
     // Name

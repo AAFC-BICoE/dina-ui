@@ -3,10 +3,12 @@ import { InputResource } from "kitsu";
 import {
   BulkEditTabContextI,
   ButtonBar,
+  ClearType,
   DinaForm,
   DoOperationsError,
   FormikButton,
   getBulkEditTabFieldInfo,
+  isResourceEmpty,
   ResourceWithHooks,
   SaveArgs,
   useApiClient,
@@ -83,7 +85,7 @@ export function StorageUnitBulkEditor({
 
   const [initialized, setInitialized] = useState(false);
 
-  const { bulkEditTab } = useBulkEditTab({
+  const { bulkEditTab, clearedFields, deletedFields } = useBulkEditTab({
     resourceHooks: storageUnitHooks,
     hideBulkEditTab: !initialized,
     resourceForm: bulkEditTabStorageUnitForm,
@@ -98,7 +100,12 @@ export function StorageUnitBulkEditor({
   const { saveAll } = useBulkStorageUnitSave({
     onSaved,
     storageUnitPreProcessor: storageUnitBulkOverrider,
-    bulkEditCtx: { resourceHooks: storageUnitHooks, bulkEditFormRef }
+    bulkEditCtx: {
+      resourceHooks: storageUnitHooks,
+      bulkEditFormRef,
+      clearedFields,
+      deletedFields
+    }
   });
 
   return (
@@ -182,7 +189,7 @@ export function getStorageUnitBulkOverrider(bulkEditFormRef) {
     }
 
     /** Override object with only the non-empty fields. */
-    const overrides = withoutBlankFields(bulkEditStorageUnit);
+    const overrides = withoutBlankFields(bulkEditStorageUnit, formik.values);
 
     const newStorageUnit: InputResource<StorageUnit> = {
       ...baseStorageUnit,
@@ -215,7 +222,8 @@ function useBulkStorageUnitSave({
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const { bulkEditFormRef, resourceHooks } = bulkEditCtx;
+  const { bulkEditFormRef, resourceHooks, clearedFields, deletedFields } =
+    bulkEditCtx;
 
   async function saveAll() {
     setError(null);
@@ -243,6 +251,7 @@ function useBulkStorageUnitSave({
 
         try {
           const submittedValues = formik.values;
+
           const saveOp = await saveHook.prepareStorageUnitSaveOperation({
             submittedValues,
             preProcessStorageUnit: async (original) => {
@@ -264,6 +273,45 @@ function useBulkStorageUnitSave({
               }
             }
           });
+
+          // Check if cleared fields have been requested, make the changes for each operation.
+          if (clearedFields?.size) {
+            for (const [fieldName, clearType] of clearedFields) {
+              _.set(
+                saveOp.resource as any,
+                fieldName,
+                clearType === ClearType.EmptyString ? "" : null
+              );
+            }
+          }
+
+          // Handle relationships in the storage unit
+          if (saveOp.resource.storageUnitType) {
+            saveOp.resource.storageUnitType = _.pick(
+              saveOp.resource.storageUnitType,
+              ["id", "type"]
+            ) as typeof saveOp.resource.storageUnitType;
+          }
+          if (saveOp.resource.parentStorageUnit) {
+            saveOp.resource.parentStorageUnit = _.pick(
+              saveOp.resource.parentStorageUnit,
+              ["id", "type"]
+            ) as typeof saveOp.resource.parentStorageUnit;
+          }
+
+          // Check if any deleted fields have been requested, make the changes for each operation.
+          if (deletedFields?.size) {
+            deletedFields.forEach((deletedField) => {
+              if (deletedField === "parentStorageUnit") {
+                saveOp.resource.relationships = {
+                  parentStorageUnit: {
+                    data: null
+                  }
+                };
+              }
+            });
+          }
+
           saveOperations.push(saveOp);
         } catch (error: unknown) {
           if (error instanceof DoOperationsError) {
@@ -284,9 +332,13 @@ function useBulkStorageUnitSave({
         }
       }
 
-      const savedStorageUnits = await save<StorageUnit>(saveOperations, {
-        apiBaseUrl: "/collection-api"
-      });
+      // Do not perform any request if no changes were made.
+      const savedStorageUnits = await save<StorageUnit>(
+        saveOperations.filter((op) => !isResourceEmpty(op.resource)),
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      );
       const savedStorageUnitIds = savedStorageUnits.map(
         (storageUnit) => storageUnit.id
       );
