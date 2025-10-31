@@ -91,6 +91,25 @@ describe("SimpleSearchFilterBuilder", () => {
         group: { EQ: "aafc" }
       });
     });
+
+    it("should allow setting the value as null for searching for empty values", () => {
+      const filter = SimpleSearchFilterBuilder.create()
+        .where("key", "EQ", null)
+        .build();
+      expect(filter).toEqual({
+        key: { EQ: null }
+      });
+    });
+
+    it("should throw an error when value is undefined", () => {
+      expect(() => {
+        SimpleSearchFilterBuilder.create<ManagedAttribute>().where(
+          "key",
+          "EQ",
+          undefined as any
+        );
+      }).toThrow("Where condition value undefined for field: key");
+    });
   });
 
   describe(".whereProvided()", () => {

@@ -160,54 +160,54 @@ input[id^="react-select"] {
 }
 
 /* Highlight the Edit All tab's cleared fields in yellow. */
-.is-explicitly-cleared .field-label {
+.is-explicitly-cleared .field-label:not(.ignore-explicitly-styles *) {
   color: rgb(184, 134, 11);
 }
 
 /** Cleared inputs should have a light yellow background and yellow border. */
 .is-explicitly-cleared {
-  input[type="text"]:not([readonly]):not(.react-select__input, .search-input),
-  input[type="text"]:not([readonly]):focus:not(.react-select__input, .search-input),
-  input[type="text"]:not(.react-select__input, .search-input):not([readonly]),
-  input[type="text"]:focus:not(.react-select__input, .search-input):not([readonly]),
-  input[type="search"]:not([readonly]),
-  input[type="search"]:focus:not([readonly]),
-  textarea,
-  textarea:focus,
-  .associated-sample-link,
-  .react-select__control {
+  input[type="text"]:not([readonly]):not(.react-select__input, .search-input):not(.ignore-explicitly-styles *),
+  input[type="text"]:not([readonly]):focus:not(.react-select__input, .search-input):not(.ignore-explicitly-styles *),
+  input[type="text"]:not(.react-select__input, .search-input):not([readonly]):not(.ignore-explicitly-styles *),
+  input[type="text"]:focus:not(.react-select__input, .search-input):not([readonly]):not(.ignore-explicitly-styles *),
+  input[type="search"]:not([readonly]):not(.ignore-explicitly-styles *),
+  input[type="search"]:focus:not([readonly]):not(.ignore-explicitly-styles *),
+  textarea:not(.ignore-explicitly-styles *),
+  textarea:focus:not(.ignore-explicitly-styles *),
+  .associated-sample-link:not(.ignore-explicitly-styles *),
+  .react-select__control:not(.ignore-explicitly-styles *) {
     border-color: #fbbf24;
     background-color: rgb(255, 255, 175) !important;
   }
 }
 
-.is-explicitly-cleared input[type="checkbox"] {
+.is-explicitly-cleared input[type="checkbox"]:not(.ignore-explicitly-styles *) {
   color: rgb(255, 255, 175) !important;
 }
 
 /* Highlight the Edit All tab's deleted fields in red. */
-.is-explicitly-deleted .field-label {
-  color: rgb(220, 38, 38); /* A rich red, adjust as needed */
+.is-explicitly-deleted .field-label:not(.ignore-explicitly-styles *) {
+  color: rgb(220, 38, 38);
 }
 
 /** Deleted inputs should have a light red background and red border. */
 .is-explicitly-deleted {
-  input[type="text"]:not([readonly]):not(.react-select__input, .search-input),
-  input[type="text"]:not([readonly]):focus:not(.react-select__input, .search-input),
-  input[type="text"]:not(.react-select__input, .search-input):not([readonly]),
-  input[type="text"]:focus:not(.react-select__input, .search-input):not([readonly]),
-  input[type="search"]:not([readonly]),
-  input[type="search"]:focus:not([readonly]),
-  textarea,
-  textarea:focus,
-  .associated-sample-link,
-  .react-select__control {
+  input[type="text"]:not([readonly]):not(.react-select__input, .search-input):not(.ignore-explicitly-styles *),
+  input[type="text"]:not([readonly]):focus:not(.react-select__input, .search-input):not(.ignore-explicitly-styles *),
+  input[type="text"]:not(.react-select__input, .search-input):not([readonly]):not(.ignore-explicitly-styles *),
+  input[type="text"]:focus:not(.react-select__input, .search-input):not([readonly]):not(.ignore-explicitly-styles *),
+  input[type="search"]:not([readonly]):not(.ignore-explicitly-styles *),
+  input[type="search"]:focus:not([readonly]):not(.ignore-explicitly-styles *),
+  textarea:not(.ignore-explicitly-styles *),
+  textarea:focus:not(.ignore-explicitly-styles *),
+  .associated-sample-link:not(.ignore-explicitly-styles *),
+  .react-select__control:not(.ignore-explicitly-styles *) {
     border-color: #f87171;
     background-color: rgb(255, 220, 220) !important;
   }
 }
 
-.is-explicitly-deleted input[type="checkbox"] {
+.is-explicitly-deleted input[type="checkbox"]:not(.ignore-explicitly-styles *) {
   color: rgb(255, 220, 220) !important;
 }
 

@@ -418,17 +418,40 @@ export function applyGroupFilters(elasticSearchQuery: any, groups: string[]) {
  * This should be applied right after the bool is generated.
  *
  * @param elasticSearchQuery The root elastic search query to add to the query.
+ * @param customQuery if supplied, add it to this.
  */
-export function applyRootQuery(elasticSearchQuery: any) {
+export function applyRootQuery(elasticSearchQuery: any, customQuery: any) {
+  // No query builder query generated
   if (!elasticSearchQuery?.bool) {
+    // If there's a custom query, return it wrapped
+    if (customQuery && !_.isEmpty(customQuery)) {
+      return customQuery.query ? customQuery : { query: customQuery };
+    }
     return elasticSearchQuery;
   }
 
+  const generatedBool = {
+    ...elasticSearchQuery.bool,
+    ...(elasticSearchQuery?.bool?.should ? { minimum_should_match: 1 } : {})
+  };
+
+  // No custom query, just return the generated query
+  if (!customQuery || _.isEmpty(customQuery)) {
+    return {
+      query: {
+        bool: generatedBool
+      }
+    };
+  }
+
+  // Extract the actual query from customQuery if it's wrapped
+  const actualCustomQuery = customQuery.query || customQuery;
+
+  // Merge custom query with generated query in a must clause
   return {
     query: {
       bool: {
-        ...elasticSearchQuery.bool,
-        ...(elasticSearchQuery?.bool?.should ? { minimum_should_match: 1 } : {})
+        must: [actualCustomQuery, { bool: generatedBool }]
       }
     }
   };

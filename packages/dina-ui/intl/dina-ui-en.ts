@@ -204,6 +204,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteThisAttributesTemplate: "Delete This Template",
   deleteThisView: "Delete This View",
   deleted: "Deleted",
+  deleteAllStorageUnit: "Delete Location From All Storage Units",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
   derivativeDetailsLabel: "Derivative Details",
   depthInMeters: "Depth in Meters",

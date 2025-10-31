@@ -114,6 +114,7 @@ export default function storageUnitListPage() {
           apiBaseUrl: "/collection-api"
         }}
         bulkEditPath="/collection/storage-unit/bulk-edit"
+        singleEditPath="/collection/storage-unit/edit"
       />
     </PageLayout>
   );
