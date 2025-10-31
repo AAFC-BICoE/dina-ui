@@ -189,7 +189,7 @@ export function StorageLinker({
         </div>
       )}
       {/* Clear button */}
-      {bulkEditContext && !isDeleted && (
+      {name === "parentStorageUnit" && bulkEditContext && !isDeleted && (
         <>
           <Button
             variant="danger"
@@ -203,6 +203,7 @@ export function StorageLinker({
       )}
       {value?.id ? (
         <AssignedStorage
+          name={name}
           value={value}
           parentIdInURL={parentIdInURL}
           onChange={changeStorageAndResetTab}

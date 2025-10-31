@@ -17,6 +17,7 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import AlphanumericEncoder from "alphanumeric-encoder";
 
 export interface AssignedStorageProps {
+  name?: string;
   readOnly?: boolean;
   value?: PersistedResource<StorageUnit>;
   onChange?: (
@@ -29,6 +30,7 @@ export interface AssignedStorageProps {
 
 /** Displays the currently assigned Storage, and lets you unlink it. */
 export function AssignedStorage({
+  name,
   onChange,
   readOnly,
   value,
@@ -74,14 +76,16 @@ export function AssignedStorage({
                   newTab={!readOnly}
                 />
               </div>
-              {!readOnly && !parentIdInURL && !bulkEditContext && (
-                <FormikButton
-                  className="remove-storage btn mb-3 list-inline-item"
-                  onClick={async () => await onChange?.({ id: null })}
-                >
-                  <RiDeleteBinLine size="1.8em" />
-                </FormikButton>
-              )}
+              {!readOnly &&
+                !parentIdInURL &&
+                (name !== "parentStorageUnit" || !bulkEditContext) && (
+                  <FormikButton
+                    className="remove-storage btn mb-3 list-inline-item"
+                    onClick={async () => await onChange?.({ id: null })}
+                  >
+                    <RiDeleteBinLine size="1.8em" />
+                  </FormikButton>
+                )}
             </div>
             {!!storageUnit.storageUnitType?.gridLayoutDefinition &&
               !isBulkEditAllTab &&
