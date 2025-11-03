@@ -22,6 +22,7 @@ export * from "./collection/event-map/CollectingEventMap";
 export * from "./collection/global-names/GlobalNamesField";
 export * from "./collection/global-names/GlobalNamesSearchBox";
 export * from "./collection/classification/ClassificationField";
+export * from "./collection/material-sample/MaterialSampleWorkflows";
 export * from "./collection/material-sample/MaterialSampleBreadCrumb";
 export * from "./collection/material-sample/material-sample-form-nav/MaterialSampleFormNav";
 export * from "./collection/material-sample/MaterialSampleIdentifiersSection";

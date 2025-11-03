@@ -37,7 +37,8 @@ import {
   useCollectingEventQuery,
   useMaterialSampleFormTemplateSelectState,
   useMaterialSampleQuery,
-  withOrganismEditorValues
+  withOrganismEditorValues,
+  MaterialSampleWorkflows
 } from "../../../components";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
@@ -312,6 +313,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 )}
 
                 <MaterialSampleIdentifiersSection />
+
+                <MaterialSampleWorkflows
+                  materialSampleQuery={materialSampleQuery}
+                />
 
                 {/* Custom Query View */}
                 <CustomQueryPageView
