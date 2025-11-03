@@ -36,8 +36,8 @@ export function Nav({
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
   const instanceContext = useInstanceContext();
-  const homeLink = router.pathname.startsWith("/feedback") ? "/feedback/home2" : "/";
-
+  const homeLink = router.pathname === "/feedback/home2" ? "/feedback/home2" : "/";
+  
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
