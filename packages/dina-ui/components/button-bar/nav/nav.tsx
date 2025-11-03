@@ -36,8 +36,19 @@ export function Nav({
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
   const instanceContext = useInstanceContext();
-  const homeLink = router.pathname === "/feedback/home2" ? "/feedback/home2" : "/";
-  
+  const [useNewLayout, setUseNewLayout] = useState(() => {
+    return localStorage.getItem("useNewLayout") === "true";
+  });
+  const activateNewLayout = () => {
+    localStorage.setItem("useNewLayout", "true");
+    setUseNewLayout(true);
+  };
+  const deactivateNewLayout = () => {
+    localStorage.removeItem("useNewLayout");
+    setUseNewLayout(false);
+  };
+  const homeLink = useNewLayout ? "/feedback/home2" : "/";
+
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
@@ -91,7 +102,8 @@ export function Nav({
                     <div style={{ marginLeft: '20px' }}>
                     {router.pathname === '/' && (
                       <Link href="/feedback/home2" passHref legacyBehavior>
-                        <Button 
+                        <Button
+                          onClick={activateNewLayout}
                           variant="outline-secondary" 
                           size="sm" 
                           className="mr-2 shadow-sm"
@@ -103,6 +115,7 @@ export function Nav({
                     {router.pathname === '/feedback/home2' && (
                       <Link href="/" passHref legacyBehavior>
                         <Button 
+                          onClick={deactivateNewLayout}
                           variant="outline-secondary" 
                           size="sm" 
                           className="mr-2 shadow-sm"                      
