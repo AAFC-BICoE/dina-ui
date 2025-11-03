@@ -12,6 +12,7 @@ import { ManagedAttributeValues } from "./ManagedAttribute";
 import { JsonValue } from "type-fest";
 import { Protocol } from "./Protocol";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
+import { Expedition } from "./Expedition";
 
 export interface CollectingEventAttributes {
   type: "collecting-event";
@@ -68,6 +69,7 @@ export interface CollectingEventAttributes {
   selectedSections?: string[];
   extensionValues?: any;
   protocol?: Protocol;
+  expedition?: Expedition;
 }
 
 export enum GeographicPlaceNameSource {
