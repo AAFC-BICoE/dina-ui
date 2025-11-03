@@ -36,6 +36,7 @@ export function Nav({
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
   const instanceContext = useInstanceContext();
+  const homeLink = router.pathname.startsWith("/feedback") ? "/feedback/home2" : "/";
 
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
@@ -129,8 +130,8 @@ export function Nav({
           }}
         >
           <Container fluid={true} className={centered ? "centered" : "px-5"}>
-            <Link href="/" passHref={true} legacyBehavior>
-              <Navbar.Brand href="/" className="app-name">
+            <Link href={homeLink} passHref={true} legacyBehavior>
+              <Navbar.Brand href={homeLink} className="app-name">
                 {instanceMode === "PROD" || !instanceMode ? (
                   <DinaMessage id="appTitle" />
                 ) : (

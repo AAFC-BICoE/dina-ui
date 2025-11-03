@@ -186,8 +186,9 @@ function SortableCard({
           </div>
         </>
       )}
-
-      <NavigationCardComponent card={card} />
+      <div style={{ pointerEvents: isCustomizeMode ? "none" : "auto" }}>
+        <NavigationCardComponent card={card} />
+      </div>
     </div>
   );
 }
