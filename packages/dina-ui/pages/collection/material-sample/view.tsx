@@ -314,10 +314,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
                 <MaterialSampleIdentifiersSection />
 
-                <MaterialSampleWorkflows
-                  materialSampleQuery={materialSampleQuery}
-                />
-
                 {/* Custom Query View */}
                 <CustomQueryPageView
                   rowStyling={rowStyling}
@@ -482,6 +478,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     title={<DinaMessage id="materialSampleAttachments" />}
                   />
                 </div>
+
+                <MaterialSampleWorkflows workflows={materialSample.workflows} />
               </main>
             </DinaForm>
           </>

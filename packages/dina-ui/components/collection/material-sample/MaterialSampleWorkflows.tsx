@@ -16,9 +16,9 @@ import useVocabularyOptions from "packages/dina-ui/components/collection/useVoca
 import { WORKFLOWS_COMPONENT_NAME } from "packages/dina-ui/types/collection-api/resources/form-legends/MaterialSampleForm";
 
 export function MaterialSampleWorkflows({
-  materialSampleQuery
+  workflows
 }: {
-  materialSampleQuery: any;
+  workflows: GenericMolecularAnalysis[] | undefined;
 }) {
   const { vocabOptions, loading } = useVocabularyOptions({
     path: "seqdb-api/vocabulary/molecularAnalysisType"
@@ -82,7 +82,7 @@ export function MaterialSampleWorkflows({
     >
       <ReactTable<GenericMolecularAnalysis>
         columns={WORKFLOW_TABLE_COLUMNS}
-        data={materialSampleQuery.response?.data.workflows || []}
+        data={workflows || []}
       />
     </FieldSet>
   );
