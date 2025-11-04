@@ -138,7 +138,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
-  collectingEventPartOfExpedition: "Collecting Event part of Expedition",
+  collectingEventPartOfExpedition: "Collecting Event Expedition",
   collectingEventPermissionAlert:
     "You do not have permission to edit this collecting event. All fields are in read-only mode.",
   collectingEventEditAlertMessage:
@@ -266,6 +266,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   existingAttachments: "Existing Attachments",
   expeditionListTitle: "Expeditions",
   extensionListTitle: " Field Extensions",
+  editExpeditionTitle: "Edit Expedition",
+  addExpeditionTitle: "Add Expedition",
   externalResourceListTitle: "External Resources",
   feedbackButtonText: "Feedback",
   feedbackTitle: "Feedback is recorded in public GitHub Issues",

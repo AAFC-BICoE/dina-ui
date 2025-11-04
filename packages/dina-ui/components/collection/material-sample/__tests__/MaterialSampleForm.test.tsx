@@ -202,13 +202,13 @@ const mockGet = jest.fn<any, any>(async (path) => {
       });
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol":
+    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition":
       return { data: testCollectionEvent() };
-    case "collection-api/collecting-event/2?include=collectors,attachment,collectionMethod,protocol":
+    case "collection-api/collecting-event/2?include=collectors,attachment,collectionMethod,protocol,expedition":
       return { data: testCollectionEventWithGeographicalPlace() };
-    case "collection-api/collecting-event/3?include=collectors,attachment,collectionMethod,protocol":
+    case "collection-api/collecting-event/3?include=collectors,attachment,collectionMethod,protocol,expedition":
       return { data: testCollectionEventWithPermissions() };
-    case "collection-api/collecting-event/4?include=collectors,attachment,collectionMethod,protocol":
+    case "collection-api/collecting-event/4?include=collectors,attachment,collectionMethod,protocol,expedition":
       return {
         data: testCollectionEventWithGeographicalPlaceCustomPlaceName()
       };
