@@ -2,17 +2,23 @@
 import { useAccount } from "common-ui";
 import { useState, useMemo } from "react";
 import Container from "react-bootstrap/Container";
-import { Footer, Head, Nav, CustomizableCardGrid, UIPreferenceHook } from "../../components";
+import {
+  Footer,
+  Head,
+  Nav,
+  CustomizableCardGrid,
+  UIPreferenceHook
+} from "../../components";
 import { NavigationCard } from "../../types/common";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 
-import { 
-  FaLayerGroup, 
-  FaLocationDot, 
-  FaBoxArchive, 
-  FaBoxesStacked, 
-  FaDiagramProject, 
+import {
+  FaLayerGroup,
+  FaLocationDot,
+  FaBoxArchive,
+  FaBoxesStacked,
+  FaDiagramProject,
   FaFileCsv,
   FaRightLeft,
   FaLink,
@@ -42,79 +48,342 @@ import {
   FaFileSignature,
   FaScissors,
   FaUserGear,
-  FaUserGroup
-} from 'react-icons/fa6';
+  FaUserGroup,
+  FaMapLocationDot
+} from "react-icons/fa6";
 
-import { MdNature } from "react-icons/md"; 
+import { MdNature } from "react-icons/md";
 
 // Source of Truth
 const COLLECTION_DEFAULTS: NavigationCard[] = [
-  { id: "assemblages", title: "title_assemblage", icon: FaLayerGroup, href: "/collection/assemblage/list", category: "collection" },
-  { id: "collecting-events", title: "collectingEventListTitle", icon: FaLocationDot, href: "/collection/collecting-event/list", category: "collection" },
-  { id: "collections", title: "collectionListTitle", icon: FaBoxArchive, href: "/collection/collection/list", category: "collection" },
-  { id: "material-samples", title: "materialSampleListTitle", icon: MdNature, href: "/collection/material-sample/list", category: "collection" },
-  { id: "storage-units", title: "storageUnitListTitle", icon: FaBoxesStacked, href: "/collection/storage-unit/list", category: "collection" },
-  { id: "projects", title: "projectListTitle", icon: FaDiagramProject, href: "/collection/project/list", category: "collection" },
-  { id: "workbook-upload", title: "workbookGroupUploadTitle", icon: FaFileCsv, href: "/workbook/upload", category: "collection" }
+  {
+    id: "assemblages",
+    title: "title_assemblage",
+    icon: FaLayerGroup,
+    href: "/collection/assemblage/list",
+    category: "collection"
+  },
+  {
+    id: "collecting-events",
+    title: "collectingEventListTitle",
+    icon: FaLocationDot,
+    href: "/collection/collecting-event/list",
+    category: "collection"
+  },
+  {
+    id: "collections",
+    title: "collectionListTitle",
+    icon: FaBoxArchive,
+    href: "/collection/collection/list",
+    category: "collection"
+  },
+  {
+    id: "expeditions",
+    title: "expeditionListTitle",
+    icon: FaMapLocationDot,
+    href: "/collection/expedition/list",
+    category: "collection"
+  },
+  {
+    id: "material-samples",
+    title: "materialSampleListTitle",
+    icon: MdNature,
+    href: "/collection/material-sample/list",
+    category: "collection"
+  },
+  {
+    id: "storage-units",
+    title: "storageUnitListTitle",
+    icon: FaBoxesStacked,
+    href: "/collection/storage-unit/list",
+    category: "collection"
+  },
+  {
+    id: "projects",
+    title: "projectListTitle",
+    icon: FaDiagramProject,
+    href: "/collection/project/list",
+    category: "collection"
+  },
+  {
+    id: "workbook-upload",
+    title: "workbookGroupUploadTitle",
+    icon: FaFileCsv,
+    href: "/workbook/upload",
+    category: "collection"
+  }
 ];
 
 const TRANSACTION_DEFAULTS: NavigationCard[] = [
-  { id: "transactions", title: "transactions", icon: FaRightLeft, href: "/loan-transaction/transaction/list", category: "transactions" }
+  {
+    id: "transactions",
+    title: "transactions",
+    icon: FaRightLeft,
+    href: "/loan-transaction/transaction/list",
+    category: "transactions"
+  }
 ];
 
 const OBJECT_STORE_DEFAULTS: NavigationCard[] = [
-  { id: "external-resources", title: "externalResourceListTitle", icon: FaLink, href: "/object-store/metadata/external-resource-edit", category: "object-store" },
-  { id: "object-subtypes", title: "objectSubtypeListTitle", icon: FaSitemap, href: "/object-store/object-subtype/list", category: "object-store" },
-  { id: "stored-objects", title: "objectListTitle", icon: FaCube, href: "/object-store/object/list", category: "object-store" },
-  { id: "upload-files", title: "uploadPageTitle", icon: FaFileArrowUp, href: "/object-store/upload", category: "object-store" }
+  {
+    id: "external-resources",
+    title: "externalResourceListTitle",
+    icon: FaLink,
+    href: "/object-store/metadata/external-resource-edit",
+    category: "object-store"
+  },
+  {
+    id: "object-subtypes",
+    title: "objectSubtypeListTitle",
+    icon: FaSitemap,
+    href: "/object-store/object-subtype/list",
+    category: "object-store"
+  },
+  {
+    id: "stored-objects",
+    title: "objectListTitle",
+    icon: FaCube,
+    href: "/object-store/object/list",
+    category: "object-store"
+  },
+  {
+    id: "upload-files",
+    title: "uploadPageTitle",
+    icon: FaFileArrowUp,
+    href: "/object-store/upload",
+    category: "object-store"
+  }
 ];
 
 const AGENT_DEFAULTS: NavigationCard[] = [
-  { id: "organizations", title: "organizationListTitle", icon: FaBuilding, href: "/organization/list", category: "agents" },
-  { id: "persons", title: "personListTitle", icon: FaUser, href: "/person/list", category: "agents" }
+  {
+    id: "organizations",
+    title: "organizationListTitle",
+    icon: FaBuilding,
+    href: "/organization/list",
+    category: "agents"
+  },
+  {
+    id: "persons",
+    title: "personListTitle",
+    icon: FaUser,
+    href: "/person/list",
+    category: "agents"
+  }
 ];
 
 const SEQUENCING_DEFAULTS: NavigationCard[] = [
-  { id: "index-sets", title: "indexSetListTitle", icon: FaBarcode, href: "/seqdb/index-set/list", category: "sequencing" },
-  { id: "library-prep-batches", title: "libraryPrepBatchListTitle", icon: FaFlaskVial, href: "/seqdb/library-prep-batch/list", category: "sequencing" },
-  { id: "metagenomics-workflow", title: "metagenomicsWorkflowTitle", icon: FaRoute, href: "/seqdb/metagenomics-workflow/list", category: "sequencing" },
-  { id: "molecular-analysis-runs", title: "molecularAnalysisRunListTitle", icon: FaMagnifyingGlassChart, href: "/seqdb/molecular-analysis-run/list", category: "sequencing" },
-  { id: "molecular-analysis-workflow", title: "molecularAnalysisWorkflowTitle", icon: FaRoute, href: "/seqdb/molecular-analysis-workflow/list", category: "sequencing" },
-  { id: "ngs-workflow", title: "ngsWorkflowWholeGenomeSeqTitle", icon: FaRoute, href: "/seqdb/ngs-workflow/list", category: "sequencing" },
-  { id: "ngs-workflow-pooling", title: "ngsWorkflowWholeGenomeSeqPoolingTitle", icon: FaRoute, href: "/seqdb/ngs-workflow-pooling/list", category: "sequencing" },
-  { id: "pcr-batches", title: "pcrBatchListTitle", icon: FaVials, href: "/seqdb/pcr-batch/list", category: "sequencing" },
-  { id: "pcr-primers", title: "pcrPrimerListTitle", icon: FaDna, href: "/seqdb/pcr-primer/list", category: "sequencing" },
-  { id: "pcr-workflows", title: "pcrWorkflowListTitle", icon: FaRoute, href: "/seqdb/pcr-workflow/list", category: "sequencing" },
-  { id: "products", title: "productListTitle", icon: FaTag, href: "/seqdb/product/list", category: "sequencing" },
-  { id: "regions", title: "regionListTitle", icon: FaVectorSquare, href: "/seqdb/region/list", category: "sequencing" },
-  { id: "seq-batches", title: "seqBatchListTitle", icon: FaLayerGroup, href: "/seqdb/seq-batch/list", category: "sequencing" },
-  { id: "seq-submission", title: "seqSubmissionListTitle", icon: FaPaperPlane, href: "/seqdb/seq-submission/list", category: "sequencing" },
-  { id: "sequencing-facilities", title: "sequencingFacilityListTitle", icon: FaIndustry, href: "/seqdb/sequencing-facility/list", category: "sequencing" },
-  { id: "seq-workflows", title: "sangerWorkflowSequencingListTitle", icon: FaRoute, href: "/seqdb/seq-workflow/list", category: "sequencing" },
-  { id: "thermocycler-profiles", title: "thermocyclerProfileListTitle", icon: FaTemperatureHalf, href: "/seqdb/thermocycler-profile/list", category: "sequencing" }
+  {
+    id: "index-sets",
+    title: "indexSetListTitle",
+    icon: FaBarcode,
+    href: "/seqdb/index-set/list",
+    category: "sequencing"
+  },
+  {
+    id: "library-prep-batches",
+    title: "libraryPrepBatchListTitle",
+    icon: FaFlaskVial,
+    href: "/seqdb/library-prep-batch/list",
+    category: "sequencing"
+  },
+  {
+    id: "metagenomics-workflow",
+    title: "metagenomicsWorkflowTitle",
+    icon: FaRoute,
+    href: "/seqdb/metagenomics-workflow/list",
+    category: "sequencing"
+  },
+  {
+    id: "molecular-analysis-runs",
+    title: "molecularAnalysisRunListTitle",
+    icon: FaMagnifyingGlassChart,
+    href: "/seqdb/molecular-analysis-run/list",
+    category: "sequencing"
+  },
+  {
+    id: "molecular-analysis-workflow",
+    title: "molecularAnalysisWorkflowTitle",
+    icon: FaRoute,
+    href: "/seqdb/molecular-analysis-workflow/list",
+    category: "sequencing"
+  },
+  {
+    id: "ngs-workflow",
+    title: "ngsWorkflowWholeGenomeSeqTitle",
+    icon: FaRoute,
+    href: "/seqdb/ngs-workflow/list",
+    category: "sequencing"
+  },
+  {
+    id: "ngs-workflow-pooling",
+    title: "ngsWorkflowWholeGenomeSeqPoolingTitle",
+    icon: FaRoute,
+    href: "/seqdb/ngs-workflow-pooling/list",
+    category: "sequencing"
+  },
+  {
+    id: "pcr-batches",
+    title: "pcrBatchListTitle",
+    icon: FaVials,
+    href: "/seqdb/pcr-batch/list",
+    category: "sequencing"
+  },
+  {
+    id: "pcr-primers",
+    title: "pcrPrimerListTitle",
+    icon: FaDna,
+    href: "/seqdb/pcr-primer/list",
+    category: "sequencing"
+  },
+  {
+    id: "pcr-workflows",
+    title: "pcrWorkflowListTitle",
+    icon: FaRoute,
+    href: "/seqdb/pcr-workflow/list",
+    category: "sequencing"
+  },
+  {
+    id: "products",
+    title: "productListTitle",
+    icon: FaTag,
+    href: "/seqdb/product/list",
+    category: "sequencing"
+  },
+  {
+    id: "regions",
+    title: "regionListTitle",
+    icon: FaVectorSquare,
+    href: "/seqdb/region/list",
+    category: "sequencing"
+  },
+  {
+    id: "seq-batches",
+    title: "seqBatchListTitle",
+    icon: FaLayerGroup,
+    href: "/seqdb/seq-batch/list",
+    category: "sequencing"
+  },
+  {
+    id: "seq-submission",
+    title: "seqSubmissionListTitle",
+    icon: FaPaperPlane,
+    href: "/seqdb/seq-submission/list",
+    category: "sequencing"
+  },
+  {
+    id: "sequencing-facilities",
+    title: "sequencingFacilityListTitle",
+    icon: FaIndustry,
+    href: "/seqdb/sequencing-facility/list",
+    category: "sequencing"
+  },
+  {
+    id: "seq-workflows",
+    title: "sangerWorkflowSequencingListTitle",
+    icon: FaRoute,
+    href: "/seqdb/seq-workflow/list",
+    category: "sequencing"
+  },
+  {
+    id: "thermocycler-profiles",
+    title: "thermocyclerProfileListTitle",
+    icon: FaTemperatureHalf,
+    href: "/seqdb/thermocycler-profile/list",
+    category: "sequencing"
+  }
 ];
 
 const CONTROLLED_VOCAB_DEFAULTS: NavigationCard[] = [
-  { id: "collection-methods", title: "collectionMethodListTitle", icon: FaWrench, href: "/collection/collection-method/list", category: "controlled-vocabulary" },
-  { id: "field-extensions", title: "fieldExtensions", icon: FaPuzzlePiece, href: "/collection/extension/list", category: "controlled-vocabulary" },
-  { id: "identifiers", title: "identifiers", icon: FaFingerprint, href: "/identifier/list", category: "controlled-vocabulary" },
-  { id: "institutions", title: "institutionListTitle", icon: FaLandmark, href: "/collection/institution/list", category: "controlled-vocabulary" },
-  { id: "managed-attributes", title: "managedAttributes", icon: FaListCheck, href: "/managed-attribute/list", category: "controlled-vocabulary" },
-  { id: "preparation-methods", title: "title_preparationMethod", icon: FaWrench, href: "/collection/preparation-method/list", category: "controlled-vocabulary" },
-  { id: "preparation-types", title: "preparationTypeListTitle", icon: FaTag, href: "/collection/preparation-type/list", category: "controlled-vocabulary" },
-  { id: "protocols", title: "protocolListTitle", icon: FaFileLines, href: "/collection/protocol/list", category: "controlled-vocabulary" },
-  { id: "storage-unit-types", title: "storageUnitTypeListTitle", icon: FaTags, href: "/collection/storage-unit-type/list", category: "controlled-vocabulary" }
+  {
+    id: "collection-methods",
+    title: "collectionMethodListTitle",
+    icon: FaWrench,
+    href: "/collection/collection-method/list",
+    category: "controlled-vocabulary"
+  },
+  {
+    id: "field-extensions",
+    title: "fieldExtensions",
+    icon: FaPuzzlePiece,
+    href: "/collection/extension/list",
+    category: "controlled-vocabulary"
+  },
+  {
+    id: "identifiers",
+    title: "identifiers",
+    icon: FaFingerprint,
+    href: "/identifier/list",
+    category: "controlled-vocabulary"
+  },
+  {
+    id: "institutions",
+    title: "institutionListTitle",
+    icon: FaLandmark,
+    href: "/collection/institution/list",
+    category: "controlled-vocabulary"
+  },
+  {
+    id: "managed-attributes",
+    title: "managedAttributes",
+    icon: FaListCheck,
+    href: "/managed-attribute/list",
+    category: "controlled-vocabulary"
+  },
+  {
+    id: "preparation-methods",
+    title: "title_preparationMethod",
+    icon: FaWrench,
+    href: "/collection/preparation-method/list",
+    category: "controlled-vocabulary"
+  },
+  {
+    id: "preparation-types",
+    title: "preparationTypeListTitle",
+    icon: FaTag,
+    href: "/collection/preparation-type/list",
+    category: "controlled-vocabulary"
+  },
+  {
+    id: "protocols",
+    title: "protocolListTitle",
+    icon: FaFileLines,
+    href: "/collection/protocol/list",
+    category: "controlled-vocabulary"
+  },
+  {
+    id: "storage-unit-types",
+    title: "storageUnitTypeListTitle",
+    icon: FaTags,
+    href: "/collection/storage-unit-type/list",
+    category: "controlled-vocabulary"
+  }
 ];
 
 function configDefaults(subject: string | undefined): NavigationCard[] {
   return [
-    { id: "form-templates", title: "formTemplates", icon: FaFileSignature, href: "/collection/form-template/list", category: "configuration" },
-    { id: "split-configurations", title: "splitConfigurationTitle", icon: FaScissors, href: "/collection/split-configuration/list", category: "configuration" },
+    {
+      id: "form-templates",
+      title: "formTemplates",
+      icon: FaFileSignature,
+      href: "/collection/form-template/list",
+      category: "configuration"
+    },
+    {
+      id: "split-configurations",
+      title: "splitConfigurationTitle",
+      icon: FaScissors,
+      href: "/collection/split-configuration/list",
+      category: "configuration"
+    },
     {
       id: "user-profile",
       title: "userProfile",
       icon: FaUserGear,
-      href: { pathname: `/dina-user/view`, query: { id: subject, hideBackButton: true } },
+      href: {
+        pathname: `/dina-user/view`,
+        query: { id: subject, hideBackButton: true }
+      },
       category: "configuration"
     }
   ];
@@ -122,11 +391,29 @@ function configDefaults(subject: string | undefined): NavigationCard[] {
 
 function managementDefaults(isAdmin?: boolean): NavigationCard[] {
   return [
-    { id: "groups", title: "groupListTitle", icon: FaUserGroup, href: "/group/list", category: "management" },
+    {
+      id: "groups",
+      title: "groupListTitle",
+      icon: FaUserGroup,
+      href: "/group/list",
+      category: "management"
+    },
     ...(isAdmin
       ? [
-          { id: "users", title: "userListTitle", icon: FaUser, href: "/dina-user/list", category: "management" },
-          { id: "report-templates", title: "reportTemplateUpload", icon: FaFileArrowUp, href: "/export/report-template/upload", category: "management" }
+          {
+            id: "users",
+            title: "userListTitle",
+            icon: FaUser,
+            href: "/dina-user/list",
+            category: "management"
+          },
+          {
+            id: "report-templates",
+            title: "reportTemplateUpload",
+            icon: FaFileArrowUp,
+            href: "/export/report-template/upload",
+            category: "management"
+          }
         ]
       : [])
   ];
@@ -143,7 +430,10 @@ export function Home2() {
   const [isCustomizeMode, setIsCustomizeMode] = useState(false);
 
   // Compute dynamic defaults (depend on subject/isAdmin):
-  const configurationDefaults = useMemo(() => configDefaults(subject), [subject]);
+  const configurationDefaults = useMemo(
+    () => configDefaults(subject),
+    [subject]
+  );
   const management = useMemo(() => managementDefaults(isAdmin), [isAdmin]);
 
   // Build one object with all sections so the hook can initialize in one PATCH/POST:
@@ -170,15 +460,17 @@ export function Home2() {
   return (
     <div>
       <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
-      <Nav 
-        isCustomizeMode={isCustomizeMode} 
-        setIsCustomizeMode={setIsCustomizeMode} 
+      <Nav
+        isCustomizeMode={isCustomizeMode}
+        setIsCustomizeMode={setIsCustomizeMode}
       />
       <main role="main">
         <Container fluid={true}>
           {/* Collection */}
           <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="collectionSectionTitle" /></h2>
+            <h2 className="mb-4">
+              <DinaMessage id="collectionSectionTitle" />
+            </h2>
             <CustomizableCardGrid
               cards={getCards("collectionCardsOrder")}
               allCards={COLLECTION_DEFAULTS}
@@ -189,7 +481,9 @@ export function Home2() {
 
           {/* Transactions */}
           <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="loanTransactionsSectionTitle" /></h2>
+            <h2 className="mb-4">
+              <DinaMessage id="loanTransactionsSectionTitle" />
+            </h2>
             <CustomizableCardGrid
               cards={getCards("transactionCardsOrder")}
               allCards={TRANSACTION_DEFAULTS}
@@ -200,7 +494,9 @@ export function Home2() {
 
           {/* Object Store */}
           <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="objectStoreTitle" /></h2>
+            <h2 className="mb-4">
+              <DinaMessage id="objectStoreTitle" />
+            </h2>
             <CustomizableCardGrid
               cards={getCards("objectStoreCardsOrder")}
               allCards={OBJECT_STORE_DEFAULTS}
@@ -211,7 +507,9 @@ export function Home2() {
 
           {/* Agent */}
           <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="agentsSectionTitle" /></h2>
+            <h2 className="mb-4">
+              <DinaMessage id="agentsSectionTitle" />
+            </h2>
             <CustomizableCardGrid
               cards={getCards("agentCardsOrder")}
               allCards={AGENT_DEFAULTS}
@@ -222,7 +520,9 @@ export function Home2() {
 
           {/* Sequencing */}
           <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="seqdbTitle" /></h2>
+            <h2 className="mb-4">
+              <DinaMessage id="seqdbTitle" />
+            </h2>
             <CustomizableCardGrid
               cards={getCards("sequencingCardsOrder")}
               allCards={SEQUENCING_DEFAULTS}
@@ -233,18 +533,24 @@ export function Home2() {
 
           {/* Controlled Vocabulary */}
           <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="controlledVocabularyTitle" /></h2>
+            <h2 className="mb-4">
+              <DinaMessage id="controlledVocabularyTitle" />
+            </h2>
             <CustomizableCardGrid
               cards={getCards("controlledVocabularyCardsOrder")}
               allCards={CONTROLLED_VOCAB_DEFAULTS}
-              onChange={(next) => saveCards("controlledVocabularyCardsOrder", next)}
+              onChange={(next) =>
+                saveCards("controlledVocabularyCardsOrder", next)
+              }
               isCustomizeMode={isCustomizeMode}
             />
           </section>
 
           {/* Configuration */}
           <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="dinaConfigurationSectionTitle" /></h2>
+            <h2 className="mb-4">
+              <DinaMessage id="dinaConfigurationSectionTitle" />
+            </h2>
             <CustomizableCardGrid
               cards={getCards("configurationCardsOrder")}
               allCards={configDefaults(isAdmin ? subject : undefined)}
@@ -255,17 +561,18 @@ export function Home2() {
 
           {/* Management */}
           {showManagementNavigation && (
-          <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="dinaManagementSectionTitle" /></h2>
-            <CustomizableCardGrid
-              cards={getCards("managementCardsOrder")}
-              allCards={management}
-              onChange={(next) => saveCards("managementCardsOrder", next)}
-              isCustomizeMode={isCustomizeMode}
-            />
-          </section>
+            <section className="mb-5">
+              <h2 className="mb-4">
+                <DinaMessage id="dinaManagementSectionTitle" />
+              </h2>
+              <CustomizableCardGrid
+                cards={getCards("managementCardsOrder")}
+                allCards={management}
+                onChange={(next) => saveCards("managementCardsOrder", next)}
+                isCustomizeMode={isCustomizeMode}
+              />
+            </section>
           )}
-
         </Container>
       </main>
       <Footer />
@@ -273,4 +580,4 @@ export function Home2() {
   );
 }
 
-export default Home2; 
+export default Home2;
