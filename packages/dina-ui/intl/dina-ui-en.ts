@@ -266,6 +266,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   existingAttachments: "Existing Attachments",
   expeditionListTitle: "Expeditions",
   extensionListTitle: " Field Extensions",
+  editExpeditionTitle: "Edit Expedition",
+  addExpeditionTitle: "Add Expedition",
   externalResourceListTitle: "External Resources",
   feedbackButtonText: "Feedback",
   feedbackTitle: "Feedback is recorded in public GitHub Issues",

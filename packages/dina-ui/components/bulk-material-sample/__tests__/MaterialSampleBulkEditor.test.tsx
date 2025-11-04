@@ -99,7 +99,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           name: "Attribute 1"
         }
       });
-    case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod,protocol":
+    case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod,protocol,expedition":
       return { data: TEST_COLLECTING_EVENT };
     case "collection-api/storage-unit":
       if (params?.filter?.rsql === "parentStorageUnit.uuid==su-1") {
