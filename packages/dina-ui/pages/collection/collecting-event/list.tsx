@@ -12,6 +12,35 @@ import { CollectingEvent } from "packages/dina-ui/types/collection-api";
 import { groupCell, GroupSelectField, Head } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
+export const getColumnDefinition: () => ColumnDefinition<CollectingEvent>[] =
+  () => {
+    return [
+      {
+        cell: ({
+          row: {
+            original: { id }
+          }
+        }) => (
+          <Link href={`/collection/collecting-event/view?id=${id}`}>
+            <DinaMessage id="viewDetails" />
+          </Link>
+        ),
+        accessorKey: "id",
+        header: () => <DinaMessage id="viewDetails" />,
+        enableSorting: false
+      },
+      "dwcFieldNumber",
+      "dwcRecordNumber",
+      stringArrayCell("otherRecordNumbers"),
+      "startEventDateTime",
+      "endEventDateTime",
+      "verbatimEventDateTime",
+      groupCell("group"),
+      "createdBy",
+      dateCell("createdOn")
+    ];
+  };
+
 export default function CollectingEventListPage() {
   const { formatMessage } = useDinaIntl();
 
@@ -20,32 +49,8 @@ export default function CollectingEventListPage() {
     "dwcFieldNumber",
     "dwcRecordNumber"
   ];
-
-  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
-    {
-      cell: ({
-        row: {
-          original: { id }
-        }
-      }) => (
-        <Link href={`/collection/collecting-event/view?id=${id}`}>
-          <DinaMessage id="viewDetails" />
-        </Link>
-      ),
-      accessorKey: "id",
-      header: () => <DinaMessage id="viewDetails" />,
-      enableSorting: false
-    },
-    "dwcFieldNumber",
-    "dwcRecordNumber",
-    stringArrayCell("otherRecordNumbers"),
-    "startEventDateTime",
-    "endEventDateTime",
-    "verbatimEventDateTime",
-    groupCell("group"),
-    "createdBy",
-    dateCell("createdOn")
-  ];
+  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] =
+    getColumnDefinition();
 
   return (
     <PageLayout

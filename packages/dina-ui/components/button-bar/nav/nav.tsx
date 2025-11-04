@@ -294,6 +294,11 @@ function NavCollectionDropdown({ formatMessage }) {
           <DinaMessage id="collectionListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/collection/expedition/list" passHref={true} legacyBehavior>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="expeditionListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/workbook/generator" passHref={true} legacyBehavior>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="workbookGenerateTemplateTitle" />
