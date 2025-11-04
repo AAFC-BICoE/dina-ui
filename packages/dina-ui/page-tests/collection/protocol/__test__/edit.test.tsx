@@ -357,7 +357,6 @@ describe("protocol edit page", () => {
 
   it("Renders an error after form submit without specifying mandatory field.", async () => {
     // The patch request will return an error.
-
     const MOCK_POST_ERROR = (() => {
       const error = new Error() as any;
       error.isAxiosError = true;
@@ -369,16 +368,20 @@ describe("protocol edit page", () => {
         data: {
           errors: [
             {
-              status: 422,
+              status: "422 UNPROCESSABLE_ENTITY",
+              code: "422",
+              title: "Constraint violation",
               detail: "name must not be blank",
-              title: "Constraint violation"
+              source: {
+                pointer: "name"
+              }
             }
           ]
         }
       };
-
       return error;
     })();
+
 
     mockPost.mockImplementationOnce(() => {
       makeAxiosErrorMoreReadable(MOCK_POST_ERROR);
@@ -392,15 +395,24 @@ describe("protocol edit page", () => {
 
     // wrapper.find("form").simulate("submit");
     fireEvent.submit(wrapper.container.querySelector("form")!);
+    
 
-    // Test expected error
+    const { title, detail } = MOCK_POST_ERROR.response.data.errors[0];
+
     await waitFor(() => {
       expect(
-        wrapper.getByText(
-          /\/collection\-api\/protocol: 422 constraint violation: name must not be blank/i
-        )
+        wrapper.getByText((_, element) => {
+          return (
+            !!element &&
+            element.classList.contains("error-message") &&
+            element.textContent?.includes(title) &&
+            element.textContent?.includes(detail)
+          );
+        })
       ).toBeInTheDocument();
-      expect(mockPush).toBeCalledTimes(0);
-    });
+
+
+        expect(mockPush).toBeCalledTimes(0);
+      });
   });
 });

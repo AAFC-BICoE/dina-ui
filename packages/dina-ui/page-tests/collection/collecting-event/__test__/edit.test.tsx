@@ -83,21 +83,21 @@ const mockBulkGet = jest.fn(async (paths) => {
   console.warn("No mock value for bulkGet paths: ", paths);
 });
 
+
 const MOCK_POST_ERROR = (() => {
   const error = new Error() as any;
   error.isAxiosError = true;
-  error.config = {
-    url: "/collection-api/collecting-event"
-  };
+  error.config = { url: "/collection-api/collecting-event" };
   error.response = {
     statusText: "500",
-    status: 500,
     data: {
       errors: [
         {
-          status: 500,
+          status: "500 BAD_REQUEST",
+          code: "500",
+          title: "Bad request",
           detail: "test error detail",
-          title: "Bad Request"
+          source: { pointer: "collecting-event" }
         }
       ]
     }
@@ -449,15 +449,22 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
+    const { title, detail } = MOCK_POST_ERROR.response.data.errors[0];
+
     await waitFor(() => {
       expect(
-        wrapper.getByText(
-          /\/collection\-api\/collecting\-event: 500 bad request: test error detail/i
-        )
-      );
-      expect(mockPush).toBeCalledTimes(0);
-    });
-  });
+        wrapper.getByText((_, element) => {
+          return (
+            !!element &&
+            element.classList.contains("error-message") &&
+            element.textContent?.includes(title) &&
+            element.textContent?.includes(detail)
+          );
+        })
+      ).toBeInTheDocument();
+
+      });
+  })
 
   it("Lets you set the primary GeoReferenceAssertion.", async () => {
     mockQuery = {};

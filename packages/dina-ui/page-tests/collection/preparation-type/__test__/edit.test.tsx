@@ -231,17 +231,17 @@ describe("preparation-type edit page", () => {
     const MOCK_POST_ERROR = (() => {
       const error = new Error() as any;
       error.isAxiosError = true;
-      error.config = {
-        url: "/collection-api/preparation-type"
-      };
+      error.config = { url: "/collection-api/preparation-type" };
       error.response = {
         statusText: "422",
         data: {
           errors: [
             {
-              status: 422,
+              status: "422 UNPROCESSABLE_ENTITY",
+              code: "422",
+              title: "Constraint violation",
               detail: "name must not be blank",
-              title: "Constraint violation"
+              source: { pointer: "name" }
             }
           ]
         }
@@ -263,13 +263,22 @@ describe("preparation-type edit page", () => {
     // Submit form without name field value
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
+    const { title, detail } = MOCK_POST_ERROR.response.data.errors[0];
+
     // Test expected error
     await waitFor(() => {
+
       expect(
-        wrapper.getByText(
-          /\/collection\-api\/preparation\-type: 422 constraint violation: name must not be blank/i
-        )
+        wrapper.getByText((_, element) => {
+          return (
+            !!element &&
+            element.classList.contains("error-message") &&
+            element.textContent?.includes(title) &&
+            element.textContent?.includes(detail)
+          );
+        })
       ).toBeInTheDocument();
+
       expect(mockPush).toBeCalledTimes(0);
     });
   });
