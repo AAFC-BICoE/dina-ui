@@ -210,6 +210,16 @@ export function useCollectingEventSave({
       }
     }
 
+    // Convert expedition to a relationship.
+    if (collectingEventDiff?.expedition) {
+      (collectingEventDiff as any).relationships.expedition = {
+        data: collectingEventDiff?.expedition?.id
+          ? _.pick(collectingEventDiff.expedition, "id", "type")
+          : null
+      };
+    }
+    delete collectingEventDiff.expedition;
+
     // First create a copy of what would be the new geographicPlaceNameSourceDetail
     const newSourceDetail = {
       ...(collectingEventDiff.geographicPlaceNameSourceDetail || {})
