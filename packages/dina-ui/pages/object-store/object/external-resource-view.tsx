@@ -20,6 +20,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 import { useMemo } from "react";
+import { FaRegClock } from "react-icons/fa";
 
 export default function ExternalResourceMetadataViewPage() {
   const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
@@ -66,6 +67,7 @@ export default function ExternalResourceMetadataViewPage() {
             href={`/object-store/metadata/revisions?id=${id}&isExternalResourceMetadata=true`}
             className="btn btn-info"
           >
+            <FaRegClock className="me-2" />
             <DinaMessage id="revisionsButtonText" />
           </Link>
           <DeleteButton

@@ -12,6 +12,7 @@ import {
   useApiClient,
   simpleSearchFilterToFiql
 } from "common-ui";
+import { FaTag } from "react-icons/fa6";
 
 interface ReportTemplateOption {
   label: string;
@@ -184,6 +185,7 @@ export function GenerateLabelDropdownButton({
   return (
     <Dropdown aria-label="Generate Label Dropdown">
       <Dropdown.Toggle aria-label="Generate Label Toggle">
+        <FaTag className="me-2" />
         <DinaMessage id="generateLabel" />
       </Dropdown.Toggle>
       <Dropdown.Menu

@@ -14,6 +14,10 @@ import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-sear
 import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 import { KitsuResource } from "kitsu";
 import { useSessionStorage } from "usehooks-ts";
+import { MdEdit } from "react-icons/md";
+import { FaTrash } from "react-icons/fa";
+import { FiDownload } from "react-icons/fi";
+import { TbArrowsSplit2 } from "react-icons/tb";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -119,6 +123,7 @@ export function BulkDeleteButton({
         );
       }}
     >
+      <FaTrash className="me-2" />
       <CommonMessage id="deleteSelectedButtonText" />
     </FormikButton>
   );
@@ -160,6 +165,7 @@ export function BulkEditButton({
         }
       }}
     >
+      <MdEdit className="me-2" />
       <CommonMessage id="editSelectedButtonText" />
     </FormikButton>
   );
@@ -244,6 +250,7 @@ export function DataExportButton<TData extends KitsuResource>({
         });
       }}
     >
+      <FiDownload className="me-2" />
       <CommonMessage id="exportButtonText" />
     </FormikButton>
   );
@@ -277,6 +284,7 @@ export function BulkSplitButton({ pathname }: BulkSplitButtonProps) {
         await router.push({ pathname });
       }}
     >
+      <TbArrowsSplit2 className="me-2" />
       <CommonMessage id="splitSelectedButtonText" />
     </FormikButton>
   );

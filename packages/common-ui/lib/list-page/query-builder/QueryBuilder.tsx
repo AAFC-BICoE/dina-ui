@@ -15,6 +15,8 @@ import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
 import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import { FaSearch } from "react-icons/fa";
+import { FaArrowRotateLeft } from "react-icons/fa6";
 
 export interface QueryBuilderContextI {
   performSubmit: () => void;
@@ -199,6 +201,7 @@ function QueryBuilder({
             className="me-2"
             disabled={validationErrors.length > 0}
           >
+            <FaSearch className="me-2" />
             <DinaMessage id="search" />
           </Button>
           <Button
@@ -209,6 +212,7 @@ function QueryBuilder({
             variant="secondary"
             className="me-2"
           >
+            <FaArrowRotateLeft className="me-2" />
             <CommonMessage id="resetButtonText" />
           </Button>
         </div>

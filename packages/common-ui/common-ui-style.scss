@@ -442,18 +442,6 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   max-height: 75vh;
 }
 
-.ReactTable thead {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.ReactTable thead th {
-  background: white;
-  padding-left: 15px !important;
-  padding-right: 15px !important;
-}
-
 .form-check-horizontal {
   display: inline;
   min-height: 1.5rem;

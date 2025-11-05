@@ -13,6 +13,7 @@ import Select from "react-select";
 import React, { CSSProperties, useState } from "react";
 import Button from "react-bootstrap/Button";
 import { SplitConfiguration } from "../../../types/collection-api/resources/SplitConfiguration";
+import { TbArrowsSplit2 } from "react-icons/tb";
 
 export interface SplitConfigurationOption {
   label: string;
@@ -159,6 +160,7 @@ export function SplitMaterialSampleDropdownButton({
           className={"btn btn-primary " + (className ? className : "me-2")}
           disabled={true}
         >
+          <TbArrowsSplit2 className="me-2" />
           <DinaMessage id="splitButton" />
         </button>
       }
@@ -166,6 +168,7 @@ export function SplitMaterialSampleDropdownButton({
   ) : (
     <Dropdown>
       <Dropdown.Toggle className={className ? className : "me-2"} style={style}>
+        <TbArrowsSplit2 className="me-2" />
         <DinaMessage id="splitButton" />
       </Dropdown.Toggle>
       <Dropdown.Menu as={CustomMenu} />
