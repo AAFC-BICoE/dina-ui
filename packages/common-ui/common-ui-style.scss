@@ -268,16 +268,37 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .rule--body {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.flex-grow-half {
+  flex: 0.5;
+}
+
+.flex-grow-expand {
+  flex: 1;
+}
+
+.flex-grow-expand > div {
+  width: 100%;
 }
 
 .rule--field {
-  flex: 1;
+  flex: 0 0 300px;
+  min-width: 200px;
+}
+
+.rule--body > :only-child > div {
+  flex: 1 0 !important;
 }
 
 .rule--operator {
-  flex: 1;
+  flex: 0 0 300px;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 .rule--operator:empty {
@@ -287,7 +308,8 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .rule--value {
   flex: 1;
-  padding-right: 5px;
+  min-width: 150px;
+  padding-right: 0;
 }
 
 .rule--value:empty {
