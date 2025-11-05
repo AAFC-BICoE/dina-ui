@@ -51,7 +51,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return { data: [TEST_GROUP_1] };
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/321?include=collectors,attachment,collectionMethod,protocol":
+    case "collection-api/collecting-event/321?include=collectors,attachment,collectionMethod,protocol,expedition":
       return { data: testCollectionEvent() };
     case "collection-api/preparation-type":
       return { data: [TEST_PREP_TYPE] };

@@ -203,7 +203,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
 const exifData = new Map().set("date original created", "2000, Jan 8");
 const TEST_OBJECTUPLOAD: PersistedResource<ObjectUpload> = {
   id: METADATA_UUID3,
-  fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
+  //fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
   sizeInBytes: 500,
   originalFilename: "test.png",
   metaFileEntryVersion: "1",

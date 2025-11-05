@@ -58,6 +58,15 @@ export default function DerivativeViewPage() {
       messages
     )}`;
 
+  // Check the request to see if a permission provider is present.
+  const permissionsProvided =
+    derivativeQuery?.response?.data?.meta?.permissionsProvider;
+
+  const canEdit = permissionsProvided
+    ? derivativeQuery?.response?.data?.meta?.permissions?.includes("update") ??
+      false
+    : true;
+
   const buttonBar = (
     <ButtonBar className="mb-3">
       <div className="col-md-8 mt-2">
@@ -69,15 +78,17 @@ export default function DerivativeViewPage() {
         />
       </div>
       <div className="col-md-4 flex d-flex gap-2">
-        <>
-          <Link
-            href={`/object-store/derivative/edit?id=${uuid}`}
-            className="btn btn-primary ms-auto"
-            style={{ width: "5rem" }}
-          >
-            <DinaMessage id="editButtonText" />
-          </Link>
-        </>
+        {canEdit && (
+          <>
+            <Link
+              href={`/object-store/derivative/edit?id=${uuid}`}
+              className="btn btn-primary ms-auto"
+              style={{ width: "5rem" }}
+            >
+              <DinaMessage id="editButtonText" />
+            </Link>
+          </>
+        )}
       </div>
     </ButtonBar>
   );

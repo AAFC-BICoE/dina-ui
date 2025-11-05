@@ -1,7 +1,7 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { MultilingualDescription, MultilingualTitle } from "../../common";
-
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 export interface AssemblageAttributes {
   type: "assemblage";
   name: string;
@@ -18,4 +18,5 @@ export interface AssemblageRelationships {
 
 export type Assemblage = KitsuResource &
   AssemblageAttributes &
-  AssemblageRelationships;
+  AssemblageRelationships &
+  HasDinaMetaInfo;

@@ -24,7 +24,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FormikProps } from "formik";
 import { useMetadataSave } from "../object-store/metadata/useMetadata";
 import { MetadataForm } from "../object-store/metadata/MetadataForm";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl"; // "packages/dina-ui/intl/dina-ui-intl"
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import _ from "lodash";
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 

@@ -552,9 +552,8 @@ export function QueryPage<TData extends KitsuResource>({
 
     // Elastic search query with pagination settings.
     let queryDSL;
-    if (customViewElasticSearchQuery) {
+    if (viewMode) {
       isActionTriggeredQuery.current = true;
-      queryDSL = customViewElasticSearchQuery;
     } else {
       queryDSL = elasticSearchFormatExport(
         submittedQueryBuilderTree,
@@ -564,10 +563,10 @@ export function QueryPage<TData extends KitsuResource>({
 
     const combinedColumns = _.uniqBy([...columns, ...displayedColumns], "id");
 
-    queryDSL = applyRootQuery(queryDSL);
+    queryDSL = applyRootQuery(queryDSL, customViewElasticSearchQuery);
 
     // Custom queries should not be adding the group.
-    if (!customViewElasticSearchQuery && customViewFilterGroups) {
+    if (!viewMode && customViewFilterGroups) {
       queryDSL = applyGroupFilters(queryDSL, groups);
     }
 

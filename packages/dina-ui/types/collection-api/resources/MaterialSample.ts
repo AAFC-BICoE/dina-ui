@@ -13,6 +13,7 @@ import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Person } from "../../objectstore-api";
 import { StorageUnitUsage } from "./StorageUnitUsage";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -133,4 +134,5 @@ export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
 
 export type MaterialSample = KitsuResource &
   MaterialSampleAttributes &
-  MaterialSampleRelationships;
+  MaterialSampleRelationships &
+  HasDinaMetaInfo;

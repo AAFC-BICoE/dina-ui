@@ -24,6 +24,7 @@ export interface AgentRolesFieldProps {
   resourcePath: string;
   readOnly?: boolean;
   forContributor?: boolean;
+  indexName?: string;
 }
 
 export function AgentRolesField({
@@ -31,7 +32,8 @@ export function AgentRolesField({
   title,
   resourcePath,
   forContributor = false,
-  readOnly
+  readOnly,
+  indexName
 }: AgentRolesFieldProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -113,7 +115,7 @@ export function AgentRolesField({
           {role.roles?.join?.(", ")}
         </span>
       )}
-      renderTabPanel={({ fieldProps, index }) => (
+      renderTabPanel={({ fieldProps }) => (
         <div>
           <div className="row">
             {forContributor ? (
@@ -127,7 +129,8 @@ export function AgentRolesField({
               <TagSelectField
                 {...fieldProps("roles")}
                 resourcePath={resourcePath}
-                tagsFieldName={`${fieldName}[${index}].roles`}
+                indexName={indexName}
+                tagsFieldName={`${fieldName}.roles`}
                 className="col-sm-4"
                 label={<DinaMessage id="roleAction" />}
               />

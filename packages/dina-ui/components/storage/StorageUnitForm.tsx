@@ -133,14 +133,22 @@ export function StorageUnitFormFields({
     setShowTextAreaInput(checked);
   };
 
-  const materialSamplesQuery = useQuery<MaterialSample[]>({
-    path: "collection-api/material-sample",
-    filter: SimpleSearchFilterBuilder.create()
-      .where("storageUnitUsage.storageUnit.uuid", "EQ", initialValues?.id)
-      .build(),
-    include: "storageUnitUsage",
-    page: { limit: 1000 }
-  });
+  // Material sample query for displaying the grid.
+  const materialSamplesQuery = useQuery<MaterialSample[]>(
+    {
+      path: "collection-api/material-sample",
+      filter: initialValues?.id
+        ? SimpleSearchFilterBuilder.create()
+            .where("storageUnitUsage.storageUnit.uuid", "EQ", initialValues.id)
+            .build()
+        : undefined,
+      include: "storageUnitUsage",
+      page: { limit: 1000 }
+    },
+    {
+      disabled: !initialValues?.id
+    }
+  );
 
   return materialSamplesQuery.loading ? (
     <LoadingSpinner loading={true} />

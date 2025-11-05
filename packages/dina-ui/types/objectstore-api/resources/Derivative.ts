@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { Metadata } from "./Metadata";
 import { ObjectUpload } from "./ObjectUpload";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface DerivativeAttributes {
   type: "derivative";
@@ -28,4 +29,5 @@ export interface DerivativeRelationships {
 
 export type Derivative = KitsuResource &
   DerivativeAttributes &
-  DerivativeRelationships;
+  DerivativeRelationships &
+  HasDinaMetaInfo;

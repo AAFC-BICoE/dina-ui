@@ -228,60 +228,98 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
   describe("applyRootQuery", () => {
     test("Boolean logic exists, move it properly to it's own boolean section.", async () => {
       expect(
-        applyRootQuery({
-          bool: {
-            must: [
-              {
-                term: {
-                  "data.attributes.materialSampleName.keyword": "Test"
+        applyRootQuery(
+          {
+            bool: {
+              must: [
+                {
+                  term: {
+                    "data.attributes.materialSampleName.keyword": "Test"
+                  }
+                },
+                {
+                  term: {
+                    "data.attributes.preparationDate": "2022-11-30"
+                  }
                 }
-              },
-              {
-                term: {
-                  "data.attributes.preparationDate": "2022-11-30"
-                }
-              }
-            ]
-          }
-        })
+              ]
+            }
+          },
+          undefined
+        )
       ).toMatchSnapshot();
     });
 
     test("Boolean logic exists, also contains should logic, include the must match minimum.", async () => {
       expect(
-        applyRootQuery({
-          bool: {
-            should: [
-              {
-                term: {
-                  "data.attributes.materialSampleName.keyword": "Test"
+        applyRootQuery(
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    "data.attributes.materialSampleName.keyword": "Test"
+                  }
+                },
+                {
+                  term: {
+                    "data.attributes.preparationDate": "2022-11-30"
+                  }
                 }
-              },
-              {
-                term: {
-                  "data.attributes.preparationDate": "2022-11-30"
+              ],
+              must: [
+                {
+                  term: {
+                    "data.attributes.materialSampleName.keyword": "Test"
+                  }
+                },
+                {
+                  term: {
+                    "data.attributes.preparationDate": "2022-11-30"
+                  }
                 }
-              }
-            ],
-            must: [
-              {
-                term: {
-                  "data.attributes.materialSampleName.keyword": "Test"
-                }
-              },
-              {
-                term: {
-                  "data.attributes.preparationDate": "2022-11-30"
-                }
-              }
-            ]
-          }
-        })
+              ]
+            }
+          },
+          undefined
+        )
       ).toMatchSnapshot();
     });
 
     test("No boolean logic exists, just return the query as is.", async () => {
-      expect(applyRootQuery({ query: {} })).toMatchSnapshot();
+      expect(applyRootQuery({ query: {} }, undefined)).toMatchSnapshot();
+    });
+
+    test("When customQuery is being applied, ensure it's being merged with the other one", async () => {
+      expect(
+        applyRootQuery(
+          {
+            bool: {
+              must: [
+                {
+                  term: {
+                    "data.attributes.materialSampleName.keyword": "Test"
+                  }
+                },
+                {
+                  term: {
+                    "data.attributes.preparationDate": "2022-11-30"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            bool: {
+              must_not: {
+                term: {
+                  "data.id": "57768f57-047c-47cf-af1b-fb1e0e1861d4"
+                }
+              }
+            }
+          }
+        )
+      ).toMatchSnapshot();
     });
   });
 
