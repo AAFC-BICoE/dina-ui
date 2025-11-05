@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 import { MultilingualDescription } from "../../common";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface ManagedAttributeAttributes<TComponent = string> {
   type: "managed-attribute";
@@ -82,7 +83,8 @@ export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
 ];
 
 export type ManagedAttribute<TComponent = string> = KitsuResource &
-  ManagedAttributeAttributes<TComponent>;
+  ManagedAttributeAttributes<TComponent> &
+  HasDinaMetaInfo;
 
 export type ManagedAttributeValues = {
   [managedAttributeId: string]: string;

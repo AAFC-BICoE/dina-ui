@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 export interface OrganizationAttributes {
   type: "organization";
   name?: Map<string, string>;
@@ -15,4 +15,6 @@ export type MultiligualName = {
   name: string;
 };
 
-export type Organization = KitsuResource & OrganizationAttributes;
+export type Organization = KitsuResource &
+  OrganizationAttributes &
+  HasDinaMetaInfo;

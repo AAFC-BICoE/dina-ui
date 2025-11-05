@@ -42,10 +42,10 @@ import {
   FaFileSignature,
   FaScissors,
   FaUserGear,
-  FaUserGroup
-} from 'react-icons/fa6';
+  FaUserGroup,
+} from "react-icons/fa6";
 
-import { MdNature } from "react-icons/md"; 
+import { MdNature } from "react-icons/md";
 
 // Source of Truth
 const COLLECTION_DEFAULTS: NavigationCard[] = [
@@ -163,10 +163,6 @@ export function Home2() {
 
   const { getCards, saveCards, getSectionOrder, saveSectionOrder, loading } = UIPreferenceHook(sections);
 
-  if (loading) {
-    return <div>Loading preferences...</div>;
-  }
-
   const sectionConfigs = [
     {
       id: "collectionCardsOrder",
@@ -251,6 +247,10 @@ export function Home2() {
         }]
       : [])
   ];
+
+  if (loading) {
+    return <div>Loading preferences...</div>;
+  }
 
    // === Apply saved section order to the UI ===
    // 1) Default order is whatever order we built the configs in:

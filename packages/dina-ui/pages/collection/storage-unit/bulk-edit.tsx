@@ -16,12 +16,8 @@ export default function MetadataBulkEditPage() {
     return <LoadingSpinner loading={true} />;
   }
 
-  async function onSaved(storageUnitIds: string[]) {
-    if (storageUnitIds.length === 1) {
-      await router.push(`/collection/storage-unit/?id=${storageUnitIds[0]}`);
-    } else {
-      await router.push("/collection/storage-unit/list");
-    }
+  async function onSaved() {
+    await router.push("/collection/storage-unit/list");
   }
 
   const title = "editStorageUnitTitle";
