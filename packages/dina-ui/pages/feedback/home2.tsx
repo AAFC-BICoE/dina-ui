@@ -2,7 +2,7 @@
 import { useAccount } from "common-ui";
 import { useState, useMemo } from "react";
 import Container from "react-bootstrap/Container";
-import { Footer, Head, Nav, CustomizableCardGrid, UIPreferenceHook } from "../../components";
+import { Footer, Head, Nav, CustomizableSectionGrid, UIPreferenceHook } from "../../components";
 import { NavigationCard } from "../../types/common";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
@@ -161,111 +161,122 @@ export function Home2() {
     [configurationDefaults, management]
   );
 
-  const { getCards, saveCards, loading } = UIPreferenceHook(sections);
+  const { getCards, saveCards, getSectionOrder, saveSectionOrder, loading } = UIPreferenceHook(sections);
 
   if (loading) {
     return <div>Loading preferences...</div>;
   }
 
+  const sectionConfigs = [
+    {
+      id: "collectionCardsOrder",
+      title: <DinaMessage id="collectionSectionTitle" />,
+      gridProps: {
+        cards: getCards("collectionCardsOrder"),
+        allCards: COLLECTION_DEFAULTS,
+        onChange: next => saveCards("collectionCardsOrder", next),
+        isCustomizeMode
+      }
+    },
+    {
+      id: "transactionCardsOrder",
+      title: <DinaMessage id="loanTransactionsSectionTitle" />,
+      gridProps: {
+        cards: getCards("transactionCardsOrder"),
+        allCards: TRANSACTION_DEFAULTS,
+        onChange: next => saveCards("transactionCardsOrder", next),
+        isCustomizeMode
+      }
+    },
+    {
+      id: "objectStoreCardsOrder",
+      title: <DinaMessage id="objectStoreTitle" />,
+      gridProps: {
+        cards: getCards("objectStoreCardsOrder"),
+        allCards: OBJECT_STORE_DEFAULTS,
+        onChange: next => saveCards("objectStoreCardsOrder", next),
+        isCustomizeMode
+      }
+    },
+    {
+      id: "agentCardsOrder",
+      title: <DinaMessage id="agentsSectionTitle" />,
+      gridProps: {
+        cards: getCards("agentCardsOrder"),
+        allCards: AGENT_DEFAULTS,
+        onChange: next => saveCards("agentCardsOrder", next),
+        isCustomizeMode
+      }
+    },
+    {
+      id: "sequencingCardsOrder",
+      title: <DinaMessage id="seqdbTitle" />,
+      gridProps: {
+        cards: getCards("sequencingCardsOrder"),
+        allCards: SEQUENCING_DEFAULTS,
+        onChange: next => saveCards("sequencingCardsOrder", next),
+        isCustomizeMode
+      }
+    },
+    {
+      id: "controlledVocabularyCardsOrder",
+      title: <DinaMessage id="controlledVocabularyTitle" />,
+      gridProps: {
+        cards: getCards("controlledVocabularyCardsOrder"),
+        allCards: CONTROLLED_VOCAB_DEFAULTS,
+        onChange: next => saveCards("controlledVocabularyCardsOrder", next),
+        isCustomizeMode
+      }
+    },
+    {
+      id: "configurationCardsOrder",
+      title: <DinaMessage id="dinaConfigurationSectionTitle" />,
+      gridProps: {
+        cards: getCards("configurationCardsOrder"),
+        allCards: configurationDefaults,
+        onChange: next => saveCards("configurationCardsOrder", next),
+        isCustomizeMode
+      }
+    },
+    ...(showManagementNavigation
+      ? [{
+          id: "managementCardsOrder",
+          title: <DinaMessage id="dinaManagementSectionTitle" />,
+          gridProps: {
+            cards: getCards("managementCardsOrder"),
+            allCards: management,
+            onChange: next => saveCards("managementCardsOrder", next),
+            isCustomizeMode
+          }
+        }]
+      : [])
+  ];
+
+   // === Apply saved section order to the UI ===
+   // 1) Default order is whatever order we built the configs in:
+   const defaultOrder = sectionConfigs.map(s => s.id);
+   // 2) Ask the hook for the saved order (or fall back to default on first run):
+   const savedOrder = getSectionOrder ? getSectionOrder(defaultOrder) : defaultOrder;
+   // 3) Derive the actual render list in the saved order (ignore unknown keys defensively):
+   const orderedSectionConfigs = savedOrder
+     .map(id => sectionConfigs.find(s => s.id === id))
+     .filter(Boolean) as typeof sectionConfigs;
+
   return (
     <div>
       <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
-      <Nav 
-        isCustomizeMode={isCustomizeMode} 
-        setIsCustomizeMode={setIsCustomizeMode} 
-      />
+        <Nav
+          isCustomizeMode={isCustomizeMode}
+          setIsCustomizeMode={setIsCustomizeMode}
+        />
       <main role="main">
-        <Container fluid={true}>
-          {/* Collection */}
-          <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="collectionSectionTitle" /></h2>
-            <CustomizableCardGrid
-              cards={getCards("collectionCardsOrder")}
-              allCards={COLLECTION_DEFAULTS}
-              onChange={(next) => saveCards("collectionCardsOrder", next)}
-              isCustomizeMode={isCustomizeMode}
-            />
-          </section>
-
-          {/* Transactions */}
-          <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="loanTransactionsSectionTitle" /></h2>
-            <CustomizableCardGrid
-              cards={getCards("transactionCardsOrder")}
-              allCards={TRANSACTION_DEFAULTS}
-              onChange={(next) => saveCards("transactionCardsOrder", next)}
-              isCustomizeMode={isCustomizeMode}
-            />
-          </section>
-
-          {/* Object Store */}
-          <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="objectStoreTitle" /></h2>
-            <CustomizableCardGrid
-              cards={getCards("objectStoreCardsOrder")}
-              allCards={OBJECT_STORE_DEFAULTS}
-              onChange={(next) => saveCards("objectStoreCardsOrder", next)}
-              isCustomizeMode={isCustomizeMode}
-            />
-          </section>
-
-          {/* Agent */}
-          <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="agentsSectionTitle" /></h2>
-            <CustomizableCardGrid
-              cards={getCards("agentCardsOrder")}
-              allCards={AGENT_DEFAULTS}
-              onChange={(next) => saveCards("agentCardsOrder", next)}
-              isCustomizeMode={isCustomizeMode}
-            />
-          </section>
-
-          {/* Sequencing */}
-          <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="seqdbTitle" /></h2>
-            <CustomizableCardGrid
-              cards={getCards("sequencingCardsOrder")}
-              allCards={SEQUENCING_DEFAULTS}
-              onChange={(next) => saveCards("sequencingCardsOrder", next)}
-              isCustomizeMode={isCustomizeMode}
-            />
-          </section>
-
-          {/* Controlled Vocabulary */}
-          <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="controlledVocabularyTitle" /></h2>
-            <CustomizableCardGrid
-              cards={getCards("controlledVocabularyCardsOrder")}
-              allCards={CONTROLLED_VOCAB_DEFAULTS}
-              onChange={(next) => saveCards("controlledVocabularyCardsOrder", next)}
-              isCustomizeMode={isCustomizeMode}
-            />
-          </section>
-
-          {/* Configuration */}
-          <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="dinaConfigurationSectionTitle" /></h2>
-            <CustomizableCardGrid
-              cards={getCards("configurationCardsOrder")}
-              allCards={configDefaults(isAdmin ? subject : undefined)}
-              onChange={(next) => saveCards("configurationCardsOrder", next)}
-              isCustomizeMode={isCustomizeMode}
-            />
-          </section>
-
-          {/* Management */}
-          {showManagementNavigation && (
-          <section className="mb-5">
-            <h2 className="mb-4"><DinaMessage id="dinaManagementSectionTitle" /></h2>
-            <CustomizableCardGrid
-              cards={getCards("managementCardsOrder")}
-              allCards={management}
-              onChange={(next) => saveCards("managementCardsOrder", next)}
-              isCustomizeMode={isCustomizeMode}
-            />
-          </section>
-          )}
-
+        <Container fluid>
+          <CustomizableSectionGrid
+             sections={orderedSectionConfigs}
+            // Persist immediately when the DND order changes:
+             onSectionOrderChange={(nextOrder) => saveSectionOrder(nextOrder.map(s => s.id))}
+             isCustomizeMode={isCustomizeMode}
+          />
         </Container>
       </main>
       <Footer />

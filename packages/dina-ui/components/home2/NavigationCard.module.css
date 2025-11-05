@@ -108,6 +108,92 @@
   animation: ripple 0.6s ease-out;
 }
 
+/* The positioned parent that contains both overlay controls and the card body */
+.sortableCard {
+  position: relative;
+  width: 180px;
+  touch-action: none;
+  display: inline-block;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+/* Customize mode – used to scope cursor/pointer-events if needed */
+.customizing {}
+
+.overlayControls {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.draggableCard,
+.cardRemoveButton {
+  pointer-events: auto;
+}
+
+/* Drag handle */
+.draggableCard {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  cursor: grab !important;
+  background: #eee;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.draggableCard:active {
+  cursor: grabbing !important; 
+}
+
+
+.cardGripIcon {
+  font-size: 22px;
+}
+
+.cardRemoveButton {
+  position: absolute;
+  color: #323538;
+  top: 6px;
+  right: 6px;
+  z-index: 6;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer !important;
+}
+.cardRemoveButton:hover {
+  color: #a71313;
+}
+/* Card body wrapper – disable clicks in customize mode and show arrow cursor */
+.cardBodyWrapper {
+  pointer-events: auto;
+}
+
+.customizing .cardBodyWrapper {
+  pointer-events: none;
+  cursor: default;
+}
+
+
+:global(.withRail) .cardBodyWrapper :global(.navigationCard) {
+  cursor: default !important;
+}
+
+
 @keyframes glow {
   from {
     opacity: 0;
