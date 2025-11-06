@@ -6,7 +6,10 @@ import {
   MaterialSample
 } from "../../../../types/collection-api";
 import "@testing-library/jest-dom";
-import { waitFor } from "@testing-library/react";
+import { waitFor, within } from "@testing-library/react";
+import { GenericMolecularAnalysis } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysisItem } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { TEST_QUALITY_CONTROL_TYPES } from "../../../seqdb/molecular-analysis-run/__mocks__/MolecularAnalysisRunViewMocks";
 
 const TEST_COLLECTION_EVENT: CollectingEvent = {
   startEventDateTime: "2019_01_01_10_10_10",
@@ -45,6 +48,24 @@ const TEST_SAMPLE_WITH_ORGANISMS: PersistedResource<MaterialSample> = {
   ]
 };
 
+const TEST_MOLECULAR_ANALYSIS: PersistedResource<GenericMolecularAnalysis> = {
+  id: "d1e4a8b0-c6d5-4e23-9b30-0ae8d8763f2b",
+  type: "generic-molecular-analysis",
+  name: "generic molecular analysis",
+  analysisType: "hrms",
+  group: "aafc"
+};
+
+const TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS: PersistedResource<GenericMolecularAnalysisItem>[] =
+  [
+    {
+      id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
+      type: "generic-molecular-analysis-item",
+      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+      materialSample: TEST_MATERIAL_SAMPLE as any
+    }
+  ];
+
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/material-sample/1":
@@ -59,6 +80,12 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/material-sample/1/attachment":
     case "collection-api/collection":
       return { data: [] };
+    case "seqdb-api/generic-molecular-analysis-item":
+      return {
+        data: TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS
+      };
+    case "seqdb-api/vocabulary/qualityControlType":
+      return { data: TEST_QUALITY_CONTROL_TYPES };
   }
 });
 
@@ -137,5 +164,39 @@ describe("Material Sample View Page", () => {
     expect(
       wrapper.getByRole("cell", { name: /test scientific name 1/i })
     ).toBeInTheDocument();
+  });
+
+  it("Renders the Material Sample with associated Material Sample Workflows", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleViewPage router={{ query: { id: "1" } } as any} />,
+      testCtx
+    );
+
+    await waitFor(() => {
+      const tableContainer = wrapper.container.querySelector(
+        "#workflows-component > div:nth-child(2) > div > table"
+      );
+
+      expect(tableContainer).toBeInTheDocument(); // Ensure container exists
+
+      // Scope queries to the specific container
+      expect(
+        within(tableContainer as HTMLElement).getByRole("link", {
+          name: /generic molecular analysis/i
+        })
+      ).toBeInTheDocument();
+
+      expect(
+        within(tableContainer as HTMLElement).getByRole("cell", {
+          name: /hrms/i
+        })
+      ).toBeInTheDocument();
+
+      expect(
+        within(tableContainer as HTMLElement).getByRole("cell", {
+          name: /aafc/i
+        })
+      ).toBeInTheDocument();
+    });
   });
 });
