@@ -6,6 +6,7 @@ import { SubmitButton } from "../formik-connected/SubmitButton";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { useModal } from "./modal";
 import _ from "lodash";
+import { FaCheck, FaTimes } from "react-icons/fa";
 
 export interface AreYouSureModalProps {
   /** Describes the acion you're asking the user about. */
@@ -68,10 +69,12 @@ export function AreYouSureModal({
               onClick={closeModal}
               buttonProps={() => ({ style: { width: "10rem" } })}
             >
+              <FaTimes className="me-2" />
               {noButtonText ?? <CommonMessage id="no" />}
             </FormikButton>
 
-            <SubmitButton className="yes-button">
+            <SubmitButton className="yes-button" showSaveIcon={false}>
+              <FaCheck className="me-2" />
               {yesButtonText ?? <CommonMessage id="yes" />}
             </SubmitButton>
           </div>

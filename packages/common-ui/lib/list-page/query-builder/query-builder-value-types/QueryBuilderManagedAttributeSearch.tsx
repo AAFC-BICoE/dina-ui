@@ -404,7 +404,7 @@ export default function QueryRowManagedAttributeSearch({
           isClearable: false,
           className: isInColumnSelector
             ? "ps-0 mt-2"
-            : "col me-1 ms-2 ps-0 flex-grow-1",
+            : "col me-1 ms-2 ps-0 flex-grow-half",
           onKeyDown,
           captureMenuScroll: true,
           menuPlacement: isInColumnSelector ? "bottom" : "auto",
@@ -424,7 +424,7 @@ export default function QueryRowManagedAttributeSearch({
       {!isInColumnSelector && operatorOptions.length !== 0 ? (
         <Select<SelectOption<string>>
           options={operatorOptions}
-          className={`col me-1 ps-0 flex-grow-1`}
+          className={`col me-1 ps-0 flex-grow-half`}
           value={selectedOperator}
           onChange={(selected) =>
             setManagedAttributeState({
@@ -443,7 +443,7 @@ export default function QueryRowManagedAttributeSearch({
 
       {/* Value Searching (changes based ont he type selected) */}
       {!isInColumnSelector && (
-        <div className="col ps-0 flex-grow-1">
+        <div className="col ps-0 flex-grow-expand">
           {supportedValueForType(managedAttributeType)}
         </div>
       )}

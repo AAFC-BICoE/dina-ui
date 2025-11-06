@@ -12,6 +12,7 @@ import {
 import { ColumnSelectorList } from "./ColumnSelectorList";
 import { generateColumnDefinition } from "./ColumnSelectorUtils";
 import { DataExportTemplate } from "../../../dina-ui/types/dina-export-api";
+import { FaColumns } from "react-icons/fa";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
 
@@ -394,6 +395,7 @@ export function ColumnSelector<TData extends KitsuResource>(
         show={showMenu}
       >
         <Dropdown.Toggle>
+          <FaColumns className="me-2" />
           <DinaMessage id="selectColumn" />
         </Dropdown.Toggle>
         <Dropdown.Menu

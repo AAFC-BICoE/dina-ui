@@ -24,6 +24,7 @@ import { useState, CSSProperties } from "react";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
+import { MdOutlineLibraryAdd } from "react-icons/md";
 
 export const MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
@@ -523,6 +524,7 @@ export default function MaterialSampleListPage() {
             href={`/collection/material-sample/bulk-create`}
             className="btn btn-primary"
           >
+            <MdOutlineLibraryAdd className="me-2" />
             <DinaMessage id="bulkCreate" />
           </Link>
         </div>

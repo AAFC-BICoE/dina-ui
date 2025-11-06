@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { CommonMessage } from "../../lib/intl/common-ui-intl";
+import { FaPlus } from "react-icons/fa";
 
 interface CreateButtonProps {
   // The link type for where to redirect the user. Gets appended with "/" + entityLink + "/edit/".
@@ -13,6 +14,7 @@ interface CreateButtonProps {
 export function CreateButton({ entityLink }: CreateButtonProps) {
   return (
     <Link href={`${entityLink}/edit`} className="btn btn-primary ms-auto">
+      <FaPlus className="me-2" />
       <CommonMessage id="createNew" />
     </Link>
   );

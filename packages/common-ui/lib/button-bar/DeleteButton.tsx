@@ -11,6 +11,7 @@ import { useModal } from "../modal/modal";
 import { MaterialSample } from "../../../dina-ui/types/collection-api";
 import { KitsuResponse } from "kitsu";
 import { StorageUnitUsage } from "../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { FaTrash } from "react-icons/fa";
 
 interface DeleteButtonProps {
   /** Additional button classes. */
@@ -136,6 +137,7 @@ export function DeleteButton({
       }
       type="button"
     >
+      <FaTrash className="me-2" />
       {children || <CommonMessage id="deleteButtonText" />}
     </button>
   );

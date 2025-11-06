@@ -67,7 +67,7 @@ export function FreeTextFilterForm({
           </div>
           <div>{children && children(formikProps)}</div>
           <div className="align-end ps-3 d-flex gap-2 align-items-center">
-            <SubmitButton className="list-inline-item">
+            <SubmitButton className="list-inline-item" showSaveIcon={false}>
               <CommonMessage id="filterSubmitButtonText" />
             </SubmitButton>
             <button
