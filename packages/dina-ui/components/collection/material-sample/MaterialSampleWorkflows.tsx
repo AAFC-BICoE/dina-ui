@@ -13,7 +13,7 @@ import {
 } from "common-ui";
 import { groupCell } from "../../../components";
 import useVocabularyOptions from "../useVocabularyOptions";
-import { WORKFLOWS_COMPONENT_NAME } from "packages/dina-ui/types/collection-api/resources/form-legends/MaterialSampleForm";
+import { WORKFLOWS_COMPONENT_NAME } from "../../../../dina-ui/types/collection-api";
 
 export function MaterialSampleWorkflows({
   workflows
