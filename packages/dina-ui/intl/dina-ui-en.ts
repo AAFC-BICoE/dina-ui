@@ -165,6 +165,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   configureDefaultValues: "Configure default values",
   configureFormTemplate: "Configure Form Template",
   contents: "Contents",
+  continueWithWorkbook: "Continue with Workbook",
+  continueWithBatchEntryForm: "Continue with Batch Entry Form",
   contributors: "Contributors",
   controlledVocabularyTitle: "Controlled Vocabulary",
   convertToDepthMinMax: "Convert to Depth Min/Max",

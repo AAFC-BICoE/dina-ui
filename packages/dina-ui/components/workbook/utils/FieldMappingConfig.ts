@@ -1,4 +1,4 @@
-import { DCTYPE_OPTIONS } from "packages/dina-ui/pages/object-store/metadata/edit";
+import { DCTYPE_OPTIONS } from "../../../pages/object-store/metadata/edit";
 import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
