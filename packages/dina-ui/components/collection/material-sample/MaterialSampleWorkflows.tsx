@@ -12,7 +12,7 @@ import {
   FieldSet
 } from "common-ui";
 import { groupCell } from "../../../components";
-import useVocabularyOptions from "packages/dina-ui/components/collection/useVocabularyOptions";
+import useVocabularyOptions from "../useVocabularyOptions";
 import { WORKFLOWS_COMPONENT_NAME } from "packages/dina-ui/types/collection-api/resources/form-legends/MaterialSampleForm";
 
 export function MaterialSampleWorkflows({
