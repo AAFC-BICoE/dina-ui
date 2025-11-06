@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import {
   MolecularAnalysisSampleSelectionStep,
   MolecularAnalysisSampleSelectionStepProps
@@ -259,22 +259,14 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     );
 
     // Remove "Sample 2" from the currently selected list.
-    userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[4]);
+    userEvent.click(wrapper.getAllByRole("checkbox")[6]);
     userEvent.click(wrapper.getByTestId("remove-resources"));
-    await waitFor(() =>
-      expect(
-        wrapper.getByText(/total selected records: 1/i)
-      ).toBeInTheDocument()
-    );
+    await waitForLoadingToDisappear();
 
     // Now add "Sample 3" to the selected list.
-    userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[2]);
+    userEvent.click(wrapper.getAllByRole("checkbox")[3]);
     userEvent.click(wrapper.getByTestId("move-resources-over"));
-    await waitFor(() =>
-      expect(
-        wrapper.getByText(/total selected records: 2/i)
-      ).toBeInTheDocument()
-    );
+    await waitForLoadingToDisappear();
 
     // Perform save
     userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));

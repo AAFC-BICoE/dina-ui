@@ -450,14 +450,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Wait for loading of the existing objects to attach...
     await waitFor(() => {
-      expect(
-        wrapper.getByRole("checkbox", { name: /select/i })
-      ).toBeInTheDocument();
+      expect(wrapper.getAllByRole("checkbox").length).toBeGreaterThan(1);
       expect(
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
     userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
     // Wait for attachments to be displayed on the page.
@@ -795,14 +793,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     await waitFor(() => {
-      expect(
-        wrapper.getByRole("checkbox", { name: /select/i })
-      ).toBeInTheDocument();
+      expect(wrapper.getAllByRole("checkbox").length).toBeGreaterThan(1);
       expect(
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
     userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
     // Add an attachment to the new quality control
@@ -814,14 +810,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     await waitFor(() => {
-      expect(
-        wrapper.getByRole("checkbox", { name: /select/i })
-      ).toBeInTheDocument();
+      expect(wrapper.getAllByRole("checkbox").length).toBeGreaterThan(1);
       expect(
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
     userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
     // Click the save button.
@@ -1230,14 +1224,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     await waitFor(() => {
-      expect(
-        wrapper.getByRole("checkbox", { name: /select/i })
-      ).toBeInTheDocument();
+      expect(wrapper.getAllByRole("checkbox").length).toBeGreaterThan(1);
       expect(
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("checkbox", { name: /select/i }));
+    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
     userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
 
     await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
