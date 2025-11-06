@@ -16,6 +16,8 @@ import { NavigationCardComponent } from "./NavigationCard";
 import { Button } from "react-bootstrap";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import styles from "./NavigationCard.module.css";
+import { FaGripLines, FaRegCircleXmark } from "react-icons/fa6";
+import cx from "clsx";
 
 interface CustomizableCardGridProps {
   cards: NavigationCard[];
@@ -37,9 +39,10 @@ export function CustomizableCardGrid({
 
   // Seed draft only when entering customize mode (isCustomize false -> true)
 
+
   useEffect(() => {
     // Always set grid cards when customize mode changes
-    setGridCards(cards);
+        setGridCards(cards);
     prevModeRef.current = isCustomizeMode;
   }, [isCustomizeMode, cards]);
 
@@ -116,83 +119,75 @@ export function CustomizableCardGrid({
 }
 
 
-
-function SortableCard({
-  card,
-  onRemove,
-  isCustomizeMode
-}: {
+type Props = {
   card: NavigationCard;
   onRemove: () => void;
   isCustomizeMode: boolean;
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: card.id });
+};
 
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
+export default function SortableCard({ card, onRemove, isCustomizeMode }: Props) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
     transition,
-    touchAction: "none",
-    opacity: isDragging ? 0.5 : 1,
-    width: "180px",
-    position: "relative"
+    isDragging
+  } = useSortable({ id: card.id });
+
+  // dnd-kit dynamic transform/transition must remain inline:
+  const transformStyle: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition
   };
 
+  const containerClass = cx(
+    styles.sortableCard, 
+    isDragging && styles.dragging,
+    isCustomizeMode && styles.customizing
+  );
+
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
+    <div ref={setNodeRef} className={containerClass} style={transformStyle}>
       {isCustomizeMode && (
-        <>
+        <div className={styles.overlayControls}>
+          {/* Drag handle (activator) */}
+          <div
+            ref={setActivatorNodeRef}
+            {...listeners}
+            {...attributes}
+            className={styles.draggableCard}
+            role="button"
+            aria-label="Drag card"
+            title="Drag card"
+          >
+            <FaGripLines aria-hidden="true" className={styles.cardGripIcon} />
+          </div>
+
+          {/* Remove button */}
           <Button
-            variant="outline-dark"
+            variant="link"
             size="sm"
-            style={{
-              position: "absolute",
-              top: 6,
-              right: 6,
-              zIndex: 10,
-              borderRadius: "50%",
-              width: "24px",
-              height: "24px",
-              padding: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "14px",
-              lineHeight: "1"
-            }}
+            className={styles.cardRemoveButton}
             onClick={(e) => {
               e.stopPropagation();
               onRemove();
             }}
+            aria-label="Remove card"
+            title="Remove card"
           >
-            ×
+            <FaRegCircleXmark className={styles.removeIcon} />
           </Button>
-
-          <div
-            {...listeners}
-            style={{
-              position: "absolute",
-              top: 4,
-              left: 4,
-              cursor: "grab",
-              zIndex: 10,
-              background: "#eee",
-              borderRadius: "4px",
-              padding: "2px 6px",
-              fontSize: "12px"
-            }}
-          >
-            ☰
-          </div>
-        </>
+        </div>
       )}
-      <div style={{ pointerEvents: isCustomizeMode ? "none" : "auto" }}>
+
+      <div className={styles.cardBodyWrapper}>
         <NavigationCardComponent card={card} />
       </div>
     </div>
   );
 }
-
 
 
 function AddCardPlaceholder({
