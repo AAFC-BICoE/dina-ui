@@ -662,6 +662,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributes: "Managed Attributes",
   managedAttributesViews: "Form Templates",
   "material-sample": "Material Sample",
+  metadata: "Metadata",
   materialDirection_tooltip:
     "Transaction Material Direction: {materialDirection}",
   materialIn: "Material In",

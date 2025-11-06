@@ -171,6 +171,18 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["collecting event remarks", "collectingEvent.remarks"]
 ]);
 
+// const METADATA_FIELD_SYNONYMS = new Map<string, string>([
+//   ["file name", "fileName"],
+//   ["date original version created", ""],
+//   ["caption", "acCaption"],
+//   ["stored object type", "dcType"],
+//   ["object type", "dcType"],
+//   ["type", "dcType"],
+//   ["subtype", "acSubtype"],
+//   ["object subtype", "acSubtype"],
+//   ["digitalized by", "dcCreator.displayName"],
+// ]);
+
 export type FieldOptionType = {
   label: string;
   value?: string;

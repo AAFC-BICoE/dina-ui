@@ -66,7 +66,7 @@ export interface WorkbookColumnMappingProps {
 }
 
 // Entities that we support to import
-const ENTITY_TYPES = ["material-sample"] as const;
+const ENTITY_TYPES = ["material-sample", "metadata"] as const;
 
 export function WorkbookColumnMapping({
   performSave,
@@ -789,7 +789,6 @@ export function WorkbookColumnMapping({
                     </FieldWrapper>
                     <FieldWrapper name="type" className="flex-grow-1">
                       <Select
-                        isDisabled={entityTypes.length === 1}
                         value={selectedType}
                         onChange={(entityType) => setType(entityType!.value)}
                         options={entityTypes}

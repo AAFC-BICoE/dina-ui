@@ -9,6 +9,7 @@ export enum WorkbookDataTypeEnum {
   BOOLEAN_ARRAY = "boolean[]",
   MANAGED_ATTRIBUTES = "managedAttributes",
   VOCABULARY = "vocabulary",
+  ENUM = "enum",
   OBJECT = "object",
   OBJECT_ARRAY = "object[]",
   CLASSIFICATION = "classification"

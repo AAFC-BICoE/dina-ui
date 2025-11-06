@@ -1,3 +1,4 @@
+import { DCTYPE_OPTIONS } from "packages/dina-ui/pages/object-store/metadata/edit";
 import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
@@ -312,6 +313,45 @@ const FieldMappingConfig: FieldMappingConfigType = {
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING }
       }
+    }
+  },
+  metadata: {
+    relationshipConfig: {
+      type: "metadata",
+      hasGroup: true,
+      baseApiPath: "/objectstore-api"
+    },
+
+    // Linking the file identifier to the metadata 'fileName' field.
+    originalFileName: { dataType: WorkbookDataTypeEnum.STRING },
+
+    fileName: { dataType: WorkbookDataTypeEnum.STRING },
+    caption: { dataType: WorkbookDataTypeEnum.STRING },
+
+    // TODO: DateTime.
+    acDigitizationDate: { dataType: WorkbookDataTypeEnum.DATE },
+
+    dcType: {
+      dataType: WorkbookDataTypeEnum.ENUM,
+      allowedValues: DCTYPE_OPTIONS
+    },
+    dcCreator: {
+      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+      relationshipConfig: {
+        hasGroup: false,
+        type: "person",
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
+        baseApiPath: "agent-api"
+      },
+      attributes: {
+        displayName: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
+    orientation: { dataType: WorkbookDataTypeEnum.NUMBER },
+    managedAttributes: {
+      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+      endpoint: "objectstore-api/managed-attribute",
+      managedAttributeComponent: "METADATA"
     }
   }
 };

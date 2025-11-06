@@ -85,6 +85,16 @@ export interface VocabularyField {
   endpoint: string;
 }
 
+export interface EnumValue {
+  label: string;
+  value: string;
+}
+
+export interface EnumField {
+  dataType: WorkbookDataTypeEnum.ENUM;
+  allowedValues: EnumValue[];
+}
+
 export interface ObjectField {
   dataType: WorkbookDataTypeEnum.OBJECT | WorkbookDataTypeEnum.OBJECT_ARRAY;
   attributes: Leaves<FieldConfigType>;
@@ -104,6 +114,7 @@ export interface ClassificationType {
 export type FieldConfigType =
   | PrimitiveField
   | VocabularyField
+  | EnumField
   | ManagedAttributeField
   | ObjectField
   | ClassificationType;
