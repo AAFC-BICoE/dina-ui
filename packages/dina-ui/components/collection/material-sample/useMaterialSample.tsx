@@ -93,19 +93,15 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         );
 
+        // Retrieve workflows linked to the material sample
         if (workflowItems) {
-          const workflows = await bulkGet<GenericMolecularAnalysis>(
-            workflowItems.data.map(
-              (item: any) =>
-                `/generic-molecular-analysis/${item.genericMolecularAnalysis.id}`
-            ),
-            {
-              apiBaseUrl: "/seqdb-api",
-              returnNullForMissingResource: true
-            }
-          );
-
-          data.workflows = _.compact(workflows);
+          data.workflows = [
+            ...new Set(
+              _.compact(workflowItems.data).map(
+                (item: any) => item.genericMolecularAnalysis
+              )
+            )
+          ];
         }
 
         for (const organism of data.organism ?? []) {
