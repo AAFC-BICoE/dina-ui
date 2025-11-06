@@ -228,25 +228,25 @@ describe("collection-method edit page", () => {
   it("Renders an error after form submit without specifying mandatory field.", async () => {
     // The patch request will return an error.
     const MOCK_POST_ERROR = (() => {
-      const error = new Error() as any;
-      error.isAxiosError = true;
-      error.config = {
-        url: "/collection-api/collection-method"
-      };
-      error.response = {
-        statusText: "422",
-        data: {
-          errors: [
-            {
-              status: 422,
-              detail: "name must not be blank",
-              title: "Constraint violation"
-            }
-          ]
-        }
-      };
+        const error = new Error() as any;
+        error.isAxiosError = true;
+        error.config = { url: "/collection-api/collection-method" };
+        error.response = {
+          statusText: "422",
+          data: {
+            errors: [
+              {
+                status: "422 UNPROCESSABLE_ENTITY",
+                code: "422",
+                title: "Constraint violation",
+                detail: "name must not be blank",
+                source: { pointer: "name" }
+              }
+            ]
+          }
+        };
+        return error
 
-      return error;
     })();
 
     mockPost.mockImplementationOnce(() => {
@@ -264,13 +264,21 @@ describe("collection-method edit page", () => {
     const form = container.querySelector("form");
     fireEvent.submit(form!);
 
-    // Check that the error message is displayed
 
+    const { title, detail } = MOCK_POST_ERROR.response.data.errors[0];
+
+    // Check that the error message is displayed
     await waitFor(() => {
+
       expect(
-        getByText(
-          /\/collection\-api\/collection\-method: 422 constraint violation: name must not be blank/i
-        )
+        getByText((_, element) => {
+          return (
+            !!element &&
+            element.classList.contains("error-message") &&
+            element.textContent?.includes(title) &&
+            element.textContent?.includes(detail)
+          );
+        })
       ).toBeInTheDocument();
 
       // Ensure no redirection happened
