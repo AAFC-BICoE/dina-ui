@@ -93,18 +93,20 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         );
 
-        const workflows = await bulkGet<GenericMolecularAnalysis>(
-          workflowItems.data.map(
-            (item: any) =>
-              `/generic-molecular-analysis/${item.genericMolecularAnalysis.id}`
-          ),
-          {
-            apiBaseUrl: "/seqdb-api",
-            returnNullForMissingResource: true
-          }
-        );
+        if (workflowItems) {
+          const workflows = await bulkGet<GenericMolecularAnalysis>(
+            workflowItems.data.map(
+              (item: any) =>
+                `/generic-molecular-analysis/${item.genericMolecularAnalysis.id}`
+            ),
+            {
+              apiBaseUrl: "/seqdb-api",
+              returnNullForMissingResource: true
+            }
+          );
 
-        data.workflows = _.compact(workflows);
+          data.workflows = _.compact(workflows);
+        }
 
         for (const organism of data.organism ?? []) {
           if (organism?.determination) {

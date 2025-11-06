@@ -479,7 +479,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   />
                 </div>
 
-                <MaterialSampleWorkflows workflows={materialSample.workflows} />
+                <MaterialSampleWorkflows
+                  workflows={materialSample?.workflows}
+                />
               </main>
             </DinaForm>
           </>
