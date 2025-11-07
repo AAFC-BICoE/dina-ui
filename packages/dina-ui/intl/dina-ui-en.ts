@@ -167,6 +167,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   contents: "Contents",
   continueWithWorkbook: "Continue with Workbook",
   continueWithBatchEntryForm: "Continue with Batch Entry Form",
+  workbookUploadBulkEditInfoMessage:
+    "{count} files ready for bulk editing. Upload a spreadsheet with an 'Original File Name' column to map metadata changes.",
   contributors: "Contributors",
   controlledVocabularyTitle: "Controlled Vocabulary",
   convertToDepthMinMax: "Convert to Depth Min/Max",

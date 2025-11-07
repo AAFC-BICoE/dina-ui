@@ -525,7 +525,7 @@ describe("Workbook Template Generator", () => {
     userEvent.type(templateNameInput, "Test.xlsx");
 
     // Click the "Add new column" dropdown
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
       expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);

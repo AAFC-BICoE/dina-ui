@@ -14,6 +14,8 @@ import {
 import { IFileWithMeta } from "../../components/object-store";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
+import { useLocalStorage } from "@rehooks/local-storage";
+import { BULK_ADD_IDS_KEY } from "../object-store/upload";
 
 export function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
@@ -33,6 +35,8 @@ export function UploadWorkbookPage() {
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
   const [redirecting, setRedirecting] = useState<boolean>(false);
+
+  const [bulkEditIds] = useLocalStorage<string[]>(BULK_ADD_IDS_KEY);
 
   /**
    * Call the object store backend API that takes in a spreadsheet and returns
@@ -81,6 +85,15 @@ export function UploadWorkbookPage() {
       <DinaMessage id="workbookUploadFailure" />
     </div>
   ) : undefined;
+
+  const objectUploadMessage = bulkEditIds?.length ? (
+    <div className="alert alert-info">
+      <DinaMessage
+        id="workbookUploadBulkEditInfoMessage"
+        values={{ count: bulkEditIds.length }}
+      />
+    </div>
+  ) : null;
 
   function isThereAnActiveUpload(): boolean {
     return (
@@ -139,7 +152,15 @@ export function UploadWorkbookPage() {
         </div>
       </>
     ) : (
-      <div className="col-md-6 col-sm-12 d-flex ms-auto">
+      <div className="col-md-12 col-sm-12 d-flex">
+        {bulkEditIds && bulkEditIds.length > 0 && (
+          <Link
+            href="/object-store/upload"
+            className="btn btn-outline-secondary previous-button"
+          >
+            <DinaMessage id="goToThePreviousStep" />
+          </Link>
+        )}
         <Link
           href={`/workbook/generator`}
           className="btn btn-primary ms-auto"
@@ -156,6 +177,7 @@ export function UploadWorkbookPage() {
         <LoadingSpinner loading={true} />
       ) : (
         <>
+          {objectUploadMessage}
           {isThereAnActiveUpload() ? (
             // If there is an unfinished upload
             <SaveWorkbookProgress
