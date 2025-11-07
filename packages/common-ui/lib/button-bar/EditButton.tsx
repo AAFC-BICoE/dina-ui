@@ -2,6 +2,7 @@ import Link from "next/link";
 import React, { CSSProperties } from "react";
 import { CommonMessage } from "../../lib/intl/common-ui-intl";
 import classNames from "classnames";
+import { MdEdit } from "react-icons/md";
 
 interface EditButtonProps {
   /** The link type for where to redirect the user. Gets appended with "/" + entityLink + "/edit/". */
@@ -52,6 +53,7 @@ export function EditButton({
       onKeyUp={onKeyUp}
       aria-describedby={ariaDescribedBy}
     >
+      <MdEdit className="me-2" />
       <CommonMessage id="editButtonText" />
     </Link>
   );

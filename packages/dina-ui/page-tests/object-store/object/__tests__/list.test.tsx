@@ -203,7 +203,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
 const exifData = new Map().set("date original created", "2000, Jan 8");
 const TEST_OBJECTUPLOAD: PersistedResource<ObjectUpload> = {
   id: METADATA_UUID3,
-  fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
+  //fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
   sizeInBytes: 500,
   originalFilename: "test.png",
   metaFileEntryVersion: "1",
@@ -300,14 +300,17 @@ describe("Metadata List Page", () => {
     await waitFor(() => {
       // Wait for checkboxes to be rendered
       expect(
-        wrapper.getAllByRole("checkbox", { name: /select/i }).length
-      ).toBeGreaterThan(0);
+        wrapper.getByRole("checkbox", { name: /check all/i })
+      ).toBeInTheDocument();
     });
 
     // Select all 3 metadatas to edit.
-    userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[0]);
-    userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[1]);
-    userEvent.click(wrapper.getAllByRole("checkbox", { name: /select/i })[2]);
+    userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
+
+    // Ensure the total selected is 3.
+    await waitFor(() => {
+      expect(wrapper.getByText("3")).toBeInTheDocument();
+    });
 
     // Click the bulk edit button:
     userEvent.click(wrapper.getByRole("button", { name: /edit selected/i }));

@@ -2,7 +2,7 @@
   position: relative;
   overflow: visible !important;
   cursor: pointer;
-  min-height: 140px;
+  min-height: 80px;
   max-height: 160px;
   width: 100%;
   border: 1px solid #e0e0e0;
@@ -11,6 +11,58 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transform: scale(1);
+}
+
+
+.placeholderCard {
+  position: relative;
+  width: 180px;
+  min-height: 140px;
+  max-height: 160px;
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  background-color: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.addButton {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  padding: 0;
+}
+
+/* Dropdown styling */
+.dropdownMenuCustom {
+  position: absolute;
+  top: 0;
+  left: 100%; 
+  margin-left: 12px; 
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  min-width: 220px;
+  padding: 8px 0;
+}
+
+
+.dropdownMenuCustom div {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdownMenuCustom div:hover {
+  background-color: #f5f5f5;
 }
 
 /* Hover modifier */
@@ -55,6 +107,92 @@
   transform: translate(-50%, -50%);
   animation: ripple 0.6s ease-out;
 }
+
+/* The positioned parent that contains both overlay controls and the card body */
+.sortableCard {
+  position: relative;
+  width: 180px;
+  touch-action: none;
+  display: inline-block;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+/* Customize mode – used to scope cursor/pointer-events if needed */
+.customizing {}
+
+.overlayControls {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.draggableCard,
+.cardRemoveButton {
+  pointer-events: auto;
+}
+
+/* Drag handle */
+.draggableCard {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  cursor: grab !important;
+  background: #eee;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.draggableCard:active {
+  cursor: grabbing !important; 
+}
+
+
+.cardGripIcon {
+  font-size: 22px;
+}
+
+.cardRemoveButton {
+  position: absolute;
+  color: #323538;
+  top: 6px;
+  right: 6px;
+  z-index: 6;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer !important;
+}
+.cardRemoveButton:hover {
+  color: #a71313;
+}
+/* Card body wrapper – disable clicks in customize mode and show arrow cursor */
+.cardBodyWrapper {
+  pointer-events: auto;
+}
+
+.customizing .cardBodyWrapper {
+  pointer-events: none;
+  cursor: default;
+}
+
+
+:global(.withRail) .cardBodyWrapper :global(.navigationCard) {
+  cursor: default !important;
+}
+
 
 @keyframes glow {
   from {

@@ -10,13 +10,14 @@
 }
 
 .ReactTable thead {
+  position: sticky;
+  top: 0;
+  background-color: white;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
-  border-right: 1px solid rgba(0, 0, 0, 0.02);
-  box-shadow: 0 2px 15px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 15px 0 rgba(0, 0, 0, 0.15), 0 1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 .ReactTable thead tr {
@@ -34,36 +35,69 @@
 
 .ReactTable th,
 .ReactTable td {
-  text-overflow: ellipsis;
   padding: 7px 5px;
   transition: 0.3s ease;
   transition-property: width, min-width, padding, opacity;
+  max-width: 10vw;
+}
+
+.ReactTable thead th {
+  white-space: nowrap;
+}
+
+.ReactTable thead th .column-header span div {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+.ReactTable thead th:hover .column-header span div {
+  text-overflow: unset;
+  overflow: visible;
+  max-width: none;
+}
+
+.ReactTable tbody td {
   white-space: normal;
-  width: auto;
+}
+
+/* Allow content inside header cells to wrap */
+.ReactTable tbody th > *,
+.ReactTable tbody th > span,
+.ReactTable tbody th > div {
+  white-space: normal;
 }
 
 .ReactTable thead tr td,
 .ReactTable thead tr th {
-  padding: 5px 5px;
+  background: white;
+  padding: 5px 15px;
   line-height: normal;
   position: relative;
-  border-right: 1px solid rgb(230, 230, 230);
-  transition: box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: inset 0 0 0 0 transparent;
+  transition: background-color 0.1s ease-in-out;
   font-weight: var(--bs-body-font-weight);
+  box-shadow: -1px 0 0 0 rgb(234, 234, 234), inset 0 1px 0 0 rgb(234, 234, 234);
 }
 
 .ReactTable thead th.-sort-asc,
 .ReactTable thead td.-sort-asc {
   box-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.6);
 }
+
 .ReactTable thead th.-sort-desc,
 .ReactTable thead td.-sort-desc {
   box-shadow: inset 0 -3px 0 0 rgba(0, 0, 0, 0.6);
 }
+
 .ReactTable thead th.-cursor-pointer,
 .ReactTable thead td.-cursor-pointer {
   cursor: pointer;
+}
+
+.ReactTable thead th:hover,
+.ReactTable thead td:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .ReactTable tbody {
@@ -87,9 +121,27 @@
 .ReactTable.-striped tr.-odd {
   background: rgba(0, 0, 0, 0.03);
 }
+
+/* Row Background Transition */
+.ReactTable.-highlight tbody tr,
+.ReactTable.-highlight.-striped tr.-odd {
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Hover Effect */
 .ReactTable.-highlight tbody tr:hover,
 .ReactTable.-highlight.-striped tr.-odd:hover {
-  background-color: rgb(222, 252, 222);
+  background-color: rgb(241, 241, 241);
+}
+
+/* Row is Selected */
+.ReactTable.-highlight tbody tr:has(input[type="checkbox"]:checked) {
+  background-color: rgb(230, 240, 255);
+}
+
+/* Checked row hover (optional - darker shade on hover) */
+.ReactTable.-highlight tbody tr:has(input[type="checkbox"]:checked):hover {
+  background-color: rgb(220, 235, 255);
 }
 
 .ReactTable .pagination-top {
@@ -254,8 +306,4 @@
 .ReactTable .rt-expander.-open:after {
   -webkit-transform: translate(-50%, -50%) rotate(0);
   transform: translate(-50%, -50%) rotate(0);
-}
-
-.react-table-overflow tbody td {
-  overflow: visible !important;
 }

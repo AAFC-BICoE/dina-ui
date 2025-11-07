@@ -17,6 +17,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import Offcanvas from "react-bootstrap/Offcanvas";
+import { FaFileArrowUp } from "react-icons/fa6";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
@@ -209,6 +210,7 @@ export default function MetadataListPage() {
               href="/object-store/upload"
               className="btn btn-primary ms-auto"
             >
+              <FaFileArrowUp className="me-2" />
               <DinaMessage id="uploadPageTitle" />
             </Link>
           </div>

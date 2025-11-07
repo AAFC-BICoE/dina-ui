@@ -11,6 +11,9 @@ import Link from "next/link";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import MetadataBadges from "./MetadataBadges";
 import { useMemo } from "react";
+import { FaRegClock } from "react-icons/fa";
+import React from "react";
+import { MdEdit } from "react-icons/md";
 
 interface MetadataPreviewProps {
   metadataId: string;
@@ -69,6 +72,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
                   }?id=${metadataId}`}
                   className="btn btn-primary metadata-edit-link"
                 >
+                  <MdEdit className="me-2" />
                   <DinaMessage id="editButtonText" />
                 </Link>
               </div>
@@ -76,6 +80,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
                 href={`/object-store/metadata/revisions?id=${metadataId}&isExternalResourceMetadata=${!!metadata?.resourceExternalURL}`}
                 className="btn btn-info metadata-revisions-link"
               >
+                <FaRegClock className="me-2" />
                 <DinaMessage id="revisionsButtonText" />
               </Link>
             </div>

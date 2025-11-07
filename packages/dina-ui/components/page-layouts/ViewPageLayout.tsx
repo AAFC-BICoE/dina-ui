@@ -18,6 +18,7 @@ import { HasDinaMetaInfo } from "../../types/DinaJsonMetaInfo";
 import Link from "next/link";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { GenerateLabelDropdownButton } from "../collection/material-sample/GenerateLabelDropdownButton";
+import { FaRegClock } from "react-icons/fa";
 
 /** This Component requires either the "query" or "customQueryHook" prop. */
 type ViewPageLayoutPropsBase<T extends KitsuResource> =
@@ -202,6 +203,7 @@ export function ViewPageLayout<T extends KitsuResource>({
                     href={`${entityLink}/revisions?id=${id}`}
                     className="btn btn-info"
                   >
+                    <FaRegClock className="me-2" />
                     <DinaMessage id="revisionsButtonText" />
                   </Link>
                 )}

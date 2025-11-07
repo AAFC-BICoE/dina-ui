@@ -22,21 +22,27 @@ const mockFetchJson = jest.fn(async () => {
       osm_type: "type1",
       category: "boundary",
       type: "administrative",
-      display_name: "result 1"
+      display_name: "result 1",
+      name: "name1",
+      addresstype: "address1"
     },
     {
       osm_id: 2,
       osm_type: "type2",
       category: "boundary",
       type: "administrative",
-      display_name: "result 2"
+      display_name: "result 2",
+      name: "name2",
+      addresstype: "address2"
     },
     {
       osm_id: 3,
       osm_type: "type3",
       category: "place",
       type: "type",
-      display_name: "result 3"
+      display_name: "result 3",
+      name: "name3",
+      addresstype: "address3"
     }
   ];
   return results;

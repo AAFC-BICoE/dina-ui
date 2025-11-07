@@ -7,6 +7,7 @@ import {
   useDinaFormContext
 } from "..";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { FaFloppyDisk } from "react-icons/fa6";
 
 interface SubmitButtonProps {
   children?: React.ReactNode;
@@ -14,6 +15,7 @@ interface SubmitButtonProps {
   hidePrimaryClass?: boolean;
   performSave?: boolean;
   setPerformSave?: (newValue: boolean) => void;
+  showSaveIcon?: boolean;
 
   /** Override internal button props using the formik context. */
   buttonProps?: (
@@ -32,7 +34,8 @@ export const SubmitButton = connect<SubmitButtonProps>(
     formik,
     hidePrimaryClass,
     performSave,
-    setPerformSave
+    setPerformSave,
+    showSaveIcon = true
   }) {
     const { isNestedForm } = useDinaFormContext();
 
@@ -69,10 +72,12 @@ export const SubmitButton = connect<SubmitButtonProps>(
         buttonProps={() => resolvedButtonProps}
         onClick={async () => await formik.submitForm()}
       >
+        {showSaveIcon && <FaFloppyDisk className="me-2" />}
         {children || <CommonMessage id="submitBtnText" />}
       </FormikButton>
     ) : (
       <button {...resolvedButtonProps} type="submit">
+        {showSaveIcon && <FaFloppyDisk className="me-2" />}
         {children || <CommonMessage id="submitBtnText" />}
       </button>
     );

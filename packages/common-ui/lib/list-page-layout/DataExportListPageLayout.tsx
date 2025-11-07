@@ -12,6 +12,8 @@ import { Button } from "react-bootstrap";
 import { useState } from "react";
 import { useIntl } from "react-intl";
 import { downloadDataExport } from "../export/exportUtils";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { FaArrowRotateLeft } from "react-icons/fa6";
 
 export interface DataExportListPageLayoutProps {
   username: string | undefined;
@@ -83,7 +85,10 @@ export function DataExportListPageLayout({
                   {loading ? (
                     <LoadingSpinner loading={loading} />
                   ) : (
-                    formatMessage({ id: "refreshButtonText" })
+                    <>
+                      <FaArrowRotateLeft className="me-2" />
+                      <DinaMessage id="refreshButtonText" />
+                    </>
                   )}
                 </Button>
               }

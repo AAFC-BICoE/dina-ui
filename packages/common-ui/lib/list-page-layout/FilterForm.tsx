@@ -7,6 +7,8 @@ import { FilterBuilderField } from "../filter-builder/FilterBuilderField";
 import { DinaForm, DinaFormOnSubmit } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { FaFilter } from "react-icons/fa";
+import { FaArrowRotateLeft } from "react-icons/fa6";
 
 interface FilterFormProps {
   children?: (formik: FormikProps<any>) => React.ReactElement;
@@ -65,7 +67,8 @@ export function FilterForm({
           </div>
           <div>{children && children(formikProps)}</div>
           <div className="align-end ps-3 d-flex gap-2 align-items-center">
-            <SubmitButton className="list-inline-item">
+            <SubmitButton className="list-inline-item" showSaveIcon={false}>
+              <FaFilter className="me-2" />
               <CommonMessage id="filterSubmitButtonText" />
             </SubmitButton>
             <button
@@ -73,6 +76,7 @@ export function FilterForm({
               type="button"
               onClick={() => resetFilterForm(formikProps)}
             >
+              <FaArrowRotateLeft className="me-2" />
               <CommonMessage id="resetFilters" />
             </button>
           </div>

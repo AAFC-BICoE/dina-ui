@@ -92,7 +92,8 @@ function GalleryItem({
       className="card card-body"
       style={{
         backgroundColor: highlighted ? HIGHLIGHT_COLOR : undefined,
-        maxWidth: "15rem"
+        maxWidth: "15rem",
+        zIndex: "-1"
       }}
     >
       <FileView

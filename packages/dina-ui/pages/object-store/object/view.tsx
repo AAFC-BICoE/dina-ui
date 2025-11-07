@@ -29,6 +29,9 @@ import { MetadataFileView } from "../../../components/object-store/metadata/Meta
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 import { useMemo } from "react";
+import { FaRegClock } from "react-icons/fa";
+import React from "react";
+import { MdEdit } from "react-icons/md";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -87,6 +90,7 @@ export default function MetadataViewPage() {
               className="btn btn-primary ms-auto"
               style={{ width: "5rem" }}
             >
+              <MdEdit className="me-2" />
               <DinaMessage id="editButtonText" />
             </Link>
             <UploadDerivativeButton acDerivedFrom={uuid} />
@@ -96,6 +100,7 @@ export default function MetadataViewPage() {
           href={`/object-store/metadata/revisions?id=${uuid}`}
           className="btn btn-info"
         >
+          <FaRegClock className="me-2" />
           <DinaMessage id="revisionsButtonText" />
         </Link>
         {canDelete && (
