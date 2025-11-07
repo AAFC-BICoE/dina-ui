@@ -268,16 +268,37 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .rule--body {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.flex-grow-half {
+  flex: 0.5;
+}
+
+.flex-grow-expand {
+  flex: 1;
+}
+
+.flex-grow-expand > div {
+  width: 100%;
 }
 
 .rule--field {
-  flex: 1;
+  flex: 0 0 300px;
+  min-width: 200px;
+}
+
+.rule--body > :only-child > div {
+  flex: 1 0 !important;
 }
 
 .rule--operator {
-  flex: 1;
+  flex: 0 0 300px;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 .rule--operator:empty {
@@ -287,7 +308,8 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .rule--value {
   flex: 1;
-  padding-right: 5px;
+  min-width: 150px;
+  padding-right: 0;
 }
 
 .rule--value:empty {
@@ -372,8 +394,7 @@ input[type="number"]::-webkit-outer-spin-button {
  */
 .react-table-overflow .rt-td, 
 .react-table-overflow .rt-tbody, 
-.react-table-overflow .rt-table,
-.react-table-overflow th {
+.react-table-overflow .rt-table {
   overflow: visible !important;
 }
 
@@ -440,19 +461,6 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   overflow-y: auto;
   width: 100%;
   max-height: 75vh;
-}
-
-.ReactTable thead {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.ReactTable thead th {
-  background: white;
-  white-space: nowrap;
-  padding-left: 15px !important;
-  padding-right: 15px !important;
 }
 
 .form-check-horizontal {

@@ -25,6 +25,8 @@ import {
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   ScheduledAction
 } from "../../../types/collection-api";
+import React from "react";
+import { MdEdit } from "react-icons/md";
 
 /** Type-safe object with all ScheduledAction fields. */
 export const SCHEDULEDACTION_FIELDS_OBJECT: Required<
@@ -140,6 +142,7 @@ export function ScheduledActionsField({
                   buttonProps={buttonProps}
                   onClick={() => openRowEditor(row)}
                 >
+                  <MdEdit className="me-2" />
                   <DinaMessage id="editButtonText" />
                 </FormikButton>
                 <FormikButton

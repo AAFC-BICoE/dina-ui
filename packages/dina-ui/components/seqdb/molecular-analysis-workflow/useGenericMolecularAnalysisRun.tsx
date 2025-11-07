@@ -1289,11 +1289,30 @@ export function useGenericMolecularAnalysisRun({
       setLoading(false);
       setReloadGenericMolecularAnalysisRun(Date.now());
       await onSaved?.(4);
-    } catch (error) {
-      console.error("Error saving sequencing run: ", error);
-      setErrorMessage("Error saving sequencing run: " + error.toString());
-      setLoading(false);
-    }
+    } catch (error: any) {
+        console.error("Error saving sequencing run:", error);
+
+        let message = "Error saving sequencing run:";
+
+        // Append individual error message if present
+        if (error.errorMessage) {
+          message += ` ${error.errorMessage}`;
+        }
+
+        // Append all field error values if present
+        if (error.fieldErrors && typeof error.fieldErrors === "object") {
+          const fieldErrorValues = Object.values(error.fieldErrors)
+            .filter((val) => typeof val === "string" && val.trim() !== "")
+            .join(", ");
+          if (fieldErrorValues) {
+            message += ` ${fieldErrorValues}`;
+          }
+        }
+
+        setErrorMessage(message);
+        setLoading(false);
+      }
+
   }
 
   // Handle saving

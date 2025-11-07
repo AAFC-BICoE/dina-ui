@@ -1,0 +1,100 @@
+/* ==== Section layout ==== */
+
+.sectionShell {
+  /* common outer container styles */
+  margin-bottom: 2rem;
+  border-radius: 0.5rem;
+  transition: box-shadow 150ms ease, background-color 150ms ease, outline 150ms ease;
+}
+
+/* Two layout modes:
+   - withRail  : customize mode (left handle rail + content)
+   - noRail    : normal mode (content only)
+*/
+.withRail {
+  display: grid;
+  grid-template-columns: 28px 1fr; /* handle rail width + content */
+  column-gap: 0.5rem;
+}
+
+.noRail {
+  display: block;
+}
+
+/* Highlight states */
+
+.isHovering {
+  background-color: rgba(13, 110, 253, 0.12); /* bs-primary tint */
+  box-shadow: 0 2px 12px rgba(13, 110, 253, 0.30);
+}
+
+.isDragging {
+  background-color: rgba(13, 110, 253, 0.06);
+  box-shadow:
+    0 0 0 3px rgba(13, 110, 253, 0.25),
+    0 6px 18px rgba(0, 0, 0, 0.20);
+}
+
+/* ==== Left rail (handle column) ==== */
+
+.sectionHandleRail {
+  display: flex;
+  align-items: flex-start; /* top-align by default */
+  /* We'll push it down via inline style padding-top to align with grid's first row */
+}
+
+/* The activator button */
+.dragHandleButton {
+  cursor: grab !important;
+  color: #323538; /* muted */
+  padding: 0.25rem;
+  border: 0;
+  background:-webkit-linear-gradient(#38414d27) ;
+  display: inline-flex;
+  align-items: center;
+  height: 100%; /* full rail height */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border-radius: 0.375rem;
+}
+
+.dragHandleButton svg {
+  font-size: 40px; /* bigger icon */
+}
+
+.dragHandleButton:active {
+  cursor: grabbing !important;
+}
+
+/* Focus ring for keyboard users */
+.dragHandleButton:focus-visible {
+  outline: 2px solid #0d6efd; /* Bootstrap primary */
+  outline-offset: 2px;
+}
+
+/* ==== Right column: header + grid ==== */
+
+.sectionInner {
+  min-width: 0; /* good practice with grids/flex to avoid overflow */
+}
+
+.sectionHeaderRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.sectionHeaderRow h3 {
+  margin: 0; /* keep title on a single row baseline */
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .sectionShell {
+    transition: none;
+  }
+}

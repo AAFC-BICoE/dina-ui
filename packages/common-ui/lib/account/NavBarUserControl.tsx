@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { useAccount } from "./AccountProvider";
 import { FaUserCircle } from "react-icons/fa";
+import { FaRightFromBracket } from "react-icons/fa6";
 
 /** Shows the logged-in user and the logout button. */
 export function NavbarUserControl() {
@@ -42,6 +43,7 @@ export function NavbarUserControl() {
             className="btn btn-info logout-button my-auto"
             onClick={() => logout()}
           >
+            <FaRightFromBracket className="me-2" />
             <CommonMessage id="logoutBtn" />
           </button>
         </>

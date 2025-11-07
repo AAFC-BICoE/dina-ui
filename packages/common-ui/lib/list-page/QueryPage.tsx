@@ -848,7 +848,7 @@ export function QueryPage<TData extends KitsuResource>({
             ),
             header: () => <SelectCheckBoxHeader />,
             enableSorting: false,
-            size: 200
+            size: 50
           }
         ]
       : [];
@@ -867,7 +867,7 @@ export function QueryPage<TData extends KitsuResource>({
             ),
             header: () => <DeselectCheckBoxHeader />,
             enableSorting: false,
-            size: 200
+            size: 50
           }
         ]
       : []),

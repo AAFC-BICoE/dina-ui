@@ -62,7 +62,7 @@ export default function QueryBuilderDateSearch({
             <>
               {matchType !== "in" && matchType !== "notIn" ? (
                 <DatePicker
-                  className="form-control"
+                  className="form-control w-100"
                   value={value}
                   onChange={(newDate: Date, event) => {
                     if (

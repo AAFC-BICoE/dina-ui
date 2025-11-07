@@ -13,6 +13,7 @@ import {
 } from "@react-awesome-query-builder/ui";
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
+
 import { useIntl } from "react-intl";
 import { DynamicFieldsMappingConfig, ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
@@ -52,6 +53,8 @@ import QueryBuilderVocabularySearch from "./query-builder-value-types/QueryBuild
 import QueryRowClassificationSearch, {
   transformClassificationToDSL
 } from "./query-builder-value-types/QueryBuilderClassificationSearch";
+import { MdPlaylistAdd } from "react-icons/md";
+import { LuParentheses } from "react-icons/lu";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -799,9 +802,16 @@ export function generateBuilderConfig(
       if (buttonProps) {
         switch (buttonProps?.type) {
           case "addRule":
+            return (
+              <Button onClick={buttonProps?.onClick} className="ms-1">
+                <MdPlaylistAdd className="me-2" />
+                {buttonProps.label}
+              </Button>
+            );
           case "addGroup":
             return (
               <Button onClick={buttonProps?.onClick} className="ms-1">
+                <LuParentheses className="me-2" />
                 {buttonProps.label}
               </Button>
             );

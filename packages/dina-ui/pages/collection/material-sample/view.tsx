@@ -57,6 +57,7 @@ import { Row } from "@tanstack/react-table";
 import { CSSProperties } from "react";
 import { dynamicFieldMappingForMaterialSample } from "./list";
 import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
+import { FaRegClock } from "react-icons/fa";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -181,14 +182,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 byPassView={true}
               />
             </div>
-
-            <div className="col-md-5 col-sm-12">
+            <div className="col-md-4 col-sm-12">
               <MaterialSampleFormTemplateSelect
                 value={sampleFormTemplate}
                 onChange={setSampleFormTemplateUUID}
               />
             </div>
-            <div className="col-md-5 flex d-flex col-sm-12 gap-1 justify-content-end">
+            <div className="col-md-6 flex d-flex col-sm-12 gap-1 justify-content-end align-items-center">
               {canEdit && (
                 <EditButton
                   entityId={id}
@@ -206,6 +206,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 href={`/collection/material-sample/revisions?id=${id}`}
                 className="btn btn-info me-3"
               >
+                <FaRegClock className="me-2" />
                 <DinaMessage id="revisionsButtonText" />
               </Link>
               {canDelete && (
@@ -214,7 +215,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   options={{ apiBaseUrl: "/collection-api" }}
                   postDeleteRedirect="/collection/material-sample/list"
                   type="material-sample"
-                  className="ms-auto"
                   onDeleted={async () => {
                     // Delete storageUnitUsage if there is one linked
                     if (materialSampleData.storageUnitUsage?.id) {
