@@ -330,15 +330,19 @@ const FieldMappingConfig: FieldMappingConfigType = {
     originalFilename: { dataType: WorkbookDataTypeEnum.STRING },
 
     fileName: { dataType: WorkbookDataTypeEnum.STRING },
-    caption: { dataType: WorkbookDataTypeEnum.STRING },
+    acCaption: { dataType: WorkbookDataTypeEnum.STRING },
 
-    // TODO: DateTime.
-    acDigitizationDate: { dataType: WorkbookDataTypeEnum.DATE },
+    acDigitizationDate: { dataType: WorkbookDataTypeEnum.DATE_TIME },
 
     dcType: {
       dataType: WorkbookDataTypeEnum.ENUM,
       allowedValues: DCTYPE_OPTIONS
     },
+    acSubtype: { dataType: WorkbookDataTypeEnum.STRING },
+
+    dcFormat: { dataType: WorkbookDataTypeEnum.STRING },
+    dcRights: { dataType: WorkbookDataTypeEnum.STRING },
+
     dcCreator: {
       dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
       relationshipConfig: {

@@ -333,7 +333,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
               <button
                 class="btn ms-auto btn-primary"
                 disabled=""
-                style="width: 12rem;"
+                style="width: 14rem;"
                 type="submit"
               >
                 <svg

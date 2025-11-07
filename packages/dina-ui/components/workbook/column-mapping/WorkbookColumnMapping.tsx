@@ -99,7 +99,6 @@ export function WorkbookColumnMapping({
     convertWorkbook,
     flattenedConfig,
     getFieldRelationshipConfig,
-    getTopLevelRelationshipConfig,
     FIELD_TO_VOCAB_ELEMS_MAP
   } = useWorkbookConverter(FieldMappingConfig, type);
 
@@ -117,7 +116,7 @@ export function WorkbookColumnMapping({
   } = useColumnMapping();
 
   const { allowAppendData, fieldColumnLocaleId } =
-    getTopLevelRelationshipConfig?.() || {
+    getFieldRelationshipConfig?.() || {
       allowAppendData: false,
       fieldColumnLocaleId: ""
     };
@@ -659,6 +658,24 @@ export function WorkbookColumnMapping({
             )
           ) {
             param.dataType = WorkbookDataTypeEnum.VOCABULARY;
+            errors.push(
+              new ValidationError(
+                formatMessage("workBookInvalidDataFormat", param),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
+        case WorkbookDataTypeEnum.ENUM:
+          const enumElements = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldPath);
+          if (
+            enumElements &&
+            !enumElements.find(
+              (ev) => ev.value === row[fieldPath] || ev.label === row[fieldPath]
+            )
+          ) {
+            param.dataType = WorkbookDataTypeEnum.ENUM;
             errors.push(
               new ValidationError(
                 formatMessage("workBookInvalidDataFormat", param),

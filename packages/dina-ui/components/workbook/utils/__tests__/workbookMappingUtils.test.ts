@@ -27,7 +27,9 @@ const mockConfig: FieldMappingConfigType = {
     relationshipConfig: {
       type: "mock-entity",
       hasGroup: true,
-      baseApiPath: "/fake-api"
+      baseApiPath: "/fake-api",
+      allowAppendData: true,
+      fieldColumnLocaleId: "test"
     },
     stringField: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
@@ -707,7 +709,9 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.objectField2.dataType": "object",
       "mockEntity.relationshipConfig.baseApiPath": "/fake-api",
       "mockEntity.relationshipConfig.hasGroup": true,
-      "mockEntity.relationshipConfig.type": "mock-entity"
+      "mockEntity.relationshipConfig.type": "mock-entity",
+      "mockEntity.relationshipConfig.allowAppendData": true,
+      "mockEntity.relationshipConfig.fieldColumnLocaleId": "test"
     });
   });
 

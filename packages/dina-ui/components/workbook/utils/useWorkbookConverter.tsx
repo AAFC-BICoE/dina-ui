@@ -63,6 +63,10 @@ export function useWorkbookConverter(
               });
             }
             break;
+          case WorkbookDataTypeEnum.ENUM:
+            const allowedValues = (recordFieldsMap[recordField] as any)
+              .allowedValues;
+            fieldToVocabElemsMap.set(recordField, allowedValues);
           case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
             if (endpoint) {
               // load available Managed Attributes
@@ -99,6 +103,17 @@ export function useWorkbookConverter(
     ) => convertString((value as string).toUpperCase(), _fieldName),
     [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
       value.toUpperCase().replace(" ", "_"),
+    [WorkbookDataTypeEnum.ENUM]: (value: any, fieldName?: string) => {
+      const allowedValues = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldName || "");
+      if (allowedValues) {
+        const found = allowedValues.find(
+          (ev) => ev.value === value || ev.label === value
+        );
+        if (found) {
+          return found.value;
+        }
+      }
+    },
     [WorkbookDataTypeEnum.CLASSIFICATION]: (value: {
       [key: string]: string;
     }) => {
@@ -166,10 +181,6 @@ export function useWorkbookConverter(
     return fieldPath
       ? flattenedConfig[fieldPath]?.relationshipConfig
       : flattenedConfig["relationshipConfig"];
-  }
-
-  function getTopLevelRelationshipConfig() {
-    return flattenedConfig["relationshipConfig"];
   }
 
   function getFieldConverter(fieldPath?: string) {
@@ -719,7 +730,6 @@ export function useWorkbookConverter(
     getFieldConverter,
     getPathOfField,
     getFieldRelationshipConfig,
-    getTopLevelRelationshipConfig,
     isFieldInALinkableRelationshipField,
     getResourceSelectForRelationshipField,
     FIELD_TO_VOCAB_ELEMS_MAP

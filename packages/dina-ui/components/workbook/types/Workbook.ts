@@ -71,6 +71,7 @@ export interface PrimitiveField {
     | WorkbookDataTypeEnum.STRING
     | WorkbookDataTypeEnum.STRING_COORDINATE
     | WorkbookDataTypeEnum.DATE
+    | WorkbookDataTypeEnum.DATE_TIME
     | WorkbookDataTypeEnum.STRING_ARRAY
     | WorkbookDataTypeEnum.NUMBER_ARRAY
     | WorkbookDataTypeEnum.BOOLEAN_ARRAY;

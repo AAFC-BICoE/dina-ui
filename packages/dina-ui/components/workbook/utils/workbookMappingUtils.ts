@@ -348,76 +348,150 @@ export function getFlattenedConfig(
 }
 
 /**
- * find the possible field that match the column header
+ * Find the possible field that matches the column header
  * @param columnHeader The column header from excel file
- * @param fieldOptions FieldOptions that predefined in FieldMappingConfig.json
- * @param type The entity type, e.g. material-sample, metadata.
- * @returns
+ * @param fieldOptions FieldOptions predefined in FieldMappingConfig.json
+ * @param type The entity type, e.g. material-sample, metadata
+ * @returns The matched field value or undefined
  */
 export function findMatchField(
   columnHeader: WorkbookColumnInfo,
   fieldOptions: FieldOptionType[],
   type: string
-) {
-  // Retrieve the synonyms map for the given type
-  if (!SYNONYMS_MAP_BY_TYPE.has(type)) {
+): string | undefined {
+  const synonymMap = getSynonymMap(type);
+  const normalizedColumnHeader = normalizeColumnHeader(
+    columnHeader,
+    synonymMap
+  );
+  const flattenedOptions = flattenFieldOptions(fieldOptions);
+
+  return findMatchingOption(
+    normalizedColumnHeader,
+    flattenedOptions,
+    synonymMap
+  );
+}
+
+/**
+ * Retrieve and validate the synonyms map for the given type
+ */
+function getSynonymMap(type: string): Map<string, string> {
+  const synonymMap = SYNONYMS_MAP_BY_TYPE.get(type);
+
+  if (!synonymMap) {
     throw new Error(
       `Unknown type: ${type}, add this new type to the SYNONYMS_MAP_BY_TYPE.`
     );
   }
-  const synonymMap = SYNONYMS_MAP_BY_TYPE.get(type);
 
-  // Search the original column if available, otherwise, just use the column header.
-  let columnHeader2: string = (
+  return synonymMap;
+}
+
+/**
+ * Normalize column header by applying synonyms
+ */
+function normalizeColumnHeader(
+  columnHeader: WorkbookColumnInfo,
+  synonymMap: Map<string, string>
+): string {
+  const rawHeader = (
     columnHeader.originalColumn ?? columnHeader.columnHeader
   ).toLowerCase();
-  if (synonymMap?.has(columnHeader2)) {
-    columnHeader2 = synonymMap.get(columnHeader2)!;
-  }
-  const plainOptions: { label: string; value: string }[] = [];
-  for (const opt of fieldOptions) {
-    if (opt.options) {
-      for (const nestOpt of opt.options) {
-        plainOptions.push({ label: nestOpt.label, value: nestOpt.value });
-      }
-    } else {
-      plainOptions.push({ label: opt.label, value: opt.value! });
-    }
-  }
-  const prefixPos = columnHeader2.lastIndexOf(".");
-  let prefix: string;
-  if (prefixPos !== -1) {
-    prefix = columnHeader2.substring(0, prefixPos + 1);
+  return synonymMap.get(rawHeader) ?? rawHeader;
+}
+
+/**
+ * Flatten nested field options into a simple array
+ */
+function flattenFieldOptions(
+  fieldOptions: FieldOptionType[]
+): Array<{ label: string; value: string }> {
+  return fieldOptions.flatMap((opt) =>
+    opt.options
+      ? opt.options.map((nestOpt) => ({
+          label: nestOpt.label,
+          value: nestOpt.value
+        }))
+      : [{ label: opt.label, value: opt.value! }]
+  );
+}
+
+/**
+ * Find matching option based on normalized column header
+ */
+function findMatchingOption(
+  normalizedHeader: string,
+  options: Array<{ label: string; value: string }>,
+  synonymMap: Map<string, string>
+): string | undefined {
+  const prefixInfo = extractPrefix(normalizedHeader);
+
+  const matchedOption = options.find((option) =>
+    prefixInfo
+      ? matchWithPrefix(option, normalizedHeader, prefixInfo, synonymMap)
+      : matchWithoutPrefix(option, normalizedHeader, options)
+  );
+
+  return matchedOption?.value;
+}
+
+/**
+ * Extract prefix from column header if it exists
+ */
+function extractPrefix(
+  header: string
+): { prefix: string; suffixStart: number } | null {
+  const lastDotIndex = header.lastIndexOf(".");
+
+  if (lastDotIndex === -1) {
+    return null;
   }
 
-  const option = _.find(plainOptions, (item) => {
-    if (prefix) {
-      if (synonymMap?.has(prefix)) {
-        prefix = synonymMap.get(prefix)!;
-      }
-      if (
-        item.value.toLowerCase().startsWith(prefix.toLowerCase()) &&
-        (item.value.toLowerCase() === columnHeader2.toLowerCase() ||
-          _toPlainString(item.label) ===
-            _toPlainString(columnHeader2.substring(prefixPos + 1)))
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      const validOptionLabel = isValidOptionLabel(
-        item,
-        plainOptions,
-        columnHeader2
-      );
-      return (
-        item.value.toLowerCase() === columnHeader2.toLowerCase() ||
-        validOptionLabel
-      );
-    }
-  });
-  return option ? option.value : undefined;
+  return {
+    prefix: header.substring(0, lastDotIndex + 1),
+    suffixStart: lastDotIndex + 1
+  };
+}
+
+/**
+ * Match option when prefix exists
+ */
+function matchWithPrefix(
+  option: { label: string; value: string },
+  normalizedHeader: string,
+  prefixInfo: { prefix: string; suffixStart: number },
+  synonymMap: Map<string, string>
+): boolean {
+  const normalizedPrefix = (
+    synonymMap.get(prefixInfo.prefix) ?? prefixInfo.prefix
+  ).toLowerCase();
+  const optionValue = option.value.toLowerCase();
+
+  if (!optionValue.startsWith(normalizedPrefix)) {
+    return false;
+  }
+
+  // Check if values match exactly or if labels match (ignoring prefix)
+  const suffix = normalizedHeader.substring(prefixInfo.suffixStart);
+  return (
+    optionValue === normalizedHeader.toLowerCase() ||
+    _toPlainString(option.label) === _toPlainString(suffix)
+  );
+}
+
+/**
+ * Match option when no prefix exists
+ */
+function matchWithoutPrefix(
+  option: { label: string; value: string },
+  normalizedHeader: string,
+  allOptions: Array<{ label: string; value: string }>
+): boolean {
+  return (
+    option.value.toLowerCase() === normalizedHeader.toLowerCase() ||
+    isValidOptionLabel(option, allOptions, normalizedHeader)
+  );
 }
 
 /**
