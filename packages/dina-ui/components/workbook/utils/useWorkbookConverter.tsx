@@ -168,6 +168,10 @@ export function useWorkbookConverter(
       : flattenedConfig["relationshipConfig"];
   }
 
+  function getTopLevelRelationshipConfig() {
+    return flattenedConfig["relationshipConfig"];
+  }
+
   function getFieldConverter(fieldPath?: string) {
     const fieldDataType = getFieldDataType(fieldPath);
     return !!fieldDataType
@@ -715,6 +719,7 @@ export function useWorkbookConverter(
     getFieldConverter,
     getPathOfField,
     getFieldRelationshipConfig,
+    getTopLevelRelationshipConfig,
     isFieldInALinkableRelationshipField,
     getResourceSelectForRelationshipField,
     FIELD_TO_VOCAB_ELEMS_MAP

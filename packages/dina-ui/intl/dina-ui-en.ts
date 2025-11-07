@@ -168,7 +168,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   continueWithWorkbook: "Continue with Workbook",
   continueWithBatchEntryForm: "Continue with Batch Entry Form",
   workbookUploadBulkEditInfoMessage:
-    "{count} files ready for bulk editing. Upload a spreadsheet with an 'Original File Name' column to map metadata changes.",
+    "{count} files ready for bulk editing. Upload a spreadsheet with an 'Original Filename' column to map metadata changes.",
   contributors: "Contributors",
   controlledVocabularyTitle: "Controlled Vocabulary",
   convertToDepthMinMax: "Convert to Depth Min/Max",
@@ -675,6 +675,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleFieldsMapping: "Material Sample Field",
+  metadataFieldsMapping: "Metadata Field",
   skipColumn: "Skip",
   materialSampleFormTemplate: "Material Sample Form Template",
   materialSampleFormTemplates: "Material Sample Form Templates",

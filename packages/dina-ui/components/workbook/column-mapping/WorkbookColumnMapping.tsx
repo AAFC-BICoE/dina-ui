@@ -99,6 +99,7 @@ export function WorkbookColumnMapping({
     convertWorkbook,
     flattenedConfig,
     getFieldRelationshipConfig,
+    getTopLevelRelationshipConfig,
     FIELD_TO_VOCAB_ELEMS_MAP
   } = useWorkbookConverter(FieldMappingConfig, type);
 
@@ -114,6 +115,12 @@ export function WorkbookColumnMapping({
     resolveColumnMappingAndRelationshipMapping,
     getResourceSelectField
   } = useColumnMapping();
+
+  const { allowAppendData, fieldColumnLocaleId } =
+    getTopLevelRelationshipConfig?.() || {
+      allowAppendData: false,
+      fieldColumnLocaleId: ""
+    };
 
   const buttonBar = (
     <>
@@ -811,7 +818,7 @@ export function WorkbookColumnMapping({
                         }
                       }}
                     />
-                    <CheckBoxField name="appendData" />
+                    {allowAppendData && <CheckBoxField name="appendData" />}
                   </div>
 
                   {!templateIntegrityWarning && (
@@ -866,7 +873,7 @@ export function WorkbookColumnMapping({
                       <DinaMessage id="spreadsheetHeader" />
                     </div>
                     <div className="col-md-6">
-                      <DinaMessage id="materialSampleFieldsMapping" />
+                      <DinaMessage id={fieldColumnLocaleId} />
                     </div>
                     <div className="col-md-2">
                       <DinaMessage id="skipColumn" />

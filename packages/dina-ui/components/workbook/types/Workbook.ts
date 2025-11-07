@@ -58,6 +58,8 @@ export type FieldMappingConfigType = {
       type: string;
       hasGroup: boolean;
       baseApiPath: string;
+      allowAppendData: boolean;
+      fieldColumnLocaleId: string;
     };
   };
 };

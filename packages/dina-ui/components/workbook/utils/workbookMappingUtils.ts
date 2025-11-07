@@ -122,66 +122,78 @@ export function _toPlainString(value: string) {
   }
 }
 
-const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
-  ["parent.", "parentMaterialSample."],
-  ["parent id", "parentMaterialSample.materialSampleName"],
-  ["parent", "parentMaterialSample.materialSampleName"],
-  ["parent material sample", "parentMaterialSample.materialSampleName"],
-  ["preparationmethod", "preparationMethod.name"],
-  ["preparation method", "preparationMethod.name"],
-  ["identifier", "materialSampleName"],
-  ["type", "materialSampleType"],
-  ["collection", "collection.name"],
-  ["collections", "collection.name"],
-  ["storage unit", "storageUnitUsage.storageUnit.name"],
-  ["storage", "storageUnitUsage.storageUnit.name"],
-  ["storageunit", "storageUnitUsage.storageUnit.name"],
-  ["project", "projects.name"],
-  ["projects", "projects.name"],
-  ["preparation type", "preparationType.name"],
-  ["preparationtype", "preparationType.name"],
-  ["prepared by", "preparedBy.displayName"],
-  ["preparedby", "preparedBy.displayName"],
-  ["preparationprotocol", "preparationProtocol.name"],
-  ["preparation protocol", "preparationProtocol.name"],
-  ["assemblage", "assemblages.name"],
-  ["assemblages", "assemblages.name"],
-  ["collectors", "collectingEvent.collectors.displayName"],
-  ["collector", "collectingEvent.collectors.displayName"],
-  ["attachment", "attachment.name"],
-  ["attachments", "attachment.name"],
-  ["hostorganism", "hostOrganism.name"],
-  ["host organism", "hostOrganism.name"],
-  ["hostremarks", "hostOrganism.remarks"],
-  ["host remarks", "hostOrganism.remarks"],
-  ["collector's number", "collectingEvent.dwcRecordNumber"],
-  ["collector number", "collectingEvent.dwcRecordNumber"],
-  ["well column", "storageUnitUsage.wellColumn"],
-  ["well row", "storageUnitUsage.wellRow"],
+const SYNONYMS_MAP_BY_TYPE = new Map<string, Map<string, string>>([
   [
-    "decimal latitude",
-    "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"
+    "material-sample",
+    new Map([
+      ["parent.", "parentMaterialSample."],
+      ["parent id", "parentMaterialSample.materialSampleName"],
+      ["parent", "parentMaterialSample.materialSampleName"],
+      ["parent material sample", "parentMaterialSample.materialSampleName"],
+      ["preparationmethod", "preparationMethod.name"],
+      ["preparation method", "preparationMethod.name"],
+      ["identifier", "materialSampleName"],
+      ["type", "materialSampleType"],
+      ["collection", "collection.name"],
+      ["collections", "collection.name"],
+      ["storage unit", "storageUnitUsage.storageUnit.name"],
+      ["storage", "storageUnitUsage.storageUnit.name"],
+      ["storageunit", "storageUnitUsage.storageUnit.name"],
+      ["project", "projects.name"],
+      ["projects", "projects.name"],
+      ["preparation type", "preparationType.name"],
+      ["preparationtype", "preparationType.name"],
+      ["prepared by", "preparedBy.displayName"],
+      ["preparedby", "preparedBy.displayName"],
+      ["preparationprotocol", "preparationProtocol.name"],
+      ["preparation protocol", "preparationProtocol.name"],
+      ["assemblage", "assemblages.name"],
+      ["assemblages", "assemblages.name"],
+      ["collectors", "collectingEvent.collectors.displayName"],
+      ["collector", "collectingEvent.collectors.displayName"],
+      ["attachment", "attachment.name"],
+      ["attachments", "attachment.name"],
+      ["hostorganism", "hostOrganism.name"],
+      ["host organism", "hostOrganism.name"],
+      ["hostremarks", "hostOrganism.remarks"],
+      ["host remarks", "hostOrganism.remarks"],
+      ["collector's number", "collectingEvent.dwcRecordNumber"],
+      ["collector number", "collectingEvent.dwcRecordNumber"],
+      ["well column", "storageUnitUsage.wellColumn"],
+      ["well row", "storageUnitUsage.wellRow"],
+      [
+        "decimal latitude",
+        "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"
+      ],
+      [
+        "decimal longitude",
+        "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
+      ],
+      ["latitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"],
+      [
+        "longitude",
+        "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
+      ],
+      ["collecting event remarks", "collectingEvent.remarks"]
+    ])
   ],
   [
-    "decimal longitude",
-    "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
-  ],
-  ["latitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"],
-  ["longitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"],
-  ["collecting event remarks", "collectingEvent.remarks"]
+    "metadata",
+    new Map([
+      ["file name", "fileName"],
+      ["original filename", "originalFilename"],
+      ["original file name", "originalFilename"],
+      ["date original version created", ""],
+      ["caption", "acCaption"],
+      ["stored object type", "dcType"],
+      ["object type", "dcType"],
+      ["type", "dcType"],
+      ["subtype", "acSubtype"],
+      ["object subtype", "acSubtype"],
+      ["digitalized by", "dcCreator.displayName"]
+    ])
+  ]
 ]);
-
-// const METADATA_FIELD_SYNONYMS = new Map<string, string>([
-//   ["file name", "fileName"],
-//   ["date original version created", ""],
-//   ["caption", "acCaption"],
-//   ["stored object type", "dcType"],
-//   ["object type", "dcType"],
-//   ["type", "dcType"],
-//   ["subtype", "acSubtype"],
-//   ["object subtype", "acSubtype"],
-//   ["digitalized by", "dcCreator.displayName"],
-// ]);
 
 export type FieldOptionType = {
   label: string;
@@ -339,18 +351,28 @@ export function getFlattenedConfig(
  * find the possible field that match the column header
  * @param columnHeader The column header from excel file
  * @param fieldOptions FieldOptions that predefined in FieldMappingConfig.json
+ * @param type The entity type, e.g. material-sample, metadata.
  * @returns
  */
 export function findMatchField(
   columnHeader: WorkbookColumnInfo,
-  fieldOptions: FieldOptionType[]
+  fieldOptions: FieldOptionType[],
+  type: string
 ) {
+  // Retrieve the synonyms map for the given type
+  if (!SYNONYMS_MAP_BY_TYPE.has(type)) {
+    throw new Error(
+      `Unknown type: ${type}, add this new type to the SYNONYMS_MAP_BY_TYPE.`
+    );
+  }
+  const synonymMap = SYNONYMS_MAP_BY_TYPE.get(type);
+
   // Search the original column if available, otherwise, just use the column header.
   let columnHeader2: string = (
     columnHeader.originalColumn ?? columnHeader.columnHeader
   ).toLowerCase();
-  if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {
-    columnHeader2 = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(columnHeader2)!;
+  if (synonymMap?.has(columnHeader2)) {
+    columnHeader2 = synonymMap.get(columnHeader2)!;
   }
   const plainOptions: { label: string; value: string }[] = [];
   for (const opt of fieldOptions) {
@@ -370,8 +392,8 @@ export function findMatchField(
 
   const option = _.find(plainOptions, (item) => {
     if (prefix) {
-      if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
-        prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
+      if (synonymMap?.has(prefix)) {
+        prefix = synonymMap.get(prefix)!;
       }
       if (
         item.value.toLowerCase().startsWith(prefix.toLowerCase()) &&

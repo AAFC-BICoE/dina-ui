@@ -301,7 +301,7 @@ export function WorkbookTemplateGenerator() {
               <SubmitButton
                 className="ms-auto"
                 buttonProps={() => ({
-                  style: { width: "12rem" },
+                  style: { width: "14rem" },
                   disabled: loading || columnsToGenerate.length === 0,
                   onClick: () => generateTemplate()
                 })}

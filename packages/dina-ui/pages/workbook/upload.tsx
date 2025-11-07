@@ -176,7 +176,6 @@ export function UploadWorkbookPage() {
         <LoadingSpinner loading={true} />
       ) : (
         <>
-          {objectUploadMessage}
           {isThereAnActiveUpload() ? (
             // If there is an unfinished upload
             <SaveWorkbookProgress
@@ -200,6 +199,7 @@ export function UploadWorkbookPage() {
           ) : (
             <>
               {failedMessage}
+              {objectUploadMessage}
               <WorkbookUpload submitData={submitFile} />
             </>
           )}

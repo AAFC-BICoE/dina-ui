@@ -10,7 +10,9 @@ const FieldMappingConfig: FieldMappingConfigType = {
     relationshipConfig: {
       type: "material-sample",
       hasGroup: true,
-      baseApiPath: "/collection-api"
+      baseApiPath: "/collection-api",
+      allowAppendData: true,
+      fieldColumnLocaleId: "materialSampleFieldsMapping"
     },
     materialSampleName: { dataType: WorkbookDataTypeEnum.STRING },
     preservationType: { dataType: WorkbookDataTypeEnum.STRING },
@@ -319,11 +321,13 @@ const FieldMappingConfig: FieldMappingConfigType = {
     relationshipConfig: {
       type: "metadata",
       hasGroup: true,
-      baseApiPath: "/objectstore-api"
+      baseApiPath: "/objectstore-api",
+      allowAppendData: false,
+      fieldColumnLocaleId: "metadataFieldsMapping"
     },
 
     // Linking the file identifier to the metadata 'fileName' field.
-    originalFileName: { dataType: WorkbookDataTypeEnum.STRING },
+    originalFilename: { dataType: WorkbookDataTypeEnum.STRING },
 
     fileName: { dataType: WorkbookDataTypeEnum.STRING },
     caption: { dataType: WorkbookDataTypeEnum.STRING },

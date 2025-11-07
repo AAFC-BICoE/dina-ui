@@ -476,7 +476,7 @@ export function useColumnMapping() {
     const newWorkbookColumnMap: WorkbookColumnMap = {};
     const newRelationshipMapping: RelationshipMapping = {};
     for (const columnHeader of headers || []) {
-      const fieldPath = findMatchField(columnHeader, theFieldOptions);
+      const fieldPath = findMatchField(columnHeader, theFieldOptions, type);
       const result = await resolveColumnMappingAndRelationshipMapping(
         columnHeader,
         fieldPath
@@ -501,7 +501,7 @@ export function useColumnMapping() {
     for (const columnHeader of headers || []) {
       const columnHeaderValue =
         columnHeader.originalColumn ?? columnHeader.columnHeader;
-      const fieldPath = findMatchField(columnHeader, newFieldOptions);
+      const fieldPath = findMatchField(columnHeader, newFieldOptions, type);
       if (fieldPath === undefined) {
         // check if the columnHeaderValue is one of managedAttributes
         const targetManagedAttr =
