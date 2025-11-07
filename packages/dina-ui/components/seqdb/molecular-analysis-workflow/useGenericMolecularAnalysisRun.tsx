@@ -235,7 +235,7 @@ export function useGenericMolecularAnalysisRun({
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
       include:
-        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result,molecularAnalysisRunItem.result"
+        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result,molecularAnalysisRunItem.run.attachments"
     },
     {
       deps: [reloadGenericMolecularAnalysisRun, editMode],
@@ -1290,29 +1290,28 @@ export function useGenericMolecularAnalysisRun({
       setReloadGenericMolecularAnalysisRun(Date.now());
       await onSaved?.(4);
     } catch (error: any) {
-        console.error("Error saving sequencing run:", error);
+      console.error("Error saving sequencing run:", error);
 
-        let message = "Error saving sequencing run:";
+      let message = "Error saving sequencing run:";
 
-        // Append individual error message if present
-        if (error.errorMessage) {
-          message += ` ${error.errorMessage}`;
-        }
-
-        // Append all field error values if present
-        if (error.fieldErrors && typeof error.fieldErrors === "object") {
-          const fieldErrorValues = Object.values(error.fieldErrors)
-            .filter((val) => typeof val === "string" && val.trim() !== "")
-            .join(", ");
-          if (fieldErrorValues) {
-            message += ` ${fieldErrorValues}`;
-          }
-        }
-
-        setErrorMessage(message);
-        setLoading(false);
+      // Append individual error message if present
+      if (error.errorMessage) {
+        message += ` ${error.errorMessage}`;
       }
 
+      // Append all field error values if present
+      if (error.fieldErrors && typeof error.fieldErrors === "object") {
+        const fieldErrorValues = Object.values(error.fieldErrors)
+          .filter((val) => typeof val === "string" && val.trim() !== "")
+          .join(", ");
+        if (fieldErrorValues) {
+          message += ` ${fieldErrorValues}`;
+        }
+      }
+
+      setErrorMessage(message);
+      setLoading(false);
+    }
   }
 
   // Handle saving
