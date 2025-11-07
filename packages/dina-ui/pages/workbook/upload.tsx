@@ -16,6 +16,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { BULK_ADD_IDS_KEY } from "../object-store/upload";
+import { FaArrowLeft, FaFileArrowDown } from "react-icons/fa6";
 
 export function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
@@ -158,14 +159,12 @@ export function UploadWorkbookPage() {
             href="/object-store/upload"
             className="btn btn-outline-secondary previous-button"
           >
+            <FaArrowLeft className="me-2" />
             <DinaMessage id="goToThePreviousStep" />
           </Link>
         )}
-        <Link
-          href={`/workbook/generator`}
-          className="btn btn-primary ms-auto"
-          style={{ width: "16rem" }}
-        >
+        <Link href={`/workbook/generator`} className="btn btn-primary ms-auto">
+          <FaFileArrowDown className="me-2" />
           <DinaMessage id="workbookGenerateTemplateTitle" />
         </Link>
       </div>
