@@ -12,7 +12,8 @@ export default function MolecularAnalysisRunViewPage() {
         </DinaForm>
       )}
       query={(id) => ({
-        path: `seqdb-api/molecular-analysis-run/${id}`
+        path: `seqdb-api/molecular-analysis-run/${id}`,
+        include: "attachments"
       })}
       entityLink="/seqdb/molecular-analysis-run"
       type="molecular-analysis-run"
