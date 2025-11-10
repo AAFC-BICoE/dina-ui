@@ -235,7 +235,7 @@ export function useGenericMolecularAnalysisRun({
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
       include:
-        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result,molecularAnalysisRunItem.run.attachments"
+        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result"
     },
     {
       deps: [reloadGenericMolecularAnalysisRun, editMode],
