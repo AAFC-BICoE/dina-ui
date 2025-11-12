@@ -45,7 +45,7 @@ import _ from "lodash";
 import {
   BULK_ADD_FILES_KEY,
   BulkAddFileInfo
-} from "packages/dina-ui/pages/object-store/upload";
+} from "../../../pages/object-store/upload";
 
 export type FieldMapType = {
   columnHeader: string;
