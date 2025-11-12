@@ -582,6 +582,13 @@ export function useColumnMapping() {
   }
 
   useEffect(() => {
+    // Clear mappings first
+    setColumnMap({});
+    setRelationshipMapping({});
+    setFieldMap([]);
+    setFieldOptions([]);
+
+    // Then regenerate if data is ready
     if (!loadingData) {
       generateFieldOptions();
     }

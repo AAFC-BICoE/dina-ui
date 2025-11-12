@@ -775,6 +775,7 @@ export function WorkbookColumnMapping({
     <LoadingSpinner loading={loading} />
   ) : (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
+      key={`${type}-${sheet}`}
       initialValues={{
         sheet: 1,
         type,
@@ -786,6 +787,7 @@ export function WorkbookColumnMapping({
       onSubmit={onSubmit}
       validationSchema={workbookColumnMappingFormSchema}
       customErrorViewerMessage={handleErrorSummary}
+      enableReinitialize={true}
     >
       {buttonBar}
       <FieldArray name="fieldMap">
