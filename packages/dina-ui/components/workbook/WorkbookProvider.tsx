@@ -18,6 +18,7 @@ import { useAccount } from "../../../common-ui/lib";
 import db from "./WorkbookDB";
 import {
   calculateColumnUniqueValuesFromSpreadsheetData,
+  detectEntityType,
   removeEmptyColumns
 } from "./utils/workbookMappingUtils";
 
@@ -179,10 +180,14 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
       const spreadsheetData: WorkbookJSON = removeEmptyColumns(action.payload);
       const columnUniqueValues: ColumnUniqueValues =
         calculateColumnUniqueValuesFromSpreadsheetData(spreadsheetData);
+
+      // Auto-detect entity type based on column headers
+      const detectedType = detectEntityType(spreadsheetData, 0);
+
       return {
         ...state,
         sheet: 0,
-        type: "material-sample",
+        type: detectedType,
         spreadsheetData,
         columnUniqueValues,
         workbookResources: [],

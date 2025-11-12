@@ -997,6 +997,100 @@ export function removeEmptyColumns(data: WorkbookJSON) {
   return data;
 }
 
+/**
+ * Automatically detect entity type based on spreadsheet column headers.
+ *
+ * @param spreadsheetData The uploaded workbook data
+ * @param sheetIndex The sheet to analyze (default: 0)
+ * @returns Detected entity type or default to "material-sample"
+ */
+export function detectEntityType(
+  spreadsheetData: WorkbookJSON,
+  sheetIndex: number = 0
+): "material-sample" | "metadata" {
+  const sheet = spreadsheetData?.[sheetIndex];
+  if (!sheet) {
+    return "material-sample";
+  }
+
+  // If template has original columns, check those first.
+  if (sheet?.originalColumns && sheet.originalColumns.length > 0) {
+    const originalHeaders = sheet.originalColumns.map((h) => _toPlainString(h));
+
+    if (
+      originalHeaders.some(
+        (h) => h.includes("originalfilename") || h.includes("filename")
+      )
+    ) {
+      return "metadata";
+    }
+    if (
+      originalHeaders.some(
+        (h) => h.includes("materialsamplename") || h.includes("collection")
+      )
+    ) {
+      return "material-sample";
+    }
+  }
+
+  const headers = getColumnHeaders(spreadsheetData, sheetIndex);
+
+  // Default fallback
+  if (!headers || headers.length === 0) {
+    return "material-sample";
+  }
+
+  // Normalize headers for comparison
+  const normalizedHeaders = headers.map((h) =>
+    _toPlainString(h.originalColumn || h.columnHeader)
+  );
+
+  // Characteristic fields for metadata
+  const metadataIndicators = [
+    "filename",
+    "originalfilename",
+    "dccreator",
+    "dctype",
+    "accaption",
+    "acdigitizationdate",
+    "acsubtype",
+    "dcformat",
+    "dcrights",
+    "orientation"
+  ];
+
+  // Characteristic fields for material-sample
+  const materialSampleIndicators = [
+    "materialsamplename",
+    "identifier",
+    "collection",
+    "collectingevent",
+    "preparationtype",
+    "storageunit",
+    "organism",
+    "barcode",
+    "preservationtype"
+  ];
+
+  // Count matches for each type
+  let metadataScore = 0;
+  let materialSampleScore = 0;
+
+  normalizedHeaders.forEach((header) => {
+    if (metadataIndicators.some((indicator) => header.includes(indicator))) {
+      metadataScore++;
+    }
+    if (
+      materialSampleIndicators.some((indicator) => header.includes(indicator))
+    ) {
+      materialSampleScore++;
+    }
+  });
+
+  // Return type with higher score.
+  return metadataScore > materialSampleScore ? "metadata" : "material-sample";
+}
+
 export function trimSpace(workbookData: WorkbookJSON) {
   for (const rows of Object.values(workbookData)) {
     for (const row of rows?.rows as WorkbookRow[]) {

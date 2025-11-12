@@ -1,7 +1,9 @@
 import {
+  detectEntityType,
   FieldMappingConfigType,
   LinkOrCreateSetting,
-  WorkbookDataTypeEnum
+  WorkbookDataTypeEnum,
+  WorkbookJSON
 } from "../../";
 import {
   convertDate,
@@ -819,6 +821,273 @@ describe("workbookMappingUtils functions", () => {
           { rowNumber: 1, content: ["data4", "data5", "data6"] }
         ]
       }
+    });
+  });
+
+  describe("detectEntityType", () => {
+    describe("regular column header detection", () => {
+      it("should detect metadata type from characteristic columns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              { rowNumber: 0, content: ["fileName", "dcCreator", "acCaption"] },
+              { rowNumber: 1, content: ["test.jpg", "John Doe", "A bird"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+
+      it("should detect material-sample type from characteristic columns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              {
+                rowNumber: 0,
+                content: ["materialSampleName", "collection", "barcode"]
+              },
+              {
+                rowNumber: 1,
+                content: ["SAMPLE-001", "Main Collection", "123456"]
+              }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should default to material-sample for ambiguous columns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              { rowNumber: 0, content: ["notes", "date", "location"] },
+              { rowNumber: 1, content: ["Some notes", "2024-01-01", "Lab"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should default to material-sample for empty spreadsheet", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [{ rowNumber: 0, content: [] }]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should detect metadata even with mixed columns if metadata score is higher", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              {
+                rowNumber: 0,
+                content: [
+                  "fileName",
+                  "dcCreator",
+                  "dcType",
+                  "acCaption",
+                  "collection"
+                ]
+              },
+              {
+                rowNumber: 1,
+                content: ["test.jpg", "John Doe", "IMAGE", "A bird", "Main"]
+              }
+            ]
+          }
+        };
+
+        // 4 metadata indicators vs 1 material-sample indicator
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+    });
+
+    describe("template-based detection (originalColumns)", () => {
+      it("should detect metadata type from template originalColumns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: [
+              "originalFilename",
+              "dcCreator.displayName",
+              "acCaption"
+            ],
+            columnAliases: ["File Name", "Creator", "Caption"],
+            rows: [
+              { rowNumber: 0, content: ["File Name", "Creator", "Caption"] },
+              { rowNumber: 1, content: ["test.jpg", "John Doe", "A bird"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+
+      it("should detect material-sample type from template originalColumns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: [
+              "materialSampleName",
+              "collection.name",
+              "collectingEvent.dwcRecordNumber"
+            ],
+            columnAliases: ["Identifier", "Collection", "Collector Number"],
+            rows: [
+              {
+                rowNumber: 0,
+                content: ["Identifier", "Collection", "Collector Number"]
+              },
+              { rowNumber: 1, content: ["SAMPLE-001", "Main", "123"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should prioritize template originalColumns over column headers", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            // Template says it's metadata
+            originalColumns: ["fileName", "dcCreator.displayName"],
+            // But user renamed columns to look like material-sample
+            columnAliases: ["File Name", "Creator"],
+            rows: [
+              {
+                rowNumber: 0,
+                content: ["materialSampleName", "collection"] // User renamed these!
+              },
+              { rowNumber: 1, content: ["test.jpg", "John Doe"] }
+            ]
+          }
+        };
+
+        // Should use originalColumns (metadata), not user-modified headers
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+
+      it("should fall back to header detection if originalColumns are ambiguous", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: [
+              "remarks", // Ambiguous - both types have this
+              "tags" // Ambiguous - both types have this
+            ],
+            columnAliases: ["Remarks", "Tags"],
+            rows: [
+              { rowNumber: 0, content: ["Remarks", "Tags"] },
+              { rowNumber: 1, content: ["Some notes", "tag1, tag2"] }
+            ]
+          }
+        };
+
+        // originalColumns don't match strong indicators, fall back to default
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should detect metadata from dcType in originalColumns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: ["dcType", "acSubtype", "orientation"],
+            columnAliases: ["Object Type", "Subtype", "Orientation"],
+            rows: [
+              {
+                rowNumber: 0,
+                content: ["Object Type", "Subtype", "Orientation"]
+              },
+              { rowNumber: 1, content: ["IMAGE", "photograph", "1"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+
+      it("should detect material-sample from preparationType in originalColumns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: [
+              "preparationType.name",
+              "storageUnit.name",
+              "organism.lifeStage"
+            ],
+            columnAliases: ["Preparation Type", "Storage", "Life Stage"],
+            rows: [
+              {
+                rowNumber: 0,
+                content: ["Preparation Type", "Storage", "Life Stage"]
+              },
+              {
+                rowNumber: 1,
+                content: ["whole specimen", "Cabinet A", "adult"]
+              }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should handle empty originalColumns array", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: [], // Empty array
+            rows: [
+              { rowNumber: 0, content: ["fileName", "dcCreator"] },
+              { rowNumber: 1, content: ["test.jpg", "John Doe"] }
+            ]
+          }
+        };
+
+        // Should fall back to regular header detection
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+    });
+
+    describe("edge cases", () => {
+      it("should handle missing sheet data", () => {
+        const spreadsheet: WorkbookJSON = {};
+        expect(detectEntityType(spreadsheet, 0)).toBe("material-sample");
+      });
+
+      it("should handle specified sheet index", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Material Samples",
+            rows: [
+              { rowNumber: 0, content: ["materialSampleName"] },
+              { rowNumber: 1, content: ["SAMPLE-001"] }
+            ]
+          },
+          "1": {
+            sheetName: "Metadata",
+            rows: [
+              { rowNumber: 0, content: ["fileName", "dcCreator"] },
+              { rowNumber: 1, content: ["test.jpg", "John"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet, 0)).toBe("material-sample");
+        expect(detectEntityType(spreadsheet, 1)).toBe("metadata");
+      });
     });
   });
 });
