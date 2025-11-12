@@ -22,6 +22,12 @@ import { FaListAlt } from "react-icons/fa";
 import { useRef } from "react";
 
 export const BULK_ADD_IDS_KEY = "bulkAddIds";
+export const BULK_ADD_FILES_KEY = "bulkAddFiles";
+
+export interface BulkAddFileInfo {
+  id: string;
+  originalFilename: string;
+}
 
 export interface OnSubmitValues {
   group?: string;
@@ -96,10 +102,19 @@ export default function UploadPage() {
 
       const navigateToEditMetadata = async () => {
         const objectUploadIds = uploadRespsT.map((item) => item.id);
+
+        deleteFromStorage(BULK_ADD_FILES_KEY);
         deleteFromStorage(BULK_EDIT_IDS_KEY);
-        writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
 
         if (actualSubmitType === "workbook") {
+          const fileInfos: BulkAddFileInfo[] = uploadRespsT.map(
+            (objectUpload) => ({
+              id: objectUpload.id ?? "",
+              originalFilename: objectUpload.originalFilename
+            })
+          );
+          writeStorage(BULK_ADD_FILES_KEY, fileInfos);
+
           // Workbook route
           await router.push({
             pathname: "/workbook/upload",
@@ -108,6 +123,8 @@ export default function UploadPage() {
             }
           });
         } else {
+          writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
+
           // Batch Entry Form route
           if (objectUploadIds.length === 1) {
             await router.push({

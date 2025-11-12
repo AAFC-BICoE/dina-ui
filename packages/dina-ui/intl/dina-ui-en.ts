@@ -676,6 +676,16 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleFieldsMapping: "Material Sample Field",
   metadataFieldsMapping: "Metadata Field",
+  expectedFiles: "Expected Files",
+  andNMore: "... and {count} more",
+  workbookInsufficientRows:
+    "The spreadsheet has {actual} rows but {expected} files were uploaded. Please ensure all uploaded files are included.",
+  workbookMissingFiles:
+    "The following uploaded files are missing from the spreadsheet: {files}{remaining, plural, =0 {} other { (and {remaining} more)}}",
+  workbookExtraFiles:
+    "The following files in the spreadsheet were not uploaded: {files}{remaining, plural, =0 {} other { (and {remaining} more)}}",
+  bulkUploadDetectedDescription:
+    "You have {count} uploaded file(s). The spreadsheet must include these files with matching 'Original Filename' values.",
   skipColumn: "Skip",
   materialSampleFormTemplate: "Material Sample Form Template",
   materialSampleFormTemplates: "Material Sample Form Templates",

@@ -19,6 +19,11 @@ import { MaterialSample } from "../../types/collection-api";
 import Link from "next/link";
 import { ErrorBanner } from "../error/ErrorBanner";
 import { simpleSearchFilterToFiql } from "../../../common-ui/lib/filter-builder/fiql";
+import { deleteFromStorage } from "@rehooks/local-storage";
+import {
+  BULK_ADD_FILES_KEY,
+  BULK_ADD_IDS_KEY
+} from "../../pages/object-store/upload";
 
 export interface SaveWorkbookProgressProps {
   onWorkbookCanceled: () => void;
@@ -77,6 +82,10 @@ export function SaveWorkbookProgress({
   };
 
   const finishUpload = (sourceSetValue?: string) => {
+    // Clear the bulk upload storage
+    deleteFromStorage(BULK_ADD_IDS_KEY);
+    deleteFromStorage(BULK_ADD_FILES_KEY);
+
     finishSavingWorkbook(sourceSetValue ?? "", resourcesUpdatedCount.current);
   };
 

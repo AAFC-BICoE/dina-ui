@@ -15,7 +15,7 @@ import { IFileWithMeta } from "../../components/object-store";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { BULK_ADD_IDS_KEY } from "../object-store/upload";
+import { BULK_ADD_FILES_KEY, BulkAddFileInfo } from "../object-store/upload";
 import { FaArrowLeft, FaFileArrowDown } from "react-icons/fa6";
 
 export function UploadWorkbookPage() {
@@ -37,7 +37,8 @@ export function UploadWorkbookPage() {
   const [performSave, setPerformSave] = useState<boolean>(false);
   const [redirecting, setRedirecting] = useState<boolean>(false);
 
-  const [bulkEditIds] = useLocalStorage<string[]>(BULK_ADD_IDS_KEY);
+  const [bulkEditFiles] =
+    useLocalStorage<BulkAddFileInfo[]>(BULK_ADD_FILES_KEY);
 
   /**
    * Call the object store backend API that takes in a spreadsheet and returns
@@ -87,12 +88,32 @@ export function UploadWorkbookPage() {
     </div>
   ) : undefined;
 
-  const objectUploadMessage = bulkEditIds?.length ? (
+  const objectUploadMessage = bulkEditFiles?.length ? (
     <div className="alert alert-info">
       <DinaMessage
         id="workbookUploadBulkEditInfoMessage"
-        values={{ count: bulkEditIds.length }}
+        values={{ count: bulkEditFiles.length }}
       />
+      <div className="mt-2">
+        <small>
+          <strong>
+            <DinaMessage id="expectedFiles" />:
+          </strong>
+          <ul className="mb-0">
+            {bulkEditFiles.slice(0, 5).map((file) => (
+              <li key={file.id}>{file.originalFilename}</li>
+            ))}
+            {bulkEditFiles.length > 5 && (
+              <li>
+                <DinaMessage
+                  id="andNMore"
+                  values={{ count: bulkEditFiles.length - 5 }}
+                />
+              </li>
+            )}
+          </ul>
+        </small>
+      </div>
     </div>
   ) : null;
 
@@ -154,7 +175,7 @@ export function UploadWorkbookPage() {
       </>
     ) : (
       <div className="col-md-12 col-sm-12 d-flex">
-        {bulkEditIds && bulkEditIds.length > 0 && (
+        {bulkEditFiles && bulkEditFiles.length > 0 && (
           <Link
             href="/object-store/upload"
             className="btn btn-outline-secondary previous-button"
