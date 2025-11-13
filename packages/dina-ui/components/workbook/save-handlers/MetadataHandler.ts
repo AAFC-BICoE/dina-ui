@@ -1,0 +1,60 @@
+import {
+  BULK_ADD_FILES_KEY,
+  BulkAddFileInfo
+} from "packages/dina-ui/pages/object-store/upload";
+import {
+  ResourceHandler,
+  SaveResourceContext,
+  SaveResourceResult
+} from "./types";
+import {} from "@rehooks/local-storage";
+
+export const metadataHandler: ResourceHandler = {
+  async processResource(
+    context: SaveResourceContext
+  ): Promise<SaveResourceResult> {
+    const {
+      resource,
+      group,
+      workbookColumnMap,
+      linkRelationshipAttribute,
+      agentId
+    } = context;
+
+    // Find the object upload in the local storage based on the resources original filename.
+    const uploadedFiles: BulkAddFileInfo[] = JSON.parse(
+      localStorage.getItem(BULK_ADD_FILES_KEY) ?? "[]"
+    );
+    const matchingFile = uploadedFiles.find(
+      (file) => file.originalFilename === resource.originalFilename
+    );
+
+    // Bucket must be set from group
+    resource.bucket = group;
+
+    // Set the acMetadataCreator
+    resource.acMetadataCreator = agentId
+      ? {
+          id: agentId,
+          type: "person"
+        }
+      : undefined;
+
+    // Set the caption default if not provided
+    if (!resource.acCaption && matchingFile) {
+      resource.acCaption = matchingFile.originalFilename;
+    }
+
+    // Set the file identifer from the upload
+    if (matchingFile) {
+      resource.fileIdentifier = matchingFile.id;
+    }
+
+    // Link relationships
+    for (const key of Object.keys(resource)) {
+      await linkRelationshipAttribute(resource, workbookColumnMap, key, group);
+    }
+
+    return { shouldPause: false };
+  }
+};

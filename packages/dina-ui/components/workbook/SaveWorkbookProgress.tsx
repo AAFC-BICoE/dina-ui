@@ -24,6 +24,7 @@ import {
   BULK_ADD_FILES_KEY,
   BULK_ADD_IDS_KEY
 } from "../../pages/object-store/upload";
+import { getHandlerForType } from "./save-handlers/registry";
 
 export interface SaveWorkbookProgressProps {
   onWorkbookCanceled: () => void;
@@ -146,171 +147,50 @@ export function SaveWorkbookProgress({
     async function saveChunkOfWorkbook(chunkedResources, progressInternal) {
       let i = 0;
       for (const resource of chunkedResources) {
-        resource.sourceSet = sourceSet.current;
         i += 1;
         progressInternal += 1;
 
-        // There was no existingResource cached from user clicking the Select button from table
-        if (!userSelectedSameNameExistingResource.current) {
-          // Handle appendData logic
-          if (appendData && resource.type === "material-sample") {
-            // In appendData mode, fetch resources that might have matching names
-            const resp = await apiClient.get<MaterialSample[]>(
-              "collection-api/material-sample",
-              {
-                fiql: simpleSearchFilterToFiql(
-                  SimpleSearchFilterBuilder.create<MaterialSample>()
-                    .where(
-                      "materialSampleName",
-                      "EQ",
-                      resource?.materialSampleName
-                    )
-                    .where("group", "EQ", group)
-                    .build()
-                ),
-                include: "attachment"
-              }
+        // Get handler for this resource type and process it
+        const handler = getHandlerForType(resource.type);
+        const result = await handler.processResource({
+          resource,
+          sourceSet: sourceSet.current ?? "",
+          group: group ?? "",
+          apiClient,
+          workbookColumnMap,
+          appendData: appendData ?? false,
+          linkRelationshipAttribute,
+          userSelectedSameNameExistingResource,
+          sameNameExistingResources,
+          userSelectedSameNameParentSample,
+          sameNameParentSamples,
+          resourcesUpdatedCount
+        });
+
+        // If handler says to pause, save what we have and pause
+        if (result.shouldPause) {
+          if (chunkedResources.slice(0, i - 1).length > 0) {
+            const savedSoFar = await save(
+              chunkedResources.slice(0, i - 1).map(
+                (item) =>
+                  ({
+                    resource: item,
+                    type
+                  } as any)
+              ),
+              { apiBaseUrl }
             );
-
-            // If multiple resources with matching names, pause upload and display table to user to select resource to append to
-            if (resp.data.length > 1) {
-              sameNameExistingResources.current = resp.data;
-
-              // Save the chunkedResources up until current resource in the chunk before pausing
-              if (chunkedResources.slice(0, i - 1).length > 0) {
-                for (const key of Object.keys(resource)) {
-                  await linkRelationshipAttribute(
-                    resource,
-                    workbookColumnMap,
-                    key,
-                    group ?? ""
-                  );
-                }
-                const savedSoFar = await save(
-                  chunkedResources.slice(0, i - 1).map(
-                    (item) =>
-                      ({
-                        resource: item,
-                        type
-                      } as any)
-                  ),
-                  { apiBaseUrl }
-                );
-                setSavedResources([...savedResources, ...savedSoFar]);
-                setNow(progressInternal - 1);
-                saveProgress(progressInternal - 1);
-              }
-              await delay(10); // Yield to render the progress bar
-              pause();
-              return;
-            } else {
-              // Else Only one resource with matching name, append data to resource
-              if (resp.data[0]) {
-                resource.id = resp.data[0].id;
-                userSelectedSameNameExistingResource.current = resp.data[0];
-
-                // Update count of existing resources updated for final confirmation screen
-                resourcesUpdatedCount.current =
-                  resourcesUpdatedCount.current + 1;
-              }
-            }
+            setSavedResources([...savedResources, ...savedSoFar]);
+            setNow(progressInternal - 1);
+            saveProgress(progressInternal - 1);
           }
-        } else {
-          // There was a cached existingResource selected by user, append data to resource selected by user
-          resource.id = userSelectedSameNameExistingResource.current.id;
-
-          // Update count of existing resources updated for final confirmation screen
-          resourcesUpdatedCount.current = resourcesUpdatedCount.current + 1;
+          await delay(10); // Yield to render the progress bar
+          pause();
+          return;
         }
 
-        // Handle checking parent samples with same name logic
-        const parentSampleName =
-          resource?.parentMaterialSample?.materialSampleName;
-
-        if (parentSampleName) {
-          // There was no parent sample cached from user clicking the Select button from table
-          if (!userSelectedSameNameParentSample.current) {
-            for (const columnMapping of Object.values(workbookColumnMap)) {
-              if (
-                columnMapping.fieldPath ===
-                "parentMaterialSample.materialSampleName"
-              ) {
-                // Check the resource's parentMaterialSample against columnMapping.multipleValueMappings for multiple parent samples
-                const multipleValueMappings =
-                  columnMapping?.multipleValueMappings?.[parentSampleName];
-
-                // Check if multiple resources with matching names, pause upload and display table to user to select parent sample to link
-                if (multipleValueMappings && multipleValueMappings.length > 1) {
-                  // Multiple parent samples with matching names found, pause upload and display table to user to select parent sample to link
-                  sameNameParentSamples.current = multipleValueMappings.map(
-                    (parentSample) => ({
-                      ...parentSample,
-                      materialSampleName: parentSampleName
-                    })
-                  );
-
-                  // Save the chunkedResources up until current resource in the chunk before pausing
-                  if (chunkedResources.slice(0, i - 1) > 0) {
-                    for (const key of Object.keys(resource)) {
-                      await linkRelationshipAttribute(
-                        resource,
-                        workbookColumnMap,
-                        key,
-                        group ?? ""
-                      );
-                    }
-                    const savedSoFar = await save(
-                      chunkedResources.slice(0, i - 1).map(
-                        (item) =>
-                          ({
-                            resource: item,
-                            type
-                          } as any)
-                      ),
-                      { apiBaseUrl }
-                    );
-                    setSavedResources([...savedResources, ...savedSoFar]);
-                    setNow(progressInternal - 1);
-                    saveProgress(progressInternal - 1);
-                  }
-
-                  await delay(10); // Yield to render the progress bar
-                  pause();
-                  return;
-                }
-              }
-            }
-          } else {
-            // There was a parent sample selected from table, filter out all other parent samples from workbookColumnMap
-            for (const columnMapping of Object.values(workbookColumnMap)) {
-              if (
-                columnMapping &&
-                columnMapping.fieldPath ===
-                  "parentMaterialSample.materialSampleName"
-              ) {
-                columnMapping.valueMapping[parentSampleName] = {
-                  id: userSelectedSameNameParentSample.current.id,
-                  type: userSelectedSameNameParentSample.current.type
-                };
-              }
-            }
-          }
-        }
-
-        for (const key of Object.keys(resource)) {
-          await linkRelationshipAttribute(
-            resource,
-            workbookColumnMap,
-            key,
-            group ?? ""
-          );
-          appendDataToArrayField(key, resource);
-        }
-
-        // Reset user selected resource to undefined
+        // Reset user selections for next resource
         userSelectedSameNameExistingResource.current = undefined;
-
-        // Reset user selected resource to undefined for next
         userSelectedSameNameParentSample.current = undefined;
       }
 
@@ -357,26 +237,6 @@ export function SaveWorkbookProgress({
       setNow(workbookResources.length);
       saveProgress(workbookResources.length);
       finishUpload(sourceSet.current);
-    }
-
-    // Append data to resource[key] field if field is array
-    function appendDataToArrayField(key: string, resource: any) {
-      if (
-        userSelectedSameNameExistingResource.current &&
-        Array.isArray(userSelectedSameNameExistingResource.current[key])
-      ) {
-        if (resource[key]) {
-          resource[key] = [
-            ...resource[key],
-            ...userSelectedSameNameExistingResource.current[key]
-          ];
-        } else if (resource.relationships?.[key]) {
-          resource.relationships[key].data = [
-            ...resource.relationships?.[key].data,
-            ...userSelectedSameNameExistingResource.current[key]
-          ];
-        }
-      }
     }
   }
 
