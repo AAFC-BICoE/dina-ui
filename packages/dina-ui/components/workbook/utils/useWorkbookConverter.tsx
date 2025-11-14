@@ -3,6 +3,7 @@ import { InputResource, KitsuResource } from "kitsu";
 import _ from "lodash";
 import { useMemo } from "react";
 import {
+  convertDateTime,
   FieldMappingConfigType,
   getFlattenedConfig,
   LinkOrCreateSetting,
@@ -96,6 +97,7 @@ export function useWorkbookConverter(
     ) => value,
     [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
     [WorkbookDataTypeEnum.DATE]: convertDate,
+    [WorkbookDataTypeEnum.DATE_TIME]: convertDateTime,
     [WorkbookDataTypeEnum.STRING]: convertString,
     [WorkbookDataTypeEnum.STRING_COORDINATE]: (
       value: any,
@@ -106,10 +108,13 @@ export function useWorkbookConverter(
     [WorkbookDataTypeEnum.ENUM]: (value: any, fieldName?: string) => {
       const allowedValues = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldName || "");
       if (allowedValues) {
+        const normalizedValue = String(value).toLowerCase();
         const found = allowedValues.find(
-          (ev) => ev.value === value || ev.label === value
+          (ev) =>
+            String(ev?.value).toLowerCase() === normalizedValue ||
+            String(ev?.label).toLowerCase() === normalizedValue
         );
-        if (found) {
+        if (found && found.value !== undefined) {
           return found.value;
         }
       }

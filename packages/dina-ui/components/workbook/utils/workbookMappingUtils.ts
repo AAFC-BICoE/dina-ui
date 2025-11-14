@@ -816,17 +816,87 @@ export function convertMap(
 }
 
 export function convertDate(value: any, _fieldName?: string) {
+  // Early exit for invalid types
+  if (
+    value === null ||
+    value === undefined ||
+    typeof value === "boolean" ||
+    Array.isArray(value) ||
+    (typeof value === "object" && !(value instanceof Date))
+  ) {
+    return null;
+  }
+
+  // Handle string input - check for empty first
+  if (typeof value === "string" && value.trim() === "") {
+    return null;
+  }
+
+  // Handle numeric input (Excel date serial)
+  if (isNumber(value)) {
+    const dateNum = convertNumber(value);
+    if (dateNum === null || isNaN(dateNum)) {
+      return null;
+    }
+
+    const excelEpoc = new Date(1900, 0, -1).getTime();
+    const msDay = 86400000;
+    const date = new Date(excelEpoc + dateNum * msDay);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+
+    return date.toISOString().split("T")[0];
+  }
+
+  // Handle non-numeric string input (passthrough)
+  if (typeof value === "string") {
+    return value.trim();
+  }
+
+  return null;
+}
+
+export function convertDateTime(value: any, _fieldName?: string) {
+  // Early exit for invalid types
+  if (
+    value === null ||
+    value === undefined ||
+    typeof value === "boolean" ||
+    Array.isArray(value) ||
+    (typeof value === "object" && !(value instanceof Date))
+  ) {
+    return null;
+  }
+
+  // Handle string input - check for empty first
+  if (typeof value === "string" && value.trim() === "") {
+    return null;
+  }
+
+  // Handle numeric input (Excel date serial) - checks both numbers AND numeric strings
   if (isNumber(value)) {
     const dateNum = convertNumber(value);
     const excelEpoc = new Date(1900, 0, -1).getTime();
     const msDay = 86400000;
     const date = new Date(excelEpoc + (dateNum ?? 0) * msDay);
-    return date.toISOString().split("T")[0];
-  } else if (typeof value === "string" && value.trim() !== "") {
-    return value.trim();
-  } else {
-    return null;
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+
+    return date.toISOString();
   }
+
+  // Handle non-numeric string input (passthrough)
+  if (typeof value === "string") {
+    return value.trim();
+  }
+
+  return null;
 }
 
 export function convertString(value: any, _filename?: string) {

@@ -1,4 +1,5 @@
 import {
+  convertDateTime,
   detectEntityType,
   FieldMappingConfigType,
   LinkOrCreateSetting,
@@ -664,8 +665,200 @@ describe("workbookMappingUtils functions", () => {
     expect(convertMap("223ddd:value3")).toEqual({ "223ddd": "value3" });
   });
 
-  it("convertDate", () => {
-    expect(convertDate("43831")).toEqual("2020-01-01");
+  describe("convertDate", () => {
+    // Excel serial number conversion
+    it("should convert Excel date number", () => {
+      expect(convertDate(43831)).toBe("2020-01-01");
+    });
+
+    it("should convert Excel date number for different dates", () => {
+      expect(convertDate(1)).toBe("1900-01-01");
+      expect(convertDate(44562)).toBe("2022-01-01");
+      expect(convertDate(45000)).toBe("2023-03-16");
+    });
+
+    it("should convert Excel string number", () => {
+      expect(convertDate("43831")).toBe("2020-01-01");
+      expect(convertDate("44562")).toBe("2022-01-01");
+    });
+
+    it("should handle decimal Excel numbers (truncates time portion)", () => {
+      expect(convertDate(43831.5)).toBe("2020-01-01");
+      expect(convertDate(43831.999)).toBe("2020-01-01");
+    });
+
+    it("should handle zero", () => {
+      expect(convertDate(0)).toBe("1899-12-30");
+    });
+
+    it("should handle negative numbers (pre-1900 dates)", () => {
+      const result = convertDate(-1);
+      expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    });
+
+    // String passthrough
+    it("should passthrough ISO date string", () => {
+      expect(convertDate("2025-11-14")).toBe("2025-11-14");
+    });
+
+    it("should trim and passthrough string", () => {
+      expect(convertDate("  2025-11-14  ")).toBe("2025-11-14");
+      expect(convertDate("  2020-01-01\n")).toBe("2020-01-01");
+    });
+
+    it("should passthrough any non-empty string", () => {
+      // Doesn't validate - assumes caller provides correct format
+      expect(convertDate("11/14/2025")).toBe("11/14/2025");
+      expect(convertDate("January 1, 2020")).toBe("January 1, 2020");
+    });
+
+    // Invalid inputs - return null
+    it("should return null for empty string", () => {
+      expect(convertDate("")).toBeNull();
+    });
+
+    it("should return null for whitespace-only string", () => {
+      expect(convertDate("   ")).toBeNull();
+      expect(convertDate("\t")).toBeNull();
+      expect(convertDate("\n")).toBeNull();
+    });
+
+    it("should return null for null", () => {
+      expect(convertDate(null)).toBeNull();
+    });
+
+    it("should return null for undefined", () => {
+      expect(convertDate(undefined)).toBeNull();
+    });
+
+    // Potential bug tests - these might fail with current implementation
+    it("should return null for boolean", () => {
+      expect(convertDate(true)).toBeNull();
+      expect(convertDate(false)).toBeNull();
+    });
+
+    it("should return null for object", () => {
+      expect(convertDate({})).toBeNull();
+      expect(convertDate(new Date())).toBeNull();
+    });
+
+    it("should return null for array", () => {
+      expect(convertDate([])).toBeNull();
+      expect(convertDate(["2025-11-14"])).toBeNull();
+    });
+
+    // Edge cases
+    it("should handle leap year dates", () => {
+      expect(convertDate(45351)).toBe("2024-02-29");
+    });
+
+    it("should handle year boundaries", () => {
+      expect(convertDate(44926)).toBe("2023-01-01");
+      expect(convertDate(45290)).toBe("2023-12-31");
+    });
+
+    it("should handle large numbers (far future dates)", () => {
+      const result = convertDate(100000);
+      expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(result).toBeTruthy();
+    });
+
+    it("should handle numeric strings with whitespace", () => {
+      expect(convertDate("  43831  ")).toBe("2020-01-01");
+    });
+
+    it("should handle floating point string", () => {
+      expect(convertDate("43831.0")).toBe("2020-01-01");
+    });
+
+    // Format consistency
+    it("should always return YYYY-MM-DD format for numbers", () => {
+      const result = convertDate(43831);
+      expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    });
+
+    it("should always return string or null", () => {
+      expect(typeof convertDate(43831)).toBe("string");
+      expect(typeof convertDate("2020-01-01")).toBe("string");
+      expect(convertDate(null)).toBeNull();
+    });
+  });
+
+  describe("convertDateTime", () => {
+    // Excel serial number with time
+    it("should convert Excel datetime number", () => {
+      expect(convertDateTime(43831.5)).toBe("2020-01-01T12:00:00.000Z");
+      // .5 represents noon (50% of a day)
+    });
+
+    it("should convert Excel date at midnight", () => {
+      expect(convertDateTime(43831)).toBe("2020-01-01T00:00:00.000Z");
+    });
+
+    it("should convert Excel string number", () => {
+      expect(convertDateTime("43831.75")).toBe("2020-01-01T18:00:00.000Z");
+      // .75 represents 6 PM (75% of a day)
+    });
+
+    // String passthrough
+    it("should passthrough ISO datetime string", () => {
+      expect(convertDateTime("2025-11-14T00:00:00.000Z")).toBe(
+        "2025-11-14T00:00:00.000Z"
+      );
+    });
+
+    it("should trim and passthrough string", () => {
+      expect(convertDateTime("  2025-11-14T12:00:00Z  ")).toBe(
+        "2025-11-14T12:00:00Z"
+      );
+    });
+
+    it("should passthrough any non-empty string", () => {
+      // Doesn't validate - assumes caller provides correct format
+      expect(convertDateTime("11/14/2025, 12:00 AM")).toBe(
+        "11/14/2025, 12:00 AM"
+      );
+    });
+
+    // Invalid inputs
+    it("should return null for empty string", () => {
+      expect(convertDateTime("")).toBeNull();
+    });
+
+    it("should return null for whitespace-only string", () => {
+      expect(convertDateTime("   ")).toBeNull();
+    });
+
+    it("should return null for null", () => {
+      expect(convertDateTime(null)).toBeNull();
+    });
+
+    it("should return null for undefined", () => {
+      expect(convertDateTime(undefined)).toBeNull();
+    });
+
+    it("should return null for boolean", () => {
+      expect(convertDateTime(true)).toBeNull();
+      expect(convertDateTime(false)).toBeNull();
+    });
+
+    it("should return null for object", () => {
+      expect(convertDateTime({})).toBeNull();
+    });
+
+    it("should return null for array", () => {
+      expect(convertDateTime([])).toBeNull();
+    });
+
+    // Edge cases
+    it("should handle fractional seconds in Excel number", () => {
+      const result = convertDateTime(43831.999988426);
+      expect(result).toContain("2020-01-01T23:59:59");
+    });
+
+    it("should handle zero", () => {
+      expect(convertDateTime(0)).toBe("1899-12-30T00:00:00.000Z");
+    });
   });
 
   it("flattenObject", () => {
