@@ -202,7 +202,7 @@ export function FileView({
             </strong>
           )}
 
-          {!hideDownload && downloadLinks?.original && (
+          {!hideDownload && errorStatus != 403 && downloadLinks?.original && (
             <>
               {metadata?.type != "derivative" &&
               metadata?.derivatives &&
