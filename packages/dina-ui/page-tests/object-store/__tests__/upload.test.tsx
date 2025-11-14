@@ -38,7 +38,7 @@ describe("Upload page", () => {
     jest.clearAllMocks();
   });
 
-  it("Uploads files when you click the Upload button", async () => {
+  it("Uploads files when you click the Continue with Batch Entry Form button", async () => {
     // Generate a mock UUID for each file being uploaded.
     const objectUploadUUIDs = [
       "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
@@ -126,12 +126,14 @@ describe("Upload page", () => {
     // Await the processing of the file uploads
     await waitFor(() => {
       expect(
-        wrapper.getByRole("button", { name: /save/i })
+        wrapper.getByRole("button", { name: "Continue with Batch Entry Form" })
       ).toBeInTheDocument();
     });
 
     // Submit
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    userEvent.click(
+      wrapper.getByRole("button", { name: "Continue with Batch Entry Form" })
+    );
 
     // The group name should be in the URL:
     await waitFor(() => {
@@ -147,6 +149,127 @@ describe("Upload page", () => {
     // You should get redirected to the bulk edit page with the new metadata IDs.
     expect(mockPush).lastCalledWith({
       pathname: "/object-store/metadata/bulk-edit",
+      query: {
+        group: "example-group"
+      }
+    });
+
+    expect(localStorage.getItem(BULK_ADD_IDS_KEY)).toEqual(
+      JSON.stringify(objectUploadUUIDs)
+    );
+  });
+
+  it("Uploads files when you click the Continue with Workbook button", async () => {
+    // Generate a mock UUID for each file being uploaded.
+    const objectUploadUUIDs = [
+      "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+      "5d02a84b-1dce-44e3-9df2-dd72e0d5b02f",
+      "990edfd7-7393-47c5-b195-61583c8ec0ce"
+    ];
+
+    let currentUuid = 0;
+
+    const mockPost = jest.fn(() => {
+      return {
+        data: {
+          data: {
+            id: objectUploadUUIDs[currentUuid++],
+            type: "object-upload",
+            attributes: {
+              dateTimeDigitized: "2003-12-14T12:01:44",
+              fileType: "text",
+              size: "500"
+            }
+          }
+        }
+      };
+    });
+
+    const mockSave = jest.fn((ops) =>
+      ops.map((op, index) => ({
+        ...op.resource,
+        id: String(index)
+      }))
+    );
+    const mockGet = jest.fn((path) => {
+      if (path === "objectstore-api/config/file-upload") {
+        return {
+          data: {
+            id: "file-upload",
+            type: "config",
+            attributes: {
+              "max-request-size": "1000MB",
+              "max-file-size": "1000MB"
+            }
+          }
+        };
+      }
+    });
+    const mockApiCtx = {
+      apiClient: {
+        get: mockGet,
+        axios: {
+          get: mockGet,
+          post: mockPost
+        }
+      },
+      save: mockSave
+    };
+
+    const wrapper = mountWithAppContext(<UploadPage />, {
+      accountContext: MOCK_ACCOUNT_CONTEXT,
+      apiContext: mockApiCtx as any
+    });
+
+    // Pretend the FileUploader is uploading these files:
+    const mockAcceptedFiles = [
+      new File(["file content"], "file1.pdf", { type: "application/pdf" }),
+      new File(["file content"], "file2.pdf", { type: "application/pdf" }),
+      new File(["file content"], "file3.pdf", { type: "application/pdf" })
+    ];
+    await waitFor(() => {
+      expect(
+        wrapper.getByLabelText(/drag and drop files here/i)
+      ).toBeInTheDocument();
+    });
+
+    // Find the file input in the Dropzone component
+    const fileInput = screen.getByLabelText(/drag and drop files here/i);
+
+    // Mock the `FileList` containing the files:
+    Object.defineProperty(fileInput, "files", {
+      value: mockAcceptedFiles
+    });
+
+    // Simulate the file selection
+    fireEvent.change(fileInput);
+
+    // Await the processing of the file uploads
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("button", { name: "Continue with Workbook" })
+      ).toBeInTheDocument();
+    });
+
+    // Submit
+    userEvent.click(
+      wrapper.getByRole("button", { name: "Continue with Workbook" })
+    );
+
+    // The group name should be in the URL:
+    await waitFor(() => {
+      expect(mockPost).lastCalledWith(
+        "/objectstore-api/file/example-group",
+        // Form data with the file would go here:
+        expect.anything(),
+        // Passes in the custom error handler:
+        expect.anything()
+      );
+    });
+
+    // You should get redirected to the workbook upload page with the new metadata IDs.
+    expect(mockPush).lastCalledWith({
+      pathname: "/workbook/upload",
       query: {
         group: "example-group"
       }

@@ -27,6 +27,7 @@ import { MetadataForm } from "../object-store/metadata/MetadataForm";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import _ from "lodash";
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
+import { FaArrowLeft } from "react-icons/fa6";
 
 export interface MetadataBulkEditorProps {
   metadatas: InputResource<Metadata>[];
@@ -120,8 +121,8 @@ export function MetadataBulkEditor({
               <FormikButton
                 className="btn btn-outline-secondary previous-button"
                 onClick={onPreviousClick}
-                buttonProps={() => ({ style: { width: "13rem" } })}
               >
+                <FaArrowLeft className="me-2" />
                 <DinaMessage id="goToThePreviousStep" />
               </FormikButton>
             </div>

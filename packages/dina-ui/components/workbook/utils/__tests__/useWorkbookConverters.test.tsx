@@ -14,7 +14,9 @@ const mockConfig: FieldMappingConfigType = {
     relationshipConfig: {
       type: "mock-entity",
       hasGroup: true,
-      baseApiPath: "fake-api"
+      baseApiPath: "fake-api",
+      allowAppendData: true,
+      fieldColumnLocaleId: "test"
     },
     stringField: { dataType: WorkbookDataTypeEnum.STRING },
     numberField: { dataType: WorkbookDataTypeEnum.NUMBER },
@@ -29,6 +31,13 @@ const mockConfig: FieldMappingConfigType = {
     vocabularyField: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
       endpoint: "vocabulary endpoint"
+    },
+    enumField: {
+      dataType: WorkbookDataTypeEnum.ENUM,
+      allowedValues: [
+        { label: "Option 1", value: "option1" },
+        { label: "Option 2", value: "option2" }
+      ]
     },
     objectField: {
       dataType: WorkbookDataTypeEnum.OBJECT,
@@ -172,7 +181,9 @@ describe("useWorkbookConverters", () => {
           relationshipConfig: {
             type: "mock-entity",
             hasGroup: true,
-            baseApiPath: "fake-api"
+            baseApiPath: "fake-api",
+            allowAppendData: true,
+            fieldColumnLocaleId: "test"
           },
           dog: {
             dataType: WorkbookDataTypeEnum.OBJECT,
@@ -209,10 +220,19 @@ describe("useWorkbookConverters", () => {
       relationshipConfig: {
         baseApiPath: "fake-api",
         hasGroup: true,
-        type: "mock-entity"
+        type: "mock-entity",
+        allowAppendData: true,
+        fieldColumnLocaleId: "test"
       },
       booleanField: {
         dataType: "boolean"
+      },
+      enumField: {
+        allowedValues: [
+          { label: "Option 1", value: "option1" },
+          { label: "Option 2", value: "option2" }
+        ],
+        dataType: "enum"
       },
       mapField: {
         dataType: "managedAttributes",
@@ -421,7 +441,9 @@ describe("useWorkbookConverters", () => {
     expect(getFieldRelationshipConfig()).toEqual({
       type: "mock-entity",
       hasGroup: true,
-      baseApiPath: "fake-api"
+      baseApiPath: "fake-api",
+      allowAppendData: true,
+      fieldColumnLocaleId: "test"
     });
     expect(getFieldRelationshipConfig("objectField")).toEqual({
       type: "object-field",

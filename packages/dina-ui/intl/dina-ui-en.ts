@@ -165,6 +165,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   configureDefaultValues: "Configure default values",
   configureFormTemplate: "Configure Form Template",
   contents: "Contents",
+  continueWithWorkbook: "Continue with Workbook",
+  continueWithBatchEntryForm: "Continue with Batch Entry Form",
+  workbookUploadBulkEditInfoMessage:
+    "{count} files ready for bulk editing. Upload a spreadsheet with an 'Original Filename' column to map metadata changes.",
   contributors: "Contributors",
   controlledVocabularyTitle: "Controlled Vocabulary",
   convertToDepthMinMax: "Convert to Depth Min/Max",
@@ -662,6 +666,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributes: "Managed Attributes",
   managedAttributesViews: "Form Templates",
   "material-sample": "Material Sample",
+  metadata: "Metadata",
   materialDirection_tooltip:
     "Transaction Material Direction: {materialDirection}",
   materialIn: "Material In",
@@ -670,6 +675,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleFieldsMapping: "Material Sample Field",
+  metadataFieldsMapping: "Metadata Field",
+  expectedFiles: "Expected Files",
+  andNMore: "... and {count} more",
+  workbookInsufficientRows:
+    "The spreadsheet has {actual} rows but {expected} files were uploaded. Please ensure all uploaded files are included.",
+  workbookMissingFiles:
+    "The following uploaded files are missing from the spreadsheet: {files}{remaining, plural, =0 {} other { (and {remaining} more)}}",
+  workbookExtraFiles:
+    "The following files in the spreadsheet were not uploaded: {files}{remaining, plural, =0 {} other { (and {remaining} more)}}",
+  bulkUploadDetectedDescription:
+    "You have {count} uploaded file(s). The spreadsheet must include these files with matching 'Original Filename' values.",
   skipColumn: "Skip",
   materialSampleFormTemplate: "Material Sample Form Template",
   materialSampleFormTemplates: "Material Sample Form Templates",

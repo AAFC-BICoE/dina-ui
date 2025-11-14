@@ -1,3 +1,4 @@
+import { DCTYPE_OPTIONS } from "../../../pages/object-store/metadata/edit";
 import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
@@ -9,7 +10,9 @@ const FieldMappingConfig: FieldMappingConfigType = {
     relationshipConfig: {
       type: "material-sample",
       hasGroup: true,
-      baseApiPath: "/collection-api"
+      baseApiPath: "/collection-api",
+      allowAppendData: true,
+      fieldColumnLocaleId: "materialSampleFieldsMapping"
     },
     materialSampleName: { dataType: WorkbookDataTypeEnum.STRING },
     preservationType: { dataType: WorkbookDataTypeEnum.STRING },
@@ -312,6 +315,51 @@ const FieldMappingConfig: FieldMappingConfigType = {
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING }
       }
+    }
+  },
+  metadata: {
+    relationshipConfig: {
+      type: "metadata",
+      hasGroup: true,
+      baseApiPath: "/objectstore-api",
+      allowAppendData: false,
+      fieldColumnLocaleId: "metadataFieldsMapping"
+    },
+
+    // Linking the file identifier to the metadata 'fileName' field.
+    originalFilename: { dataType: WorkbookDataTypeEnum.STRING },
+
+    fileName: { dataType: WorkbookDataTypeEnum.STRING },
+    acCaption: { dataType: WorkbookDataTypeEnum.STRING },
+
+    acDigitizationDate: { dataType: WorkbookDataTypeEnum.DATE_TIME },
+
+    dcType: {
+      dataType: WorkbookDataTypeEnum.ENUM,
+      allowedValues: DCTYPE_OPTIONS
+    },
+    acSubtype: { dataType: WorkbookDataTypeEnum.STRING },
+
+    dcFormat: { dataType: WorkbookDataTypeEnum.STRING },
+    dcRights: { dataType: WorkbookDataTypeEnum.STRING },
+
+    dcCreator: {
+      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+      relationshipConfig: {
+        hasGroup: false,
+        type: "person",
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
+        baseApiPath: "agent-api"
+      },
+      attributes: {
+        displayName: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
+    orientation: { dataType: WorkbookDataTypeEnum.NUMBER },
+    managedAttributes: {
+      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+      endpoint: "objectstore-api/managed-attribute",
+      managedAttributeComponent: "METADATA"
     }
   }
 };

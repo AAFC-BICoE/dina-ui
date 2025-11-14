@@ -122,53 +122,77 @@ export function _toPlainString(value: string) {
   }
 }
 
-const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
-  ["parent.", "parentMaterialSample."],
-  ["parent id", "parentMaterialSample.materialSampleName"],
-  ["parent", "parentMaterialSample.materialSampleName"],
-  ["parent material sample", "parentMaterialSample.materialSampleName"],
-  ["preparationmethod", "preparationMethod.name"],
-  ["preparation method", "preparationMethod.name"],
-  ["identifier", "materialSampleName"],
-  ["type", "materialSampleType"],
-  ["collection", "collection.name"],
-  ["collections", "collection.name"],
-  ["storage unit", "storageUnitUsage.storageUnit.name"],
-  ["storage", "storageUnitUsage.storageUnit.name"],
-  ["storageunit", "storageUnitUsage.storageUnit.name"],
-  ["project", "projects.name"],
-  ["projects", "projects.name"],
-  ["preparation type", "preparationType.name"],
-  ["preparationtype", "preparationType.name"],
-  ["prepared by", "preparedBy.displayName"],
-  ["preparedby", "preparedBy.displayName"],
-  ["preparationprotocol", "preparationProtocol.name"],
-  ["preparation protocol", "preparationProtocol.name"],
-  ["assemblage", "assemblages.name"],
-  ["assemblages", "assemblages.name"],
-  ["collectors", "collectingEvent.collectors.displayName"],
-  ["collector", "collectingEvent.collectors.displayName"],
-  ["attachment", "attachment.name"],
-  ["attachments", "attachment.name"],
-  ["hostorganism", "hostOrganism.name"],
-  ["host organism", "hostOrganism.name"],
-  ["hostremarks", "hostOrganism.remarks"],
-  ["host remarks", "hostOrganism.remarks"],
-  ["collector's number", "collectingEvent.dwcRecordNumber"],
-  ["collector number", "collectingEvent.dwcRecordNumber"],
-  ["well column", "storageUnitUsage.wellColumn"],
-  ["well row", "storageUnitUsage.wellRow"],
+const SYNONYMS_MAP_BY_TYPE = new Map<string, Map<string, string>>([
   [
-    "decimal latitude",
-    "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"
+    "material-sample",
+    new Map([
+      ["parent.", "parentMaterialSample."],
+      ["parent id", "parentMaterialSample.materialSampleName"],
+      ["parent", "parentMaterialSample.materialSampleName"],
+      ["parent material sample", "parentMaterialSample.materialSampleName"],
+      ["preparationmethod", "preparationMethod.name"],
+      ["preparation method", "preparationMethod.name"],
+      ["identifier", "materialSampleName"],
+      ["type", "materialSampleType"],
+      ["collection", "collection.name"],
+      ["collections", "collection.name"],
+      ["storage unit", "storageUnitUsage.storageUnit.name"],
+      ["storage", "storageUnitUsage.storageUnit.name"],
+      ["storageunit", "storageUnitUsage.storageUnit.name"],
+      ["project", "projects.name"],
+      ["projects", "projects.name"],
+      ["preparation type", "preparationType.name"],
+      ["preparationtype", "preparationType.name"],
+      ["prepared by", "preparedBy.displayName"],
+      ["preparedby", "preparedBy.displayName"],
+      ["preparationprotocol", "preparationProtocol.name"],
+      ["preparation protocol", "preparationProtocol.name"],
+      ["assemblage", "assemblages.name"],
+      ["assemblages", "assemblages.name"],
+      ["collectors", "collectingEvent.collectors.displayName"],
+      ["collector", "collectingEvent.collectors.displayName"],
+      ["attachment", "attachment.name"],
+      ["attachments", "attachment.name"],
+      ["hostorganism", "hostOrganism.name"],
+      ["host organism", "hostOrganism.name"],
+      ["hostremarks", "hostOrganism.remarks"],
+      ["host remarks", "hostOrganism.remarks"],
+      ["collector's number", "collectingEvent.dwcRecordNumber"],
+      ["collector number", "collectingEvent.dwcRecordNumber"],
+      ["well column", "storageUnitUsage.wellColumn"],
+      ["well row", "storageUnitUsage.wellRow"],
+      [
+        "decimal latitude",
+        "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"
+      ],
+      [
+        "decimal longitude",
+        "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
+      ],
+      ["latitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"],
+      [
+        "longitude",
+        "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
+      ],
+      ["collecting event remarks", "collectingEvent.remarks"]
+    ])
   ],
   [
-    "decimal longitude",
-    "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
-  ],
-  ["latitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"],
-  ["longitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"],
-  ["collecting event remarks", "collectingEvent.remarks"]
+    "metadata",
+    new Map([
+      ["file name", "fileName"],
+      ["original filename", "originalFilename"],
+      ["original file name", "originalFilename"],
+      ["date original version created", ""],
+      ["caption", "acCaption"],
+      ["stored object type", "dcType"],
+      ["object type", "dcType"],
+      ["type", "dcType"],
+      ["subtype", "acSubtype"],
+      ["object subtype", "acSubtype"],
+      ["digitalized by", "dcCreator.displayName"]
+    ])
+  ]
 ]);
 
 export type FieldOptionType = {
@@ -324,66 +348,150 @@ export function getFlattenedConfig(
 }
 
 /**
- * find the possible field that match the column header
+ * Find the possible field that matches the column header
  * @param columnHeader The column header from excel file
- * @param fieldOptions FieldOptions that predefined in FieldMappingConfig.json
- * @returns
+ * @param fieldOptions FieldOptions predefined in FieldMappingConfig.json
+ * @param type The entity type, e.g. material-sample, metadata
+ * @returns The matched field value or undefined
  */
 export function findMatchField(
   columnHeader: WorkbookColumnInfo,
-  fieldOptions: FieldOptionType[]
-) {
-  // Search the original column if available, otherwise, just use the column header.
-  let columnHeader2: string = (
-    columnHeader.originalColumn ?? columnHeader.columnHeader
-  ).toLowerCase();
-  if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {
-    columnHeader2 = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(columnHeader2)!;
-  }
-  const plainOptions: { label: string; value: string }[] = [];
-  for (const opt of fieldOptions) {
-    if (opt.options) {
-      for (const nestOpt of opt.options) {
-        plainOptions.push({ label: nestOpt.label, value: nestOpt.value });
-      }
-    } else {
-      plainOptions.push({ label: opt.label, value: opt.value! });
-    }
-  }
-  const prefixPos = columnHeader2.lastIndexOf(".");
-  let prefix: string;
-  if (prefixPos !== -1) {
-    prefix = columnHeader2.substring(0, prefixPos + 1);
+  fieldOptions: FieldOptionType[],
+  type: string
+): string | undefined {
+  const synonymMap = getSynonymMap(type);
+  const normalizedColumnHeader = normalizeColumnHeader(
+    columnHeader,
+    synonymMap
+  );
+  const flattenedOptions = flattenFieldOptions(fieldOptions);
+
+  return findMatchingOption(
+    normalizedColumnHeader,
+    flattenedOptions,
+    synonymMap
+  );
+}
+
+/**
+ * Retrieve and validate the synonyms map for the given type
+ */
+function getSynonymMap(type: string): Map<string, string> {
+  const synonymMap = SYNONYMS_MAP_BY_TYPE.get(type);
+
+  if (!synonymMap) {
+    throw new Error(
+      `Unknown type: ${type}, add this new type to the SYNONYMS_MAP_BY_TYPE.`
+    );
   }
 
-  const option = _.find(plainOptions, (item) => {
-    if (prefix) {
-      if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
-        prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
-      }
-      if (
-        item.value.toLowerCase().startsWith(prefix.toLowerCase()) &&
-        (item.value.toLowerCase() === columnHeader2.toLowerCase() ||
-          _toPlainString(item.label) ===
-            _toPlainString(columnHeader2.substring(prefixPos + 1)))
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      const validOptionLabel = isValidOptionLabel(
-        item,
-        plainOptions,
-        columnHeader2
-      );
-      return (
-        item.value.toLowerCase() === columnHeader2.toLowerCase() ||
-        validOptionLabel
-      );
-    }
-  });
-  return option ? option.value : undefined;
+  return synonymMap;
+}
+
+/**
+ * Normalize column header by applying synonyms
+ */
+function normalizeColumnHeader(
+  columnHeader: WorkbookColumnInfo,
+  synonymMap: Map<string, string>
+): string {
+  const rawHeader = (
+    columnHeader.originalColumn ?? columnHeader.columnHeader
+  ).toLowerCase();
+  return synonymMap.get(rawHeader) ?? rawHeader;
+}
+
+/**
+ * Flatten nested field options into a simple array
+ */
+function flattenFieldOptions(
+  fieldOptions: FieldOptionType[]
+): Array<{ label: string; value: string }> {
+  return fieldOptions.flatMap((opt) =>
+    opt.options
+      ? opt.options.map((nestOpt) => ({
+          label: nestOpt.label,
+          value: nestOpt.value
+        }))
+      : [{ label: opt.label, value: opt.value! }]
+  );
+}
+
+/**
+ * Find matching option based on normalized column header
+ */
+function findMatchingOption(
+  normalizedHeader: string,
+  options: Array<{ label: string; value: string }>,
+  synonymMap: Map<string, string>
+): string | undefined {
+  const prefixInfo = extractPrefix(normalizedHeader);
+
+  const matchedOption = options.find((option) =>
+    prefixInfo
+      ? matchWithPrefix(option, normalizedHeader, prefixInfo, synonymMap)
+      : matchWithoutPrefix(option, normalizedHeader, options)
+  );
+
+  return matchedOption?.value;
+}
+
+/**
+ * Extract prefix from column header if it exists
+ */
+function extractPrefix(
+  header: string
+): { prefix: string; suffixStart: number } | null {
+  const lastDotIndex = header.lastIndexOf(".");
+
+  if (lastDotIndex === -1) {
+    return null;
+  }
+
+  return {
+    prefix: header.substring(0, lastDotIndex + 1),
+    suffixStart: lastDotIndex + 1
+  };
+}
+
+/**
+ * Match option when prefix exists
+ */
+function matchWithPrefix(
+  option: { label: string; value: string },
+  normalizedHeader: string,
+  prefixInfo: { prefix: string; suffixStart: number },
+  synonymMap: Map<string, string>
+): boolean {
+  const normalizedPrefix = (
+    synonymMap.get(prefixInfo.prefix) ?? prefixInfo.prefix
+  ).toLowerCase();
+  const optionValue = option.value.toLowerCase();
+
+  if (!optionValue.startsWith(normalizedPrefix)) {
+    return false;
+  }
+
+  // Check if values match exactly or if labels match (ignoring prefix)
+  const suffix = normalizedHeader.substring(prefixInfo.suffixStart);
+  return (
+    optionValue === normalizedHeader.toLowerCase() ||
+    _toPlainString(option.label) === _toPlainString(suffix)
+  );
+}
+
+/**
+ * Match option when no prefix exists
+ */
+function matchWithoutPrefix(
+  option: { label: string; value: string },
+  normalizedHeader: string,
+  allOptions: Array<{ label: string; value: string }>
+): boolean {
+  return (
+    option.value.toLowerCase() === normalizedHeader.toLowerCase() ||
+    isValidOptionLabel(option, allOptions, normalizedHeader)
+  );
 }
 
 /**
@@ -708,17 +816,87 @@ export function convertMap(
 }
 
 export function convertDate(value: any, _fieldName?: string) {
+  // Early exit for invalid types
+  if (
+    value === null ||
+    value === undefined ||
+    typeof value === "boolean" ||
+    Array.isArray(value) ||
+    (typeof value === "object" && !(value instanceof Date))
+  ) {
+    return null;
+  }
+
+  // Handle string input - check for empty first
+  if (typeof value === "string" && value.trim() === "") {
+    return null;
+  }
+
+  // Handle numeric input (Excel date serial)
+  if (isNumber(value)) {
+    const dateNum = convertNumber(value);
+    if (dateNum === null || isNaN(dateNum)) {
+      return null;
+    }
+
+    const excelEpoc = new Date(1900, 0, -1).getTime();
+    const msDay = 86400000;
+    const date = new Date(excelEpoc + dateNum * msDay);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+
+    return date.toISOString().split("T")[0];
+  }
+
+  // Handle non-numeric string input (passthrough)
+  if (typeof value === "string") {
+    return value.trim();
+  }
+
+  return null;
+}
+
+export function convertDateTime(value: any, _fieldName?: string) {
+  // Early exit for invalid types
+  if (
+    value === null ||
+    value === undefined ||
+    typeof value === "boolean" ||
+    Array.isArray(value) ||
+    (typeof value === "object" && !(value instanceof Date))
+  ) {
+    return null;
+  }
+
+  // Handle string input - check for empty first
+  if (typeof value === "string" && value.trim() === "") {
+    return null;
+  }
+
+  // Handle numeric input (Excel date serial) - checks both numbers AND numeric strings
   if (isNumber(value)) {
     const dateNum = convertNumber(value);
     const excelEpoc = new Date(1900, 0, -1).getTime();
     const msDay = 86400000;
     const date = new Date(excelEpoc + (dateNum ?? 0) * msDay);
-    return date.toISOString().split("T")[0];
-  } else if (typeof value === "string" && value.trim() !== "") {
-    return value.trim();
-  } else {
-    return null;
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+
+    return date.toISOString();
   }
+
+  // Handle non-numeric string input (passthrough)
+  if (typeof value === "string") {
+    return value.trim();
+  }
+
+  return null;
 }
 
 export function convertString(value: any, _filename?: string) {
@@ -887,6 +1065,100 @@ export function removeEmptyColumns(data: WorkbookJSON) {
     }
   }
   return data;
+}
+
+/**
+ * Automatically detect entity type based on spreadsheet column headers.
+ *
+ * @param spreadsheetData The uploaded workbook data
+ * @param sheetIndex The sheet to analyze (default: 0)
+ * @returns Detected entity type or default to "material-sample"
+ */
+export function detectEntityType(
+  spreadsheetData: WorkbookJSON,
+  sheetIndex: number = 0
+): "material-sample" | "metadata" {
+  const sheet = spreadsheetData?.[sheetIndex];
+  if (!sheet) {
+    return "material-sample";
+  }
+
+  // If template has original columns, check those first.
+  if (sheet?.originalColumns && sheet.originalColumns.length > 0) {
+    const originalHeaders = sheet.originalColumns.map((h) => _toPlainString(h));
+
+    if (
+      originalHeaders.some(
+        (h) => h.includes("originalfilename") || h.includes("filename")
+      )
+    ) {
+      return "metadata";
+    }
+    if (
+      originalHeaders.some(
+        (h) => h.includes("materialsamplename") || h.includes("collection")
+      )
+    ) {
+      return "material-sample";
+    }
+  }
+
+  const headers = getColumnHeaders(spreadsheetData, sheetIndex);
+
+  // Default fallback
+  if (!headers || headers.length === 0) {
+    return "material-sample";
+  }
+
+  // Normalize headers for comparison
+  const normalizedHeaders = headers.map((h) =>
+    _toPlainString(h.originalColumn || h.columnHeader)
+  );
+
+  // Characteristic fields for metadata
+  const metadataIndicators = [
+    "filename",
+    "originalfilename",
+    "dccreator",
+    "dctype",
+    "accaption",
+    "acdigitizationdate",
+    "acsubtype",
+    "dcformat",
+    "dcrights",
+    "orientation"
+  ];
+
+  // Characteristic fields for material-sample
+  const materialSampleIndicators = [
+    "materialsamplename",
+    "identifier",
+    "collection",
+    "collectingevent",
+    "preparationtype",
+    "storageunit",
+    "organism",
+    "barcode",
+    "preservationtype"
+  ];
+
+  // Count matches for each type
+  let metadataScore = 0;
+  let materialSampleScore = 0;
+
+  normalizedHeaders.forEach((header) => {
+    if (metadataIndicators.some((indicator) => header.includes(indicator))) {
+      metadataScore++;
+    }
+    if (
+      materialSampleIndicators.some((indicator) => header.includes(indicator))
+    ) {
+      materialSampleScore++;
+    }
+  });
+
+  // Return type with higher score.
+  return metadataScore > materialSampleScore ? "metadata" : "material-sample";
 }
 
 export function trimSpace(workbookData: WorkbookJSON) {
