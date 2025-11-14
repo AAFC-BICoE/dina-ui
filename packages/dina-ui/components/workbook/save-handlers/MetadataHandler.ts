@@ -1,13 +1,12 @@
 import {
   BULK_ADD_FILES_KEY,
   BulkAddFileInfo
-} from "packages/dina-ui/pages/object-store/upload";
+} from "../../../pages/object-store/upload";
 import {
   ResourceHandler,
   SaveResourceContext,
   SaveResourceResult
 } from "./types";
-import {} from "@rehooks/local-storage";
 
 export const metadataHandler: ResourceHandler = {
   async processResource(
