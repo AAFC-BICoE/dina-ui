@@ -1,5 +1,5 @@
 import { FaRegCheckCircle } from "react-icons/fa";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useSessionStorage } from "usehooks-ts";
 import { defaultJsonTree } from "common-ui/lib/list-page/query-builder/QueryBuilder";
 import { JsonTree } from "@react-awesome-query-builder/ui";
@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
 import { useEffect } from "react";
 import { getGroupStorageKey, Tooltip } from "common-ui";
+import { useWorkbookContext } from "./WorkbookProvider";
 
 interface WorkbookConfirmationProps {
   /** The total number of resources in the workbook. */
@@ -38,12 +39,16 @@ export function WorkbookConfirmation({
   resourcesUpdatedCount
 }: WorkbookConfirmationProps) {
   const router = useRouter();
+  const { formatMessage } = useDinaIntl();
+
   const uniqueName = "material-sample-list";
 
   const [_, setSessionStorageQueryTree] = useSessionStorage<JsonTree>(
     createSessionStorageLastUsedTreeKey(uniqueName),
     defaultJsonTree
   );
+
+  const { type } = useWorkbookContext();
 
   // Groups selected for the search.
   const GROUP_STORAGE_KEY = getGroupStorageKey(uniqueName);
@@ -77,8 +82,17 @@ export function WorkbookConfirmation({
     setSessionStorageQueryTree(sourceSetQuery);
     writeStorage(GROUP_STORAGE_KEY, [groupUsed]);
 
-    // Redirect to to material-sample list page.
-    router.push("/collection/material-sample/list");
+    // Redirect to the list page for the specific workbook type.
+    switch (type) {
+      case "material-sample":
+        router.push("/collection/material-sample/list");
+        break;
+      case "metadata":
+        router.push("/object-store/object/list");
+        break;
+      default:
+        throw new Error(`Unhandled workbook type: ${type}`);
+    }
   };
 
   /** Handle if they leave without selecting an option, reset the uploader. */
@@ -118,7 +132,8 @@ export function WorkbookConfirmation({
           <DinaMessage
             id="workbook_confirmation_total"
             values={{
-              total: totalWorkbookResourcesCount - (resourcesUpdatedCount ?? 0)
+              total: totalWorkbookResourcesCount - (resourcesUpdatedCount ?? 0),
+              type: formatMessage(type as any)
             }}
           />
         </span>
@@ -126,7 +141,8 @@ export function WorkbookConfirmation({
           <DinaMessage
             id="workbook_updated_total"
             values={{
-              total: resourcesUpdatedCount
+              total: resourcesUpdatedCount,
+              type: formatMessage(type as any)
             }}
           />
         </span>
@@ -153,7 +169,10 @@ export function WorkbookConfirmation({
         </button>
 
         <button className="btn btn-primary col-sm-3" onClick={onViewWorkbook}>
-          <DinaMessage id="workbook_confirmation_view" />
+          <DinaMessage
+            id="workbook_confirmation_view"
+            values={{ type: formatMessage(type as any) }}
+          />
         </button>
       </div>
     </>
