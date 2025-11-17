@@ -20,6 +20,9 @@ export const metadataHandler: ResourceHandler = {
       agentId
     } = context;
 
+    // Apply sourceSet field.
+    resource.sourceSet = context.sourceSet;
+
     // Find the object upload in the local storage based on the resources original filename.
     const uploadedFiles: BulkAddFileInfo[] = JSON.parse(
       localStorage.getItem(BULK_ADD_FILES_KEY) ?? "[]"

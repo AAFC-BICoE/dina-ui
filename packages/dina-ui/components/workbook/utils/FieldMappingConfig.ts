@@ -329,7 +329,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
     // Linking the file identifier to the metadata 'fileName' field.
     originalFilename: { dataType: WorkbookDataTypeEnum.STRING },
 
-    fileName: { dataType: WorkbookDataTypeEnum.STRING },
+    filename: { dataType: WorkbookDataTypeEnum.STRING },
     acCaption: { dataType: WorkbookDataTypeEnum.STRING },
 
     acDigitizationDate: { dataType: WorkbookDataTypeEnum.DATE_TIME },
@@ -340,8 +340,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
     },
     acSubtype: { dataType: WorkbookDataTypeEnum.STRING },
 
-    dcFormat: { dataType: WorkbookDataTypeEnum.STRING },
-    dcRights: { dataType: WorkbookDataTypeEnum.STRING },
+    orientation: { dataType: WorkbookDataTypeEnum.NUMBER },
 
     dcCreator: {
       dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
@@ -355,7 +354,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         displayName: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
-    orientation: { dataType: WorkbookDataTypeEnum.NUMBER },
+
     managedAttributes: {
       dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
       endpoint: "objectstore-api/managed-attribute",
