@@ -16,7 +16,7 @@ import {
 import Kitsu from "kitsu";
 import { formatBytes } from "../object-store-utils";
 import Link from "next/link";
-import { useAccount } from "packages/common-ui/lib/account/AccountProvider";
+import { useAccount } from "../../../../../packages/common-ui/lib/account/AccountProvider";
 
 export interface DerivativeListProps {
   metadata: Metadata;
