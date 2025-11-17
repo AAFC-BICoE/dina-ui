@@ -31,6 +31,14 @@ export const metadataHandler: ResourceHandler = {
       (file) => file.originalFilename === resource.originalFilename
     );
 
+    // If matchingFile is not found, throw an error.
+    // Should be caught with validation before this point but just in case.
+    if (!matchingFile) {
+      throw new Error(
+        `No uploaded file found for metadata with original filename: ${resource.originalFilename}`
+      );
+    }
+
     // Bucket must be set from group
     resource.bucket = group;
 
@@ -45,6 +53,11 @@ export const metadataHandler: ResourceHandler = {
     // Set the caption default if not provided
     if (!resource.acCaption && matchingFile) {
       resource.acCaption = matchingFile.originalFilename;
+    }
+
+    // AcSubtype should be uppercase if provided.
+    if (resource.acSubtype) {
+      resource.acSubtype = resource.acSubtype.toUpperCase();
     }
 
     // Set the file identifer from the upload

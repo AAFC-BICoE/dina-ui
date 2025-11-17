@@ -861,6 +861,7 @@ export function useColumnMapping() {
         break;
       case "collectingEvent.collectors.displayName":
       case "preparedBy.displayName":
+      case "dcCreator.displayName":
         options = persons.map((resource) => ({
           label: resource.displayName,
           value: resource.id,

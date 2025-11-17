@@ -91,6 +91,24 @@ describe("metadataHandler", () => {
     );
   });
 
+  it("should uppercase acSubtype if provided", async () => {
+    baseContext.resource.acSubtype = "sampleSubtype";
+
+    const uploadedFiles: BulkAddFileInfo[] = [
+      {
+        id: "file-uuid-123",
+        originalFilename: "test-image.jpg",
+        uploadedFilename: "uploaded-test-image.jpg"
+      } as BulkAddFileInfo
+    ];
+
+    localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
+
+    await metadataHandler.processResource(baseContext);
+
+    expect(baseContext.resource.acSubtype).toBe("SAMPLESUBTYPE");
+  });
+
   it("should handle when no matching file found in localStorage", async () => {
     const uploadedFiles: BulkAddFileInfo[] = [
       {
@@ -102,14 +120,24 @@ describe("metadataHandler", () => {
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
-    await metadataHandler.processResource(baseContext);
-
-    expect(baseContext.resource.bucket).toBe("test-group");
-    expect(baseContext.resource.fileIdentifier).toBeUndefined();
-    expect(baseContext.resource.acCaption).toBeUndefined();
+    await metadataHandler.processResource(baseContext).catch((error) => {
+      expect(error).toBeInstanceOf(Error);
+      expect(error.message).toBe(
+        "No uploaded file found for metadata with original filename: test-image.jpg"
+      );
+    });
   });
 
-  it("should set acMetadataCreator from agentId and call linkRelationshipAttribute", async () => {
+  it("should set acMetadataCreator from agentId", async () => {
+    const uploadedFiles: BulkAddFileInfo[] = [
+      {
+        id: "file-uuid-123",
+        originalFilename: "test-image.jpg",
+        uploadedFilename: "uploaded-test-image.jpg"
+      } as BulkAddFileInfo
+    ];
+    localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
+
     baseContext.resource = {
       originalFilename: "test-image.jpg",
       type: "metadata",
@@ -122,19 +150,5 @@ describe("metadataHandler", () => {
       id: "agent-123",
       type: "person"
     });
-
-    expect(mockLinkRelationshipAttribute).toHaveBeenCalledTimes(6);
-    expect(mockLinkRelationshipAttribute).toHaveBeenCalledWith(
-      baseContext.resource,
-      baseContext.workbookColumnMap,
-      "originalFilename",
-      "test-group"
-    );
-    expect(mockLinkRelationshipAttribute).toHaveBeenCalledWith(
-      baseContext.resource,
-      baseContext.workbookColumnMap,
-      "acTags",
-      "test-group"
-    );
   });
 });

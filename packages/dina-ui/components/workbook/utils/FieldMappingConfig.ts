@@ -343,7 +343,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
     orientation: { dataType: WorkbookDataTypeEnum.NUMBER },
 
     dcCreator: {
-      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+      dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
         hasGroup: false,
         type: "person",
