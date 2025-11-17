@@ -16,6 +16,7 @@ import {
 import Kitsu from "kitsu";
 import { formatBytes } from "../object-store-utils";
 import Link from "next/link";
+import { useAccount } from "packages/common-ui/lib/account/AccountProvider";
 
 export interface DerivativeListProps {
   metadata: Metadata;
@@ -27,6 +28,8 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [selectedDerivativePath, setSelectedDerivativePath] =
     useState<string>();
+
+  const account = useAccount();
 
   useBlobLoad({
     filePath: selectedDerivativePath,
@@ -104,7 +107,7 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
             header: () => <DinaMessage id="actions" />,
             cell: ({
               row: {
-                original: { id, bucket, fileIdentifier }
+                original: { id, bucket, fileIdentifier, publiclyReleasable }
               }
             }) => (
               <div className="d-flex justify-content-center">
@@ -119,15 +122,18 @@ export function DerivativeList({ metadata }: DerivativeListProps) {
                 </Link>
 
                 {/* Download Button */}
-                <DownloadButton
-                  id="downloadFile"
-                  path={`/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`}
-                  isDownloading={isDownloading}
-                  handleDownloadLink={handleDownloadLink}
-                  apiClient={apiClient}
-                  setIsDownloading={setIsDownloading}
-                  classname="ms-2"
-                />
+                {(account?.groupNames ?? []).includes(bucket) ||
+                publiclyReleasable ? (
+                  <DownloadButton
+                    id="downloadFile"
+                    path={`/objectstore-api/file/${bucket}/derivative/${fileIdentifier}`}
+                    isDownloading={isDownloading}
+                    handleDownloadLink={handleDownloadLink}
+                    apiClient={apiClient}
+                    setIsDownloading={setIsDownloading}
+                    classname="ms-2"
+                  />
+                ) : null}
               </div>
             ),
             enableSorting: false
