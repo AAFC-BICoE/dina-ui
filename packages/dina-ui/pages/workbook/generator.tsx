@@ -32,6 +32,7 @@ import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import { handleDownloadLink } from "../../components/object-store/object-store-utils";
 import { downloadBlobFile } from "common-ui";
 import _ from "lodash";
+import { dynamicFieldMappingForMetadata } from "../object-store/object/list";
 
 export interface EntityConfiguration {
   name: string;
@@ -68,10 +69,7 @@ const ENTITY_TYPES: EntityConfiguration[] = [
     indexName: "dina_object_store_index",
     uniqueName: "metadata-template-generator",
     requiredFields: ["originalFilename"],
-    dynamicConfig: {
-      fields: [],
-      relationshipFields: []
-    }
+    dynamicConfig: dynamicFieldMappingForMetadata
   }
 ];
 

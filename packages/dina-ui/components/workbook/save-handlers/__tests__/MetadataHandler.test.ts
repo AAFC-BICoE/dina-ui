@@ -123,7 +123,7 @@ describe("metadataHandler", () => {
       type: "person"
     });
 
-    expect(mockLinkRelationshipAttribute).toHaveBeenCalledTimes(5);
+    expect(mockLinkRelationshipAttribute).toHaveBeenCalledTimes(6);
     expect(mockLinkRelationshipAttribute).toHaveBeenCalledWith(
       baseContext.resource,
       baseContext.workbookColumnMap,

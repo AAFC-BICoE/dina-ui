@@ -223,11 +223,30 @@ export default function UploadPage() {
                   hasAnInvalidFileSize
                 }) => {
                   const isDisabled = disabled || hasAnInvalidFileSize;
+                  const isDerivative = !!router?.query?.derivativeType;
 
                   if (isSubmitting) {
                     return (
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <LoadingSpinner loading={true} />
+                      </div>
+                    );
+                  }
+
+                  if (isDerivative) {
+                    return (
+                      <div className="d-flex gap-2 dzu-submitButtonContainer">
+                        <button
+                          type="button"
+                          className="btn btn-success"
+                          onClick={() => {
+                            submitTypeRef.current = "batchEntry";
+                            handleSubmit(files);
+                          }}
+                          disabled={isDisabled}
+                        >
+                          <DinaMessage id="save" />
+                        </button>
                       </div>
                     );
                   }
