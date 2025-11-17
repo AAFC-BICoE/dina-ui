@@ -80,3 +80,4 @@ export * from "./home2/NavigationCard";
 export * from "./home2/CustomizableCardGrid";
 export * from "./home2/CustomizableSectionGrid";
 export * from "./home2/UIPreferenceHook"
+export * from "./page-layouts/TypeFilterSideBarDynamic"
