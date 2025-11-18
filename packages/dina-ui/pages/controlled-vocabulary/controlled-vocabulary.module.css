@@ -1,0 +1,71 @@
+
+/* controlled-vocabulary.module.css */
+
+.cvGrid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.cvSidebar {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.75rem;
+  background: #fff;
+  width: 280px;
+  max-width: 280px;
+  position: sticky;
+  top: 0; /* optional: keep visible while scrolling */
+}
+
+
+/* Main (table container) */
+.main,
+.cvMain {
+  min-width: 0;
+  overflow-x: auto;   /* fallback scroll when needed */
+  overflow-y: visible;
+}
+
+/* Compact table spacing */
+.main :global(table),
+.cvMain :global(table) {
+  font-size: 0.95rem;
+  table-layout: auto !important;
+  width: 100%;
+}
+
+/* 3) Ensure headers and their children can wrap */
+.main :global(th),
+.cvMain :global(th),
+.main :global(th *),
+.cvMain :global(th *) {
+  white-space: normal !important;
+  min-width: 0 !important;
+}
+
+/* 4) If header wrappers use flex, allow wrapping there */
+.main :global(th .d-flex),
+.cvMain :global(th .d-flex),
+.main :global(th .d-inline-flex),
+.cvMain :global(th .d-inline-flex) {
+  flex-wrap: wrap;
+  white-space: normal !important;
+  min-width: 0;
+}
+.cvMain :global(.ReactTable) th,
+.cvMain :global(.ReactTable) td {
+  max-width: none !important;
+}
+/* Responsive: stack sidebar above table on small screens */
+@media (max-width: 768px) {
+  .cvGrid { grid-template-columns: 1fr; }
+  .cvSidebar {
+    max-height: unset;
+    border-right: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
