@@ -54,7 +54,10 @@
   white-space: normal !important;
   min-width: 0;
 }
-
+.cvMain :global(.ReactTable) th,
+.cvMain :global(.ReactTable) td {
+  max-width: none !important;
+}
 /* Responsive: stack sidebar above table on small screens */
 @media (max-width: 768px) {
   .cvGrid { grid-template-columns: 1fr; }

@@ -5,7 +5,7 @@ import {
   descriptionCell,
   ListLayoutFilterType,
   ListPageLayout,
-  SimpleSearchFilterBuilder,
+  //SimpleSearchFilterBuilder,
   useApiClient,
 } from "common-ui";
 import { useMemo, useCallback, useState } from "react";
@@ -27,16 +27,20 @@ import { useControlledVocabularySidebarData } from
   "packages/dina-ui/components/controlled-vocabulary/useControlledVocabularySidebarData";
 import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 
+
 /**
- * Controlled Vocabulary list page (single page, no tabs).
+ * Controlled Vocabulary list page
  */
 export default function ControlledVocabularyListPage() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
+
   /**
-   * 1) Fetch only CVs of type MANAGED_ATTRIBUTE using **FIQL** (no RSQL).
-   *    We only need `name` and `key` for the sidebar options.
+   * 1) Sidebar “parent” vocabularies:
+   *    Fetch CVs of type MANAGED_ATTRIBUTE via FIQL.
+   *    Only basic fields are required to render the sidebar options.
    */
+
   const {
     items: cvItems,
     loading: cvLoading,
@@ -52,17 +56,17 @@ export default function ControlledVocabularyListPage() {
     }
   });
 
+
   /**
-   * 2) Built-in text search attributes:
+   * 2) Free-text search attributes available in the list filter.
    */
+
   const CV_FILTER_ATTRIBUTES = [
     "name",
     "key",
     "unit",
     "createdBy",
-    "dinaComponent",
-    "vocabularyElementType",
-    "managedAttributeComponent"
+    "dinaComponent"
   ];
 
   /**
@@ -100,7 +104,8 @@ export default function ControlledVocabularyListPage() {
           ? original.acceptedValues.map(v => `"${v}"`).join(", ")
           : ""
     },
-    // You can keep using your helper for multilingual description:
+
+    // Multilingual description + Group + audit columns:
     descriptionCell(false, false, "multilingualDescription"),
     groupCell("group"),
     { accessorKey: "createdBy", header: () => <DinaMessage id="field_createdBy" /> },
@@ -109,7 +114,9 @@ export default function ControlledVocabularyListPage() {
 
 
   /**
-   * 4) Sidebar UI state.
+   * 4) Sidebar state:
+   *    - parent_cv_ids: selected vocabularies (parents)
+   *    - children: selected child “types”
    */
 
   const [typeFilter, setTypeFilter] = useState<TypeFilterState>({
@@ -117,10 +124,8 @@ export default function ControlledVocabularyListPage() {
     children: [] // (optional) for future child selections
   });
 
-  // 4) Lazy loader for children:
-  //    For a given parent CV id, fetch related CV items and return *unique* dinaComponent values (+counts).
   const loadChildren = useCallback(async (parentUuid : string): Promise<SidebarOption[]> => {
-    // We can pass fiql for this ad-hoc fetch; the server supports FIQL consistently.
+
     const resp: any = await apiClient.get("/collection-api/controlled-vocabulary-item", {
       page: { limit: 1000 },
       filter: { "controlledVocabulary.uuid": { EQ: parentUuid } },
@@ -140,21 +145,36 @@ export default function ControlledVocabularyListPage() {
 
 
   /**
-   * 5) Build ALL sidebar options dynamically
-   *    - Managed Attributes: each CV becomes an option
+   * 5) Build parent options for the sidebar from fetched CVs.
    */
 
   const parentOptions = useMemo(
     () =>
       cvItems.map(cv => ({
-        // Use the JSON:API id (uuid) so we can filter cv-items by relationship:
         id: String((cv as any).id),
         label: String(cv.name),
-        hasChildren: true // show chevron now; you'll wire loadChildren later
+        hasChildren: true
       })),
     [cvItems]
   );
-  
+    /** Build an OR-of-EQ FIQL for a field.
+   *  []           -> ""
+   *  ["A"]        -> "field==A"
+   *  ["A","B"]    -> "(field==A,field==B)"
+   */
+  function fiqlOrEq(field: string, values: string[]): string {
+    if (!values?.length) return "";
+    if (values.length === 1) return `${field}==${values[0]}`;
+    return `(${values.map(v => `${field}==${v}`).join(",")})`;
+  }
+
+  /** AND-join non-empty FIQL fragments, wrapping each in (...) */
+  function fiqlAnd(...parts: (string | undefined)[]): string {
+    const nonEmpty = parts.filter(Boolean) as string[];
+    if (!nonEmpty.length) return "";
+    return nonEmpty.map(p => `(${p})`).join(";");
+  }
+
   /**
    * 6) Page layout with sidebar + table.
    */
@@ -166,39 +186,21 @@ export default function ControlledVocabularyListPage() {
           formatMessage("controlledVocabularyTitle" as any) ?? "Controlled Vocabulary"
         }
       />
-
       <ListPageLayout<ControlledVocabularyItem>
         id="controlled-vocabulary-items-list"
-        useFiql={false}
+        useFiql={true}
         filterType={ListLayoutFilterType.FILTER_BUILDER}
         filterAttributes={CV_FILTER_ATTRIBUTES}
 
         additionalFilters={(filterForm) => {
-          // Parent selections from the sidebar:
-          const selectedParents = typeFilter.parent_cv_ids;
-
           const selectedChildren = typeFilter.children ?? [];
+          const groupVal         = (filterForm as any)?.group as string | undefined;
 
-          // When filtering on relationship paths (e.g., "controlledVocabulary.id"),
-          const builder = SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
-            .whereProvided("group" as any, "EQ", (filterForm as any)?.group);
+          const groupFiql  = groupVal ? `group==${groupVal}` : "";
+          const childFiql  = fiqlOrEq("dinaComponent", selectedChildren);
 
-          if (selectedParents?.length) {
-            builder.add({
-              ["controlledVocabulary.uuid"]: { IN: selectedParents.join(",") }
-            } as any);
-          }
-
-
-          // Children (dinaComponent)
-          if (selectedChildren.length === 1) {
-            builder.where("dinaComponent" as any, "EQ", selectedChildren[0]);
-          } else if (selectedChildren.length > 1) {
-            // See multi-select options below
-            builder.whereIn("dinaComponent" as any, selectedChildren as any);
-          }
-
-          return builder.build();
+          // ✅ Return a FIQL string; ListPageLayout now passes it through unchanged.
+          return fiqlAnd(groupFiql, childFiql);
         }}
 
         filterFormchildren={({ submitForm }) => (
