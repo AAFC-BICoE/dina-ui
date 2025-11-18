@@ -22,6 +22,8 @@ import { ValidationError } from "yup";
 import {
   RelationshipMapping,
   WorkbookDataTypeEnum,
+  isDate,
+  isDateTime,
   useWorkbookContext
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -443,6 +445,13 @@ export function WorkbookColumnMapping({
         });
       }
 
+      for (let i = 0; i < workbookData.length; i++) {
+        const row = workbookData[i];
+        for (const fieldPath of Object.keys(row)) {
+          validateDataFormat(row, fieldPath, errors);
+        }
+      }
+
       return errors;
     } else {
       const uniqueSampleCollections: UniqueSampleNameCollectionPairs[] =
@@ -754,14 +763,21 @@ export function WorkbookColumnMapping({
           const enumElements = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldPath);
           if (
             enumElements &&
-            !enumElements.find(
-              (ev) => ev.value === row[fieldPath] || ev.label === row[fieldPath]
-            )
+            !enumElements.find((ev) => {
+              const rowValue = row[fieldPath]?.toString().toLowerCase();
+              const enumValue = ev.value?.toString().toLowerCase();
+              const enumLabel = ev.label?.toString().toLowerCase();
+              return rowValue === enumValue || rowValue === enumLabel;
+            })
           ) {
             param.dataType = WorkbookDataTypeEnum.ENUM;
             errors.push(
               new ValidationError(
-                formatMessage("workBookInvalidDataFormat", param),
+                fieldPath +
+                  " " +
+                  formatMessage("workBookInvalidEnumFormat") +
+                  " " +
+                  enumElements.map((ev) => ev.label || ev.value).join(", "),
                 fieldPath,
                 "sheet"
               )
@@ -779,6 +795,32 @@ export function WorkbookColumnMapping({
               )
             );
           }
+        case WorkbookDataTypeEnum.DATE:
+          if (!isDate(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.DATE;
+            errors.push(
+              new ValidationError(
+                fieldPath + " " + formatMessage("workBookInvalidDateFormat"),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
+        case WorkbookDataTypeEnum.DATE_TIME:
+          if (!isDateTime(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.DATE_TIME;
+            errors.push(
+              new ValidationError(
+                fieldPath +
+                  " " +
+                  formatMessage("workBookInvalidDateTimeFormat"),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
       }
     }
   }

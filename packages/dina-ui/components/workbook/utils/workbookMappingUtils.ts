@@ -815,140 +815,163 @@ export function convertMap(
   return map;
 }
 
-export function convertDate(
-  value: any,
-  fieldName?: string,
-  formatMessage?: any
-) {
-  const field = fieldName || "date";
-  const param = { fieldName: field };
-
-  // Allow null, undefined, or empty string to pass through
-  if (value === null || value === undefined) {
-    return value;
+/**
+ * Check if a value is a valid ISO date string (YYYY-MM-DD)
+ */
+export function isDate(value: string | null | undefined): boolean {
+  if (value == null || typeof value !== "string") {
+    return false;
   }
 
-  // Early exit for invalid types
-  if (
-    typeof value === "boolean" ||
-    Array.isArray(value) ||
-    (typeof value === "object" && !(value instanceof Date))
-  ) {
-    throw new ValidationError(
-      formatMessage("workBookInvalidDateType", param),
-      field,
-      "sheet"
-    );
+  const trimmed = value.trim();
+  if (trimmed === "") {
+    return true; // Empty strings are valid (will be null)
+  }
+
+  const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!isoDateRegex.test(trimmed)) {
+    return false;
+  }
+
+  const date = new Date(trimmed + "T00:00:00.000Z");
+  if (isNaN(date.getTime())) {
+    return false;
+  }
+
+  const isoString = date.toISOString().split("T")[0];
+  return isoString === trimmed;
+}
+
+/**
+ * Check if a value is a valid ISO datetime string (YYYY-MM-DDTHH:mm:ss.SSSZ)
+ * or a date string (YYYY-MM-DD)
+ */
+export function isDateTime(value: string | null | undefined): boolean {
+  if (value == null || typeof value !== "string") {
+    return false;
+  }
+
+  const trimmed = value.trim();
+  if (trimmed === "") {
+    return true; // Empty strings are valid (will be null)
+  }
+
+  const dateOnlyRegex = /^\d{4}-\d{2}-\d{2}$/;
+  const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?(Z)?$/;
+
+  let dateTimeString = trimmed;
+
+  if (dateOnlyRegex.test(trimmed)) {
+    dateTimeString = `${trimmed}T00:00:00.000Z`;
+  } else if (!dateTimeRegex.test(trimmed)) {
+    return false;
+  }
+
+  const [datePart, timePart] = dateTimeString.split("T");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [time] = timePart.split(".");
+  const [hours, minutes, seconds] = time.split(":").map(Number);
+
+  const date = new Date(year, month - 1, day, hours, minutes, seconds);
+
+  if (isNaN(date.getTime())) {
+    return false;
+  }
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day &&
+    date.getHours() === hours &&
+    date.getMinutes() === minutes &&
+    date.getSeconds() === seconds
+  );
+}
+
+export function convertDate(value: any, _fieldName?: string) {
+  // Allow null, undefined to pass through
+  if (value === null || value === undefined) {
+    return value;
   }
 
   // Handle string input
   if (typeof value === "string") {
     const trimmed = value.trim();
 
-    // Allow empty strings to pass through
+    // Allow empty/whitespace strings to pass through
     if (trimmed === "") {
       return value;
     }
 
-    // Validate ISO date format (YYYY-MM-DD)
+    // Validate format
     const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!isoDateRegex.test(trimmed)) {
-      throw new ValidationError(
-        formatMessage("workBookInvalidDateFormat", param),
-        field,
-        "sheet"
-      );
+      return null;
     }
 
-    // Validate it's a real date
+    // Parse and validate it's a real date
     const date = new Date(trimmed + "T00:00:00.000Z");
     if (isNaN(date.getTime())) {
-      throw new ValidationError(
-        formatMessage("workBookInvalidDateValue", param),
-        field,
-        "sheet"
-      );
+      return null;
     }
 
-    // Verify the parsed date matches the input (prevents invalid dates like 2023-02-30)
+    // Verify the parsed date matches the input (prevents auto-correction like Feb 30 -> March 2)
     const isoString = date.toISOString().split("T")[0];
     if (isoString !== trimmed) {
-      throw new ValidationError(
-        formatMessage("workBookInvalidDateValue", param),
-        field,
-        "sheet"
-      );
+      return null;
     }
 
     return trimmed;
   }
 
-  throw new ValidationError(
-    formatMessage("workBookInvalidDateType", param),
-    field,
-    "sheet"
-  );
+  return null;
 }
 
-export function convertDateTime(
-  value: any,
-  fieldName?: string,
-  formatMessage?: any
-) {
-  const field = fieldName || "datetime";
-  const param = { fieldName: field };
-
-  // Allow null, undefined, or empty string to pass through
+export function convertDateTime(value: any, _fieldName?: string) {
+  // Allow null, undefined to pass through
   if (value === null || value === undefined) {
     return value;
-  }
-
-  // Early exit for invalid types
-  if (
-    typeof value === "boolean" ||
-    Array.isArray(value) ||
-    (typeof value === "object" && !(value instanceof Date))
-  ) {
-    throw new ValidationError(
-      formatMessage("workBookInvalidDateTimeType", param),
-      field,
-      "sheet"
-    );
   }
 
   // Handle string input
   if (typeof value === "string") {
     const trimmed = value.trim();
 
-    // Allow empty strings to pass through
+    // Allow empty/whitespace strings to pass through
     if (trimmed === "") {
       return value;
     }
 
-    // Validate ISO 8601 datetime format (with optional time part, no timezone)
-    // Accepts: YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss or YYYY-MM-DDTHH:mm:ss.SSS
     const dateOnlyRegex = /^\d{4}-\d{2}-\d{2}$/;
     const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?(Z)?$/;
 
     let dateTimeString = trimmed;
+    let inputYear: number, inputMonth: number, inputDay: number;
+    let inputHours: number, inputMinutes: number, inputSeconds: number;
 
     // If only date is provided, append time as 00:00:00.000Z
     if (dateOnlyRegex.test(trimmed)) {
       dateTimeString = `${trimmed}T00:00:00.000Z`;
-    } else if (!dateTimeRegex.test(trimmed)) {
-      throw new ValidationError(
-        formatMessage("workBookInvalidDateTimeFormat", param),
-        field,
-        "sheet"
-      );
+      [inputYear, inputMonth, inputDay] = trimmed.split("-").map(Number);
+      inputHours = 0;
+      inputMinutes = 0;
+      inputSeconds = 0;
+    } else if (dateTimeRegex.test(trimmed)) {
+      // Parse the input components
+      const [datePart, timePart] = trimmed.split("T");
+      [inputYear, inputMonth, inputDay] = datePart.split("-").map(Number);
+      const [time] = timePart.split(".");
+      [inputHours, inputMinutes, inputSeconds] = time.split(":").map(Number);
+    } else {
+      return null;
     }
 
-    // Parse as local time by creating date from components
+    // Parse using Date constructor
     const [datePart, timePart] = dateTimeString.split("T");
     const [year, month, day] = datePart.split("-").map(Number);
     const [time, ms] = timePart.split(".");
     const [hours, minutes, seconds] = time.split(":").map(Number);
-    const milliseconds = ms ? parseInt(ms) : 0;
+    const milliseconds = ms ? parseInt(ms.replace("Z", "")) : 0;
 
     const date = new Date(
       year,
@@ -962,30 +985,22 @@ export function convertDateTime(
 
     // Validate it's a real datetime
     if (isNaN(date.getTime())) {
-      throw new ValidationError(
-        formatMessage("workBookInvalidDateTimeValue", param),
-        field,
-        "sheet"
-      );
+      return null;
     }
 
-    // Verify the parsed date matches the input (prevents invalid dates like 2023-02-30)
+    // Verify the parsed date matches the input (prevents auto-correction like Feb 30 -> March 2, hour 25 -> next day)
     if (
-      date.getFullYear() !== year ||
-      date.getMonth() !== month - 1 ||
-      date.getDate() !== day ||
-      date.getHours() !== hours ||
-      date.getMinutes() !== minutes ||
-      date.getSeconds() !== seconds
+      date.getFullYear() !== inputYear ||
+      date.getMonth() !== inputMonth - 1 ||
+      date.getDate() !== inputDay ||
+      date.getHours() !== inputHours ||
+      date.getMinutes() !== inputMinutes ||
+      date.getSeconds() !== inputSeconds
     ) {
-      throw new ValidationError(
-        formatMessage("workBookInvalidDateTimeValue", param),
-        field,
-        "sheet"
-      );
+      return null;
     }
 
-    // Return as ISO string format without timezone (local time)
+    // Return as ISO string format with Z suffix
     const pad = (n: number) => n.toString().padStart(2, "0");
     const pad3 = (n: number) => n.toString().padStart(3, "0");
 
@@ -996,11 +1011,7 @@ export function convertDateTime(
     )}.${pad3(date.getMilliseconds())}Z`;
   }
 
-  throw new ValidationError(
-    formatMessage("workBookInvalidDateTimeType", param),
-    field,
-    "sheet"
-  );
+  return null;
 }
 
 export function convertString(value: any, _filename?: string) {

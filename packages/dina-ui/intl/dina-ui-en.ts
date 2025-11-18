@@ -1118,6 +1118,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "These entries already exist in the system with the same Primary ID and Collection Name: {duplicateNames}",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be a {dataType}",
+  workBookInvalidEnumFormat: "must be one of the accepted values:",
   workBookInvalidManagedAttributeDataType:
     "Invalid Managed Attribute data type: managed attribute key {key} expects {type} data type.",
   workBookInvalidManagedAttributeKey:
@@ -1251,16 +1252,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookInvalidDateType:
     "Field '{fieldName}' must be a valid date string, received invalid type",
   workBookEmptyDateValue: "Field '{fieldName}' cannot be empty",
-  workBookInvalidDateFormat: "Field '{fieldName}' must be in YYYY-MM-DD format",
-  workBookInvalidDateValue:
-    "Field '{fieldName}' contains an invalid date (e.g., 2023-02-30)",
-  workBookInvalidDateTimeType:
-    "Field '{fieldName}' must be a valid datetime string, received invalid type",
-  workBookEmptyDateTimeValue: "Field '{fieldName}' cannot be empty",
+  workBookInvalidDateFormat:
+    "needs to be a valid date in this format: YYYY-MM-DD (for example: 2023-12-25)",
   workBookInvalidDateTimeFormat:
-    "Field '{fieldName}' must be in YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss format (e.g., 2023-02-28T14:30:00)",
-  workBookInvalidDateTimeValue:
-    "Field '{fieldName}' contains an invalid date time",
+    "needs to be a valid date or date with time. Use YYYY-MM-DD (like 2023-12-25) or include the time as YYYY-MM-DDTHH:mm:ss.SSSZ (like 2023-12-25T14:30:00.000Z)",
   storageUnit_duplicate_title: "Storage Unit Name already exists",
   storageUnit_duplicate_body:
     'The name "{duplicatedName}" is already in use for another storage unit in this group. Would you still like to proceed?',
