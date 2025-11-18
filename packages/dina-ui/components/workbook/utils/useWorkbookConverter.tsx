@@ -96,8 +96,10 @@ export function useWorkbookConverter(
       _fieldName?: string
     ) => value,
     [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
-    [WorkbookDataTypeEnum.DATE]: convertDate,
-    [WorkbookDataTypeEnum.DATE_TIME]: convertDateTime,
+    [WorkbookDataTypeEnum.DATE]: (val: string, _fieldName?: string) =>
+      convertDate(val, _fieldName, formatMessage),
+    [WorkbookDataTypeEnum.DATE_TIME]: (val: string, _fieldName?: string) =>
+      convertDateTime(val, _fieldName, formatMessage),
     [WorkbookDataTypeEnum.STRING]: convertString,
     [WorkbookDataTypeEnum.STRING_COORDINATE]: (
       value: any,

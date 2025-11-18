@@ -1248,6 +1248,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbook_updated_total: "{total} existing {type}s were updated.",
   workbook_confirmation_new: "Upload New Workbook",
   workbook_confirmation_view: "View Imported {type}s",
+  workBookInvalidDateType:
+    "Field '{fieldName}' must be a valid date string, received invalid type",
+  workBookEmptyDateValue: "Field '{fieldName}' cannot be empty",
+  workBookInvalidDateFormat: "Field '{fieldName}' must be in YYYY-MM-DD format",
+  workBookInvalidDateValue:
+    "Field '{fieldName}' contains an invalid date (e.g., 2023-02-30)",
+  workBookInvalidDateTimeType:
+    "Field '{fieldName}' must be a valid datetime string, received invalid type",
+  workBookEmptyDateTimeValue: "Field '{fieldName}' cannot be empty",
+  workBookInvalidDateTimeFormat:
+    "Field '{fieldName}' must be in YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss format (e.g., 2023-02-28T14:30:00)",
+  workBookInvalidDateTimeValue:
+    "Field '{fieldName}' contains an invalid date time",
   storageUnit_duplicate_title: "Storage Unit Name already exists",
   storageUnit_duplicate_body:
     'The name "{duplicatedName}" is already in use for another storage unit in this group. Would you still like to proceed?',

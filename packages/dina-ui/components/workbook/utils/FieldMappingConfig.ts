@@ -342,6 +342,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
 
     orientation: { dataType: WorkbookDataTypeEnum.NUMBER },
 
+    dcRights: { dataType: WorkbookDataTypeEnum.STRING },
+
     dcCreator: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {

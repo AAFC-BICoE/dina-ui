@@ -6,7 +6,7 @@ import { JsonTree } from "@react-awesome-query-builder/ui";
 import { createSessionStorageLastUsedTreeKey } from "common-ui/lib/list-page/saved-searches/SavedSearch";
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { getGroupStorageKey, Tooltip } from "common-ui";
 import { useWorkbookContext } from "./WorkbookProvider";
 
@@ -41,14 +41,22 @@ export function WorkbookConfirmation({
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
 
-  const uniqueName = "material-sample-list";
+  const { type } = useWorkbookContext();
+
+  const uniqueName = useMemo(() => {
+    if (type === "material-sample") {
+      return "material-sample-list";
+    } else if (type === "metadata") {
+      return "object-store-list";
+    } else {
+      throw new Error(`Unhandled workbook type: ${type}`);
+    }
+  }, [type]);
 
   const [_, setSessionStorageQueryTree] = useSessionStorage<JsonTree>(
     createSessionStorageLastUsedTreeKey(uniqueName),
     defaultJsonTree
   );
-
-  const { type } = useWorkbookContext();
 
   // Groups selected for the search.
   const GROUP_STORAGE_KEY = getGroupStorageKey(uniqueName);

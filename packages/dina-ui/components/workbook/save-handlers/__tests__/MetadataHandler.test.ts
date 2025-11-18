@@ -52,6 +52,23 @@ describe("metadataHandler", () => {
     };
   });
 
+  it("should set sourceSet on the resource", async () => {
+    const uploadedFiles: BulkAddFileInfo[] = [
+      {
+        id: "file-uuid-123",
+        originalFilename: "test-image.jpg",
+        uploadedFilename: "uploaded-test-image.jpg"
+      } as BulkAddFileInfo
+    ];
+
+    localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
+
+    const result = await metadataHandler.processResource(baseContext);
+
+    expect(baseContext.resource.sourceSet).toBe("test-source-set");
+    expect(result.shouldPause).toBe(false);
+  });
+
   it("should set bucket, fileIdentifier, and default acCaption when matching file found", async () => {
     const uploadedFiles: BulkAddFileInfo[] = [
       {
@@ -140,8 +157,7 @@ describe("metadataHandler", () => {
 
     baseContext.resource = {
       originalFilename: "test-image.jpg",
-      type: "metadata",
-      acTags: ["tag1", "tag2"]
+      type: "metadata"
     };
 
     await metadataHandler.processResource(baseContext);

@@ -24,6 +24,7 @@ import {
   trimSpace,
   validateTemplateIntegrity
 } from "../workbookMappingUtils";
+import { ValidationError } from "yup";
 
 const mockConfig: FieldMappingConfigType = {
   mockEntity: {
@@ -666,198 +667,421 @@ describe("workbookMappingUtils functions", () => {
   });
 
   describe("convertDate", () => {
-    // Excel serial number conversion
-    it("should convert Excel date number", () => {
-      expect(convertDate(43831)).toBe("2020-01-01");
+    const mockFormatMessage = (key: string, params: any) =>
+      `${key}: ${params.fieldName}`;
+
+    describe("Valid inputs", () => {
+      it("should accept and return valid ISO date string", () => {
+        expect(convertDate("2025-11-14", "testField", mockFormatMessage)).toBe(
+          "2025-11-14"
+        );
+        expect(convertDate("2020-01-01", "testField", mockFormatMessage)).toBe(
+          "2020-01-01"
+        );
+      });
+
+      it("should trim whitespace and return valid date", () => {
+        expect(
+          convertDate("  2025-11-14  ", "testField", mockFormatMessage)
+        ).toBe("2025-11-14");
+        expect(
+          convertDate("  2020-01-01\n", "testField", mockFormatMessage)
+        ).toBe("2020-01-01");
+      });
+
+      it("should handle leap years correctly", () => {
+        expect(convertDate("2020-02-29", "testField", mockFormatMessage)).toBe(
+          "2020-02-29"
+        );
+        expect(convertDate("2024-02-29", "testField", mockFormatMessage)).toBe(
+          "2024-02-29"
+        );
+      });
+
+      it("should handle edge case dates", () => {
+        expect(convertDate("1900-01-01", "testField", mockFormatMessage)).toBe(
+          "1900-01-01"
+        );
+        expect(convertDate("2099-12-31", "testField", mockFormatMessage)).toBe(
+          "2099-12-31"
+        );
+      });
     });
 
-    it("should convert Excel date number for different dates", () => {
-      expect(convertDate(1)).toBe("1900-01-01");
-      expect(convertDate(44562)).toBe("2022-01-01");
-      expect(convertDate(45000)).toBe("2023-03-16");
+    describe("Null/empty values passthrough", () => {
+      it("should return null for null", () => {
+        expect(convertDate(null, "testField", mockFormatMessage)).toBeNull();
+      });
+
+      it("should return undefined for undefined", () => {
+        expect(
+          convertDate(undefined, "testField", mockFormatMessage)
+        ).toBeUndefined();
+      });
+
+      it("should return empty string for empty string", () => {
+        expect(convertDate("", "testField", mockFormatMessage)).toBe("");
+      });
+
+      it("should return whitespace-only string as-is", () => {
+        expect(convertDate("   ", "testField", mockFormatMessage)).toBe("   ");
+        expect(convertDate("\t", "testField", mockFormatMessage)).toBe("\t");
+      });
     });
 
-    it("should convert Excel string number", () => {
-      expect(convertDate("43831")).toBe("2020-01-01");
-      expect(convertDate("44562")).toBe("2022-01-01");
+    describe("Invalid inputs - throw ValidationError", () => {
+      it("should throw for invalid date format", () => {
+        expect(() =>
+          convertDate("11/14/2025", "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDate("January 1, 2020", "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDate("2025-1-1", "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDate("25-11-14", "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+      });
+
+      it("should throw for invalid dates", () => {
+        expect(() =>
+          convertDate("2023-02-30", "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDate("2023-13-01", "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDate("2023-00-01", "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDate("2023-01-32", "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDate("2021-02-29", "testField", mockFormatMessage)
+        ).toThrow(ValidationError); // Not a leap year
+      });
+
+      it("should throw for boolean values", () => {
+        expect(() => convertDate(true, "testField", mockFormatMessage)).toThrow(
+          ValidationError
+        );
+        expect(() =>
+          convertDate(false, "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+      });
+
+      it("should throw for arrays", () => {
+        expect(() => convertDate([], "testField", mockFormatMessage)).toThrow(
+          ValidationError
+        );
+        expect(() =>
+          convertDate(["2025-11-14"], "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+      });
+
+      it("should throw for objects", () => {
+        expect(() => convertDate({}, "testField", mockFormatMessage)).toThrow(
+          ValidationError
+        );
+        expect(() =>
+          convertDate({ date: "2025-11-14" }, "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+      });
+
+      it("should throw for numbers", () => {
+        expect(() =>
+          convertDate(43831, "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() => convertDate(0, "testField", mockFormatMessage)).toThrow(
+          ValidationError
+        );
+      });
+
+      it("should throw for Date objects", () => {
+        expect(() =>
+          convertDate(new Date(), "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+      });
     });
 
-    it("should handle decimal Excel numbers (truncates time portion)", () => {
-      expect(convertDate(43831.5)).toBe("2020-01-01");
-      expect(convertDate(43831.999)).toBe("2020-01-01");
-    });
+    describe("Error message field names", () => {
+      it("should use provided field name in error", () => {
+        expect(() =>
+          convertDate("invalid", "birthDate", mockFormatMessage)
+        ).toThrow(/birthDate/);
+      });
 
-    it("should handle zero", () => {
-      expect(convertDate(0)).toBe("1899-12-30");
-    });
-
-    it("should handle negative numbers (pre-1900 dates)", () => {
-      const result = convertDate(-1);
-      expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    });
-
-    // String passthrough
-    it("should passthrough ISO date string", () => {
-      expect(convertDate("2025-11-14")).toBe("2025-11-14");
-    });
-
-    it("should trim and passthrough string", () => {
-      expect(convertDate("  2025-11-14  ")).toBe("2025-11-14");
-      expect(convertDate("  2020-01-01\n")).toBe("2020-01-01");
-    });
-
-    it("should passthrough any non-empty string", () => {
-      // Doesn't validate - assumes caller provides correct format
-      expect(convertDate("11/14/2025")).toBe("11/14/2025");
-      expect(convertDate("January 1, 2020")).toBe("January 1, 2020");
-    });
-
-    // Invalid inputs - return null
-    it("should return null for empty string", () => {
-      expect(convertDate("")).toBeNull();
-    });
-
-    it("should return null for whitespace-only string", () => {
-      expect(convertDate("   ")).toBeNull();
-      expect(convertDate("\t")).toBeNull();
-      expect(convertDate("\n")).toBeNull();
-    });
-
-    it("should return null for null", () => {
-      expect(convertDate(null)).toBeNull();
-    });
-
-    it("should return null for undefined", () => {
-      expect(convertDate(undefined)).toBeNull();
-    });
-
-    // Potential bug tests - these might fail with current implementation
-    it("should return null for boolean", () => {
-      expect(convertDate(true)).toBeNull();
-      expect(convertDate(false)).toBeNull();
-    });
-
-    it("should return null for object", () => {
-      expect(convertDate({})).toBeNull();
-      expect(convertDate(new Date())).toBeNull();
-    });
-
-    it("should return null for array", () => {
-      expect(convertDate([])).toBeNull();
-      expect(convertDate(["2025-11-14"])).toBeNull();
-    });
-
-    // Edge cases
-    it("should handle leap year dates", () => {
-      expect(convertDate(45351)).toBe("2024-02-29");
-    });
-
-    it("should handle year boundaries", () => {
-      expect(convertDate(44926)).toBe("2023-01-01");
-      expect(convertDate(45290)).toBe("2023-12-31");
-    });
-
-    it("should handle large numbers (far future dates)", () => {
-      const result = convertDate(100000);
-      expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(result).toBeTruthy();
-    });
-
-    it("should handle numeric strings with whitespace", () => {
-      expect(convertDate("  43831  ")).toBe("2020-01-01");
-    });
-
-    it("should handle floating point string", () => {
-      expect(convertDate("43831.0")).toBe("2020-01-01");
-    });
-
-    // Format consistency
-    it("should always return YYYY-MM-DD format for numbers", () => {
-      const result = convertDate(43831);
-      expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    });
-
-    it("should always return string or null", () => {
-      expect(typeof convertDate(43831)).toBe("string");
-      expect(typeof convertDate("2020-01-01")).toBe("string");
-      expect(convertDate(null)).toBeNull();
+      it("should use default field name when not provided", () => {
+        expect(() =>
+          convertDate("invalid", undefined, mockFormatMessage)
+        ).toThrow(/date/);
+      });
     });
   });
 
   describe("convertDateTime", () => {
-    // Excel serial number with time
-    it("should convert Excel datetime number", () => {
-      expect(convertDateTime(43831.5)).toBe("2020-01-01T12:00:00.000Z");
-      // .5 represents noon (50% of a day)
+    const mockFormatMessage = (key: string, params: any) =>
+      `${key}: ${params.fieldName}`;
+
+    describe("Valid inputs", () => {
+      it("should accept and return valid ISO datetime string", () => {
+        expect(
+          convertDateTime(
+            "2025-11-14T12:30:45.000",
+            "testField",
+            mockFormatMessage
+          )
+        ).toBe("2025-11-14T12:30:45.000Z");
+        expect(
+          convertDateTime(
+            "2020-01-01T00:00:00.000Z",
+            "testField",
+            mockFormatMessage
+          )
+        ).toBe("2020-01-01T00:00:00.000Z");
+      });
+
+      it("should accept datetime without milliseconds", () => {
+        expect(
+          convertDateTime("2025-11-14T12:30:45", "testField", mockFormatMessage)
+        ).toBe("2025-11-14T12:30:45.000Z");
+      });
+
+      it("should accept date-only format and default time to 00:00:00.000", () => {
+        expect(
+          convertDateTime("2025-11-14", "testField", mockFormatMessage)
+        ).toBe("2025-11-14T00:00:00.000Z");
+        expect(
+          convertDateTime("2020-01-01", "testField", mockFormatMessage)
+        ).toBe("2020-01-01T00:00:00.000Z");
+      });
+
+      it("should trim whitespace and return valid datetime", () => {
+        expect(
+          convertDateTime(
+            "  2025-11-14T12:00:00.000  ",
+            "testField",
+            mockFormatMessage
+          )
+        ).toBe("2025-11-14T12:00:00.000Z");
+        expect(
+          convertDateTime("  2020-01-01  ", "testField", mockFormatMessage)
+        ).toBe("2020-01-01T00:00:00.000Z");
+      });
+
+      it("should handle various times correctly", () => {
+        expect(
+          convertDateTime(
+            "2025-11-14T00:00:00.000Z",
+            "testField",
+            mockFormatMessage
+          )
+        ).toBe("2025-11-14T00:00:00.000Z"); // Midnight
+        expect(
+          convertDateTime(
+            "2025-11-14T23:59:59.999Z",
+            "testField",
+            mockFormatMessage
+          )
+        ).toBe("2025-11-14T23:59:59.999Z"); // End of day
+        expect(
+          convertDateTime(
+            "2025-11-14T12:00:00.000Z",
+            "testField",
+            mockFormatMessage
+          )
+        ).toBe("2025-11-14T12:00:00.000Z"); // Noon
+      });
+
+      it("should handle leap year dates", () => {
+        expect(
+          convertDateTime(
+            "2020-02-29T10:30:00.000Z",
+            "testField",
+            mockFormatMessage
+          )
+        ).toBe("2020-02-29T10:30:00.000Z");
+      });
     });
 
-    it("should convert Excel date at midnight", () => {
-      expect(convertDateTime(43831)).toBe("2020-01-01T00:00:00.000Z");
+    describe("Null/empty values passthrough", () => {
+      it("should return null for null", () => {
+        expect(
+          convertDateTime(null, "testField", mockFormatMessage)
+        ).toBeNull();
+      });
+
+      it("should return undefined for undefined", () => {
+        expect(
+          convertDateTime(undefined, "testField", mockFormatMessage)
+        ).toBeUndefined();
+      });
+
+      it("should return empty string for empty string", () => {
+        expect(convertDateTime("", "testField", mockFormatMessage)).toBe("");
+      });
+
+      it("should return whitespace-only string as-is", () => {
+        expect(convertDateTime("   ", "testField", mockFormatMessage)).toBe(
+          "   "
+        );
+      });
     });
 
-    it("should convert Excel string number", () => {
-      expect(convertDateTime("43831.75")).toBe("2020-01-01T18:00:00.000Z");
-      // .75 represents 6 PM (75% of a day)
+    describe("Invalid inputs - throw ValidationError", () => {
+      it("should throw for invalid datetime format", () => {
+        expect(() =>
+          convertDateTime(
+            "11/14/2025, 12:00 AM",
+            "testField",
+            mockFormatMessage
+          )
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDateTime("January 1, 2020", "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDateTime("2025-11-14 12:00:00", "testField", mockFormatMessage)
+        ).toThrow(ValidationError); // Missing T separator
+      });
+
+      it("should throw for datetime with timezone", () => {
+        expect(() =>
+          convertDateTime(
+            "2025-11-14T12:00:00+05:00",
+            "testField",
+            mockFormatMessage
+          )
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDateTime(
+            "2025-11-14T12:00:00-08:00",
+            "testField",
+            mockFormatMessage
+          )
+        ).toThrow(ValidationError);
+      });
+
+      it("should throw for invalid dates", () => {
+        expect(() =>
+          convertDateTime(
+            "2023-02-30T12:00:00.000",
+            "testField",
+            mockFormatMessage
+          )
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDateTime(
+            "2023-13-01T12:00:00.000Z",
+            "testField",
+            mockFormatMessage
+          )
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDateTime(
+            "2021-02-29T12:00:00.000",
+            "testField",
+            mockFormatMessage
+          )
+        ).toThrow(ValidationError); // Not a leap year
+      });
+
+      it("should throw for invalid times", () => {
+        expect(() =>
+          convertDateTime(
+            "2025-11-14T25:00:00.000",
+            "testField",
+            mockFormatMessage
+          )
+        ).toThrow(ValidationError); // Invalid hour
+        expect(() =>
+          convertDateTime(
+            "2025-11-14T12:60:00.000Z",
+            "testField",
+            mockFormatMessage
+          )
+        ).toThrow(ValidationError); // Invalid minute
+        expect(() =>
+          convertDateTime(
+            "2025-11-14T12:00:60.000",
+            "testField",
+            mockFormatMessage
+          )
+        ).toThrow(ValidationError); // Invalid second
+      });
+
+      it("should throw for boolean values", () => {
+        expect(() =>
+          convertDateTime(true, "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDateTime(false, "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+      });
+
+      it("should throw for arrays", () => {
+        expect(() =>
+          convertDateTime([], "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+      });
+
+      it("should throw for objects", () => {
+        expect(() =>
+          convertDateTime({}, "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+      });
+
+      it("should throw for numbers", () => {
+        expect(() =>
+          convertDateTime(43831, "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+        expect(() =>
+          convertDateTime(43831.5, "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+      });
+
+      it("should throw for Date objects", () => {
+        expect(() =>
+          convertDateTime(new Date(), "testField", mockFormatMessage)
+        ).toThrow(ValidationError);
+      });
     });
 
-    // String passthrough
-    it("should passthrough ISO datetime string", () => {
-      expect(convertDateTime("2025-11-14T00:00:00.000Z")).toBe(
-        "2025-11-14T00:00:00.000Z"
-      );
+    describe("Error message field names", () => {
+      it("should use provided field name in error", () => {
+        expect(() =>
+          convertDateTime("invalid", "createdAt", mockFormatMessage)
+        ).toThrow(/createdAt/);
+      });
+
+      it("should use default field name when not provided", () => {
+        expect(() =>
+          convertDateTime("invalid", undefined, mockFormatMessage)
+        ).toThrow(/datetime/);
+      });
     });
 
-    it("should trim and passthrough string", () => {
-      expect(convertDateTime("  2025-11-14T12:00:00Z  ")).toBe(
-        "2025-11-14T12:00:00Z"
-      );
-    });
+    describe("Local time (no timezone)", () => {
+      it("should return datetime without timezone suffix", () => {
+        const result = convertDateTime(
+          "2025-11-14T12:30:45.000",
+          "testField",
+          mockFormatMessage
+        );
+        expect(result).toContain("Z");
+        expect(result).not.toMatch(/[+-]\d{2}:\d{2}$/);
+      });
 
-    it("should passthrough any non-empty string", () => {
-      // Doesn't validate - assumes caller provides correct format
-      expect(convertDateTime("11/14/2025, 12:00 AM")).toBe(
-        "11/14/2025, 12:00 AM"
-      );
-    });
-
-    // Invalid inputs
-    it("should return null for empty string", () => {
-      expect(convertDateTime("")).toBeNull();
-    });
-
-    it("should return null for whitespace-only string", () => {
-      expect(convertDateTime("   ")).toBeNull();
-    });
-
-    it("should return null for null", () => {
-      expect(convertDateTime(null)).toBeNull();
-    });
-
-    it("should return null for undefined", () => {
-      expect(convertDateTime(undefined)).toBeNull();
-    });
-
-    it("should return null for boolean", () => {
-      expect(convertDateTime(true)).toBeNull();
-      expect(convertDateTime(false)).toBeNull();
-    });
-
-    it("should return null for object", () => {
-      expect(convertDateTime({})).toBeNull();
-    });
-
-    it("should return null for array", () => {
-      expect(convertDateTime([])).toBeNull();
-    });
-
-    // Edge cases
-    it("should handle fractional seconds in Excel number", () => {
-      const result = convertDateTime(43831.999988426);
-      expect(result).toContain("2020-01-01T23:59:59");
-    });
-
-    it("should handle zero", () => {
-      expect(convertDateTime(0)).toBe("1899-12-30T00:00:00.000Z");
+      it("should treat all inputs as local time", () => {
+        const result = convertDateTime(
+          "2025-11-14T12:00:00.000",
+          "testField",
+          mockFormatMessage
+        );
+        expect(result).toBe("2025-11-14T12:00:00.000Z");
+      });
     });
   });
 
