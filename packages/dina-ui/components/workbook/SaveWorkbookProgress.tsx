@@ -7,6 +7,7 @@ import {
   DoOperationsError,
   QueryTable,
   SimpleSearchFilterBuilder,
+  useAccount,
   useApiClient
 } from "../../../common-ui/lib";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
@@ -54,6 +55,9 @@ export function SaveWorkbookProgress({
   } = useWorkbookContext();
 
   const { save, apiClient, doOperations } = useApiClient();
+
+  const { agentId } = useAccount();
+
   const statusRef = useRef<WorkBookSavingStatus>(status ?? "CANCELED");
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
@@ -164,7 +168,8 @@ export function SaveWorkbookProgress({
           sameNameExistingResources,
           userSelectedSameNameParentSample,
           sameNameParentSamples,
-          resourcesUpdatedCount
+          resourcesUpdatedCount,
+          agentId: agentId
         });
 
         // If handler says to pause, save what we have and pause

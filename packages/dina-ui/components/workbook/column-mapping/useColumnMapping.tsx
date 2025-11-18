@@ -85,7 +85,7 @@ export function useColumnMapping() {
 
   const {
     loading: attrLoadingMaterialSample,
-    response: attrRespMaterialSamplem
+    response: attrRespMaterialSample
   } = useQuery<ManagedAttribute[]>({
     path: "collection-api/managed-attribute",
     filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
@@ -97,6 +97,18 @@ export function useColumnMapping() {
       .build(),
     page: { limit: 1000 }
   });
+
+  const { loading: attrLoadingMetadata, response: attrRespMetadata } = useQuery<
+    ManagedAttribute[]
+  >(
+    {
+      path: "objectstore-api/managed-attribute",
+      page: { limit: 1000 }
+    },
+    {
+      disabled: type !== "metadata"
+    }
+  );
 
   const { loading: taxonomicRankLoading, response: taxonomicRankResp } =
     useQuery<Vocabulary>({
@@ -198,6 +210,7 @@ export function useColumnMapping() {
 
   const loadingData =
     attrLoadingMaterialSample ||
+    attrLoadingMetadata ||
     assemblageLoading ||
     collectionLoading ||
     preparationTypeLoading ||
@@ -209,7 +222,10 @@ export function useColumnMapping() {
     taxonomicRankLoading ||
     metadataLoading;
 
-  const managedAttributes = [...(attrRespMaterialSamplem?.data ?? [])];
+  const managedAttributes = [
+    ...(attrRespMaterialSample?.data ?? []),
+    ...(attrRespMetadata?.data ?? [])
+  ];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
   const assemblages = (assemblageResp?.data || []).map((item) => ({
     ...item,
@@ -362,8 +378,9 @@ export function useColumnMapping() {
     return managedAttributes.find(
       (managedAttribute) =>
         managedAttribute.key === key &&
-        managedAttribute.managedAttributeComponent ===
-          config?.managedAttributeComponent
+        (config.managedAttributeComponent === "ENTITY" ||
+          managedAttribute.managedAttributeComponent ===
+            config.managedAttributeComponent)
     );
   }
 
@@ -759,6 +776,7 @@ export function useColumnMapping() {
           break;
         case "collectingEvent.collectors.displayName":
         case "preparedBy.displayName":
+        case "dcCreator.displayName":
           found =
             persons.find((item) => item.displayName === value) ??
             persons.find((item) =>

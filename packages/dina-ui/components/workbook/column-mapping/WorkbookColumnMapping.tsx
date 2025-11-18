@@ -1059,6 +1059,7 @@ export function WorkbookColumnMapping({
                       fieldOptions={fieldOptions}
                       onFieldMappingChange={onFieldMappingChange}
                       key={index}
+                      type={type}
                     />
                   ))}
                 </Card.Body>

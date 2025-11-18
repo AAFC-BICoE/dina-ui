@@ -16,13 +16,15 @@ export interface ColumnMappingRowProps {
     }[];
   }[];
   onFieldMappingChange: (columnName: WorkbookColumnInfo, newFieldPath) => void;
+  type: string;
 }
 
 export function ColumnMappingRow({
   columnName,
   columnIndex,
   fieldOptions,
-  onFieldMappingChange
+  onFieldMappingChange,
+  type
 }: ColumnMappingRowProps) {
   const onFieldChanged = useCallback((newFieldPath: string) => {
     onFieldMappingChange(columnName, newFieldPath);
@@ -41,6 +43,7 @@ export function ColumnMappingRow({
               fieldOptions={fieldOptions}
               disabled={isSkipped ?? false}
               onFieldChanged={onFieldChanged}
+              type={type}
             />
           )}
         </FieldSpy>
