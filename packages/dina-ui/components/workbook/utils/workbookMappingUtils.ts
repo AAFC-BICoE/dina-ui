@@ -180,17 +180,45 @@ const SYNONYMS_MAP_BY_TYPE = new Map<string, Map<string, string>>([
   [
     "metadata",
     new Map([
-      ["file name", "fileName"],
-      ["original filename", "originalFilename"],
-      ["original file name", "originalFilename"],
-      ["date original version created", ""],
+      // acDigitizationDate
+      ["date", "acDigitizationDate"],
+      ["created", "acDigitizationDate"],
+      ["date created", "acDigitizationDate"],
+      ["date original version created", "acDigitizationDate"],
+      ["date original created", "acDigitizationDate"],
+
+      // acCaption
       ["caption", "acCaption"],
+
+      // dcCreator
+      ["digitized by", "dcCreator.displayName"],
+      ["creator", "dcCreator.displayName"],
+
+      // dcRights
+      ["copyright", "dcRights"],
+      ["copyright holder", "dcRights"],
+      ["rights holder", "dcRights"],
+      ["rights", "dcRights"],
+
+      // dcType
       ["stored object type", "dcType"],
       ["object type", "dcType"],
       ["type", "dcType"],
+
+      // acSubtype
       ["subtype", "acSubtype"],
+      ["sub type", "acSubtype"],
       ["object subtype", "acSubtype"],
-      ["digitalized by", "dcCreator.displayName"]
+
+      // orientation
+      ["rotation", "orientation"],
+
+      // fileName
+      ["file name", "fileName"],
+
+      // originalFilename
+      ["original filename", "originalFilename"],
+      ["original file name", "originalFilename"]
     ])
   ]
 ]);

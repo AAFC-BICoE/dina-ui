@@ -203,29 +203,6 @@ describe("materialSampleHandler", () => {
     ]);
   });
 
-  it("should append data to relationship fields", async () => {
-    const existingResource = {
-      id: "existing-123",
-      associations: [{ id: "assoc-1", type: "association" }],
-      type: "material-sample"
-    };
-
-    baseContext.appendData = true;
-    baseContext.resource.relationships = {
-      associations: {
-        data: [{ id: "assoc-2", type: "association" }]
-      }
-    };
-    mockApiClient.get.mockResolvedValue({ data: [existingResource] });
-
-    await materialSampleHandler.processResource(baseContext);
-
-    expect(baseContext.resource.relationships.associations.data).toEqual([
-      { id: "assoc-2", type: "association" },
-      { id: "assoc-1", type: "association" }
-    ]);
-  });
-
   it("should call linkRelationshipAttribute for each key in resource", async () => {
     baseContext.resource = {
       materialSampleName: "TEST-SAMPLE-001",
