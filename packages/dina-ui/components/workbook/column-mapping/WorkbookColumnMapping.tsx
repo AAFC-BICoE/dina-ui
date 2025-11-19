@@ -15,6 +15,7 @@ import {
   VocabularyElement
 } from "packages/dina-ui/types/collection-api";
 import { Ref, useRef } from "react";
+import Link from "next/link";
 import { Alert, Card } from "react-bootstrap";
 import Select from "react-select";
 import * as yup from "yup";
@@ -993,6 +994,21 @@ export function WorkbookColumnMapping({
                       </ul>
                     </Alert>
                   )}
+
+                  {type === "metadata" &&
+                    (!bulkEditFiles || bulkEditFiles.length === 0) && (
+                      <div className="alert alert-danger mb-0">
+                        <DinaMessage id="noBulkEditFilesError" />
+                        <div className="mt-2">
+                          <Link
+                            href="/object-store/upload"
+                            className="btn btn-primary btn-sm"
+                          >
+                            <DinaMessage id="goToObjectUploadPage" />
+                          </Link>
+                        </div>
+                      </div>
+                    )}
 
                   {bulkEditFiles &&
                     bulkEditFiles.length > 0 &&

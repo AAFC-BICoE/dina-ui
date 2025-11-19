@@ -686,6 +686,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "The following files in the spreadsheet were not uploaded: {files}{remaining, plural, =0 {} other { (and {remaining} more)}}",
   bulkUploadDetectedDescription:
     "You have {count} uploaded file(s). The spreadsheet must include these files with matching 'Original Filename' values.",
+  noBulkEditFilesError:
+    "You do not have files uploaded to bulk edit. Go to the object upload page to upload files to be edited.",
+  goToObjectUploadPage: "Go to Object Upload Page",
   skipColumn: "Skip",
   materialSampleFormTemplate: "Material Sample Form Template",
   materialSampleFormTemplates: "Material Sample Form Templates",
