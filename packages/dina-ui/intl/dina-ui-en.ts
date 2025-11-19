@@ -282,8 +282,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   feedbackExternal: "(external, GitHub account required)",
   enterFullscreen: "Enter Fullscreen",
   exitFullscreen: "Exit Fullscreen",
-  pageSizeError:
-    "Page number exceeds system limit. To get more relevant results, please modify your search query or change the sort order.",
   fieldExtensions: "Field Extensions",
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
