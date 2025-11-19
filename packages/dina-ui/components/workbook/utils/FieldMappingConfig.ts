@@ -360,7 +360,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
     managedAttributes: {
       dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
       endpoint: "objectstore-api/managed-attribute",
-      managedAttributeComponent: "METADATA"
+      managedAttributeComponent: "ENTITY"
     }
   }
 };

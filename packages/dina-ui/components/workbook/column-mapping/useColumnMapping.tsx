@@ -566,6 +566,14 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
+          } else {
+            map.push({
+              targetField: "managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr,
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
+            });
           }
         } else if (targetTaxonomicRank) {
           map.push({

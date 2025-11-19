@@ -966,7 +966,7 @@ export function WorkbookColumnMapping({
                   </div>
 
                   {!templateIntegrityWarning && (
-                    <Alert variant="warning" className="mb-0">
+                    <Alert variant="warning" className="mb-1">
                       <Alert.Heading>
                         <DinaMessage id="workbook_templateIntegrityWarning_title" />
                       </Alert.Heading>
@@ -994,34 +994,36 @@ export function WorkbookColumnMapping({
                     </Alert>
                   )}
 
-                  {bulkEditFiles && bulkEditFiles.length > 0 && (
-                    <div className="alert alert-info">
-                      <DinaMessage
-                        id="bulkUploadDetectedDescription"
-                        values={{ count: bulkEditFiles.length }}
-                      />
-                      <div className="mt-2">
-                        <small>
-                          <strong>
-                            <DinaMessage id="expectedFiles" />:
-                          </strong>
-                          <ul className="mb-0">
-                            {bulkEditFiles.slice(0, 5).map((file) => (
-                              <li key={file.id}>{file.originalFilename}</li>
-                            ))}
-                            {bulkEditFiles.length > 5 && (
-                              <li>
-                                <DinaMessage
-                                  id="andNMore"
-                                  values={{ count: bulkEditFiles.length - 5 }}
-                                />
-                              </li>
-                            )}
-                          </ul>
-                        </small>
+                  {bulkEditFiles &&
+                    bulkEditFiles.length > 0 &&
+                    type === "metadata" && (
+                      <div className="alert alert-info mb-0">
+                        <DinaMessage
+                          id="bulkUploadDetectedDescription"
+                          values={{ count: bulkEditFiles.length }}
+                        />
+                        <div className="mt-2">
+                          <small>
+                            <strong>
+                              <DinaMessage id="expectedFiles" />:
+                            </strong>
+                            <ul className="mb-0">
+                              {bulkEditFiles.slice(0, 5).map((file) => (
+                                <li key={file.id}>{file.originalFilename}</li>
+                              ))}
+                              {bulkEditFiles.length > 5 && (
+                                <li>
+                                  <DinaMessage
+                                    id="andNMore"
+                                    values={{ count: bulkEditFiles.length - 5 }}
+                                  />
+                                </li>
+                              )}
+                            </ul>
+                          </small>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </Card.Body>
               </Card>
 
