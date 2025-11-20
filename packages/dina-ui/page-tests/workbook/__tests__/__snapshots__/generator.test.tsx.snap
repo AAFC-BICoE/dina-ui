@@ -333,7 +333,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
               <button
                 class="btn ms-auto btn-primary"
                 disabled=""
-                style="width: 12rem;"
+                style="width: 14rem;"
                 type="submit"
               >
                 <svg
@@ -431,7 +431,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                     style="cursor: auto;"
                   >
                     <div
-                      class="css-3iigni-container"
+                      class="css-b62m3t-container"
                     >
                       <span
                         class="css-1f43avz-a11yText-A11yText"
@@ -445,19 +445,18 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                         role="log"
                       />
                       <div
-                        aria-disabled="true"
-                        class="css-16xfy0z-control"
+                        class="css-13cymwt-control"
                       >
                         <div
                           class="css-hlgwow"
                         >
                           <div
-                            class="css-olqui2-singleValue"
+                            class="css-1dimb5e-singleValue"
                           >
                             Material Sample
                           </div>
                           <div
-                            class="css-1mkvw8y"
+                            class="css-19bb58m"
                             data-value=""
                           >
                             <input
@@ -469,7 +468,6 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                               autocomplete="off"
                               autocorrect="off"
                               class=""
-                              disabled=""
                               id="react-select-2-input"
                               role="combobox"
                               spellcheck="false"
@@ -484,7 +482,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                           class="css-1wy0on6"
                         >
                           <span
-                            class="css-894a34-indicatorSeparator"
+                            class="css-1u9des2-indicatorSeparator"
                           />
                           <div
                             aria-hidden="true"

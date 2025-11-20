@@ -4,7 +4,8 @@ import {
   useModal,
   AreYouSureModal,
   BULK_EDIT_IDS_KEY,
-  useApiClient
+  useApiClient,
+  LoadingSpinner
 } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
@@ -16,8 +17,17 @@ import {
 import { useFileUpload } from "../../components/object-store/file-upload/FileUploadProvider";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { writeStorage, deleteFromStorage } from "@rehooks/local-storage";
+import { FaFileExcel } from "react-icons/fa6";
+import { FaListAlt } from "react-icons/fa";
+import { useRef } from "react";
 
 export const BULK_ADD_IDS_KEY = "bulkAddIds";
+export const BULK_ADD_FILES_KEY = "bulkAddFiles";
+
+export interface BulkAddFileInfo {
+  id: string;
+  originalFilename: string;
+}
 
 export interface OnSubmitValues {
   group?: string;
@@ -31,10 +41,15 @@ export default function UploadPage() {
   const { openModal } = useModal();
   const { apiClient } = useApiClient();
 
+  const submitTypeRef = useRef<"workbook" | "batchEntry">("batchEntry");
+
   async function onSubmit({
     acceptedFiles,
-    group
+    group,
+    submitType
   }: FileUploaderOnSubmitArgs<OnSubmitValues>) {
+    const actualSubmitType = submitType || submitTypeRef.current;
+
     if (!group) {
       throw new Error(formatMessage("groupMustBeSelected"));
     }
@@ -87,22 +102,45 @@ export default function UploadPage() {
 
       const navigateToEditMetadata = async () => {
         const objectUploadIds = uploadRespsT.map((item) => item.id);
+
+        deleteFromStorage(BULK_ADD_FILES_KEY);
         deleteFromStorage(BULK_EDIT_IDS_KEY);
-        writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
-        if (objectUploadIds.length === 1) {
+
+        if (actualSubmitType === "workbook") {
+          const fileInfos: BulkAddFileInfo[] = uploadRespsT.map(
+            (objectUpload) => ({
+              id: objectUpload.id ?? "",
+              originalFilename: objectUpload.originalFilename
+            })
+          );
+          writeStorage(BULK_ADD_FILES_KEY, fileInfos);
+
+          // Workbook route
           await router.push({
-            pathname: "/object-store/metadata/edit",
+            pathname: "/workbook/upload",
             query: {
               group
             }
           });
         } else {
-          await router.push({
-            pathname: "/object-store/metadata/bulk-edit",
-            query: {
-              group
-            }
-          });
+          writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
+
+          // Batch Entry Form route
+          if (objectUploadIds.length === 1) {
+            await router.push({
+              pathname: "/object-store/metadata/edit",
+              query: {
+                group
+              }
+            });
+          } else {
+            await router.push({
+              pathname: "/object-store/metadata/bulk-edit",
+              query: {
+                group
+              }
+            });
+          }
         }
       };
 
@@ -175,7 +213,75 @@ export default function UploadPage() {
               />
             </div>
             <div>
-              <FileUploader onSubmit={onSubmit} />
+              <FileUploader
+                onSubmit={onSubmit}
+                SubmitButtonComponent={({
+                  files,
+                  onSubmit: handleSubmit,
+                  disabled,
+                  isSubmitting,
+                  hasAnInvalidFileSize
+                }) => {
+                  const isDisabled = disabled || hasAnInvalidFileSize;
+                  const isDerivative = !!router?.query?.derivativeType;
+
+                  if (isSubmitting) {
+                    return (
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <LoadingSpinner loading={true} />
+                      </div>
+                    );
+                  }
+
+                  if (isDerivative) {
+                    return (
+                      <div className="d-flex gap-2 dzu-submitButtonContainer">
+                        <button
+                          type="button"
+                          className="btn btn-success"
+                          onClick={() => {
+                            submitTypeRef.current = "batchEntry";
+                            handleSubmit(files);
+                          }}
+                          disabled={isDisabled}
+                        >
+                          <DinaMessage id="save" />
+                        </button>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="d-flex gap-2 dzu-submitButtonContainer">
+                      <button
+                        type="button"
+                        className="btn btn-success me-2"
+                        style={{ marginRight: "0.5rem" }}
+                        onClick={() => {
+                          submitTypeRef.current = "workbook";
+                          handleSubmit(files);
+                        }}
+                        disabled={isDisabled}
+                      >
+                        <FaFileExcel className="me-2" />
+                        <DinaMessage id="continueWithWorkbook" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-success"
+                        onClick={() => {
+                          submitTypeRef.current = "batchEntry";
+                          handleSubmit(files);
+                        }}
+                        disabled={isDisabled}
+                      >
+                        <FaListAlt className="me-2" />
+                        <DinaMessage id="continueWithBatchEntryForm" />
+                      </button>
+                    </div>
+                  );
+                }}
+              />
             </div>
           </DinaForm>
         )}

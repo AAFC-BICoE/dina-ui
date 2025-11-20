@@ -14,6 +14,9 @@ import {
 import { IFileWithMeta } from "../../components/object-store";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
+import { useLocalStorage } from "@rehooks/local-storage";
+import { BULK_ADD_FILES_KEY, BulkAddFileInfo } from "../object-store/upload";
+import { FaArrowLeft, FaFileArrowDown } from "react-icons/fa6";
 
 export function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
@@ -33,6 +36,9 @@ export function UploadWorkbookPage() {
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
   const [redirecting, setRedirecting] = useState<boolean>(false);
+
+  const [bulkEditFiles] =
+    useLocalStorage<BulkAddFileInfo[]>(BULK_ADD_FILES_KEY);
 
   /**
    * Call the object store backend API that takes in a spreadsheet and returns
@@ -81,6 +87,35 @@ export function UploadWorkbookPage() {
       <DinaMessage id="workbookUploadFailure" />
     </div>
   ) : undefined;
+
+  const objectUploadMessage = bulkEditFiles?.length ? (
+    <div className="alert alert-info">
+      <DinaMessage
+        id="workbookUploadBulkEditInfoMessage"
+        values={{ count: bulkEditFiles.length }}
+      />
+      <div className="mt-2">
+        <small>
+          <strong>
+            <DinaMessage id="expectedFiles" />:
+          </strong>
+          <ul className="mb-0">
+            {bulkEditFiles.slice(0, 5).map((file) => (
+              <li key={file.id}>{file.originalFilename}</li>
+            ))}
+            {bulkEditFiles.length > 5 && (
+              <li>
+                <DinaMessage
+                  id="andNMore"
+                  values={{ count: bulkEditFiles.length - 5 }}
+                />
+              </li>
+            )}
+          </ul>
+        </small>
+      </div>
+    </div>
+  ) : null;
 
   function isThereAnActiveUpload(): boolean {
     return (
@@ -139,12 +174,18 @@ export function UploadWorkbookPage() {
         </div>
       </>
     ) : (
-      <div className="col-md-6 col-sm-12 d-flex ms-auto">
-        <Link
-          href={`/workbook/generator`}
-          className="btn btn-primary ms-auto"
-          style={{ width: "16rem" }}
-        >
+      <div className="col-md-12 col-sm-12 d-flex">
+        {bulkEditFiles && bulkEditFiles.length > 0 && (
+          <Link
+            href="/object-store/upload"
+            className="btn btn-outline-secondary previous-button"
+          >
+            <FaArrowLeft className="me-2" />
+            <DinaMessage id="goToThePreviousStep" />
+          </Link>
+        )}
+        <Link href={`/workbook/generator`} className="btn btn-primary ms-auto">
+          <FaFileArrowDown className="me-2" />
           <DinaMessage id="workbookGenerateTemplateTitle" />
         </Link>
       </div>
@@ -179,6 +220,7 @@ export function UploadWorkbookPage() {
           ) : (
             <>
               {failedMessage}
+              {objectUploadMessage}
               <WorkbookUpload submitData={submitFile} />
             </>
           )}

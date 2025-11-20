@@ -97,10 +97,11 @@ export function RelationshipFieldMapping({
         {Object.keys(columnUniqueValues[sheet])
           .filter(
             (columnName) =>
-              workbookColumnMap[columnName]?.mapRelationship &&
-              workbookColumnMap[columnName].showOnUI &&
-              skippedRecords[workbookColumnMap[columnName].fieldPath ?? ""] ===
-                false
+              workbookColumnMap?.[columnName]?.mapRelationship &&
+              workbookColumnMap?.[columnName]?.showOnUI &&
+              skippedRecords[
+                workbookColumnMap?.[columnName]?.fieldPath ?? ""
+              ] === false
           )
           .map((columnName, index1) => {
             const thisColumnMap = workbookColumnMap[columnName]!;

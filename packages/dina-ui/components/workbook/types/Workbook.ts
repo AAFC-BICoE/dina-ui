@@ -58,6 +58,8 @@ export type FieldMappingConfigType = {
       type: string;
       hasGroup: boolean;
       baseApiPath: string;
+      allowAppendData: boolean;
+      fieldColumnLocaleId: string;
     };
   };
 };
@@ -69,6 +71,7 @@ export interface PrimitiveField {
     | WorkbookDataTypeEnum.STRING
     | WorkbookDataTypeEnum.STRING_COORDINATE
     | WorkbookDataTypeEnum.DATE
+    | WorkbookDataTypeEnum.DATE_TIME
     | WorkbookDataTypeEnum.STRING_ARRAY
     | WorkbookDataTypeEnum.NUMBER_ARRAY
     | WorkbookDataTypeEnum.BOOLEAN_ARRAY;
@@ -83,6 +86,16 @@ export interface ManagedAttributeField {
 export interface VocabularyField {
   dataType: WorkbookDataTypeEnum.VOCABULARY;
   endpoint: string;
+}
+
+export interface EnumValue {
+  label: string;
+  value: string;
+}
+
+export interface EnumField {
+  dataType: WorkbookDataTypeEnum.ENUM;
+  allowedValues: EnumValue[];
 }
 
 export interface ObjectField {
@@ -104,6 +117,7 @@ export interface ClassificationType {
 export type FieldConfigType =
   | PrimitiveField
   | VocabularyField
+  | EnumField
   | ManagedAttributeField
   | ObjectField
   | ClassificationType;

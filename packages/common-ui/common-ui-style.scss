@@ -229,6 +229,13 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /*
+ * Fixes vertical alignment of SVG icons within buttons.
+ */
+.btn > svg {
+  margin-top: -3px;
+}
+
+/*
  * Query Builder Custom CSS
  */
 .qb-lite {
