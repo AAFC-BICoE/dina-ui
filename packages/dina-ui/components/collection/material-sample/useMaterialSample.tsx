@@ -12,7 +12,8 @@ import {
   useApiClient,
   useQuery,
   useRelationshipUsagesCount,
-  withoutBlankFields
+  withoutBlankFields,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -52,6 +53,7 @@ import { useGenerateSequence } from "./useGenerateSequence";
 import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { Alert } from "react-bootstrap";
 import CollectingEventEditAlert from "../collecting-event/CollectingEventEditAlert";
+import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet, apiClient } = useApiClient();
@@ -81,6 +83,27 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       disabled: !id,
       onSuccess: async ({ data }) => {
+        const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
+          `seqdb-api/generic-molecular-analysis-item`,
+          {
+            include: "genericMolecularAnalysis, materialSample",
+            filter: SimpleSearchFilterBuilder.create()
+              .where("materialSample.id", "EQ", data.id)
+              .build()
+          }
+        );
+
+        // Retrieve workflows linked to the material sample
+        if (workflowItems) {
+          data.workflows = [
+            ...new Set(
+              _.compact(workflowItems.data).map(
+                (item: any) => item.genericMolecularAnalysis
+              )
+            )
+          ];
+        }
+
         for (const organism of data.organism ?? []) {
           if (organism?.determination) {
             // Retrieve determiner arrays on determination.
