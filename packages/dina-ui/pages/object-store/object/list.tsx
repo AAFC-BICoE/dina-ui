@@ -189,12 +189,11 @@ export default function MetadataListPage() {
         </div>
       ),
       header: () => (
-        <div id="acPreviewLinksHeader">
+        <div id="acPreviewLinksHeader" style={{ whiteSpace: "nowrap" }}>
           <DinaMessage id="viewPreviewButtonText" />
         </div>
       ),
-      enableSorting: false,
-      size: 200
+      enableSorting: false
     }
   ];
 
