@@ -106,6 +106,7 @@ export * from "./search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 export * from "./util/useIsMounted";
 export * from "./table/EditableTable";
 export * from "./util/useStringArrayConverter";
+export * from "./util/useSubmitHandler";
 export * from "./util/useMaterialSampleNameComparator";
 export * from "./util/simpleSearchFilterBuilder";
 export * from "./filter-builder/fiql";
