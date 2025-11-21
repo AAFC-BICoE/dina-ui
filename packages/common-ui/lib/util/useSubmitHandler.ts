@@ -1,4 +1,12 @@
 import { useCallback } from "react";
+import { DinaFormOnSubmit } from "common-ui"; 
+import { pickChangedFields, DiffOptions } from "../util/diffUtils";
+import {
+  applyRelationshipMappings,
+  diffRelationships,
+  RelationshipMapping
+} from "../util/relationships";
+import { bulkEditAllManagedAttributes } from "../util/bulkEditAllManagedAttributes";
 
 export interface SaveOptions {
   apiBaseUrl: string;
@@ -6,50 +14,29 @@ export interface SaveOptions {
 }
 
 export interface UseSubmitHandlerOptions<T extends Record<string, any>> {
-  original: T;
-  edited: T;
+  /** Original values (undefined if creating new) */
+  original?: T;
   resourceType: string;
   saveOptions: SaveOptions;
 
-  /** Some transforms may be needed.. */
-  transforms?: Array<(values: T) => Promise<T> | T>;
+  /** Async transforms to modify submittedValues before diffing/mapping */
+  transforms?: Array<(values: T, api: any) => Promise<T> | T>;
 
-  /** Relationship mappings for attribute → relationship conversion. */
-  // This will assist with relationship mapping and relationship diffing
-  relationshipMappings?:
+  /** Configuration for your applyRelationshipMappings helper */
+  relationshipMappings?: RelationshipMapping[];
 
-  /** Diff options for attributes. */
-  // this will assist with diffing. Could include ignoreKeys, customHandlers, etc.
-  diffOptions?:
+  /** Configuration for your pickChangedFields helper */
+  diffOptions?: DiffOptions;
 
-  /** Deleted managed attribute keys (bulk edit scenario). */
   deletedManagedAttrFields?: Set<string>;
 
-  /** Hook before save to mutate payload (e.g., sequence generation). */
-  beforeSave?: (payload: { resource: any; type: string }) => Promise<void>;
-
-  /** Called after successful save. */
-  onSuccess?: (saved: any) => Promise<void>;
-
-  /** Called after save for cleanup (e.g., delete extra records). */
-  afterSave?: () => Promise<void>;
-
-  /** Skip save if nothing changed and resource has an ID. */
-  skipWhenEmptyWithId?: boolean;
-
-  /** If skipped, still call onSuccess. */
-  callOnSuccessWhenSkipped?: boolean;
-
-  /** Save function (Dina save). */
-  saveFn: (
-    operations: any[],
-    options: SaveOptions
-  ) => Promise<any[]>; // returns array of saved resources
+  beforeSave?: (payload: { resource: any; type: string }) => void | Promise<void>;
+  onSuccess?: (saved: any) => void | Promise<void> | undefined;
+  afterSave?: () => void | Promise<void>;
 }
 
 export function useSubmitHandler<T extends Record<string, any>>({
   original,
-  edited,
   resourceType,
   saveOptions,
   transforms = [],
@@ -58,64 +45,112 @@ export function useSubmitHandler<T extends Record<string, any>>({
   deletedManagedAttrFields = new Set(),
   beforeSave,
   onSuccess,
-  afterSave,
-  skipWhenEmptyWithId = false,
-  callOnSuccessWhenSkipped = false,
-  saveFn
+  afterSave
 }: UseSubmitHandlerOptions<T>) {
-  return useCallback(async () => {
-    // Flow..
-    // 1) Apply transforms pipeline
 
-    // 2) Apply relationship mappings
+  // We return the function expected by DinaForm
+  const onSubmit: DinaFormOnSubmit = useCallback(
+    async ({ submittedValues, api }) => {
+      try {
+        // 1. RUN TRANSFORMS
+        // e.g. Save Nested relationships asynchronously
+        let processed: any = { ...submittedValues };
+        for (const transform of transforms) {
+          processed = await transform(processed, api);
+        }
 
-    // 3) Managed attributes mapping (can use bulkEditAllManagedAttributes)
+        // 2. MAP RELATIONSHIPS
+        // Moves fields from 'processed' into 'relationships' based on mapping config
+        const { nextValues, relationships } = applyRelationshipMappings(
+          processed,
+          relationshipMappings
+        );
+        processed = nextValues;
 
-    // 4) Attribute diff
+        // 3. DIFF ATTRIBUTES
+        const attributesDiff = pickChangedFields(
+          original ?? {}, 
+          processed ?? {}, 
+          diffOptions
+        );
 
-    // 5) Relationship diff
+        // 4. DIFF MANAGED ATTRIBUTES
+        if (processed.managedAttributes || original?.managedAttributes) {
+          const managedAttrsDiff = bulkEditAllManagedAttributes(
+            processed.managedAttributes || {},
+            original?.managedAttributes || {},
+            deletedManagedAttrFields,
+            "managedAttributes"
+          );
+          // If managed attributes changed, add them to the main diff
+          if (Object.keys(managedAttrsDiff).length > 0) {
+            attributesDiff["managedAttributes"] = managedAttrsDiff;
+          }
+        }
 
-    // 6) Skip if nothing changed
+        // 5. DIFF RELATIONSHIPS
+        const relationshipDiff = diffRelationships(
+          original?.relationships,
+          relationships // These are the relationships generated in Step 2
+        );
 
-    // 7) Build payload
-    const resource: any = {
-      id: original?.id,
-      type: resourceType,
-      ...attributesDiff
-    };
-    if (relationshipDiff && Object.keys(relationshipDiff).length > 0) {
-      resource.relationships = relationshipDiff;
-    }
+        // 6. SKIP IF EMPTY (Optional safety check)
+        const isEmpty = 
+          Object.keys(attributesDiff).length === 0 && 
+          (!relationshipDiff || Object.keys(relationshipDiff).length === 0);
 
-    const payloadOp = { resource, type: resourceType };
+        // If creating record allow empty
+        if (isEmpty && original?.id) {
+            if (onSuccess) await onSuccess(original);
+            return;
+        }
 
-    // 8) beforeSave hook
-    if (beforeSave) {
-      await beforeSave(payloadOp);
-    }
+        // 7. BUILD PAYLOAD
+        const resource: any = {
+          ...attributesDiff,
+          type: resourceType
+        };
 
-    // 9) Save
-    const [saved] = await saveFn([payloadOp], saveOptions);
+        // Add ID if updating
+        if (original?.id) {
+          resource.id = original.id;
+        }
 
-    // 10) Post-save hooks
-    if (onSuccess) await onSuccess(saved);
-    if (afterSave) await afterSave();
+        // Attach relationship diffs if any
+        if (relationshipDiff) {
+          resource.relationships = relationshipDiff;
+        }
 
-    return saved;
-  }, [
-    original,
-    edited,
-    resourceType,
-    saveOptions,
-    transforms,
-    relationshipMappings,
-    diffOptions,
-    deletedManagedAttrFields,
-    beforeSave,
-    onSuccess,
-    afterSave,
-    skipWhenEmptyWithId,
-    callOnSuccessWhenSkipped,
-    saveFn
-  ]);
+        const payloadOp = { resource, type: resourceType };
+
+        // Hook for final payload inspection
+        if (beforeSave) await beforeSave(payloadOp);
+
+        // 8. SAVE
+        const [saved] = await api.save([payloadOp], saveOptions);
+
+        // 9. POST-SAVE
+        if (onSuccess) await onSuccess(saved);
+        if (afterSave) await afterSave();
+
+      } catch (error) {
+        console.error("Submit Handler Error:", error);
+        throw error; // Re-throw so DinaForm handles the UI error state
+      }
+    },
+    [
+      original,
+      resourceType,
+      saveOptions,
+      transforms,
+      relationshipMappings,
+      diffOptions,
+      deletedManagedAttrFields,
+      beforeSave,
+      onSuccess,
+      afterSave
+    ]
+  );
+
+  return onSubmit;
 }
