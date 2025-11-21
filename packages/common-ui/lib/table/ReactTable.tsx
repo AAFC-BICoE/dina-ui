@@ -6,6 +6,7 @@ import {
   Row,
   SortingState,
   VisibilityState,
+  flexRender,
   getCoreRowModel,
   getExpandedRowModel,
   getFilteredRowModel,
@@ -24,10 +25,10 @@ import {
 } from "react";
 import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
+import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
-import { FaExpand, FaCompress } from "react-icons/fa";
-import { SmartHeader } from "./SmartHeader";
+import { FaArrowDown, FaArrowUp, FaExpand, FaCompress } from "react-icons/fa";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500, 1000];
 
@@ -324,13 +325,70 @@ export function ReactTable<TData>({
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <SmartHeader<TData>
-                    key={header.id}
-                    header={header}
-                    sorting={sorting}
-                  />
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const defaultSortRule = sorting?.find(
+                    (sortRule) => sortRule.id === header.id
+                  );
+
+                  const isSortedDesc =
+                    header.column.getIsSorted() === "asc" ||
+                    defaultSortRule?.desc === false;
+
+                  const isSortedAsc =
+                    header.column.getIsSorted() === "desc" ||
+                    defaultSortRule?.desc === true;
+
+                  return (
+                    <th
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className={classnames(
+                        header.column.getCanSort() && "-cursor-pointer"
+                      )}
+                      style={{
+                        width:
+                          header.column.columnDef.size === 0
+                            ? "auto"
+                            : header.column.columnDef.size
+                      }}
+                      onClick={header.column.getToggleSortingHandler()}
+                    >
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={
+                            header.column.getCanSort()
+                              ? "-cursor-pointer select-none column-header"
+                              : "column-header"
+                          }
+                        >
+                          <span className="d-flex align-items-center justify-content-center">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            {isSortedAsc && (
+                              <FaArrowDown
+                                className="-sort-asc"
+                                onClick={header.column.getToggleSortingHandler()}
+                              />
+                            )}
+                            {isSortedDesc && (
+                              <FaArrowUp
+                                className="-sort-desc"
+                                onClick={header.column.getToggleSortingHandler()}
+                              />
+                            )}
+                          </span>
+                        </div>
+                      )}
+                      {header.column.getCanFilter() ? (
+                        <div>
+                          <FilterInput column={header.column} />
+                        </div>
+                      ) : null}
+                    </th>
+                  );
+                })}
               </tr>
             ))}
           </thead>
