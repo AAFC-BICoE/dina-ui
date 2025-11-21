@@ -1,14 +1,12 @@
-
 import {
   ColumnDefinition,
   dateCell,
   descriptionCell,
   ListLayoutFilterType,
   ListPageLayout,
-  //SimpleSearchFilterBuilder,
   useApiClient,
 } from "common-ui";
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react"; // Added useEffect
 
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
@@ -27,20 +25,11 @@ import { useControlledVocabularySidebarData } from
   "packages/dina-ui/components/controlled-vocabulary/useControlledVocabularySidebarData";
 import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 
-
-/**
- * Controlled Vocabulary list page
- */
 export default function ControlledVocabularyListPage() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
 
-  /**
-   * 1) Sidebar “parent” vocabularies:
-   *    Fetch CVs of type MANAGED_ATTRIBUTE via FIQL.
-   *    Only basic fields are required to render the sidebar options.
-   */
-
+  // 1. Data Hook
   const {
     items: cvItems,
     loading: cvLoading,
@@ -56,22 +45,89 @@ export default function ControlledVocabularyListPage() {
     }
   });
 
+  const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy", "dinaComponent"];
 
-  /**
-   * 2) Free-text search attributes available in the list filter.
-   */
+  // 2. Filter State
+  const [typeFilter, setTypeFilter] = useState<TypeFilterState>({
+    parent_cv_ids: [],
+    children: [] 
+  });
 
-  const CV_FILTER_ATTRIBUTES = [
-    "name",
-    "key",
-    "unit",
-    "createdBy",
-    "dinaComponent"
-  ];
+  // 3. Load Children Helper (Used for both Lazy Load AND Initial Count)
+  const loadChildren = useCallback(async (parentUuid : string): Promise<SidebarOption[]> => {
+    const resp: any = await apiClient.get("/collection-api/controlled-vocabulary-item", {
+      page: { limit: 1000 },
+      filter: { "controlledVocabulary.uuid": { EQ: parentUuid } },
+      fields: { "controlled-vocabulary-item": "id,dinaComponent" }
+    });
 
-  /**
-   * 3) Table columns
-   */
+    const arr: any[] = Array.isArray(resp?.data) ? resp.data : [];
+    const counts = new Map<string, number>();
+    for (const it of arr) {
+      const comp = it?.attributes?.dinaComponent ?? it?.dinaComponent;
+      if (!comp) continue;
+      counts.set(comp, (counts.get(comp) ?? 0) + 1);
+    }
+    return Array.from(counts, ([id, count]) => ({ id, label: id, count }));
+  }, [apiClient]);
+
+
+  const [parentCounts, setParentCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!cvItems || cvItems.length === 0) return;
+
+    // Loop through all parents and fetch their structure to determine counts
+    const fetchAllCounts = async () => {
+      const newCounts: Record<string, number> = {};
+      
+      await Promise.all(
+        cvItems.map(async (cv: any) => {
+          try {
+            const children = await loadChildren(cv.id);
+            // The sidebar treats the groups (dinaComponents) as children.
+            // We count how many groups exist.
+            newCounts[cv.id] = children.length;
+          } catch (e) {
+            console.error("Error loading count for CV", cv.id, e);
+          }
+        })
+      );
+      
+      setParentCounts(newCounts);
+    };
+
+    fetchAllCounts();
+  }, [cvItems, loadChildren]);
+
+  // 4. Build Sidebar Options (merged with Counts)
+  const parentOptions = useMemo(() => {
+    return cvItems.map(cv => {
+      const id = String((cv as any).id);
+      return {
+        id,
+        label: String(cv.name),
+        hasChildren: true,
+        // Inject the pre-calculated count here
+        count: parentCounts[id] 
+      };
+    });
+  }, [cvItems, parentCounts]);
+
+  // 5. Helpers for FIQL
+  function fiqlOrEq(field: string, values: string[]): string {
+    if (!values?.length) return "";
+    if (values.length === 1) return `${field}==${values[0]}`;
+    return `(${values.map(v => `${field}==${v}`).join(",")})`;
+  }
+
+  function fiqlAnd(...parts: (string | undefined)[]): string {
+    const nonEmpty = parts.filter(Boolean) as string[];
+    if (!nonEmpty.length) return "";
+    return nonEmpty.map(p => `(${p})`).join(";");
+  }
+
+  // 6. Table Columns
   const COLUMNS: ColumnDefinition<ControlledVocabularyItem>[] = [
     {
       accessorKey: "name",
@@ -104,102 +160,28 @@ export default function ControlledVocabularyListPage() {
           ? original.acceptedValues.map(v => `"${v}"`).join(", ")
           : ""
     },
-
-    // Multilingual description + Group + audit columns:
     descriptionCell(false, false, "multilingualDescription"),
     groupCell("group"),
     { accessorKey: "createdBy", header: () => <DinaMessage id="field_createdBy" /> },
     dateCell("createdOn")
   ];
 
-
-  /**
-   * 4) Sidebar state:
-   *    - parent_cv_ids: selected vocabularies (parents)
-   *    - children: selected child “types”
-   */
-
-  const [typeFilter, setTypeFilter] = useState<TypeFilterState>({
-    parent_cv_ids: [],
-    children: [] // (optional) for future child selections
-  });
-
-  const loadChildren = useCallback(async (parentUuid : string): Promise<SidebarOption[]> => {
-
-    const resp: any = await apiClient.get("/collection-api/controlled-vocabulary-item", {
-      page: { limit: 1000 },
-      filter: { "controlledVocabulary.uuid": { EQ: parentUuid } },
-      fields: { "controlled-vocabulary-item": "id,dinaComponent" }
-    });
-
-    const arr: any[] = Array.isArray(resp?.data) ? resp.data : [];
-    // Build unique dinaComponent list with counts:
-    const counts = new Map<string, number>();
-    for (const it of arr) {
-      const comp = it?.attributes?.dinaComponent ?? it?.dinaComponent;
-      if (!comp) continue;
-      counts.set(comp, (counts.get(comp) ?? 0) + 1);
-    }
-    return Array.from(counts, ([id, count]) => ({ id, label: id, count }));
-  }, [apiClient]);
-
-
-  /**
-   * 5) Build parent options for the sidebar from fetched CVs.
-   */
-
-  const parentOptions = useMemo(
-    () =>
-      cvItems.map(cv => ({
-        id: String((cv as any).id),
-        label: String(cv.name),
-        hasChildren: true
-      })),
-    [cvItems]
-  );
-    /** Build an OR-of-EQ FIQL for a field.
-   *  []           -> ""
-   *  ["A"]        -> "field==A"
-   *  ["A","B"]    -> "(field==A,field==B)"
-   */
-  function fiqlOrEq(field: string, values: string[]): string {
-    if (!values?.length) return "";
-    if (values.length === 1) return `${field}==${values[0]}`;
-    return `(${values.map(v => `${field}==${v}`).join(",")})`;
-  }
-
-  /** AND-join non-empty FIQL fragments, wrapping each in (...) */
-  function fiqlAnd(...parts: (string | undefined)[]): string {
-    const nonEmpty = parts.filter(Boolean) as string[];
-    if (!nonEmpty.length) return "";
-    return nonEmpty.map(p => `(${p})`).join(";");
-  }
-
-  /**
-   * 6) Page layout with sidebar + table.
-   */
   return (
-    <PageLayout
-      titleId="controlledVocabularyTitle">
+    <PageLayout titleId="controlledVocabularyTitle">
       <Head
-        title={
-          formatMessage("controlledVocabularyTitle" as any) ?? "Controlled Vocabulary"
-        }
+        title={formatMessage("controlledVocabularyTitle" as any) ?? "Controlled Vocabulary"}
       />
       <ListPageLayout<ControlledVocabularyItem>
         id="controlled-vocabulary-items-list"
         useFiql={true}
         filterType={ListLayoutFilterType.FILTER_BUILDER}
         filterAttributes={CV_FILTER_ATTRIBUTES}
-
+        
         additionalFilters={(filterForm) => {
           const selectedChildren = typeFilter.children ?? [];
-          const groupVal         = (filterForm as any)?.group as string | undefined;
-
-          const groupFiql  = groupVal ? `group==${groupVal}` : "";
-          const childFiql  = fiqlOrEq("dinaComponent", selectedChildren);
-
-          // ✅ Return a FIQL string; ListPageLayout now passes it through unchanged.
+          const groupVal = (filterForm as any)?.group as string | undefined;
+          const groupFiql = groupVal ? `group==${groupVal}` : "";
+          const childFiql = fiqlOrEq("dinaComponent", selectedChildren);
           return fiqlAnd(groupFiql, childFiql);
         }}
 
@@ -231,9 +213,7 @@ export default function ControlledVocabularyListPage() {
                   Failed to load controlled vocabularies.
                 </div>
               )}
-
             </aside>
-
             <div className={styles.cvMain}>{children}</div>
           </div>
         )}
