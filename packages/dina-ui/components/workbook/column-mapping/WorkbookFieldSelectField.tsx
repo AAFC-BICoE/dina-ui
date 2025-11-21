@@ -29,13 +29,15 @@ export interface WorkbookFieldSelectFieldProps {
   }[];
   disabled: boolean;
   onFieldChanged?: (newFieldPath) => void;
+  type: string;
 }
 
 export function WorkbookFieldSelectField({
   columnIndex,
   fieldOptions,
   disabled = false,
-  onFieldChanged
+  onFieldChanged,
+  type
 }: WorkbookFieldSelectFieldProps) {
   const { locale, formatMessage } = useDinaIntl();
   const { taxonomicRanks } = useColumnMapping();
@@ -136,14 +138,24 @@ export function WorkbookFieldSelectField({
             }}
             filter={(input: string) =>
               SimpleSearchFilterBuilder.create<ManagedAttribute>()
-                .where("managedAttributeComponent", "EQ", "MATERIAL_SAMPLE")
+                .when(type === "material-sample", (builder) =>
+                  builder.where(
+                    "managedAttributeComponent",
+                    "EQ",
+                    "MATERIAL_SAMPLE"
+                  )
+                )
                 .searchFilter("name", input)
                 .build()
             }
             isDisabled={disabled}
             additionalSort={"name"}
             showGroupCategary={true}
-            model="collection-api/managed-attribute"
+            model={
+              type === "material-sample"
+                ? "collection-api/managed-attribute"
+                : "objectstore-api/managed-attribute"
+            }
             optionLabel={(ma) => {
               const multiDescription =
                 ma?.multilingualDescription?.descriptions?.find(

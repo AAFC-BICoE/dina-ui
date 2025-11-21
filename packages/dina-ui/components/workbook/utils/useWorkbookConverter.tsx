@@ -3,6 +3,7 @@ import { InputResource, KitsuResource } from "kitsu";
 import _ from "lodash";
 import { useMemo } from "react";
 import {
+  convertDateTime,
   FieldMappingConfigType,
   getFlattenedConfig,
   LinkOrCreateSetting,
@@ -63,6 +64,10 @@ export function useWorkbookConverter(
               });
             }
             break;
+          case WorkbookDataTypeEnum.ENUM:
+            const allowedValues = (recordFieldsMap[recordField] as any)
+              .allowedValues;
+            fieldToVocabElemsMap.set(recordField, allowedValues);
           case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
             if (endpoint) {
               // load available Managed Attributes
@@ -92,6 +97,7 @@ export function useWorkbookConverter(
     ) => value,
     [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
     [WorkbookDataTypeEnum.DATE]: convertDate,
+    [WorkbookDataTypeEnum.DATE_TIME]: convertDateTime,
     [WorkbookDataTypeEnum.STRING]: convertString,
     [WorkbookDataTypeEnum.STRING_COORDINATE]: (
       value: any,
@@ -99,6 +105,20 @@ export function useWorkbookConverter(
     ) => convertString((value as string).toUpperCase(), _fieldName),
     [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
       value.toUpperCase().replace(" ", "_"),
+    [WorkbookDataTypeEnum.ENUM]: (value: any, fieldName?: string) => {
+      const allowedValues = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldName || "");
+      if (allowedValues) {
+        const normalizedValue = String(value).toLowerCase();
+        const found = allowedValues.find(
+          (ev) =>
+            String(ev?.value).toLowerCase() === normalizedValue ||
+            String(ev?.label).toLowerCase() === normalizedValue
+        );
+        if (found && found.value !== undefined) {
+          return found.value;
+        }
+      }
+    },
     [WorkbookDataTypeEnum.CLASSIFICATION]: (value: {
       [key: string]: string;
     }) => {

@@ -85,7 +85,7 @@ export function useColumnMapping() {
 
   const {
     loading: attrLoadingMaterialSample,
-    response: attrRespMaterialSamplem
+    response: attrRespMaterialSample
   } = useQuery<ManagedAttribute[]>({
     path: "collection-api/managed-attribute",
     filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
@@ -97,6 +97,18 @@ export function useColumnMapping() {
       .build(),
     page: { limit: 1000 }
   });
+
+  const { loading: attrLoadingMetadata, response: attrRespMetadata } = useQuery<
+    ManagedAttribute[]
+  >(
+    {
+      path: "objectstore-api/managed-attribute",
+      page: { limit: 1000 }
+    },
+    {
+      disabled: type !== "metadata"
+    }
+  );
 
   const { loading: taxonomicRankLoading, response: taxonomicRankResp } =
     useQuery<Vocabulary>({
@@ -198,6 +210,7 @@ export function useColumnMapping() {
 
   const loadingData =
     attrLoadingMaterialSample ||
+    attrLoadingMetadata ||
     assemblageLoading ||
     collectionLoading ||
     preparationTypeLoading ||
@@ -209,7 +222,10 @@ export function useColumnMapping() {
     taxonomicRankLoading ||
     metadataLoading;
 
-  const managedAttributes = [...(attrRespMaterialSamplem?.data ?? [])];
+  const managedAttributes = [
+    ...(attrRespMaterialSample?.data ?? []),
+    ...(attrRespMetadata?.data ?? [])
+  ];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
   const assemblages = (assemblageResp?.data || []).map((item) => ({
     ...item,
@@ -362,8 +378,9 @@ export function useColumnMapping() {
     return managedAttributes.find(
       (managedAttribute) =>
         managedAttribute.key === key &&
-        managedAttribute.managedAttributeComponent ===
-          config?.managedAttributeComponent
+        (config.managedAttributeComponent === "ENTITY" ||
+          managedAttribute.managedAttributeComponent ===
+            config.managedAttributeComponent)
     );
   }
 
@@ -476,7 +493,7 @@ export function useColumnMapping() {
     const newWorkbookColumnMap: WorkbookColumnMap = {};
     const newRelationshipMapping: RelationshipMapping = {};
     for (const columnHeader of headers || []) {
-      const fieldPath = findMatchField(columnHeader, theFieldOptions);
+      const fieldPath = findMatchField(columnHeader, theFieldOptions, type);
       const result = await resolveColumnMappingAndRelationshipMapping(
         columnHeader,
         fieldPath
@@ -501,7 +518,7 @@ export function useColumnMapping() {
     for (const columnHeader of headers || []) {
       const columnHeaderValue =
         columnHeader.originalColumn ?? columnHeader.columnHeader;
-      const fieldPath = findMatchField(columnHeader, newFieldOptions);
+      const fieldPath = findMatchField(columnHeader, newFieldOptions, type);
       if (fieldPath === undefined) {
         // check if the columnHeaderValue is one of managedAttributes
         const targetManagedAttr =
@@ -549,6 +566,14 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
+          } else {
+            map.push({
+              targetField: "managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr,
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
+            });
           }
         } else if (targetTaxonomicRank) {
           map.push({
@@ -582,6 +607,13 @@ export function useColumnMapping() {
   }
 
   useEffect(() => {
+    // Clear mappings first
+    setColumnMap({});
+    setRelationshipMapping({});
+    setFieldMap([]);
+    setFieldOptions([]);
+
+    // Then regenerate if data is ready
     if (!loadingData) {
       generateFieldOptions();
     }
@@ -752,6 +784,7 @@ export function useColumnMapping() {
           break;
         case "collectingEvent.collectors.displayName":
         case "preparedBy.displayName":
+        case "dcCreator.displayName":
           found =
             persons.find((item) => item.displayName === value) ??
             persons.find((item) =>
@@ -854,6 +887,7 @@ export function useColumnMapping() {
         break;
       case "collectingEvent.collectors.displayName":
       case "preparedBy.displayName":
+      case "dcCreator.displayName":
         options = persons.map((resource) => ({
           label: resource.displayName,
           value: resource.id,

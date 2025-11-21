@@ -11,6 +11,7 @@ export const COLLECTING_EVENT_COMPONENT_NAME: string =
 export const PREPARATIONS_COMPONENT_NAME: string = "preparations-component";
 export const ORGANISMS_COMPONENT_NAME: string = "organisms-component";
 export const ASSOCIATIONS_COMPONENT_NAME: string = "associations-component";
+export const WORKFLOWS_COMPONENT_NAME: string = "workflows-component";
 export const STORAGE_COMPONENT_NAME: string = "storage-component";
 export const RESTRICTION_COMPONENT_NAME: string = "restriction-component";
 export const SCHEDULED_ACTIONS_COMPONENT_NAME: string =

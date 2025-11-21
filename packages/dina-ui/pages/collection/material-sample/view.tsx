@@ -37,7 +37,8 @@ import {
   useCollectingEventQuery,
   useMaterialSampleFormTemplateSelectState,
   useMaterialSampleQuery,
-  withOrganismEditorValues
+  withOrganismEditorValues,
+  MaterialSampleWorkflows
 } from "../../../components";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
@@ -477,6 +478,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     title={<DinaMessage id="materialSampleAttachments" />}
                   />
                 </div>
+
+                <MaterialSampleWorkflows
+                  workflows={materialSample?.workflows}
+                />
               </main>
             </DinaForm>
           </>

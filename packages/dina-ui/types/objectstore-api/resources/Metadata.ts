@@ -36,6 +36,8 @@ export interface MetadataAttributes {
   publiclyReleasable?: boolean;
   orientation?: number;
 
+  sourceSet?: string;
+
   acHashFunction?: string;
   acHashValue?: string;
 

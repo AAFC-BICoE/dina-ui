@@ -52,7 +52,7 @@ describe("Workbook Template Generator", () => {
     });
 
     // Click the "Add new column" dropdown
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
       expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
@@ -67,7 +67,7 @@ describe("Workbook Template Generator", () => {
     );
 
     // Select "Barcode", give it alias of "Bar code"
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(wrapper.getByRole("option", { name: /barcode/i }));
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
     userEvent.type(
@@ -76,7 +76,7 @@ describe("Workbook Template Generator", () => {
     );
 
     // Select a relationship level field, and give it an alias.
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getAllByRole("option", {
         name: /additional collection number/i
@@ -125,7 +125,7 @@ describe("Workbook Template Generator", () => {
     });
 
     // Click the "Add new column" dropdown
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
       expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
@@ -143,7 +143,7 @@ describe("Workbook Template Generator", () => {
     );
 
     // Select "Barcode", give it alias of "Bar code"
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(wrapper.getByRole("option", { name: /barcode/i }));
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
     await waitFor(() =>
@@ -155,7 +155,7 @@ describe("Workbook Template Generator", () => {
     );
 
     // Select a relationship level field, and give it an alias.
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getAllByRole("option", {
         name: /additional collection number/i
@@ -212,7 +212,7 @@ describe("Workbook Template Generator", () => {
     });
 
     // Click the "Add new column" dropdown
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
       expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
@@ -223,12 +223,12 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
 
     // Select "Barcode"
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(wrapper.getByRole("option", { name: /barcode/i }));
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
 
     // Select a relationship level field
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getAllByRole("option", { name: /collection number/i })[1]
     );
@@ -274,11 +274,11 @@ describe("Workbook Template Generator", () => {
       apiContext
     });
     await waitFor(() =>
-      expect(wrapper.getByRole("combobox")).toBeInTheDocument()
+      expect(wrapper.getAllByRole("combobox")[1]).toBeInTheDocument()
     );
 
     // Click the "Add new column" dropdown
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
       expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
@@ -291,11 +291,11 @@ describe("Workbook Template Generator", () => {
       })[0]
     );
     await waitFor(() =>
-      expect(wrapper.getAllByRole("combobox")[1]).toBeInTheDocument()
+      expect(wrapper.getAllByRole("combobox")[2]).toBeInTheDocument()
     );
 
     // Select a managed attribute to generate.
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(wrapper.getAllByRole("combobox")[2]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("option", { name: /my test managed attribute/i })
@@ -311,7 +311,7 @@ describe("Workbook Template Generator", () => {
     );
 
     // Click the "Add new column" dropdown
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
       expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
@@ -324,11 +324,11 @@ describe("Workbook Template Generator", () => {
       })[0]
     );
     await waitFor(() =>
-      expect(wrapper.getAllByRole("combobox")[1]).toBeInTheDocument()
+      expect(wrapper.getAllByRole("combobox")[2]).toBeInTheDocument()
     );
 
     // Select a managed attribute to generate.
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(wrapper.getAllByRole("combobox")[2]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("option", {
@@ -348,7 +348,7 @@ describe("Workbook Template Generator", () => {
     );
 
     // Click the "Add new column" dropdown
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
       expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
@@ -365,7 +365,7 @@ describe("Workbook Template Generator", () => {
     );
 
     // Select a managed attribute to generate.
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(wrapper.getAllByRole("combobox")[2]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("option", {
@@ -421,13 +421,13 @@ describe("Workbook Template Generator", () => {
       apiContext
     });
     await waitFor(() =>
-      expect(wrapper.getByRole("combobox")).toBeInTheDocument()
+      expect(wrapper.getAllByRole("combobox")[1]).toBeInTheDocument()
     );
 
     // Go through all the possible classifications from the mock.
     for (const element of TEST_CLASSIFICATIONS.vocabularyElements as any) {
       // Click the "Add new column" dropdown
-      userEvent.click(wrapper.getByRole("combobox"));
+      userEvent.click(wrapper.getAllByRole("combobox")[1]);
       await waitFor(() => {
         // Total number of options expected based on the dynamic config and index map returned.
         expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
@@ -449,7 +449,7 @@ describe("Workbook Template Generator", () => {
       expect(
         wrapper.getByText(/select classification rank\.\.\./i)
       ).toBeInTheDocument();
-      userEvent.click(wrapper.getAllByRole("combobox")[1]);
+      userEvent.click(wrapper.getAllByRole("combobox")[2]);
 
       // Select classification name.
       userEvent.click(
@@ -525,7 +525,7 @@ describe("Workbook Template Generator", () => {
     userEvent.type(templateNameInput, "Test.xlsx");
 
     // Click the "Add new column" dropdown
-    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
       expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);

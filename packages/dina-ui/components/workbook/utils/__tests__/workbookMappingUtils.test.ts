@@ -1,7 +1,12 @@
 import {
+  convertDateTime,
+  detectEntityType,
   FieldMappingConfigType,
+  isDate,
+  isDateTime,
   LinkOrCreateSetting,
-  WorkbookDataTypeEnum
+  WorkbookDataTypeEnum,
+  WorkbookJSON
 } from "../../";
 import {
   convertDate,
@@ -27,7 +32,9 @@ const mockConfig: FieldMappingConfigType = {
     relationshipConfig: {
       type: "mock-entity",
       hasGroup: true,
-      baseApiPath: "/fake-api"
+      baseApiPath: "/fake-api",
+      allowAppendData: true,
+      fieldColumnLocaleId: "test"
     },
     stringField: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
@@ -660,8 +667,364 @@ describe("workbookMappingUtils functions", () => {
     expect(convertMap("223ddd:value3")).toEqual({ "223ddd": "value3" });
   });
 
-  it("convertDate", () => {
-    expect(convertDate("43831")).toEqual("2020-01-01");
+  describe("isDate", () => {
+    describe("Valid inputs", () => {
+      it("should accept valid ISO date string", () => {
+        expect(isDate("2025-11-14")).toBe(true);
+        expect(isDate("2020-01-01")).toBe(true);
+      });
+
+      it("should accept dates with whitespace", () => {
+        expect(isDate("  2025-11-14  ")).toBe(true);
+        expect(isDate("  2020-01-01\n")).toBe(true);
+      });
+
+      it("should accept leap years correctly", () => {
+        expect(isDate("2020-02-29")).toBe(true);
+        expect(isDate("2024-02-29")).toBe(true);
+      });
+
+      it("should accept edge case dates", () => {
+        expect(isDate("1900-01-01")).toBe(true);
+        expect(isDate("2099-12-31")).toBe(true);
+      });
+
+      it("should accept empty string", () => {
+        expect(isDate("")).toBe(true);
+        expect(isDate("   ")).toBe(true);
+      });
+    });
+
+    describe("Null/undefined values", () => {
+      it("should return false for null", () => {
+        expect(isDate(null)).toBe(false);
+      });
+
+      it("should return false for undefined", () => {
+        expect(isDate(undefined)).toBe(false);
+      });
+    });
+
+    describe("Invalid inputs", () => {
+      it("should reject invalid date format", () => {
+        expect(isDate("11/14/2025")).toBe(false);
+        expect(isDate("January 1, 2020")).toBe(false);
+        expect(isDate("2025-1-1")).toBe(false);
+        expect(isDate("25-11-14")).toBe(false);
+      });
+
+      it("should reject invalid dates", () => {
+        expect(isDate("2023-02-30")).toBe(false);
+        expect(isDate("2023-13-01")).toBe(false);
+        expect(isDate("2023-00-01")).toBe(false);
+        expect(isDate("2023-01-32")).toBe(false);
+        expect(isDate("2021-02-29")).toBe(false); // Not a leap year
+      });
+
+      it("should reject non-string types", () => {
+        expect(isDate(true as any)).toBe(false);
+        expect(isDate(false as any)).toBe(false);
+        expect(isDate([] as any)).toBe(false);
+        expect(isDate({} as any)).toBe(false);
+        expect(isDate(43831 as any)).toBe(false);
+        expect(isDate(new Date() as any)).toBe(false);
+      });
+    });
+  });
+
+  describe("isDateTime", () => {
+    describe("Valid inputs", () => {
+      it("should accept valid ISO datetime string", () => {
+        expect(isDateTime("2025-11-14T12:30:45.000")).toBe(true);
+        expect(isDateTime("2020-01-01T00:00:00.000Z")).toBe(true);
+      });
+
+      it("should accept datetime without milliseconds", () => {
+        expect(isDateTime("2025-11-14T12:30:45")).toBe(true);
+      });
+
+      it("should accept date-only format", () => {
+        expect(isDateTime("2025-11-14")).toBe(true);
+        expect(isDateTime("2020-01-01")).toBe(true);
+      });
+
+      it("should accept datetimes with whitespace", () => {
+        expect(isDateTime("  2025-11-14T12:00:00.000  ")).toBe(true);
+        expect(isDateTime("  2020-01-01  ")).toBe(true);
+      });
+
+      it("should accept various times correctly", () => {
+        expect(isDateTime("2025-11-14T00:00:00.000Z")).toBe(true); // Midnight
+        expect(isDateTime("2025-11-14T23:59:59.999Z")).toBe(true); // End of day
+        expect(isDateTime("2025-11-14T12:00:00.000Z")).toBe(true); // Noon
+      });
+
+      it("should accept leap year dates", () => {
+        expect(isDateTime("2020-02-29T10:30:00.000Z")).toBe(true);
+      });
+
+      it("should accept empty string", () => {
+        expect(isDateTime("")).toBe(true);
+        expect(isDateTime("   ")).toBe(true);
+      });
+    });
+
+    describe("Null/undefined values", () => {
+      it("should return false for null", () => {
+        expect(isDateTime(null)).toBe(false);
+      });
+
+      it("should return false for undefined", () => {
+        expect(isDateTime(undefined)).toBe(false);
+      });
+    });
+
+    describe("Invalid inputs", () => {
+      it("should reject invalid datetime format", () => {
+        expect(isDateTime("11/14/2025, 12:00 AM")).toBe(false);
+        expect(isDateTime("January 1, 2020")).toBe(false);
+        expect(isDateTime("2025-11-14 12:00:00")).toBe(false); // Missing T separator
+      });
+
+      it("should reject datetime with timezone offset", () => {
+        expect(isDateTime("2025-11-14T12:00:00+05:00")).toBe(false);
+        expect(isDateTime("2025-11-14T12:00:00-08:00")).toBe(false);
+      });
+
+      it("should reject invalid dates", () => {
+        expect(isDateTime("2023-02-30T12:00:00.000")).toBe(false);
+        expect(isDateTime("2023-13-01T12:00:00.000Z")).toBe(false);
+        expect(isDateTime("2021-02-29T12:00:00.000")).toBe(false); // Not a leap year
+      });
+
+      it("should reject invalid times", () => {
+        expect(isDateTime("2025-11-14T25:00:00.000")).toBe(false); // Invalid hour
+        expect(isDateTime("2025-11-14T12:60:00.000Z")).toBe(false); // Invalid minute
+        expect(isDateTime("2025-11-14T12:00:60.000")).toBe(false); // Invalid second
+      });
+
+      it("should reject non-string types", () => {
+        expect(isDateTime(true as any)).toBe(false);
+        expect(isDateTime(false as any)).toBe(false);
+        expect(isDateTime([] as any)).toBe(false);
+        expect(isDateTime({} as any)).toBe(false);
+        expect(isDateTime(43831 as any)).toBe(false);
+        expect(isDateTime(new Date() as any)).toBe(false);
+      });
+    });
+  });
+
+  describe("convertDate", () => {
+    describe("Valid inputs", () => {
+      it("should convert valid ISO date string", () => {
+        expect(convertDate("2025-11-14")).toBe("2025-11-14");
+        expect(convertDate("2020-01-01")).toBe("2020-01-01");
+      });
+
+      it("should trim whitespace and convert", () => {
+        expect(convertDate("  2025-11-14  ")).toBe("2025-11-14");
+        expect(convertDate("  2020-01-01\n")).toBe("2020-01-01");
+      });
+
+      it("should handle leap years correctly", () => {
+        expect(convertDate("2020-02-29")).toBe("2020-02-29");
+        expect(convertDate("2024-02-29")).toBe("2024-02-29");
+      });
+
+      it("should handle edge case dates", () => {
+        expect(convertDate("1900-01-01")).toBe("1900-01-01");
+        expect(convertDate("2099-12-31")).toBe("2099-12-31");
+      });
+    });
+
+    describe("Null/empty values passthrough", () => {
+      it("should return null for null", () => {
+        expect(convertDate(null)).toBeNull();
+      });
+
+      it("should return undefined for undefined", () => {
+        expect(convertDate(undefined)).toBeUndefined();
+      });
+
+      it("should return empty string for empty string", () => {
+        expect(convertDate("")).toBe("");
+      });
+
+      it("should return whitespace-only string as-is", () => {
+        expect(convertDate("   ")).toBe("   ");
+        expect(convertDate("\t")).toBe("\t");
+      });
+    });
+
+    describe("Invalid inputs return null", () => {
+      it("should return null for invalid date format", () => {
+        expect(convertDate("11/14/2025")).toBeNull();
+        expect(convertDate("January 1, 2020")).toBeNull();
+        expect(convertDate("2025-1-1")).toBeNull();
+        expect(convertDate("25-11-14")).toBeNull();
+      });
+
+      it("should return null for invalid dates", () => {
+        expect(convertDate("2023-02-30")).toBeNull();
+        expect(convertDate("2023-13-01")).toBeNull();
+        expect(convertDate("2023-00-01")).toBeNull();
+        expect(convertDate("2023-01-32")).toBeNull();
+        expect(convertDate("2021-02-29")).toBeNull(); // Not a leap year
+      });
+
+      it("should return null for boolean values", () => {
+        expect(convertDate(true)).toBeNull();
+        expect(convertDate(false)).toBeNull();
+      });
+
+      it("should return null for arrays", () => {
+        expect(convertDate([])).toBeNull();
+        expect(convertDate(["2025-11-14"])).toBeNull();
+      });
+
+      it("should return null for objects", () => {
+        expect(convertDate({})).toBeNull();
+        expect(convertDate({ date: "2025-11-14" })).toBeNull();
+      });
+
+      it("should return null for numbers", () => {
+        expect(convertDate(43831)).toBeNull();
+        expect(convertDate(0)).toBeNull();
+      });
+
+      it("should return null for Date objects", () => {
+        expect(convertDate(new Date())).toBeNull();
+      });
+    });
+  });
+
+  describe("convertDateTime", () => {
+    describe("Valid inputs", () => {
+      it("should convert valid ISO datetime string", () => {
+        expect(convertDateTime("2025-11-14T12:30:45.000")).toBe(
+          "2025-11-14T12:30:45.000Z"
+        );
+        expect(convertDateTime("2020-01-01T00:00:00.000Z")).toBe(
+          "2020-01-01T00:00:00.000Z"
+        );
+      });
+
+      it("should convert datetime without milliseconds", () => {
+        expect(convertDateTime("2025-11-14T12:30:45")).toBe(
+          "2025-11-14T12:30:45.000Z"
+        );
+      });
+
+      it("should convert date-only format with default time", () => {
+        expect(convertDateTime("2025-11-14")).toBe("2025-11-14T00:00:00.000Z");
+        expect(convertDateTime("2020-01-01")).toBe("2020-01-01T00:00:00.000Z");
+      });
+
+      it("should trim whitespace and convert", () => {
+        expect(convertDateTime("  2025-11-14T12:00:00.000  ")).toBe(
+          "2025-11-14T12:00:00.000Z"
+        );
+        expect(convertDateTime("  2020-01-01  ")).toBe(
+          "2020-01-01T00:00:00.000Z"
+        );
+      });
+
+      it("should handle various times correctly", () => {
+        expect(convertDateTime("2025-11-14T00:00:00.000Z")).toBe(
+          "2025-11-14T00:00:00.000Z"
+        ); // Midnight
+        expect(convertDateTime("2025-11-14T23:59:59.999Z")).toBe(
+          "2025-11-14T23:59:59.999Z"
+        ); // End of day
+        expect(convertDateTime("2025-11-14T12:00:00.000Z")).toBe(
+          "2025-11-14T12:00:00.000Z"
+        ); // Noon
+      });
+
+      it("should handle leap year dates", () => {
+        expect(convertDateTime("2020-02-29T10:30:00.000Z")).toBe(
+          "2020-02-29T10:30:00.000Z"
+        );
+      });
+    });
+
+    describe("Null/empty values passthrough", () => {
+      it("should return null for null", () => {
+        expect(convertDateTime(null)).toBeNull();
+      });
+
+      it("should return undefined for undefined", () => {
+        expect(convertDateTime(undefined)).toBeUndefined();
+      });
+
+      it("should return empty string for empty string", () => {
+        expect(convertDateTime("")).toBe("");
+      });
+
+      it("should return whitespace-only string as-is", () => {
+        expect(convertDateTime("   ")).toBe("   ");
+      });
+    });
+
+    describe("Invalid inputs return null", () => {
+      it("should return null for invalid datetime format", () => {
+        expect(convertDateTime("11/14/2025, 12:00 AM")).toBeNull();
+        expect(convertDateTime("January 1, 2020")).toBeNull();
+        expect(convertDateTime("2025-11-14 12:00:00")).toBeNull(); // Missing T separator
+      });
+
+      it("should return null for datetime with timezone offset", () => {
+        expect(convertDateTime("2025-11-14T12:00:00+05:00")).toBeNull();
+        expect(convertDateTime("2025-11-14T12:00:00-08:00")).toBeNull();
+      });
+
+      it("should return null for invalid dates", () => {
+        expect(convertDateTime("2023-02-30T12:00:00.000")).toBeNull();
+        expect(convertDateTime("2023-13-01T12:00:00.000Z")).toBeNull();
+        expect(convertDateTime("2021-02-29T12:00:00.000")).toBeNull(); // Not a leap year
+      });
+
+      it("should return null for invalid times", () => {
+        expect(convertDateTime("2025-11-14T25:00:00.000")).toBeNull(); // Invalid hour
+        expect(convertDateTime("2025-11-14T12:60:00.000Z")).toBeNull(); // Invalid minute
+        expect(convertDateTime("2025-11-14T12:00:60.000")).toBeNull(); // Invalid second
+      });
+
+      it("should return null for boolean values", () => {
+        expect(convertDateTime(true)).toBeNull();
+        expect(convertDateTime(false)).toBeNull();
+      });
+
+      it("should return null for arrays", () => {
+        expect(convertDateTime([])).toBeNull();
+      });
+
+      it("should return null for objects", () => {
+        expect(convertDateTime({})).toBeNull();
+      });
+
+      it("should return null for numbers", () => {
+        expect(convertDateTime(43831)).toBeNull();
+        expect(convertDateTime(43831.5)).toBeNull();
+      });
+
+      it("should return null for Date objects", () => {
+        expect(convertDateTime(new Date())).toBeNull();
+      });
+    });
+
+    describe("Output format", () => {
+      it("should return datetime with Z suffix", () => {
+        const result = convertDateTime("2025-11-14T12:30:45.000");
+        expect(result).toContain("Z");
+        expect(result).not.toMatch(/[+-]\d{2}:\d{2}$/);
+      });
+
+      it("should treat all inputs as local time", () => {
+        const result = convertDateTime("2025-11-14T12:00:00.000");
+        expect(result).toBe("2025-11-14T12:00:00.000Z");
+      });
+    });
   });
 
   it("flattenObject", () => {
@@ -707,7 +1070,9 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.objectField2.dataType": "object",
       "mockEntity.relationshipConfig.baseApiPath": "/fake-api",
       "mockEntity.relationshipConfig.hasGroup": true,
-      "mockEntity.relationshipConfig.type": "mock-entity"
+      "mockEntity.relationshipConfig.type": "mock-entity",
+      "mockEntity.relationshipConfig.allowAppendData": true,
+      "mockEntity.relationshipConfig.fieldColumnLocaleId": "test"
     });
   });
 
@@ -815,6 +1180,273 @@ describe("workbookMappingUtils functions", () => {
           { rowNumber: 1, content: ["data4", "data5", "data6"] }
         ]
       }
+    });
+  });
+
+  describe("detectEntityType", () => {
+    describe("regular column header detection", () => {
+      it("should detect metadata type from characteristic columns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              { rowNumber: 0, content: ["fileName", "dcCreator", "acCaption"] },
+              { rowNumber: 1, content: ["test.jpg", "John Doe", "A bird"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+
+      it("should detect material-sample type from characteristic columns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              {
+                rowNumber: 0,
+                content: ["materialSampleName", "collection", "barcode"]
+              },
+              {
+                rowNumber: 1,
+                content: ["SAMPLE-001", "Main Collection", "123456"]
+              }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should default to material-sample for ambiguous columns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              { rowNumber: 0, content: ["notes", "date", "location"] },
+              { rowNumber: 1, content: ["Some notes", "2024-01-01", "Lab"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should default to material-sample for empty spreadsheet", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [{ rowNumber: 0, content: [] }]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should detect metadata even with mixed columns if metadata score is higher", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              {
+                rowNumber: 0,
+                content: [
+                  "fileName",
+                  "dcCreator",
+                  "dcType",
+                  "acCaption",
+                  "collection"
+                ]
+              },
+              {
+                rowNumber: 1,
+                content: ["test.jpg", "John Doe", "IMAGE", "A bird", "Main"]
+              }
+            ]
+          }
+        };
+
+        // 4 metadata indicators vs 1 material-sample indicator
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+    });
+
+    describe("template-based detection (originalColumns)", () => {
+      it("should detect metadata type from template originalColumns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: [
+              "originalFilename",
+              "dcCreator.displayName",
+              "acCaption"
+            ],
+            columnAliases: ["File Name", "Creator", "Caption"],
+            rows: [
+              { rowNumber: 0, content: ["File Name", "Creator", "Caption"] },
+              { rowNumber: 1, content: ["test.jpg", "John Doe", "A bird"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+
+      it("should detect material-sample type from template originalColumns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: [
+              "materialSampleName",
+              "collection.name",
+              "collectingEvent.dwcRecordNumber"
+            ],
+            columnAliases: ["Identifier", "Collection", "Collector Number"],
+            rows: [
+              {
+                rowNumber: 0,
+                content: ["Identifier", "Collection", "Collector Number"]
+              },
+              { rowNumber: 1, content: ["SAMPLE-001", "Main", "123"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should prioritize template originalColumns over column headers", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            // Template says it's metadata
+            originalColumns: ["fileName", "dcCreator.displayName"],
+            // But user renamed columns to look like material-sample
+            columnAliases: ["File Name", "Creator"],
+            rows: [
+              {
+                rowNumber: 0,
+                content: ["materialSampleName", "collection"] // User renamed these!
+              },
+              { rowNumber: 1, content: ["test.jpg", "John Doe"] }
+            ]
+          }
+        };
+
+        // Should use originalColumns (metadata), not user-modified headers
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+
+      it("should fall back to header detection if originalColumns are ambiguous", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: [
+              "remarks", // Ambiguous - both types have this
+              "tags" // Ambiguous - both types have this
+            ],
+            columnAliases: ["Remarks", "Tags"],
+            rows: [
+              { rowNumber: 0, content: ["Remarks", "Tags"] },
+              { rowNumber: 1, content: ["Some notes", "tag1, tag2"] }
+            ]
+          }
+        };
+
+        // originalColumns don't match strong indicators, fall back to default
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should detect metadata from dcType in originalColumns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: ["dcType", "acSubtype", "orientation"],
+            columnAliases: ["Object Type", "Subtype", "Orientation"],
+            rows: [
+              {
+                rowNumber: 0,
+                content: ["Object Type", "Subtype", "Orientation"]
+              },
+              { rowNumber: 1, content: ["IMAGE", "photograph", "1"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+
+      it("should detect material-sample from preparationType in originalColumns", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: [
+              "preparationType.name",
+              "storageUnit.name",
+              "organism.lifeStage"
+            ],
+            columnAliases: ["Preparation Type", "Storage", "Life Stage"],
+            rows: [
+              {
+                rowNumber: 0,
+                content: ["Preparation Type", "Storage", "Life Stage"]
+              },
+              {
+                rowNumber: 1,
+                content: ["whole specimen", "Cabinet A", "adult"]
+              }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet)).toBe("material-sample");
+      });
+
+      it("should handle empty originalColumns array", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Sheet1",
+            originalColumns: [], // Empty array
+            rows: [
+              { rowNumber: 0, content: ["fileName", "dcCreator"] },
+              { rowNumber: 1, content: ["test.jpg", "John Doe"] }
+            ]
+          }
+        };
+
+        // Should fall back to regular header detection
+        expect(detectEntityType(spreadsheet)).toBe("metadata");
+      });
+    });
+
+    describe("edge cases", () => {
+      it("should handle missing sheet data", () => {
+        const spreadsheet: WorkbookJSON = {};
+        expect(detectEntityType(spreadsheet, 0)).toBe("material-sample");
+      });
+
+      it("should handle specified sheet index", () => {
+        const spreadsheet: WorkbookJSON = {
+          "0": {
+            sheetName: "Material Samples",
+            rows: [
+              { rowNumber: 0, content: ["materialSampleName"] },
+              { rowNumber: 1, content: ["SAMPLE-001"] }
+            ]
+          },
+          "1": {
+            sheetName: "Metadata",
+            rows: [
+              { rowNumber: 0, content: ["fileName", "dcCreator"] },
+              { rowNumber: 1, content: ["test.jpg", "John"] }
+            ]
+          }
+        };
+
+        expect(detectEntityType(spreadsheet, 0)).toBe("material-sample");
+        expect(detectEntityType(spreadsheet, 1)).toBe("metadata");
+      });
     });
   });
 });

@@ -14,6 +14,7 @@ import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Person } from "../../objectstore-api";
 import { StorageUnitUsage } from "./StorageUnitUsage";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
+import { GenericMolecularAnalysis } from "../../seqdb-api/resources/GenericMolecularAnalysis";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -32,7 +33,6 @@ export interface MaterialSampleAttributes {
   preparationSubstrate?: string | null;
   preparationDate?: string | null;
   preparationRemarks?: string | null;
-  description?: string;
   dwcDegreeOfEstablishment?: string | null;
   preparationManagedAttributes?: ManagedAttributeValues;
 
@@ -80,6 +80,9 @@ export interface MaterialSampleAttributes {
   restrictionRemarks?: string | null;
   extensionValues?: any;
   version?: string;
+
+  // Workflows associated with this material sample
+  workflows?: GenericMolecularAnalysis[];
 
   // Client side for parent attributes
   parentAttributes?: any;

@@ -81,7 +81,7 @@ export default function MaterialSampleEditPage() {
           {!id && (
             <SubmitButton
               buttonProps={() => ({
-                style: { width: "12rem" },
+                style: { width: "13rem" },
                 onClick: () => setSaveRedirect("CREATE_NEXT")
               })}
             >

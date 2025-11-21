@@ -1,3 +1,4 @@
+import { DCTYPE_OPTIONS } from "../../../pages/object-store/metadata/edit";
 import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
@@ -9,7 +10,9 @@ const FieldMappingConfig: FieldMappingConfigType = {
     relationshipConfig: {
       type: "material-sample",
       hasGroup: true,
-      baseApiPath: "/collection-api"
+      baseApiPath: "/collection-api",
+      allowAppendData: true,
+      fieldColumnLocaleId: "materialSampleFieldsMapping"
     },
     materialSampleName: { dataType: WorkbookDataTypeEnum.STRING },
     preservationType: { dataType: WorkbookDataTypeEnum.STRING },
@@ -23,7 +26,6 @@ const FieldMappingConfig: FieldMappingConfigType = {
       endpoint: "collection-api/managed-attribute",
       managedAttributeComponent: "PREPARATION"
     },
-    description: { dataType: WorkbookDataTypeEnum.STRING },
     dwcDegreeOfEstablishment: { dataType: WorkbookDataTypeEnum.STRING },
     barcode: { dataType: WorkbookDataTypeEnum.STRING },
     materialSampleState: { dataType: WorkbookDataTypeEnum.STRING },
@@ -312,6 +314,52 @@ const FieldMappingConfig: FieldMappingConfigType = {
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING }
       }
+    }
+  },
+  metadata: {
+    relationshipConfig: {
+      type: "metadata",
+      hasGroup: true,
+      baseApiPath: "/objectstore-api",
+      allowAppendData: false,
+      fieldColumnLocaleId: "metadataFieldsMapping"
+    },
+
+    // Linking the file identifier to the metadata 'fileName' field.
+    originalFilename: { dataType: WorkbookDataTypeEnum.STRING },
+
+    filename: { dataType: WorkbookDataTypeEnum.STRING },
+    acCaption: { dataType: WorkbookDataTypeEnum.STRING },
+
+    acDigitizationDate: { dataType: WorkbookDataTypeEnum.DATE_TIME },
+
+    dcType: {
+      dataType: WorkbookDataTypeEnum.ENUM,
+      allowedValues: DCTYPE_OPTIONS
+    },
+    acSubtype: { dataType: WorkbookDataTypeEnum.STRING },
+
+    orientation: { dataType: WorkbookDataTypeEnum.NUMBER },
+
+    dcRights: { dataType: WorkbookDataTypeEnum.STRING },
+
+    dcCreator: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      relationshipConfig: {
+        hasGroup: false,
+        type: "person",
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
+        baseApiPath: "agent-api"
+      },
+      attributes: {
+        displayName: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
+
+    managedAttributes: {
+      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+      endpoint: "objectstore-api/managed-attribute",
+      managedAttributeComponent: "ENTITY"
     }
   }
 };
