@@ -26,7 +26,6 @@ const FieldMappingConfig: FieldMappingConfigType = {
       endpoint: "collection-api/managed-attribute",
       managedAttributeComponent: "PREPARATION"
     },
-    description: { dataType: WorkbookDataTypeEnum.STRING },
     dwcDegreeOfEstablishment: { dataType: WorkbookDataTypeEnum.STRING },
     barcode: { dataType: WorkbookDataTypeEnum.STRING },
     materialSampleState: { dataType: WorkbookDataTypeEnum.STRING },

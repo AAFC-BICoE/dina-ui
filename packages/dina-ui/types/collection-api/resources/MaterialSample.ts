@@ -33,7 +33,6 @@ export interface MaterialSampleAttributes {
   preparationSubstrate?: string | null;
   preparationDate?: string | null;
   preparationRemarks?: string | null;
-  description?: string;
   dwcDegreeOfEstablishment?: string | null;
   preparationManagedAttributes?: ManagedAttributeValues;
 
