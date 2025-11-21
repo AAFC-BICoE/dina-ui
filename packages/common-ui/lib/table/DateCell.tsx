@@ -21,7 +21,11 @@ export function dateCell<TData extends KitsuResource>(
         const relationshipAccessorKey = relationshipAccessor?.join(".");
         value = _.get(original, relationshipAccessorKey ?? label);
       }
-      return <DateView date={value} />;
+      return (
+        <span style={{ whiteSpace: "nowrap" }}>
+          <DateView date={value} />
+        </span>
+      );
     },
     header: () => <FieldHeader name={label} />,
     isKeyword: false,

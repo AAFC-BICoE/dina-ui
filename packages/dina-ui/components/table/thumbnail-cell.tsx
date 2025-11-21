@@ -77,17 +77,15 @@ export interface SmallThumbnailProps {
 export function SmallThumbnail({ filePath, altImage }: SmallThumbnailProps) {
   const { formatMessage } = useDinaIntl();
 
-  const height = "5rem";
-
   return (
-    <div style={{ maxHeight: height }}>
+    <div style={{ maxWidth: "250px" }}>
       <FileView
         filePath={filePath}
         fileType="jpg"
         imgAlt={
           altImage ? altImage : formatMessage("thumbnailNotAvailableText")
         }
-        imgHeight={height}
+        imgHeight="5rem"
       />
     </div>
   );
