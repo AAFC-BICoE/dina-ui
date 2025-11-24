@@ -18,6 +18,7 @@
   -ms-user-select: none;
   user-select: none;
   box-shadow: 0 2px 15px 0 rgba(0, 0, 0, 0.15), 0 1px 0 0 rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
 .ReactTable thead tr {
@@ -38,6 +39,7 @@
   padding: 7px 5px;
   transition: 0.3s ease;
   transition-property: width, min-width, padding, opacity;
+  max-width: 450px;
 }
 
 .ReactTable tbody td {
