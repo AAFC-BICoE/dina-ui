@@ -10,6 +10,7 @@ import {
   resourceDifference,
   SaveArgs,
   useApiClient,
+  useAccount,
   useQuery,
   useRelationshipUsagesCount,
   withoutBlankFields,
@@ -247,8 +248,10 @@ export function useMaterialSampleSave({
   showChangedIndicatorsInNestedForms,
   visibleManagedAttributeKeys
 }: UseMaterialSampleSaveParams) {
-  const { save, apiClient } = useApiClient();
+  const apiContext = useApiClient();
+  const account = useAccount();
   const { formatMessage } = useDinaIntl();
+  const { save, apiClient } = apiContext; 
 
   // For editing existing templates:
   const hasColEventTemplate =
@@ -775,12 +778,13 @@ export function useMaterialSampleSave({
         }
         // Only send the save request if the Collecting Event was edited:
         const savedCollectingEvent = collectingEventWasEdited
-          ? // Use the same save method as the Collecting Event page:
-            await saveCollectingEvent(
-              submittedCollectingEvent,
-              colEventFormRefToUse.current
-            )
-          : submittedCollectingEvent;
+        ? await saveCollectingEvent({
+            submittedValues: submittedCollectingEvent,
+            formik: colEventFormRefToUse.current,
+            api: apiContext,
+            account: account
+          })
+        : submittedCollectingEvent;
 
         // Set the ColEventId here in case the next operation fails:
         setColEventId(savedCollectingEvent.id);

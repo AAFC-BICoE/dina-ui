@@ -64,11 +64,18 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const { apiClient } = useApiClient();
   const { openModal } = useModal();
 
+  const handleSuccess = async (saved: CollectingEvent) => {
+    await router.push(
+      `/collection/collecting-event/view?id=${saved.id}`
+    );
+  };
+
   const {
     collectingEventInitialValues,
     saveCollectingEvent,
     collectingEventFormSchema
-  } = useCollectingEventSave({ fetchedCollectingEvent: collectingEvent });
+  } = useCollectingEventSave({ fetchedCollectingEvent: collectingEvent, onSaved: handleSuccess });
+
 
   // Hook to check for material sample usages.
   const { usageCount: materialSampleUsageCount } = useRelationshipUsagesCount({
@@ -86,27 +93,21 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     DEFAULT_VERBATIM_SRS_KEY
   );
 
-  const onSubmit: DinaFormOnSubmit<CollectingEvent> = async ({
-    submittedValues,
-    formik
-  }) => {
+  const onSubmit: DinaFormOnSubmit<CollectingEvent> = async (dinaFormArgs)  => {
+
+    // Define the actual save action
     const performSave = async () => {
-      const savedCollectingEvent = await saveCollectingEvent(
-        submittedValues,
-        formik
-      );
-      await router.push(
-        `/collection/collecting-event/view?id=${savedCollectingEvent?.id}`
-      );
+      // This now calls the pipeline created by useSubmitHandler
+      await saveCollectingEvent(dinaFormArgs);
     };
 
-    // Check if multiple material sample usages exist to display an confirmation.
+    // 2. Keep the Modal Logic here
     if (materialSampleUsageCount && materialSampleUsageCount > 1) {
       openModal(renderConfirmationModal(materialSampleUsageCount, performSave));
-      return;
+    }else {
+      // 3. If no modal needed, save immediately
+      await performSave();
     }
-
-    await performSave();
   };
 
   const buttonBar = (

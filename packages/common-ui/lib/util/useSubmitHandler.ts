@@ -33,6 +33,12 @@ export interface UseSubmitHandlerOptions<T extends Record<string, any>> {
   beforeSave?: (payload: { resource: any; type: string }) => void | Promise<void>;
   onSuccess?: (saved: any) => void | Promise<void> | undefined;
   afterSave?: () => void | Promise<void>;
+
+  /** 
+   * Optional: Override the default api.save function. 
+   * Useful for permission checks or custom saving logic.
+   */
+  saveFn?: (operations: any[], options: SaveOptions) => Promise<any[]>;
 }
 
 export function useSubmitHandler<T extends Record<string, any>>({
@@ -45,12 +51,14 @@ export function useSubmitHandler<T extends Record<string, any>>({
   deletedManagedAttrFields = new Set(),
   beforeSave,
   onSuccess,
-  afterSave
+  afterSave,
+  saveFn
 }: UseSubmitHandlerOptions<T>) {
 
   // We return the function expected by DinaForm
-  const onSubmit: DinaFormOnSubmit = useCallback(
+  const onSubmit = useCallback(
     async ({ submittedValues, api }) => {
+
       try {
         // 1. RUN TRANSFORMS
         // e.g. Save Nested relationships asynchronously
@@ -132,6 +140,8 @@ export function useSubmitHandler<T extends Record<string, any>>({
         // 9. POST-SAVE
         if (onSuccess) await onSuccess(saved);
         if (afterSave) await afterSave();
+        
+        return saved;
 
       } catch (error) {
         console.error("Submit Handler Error:", error);
@@ -148,9 +158,10 @@ export function useSubmitHandler<T extends Record<string, any>>({
       deletedManagedAttrFields,
       beforeSave,
       onSuccess,
-      afterSave
+      afterSave,
+      saveFn
     ]
-  );
+  ) as unknown as DinaFormOnSubmit;
 
   return onSubmit;
 }
