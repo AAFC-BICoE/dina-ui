@@ -6,7 +6,8 @@ import {
   ColumnDefinition,
   booleanCell,
   dateCell,
-  FieldHeader
+  FieldHeader,
+  fiql
 } from "common-ui";
 import Link from "next/link";
 import { FormTemplate } from "../../../types/collection-api";
@@ -88,16 +89,46 @@ export default function MaterialSampleFormTemplateListPage() {
         </div>
       }
     >
-      <ListPageLayout
+      <ListPageLayout<FormTemplate>
         additionalFilters={(filterForm) => ({
-          // Display all user form templates and public to the group templates.
-          ...(filterForm.group
-            ? {
-                rsql: `group==${filterForm.group};(createdBy==${username},restrictToCreatedBy==false)`
+          fiql: fiql({
+            type: "FILTER_GROUP",
+            operator: "AND",
+            id: 1,
+            children: [
+              {
+                type: "FILTER_ROW",
+                id: 2,
+                attribute: "group",
+                predicate: filterForm.group ? "IS" : "IN",
+                searchType: "EXACT_MATCH",
+                value: filterForm.group || groupNames
+              },
+              {
+                type: "FILTER_GROUP",
+                operator: "OR",
+                id: 3,
+                children: [
+                  {
+                    type: "FILTER_ROW",
+                    id: 4,
+                    attribute: "createdBy",
+                    predicate: "IS",
+                    searchType: "EXACT_MATCH",
+                    value: username ?? ""
+                  },
+                  {
+                    type: "FILTER_ROW",
+                    id: 5,
+                    attribute: "restrictToCreatedBy",
+                    predicate: "IS",
+                    searchType: "EXACT_MATCH",
+                    value: "false"
+                  }
+                ]
               }
-            : {
-                rsql: `group=in=(${groupNames});(createdBy==${username},restrictToCreatedBy==false)`
-              })
+            ]
+          })
         })}
         filterAttributes={FILTER_ATTRIBUTES}
         id="material-sample-form-template-list"
@@ -116,6 +147,7 @@ export default function MaterialSampleFormTemplateListPage() {
             </div>
           </div>
         )}
+        useFiql={true}
       />
     </PageLayout>
   );
