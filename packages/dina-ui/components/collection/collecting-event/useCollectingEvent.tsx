@@ -1,11 +1,13 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
+  isResourceEmpty,
   processExtensionValuesLoading,
   processExtensionValuesSaving,
+  resourceDifference,
   useApiClient,
-  useQuery,
-  useSubmitHandler
+  useQuery
 } from "common-ui";
+import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import _ from "lodash";
 import { useMemo } from "react";
@@ -94,13 +96,11 @@ export function useCollectingEventQuery(id?: string | null) {
 interface UseCollectingEventSaveParams {
   fetchedCollectingEvent?: PersistedResource<CollectingEvent>;
   attachmentsConfig?: AllowAttachmentsConfig;
-  onSaved?: (saved: PersistedResource<CollectingEvent>) => void | Promise<void>;
 }
 
 /** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
 export function useCollectingEventSave({
   fetchedCollectingEvent,
-  onSaved,
   attachmentsConfig
 }: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
@@ -137,46 +137,139 @@ export function useCollectingEventSave({
           publiclyReleasable: true
         };
 
-  // --- TRANSFORMS ---
+  async function saveCollectingEvent(
+    submittedValues: CollectingEvent,
+    collectingEventFormik: FormikContextType<any>
+  ) {
+    // Only submit the changed values to the back-end:
+    const collectingEventDiff = collectingEventInitialValues.id
+      ? resourceDifference({
+          original: collectingEventInitialValues as CollectingEvent,
+          updated: submittedValues
+        })
+      : submittedValues;
 
-  // 1. Logic for preparing Geographic Place Name details
-  const preparePlaceNameDetails = (values: Partial<CollectingEvent>) => {
-    const modified = { ...values };
-    const newSourceDetail: any = {
-      ...(modified.geographicPlaceNameSourceDetail || {})
-    };
+    // Init relationships object for one-to-many relations:
+    (collectingEventDiff as any).relationships = {};
 
-    if (modified.srcAdminLevels && modified.srcAdminLevels.length > 0) {
-      const sectionIds = _.toPairs((modified as any).selectedSections)
+    // handle converting to relationship manually due to crnk bug
+    if (
+      collectingEventDiff &&
+      collectingEventDiff.collectors &&
+      collectingEventDiff.collectors.length > 0
+    ) {
+      (collectingEventDiff as any).relationships.collectors = {
+        data: collectingEventDiff?.collectors.map((collector) => ({
+          id: collector.id,
+          type: "person"
+        }))
+      };
+    }
+    delete collectingEventDiff.collectors;
+
+    if ((collectingEventDiff.collectorGroups as any)?.id)
+      collectingEventDiff.collectorGroupUuid = (
+        collectingEventDiff.collectorGroups as any
+      ).id;
+    delete collectingEventDiff.collectorGroups;
+
+    // If going from an array of other record numbers to empty, set it null.
+    if (
+      collectingEventDiff?.otherRecordNumbers &&
+      collectingEventDiff.otherRecordNumbers.length === 0
+    ) {
+      collectingEventDiff.otherRecordNumbers = null as any;
+    }
+
+    // Add attachments if they were selected:
+    if (collectingEventDiff?.attachment) {
+      (collectingEventDiff as any).relationships.attachment = {
+        data:
+          collectingEventDiff.attachment?.map((it) => ({
+            id: it.id,
+            type: it.type
+          })) ?? []
+      };
+
+      // Delete the 'attachment' attribute because it should stay in the relationships field:
+      delete collectingEventDiff.attachment;
+    }
+
+    // Convert georeferenceByAgents to relationship
+    if (
+      collectingEventDiff.geoReferenceAssertions &&
+      collectingEventDiff.geoReferenceAssertions.length > 0
+    ) {
+      for (const assertion of collectingEventDiff.geoReferenceAssertions) {
+        const referenceBy = assertion.georeferencedBy;
+        if (referenceBy && typeof referenceBy !== "string") {
+          assertion.georeferencedBy = referenceBy.map((it) =>
+            typeof it !== "string" ? it.id : (null as any)
+          );
+        }
+      }
+    }
+
+    // Convert expedition to a relationship.
+    if (collectingEventDiff?.expedition) {
+      (collectingEventDiff as any).relationships.expedition = {
+        data: collectingEventDiff?.expedition?.id
+          ? _.pick(collectingEventDiff.expedition, "id", "type")
+          : null
+      };
+    }
+    delete collectingEventDiff.expedition;
+
+    // First create a copy of what would be the new geographicPlaceNameSourceDetail
+    const newSourceDetail = {
+      ...(collectingEventDiff.geographicPlaceNameSourceDetail || {})
+    } as any;
+
+    if (
+      collectingEventDiff.srcAdminLevels &&
+      collectingEventDiff.srcAdminLevels.length > 0
+    ) {
+      // Parse srcAdminLevels to geographicPlaceNameSourceDetail
+      // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
+      const sectionIds = _.toPairs(collectingEventDiff.selectedSections)
         .filter((pair) => pair[1])
         .map((pair) => pair[0]);
 
-      if (modified.srcAdminLevels.length > 1) {
+      if (collectingEventDiff.srcAdminLevels.length > 1)
         newSourceDetail.higherGeographicPlaces = [];
-      }
 
-      modified.srcAdminLevels
-        .filter((lvl) => lvl)
-        .forEach((srcAdminLevel, idx) => {
+      collectingEventDiff.srcAdminLevels
+        .filter((srcAdminLevel) => srcAdminLevel)
+        .map((srcAdminLevel, idx) => {
+          // the first one can either be selectedGeographicPlace or customGeographicPlace
+          // when the entry only has name in it, it is user entered customPlaceName entry
+          // when the enry does not have osm_id, it will be saved as customPlaceName (e.g central experimental farm)
           if (idx === 0) {
-            // First entry: either Custom or Selected
             if (!srcAdminLevel.id) {
               newSourceDetail.customGeographicPlace = srcAdminLevel.name;
+
+              // If a custom place is set, ensure selected place is null to avoid conflicts.
               newSourceDetail.selectedGeographicPlace = null;
             } else {
               if (
-                sectionIds.includes(srcAdminLevel.shortId?.toString() ?? "")
-              ) {
+                sectionIds.filter(
+                  (id) => id === srcAdminLevel.shortId?.toString()
+                ).length
+              )
                 newSourceDetail.selectedGeographicPlace = _.omit(
                   srcAdminLevel,
                   ["shortId", "type"]
                 );
-              }
+
+              // If a selected place is set, ensure custom place is null to avoid conflicts.
               newSourceDetail.customGeographicPlace = null;
             }
           } else {
-            // Subsequent entries: Higher Geog Places
-            if (sectionIds.includes(srcAdminLevel.shortId?.toString() ?? "")) {
+            if (
+              sectionIds.filter(
+                (id) => id === srcAdminLevel.shortId?.toString()
+              ).length
+            ) {
               newSourceDetail.higherGeographicPlaces?.push(
                 _.omit(srcAdminLevel, ["shortId", "type"])
               );
@@ -185,152 +278,99 @@ export function useCollectingEventSave({
         });
     }
 
-    // Determine if we should update or delete the detail field
-    const initialSourceDetail =
-      collectingEventInitialValues.geographicPlaceNameSourceDetail ?? null;
-    const submittedSourceDetail =
-      modified.geographicPlaceNameSourceDetail ?? null;
-
-    // Logic: If creating new OR if calculated details changed
+    // Only apply changes if different from initial values or if creating a new record
     if (
-      !collectingEventInitialValues.id ||
-      !_.isEqual(initialSourceDetail, newSourceDetail)
+      !collectingEventInitialValues.id || // For new collecting events
+      !_.isEqual(
+        collectingEventInitialValues.geographicPlaceNameSourceDetail,
+        newSourceDetail
+      )
     ) {
       if (Object.keys(newSourceDetail).length > 0) {
-        modified.geographicPlaceNameSourceDetail = _.cloneDeep(newSourceDetail);
+        collectingEventDiff.geographicPlaceNameSourceDetail =
+          _.cloneDeep(newSourceDetail);
       } else {
-        // Handle deletion case
+        const initialSourceDetail =
+          collectingEventInitialValues.geographicPlaceNameSourceDetail ?? null;
+        const submittedSourceDetail =
+          submittedValues.geographicPlaceNameSourceDetail ?? null;
+
+        // Check if the record has been deleted locally.
         if (
           !_.isEqual(initialSourceDetail, submittedSourceDetail) &&
           submittedSourceDetail === null
         ) {
-          modified.geographicPlaceNameSourceDetail = undefined;
-          (modified as any).geographicPlaceNameSource = null;
+          (collectingEventDiff.geographicPlaceNameSourceDetail as any) = null;
+          (collectingEventDiff.geographicPlaceNameSource as any) = null;
         }
       }
     } else {
-      // No changes to this complex object, so remove it to avoid sending it in diff
-      delete modified.geographicPlaceNameSourceDetail;
+      // If no changes, remove this field from the diff
+      delete collectingEventDiff.geographicPlaceNameSourceDetail;
     }
 
-    // Cleanup UI fields
-    delete modified.srcAdminLevels;
-    delete (modified as any).selectedSections;
-    delete (modified as any).selectAll;
+    delete collectingEventDiff.srcAdminLevels;
+    delete collectingEventDiff.selectedSections;
+    delete (collectingEventDiff as any).selectAll;
 
-    return modified;
-  };
-
-  // 2. Main Transformation Pipeline
-  const saveTransforms = [
-    (values: CollectingEvent) => {
-      const modified = { ...values };
-
-      // Handle Collector Groups
-      if ((modified.collectorGroups as any)?.id) {
-        modified.collectorGroupUuid = (modified.collectorGroups as any).id;
-      }
-      delete modified.collectorGroups;
-
-      // Handle Other Record Numbers
-      if (
-        modified.otherRecordNumbers &&
-        modified.otherRecordNumbers.length === 0
-      ) {
-        modified.otherRecordNumbers = null as any;
-      }
-
-      // Handle GeoReference Assertions (Person Objects -> IDs)
-      if (
-        modified.geoReferenceAssertions &&
-        modified.geoReferenceAssertions.length > 0
-      ) {
-        modified.geoReferenceAssertions.forEach((assertion) => {
-          const referenceBy = assertion.georeferencedBy;
-          if (referenceBy && Array.isArray(referenceBy)) {
-            assertion.georeferencedBy = referenceBy.map((it: any) =>
-              it?.id ? it.id : null
-            );
-          }
-        });
-      }
-
-      // Handle Coordinate System cleanup for new records
-      if (
-        !modified.id &&
-        !modified.dwcVerbatimCoordinates?.trim?.() &&
-        !modified.dwcVerbatimLatitude?.trim?.() &&
-        !modified.dwcVerbatimLongitude?.trim?.()
-      ) {
-        modified.dwcVerbatimCoordinateSystem = null;
-      }
-
-      // Handle Extensions
-      if (modified.extensionValues) {
-        modified.extensionValues = processExtensionValuesSaving(
-          modified.extensionValues
-        );
-      }
-
-      // Run the Place Name logic
-      return preparePlaceNameDetails(modified) as CollectingEvent;
+    // Remove the coord system for new Collecting events with no coordinates specified:
+    if (
+      !collectingEventDiff.id &&
+      !collectingEventDiff.dwcVerbatimCoordinates?.trim?.() &&
+      !collectingEventDiff.dwcVerbatimLatitude?.trim?.() &&
+      !collectingEventDiff.dwcVerbatimLongitude?.trim?.()
+    ) {
+      collectingEventDiff.dwcVerbatimCoordinateSystem = null;
     }
-  ];
 
-  // --- SAVE HANDLER ---
-  const saveCollectingEvent = useSubmitHandler<CollectingEvent>({
-    original: collectingEventInitialValues as CollectingEvent,
-    resourceType: "collecting-event",
-    saveOptions: { apiBaseUrl: "/collection-api" },
-    transforms: saveTransforms,
+    if (collectingEventDiff.extensionValues) {
+      collectingEventDiff.extensionValues = processExtensionValuesSaving(
+        collectingEventDiff.extensionValues
+      );
+    }
 
-    // Permissions check: Custom save function wrapper
-    saveFn: async (ops, options) => {
-      const payload = ops[0].resource;
-      // Check permissions
-      const permissionsProvided = payload.meta?.permissionsProvider;
-      const canEdit = permissionsProvided
-        ? payload.meta?.permissions?.includes(
-            collectingEventInitialValues.id ? "update" : "create"
-          ) ?? false
-        : true;
+    // If the relationship section is empty, remove it from the query.
+    if (Object.keys((collectingEventDiff as any).relationships).length === 0) {
+      delete (collectingEventDiff as any).relationships;
+    }
 
-      if (!canEdit) {
-        // If no permission, do not call API. Return the payload as if it was saved.
-        return [payload];
+    // Do not perform any request if it's empty...
+    if (isResourceEmpty(collectingEventDiff)) {
+      collectingEventFormik.setFieldValue("id", collectingEventDiff.id);
+      return collectingEventDiff as PersistedResource<CollectingEvent>;
+    }
+
+    // Check if the user has permission to edit the collecting event itself. It can be attached
+    // to the material sample still.
+    const permissionsProvided = submittedValues?.meta?.permissionsProvider;
+    const canEdit = permissionsProvided
+      ? submittedValues?.meta?.permissions?.includes(
+          collectingEventInitialValues.id ? "update" : "create"
+        ) ?? false
+      : true;
+    if (!canEdit) {
+      collectingEventFormik.setFieldValue("id", collectingEventDiff.id);
+      return collectingEventDiff as PersistedResource<CollectingEvent>;
+    }
+
+    const [savedCollectingEvent] = await save<CollectingEvent>(
+      [
+        {
+          resource: collectingEventDiff,
+          type: "collecting-event"
+        }
+      ],
+      {
+        apiBaseUrl: "/collection-api"
       }
+    );
 
-      // Proceed with normal save
-      return save(ops, options);
-    },
-    onSuccess: async (saved) => {
-       if (onSaved) await onSaved(saved);
-    },
+    // Set the Collecting Event ID so if there is an error after this,
+    // then subsequent submissions use PATCH instea of POST:
+    collectingEventFormik.setFieldValue("id", savedCollectingEvent.id);
 
-    relationshipMappings: [
-      {
-        sourceAttribute: "collectors",
-        relationshipName: "collectors",
-        removeSourceAttribute: true,
-        toRelationshipData: (val) =>
-          val?.map((c: any) => ({ id: c.id, type: "person" })) ?? []
-      },
-      {
-        sourceAttribute: "attachment",
-        relationshipName: "attachment",
-        removeSourceAttribute: true,
-        toRelationshipData: (val) =>
-          val?.map((a: any) => ({ id: a.id, type: a.type })) ?? []
-      },
-      {
-        sourceAttribute: "expedition",
-        relationshipName: "expedition",
-        removeSourceAttribute: true,
-        toRelationshipData: (val) =>
-          val?.id ? [{ id: val.id, type: "collecting-event" }] : [] // Original logic: _.pick(expedition, "id", "type") which implies single object or null
-      }
-    ]
-  });
+    return savedCollectingEvent;
+  }
 
   return {
     collectingEventInitialValues,
