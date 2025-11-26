@@ -874,6 +874,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   transactionDetails: "Détails de la transaction",
   transactions: "Transactions",
   type: "Catégorie",
+  typeAtLeast2Characters: "Type at least 2 characters...",
   typeAnythingOrPickAScientificName:
     "Taper quelque chose ou choisir un nom scientifique",
   typeNewTagOrSearchPreviousTags:

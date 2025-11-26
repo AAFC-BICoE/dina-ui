@@ -1059,6 +1059,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   transactionDetails: "Transaction Details",
   transactions: "Transactions",
   type: "Type",
+  typeAtLeast2Characters: "Type at least 2 characters...",
   typeAnythingOrPickAScientificName: "Type anything or pick a Scientific Name",
   typeNewTagOrSearchPreviousTags: "Type New Tag or Search Previous Tags",
   typeSpecimen: "Type Specimen",

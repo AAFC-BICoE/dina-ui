@@ -1,11 +1,14 @@
 import { useThrottledFetch, SelectField, TextFieldProps } from "..";
-import React from "react";
+import { useIntl } from "react-intl";
+import { ReadOnlyValue } from "./FieldView";
+import { components } from "react-select";
+
+import { useField } from "formik";
 
 export interface ConceptUrlFieldProps extends TextFieldProps {
   conceptQueryEndpoint?: string;
   topLevelConcept?: string;
   fetchJson?: (url: string) => Promise<any>;
-  initSearchValue?: string;
 }
 
 export async function conceptSPARQLQuery<T>({
@@ -57,17 +60,9 @@ export async function conceptSPARQLQuery<T>({
   }
 }
 
-/** Input field for a number. */
 export function ConceptUrlField(props: ConceptUrlFieldProps) {
-  const {
-    conceptQueryEndpoint,
-    topLevelConcept,
-    initSearchValue,
-    name,
-    label
-  } = props;
-
-  // const [options, setOptions] = useState([]);
+  const { conceptQueryEndpoint, topLevelConcept, name, label } = props;
+  const { formatMessage } = useIntl();
 
   const { searchResult, doThrottledSearch } = useThrottledFetch({
     fetcher: (searchValue) => {
@@ -79,37 +74,97 @@ export function ConceptUrlField(props: ConceptUrlFieldProps) {
         searchValue: searchValue
       });
     },
-    timeoutMs: 1000,
-    initSearchValue
+    timeoutMs: 1000
   });
+
+  const customReadOnlyRender = (value: string) => {
+    const value_object = JSON.parse(value);
+    return (
+      <div className="read-only-view">
+        <ReadOnlyValue
+          link={value_object.uri}
+          value={value_object.label}
+          isExternalLink={true}
+        />
+      </div>
+    );
+  };
+
+  const CustomOption = (props) => {
+    const value_object = JSON.parse(props.data.value);
+
+    return (
+      <components.Option {...props}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontWeight: "bold" }}>{props.data.label}</span>
+          <span style={{ fontSize: "11px", opacity: 0.7 }}>
+            {value_object.uri}
+          </span>
+          <a
+            href={value_object.uri}
+            className="btn btn-info btn-sm"
+            style={{
+              padding: "0"
+            }}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              window.open(value_object.uri, "_blank", "noopener,noreferrer");
+            }}
+          >
+            {formatMessage({ id: "viewDetailButtonLabel" })}
+          </a>
+        </div>
+      </components.Option>
+    );
+  };
+
+  // in order to prepare the Select options accordingly we need to access
+  // the actual formik value when editing an existing data entry
+  const [thisField] = useField(name);
+  const initialFormikValue = thisField.value;
+  const initialOption = initialFormikValue
+    ? [
+        {
+          label: JSON.parse(initialFormikValue).label,
+          value: initialFormikValue
+        }
+      ]
+    : [];
 
   return (
     <SelectField
-      options={
-        searchResult
-          ? searchResult.results.bindings.map((b) => {
-              return {
+      selectProps={{
+        placeholder: formatMessage({ id: "typeAtLeast2Characters" }),
+        components: { Option: CustomOption },
+        isClearable: true
+      }}
+      options={[
+        ...(searchResult
+          ? searchResult.results.bindings.map((b) => ({
+              label: b.label.value,
+              value: JSON.stringify({
                 label: b.label.value,
-                value: JSON.stringify({
-                  label: b.label.value,
-                  uri: b.subject.value
-                })
-              };
-            })
-          : []
-      }
+                uri: b.subject.value
+              })
+            }))
+          : []),
+        ...(initialOption || []) // add initial value if present
+      ]}
       name={name}
       label={label}
       removeBottomMargin={true}
       disableTemplateCheckbox={true}
       onInputChange={(value, { action }) => {
         if (action === "input-change") {
-          if (value.length > 2) {
+          if (value.length >= 2) {
             doThrottledSearch(value);
           }
         }
       }}
-      placeholder="Type at least 3 characaters..."
+      readOnlyRender={customReadOnlyRender}
     />
   );
 }
