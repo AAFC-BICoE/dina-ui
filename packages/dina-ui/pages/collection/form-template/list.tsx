@@ -90,8 +90,8 @@ export default function MaterialSampleFormTemplateListPage() {
       }
     >
       <ListPageLayout<FormTemplate>
-        additionalFilters={(filterForm) => ({
-          fiql: fiql({
+        additionalFiqlFilters={(filterForm) =>
+          fiql({
             type: "FILTER_GROUP",
             operator: "AND",
             id: 1,
@@ -129,7 +129,7 @@ export default function MaterialSampleFormTemplateListPage() {
               }
             ]
           })
-        })}
+        }
         filterAttributes={FILTER_ATTRIBUTES}
         id="material-sample-form-template-list"
         queryTableProps={{

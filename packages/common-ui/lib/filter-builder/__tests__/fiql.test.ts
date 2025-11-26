@@ -587,6 +587,52 @@ describe("fiql conversion", () => {
     expect(fiqlFilter).toEqual("(group==test,group==test2),status==active");
   });
 
+  it("Combines multiple groups and operators.", () => {
+    const model: FilterGroupModel = {
+      type: "FILTER_GROUP",
+      operator: "AND",
+      id: 1,
+      children: [
+        {
+          type: "FILTER_ROW",
+          id: 2,
+          attribute: "group",
+          predicate: "IN",
+          searchType: "EXACT_MATCH",
+          value: ["aafc", "cnc"]
+        },
+        {
+          type: "FILTER_GROUP",
+          operator: "OR",
+          id: 3,
+          children: [
+            {
+              type: "FILTER_ROW",
+              id: 4,
+              attribute: "createdBy",
+              predicate: "IS",
+              searchType: "EXACT_MATCH",
+              value: "dina-admin"
+            },
+            {
+              type: "FILTER_ROW",
+              id: 5,
+              attribute: "restrictToCreatedBy",
+              predicate: "IS",
+              searchType: "EXACT_MATCH",
+              value: "false"
+            }
+          ]
+        }
+      ]
+    };
+
+    const fiqlFilter = fiql(model);
+    expect(fiqlFilter).toEqual(
+      "(group==aafc,group==cnc);(createdBy==dina-admin,restrictToCreatedBy==false)"
+    );
+  });
+
   describe("simpleSearchFilterToFiql", () => {
     it("Converts a FilterParam to fiql correctly.", () => {
       const filterParam: FilterParam = {
