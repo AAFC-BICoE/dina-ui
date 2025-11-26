@@ -120,8 +120,8 @@ export function useSubmitHandler<T extends Record<string, any>>({
         };
 
         // Add ID if updating
-        if (original?.id) {
-          resource.id = original.id;
+        if (original?.id || original?.uuid) {
+          resource.id = original.id || original.uuid;
         }
 
         // Attach relationship diffs if any
