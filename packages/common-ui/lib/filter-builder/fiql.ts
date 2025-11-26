@@ -155,6 +155,41 @@ function toPredicate(
     };
   }
 
+  // Handle IN predicate
+  if (predicate === "IN" || predicate === "NOT IN") {
+    const values = Array.isArray(value) ? value : [value];
+    const comparison = predicate === "IN" ? "==" : "!=";
+    const operator = predicate === "IN" ? "OR" : "AND";
+
+    const operands = values.map((val) => {
+      let searchValue = val;
+
+      // Handle dropdown/resource types
+      if (
+        attributeConfig.type === "DROPDOWN" &&
+        typeof val === "object" &&
+        (val as KitsuResource)?.id
+      ) {
+        searchValue = String((val as KitsuResource).id);
+      } else if (typeof val === "string") {
+        searchValue = val;
+      } else if (typeof val === "number") {
+        searchValue = String(val);
+      }
+
+      return {
+        arguments: searchValue,
+        comparison,
+        selector
+      };
+    });
+
+    return {
+      operands,
+      operator
+    };
+  }
+
   // Allow list/range filters.
   if (typeof value === "string" && attributeConfig?.allowRange) {
     const commaSplit = value.split(",");

@@ -147,6 +147,18 @@ export function MaterialSampleGenerationForm({
           className="col-sm-6"
           enableStoredDefaultGroup={true}
         />
+        <Field name="collection">
+          {({ form }: any) => (
+            <CollectionSelectField
+              className="col-sm-6"
+              name="collection"
+              onChange={(value) => {
+                form.setFieldValue("baseName", (value as Collection)?.code);
+              }}
+              cannotBeChanged={false}
+            />
+          )}
+        </Field>
       </div>
       <div className="d-flex justify-content-between">
         <div style={{ width: "25rem" }}>
@@ -157,12 +169,7 @@ export function MaterialSampleGenerationForm({
           />
         </div>
         <CheckBoxField
-          onCheckBoxClick={(event, formik) => {
-            if (event.target.checked) {
-              formik.setFieldValue("baseName", baseNameFromCollection);
-            } else {
-              formik.setFieldValue("baseName", "");
-            }
+          onCheckBoxClick={(event) => {
             setUseNextSequence(event.target.checked);
             setGenerationMode(GENERATION_MODES[0]);
           }}
@@ -245,13 +252,6 @@ function GeneratorFields({
         <DinaMessage id="primaryId" />
       </h4>
       <div className="row">
-        <CollectionSelectField
-          className="col-sm-6"
-          name="collection"
-          onChange={(value) => {
-            formikForm.setFieldValue("baseName", (value as Collection)?.code);
-          }}
-        />
         {generationMode === "SERIES" && (
           <>
             <SelectField
