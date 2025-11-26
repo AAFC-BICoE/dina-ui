@@ -169,12 +169,7 @@ export function MaterialSampleGenerationForm({
           />
         </div>
         <CheckBoxField
-          onCheckBoxClick={(event, formik) => {
-            if (event.target.checked) {
-              formik.setFieldValue("baseName", baseNameFromCollection);
-            } else {
-              formik.setFieldValue("baseName", "");
-            }
+          onCheckBoxClick={(event) => {
             setUseNextSequence(event.target.checked);
             setGenerationMode(GENERATION_MODES[0]);
           }}
