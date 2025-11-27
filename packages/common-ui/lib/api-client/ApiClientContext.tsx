@@ -270,7 +270,8 @@ export class ApiClientImpl implements ApiClientI {
       "collecting-event",
       "user",
       "storage-unit",
-      "storage-unit-usage"
+      "storage-unit-usage",
+      "material-sample-summary"
     ];
 
     // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
