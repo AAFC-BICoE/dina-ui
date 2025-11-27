@@ -31,6 +31,7 @@ export interface SelectFieldProps<T> extends FieldWrapperProps {
   selectProps?: Partial<ComponentProps<typeof Select>>;
   filterValues?: any;
   readOnlyBold?: boolean;
+  onInputChange?: (value: any, { action }: { action: any }) => void;
 }
 
 /** The value could be one element or an array. */
@@ -50,6 +51,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
     readOnlyRender,
     filterValues,
     readOnlyBold,
+    onInputChange,
     ...labelWrapperProps
   } = props;
 
@@ -165,6 +167,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
                   ? (option) => !filterValues.includes(option.value)
                   : undefined
               }
+              onInputChange={onInputChange}
             />
           </div>
         );

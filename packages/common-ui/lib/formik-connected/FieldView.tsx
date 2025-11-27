@@ -13,16 +13,28 @@ export interface ReadOnlyValueProps {
   value: any;
   link?: string;
   bold?: boolean;
+  isExternalLink?: boolean;
 }
 
-export function ReadOnlyValue({ value, link, bold }: ReadOnlyValueProps) {
+export function ReadOnlyValue({
+  value,
+  link,
+  bold,
+  isExternalLink
+}: ReadOnlyValueProps) {
   return (
     <div
       className="field-view"
       style={{ whiteSpace: "pre-wrap", fontWeight: bold ? "bold" : undefined }}
     >
       {link ? (
-        <Link href={link}>{value}</Link>
+        isExternalLink ? (
+          <a href={link} target="_blank" rel="noopener noreferrer">
+            {value}
+          </a>
+        ) : (
+          <Link href={link}>{value}</Link>
+        )
       ) : Array.isArray(value) ? (
         value.map((val, idx) => {
           const displayString = val.name

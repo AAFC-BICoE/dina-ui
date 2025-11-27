@@ -718,6 +718,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   transactionAttachments: "Anhänge der Transaktion",
   transactionDetails: "Transaktionsdetails",
   transactions: "Transaktionen",
+  typeAtLeast2Characters: "Gib min. 2 Buchstaben ein...",
   typeAnythingOrPickAScientificName:
     "Geben Sie etwas ein oder wählen Sie einen wissenschaftlichen Namen",
   typeNewTagOrSearchPreviousTags:
