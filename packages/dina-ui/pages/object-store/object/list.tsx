@@ -104,6 +104,7 @@ export default function MetadataListPage() {
           <Link
             href={`/object-store/object/external-resource-view?id=${original?.id}`}
             className="m-auto"
+            style={{ whiteSpace: "nowrap" }}
           >
             <DinaMessage id="viewDetails" />
           </Link>
@@ -112,6 +113,7 @@ export default function MetadataListPage() {
             href={`/object-store/object/view?id=${original.id}`}
             passHref={true}
             id={`file-name-${original.id}`}
+            style={{ whiteSpace: "nowrap" }}
           >
             <DinaMessage id="viewDetails" />
           </Link>
@@ -187,12 +189,11 @@ export default function MetadataListPage() {
         </div>
       ),
       header: () => (
-        <div id="acPreviewLinksHeader">
+        <div id="acPreviewLinksHeader" style={{ whiteSpace: "nowrap" }}>
           <DinaMessage id="viewPreviewButtonText" />
         </div>
       ),
-      enableSorting: false,
-      size: 200
+      enableSorting: false
     }
   ];
 

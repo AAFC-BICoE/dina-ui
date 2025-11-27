@@ -161,7 +161,7 @@ export function FileView({
                     <img
                       alt={imgAlt ?? `File path : ${filePath}`}
                       src={objectUrl as any}
-                      style={{ height: imgHeight }}
+                      style={{ maxHeight: imgHeight }}
                       onError={(event) =>
                         (event.currentTarget.style.display = "none")
                       }

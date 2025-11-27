@@ -397,6 +397,13 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /*
+ * React Select Styles
+ */
+.ReactTable .-pagination .react-select__menu {
+  z-index: 3; 
+}
+
+/*
  * React Table Styles
  */
 .react-table-overflow .rt-td, 
@@ -409,7 +416,6 @@ input[type="number"]::-webkit-outer-spin-button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
 }
 
 .table-top-controls .pagination-top {

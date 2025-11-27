@@ -138,7 +138,6 @@ export function getImageLinkColumn<TData extends KitsuResource>(
     isColumnVisible: true,
     enableSorting: false,
     columnSelectorString: path,
-    size: 350,
     additionalAccessors: ["data.attributes.fileExtension"]
   };
 }
@@ -214,7 +213,7 @@ export function ImageLinkButton({ imageType, metadata }: ImageLinkButtonProps) {
   }
 
   return (
-    <div className="text-center">
+    <div className="text-center" style={{ whiteSpace: "nowrap" }}>
       <a
         href={IMAGE_VIEW_LINK + fileIdentifier}
         target="_blank"

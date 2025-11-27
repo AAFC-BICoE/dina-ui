@@ -18,6 +18,7 @@
   -ms-user-select: none;
   user-select: none;
   box-shadow: 0 2px 15px 0 rgba(0, 0, 0, 0.15), 0 1px 0 0 rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
 .ReactTable thead tr {
@@ -38,28 +39,30 @@
   padding: 7px 5px;
   transition: 0.3s ease;
   transition-property: width, min-width, padding, opacity;
-  max-width: 10vw;
-}
-
-.ReactTable thead th {
-  white-space: nowrap;
-}
-
-.ReactTable thead th .column-header span div {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  max-width: 200px;
-}
-
-.ReactTable thead th:hover .column-header span div {
-  text-overflow: unset;
-  overflow: visible;
-  max-width: none;
+  max-width: 450px;
 }
 
 .ReactTable tbody td {
   white-space: normal;
+}
+
+.column-header {
+  max-height: 50px;
+}
+
+.column-header > span > div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  transition: width 2s ease;
+}
+
+/* On hover show full header text */
+.column-header:hover > span > div {
+  white-space: nowrap;
 }
 
 /* Allow content inside header cells to wrap */
@@ -78,6 +81,12 @@
   transition: background-color 0.1s ease-in-out;
   font-weight: var(--bs-body-font-weight);
   box-shadow: -1px 0 0 0 rgb(234, 234, 234), inset 0 1px 0 0 rgb(234, 234, 234);
+}
+
+.-sort-asc,
+.-sort-desc {
+  min-width: 30px !important;
+  max-width: 30px !important;
 }
 
 .ReactTable thead th.-sort-asc,
