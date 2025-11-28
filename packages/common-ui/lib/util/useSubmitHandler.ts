@@ -4,7 +4,8 @@ import { pickChangedFields, DiffOptions } from "../util/diffUtils";
 import {
   applyRelationshipMappings,
   diffRelationships,
-  RelationshipMapping
+  RelationshipMapping,
+  processNestedResources
 } from "../util/relationships";
 import { bulkEditAllManagedAttributes } from "../util/bulkEditAllManagedAttributes";
 
@@ -30,6 +31,13 @@ export interface UseSubmitHandlerOptions<T extends Record<string, any>> {
 
   deletedManagedAttrFields?: Set<string>;
 
+  /** 
+   * Array of managed attribute field names to process.
+   * Default: ["managedAttributes"]
+   * Example: ["managedAttributes", "preparationManagedAttributes"]
+   */
+  managedAttributeFields?: string[];
+
   beforeSave?: (payload: { resource: any; type: string }) => void | Promise<void>;
   onSuccess?: (saved: any) => void | Promise<void> | undefined;
   afterSave?: () => void | Promise<void>;
@@ -49,20 +57,29 @@ export function useSubmitHandler<T extends Record<string, any>>({
   relationshipMappings = [],
   diffOptions,
   deletedManagedAttrFields = new Set(),
+  managedAttributeFields = ["managedAttributes"],
   beforeSave,
   onSuccess,
   afterSave,
   saveFn
 }: UseSubmitHandlerOptions<T>) {
 
-  // We return the function expected by DinaForm
+  // Return the function expected by DinaForm
   const onSubmit = useCallback(
     async ({ submittedValues, api }) => {
 
       try {
+        // 0. PROCESS NESTED RESOURCES (if configured)
+        // Handle saving/deleting nested resources before user transforms
+        let processed: any = await processNestedResources(
+          submittedValues,
+          original,
+          relationshipMappings,
+          api
+        );
+
         // 1. RUN TRANSFORMS
-        // e.g. Save Nested relationships asynchronously
-        let processed: any = { ...submittedValues };
+        // e.g. Additional custom transformations
         for (const transform of transforms) {
           processed = await transform(processed, api);
         }
@@ -83,16 +100,19 @@ export function useSubmitHandler<T extends Record<string, any>>({
         );
 
         // 4. DIFF MANAGED ATTRIBUTES
-        if (processed.managedAttributes || original?.managedAttributes) {
-          const managedAttrsDiff = bulkEditAllManagedAttributes(
-            processed.managedAttributes || {},
-            original?.managedAttributes || {},
-            deletedManagedAttrFields,
-            "managedAttributes"
-          );
-          // If managed attributes changed, add them to the main diff
-          if (Object.keys(managedAttrsDiff).length > 0) {
-            attributesDiff["managedAttributes"] = managedAttrsDiff;
+        // Process all managed attribute fields (e.g., managedAttributes, preparationManagedAttributes)
+        for (const fieldName of managedAttributeFields) {
+          if (processed[fieldName] || original?.[fieldName]) {
+            const managedAttrsDiff = bulkEditAllManagedAttributes(
+              processed[fieldName] || {},
+              original?.[fieldName] || {},
+              deletedManagedAttrFields,
+              fieldName
+            );
+            // If managed attributes changed, add them to the main diff
+            if (Object.keys(managedAttrsDiff).length > 0) {
+              attributesDiff[fieldName] = managedAttrsDiff;
+            }
           }
         }
 
@@ -156,6 +176,7 @@ export function useSubmitHandler<T extends Record<string, any>>({
       relationshipMappings,
       diffOptions,
       deletedManagedAttrFields,
+      managedAttributeFields,
       beforeSave,
       onSuccess,
       afterSave,
