@@ -151,7 +151,7 @@ export function MetadataBulkEditor({
           resources={metadataHooks}
           extraTabs={[bulkEditTab]}
           tabNameConfig={(metadata: ResourceWithHooks<Metadata>) =>
-            metadata?.resource?.originalFilename
+            metadata?.resource?.filename
           }
           renderOneResource={({ index }) => (
             <MetadataForm
