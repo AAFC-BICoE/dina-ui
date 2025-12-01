@@ -176,20 +176,20 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         }
         const buttonBar = id && (
           <ButtonBar>
-            <div className="col-md-2 col-sm-12 mt-2">
+            <div className="col-xl-2 col-lg-2 col-md-12 col-sm-12 mt-2">
               <BackButton
                 entityId={id}
                 entityLink="/collection/material-sample"
                 byPassView={true}
               />
             </div>
-            <div className="col-md-4 col-sm-12">
+            <div className="col-xl-4 col-lg-5 col-md-12 col-sm-12">
               <MaterialSampleFormTemplateSelect
                 value={sampleFormTemplate}
                 onChange={setSampleFormTemplateUUID}
               />
             </div>
-            <div className="col-md-6 flex d-flex col-sm-12 gap-1 justify-content-end align-items-center">
+            <div className="col-xl-6 col-lg-12 col-md-12 col-sm-12 flex d-flex  gap-1 justify-content-end align-items-center">
               {canEdit && (
                 <EditButton
                   entityId={id}

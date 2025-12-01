@@ -19,7 +19,7 @@ export function MaterialSampleFormTemplateSelect({
 
   return (
     <label className="d-flex align-items-center gap-2 form-template-select">
-      <div className="fw-bold">
+      <div className="fw-bold" style={{ whiteSpace: "pre" }}>
         <DinaMessage id="formTemplateSelection" />
       </div>
       <div style={{ width: "20rem" }}>
