@@ -44,6 +44,8 @@
 
 .ReactTable tbody td {
   white-space: normal;
+  overflow-wrap: break-word;
+  word-break: keep-all;
 }
 
 .column-header {
