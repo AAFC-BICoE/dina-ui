@@ -15,6 +15,8 @@ import {
 } from "../__mocks__/MetadataBulkMocks";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
+import { InputResource } from "kitsu";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
 
 const mockGet = jest.fn<any, any>(async (path, _params) => {
   switch (path) {
@@ -85,9 +87,9 @@ describe("MetadataBulkEditor", () => {
       // 3 Metadata Records should be displayed in tabs at the top of the page, along with the
       // edit all tab.
       await waitFor(() => {
-        expect(wrapper.getByText(/upload1\.jpg/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/upload2\.jpg/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/upload3\.jpg/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/upload1/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/upload2/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/upload3/i)).toBeInTheDocument();
         expect(wrapper.getByText(/edit all/i)).toBeInTheDocument();
       });
 
@@ -115,7 +117,7 @@ describe("MetadataBulkEditor", () => {
 
       // Individual Tab Edit Page
       const upload1Tab = wrapper.getByRole("tabpanel", {
-        name: /upload1\.jpg/i
+        name: /upload1/i
       });
 
       // Original Filename
@@ -133,7 +135,7 @@ describe("MetadataBulkEditor", () => {
       ).toHaveDisplayValue("upload1.jpg");
     });
 
-    it("Upload 3 files, make edit all changes, metadata records created correctly", async () => {
+    it("Display bulk editor, 3 new metadata records provided", async () => {
       const wrapper = mountWithAppContext(
         <MetadataBulkEditor
           metadatas={TEST_NEW_METADATA}
@@ -146,9 +148,9 @@ describe("MetadataBulkEditor", () => {
       // 3 Metadata Records should be displayed in tabs at the top of the page, along with the
       // edit all tab.
       await waitFor(() => {
-        expect(wrapper.getByText(/upload1\.jpg/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/upload2\.jpg/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/upload3\.jpg/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/upload1/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/upload2/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/upload3/i)).toBeInTheDocument();
         expect(wrapper.getByText(/edit all/i)).toBeInTheDocument();
       });
 
@@ -195,6 +197,7 @@ describe("MetadataBulkEditor", () => {
             {
               resource: {
                 fileIdentifier: "upload-fileidentifier-1",
+                filename: "upload1",
                 originalFilename: "upload1.jpg",
                 ...baseFields
               },
@@ -203,6 +206,7 @@ describe("MetadataBulkEditor", () => {
             {
               resource: {
                 fileIdentifier: "upload-fileidentifier-2",
+                filename: "upload2",
                 originalFilename: "upload2.jpg",
                 ...baseFields
               },
@@ -211,6 +215,7 @@ describe("MetadataBulkEditor", () => {
             {
               resource: {
                 fileIdentifier: "upload-fileidentifier-3",
+                filename: "upload3",
                 originalFilename: "upload3.jpg",
                 ...baseFields
               },
@@ -236,15 +241,15 @@ describe("MetadataBulkEditor", () => {
 
       // Wait for all tabs to be present
       await waitFor(() => {
-        expect(wrapper.getByText(/upload1\.jpg/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/upload2\.jpg/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/upload3\.jpg/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/upload1/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/upload2/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/upload3/i)).toBeInTheDocument();
       });
 
-      // Click on upload1.jpg tab and edit its caption
-      userEvent.click(wrapper.getByText(/upload1\.jpg/i));
+      // Click on upload1 tab and edit its caption
+      userEvent.click(wrapper.getByText(/upload1/i));
       const upload1Tab = wrapper.getByRole("tabpanel", {
-        name: /upload1\.jpg/i
+        name: /upload1/i
       });
       userEvent.clear(
         within(upload1Tab).getByRole("textbox", { name: /caption/i })
@@ -254,10 +259,10 @@ describe("MetadataBulkEditor", () => {
         "Caption for Upload 1"
       );
 
-      // Click on upload2.jpg tab and edit its caption
-      userEvent.click(wrapper.getByText(/upload2\.jpg/i));
+      // Click on upload2 tab and edit its caption
+      userEvent.click(wrapper.getByText(/upload2/i));
       const upload2Tab = wrapper.getByRole("tabpanel", {
-        name: /upload2\.jpg/i
+        name: /upload2/i
       });
       userEvent.clear(
         within(upload2Tab).getByRole("textbox", { name: /caption/i })
@@ -267,10 +272,10 @@ describe("MetadataBulkEditor", () => {
         "Caption for Upload 2"
       );
 
-      // Click on upload3.jpg tab and edit its caption
-      userEvent.click(wrapper.getByText(/upload3\.jpg/i));
+      // Click on upload3 tab and edit its caption
+      userEvent.click(wrapper.getByText(/upload3/i));
       const upload3Tab = wrapper.getByRole("tabpanel", {
-        name: /upload3\.jpg/i
+        name: /upload3/i
       });
       userEvent.clear(
         within(upload3Tab).getByRole("textbox", { name: /caption/i })
@@ -310,6 +315,7 @@ describe("MetadataBulkEditor", () => {
             {
               resource: {
                 fileIdentifier: "upload-fileidentifier-1",
+                filename: "upload1",
                 originalFilename: "upload1.jpg",
                 acCaption: "Caption for Upload 1",
                 ...baseFields
@@ -319,6 +325,7 @@ describe("MetadataBulkEditor", () => {
             {
               resource: {
                 fileIdentifier: "upload-fileidentifier-2",
+                filename: "upload2",
                 originalFilename: "upload2.jpg",
                 acCaption: "Caption for Upload 2",
                 ...baseFields
@@ -328,6 +335,7 @@ describe("MetadataBulkEditor", () => {
             {
               resource: {
                 fileIdentifier: "upload-fileidentifier-3",
+                filename: "upload3",
                 originalFilename: "upload3.jpg",
                 acCaption: "Caption for Upload 3",
                 ...baseFields
@@ -340,6 +348,74 @@ describe("MetadataBulkEditor", () => {
           }
         ]
       ]);
+    });
+
+    it("When filename is missing, tabs show index-based fallback (#1, #2, #3)", async () => {
+      // Create metadata without filename (but with originalFilename to verify fallback ignores it)
+      const metadataWithoutFilenames: InputResource<Metadata>[] = [
+        {
+          type: "metadata",
+          bucket: BUCKET,
+          dcRights: DC_RIGHTS,
+          dcType: DC_TYPE,
+          fileIdentifier: "no-filename-1",
+          originalFilename: "should-not-display-1.jpg",
+          acMetadataCreator: {
+            id: "ac-metadata-creator-id",
+            type: "person"
+          }
+        },
+        {
+          type: "metadata",
+          bucket: BUCKET,
+          dcRights: DC_RIGHTS,
+          dcType: DC_TYPE,
+          fileIdentifier: "no-filename-2",
+          originalFilename: "should-not-display-2.jpg",
+          acMetadataCreator: {
+            id: "ac-metadata-creator-id",
+            type: "person"
+          }
+        },
+        {
+          type: "metadata",
+          bucket: BUCKET,
+          dcRights: DC_RIGHTS,
+          dcType: DC_TYPE,
+          fileIdentifier: "no-filename-3",
+          originalFilename: "should-not-display-3.jpg",
+          acMetadataCreator: {
+            id: "ac-metadata-creator-id",
+            type: "person"
+          }
+        }
+      ];
+
+      const wrapper = mountWithAppContext(
+        <MetadataBulkEditor
+          metadatas={metadataWithoutFilenames}
+          onSaved={mockOnSaved}
+        />,
+        testCtx as any
+      );
+      await waitForLoadingToDisappear();
+
+      // Tabs should display index-based fallback: #1, #2, #3
+      await waitFor(() => {
+        expect(wrapper.getByText("#1")).toBeInTheDocument();
+        expect(wrapper.getByText("#2")).toBeInTheDocument();
+        expect(wrapper.getByText("#3")).toBeInTheDocument();
+        expect(wrapper.getByText(/edit all/i)).toBeInTheDocument();
+      });
+
+      // Verify we can interact with the #1 tab
+      const tab1 = wrapper.getByRole("tabpanel", { name: "#1" });
+      expect(tab1).toBeInTheDocument();
+
+      // Verify originalFilename is still displayed in the form field (but not in the tab)
+      expect(
+        within(tab1).getByRole("textbox", { name: /original filename/i })
+      ).toHaveDisplayValue("should-not-display-1.jpg");
     });
   });
 
@@ -357,9 +433,9 @@ describe("MetadataBulkEditor", () => {
       // 3 Metadata Records should be displayed in tabs at the top of the page, along with the
       // edit all tab.
       await waitFor(() => {
-        expect(wrapper.getByText(/bulkEdit1\.jpg/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/bulkEdit2\.jpg/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/bulkEdit3\.jpg/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/bulkEdit1/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/bulkEdit2/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/bulkEdit3/i)).toBeInTheDocument();
         expect(wrapper.getByText(/edit all/i)).toBeInTheDocument();
       });
 
@@ -392,7 +468,7 @@ describe("MetadataBulkEditor", () => {
 
       // Individual Tab Edit Page
       const upload1Tab = wrapper.getByRole("tabpanel", {
-        name: /bulkEdit1\.jpg/i
+        name: /bulkEdit1/i
       });
 
       // Original Filename
@@ -488,14 +564,14 @@ describe("MetadataBulkEditor", () => {
 
       // Wait for all tabs
       await waitFor(() => {
-        expect(wrapper.getByText(/bulkEdit1\.jpg/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/bulkEdit2\.jpg/i)).toBeInTheDocument();
-        expect(wrapper.getByText(/bulkEdit3\.jpg/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/bulkEdit1/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/bulkEdit2/i)).toBeInTheDocument();
+        expect(wrapper.getByText(/bulkEdit3/i)).toBeInTheDocument();
       });
 
       // Edit bulkEdit1.jpg
-      userEvent.click(wrapper.getByText(/bulkEdit1\.jpg/i));
-      const tab1 = wrapper.getByRole("tabpanel", { name: /bulkEdit1\.jpg/i });
+      userEvent.click(wrapper.getByText(/bulkEdit1/i));
+      const tab1 = wrapper.getByRole("tabpanel", { name: /bulkEdit1/i });
       userEvent.clear(within(tab1).getByRole("textbox", { name: /caption/i }));
       userEvent.type(
         within(tab1).getByRole("textbox", { name: /caption/i }),
@@ -503,8 +579,8 @@ describe("MetadataBulkEditor", () => {
       );
 
       // Edit bulkEdit2.jpg
-      userEvent.click(wrapper.getByText(/bulkEdit2\.jpg/i));
-      const tab2 = wrapper.getByRole("tabpanel", { name: /bulkEdit2\.jpg/i });
+      userEvent.click(wrapper.getByText(/bulkEdit2/i));
+      const tab2 = wrapper.getByRole("tabpanel", { name: /bulkEdit2/i });
       userEvent.clear(within(tab2).getByRole("textbox", { name: /caption/i }));
       userEvent.type(
         within(tab2).getByRole("textbox", { name: /caption/i }),
@@ -512,8 +588,8 @@ describe("MetadataBulkEditor", () => {
       );
 
       // Edit bulkEdit3.jpg
-      userEvent.click(wrapper.getByText(/bulkEdit3\.jpg/i));
-      const tab3 = wrapper.getByRole("tabpanel", { name: /bulkEdit3\.jpg/i });
+      userEvent.click(wrapper.getByText(/bulkEdit3/i));
+      const tab3 = wrapper.getByRole("tabpanel", { name: /bulkEdit3/i });
       userEvent.clear(within(tab3).getByRole("textbox", { name: /caption/i }));
       userEvent.type(
         within(tab3).getByRole("textbox", { name: /caption/i }),

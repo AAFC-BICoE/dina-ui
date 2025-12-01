@@ -30,6 +30,7 @@ export const TEST_NEW_METADATA: InputResource<Metadata>[] = [
   {
     type: "metadata",
     acCaption: "upload1.jpg",
+    filename: "upload1",
     originalFilename: "upload1.jpg",
     acMetadataCreator: {
       id: "ac-metadata-creator-id",
@@ -47,6 +48,7 @@ export const TEST_NEW_METADATA: InputResource<Metadata>[] = [
   {
     type: "metadata",
     acCaption: "upload2.jpg",
+    filename: "upload2",
     originalFilename: "upload2.jpg",
     acMetadataCreator: {
       id: "ac-metadata-creator-id",
@@ -64,6 +66,7 @@ export const TEST_NEW_METADATA: InputResource<Metadata>[] = [
   {
     type: "metadata",
     acCaption: "upload3.jpg",
+    filename: "upload3",
     originalFilename: "upload3.jpg",
     acMetadataCreator: {
       id: "ac-metadata-creator-id",
@@ -85,6 +88,7 @@ export const TEST_BULK_EDIT_METADATA: InputResource<Metadata>[] = [
     type: "metadata",
     id: "bulk-edit-1",
     acCaption: "Same Caption",
+    filename: "bulkEdit1",
     originalFilename: "bulkEdit1.jpg",
     acMetadataCreator: {
       id: "ac-metadata-creator-id",
@@ -103,6 +107,7 @@ export const TEST_BULK_EDIT_METADATA: InputResource<Metadata>[] = [
     type: "metadata",
     id: "bulk-edit-2",
     acCaption: "Same Caption",
+    filename: "bulkEdit2",
     originalFilename: "bulkEdit2.jpg",
     acMetadataCreator: {
       id: "ac-metadata-creator-id",
@@ -121,6 +126,7 @@ export const TEST_BULK_EDIT_METADATA: InputResource<Metadata>[] = [
     type: "metadata",
     id: "bulk-edit-3",
     acCaption: "Same Caption",
+    filename: "bulkEdit3",
     originalFilename: "bulkEdit3.jpg",
     acMetadataCreator: {
       id: "ac-metadata-creator-id",
