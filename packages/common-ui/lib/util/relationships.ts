@@ -78,34 +78,55 @@ export function applyRelationshipMappings(
     }
   }
 
-  // Drop empty arrays
-  const pruned: Record<string, any> = {};
-  for (const [key, rel] of Object.entries(relationships)) {
-    if (Array.isArray(rel.data) && rel.data.length > 0) {
-      pruned[key] = rel;
-    }
-  }
-
-  return { nextValues, relationships: pruned };
+  // Keep all relationships, including empty ones
+  return { nextValues, relationships };
 }
 
-/** Compute relationship diff against original.relationships (only changed ones). */
+/** 
+ * Compute relationship diff against original.relationships (only changed ones).
+ * 
+ * @param originalRelationships - The original relationships from the API
+ * @param newRelationships - The new relationships to compare
+ * @returns Object containing only changed relationships, or undefined if none changed
+ */
 export function diffRelationships(
   originalRelationships: Record<string, any> | undefined,
   newRelationships: Record<string, any> | undefined
 ): Record<string, any> | undefined {
   if (!newRelationships) return undefined;
+  
+  // If no original relationships exist, this is a CREATE operation
+  // Return all non-empty relationships
+  if (!originalRelationships) {
+    const nonEmpty: Record<string, any> = {};
+    for (const [key, rel] of Object.entries(newRelationships)) {
+      if (Array.isArray(rel.data) ? rel.data.length > 0 : rel.data !== null) {
+        nonEmpty[key] = rel;
+      }
+    }
+    return Object.keys(nonEmpty).length > 0 ? nonEmpty : undefined;
+  }
+  
+  // This is an UPDATE operation - only include changed relationships
   const o = originalRelationships ?? {};
   const diff: Record<string, any> = {};
 
+  // Check all relationships from newRelationships
   for (const key of Object.keys(newRelationships)) {
     const oRel = o[key]?.data ?? [];
     const nRel = newRelationships[key]?.data ?? [];
-    if (!deepEqual(oRel, nRel)) {
+    
+    // Check if this relationship has changed
+    const hasChanged = !deepEqual(oRel, nRel);
+    
+    // For nested resources: only include in diff if they've changed
+    // (processNestedResources handles the actual resource CRUD)
+    // For regular relationships: only include if changed
+    if (hasChanged) {
       diff[key] = { data: nRel };
     }
   }
-
+  
   return Object.keys(diff).length ? diff : undefined;
 }
 
