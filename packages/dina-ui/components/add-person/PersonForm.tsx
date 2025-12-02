@@ -6,19 +6,15 @@ import {
   useModal,
   StringArrayField,
   ResourceSelectField,
-  SaveArgs,
-  useApiClient,
   BackButton,
   ButtonBar,
   useSubmitHandler
 } from "common-ui";
-import { InputResource, PersistedResource } from "kitsu";
-import { Identifier } from "packages/dina-ui/types/agent-api/resources/Identifier";
+import { PersistedResource } from "kitsu";
 import { Organization } from "../../../dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
-import _ from "lodash";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import * as yup from "yup";
 
@@ -34,8 +30,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   };
   const { formatMessage } = useDinaIntl();
   const id = person?.id;
-  const { save } = useApiClient();
-  let submittedIdentifierIds: any[] = [];
   const personFormValidationSchema = yup.object({
     displayName: yup
       .string()
@@ -65,108 +59,30 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       )
   });
 
-  /**
-   * Handle creating, updating Identifiers
-   */
-  async function saveIdentifiers(
-    submitted: InputResource<Person>
-  ): Promise<PersistedResource<Identifier>[]> {
-    submittedIdentifierIds =
-      submitted.identifiers?.map((identifier) => {
-        return identifier.id;
-      }) ?? [];
-
-    // get save arguments. save() already automatically POSTs for new resources and PATCH for existing resources
-    const identifierSaveArgs: SaveArgs<Identifier>[] =
-      submitted.identifiers
-        ?.filter((item) => item && (item.type || item.value))
-        ?.map((resource) => {
-          return {
-            resource,
-            type: "identifier"
-          };
-        }) ?? [];
-
-    delete submitted.identifiers;
-
-    let savedIdentifiers: PersistedResource<Identifier>[] = [];
-    // Don't call the API with an empty Save array:
-    if (identifierSaveArgs.length) {
-      savedIdentifiers = await save<Identifier>(identifierSaveArgs, {
-        apiBaseUrl: "/agent-api",
-        skipOperationForSingleRequest: true
-      });
-    }
-    return savedIdentifiers;
-  }
-
-  async function deleteIdentifiers() {
-    const identifierDeleteArgs: any[] =
-      initialValues.identifiers
-        ?.map((identifier) => {
-          return {
-            delete: identifier
-          };
-        })
-        .filter((deleteArg) => {
-          return !submittedIdentifierIds.includes(deleteArg.delete.id);
-        }) ?? [];
-    let deletedIdentifiers: PersistedResource<Identifier>[] = [];
-    // Don't call the API with an empty Save array:
-    if (identifierDeleteArgs.length) {
-      deletedIdentifiers = await save<Identifier>(identifierDeleteArgs, {
-        apiBaseUrl: "/agent-api"
-      });
-    }
-
-    return deletedIdentifiers;
-  }
-
-    const personSubmitHandler = useSubmitHandler<Person>({
+  const personSubmitHandler = useSubmitHandler<Person>({
     original: initialValues as Person,
     resourceType: "person",
     saveOptions: { apiBaseUrl: "/agent-api", skipOperationForSingleRequest: true },
 
-    // 1. TRANSFORM: (Async Saving)
-    transforms: [
-      async (values) => {
-        const modified = { ...values };
-        
-        if (modified.identifiers) {
-          // We await the save here so we have IDs ready for the next step
-          const savedIds = await saveIdentifiers(modified);
-          
-          // Replace the form values with the saved version
-          modified.identifiers = savedIds;
-        }
-        
-        return modified;
-      }
-    ],
-
-    // 2. MAPPING: Do the formatting (Sync)
+    // Configure relationships (including nested resources)
     relationshipMappings: [
       {
         sourceAttribute: "identifiers",
         relationshipName: "identifiers",
         removeSourceAttribute: true,
-
-        toRelationshipData: (values) => 
-          values?.map((it: any) => ({ id: it.id, type: it.type })) ?? []
+        relationshipType: "ARRAY",
+        nestedResource: {
+          resourceType: "identifier",
+          apiBaseUrl: "/agent-api"
+        }
       },
       {
         sourceAttribute: "organizations",
         relationshipName: "organizations",
         removeSourceAttribute: true,
-
-        toRelationshipData: (values) => 
-          values?.map((it: any) => ({ id: it.id, type: it.type })) ?? []
-      },
+        relationshipType: "ARRAY"
+      }
     ],
-
-    afterSave: async () => {
-      await deleteIdentifiers();
-    },
     
     onSuccess: onSubmitSuccess
       
