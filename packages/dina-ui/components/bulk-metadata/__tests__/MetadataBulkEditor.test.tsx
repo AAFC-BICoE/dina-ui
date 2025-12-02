@@ -350,8 +350,8 @@ describe("MetadataBulkEditor", () => {
       ]);
     });
 
-    it("When filename is missing, tabs show index-based fallback (#1, #2, #3)", async () => {
-      // Create metadata without filename (but with originalFilename to verify fallback ignores it)
+    it("When filename is missing, tabs show originalFilename fallback", async () => {
+      // Create metadata without filename (but with originalFilename to verify fallback)
       const metadataWithoutFilenames: InputResource<Metadata>[] = [
         {
           type: "metadata",
@@ -359,7 +359,7 @@ describe("MetadataBulkEditor", () => {
           dcRights: DC_RIGHTS,
           dcType: DC_TYPE,
           fileIdentifier: "no-filename-1",
-          originalFilename: "should-not-display-1.jpg",
+          originalFilename: "should-display-1.jpg",
           acMetadataCreator: {
             id: "ac-metadata-creator-id",
             type: "person"
@@ -371,7 +371,7 @@ describe("MetadataBulkEditor", () => {
           dcRights: DC_RIGHTS,
           dcType: DC_TYPE,
           fileIdentifier: "no-filename-2",
-          originalFilename: "should-not-display-2.jpg",
+          originalFilename: "should-display-2.jpg",
           acMetadataCreator: {
             id: "ac-metadata-creator-id",
             type: "person"
@@ -383,7 +383,7 @@ describe("MetadataBulkEditor", () => {
           dcRights: DC_RIGHTS,
           dcType: DC_TYPE,
           fileIdentifier: "no-filename-3",
-          originalFilename: "should-not-display-3.jpg",
+          originalFilename: "should-display-3.jpg",
           acMetadataCreator: {
             id: "ac-metadata-creator-id",
             type: "person"
@@ -400,22 +400,22 @@ describe("MetadataBulkEditor", () => {
       );
       await waitForLoadingToDisappear();
 
-      // Tabs should display index-based fallback: #1, #2, #3
+      // Tabs should display originalFilename since filename is missing
       await waitFor(() => {
-        expect(wrapper.getByText("#1")).toBeInTheDocument();
-        expect(wrapper.getByText("#2")).toBeInTheDocument();
-        expect(wrapper.getByText("#3")).toBeInTheDocument();
+        expect(wrapper.getByText("should-display-1.jpg")).toBeInTheDocument();
+        expect(wrapper.getByText("should-display-2.jpg")).toBeInTheDocument();
+        expect(wrapper.getByText("should-display-3.jpg")).toBeInTheDocument();
         expect(wrapper.getByText(/edit all/i)).toBeInTheDocument();
       });
 
-      // Verify we can interact with the #1 tab
-      const tab1 = wrapper.getByRole("tabpanel", { name: "#1" });
+      // Verify we can interact with the should-display-1.jpg tab
+      const tab1 = wrapper.getByRole("tabpanel", { name: "should-display-1.jpg" });
       expect(tab1).toBeInTheDocument();
 
       // Verify originalFilename is still displayed in the form field (but not in the tab)
       expect(
         within(tab1).getByRole("textbox", { name: /original filename/i })
-      ).toHaveDisplayValue("should-not-display-1.jpg");
+      ).toHaveDisplayValue("should-display-1.jpg");
     });
   });
 
