@@ -23,19 +23,23 @@ export const metadataHandler: ResourceHandler = {
     // Apply sourceSet field.
     resource.sourceSet = context.sourceSet;
 
-    // Find the object upload in the local storage based on the resources original filename.
-    const uploadedFiles: BulkAddFileInfo[] = JSON.parse(
+    // Read uploaded files from local storage.
+    const uploadedGroups: BulkAddFileInfo[] = JSON.parse(
       localStorage.getItem(BULK_ADD_FILES_KEY) ?? "[]"
     );
-    const matchingFile = uploadedFiles.find(
+
+    // Find the entry for the current group.
+    const groupEntry = uploadedGroups.find((entry) => entry.group === group);
+
+    // Find the matching file within that group's files by originalFilename.
+    const matchingFile = groupEntry?.files.find(
       (file) => file.originalFilename === resource.originalFilename
     );
 
     // If matchingFile is not found, throw an error.
-    // Should be caught with validation before this point but just in case.
     if (!matchingFile) {
       throw new Error(
-        `No uploaded file found for metadata with original filename: ${resource.originalFilename}`
+        `No uploaded file found for metadata with original filename: ${resource.originalFilename} in group: ${group}`
       );
     }
 
@@ -51,7 +55,7 @@ export const metadataHandler: ResourceHandler = {
       : undefined;
 
     // Set the caption default if not provided
-    if (!resource.acCaption && matchingFile) {
+    if (!resource.acCaption) {
       resource.acCaption = matchingFile.originalFilename;
     }
 
@@ -61,9 +65,7 @@ export const metadataHandler: ResourceHandler = {
     }
 
     // Set the file identifer from the upload
-    if (matchingFile) {
-      resource.fileIdentifier = matchingFile.id;
-    }
+    resource.fileIdentifier = matchingFile.id;
 
     // Link relationships
     for (const key of Object.keys(resource)) {

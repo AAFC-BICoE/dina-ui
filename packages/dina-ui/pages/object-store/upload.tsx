@@ -25,8 +25,11 @@ export const BULK_ADD_IDS_KEY = "bulkAddIds";
 export const BULK_ADD_FILES_KEY = "bulkAddFiles";
 
 export interface BulkAddFileInfo {
-  id: string;
-  originalFilename: string;
+  group: string;
+  files: {
+    id: string;
+    originalFilename: string;
+  }[];
 }
 
 export interface OnSubmitValues {
@@ -107,12 +110,15 @@ export default function UploadPage() {
         deleteFromStorage(BULK_EDIT_IDS_KEY);
 
         if (actualSubmitType === "workbook") {
-          const fileInfos: BulkAddFileInfo[] = uploadRespsT.map(
-            (objectUpload) => ({
-              id: objectUpload.id ?? "",
-              originalFilename: objectUpload.originalFilename
-            })
-          );
+          const fileInfos: BulkAddFileInfo[] = [
+            {
+              group,
+              files: uploadRespsT.map((objectUpload) => ({
+                id: objectUpload.id ?? "",
+                originalFilename: objectUpload.originalFilename
+              }))
+            }
+          ];
           writeStorage(BULK_ADD_FILES_KEY, fileInfos);
 
           // Workbook route

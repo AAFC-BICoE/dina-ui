@@ -2,7 +2,7 @@ import { ApiClientContext, LoadingSpinner } from "common-ui";
 import { withRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { SaveWorkbookProgress } from "packages/dina-ui/components/workbook/SaveWorkbookProgress";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import {
   WorkbookColumnMapping,
@@ -39,6 +39,11 @@ export function UploadWorkbookPage() {
 
   const [bulkEditFiles] =
     useLocalStorage<BulkAddFileInfo[]>(BULK_ADD_FILES_KEY);
+
+  const filesToShow = useMemo(
+    () => bulkEditFiles?.flatMap((entry) => entry.files) ?? [],
+    [bulkEditFiles]
+  );
 
   /**
    * Call the object store backend API that takes in a spreadsheet and returns
@@ -100,14 +105,14 @@ export function UploadWorkbookPage() {
             <DinaMessage id="expectedFiles" />:
           </strong>
           <ul className="mb-0">
-            {bulkEditFiles.slice(0, 5).map((file) => (
+            {filesToShow.slice(0, 5).map((file) => (
               <li key={file.id}>{file.originalFilename}</li>
             ))}
-            {bulkEditFiles.length > 5 && (
+            {filesToShow.length > 5 && (
               <li>
                 <DinaMessage
                   id="andNMore"
-                  values={{ count: bulkEditFiles.length - 5 }}
+                  values={{ count: filesToShow.length - 5 }}
                 />
               </li>
             )}

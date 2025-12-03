@@ -14,7 +14,7 @@ import {
   ManagedAttribute,
   VocabularyElement
 } from "packages/dina-ui/types/collection-api";
-import { Ref, useRef } from "react";
+import { Ref, useMemo, useRef } from "react";
 import Link from "next/link";
 import { Alert, Card } from "react-bootstrap";
 import Select from "react-select";
@@ -131,6 +131,11 @@ export function WorkbookColumnMapping({
 
   const [bulkEditFiles] =
     useLocalStorage<BulkAddFileInfo[]>(BULK_ADD_FILES_KEY);
+
+  const filesToShow = useMemo(
+    () => bulkEditFiles?.flatMap((entry) => entry.files) ?? [],
+    [bulkEditFiles]
+  );
 
   const buttonBar = (
     <>
@@ -397,9 +402,9 @@ export function WorkbookColumnMapping({
       .map((name) => name.trim().toLowerCase());
 
     // Check if all uploaded files are present in the workbook
-    const expectedFilenames = bulkEditFiles.map((file) =>
-      file.originalFilename.trim().toLowerCase()
-    );
+    const expectedFilenames = bulkEditFiles
+      .flatMap((entry) => entry.files)
+      .map((file) => file.originalFilename.trim().toLowerCase());
 
     const missingFiles = expectedFilenames.filter(
       (filename) => !workbookFilenames.includes(filename)
@@ -1024,14 +1029,14 @@ export function WorkbookColumnMapping({
                               <DinaMessage id="expectedFiles" />:
                             </strong>
                             <ul className="mb-0">
-                              {bulkEditFiles.slice(0, 5).map((file) => (
+                              {filesToShow.slice(0, 5).map((file) => (
                                 <li key={file.id}>{file.originalFilename}</li>
                               ))}
-                              {bulkEditFiles.length > 5 && (
+                              {filesToShow.length > 5 && (
                                 <li>
                                   <DinaMessage
                                     id="andNMore"
-                                    values={{ count: bulkEditFiles.length - 5 }}
+                                    values={{ count: filesToShow.length - 5 }}
                                   />
                                 </li>
                               )}
