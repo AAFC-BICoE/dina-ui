@@ -150,9 +150,10 @@ export function MetadataBulkEditor({
           onSelectTab={setSelectedTab}
           resources={metadataHooks}
           extraTabs={[bulkEditTab]}
-          tabNameConfig={(metadata: ResourceWithHooks<Metadata>) =>
-            metadata?.resource?.originalFilename
-          }
+          tabNameConfig={(metadata: ResourceWithHooks<Metadata>) => {
+            const { filename, originalFilename } = metadata?.resource ?? {};
+            return filename ?? originalFilename;
+          }}
           renderOneResource={({ index }) => (
             <MetadataForm
               metadataFormRef={(form) => {
