@@ -12,27 +12,20 @@ export const metadataHandler: ResourceHandler = {
   async processResource(
     context: SaveResourceContext
   ): Promise<SaveResourceResult> {
-    const {
-      resource,
-      group,
-      workbookColumnMap,
-      linkRelationshipAttribute,
-      agentId
-    } = context;
+    const { resource, workbookColumnMap, linkRelationshipAttribute, agentId } =
+      context;
 
     // Apply sourceSet field.
     resource.sourceSet = context.sourceSet;
 
     // Read uploaded files from local storage.
-    const uploadedGroups: BulkAddFileInfo[] = JSON.parse(
+    const uploadedFiles: BulkAddFileInfo = JSON.parse(
       localStorage.getItem(BULK_ADD_FILES_KEY) ?? "[]"
     );
-
-    // Find the entry for the current group.
-    const groupEntry = uploadedGroups.find((entry) => entry.group === group);
+    const group = uploadedFiles.group;
 
     // Find the matching file within that group's files by originalFilename.
-    const matchingFile = groupEntry?.files.find(
+    const matchingFile = uploadedFiles?.files.find(
       (file) => file.originalFilename === resource.originalFilename
     );
 

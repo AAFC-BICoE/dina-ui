@@ -53,17 +53,15 @@ describe("metadataHandler", () => {
   });
 
   it("should set sourceSet on the resource", async () => {
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        group: "test-group",
-        files: [
-          {
-            id: "file-uuid-123",
-            originalFilename: "test-image.jpg"
-          }
-        ]
-      }
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "file-uuid-123",
+          originalFilename: "test-image.jpg"
+        }
+      ]
+    };
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
@@ -74,17 +72,15 @@ describe("metadataHandler", () => {
   });
 
   it("should set bucket, fileIdentifier, and default acCaption when matching file found", async () => {
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        group: "test-group",
-        files: [
-          {
-            id: "file-uuid-123",
-            originalFilename: "test-image.jpg"
-          }
-        ]
-      }
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "file-uuid-123",
+          originalFilename: "test-image.jpg"
+        }
+      ]
+    };
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
@@ -99,17 +95,15 @@ describe("metadataHandler", () => {
   it("should not override existing acCaption", async () => {
     baseContext.resource.acCaption = "Custom caption provided by user";
 
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        group: "test-group",
-        files: [
-          {
-            id: "file-uuid-123",
-            originalFilename: "test-image.jpg"
-          }
-        ]
-      }
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "file-uuid-123",
+          originalFilename: "test-image.jpg"
+        }
+      ]
+    };
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
@@ -123,17 +117,15 @@ describe("metadataHandler", () => {
   it("should uppercase acSubtype if provided", async () => {
     baseContext.resource.acSubtype = "sampleSubtype";
 
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        group: "test-group",
-        files: [
-          {
-            id: "file-uuid-123",
-            originalFilename: "test-image.jpg"
-          }
-        ]
-      }
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "file-uuid-123",
+          originalFilename: "test-image.jpg"
+        }
+      ]
+    };
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
@@ -143,17 +135,15 @@ describe("metadataHandler", () => {
   });
 
   it("should handle when no matching file found in localStorage", async () => {
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        group: "test-group",
-        files: [
-          {
-            id: "different-file-uuid",
-            originalFilename: "different-image.jpg"
-          }
-        ]
-      }
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "different-file-uuid",
+          originalFilename: "different-image.jpg"
+        }
+      ]
+    };
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
@@ -165,17 +155,15 @@ describe("metadataHandler", () => {
   });
 
   it("should set acMetadataCreator from agentId", async () => {
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        group: "test-group",
-        files: [
-          {
-            id: "file-uuid-123",
-            originalFilename: "test-image.jpg"
-          }
-        ]
-      }
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "file-uuid-123",
+          originalFilename: "test-image.jpg"
+        }
+      ]
+    };
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
     baseContext.resource = {

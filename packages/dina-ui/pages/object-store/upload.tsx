@@ -110,15 +110,13 @@ export default function UploadPage() {
         deleteFromStorage(BULK_EDIT_IDS_KEY);
 
         if (actualSubmitType === "workbook") {
-          const fileInfos: BulkAddFileInfo[] = [
-            {
-              group,
-              files: uploadRespsT.map((objectUpload) => ({
-                id: objectUpload.id ?? "",
-                originalFilename: objectUpload.originalFilename
-              }))
-            }
-          ];
+          const fileInfos: BulkAddFileInfo = {
+            group,
+            files: uploadRespsT.map((objectUpload) => ({
+              id: objectUpload.id ?? "",
+              originalFilename: objectUpload.originalFilename
+            }))
+          };
           writeStorage(BULK_ADD_FILES_KEY, fileInfos);
 
           // Workbook route

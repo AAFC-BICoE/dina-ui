@@ -49,6 +49,7 @@ import {
   BULK_ADD_FILES_KEY,
   BulkAddFileInfo
 } from "../../../pages/object-store/upload";
+import { FaFileCircleXmark } from "react-icons/fa6";
 
 export type FieldMapType = {
   columnHeader: string;
@@ -129,11 +130,10 @@ export function WorkbookColumnMapping({
       fieldColumnLocaleId: ""
     };
 
-  const [bulkEditFiles] =
-    useLocalStorage<BulkAddFileInfo[]>(BULK_ADD_FILES_KEY);
+  const [bulkEditFiles] = useLocalStorage<BulkAddFileInfo>(BULK_ADD_FILES_KEY);
 
   const filesToShow = useMemo(
-    () => bulkEditFiles?.flatMap((entry) => entry.files) ?? [],
+    () => bulkEditFiles?.files ?? [],
     [bulkEditFiles]
   );
 
@@ -378,17 +378,17 @@ export function WorkbookColumnMapping({
   function validateBulkUploadFiles(
     workbookData: { [field: string]: any }[]
   ): string[] {
-    if (!bulkEditFiles || bulkEditFiles.length === 0) {
+    if (!bulkEditFiles || filesToShow.length === 0) {
       return []; // No bulk upload validation needed
     }
 
     const errors: string[] = [];
 
     // Check if we have enough rows in the spreadsheet
-    if (workbookData.length < bulkEditFiles.length) {
+    if (workbookData.length < filesToShow.length) {
       errors.push(
         formatMessage("workbookInsufficientRows", {
-          expected: bulkEditFiles.length,
+          expected: filesToShow.length,
           actual: workbookData.length
         })
       );
@@ -402,9 +402,9 @@ export function WorkbookColumnMapping({
       .map((name) => name.trim().toLowerCase());
 
     // Check if all uploaded files are present in the workbook
-    const expectedFilenames = bulkEditFiles
-      .flatMap((entry) => entry.files)
-      .map((file) => file.originalFilename.trim().toLowerCase());
+    const expectedFilenames = filesToShow.map((file) =>
+      file.originalFilename.trim().toLowerCase()
+    );
 
     const missingFiles = expectedFilenames.filter(
       (filename) => !workbookFilenames.includes(filename)
@@ -901,7 +901,26 @@ export function WorkbookColumnMapping({
     }
   }
 
-  const selectedType = entityTypes.find((item) => item.value === type);
+  const discardUploadedFiles = () => {
+    localStorage.removeItem(BULK_ADD_FILES_KEY);
+  };
+
+  // Find the group from the first bulkEditFiles entry, if any:
+  const groupFromStorage = bulkEditFiles?.[0]?.group;
+
+  // If bulkEditFiles exist, force type to "metadata"
+  const typeFromStorage =
+    bulkEditFiles && filesToShow.length > 0 ? "metadata" : type;
+  const isTypeDisabled = !!(bulkEditFiles && filesToShow.length > 0);
+
+  // If bulkEditFiles exist, force group to groupFromStorage and disable dropdown
+  const isGroupDisabled = !!groupFromStorage;
+  const effectiveGroup = groupFromStorage ?? group;
+
+  const selectedType = entityTypes.find(
+    (item) => item.value === typeFromStorage
+  );
+
   return loading || fieldMap.length === 0 ? (
     <LoadingSpinner loading={loading} />
   ) : (
@@ -909,10 +928,10 @@ export function WorkbookColumnMapping({
       key={`${type}-${sheet}`}
       initialValues={{
         sheet: 1,
-        type,
+        type: typeFromStorage,
         fieldMap,
         relationshipMapping,
-        group
+        group: effectiveGroup
       }}
       innerRef={formRef}
       onSubmit={onSubmit}
@@ -953,6 +972,7 @@ export function WorkbookColumnMapping({
                         styles={{
                           menuPortal: (base) => ({ ...base, zIndex: 9999 })
                         }}
+                        isDisabled={isTypeDisabled}
                       />
                     </FieldWrapper>
                     <GroupSelectField
@@ -961,8 +981,10 @@ export function WorkbookColumnMapping({
                       hideWithOnlyOneGroup={false}
                       className="flex-grow-1"
                       onChange={(newGroup) => setGroup(newGroup)}
+                      disabled={isGroupDisabled}
                       selectProps={{
                         menuPortalTarget: document.body,
+                        isDisabled: isGroupDisabled,
                         styles: {
                           menuPortal: (base) => ({ ...base, zIndex: 9999 })
                         }
@@ -1001,7 +1023,7 @@ export function WorkbookColumnMapping({
                   )}
 
                   {type === "metadata" &&
-                    (!bulkEditFiles || bulkEditFiles.length === 0) && (
+                    (!bulkEditFiles || filesToShow.length === 0) && (
                       <div className="alert alert-danger mb-0">
                         <DinaMessage id="noBulkEditFilesError" />
                         <div className="mt-2">
@@ -1016,32 +1038,44 @@ export function WorkbookColumnMapping({
                     )}
 
                   {bulkEditFiles &&
-                    bulkEditFiles.length > 0 &&
+                    filesToShow.length > 0 &&
                     type === "metadata" && (
-                      <div className="alert alert-info mb-0">
-                        <DinaMessage
-                          id="bulkUploadDetectedDescription"
-                          values={{ count: bulkEditFiles.length }}
-                        />
-                        <div className="mt-2">
-                          <small>
-                            <strong>
-                              <DinaMessage id="expectedFiles" />:
-                            </strong>
-                            <ul className="mb-0">
-                              {filesToShow.slice(0, 5).map((file) => (
-                                <li key={file.id}>{file.originalFilename}</li>
-                              ))}
-                              {filesToShow.length > 5 && (
-                                <li>
-                                  <DinaMessage
-                                    id="andNMore"
-                                    values={{ count: filesToShow.length - 5 }}
-                                  />
-                                </li>
-                              )}
-                            </ul>
-                          </small>
+                      <div className="alert alert-info mb-0 d-flex justify-content-between align-items-start">
+                        <div>
+                          <DinaMessage
+                            id="bulkUploadDetectedDescription"
+                            values={{ count: filesToShow.length }} // Use filesToShow for proper count
+                          />
+                          <div className="mt-2">
+                            <small>
+                              <strong>
+                                <DinaMessage id="expectedFiles" />:
+                              </strong>
+                              <ul className="mb-0">
+                                {filesToShow.slice(0, 5).map((file) => (
+                                  <li key={file.id}>{file.originalFilename}</li>
+                                ))}
+                                {filesToShow.length > 5 && (
+                                  <li>
+                                    <DinaMessage
+                                      id="andNMore"
+                                      values={{ count: filesToShow.length - 5 }}
+                                    />
+                                  </li>
+                                )}
+                              </ul>
+                            </small>
+                          </div>
+                        </div>
+                        <div className="ms-3">
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={discardUploadedFiles}
+                          >
+                            <FaFileCircleXmark className="me-2" />
+                            <DinaMessage id="discardUploadedFiles" />
+                          </button>
                         </div>
                       </div>
                     )}
