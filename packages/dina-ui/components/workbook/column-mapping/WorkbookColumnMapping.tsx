@@ -130,7 +130,8 @@ export function WorkbookColumnMapping({
       fieldColumnLocaleId: ""
     };
 
-  const [bulkEditFiles] = useLocalStorage<BulkAddFileInfo>(BULK_ADD_FILES_KEY);
+  const [bulkEditFiles, setBulkEditFiles] =
+    useLocalStorage<BulkAddFileInfo>(BULK_ADD_FILES_KEY);
 
   const filesToShow = useMemo(
     () => bulkEditFiles?.files ?? [],
@@ -902,11 +903,12 @@ export function WorkbookColumnMapping({
   }
 
   const discardUploadedFiles = () => {
+    setBulkEditFiles(null as any);
     localStorage.removeItem(BULK_ADD_FILES_KEY);
   };
 
   // Find the group from the first bulkEditFiles entry, if any:
-  const groupFromStorage = bulkEditFiles?.[0]?.group;
+  const groupFromStorage = bulkEditFiles?.group;
 
   // If bulkEditFiles exist, force type to "metadata"
   const typeFromStorage =
@@ -1070,7 +1072,7 @@ export function WorkbookColumnMapping({
                         <div className="ms-3">
                           <button
                             type="button"
-                            className="btn btn-secondary btn-sm"
+                            className="btn btn-secondary"
                             onClick={discardUploadedFiles}
                           >
                             <FaFileCircleXmark className="me-2" />

@@ -41,7 +41,8 @@ export function UploadWorkbookPage() {
   const [performSave, setPerformSave] = useState<boolean>(false);
   const [redirecting, setRedirecting] = useState<boolean>(false);
 
-  const [bulkEditFiles] = useLocalStorage<BulkAddFileInfo>(BULK_ADD_FILES_KEY);
+  const [bulkEditFiles, setBulkEditFiles] =
+    useLocalStorage<BulkAddFileInfo>(BULK_ADD_FILES_KEY);
 
   const filesToShow = useMemo(
     () => bulkEditFiles?.files ?? [],
@@ -97,6 +98,7 @@ export function UploadWorkbookPage() {
   ) : undefined;
 
   const discardUploadedFiles = () => {
+    setBulkEditFiles(null as any);
     localStorage.removeItem(BULK_ADD_FILES_KEY);
   };
 
