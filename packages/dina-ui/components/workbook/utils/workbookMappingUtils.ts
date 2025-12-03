@@ -8,7 +8,7 @@ import {
   WorkbookRow
 } from "../types/Workbook";
 import { WorkbookDataTypeEnum } from "../types/WorkbookDataTypeEnum";
-import { BULK_ADD_FILES_KEY } from "packages/dina-ui/pages/object-store/upload";
+import { BULK_ADD_FILES_KEY } from "../../../pages/object-store/upload";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
