@@ -28,7 +28,7 @@ describe("metadataHandler", () => {
       }),
       length: 0,
       key: jest.fn()
-    };
+    } as any;
 
     mockLinkRelationshipAttribute = jest.fn();
 
@@ -53,13 +53,15 @@ describe("metadataHandler", () => {
   });
 
   it("should set sourceSet on the resource", async () => {
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        id: "file-uuid-123",
-        originalFilename: "test-image.jpg",
-        uploadedFilename: "uploaded-test-image.jpg"
-      } as BulkAddFileInfo
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "file-uuid-123",
+          originalFilename: "test-image.jpg"
+        }
+      ]
+    };
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
@@ -70,13 +72,15 @@ describe("metadataHandler", () => {
   });
 
   it("should set bucket, fileIdentifier, and default acCaption when matching file found", async () => {
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        id: "file-uuid-123",
-        originalFilename: "test-image.jpg",
-        uploadedFilename: "uploaded-test-image.jpg"
-      } as BulkAddFileInfo
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "file-uuid-123",
+          originalFilename: "test-image.jpg"
+        }
+      ]
+    };
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
@@ -91,13 +95,15 @@ describe("metadataHandler", () => {
   it("should not override existing acCaption", async () => {
     baseContext.resource.acCaption = "Custom caption provided by user";
 
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        id: "file-uuid-123",
-        originalFilename: "test-image.jpg",
-        uploadedFilename: "uploaded-test-image.jpg"
-      } as BulkAddFileInfo
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "file-uuid-123",
+          originalFilename: "test-image.jpg"
+        }
+      ]
+    };
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
@@ -111,13 +117,15 @@ describe("metadataHandler", () => {
   it("should uppercase acSubtype if provided", async () => {
     baseContext.resource.acSubtype = "sampleSubtype";
 
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        id: "file-uuid-123",
-        originalFilename: "test-image.jpg",
-        uploadedFilename: "uploaded-test-image.jpg"
-      } as BulkAddFileInfo
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "file-uuid-123",
+          originalFilename: "test-image.jpg"
+        }
+      ]
+    };
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
@@ -127,32 +135,35 @@ describe("metadataHandler", () => {
   });
 
   it("should handle when no matching file found in localStorage", async () => {
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        id: "different-file-uuid",
-        originalFilename: "different-image.jpg",
-        uploadedFilename: "uploaded-different-image.jpg"
-      } as BulkAddFileInfo
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "different-file-uuid",
+          originalFilename: "different-image.jpg"
+        }
+      ]
+    };
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
-    await metadataHandler.processResource(baseContext).catch((error) => {
-      expect(error).toBeInstanceOf(Error);
-      expect(error.message).toBe(
-        "No uploaded file found for metadata with original filename: test-image.jpg"
-      );
-    });
+    await expect(
+      metadataHandler.processResource(baseContext)
+    ).rejects.toThrowError(
+      "No uploaded file found for metadata with original filename: test-image.jpg in group: test-group"
+    );
   });
 
   it("should set acMetadataCreator from agentId", async () => {
-    const uploadedFiles: BulkAddFileInfo[] = [
-      {
-        id: "file-uuid-123",
-        originalFilename: "test-image.jpg",
-        uploadedFilename: "uploaded-test-image.jpg"
-      } as BulkAddFileInfo
-    ];
+    const uploadedFiles: BulkAddFileInfo = {
+      group: "test-group",
+      files: [
+        {
+          id: "file-uuid-123",
+          originalFilename: "test-image.jpg"
+        }
+      ]
+    };
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
     baseContext.resource = {

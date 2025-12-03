@@ -2,7 +2,7 @@ import { ApiClientContext, LoadingSpinner } from "common-ui";
 import { withRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { SaveWorkbookProgress } from "packages/dina-ui/components/workbook/SaveWorkbookProgress";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import {
   WorkbookColumnMapping,
@@ -16,7 +16,11 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { BULK_ADD_FILES_KEY, BulkAddFileInfo } from "../object-store/upload";
-import { FaArrowLeft, FaFileArrowDown } from "react-icons/fa6";
+import {
+  FaArrowLeft,
+  FaFileArrowDown,
+  FaFileCircleXmark
+} from "react-icons/fa6";
 
 export function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
@@ -37,8 +41,13 @@ export function UploadWorkbookPage() {
   const [performSave, setPerformSave] = useState<boolean>(false);
   const [redirecting, setRedirecting] = useState<boolean>(false);
 
-  const [bulkEditFiles] =
-    useLocalStorage<BulkAddFileInfo[]>(BULK_ADD_FILES_KEY);
+  const [bulkEditFiles, setBulkEditFiles] =
+    useLocalStorage<BulkAddFileInfo>(BULK_ADD_FILES_KEY);
+
+  const filesToShow = useMemo(
+    () => bulkEditFiles?.files ?? [],
+    [bulkEditFiles]
+  );
 
   /**
    * Call the object store backend API that takes in a spreadsheet and returns
@@ -88,31 +97,48 @@ export function UploadWorkbookPage() {
     </div>
   ) : undefined;
 
-  const objectUploadMessage = bulkEditFiles?.length ? (
-    <div className="alert alert-info">
-      <DinaMessage
-        id="workbookUploadBulkEditInfoMessage"
-        values={{ count: bulkEditFiles.length }}
-      />
-      <div className="mt-2">
-        <small>
-          <strong>
-            <DinaMessage id="expectedFiles" />:
-          </strong>
-          <ul className="mb-0">
-            {bulkEditFiles.slice(0, 5).map((file) => (
-              <li key={file.id}>{file.originalFilename}</li>
-            ))}
-            {bulkEditFiles.length > 5 && (
-              <li>
-                <DinaMessage
-                  id="andNMore"
-                  values={{ count: bulkEditFiles.length - 5 }}
-                />
-              </li>
-            )}
-          </ul>
-        </small>
+  const discardUploadedFiles = () => {
+    setBulkEditFiles(null as any);
+    localStorage.removeItem(BULK_ADD_FILES_KEY);
+  };
+
+  const objectUploadMessage = filesToShow.length ? (
+    <div className="alert alert-info d-flex justify-content-between align-items-start">
+      <div>
+        <DinaMessage
+          id="workbookUploadBulkEditInfoMessage"
+          values={{ count: filesToShow.length }}
+        />
+        <div className="mt-2">
+          <small>
+            <strong>
+              <DinaMessage id="expectedFiles" />:
+            </strong>
+            <ul className="mb-0">
+              {filesToShow.slice(0, 5).map((file) => (
+                <li key={file.id}>{file.originalFilename}</li>
+              ))}
+              {filesToShow.length > 5 && (
+                <li>
+                  <DinaMessage
+                    id="andNMore"
+                    values={{ count: filesToShow.length - 5 }}
+                  />
+                </li>
+              )}
+            </ul>
+          </small>
+        </div>
+      </div>
+      <div className="ms-3">
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={discardUploadedFiles}
+        >
+          <FaFileCircleXmark className="me-2" />
+          <DinaMessage id="discardUploadedFiles" />
+        </button>
       </div>
     </div>
   ) : null;
@@ -175,7 +201,7 @@ export function UploadWorkbookPage() {
       </>
     ) : (
       <div className="col-md-12 col-sm-12 d-flex">
-        {bulkEditFiles && bulkEditFiles.length > 0 && (
+        {bulkEditFiles && bulkEditFiles?.files?.length > 0 && (
           <Link
             href="/object-store/upload"
             className="btn btn-outline-secondary previous-button"

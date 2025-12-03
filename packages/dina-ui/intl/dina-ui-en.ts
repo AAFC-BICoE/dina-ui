@@ -229,6 +229,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dinaConfigurationSectionTitle: "Configuration",
   userProfile: "User Profile",
   disabledForChildMaterialSamples: "Disabled for child Material Samples",
+  discardUploadedFiles: "Discard uploaded files",
   dragDropInstructionsHeader: "To rearrange the attribute order:",
   dragDropKeyboardInstructions:
     "Tab to the attribute, then press space to select it. Use the arrow keys to move the item, then press space to place it.",
