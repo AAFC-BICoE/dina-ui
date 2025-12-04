@@ -151,7 +151,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
         changeQualityControlEnabled(false);
       }
     }
-  }, [loadQualityControls]);
+  }, [loadQualityControls, qualityControlsLoaded]);
 
   /**
    * Each time the runSummaries state changes (which can occur when loading and user selects a checkbox.)
