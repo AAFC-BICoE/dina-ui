@@ -36,6 +36,7 @@ export enum ListLayoutFilterType {
 export interface ListPageLayoutProps<TData extends KitsuResource> {
   // if useFiql is true, additionalFilters should be a FIQL string or a function that returns a FIQL string.
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
+  additionalFiqlFilters?: string | ((filterForm: any) => string);
   defaultSort?: ColumnSort[];
   filterType?: ListLayoutFilterType;
   enableInMemoryFilter?: boolean;
@@ -71,6 +72,7 @@ interface ListPageLayoutContext<TData extends KitsuResource> {
  */
 export function ListPageLayout<TData extends KitsuResource>({
   additionalFilters: additionalFiltersProp,
+  additionalFiqlFilters: additionalFiqlFiltersProp,
   defaultSort: defaultSortProp,
   filterType = ListLayoutFilterType.FILTER_BUILDER,
   enableInMemoryFilter = false,
@@ -84,6 +86,13 @@ export function ListPageLayout<TData extends KitsuResource>({
   bulkDeleteButtonProps,
   bulkEditPath
 }: ListPageLayoutProps<TData>) {
+  // Validate that additionalFiqlFilters is only used with useFiql
+  if (additionalFiqlFiltersProp && !useFiql) {
+    throw new Error(
+      "additionalFiqlFilters prop can only be used when useFiql is enabled"
+    );
+  }
+
   const tablePageSizeKey = `${id}_tablePageSize`;
   const tableSortKey = `${id}_tableSort`;
   const filterformKey = `${id}_filterForm`;
@@ -135,12 +144,24 @@ export function ListPageLayout<TData extends KitsuResource>({
         : additionalFiltersProp;
     const additionalFiltersFiql = simpleSearchFilterToFiql(additionalFilters);
 
-    if (filterBuilderFiql && additionalFiltersFiql) {
-      filterParam = `(${filterBuilderFiql});(${additionalFiltersFiql})`;
-    } else if (filterBuilderFiql) {
-      filterParam = filterBuilderFiql;
-    } else if (additionalFiltersFiql) {
-      filterParam = additionalFiltersFiql;
+    const additionalFiqlFilters =
+      typeof additionalFiqlFiltersProp === "function"
+        ? additionalFiqlFiltersProp(filterForm)
+        : additionalFiqlFiltersProp;
+
+    // Combine all FIQL filters
+    const fiqlParts = [
+      filterBuilderFiql,
+      additionalFiltersFiql,
+      additionalFiqlFilters
+    ].filter(Boolean);
+
+    if (fiqlParts.length > 1) {
+      // Only wrap in parentheses when combining multiple filters
+      filterParam = fiqlParts.map((part) => `(${part})`).join(";");
+    } else if (fiqlParts.length === 1) {
+      // Don't wrap when there's only one filter
+      filterParam = fiqlParts[0];
     }
   } else {
     let filterBuilder = "";

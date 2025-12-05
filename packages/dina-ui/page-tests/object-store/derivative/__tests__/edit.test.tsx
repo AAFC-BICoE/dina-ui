@@ -149,9 +149,7 @@ describe("Derivative single record edit page.", () => {
     });
     userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
 
-    userEvent.click(
-      wrapper.getByRole("switch", { name: /not publicly releasable/i })
-    );
+    userEvent.click(wrapper.getByRole("switch"));
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
     // Check only the changed values
@@ -204,9 +202,7 @@ describe("Derivative single record edit page.", () => {
     });
     userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
 
-    userEvent.click(
-      wrapper.getByRole("switch", { name: /not publicly releasable/i })
-    );
+    userEvent.click(wrapper.getByRole("switch"));
 
     await waitFor(() => {
       expect(

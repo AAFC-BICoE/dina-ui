@@ -270,7 +270,8 @@ export class ApiClientImpl implements ApiClientI {
       "collecting-event",
       "user",
       "storage-unit",
-      "storage-unit-usage"
+      "storage-unit-usage",
+      "material-sample-summary"
     ];
 
     // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
@@ -983,16 +984,22 @@ export class CustomDinaKitsu extends Kitsu {
         timeout
       });
 
+      // Preserve the relationships object before Kitsu's deserialise removes it
+      // We need this for proper diffing in useSubmitHandler
+      const originalRelationships = data?.data?.relationships 
+        ? JSON.parse(JSON.stringify(data.data.relationships)) 
+        : undefined;
+
       const deserialized = await deserialise(data);
 
-      // Handle relationships
-      const relationships = deserialized?.data?.relationships;
+      // Handle relationships - denormalize them into the main object if not already present
+      const relationships = originalRelationships;
       for (const key of _.keys(relationships)) {
         if (relationships?.[key]?.data === null) {
-          // Remove null relationships
+          // Remove null relationships from the relationships object
           delete relationships[key];
         } else if (relationships?.[key]?.data && !deserialized.data[key]) {
-          // If relationship exists but wasn't resolved, create basic object with id/type.
+          // If relationship exists but wasn't resolved by Kitsu, create basic object with id/type.
           const relData = relationships[key].data;
           if (Array.isArray(relData)) {
             deserialized.data[key] = relData.map((item) => ({
@@ -1003,6 +1010,11 @@ export class CustomDinaKitsu extends Kitsu {
             deserialized.data[key] = { id: relData.id, type: relData.type };
           }
         }
+      }
+      
+      // Restore the relationships object on the deserialized data for diffing purposes
+      if (relationships && Object.keys(relationships).length > 0) {
+        deserialized.data.relationships = relationships;
       }
 
       return deserialized;

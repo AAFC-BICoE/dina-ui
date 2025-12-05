@@ -134,6 +134,20 @@ export default function ExportPage<TData extends KitsuResource>() {
     dynamicFieldMapping
   });
 
+  if (indexMap && !indexMap.find((im) => im.label === "resourceExternalURL")) {
+    indexMap.push({
+      path: "data.attributes",
+      value: "data.attributes.externalResourceURL",
+      label: "resourceExternalURL",
+      hideField: false,
+      type: "string",
+      containsSupport: false,
+      endsWithSupport: false,
+      dynamicField: undefined,
+      distinctTerm: false,
+      optimizedPrefix: false
+    } as ESIndexMapping);
+  }
   // The selected field from the query field selector.
   const [selectedFilenameAliasField, setSelectedFilenameAliasField] =
     useState<ESIndexMapping>();

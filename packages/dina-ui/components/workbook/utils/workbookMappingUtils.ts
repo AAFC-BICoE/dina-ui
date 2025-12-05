@@ -8,6 +8,7 @@ import {
   WorkbookRow
 } from "../types/Workbook";
 import { WorkbookDataTypeEnum } from "../types/WorkbookDataTypeEnum";
+import { BULK_ADD_FILES_KEY } from "../../../pages/object-store/upload";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
@@ -1211,7 +1212,8 @@ export function removeEmptyColumns(data: WorkbookJSON) {
 }
 
 /**
- * Automatically detect entity type based on spreadsheet column headers.
+ * Automatically detect entity type based on spreadsheet column headers
+ * OR force "metadata" if bulk upload object upload structure is in localStorage.
  *
  * @param spreadsheetData The uploaded workbook data
  * @param sheetIndex The sheet to analyze (default: 0)
@@ -1221,6 +1223,22 @@ export function detectEntityType(
   spreadsheetData: WorkbookJSON,
   sheetIndex: number = 0
 ): "material-sample" | "metadata" {
+  // Check for presence of object upload structure in localStorage:
+  try {
+    const raw = window?.localStorage?.getItem(BULK_ADD_FILES_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (
+        parsed?.files &&
+        Array.isArray(parsed.files) &&
+        parsed.files.length > 0
+      ) {
+        return "metadata";
+      }
+    }
+  } catch {}
+
+  // original guessing logic:
   const sheet = spreadsheetData?.[sheetIndex];
   if (!sheet) {
     return "material-sample";

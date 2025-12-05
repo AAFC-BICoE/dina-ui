@@ -1,4 +1,4 @@
-import { KitsuResource, PersistedResource } from "kitsu";
+import { PersistedResource } from "kitsu";
 import moment from "moment";
 import React from "react";
 import Select from "react-select";
@@ -17,7 +17,14 @@ import {
 } from "./FilterBuilderContext";
 import { DateRange, FilterRowDatePicker } from "./FilterRowDatePicker";
 
-export type FilterRowPredicate = "IS" | "IS NOT" | "FROM" | "UNTIL" | "BETWEEN";
+export type FilterRowPredicate =
+  | "IS"
+  | "IS NOT"
+  | "FROM"
+  | "UNTIL"
+  | "BETWEEN"
+  | "IN"
+  | "NOT IN";
 
 export type FilterRowSearchType =
   | "PARTIAL_MATCH"
@@ -30,7 +37,7 @@ export interface FilterRowModel {
   attribute: FilterAttribute;
   predicate: FilterRowPredicate;
   searchType: FilterRowSearchType;
-  value: string | KitsuResource | DateRange;
+  value: any;
 }
 
 export interface FilterRowProps {

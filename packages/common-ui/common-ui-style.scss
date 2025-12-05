@@ -3,6 +3,18 @@
 */
 
 /*
+ * Global rules
+ */
+h1, h2, h3, h4, h5, h6, p, span, strong, a {
+  overflow-wrap: break-word;
+  word-break: keep-all;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: anywhere;
+}
+
+/*
  * Changes the default color of the badge to dark grey. 
  * Currently there is no background color that is applied.
  */
@@ -397,6 +409,13 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /*
+ * React Select Styles
+ */
+.ReactTable .-pagination .react-select__menu {
+  z-index: 3; 
+}
+
+/*
  * React Table Styles
  */
 .react-table-overflow .rt-td, 
@@ -409,7 +428,6 @@ input[type="number"]::-webkit-outer-spin-button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
 }
 
 .table-top-controls .pagination-top {

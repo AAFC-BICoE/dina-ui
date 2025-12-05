@@ -386,6 +386,253 @@ describe("fiql conversion", () => {
     expect(fiqlFilter).toEqual("acMetadataCreator==null");
   });
 
+  it("Allows IN filter with multiple string values.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: "group",
+          id: 1,
+          predicate: "IN",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: ["test", "test2", "test3"]
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const fiqlFilter = fiql(model);
+    expect(fiqlFilter).toEqual("group==test,group==test2,group==test3");
+  });
+
+  it("Allows NOT IN filter with multiple string values.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: "group",
+          id: 1,
+          predicate: "NOT IN",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: ["test", "test2"]
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const fiqlFilter = fiql(model);
+    expect(fiqlFilter).toEqual("group!=test;group!=test2");
+  });
+
+  it("Allows IN filter with single value.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: "status",
+          id: 1,
+          predicate: "IN",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: ["active"]
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const fiqlFilter = fiql(model);
+    expect(fiqlFilter).toEqual("status==active");
+  });
+
+  it("Allows IN filter with DROPDOWN type resources.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            name: "managedBy",
+            type: "DROPDOWN",
+            resourcePath: "agent-api/person"
+          },
+          id: 1,
+          predicate: "IN",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: [
+            { id: "person-1", type: "person" },
+            { id: "person-2", type: "person" },
+            { id: "person-3", type: "person" }
+          ]
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const fiqlFilter = fiql(model);
+    expect(fiqlFilter).toEqual(
+      "managedBy==person-1,managedBy==person-2,managedBy==person-3"
+    );
+  });
+
+  it("Allows NOT IN filter with DROPDOWN type resources.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            name: "managedBy",
+            type: "DROPDOWN",
+            resourcePath: "agent-api/person"
+          },
+          id: 1,
+          predicate: "NOT IN",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: [
+            { id: "person-1", type: "person" },
+            { id: "person-2", type: "person" }
+          ]
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const fiqlFilter = fiql(model);
+    expect(fiqlFilter).toEqual("managedBy!=person-1;managedBy!=person-2");
+  });
+
+  it("Allows IN filter with numeric values.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: "quantity",
+          id: 1,
+          predicate: "IN",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: [10, 20, 30]
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const fiqlFilter = fiql(model);
+    expect(fiqlFilter).toEqual("quantity==10,quantity==20,quantity==30");
+  });
+
+  it("Combines IN filter with other filters using AND.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: "group",
+          id: 1,
+          predicate: "IN",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: ["test", "test2"]
+        },
+        {
+          attribute: "status",
+          id: 2,
+          predicate: "IS",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: "active"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const fiqlFilter = fiql(model);
+    expect(fiqlFilter).toEqual("(group==test,group==test2);status==active");
+  });
+
+  it("Combines IN filter with other filters using OR.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: "group",
+          id: 1,
+          predicate: "IN",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: ["test", "test2"]
+        },
+        {
+          attribute: "status",
+          id: 2,
+          predicate: "IS",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: "active"
+        }
+      ],
+      id: 6,
+      operator: "OR",
+      type: "FILTER_GROUP"
+    };
+
+    const fiqlFilter = fiql(model);
+    expect(fiqlFilter).toEqual("(group==test,group==test2),status==active");
+  });
+
+  it("Combines multiple groups and operators.", () => {
+    const model: FilterGroupModel = {
+      type: "FILTER_GROUP",
+      operator: "AND",
+      id: 1,
+      children: [
+        {
+          type: "FILTER_ROW",
+          id: 2,
+          attribute: "group",
+          predicate: "IN",
+          searchType: "EXACT_MATCH",
+          value: ["aafc", "cnc"]
+        },
+        {
+          type: "FILTER_GROUP",
+          operator: "OR",
+          id: 3,
+          children: [
+            {
+              type: "FILTER_ROW",
+              id: 4,
+              attribute: "createdBy",
+              predicate: "IS",
+              searchType: "EXACT_MATCH",
+              value: "dina-admin"
+            },
+            {
+              type: "FILTER_ROW",
+              id: 5,
+              attribute: "restrictToCreatedBy",
+              predicate: "IS",
+              searchType: "EXACT_MATCH",
+              value: "false"
+            }
+          ]
+        }
+      ]
+    };
+
+    const fiqlFilter = fiql(model);
+    expect(fiqlFilter).toEqual(
+      "(group==aafc,group==cnc);(createdBy==dina-admin,restrictToCreatedBy==false)"
+    );
+  });
+
   describe("simpleSearchFilterToFiql", () => {
     it("Converts a FilterParam to fiql correctly.", () => {
       const filterParam: FilterParam = {

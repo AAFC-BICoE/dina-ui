@@ -1,24 +1,20 @@
 import {
   DinaForm,
-  DinaFormOnSubmit,
   filterBy,
   SubmitButton,
   TextField,
   useModal,
   StringArrayField,
   ResourceSelectField,
-  SaveArgs,
-  useApiClient,
   BackButton,
-  ButtonBar
+  ButtonBar,
+  useSubmitHandler
 } from "common-ui";
-import { InputResource, PersistedResource } from "kitsu";
-import { Identifier } from "packages/dina-ui/types/agent-api/resources/Identifier";
+import { PersistedResource } from "kitsu";
 import { Organization } from "../../../dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
-import _ from "lodash";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import * as yup from "yup";
 
@@ -34,8 +30,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   };
   const { formatMessage } = useDinaIntl();
   const id = person?.id;
-  const { save } = useApiClient();
-  let submittedIdentifierIds: any[] = [];
   const personFormValidationSchema = yup.object({
     displayName: yup
       .string()
@@ -65,108 +59,34 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       )
   });
 
-  /**
-   * Handle creating, updating Identifiers
-   */
-  async function saveIdentifiers(
-    submitted: InputResource<Person>
-  ): Promise<PersistedResource<Identifier>[]> {
-    submittedIdentifierIds =
-      submitted.identifiers?.map((identifier) => {
-        return identifier.id;
-      }) ?? [];
+  const personSubmitHandler = useSubmitHandler<Person>({
+    original: initialValues as Person,
+    resourceType: "person",
+    saveOptions: { apiBaseUrl: "/agent-api", skipOperationForSingleRequest: true },
 
-    // get save arguments. save() already automatically POSTs for new resources and PATCH for existing resources
-    const identifierSaveArgs: SaveArgs<Identifier>[] =
-      submitted.identifiers
-        ?.filter((item) => item && (item.type || item.value))
-        ?.map((resource) => {
-          return {
-            resource,
-            type: "identifier"
-          };
-        }) ?? [];
-
-    delete submitted.identifiers;
-
-    let savedIdentifiers: PersistedResource<Identifier>[] = [];
-    // Don't call the API with an empty Save array:
-    if (identifierSaveArgs.length) {
-      savedIdentifiers = await save<Identifier>(identifierSaveArgs, {
-        apiBaseUrl: "/agent-api",
-        skipOperationForSingleRequest: true
-      });
-    }
-    return savedIdentifiers;
-  }
-
-  async function deleteIdentifiers() {
-    const identifierDeleteArgs: any[] =
-      initialValues.identifiers
-        ?.map((identifier) => {
-          return {
-            delete: identifier
-          };
-        })
-        .filter((deleteArg) => {
-          return !submittedIdentifierIds.includes(deleteArg.delete.id);
-        }) ?? [];
-    let deletedIdentifiers: PersistedResource<Identifier>[] = [];
-    // Don't call the API with an empty Save array:
-    if (identifierDeleteArgs.length) {
-      deletedIdentifiers = await save<Identifier>(identifierDeleteArgs, {
-        apiBaseUrl: "/agent-api"
-      });
-    }
-
-    return deletedIdentifiers;
-  }
-
-  const onSubmit: DinaFormOnSubmit = async ({
-    submittedValues: { ...submittedPerson }
-  }) => {
-    submittedPerson.relationships = {
-      ...(submittedPerson.organizations && {
-        organizations: {
-          data: submittedPerson.organizations.map((it) => {
-            return {
-              id: it.id,
-              type: "organization"
-            };
-          })
-        }
-      }),
-      ...(submittedPerson.identifiers && {
-        identifiers: {
-          data: (await saveIdentifiers(submittedPerson)).map((it) => {
-            return _.pick(it, "id", "type");
-          })
-        }
-      })
-    };
-    delete submittedPerson.organizations;
-
-    if (Object.keys(submittedPerson.relationships).length === 0) {
-      delete submittedPerson.relationships;
-    }
-
-    const [savedPerson] = await save<Person>(
-      [
-        {
-          resource: submittedPerson,
-          type: "person"
-        }
-      ],
+    // Configure relationships (including nested resources)
+    relationshipMappings: [
       {
-        apiBaseUrl: "/agent-api",
-        skipOperationForSingleRequest: true
+        sourceAttribute: "identifiers",
+        relationshipName: "identifiers",
+        removeSourceAttribute: true,
+        relationshipType: "ARRAY",
+        nestedResource: {
+          resourceType: "identifier",
+          apiBaseUrl: "/agent-api"
+        }
+      },
+      {
+        sourceAttribute: "organizations",
+        relationshipName: "organizations",
+        removeSourceAttribute: true,
+        relationshipType: "ARRAY"
       }
-    );
-
-    // delete Identifier after unlinking from Person
-    await deleteIdentifiers();
-    await onSubmitSuccess?.(savedPerson);
-  };
+    ],
+    
+    onSuccess: onSubmitSuccess
+      
+  });
 
   const buttonBar = (
     <ButtonBar className="mb-3">
@@ -186,7 +106,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   return (
     <DinaForm
       initialValues={initialValues}
-      onSubmit={onSubmit}
+      onSubmit={personSubmitHandler}
       validationSchema={personFormValidationSchema}
     >
       {buttonBar}
