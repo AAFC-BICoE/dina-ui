@@ -32,10 +32,7 @@ import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { ResourceNameIdentifier } from "../../../types/common/resources/ResourceNameIdentifier";
-import {
-  PersonSelectField,
-  ProjectSelectField
-} from "../../resource-select-fields/resource-select-fields";
+import { PersonSelectField, ProjectSelectField } from "../../resource-select-fields/resource-select-fields";
 
 export function useColumnMapping() {
   const { formatMessage } = useDinaIntl();
@@ -703,10 +700,7 @@ export function useColumnMapping() {
     if (values) {
       for (const value of Object.keys(values)) {
         // Sanitize the key to make it valid for Formik form paths (replace dots, semicolons, spaces)
-        const sanitizedKey = value
-          .replaceAll(".", "_")
-          .replaceAll(";", "_")
-          .replaceAll(" ", "_");
+        const sanitizedKey = value.replaceAll(".", "_").replaceAll(";", "_").replaceAll(" ", "_");
 
         // Find initial relationship value without string splitting
         const found: PersistedResource<any> | undefined =
@@ -716,16 +710,12 @@ export function useColumnMapping() {
         if (found) {
           if (MULTI_SELECT_FIELDS.has(fieldPath)) {
             // Store full object for multi-select (array)
-            theRelationshipMapping[columnHeader][sanitizedKey] = _.pick(found, [
-              "id",
-              "type"
-            ]);
+            theRelationshipMapping[columnHeader][sanitizedKey] = 
+              _.pick(found, ["id", "type"]);
           } else {
             // Store only id and type for single-select
-            theRelationshipMapping[columnHeader][sanitizedKey] = _.pick(found, [
-              "id",
-              "type"
-            ]);
+            theRelationshipMapping[columnHeader][sanitizedKey] =
+              _.pick(found, ["id", "type"]);
           }
         } else {
           // No value was found without string splitting
@@ -836,10 +826,7 @@ export function useColumnMapping() {
     }
 
     // Sanitize fieldValue for use in form field path (replace special characters that break Formik paths)
-    const sanitizedFieldValue = fieldValue
-      ?.replaceAll(".", "_")
-      .replaceAll(";", "_")
-      .replaceAll(" ", "_");
+    const sanitizedFieldValue = fieldValue?.replaceAll(".", "_").replaceAll(";", "_").replaceAll(" ", "_");
 
     const selectElemName = MULTI_SELECT_FIELDS.has(fieldPath)
       ? `relationshipMapping.${columnHeader.replaceAll(
