@@ -710,8 +710,9 @@ export function useColumnMapping() {
         if (found) {
           if (MULTI_SELECT_FIELDS.has(fieldPath)) {
             // Store full object for multi-select (array)
-            theRelationshipMapping[columnHeader][sanitizedKey] = 
-              _.pick(found, ["id", "type"]);
+            theRelationshipMapping[columnHeader][sanitizedKey] = [
+              _.pick(found, ["id", "type"])
+            ];
           } else {
             // Store only id and type for single-select
             theRelationshipMapping[columnHeader][sanitizedKey] =
