@@ -8,7 +8,6 @@ import { FieldExtensionSearchStates } from "../list-page/query-builder/query-bui
 import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
-import { ColumnFunctionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryRowColumnFunctionInput";
 import {
   DynamicField,
   DynamicFieldsMappingConfig,
@@ -23,6 +22,7 @@ import {
   getImageLinkColumn,
   ImageLinkStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
+import { FunctionDef } from "../../../dina-ui/types/dina-export-api/resources/DataExport";
 
 export function convertColumnsToAliases(columns): string[] {
   if (!columns) {
@@ -138,9 +138,9 @@ export function generateColumnPath({
           "presence"
         );
 
-      // Column Functions (functionId/functionName/params)
+      // Column Functions (functionId/functionDef/paramJson)
       case "columnFunction":
-        const columnFunctionStateValues: ColumnFunctionSearchStates =
+        const columnFunctionStateValues: FunctionDef =
           JSON.parse(dynamicFieldValue);
         const functionId = Object.keys(columnFunctionStateValues)[0];
         return (
@@ -148,12 +148,9 @@ export function generateColumnPath({
           "/" +
           functionId +
           "/" +
-          columnFunctionStateValues[functionId].functionName +
+          columnFunctionStateValues[functionId].functionDef +
           (columnFunctionStateValues[functionId].params
-            ? "/" +
-              columnFunctionStateValues[functionId].params
-                .map((field) => (field.parentName ? field.value : field.label))
-                .join("+")
+            ? "/" + JSON.stringify(columnFunctionStateValues[functionId].params)
             : "")
         );
 
@@ -446,7 +443,8 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
 
     // Handle column functions paths
     if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
-      const paramStr = pathParts.length > 3 ? "(" + pathParts[3] + ")" : "";
+      const rawParams = pathParts.slice(3).join("/");
+      const paramStr = rawParams ? "(" + rawParams + ")" : "";
       const fieldId = pathParts[1] + "." + pathParts[2] + paramStr;
 
       return {
@@ -1228,17 +1226,47 @@ export interface FunctionFieldLabelProps {
   functionFieldPath: string;
   indexMappings?: ESIndexMapping[];
 }
+
 export function FunctionFieldLabel({
   functionFieldPath,
   indexMappings
 }: FunctionFieldLabelProps) {
   const { messages, formatMessage } = useDinaIntl();
   const pathParts = functionFieldPath.split("/");
+
   if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
     const functionName = pathParts[2];
-    const paramStr = pathParts.length > 3 ? pathParts[3] : undefined;
+
+    // Rejoin the remaining parts because the JSON might contain slashes (e.g. URLs)
+    const paramJsonStr =
+      pathParts.length > 3 ? pathParts.slice(3).join("/") : undefined;
+
+    let rawValues: string[] = [];
+
+    // Helper to recursively extract all string values from the JSON structure
+    const extractStringValues = (obj: any): string[] => {
+      if (typeof obj === "string") return [obj];
+      if (Array.isArray(obj)) {
+        return obj.flatMap(extractStringValues);
+      }
+      if (typeof obj === "object" && obj !== null) {
+        return Object.values(obj).flatMap(extractStringValues);
+      }
+      return [];
+    };
+
+    if (paramJsonStr) {
+      try {
+        const parsed = JSON.parse(paramJsonStr);
+        rawValues = extractStringValues(parsed);
+      } catch (e) {
+        // Fallback if parsing fails, though unlikely if generated correctly
+        console.error("Failed to parse column function params", e);
+      }
+    }
+
     const paramObjects = _.compact(
-      paramStr?.split("+").map((field) => {
+      rawValues.map((field) => {
         const mappingMatch = indexMappings?.find((mapping) =>
           mapping.parentName
             ? mapping.value === field ||
@@ -1278,6 +1306,7 @@ export function FunctionFieldLabel({
             .join(" + ") +
           ")"
         : "";
+
     return (
       <span>{formatMessage(functionName as any) + formattedParamStr}</span>
     );

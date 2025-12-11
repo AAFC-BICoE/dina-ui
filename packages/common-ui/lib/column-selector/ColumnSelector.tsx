@@ -275,15 +275,15 @@ export function ColumnSelector<TData extends KitsuResource>(
         const promises = overrideDisplayedColumns?.columns?.map?.(
           async (localColumn, index) => {
             const columnFunctionPath = localColumn.includes("function")
-              ? overrideDisplayedColumns.columnFunctions?.[localColumn]
-                  .functionName === "CONCAT"
+              ? overrideDisplayedColumns.functions?.[localColumn]
+                  .functionDef === "CONCAT"
                 ? `columnFunction/${localColumn}/${
-                    overrideDisplayedColumns.columnFunctions?.[localColumn]
-                      .functionName
-                  }/${overrideDisplayedColumns.columnFunctions?.[
+                    overrideDisplayedColumns.functions?.[localColumn]
+                      .functionDef
+                  }/${overrideDisplayedColumns.functions?.[
                     localColumn
                   ].params.join("+")}`
-                : `columnFunction/${localColumn}/${overrideDisplayedColumns.columnFunctions?.[localColumn].functionName}`
+                : `columnFunction/${localColumn}/${overrideDisplayedColumns.functions?.[localColumn].functionDef}`
               : undefined;
 
             const newColumnDefinition = await generateColumnDefinition({

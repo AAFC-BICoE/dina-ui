@@ -198,7 +198,7 @@ export default function ExportPage<TData extends KitsuResource>() {
         query: queryString,
         columns: convertColumnsToPaths(columnsToExport),
         columnAliases: convertColumnsToAliases(columnsToExport),
-        columnFunctions:
+        functions:
           Object.keys(columnFunctions ?? {}).length === 0
             ? undefined
             : columnFunctions,
