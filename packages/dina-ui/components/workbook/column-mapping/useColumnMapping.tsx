@@ -699,8 +699,8 @@ export function useColumnMapping() {
 
     if (values) {
       for (const value of Object.keys(values)) {
-        // Sanitize the key to make it valid for Formik form paths (replace dots, semicolons, spaces)
-        const sanitizedKey = value.replaceAll(".", "_").replaceAll(";", "_").replaceAll(" ", "_");
+        // Sanitize the key to make it valid for Formik form paths (replace dots)
+        const sanitizedKey = value.replaceAll(".", "_");
 
         // Find initial relationship value without string splitting
         const found: PersistedResource<any> | undefined =
@@ -824,8 +824,8 @@ export function useColumnMapping() {
       return undefined;
     }
 
-    // Sanitize fieldValue for use in form field path (replace special characters that break Formik paths)
-    const sanitizedFieldValue = fieldValue?.replaceAll(".", "_").replaceAll(";", "_").replaceAll(" ", "_");
+    // Sanitize fieldValue for use in form field path (replace dots)
+    const sanitizedFieldValue = fieldValue?.replaceAll(".", "_");
 
     const selectElemName = MULTI_SELECT_FIELDS.has(fieldPath)
       ? `relationshipMapping.${columnHeader.replaceAll(
