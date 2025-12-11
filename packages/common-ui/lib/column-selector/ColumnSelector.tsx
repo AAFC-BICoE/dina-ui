@@ -71,7 +71,7 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   mandatoryDisplayedColumns?: string[];
 
   /**
-   * IDs of the columns that should always be displayed and cannot be deleted.
+   * IDs of the columns that cannot be exported.
    *
    * Uses the startsWith match so you can define the full path or partial paths.
    */
@@ -199,22 +199,24 @@ export function ColumnSelector<TData extends KitsuResource>(
       }
 
       // Add UUID field as an additional field.
-      injectedMappings = injectedMappings.concat(
-        {
-          label: "id",
-          value: "id",
-          path: "id",
-          hideField: false,
-          type: "text",
-          containsSupport: false,
-          distinctTerm: false,
-          endsWithSupport: false,
-          keywordMultiFieldSupport: false,
-          keywordNumericSupport: false,
-          optimizedPrefix: false,
-          dynamicField: undefined
-        },
-        {
+      injectedMappings = injectedMappings.concat({
+        label: "id",
+        value: "id",
+        path: "id",
+        hideField: false,
+        type: "text",
+        containsSupport: false,
+        distinctTerm: false,
+        endsWithSupport: false,
+        keywordMultiFieldSupport: false,
+        keywordNumericSupport: false,
+        optimizedPrefix: false,
+        dynamicField: undefined
+      });
+
+      // Do not display column functions in the list of selectable columns unless in export mode.
+      if (exportMode) {
+        injectedMappings = injectedMappings.concat({
           label: "columnFunction",
           value: "columnFunction",
           path: "columnFunction",
@@ -231,8 +233,8 @@ export function ColumnSelector<TData extends KitsuResource>(
           keywordNumericSupport: false,
           optimizedPrefix: false,
           endsWithSupport: false
-        }
-      );
+        });
+      }
 
       // Finally, set it as the state.
       setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);

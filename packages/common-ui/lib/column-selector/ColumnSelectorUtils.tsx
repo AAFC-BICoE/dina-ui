@@ -42,6 +42,11 @@ export function convertColumnsToPaths(columns): string[] {
   );
 }
 
+/**
+ * Function is used to generated the functions to go along with the data export request.
+ *
+ * This function should be changed if a new column function def is added.
+ */
 export function getColumnFunctions<TData extends KitsuResource>(
   columnsToExport: TableColumn<TData>[]
 ) {
@@ -49,21 +54,33 @@ export function getColumnFunctions<TData extends KitsuResource>(
     .filter((c) => c.columnSelectorString?.startsWith("columnFunction/"))
     .reduce((prev, curr) => {
       const columnParts = curr.columnSelectorString?.split("/");
-      if (columnParts) {
-        const functionName = columnParts[2];
-        const functionParams = columnParts[3]?.split("+");
-        const params =
-          functionName === "CONVERT_COORDINATES_DD"
-            ? ["collectingEvent.eventGeom"]
-            : functionParams;
+
+      if (columnParts && columnParts.length >= 3) {
+        const functionId = columnParts[1];
+        const functionDef = columnParts[2];
+        const paramString = columnParts[3];
+
+        let params: Record<string, any>;
+
+        if (functionDef === "CONVERT_COORDINATES_DD") {
+          // Reconstruct the object for coordinates (locked to this specific field for now)
+          params = { column: "collectingEvent.eventGeom" };
+        } else {
+          // Reconstruct the { items: [] } object structure
+          params = {
+            items: paramString ? paramString.split("+") : []
+          };
+        }
+
         return {
           ...prev,
-          [columnParts[1]]: {
-            functionName: columnParts[2],
+          [functionId]: {
+            functionDef: functionDef,
             params: params
           }
         };
       }
+      return prev;
     }, {});
 }
 
@@ -1307,9 +1324,7 @@ export function FunctionFieldLabel({
           ")"
         : "";
 
-    return (
-      <span>{formatMessage(functionName as any) + formattedParamStr}</span>
-    );
+    return <div>{formatMessage(functionName as any) + formattedParamStr}</div>;
   } else {
     return <></>;
   }
