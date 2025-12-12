@@ -472,7 +472,7 @@ export function useWorkbookConverter(
               resource.relationships = {};
             }
             resource.relationships[attributeName] = {
-              data: valueToLink
+              data: _.pick(valueToLink, ["id", "type"])
             };
             delete resource[attributeName];
             return;
@@ -609,8 +609,9 @@ export function useWorkbookConverter(
               }
             }
             if (valueToLink) {
+              const valuesToAdd = Array.isArray(valueToLink) ? valueToLink : [valueToLink];
               valuesForRelationship.push(
-                ...(Array.isArray(valueToLink) ? valueToLink : [valueToLink])
+                ...valuesToAdd.map(v => _.pick(v, ["id", "type"]))
               );
             } else {
               if (
@@ -681,8 +682,9 @@ export function useWorkbookConverter(
         resource.relationships[attributeName] = {
           data: valuesForRelationship
         };
-        delete resource[attributeName];
       }
+      // Need to delete the attributes that should be in relationships, no matter there is value or not.
+      delete resource[attributeName];
     }
   }
 

@@ -180,7 +180,9 @@ export function WorkbookColumnMapping({
         const mappedValues = Object.keys(relationshipMapping[columnName] || {});
 
         for (const value of values) {
-          if (mappedValues.indexOf(value.replaceAll(".", "_")) === -1) {
+          // Use the same sanitization as the storage (replace dots)
+          const sanitizedValue = value.replaceAll(".", "_");
+          if (mappedValues.indexOf(sanitizedValue) === -1) {
             unmappedColumnNames.push(
               workbookColumnMap[columnName].originalColumnName
             );
