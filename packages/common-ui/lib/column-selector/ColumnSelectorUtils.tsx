@@ -66,9 +66,10 @@ export function getColumnFunctions<TData extends KitsuResource>(
           // Reconstruct the object for coordinates (locked to this specific field for now)
           params = { column: "collectingEvent.eventGeom" };
         } else {
+          const parsedParams = JSON.parse(paramString);
           // Reconstruct the { items: [] } object structure
           params = {
-            items: paramString ? paramString.split("+") : []
+            items: parsedParams?.items || []
           };
         }
 
