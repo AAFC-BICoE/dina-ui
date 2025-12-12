@@ -1226,6 +1226,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataLabel: "Data",
   objectsLabel: "Objects",
   relatedRecord: "Related Record",
+  relatedObjectsPerson:
+    "These objects are related to this person and will be affected by the deletion.",
   reportTemplateUpload: "Report Template Upload",
   managedBy: "Managed By",
   agentId: "Agent Link",

@@ -36,7 +36,7 @@ export interface AreYouSureModalProps {
   noButtonText?: ReactNode;
 }
 
-export function AreYouSureModal({
+export function AreYouSureModalPersonDelete({
   actionMessage,
   onYesButtonClicked,
   yesButtonText,
