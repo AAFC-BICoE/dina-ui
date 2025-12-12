@@ -682,8 +682,9 @@ export function useWorkbookConverter(
         resource.relationships[attributeName] = {
           data: valuesForRelationship
         };
-        delete resource[attributeName];
       }
+      // Need to delete the attributes that should be in relationships, no matter there is value or not.
+      delete resource[attributeName];
     }
   }
 
