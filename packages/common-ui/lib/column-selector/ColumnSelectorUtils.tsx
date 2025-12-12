@@ -461,9 +461,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
 
     // Handle column functions paths
     if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
-      const rawParams = pathParts.slice(3).join("/");
-      const paramStr = rawParams ? "(" + rawParams + ")" : "";
-      const fieldId = pathParts[1] + "." + pathParts[2] + paramStr;
+      const fieldId = pathParts[1];
 
       return {
         columnSelectorString: path,

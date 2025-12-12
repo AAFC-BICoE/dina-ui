@@ -276,17 +276,21 @@ export function ColumnSelector<TData extends KitsuResource>(
       if (injectedIndexMapping && overrideDisplayedColumns) {
         const promises = overrideDisplayedColumns?.columns?.map?.(
           async (localColumn, index) => {
-            const columnFunctionPath = localColumn.includes("function")
-              ? overrideDisplayedColumns.functions?.[localColumn]
-                  .functionDef === "CONCAT"
-                ? `columnFunction/${localColumn}/${
-                    overrideDisplayedColumns.functions?.[localColumn]
-                      .functionDef
-                  }/${overrideDisplayedColumns.functions?.[
-                    localColumn
-                  ].params.join("+")}`
-                : `columnFunction/${localColumn}/${overrideDisplayedColumns.functions?.[localColumn].functionDef}`
-              : undefined;
+            let columnFunctionPath: string | undefined = undefined;
+
+            // Determine if this is a function column and construct the path
+            if (localColumn.includes("function")) {
+              const funcData =
+                overrideDisplayedColumns.functions?.[localColumn];
+              if (funcData) {
+                // Format: columnFunction/functionId/functionDef[/paramJson]
+                columnFunctionPath =
+                  `columnFunction/${localColumn}/${funcData.functionDef}` +
+                  (funcData.params
+                    ? "/" + JSON.stringify(funcData.params)
+                    : "");
+              }
+            }
 
             const newColumnDefinition = await generateColumnDefinition({
               indexMappings: injectedIndexMapping,
@@ -295,6 +299,7 @@ export function ColumnSelector<TData extends KitsuResource>(
               defaultColumns,
               path: columnFunctionPath ?? localColumn
             });
+
             // Set the column header if saved.
             if (newColumnDefinition) {
               newColumnDefinition.exportHeader =

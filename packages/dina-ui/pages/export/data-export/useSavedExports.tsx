@@ -196,7 +196,7 @@ export default function useSavedExports<TData extends KitsuResource>({
             publiclyReleasable: publiclyReleasable,
             exportType: exportType,
             exportOptions: { columnSeparator: selectedSeparator.value },
-            columnFunctions:
+            functions:
               Object.keys(columnFunctions ?? {}).length === 0
                 ? undefined
                 : columnFunctions
@@ -255,7 +255,7 @@ export default function useSavedExports<TData extends KitsuResource>({
             exportType: exportType,
             exportOptions: { columnSeparator: selectedSeparator.value },
             group: groupNames?.[0],
-            columnFunctions:
+            functions:
               Object.keys(columnFunctions ?? {}).length === 0
                 ? undefined
                 : columnFunctions
