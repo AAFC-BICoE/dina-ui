@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
-import Alert from "react-bootstrap/Alert";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import _ from "lodash";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
@@ -113,6 +112,11 @@ export default function useSavedExports<TData extends KitsuResource>({
    * Create a new saved export.
    */
   async function createSavedExport() {
+    // Do not create if we are displaying the override warning.
+    if (displayOverrideWarning) {
+      return;
+    }
+
     setLoadingCreateSavedExport(true);
 
     try {
@@ -196,7 +200,7 @@ export default function useSavedExports<TData extends KitsuResource>({
             publiclyReleasable: publiclyReleasable,
             exportType: exportType,
             exportOptions: { columnSeparator: selectedSeparator.value },
-            columnFunctions:
+            functions:
               Object.keys(columnFunctions ?? {}).length === 0
                 ? undefined
                 : columnFunctions
@@ -255,7 +259,7 @@ export default function useSavedExports<TData extends KitsuResource>({
             exportType: exportType,
             exportOptions: { columnSeparator: selectedSeparator.value },
             group: groupNames?.[0],
-            columnFunctions:
+            functions:
               Object.keys(columnFunctions ?? {}).length === 0
                 ? undefined
                 : columnFunctions
@@ -337,7 +341,9 @@ export default function useSavedExports<TData extends KitsuResource>({
     ) !== undefined;
 
   const disableCreateButton =
-    loadingCreateSavedExport || savedExportName.trim() === "";
+    loadingCreateSavedExport ||
+    savedExportName.trim() === "" ||
+    displayOverrideWarning;
 
   const ModalElement = useMemo(
     () => (
@@ -354,24 +360,25 @@ export default function useSavedExports<TData extends KitsuResource>({
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {displayOverrideWarning && (
-            <Alert variant={"warning"}>
-              <DinaMessage
-                id="savedExport_overrideWarning"
-                values={{ savedExportName }}
-              />
-            </Alert>
-          )}
-
           <strong>
             <DinaMessage id="savedExport_createName" />
           </strong>
           <input
-            className="form-control"
+            className={`form-control${
+              displayOverrideWarning ? " is-invalid" : ""
+            }`}
             value={savedExportName}
             onChange={(e) => setSavedExportName(e.target.value)}
             disabled={loadingCreateSavedExport}
           />
+          {displayOverrideWarning && (
+            <div className="invalid-feedback" style={{ display: "block" }}>
+              <DinaMessage
+                id="savedExport_overrideWarning"
+                values={{ savedExportName }}
+              />
+            </div>
+          )}
           <br />
           <strong>
             <DinaMessage id="visibility" />

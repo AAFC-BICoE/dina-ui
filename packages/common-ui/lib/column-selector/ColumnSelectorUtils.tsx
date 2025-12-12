@@ -8,7 +8,6 @@ import { FieldExtensionSearchStates } from "../list-page/query-builder/query-bui
 import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
-import { ColumnFunctionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryRowColumnFunctionInput";
 import {
   DynamicField,
   DynamicFieldsMappingConfig,
@@ -23,6 +22,7 @@ import {
   getImageLinkColumn,
   ImageLinkStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
+import { FunctionDef } from "../../../dina-ui/types/dina-export-api/resources/DataExport";
 
 export function convertColumnsToAliases(columns): string[] {
   if (!columns) {
@@ -42,6 +42,11 @@ export function convertColumnsToPaths(columns): string[] {
   );
 }
 
+/**
+ * Function is used to generated the functions to go along with the data export request.
+ *
+ * This function should be changed if a new column function def is added.
+ */
 export function getColumnFunctions<TData extends KitsuResource>(
   columnsToExport: TableColumn<TData>[]
 ) {
@@ -49,21 +54,34 @@ export function getColumnFunctions<TData extends KitsuResource>(
     .filter((c) => c.columnSelectorString?.startsWith("columnFunction/"))
     .reduce((prev, curr) => {
       const columnParts = curr.columnSelectorString?.split("/");
-      if (columnParts) {
-        const functionName = columnParts[2];
-        const functionParams = columnParts[3]?.split("+");
-        const params =
-          functionName === "CONVERT_COORDINATES_DD"
-            ? ["collectingEvent.eventGeom"]
-            : functionParams;
+
+      if (columnParts && columnParts.length >= 3) {
+        const functionId = columnParts[1];
+        const functionDef = columnParts[2];
+        const paramString = columnParts[3];
+
+        let params: Record<string, any>;
+
+        if (functionDef === "CONVERT_COORDINATES_DD") {
+          // Reconstruct the object for coordinates (locked to this specific field for now)
+          params = { column: "collectingEvent.eventGeom" };
+        } else {
+          const parsedParams = JSON.parse(paramString);
+          // Reconstruct the { items: [] } object structure
+          params = {
+            items: parsedParams?.items || []
+          };
+        }
+
         return {
           ...prev,
-          [columnParts[1]]: {
-            functionName: columnParts[2],
+          [functionId]: {
+            functionDef: functionDef,
             params: params
           }
         };
       }
+      return prev;
     }, {});
 }
 
@@ -138,9 +156,9 @@ export function generateColumnPath({
           "presence"
         );
 
-      // Column Functions (functionId/functionName/params)
+      // Column Functions (functionId/functionDef/paramJson)
       case "columnFunction":
-        const columnFunctionStateValues: ColumnFunctionSearchStates =
+        const columnFunctionStateValues: FunctionDef =
           JSON.parse(dynamicFieldValue);
         const functionId = Object.keys(columnFunctionStateValues)[0];
         return (
@@ -148,12 +166,9 @@ export function generateColumnPath({
           "/" +
           functionId +
           "/" +
-          columnFunctionStateValues[functionId].functionName +
+          columnFunctionStateValues[functionId].functionDef +
           (columnFunctionStateValues[functionId].params
-            ? "/" +
-              columnFunctionStateValues[functionId].params
-                .map((field) => (field.parentName ? field.value : field.label))
-                .join("+")
+            ? "/" + JSON.stringify(columnFunctionStateValues[functionId].params)
             : "")
         );
 
@@ -446,8 +461,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
 
     // Handle column functions paths
     if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
-      const paramStr = pathParts.length > 3 ? "(" + pathParts[3] + ")" : "";
-      const fieldId = pathParts[1] + "." + pathParts[2] + paramStr;
+      const fieldId = pathParts[1];
 
       return {
         columnSelectorString: path,
@@ -1228,17 +1242,47 @@ export interface FunctionFieldLabelProps {
   functionFieldPath: string;
   indexMappings?: ESIndexMapping[];
 }
+
 export function FunctionFieldLabel({
   functionFieldPath,
   indexMappings
 }: FunctionFieldLabelProps) {
   const { messages, formatMessage } = useDinaIntl();
   const pathParts = functionFieldPath.split("/");
+
   if (pathParts.length >= 3 && pathParts[0] === "columnFunction") {
     const functionName = pathParts[2];
-    const paramStr = pathParts.length > 3 ? pathParts[3] : undefined;
+
+    // Rejoin the remaining parts because the JSON might contain slashes (e.g. URLs)
+    const paramJsonStr =
+      pathParts.length > 3 ? pathParts.slice(3).join("/") : undefined;
+
+    let rawValues: string[] = [];
+
+    // Helper to recursively extract all string values from the JSON structure
+    const extractStringValues = (obj: any): string[] => {
+      if (typeof obj === "string") return [obj];
+      if (Array.isArray(obj)) {
+        return obj.flatMap(extractStringValues);
+      }
+      if (typeof obj === "object" && obj !== null) {
+        return Object.values(obj).flatMap(extractStringValues);
+      }
+      return [];
+    };
+
+    if (paramJsonStr) {
+      try {
+        const parsed = JSON.parse(paramJsonStr);
+        rawValues = extractStringValues(parsed);
+      } catch (e) {
+        // Fallback if parsing fails, though unlikely if generated correctly
+        console.error("Failed to parse column function params", e);
+      }
+    }
+
     const paramObjects = _.compact(
-      paramStr?.split("+").map((field) => {
+      rawValues.map((field) => {
         const mappingMatch = indexMappings?.find((mapping) =>
           mapping.parentName
             ? mapping.value === field ||
@@ -1278,9 +1322,8 @@ export function FunctionFieldLabel({
             .join(" + ") +
           ")"
         : "";
-    return (
-      <span>{formatMessage(functionName as any) + formattedParamStr}</span>
-    );
+
+    return <div>{formatMessage(functionName as any) + formattedParamStr}</div>;
   } else {
     return <></>;
   }

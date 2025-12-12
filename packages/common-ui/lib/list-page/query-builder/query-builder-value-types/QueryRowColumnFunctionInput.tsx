@@ -9,6 +9,10 @@ import QueryRowFieldExtensionSearch from "./QueryBuilderFieldExtensionSearch";
 import QueryRowIdentifierSearch from "./QueryBuilderIdentifierSearch";
 import QueryRowManagedAttributeSearch from "./QueryBuilderManagedAttributeSearch";
 import QueryRowRelationshipPresenceSearch from "./QueryBuilderRelationshipPresenceSearch";
+import {
+  FunctionDef,
+  FunctionDefinitions
+} from "../../../../../dina-ui/types/dina-export-api";
 
 interface QueryRowColumnFunctionInputProps {
   /**
@@ -39,16 +43,7 @@ interface QueryRowColumnFunctionInputProps {
 
 export interface FormulaOption {
   label: string;
-  value: FunctionNameType;
-}
-
-export type FunctionNameType = "CONCAT" | "CONVERT_COORDINATES_DD";
-
-export interface ColumnFunctionSearchStates {
-  // function name (formula), so far it only supports "CONCAT" and "CONVERT_COORDINATES_DD"
-  functionName?: FunctionNameType;
-  // column names for function CONCAT
-  params?: (ESIndexMapping | undefined)[];
+  value: FunctionDefinitions;
 }
 
 export default function QueryRowColumnFunctionInput({
@@ -71,37 +66,36 @@ export default function QueryRowColumnFunctionInput({
     }
   ];
 
+  // Helper to safely parse initial state
+  const parseInitialState = (val?: string): FunctionDef => {
+    if (!val) return { functionDef: undefined as any, params: {} };
+    try {
+      const parsed = JSON.parse(val);
+      // Handle the wrapper object { [functionId]: ... } if it exists, or raw object
+      const innerObj = parsed[functionId] || Object.values(parsed)[0];
+      return innerObj || { functionDef: undefined as any, params: {} };
+    } catch (_e) {
+      return { functionDef: undefined as any, params: {} };
+    }
+  };
+
   const [columnFunctionSearchState, setColumnFunctionSearchState] =
-    useState<ColumnFunctionSearchStates>(
-      value
-        ? JSON.parse(value)
-        : {
-            functionName: undefined,
-            params: undefined
-          }
-    );
+    useState<FunctionDef>(parseInitialState(value));
 
   const [
     submittedColumnFunctionSearchState,
     setSubmittedColumnFunctionSearchState
-  ] = useState<ColumnFunctionSearchStates>(
-    value
-      ? JSON.parse(value)
-      : {
-          functionName: undefined,
-          params: undefined
-        }
-  );
+  ] = useState<FunctionDef>(parseInitialState(value));
 
-  const onFormulaChanged = (newFormula: FunctionNameType) => {
-    if (columnFunctionSearchState.functionName !== newFormula) {
+  const onFormulaChanged = (newFormula: FunctionDefinitions) => {
+    if (columnFunctionSearchState.functionDef !== newFormula) {
       setColumnFunctionSearchState({
-        functionName: newFormula as any,
-        params: newFormula === "CONCAT" ? [undefined] : undefined
+        functionDef: newFormula as any,
+        params: newFormula === "CONCAT" ? { items: [] } : {}
       });
       setSubmittedColumnFunctionSearchState({
-        functionName: newFormula as any,
-        params: newFormula === "CONCAT" ? [undefined] : undefined
+        functionDef: newFormula as any,
+        params: newFormula === "CONCAT" ? { items: [] } : {}
       });
     }
   };
@@ -109,22 +103,60 @@ export default function QueryRowColumnFunctionInput({
   // Convert the state in this component to a value that can be stored in the Query Builder.
   useEffect(() => {
     if (setValue && isValid(submittedColumnFunctionSearchState)) {
+      const payload: FunctionDef = _.cloneDeep(
+        submittedColumnFunctionSearchState
+      );
+
+      // Convert Objects back to Strings for the output
+      if (
+        payload.functionDef === "CONCAT" &&
+        payload.params?.items &&
+        Array.isArray(payload.params.items)
+      ) {
+        payload.params.items = payload.params.items.map((field: any) => {
+          // If it's already a string, keep it. If it's a mapping object, transform it.
+          if (typeof field === "string") return field;
+          return field?.parentName ? field.value : field?.label;
+        });
+      }
+
       setValue(
         JSON.stringify({
-          [functionId]: submittedColumnFunctionSearchState
+          [functionId]: payload
         })
       );
     }
-  }, [submittedColumnFunctionSearchState, setValue]);
+  }, [submittedColumnFunctionSearchState, setValue, functionId]);
 
   // Convert a value from Query Builder into the Field Extension State in this component.
   useEffect(() => {
-    if (value) {
-      setSubmittedColumnFunctionSearchState(
-        Object.values(JSON.parse(value))[0] as ColumnFunctionSearchStates
-      );
+    if (value && indexMapping) {
+      const rawParsed = Object.values(JSON.parse(value))[0] as FunctionDef;
+
+      // Convert Strings back to Objects so the Dropdowns work properly.
+      if (
+        rawParsed.functionDef === "CONCAT" &&
+        rawParsed.params?.items &&
+        Array.isArray(rawParsed.params.items)
+      ) {
+        rawParsed.params.items = rawParsed.params.items.map((item: any) => {
+          // If it is already an object (ESIndexMapping), leave it alone
+          if (typeof item !== "string") return item;
+
+          // Find the matching ESIndexMapping object from the provided indexMapping list
+          // We check against 'value' (path) OR 'label' because the save logic uses either depending on parentName
+          const found = indexMapping.find(
+            (mapping) => mapping.value === item || mapping.label === item
+          );
+
+          return found || { label: item, value: item };
+        });
+      }
+
+      setSubmittedColumnFunctionSearchState(rawParsed);
+      setColumnFunctionSearchState(rawParsed);
     }
-  }, [value]);
+  }, [value, indexMapping]);
 
   const indexMappingFiltered = useMemo(() => {
     return (
@@ -132,17 +164,20 @@ export default function QueryRowColumnFunctionInput({
         (item) => item.dynamicField?.type !== "columnFunction"
       ) ?? []
     );
-  }, indexMapping);
+  }, [indexMapping]);
 
-  const isValid = (state: ColumnFunctionSearchStates) => {
-    if (state && state.functionName) {
+  const isValid = (state: FunctionDef) => {
+    if (state && state.functionDef) {
       if (
-        state.functionName === "CONCAT" &&
-        _.compact(state.params).length > 1
+        state.functionDef === "CONCAT" &&
+        state?.params?.items &&
+        _.compact(state.params.items).length > 1
       ) {
         return true;
-      } else if (state.functionName === "CONVERT_COORDINATES_DD") {
-        state.params = undefined;
+      } else if (state.functionDef === "CONVERT_COORDINATES_DD") {
+        state.params = {
+          column: "collectingEvent.eventGeom"
+        };
         return true;
       }
     }
@@ -151,32 +186,36 @@ export default function QueryRowColumnFunctionInput({
 
   const selectedFunction =
     formulaOptions?.find(
-      (formula) => formula.value === columnFunctionSearchState.functionName
+      (formula) => formula.value === columnFunctionSearchState.functionDef
     ) ?? null;
 
   const functionParams = (
-    _.compact(columnFunctionSearchState.params) as (
+    _.compact(columnFunctionSearchState?.params?.items) as (
       | ESIndexMapping
       | undefined
     )[]
   ).concat(undefined);
 
   const setFunctionParam = (fieldPath: string, index: number) => {
-    const params = columnFunctionSearchState.params ?? [];
+    const params = columnFunctionSearchState?.params?.items ?? [];
     params[index] = indexMapping?.find((item) => item.value === fieldPath);
 
-    const submittedParams = submittedColumnFunctionSearchState.params ?? [];
+    const submittedParams =
+      submittedColumnFunctionSearchState?.params?.items ?? [];
     submittedParams[index] = indexMapping?.find(
       (item) => item.value === fieldPath
     );
 
     setColumnFunctionSearchState({
-      functionName: columnFunctionSearchState.functionName,
-      params: [...params]
+      functionDef: columnFunctionSearchState.functionDef,
+      params: { ...columnFunctionSearchState.params, items: params }
     });
     setSubmittedColumnFunctionSearchState({
-      functionName: submittedColumnFunctionSearchState.functionName,
-      params: [...submittedParams]
+      functionDef: submittedColumnFunctionSearchState.functionDef,
+      params: {
+        ...submittedColumnFunctionSearchState.params,
+        items: submittedParams
+      }
     });
   };
 
@@ -270,7 +309,9 @@ export default function QueryRowColumnFunctionInput({
   ): ((fieldPath: string) => void) | undefined {
     return (fieldPath) => {
       if (field?.dynamicField) {
-        const params = [...(submittedColumnFunctionSearchState.params ?? [])];
+        const params = [
+          ...(submittedColumnFunctionSearchState?.params?.items ?? [])
+        ];
         let indexValue: string;
         let foundIndexMapping: ESIndexMapping | undefined = undefined;
         switch (field.dynamicField.type) {
@@ -337,7 +378,7 @@ export default function QueryRowColumnFunctionInput({
           // Update dynamicField for submitted column function search state only to prevent unwanted dropdown changes
           setSubmittedColumnFunctionSearchState((prev) => ({
             ...prev,
-            params: params
+            params: { ...prev.params, items: params }
           }));
         }
       }

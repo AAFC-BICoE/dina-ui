@@ -71,7 +71,7 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   mandatoryDisplayedColumns?: string[];
 
   /**
-   * IDs of the columns that should always be displayed and cannot be deleted.
+   * IDs of the columns that cannot be exported.
    *
    * Uses the startsWith match so you can define the full path or partial paths.
    */
@@ -199,22 +199,24 @@ export function ColumnSelector<TData extends KitsuResource>(
       }
 
       // Add UUID field as an additional field.
-      injectedMappings = injectedMappings.concat(
-        {
-          label: "id",
-          value: "id",
-          path: "id",
-          hideField: false,
-          type: "text",
-          containsSupport: false,
-          distinctTerm: false,
-          endsWithSupport: false,
-          keywordMultiFieldSupport: false,
-          keywordNumericSupport: false,
-          optimizedPrefix: false,
-          dynamicField: undefined
-        },
-        {
+      injectedMappings = injectedMappings.concat({
+        label: "id",
+        value: "id",
+        path: "id",
+        hideField: false,
+        type: "text",
+        containsSupport: false,
+        distinctTerm: false,
+        endsWithSupport: false,
+        keywordMultiFieldSupport: false,
+        keywordNumericSupport: false,
+        optimizedPrefix: false,
+        dynamicField: undefined
+      });
+
+      // Do not display column functions in the list of selectable columns unless in export mode.
+      if (exportMode) {
+        injectedMappings = injectedMappings.concat({
           label: "columnFunction",
           value: "columnFunction",
           path: "columnFunction",
@@ -231,8 +233,8 @@ export function ColumnSelector<TData extends KitsuResource>(
           keywordNumericSupport: false,
           optimizedPrefix: false,
           endsWithSupport: false
-        }
-      );
+        });
+      }
 
       // Finally, set it as the state.
       setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
@@ -274,17 +276,32 @@ export function ColumnSelector<TData extends KitsuResource>(
       if (injectedIndexMapping && overrideDisplayedColumns) {
         const promises = overrideDisplayedColumns?.columns?.map?.(
           async (localColumn, index) => {
-            const columnFunctionPath = localColumn.includes("function")
-              ? overrideDisplayedColumns.columnFunctions?.[localColumn]
-                  .functionName === "CONCAT"
-                ? `columnFunction/${localColumn}/${
-                    overrideDisplayedColumns.columnFunctions?.[localColumn]
-                      .functionName
-                  }/${overrideDisplayedColumns.columnFunctions?.[
-                    localColumn
-                  ].params.join("+")}`
-                : `columnFunction/${localColumn}/${overrideDisplayedColumns.columnFunctions?.[localColumn].functionName}`
-              : undefined;
+            let columnFunctionPath: string | undefined = undefined;
+
+            // Determine if this is a function column and construct the path
+            if (localColumn.includes("function")) {
+              const funcData =
+                overrideDisplayedColumns.functions?.[localColumn];
+              if (funcData) {
+                let finalParams = funcData.params;
+
+                // Check if we are using the old format (where params was just an array of strings)
+                // If so, convert it to the new object format { items: [...] }
+                if (
+                  funcData.functionDef === "CONCAT" &&
+                  Array.isArray(finalParams)
+                ) {
+                  finalParams = { items: finalParams };
+                }
+
+                // Format: columnFunction/functionId/functionDef[/paramJson]
+                columnFunctionPath =
+                  `columnFunction/${localColumn}/${funcData.functionDef}` +
+                  (funcData.params
+                    ? "/" + JSON.stringify(funcData.params)
+                    : "");
+              }
+            }
 
             const newColumnDefinition = await generateColumnDefinition({
               indexMappings: injectedIndexMapping,
@@ -293,6 +310,7 @@ export function ColumnSelector<TData extends KitsuResource>(
               defaultColumns,
               path: columnFunctionPath ?? localColumn
             });
+
             // Set the column header if saved.
             if (newColumnDefinition) {
               newColumnDefinition.exportHeader =

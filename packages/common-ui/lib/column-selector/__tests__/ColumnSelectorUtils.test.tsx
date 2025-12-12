@@ -296,9 +296,11 @@ describe("ColumnSelectorUtils", () => {
             endsWithSupport: false
           },
           dynamicFieldValue:
-            '{"function1":{"functionName":"CONCAT","params":[{"label":"barcode","value":"data.attributes.barcode","hideField":false,"type":"text","path":"data.attributes","keywordMultiFieldSupport":true,"keywordNumericSupport":false,"optimizedPrefix":false,"containsSupport":false,"endsWithSupport":false},{"label":"createdBy","value":"data.attributes.createdBy","hideField":false,"type":"text","path":"data.attributes","keywordMultiFieldSupport":true,"keywordNumericSupport":false,"optimizedPrefix":false,"containsSupport":false,"endsWithSupport":false}]}}'
+            '{"function1":{"functionDef":"CONCAT","params":{"items": ["barcode","createdBy"]}}}'
         })
-      ).toEqual("columnFunction/function1/CONCAT/barcode+createdBy");
+      ).toEqual(
+        'columnFunction/function1/CONCAT/{"items":["barcode","createdBy"]}'
+      );
 
       expect(
         generateColumnPath({
@@ -321,7 +323,7 @@ describe("ColumnSelectorUtils", () => {
             endsWithSupport: false
           },
           dynamicFieldValue:
-            '{"function2":{"functionName":"CONVERT_COORDINATES_DD"}}'
+            '{"function2":{"functionDef":"CONVERT_COORDINATES_DD"}}'
         })
       ).toEqual("columnFunction/function2/CONVERT_COORDINATES_DD");
     });

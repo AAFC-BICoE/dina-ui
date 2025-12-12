@@ -1271,7 +1271,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedExport_exportDropdown: "Select Export Template",
   savedExport_createTitle: "Save Export Template",
   savedExport_overrideWarning:
-    'A export template exists with the name "{savedExportName}". Creating this export template will replace the existing one.',
+    'A export template exists with the name "{savedExportName}". Please select a new name or delete the existing template first.',
   savedExport_createName: "Saved Export Template Name",
   savedExport_columnsToBeSaved: "Columns to be saved",
   export_columnsToExport: "Columns To Export",
