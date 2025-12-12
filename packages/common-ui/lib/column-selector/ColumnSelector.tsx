@@ -283,6 +283,17 @@ export function ColumnSelector<TData extends KitsuResource>(
               const funcData =
                 overrideDisplayedColumns.functions?.[localColumn];
               if (funcData) {
+                let finalParams = funcData.params;
+
+                // Check if we are using the old format (where params was just an array of strings)
+                // If so, convert it to the new object format { items: [...] }
+                if (
+                  funcData.functionDef === "CONCAT" &&
+                  Array.isArray(finalParams)
+                ) {
+                  finalParams = { items: finalParams };
+                }
+
                 // Format: columnFunction/functionId/functionDef[/paramJson]
                 columnFunctionPath =
                   `columnFunction/${localColumn}/${funcData.functionDef}` +
