@@ -131,12 +131,12 @@ export function DeleteButton({
       onClick={() =>
         openModal(
           type === "person" ? (
-            <AreYouSureModal
+            <AreYouSureModalPersonDelete
               actionMessage={<CommonMessage id="deleteButtonText" />}
               onYesButtonClicked={doDelete}
             />
           ) : (
-            <AreYouSureModalPersonDelete
+            <AreYouSureModal
               actionMessage={<CommonMessage id="deleteButtonText" />}
               onYesButtonClicked={doDelete}
             />

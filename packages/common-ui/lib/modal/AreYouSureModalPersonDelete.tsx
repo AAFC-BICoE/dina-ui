@@ -13,8 +13,10 @@ import { useDinaIntl } from "../../../../packages/dina-ui/intl/dina-ui-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { PersistedResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { simpleSearchFilterToFiql } from "../filter-builder/fiql";
+import { ReactTable } from "../table/ReactTable";
+import { ColumnDef } from "@tanstack/react-table";
 
 export interface AreYouSureModalProps {
   /** Describes the acion you're asking the user about. */
@@ -61,6 +63,61 @@ export function AreYouSureModalPersonDelete({
     closeModal();
   }
 
+  // Mapping from resource type to API segment
+  const apiMapping = {
+    metadata: "object-store",
+    "material-sample": "collection",
+    "collecting-event": "collection",
+    project: "collection",
+    expedition: "collection",
+    "pcr-batch": "seqdb",
+    "seq-batch": "seqdb",
+    "seq-submission": "seqdb"
+  };
+
+  // mapping for resource names
+  // const resourceConfig = {
+  //   "metadata": (r: any) => r.filename,
+  //   "material-sample": (r: any) => r.materialSampleName,
+  //   "collecting-event": (r: any) => r.filename,
+  // } as const
+
+  const RELATED_OBJECTS_COLUMNS: ColumnDef<KitsuResource>[] = [
+    {
+      id: "type",
+      accessorKey: "type",
+      header: () => <strong>{formatMessage("resourceType")}</strong>,
+      cell: ({ row }) => {
+        const object = row.original;
+        return (
+          <div className="d-flex flex-row mx-3" key={object.id}>
+            {object.type}
+          </div>
+        );
+      }
+    },
+    {
+      id: "resourceName",
+      accessorKey: "resourceName",
+      header: () => <strong>{formatMessage("resourceName")}</strong>,
+      cell: ({ row }) => {
+        const object = row.original;
+        return (
+          <div className="d-flex flex-row mx-3" key={object.id}>
+            <Link
+              onClick={closeModal}
+              href={`/${apiMapping[object.type]}/${object.type}/view?id=${
+                object.id
+              }`}
+            >
+              {object.id}
+            </Link>
+          </div>
+        );
+      }
+    }
+  ];
+
   async function getRelatedObjects(uuid: string): Promise<PersistedResource[]> {
     // fields with person relationships to check
     const relationshipFields = {
@@ -72,8 +129,29 @@ export function AreYouSureModalPersonDelete({
       "collection-api": {
         "material-sample": {
           fields: ["preparedBy"]
+        },
+        "collecting-event": {
+          fields: ["collectors"]
+        },
+        project: {
+          fields: ["contributors.agent"]
+        },
+        expedition: {
+          fields: ["participants"]
         }
       }
+      // seqdb will be added later
+      // "seqdb-api" : {
+      //   "pcr-batch" : {
+      //     fields : ["experimenters"]
+      //   },
+      //   "seq-batch:" : {
+      //     fields : ["experimenters"]
+      //   },
+      //   "seq-submission" : {
+      //     fields : ["submittedBy"]
+      //   }
+      // }
     };
 
     const relatedObjects: PersistedResource[] = [];
@@ -81,7 +159,6 @@ export function AreYouSureModalPersonDelete({
     for (const api of Object.keys(relationshipFields)) {
       for (const resourceType of Object.keys(relationshipFields[api])) {
         // Create a new filter for each resource type
-
         // for each field in resourceType, check for relationships to the given UUID
         for (const field in relationshipFields[api][resourceType]["fields"]) {
           const filter = SimpleSearchFilterBuilder.create();
@@ -109,22 +186,7 @@ export function AreYouSureModalPersonDelete({
     return (
       <div>
         <div>{formatMessage("relatedObjectsPerson")}</div>
-        {relatedObjects.length > 0 &&
-          relatedObjects.map((object) => (
-            <div className="d-flex flex-row mx-3" key={object.id}>
-              {["metadata"].includes(object.type) ? (
-                <Link
-                  href={`/object-store/${object.type}/view?id=${object.id}`}
-                >
-                  {object.id}
-                </Link>
-              ) : (
-                <Link href={`/collection/${object.type}/view?id=${object.id}`}>
-                  {object.id}
-                </Link>
-              )}
-            </div>
-          ))}
+        <ReactTable columns={RELATED_OBJECTS_COLUMNS} data={relatedObjects} />
       </div>
     );
   };
