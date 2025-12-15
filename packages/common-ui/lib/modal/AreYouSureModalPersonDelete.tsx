@@ -9,7 +9,7 @@ import _ from "lodash";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { SimpleSearchFilterBuilder } from "../util/simpleSearchFilterBuilder";
 import { useApiClient } from "../api-client/ApiClientContext";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../../packages/dina-ui/intl/dina-ui-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
