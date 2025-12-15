@@ -70,9 +70,9 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   existing: "Vorhanden",
   expand: "Erweitern",
   exportButtonText: "Exportieren",
-  exportObjectsButtonText: "Objekte exportieren",
+  exportObjectsButtonText: "Medienobjekte exportieren",
   exportObjectsMaxLimitTooltip:
-    "Objekte exportieren erlaubt maximal 100 Dateien. Bitte bis zu 100 Dateien auswählen.",
+    "Medienobjekte exportieren erlaubt maximal 100 Dateien. Bitte bis zu 100 Dateien auswählen.",
   false: "FALSCH",
   field_address: "Adresse",
   field_author: "Verfasser",
