@@ -126,6 +126,12 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
     "Für dieses Feld werden bei den ausgewählten Datensätzen keine ßnderungen vorgenommen. Bereits vorhandene Werte bleiben unverändert.",
   noRowsFound: "keine Zeilen gefunden",
   none: "keine",
+  numberBetweenInvalid:
+    "Ungültige Bereichssuche: Die Von-Zahl ist größer als die Bis-Zahl.",
+  numberBetweenMissingValues:
+    "Ungültige Bereichssuche: Es müssen zwei Zahlen angegeben werden.",
+  numberInRangeInvalid:
+    "Ungültige In/Not-in-Suche: Zahlen müssen gültig und kommagetrennt sein (z. B. 12.5, 2, 4).",
   numberInvalid: "Bitte gib eine gültige Zahl ein",
   of: "von",
   oneValuePerLine: "Ein Eintrag pro Zeile",
