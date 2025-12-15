@@ -52,7 +52,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addRuleSet: "Regelsatz hinzufügen",
   addScheduledAction: "Terminierte Aktion hinzufügen",
   addStorageUnitTitle: "Lagerungseinheit hinzufügen",
-  addStorageUnitTypeTitle: "Typ einer Lagerungseinheit hinzufügen",
+  addStorageUnitTypeTitle: "Lagereinheitstyp hinzufügen",
   addTransactionTitle: "Transaktion anlegen",
   additionalRemarks: "Zusätzliche Anmerkungen",
   adminRoles: "Admin-Rollen",
@@ -73,7 +73,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   assemblage: "Teilsammlung",
   assemblageAttachments: "Teilsammlung-Anhänge",
   assemblageListTitle: "Teilsammlungen",
-  assemblageManagedAttributes: "Regelattribute der Teilsammlungen",
+  assemblageManagedAttributes: "Regelattribute der Teilsammlung",
   assemblage_tooltip:
     "Mechanismus zur Gruppierung von Materialproben nach einem organisatorischen Thema.",
   assemblages: "Teilsammlungen",
@@ -1194,7 +1194,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   storageUnitListTitle: "Lagereinheit",
   storageUnitName: "Name der Lagereinheit",
   storageUnitType: "Typ der Lagereinheit",
-  storageUnitTypeListTitle: "Typen der Lagereinheit",
+  storageUnitTypeListTitle: "Lagereinheitstypen",
   storageUnit_duplicate_body:
     "Der Name „{duplicatedName}“ wird bereits für eine andere Lagereinheit in dieser Gruppe verwendet. Möchten Sie trotzdem fortfahren?",
   storageUnit_duplicate_title: "Name der Lagereinheit existiert bereits",
@@ -1222,7 +1222,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   thumbnail: "Vorschaubild",
   thumbnailNotAvailableText: "Kein Vorschaubild vorhanden",
   title_acMetadataCreator: "Hochgeladen von",
-  title_assemblage: "Fundzusammenstellung",
+  title_assemblage: "Teilsammlungen",
   title_collectingEvent: "Sammlungsevent",
   title_collection: "Sammlung",
   title_dcCreator: "Digitalisiert von",
@@ -1246,7 +1246,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   typeAnythingOrPickAScientificName:
     "Geben Sie etwas ein oder wählen Sie einen wissenschaftlichen Namen",
   typeNewTagOrSearchPreviousTags:
-    "Geben Sie ein neues Schlagwort ein oder durchsuchen Sie die voerherigen Schlagwörter",
+    "Geben Sie ein neues Schlagwort ein oder durchsuchen Sie die vorherigen Schlagwörter",
   typeSpecimen: "Geben sie das Exemplar ein",
   unauthorized: "Nicht autorisiert",
   unit: "Einheit",
