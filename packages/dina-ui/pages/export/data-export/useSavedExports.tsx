@@ -283,6 +283,40 @@ export default function useSavedExports<TData extends KitsuResource>({
   }
 
   /**
+   * MIGRATION: For legacy records with columnFunctions, convert them to the new
+   * "functions" format and clear the old "columnFunctions" on the backend.
+   *
+   * This sends a minimal PATCH: only "functions" and "columnFunctions".
+   */
+  async function performSavedExportMigration(
+    migratedExport: DataExportTemplate
+  ): Promise<void> {
+    await apiClient.axios.patch(
+      `/dina-export-api/data-export-template/${migratedExport.id}`,
+      {
+        data: {
+          id: migratedExport.id,
+          type: migratedExport.type,
+          attributes: {
+            // New functions state to persist:
+            functions: (migratedExport as any).functions,
+            // Clear legacy field on the backend:
+            columnFunctions: {}
+          }
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json"
+        }
+      }
+    );
+
+    // Reload so local state is in sync with the backend:
+    await retrieveSavedExports();
+  }
+
+  /**
    * Retrieve the users user-preferences and find the savedExportColumnSelection
    * filtered for this specific indexName.
    */
@@ -316,7 +350,58 @@ export default function useSavedExports<TData extends KitsuResource>({
    */
   useEffect(() => {
     if (selectedSavedExport) {
-      setColumnPathsToExport(selectedSavedExport);
+      // MIGRATION CODE: Handle legacy saved exports with column functions.
+      const legacyColumnFunctions = (selectedSavedExport as any)
+        .columnFunctions;
+
+      if (legacyColumnFunctions && Object.keys(legacyColumnFunctions).length) {
+        // Build a new "functions" object from legacyColumnFunctions:
+        const newFunctions: Record<string, any> = {
+          ...(selectedSavedExport as any).functions
+        };
+
+        Object.entries(legacyColumnFunctions).forEach(
+          ([functionKey, legacyDef]: [string, any]) => {
+            const { functionName, params } = legacyDef;
+
+            const newFunc: any = {
+              functionDef: functionName,
+              params: {}
+            };
+
+            if (functionName === "CONCAT") {
+              newFunc.params.items = params;
+            } else if (functionName === "CONVERT_COORDINATES_DD") {
+              newFunc.params = { column: "collectingEvent.eventGeom" };
+            }
+
+            newFunctions[functionKey] = newFunc;
+          }
+        );
+
+        const migratedExport: any = {
+          ...selectedSavedExport,
+          // Clear legacy field and set new one:
+          columnFunctions: {} as any,
+          functions: newFunctions as any
+        };
+
+        // Sync all related state with the migrated export
+        setSelectedSavedExport(migratedExport);
+        setColumnPathsToExport(migratedExport);
+        setRestrictToCreatedBy(
+          migratedExport.restrictToCreatedBy ?? restrictToCreatedBy
+        );
+        setPubliclyReleaseable(
+          migratedExport.publiclyReleasable ?? publiclyReleasable
+        );
+
+        // Now persist the migrated object to the backend
+        performSavedExportMigration(migratedExport);
+      } else {
+        // No migration needed, just load paths:
+        setColumnPathsToExport(selectedSavedExport);
+      }
     }
   }, [selectedSavedExport]);
 
