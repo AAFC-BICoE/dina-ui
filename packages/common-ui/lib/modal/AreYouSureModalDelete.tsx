@@ -21,7 +21,7 @@ import {
   getResourceName,
   getResourceApi,
   RelationshipFields
-} from "./RelatedObjectUtils";
+} from "common-ui/lib/modal/RelatedObjectUtils";
 export interface AreYouSureModalProps {
   /** Describes the acion you're asking the user about. */
   actionMessage: ReactNode;
