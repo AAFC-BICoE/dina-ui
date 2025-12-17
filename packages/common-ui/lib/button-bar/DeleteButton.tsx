@@ -7,7 +7,8 @@ import {
 } from "../api-client/ApiClientContext";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
-import { AreYouSureModalPersonDelete } from "../modal/AreYouSureModalPersonDelete";
+import { AreYouSureModalDelete } from "../modal/AreYouSureModalDelete";
+import { personRelationshipFields } from "../modal/RelatedObjectUtils";
 import { useModal } from "../modal/modal";
 import { MaterialSample } from "../../../dina-ui/types/collection-api";
 import { KitsuResponse } from "kitsu";
@@ -131,9 +132,10 @@ export function DeleteButton({
       onClick={() =>
         openModal(
           type === "person" ? (
-            <AreYouSureModalPersonDelete
+            <AreYouSureModalDelete
               actionMessage={<CommonMessage id="deleteButtonText" />}
               onYesButtonClicked={doDelete}
+              relationshipFields={personRelationshipFields}
             />
           ) : (
             <AreYouSureModal
