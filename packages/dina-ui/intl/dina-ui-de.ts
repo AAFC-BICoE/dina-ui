@@ -190,7 +190,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   columnSelector_field_placeholder: "Feld auswählen",
   columnSelector_resetButton: "Spalten zurücksetzen",
   columnSelector_selectClassification: "Klassifikation auswählen:",
-  columnSelector_selectManagedAttribute: "Verwaltetes Attribut auswählen:",
+  columnSelector_selectManagedAttribute: "Regelattribut auswählen:",
   components: "Komponenten",
   configureDefaultValues: "Standardwert konfigurieren",
   configureFormTemplate: "Formularvorlage konfigurieren",
