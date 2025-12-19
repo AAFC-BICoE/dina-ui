@@ -66,7 +66,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   allowDuplicate: "Dublikate zulassen",
   allowExisting: "Existierende zulassen",
   allowNew: "Neue zulassen",
-  andNMore: "... und {count} weitere",
+  andNMore: "… und {count} weitere",
   appTitle: "DINA",
   appTitleInstanceMode: "DINA ({instanceMode})",
   areYouSureRemoveSavedSearch: "Sind Sie sicher",
@@ -106,7 +106,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   browseStorageTree: "Lagerungsbaum durchsuchen",
   bulkCreate: "mehrere Neue anlegen",
   bulkEditNotPubliclyReleasableTooltip:
-    'Der aktuelle Status der ausgewählten Elemente ist standardmäßig auf "{keepCurrentValues}" gesetzt. Ãnderungen hier werden auf alle ausgewählten Elemente angewendet.',
+    "Der aktuelle Status der ausgewählten Elemente ist standardmäßig auf „{keepCurrentValues}“ gesetzt. Änderungen hier werden auf alle ausgewählten Elemente angewendet.",
   bulkEditResourceLinkerWarningMulti:
     "Diese {fieldName} wird mit allen {targetType} verknüpft",
   bulkEditResourceLinkerWarningSingle:
@@ -131,7 +131,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Diese geplante Aktion wird für alle Materialproben gesetzt.",
   bulkOperationCompleteTitle: "Sammeloperation abgeschlossen",
   bulkUploadDetectedDescription:
-    "Sie haben {count} Dateien hochgeladen. Die Tabelle muss diese Dateien mit passenden âOriginal Filenameâ-Werten enthalten.",
+    "Sie haben {count} Dateien hochgeladen. Die Tabelle muss diese Dateien mit passenden „Original Filename“-Werten enthalten.",
   cancelButtonText: "Abbrechen",
   cataloguedObjectListTitle: "Katalogisierte Objekte",
   cfiaPPCLevel: "CFIA PPC Level",
@@ -156,9 +156,9 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Dieses Sammlungsevent ist derzeit mit {count} Materialproben verknüpft. Stellen Sie sicher",
   collectingEventEditAlertTitle: "Sammlungsevent aktualisieren?",
   collectingEventEditErrorMessage:
-    "Dieses Sammlungsevent ist derzeit mit {count} Materialproben verknüpft. Bearbeitung ist nur auf der Detailseite des Sammlungsevents mÃ¶glich.",
+    "Dieses Sammlungsevent ist derzeit mit {count} Materialproben verknüpft. Bearbeitung ist nur auf der Detailseite des Sammlungsevents möglich.",
   collectingEventEditErrorMessageSingle:
-    "Dieses Sammlungsevent ist derzeit mit einer Materialprobe verknüpft. Bearbeitung ist nur auf der Detailseite des Sammlungsevents mÃ¶glich.",
+    "Dieses Sammlungsevent ist derzeit mit einer Materialprobe verknüpft. Bearbeitung ist nur auf der Detailseite des Sammlungsevents möglich.",
   collectingEventFieldExtensions: "Sammlungsevent-Felderweiterungen",
   collectingEventGoToDetails: "Zur Detailseite des Sammlungsevents",
   collectingEventListTitle: "Sammlungsevent",
@@ -222,7 +222,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createStorage: "Lagerort anlegen",
   croppedImg: "Zugeschnittenes Bild",
   customPlaceName: "Benutzerdefinierter Ortsname",
-  customPlaceNamePlaceholder: "Eigenen Ortsnamen eingeben â¦",
+  customPlaceNamePlaceholder: "Eigenen Ortsnamen eingeben …",
   dataComponents: "Datenelement",
   dataEntryLabel: "Dateneingabe",
   dataExportError: "Beim Exportieren der Daten ist ein Fehler aufgetreten.",
@@ -230,7 +230,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   dataLabel: "Daten",
   dataPasteZone: "Daten-Einfügebereich",
   dataSourceHasNoTaxonData:
-    "Diese Datenquelle liefert nur Namen. Ãbergeordnete taxonomische Daten sind nicht verfügbar.",
+    "Diese Datenquelle liefert nur Namen. Übergeordnete taxonomische Daten sind nicht verfügbar.",
   dataType: "Typ:",
   dataUnit: "Einheit:",
   dataValue: "Wert:",
@@ -242,7 +242,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   defaultValues: "Standardwert",
   defaultValuesConfig: "Konfiguration der Standardwerte",
   defaultValuesConfigs: "Konfigurationen der Standardwerte",
-  deleteAllStorageUnit: "Standort aus allen Lagereinheiten lÃ¶schen",
+  deleteAllStorageUnit: "Standort aus allen Lagereinheiten löschen",
   deleteButtonText: "Löschen",
   deleteConfig: "Konfiguration löschen",
   deleteEmptyStorageWarning:
@@ -342,7 +342,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   feedbackLinkTitle: "GitHub-Issues",
   feedbackTitle: "Feedback wird in öffentlichen GitHub-Issues erfasst",
   feedbackWarningDescription:
-    "Überprüfen Sie vor dem Posten Text und Anhänge, um sicherzustellen, dass keine sensiblen Informationen offengelegt werden. Private Daten, Zugangsdaten oder proprietäre Projektinformationen gelten als offengelegt, wenn sie in Issue-Beschreibungen, Kommentaren oder Anhängen vorkommen.",
+    "Überprüfen Sie vor dem Posten Text und Anhänge, um sicherzustellen, dass keine sensiblen Informationen offengelegt werden. Private Daten, Zugangsdaten oder proprietäre Projektinformationen gelten als offengelegt, wenn sie in Issue-Beschreibungen, Kommentaren oder Anhängen vorkommen.",
   feedbackWarningTitle:
     "Warnung: GitHub-Issues sind öffentlich sichtbar, jeder kann Inhalte einsehen und durchsuchen.",
   fieldExtensions: "Felderweiterung",
@@ -479,14 +479,14 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_endDate: "Enddatum",
   field_endEventDateTime: "Datum und Zeit des Endevents",
   field_endEventDateTime_tooltip:
-    "Endzeitpunktformat muss ein Teilformat von YYYY-MM-DDTHH:MM:SS.MMM sein. Wenn ein Datum/Zeitwert vorhanden ist, ist âTâ erforderlich.",
+    "Endzeitpunktformat muss ein Teilformat von YYYY-MM-DDTHH:MM:SS.MMM sein. Wenn ein Datum/Zeitwert vorhanden ist, ist „T“ erforderlich.",
   field_expeditionName: "Expeditionsname",
   field_familyNames: "Familienname",
   field_familyNames_tooltip:
     "Familienname(n), einschließlich zusammengesetzter Familiennamen",
   field_fieldExtensions: "Felderweiterungen",
   field_fileIdentifier: "Datei-Bezeichner",
-  field_fileSize: "Dateigröße",
+  field_fileSize: "Dateigröße",
   field_filename: "Dateiname",
   field_geographicContext: "Geographischer Kontext",
   field_givenNames: "Vornamen",
@@ -613,7 +613,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_startDate: "Anfangsdatum",
   field_startEventDateTime: "Datum und Zeit des Anfangsevents",
   field_startEventDateTime_tooltip:
-    "Startzeitpunktformat muss ein Teilformat von YYYY-MM-DDTHH:MM:SS.MMM sein. Wenn ein Datum/Zeitwert vorhanden ist, ist âTâ erforderlich.",
+    "Startzeitpunktformat muss ein Teilformat von YYYY-MM-DDTHH:MM:SS.MMM sein. Wenn ein Datum/Zeitwert vorhanden ist, ist „T“ erforderlich.",
   field_status: "Status",
   field_storageUnit: "Lagereinheit",
   field_tags: "Stichworte",
@@ -624,7 +624,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_templateOutputMediaType: "Vorlagen-Ausgabemedientyp",
   field_title: "Titel",
   "field_title.en": "Englischer Titel",
-  "field_title.fr": "FranzÃ¶sischer Titel",
+  "field_title.fr": "Französischer Titel",
   field_transactionNumber: "Transaktionsnummer",
   field_transactionType: "Transaktionstyp",
   field_transcriberRemarks: "Notizen des Übertragenden",
@@ -683,7 +683,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   generateLabel: "Ettikett generieren",
   generateSeries: "Serie generieren",
   generateURLButtonText: "URL erzeugen",
-  generatingReport: "Bericht wird erstellt...",
+  generatingReport: "Bericht wird erstellt …",
   genericMolecularAnalysis: "Allgemeine Molekularanalyse",
   geoReferenceAssertion: "Georeferenzierungszusage",
   geoReferenceAssertions: "GEO-Referenzaussagen",
@@ -731,13 +731,13 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   literalGeoreferencedByLabel: "Georeferenziert durch",
   load: "Belastung",
   loading: "Laden",
-  loadingSpinner: "Lädt...",
+  loadingSpinner: "Lädt …",
   loanTransaction: "Transaktion",
   loanTransactionManagedAttributeListTitle:
     "Regelattribut für Kredite und Transaktionen",
   loanTransactionsSectionTitle: "Transaktionen",
   locationLabel: "Ort",
-  locationPlaceholder: "Ort zum Suchen eingeben...",
+  locationPlaceholder: "Ort zum Suchen eingeben …",
   longitudeValidationError:
     "Ungültiger Längengrad: {longtitude}, \n der gültige Längengradbereich liegt zwischen -90 und 90 für Grad und 0 bis 60 für Minute und Sekunde",
   makeFiledAs: "als 'abgelegt als' markieren",
@@ -771,7 +771,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   materialSampleListTitle: "Materialprobe",
   materialSampleManagedAttributes: "Regelattribut zur Materialprobe",
   materialSampleName: "Name der Materialprobe",
-  materialSampleShowParentAttributes: "Übergeordnete Attribute",
+  materialSampleShowParentAttributes: "Übergeordnete Attribute",
   materialSampleSplitConfiguration: "Aufteilungskonfiguration",
   materialSampleSplitConfigurationCondition: "Bedingung",
   materialSampleSplitConfigurationConditionType: "Bedingungstyp",
@@ -1130,12 +1130,12 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   shipmentDetails: "Lieferdetails",
   showLess: "Weniger anzeigen",
   showMore: "Mehr anzeigen",
-  showParentAttributes: "Übergeordnete Materialprobe",
+  showParentAttributes: "Übergeordnete Materialprobe",
   showing: "Anzeigen",
   showingFilteredStorageUnits: "Gefilterte Lagerungseinheiten anzeigen",
   showingTopLevelStorageUnits: "Top Level Lagerungseinheiten anzeigen",
   singleAttachmentFoundBannerText: "1 Anhang wurde gefunden.",
-  skipColumn: "Überspringen",
+  skipColumn: "Überspringen",
   skipToAboutThisApplication: "Zur Seite 'Über diese Seite' springen",
   skipToBasicHtmlVersion: "zur basic HTML Version wechseln",
   skipToMainContent: "Zum Hauptinhalt springen",
@@ -1146,7 +1146,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Automatisch generierter Name des Arbeitsmappengenerators",
   specifyParentContainer: "Bitte Elternelement auswählen",
   splitButton: "Aufteilen",
-  splitConfigurationAdd: "Aufteilungskonfiguration hinzufÜ¼gen",
+  splitConfigurationAdd: "Aufteilungskonfiguration hinzufügen",
   splitConfigurationEdit: "Aufteilungskonfiguration bearbeiten",
   splitConfigurationNameLabel: "Name der Split-Konfiguration",
   splitConfigurationTitle: "Aufteilungskonfigurationen",
@@ -1328,7 +1328,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   workbookPreviewTitle: "Vorschau der Arbeitsmappe",
   workbookTitle: "Arbeitsmappen",
   workbookUploadBulkEditInfoMessage:
-    "{count} Dateien für Massenbearbeitung bereit. Laden Sie eine Tabelle mit einer Spalte Original Filename hoch",
+    "{count} Dateien für Massenbearbeitung bereit. Laden Sie eine Tabelle mit einer Spalte „Original Filename“ hoch",
   workbookUploadFailure:
     "Es ist ein Problem beim Lesen der hochgeladenen Tabelle aufgetreten",
   workbookUploadInstructions:

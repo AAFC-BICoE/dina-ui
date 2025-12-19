@@ -26,7 +26,7 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   bulkSubmissionErrorInfo:
     "fehlerhafte Eingabe: Bitte prüfen Sie die Felder mit roter Kennzeichnung.",
   cancelButtonText: "Annullieren",
-  changesMade: "Änderungen vorgenommen",
+  changesMade: "Änderungen vorgenommen",
   changesMadeTooltip:
     "Dieses Feld wird für alle ausgewählten Datensätze auf denselben Wert gesetzt. Vorhandene Werte werden überschrieben.",
   checkAll: "Alle prüfen",
@@ -70,9 +70,9 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   existing: "Vorhanden",
   expand: "Erweitern",
   exportButtonText: "Exportieren",
-  exportObjectsButtonText: "Medienobjekte exportieren",
+  exportObjectsButtonText: "Objekte exportieren",
   exportObjectsMaxLimitTooltip:
-    "Medienobjekte exportieren erlaubt maximal 100 Dateien. Bitte bis zu 100 Dateien auswählen.",
+    "„Objekte exportieren“ erlaubt maximal 100 Dateien. Bitte bis zu 100 Dateien auswählen.",
   false: "FALSCH",
   field_address: "Adresse",
   field_author: "Verfasser",
@@ -106,7 +106,7 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   jumpToPage: "Zur Seite springen",
   keepCurrentValues: "Aktuelle Werte beibehalten",
   languageOfPage: "deu",
-  largeImage: "Großes Bild",
+  largeImage: "Großes Bild",
   last: "Letzte",
   loadingText: "lädt…",
   loggedInAsUser: "Eingelogged als:",
@@ -121,9 +121,9 @@ export const COMMON_UI_MESSAGES_GERMAN: Partial<
   navigation: "Navigation",
   next: "Nächstes",
   no: "Nein",
-  noChangesMade: "Keine ßnderungen",
+  noChangesMade: "Keine Änderungen",
   noChangesMadeTooltip:
-    "Für dieses Feld werden bei den ausgewählten Datensätzen keine ßnderungen vorgenommen. Bereits vorhandene Werte bleiben unverändert.",
+    "Für dieses Feld werden bei den ausgewählten Datensätzen keine Änderungen vorgenommen. Bereits vorhandene Werte bleiben unverändert.",
   noRowsFound: "keine Zeilen gefunden",
   none: "keine",
   numberBetweenInvalid:
