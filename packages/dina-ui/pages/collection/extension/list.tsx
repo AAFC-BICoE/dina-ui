@@ -106,19 +106,24 @@ export default function FieldListPage() {
   return (
     <PageLayout titleId="extensionListTitle">
       <div className="d-flex flex-column">
-        <span style={{ fontWeight: "bold" }} className="mt-1">
-          {" "}
-          {formatMessage("selectAnExtenstion")}{" "}
-        </span>
-        <Select
-          options={extensionOptions}
-          onChange={onExtensionSelectionChanged}
-          defaultValue={extensionOptions?.[0]}
-        />
-        <FreeTextFilterForm
-          filterAttributes={["name", "multilingualDescription"]}
-          id={id}
-        />
+        <div className="mt-1">
+          <span style={{ fontWeight: "bold" }}>
+            {" "}
+            {formatMessage("selectAnExtenstion")}{" "}
+          </span>
+          <Select
+            options={extensionOptions}
+            onChange={onExtensionSelectionChanged}
+            defaultValue={extensionOptions?.[0]}
+            styles={{ menu: (base) => ({ ...base, zIndex: 9999 }) }}
+          />
+        </div>
+        <div className="mt-3">
+          <FreeTextFilterForm
+            filterAttributes={["name", "multilingualDescription"]}
+            id={id}
+          />
+        </div>
 
         <span style={{ fontWeight: "bold" }} className="mt-3">
           {" "}

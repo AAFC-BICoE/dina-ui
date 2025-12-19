@@ -7,6 +7,7 @@ import { DinaForm, DinaFormOnSubmit } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { FilterFreeTextSearchField } from "../filter-free-text-search/FilterFreeTextSearchField";
+import { FaArrowRotateLeft, FaFilter } from "react-icons/fa6";
 
 interface FreeTextFilterFormProps {
   children?: (formik: FormikProps<any>) => React.ReactElement;
@@ -66,8 +67,12 @@ export function FreeTextFilterForm({
             />
           </div>
           <div>{children && children(formikProps)}</div>
-          <div className="align-end ps-3 d-flex gap-2 align-items-center">
+          <div
+            className="align-end ps-3 d-flex gap-2 align-items-center"
+            style={{ marginTop: "29px" }}
+          >
             <SubmitButton className="list-inline-item" showSaveIcon={false}>
+              <FaFilter className="me-2" />
               <CommonMessage id="filterSubmitButtonText" />
             </SubmitButton>
             <button
@@ -75,6 +80,7 @@ export function FreeTextFilterForm({
               type="button"
               onClick={() => resetFilterForm(formikProps)}
             >
+              <FaArrowRotateLeft className="me-2" />
               <CommonMessage id="resetFilters" />
             </button>
           </div>
