@@ -5,7 +5,7 @@ import { NotificationCard } from "./NotificationCard";
 import { CommonMessage } from "../intl/common-ui-intl";
 import "./notification.css";
 
-export interface NotificationProps {
+export interface UserNotificationProps {
   /**
    * Polling interval in milliseconds.
    * Default: 30000 (30 seconds)
@@ -13,9 +13,9 @@ export interface NotificationProps {
   pollingInterval?: number;
 }
 
-export function Notification({
+export function UserNotification({
   pollingInterval = 30000
-}: NotificationProps = {}) {
+}: UserNotificationProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

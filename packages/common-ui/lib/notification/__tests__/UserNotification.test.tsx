@@ -1,9 +1,9 @@
 import "@testing-library/jest-dom";
 import { fireEvent, waitFor } from "@testing-library/react";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { Notification } from "../Notification";
+import { UserNotification } from "../UserNotification";
 
-describe("Notification", () => {
+describe("UserNotification", () => {
   let mockGet: jest.Mock;
   let mockDoOperations: jest.Mock;
 
@@ -50,7 +50,7 @@ describe("Notification", () => {
     it("Renders bell icon button", async () => {
       mockGet.mockResolvedValue({ data: [], meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -69,7 +69,7 @@ describe("Notification", () => {
     it("Shows unread count badge when there are unread notifications", async () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -91,7 +91,7 @@ describe("Notification", () => {
 
       mockGet.mockResolvedValue({ data: readNotifications, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -107,7 +107,7 @@ describe("Notification", () => {
     it("Dropdown is hidden by default", async () => {
       mockGet.mockResolvedValue({ data: [], meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -129,7 +129,7 @@ describe("Notification", () => {
     it("Opens dropdown when clicking bell icon", async () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -154,7 +154,7 @@ describe("Notification", () => {
     it("Closes dropdown when clicking bell icon again", async () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -187,7 +187,7 @@ describe("Notification", () => {
     it("Closes dropdown when clicking outside", async () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -221,7 +221,7 @@ describe("Notification", () => {
     it("Keeps dropdown open when clicking inside it", async () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -264,7 +264,7 @@ describe("Notification", () => {
       });
       mockGet.mockReturnValue(getPromise);
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -286,7 +286,7 @@ describe("Notification", () => {
     it("Shows error state when fetch fails", async () => {
       mockGet.mockRejectedValue(new Error("Network error"));
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -311,7 +311,7 @@ describe("Notification", () => {
     it("Shows empty state when no notifications", async () => {
       mockGet.mockResolvedValue({ data: [], meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -334,7 +334,7 @@ describe("Notification", () => {
     it("Displays notification cards when data is available", async () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -359,7 +359,7 @@ describe("Notification", () => {
     it("Displays correct number of notification cards", async () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -385,7 +385,7 @@ describe("Notification", () => {
     it("Shows mark all as read button when there are unread notifications", async () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -413,7 +413,7 @@ describe("Notification", () => {
 
       mockGet.mockResolvedValue({ data: readNotifications, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -439,7 +439,7 @@ describe("Notification", () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
       mockDoOperations.mockResolvedValue(undefined);
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -478,7 +478,7 @@ describe("Notification", () => {
     it("Passes pollingInterval to useNotification hook", async () => {
       mockGet.mockResolvedValue({ data: [], meta: undefined });
 
-      mountWithAppContext(<Notification pollingInterval={5000} />, {
+      mountWithAppContext(<UserNotification pollingInterval={5000} />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -500,7 +500,7 @@ describe("Notification", () => {
     it("Uses default polling interval when not specified", async () => {
       mockGet.mockResolvedValue({ data: [], meta: undefined });
 
-      mountWithAppContext(<Notification />, {
+      mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -520,7 +520,7 @@ describe("Notification", () => {
     it("Has proper aria-label on bell button", async () => {
       mockGet.mockResolvedValue({ data: [], meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -538,7 +538,7 @@ describe("Notification", () => {
     it("Has visually-hidden text for screen readers on badge", async () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -557,7 +557,7 @@ describe("Notification", () => {
     it("Updates notification list when data changes", async () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations
@@ -582,7 +582,7 @@ describe("Notification", () => {
       mockGet.mockResolvedValue({ data: MOCK_NOTIFICATIONS, meta: undefined });
       mockDoOperations.mockResolvedValue(undefined);
 
-      const wrapper = mountWithAppContext(<Notification />, {
+      const wrapper = mountWithAppContext(<UserNotification />, {
         apiContext: {
           apiClient: { get: mockGet },
           doOperations: mockDoOperations

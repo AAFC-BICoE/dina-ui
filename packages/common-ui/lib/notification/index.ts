@@ -1,5 +1,5 @@
-export { Notification } from "./Notification";
-export type { NotificationProps } from "./Notification";
+export { UserNotification } from "./UserNotification";
+export type { UserNotificationProps as NotificationProps } from "./UserNotification";
 export { NotificationCard } from "./NotificationCard";
 export type { NotificationCardProps } from "./NotificationCard";
 export { useNotification } from "./useNotification";
@@ -8,7 +8,7 @@ export type {
   UseNotificationReturn
 } from "./useNotification";
 export type {
-  Notification as NotificationType,
+  Notification,
   NotificationMessageParam,
   NotificationUpdatePayload
 } from "./types";
