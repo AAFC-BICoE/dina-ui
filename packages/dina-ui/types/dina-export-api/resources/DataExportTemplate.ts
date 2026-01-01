@@ -16,7 +16,7 @@ export interface DataExportTemplateAttributes {
 
   columns?: string[];
   columnAliases?: string[];
-  columnFunctions?: Record<string, FunctionDef>;
+  functions?: Record<string, FunctionDef>;
 }
 
 export type DataExportTemplate = KitsuResource & DataExportTemplateAttributes;

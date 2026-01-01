@@ -2,12 +2,12 @@ import { KitsuResource } from "kitsu";
 
 export type ExportStatus = "NEW" | "RUNNING" | "COMPLETED" | "ERROR";
 export type ExportType = "TABULAR_DATA" | "OBJECT_ARCHIVE";
-export type FunctionName = "CONCAT" | "CONVERT_COORDINATES_DD";
+export type FunctionDefinitions = "CONCAT" | "CONVERT_COORDINATES_DD";
 export type ColumnSeparator = "COMMA" | "TAB";
 
 export interface FunctionDef {
-  functionName: FunctionName;
-  params: string[];
+  functionDef: FunctionDefinitions;
+  params: { [key: string]: any };
 }
 
 export interface DataExportAttributes {
@@ -22,7 +22,7 @@ export interface DataExportAttributes {
   exportType: ExportType;
   exportOptions?: ExportOptions;
   columnAliases?: string[];
-  columnFunctions?: Record<string, FunctionDef>;
+  functions?: Record<string, FunctionDef>;
 }
 
 export interface ExportOptions {
