@@ -382,7 +382,6 @@ describe("protocol edit page", () => {
       return error;
     })();
 
-
     mockPost.mockImplementationOnce(() => {
       makeAxiosErrorMoreReadable(MOCK_POST_ERROR);
     });
@@ -395,15 +394,14 @@ describe("protocol edit page", () => {
 
     // wrapper.find("form").simulate("submit");
     fireEvent.submit(wrapper.container.querySelector("form")!);
-    
 
     const { title, detail } = MOCK_POST_ERROR.response.data.errors[0];
 
     await waitFor(() => {
       expect(
         wrapper.getByText((_, element) => {
-          return (
-            !!element &&
+          return !!(
+            element &&
             element.classList.contains("error-message") &&
             element.textContent?.includes(title) &&
             element.textContent?.includes(detail)
@@ -411,8 +409,7 @@ describe("protocol edit page", () => {
         })
       ).toBeInTheDocument();
 
-
-        expect(mockPush).toBeCalledTimes(0);
-      });
+      expect(mockPush).toBeCalledTimes(0);
+    });
   });
 });

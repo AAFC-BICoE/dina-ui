@@ -47,7 +47,7 @@ export function useNotification({
   // Fetch notifications
   const fetchNotifications = useCallback(async () => {
     if (disabled) {
-      return undefined;
+      return [];
     }
 
     const response = await apiClient.get<Notification[]>(
@@ -58,7 +58,8 @@ export function useNotification({
       }
     );
 
-    return response?.data ?? [];
+    // Ensure we always return an array
+    return Array.isArray(response?.data) ? response.data : [];
   }, [apiClient, disabled]);
 
   // Generate cache key
@@ -82,9 +83,9 @@ export function useNotification({
   // Calculate unread notifications and count
   const unreadNotifications = useMemo(
     () =>
-      (notifications ?? []).filter(
-        (notification) => notification?.status === "NEW"
-      ),
+      Array.isArray(notifications)
+        ? notifications.filter((notification) => notification?.status === "NEW")
+        : [],
     [notifications]
   );
 
@@ -137,7 +138,7 @@ export function useNotification({
   const markAllAsRead = useCallback(async () => {
     const payload: undefined | NotificationUpdatePayload[] =
       unreadNotifications?.map((item) => ({ id: item.id, status: "READ" }));
-    if (payload) {
+    if (payload && payload.length > 0) {
       await updateNotificationStatus(payload);
     }
   }, [updateNotificationStatus, unreadNotifications]);

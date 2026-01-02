@@ -228,25 +228,24 @@ describe("collection-method edit page", () => {
   it("Renders an error after form submit without specifying mandatory field.", async () => {
     // The patch request will return an error.
     const MOCK_POST_ERROR = (() => {
-        const error = new Error() as any;
-        error.isAxiosError = true;
-        error.config = { url: "/collection-api/collection-method" };
-        error.response = {
-          statusText: "422",
-          data: {
-            errors: [
-              {
-                status: "422 UNPROCESSABLE_ENTITY",
-                code: "422",
-                title: "Constraint violation",
-                detail: "name must not be blank",
-                source: { pointer: "name" }
-              }
-            ]
-          }
-        };
-        return error
-
+      const error = new Error() as any;
+      error.isAxiosError = true;
+      error.config = { url: "/collection-api/collection-method" };
+      error.response = {
+        statusText: "422",
+        data: {
+          errors: [
+            {
+              status: "422 UNPROCESSABLE_ENTITY",
+              code: "422",
+              title: "Constraint violation",
+              detail: "name must not be blank",
+              source: { pointer: "name" }
+            }
+          ]
+        }
+      };
+      return error;
     })();
 
     mockPost.mockImplementationOnce(() => {
@@ -264,16 +263,14 @@ describe("collection-method edit page", () => {
     const form = container.querySelector("form");
     fireEvent.submit(form!);
 
-
     const { title, detail } = MOCK_POST_ERROR.response.data.errors[0];
 
     // Check that the error message is displayed
     await waitFor(() => {
-
       expect(
         getByText((_, element) => {
-          return (
-            !!element &&
+          return !!(
+            element &&
             element.classList.contains("error-message") &&
             element.textContent?.includes(title) &&
             element.textContent?.includes(detail)

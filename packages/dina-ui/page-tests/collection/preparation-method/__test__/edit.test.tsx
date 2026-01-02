@@ -263,11 +263,10 @@ describe("preparation-method edit page", () => {
 
     // Test expected error
     await waitFor(() => {
-
       expect(
         wrapper.getByText((_, element) => {
-          return (
-            !!element &&
+          return !!(
+            element &&
             element.classList.contains("error-message") &&
             element.textContent?.includes(title) &&
             element.textContent?.includes(detail)
