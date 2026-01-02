@@ -82,7 +82,9 @@ export function useNotification({
   // Calculate unread notifications and count
   const unreadNotifications = useMemo(
     () =>
-      notifications?.filter((notification) => notification?.status === "NEW"),
+      (notifications ?? []).filter(
+        (notification) => notification?.status === "NEW"
+      ),
     [notifications]
   );
 
