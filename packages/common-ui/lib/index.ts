@@ -126,6 +126,7 @@ export * from "./generator-selector/GeneratorSelector";
 export * from "./generator-selector/GeneratorItem";
 export * from "./multilingual-components/MultilingualDescription";
 export * from "./multilingual-components/MultilingualTitle";
+export * from "./notification";
 export * from "./instance/InstanceContextProvider";
 export * from "./label/FieldLabel";
 export * from "./visibility/useIsVisible";

@@ -3,6 +3,7 @@ import { CommonMessage } from "../intl/common-ui-intl";
 import { useAccount } from "./AccountProvider";
 import { FaUserCircle } from "react-icons/fa";
 import { FaRightFromBracket } from "react-icons/fa6";
+import { UserNotification } from "../notification/UserNotification";
 
 /** Shows the logged-in user and the logout button. */
 export function NavbarUserControl() {
@@ -36,6 +37,9 @@ export function NavbarUserControl() {
               </span>
             </>
           )}
+
+          {/* Notification Bell */}
+          <UserNotification />
 
           {/* Logout Button */}
           <button
