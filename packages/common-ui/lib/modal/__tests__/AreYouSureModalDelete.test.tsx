@@ -93,7 +93,7 @@ describe("AreYouSureModalDelete", () => {
     expect(wrapper.getByText(/test message/i)).toBeInTheDocument();
 
     // Click 'no':
-    fireEvent.click(wrapper.getByRole("button", { name: /no/i }));
+    fireEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
 
     // Should be closed now:
     expect(wrapper.queryByText(/test message/i)).not.toBeInTheDocument();
@@ -109,7 +109,7 @@ describe("AreYouSureModalDelete", () => {
     expect(wrapper.getByText(/test message/i)).toBeInTheDocument();
 
     // Click 'yes':
-    fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+    fireEvent.click(wrapper.getByRole("button", { name: /delete/i }));
 
     // Should have run the function:
     await waitFor(() => {
