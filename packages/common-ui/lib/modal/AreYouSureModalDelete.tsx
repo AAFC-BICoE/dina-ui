@@ -2,26 +2,23 @@ import { ReactNode } from "react";
 import { DinaForm, DinaFormSubmitParams } from "../formik-connected/DinaForm";
 import { FormikButton } from "../formik-connected/FormikButton";
 import { OnFormikSubmit } from "../formik-connected/safeSubmit";
-import { SubmitButton } from "../formik-connected/SubmitButton";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { useModal } from "./modal";
 import _ from "lodash";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { FaExternalLinkAlt, FaTimes, FaTrashAlt } from "react-icons/fa";
 import { SimpleSearchFilterBuilder } from "../util/simpleSearchFilterBuilder";
 import { useApiClient } from "../api-client/ApiClientContext";
-import { useDinaIntl } from "../../../../packages/dina-ui/intl/dina-ui-intl";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../packages/dina-ui/intl/dina-ui-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { simpleSearchFilterToFiql } from "../filter-builder/fiql";
 import { ReactTable } from "../table/ReactTable";
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  getResourceName,
-  getResourceApi,
-  RelationshipFields
-} from "common-ui/lib/modal/RelatedObjectUtils";
+import { RelationshipFields } from "common-ui/lib/modal/types";
 export interface AreYouSureModalProps {
   /** Describes the acion you're asking the user about. */
   actionMessage: ReactNode;
@@ -70,6 +67,7 @@ export function AreYouSureModalDelete({
   const { closeModal } = useModal();
   const { apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const uuid = router.query.id as string;
 
@@ -106,15 +104,34 @@ export function AreYouSureModalDelete({
       header: () => <strong>{formatMessage("resourceName")}</strong>,
       cell: ({ row }) => {
         const object = row.original;
+
+        // Find the API key that contains the configuration for this object's type
+        const apiName = Object.keys(relationshipFields).find(
+          (key) => relationshipFields[key]?.[object.type]
+        );
+
+        // Retrieve the specific configuration object
+        const config = apiName
+          ? relationshipFields[apiName][object.type]
+          : undefined;
+
+        if (!config) {
+          return (
+            <div className="d-flex flex-row mx-3" key={object.id}>
+              {object.id}
+            </div>
+          );
+        }
+
         return (
           <div className="d-flex flex-row mx-3" key={object.id}>
             <Link
-              onClick={closeModal}
-              href={`/${getResourceApi(object.type)}/${object.type}/view?id=${
-                object.id
-              }`}
+              href={`${config.linkPath}${object.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              {getResourceName(object.type, object) || object.id}
+              {config.nameMapping(object) || object.id}
+              <FaExternalLinkAlt className="ms-2" />
             </Link>
           </div>
         );
@@ -130,14 +147,18 @@ export function AreYouSureModalDelete({
         // Create a new filter for each resource type
         // for each field in resourceType, check for relationships to the given UUID
         for (const field of relationshipFields[api][resourceType]["fields"]) {
-          const filter = SimpleSearchFilterBuilder.create();
-          filter.where(`${field}.id`, "EQ", uuid);
           // Make one API call per resource type
-          const response = await apiClient.get(`${api}/${resourceType}`, {
-            filter: simpleSearchFilterToFiql(filter.build())
-          });
-          if (response?.data && (response.data as any).length > 0) {
-            relatedObjects.push(...(response.data as any));
+          try {
+            const response = await apiClient.get(`${api}/${resourceType}`, {
+              filter: SimpleSearchFilterBuilder.create<any>()
+                .where(`${field}`, "EQ", uuid)
+                .build()
+            });
+            if (response?.data && (response.data as any).length > 0) {
+              relatedObjects.push(...(response.data as any));
+            }
+          } catch (error) {
+            console.error(error);
           }
         }
       }
@@ -155,7 +176,12 @@ export function AreYouSureModalDelete({
     return (
       <div>
         <div>{formatMessage("relatedObjectsPerson")}</div>
-        <ReactTable columns={RELATED_OBJECTS_COLUMNS} data={relatedObjects} />
+        <ReactTable
+          columns={RELATED_OBJECTS_COLUMNS}
+          data={relatedObjects}
+          className="related-table mt-3"
+          loading={loading}
+        />
       </div>
     );
   };
@@ -166,6 +192,7 @@ export function AreYouSureModalDelete({
     async function fetchRelatedObjects() {
       const result = await getRelatedObjects(uuid);
       setRelatedObjects(result ?? []);
+      setLoading(false);
     }
     if (uuid) {
       fetchRelatedObjects();
@@ -176,6 +203,14 @@ export function AreYouSureModalDelete({
   return (
     <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
       <div className="modal-content are-you-sure-modal">
+        <style>{`
+          .modal-dialog {
+            max-width: 700px;
+          }
+          .related-table .table-responsive-wrapper {
+            max-height: 320px !important;
+          }
+        `}</style>
         <div className="modal-header">
           <div className="modal-title h3">{actionMessage}</div>
         </div>
@@ -198,13 +233,17 @@ export function AreYouSureModalDelete({
               buttonProps={() => ({ style: { width: "10rem" } })}
             >
               <FaTimes className="me-2" />
-              {noButtonText ?? <CommonMessage id="no" />}
+              {noButtonText ?? <CommonMessage id="cancelButtonText" />}
             </FormikButton>
 
-            <SubmitButton className="yes-button" showSaveIcon={false}>
-              <FaCheck className="me-2" />
-              {yesButtonText ?? <CommonMessage id="yes" />}
-            </SubmitButton>
+            <FormikButton
+              className="btn btn-danger yes-button"
+              onClick={onYesClickInternal}
+              buttonProps={() => ({ style: { width: "10rem" } })}
+            >
+              <FaTrashAlt className="me-2" />
+              {yesButtonText ?? <DinaMessage id="deleteButtonText" />}
+            </FormikButton>
           </div>
         </div>
       </div>

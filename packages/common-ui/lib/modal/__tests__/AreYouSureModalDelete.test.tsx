@@ -1,6 +1,6 @@
 import { mountWithAppContext } from "common-ui";
 import { AreYouSureModalDelete } from "../AreYouSureModalDelete";
-import { personRelationshipFields } from "../RelatedObjectUtils";
+import { personRelationshipFields } from "../types";
 import { useModal } from "../modal";
 import { fireEvent, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
