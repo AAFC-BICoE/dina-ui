@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
-import Alert from "react-bootstrap/Alert";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import _ from "lodash";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
@@ -113,6 +112,11 @@ export default function useSavedExports<TData extends KitsuResource>({
    * Create a new saved export.
    */
   async function createSavedExport() {
+    // Do not create if we are displaying the override warning.
+    if (displayOverrideWarning) {
+      return;
+    }
+
     setLoadingCreateSavedExport(true);
 
     try {
@@ -196,7 +200,7 @@ export default function useSavedExports<TData extends KitsuResource>({
             publiclyReleasable: publiclyReleasable,
             exportType: exportType,
             exportOptions: { columnSeparator: selectedSeparator.value },
-            columnFunctions:
+            functions:
               Object.keys(columnFunctions ?? {}).length === 0
                 ? undefined
                 : columnFunctions
@@ -255,7 +259,7 @@ export default function useSavedExports<TData extends KitsuResource>({
             exportType: exportType,
             exportOptions: { columnSeparator: selectedSeparator.value },
             group: groupNames?.[0],
-            columnFunctions:
+            functions:
               Object.keys(columnFunctions ?? {}).length === 0
                 ? undefined
                 : columnFunctions
@@ -276,6 +280,40 @@ export default function useSavedExports<TData extends KitsuResource>({
       type: createdSavedExportResp.data.data.type,
       ...createdSavedExportResp.data.data.attributes
     };
+  }
+
+  /**
+   * MIGRATION: For legacy records with columnFunctions, convert them to the new
+   * "functions" format and clear the old "columnFunctions" on the backend.
+   *
+   * This sends a minimal PATCH: only "functions" and "columnFunctions".
+   */
+  async function performSavedExportMigration(
+    migratedExport: DataExportTemplate
+  ): Promise<void> {
+    await apiClient.axios.patch(
+      `/dina-export-api/data-export-template/${migratedExport.id}`,
+      {
+        data: {
+          id: migratedExport.id,
+          type: migratedExport.type,
+          attributes: {
+            // New functions state to persist:
+            functions: (migratedExport as any).functions,
+            // Clear legacy field on the backend:
+            columnFunctions: {}
+          }
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json"
+        }
+      }
+    );
+
+    // Reload so local state is in sync with the backend:
+    await retrieveSavedExports();
   }
 
   /**
@@ -312,7 +350,58 @@ export default function useSavedExports<TData extends KitsuResource>({
    */
   useEffect(() => {
     if (selectedSavedExport) {
-      setColumnPathsToExport(selectedSavedExport);
+      // MIGRATION CODE: Handle legacy saved exports with column functions.
+      const legacyColumnFunctions = (selectedSavedExport as any)
+        .columnFunctions;
+
+      if (legacyColumnFunctions && Object.keys(legacyColumnFunctions).length) {
+        // Build a new "functions" object from legacyColumnFunctions:
+        const newFunctions: Record<string, any> = {
+          ...(selectedSavedExport as any).functions
+        };
+
+        Object.entries(legacyColumnFunctions).forEach(
+          ([functionKey, legacyDef]: [string, any]) => {
+            const { functionName, params } = legacyDef;
+
+            const newFunc: any = {
+              functionDef: functionName,
+              params: {}
+            };
+
+            if (functionName === "CONCAT") {
+              newFunc.params.items = params;
+            } else if (functionName === "CONVERT_COORDINATES_DD") {
+              newFunc.params = { column: "collectingEvent.eventGeom" };
+            }
+
+            newFunctions[functionKey] = newFunc;
+          }
+        );
+
+        const migratedExport: any = {
+          ...selectedSavedExport,
+          // Clear legacy field and set new one:
+          columnFunctions: {} as any,
+          functions: newFunctions as any
+        };
+
+        // Sync all related state with the migrated export
+        setSelectedSavedExport(migratedExport);
+        setColumnPathsToExport(migratedExport);
+        setRestrictToCreatedBy(
+          migratedExport.restrictToCreatedBy ?? restrictToCreatedBy
+        );
+        setPubliclyReleaseable(
+          migratedExport.publiclyReleasable ?? publiclyReleasable
+        );
+
+        // Now persist the migrated object to the backend
+        performSavedExportMigration(migratedExport);
+      } else {
+        // No migration needed, just load paths:
+        setColumnPathsToExport(selectedSavedExport);
+      }
     }
   }, [selectedSavedExport]);
 
@@ -337,7 +426,9 @@ export default function useSavedExports<TData extends KitsuResource>({
     ) !== undefined;
 
   const disableCreateButton =
-    loadingCreateSavedExport || savedExportName.trim() === "";
+    loadingCreateSavedExport ||
+    savedExportName.trim() === "" ||
+    displayOverrideWarning;
 
   const ModalElement = useMemo(
     () => (
@@ -354,24 +445,25 @@ export default function useSavedExports<TData extends KitsuResource>({
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {displayOverrideWarning && (
-            <Alert variant={"warning"}>
-              <DinaMessage
-                id="savedExport_overrideWarning"
-                values={{ savedExportName }}
-              />
-            </Alert>
-          )}
-
           <strong>
             <DinaMessage id="savedExport_createName" />
           </strong>
           <input
-            className="form-control"
+            className={`form-control${
+              displayOverrideWarning ? " is-invalid" : ""
+            }`}
             value={savedExportName}
             onChange={(e) => setSavedExportName(e.target.value)}
             disabled={loadingCreateSavedExport}
           />
+          {displayOverrideWarning && (
+            <div className="invalid-feedback" style={{ display: "block" }}>
+              <DinaMessage
+                id="savedExport_overrideWarning"
+                values={{ savedExportName }}
+              />
+            </div>
+          )}
           <br />
           <strong>
             <DinaMessage id="visibility" />

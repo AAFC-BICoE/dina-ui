@@ -1,4 +1,8 @@
-import { filterBy, ResourceSelect, useAccount } from "common-ui";
+import {
+  ResourceSelect,
+  SimpleSearchFilterBuilder,
+  useAccount
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { FormTemplate } from "../../../types/collection-api";
@@ -13,37 +17,24 @@ export function MaterialSampleFormTemplateSelect({
 }: MaterialSampleFormTemplateSelectProps) {
   const { isAdmin, groupNames, username } = useAccount();
 
-  const filterByGroup = filterBy(
-    [],
-    !isAdmin
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: "group",
-              comparison: "=in=",
-              arguments: groupNames || []
-            }
-          ]
-        }
-      : undefined
-  );
-
   return (
     <label className="d-flex align-items-center gap-2 form-template-select">
-      <div className="fw-bold">
+      <div className="fw-bold" style={{ whiteSpace: "pre" }}>
         <DinaMessage id="formTemplateSelection" />
       </div>
       <div style={{ width: "20rem" }}>
         <ResourceSelect<FormTemplate>
-          filter={(input) => ({
-            // Filter by "material-sample-form-section-order" to omit unrelated form-template records:
-            "viewConfiguration.type": "material-sample-form-template",
-            // Filter by view name typed into the dropdown:
-            ...filterBy(["name"])(input),
-            // Filter by the groups you are currently in.
-            ...filterByGroup("")
-          })}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<FormTemplate>()
+              .searchFilter("name", input)
+              .where(
+                "viewConfiguration.type" as any,
+                "EQ",
+                "material-sample-form-template"
+              )
+              .when(!isAdmin, (builder) => builder.whereIn("group", groupNames))
+              .build()
+          }
           filterList={(item) =>
             !item?.id ||
             item?.restrictToCreatedBy === false ||

@@ -49,6 +49,7 @@ export function NotPubliclyReleasableSection() {
           className="notPubliclyReleasable"
           name="publiclyReleasable"
           label={<DinaMessage id="notPubliclyReleasable" />}
+          disableLabelClick={true}
         />
       )}
       <DinaFormSection horizontal={false}>

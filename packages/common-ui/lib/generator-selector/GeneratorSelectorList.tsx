@@ -303,11 +303,16 @@ export function GeneratorSelectorList({
                 filter={(input) =>
                   SimpleSearchFilterBuilder.create<ManagedAttribute>()
                     .searchFilter("name", input)
-                    .where(
-                      "managedAttributeComponent",
-                      "EQ",
-                      selectedField?.dynamicConfig?.component ??
-                        "MATERIAL_SAMPLE"
+                    .when(
+                      !!selectedField?.dynamicConfig?.component &&
+                        selectedField?.dynamicConfig?.component !== "ENTITY",
+                      (builder) =>
+                        builder.where(
+                          "managedAttributeComponent",
+                          "EQ",
+                          selectedField?.dynamicConfig?.component ??
+                            "MATERIAL_SAMPLE"
+                        )
                     )
                     .build()
                 }
@@ -321,7 +326,7 @@ export function GeneratorSelectorList({
                     setDynamicFieldLabel((newValue as any)?.name);
                   }
                 }}
-                model="collection-api/managed-attribute"
+                model={selectedField?.dynamicConfig?.apiEndpoint ?? ""}
                 optionLabel={(ma) => {
                   const multiDescription =
                     ma?.multilingualDescription?.descriptions?.find(

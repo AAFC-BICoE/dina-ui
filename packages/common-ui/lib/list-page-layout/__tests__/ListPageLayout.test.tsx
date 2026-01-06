@@ -198,4 +198,70 @@ describe("ListPageLayout component", () => {
       expect(args).not.toHaveProperty("filter");
     });
   });
+
+  it("Combines additionalFiqlFilters with other FIQL filters.", async () => {
+    const wrapper = mountWithAppContext(
+      <ListPageLayout
+        id="test-layout"
+        useFiql={true}
+        additionalFiqlFilters="status==active"
+        additionalFilters={SimpleSearchFilterBuilder.create()
+          .where("group", "EQ", "testGroup")
+          .build()}
+        filterAttributes={["name"]}
+        queryTableProps={{
+          columns: ["name", "type"],
+          path: "pcrPrimer"
+        }}
+      />,
+      { apiContext: mockApiCtx }
+    );
+
+    // Wait for the default search to finish.
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /filter value/i })
+      ).toBeInTheDocument();
+    });
+
+    // Do a filtered search.
+    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
+      target: { value: "101F" }
+    });
+    fireEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
+
+    // All filters should be combined with semicolons (AND operator).
+    await waitFor(() => {
+      expect(mockGet).lastCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          fiql: "(name==*101F*);(group==testGroup);(status==active)"
+        })
+      );
+    });
+  });
+
+  it("Throws an error when additionalFiqlFilters is used without useFiql.", () => {
+    // Mock console.error to suppress error output in test
+    const consoleError = jest.spyOn(console, "error").mockImplementation();
+
+    expect(() => {
+      mountWithAppContext(
+        <ListPageLayout
+          id="test-layout"
+          additionalFiqlFilters="status==active"
+          filterAttributes={["name"]}
+          queryTableProps={{
+            columns: ["name", "type"],
+            path: "pcrPrimer"
+          }}
+        />,
+        { apiContext: mockApiCtx }
+      );
+    }).toThrow(
+      "additionalFiqlFilters prop can only be used when useFiql is enabled"
+    );
+
+    consoleError.mockRestore();
+  });
 });

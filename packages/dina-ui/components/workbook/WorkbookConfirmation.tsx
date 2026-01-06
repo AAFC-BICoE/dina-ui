@@ -1,13 +1,14 @@
 import { FaRegCheckCircle } from "react-icons/fa";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useSessionStorage } from "usehooks-ts";
 import { defaultJsonTree } from "common-ui/lib/list-page/query-builder/QueryBuilder";
 import { JsonTree } from "@react-awesome-query-builder/ui";
 import { createSessionStorageLastUsedTreeKey } from "common-ui/lib/list-page/saved-searches/SavedSearch";
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
-import { useEffect } from "react";
-import { getGroupStorageKey, Tooltip } from "common-ui";
+import { useEffect, useMemo, useState } from "react";
+import { getGroupStorageKey, LoadingSpinner, Tooltip } from "common-ui";
+import { useWorkbookContext } from "./WorkbookProvider";
 
 interface WorkbookConfirmationProps {
   /** The total number of resources in the workbook. */
@@ -38,7 +39,20 @@ export function WorkbookConfirmation({
   resourcesUpdatedCount
 }: WorkbookConfirmationProps) {
   const router = useRouter();
-  const uniqueName = "material-sample-list";
+  const { formatMessage } = useDinaIntl();
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const { type } = useWorkbookContext();
+
+  const uniqueName = useMemo(() => {
+    if (type === "material-sample") {
+      return "material-sample-list";
+    } else if (type === "metadata") {
+      return "object-store-list";
+    } else {
+      throw new Error(`Unhandled workbook type: ${type}`);
+    }
+  }, [type]);
 
   const [_, setSessionStorageQueryTree] = useSessionStorage<JsonTree>(
     createSessionStorageLastUsedTreeKey(uniqueName),
@@ -48,7 +62,10 @@ export function WorkbookConfirmation({
   // Groups selected for the search.
   const GROUP_STORAGE_KEY = getGroupStorageKey(uniqueName);
 
-  const onViewWorkbook = () => {
+  const onViewWorkbook = async () => {
+    // Show loading state
+    setIsNavigating(true);
+
     // Stop rendering this page since we will be redirecting and don't need to see updates anymore.
     preventRendering();
 
@@ -76,9 +93,19 @@ export function WorkbookConfirmation({
     } as JsonTree;
     setSessionStorageQueryTree(sourceSetQuery);
     writeStorage(GROUP_STORAGE_KEY, [groupUsed]);
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
-    // Redirect to to material-sample list page.
-    router.push("/collection/material-sample/list");
+    // Redirect to the list page for the specific workbook type.
+    switch (type) {
+      case "material-sample":
+        await router.push("/collection/material-sample/list");
+        break;
+      case "metadata":
+        await router.push("/object-store/object/list");
+        break;
+      default:
+        throw new Error(`Unhandled workbook type: ${type}`);
+    }
   };
 
   /** Handle if they leave without selecting an option, reset the uploader. */
@@ -97,6 +124,20 @@ export function WorkbookConfirmation({
       router.events.off("routeChangeStart", handleBrowseAway);
     };
   }, []);
+
+  // Show loading overlay when navigating
+  if (isNavigating) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "400px" }}
+      >
+        <div className="text-center">
+          <LoadingSpinner loading={true} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -118,7 +159,8 @@ export function WorkbookConfirmation({
           <DinaMessage
             id="workbook_confirmation_total"
             values={{
-              total: totalWorkbookResourcesCount - (resourcesUpdatedCount ?? 0)
+              total: totalWorkbookResourcesCount - (resourcesUpdatedCount ?? 0),
+              type: formatMessage(type as any)
             }}
           />
         </span>
@@ -126,7 +168,8 @@ export function WorkbookConfirmation({
           <DinaMessage
             id="workbook_updated_total"
             values={{
-              total: resourcesUpdatedCount
+              total: resourcesUpdatedCount,
+              type: formatMessage(type as any)
             }}
           />
         </span>
@@ -148,12 +191,31 @@ export function WorkbookConfirmation({
         <button
           className="btn btn-secondary col-sm-3"
           onClick={() => onWorkbookReset()}
+          disabled={isNavigating}
         >
           <DinaMessage id="workbook_confirmation_new" />
         </button>
 
-        <button className="btn btn-primary col-sm-3" onClick={onViewWorkbook}>
-          <DinaMessage id="workbook_confirmation_view" />
+        <button
+          className="btn btn-primary col-sm-3"
+          onClick={onViewWorkbook}
+          disabled={isNavigating}
+        >
+          {isNavigating ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              <DinaMessage id="loading" />
+            </>
+          ) : (
+            <DinaMessage
+              id="workbook_confirmation_view"
+              values={{ type: formatMessage(type as any) }}
+            />
+          )}
         </button>
       </div>
     </>

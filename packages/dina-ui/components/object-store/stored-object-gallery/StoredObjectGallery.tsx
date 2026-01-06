@@ -93,7 +93,7 @@ function GalleryItem({
       style={{
         backgroundColor: highlighted ? HIGHLIGHT_COLOR : undefined,
         maxWidth: "15rem",
-        zIndex: "-1"
+        zIndex: "1"
       }}
     >
       <FileView

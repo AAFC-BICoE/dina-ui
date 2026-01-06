@@ -20,7 +20,7 @@ import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
   FieldOptionType,
-  PERSON_SELECT_FIELDS,
+  MULTI_SELECT_FIELDS,
   WorkbookColumnInfo,
   compareAlphanumeric,
   findMatchField,
@@ -32,7 +32,7 @@ import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { ResourceNameIdentifier } from "../../../types/common/resources/ResourceNameIdentifier";
-import { PersonSelectField } from "../../resource-select-fields/resource-select-fields";
+import { PersonSelectField, ProjectSelectField } from "../../resource-select-fields/resource-select-fields";
 
 export function useColumnMapping() {
   const { formatMessage } = useDinaIntl();
@@ -85,7 +85,7 @@ export function useColumnMapping() {
 
   const {
     loading: attrLoadingMaterialSample,
-    response: attrRespMaterialSamplem
+    response: attrRespMaterialSample
   } = useQuery<ManagedAttribute[]>({
     path: "collection-api/managed-attribute",
     filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
@@ -97,6 +97,18 @@ export function useColumnMapping() {
       .build(),
     page: { limit: 1000 }
   });
+
+  const { loading: attrLoadingMetadata, response: attrRespMetadata } = useQuery<
+    ManagedAttribute[]
+  >(
+    {
+      path: "objectstore-api/managed-attribute",
+      page: { limit: 1000 }
+    },
+    {
+      disabled: type !== "metadata"
+    }
+  );
 
   const { loading: taxonomicRankLoading, response: taxonomicRankResp } =
     useQuery<Vocabulary>({
@@ -198,6 +210,7 @@ export function useColumnMapping() {
 
   const loadingData =
     attrLoadingMaterialSample ||
+    attrLoadingMetadata ||
     assemblageLoading ||
     collectionLoading ||
     preparationTypeLoading ||
@@ -209,7 +222,10 @@ export function useColumnMapping() {
     taxonomicRankLoading ||
     metadataLoading;
 
-  const managedAttributes = [...(attrRespMaterialSamplem?.data ?? [])];
+  const managedAttributes = [
+    ...(attrRespMaterialSample?.data ?? []),
+    ...(attrRespMetadata?.data ?? [])
+  ];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
   const assemblages = (assemblageResp?.data || []).map((item) => ({
     ...item,
@@ -362,8 +378,9 @@ export function useColumnMapping() {
     return managedAttributes.find(
       (managedAttribute) =>
         managedAttribute.key === key &&
-        managedAttribute.managedAttributeComponent ===
-          config?.managedAttributeComponent
+        (config.managedAttributeComponent === "ENTITY" ||
+          managedAttribute.managedAttributeComponent ===
+            config.managedAttributeComponent)
     );
   }
 
@@ -476,7 +493,7 @@ export function useColumnMapping() {
     const newWorkbookColumnMap: WorkbookColumnMap = {};
     const newRelationshipMapping: RelationshipMapping = {};
     for (const columnHeader of headers || []) {
-      const fieldPath = findMatchField(columnHeader, theFieldOptions);
+      const fieldPath = findMatchField(columnHeader, theFieldOptions, type);
       const result = await resolveColumnMappingAndRelationshipMapping(
         columnHeader,
         fieldPath
@@ -501,7 +518,7 @@ export function useColumnMapping() {
     for (const columnHeader of headers || []) {
       const columnHeaderValue =
         columnHeader.originalColumn ?? columnHeader.columnHeader;
-      const fieldPath = findMatchField(columnHeader, newFieldOptions);
+      const fieldPath = findMatchField(columnHeader, newFieldOptions, type);
       if (fieldPath === undefined) {
         // check if the columnHeaderValue is one of managedAttributes
         const targetManagedAttr =
@@ -549,6 +566,14 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
+          } else {
+            map.push({
+              targetField: "managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr,
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
+            });
           }
         } else if (targetTaxonomicRank) {
           map.push({
@@ -582,6 +607,13 @@ export function useColumnMapping() {
   }
 
   useEffect(() => {
+    // Clear mappings first
+    setColumnMap({});
+    setRelationshipMapping({});
+    setFieldMap([]);
+    setFieldOptions([]);
+
+    // Then regenerate if data is ready
     if (!loadingData) {
       generateFieldOptions();
     }
@@ -667,17 +699,21 @@ export function useColumnMapping() {
 
     if (values) {
       for (const value of Object.keys(values)) {
+        // Sanitize the key to make it valid for Formik form paths (replace dots)
+        const sanitizedKey = value.replaceAll(".", "_");
+
         // Find initial relationship value without string splitting
         const found: PersistedResource<any> | undefined =
           getInitialRelationshipFieldValues(value);
+
         // If relationship is found, set it. If not, reset it so it's empty.
         if (found) {
-          if (PERSON_SELECT_FIELDS.has(fieldPath)) {
-            theRelationshipMapping[columnHeader][value.replaceAll(".", "_")] = [
-              _.pick(found, ["id", "type"])
-            ];
+          if (MULTI_SELECT_FIELDS.has(fieldPath)) {
+            // Store full object for multi-select (array)
+            theRelationshipMapping[columnHeader][sanitizedKey] = [found];
           } else {
-            theRelationshipMapping[columnHeader][value.replaceAll(".", "_")] =
+            // Store only id and type for single-select
+            theRelationshipMapping[columnHeader][sanitizedKey] =
               _.pick(found, ["id", "type"]);
           }
         } else {
@@ -687,21 +723,25 @@ export function useColumnMapping() {
             id: string;
             type: string;
           }[] = [];
-          if (PERSON_SELECT_FIELDS.has(fieldPath)) {
+          if (MULTI_SELECT_FIELDS.has(fieldPath)) {
             const splitFieldValues = value
               .split(";")
               .map((item) => item.trim());
+
             for (const fieldValue of splitFieldValues) {
               const initialRelationshipFieldValue:
                 | PersistedResource<any>
                 | undefined = getInitialRelationshipFieldValues(fieldValue);
+
               if (initialRelationshipFieldValue) {
+                // Store the full object so ResourceSelectField can display it properly
                 relationshipMappingDefaultValues.push(
-                  _.pick(initialRelationshipFieldValue, ["id", "type"])
+                  initialRelationshipFieldValue
                 );
               }
             }
-            theRelationshipMapping[columnHeader][value.replaceAll(".", "_")] =
+
+            theRelationshipMapping[columnHeader][sanitizedKey] =
               relationshipMappingDefaultValues;
           }
         }
@@ -752,6 +792,7 @@ export function useColumnMapping() {
           break;
         case "collectingEvent.collectors.displayName":
         case "preparedBy.displayName":
+        case "dcCreator.displayName":
           found =
             persons.find((item) => item.displayName === value) ??
             persons.find((item) =>
@@ -783,11 +824,14 @@ export function useColumnMapping() {
       return undefined;
     }
 
-    const selectElemName = PERSON_SELECT_FIELDS.has(fieldPath)
+    // Sanitize fieldValue for use in form field path (replace dots)
+    const sanitizedFieldValue = fieldValue?.replaceAll(".", "_");
+
+    const selectElemName = MULTI_SELECT_FIELDS.has(fieldPath)
       ? `relationshipMapping.${columnHeader.replaceAll(
           ".",
           "_"
-        )}.${fieldValue.replaceAll(".", "_")}`
+        )}.${sanitizedFieldValue}`
       : `relationshipMapping.${columnHeader.replaceAll(
           ".",
           "_"
@@ -854,6 +898,7 @@ export function useColumnMapping() {
         break;
       case "collectingEvent.collectors.displayName":
       case "preparedBy.displayName":
+      case "dcCreator.displayName":
         options = persons.map((resource) => ({
           label: resource.displayName,
           value: resource.id,
@@ -888,53 +933,96 @@ export function useColumnMapping() {
     const showDuplicateWarningTooltip =
       hasDuplicatesResources && duplicateResourcesSelected;
 
+    /**
+     * Renders the appropriate select field component based on field type.
+     * - Multi-select person fields use PersonSelectField
+     * - Multi-select project fields use ProjectSelectField
+     * - Other multi-select fields use SelectField with isMulti
+     * - Single-select fields use standard SelectField
+     */
+    function renderSelectField() {
+      if (!fieldPath) return null;
+
+      const isMultiSelectField = MULTI_SELECT_FIELDS.has(fieldPath);
+      const isPersonField = fieldPath.includes("displayName");
+      const isProjectField = fieldPath === "projects.name";
+
+      const commonSelectProps = {
+        className: "flex-fill",
+        name: selectElemName,
+        hideLabel: true,
+        selectProps: {
+          isClearable: true,
+          menuPortalTarget: document.body,
+          styles: {
+            menuPortal: (base) => ({ ...base, zIndex: 9999 })
+          }
+        }
+      };
+
+      // Handle multi-select fields
+      if (isMultiSelectField) {
+        const multiSelectOnChange = (newValue: any) => {
+          if (!columnHeader || !fieldValue) return;
+          onChangeRelatedRecord(
+            columnHeader,
+            fieldValue,
+            newValue?.map((item: any) => item.id),
+            targetType
+          );
+        };
+
+        if (isPersonField) {
+          return (
+            <PersonSelectField
+              {...commonSelectProps}
+              isMulti={true}
+              onChange={multiSelectOnChange}
+            />
+          );
+        }
+
+        if (isProjectField) {
+          return (
+            <ProjectSelectField
+              {...commonSelectProps}
+              onChange={multiSelectOnChange}
+            />
+          );
+        }
+
+        // Other multi-select fields (future-proof)
+        return (
+          <SelectField
+            {...commonSelectProps}
+            options={options}
+            isMulti={true}
+            onChange={multiSelectOnChange}
+          />
+        );
+      }
+
+      // Handle single-select fields
+      return (
+        <SelectField
+          {...commonSelectProps}
+          options={options}
+          onChange={(newValue) => {
+            if (!columnHeader || !fieldValue) return;
+            onChangeRelatedRecord(
+              columnHeader,
+              fieldValue,
+              newValue as string,
+              targetType
+            );
+          }}
+        />
+      );
+    }
+
     return (
       <div className="d-flex">
-        {PERSON_SELECT_FIELDS.has(fieldPath) ? (
-          <PersonSelectField
-            onChange={(newValue) => {
-              onChangeRelatedRecord(
-                columnHeader,
-                fieldValue,
-                (newValue as any)?.map((person) => person.id),
-                targetType
-              );
-            }}
-            className="flex-fill"
-            name={selectElemName}
-            hideLabel={true}
-            isMulti={true}
-            selectProps={{
-              isClearable: true,
-              menuPortalTarget: document.body,
-              styles: {
-                menuPortal: (base) => ({ ...base, zIndex: 9999 })
-              }
-            }}
-          />
-        ) : (
-          <SelectField
-            className="flex-fill"
-            name={selectElemName}
-            options={options}
-            hideLabel={true}
-            selectProps={{
-              isClearable: true,
-              menuPortalTarget: document.body,
-              styles: {
-                menuPortal: (base) => ({ ...base, zIndex: 9999 })
-              }
-            }}
-            onChange={(newValue) => {
-              onChangeRelatedRecord(
-                columnHeader,
-                fieldValue,
-                newValue as string,
-                targetType
-              );
-            }}
-          />
-        )}
+        {renderSelectField()}
         {showDuplicateWarningTooltip && (
           <Tooltip
             disableSpanMargin={true}

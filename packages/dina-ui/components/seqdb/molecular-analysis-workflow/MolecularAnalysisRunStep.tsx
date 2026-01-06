@@ -136,7 +136,10 @@ export function MolecularAnalysisRunStep({
             )}
           </div>
           <div className="col-12">
-            <DinaForm initialValues={{}} readOnly={!editMode}>
+            <DinaForm
+              initialValues={{ attachments: attachments }}
+              readOnly={!editMode}
+            >
               {/* Sequencing Run Content */}
               <SequencingRunContentSection
                 columns={columns}

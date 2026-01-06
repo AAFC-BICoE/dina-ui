@@ -177,9 +177,7 @@ describe("Metadata single record edit page.", () => {
       }
     );
 
-    userEvent.click(
-      wrapper.getByRole("switch", { name: /not publicly releasable/i })
-    );
+    userEvent.click(wrapper.getByRole("switch"));
 
     await waitFor(() => {
       expect(

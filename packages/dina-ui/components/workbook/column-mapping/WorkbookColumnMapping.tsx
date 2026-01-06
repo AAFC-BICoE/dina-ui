@@ -7,13 +7,15 @@ import {
   useApiClient,
   useModal
 } from "common-ui/lib";
+import { useLocalStorage } from "@rehooks/local-storage";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
 import {
   ManagedAttribute,
   VocabularyElement
 } from "packages/dina-ui/types/collection-api";
-import { Ref, useRef } from "react";
+import { Ref, useMemo, useRef } from "react";
+import Link from "next/link";
 import { Alert, Card } from "react-bootstrap";
 import Select from "react-select";
 import * as yup from "yup";
@@ -21,6 +23,8 @@ import { ValidationError } from "yup";
 import {
   RelationshipMapping,
   WorkbookDataTypeEnum,
+  isDate,
+  isDateTime,
   useWorkbookContext
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -41,6 +45,11 @@ import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
 import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
 import _ from "lodash";
+import {
+  BULK_ADD_FILES_KEY,
+  BulkAddFileInfo
+} from "../../../pages/object-store/upload";
+import { FaFileCircleXmark } from "react-icons/fa6";
 
 export type FieldMapType = {
   columnHeader: string;
@@ -66,7 +75,7 @@ export interface WorkbookColumnMappingProps {
 }
 
 // Entities that we support to import
-const ENTITY_TYPES = ["material-sample"] as const;
+const ENTITY_TYPES = ["material-sample", "metadata"] as const;
 
 export function WorkbookColumnMapping({
   performSave,
@@ -115,6 +124,20 @@ export function WorkbookColumnMapping({
     getResourceSelectField
   } = useColumnMapping();
 
+  const { allowAppendData, fieldColumnLocaleId } =
+    getFieldRelationshipConfig?.() || {
+      allowAppendData: false,
+      fieldColumnLocaleId: ""
+    };
+
+  const [bulkEditFiles, setBulkEditFiles] =
+    useLocalStorage<BulkAddFileInfo>(BULK_ADD_FILES_KEY);
+
+  const filesToShow = useMemo(
+    () => bulkEditFiles?.files ?? [],
+    [bulkEditFiles]
+  );
+
   const buttonBar = (
     <>
       <SubmitButton
@@ -157,7 +180,9 @@ export function WorkbookColumnMapping({
         const mappedValues = Object.keys(relationshipMapping[columnName] || {});
 
         for (const value of values) {
-          if (mappedValues.indexOf(value.replaceAll(".", "_")) === -1) {
+          // Use the same sanitization as the storage (replace dots)
+          const sanitizedValue = value.replaceAll(".", "_");
+          if (mappedValues.indexOf(sanitizedValue) === -1) {
             unmappedColumnNames.push(
               workbookColumnMap[columnName].originalColumnName
             );
@@ -353,95 +378,177 @@ export function WorkbookColumnMapping({
     serverDuplicate: boolean;
   }
 
-  async function validateData(
-    workbookData: { [field: string]: any }[],
-    errors: ValidationError[]
-  ) {
-    const uniqueSampleCollections: UniqueSampleNameCollectionPairs[] =
-      generateUniqueSampleNamePairs();
-
-    // get all mapped parent material sample names
-    const parentValueMapping =
-      Object.values(workbookColumnMap ?? {}).find(
-        (item) => item.fieldPath === "parentMaterialSample.materialSampleName"
-      )?.valueMapping ?? {};
-    const mappedParentNames = Object.keys(parentValueMapping);
-    const missingParentMaterialSampleNames: string[] = [];
-
-    for (let i = 0; i < workbookData.length; i++) {
-      const row = workbookData[i];
-      for (const fieldPath of Object.keys(row)) {
-        switch (fieldPath) {
-          case "rowNumber":
-            continue;
-          case "materialSampleName":
-            await validateServerDuplicateMaterialSampleNames(
-              uniqueSampleCollections
-            );
-            break;
-          case "parentMaterialSample.materialSampleName":
-            // If there is a parent material-sample name, but the name is not found
-            validateMissingParentMaterialSamples(
-              row,
-              fieldPath,
-              mappedParentNames,
-              missingParentMaterialSampleNames
-            );
-            break;
-          default:
-            validateDataFormat(row, fieldPath, errors);
-        }
-      }
+  function validateBulkUploadFiles(
+    workbookData: { [field: string]: any }[]
+  ): string[] {
+    if (!bulkEditFiles || filesToShow.length === 0) {
+      return []; // No bulk upload validation needed
     }
 
-    // Report the errors
-    if (missingParentMaterialSampleNames.length > 0) {
+    const errors: string[] = [];
+
+    // Check if we have enough rows in the spreadsheet
+    if (workbookData.length < filesToShow.length) {
       errors.push(
-        new ValidationError(
-          formatMessage("missingParentMaterialSampleNames", {
-            missingNames: missingParentMaterialSampleNames.join(", ")
-          }),
-          "parentMaterialSample.materialSampleName",
-          "sheet"
-        )
+        formatMessage("workbookInsufficientRows", {
+          expected: filesToShow.length,
+          actual: workbookData.length
+        })
+      );
+      return errors;
+    }
+
+    // Extract original filenames from workbook
+    const workbookFilenames = workbookData
+      .map((row) => row["originalFilename"] as string)
+      .filter(Boolean)
+      .map((name) => name.trim().toLowerCase());
+
+    // Check if all uploaded files are present in the workbook
+    const expectedFilenames = filesToShow.map((file) =>
+      file.originalFilename.trim().toLowerCase()
+    );
+
+    const missingFiles = expectedFilenames.filter(
+      (filename) => !workbookFilenames.includes(filename)
+    );
+
+    if (missingFiles.length > 0) {
+      errors.push(
+        formatMessage("workbookMissingFiles", {
+          files: missingFiles.slice(0, 5).join(", "),
+          remaining: missingFiles.length > 5 ? missingFiles.length - 5 : 0
+        })
       );
     }
 
-    const onSheetDuplicates: string[] = uniqueSampleCollections
-      .filter((pair) => pair.localDuplicate)
-      .map(
-        (pair) => pair.materialSampleName + " (" + pair.collectionName + ")"
-      );
-    if (onSheetDuplicates.length > 0) {
-      errors.push(
-        new ValidationError(
-          formatMessage("onSheetDuplicateMaterialSampleNames", {
-            duplicateNames: onSheetDuplicates.join(", ")
-          }),
-          "materialSampleName",
-          "sheet"
-        )
-      );
-    }
+    // Check for extra files in workbook that weren't uploaded
+    const extraFiles = workbookFilenames.filter(
+      (filename) => !expectedFilenames.includes(filename)
+    );
 
-    const onServerDuplicates: string[] = uniqueSampleCollections
-      .filter((pair) => pair.serverDuplicate)
-      .map(
-        (pair) => pair.materialSampleName + " (" + pair.collectionName + ")"
-      );
-    if (onServerDuplicates.length > 0) {
+    if (extraFiles.length > 0) {
       errors.push(
-        new ValidationError(
-          formatMessage("duplicateMaterialSampleNames", {
-            duplicateNames: onServerDuplicates.join(", ")
-          }),
-          "materialSampleName",
-          "sheet"
-        )
+        formatMessage("workbookExtraFiles", {
+          files: extraFiles.slice(0, 5).join(", "),
+          remaining: extraFiles.length > 5 ? extraFiles.length - 5 : 0
+        })
       );
     }
 
     return errors;
+  }
+
+  async function validateData(
+    workbookData: { [field: string]: any }[],
+    errors: ValidationError[]
+  ) {
+    if (type === "metadata") {
+      const bulkUploadErrors = validateBulkUploadFiles(workbookData);
+
+      if (bulkUploadErrors.length > 0) {
+        bulkUploadErrors.forEach((errorMsg) => {
+          errors.push(
+            new ValidationError(errorMsg, "originalFilename", "sheet")
+          );
+        });
+      }
+
+      for (let i = 0; i < workbookData.length; i++) {
+        const row = workbookData[i];
+        for (const fieldPath of Object.keys(row)) {
+          validateDataFormat(row, fieldPath, errors);
+        }
+      }
+
+      return errors;
+    } else {
+      const uniqueSampleCollections: UniqueSampleNameCollectionPairs[] =
+        generateUniqueSampleNamePairs();
+
+      // get all mapped parent material sample names
+      const parentValueMapping =
+        Object.values(workbookColumnMap ?? {}).find(
+          (item) => item.fieldPath === "parentMaterialSample.materialSampleName"
+        )?.valueMapping ?? {};
+      const mappedParentNames = Object.keys(parentValueMapping);
+      const missingParentMaterialSampleNames: string[] = [];
+
+      for (let i = 0; i < workbookData.length; i++) {
+        const row = workbookData[i];
+        for (const fieldPath of Object.keys(row)) {
+          switch (fieldPath) {
+            case "rowNumber":
+              continue;
+            case "materialSampleName":
+              await validateServerDuplicateMaterialSampleNames(
+                uniqueSampleCollections
+              );
+              break;
+            case "parentMaterialSample.materialSampleName":
+              // If there is a parent material-sample name, but the name is not found
+              validateMissingParentMaterialSamples(
+                row,
+                fieldPath,
+                mappedParentNames,
+                missingParentMaterialSampleNames
+              );
+              break;
+            default:
+              validateDataFormat(row, fieldPath, errors);
+          }
+        }
+      }
+
+      // Report the errors
+      if (missingParentMaterialSampleNames.length > 0) {
+        errors.push(
+          new ValidationError(
+            formatMessage("missingParentMaterialSampleNames", {
+              missingNames: missingParentMaterialSampleNames.join(", ")
+            }),
+            "parentMaterialSample.materialSampleName",
+            "sheet"
+          )
+        );
+      }
+
+      const onSheetDuplicates: string[] = uniqueSampleCollections
+        .filter((pair) => pair.localDuplicate)
+        .map(
+          (pair) => pair.materialSampleName + " (" + pair.collectionName + ")"
+        );
+      if (onSheetDuplicates.length > 0) {
+        errors.push(
+          new ValidationError(
+            formatMessage("onSheetDuplicateMaterialSampleNames", {
+              duplicateNames: onSheetDuplicates.join(", ")
+            }),
+            "materialSampleName",
+            "sheet"
+          )
+        );
+      }
+
+      const onServerDuplicates: string[] = uniqueSampleCollections
+        .filter((pair) => pair.serverDuplicate)
+        .map(
+          (pair) => pair.materialSampleName + " (" + pair.collectionName + ")"
+        );
+      if (onServerDuplicates.length > 0) {
+        errors.push(
+          new ValidationError(
+            formatMessage("duplicateMaterialSampleNames", {
+              duplicateNames: onServerDuplicates.join(", ")
+            }),
+            "materialSampleName",
+            "sheet"
+          )
+        );
+      }
+
+      return errors;
+    }
   }
 
   function validateMissingParentMaterialSamples(
@@ -661,6 +768,31 @@ export function WorkbookColumnMapping({
             );
           }
           break;
+        case WorkbookDataTypeEnum.ENUM:
+          const enumElements = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldPath);
+          if (
+            enumElements &&
+            !enumElements.find((ev) => {
+              const rowValue = row[fieldPath]?.toString().toLowerCase();
+              const enumValue = ev.value?.toString().toLowerCase();
+              const enumLabel = ev.label?.toString().toLowerCase();
+              return rowValue === enumValue || rowValue === enumLabel;
+            })
+          ) {
+            param.dataType = WorkbookDataTypeEnum.ENUM;
+            errors.push(
+              new ValidationError(
+                fieldPath +
+                  " " +
+                  formatMessage("workBookInvalidEnumFormat") +
+                  " " +
+                  enumElements.map((ev) => ev.label || ev.value).join(", "),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
         case WorkbookDataTypeEnum.STRING_COORDINATE:
           if (!/[a-zA-Z]/.test(row[fieldPath])) {
             param.dataType = WorkbookDataTypeEnum.STRING_COORDINATE;
@@ -672,6 +804,32 @@ export function WorkbookColumnMapping({
               )
             );
           }
+        case WorkbookDataTypeEnum.DATE:
+          if (!isDate(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.DATE;
+            errors.push(
+              new ValidationError(
+                fieldPath + " " + formatMessage("workBookInvalidDateFormat"),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
+        case WorkbookDataTypeEnum.DATE_TIME:
+          if (!isDateTime(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.DATE_TIME;
+            errors.push(
+              new ValidationError(
+                fieldPath +
+                  " " +
+                  formatMessage("workBookInvalidDateTimeFormat"),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
       }
     }
   }
@@ -746,22 +904,44 @@ export function WorkbookColumnMapping({
     }
   }
 
-  const selectedType = entityTypes.find((item) => item.value === type);
+  const discardUploadedFiles = () => {
+    setBulkEditFiles(null as any);
+    localStorage.removeItem(BULK_ADD_FILES_KEY);
+  };
+
+  // Find the group from the first bulkEditFiles entry, if any:
+  const groupFromStorage = bulkEditFiles?.group;
+
+  // If bulkEditFiles exist, force type to "metadata"
+  const typeFromStorage =
+    bulkEditFiles && filesToShow.length > 0 ? "metadata" : type;
+  const isTypeDisabled = !!(bulkEditFiles && filesToShow.length > 0);
+
+  // If bulkEditFiles exist, force group to groupFromStorage and disable dropdown
+  const isGroupDisabled = !!groupFromStorage;
+  const effectiveGroup = groupFromStorage ?? group;
+
+  const selectedType = entityTypes.find(
+    (item) => item.value === typeFromStorage
+  );
+
   return loading || fieldMap.length === 0 ? (
     <LoadingSpinner loading={loading} />
   ) : (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
+      key={`${type}-${sheet}`}
       initialValues={{
         sheet: 1,
-        type,
+        type: typeFromStorage,
         fieldMap,
         relationshipMapping,
-        group
+        group: effectiveGroup
       }}
       innerRef={formRef}
       onSubmit={onSubmit}
       validationSchema={workbookColumnMappingFormSchema}
       customErrorViewerMessage={handleErrorSummary}
+      enableReinitialize={true}
     >
       {buttonBar}
       <FieldArray name="fieldMap">
@@ -789,7 +969,6 @@ export function WorkbookColumnMapping({
                     </FieldWrapper>
                     <FieldWrapper name="type" className="flex-grow-1">
                       <Select
-                        isDisabled={entityTypes.length === 1}
                         value={selectedType}
                         onChange={(entityType) => setType(entityType!.value)}
                         options={entityTypes}
@@ -797,6 +976,7 @@ export function WorkbookColumnMapping({
                         styles={{
                           menuPortal: (base) => ({ ...base, zIndex: 9999 })
                         }}
+                        isDisabled={isTypeDisabled}
                       />
                     </FieldWrapper>
                     <GroupSelectField
@@ -805,18 +985,20 @@ export function WorkbookColumnMapping({
                       hideWithOnlyOneGroup={false}
                       className="flex-grow-1"
                       onChange={(newGroup) => setGroup(newGroup)}
+                      disabled={isGroupDisabled}
                       selectProps={{
                         menuPortalTarget: document.body,
+                        isDisabled: isGroupDisabled,
                         styles: {
                           menuPortal: (base) => ({ ...base, zIndex: 9999 })
                         }
                       }}
                     />
-                    <CheckBoxField name="appendData" />
+                    {allowAppendData && <CheckBoxField name="appendData" />}
                   </div>
 
                   {!templateIntegrityWarning && (
-                    <Alert variant="warning" className="mb-0">
+                    <Alert variant="warning" className="mb-1">
                       <Alert.Heading>
                         <DinaMessage id="workbook_templateIntegrityWarning_title" />
                       </Alert.Heading>
@@ -843,6 +1025,64 @@ export function WorkbookColumnMapping({
                       </ul>
                     </Alert>
                   )}
+
+                  {type === "metadata" &&
+                    (!bulkEditFiles || filesToShow.length === 0) && (
+                      <div className="alert alert-danger mb-0">
+                        <DinaMessage id="noBulkEditFilesError" />
+                        <div className="mt-2">
+                          <Link
+                            href="/object-store/upload"
+                            className="btn btn-primary btn-sm"
+                          >
+                            <DinaMessage id="goToObjectUploadPage" />
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+
+                  {bulkEditFiles &&
+                    filesToShow.length > 0 &&
+                    type === "metadata" && (
+                      <div className="alert alert-info mb-0 d-flex justify-content-between align-items-start">
+                        <div>
+                          <DinaMessage
+                            id="bulkUploadDetectedDescription"
+                            values={{ count: filesToShow.length }} // Use filesToShow for proper count
+                          />
+                          <div className="mt-2">
+                            <small>
+                              <strong>
+                                <DinaMessage id="expectedFiles" />:
+                              </strong>
+                              <ul className="mb-0">
+                                {filesToShow.slice(0, 5).map((file) => (
+                                  <li key={file.id}>{file.originalFilename}</li>
+                                ))}
+                                {filesToShow.length > 5 && (
+                                  <li>
+                                    <DinaMessage
+                                      id="andNMore"
+                                      values={{ count: filesToShow.length - 5 }}
+                                    />
+                                  </li>
+                                )}
+                              </ul>
+                            </small>
+                          </div>
+                        </div>
+                        <div className="ms-3">
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={discardUploadedFiles}
+                          >
+                            <FaFileCircleXmark className="me-2" />
+                            <DinaMessage id="discardUploadedFiles" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                 </Card.Body>
               </Card>
 
@@ -867,7 +1107,7 @@ export function WorkbookColumnMapping({
                       <DinaMessage id="spreadsheetHeader" />
                     </div>
                     <div className="col-md-6">
-                      <DinaMessage id="materialSampleFieldsMapping" />
+                      <DinaMessage id={fieldColumnLocaleId} />
                     </div>
                     <div className="col-md-2">
                       <DinaMessage id="skipColumn" />
@@ -880,6 +1120,7 @@ export function WorkbookColumnMapping({
                       fieldOptions={fieldOptions}
                       onFieldMappingChange={onFieldMappingChange}
                       key={index}
+                      type={type}
                     />
                   ))}
                 </Card.Body>

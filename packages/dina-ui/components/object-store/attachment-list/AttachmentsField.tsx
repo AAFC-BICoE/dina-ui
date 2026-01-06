@@ -23,6 +23,7 @@ import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
 import classNames from "classnames";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { ColumnDef } from "@tanstack/react-table";
+import { FaPaperclip, FaTimes } from "react-icons/fa";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -309,7 +310,8 @@ export function AddAttachmentsButton({
           }
         `}</style>
         <div className="modal-header">
-          <button className="btn btn-dark" onClick={closeModal}>
+          <button className="btn btn-dark ms-auto" onClick={closeModal}>
+            <FaTimes className="me-2" />
             <DinaMessage id="cancelButtonText" />
           </button>
         </div>
@@ -338,9 +340,10 @@ export function AddAttachmentsButton({
       )}
       type="button"
       onClick={openAttachmentsModal}
-      style={style ?? { width: "10rem" }}
+      style={style ?? { width: "12rem" }}
       disabled={addingAttachmentsDisabled}
     >
+      <FaPaperclip className="me-2" />
       {buttonTextElement ?? <DinaMessage id={"addAttachments"} />}
     </button>
   );

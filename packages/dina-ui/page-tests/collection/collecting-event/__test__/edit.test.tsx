@@ -83,7 +83,6 @@ const mockBulkGet = jest.fn(async (paths) => {
   console.warn("No mock value for bulkGet paths: ", paths);
 });
 
-
 const MOCK_POST_ERROR = (() => {
   const error = new Error() as any;
   error.isAxiosError = true;
@@ -454,17 +453,16 @@ describe("collecting-event edit page", () => {
     await waitFor(() => {
       expect(
         wrapper.getByText((_, element) => {
-          return (
-            !!element &&
+          return !!(
+            element &&
             element.classList.contains("error-message") &&
             element.textContent?.includes(title) &&
             element.textContent?.includes(detail)
           );
         })
       ).toBeInTheDocument();
-
-      });
-  })
+    });
+  });
 
   it("Lets you set the primary GeoReferenceAssertion.", async () => {
     mockQuery = {};

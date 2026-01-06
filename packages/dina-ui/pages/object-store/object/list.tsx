@@ -7,7 +7,10 @@ import {
   stringArrayCell
 } from "common-ui";
 import Link from "next/link";
-import { TableColumn } from "../../../../common-ui/lib/list-page/types";
+import {
+  DynamicFieldsMappingConfig,
+  TableColumn
+} from "../../../../common-ui/lib/list-page/types";
 import { Component, useMemo, useState, useEffect } from "react";
 import { Footer, Head, Nav, ThumbnailCell } from "../../../components";
 import {
@@ -32,6 +35,24 @@ export const OBJECT_STORE_NON_EXPORTABLE_COLUMNS: string[] = [
 const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
 
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
+
+export const dynamicFieldMappingForMetadata: DynamicFieldsMappingConfig = {
+  fields: [
+    {
+      type: "managedAttribute",
+      label: "managedAttributes",
+      path: "data.attributes.managedAttributes",
+      apiEndpoint: "objectstore-api/managed-attribute",
+      component: "ENTITY"
+    },
+    {
+      type: "imageLink",
+      label: "_imageLink",
+      path: "_imageLink"
+    }
+  ],
+  relationshipFields: []
+};
 
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
@@ -83,6 +104,7 @@ export default function MetadataListPage() {
           <Link
             href={`/object-store/object/external-resource-view?id=${original?.id}`}
             className="m-auto"
+            style={{ whiteSpace: "nowrap" }}
           >
             <DinaMessage id="viewDetails" />
           </Link>
@@ -91,6 +113,7 @@ export default function MetadataListPage() {
             href={`/object-store/object/view?id=${original.id}`}
             passHref={true}
             id={`file-name-${original.id}`}
+            style={{ whiteSpace: "nowrap" }}
           >
             <DinaMessage id="viewDetails" />
           </Link>
@@ -166,12 +189,11 @@ export default function MetadataListPage() {
         </div>
       ),
       header: () => (
-        <div id="acPreviewLinksHeader">
+        <div id="acPreviewLinksHeader" style={{ whiteSpace: "nowrap" }}>
           <DinaMessage id="viewPreviewButtonText" />
         </div>
       ),
-      enableSorting: false,
-      size: 200
+      enableSorting: false
     }
   ];
 
@@ -221,23 +243,7 @@ export default function MetadataListPage() {
               <QueryPage
                 indexName={"dina_object_store_index"}
                 uniqueName="object-store-list"
-                dynamicFieldMapping={{
-                  fields: [
-                    {
-                      type: "managedAttribute",
-                      label: "managedAttributes",
-                      path: "data.attributes.managedAttributes",
-                      apiEndpoint: "objectstore-api/managed-attribute",
-                      component: "ENTITY"
-                    },
-                    {
-                      type: "imageLink",
-                      label: "_imageLink",
-                      path: "_imageLink"
-                    }
-                  ],
-                  relationshipFields: []
-                }}
+                dynamicFieldMapping={dynamicFieldMappingForMetadata}
                 mandatoryDisplayedColumns={["thumbnail", "viewDetails"]}
                 nonExportableColumns={OBJECT_STORE_NON_EXPORTABLE_COLUMNS}
                 nonSearchableColumns={[

@@ -165,6 +165,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   configureDefaultValues: "Configure default values",
   configureFormTemplate: "Configure Form Template",
   contents: "Contents",
+  continueWithWorkbook: "Continue with Workbook",
+  continueWithBatchEntryForm: "Continue with Batch Entry Form",
+  workbookUploadBulkEditInfoMessage:
+    "{count} files ready for bulk editing. Upload a spreadsheet with an 'Original Filename' column to map metadata changes.",
   contributors: "Contributors",
   controlledVocabularyTitle: "Controlled Vocabulary",
   convertToDepthMinMax: "Convert to Depth Min/Max",
@@ -225,6 +229,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dinaConfigurationSectionTitle: "Configuration",
   userProfile: "User Profile",
   disabledForChildMaterialSamples: "Disabled for child Material Samples",
+  discardUploadedFiles: "Discard uploaded files",
   dragDropInstructionsHeader: "To rearrange the attribute order:",
   dragDropKeyboardInstructions:
     "Tab to the attribute, then press space to select it. Use the arrow keys to move the item, then press space to place it.",
@@ -282,8 +287,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   feedbackExternal: "(external, GitHub account required)",
   enterFullscreen: "Enter Fullscreen",
   exitFullscreen: "Exit Fullscreen",
-  pageSizeError:
-    "Page number exceeds system limit. To get more relevant results, please modify your search query or change the sort order.",
   fieldExtensions: "Field Extensions",
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
@@ -662,6 +665,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributes: "Managed Attributes",
   managedAttributesViews: "Form Templates",
   "material-sample": "Material Sample",
+  metadata: "Metadata",
   materialDirection_tooltip:
     "Transaction Material Direction: {materialDirection}",
   materialIn: "Material In",
@@ -670,6 +674,20 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleFieldsMapping: "Material Sample Field",
+  metadataFieldsMapping: "Metadata Field",
+  expectedFiles: "Expected Files",
+  andNMore: "... and {count} more",
+  workbookInsufficientRows:
+    "The spreadsheet has {actual} rows but {expected} files were uploaded. Please ensure all uploaded files are included.",
+  workbookMissingFiles:
+    "The following uploaded files are missing from the spreadsheet: {files}{remaining, plural, =0 {} other { (and {remaining} more)}}",
+  workbookExtraFiles:
+    "The following files in the spreadsheet were not uploaded: {files}{remaining, plural, =0 {} other { (and {remaining} more)}}",
+  bulkUploadDetectedDescription:
+    "You have {count} uploaded file(s). The spreadsheet must include these files with matching 'Original Filename' values.",
+  noBulkEditFilesError:
+    "You do not have files uploaded to bulk edit. Go to the object upload page to upload files to be edited.",
+  goToObjectUploadPage: "Go to Object Upload Page",
   skipColumn: "Skip",
   materialSampleFormTemplate: "Material Sample Form Template",
   materialSampleFormTemplates: "Material Sample Form Templates",
@@ -1102,6 +1120,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "These entries already exist in the system with the same Primary ID and Collection Name: {duplicateNames}",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be a {dataType}",
+  workBookInvalidEnumFormat: "must be one of the accepted values:",
   workBookInvalidManagedAttributeDataType:
     "Invalid Managed Attribute data type: managed attribute key {key} expects {type} data type.",
   workBookInvalidManagedAttributeKey:
@@ -1228,10 +1247,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_column: "Column",
   deleteFailedImport: "Delete Failed Import",
   workbook_confirmation_title: "Import Complete!",
-  workbook_confirmation_total: "{total} new material samples were created.",
-  workbook_updated_total: "{total} existing material samples were updated.",
+  workbook_confirmation_total: "{total} new {type}s were created.",
+  workbook_updated_total: "{total} existing {type}s were updated.",
   workbook_confirmation_new: "Upload New Workbook",
-  workbook_confirmation_view: "View Imported Material Samples",
+  workbook_confirmation_view: "View Imported {type}s",
+  workBookInvalidDateType:
+    "Field '{fieldName}' must be a valid date string, received invalid type",
+  workBookEmptyDateValue: "Field '{fieldName}' cannot be empty",
+  workBookInvalidDateFormat:
+    "needs to be a valid date in this format: YYYY-MM-DD (for example: 2023-12-25)",
+  workBookInvalidDateTimeFormat:
+    "needs to be a valid date or date with time. Use YYYY-MM-DD (like 2023-12-25) or include the time as YYYY-MM-DDTHH:mm:ss.SSSZ (like 2023-12-25T14:30:00.000Z)",
   storageUnit_duplicate_title: "Storage Unit Name already exists",
   storageUnit_duplicate_body:
     'The name "{duplicatedName}" is already in use for another storage unit in this group. Would you still like to proceed?',
@@ -1245,7 +1271,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedExport_exportDropdown: "Select Export Template",
   savedExport_createTitle: "Save Export Template",
   savedExport_overrideWarning:
-    'A export template exists with the name "{savedExportName}". Creating this export template will replace the existing one.',
+    'A export template exists with the name "{savedExportName}". Please select a new name or delete the existing template first.',
   savedExport_createName: "Saved Export Template Name",
   savedExport_columnsToBeSaved: "Columns to be saved",
   export_columnsToExport: "Columns To Export",
@@ -1328,5 +1354,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   taxonomyHierarchySubtitle:
     "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination.",
   notPubliclyReleasableWithReason: "Not Publicly Releasable: {reason}",
-  clearAllNamesButtonText: "Clear All Names"
+  clearAllNamesButtonText: "Clear All Names",
+  workflowsLegend: "Molecular Analysis Workflows"
 };

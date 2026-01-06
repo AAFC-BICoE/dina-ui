@@ -57,26 +57,6 @@ export type TableColumn<TData extends KitsuResource> = ColumnDef<TData> & {
 };
 
 /**
- * Data type of Column functions to export.
- *
- * For example:
- *
- * {
- *    "function1": {
- *      "functionName":"CONVERT_COORDINATES_DD",
- *      "params":["collectingEvent.eventGeom"]
- *    }
- *  }
- */
-
-export interface ColumnFunctions {
-  [functionId: string]: {
-    functionName: string;
-    params: string[];
-  };
-}
-
-/**
  * The full path will be generated for elastic using a combination of the parent path and
  * the value. The path is generated using the following:
  *

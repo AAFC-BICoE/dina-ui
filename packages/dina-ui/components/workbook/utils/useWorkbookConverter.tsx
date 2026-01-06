@@ -3,6 +3,7 @@ import { InputResource, KitsuResource } from "kitsu";
 import _ from "lodash";
 import { useMemo } from "react";
 import {
+  convertDateTime,
   FieldMappingConfigType,
   getFlattenedConfig,
   LinkOrCreateSetting,
@@ -63,6 +64,10 @@ export function useWorkbookConverter(
               });
             }
             break;
+          case WorkbookDataTypeEnum.ENUM:
+            const allowedValues = (recordFieldsMap[recordField] as any)
+              .allowedValues;
+            fieldToVocabElemsMap.set(recordField, allowedValues);
           case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
             if (endpoint) {
               // load available Managed Attributes
@@ -92,6 +97,7 @@ export function useWorkbookConverter(
     ) => value,
     [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
     [WorkbookDataTypeEnum.DATE]: convertDate,
+    [WorkbookDataTypeEnum.DATE_TIME]: convertDateTime,
     [WorkbookDataTypeEnum.STRING]: convertString,
     [WorkbookDataTypeEnum.STRING_COORDINATE]: (
       value: any,
@@ -99,6 +105,20 @@ export function useWorkbookConverter(
     ) => convertString((value as string).toUpperCase(), _fieldName),
     [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
       value.toUpperCase().replace(" ", "_"),
+    [WorkbookDataTypeEnum.ENUM]: (value: any, fieldName?: string) => {
+      const allowedValues = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldName || "");
+      if (allowedValues) {
+        const normalizedValue = String(value).toLowerCase();
+        const found = allowedValues.find(
+          (ev) =>
+            String(ev?.value).toLowerCase() === normalizedValue ||
+            String(ev?.label).toLowerCase() === normalizedValue
+        );
+        if (found && found.value !== undefined) {
+          return found.value;
+        }
+      }
+    },
     [WorkbookDataTypeEnum.CLASSIFICATION]: (value: {
       [key: string]: string;
     }) => {
@@ -419,7 +439,7 @@ export function useWorkbookConverter(
       const relationshipConfig = value.relationshipConfig;
       if (relationshipConfig) {
         // If the value is an Object type, and there is a relationshipConfig defined
-        let valueToLink;
+        let valueToLink: any;
         if (
           relationshipConfig.linkOrCreateSetting === LinkOrCreateSetting.LINK ||
           relationshipConfig.linkOrCreateSetting ===
@@ -452,7 +472,7 @@ export function useWorkbookConverter(
               resource.relationships = {};
             }
             resource.relationships[attributeName] = {
-              data: valueToLink
+              data: _.pick(valueToLink, ["id", "type"])
             };
             delete resource[attributeName];
             return;
@@ -552,13 +572,15 @@ export function useWorkbookConverter(
       }
     } else if (Array.isArray(value) && value.length > 0) {
       const valuesForRelationship: { id: string; type: string }[] = [];
+      let hasRelationshipConfig = false;
       for (const valueInArray of value) {
         const relationshipConfig = valueInArray.relationshipConfig;
         // If the value is an Object Array type, and there is a relationshipConfig defined
         // Then we need to loop through all properties of each item in the array
         if (relationshipConfig) {
+          hasRelationshipConfig = true;
           // The filter below is to find out all simple data type properties
-          let valueToLink;
+          let valueToLink: any;
           if (
             relationshipConfig.linkOrCreateSetting ===
               LinkOrCreateSetting.LINK ||
@@ -589,8 +611,9 @@ export function useWorkbookConverter(
               }
             }
             if (valueToLink) {
+              const valuesToAdd = Array.isArray(valueToLink) ? valueToLink : [valueToLink];
               valuesForRelationship.push(
-                ...(Array.isArray(valueToLink) ? valueToLink : [valueToLink])
+                ...valuesToAdd.map(v => _.pick(v, ["id", "type"]))
               );
             } else {
               if (
@@ -654,13 +677,17 @@ export function useWorkbookConverter(
           }
         }
       }
-      if (!resource.relationships) {
-        resource.relationships = {};
-      }
-      if (valuesForRelationship.length) {
-        resource.relationships[attributeName] = {
-          data: valuesForRelationship
-        };
+      // Only process as relationship and delete if the array contained relationship objects
+      if (hasRelationshipConfig) {
+        if (!resource.relationships) {
+          resource.relationships = {};
+        }
+        if (valuesForRelationship.length) {
+          resource.relationships[attributeName] = {
+            data: valuesForRelationship
+          };
+        }
+        // Delete the attribute that should be in relationships
         delete resource[attributeName];
       }
     }

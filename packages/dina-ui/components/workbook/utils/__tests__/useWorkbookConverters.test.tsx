@@ -14,7 +14,9 @@ const mockConfig: FieldMappingConfigType = {
     relationshipConfig: {
       type: "mock-entity",
       hasGroup: true,
-      baseApiPath: "fake-api"
+      baseApiPath: "fake-api",
+      allowAppendData: true,
+      fieldColumnLocaleId: "test"
     },
     stringField: { dataType: WorkbookDataTypeEnum.STRING },
     numberField: { dataType: WorkbookDataTypeEnum.NUMBER },
@@ -29,6 +31,13 @@ const mockConfig: FieldMappingConfigType = {
     vocabularyField: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
       endpoint: "vocabulary endpoint"
+    },
+    enumField: {
+      dataType: WorkbookDataTypeEnum.ENUM,
+      allowedValues: [
+        { label: "Option 1", value: "option1" },
+        { label: "Option 2", value: "option2" }
+      ]
     },
     objectField: {
       dataType: WorkbookDataTypeEnum.OBJECT,
@@ -172,7 +181,9 @@ describe("useWorkbookConverters", () => {
           relationshipConfig: {
             type: "mock-entity",
             hasGroup: true,
-            baseApiPath: "fake-api"
+            baseApiPath: "fake-api",
+            allowAppendData: true,
+            fieldColumnLocaleId: "test"
           },
           dog: {
             dataType: WorkbookDataTypeEnum.OBJECT,
@@ -209,10 +220,19 @@ describe("useWorkbookConverters", () => {
       relationshipConfig: {
         baseApiPath: "fake-api",
         hasGroup: true,
-        type: "mock-entity"
+        type: "mock-entity",
+        allowAppendData: true,
+        fieldColumnLocaleId: "test"
       },
       booleanField: {
         dataType: "boolean"
+      },
+      enumField: {
+        allowedValues: [
+          { label: "Option 1", value: "option1" },
+          { label: "Option 2", value: "option2" }
+        ],
+        dataType: "enum"
       },
       mapField: {
         dataType: "managedAttributes",
@@ -421,7 +441,9 @@ describe("useWorkbookConverters", () => {
     expect(getFieldRelationshipConfig()).toEqual({
       type: "mock-entity",
       hasGroup: true,
-      baseApiPath: "fake-api"
+      baseApiPath: "fake-api",
+      allowAppendData: true,
+      fieldColumnLocaleId: "test"
     });
     expect(getFieldRelationshipConfig("objectField")).toEqual({
       type: "object-field",
@@ -919,6 +941,322 @@ describe("useWorkbookConverters", () => {
           type: "person"
         }
       }
+    });
+  });
+
+  describe("Multi-select relationships (projects and preparedBy)", () => {
+    it("linkRelationshipAttribute should handle multi-project selection with full objects", async () => {
+      const mockSave = jest.fn();
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: mockSave
+      } as any);
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockResource: any = {
+        relationshipConfig: {
+          baseApiPath: "fake-api",
+          hasGroup: true,
+          type: "material-sample"
+        },
+        projects: [
+          {
+            name: "Project 1",
+            relationshipConfig: {
+              baseApiPath: "/collection-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK,
+              type: "project"
+            }
+          },
+          {
+            name: "Project 2",
+            relationshipConfig: {
+              baseApiPath: "/collection-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK,
+              type: "project"
+            }
+          }
+        ]
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "projects.name": {
+          fieldPath: "projects.name",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {
+            "Project 1": {
+              id: "project-1-id",
+              type: "project",
+              name: "Project 1"
+            },
+            "Project 2": {
+              id: "project-2-id",
+              type: "project",
+              name: "Project 2"
+            }
+          },
+          numOfUniqueValues: 2,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        "projects",
+        "test-group"
+      );
+
+      // Verify that relationship data only contains {id, type}, not the full object
+      expect(mockResource.relationships.projects.data).toEqual([
+        { id: "project-1-id", type: "project" },
+        { id: "project-2-id", type: "project" }
+      ]);
+
+      // Verify no extra fields like 'name' are included
+      expect(mockResource.relationships.projects.data[0]).not.toHaveProperty("name");
+      expect(mockResource.relationships.projects.data[1]).not.toHaveProperty("name");
+    });
+
+    it("linkRelationshipAttribute should handle multi-person selection (preparedBy) with full objects", async () => {
+      const mockSave = jest.fn();
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: mockSave
+      } as any);
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockResource: any = {
+        relationshipConfig: {
+          baseApiPath: "fake-api",
+          hasGroup: true,
+          type: "material-sample"
+        },
+        preparedBy: [
+          {
+            displayName: "Person 1",
+            relationshipConfig: {
+              baseApiPath: "/agent-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK,
+              type: "person"
+            }
+          },
+          {
+            displayName: "Person 2",
+            relationshipConfig: {
+              baseApiPath: "/agent-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK,
+              type: "person"
+            }
+          }
+        ]
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "preparedBy.displayName": {
+          fieldPath: "preparedBy.displayName",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {
+            "Person 1": {
+              id: "person-1-id",
+              type: "person",
+              displayName: "Person 1",
+              email: "person1@example.com"
+            } as any,
+            "Person 2": {
+              id: "person-2-id",
+              type: "person",
+              displayName: "Person 2",
+              email: "person2@example.com"
+            } as any
+          },
+          numOfUniqueValues: 2,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        "preparedBy",
+        "test-group"
+      );
+
+      // Verify that relationship data only contains {id, type}, not the full object
+      expect(mockResource.relationships.preparedBy.data).toEqual([
+        { id: "person-1-id", type: "person" },
+        { id: "person-2-id", type: "person" }
+      ]);
+
+      // Verify no extra fields like 'displayName' or 'email' are included
+      expect(mockResource.relationships.preparedBy.data[0]).not.toHaveProperty("displayName");
+      expect(mockResource.relationships.preparedBy.data[0]).not.toHaveProperty("email");
+      expect(mockResource.relationships.preparedBy.data[1]).not.toHaveProperty("displayName");
+      expect(mockResource.relationships.preparedBy.data[1]).not.toHaveProperty("email");
+    });
+
+    it("linkRelationshipAttribute should strip extra fields from single relationship", async () => {
+      const mockSave = jest.fn();
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: mockSave
+      } as any);
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockResource: any = {
+        relationshipConfig: {
+          baseApiPath: "fake-api",
+          hasGroup: true,
+          type: "material-sample"
+        },
+        collection: {
+          name: "Test Collection",
+          relationshipConfig: {
+            baseApiPath: "/collection-api",
+            hasGroup: false,
+            linkOrCreateSetting: LinkOrCreateSetting.LINK,
+            type: "collection"
+          }
+        }
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "collection.name": {
+          fieldPath: "collection.name",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {
+            "Test Collection": {
+              id: "collection-id",
+              type: "collection",
+              name: "Test Collection",
+              code: "TC-001"
+            } as any
+          },
+          numOfUniqueValues: 1,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        "collection",
+        "test-group"
+      );
+
+      // Verify that relationship data only contains {id, type}
+      expect(mockResource.relationships.collection.data).toEqual({
+        id: "collection-id",
+        type: "collection"
+      });
+
+      // Verify no extra fields are included
+      expect(mockResource.relationships.collection.data).not.toHaveProperty("name");
+      expect(mockResource.relationships.collection.data).not.toHaveProperty("code");
+    });
+
+    it("linkRelationshipAttribute should handle array of relationships when valueToLink is an array", async () => {
+      const mockSave = jest.fn();
+      jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+        apiClient: {
+          get: jest.fn().mockResolvedValue({})
+        } as any,
+        save: mockSave
+      } as any);
+      const { linkRelationshipAttribute } = getWorkbookConverter(
+        mockConfig,
+        "mockEntity"
+      );
+
+      const mockResource: any = {
+        relationshipConfig: {
+          baseApiPath: "fake-api",
+          hasGroup: true,
+          type: "material-sample"
+        },
+        collectors: [
+          {
+            displayName: "Collector 1",
+            relationshipConfig: {
+              baseApiPath: "/agent-api",
+              hasGroup: false,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK,
+              type: "person"
+            }
+          }
+        ]
+      };
+
+      const mockWorkbookColumnMap: WorkbookColumnMap = {
+        "collectors.displayName": {
+          fieldPath: "collectors.displayName",
+          showOnUI: true,
+          mapRelationship: true,
+          valueMapping: {
+            "Collector 1": [
+              {
+                id: "collector-1a-id",
+                type: "person",
+                displayName: "Collector 1",
+                givenNames: "John"
+              },
+              {
+                id: "collector-1b-id",
+                type: "person",
+                displayName: "Collector 1",
+                givenNames: "Jane"
+              }
+            ] as any
+          },
+          numOfUniqueValues: 1,
+          originalColumnName: "",
+          multipleValueMappings: {}
+        }
+      };
+
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        "collectors",
+        "test-group"
+      );
+
+      // When valueToLink is an array, all items should be included and stripped to {id, type}
+      expect(mockResource.relationships.collectors.data).toEqual([
+        { id: "collector-1a-id", type: "person" },
+        { id: "collector-1b-id", type: "person" }
+      ]);
+
+      // Verify no extra fields are included
+      expect(mockResource.relationships.collectors.data[0]).not.toHaveProperty("displayName");
+      expect(mockResource.relationships.collectors.data[0]).not.toHaveProperty("givenNames");
+      expect(mockResource.relationships.collectors.data[1]).not.toHaveProperty("displayName");
+      expect(mockResource.relationships.collectors.data[1]).not.toHaveProperty("givenNames");
     });
   });
 });

@@ -16,6 +16,12 @@ export function ExistingObjectsAttacher({
       bucketField: "data.attributes.bucket"
     }),
     {
+      header: () => <FieldHeader name="filename" />,
+      accessorKey: "data.attributes.filename",
+      isKeyword: true,
+      id: "filename"
+    },
+    {
       header: () => <FieldHeader name="acCaption" />,
       accessorKey: "data.attributes.acCaption",
       isKeyword: true,

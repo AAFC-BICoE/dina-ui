@@ -134,6 +134,21 @@ export default function ExportPage<TData extends KitsuResource>() {
     dynamicFieldMapping
   });
 
+  if (indexMap && !indexMap.find((im) => im.label === "resourceExternalURL")) {
+    indexMap.push({
+      path: "data.attributes",
+      value: "data.attributes.externalResourceURL",
+      label: "resourceExternalURL",
+      hideField: false,
+      type: "string",
+      containsSupport: false,
+      endsWithSupport: false,
+      dynamicField: undefined,
+      distinctTerm: false,
+      optimizedPrefix: false
+    } as ESIndexMapping);
+  }
+
   // The selected field from the query field selector.
   const [selectedFilenameAliasField, setSelectedFilenameAliasField] =
     useState<ESIndexMapping>();
@@ -162,6 +177,9 @@ export default function ExportPage<TData extends KitsuResource>() {
     setPubliclyReleaseable
   } = useSavedExports<TData>({ exportType, selectedSeparator });
 
+  const nonExportableColumns: string[] =
+    NON_EXPORTABLE_COLUMNS_MAP?.[indexName] ?? [];
+
   async function exportData(formik) {
     setLoading(true);
 
@@ -176,15 +194,23 @@ export default function ExportPage<TData extends KitsuResource>() {
 
     const columnFunctions = getColumnFunctions<TData>(columnsToExport);
 
+    // Non-exportable columns filtering
+    const filteredColumns = columnsToExport.filter(
+      (column) =>
+        !nonExportableColumns.some((prefix) =>
+          (column?.id ?? "").startsWith(prefix)
+        )
+    );
+
     // Make query to data-export
     const dataExportSaveArg: SaveArgs<DataExport> = {
       resource: {
         type: "data-export",
         source: indexName,
         query: queryString,
-        columns: convertColumnsToPaths(columnsToExport),
-        columnAliases: convertColumnsToAliases(columnsToExport),
-        columnFunctions:
+        columns: convertColumnsToPaths(filteredColumns),
+        columnAliases: convertColumnsToAliases(filteredColumns),
+        functions:
           Object.keys(columnFunctions ?? {}).length === 0
             ? undefined
             : columnFunctions,
@@ -659,9 +685,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                       uniqueName={uniqueName}
                       dynamicFieldsMappingConfig={dynamicFieldMapping}
                       disabled={loading}
-                      nonExportableColumns={
-                        NON_EXPORTABLE_COLUMNS_MAP?.[indexName] ?? []
-                      }
+                      nonExportableColumns={nonExportableColumns}
                     />
                   </Card.Body>
                 </Card>

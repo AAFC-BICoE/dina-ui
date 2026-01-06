@@ -17,7 +17,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Alert, Button, Card, Form } from "react-bootstrap";
 import Select from "react-select";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DynamicFieldsMappingConfig } from "common-ui/lib/list-page/types";
 import { dynamicFieldMappingForMaterialSample } from "../collection/material-sample/list";
 import Link from "next/link";
@@ -31,12 +31,15 @@ import InputGroup from "react-bootstrap/InputGroup";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import { handleDownloadLink } from "../../components/object-store/object-store-utils";
 import { downloadBlobFile } from "common-ui";
+import _ from "lodash";
+import { dynamicFieldMappingForMetadata } from "../object-store/object/list";
 
 export interface EntityConfiguration {
   name: string;
   indexName: string;
   uniqueName: string;
   dynamicConfig: DynamicFieldsMappingConfig;
+  requiredFields?: string[];
 }
 
 // Entities that we support to generate templates
@@ -60,6 +63,13 @@ const ENTITY_TYPES: EntityConfiguration[] = [
         }
       ]
     }
+  },
+  {
+    name: "metadata",
+    indexName: "dina_object_store_index",
+    uniqueName: "metadata-template-generator",
+    requiredFields: ["originalFilename"],
+    dynamicConfig: dynamicFieldMappingForMetadata
   }
 ];
 
@@ -93,10 +103,70 @@ export function WorkbookTemplateGenerator() {
   }));
   const selectedType = entityTypes.find((item) => item.value === type.name);
 
-  const flattenedConfig = getFlattenedConfig(FieldMappingConfig, type.name);
+  const flattenedConfig = useMemo(() => {
+    return getFlattenedConfig(FieldMappingConfig, type.name);
+  }, [type.name]);
+
   const newFieldOptions = useMemo(() => {
     return generateWorkbookFieldOptions(flattenedConfig, formatMessage);
   }, [flattenedConfig]);
+
+  // Automatically add required fields when type changes
+  useEffect(() => {
+    if (type.requiredFields && type.requiredFields.length > 0) {
+      const requiredColumns: GeneratorColumn[] = type.requiredFields.map(
+        (fieldName) => {
+          // Search through flat options first
+          const flatOption = newFieldOptions.find(
+            (option) => !("options" in option) && option.value === fieldName
+          );
+
+          if (flatOption) {
+            return {
+              columnLabel: flatOption.label,
+              columnValue: (flatOption as any).value,
+              columnAlias: ""
+            } as GeneratorColumn;
+          }
+
+          // Search through grouped/nested options
+          for (const item of newFieldOptions) {
+            if ("options" in item) {
+              const nestedOption = item.options.find(
+                (opt) => opt.value === fieldName
+              );
+              if (nestedOption) {
+                return {
+                  columnLabel: nestedOption.label,
+                  columnValue: nestedOption.value,
+                  columnAlias: ""
+                } as GeneratorColumn;
+              }
+            }
+          }
+
+          // If not found in options, create it manually with formatted label
+          return {
+            columnLabel: fieldName
+              .split(".")
+              .map(
+                (part) =>
+                  formatMessage(`field_${part}` as any)?.trim() ||
+                  formatMessage(part as any)?.trim() ||
+                  _.startCase(part)
+              )
+              .join("."),
+            columnValue: fieldName,
+            columnAlias: ""
+          } as GeneratorColumn;
+        }
+      );
+
+      setColumnsToGenerate(requiredColumns);
+    } else {
+      setColumnsToGenerate([]);
+    }
+  }, [type, newFieldOptions]);
 
   async function generateTemplate() {
     setLoading(true);
@@ -229,7 +299,7 @@ export function WorkbookTemplateGenerator() {
               <SubmitButton
                 className="ms-auto"
                 buttonProps={() => ({
-                  style: { width: "12rem" },
+                  style: { width: "14rem" },
                   disabled: loading || columnsToGenerate.length === 0,
                   onClick: () => generateTemplate()
                 })}
@@ -273,7 +343,6 @@ export function WorkbookTemplateGenerator() {
 
               <FieldWrapper name="type" className="flex-grow-1">
                 <Select
-                  isDisabled={entityTypes.length === 1}
                   value={selectedType}
                   onChange={(entityType) =>
                     setType(

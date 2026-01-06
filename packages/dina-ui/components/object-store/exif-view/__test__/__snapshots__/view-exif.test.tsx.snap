@@ -95,10 +95,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    2000, Jan 8
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      2000, Jan 8
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -120,10 +125,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    1/200
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      1/200
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -145,10 +155,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    0.5
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      0.5
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -170,10 +185,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    -0.5
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      -0.5
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -195,10 +215,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    f/8
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      f/8
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -220,10 +245,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    30fps
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      30fps
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -245,10 +275,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    f/2.8
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      f/2.8
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -270,10 +305,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    300dpi
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      300dpi
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -295,10 +335,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    10s
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      10s
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -320,10 +365,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    Canon EOS R5
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      Canon EOS R5
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -357,10 +407,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    landscape
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      landscape
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -382,10 +437,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    evaluative
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      evaluative
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -407,10 +467,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    100
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      100
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -432,10 +497,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    6720x4480
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      6720x4480
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -457,10 +527,15 @@ exports[`View Exif page renders exif props when received file upload response 1`
                   class="value-cell"
                 >
                   <div
-                    class="field-view"
-                    style="white-space: pre-wrap;"
+                    class="field-view-container"
+                    style="display: flex; flex-direction: column; gap: 0.25rem;"
                   >
-                    John Doe
+                    <div
+                      class="field-view read-only-scroll"
+                      style="white-space: pre-wrap; overflow-wrap: anywhere;"
+                    >
+                      John Doe
+                    </div>
                   </div>
                 </td>
               </tr>
