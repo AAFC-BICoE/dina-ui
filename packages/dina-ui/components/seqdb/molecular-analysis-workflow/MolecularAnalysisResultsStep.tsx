@@ -21,6 +21,7 @@ import { MolecularAnalysisResult } from "../../../types/seqdb-api/resources/mole
 import { MolecularAnalysisRunItem } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRunColumns";
 import { useState } from "react";
+import { FaMagic } from "react-icons/fa";
 
 export interface MolecularAnalysisResultsStepProps {
   molecularAnalysisId: string;
@@ -153,7 +154,14 @@ export function MolecularAnalysisResultsStep({
               <strong>
                 <DinaMessage id="molecularAnalysisRunStep_sequencingRunContent" />
               </strong>
-              <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
+              <DropdownButton
+                title={
+                  <>
+                    <FaMagic className="me-2" />
+                    {formatMessage("autoSelectButtonTitle")}
+                  </>
+                }
+              >
                 <Dropdown.Item
                   onClick={async () => {
                     setNumAttachmentsFound(0);
@@ -280,7 +288,14 @@ export function MolecularAnalysisResultsStep({
                   <DinaMessage id="molecularAnalysisRunStep_sequencingQualityControl" />
                 </strong>
 
-                <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
+                <DropdownButton
+                  title={
+                    <>
+                      <FaMagic className="me-2" />
+                      {formatMessage("autoSelectButtonTitle")}
+                    </>
+                  }
+                >
                   <Dropdown.Item
                     onClick={async () => {
                       setNumQualityControlAttachmentsFound(0);

@@ -964,6 +964,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectColumn: "Select Column",
+  missingMetadataAlert:
+    "{count, plural, one {One metadata could not be loaded or has likely been deleted.} other {# metadata entries could not be loaded or have likely been deleted.}}",
   columnSelector_currentlyDisplayed: "Currently displayed columns:",
   columnSelector_columnsToBeExported: "Selected Columns:",
   columnSelector_addNewColumn: "Add a new column:",

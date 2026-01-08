@@ -16,8 +16,9 @@ import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { FaEdit, FaUnlink } from "react-icons/fa";
 
 export interface ExistingAttachmentsTableProps {
   metadatas: ResourceIdentifierObject[];
@@ -51,8 +52,13 @@ export function ExistingAttachmentsTable({
 
   const { openMetadataEditorModal } = useBulkMetadataEditModal();
 
+  const [totalMissing, setTotalMissing] = useState<number>(0);
+
   useEffect(() => {
-    setAvailableMetadatas(metadatas.map((m) => ({ id: m.id, type: m.type })));
+    setAvailableMetadatas(
+      metadatas.filter((m) => !!m).map((m) => ({ id: m.id, type: m.type }))
+    );
+    setTotalMissing(metadatas.filter((m) => !m).length);
   }, [metadatas, setAvailableMetadatas]);
 
   const ATTACHMENT_TABLE_COLUMNS: ColumnDef<Metadata>[] = [
@@ -153,7 +159,7 @@ export function ExistingAttachmentsTable({
   }
 
   const { data: metadataObjects, loading } = useBulkGet<Metadata>({
-    ids: metadatas.map((m) => m.id),
+    ids: metadatas.filter((m) => m).map((m) => m?.id),
     listPath: "objectstore-api/metadata?include=derivatives"
   });
 
@@ -162,23 +168,32 @@ export function ExistingAttachmentsTable({
       initialValues={{ selectedMetadatas: {} }}
     >
       <div className="list-inline" style={{ minHeight: "3rem" }}>
+        {/* Show alert with total missing metadatas */}
+        {totalMissing > 0 && (
+          <div className="alert alert-warning">
+            {formatMessage("missingMetadataAlert", { count: totalMissing })}
+          </div>
+        )}
+
         <div className="float-start">
           {detachTotalSelected && <DetachedTotalSelected />}
         </div>
-        <div className="float-end">
+        <div className="float-end mt-2 mb-2 me-2">
           <FormikButton
             buttonProps={bulkButtonProps}
             className="btn btn-primary ms-2 metadata-bulk-edit-button"
             onClick={editSelectedMetadatas}
           >
+            <FaEdit className="me-2" />
             <DinaMessage id="editSelectedAttachmentMetadata" />
           </FormikButton>
           {onDetachMetadataIds && (
             <FormikButton
               buttonProps={bulkButtonProps}
-              className="btn btn-primary ms-2 metadata-detach-button"
+              className="btn btn-danger ms-2 metadata-detach-button"
               onClick={detachSelectedMetadatas}
             >
+              <FaUnlink className="me-2" />
               <DinaMessage id="detachSelectedButtonText" />
             </FormikButton>
           )}

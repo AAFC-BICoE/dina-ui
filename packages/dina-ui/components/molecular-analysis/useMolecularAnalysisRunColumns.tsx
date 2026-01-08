@@ -19,6 +19,7 @@ import React from "react";
 import { SequencingRunItem } from "./useMolecularAnalysisRun";
 import { QualityControlWithAttachment } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
 import { VocabularyOption } from "../collection/VocabularySelectField";
+import { FaTrashAlt } from "react-icons/fa";
 
 interface UseMolecularAnalysisRunColumnsProps {
   type: string;
@@ -459,7 +460,7 @@ export function useMolecularAnalysisRunColumns({
                 style={{
                   paddingLeft: "15px",
                   paddingRight: "15px",
-                  width: "8rem"
+                  width: "9rem"
                 }}
                 type="button"
                 key={1}
@@ -511,6 +512,7 @@ export function useMolecularAnalysisRunColumns({
                   }
                 }}
               >
+                <FaTrashAlt className="me-2" />
                 <DinaMessage id="removeAllButtonText" />
               </button>
             </div>
@@ -618,7 +620,7 @@ export function useMolecularAnalysisRunColumns({
               style={{
                 paddingLeft: "15px",
                 paddingRight: "15px",
-                width: "8rem"
+                width: "9rem"
               }}
               type="button"
               key={1}
@@ -637,6 +639,7 @@ export function useMolecularAnalysisRunColumns({
                 setReloadGenericMolecularAnalysisRun?.(Date.now());
               }}
             >
+              <FaTrashAlt className="me-2" />
               <DinaMessage id="removeAllButtonText" />
             </button>
           </div>
