@@ -1141,7 +1141,11 @@ export function useGenericMolecularAnalysisRun({
               type: "molecular-analysis-result",
               group: groupName,
               relationships: {
-                attachments: { data: currentAttachments }
+                attachments: {
+                  data: _.map(currentAttachments, (item) =>
+                    _.pick(item, ["id", "type"])
+                  )
+                }
               }
             }
           } as any
@@ -1218,7 +1222,11 @@ export function useGenericMolecularAnalysisRun({
                 id: resultIdToUpdate,
                 type: "molecular-analysis-result",
                 relationships: {
-                  attachments: { data: currentAttachments }
+                  attachments: {
+                    data: _.map(currentAttachments, (item) =>
+                      _.pick(item, ["id", "type"])
+                    )
+                  }
                 }
               }
             } as any
