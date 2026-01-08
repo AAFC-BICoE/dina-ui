@@ -39,13 +39,12 @@ export default function ControlledVocabularyListPage() {
     resourcePath: "controlled-vocabulary",
     limit: 1000,
     params: {
-      fiql: "type==MANAGED_ATTRIBUTE",
       fields: { "controlled-vocabulary": "id,name,key,type,vocabClass" },
       sort: "name"
     }
   });
 
-  const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy", "dinaComponent"];
+  const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy"];
 
   // 2. Filter State
   const [typeFilter, setTypeFilter] = useState<TypeFilterState>({
@@ -129,6 +128,11 @@ export default function ControlledVocabularyListPage() {
 
   // 6. Table Columns
   const COLUMNS: ColumnDefinition<ControlledVocabularyItem>[] = [
+    {
+      accessorKey: "multilingualTitle",
+      header: "Multilingual Title",
+      cell: ({ row: { original } }) => original.multilingualTitle?.titles?.[0]?.title ?? ""
+    },
     {
       accessorKey: "name",
       header: "Name",
