@@ -358,7 +358,7 @@ function addAttachedMetadatas(
     onChange(
       _.uniqBy(
         [...value, ...newIds.map((it) => ({ id: it, type: "metadata" }))],
-        (val) => val.id
+        (val) => val?.id
       )
     );
     closeModal();

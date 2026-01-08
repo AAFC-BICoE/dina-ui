@@ -3,6 +3,7 @@ import {
   DeleteArgs,
   FieldHeader,
   SaveArgs,
+  Tooltip,
   useAccount,
   useApiClient,
   useStringComparator
@@ -19,7 +20,7 @@ import React from "react";
 import { SequencingRunItem } from "./useMolecularAnalysisRun";
 import { QualityControlWithAttachment } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
 import { VocabularyOption } from "../collection/VocabularySelectField";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaExclamationTriangle, FaTrashAlt, FaUnlink } from "react-icons/fa";
 
 interface UseMolecularAnalysisRunColumnsProps {
   type: string;
@@ -356,23 +357,56 @@ export function useMolecularAnalysisRunColumns({
         cell: ({ row: { original } }) => {
           const attachments =
             original.molecularAnalysisRunItem?.result?.attachments ?? [];
-          const attachmentElements = attachments?.map((attachment, index) =>
-            attachment ? (
-              <React.Fragment key={attachment?.id}>
+          const attachmentElements = attachments.map((attachment, index) => {
+            if (!attachment || (attachment as any).issue) {
+              const isDeleted = (attachment as any).issue === "deleted";
+              const isLoadingIssue =
+                (attachment as any).issue === "loadingIssue";
+
+              return (
+                <React.Fragment key={`missing-${index}`}>
+                  <Tooltip
+                    visibleElement={
+                      <span className="text-danger">
+                        {isDeleted ? (
+                          <FaTrashAlt className="me-1" />
+                        ) : (
+                          <FaExclamationTriangle className="me-1" />
+                        )}
+                        <DinaMessage
+                          id={
+                            isLoadingIssue
+                              ? "loadingIssueAttachmentText"
+                              : "deletedAttachmentText"
+                          }
+                        />
+                      </span>
+                    }
+                    id={
+                      isDeleted
+                        ? "deletedAttachmentTooltipText"
+                        : "loadingIssueTooltipText"
+                    }
+                  />
+                  {index < attachments.length - 1 && ", "}
+                </React.Fragment>
+              );
+            }
+
+            return (
+              <React.Fragment key={attachment.id}>
                 <Link
-                  href={`/object-store/object/view?id=${attachment?.id}`}
+                  href={`/object-store/object/view?id=${attachment.id}`}
                   legacyBehavior
                 >
-                  {attachment?.originalFilename}
+                  {attachment.originalFilename}
                 </Link>
-                {index < attachments?.length - 1 && ", "}
+                {index < attachments.length - 1 && ", "}
               </React.Fragment>
-            ) : null
-          );
+            );
+          });
 
-          return (
-            <>{attachmentElements?.length > 0 ? attachmentElements : null}</>
-          );
+          return <>{attachmentElements}</>;
         },
         header: () => <FieldHeader name={"attachments"} />,
         accessorKey: "resultAttachment",
@@ -512,7 +546,7 @@ export function useMolecularAnalysisRunColumns({
                   }
                 }}
               >
-                <FaTrashAlt className="me-2" />
+                <FaUnlink className="me-2" />
                 <DinaMessage id="removeAllButtonText" />
               </button>
             </div>
@@ -559,19 +593,54 @@ export function useMolecularAnalysisRunColumns({
       cell: ({ row: { original } }) => {
         const attachments = original.attachments ?? [];
         const attachmentElements = attachments?.map((attachment, index) => {
-          return attachment ? (
-            <React.Fragment key={attachment?.id}>
-              <Link href={`/object-store/object/view?id=${attachment?.id}`}>
+          if (!attachment || (attachment as any).issue) {
+            const isDeleted = (attachment as any).issue === "deleted";
+            const isLoadingIssue = (attachment as any).issue === "loadingIssue";
+
+            return (
+              <React.Fragment key={`missing-${index}`}>
+                <Tooltip
+                  visibleElement={
+                    <span className="text-danger">
+                      {isDeleted ? (
+                        <FaTrashAlt className="me-1" />
+                      ) : (
+                        <FaExclamationTriangle className="me-1" />
+                      )}
+                      <DinaMessage
+                        id={
+                          isLoadingIssue
+                            ? "loadingIssueAttachmentText"
+                            : "deletedAttachmentText"
+                        }
+                      />
+                    </span>
+                  }
+                  id={
+                    isDeleted
+                      ? "deletedAttachmentTooltipText"
+                      : "loadingIssueTooltipText"
+                  }
+                />
+                {index < attachments.length - 1 && ", "}
+              </React.Fragment>
+            );
+          }
+
+          return (
+            <React.Fragment key={attachment.id}>
+              <Link
+                href={`/object-store/object/view?id=${attachment.id}`}
+                legacyBehavior
+              >
                 {(attachment as any)?.originalFilename}
               </Link>
-              {index < attachments?.length - 1 && ", "}
+              {index < attachments.length - 1 && ", "}
             </React.Fragment>
-          ) : null;
+          );
         });
 
-        return (
-          <>{attachmentElements?.length > 0 ? attachmentElements : null}</>
-        );
+        return <>{attachmentElements}</>;
       },
       header: () => <FieldHeader name={"attachments"} />,
       accessorKey: "resultAttachment",
@@ -639,7 +708,7 @@ export function useMolecularAnalysisRunColumns({
                 setReloadGenericMolecularAnalysisRun?.(Date.now());
               }}
             >
-              <FaTrashAlt className="me-2" />
+              <FaUnlink className="me-2" />
               <DinaMessage id="removeAllButtonText" />
             </button>
           </div>
