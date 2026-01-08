@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 
 export interface SidebarOption {
@@ -34,12 +34,44 @@ export function TypeFilterSideBarDynamic({
   const [open, setOpen] = useState<Record<string, boolean>>({});
   // Local data state for asynchronously loaded children
   const [loadedChildren, setLoadedChildren] = useState<Record<string, SidebarOption[]>>({});
+  // Track if we've already auto-expanded
+  const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
 
   // 1. Merge static children map with dynamically loaded children
   const allChildren = useMemo(
     () => ({ ...(childrenMap ?? {}), ...loadedChildren }),
     [childrenMap, loadedChildren]
   );
+
+  // Auto-expand all parents on mount to load their children
+  useEffect(() => {
+    if (hasAutoExpanded || parents.length === 0 || !loadChildren) {
+      return;
+    }
+
+    const expandAll = async () => {
+      const newOpen: Record<string, boolean> = {};
+      const newChildren: Record<string, SidebarOption[]> = {};
+
+      for (const parent of parents) {
+        if (parent.hasChildren && !loadedChildren[parent.id]) {
+          newOpen[parent.id] = true;
+          try {
+            const loaded = await loadChildren(parent.id);
+            newChildren[parent.id] = Array.isArray(loaded) ? loaded : [];
+          } catch (err) {
+            console.error("Failed to auto-load children for", parent.id, err);
+          }
+        }
+      }
+
+      setOpen((prev) => ({ ...prev, ...newOpen }));
+      setLoadedChildren((prev) => ({ ...prev, ...newChildren }));
+      setHasAutoExpanded(true);
+    };
+
+    expandAll();
+  }, [parents, loadChildren, hasAutoExpanded, loadedChildren]);
 
   const selectedParentSet = useMemo(() => new Set(selected.parent_cv_ids ?? []), [selected.parent_cv_ids]);
   const selectedChildSet = useMemo(() => new Set(selected.children ?? []), [selected.children]);

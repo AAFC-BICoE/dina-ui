@@ -182,10 +182,28 @@ export default function ControlledVocabularyListPage() {
         filterAttributes={CV_FILTER_ATTRIBUTES}
         
         additionalFilters={(filterForm) => {
+          const selectedParents = typeFilter.parent_cv_ids ?? [];
           const selectedChildren = typeFilter.children ?? [];
           const groupVal = (filterForm as any)?.group as string | undefined;
           const groupFiql = groupVal ? `group==${groupVal}` : "";
-          const childFiql = fiqlOrEq("dinaComponent", selectedChildren);
+          
+          let childFiql = "";
+          
+          if (selectedChildren.length > 0) {
+            // Filter by selected children (dinaComponents)
+            childFiql = fiqlOrEq("dinaComponent", selectedChildren);
+          } else if (selectedParents.length > 0) {
+            // If parents are selected but no children, show nothing
+            // (This happens when a parent with no items is selected)
+            const allSelectedHaveNoChildren = selectedParents.every(
+              parentId => (parentCounts[parentId] ?? 0) === 0
+            );
+            
+            if (allSelectedHaveNoChildren) {
+              childFiql = "dinaComponent==__NONE__";
+            }
+          }
+          
           return fiqlAnd(groupFiql, childFiql);
         }}
 
