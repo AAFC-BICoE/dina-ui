@@ -325,6 +325,13 @@ export function MolecularAnalysisResultsStep({
                                   qualityControl.attachments ?? [];
                                 const incoming = metadataResp.data as any[];
 
+                                const existingIds = new Set(
+                                  existing.map((item) => item.id)
+                                );
+                                const newAttachments = incoming.filter(
+                                  (item) => !existingIds.has(item.id)
+                                );
+
                                 const combined = [...existing, ...incoming];
                                 const uniqueById = Array.from(
                                   new Map(
@@ -336,11 +343,13 @@ export function MolecularAnalysisResultsStep({
                                   ...qualityControl,
                                   attachments: uniqueById
                                 };
-                                uniqueById.forEach(() => {
+
+                                // Only increment for the truly new items
+                                if (newAttachments.length > 0) {
                                   setNumQualityControlAttachmentsFound(
-                                    (prev) => prev + 1
+                                    (prev) => prev + newAttachments.length
                                   );
-                                });
+                                }
                               }
                             }
                           }
