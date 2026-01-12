@@ -56,7 +56,8 @@ export function ExistingAttachmentsTable({
 
   const { formatMessage } = useDinaIntl();
 
-  const { openMetadataEditorModal } = useBulkMetadataEditModal();
+  const { openMetadataEditorModal, closeMetadataEditorModal } =
+    useBulkMetadataEditModal();
 
   useEffect(() => {
     setAvailableMetadatas(
@@ -191,6 +192,7 @@ export function ExistingAttachmentsTable({
       .map((pair) => pair[0]);
 
     await onDetachMetadataIds?.(metadataIds);
+    closeMetadataEditorModal();
   }
 
   const { dataWithNullForMissing: metadataObjects, loading } =
@@ -201,17 +203,17 @@ export function ExistingAttachmentsTable({
 
   const processedMetadatas = useMemo(() => {
     if (loading || !metadataObjects) {
-      return metadataObjects;
+      return [];
     }
 
-    return metadataObjects.map((result) => {
-      const original = result;
+    return metadataObjects.map((result, index) => {
+      const source = metadatas[index];
 
       // Handle Deleted (null)
       if (result === null) {
         return {
-          id: original?.id,
-          type: original?.type,
+          id: source?.id,
+          type: source?.type,
           issue: "deleted"
         };
       }
@@ -219,15 +221,15 @@ export function ExistingAttachmentsTable({
       // Handle Missing/Error (undefined)
       if (result === undefined) {
         return {
-          id: original?.id,
-          type: original?.type,
+          id: source?.id,
+          type: source?.type,
           issue: "loadingIssue"
         };
       }
 
       return result;
     });
-  }, [metadataObjects, loading]);
+  }, [metadataObjects, loading, metadatas]);
 
   return (
     <DinaForm<AttachmentsTableFormValues>
@@ -260,7 +262,7 @@ export function ExistingAttachmentsTable({
       </div>
       <ReactTable
         columns={ATTACHMENT_TABLE_COLUMNS}
-        data={processedMetadatas ?? ([] as any)}
+        data={(processedMetadatas as any) ?? ([] as any)}
         enableSorting={false}
         pageSize={10000}
         loading={loading}

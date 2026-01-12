@@ -488,6 +488,94 @@ export function useMolecularAnalysisRunColumns({
                     setReloadGenericMolecularAnalysisRun?.(Date.now());
                   }
                 }}
+                onDetachMetadataIds={async (metadataIds: string[]) => {
+                  if (
+                    original.molecularAnalysisRunItem &&
+                    original.molecularAnalysisRunItem.result &&
+                    original.molecularAnalysisRunItem.result.id
+                  ) {
+                    const resultId =
+                      original.molecularAnalysisRunItem.result.id;
+                    const resultType =
+                      original.molecularAnalysisRunItem.result.type;
+
+                    // Get current attachments
+                    const currentAttachments =
+                      (original.molecularAnalysisRunItem.result
+                        .attachments as ResourceIdentifierObject[]) ?? [];
+
+                    // Filter out the attachments that correspond to the IDs to be detached
+                    const remainingAttachments = currentAttachments.filter(
+                      (attachment) => !metadataIds.includes(attachment.id)
+                    );
+
+                    // If no attachments remain, delete the result entirely
+                    if (remainingAttachments.length === 0) {
+                      // 1. Unlink the Result from the Run Item
+                      const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+                        [
+                          {
+                            resource: {
+                              id: original.molecularAnalysisRunItem.id,
+                              type: original.molecularAnalysisRunItem.type,
+                              relationships: {
+                                result: {
+                                  data: null
+                                }
+                              }
+                            },
+                            type: "molecular-analysis-run-item"
+                          } as any
+                        ];
+                      await save?.<MolecularAnalysisRunItem>(
+                        molecularAnalysisRunItemSaveArgs,
+                        {
+                          apiBaseUrl: "seqdb-api/molecular-analysis-run-item"
+                        }
+                      );
+
+                      // 2. Delete the Result resource
+                      const molecularAnalysisRunResultDeleteArgs: DeleteArgs[] =
+                        [
+                          {
+                            delete: {
+                              id: resultId,
+                              type: resultType
+                            }
+                          }
+                        ];
+                      await save?.(molecularAnalysisRunResultDeleteArgs, {
+                        apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                      });
+                    } else {
+                      // Otherwise, just update the relationship with the remaining attachments
+                      const molecularAnalysisRunResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
+                        [
+                          {
+                            type: "molecular-analysis-result",
+                            resource: {
+                              id: resultId,
+                              type: "molecular-analysis-result",
+                              relationships: {
+                                attachments: {
+                                  data: remainingAttachments as Metadata[]
+                                }
+                              }
+                            }
+                          } as any
+                        ];
+
+                      await save?.<MolecularAnalysisResult>(
+                        molecularAnalysisRunResultSaveArgs,
+                        {
+                          apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                        }
+                      );
+                    }
+
+                    setReloadGenericMolecularAnalysisRun?.(Date.now());
+                  }
+                }}
               />
               <button
                 className={`btn btn-danger delete-button`}
@@ -675,6 +763,30 @@ export function useMolecularAnalysisRunColumns({
                 const updatedQc = {
                   ...updatedQualityControlsCopy[index],
                   attachments: newMetadatas as ResourceIdentifierObject[]
+                };
+                updatedQualityControlsCopy[index] = updatedQc;
+
+                await updateExistingQualityControls?.(
+                  updatedQualityControlsCopy
+                );
+                setReloadGenericMolecularAnalysisRun?.(Date.now());
+              }}
+              onDetachMetadataIds={async (metadataIds: string[]) => {
+                const updatedQualityControlsCopy = [
+                  ...(qualityControls ?? [])
+                ] as QualityControlWithAttachment[];
+
+                const currentAttachments =
+                  updatedQualityControlsCopy[index].attachments ?? [];
+
+                const remainingAttachments = currentAttachments.filter(
+                  (attachment) => !metadataIds.includes(attachment.id)
+                );
+
+                const updatedQc = {
+                  ...updatedQualityControlsCopy[index],
+                  attachments:
+                    remainingAttachments as ResourceIdentifierObject[]
                 };
                 updatedQualityControlsCopy[index] = updatedQc;
 
