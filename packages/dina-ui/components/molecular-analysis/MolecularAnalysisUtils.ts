@@ -39,7 +39,8 @@ export function useDeleteMolecularAnalysisWorkflows() {
           ]
         })(""),
         include:
-          "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result"
+          "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result",
+        page: { limit: 1000 }
       });
 
       const genericMolecularAnalysisItems =
@@ -97,7 +98,8 @@ export function useDeleteMolecularAnalysisWorkflows() {
                   arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
                 }
               ]
-            })("")
+            })(""),
+            page: { limit: 1000 }
           });
           if (qualityControlItemQuery.data.length > 0) {
             for (const qualityControlItem of qualityControlItemQuery.data) {
@@ -192,7 +194,8 @@ async function handleDeleteQualityControl(
           }
         ]
       })(""),
-      include: "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
+      include: "molecularAnalysisRunItem,molecularAnalysisRunItem.result",
+      page: { limit: 1000 }
     }
   );
   const qualityControls = qualityControlsQuery.data;
