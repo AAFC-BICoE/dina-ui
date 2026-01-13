@@ -7,8 +7,8 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import PageLayout from "../../../components/page/PageLayout";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Card } from "react-bootstrap";
