@@ -60,5 +60,5 @@ export function useBulkMetadataEditModal() {
     );
   }
 
-  return { openMetadataEditorModal };
+  return { openMetadataEditorModal, closeMetadataEditorModal: closeModal };
 }

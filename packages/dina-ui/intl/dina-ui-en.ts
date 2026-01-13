@@ -964,6 +964,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectColumn: "Select Column",
+  missingMetadataAlert:
+    "{count, plural, one {One metadata could not be loaded or has likely been deleted.} other {# metadata entries could not be loaded or have likely been deleted.}}",
+  loadingIssueAttachmentText: "Loading issue",
+  deletedAttachmentText: "Not found",
+  deletedAttachmentTooltipText:
+    "The stored object for this attachment has been deleted.",
+  loadingIssueTooltipText:
+    "An issue occurred while loading this attachment. Please try again later.",
   columnSelector_currentlyDisplayed: "Currently displayed columns:",
   columnSelector_columnsToBeExported: "Selected Columns:",
   columnSelector_addNewColumn: "Add a new column:",
@@ -1317,7 +1325,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachmentsBasedOnItemNameButton: "Attachments based on item name",
   addButtonText: "Add",
   removeButtonText: "Remove",
-  removeAllButtonText: "Remove All",
+  removeAllButtonText: "Detach All",
   editIdentifierTitle: "Edit Identifier",
   field_uriTemplate: "URI Template",
   attachmentsFoundBannerText: "{numAttachmentsFound} attachments were found.",

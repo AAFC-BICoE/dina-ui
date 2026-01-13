@@ -331,13 +331,46 @@ export function useGenericMolecularAnalysisRun({
             );
           if (molecularAnalysisResultQuery.length > 0) {
             for (const molecularAnalysisResult of molecularAnalysisResultQuery) {
+              const originalAttachments =
+                molecularAnalysisResult?.attachments || [];
+
+              // Fetch attachment metadatas
               const resultAttachmentsQuery = await bulkGet<Metadata>(
-                molecularAnalysisResult?.attachments.map(
-                  (attachment) => `/metadata/${attachment?.id}`
+                originalAttachments.map(
+                  (attachment) => `metadata/${attachment?.id}`
                 ),
-                { apiBaseUrl: "/objectstore-api" }
+                {
+                  apiBaseUrl: "/objectstore-api",
+                  returnNullForMissingResource: true
+                }
               );
-              molecularAnalysisResult.attachments = resultAttachmentsQuery;
+
+              // Parse and assign attachments with handling for deleted/missing metadata
+              (molecularAnalysisResult as any).attachments =
+                resultAttachmentsQuery.map((result, index) => {
+                  const original = originalAttachments[index];
+
+                  // Handle Deleted (null)
+                  if (result === null) {
+                    return {
+                      id: original?.id,
+                      type: original?.type, // Assuming 'type' exists on the original object
+                      issue: "deleted"
+                    };
+                  }
+
+                  // Handle Missing/Error (undefined)
+                  if (result === undefined) {
+                    return {
+                      id: original?.id,
+                      type: original?.type,
+                      issue: "loadingIssue"
+                    };
+                  }
+
+                  // Return the successfully fetched metadata
+                  return result;
+                });
             }
           }
 
@@ -619,16 +652,39 @@ export function useGenericMolecularAnalysisRun({
             const attachmentMetadatas = await bulkGet<Metadata>(
               attachments.map((attachment) => `metadata/${attachment.id}`),
               {
-                apiBaseUrl: "objectstore-api"
+                apiBaseUrl: "objectstore-api",
+                returnNullForMissingResource: true
+              }
+            );
+
+            // Map the results to handle null (deleted) and undefined (missing)
+            const processedAttachments = attachmentMetadatas.map(
+              (result, index) => {
+                const original = attachments[index];
+
+                if (result === null) {
+                  return {
+                    id: original.id,
+                    type: original.type,
+                    issue: "deleted"
+                  };
+                }
+
+                if (result === undefined) {
+                  return {
+                    id: original.id,
+                    type: original.type,
+                    issue: "loadingIssue"
+                  };
+                }
+
+                return result;
               }
             );
 
             newQualityControls.push({
               ...qualityControlFound,
-              attachments:
-                _.compact(attachmentMetadatas).length === attachments.length
-                  ? (attachmentMetadatas as ResourceIdentifierObject[])
-                  : attachments ?? []
+              attachments: processedAttachments as ResourceIdentifierObject[]
             });
           }
         }
@@ -702,7 +758,7 @@ export function useGenericMolecularAnalysisRun({
             ...(attachmentsChanged && {
               relationships: {
                 attachments: {
-                  data: attachments
+                  data: _.map(attachments, (item) => _.pick(item, "id", "type"))
                 }
               }
             })
@@ -879,7 +935,11 @@ export function useGenericMolecularAnalysisRun({
                   type: "molecular-analysis-result",
                   group: groupName,
                   relationships: {
-                    attachments: { data: qualityControl.attachments }
+                    attachments: {
+                      data: _.map(qualityControl.attachments, (item) =>
+                        _.pick(item, "id", "type")
+                      )
+                    }
                   }
                 }
               } as SaveArgs<MolecularAnalysisResult>;
@@ -1085,7 +1145,11 @@ export function useGenericMolecularAnalysisRun({
               type: "molecular-analysis-result",
               group: groupName,
               relationships: {
-                attachments: { data: currentAttachments }
+                attachments: {
+                  data: _.map(currentAttachments, (item) =>
+                    _.pick(item, ["id", "type"])
+                  )
+                }
               }
             }
           } as any
@@ -1162,7 +1226,11 @@ export function useGenericMolecularAnalysisRun({
                 id: resultIdToUpdate,
                 type: "molecular-analysis-result",
                 relationships: {
-                  attachments: { data: currentAttachments }
+                  attachments: {
+                    data: _.map(currentAttachments, (item) =>
+                      _.pick(item, ["id", "type"])
+                    )
+                  }
                 }
               }
             } as any

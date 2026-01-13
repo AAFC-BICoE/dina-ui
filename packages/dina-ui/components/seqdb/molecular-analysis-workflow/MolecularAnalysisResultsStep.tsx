@@ -21,6 +21,7 @@ import { MolecularAnalysisResult } from "../../../types/seqdb-api/resources/mole
 import { MolecularAnalysisRunItem } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRunColumns";
 import { useState } from "react";
+import { FaMagic } from "react-icons/fa";
 
 export interface MolecularAnalysisResultsStepProps {
   molecularAnalysisId: string;
@@ -153,7 +154,14 @@ export function MolecularAnalysisResultsStep({
               <strong>
                 <DinaMessage id="molecularAnalysisRunStep_sequencingRunContent" />
               </strong>
-              <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
+              <DropdownButton
+                title={
+                  <>
+                    <FaMagic className="me-2" />
+                    {formatMessage("autoSelectButtonTitle")}
+                  </>
+                }
+              >
                 <Dropdown.Item
                   onClick={async () => {
                     setNumAttachmentsFound(0);
@@ -280,7 +288,14 @@ export function MolecularAnalysisResultsStep({
                   <DinaMessage id="molecularAnalysisRunStep_sequencingQualityControl" />
                 </strong>
 
-                <DropdownButton title={formatMessage("autoSelectButtonTitle")}>
+                <DropdownButton
+                  title={
+                    <>
+                      <FaMagic className="me-2" />
+                      {formatMessage("autoSelectButtonTitle")}
+                    </>
+                  }
+                >
                   <Dropdown.Item
                     onClick={async () => {
                       setNumQualityControlAttachmentsFound(0);
@@ -310,6 +325,13 @@ export function MolecularAnalysisResultsStep({
                                   qualityControl.attachments ?? [];
                                 const incoming = metadataResp.data as any[];
 
+                                const existingIds = new Set(
+                                  existing.map((item) => item.id)
+                                );
+                                const newAttachments = incoming.filter(
+                                  (item) => !existingIds.has(item.id)
+                                );
+
                                 const combined = [...existing, ...incoming];
                                 const uniqueById = Array.from(
                                   new Map(
@@ -321,11 +343,13 @@ export function MolecularAnalysisResultsStep({
                                   ...qualityControl,
                                   attachments: uniqueById
                                 };
-                                uniqueById.forEach(() => {
+
+                                // Only increment for the truly new items
+                                if (newAttachments.length > 0) {
                                   setNumQualityControlAttachmentsFound(
-                                    (prev) => prev + 1
+                                    (prev) => prev + newAttachments.length
                                   );
-                                });
+                                }
                               }
                             }
                           }
