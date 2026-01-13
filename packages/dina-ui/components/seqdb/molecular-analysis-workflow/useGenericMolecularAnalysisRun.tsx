@@ -758,7 +758,7 @@ export function useGenericMolecularAnalysisRun({
             ...(attachmentsChanged && {
               relationships: {
                 attachments: {
-                  data: attachments
+                  data: _.map(attachments, (item) => _.pick(item, "id", "type"))
                 }
               }
             })
@@ -935,7 +935,11 @@ export function useGenericMolecularAnalysisRun({
                   type: "molecular-analysis-result",
                   group: groupName,
                   relationships: {
-                    attachments: { data: qualityControl.attachments }
+                    attachments: {
+                      data: _.map(qualityControl.attachments, (item) =>
+                        _.pick(item, "id", "type")
+                      )
+                    }
                   }
                 }
               } as SaveArgs<MolecularAnalysisResult>;

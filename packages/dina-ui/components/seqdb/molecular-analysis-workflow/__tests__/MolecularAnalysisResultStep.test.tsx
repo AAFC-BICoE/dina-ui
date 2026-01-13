@@ -383,6 +383,393 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       expect(wrapper.getByText(/loading issue/i)).toBeInTheDocument();
       expect(wrapper.getAllByText(/not found/i).length).toBe(3); // Including quality control failures.
     });
+
+    it("Detach all functionality", async () => {
+      const RESULT_TO_DETACH = {
+        id: "result-detach-run",
+        type: "molecular-analysis-result",
+        attachments: []
+      };
+
+      const RUN_ITEM_WITH_RESULT = {
+        id: "run-item-detach",
+        type: "molecular-analysis-run-item",
+        name: "Run Item To Detach",
+        usageType:
+          MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+        result: RESULT_TO_DETACH,
+        run: TEST_MOLECULAR_ANALYSIS_RUN
+      };
+
+      const GENERIC_ITEM_WITH_RESULT = {
+        id: "generic-item-detach",
+        type: "generic-molecular-analysis-item",
+        genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+        materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[0],
+        molecularAnalysisRunItem: RUN_ITEM_WITH_RESULT,
+        storageUnitUsage: STORAGE_UNIT_USAGE_1
+      };
+
+      const mockGetWithResult = jest.fn<any, any>(async (path, params) => {
+        if (
+          path === "/seqdb-api/generic-molecular-analysis-item" &&
+          params?.filter?.rsql?.includes(TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
+        ) {
+          return { data: [GENERIC_ITEM_WITH_RESULT] };
+        }
+        if (
+          path === `seqdb-api/molecular-analysis-result/${RESULT_TO_DETACH.id}`
+        ) {
+          return { data: RESULT_TO_DETACH };
+        }
+        // Fallback to default mock
+        return mockGet(path, params);
+      });
+
+      // Bulk get needs to handle the result lookups
+      const mockBulkGetWithResult = jest.fn(async (paths) => {
+        return paths.map((path) => {
+          if (path.includes(RESULT_TO_DETACH.id)) return RESULT_TO_DETACH;
+          if (path.includes(TEST_MATERIAL_SAMPLE_SUMMARY[0].id))
+            return TEST_MATERIAL_SAMPLE_SUMMARY[0];
+          if (path.includes(STORAGE_UNIT_USAGE_1.id!))
+            return STORAGE_UNIT_USAGE_1;
+          return null;
+        });
+      });
+
+      const detachCtx = {
+        apiContext: {
+          apiClient: {
+            get: mockGetWithResult,
+            axios: { get: mockGetWithResult }
+          },
+          bulkGet: mockBulkGetWithResult,
+          save: mockSave
+        }
+      } as any;
+
+      const wrapper = mountWithAppContext(<TestComponentWrapper />, detachCtx);
+      await waitForLoadingToDisappear();
+
+      // Click Detach All button (The first one belongs to the Sequencing Run Content section)
+      const detachAllButton = wrapper.getAllByRole("button", {
+        name: /detach all/i
+      });
+      userEvent.click(detachAllButton[0]);
+
+      // Expect save to be called to update Run Items/Results
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalled();
+      });
+
+      // Remove result link from Run Item
+      expect(mockSave).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            resource: {
+              id: "run-item-detach",
+              relationships: {
+                result: {
+                  data: null
+                }
+              },
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        { apiBaseUrl: "seqdb-api/molecular-analysis-run-item" }
+      );
+
+      // Now delete the result itself
+      expect(mockSave).toHaveBeenNthCalledWith(
+        2,
+        [
+          {
+            delete: {
+              id: "result-detach-run",
+              type: "molecular-analysis-result"
+            }
+          }
+        ],
+        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+      );
+    });
+
+    it("Ability to delete all broken attachments directly", async () => {
+      const DELETED_METADATA_ID = "deleted-metadata-id-run";
+      const LOADING_ISSUE_METADATA_ID = "loading-issue-metadata-id-run";
+
+      // Setup a result with problematic attachments
+      const RESULT_WITH_ISSUES = {
+        id: "result-with-issues-run",
+        type: "molecular-analysis-result",
+        attachments: [
+          { id: DELETED_METADATA_ID, type: "metadata" },
+          { id: LOADING_ISSUE_METADATA_ID, type: "metadata" }
+        ]
+      };
+
+      // Setup a Run Item linked to the result
+      const RUN_ITEM_WITH_ISSUES = {
+        id: "run-item-issues",
+        type: "molecular-analysis-run-item",
+        name: "Run Item With Issues",
+        usageType:
+          MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+        result: RESULT_WITH_ISSUES,
+        run: TEST_MOLECULAR_ANALYSIS_RUN
+      };
+
+      // Setup the Generic Item (Table Row) linked to the Run Item
+      const GENERIC_ITEM_WITH_ISSUES = {
+        id: "generic-item-issues",
+        type: "generic-molecular-analysis-item",
+        genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+        materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[0],
+        molecularAnalysisRunItem: RUN_ITEM_WITH_ISSUES,
+        storageUnitUsage: STORAGE_UNIT_USAGE_1
+      };
+
+      const mockGetWithIssues = jest.fn<any, any>(async (path, params) => {
+        // Intercept request for generic items to return our test item
+        if (
+          path === "/seqdb-api/generic-molecular-analysis-item" &&
+          params?.filter?.rsql?.includes(TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
+        ) {
+          return { data: [GENERIC_ITEM_WITH_ISSUES] };
+        }
+        // Intercept specific result request
+        if (
+          path ===
+          `seqdb-api/molecular-analysis-result/${RESULT_WITH_ISSUES.id}`
+        ) {
+          return { data: RESULT_WITH_ISSUES };
+        }
+
+        return mockGet(path, params);
+      });
+
+      const mockBulkGetWithIssues = jest.fn(async (paths) => {
+        return paths.map((path) => {
+          // Handle problematic metadata
+          if (path.includes(DELETED_METADATA_ID)) return null;
+          if (path.includes(LOADING_ISSUE_METADATA_ID)) return undefined;
+
+          // Handle Result (Bulk get is used for generic item results)
+          if (path.includes(RESULT_WITH_ISSUES.id)) return RESULT_WITH_ISSUES;
+
+          // Fallback for standard items needed for the table row
+          if (path.includes(TEST_MATERIAL_SAMPLE_SUMMARY[0].id))
+            return TEST_MATERIAL_SAMPLE_SUMMARY[0];
+          if (path.includes(STORAGE_UNIT_USAGE_1.id!))
+            return STORAGE_UNIT_USAGE_1;
+
+          return null;
+        });
+      });
+
+      const issuesCtx = {
+        apiContext: {
+          apiClient: {
+            get: mockGetWithIssues,
+            axios: { get: mockGetWithIssues }
+          },
+          bulkGet: mockBulkGetWithIssues,
+          save: mockSave
+        }
+      } as any;
+
+      const wrapper = mountWithAppContext(<TestComponentWrapper />, issuesCtx);
+      await waitForLoadingToDisappear();
+
+      // Verify Run Item is rendered
+      expect(
+        wrapper.getByRole("cell", { name: /run item with issues/i })
+      ).toBeInTheDocument();
+
+      // Verify error messages for attachments
+      expect(wrapper.getByText(/loading issue/i)).toBeInTheDocument();
+      expect(wrapper.getAllByText(/not found/i).length).toBeGreaterThan(0);
+
+      // Click the "Add" button (The first one corresponds to the Run Content section)
+      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+      await waitForLoadingToDisappear();
+
+      // Check the "Select all" checkbox.
+      userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
+
+      // Click the "Detach Selected" button.
+      userEvent.click(
+        wrapper.getByRole("button", { name: /detach selected/i })
+      );
+      await waitForLoadingToDisappear();
+
+      // Expect save to be called to update the Molecular Analysis Result
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalled();
+      });
+
+      // Delete the result link from the Run Item
+      expect(mockSave).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            resource: {
+              id: "run-item-issues",
+              relationships: {
+                result: {
+                  data: null
+                }
+              },
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        { apiBaseUrl: "seqdb-api/molecular-analysis-run-item" }
+      );
+
+      // Delete the result itself now it has been unlinked.
+      expect(mockSave).toHaveBeenNthCalledWith(
+        2,
+        [
+          {
+            delete: {
+              id: "result-with-issues-run",
+              type: "molecular-analysis-result"
+            }
+          }
+        ],
+        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+      );
+    });
+
+    it("Ability to delete one broken attachment directly", async () => {
+      const DELETED_METADATA_ID = "deleted-metadata-id-run";
+      const LOADING_ISSUE_METADATA_ID = "loading-issue-metadata-id-run";
+
+      const RESULT_WITH_ISSUES = {
+        id: "result-with-issues-run",
+        type: "molecular-analysis-result",
+        attachments: [
+          { id: DELETED_METADATA_ID, type: "metadata" },
+          { id: LOADING_ISSUE_METADATA_ID, type: "metadata" }
+        ]
+      };
+
+      const RUN_ITEM_WITH_ISSUES = {
+        id: "run-item-issues",
+        type: "molecular-analysis-run-item",
+        name: "Run Item With Issues",
+        usageType:
+          MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+        result: RESULT_WITH_ISSUES,
+        run: TEST_MOLECULAR_ANALYSIS_RUN
+      };
+
+      const GENERIC_ITEM_WITH_ISSUES = {
+        id: "generic-item-issues",
+        type: "generic-molecular-analysis-item",
+        genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+        materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[0],
+        molecularAnalysisRunItem: RUN_ITEM_WITH_ISSUES,
+        storageUnitUsage: STORAGE_UNIT_USAGE_1
+      };
+
+      const mockGetWithIssues = jest.fn<any, any>(async (path, params) => {
+        if (
+          path === "/seqdb-api/generic-molecular-analysis-item" &&
+          params?.filter?.rsql?.includes(TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID)
+        ) {
+          return { data: [GENERIC_ITEM_WITH_ISSUES] };
+        }
+        if (
+          path ===
+          `seqdb-api/molecular-analysis-result/${RESULT_WITH_ISSUES.id}`
+        ) {
+          return { data: RESULT_WITH_ISSUES };
+        }
+        return mockGet(path, params);
+      });
+
+      const mockBulkGetWithIssues = jest.fn(async (paths) => {
+        return paths.map((path) => {
+          if (path.includes(DELETED_METADATA_ID)) return null;
+          if (path.includes(LOADING_ISSUE_METADATA_ID)) return undefined;
+          if (path.includes(RESULT_WITH_ISSUES.id)) return RESULT_WITH_ISSUES;
+          if (path.includes(TEST_MATERIAL_SAMPLE_SUMMARY[0].id))
+            return TEST_MATERIAL_SAMPLE_SUMMARY[0];
+          if (path.includes(STORAGE_UNIT_USAGE_1.id!))
+            return STORAGE_UNIT_USAGE_1;
+          return null;
+        });
+      });
+
+      const issuesCtx = {
+        apiContext: {
+          apiClient: {
+            get: mockGetWithIssues,
+            axios: { get: mockGetWithIssues }
+          },
+          bulkGet: mockBulkGetWithIssues,
+          save: mockSave
+        }
+      } as any;
+
+      const wrapper = mountWithAppContext(<TestComponentWrapper />, issuesCtx);
+      await waitForLoadingToDisappear();
+
+      // Verify Run Item is rendered
+      expect(
+        wrapper.getByRole("cell", { name: /run item with issues/i })
+      ).toBeInTheDocument();
+
+      // Click the "Add" button (First one for Run Content)
+      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+      await waitForLoadingToDisappear();
+
+      // Check the checkbox for just the deleted attachment (index 1)
+      userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+
+      // Click the "Detach Selected" button.
+      userEvent.click(
+        wrapper.getByRole("button", { name: /detach selected/i })
+      );
+      await waitForLoadingToDisappear();
+
+      // Expect save to be called to update the Molecular Analysis Result
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalled();
+      });
+
+      // Update the result to remove the specific attachment
+      expect(mockSave).toHaveBeenNthCalledWith(
+        1,
+        [
+          {
+            resource: {
+              id: "result-with-issues-run",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: LOADING_ISSUE_METADATA_ID,
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
+              type: "molecular-analysis-result"
+            },
+            type: "molecular-analysis-result"
+          }
+        ],
+        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+      );
+    });
   });
 
   describe("Sequencing Quality Control Section", () => {

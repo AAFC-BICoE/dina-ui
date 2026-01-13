@@ -21,6 +21,7 @@ import { SequencingRunItem } from "./useMolecularAnalysisRun";
 import { QualityControlWithAttachment } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
 import { VocabularyOption } from "../collection/VocabularySelectField";
 import { FaExclamationTriangle, FaTrashAlt, FaUnlink } from "react-icons/fa";
+import _ from "lodash";
 
 interface UseMolecularAnalysisRunColumnsProps {
   type: string;
@@ -448,7 +449,9 @@ export function useMolecularAnalysisRunColumns({
                             group: groupNames?.[0],
                             relationships: {
                               attachments: {
-                                data: newMetadatas as Metadata[]
+                                data: _.map(newMetadatas, (item) =>
+                                  _.pick(item, "id", "type")
+                                ) as Metadata[]
                               }
                             }
                           }
@@ -558,7 +561,9 @@ export function useMolecularAnalysisRunColumns({
                               type: "molecular-analysis-result",
                               relationships: {
                                 attachments: {
-                                  data: remainingAttachments as Metadata[]
+                                  data: _.map(remainingAttachments, (item) =>
+                                    _.pick(item, "id", "type")
+                                  ) as Metadata[]
                                 }
                               }
                             }
@@ -762,7 +767,9 @@ export function useMolecularAnalysisRunColumns({
                 ] as QualityControlWithAttachment[];
                 const updatedQc = {
                   ...updatedQualityControlsCopy[index],
-                  attachments: newMetadatas as ResourceIdentifierObject[]
+                  attachments: _.map(newMetadatas, (item) =>
+                    _.pick(item, "id", "type")
+                  ) as ResourceIdentifierObject[]
                 };
                 updatedQualityControlsCopy[index] = updatedQc;
 
@@ -785,8 +792,9 @@ export function useMolecularAnalysisRunColumns({
 
                 const updatedQc = {
                   ...updatedQualityControlsCopy[index],
-                  attachments:
-                    remainingAttachments as ResourceIdentifierObject[]
+                  attachments: _.map(remainingAttachments, (item) =>
+                    _.pick(item, "id", "type")
+                  ) as ResourceIdentifierObject[]
                 };
                 updatedQualityControlsCopy[index] = updatedQc;
 
