@@ -7,6 +7,7 @@ import {
 } from "common-ui";
 import ExportMolecularAnalysisPage from "../../../../pages/export/molecular-analysis-export/export";
 import userEvent from "@testing-library/user-event";
+import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 const mockPush = jest.fn();
 jest.mock("next/router", () => ({
@@ -106,7 +107,7 @@ const TEST_QC_ITEMS_RESPONSE = [
   {
     id: TEST_QC_ITEM_ID,
     type: "molecular-analysis-run-item",
-    usageType: "QUALITY_CONTROL",
+    usageType: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL,
     run: { id: TEST_RUN_ID },
     result: { id: TEST_QC_RESULT_UUID }
   }
@@ -118,7 +119,7 @@ const TEST_QC_RESULT_RESPONSE = [
     type: "molecular-analysis-result",
     attachments: [
       {
-        id: TEST_METADATA_3,
+        id: TEST_METADATA_ID_3,
         type: "metadata"
       }
     ]
@@ -133,14 +134,17 @@ const TEST_QC_DEFINITION_RESPONSE = [
 ];
 
 const mockGet = jest.fn<any, any>(async (path) => {
-  // console.log("Mock GET called with path:", path);
-
+  // Molecular Analysis Run Item (for QC)
   if (path === "seqdb-api/molecular-analysis-run-item") {
     return { data: TEST_QC_ITEMS_RESPONSE };
   }
+
+  // Molecular Analysis Run Result
   if (path === "seqdb-api/molecular-analysis-result") {
     return { data: TEST_QC_RESULT_RESPONSE };
   }
+
+  // Quality Control Name
   if (path === "seqdb-api/quality-control") {
     return { data: TEST_QC_DEFINITION_RESPONSE };
   }
@@ -148,13 +152,18 @@ const mockGet = jest.fn<any, any>(async (path) => {
 });
 
 const mockBulkGet = jest.fn<any, any>(async (paths) => {
-  // console.log("Mock Bulk GET called with paths:", paths);
-
   if (!paths.length) return [];
 
   // Metadata
   if (paths[0].includes("metadata/")) {
-    return [TEST_METADATA_1, TEST_METADATA_2];
+    return paths
+      .map((path) => {
+        if (path.includes(TEST_METADATA_ID_1)) return TEST_METADATA_1;
+        if (path.includes(TEST_METADATA_ID_2)) return TEST_METADATA_2;
+        if (path.includes(TEST_METADATA_ID_3)) return TEST_METADATA_3;
+        return null;
+      })
+      .filter(Boolean);
   }
 
   // Run Attachments
@@ -405,10 +414,49 @@ describe("ExportMolecularAnalysisPage", () => {
     userEvent.click(wrapper.getByTestId("includeQualityControls"));
 
     // Wait for the quality control attachments to be loaded.
-    // TODO Get quality controls working again...
-    // await waitFor(() => {
-    //   const badges = wrapper.getAllByText(/1 attachments/i);
-    //   expect(badges.length).toBeGreaterThanOrEqual(3);
-    // });
+    await waitFor(() => {
+      const badges = wrapper.getAllByText(/1 attachments/i);
+      expect(badges.length).toBeGreaterThanOrEqual(3);
+    });
+
+    // Click Export Button
+    userEvent.click(wrapper.getByRole("button", { name: /export/i }));
+
+    // Wait for save to be called
+    await waitFor(() => {
+      expect(mockSave).toHaveBeenCalledTimes(1);
+    });
+
+    // Ensure request is correct.
+    expect(mockSave).toHaveBeenCalledWith(
+      [
+        {
+          resource: {
+            exportLayout: {
+              "Test Run 1/": ["file-identifier-1"],
+              "Test Run 1/controls": ["file-identifier-3"],
+              "Test Run 1/results": ["file-identifier-2"]
+            },
+            fileIdentifiers: [
+              "file-identifier-1",
+              "file-identifier-2",
+              "file-identifier-3"
+            ],
+            name: undefined, // No name provided in this test.
+            type: "object-export"
+          },
+          type: "object-export"
+        }
+      ],
+      { apiBaseUrl: "/objectstore-api" }
+    );
+
+    // Verify it attempts to download it.
+    await waitFor(() =>
+      expect(mockGet).toHaveBeenCalledWith(
+        "dina-export-api/data-export/export-job-1",
+        {}
+      )
+    );
   });
 });
