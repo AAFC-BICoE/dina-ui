@@ -87,6 +87,7 @@ export default function ExportMolecularAnalysisPage() {
                             <input
                               type="checkbox"
                               name={`runSelected[${index}]`}
+                              data-testid={`runSelected[${index}]`}
                               checked={runSummary?.enabled}
                               style={checkboxProps.style}
                               onChange={() => {
@@ -134,6 +135,7 @@ export default function ExportMolecularAnalysisPage() {
                                   <input
                                     type="checkbox"
                                     name={`runItemSelected[${itemIndex}]`}
+                                    data-testid={`runItemSelected[${itemIndex}]`}
                                     checked={
                                       runSummary.enabled ? item?.enabled : false
                                     }
@@ -243,6 +245,7 @@ export default function ExportMolecularAnalysisPage() {
                   <input
                     type="checkbox"
                     name="includeQualityControls"
+                    data-testid="includeQualityControls"
                     style={{
                       height: "30px",
                       width: "30px",
