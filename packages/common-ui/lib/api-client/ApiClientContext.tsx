@@ -271,7 +271,9 @@ export class ApiClientImpl implements ApiClientI {
       "user",
       "storage-unit",
       "storage-unit-usage",
-      "material-sample-summary"
+      "material-sample-summary",
+      "project",
+      "notification"
     ];
 
     // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
@@ -986,8 +988,8 @@ export class CustomDinaKitsu extends Kitsu {
 
       // Preserve the relationships object before Kitsu's deserialise removes it
       // We need this for proper diffing in useSubmitHandler
-      const originalRelationships = data?.data?.relationships 
-        ? JSON.parse(JSON.stringify(data.data.relationships)) 
+      const originalRelationships = data?.data?.relationships
+        ? JSON.parse(JSON.stringify(data.data.relationships))
         : undefined;
 
       const deserialized = await deserialise(data);
@@ -1011,7 +1013,7 @@ export class CustomDinaKitsu extends Kitsu {
           }
         }
       }
-      
+
       // Restore the relationships object on the deserialized data for diffing purposes
       if (relationships && Object.keys(relationships).length > 0) {
         deserialized.data.relationships = relationships;

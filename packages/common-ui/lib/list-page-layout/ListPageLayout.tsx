@@ -138,11 +138,17 @@ export function ListPageLayout<TData extends KitsuResource>({
       setImmediate(() => setFilterForm({}));
     }
 
-    const additionalFilters =
-      typeof additionalFiltersProp === "function"
-        ? additionalFiltersProp(filterForm)
-        : additionalFiltersProp;
-    const additionalFiltersFiql = simpleSearchFilterToFiql(additionalFilters);
+  const additionalFilters =
+    typeof additionalFiltersProp === "function"
+      ? additionalFiltersProp(filterForm)
+      : additionalFiltersProp;
+
+    // If the caller returns a string, use it directly (it is already FIQL).
+    // Otherwise, convert the simple-filter object to FIQL.
+    const additionalFiltersFiql =
+      typeof additionalFilters === "string"
+        ? (additionalFilters as string)
+        : simpleSearchFilterToFiql(additionalFilters);
 
     const additionalFiqlFilters =
       typeof additionalFiqlFiltersProp === "function"

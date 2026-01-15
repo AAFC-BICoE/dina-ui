@@ -191,5 +191,11 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   mismatchMaterialSampleTypeError:
     "Some Material Samples do not match the Split Configuration and were removed.",
   backToParentFile: "Back to parent file: {parentFilename}",
-  attachSelected: "Attach Selected"
+  attachSelected: "Attach Selected",
+  notifications: "Notifications",
+  noNotifications: "No notifications",
+  markAllAsRead: "Mark all as read",
+  notificationErrorTitle: "Failed to load notifications",
+  notificationErrorMessage:
+    "Unable to fetch notifications. Please try again later."
 };

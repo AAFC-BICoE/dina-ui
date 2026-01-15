@@ -23,9 +23,7 @@ import QueryRowManagedAttributeSearch, {
 import QueryRowRelationshipPresenceSearch, {
   RelationshipPresenceSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
-import QueryRowColumnFunctionInput, {
-  ColumnFunctionSearchStates
-} from "../list-page/query-builder/query-builder-value-types/QueryRowColumnFunctionInput";
+import QueryRowColumnFunctionInput from "../list-page/query-builder/query-builder-value-types/QueryRowColumnFunctionInput";
 import { ESIndexMapping, TableColumn } from "../list-page/types";
 import { ColumnItem } from "./ColumnItem";
 import {
@@ -39,6 +37,7 @@ import { FaArrowRotateLeft, FaPlus } from "react-icons/fa6";
 import QueryRowImageLink, {
   ImageLinkStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
+import { FunctionDef } from "../../../dina-ui/types/dina-export-api";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -123,13 +122,13 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               break;
             case "columnFunction":
               const parsedValue = JSON.parse(dynamicFieldValue);
-              const columnFunctionValues: ColumnFunctionSearchStates =
-                Object.values(parsedValue)[0] as any;
+              const columnFunctionValues: FunctionDef = Object.values(
+                parsedValue
+              )[0] as any;
               if (
-                columnFunctionValues.functionName ===
-                  "CONVERT_COORDINATES_DD" ||
-                (columnFunctionValues.functionName === "CONCAT" &&
-                  (columnFunctionValues.params?.length ?? 0) > 1)
+                columnFunctionValues.functionDef === "CONVERT_COORDINATES_DD" ||
+                (columnFunctionValues.functionDef === "CONCAT" &&
+                  (columnFunctionValues.params?.items?.length ?? 0) > 1)
               ) {
                 setIsValidField(true);
                 return;

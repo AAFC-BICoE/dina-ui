@@ -16,8 +16,15 @@ import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import {
+  FaEdit,
+  FaExclamationTriangle,
+  FaTrashAlt,
+  FaUnlink
+} from "react-icons/fa";
+import React from "react";
 
 export interface ExistingAttachmentsTableProps {
   metadatas: ResourceIdentifierObject[];
@@ -49,10 +56,13 @@ export function ExistingAttachmentsTable({
 
   const { formatMessage } = useDinaIntl();
 
-  const { openMetadataEditorModal } = useBulkMetadataEditModal();
+  const { openMetadataEditorModal, closeMetadataEditorModal } =
+    useBulkMetadataEditModal();
 
   useEffect(() => {
-    setAvailableMetadatas(metadatas.map((m) => ({ id: m.id, type: m.type })));
+    setAvailableMetadatas(
+      metadatas.filter((m) => !!m).map((m) => ({ id: m.id, type: m.type }))
+    );
   }, [metadatas, setAvailableMetadatas]);
 
   const ATTACHMENT_TABLE_COLUMNS: ColumnDef<Metadata>[] = [
@@ -81,6 +91,38 @@ export function ExistingAttachmentsTable({
               {`<${formatMessage("deleted")}>`}
               <Tooltip id="deletedMetadata_tooltip" intlValues={{ id }} />
             </div>
+          );
+        }
+
+        if ((metadata as any)?.issue) {
+          const isDeleted = (metadata as any).issue === "deleted";
+          const isLoadingIssue = (metadata as any).issue === "loadingIssue";
+          return (
+            <>
+              <Tooltip
+                visibleElement={
+                  <span className="text-danger">
+                    {isDeleted ? (
+                      <FaTrashAlt className="me-1" />
+                    ) : (
+                      <FaExclamationTriangle className="me-1" />
+                    )}
+                    <DinaMessage
+                      id={
+                        isLoadingIssue
+                          ? "loadingIssueAttachmentText"
+                          : "deletedAttachmentText"
+                      }
+                    />
+                  </span>
+                }
+                id={
+                  isDeleted
+                    ? "deletedAttachmentTooltipText"
+                    : "loadingIssueTooltipText"
+                }
+              />
+            </>
           );
         }
 
@@ -150,12 +192,44 @@ export function ExistingAttachmentsTable({
       .map((pair) => pair[0]);
 
     await onDetachMetadataIds?.(metadataIds);
+    closeMetadataEditorModal();
   }
 
-  const { data: metadataObjects, loading } = useBulkGet<Metadata>({
-    ids: metadatas.map((m) => m.id),
-    listPath: "objectstore-api/metadata?include=derivatives"
-  });
+  const { dataWithNullForMissing: metadataObjects, loading } =
+    useBulkGet<Metadata>({
+      ids: metadatas.filter((m) => m).map((m) => m?.id),
+      listPath: "objectstore-api/metadata?include=derivatives"
+    });
+
+  const processedMetadatas = useMemo(() => {
+    if (loading || !metadataObjects) {
+      return [];
+    }
+
+    return metadataObjects.map((result, index) => {
+      const source = metadatas[index];
+
+      // Handle Deleted (null)
+      if (result === null) {
+        return {
+          id: source?.id,
+          type: source?.type,
+          issue: "deleted"
+        };
+      }
+
+      // Handle Missing/Error (undefined)
+      if (result === undefined) {
+        return {
+          id: source?.id,
+          type: source?.type,
+          issue: "loadingIssue"
+        };
+      }
+
+      return result;
+    });
+  }, [metadataObjects, loading, metadatas]);
 
   return (
     <DinaForm<AttachmentsTableFormValues>
@@ -165,20 +239,22 @@ export function ExistingAttachmentsTable({
         <div className="float-start">
           {detachTotalSelected && <DetachedTotalSelected />}
         </div>
-        <div className="float-end">
+        <div className="float-end mt-2 mb-2 me-2">
           <FormikButton
             buttonProps={bulkButtonProps}
             className="btn btn-primary ms-2 metadata-bulk-edit-button"
             onClick={editSelectedMetadatas}
           >
+            <FaEdit className="me-2" />
             <DinaMessage id="editSelectedAttachmentMetadata" />
           </FormikButton>
           {onDetachMetadataIds && (
             <FormikButton
               buttonProps={bulkButtonProps}
-              className="btn btn-primary ms-2 metadata-detach-button"
+              className="btn btn-danger ms-2 metadata-detach-button"
               onClick={detachSelectedMetadatas}
             >
+              <FaUnlink className="me-2" />
               <DinaMessage id="detachSelectedButtonText" />
             </FormikButton>
           )}
@@ -186,7 +262,7 @@ export function ExistingAttachmentsTable({
       </div>
       <ReactTable
         columns={ATTACHMENT_TABLE_COLUMNS}
-        data={metadataObjects ?? ([] as any)}
+        data={(processedMetadatas as any) ?? ([] as any)}
         enableSorting={false}
         pageSize={10000}
         loading={loading}

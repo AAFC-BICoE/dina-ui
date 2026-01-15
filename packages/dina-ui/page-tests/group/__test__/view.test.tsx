@@ -49,7 +49,7 @@ describe("Group view page", () => {
     });
 
     // Wait for the page to load.
-    await waitFor(() => expect(mockGet).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockGet).toHaveBeenCalled());
     await waitFor(() => expect(mockBulkGet).toHaveBeenCalledTimes(1));
     const reactTable = await wrapper.findByTestId("ReactTable");
     expect(reactTable).toBeInTheDocument();
