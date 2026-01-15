@@ -212,9 +212,9 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     // Retrieve the run items based on the query object.
     let queryDSL = queryObject;
     queryDSL = applySourceFilteringString(queryDSL, [
-      "included.id",
-      "included.type",
-      "included.attributes"
+      "data.id",
+      "data.type",
+      "data.attributes"
     ]);
     queryDSL = applyPagination(
       queryDSL,

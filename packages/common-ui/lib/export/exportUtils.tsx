@@ -15,7 +15,7 @@ export const MAX_OBJECT_EXPORT_TOTAL = 1000;
  * The purpose of this limit is to prevent too many requests being performed on the molecular
  * analysis export.
  */
-export const MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT = 1000;
+export const MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT = 200;
 
 /**
  * How many retrys will be performed before failing the get export.
