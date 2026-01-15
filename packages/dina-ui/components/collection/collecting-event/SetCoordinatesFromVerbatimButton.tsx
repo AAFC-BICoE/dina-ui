@@ -1,10 +1,10 @@
-import { FormikButton, Tooltip, useDinaFormContext } from "common-ui";
+import { FormikButton, useDinaFormContext } from "common-ui";
 import Coordinates from "coordinate-parser";
 import { FormikContextType } from "formik";
 import _ from "lodash";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useState } from "react";
-import { SiConvertio } from "react-icons/si";
+import { FaArrowsRotate } from "react-icons/fa6";
 
 export interface SetCoordinatesFromVerbatimButtonProps {
   /** Button content */
@@ -78,7 +78,8 @@ export function SetCoordinatesFromVerbatimButton({
 
   // Don't render in read-only mode.
   return readOnly ? null : (
-    <div>
+    <>
+      {error && <div className="alert alert-danger">{error}</div>}
       <FormikButton
         onClick={doConversion}
         className={className}
@@ -87,10 +88,9 @@ export function SetCoordinatesFromVerbatimButton({
             !_.get(values, sourceLatField) || !_.get(values, sourceLonField)
         })}
       >
-        {error && <div className="alert alert-danger">{error}</div>}
-        <SiConvertio />
+        <FaArrowsRotate className="me-2" />
+        {buttonText}
       </FormikButton>
-      <Tooltip directText={buttonText} />
-    </div>
+    </>
   );
 }

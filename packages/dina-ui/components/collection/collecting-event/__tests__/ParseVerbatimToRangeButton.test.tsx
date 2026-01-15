@@ -7,6 +7,10 @@ import "@testing-library/jest-dom";
 const mockSubmit = jest.fn();
 
 describe("ParseVerbatimToRangeButton component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("Sets the range from two detected values when there is no current min value.", async () => {
     const { container } = mountWithAppContext(
       <DinaForm
@@ -63,7 +67,8 @@ describe("ParseVerbatimToRangeButton component", () => {
     await waitFor(() => {
       expect(mockSubmit).lastCalledWith({
         verbatim: "1m ",
-        min: "1"
+        min: "1",
+        max: null
       });
     });
   });

@@ -81,7 +81,11 @@ export function InputWithCoordButtons({
               : "d-none"
           }
           type="button"
-          style={{ width: "3rem" }}
+          style={{
+            width: "3rem",
+            borderTopRightRadius: "0.25rem",
+            borderBottomRightRadius: "0.25rem"
+          }}
           onClick={() => insertSymbol(symbol)}
         >
           {symbol}

@@ -25,12 +25,11 @@ export function NumberRangeFields({
     minNameVisible: boolean;
     maxNameVisible: boolean;
   } = useMemo(() => {
-    if (isTemplate) {
+    // If we are not in template mode or using a form template, always show.
+    if (isTemplate || !formTemplate || !componentName || !sectionName) {
       return { minNameVisible: true, maxNameVisible: true };
     }
-    if (!formTemplate || !componentName || !sectionName) {
-      return { minNameVisible: false, maxNameVisible: false };
-    }
+
     // First find the component we are looking for.
     const componentFound = _.find(formTemplate?.components, {
       name: componentName
