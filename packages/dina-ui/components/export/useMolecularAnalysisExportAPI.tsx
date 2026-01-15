@@ -287,7 +287,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
           <Alert variant="danger" className="mb-2">
             <DinaMessage
               id="elasticSearchError"
-              values={{ cause: elasticSearchError?.cause?.data }}
+              values={{ cause: elasticSearchError?.cause?.data ?? "" }}
             />
           </Alert>
         );
