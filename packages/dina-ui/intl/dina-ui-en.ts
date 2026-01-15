@@ -1228,6 +1228,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A maximum of {limit} material samples allowed per export for Molecular Analysis exporting. Please reduce your selection on the list page.",
   molecularAnalysisExportMaxObjectError:
     "A maximum of {limit} attachments allowed per export for Molecular Analysis exporting. Please deselect attachments in the run item selection.",
+  elasticSearchError: "Elasticsearch Error: {cause}",
   totalAttachments: "Total attachments to be exported:",
   runItemSelection: "Run Item Selection",
   exportColumns: "Export Columns:",

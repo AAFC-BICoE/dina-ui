@@ -285,7 +285,10 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
         console.error(elasticSearchError);
         setDataExportError(
           <Alert variant="danger" className="mb-2">
-            {elasticSearchError}
+            <DinaMessage
+              id="elasticSearchError"
+              values={{ cause: elasticSearchError?.cause?.data }}
+            />
           </Alert>
         );
       });
