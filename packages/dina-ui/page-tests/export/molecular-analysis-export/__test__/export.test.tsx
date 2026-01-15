@@ -36,14 +36,14 @@ const TEST_METADATA_2 = {
   id: TEST_METADATA_ID_2,
   type: "metadata",
   fileIdentifier: TEST_FILE_IDENTIFIER_2,
-  dcType: "IMAGE"
+  dcType: "TEXT"
 };
 
 const TEST_METADATA_3 = {
   id: TEST_METADATA_ID_3,
   type: "metadata",
   fileIdentifier: TEST_FILE_IDENTIFIER_3,
-  dcType: "IMAGE"
+  dcType: "DATASET"
 };
 
 const TEST_RUN_ID = "molecular-analysis-run-1";

@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Card } from "react-bootstrap";
 import useMolecularAnalysisExportAPI from "../../../components/export/useMolecularAnalysisExportAPI";
 import React from "react";
+import { FaCheckSquare, FaHistory, FaRegSquare } from "react-icons/fa";
 
 export default function ExportMolecularAnalysisPage() {
   const router = useRouter();
@@ -57,6 +58,7 @@ export default function ExportMolecularAnalysisPage() {
               href={`/export/data-export/list?entityLink=${entityLink}`}
               className="btn btn-primary ms-auto"
             >
+              <FaHistory className="me-2" />
               <DinaMessage id="viewExportHistoryButton" />
             </Link>
           </div>
@@ -200,6 +202,7 @@ export default function ExportMolecularAnalysisPage() {
                   }}
                   disabled={exportLoading}
                 >
+                  <FaCheckSquare className="me-2" />
                   <DinaMessage id="selectAll" />
                 </button>
                 <button
@@ -215,6 +218,7 @@ export default function ExportMolecularAnalysisPage() {
                   }}
                   disabled={exportLoading}
                 >
+                  <FaRegSquare className="me-2" />
                   <DinaMessage id="deselectAll" />
                 </button>
               </div>

@@ -51,6 +51,7 @@ export default function MetadataBulkEditPage() {
               objectUploadIds={objectUploadIds}
               onSaved={onSaved}
               onPreviousClick={() => router.push("/object-store/object/list")}
+              insideModal={false}
             />
           )
         )}
