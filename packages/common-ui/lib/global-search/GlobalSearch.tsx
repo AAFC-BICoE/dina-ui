@@ -27,7 +27,7 @@ export function GlobalSearch({
     if (searchProp !== undefined && searchProp !== searchTerm) {
       setSearchTerm(searchProp);
     }
-  }, [searchProp]);
+  }, [searchProp, searchTerm]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

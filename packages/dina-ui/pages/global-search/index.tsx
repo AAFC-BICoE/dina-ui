@@ -48,7 +48,7 @@ export default function GlobalSearchResultPage() {
   const tabs = [
     {
       key: "all",
-      label: "All Results",
+      label: formatMessage("allResults"),
       count: searchResult?.totalCount || 0
     },
     ...SEARCH_INDEXES.map((config) => {
@@ -101,9 +101,13 @@ export default function GlobalSearchResultPage() {
           {/* Search Results Header */}
           {searchTerm && !pending && searchResult && (
             <>
-              <h3 className="mb-2">Search Results for "{searchTerm}"</h3>
+              <h3 className="mb-2">
+                {formatMessage("searchResultsFor", { searchTerm })}
+              </h3>
               <div className="mb-3 text-muted">
-                {searchResult.totalCount} results found
+                {formatMessage("resultsFound", {
+                  count: searchResult.totalCount
+                })}
               </div>
             </>
           )}
@@ -145,7 +149,7 @@ export default function GlobalSearchResultPage() {
             activeTab === "all" &&
             searchResult.topMatches.length > 0 && (
               <div className="mb-5">
-                <h4 className="mb-3">Top Matches</h4>
+                <h4 className="mb-3">{formatMessage("topMatches")}</h4>
                 {searchResult.topMatches.map((hit, index) => (
                   <SearchResultItem key={`top-${index}`} hit={hit} />
                 ))}

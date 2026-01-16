@@ -202,5 +202,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   globalSearchResults: "Global Search Results",
   searchErrorMessage: "An error occurred while searching",
   noSearchResults: "No results found",
-  enterSearchTerm: "Enter a search term to begin"
+  enterSearchTerm: "Enter a search term to begin",
+  allResults: "All Results",
+  searchResultsFor: 'Search Results for "{searchTerm}"',
+  resultsFound: "{count} results found",
+  topMatches: "Top Matches"
 };

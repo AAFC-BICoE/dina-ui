@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { useApiClient } from "../api-client/ApiClientContext";
-import { useAccount } from "../account/AccountProvider";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { SEARCH_INDEXES } from "./searchConfig";
@@ -52,16 +51,9 @@ export interface UseMultiIndexSearchConfig {
  */
 export function useMultiIndexSearch(config: UseMultiIndexSearchConfig = {}) {
   const { apiClient } = useApiClient();
-  const { groupNames } = useAccount();
   const [searchTerm, setSearchTerm] = useState(config.initialSearchTerm || "");
 
-  const {
-    group,
-    fields = ["data.attributes.*"],
-    topResultsPerIndex = 10
-  } = config;
-
-  const searchGroup = group ?? groupNames?.[0];
+  const { fields = ["data.attributes.*"], topResultsPerIndex = 10 } = config;
 
   // Build multi-index aggregation query
   const queryDSL = useMemo(() => {
@@ -74,7 +66,7 @@ export function useMultiIndexSearch(config: UseMultiIndexSearchConfig = {}) {
       query: {
         multi_match: {
           query: searchTerm,
-          fields: ["data.attributes.*"],
+          fields,
           lenient: true
         }
       },
@@ -87,7 +79,7 @@ export function useMultiIndexSearch(config: UseMultiIndexSearchConfig = {}) {
           aggs: {
             top_results: {
               top_hits: {
-                size: 10,
+                size: topResultsPerIndex,
                 _source: {
                   includes: [
                     "data.id",
@@ -112,7 +104,7 @@ export function useMultiIndexSearch(config: UseMultiIndexSearchConfig = {}) {
         }
       }
     };
-  }, [searchTerm, searchGroup, fields, topResultsPerIndex]);
+  }, [searchTerm, fields, topResultsPerIndex]);
 
   const indexNames = (indexName?: string) =>
     (indexName
@@ -161,7 +153,7 @@ export function useMultiIndexSearch(config: UseMultiIndexSearchConfig = {}) {
     const allTopHits = indexResults.flatMap((ir) => ir.topHits);
     const topMatches = allTopHits
       .sort((a, b) => (b._score || 0) - (a._score || 0))
-      .slice(0, 10);
+      .slice(0, topResultsPerIndex);
 
     return {
       totalCount,

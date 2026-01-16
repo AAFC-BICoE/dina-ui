@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useIntl } from "react-intl";
 import { Table } from "react-bootstrap";
 import { getIndexConfig } from "./searchConfig";
 import { ElasticsearchHit } from "./useMultiIndexSearch";
@@ -51,6 +52,7 @@ export function SearchResultItem({
   hit,
   showIcon = true
 }: SearchResultItemProps) {
+  const { formatMessage } = useIntl();
   const source = hit._source;
   const highlight = hit.highlight || {};
   const indexName = hit._index;
@@ -128,9 +130,11 @@ export function SearchResultItem({
               <th
                 style={{ width: "40%", fontWeight: "normal", color: "#6c757d" }}
               >
-                Attribute
+                {formatMessage({ id: "attributeLabel" })}
               </th>
-              <th style={{ fontWeight: "normal", color: "#6c757d" }}>Value</th>
+              <th style={{ fontWeight: "normal", color: "#6c757d" }}>
+                {formatMessage({ id: "valueLabel" })}
+              </th>
             </tr>
           </thead>
           <tbody>{attributeRows}</tbody>
