@@ -42,6 +42,36 @@ describe("ParseVerbatimToRangeButton component", () => {
     });
   });
 
+  it("Sets the range from two detected values and converts the min/max properly", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ verbatim: "10km -5km" }}
+        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        <ParseVerbatimToRangeButton
+          buttonText="buttonText"
+          rangeFields={["min", "max"]}
+          verbatimField="verbatim"
+        />
+      </DinaForm>
+    );
+
+    const button = wrapper.getByRole("button");
+    fireEvent.click(button);
+
+    // Submit the form using querySelector
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
+
+    await waitFor(() => {
+      expect(mockSubmit).lastCalledWith({
+        verbatim: "10km -5km",
+        min: "10000",
+        max: "5000"
+      });
+    });
+  });
+
   it("Only sets the min when there is one detected value.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm
