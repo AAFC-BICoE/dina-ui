@@ -45,11 +45,21 @@ export function ParseVerbatimToRangeButton({
     setStatus("idle");
     setFeedbackMsg("");
 
-    const verbatimText: string = _.get(values, verbatimField)?.toString() ?? "";
+    const verbatimText: string = (
+      _.get(values, verbatimField)?.toString() ?? ""
+    ).trim();
+
+    // Ensure not empty
+    if (!verbatimText) {
+      setStatus("error");
+      setFeedbackMsg("Field is empty");
+      return;
+    }
 
     const validNumbers = verbatimText
       .split(/to|\-/)
-      .map((text) => toMeters(text));
+      .map((text) => toMeters(text))
+      .filter((val) => !_.isNil(val) && val !== "");
 
     if (validNumbers.length >= 2) {
       // Range found (take the first two valid numbers)

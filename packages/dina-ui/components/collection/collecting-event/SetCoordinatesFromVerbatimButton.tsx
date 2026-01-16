@@ -3,8 +3,12 @@ import Coordinates from "coordinate-parser";
 import { FormikContextType } from "formik";
 import _ from "lodash";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { useState } from "react";
-import { FaArrowsRotate } from "react-icons/fa6";
+import { useEffect, useState } from "react";
+import {
+  FaArrowsRotate,
+  FaCheck,
+  FaTriangleExclamation
+} from "react-icons/fa6";
 
 export interface SetCoordinatesFromVerbatimButtonProps {
   /** Button content */
@@ -31,21 +35,40 @@ export function SetCoordinatesFromVerbatimButton({
   buttonText
 }: SetCoordinatesFromVerbatimButtonProps) {
   const { readOnly } = useDinaFormContext();
-  const [error, setError] = useState<string>("");
   const { formatMessage } = useDinaIntl();
 
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [feedbackMsg, setFeedbackMsg] = useState<string>("");
+
+  // Clear the status message after 5 seconds
+  useEffect(() => {
+    if (status !== "idle") {
+      const timer = setTimeout(() => {
+        setStatus("idle");
+        setFeedbackMsg("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
+
   function doConversion(values: any, formik: FormikContextType<any>) {
+    // Reset status before processing
+    setStatus("idle");
+    setFeedbackMsg("");
+
     try {
-      const coords = new Coordinates(
-        `${_.get(values, sourceLatField)}, ${_.get(values, sourceLonField)}`
-      );
+      const latitudeStr = _.get(values, sourceLatField, "");
+      const longitudeStr = _.get(values, sourceLonField, "");
+
+      const coords = new Coordinates(`${latitudeStr}, ${longitudeStr}`);
 
       // Limit to 6 decimal places:
       const lat = Number(coords.getLatitude().toFixed(6));
       const lon = Number(coords.getLongitude().toFixed(6));
 
       if (lat > 90 || lat < -90) {
-        setError(
+        setStatus("error");
+        setFeedbackMsg(
           formatMessage("latitudeValidationError", {
             latitude: lat
           })
@@ -54,7 +77,8 @@ export function SetCoordinatesFromVerbatimButton({
       }
 
       if (lon > 180 || lon < -180) {
-        setError(
+        setStatus("error");
+        setFeedbackMsg(
           formatMessage("longitudeValidationError", {
             longtitude: lon
           })
@@ -70,16 +94,17 @@ export function SetCoordinatesFromVerbatimButton({
       }
       onClick?.({ lat: String(lat), lon: String(lon) });
 
-      setError("");
+      setStatus("success");
+      setFeedbackMsg("Coordinates set");
     } catch (error) {
-      setError(error.message);
+      setStatus("error");
+      setFeedbackMsg(error.message);
     }
   }
 
   // Don't render in read-only mode.
   return readOnly ? null : (
-    <>
-      {error && <div className="alert alert-danger">{error}</div>}
+    <div className="d-flex align-items-center gap-2">
       <FormikButton
         onClick={doConversion}
         className={className}
@@ -91,6 +116,20 @@ export function SetCoordinatesFromVerbatimButton({
         <FaArrowsRotate className="me-2" />
         {buttonText}
       </FormikButton>
-    </>
+
+      {/* Success Indicator */}
+      {status === "success" && (
+        <span className="text-success d-flex align-items-center animate-fade-in">
+          <FaCheck className="me-1" /> {feedbackMsg}
+        </span>
+      )}
+
+      {/* Error Indicator */}
+      {status === "error" && (
+        <span className="text-danger d-flex align-items-center animate-fade-in">
+          <FaTriangleExclamation className="me-1" /> {feedbackMsg}
+        </span>
+      )}
+    </div>
   );
 }
