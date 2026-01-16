@@ -1,7 +1,17 @@
 import Link from "next/link";
-import { Card } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import { getIndexConfig } from "./searchConfig";
 import { ElasticsearchHit } from "./useMultiIndexSearch";
+
+/**
+ * Format camelCase attribute name to Title Case with spaces
+ */
+function formatAttributeName(name: string): string {
+  return name
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (str) => str.toUpperCase())
+    .trim();
+}
 
 export interface SearchResultItemProps {
   hit: ElasticsearchHit;
@@ -78,9 +88,7 @@ export function SearchResultItem({
 
     attributeRows.push(
       <tr key={field}>
-        <td className="text-muted" style={{ width: "150px" }}>
-          {attributeName}
-        </td>
+        <td>{formatAttributeName(attributeName)}</td>
         <td>
           <HighlightedText text={highlightedValue} />
         </td>
@@ -89,31 +97,45 @@ export function SearchResultItem({
   });
 
   return (
-    <Card className="mb-3">
-      <Card.Body>
-        <div className="d-flex align-items-start gap-3">
-          {showIcon && Icon && (
-            <div
-              className="text-muted"
-              style={{ fontSize: "2rem", marginTop: "0.25rem" }}
-            >
-              <Icon />
-            </div>
-          )}
-          <div className="flex-grow-1">
-            <Card.Title>
-              <Link href={`${config.linkPath}${id}`}>
-                <strong>{linkText}</strong>
-              </Link>
-            </Card.Title>
-            {attributeRows.length > 0 && (
-              <table className="table table-sm table-borderless mb-0">
-                <tbody>{attributeRows}</tbody>
-              </table>
-            )}
+    <div className="mb-4 pb-3">
+      <div className="d-flex align-items-center gap-3 mb-2">
+        {showIcon && Icon && (
+          <div
+            className="d-flex align-items-center justify-content-center text-muted"
+            style={{
+              width: "50px",
+              height: "50px",
+              backgroundColor: "#f5f5f5",
+              borderRadius: "8px",
+              fontSize: "1.5rem"
+            }}
+          >
+            <Icon />
           </div>
-        </div>
-      </Card.Body>
-    </Card>
+        )}
+        <Link href={`${config.linkPath}${id}`} className="fs-5">
+          {linkText}
+        </Link>
+      </div>
+      {attributeRows.length > 0 && (
+        <Table
+          size="sm"
+          className="mb-0"
+          style={{ marginLeft: showIcon ? "62px" : "0" }}
+        >
+          <thead>
+            <tr style={{ backgroundColor: "#f8f9fa" }}>
+              <th
+                style={{ width: "40%", fontWeight: "normal", color: "#6c757d" }}
+              >
+                Attribute
+              </th>
+              <th style={{ fontWeight: "normal", color: "#6c757d" }}>Value</th>
+            </tr>
+          </thead>
+          <tbody>{attributeRows}</tbody>
+        </Table>
+      )}
+    </div>
   );
 }

@@ -4,7 +4,8 @@ import {
   FaFlask,
   FaBox,
   FaWarehouse,
-  FaHandshake
+  FaHandshake,
+  FaProjectDiagram
 } from "react-icons/fa";
 
 export interface IndexConfig {
@@ -51,6 +52,18 @@ export const SEARCH_INDEXES: IndexConfig[] = [
     linkAttribute: "data.attributes.name",
     linkPath: "/collection/storage-unit/view?id=",
     displayAttributes: ["data.attributes.name", "data.attributes.group"]
+  },
+  {
+    name: "Projects",
+    indexName: "dina_project_index",
+    icon: FaProjectDiagram,
+    linkAttribute: "data.attributes.name",
+    linkPath: "/collection/project/view?id=",
+    displayAttributes: [
+      "data.attributes.name",
+      "data.attributes.status",
+      "data.attributes.group"
+    ]
   },
   {
     name: "Transactions",
