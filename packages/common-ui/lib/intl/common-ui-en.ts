@@ -197,5 +197,10 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   markAllAsRead: "Mark all as read",
   notificationErrorTitle: "Failed to load notifications",
   notificationErrorMessage:
-    "Unable to fetch notifications. Please try again later."
+    "Unable to fetch notifications. Please try again later.",
+  searchDinaPlaceholder: "Search DINA...",
+  globalSearchResults: "Global Search Results",
+  searchErrorMessage: "An error occurred while searching",
+  noSearchResults: "No results found",
+  enterSearchTerm: "Enter a search term to begin"
 };
