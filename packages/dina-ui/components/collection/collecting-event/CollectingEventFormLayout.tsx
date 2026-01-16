@@ -646,7 +646,7 @@ export function CollectingEventFormLayout({
               <div className="col-md-6">
                 <TextField
                   name="dwcFieldNumber"
-                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collection_number"
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_collection_number"
                   tooltipLinkText="fromDinaUserGuide"
                 />
                 {!isTemplate && <StringArrayField name="otherRecordNumbers" />}
