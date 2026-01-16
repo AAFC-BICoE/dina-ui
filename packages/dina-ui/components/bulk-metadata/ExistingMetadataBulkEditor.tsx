@@ -3,19 +3,23 @@ import { InputResource } from "kitsu";
 import _ from "lodash";
 import { Metadata } from "../../types/objectstore-api";
 import { useMetadataEditQuery } from "../object-store/metadata/useMetadata";
-import { MetadataBulkEditor } from "./MetadataBulkEditor";
+import {
+  MetadataBulkEditor,
+  MetadataBulkEditorHandle
+} from "./MetadataBulkEditor";
+import { forwardRef } from "react";
 
 export interface ExistingMetadataBulkEditorProps {
   ids: string[];
   onSaved: (metadataIds: string[]) => void | Promise<void>;
   onPreviousClick?: () => void;
+  insideModal?: boolean;
 }
 
-export function ExistingMetadataBulkEditor({
-  ids,
-  onSaved,
-  onPreviousClick
-}: ExistingMetadataBulkEditorProps) {
+export const ExistingMetadataBulkEditor = forwardRef<
+  MetadataBulkEditorHandle,
+  ExistingMetadataBulkEditorProps
+>(({ ids, onSaved, onPreviousClick, insideModal }, ref) => {
   const metadataQueries = ids.map((id) => useMetadataEditQuery(id));
 
   /** Whether any query is loading. */
@@ -51,12 +55,14 @@ export function ExistingMetadataBulkEditor({
   if (metadatas.length) {
     return (
       <MetadataBulkEditor
+        ref={ref}
         metadatas={metadatas}
         onSaved={onSaved}
         onPreviousClick={onPreviousClick}
+        insideModal={insideModal}
       />
     );
   }
 
   return null;
-}
+});

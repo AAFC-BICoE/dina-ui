@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { forwardRef, useCallback, useImperativeHandle } from "react";
 import { Metadata } from "../../types/objectstore-api";
 import { InputResource, PersistedResource } from "kitsu";
 import {
@@ -34,7 +34,13 @@ export interface MetadataBulkEditorProps {
   onSaved: (metadataIds: string[]) => void | Promise<void>;
   disableMetadataNameField?: boolean;
   onPreviousClick?: () => void;
+  insideModal?: boolean;
 }
+
+export interface MetadataBulkEditorHandle {
+  saveAll: () => Promise<void>;
+}
+
 function getMetadataHooks(metadatas) {
   return metadatas.map((resource, index) => {
     const key = `metadata-${index}`;
@@ -49,131 +55,141 @@ function getMetadataHooks(metadatas) {
   });
 }
 
-export function MetadataBulkEditor({
-  metadatas: metadatasProp,
-  onPreviousClick,
-  onSaved
-}: MetadataBulkEditorProps) {
-  const [selectedTab, setSelectedTab] = useState<
-    BulkNavigatorTab | ResourceWithHooks
-  >();
+export const MetadataBulkEditor = forwardRef<
+  MetadataBulkEditorHandle,
+  MetadataBulkEditorProps
+>(
+  (
+    { metadatas: metadatasProp, onPreviousClick, onSaved, insideModal = false },
+    ref
+  ) => {
+    const [selectedTab, setSelectedTab] = useState<
+      BulkNavigatorTab | ResourceWithHooks
+    >();
 
-  // Make sure the metadatas list doesn't change during this component's lifecycle:
-  const metadatas = useMemo(() => metadatasProp, []);
+    // Make sure the metadatas list doesn't change during this component's lifecycle:
+    const metadatas = useMemo(() => metadatasProp, []);
 
-  const initialValues: InputResource<Metadata> = {
-    type: "metadata",
-    group: ""
-  };
+    const initialValues: InputResource<Metadata> = {
+      type: "metadata",
+      group: ""
+    };
 
-  const bulkEditMetadataHook = useMetadataSave({
-    initialValues
-  });
+    const bulkEditMetadataHook = useMetadataSave({
+      initialValues
+    });
 
-  const bulkEditFormRef = useRef<FormikProps<InputResource<Metadata>>>(null);
+    const bulkEditFormRef = useRef<FormikProps<InputResource<Metadata>>>(null);
 
-  const metadataHooks = getMetadataHooks(metadatas);
+    const metadataHooks = getMetadataHooks(metadatas);
 
-  const metadataForm = (
-    <MetadataForm
-      metadata={initialValues}
-      buttonBar={null}
-      metadataFormRef={bulkEditFormRef}
-      metadataSaveHook={bulkEditMetadataHook}
-    />
-  );
+    const metadataForm = (
+      <MetadataForm
+        metadata={initialValues}
+        buttonBar={null}
+        metadataFormRef={bulkEditFormRef}
+        metadataSaveHook={bulkEditMetadataHook}
+      />
+    );
 
-  const [initialized, setInitialized] = useState(false);
+    const [initialized, setInitialized] = useState(false);
 
-  const { bulkEditTab, clearedFields, deletedFields } = useBulkEditTab({
-    resourceHooks: metadataHooks,
-    hideBulkEditTab: !initialized,
-    resourceForm: metadataForm,
-    bulkEditFormRef
-  });
-
-  const metadataBulkOverrider = useCallback(
-    () => getMetadataBulkOverrider(bulkEditFormRef, deletedFields),
-    [bulkEditFormRef, deletedFields]
-  );
-
-  useEffect(() => {
-    // Set the initial tab to the Edit All tab:
-    setSelectedTab(bulkEditTab);
-  }, []);
-
-  const { saveAll } = useBulkMetadataSave({
-    onSaved,
-    metadataPreProcessor: metadataBulkOverrider,
-    bulkEditCtx: {
+    const { bulkEditTab, clearedFields, deletedFields } = useBulkEditTab({
       resourceHooks: metadataHooks,
-      bulkEditFormRef,
-      clearedFields
-    }
-  });
+      hideBulkEditTab: !initialized,
+      resourceForm: metadataForm,
+      bulkEditFormRef
+    });
 
-  return (
-    <div>
-      <DinaForm initialValues={{}}>
-        <ButtonBar className="button-bar">
-          {onPreviousClick && (
-            <div style={{ display: "inline-block", width: "50%" }}>
-              <FormikButton
-                className="btn btn-outline-secondary previous-button"
-                onClick={onPreviousClick}
+    const metadataBulkOverrider = useCallback(
+      () => getMetadataBulkOverrider(bulkEditFormRef, deletedFields),
+      [bulkEditFormRef, deletedFields]
+    );
+
+    useEffect(() => {
+      // Set the initial tab to the Edit All tab:
+      setSelectedTab(bulkEditTab);
+    }, []);
+
+    const { saveAll } = useBulkMetadataSave({
+      onSaved,
+      metadataPreProcessor: metadataBulkOverrider,
+      bulkEditCtx: {
+        resourceHooks: metadataHooks,
+        bulkEditFormRef,
+        clearedFields
+      }
+    });
+
+    useImperativeHandle(ref, () => ({
+      saveAll
+    }));
+
+    return (
+      <div>
+        <DinaForm initialValues={{}}>
+          {!insideModal && (
+            <ButtonBar className="button-bar">
+              {onPreviousClick && (
+                <div style={{ display: "inline-block", width: "50%" }}>
+                  <FormikButton
+                    className="btn btn-outline-secondary previous-button"
+                    onClick={onPreviousClick}
+                  >
+                    <FaArrowLeft className="me-2" />
+                    <DinaMessage id="goToThePreviousStep" />
+                  </FormikButton>
+                </div>
+              )}
+              <div
+                style={{
+                  display: "inline-block",
+                  width: "50%",
+                  textAlign: "right"
+                }}
               >
-                <FaArrowLeft className="me-2" />
-                <DinaMessage id="goToThePreviousStep" />
-              </FormikButton>
-            </div>
+                <FormikButton
+                  className="btn btn-primary bulk-save-button"
+                  onClick={saveAll}
+                  buttonProps={() => ({ style: { width: "10rem" } })}
+                >
+                  <DinaMessage id="saveAll" />
+                </FormikButton>
+              </div>
+            </ButtonBar>
           )}
-          <div
-            style={{
-              display: "inline-block",
-              width: "50%",
-              textAlign: "right"
+        </DinaForm>
+        {selectedTab && (
+          <BulkEditNavigator
+            selectedTab={selectedTab}
+            onSelectTab={setSelectedTab}
+            resources={metadataHooks}
+            extraTabs={[bulkEditTab]}
+            tabNameConfig={(metadata: ResourceWithHooks<Metadata>) => {
+              const { filename, originalFilename } = metadata?.resource ?? {};
+              return filename ?? originalFilename;
             }}
-          >
-            <FormikButton
-              className="btn btn-primary bulk-save-button"
-              onClick={saveAll}
-              buttonProps={() => ({ style: { width: "10rem" } })}
-            >
-              <DinaMessage id="saveAll" />
-            </FormikButton>
-          </div>
-        </ButtonBar>
-      </DinaForm>
-      {selectedTab && (
-        <BulkEditNavigator
-          selectedTab={selectedTab}
-          onSelectTab={setSelectedTab}
-          resources={metadataHooks}
-          extraTabs={[bulkEditTab]}
-          tabNameConfig={(metadata: ResourceWithHooks<Metadata>) => {
-            const { filename, originalFilename } = metadata?.resource ?? {};
-            return filename ?? originalFilename;
-          }}
-          renderOneResource={({ index }) => (
-            <MetadataForm
-              metadataFormRef={(form) => {
-                const isLastRefSetter =
-                  metadataHooks.filter((it) => !it.formRef.current).length ===
-                  1;
-                metadataHooks[index].formRef.current = form;
-                if (isLastRefSetter && form) {
-                  setInitialized(true);
-                }
-              }}
-              metadataSaveHook={metadataHooks[index].saveHook}
-              buttonBar={null}
-            />
-          )}
-        />
-      )}
-    </div>
-  );
-}
+            renderOneResource={({ index }) => (
+              <MetadataForm
+                metadataFormRef={(form) => {
+                  const isLastRefSetter =
+                    metadataHooks.filter((it) => !it.formRef.current).length ===
+                    1;
+                  metadataHooks[index].formRef.current = form;
+                  if (isLastRefSetter && form) {
+                    setInitialized(true);
+                  }
+                }}
+                metadataSaveHook={metadataHooks[index].saveHook}
+                buttonBar={null}
+              />
+            )}
+          />
+        )}
+      </div>
+    );
+  }
+);
 
 export function getMetadataBulkOverrider(
   bulkEditFormRef,
