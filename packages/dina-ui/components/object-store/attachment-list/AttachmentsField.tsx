@@ -305,7 +305,7 @@ export function AddAttachmentsButton({
       <div className="modal-content">
         <style>{`
           .modal-dialog {
-            max-width: calc(100vw - 3rem);
+            max-width: calc(90vw - 3rem);
           }
           .ht_master .wtHolder {
             height: 0% !important;

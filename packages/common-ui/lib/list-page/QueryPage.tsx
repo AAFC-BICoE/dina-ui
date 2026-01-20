@@ -897,10 +897,13 @@ export function QueryPage<TData extends KitsuResource>({
   /**
    * When the group filter has changed, store the new value for the search.
    */
-  const onGroupChange = useCallback((newGroups: string[]) => {
-    isActionTriggeredQuery.current = true;
-    setGroups(newGroups);
-  }, []);
+  const onGroupChange = useCallback(
+    (newGroups: string[]) => {
+      isActionTriggeredQuery.current = true;
+      setGroups(newGroups);
+    },
+    [setGroups]
+  );
 
   /**
    * When the displayed columns are changed from the column selector, we need to trigger
