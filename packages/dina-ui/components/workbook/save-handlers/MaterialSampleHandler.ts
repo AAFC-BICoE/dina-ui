@@ -4,7 +4,8 @@ import { MaterialSample } from "../../../types/collection-api";
 import {
   ResourceHandler,
   SaveResourceContext,
-  SaveResourceResult
+  SaveResourceResult,
+  WorkbookSaveError
 } from "./types";
 
 export const materialSampleHandler: ResourceHandler = {
@@ -51,6 +52,12 @@ export const materialSampleHandler: ResourceHandler = {
           resource.id = resp.data[0].id;
           userSelectedSameNameExistingResource.current = resp.data[0];
           resourcesUpdatedCount.current = resourcesUpdatedCount.current + 1;
+        } else {
+          // No matching record found - throw error instead of creating new record
+          throw new WorkbookSaveError("appendDataNoMatchingRecordError", {
+            materialSampleName: resource?.materialSampleName,
+            group
+          });
         }
       }
     } else {

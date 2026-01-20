@@ -3,6 +3,26 @@
 import Kitsu from "kitsu";
 import { WorkbookColumnMap } from "../types/Workbook";
 
+/**
+ * Custom error class for workbook save errors that supports i18n.
+ * The messageKey and messageValues are used by the UI component to format the error message.
+ */
+export class WorkbookSaveError extends Error {
+  messageKey: string;
+  messageValues: Record<string, any>;
+
+  constructor(
+    messageKey: string,
+    messageValues: Record<string, any> = {},
+    fallbackMessage?: string
+  ) {
+    super(fallbackMessage || messageKey);
+    this.name = "WorkbookSaveError";
+    this.messageKey = messageKey;
+    this.messageValues = messageValues;
+  }
+}
+
 export interface SaveResourceContext {
   resource: any;
   sourceSet: string;
