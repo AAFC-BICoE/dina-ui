@@ -12,7 +12,6 @@ import {
   filterBy,
   getExport,
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
-  MAX_OBJECT_EXPORT_TOTAL,
   useApiClient
 } from "common-ui";
 import {
@@ -190,17 +189,6 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       });
     }
 
-    if (count > MAX_OBJECT_EXPORT_TOTAL) {
-      setDataExportError(
-        <Alert variant="danger" className="mb-2">
-          <DinaMessage
-            id="molecularAnalysisExportMaxObjectError"
-            values={{ limit: MAX_OBJECT_EXPORT_TOTAL }}
-          />
-        </Alert>
-      );
-    }
-
     return count;
   }, [runSummaries]);
 
@@ -212,9 +200,9 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     // Retrieve the run items based on the query object.
     let queryDSL = queryObject;
     queryDSL = applySourceFilteringString(queryDSL, [
-      "data.id",
-      "data.type",
-      "data.attributes"
+      "included.id",
+      "included.type",
+      "included.attributes"
     ]);
     queryDSL = applyPagination(
       queryDSL,
