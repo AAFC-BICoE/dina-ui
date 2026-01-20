@@ -347,11 +347,17 @@ export class ApiClientImpl implements ApiClientI {
           default:
             throw new Error(`Unsupported single operation: ${operation.op}`);
         }
-      } catch (error) {
+      } catch (error: any) {
+        const errorStatus = error.cause?.data?.errors?.[0]?.status;
+
+        // If it's a 404 or 410 and returnNullForMissingResource, return null.
         if (
           returnNullForMissingResource &&
-          (error.cause.data.errors[0].status.includes("404") ||
-            error.cause.data.errors[0].status.includes("410"))
+          errorStatus &&
+          (errorStatus === "404" ||
+            errorStatus === "410" ||
+            errorStatus === 404 ||
+            errorStatus === 410)
         ) {
           responses = [
             {
@@ -360,7 +366,8 @@ export class ApiClientImpl implements ApiClientI {
             }
           ];
         } else {
-          throw error;
+          const err = new Error(error.message);
+          throw err;
         }
       }
     } else {
@@ -964,9 +971,9 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
     }
     const err = new Error(errorMessage) as any;
     err.cause = error.response;
-    throw err;
+    return Promise.reject(err);
   }
-  throw error;
+  return Promise.reject(error);
 }
 
 export class CustomDinaKitsu extends Kitsu {
