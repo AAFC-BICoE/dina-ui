@@ -1,4 +1,8 @@
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import "@testing-library/jest-dom";
 import { waitFor } from "@testing-library/react";
 import {
@@ -283,6 +287,20 @@ describe("ExportMolecularAnalysisPage", () => {
 
     // Ensure the total is 2.
     expect(wrapper.getByText(/2/i)).toBeInTheDocument();
+
+    // Ensure the elastic search was generated correctly.
+    expect(mockPost).toHaveBeenCalledWith(
+      "search-api/search-ws/search",
+      {
+        query: "test",
+        _source: {
+          includes: ["included.id", "included.type", "included.attributes"]
+        },
+        from: 0,
+        size: MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT
+      },
+      { params: { indexName: "dina_material_sample_index" } }
+    );
   });
 
   it("Redirects if no records are found in storage", async () => {
