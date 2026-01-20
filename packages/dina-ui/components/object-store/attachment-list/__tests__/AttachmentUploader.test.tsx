@@ -1,7 +1,8 @@
 import { mountWithAppContext } from "common-ui";
 import { AttachmentUploader } from "../AttachmentUploader";
-import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 const mockPost = jest.fn((path) => {
   if (path === "search-api/search-ws/search") {
@@ -86,7 +87,7 @@ describe("AttachmentUploader component", () => {
   });
 
   it("Uploads the files and opens the Metadata editor.", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <AttachmentUploader afterMetadatasSaved={mockAfterMetadatasSaved} />,
       { apiContext }
     );
@@ -98,34 +99,34 @@ describe("AttachmentUploader component", () => {
     ];
     await waitFor(() => {
       expect(
-        screen.getByRole("combobox", {
+        wrapper.getByRole("combobox", {
           name: /group select\.\.\./i
         })
       ).toBeInTheDocument();
     });
 
     // Select group
-    fireEvent.mouseDown(
-      screen.getByRole("combobox", {
+    userEvent.click(
+      wrapper.getByRole("combobox", {
         name: /group select\.\.\./i
       })
     );
 
     await waitFor(() => {
       expect(
-        screen.getByRole("option", {
+        wrapper.getByRole("option", {
           name: /aafc/i
         })
       ).toBeInTheDocument();
     });
-    fireEvent.click(
-      screen.getByRole("option", {
+    userEvent.click(
+      wrapper.getByRole("option", {
         name: /aafc/i
       })
     );
 
     // Find the file input in the Dropzone component
-    const fileInput = screen.getByLabelText(/drag and drop files here/i);
+    const fileInput = wrapper.getByLabelText(/drag and drop files here/i);
     await waitFor(() => {
       expect(fileInput).toBeInTheDocument();
     });
@@ -141,13 +142,13 @@ describe("AttachmentUploader component", () => {
     // Simulate the save upload
     await waitFor(() => {
       expect(
-        screen.getByRole("button", {
+        wrapper.getByRole("button", {
           name: /save/i
         })
       ).toBeInTheDocument();
     });
-    fireEvent.click(
-      screen.getByRole("button", {
+    userEvent.click(
+      wrapper.getByRole("button", {
         name: /save/i
       })
     );
@@ -156,13 +157,13 @@ describe("AttachmentUploader component", () => {
     // Simulate clicking Save All metadata button
     await waitFor(() => {
       expect(
-        screen.getByRole("button", {
+        wrapper.getByRole("button", {
           name: /save all/i
         })
       ).toBeInTheDocument();
     });
-    fireEvent.click(
-      screen.getByRole("button", {
+    userEvent.click(
+      wrapper.getByRole("button", {
         name: /save all/i
       })
     );
