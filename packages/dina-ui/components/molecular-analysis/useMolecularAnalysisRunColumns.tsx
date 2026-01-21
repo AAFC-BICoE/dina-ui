@@ -3,6 +3,7 @@ import {
   DeleteArgs,
   FieldHeader,
   SaveArgs,
+  Tooltip,
   useAccount,
   useApiClient,
   useStringComparator
@@ -19,6 +20,8 @@ import React from "react";
 import { SequencingRunItem } from "./useMolecularAnalysisRun";
 import { QualityControlWithAttachment } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
 import { VocabularyOption } from "../collection/VocabularySelectField";
+import { FaExclamationTriangle, FaTrashAlt, FaUnlink } from "react-icons/fa";
+import _ from "lodash";
 
 interface UseMolecularAnalysisRunColumnsProps {
   type: string;
@@ -355,23 +358,56 @@ export function useMolecularAnalysisRunColumns({
         cell: ({ row: { original } }) => {
           const attachments =
             original.molecularAnalysisRunItem?.result?.attachments ?? [];
-          const attachmentElements = attachments?.map((attachment, index) =>
-            attachment ? (
-              <React.Fragment key={attachment?.id}>
+          const attachmentElements = attachments.map((attachment, index) => {
+            if (!attachment || (attachment as any).issue) {
+              const isDeleted = (attachment as any).issue === "deleted";
+              const isLoadingIssue =
+                (attachment as any).issue === "loadingIssue";
+
+              return (
+                <React.Fragment key={`missing-${index}`}>
+                  <Tooltip
+                    visibleElement={
+                      <span className="text-danger">
+                        {isDeleted ? (
+                          <FaTrashAlt className="me-1" />
+                        ) : (
+                          <FaExclamationTriangle className="me-1" />
+                        )}
+                        <DinaMessage
+                          id={
+                            isLoadingIssue
+                              ? "loadingIssueAttachmentText"
+                              : "deletedAttachmentText"
+                          }
+                        />
+                      </span>
+                    }
+                    id={
+                      isDeleted
+                        ? "deletedAttachmentTooltipText"
+                        : "loadingIssueTooltipText"
+                    }
+                  />
+                  {index < attachments.length - 1 && ", "}
+                </React.Fragment>
+              );
+            }
+
+            return (
+              <React.Fragment key={attachment.id}>
                 <Link
-                  href={`/object-store/object/view?id=${attachment?.id}`}
+                  href={`/object-store/object/view?id=${attachment.id}`}
                   legacyBehavior
                 >
-                  {attachment?.originalFilename}
+                  {attachment.originalFilename}
                 </Link>
-                {index < attachments?.length - 1 && ", "}
+                {index < attachments.length - 1 && ", "}
               </React.Fragment>
-            ) : null
-          );
+            );
+          });
 
-          return (
-            <>{attachmentElements?.length > 0 ? attachmentElements : null}</>
-          );
+          return <>{attachmentElements}</>;
         },
         header: () => <FieldHeader name={"attachments"} />,
         accessorKey: "resultAttachment",
@@ -413,7 +449,9 @@ export function useMolecularAnalysisRunColumns({
                             group: groupNames?.[0],
                             relationships: {
                               attachments: {
-                                data: newMetadatas as Metadata[]
+                                data: _.map(newMetadatas, (item) =>
+                                  _.pick(item, "id", "type")
+                                ) as Metadata[]
                               }
                             }
                           }
@@ -453,13 +491,103 @@ export function useMolecularAnalysisRunColumns({
                     setReloadGenericMolecularAnalysisRun?.(Date.now());
                   }
                 }}
+                onDetachMetadataIds={async (metadataIds: string[]) => {
+                  if (
+                    original.molecularAnalysisRunItem &&
+                    original.molecularAnalysisRunItem.result &&
+                    original.molecularAnalysisRunItem.result.id
+                  ) {
+                    const resultId =
+                      original.molecularAnalysisRunItem.result.id;
+                    const resultType =
+                      original.molecularAnalysisRunItem.result.type;
+
+                    // Get current attachments
+                    const currentAttachments =
+                      (original.molecularAnalysisRunItem.result
+                        .attachments as ResourceIdentifierObject[]) ?? [];
+
+                    // Filter out the attachments that correspond to the IDs to be detached
+                    const remainingAttachments = currentAttachments.filter(
+                      (attachment) => !metadataIds.includes(attachment.id)
+                    );
+
+                    // If no attachments remain, delete the result entirely
+                    if (remainingAttachments.length === 0) {
+                      // 1. Unlink the Result from the Run Item
+                      const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+                        [
+                          {
+                            resource: {
+                              id: original.molecularAnalysisRunItem.id,
+                              type: original.molecularAnalysisRunItem.type,
+                              relationships: {
+                                result: {
+                                  data: null
+                                }
+                              }
+                            },
+                            type: "molecular-analysis-run-item"
+                          } as any
+                        ];
+                      await save?.<MolecularAnalysisRunItem>(
+                        molecularAnalysisRunItemSaveArgs,
+                        {
+                          apiBaseUrl: "seqdb-api/molecular-analysis-run-item"
+                        }
+                      );
+
+                      // 2. Delete the Result resource
+                      const molecularAnalysisRunResultDeleteArgs: DeleteArgs[] =
+                        [
+                          {
+                            delete: {
+                              id: resultId,
+                              type: resultType
+                            }
+                          }
+                        ];
+                      await save?.(molecularAnalysisRunResultDeleteArgs, {
+                        apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                      });
+                    } else {
+                      // Otherwise, just update the relationship with the remaining attachments
+                      const molecularAnalysisRunResultSaveArgs: SaveArgs<MolecularAnalysisResult>[] =
+                        [
+                          {
+                            type: "molecular-analysis-result",
+                            resource: {
+                              id: resultId,
+                              type: "molecular-analysis-result",
+                              relationships: {
+                                attachments: {
+                                  data: _.map(remainingAttachments, (item) =>
+                                    _.pick(item, "id", "type")
+                                  ) as Metadata[]
+                                }
+                              }
+                            }
+                          } as any
+                        ];
+
+                      await save?.<MolecularAnalysisResult>(
+                        molecularAnalysisRunResultSaveArgs,
+                        {
+                          apiBaseUrl: "seqdb-api/molecular-analysis-result"
+                        }
+                      );
+                    }
+
+                    setReloadGenericMolecularAnalysisRun?.(Date.now());
+                  }
+                }}
               />
               <button
                 className={`btn btn-danger delete-button`}
                 style={{
                   paddingLeft: "15px",
                   paddingRight: "15px",
-                  width: "8rem"
+                  width: "9rem"
                 }}
                 type="button"
                 key={1}
@@ -511,6 +639,7 @@ export function useMolecularAnalysisRunColumns({
                   }
                 }}
               >
+                <FaUnlink className="me-2" />
                 <DinaMessage id="removeAllButtonText" />
               </button>
             </div>
@@ -557,19 +686,54 @@ export function useMolecularAnalysisRunColumns({
       cell: ({ row: { original } }) => {
         const attachments = original.attachments ?? [];
         const attachmentElements = attachments?.map((attachment, index) => {
-          return attachment ? (
-            <React.Fragment key={attachment?.id}>
-              <Link href={`/object-store/object/view?id=${attachment?.id}`}>
+          if (!attachment || (attachment as any).issue) {
+            const isDeleted = (attachment as any).issue === "deleted";
+            const isLoadingIssue = (attachment as any).issue === "loadingIssue";
+
+            return (
+              <React.Fragment key={`missing-${index}`}>
+                <Tooltip
+                  visibleElement={
+                    <span className="text-danger">
+                      {isDeleted ? (
+                        <FaTrashAlt className="me-1" />
+                      ) : (
+                        <FaExclamationTriangle className="me-1" />
+                      )}
+                      <DinaMessage
+                        id={
+                          isLoadingIssue
+                            ? "loadingIssueAttachmentText"
+                            : "deletedAttachmentText"
+                        }
+                      />
+                    </span>
+                  }
+                  id={
+                    isDeleted
+                      ? "deletedAttachmentTooltipText"
+                      : "loadingIssueTooltipText"
+                  }
+                />
+                {index < attachments.length - 1 && ", "}
+              </React.Fragment>
+            );
+          }
+
+          return (
+            <React.Fragment key={attachment.id}>
+              <Link
+                href={`/object-store/object/view?id=${attachment.id}`}
+                legacyBehavior
+              >
                 {(attachment as any)?.originalFilename}
               </Link>
-              {index < attachments?.length - 1 && ", "}
+              {index < attachments.length - 1 && ", "}
             </React.Fragment>
-          ) : null;
+          );
         });
 
-        return (
-          <>{attachmentElements?.length > 0 ? attachmentElements : null}</>
-        );
+        return <>{attachmentElements}</>;
       },
       header: () => <FieldHeader name={"attachments"} />,
       accessorKey: "resultAttachment",
@@ -603,7 +767,34 @@ export function useMolecularAnalysisRunColumns({
                 ] as QualityControlWithAttachment[];
                 const updatedQc = {
                   ...updatedQualityControlsCopy[index],
-                  attachments: newMetadatas as ResourceIdentifierObject[]
+                  attachments: _.map(newMetadatas, (item) =>
+                    _.pick(item, "id", "type")
+                  ) as ResourceIdentifierObject[]
+                };
+                updatedQualityControlsCopy[index] = updatedQc;
+
+                await updateExistingQualityControls?.(
+                  updatedQualityControlsCopy
+                );
+                setReloadGenericMolecularAnalysisRun?.(Date.now());
+              }}
+              onDetachMetadataIds={async (metadataIds: string[]) => {
+                const updatedQualityControlsCopy = [
+                  ...(qualityControls ?? [])
+                ] as QualityControlWithAttachment[];
+
+                const currentAttachments =
+                  updatedQualityControlsCopy[index].attachments ?? [];
+
+                const remainingAttachments = currentAttachments.filter(
+                  (attachment) => !metadataIds.includes(attachment.id)
+                );
+
+                const updatedQc = {
+                  ...updatedQualityControlsCopy[index],
+                  attachments: _.map(remainingAttachments, (item) =>
+                    _.pick(item, "id", "type")
+                  ) as ResourceIdentifierObject[]
                 };
                 updatedQualityControlsCopy[index] = updatedQc;
 
@@ -618,7 +809,7 @@ export function useMolecularAnalysisRunColumns({
               style={{
                 paddingLeft: "15px",
                 paddingRight: "15px",
-                width: "8rem"
+                width: "9rem"
               }}
               type="button"
               key={1}
@@ -637,6 +828,7 @@ export function useMolecularAnalysisRunColumns({
                 setReloadGenericMolecularAnalysisRun?.(Date.now());
               }}
             >
+              <FaUnlink className="me-2" />
               <DinaMessage id="removeAllButtonText" />
             </button>
           </div>

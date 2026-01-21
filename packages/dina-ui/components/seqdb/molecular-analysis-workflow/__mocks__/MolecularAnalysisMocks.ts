@@ -65,6 +65,21 @@ export const TEST_METADATA_3: PersistedResource<Metadata> = {
   group: "aafc"
 };
 
+export const TEST_METADATA_4: PersistedResource<Metadata> = {
+  id: "5be7368e-52ae-4bd5-a1de-1bc10a484337",
+  type: "metadata",
+  createdOn: "2024-12-03T14:56:51.439016Z",
+  bucket: "aafc",
+  fileIdentifier: "4a1b51d2-13ed-4916-911d-9431718a5ceb",
+  fileExtension: ".jpg",
+  dcFormat: "image/jpeg",
+  dcType: "IMAGE",
+  acCaption: "denmark.jpg",
+  originalFilename: "denmark.jpg",
+  publiclyReleasable: true,
+  group: "aafc"
+};
+
 export const TEST_GROUP: PersistedResource<Group>[] = [
   {
     id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
@@ -177,6 +192,9 @@ export const TEST_MATERIAL_SAMPLE_SUMMARY: PersistedResource<MaterialSampleSumma
     }
   ];
 
+export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN_ITEM_ID =
+  "f65ed036-eb92-40d9-af03-d027646e8948";
+
 export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN: PersistedResource<GenericMolecularAnalysisItem>[] =
   [
     {
@@ -185,7 +203,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN: PersistedResource<GenericMo
       genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
       materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[0],
       molecularAnalysisRunItem: {
-        id: "f65ed036-eb92-40d9-af03-d027646e8948",
+        id: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN_ITEM_ID,
         type: "molecular-analysis-run-item",
         name: "Provided run item name",
         usageType: "hrms",

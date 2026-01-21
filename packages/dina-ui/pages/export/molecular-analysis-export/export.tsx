@@ -7,13 +7,14 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import PageLayout from "../../../components/page/PageLayout";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Card } from "react-bootstrap";
+import { Alert, Card } from "react-bootstrap";
 import useMolecularAnalysisExportAPI from "../../../components/export/useMolecularAnalysisExportAPI";
 import React from "react";
+import { FaCheckSquare, FaHistory, FaRegSquare } from "react-icons/fa";
 
 export default function ExportMolecularAnalysisPage() {
   const router = useRouter();
@@ -57,6 +58,7 @@ export default function ExportMolecularAnalysisPage() {
               href={`/export/data-export/list?entityLink=${entityLink}`}
               className="btn btn-primary ms-auto"
             >
+              <FaHistory className="me-2" />
               <DinaMessage id="viewExportHistoryButton" />
             </Link>
           </div>
@@ -65,6 +67,16 @@ export default function ExportMolecularAnalysisPage() {
     >
       <DinaForm initialValues={{}}>
         {dataExportError}
+
+        {/* If the total attachments exceeds the max, show an error alert. */}
+        {totalAttachments > MAX_OBJECT_EXPORT_TOTAL && (
+          <Alert variant="danger" className="mb-2">
+            <DinaMessage
+              id="molecularAnalysisExportMaxObjectError"
+              values={{ limit: MAX_OBJECT_EXPORT_TOTAL }}
+            />
+          </Alert>
+        )}
 
         <div className="col-md-12">
           <h4 className="mt-3">
@@ -87,6 +99,7 @@ export default function ExportMolecularAnalysisPage() {
                             <input
                               type="checkbox"
                               name={`runSelected[${index}]`}
+                              data-testid={`runSelected[${index}]`}
                               checked={runSummary?.enabled}
                               style={checkboxProps.style}
                               onChange={() => {
@@ -134,6 +147,7 @@ export default function ExportMolecularAnalysisPage() {
                                   <input
                                     type="checkbox"
                                     name={`runItemSelected[${itemIndex}]`}
+                                    data-testid={`runItemSelected[${itemIndex}]`}
                                     checked={
                                       runSummary.enabled ? item?.enabled : false
                                     }
@@ -198,6 +212,7 @@ export default function ExportMolecularAnalysisPage() {
                   }}
                   disabled={exportLoading}
                 >
+                  <FaCheckSquare className="me-2" />
                   <DinaMessage id="selectAll" />
                 </button>
                 <button
@@ -213,6 +228,7 @@ export default function ExportMolecularAnalysisPage() {
                   }}
                   disabled={exportLoading}
                 >
+                  <FaRegSquare className="me-2" />
                   <DinaMessage id="deselectAll" />
                 </button>
               </div>
@@ -243,6 +259,7 @@ export default function ExportMolecularAnalysisPage() {
                   <input
                     type="checkbox"
                     name="includeQualityControls"
+                    data-testid="includeQualityControls"
                     style={{
                       height: "30px",
                       width: "30px",

@@ -284,6 +284,7 @@ interface AddAttachmentsButtonProps {
   className?: string;
   removeMargin?: boolean;
   readOnly: boolean;
+  onDetachMetadataIds?: ((metadataIds: string[]) => Promise<void>) | undefined;
 }
 
 export function AddAttachmentsButton({
@@ -295,7 +296,8 @@ export function AddAttachmentsButton({
   style,
   className,
   removeMargin,
-  readOnly
+  readOnly,
+  onDetachMetadataIds
 }: AddAttachmentsButtonProps) {
   const { closeModal, openModal } = useModal();
   function openAttachmentsModal() {
@@ -303,7 +305,7 @@ export function AddAttachmentsButton({
       <div className="modal-content">
         <style>{`
           .modal-dialog {
-            max-width: calc(100vw - 3rem);
+            max-width: calc(90vw - 3rem);
           }
           .ht_master .wtHolder {
             height: 0% !important;
@@ -326,6 +328,7 @@ export function AddAttachmentsButton({
               closeModal
             )}
             readOnly={readOnly}
+            onDetachMetadataIds={onDetachMetadataIds}
           />
         </div>
       </div>
@@ -358,7 +361,7 @@ function addAttachedMetadatas(
     onChange(
       _.uniqBy(
         [...value, ...newIds.map((it) => ({ id: it, type: "metadata" }))],
-        (val) => val.id
+        (val) => val?.id
       )
     );
     closeModal();

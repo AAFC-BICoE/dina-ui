@@ -2,17 +2,16 @@ import {
   applyPagination,
   applySourceFilteringString
 } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
+import { MolecularAnalysisRun } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { PersistedResource } from "kitsu";
-import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
-import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { Metadata, ObjectExport } from "../../types/objectstore-api";
+import { MolecularAnalysisResult } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   filterBy,
   getExport,
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
-  MAX_OBJECT_EXPORT_TOTAL,
   useApiClient
 } from "common-ui";
 import {
@@ -27,12 +26,12 @@ import useLocalStorage from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { Alert } from "react-bootstrap";
 import { useSessionStorage } from "usehooks-ts";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType
-} from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
+} from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { QualityControl } from "../../types/seqdb-api/resources/QualityControl";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 export interface UseMolecularAnalysisExportAPIReturn {
@@ -190,17 +189,6 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       });
     }
 
-    if (count > MAX_OBJECT_EXPORT_TOTAL) {
-      setDataExportError(
-        <Alert variant="danger" className="mb-2">
-          <DinaMessage
-            id="molecularAnalysisExportMaxObjectError"
-            values={{ limit: MAX_OBJECT_EXPORT_TOTAL }}
-          />
-        </Alert>
-      );
-    }
-
     return count;
   }, [runSummaries]);
 
@@ -285,7 +273,10 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
         console.error(elasticSearchError);
         setDataExportError(
           <Alert variant="danger" className="mb-2">
-            {elasticSearchError}
+            <DinaMessage
+              id="elasticSearchError"
+              values={{ cause: elasticSearchError?.cause?.data ?? "" }}
+            />
           </Alert>
         );
       });
