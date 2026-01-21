@@ -366,8 +366,7 @@ export class ApiClientImpl implements ApiClientI {
             }
           ];
         } else {
-          const err = new Error(error.message);
-          throw err;
+          throw error;
         }
       }
     } else {
