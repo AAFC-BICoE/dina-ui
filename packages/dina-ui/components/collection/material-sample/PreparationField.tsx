@@ -106,7 +106,7 @@ export function PreparationField({
                       .whereProvided("group", "EQ", group)
                       .build()
                   }
-                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-type"
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-type"
                   tooltipLinkText="fromDinaUserGuide"
                 />
                 <ResourceSelectField<PreparationMethod>
@@ -122,7 +122,7 @@ export function PreparationField({
                       .build()
                   }
                   key={group}
-                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-method"
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-method"
                   tooltipLinkText="fromDinaUserGuide"
                 />
               </div>
@@ -130,22 +130,22 @@ export function PreparationField({
           </FieldSpy>
           <TextField
             {...fieldProps("preservationType")}
-            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preservation-type"
+            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preservation-type"
             tooltipLinkText="fromDinaUserGuide"
           />
           <TextField
             {...fieldProps("preparationFixative")}
-            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-fixative"
+            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-fixative"
             tooltipLinkText="fromDinaUserGuide"
           />
           <TextField
             {...fieldProps("preparationMaterials")}
-            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-materials"
+            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-materials"
             tooltipLinkText="fromDinaUserGuide"
           />
           <TextField
             {...fieldProps("preparationSubstrate")}
-            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-substrate"
+            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-substrate"
             tooltipLinkText="fromDinaUserGuide"
           />
         </div>

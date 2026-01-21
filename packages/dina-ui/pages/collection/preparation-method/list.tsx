@@ -45,7 +45,7 @@ export default function preparationMethodListPage() {
       titleId="title_preparationMethod"
       headingTooltip={{
         id: "field_preparationMethod_tooltip",
-        link: "https://aafc-bicoe.github.io/dina-documentation/#preparation-method",
+        link: "https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-method",
         linkText: "fromDinaUserGuide",
         placement: "right"
       }}
