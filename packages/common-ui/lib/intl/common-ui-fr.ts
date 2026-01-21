@@ -126,7 +126,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     allResults: "Tous les résultats",
     searchResultsFor: "Résultats de recherche pour « {searchTerm} »",
     resultsFound: "{count} résultats trouvés",
-    topMatches: "Meilleures correspondances",
+    topMatches: "Meilleurs résultats",
     searchResults: "Chercher résultats",
     select: "Sélectionner ",
     selectLocation: "Sélectionner l’emplacement",

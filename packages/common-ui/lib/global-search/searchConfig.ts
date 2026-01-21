@@ -1,12 +1,7 @@
 import { IconType } from "react-icons";
-import {
-  FaUser,
-  FaFlask,
-  FaBox,
-  FaWarehouse,
-  FaHandshake,
-  FaProjectDiagram
-} from "react-icons/fa";
+import { FaUser, FaCube } from "react-icons/fa";
+import { FaBoxesStacked, FaDiagramProject, FaRightLeft } from "react-icons/fa6";
+import { MdNature } from "react-icons/md";
 
 export interface IndexConfig {
   name: string;
@@ -24,7 +19,7 @@ export const SEARCH_INDEXES: IndexConfig[] = [
   {
     name: "materialSampleListTitle",
     indexName: "dina_material_sample_index",
-    icon: FaFlask,
+    icon: MdNature,
     linkAttribute: "data.attributes.materialSampleName",
     linkPath: "/collection/material-sample/view?id=",
     displayAttributes: [
@@ -36,7 +31,7 @@ export const SEARCH_INDEXES: IndexConfig[] = [
   {
     name: "objectListTitle",
     indexName: "dina_object_store_index",
-    icon: FaBox,
+    icon: FaCube,
     linkAttribute: "data.attributes.originalFilename",
     linkPath: "/object-store/object/view?id=",
     displayAttributes: [
@@ -48,7 +43,7 @@ export const SEARCH_INDEXES: IndexConfig[] = [
   {
     name: "storageUnitListTitle",
     indexName: "dina_storage_index",
-    icon: FaWarehouse,
+    icon: FaBoxesStacked,
     linkAttribute: "data.attributes.name",
     linkPath: "/collection/storage-unit/view?id=",
     displayAttributes: ["data.attributes.name", "data.attributes.group"]
@@ -56,7 +51,7 @@ export const SEARCH_INDEXES: IndexConfig[] = [
   {
     name: "projectListTitle",
     indexName: "dina_project_index",
-    icon: FaProjectDiagram,
+    icon: FaDiagramProject,
     linkAttribute: "data.attributes.name",
     linkPath: "/collection/project/view?id=",
     displayAttributes: [
@@ -68,7 +63,7 @@ export const SEARCH_INDEXES: IndexConfig[] = [
   {
     name: "loanTransactionsSectionTitle",
     indexName: "dina_loan_transaction_index",
-    icon: FaHandshake,
+    icon: FaRightLeft,
     linkAttribute: "data.attributes.transactionNumber",
     linkPath: "/loan-transaction/transaction/view?id=",
     displayAttributes: [
