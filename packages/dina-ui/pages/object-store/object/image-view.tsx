@@ -6,10 +6,11 @@ import {
 } from "common-ui";
 import { useRouter } from "next/router";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { useState, useCallback, useRef } from "react";
+import { useRef } from "react";
 import { ObjectUpload, Derivative } from "../../../types/objectstore-api";
 import { Head } from "../../../components/head";
 import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 /**
  * ImageViewer component displays an image fetched from the object store with simple zoom toggle.
@@ -61,11 +62,7 @@ export default function ImageViewer() {
     }
   );
 
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
-
-  const ZOOM_SCALE = 4;
 
   // Determine file URL based on available data
   const fileUrl = (() => {
@@ -99,41 +96,6 @@ export default function ImageViewer() {
     objectUploadLoading || (objectError && derivativeLoading) || blobLoading;
   const hasError = (objectError && derivativeError) || blobError;
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLImageElement>) => {
-      e.preventDefault();
-      const image = imageRef.current;
-      if (!image) return;
-
-      if (!isZoomed) {
-        const rect = image.getBoundingClientRect();
-
-        // Click position relative to image's top-left corner
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-
-        // Center of the image
-        const imageCenterX = rect.width / 2;
-        const imageCenterY = rect.height / 2;
-
-        // Calculate the translation needed to keep the clicked point stationary.
-        const translateX = (imageCenterX - clickX) * (ZOOM_SCALE - 1);
-        const translateY = (imageCenterY - clickY) * (ZOOM_SCALE - 1);
-
-        setPosition({
-          x: translateX,
-          y: translateY
-        });
-        setIsZoomed(true);
-      } else {
-        // Zoom out to fit screen
-        setIsZoomed(false);
-        setPosition({ x: 0, y: 0 });
-      }
-    },
-    [isZoomed]
-  );
-
   return (
     <>
       <Head title={formatMessage("imagePreview")} />
@@ -146,23 +108,36 @@ export default function ImageViewer() {
         ) : hasError ? (
           <DinaMessage id="previewNotAvailable" />
         ) : (
-          <img
-            ref={imageRef}
-            src={objectUrl || ""}
-            alt={id as string}
-            style={{
-              maxHeight: "100dvh",
-              maxWidth: "100dvw",
-              transform: `translate(${position.x}px, ${position.y}px) scale(${
-                isZoomed ? ZOOM_SCALE : 1
-              })`,
-              cursor: isZoomed ? "zoom-out" : "zoom-in",
-              userSelect: "none",
-              transition: "transform 0.4s ease-out"
-            }}
-            onClick={handleClick}
-            draggable={false}
-          />
+          <TransformWrapper
+            panning={{ velocityDisabled: true }}
+            disablePadding={true}
+          >
+            {({ zoomIn, zoomOut, resetTransform }) => (
+              <>
+                <div
+                  className="position-absolute top-0 start-50 translate-middle-x mt-3"
+                  style={{ zIndex: 10 }}
+                >
+                  <button onClick={() => zoomIn()}>Zoom In +</button>
+                  <button onClick={() => zoomOut()}>Zoom Out -</button>
+                  <button onClick={() => resetTransform()}>Reset X</button>
+                </div>
+                <div>
+                  <TransformComponent>
+                    <img
+                      ref={imageRef}
+                      src={objectUrl || ""}
+                      alt={id as string}
+                      style={{
+                        maxHeight: "100dvh",
+                        maxWidth: "100dvw"
+                      }}
+                    />
+                  </TransformComponent>
+                </div>
+              </>
+            )}
+          </TransformWrapper>
         )}
       </div>
     </>

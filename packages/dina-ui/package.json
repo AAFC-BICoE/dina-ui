@@ -26,6 +26,7 @@
     "react-dropzone-uploader": "^2.11.0",
     "react-switch": "^7.1.0",
     "react-tabs": "^6.1.0",
+    "react-zoom-pan-pinch": "^3.7.0",
     "zod": "^3.11.6"
   },
   "devDependencies": {
