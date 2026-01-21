@@ -273,7 +273,7 @@ export function PreparationTypeSelectField(
       }
       tooltipLink={
         props.tooltipLink ??
-        "https://aafc-bicoe.github.io/dina-documentation/#preparation-type"
+        "https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-type"
       }
       tooltipLinkText={props.tooltipLinkText ?? "fromDinaUserGuide"}
     />
@@ -303,7 +303,7 @@ export function PreparationMethodSelectField(
       }
       tooltipLink={
         props.tooltipLink ??
-        "https://aafc-bicoe.github.io/dina-documentation/#preparation-method"
+        "https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#preparation-method"
       }
       tooltipLinkText={props.tooltipLinkText ?? "fromDinaUserGuide"}
     />
