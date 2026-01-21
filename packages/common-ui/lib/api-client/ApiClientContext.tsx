@@ -970,9 +970,9 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
     }
     const err = new Error(errorMessage) as any;
     err.cause = error.response;
-    return Promise.reject(err);
+    throw err;
   }
-  return Promise.reject(error);
+  throw error;
 }
 
 export class CustomDinaKitsu extends Kitsu {
