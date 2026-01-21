@@ -4,7 +4,7 @@ import { Table } from "react-bootstrap";
 import { getIndexConfig } from "./searchConfig";
 import { ElasticsearchHit } from "./useMultiIndexSearch";
 import { startCase } from "lodash";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 
 export interface SearchResultItemProps {
   hit: ElasticsearchHit;
