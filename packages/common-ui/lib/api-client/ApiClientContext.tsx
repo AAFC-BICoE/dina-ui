@@ -348,16 +348,11 @@ export class ApiClientImpl implements ApiClientI {
             throw new Error(`Unsupported single operation: ${operation.op}`);
         }
       } catch (error: any) {
-        const errorStatus = error.cause?.data?.errors?.[0]?.status;
-
         // If it's a 404 or 410 and returnNullForMissingResource, return null.
         if (
           returnNullForMissingResource &&
-          errorStatus &&
-          (errorStatus === "404" ||
-            errorStatus === "410" ||
-            errorStatus === 404 ||
-            errorStatus === 410)
+          (error.cause.data.errors[0].status.includes("404") ||
+            error.cause.data.errors[0].status.includes("410"))
         ) {
           responses = [
             {

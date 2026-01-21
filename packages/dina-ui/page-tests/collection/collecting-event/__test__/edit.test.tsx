@@ -105,10 +105,13 @@ const MOCK_POST_ERROR = (() => {
   return error;
 })();
 
-const mockPost = jest.fn((path) => {
+const mockPost = jest.fn((path, contents) => {
   if (path === "search-api/search-ws/search") {
     return new Promise((resolve) => resolve);
-  } else {
+  } else if (
+    contents &&
+    contents.data?.attributes?.verbatimEventDateTime === "error_trigger"
+  ) {
     makeAxiosErrorMoreReadable(MOCK_POST_ERROR);
   }
 });
@@ -434,13 +437,16 @@ describe("collecting-event edit page", () => {
       ).toBeInTheDocument();
     });
 
-    // Change combobox value.
+    // Change verbatimEventDateTime value to indicate error should be triggered.
+
     fireEvent.change(
-      wrapper.getByRole("combobox", { name: /group select\.\.\./i }),
+      wrapper.getByRole("textbox", {
+        name: /verbatim event datetime/i
+      }),
       {
         target: {
-          label: "group",
-          value: "test group"
+          name: "verbatimEventDateTime",
+          value: "error_trigger"
         }
       }
     );
