@@ -1,6 +1,6 @@
 import { Nav } from "react-bootstrap";
 import { getIndexConfig } from "./searchConfig";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 
 export interface TabData {
   key: string;
