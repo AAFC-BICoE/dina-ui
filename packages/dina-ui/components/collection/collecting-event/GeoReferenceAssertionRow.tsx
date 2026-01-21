@@ -192,7 +192,7 @@ export function GeoReferenceAssertionRow({
         />
         <NumberField
           name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
-          tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_coordinate_uncertainty_in_meters"
+          tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_coordinate_uncertainty_in_meters"
           tooltipLinkText="fromDinaUserGuide"
           customName="dwcCoordinateUncertaintyInMeters"
           isInteger={true}

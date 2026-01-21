@@ -67,7 +67,7 @@ export default function AssemblageEditPage() {
             <Tooltip
               id={"assemblage_tooltip"}
               link={
-                "https://aafc-bicoe.github.io/dina-documentation/#assemblage"
+                "https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#assemblage"
               }
               linkText={"fromDinaUserGuide"}
               placement={"right"}

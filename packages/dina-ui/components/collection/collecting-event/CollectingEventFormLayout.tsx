@@ -646,7 +646,7 @@ export function CollectingEventFormLayout({
               <div className="col-md-6">
                 <TextField
                   name="dwcFieldNumber"
-                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collection_number"
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_collection_number"
                   tooltipLinkText="fromDinaUserGuide"
                 />
                 {!isTemplate && <StringArrayField name="otherRecordNumbers" />}
@@ -748,7 +748,7 @@ export function CollectingEventFormLayout({
             <PersonSelectField name="collectors" isMulti={true} />
             <TextField
               name="dwcRecordNumber"
-              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collectors_number"
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_collectors_number"
               tooltipLinkText="fromDinaUserGuide"
             />
           </FieldSet>
@@ -936,7 +936,7 @@ export function CollectingEventFormLayout({
             <TextField
               name="host"
               customName={"collectingEventHost"}
-              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_host"
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#ce-host"
               tooltipLinkText="fromDinaUserGuide"
             />
             <Field name="group">
@@ -945,7 +945,7 @@ export function CollectingEventFormLayout({
                 <CollectionMethodSelectField
                   name="collectionMethod"
                   customName={"collectingEventCollectionMethod"}
-                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#collection-method"
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#collection-method"
                   tooltipLinkText="fromDinaUserGuide"
                   filter={(searchValue: string) =>
                     SimpleSearchFilterBuilder.create<CollectionMethod>()
@@ -972,7 +972,7 @@ export function CollectingEventFormLayout({
             <AutoSuggestTextField<CollectingEvent>
               name="substrate"
               customName={"collectingEventSubstrate"}
-              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_substrate"
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#_substrate"
               tooltipLinkText="fromDinaUserGuide"
               jsonApiBackend={{
                 query: (searchValue, ctx) => ({

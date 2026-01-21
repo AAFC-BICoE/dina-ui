@@ -39,7 +39,9 @@ export default function AssemblageDetailsPage() {
       tooltipNode={
         <Tooltip
           id={"assemblage_tooltip"}
-          link={"https://aafc-bicoe.github.io/dina-documentation/#assemblage"}
+          link={
+            "https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#assemblage"
+          }
           linkText={"fromDinaUserGuide"}
           placement={"right"}
         />
