@@ -24,10 +24,10 @@ export function GlobalSearch({
 
   // Sync with external searchTerm prop changes
   useEffect(() => {
-    if (searchProp !== undefined && searchProp !== searchTerm) {
+    if (searchProp !== undefined) {
       setSearchTerm(searchProp);
     }
-  }, [searchProp, searchTerm]);
+  }, [searchProp]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
