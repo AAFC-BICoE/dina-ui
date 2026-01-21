@@ -1,6 +1,6 @@
 import { MaterialSample } from "../../../../types/collection-api";
 import { materialSampleHandler } from "../MaterialSampleHandler";
-import { SaveResourceContext } from "../types";
+import { SaveResourceContext, WorkbookSaveError } from "../types";
 import { WorkbookColumnMap } from "../../types/Workbook";
 
 describe("materialSampleHandler", () => {
@@ -40,15 +40,23 @@ describe("materialSampleHandler", () => {
     expect(result.shouldPause).toBe(false);
   });
 
-  it("should create new resource when appendData is true and no existing resource found", async () => {
+  it("should throw error when appendData is true and no existing resource found", async () => {
     baseContext.appendData = true;
     mockApiClient.get.mockResolvedValue({ data: [] });
 
-    const result = await materialSampleHandler.processResource(baseContext);
+    await expect(
+      materialSampleHandler.processResource(baseContext)
+    ).rejects.toThrow(WorkbookSaveError);
 
-    expect(baseContext.resource.id).toBeUndefined();
-    expect(result.shouldPause).toBe(false);
-    expect(baseContext.resourcesUpdatedCount.current).toBe(0);
+    await expect(
+      materialSampleHandler.processResource(baseContext)
+    ).rejects.toMatchObject({
+      messageKey: "appendDataNoMatchingRecordError",
+      messageValues: {
+        materialSampleName: "TEST-SAMPLE-001",
+        group: "test-group"
+      }
+    });
   });
 
   it("should update existing resource when one match found", async () => {
