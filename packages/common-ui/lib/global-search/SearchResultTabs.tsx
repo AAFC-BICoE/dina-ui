@@ -1,5 +1,6 @@
 import { Nav } from "react-bootstrap";
 import { getIndexConfig } from "./searchConfig";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export interface TabData {
   key: string;
@@ -43,7 +44,7 @@ export function SearchResultTabs({
                 }
                 return null;
               })()}
-            {tab.label}
+            <DinaMessage id={tab.label as any} />
             {tab.count > 0 && (
               <span className="badge bg-secondary rounded-pill">
                 {tab.count}

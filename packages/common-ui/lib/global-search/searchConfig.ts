@@ -22,7 +22,7 @@ export interface IndexConfig {
  */
 export const SEARCH_INDEXES: IndexConfig[] = [
   {
-    name: "Material Samples",
+    name: "materialSampleListTitle",
     indexName: "dina_material_sample_index",
     icon: FaFlask,
     linkAttribute: "data.attributes.materialSampleName",
@@ -34,7 +34,7 @@ export const SEARCH_INDEXES: IndexConfig[] = [
     ]
   },
   {
-    name: "Stored Objects",
+    name: "objectListTitle",
     indexName: "dina_object_store_index",
     icon: FaBox,
     linkAttribute: "data.attributes.originalFilename",
@@ -46,7 +46,7 @@ export const SEARCH_INDEXES: IndexConfig[] = [
     ]
   },
   {
-    name: "Storage Units",
+    name: "storageUnitListTitle",
     indexName: "dina_storage_index",
     icon: FaWarehouse,
     linkAttribute: "data.attributes.name",
@@ -54,7 +54,7 @@ export const SEARCH_INDEXES: IndexConfig[] = [
     displayAttributes: ["data.attributes.name", "data.attributes.group"]
   },
   {
-    name: "Projects",
+    name: "projectListTitle",
     indexName: "dina_project_index",
     icon: FaProjectDiagram,
     linkAttribute: "data.attributes.name",
@@ -66,7 +66,7 @@ export const SEARCH_INDEXES: IndexConfig[] = [
     ]
   },
   {
-    name: "Transactions",
+    name: "loanTransactionsSectionTitle",
     indexName: "dina_loan_transaction_index",
     icon: FaHandshake,
     linkAttribute: "data.attributes.transactionNumber",
@@ -78,7 +78,7 @@ export const SEARCH_INDEXES: IndexConfig[] = [
     ]
   },
   {
-    name: "People",
+    name: "peopleTitle",
     indexName: "dina_agent_index",
     icon: FaUser,
     linkAttribute: "data.attributes.displayName",

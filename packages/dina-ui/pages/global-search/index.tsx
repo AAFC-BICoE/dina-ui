@@ -48,7 +48,7 @@ export default function GlobalSearchResultPage() {
   const tabs = [
     {
       key: "all",
-      label: formatMessage("allResults"),
+      label: "allResults",
       count: searchResult?.totalCount || 0
     },
     ...SEARCH_INDEXES.map((config) => {
@@ -164,7 +164,9 @@ export default function GlobalSearchResultPage() {
 
               return (
                 <div key={indexResult.indexName} className="mb-5">
-                  <h4 className="mb-3">{config.name}</h4>
+                  <h4 className="mb-3">
+                    <DinaMessage id={config.name as any} />
+                  </h4>
                   {indexResult.topHits.map((hit, index) => (
                     <SearchResultItem
                       key={`${indexResult.indexName}-${index}`}

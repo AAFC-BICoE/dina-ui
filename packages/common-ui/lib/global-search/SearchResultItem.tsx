@@ -3,16 +3,8 @@ import { useIntl } from "react-intl";
 import { Table } from "react-bootstrap";
 import { getIndexConfig } from "./searchConfig";
 import { ElasticsearchHit } from "./useMultiIndexSearch";
-
-/**
- * Format camelCase attribute name to Title Case with spaces
- */
-function formatAttributeName(name: string): string {
-  return name
-    .replace(/([A-Z])/g, " $1")
-    .replace(/^./, (str) => str.toUpperCase())
-    .trim();
-}
+import { startCase } from "lodash";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 
 export interface SearchResultItemProps {
   hit: ElasticsearchHit;
@@ -53,6 +45,7 @@ export function SearchResultItem({
   showIcon = true
 }: SearchResultItemProps) {
   const { formatMessage } = useIntl();
+  const { formatMessage: formatDianMessage } = useDinaIntl();
   const source = hit._source;
   const highlight = hit.highlight || {};
   const indexName = hit._index;
@@ -65,6 +58,11 @@ export function SearchResultItem({
   const Icon = config.icon;
   const id = source?.data?.id;
   const attrs = source?.data?.attributes || {};
+
+  const formatAttributeName = (attributeName: string) =>
+    formatDianMessage(`field_${attributeName}` as any)?.trim() ||
+    formatDianMessage(attributeName as any)?.trim() ||
+    startCase(attributeName);
 
   // Get link text based on entity type
   const getLinkText = () => {
