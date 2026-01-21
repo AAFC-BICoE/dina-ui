@@ -64,29 +64,39 @@ export function InputWithCoordButtons({
       });
     }
   }
+
+  // Determine which symbols are actually visible
+  const visibleSymbols = [
+    { symbol: "°", show: !isExternallyControlled || shouldShowDegree },
+    { symbol: "′", show: !isExternallyControlled || shouldShowMinute },
+    { symbol: "″", show: !isExternallyControlled || shouldShowSecond }
+  ].filter((item) => item.show);
+
   return (
     <div className="input-group">
       <input type="text" {...inputProps} ref={inputRef} />
-      {["°", "′", "″"].map((symbol) => (
-        <button
-          key={symbol}
-          tabIndex={0}
-          className={
-            !isExternallyControlled
-              ? "btn btn-info coord-button"
-              : (symbol === "°" && shouldShowDegree) ||
-                (symbol === "′" && shouldShowMinute) ||
-                (symbol === "″" && shouldShowSecond)
-              ? "btn btn-info coord-button"
-              : "d-none"
-          }
-          type="button"
-          style={{ width: "3rem" }}
-          onClick={() => insertSymbol(symbol)}
-        >
-          {symbol}
-        </button>
-      ))}
+      {visibleSymbols.map(({ symbol }, index) => {
+        // Check if this is the last button
+        const isLast = index === visibleSymbols.length - 1;
+
+        return (
+          <button
+            key={symbol}
+            tabIndex={0}
+            className="btn btn-info coord-button"
+            type="button"
+            style={{
+              width: "3rem",
+              // Apply radius only if it is the last item
+              borderTopRightRadius: isLast ? "0.25rem" : 0,
+              borderBottomRightRadius: isLast ? "0.25rem" : 0
+            }}
+            onClick={() => insertSymbol(symbol)}
+          >
+            {symbol}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -914,7 +914,6 @@ export function CollectingEventFormLayout({
             </div>
             <TextField name="dwcVerbatimDepth" />
             <div>
-              {" "}
               <ParseVerbatimToRangeButton
                 verbatimField="dwcVerbatimDepth"
                 rangeFields={[
