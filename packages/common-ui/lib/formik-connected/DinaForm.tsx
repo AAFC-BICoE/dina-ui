@@ -100,10 +100,14 @@ function parseJsonApiErrors(error: any): Record<string, string> {
       const pointer = err?.source?.pointer;
       const fieldName = pointer?.replace(/^\/?data\/attributes\//, "");
       if (fieldName) {
-        fieldErrors[fieldName] = `${err.title}: ${err.detail}`;
+        fieldErrors[fieldName] = err.detail
+          ? `${err.title}: ${err.detail}`
+          : err.title;
       } else {
         // If no field is specified, assign general submission error
-        fieldErrors["Form submission issue"] = `${err.title}: ${err.detail}`;
+        fieldErrors["Form submission issue"] = err.detail
+          ? `${err.title}: ${err.detail}`
+          : err.title;
       }
     }
   }
