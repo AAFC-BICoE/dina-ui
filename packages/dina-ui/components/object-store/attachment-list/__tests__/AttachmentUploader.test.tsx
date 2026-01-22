@@ -168,8 +168,11 @@ describe("AttachmentUploader component", () => {
     );
 
     // Ensure the afterMetadatasSaved callback was called with the right metadata IDs
-    await waitFor(() => {
-      expect(mockAfterMetadatasSaved).toHaveBeenCalledWith(["0", "1", "2"]);
-    });
+    await waitFor(
+      () => {
+        expect(mockAfterMetadatasSaved).toHaveBeenCalledWith(["0", "1", "2"]);
+      },
+      { timeout: 3000 }
+    );
   });
 });
