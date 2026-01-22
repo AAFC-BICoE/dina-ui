@@ -11,6 +11,7 @@ import { ObjectUpload, Derivative } from "../../../types/objectstore-api";
 import { Head } from "../../../components/head";
 import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { Button, ButtonGroup } from "react-bootstrap";
 
 /**
  * ImageViewer component displays an image fetched from the object store with simple zoom toggle.
@@ -114,14 +115,64 @@ export default function ImageViewer() {
           >
             {({ zoomIn, zoomOut, resetTransform }) => (
               <>
-                <div
+                <ButtonGroup
                   className="position-absolute top-0 start-50 translate-middle-x mt-3"
                   style={{ zIndex: 10 }}
                 >
-                  <button onClick={() => zoomIn()}>Zoom In +</button>
-                  <button onClick={() => zoomOut()}>Zoom Out -</button>
-                  <button onClick={() => resetTransform()}>Reset X</button>
-                </div>
+                  <Button variant="primary" onClick={() => zoomIn()}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-zoom-in"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"
+                      />
+                      <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z" />
+                      <path
+                        fill-rule="evenodd"
+                        d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5"
+                      />
+                    </svg>
+                  </Button>
+                  <Button variant="primary" onClick={() => zoomOut()}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-zoom-out"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"
+                      />
+                      <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z" />
+                      <path
+                        fill-rule="evenodd"
+                        d="M3 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"
+                      />
+                    </svg>
+                  </Button>
+                  <Button variant="primary" onClick={() => resetTransform()}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-x-circle"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+                    </svg>
+                  </Button>
+                </ButtonGroup>
                 <div>
                   <TransformComponent>
                     <img
