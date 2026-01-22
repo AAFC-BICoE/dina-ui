@@ -10,8 +10,13 @@ import { useRef } from "react";
 import { ObjectUpload, Derivative } from "../../../types/objectstore-api";
 import { Head } from "../../../components/head";
 import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import {
+  TransformWrapper,
+  TransformComponent,
+  MiniMap
+} from "react-zoom-pan-pinch";
 import { Button, ButtonGroup } from "react-bootstrap";
+import { useState } from "react";
 
 /**
  * ImageViewer component displays an image fetched from the object store with simple zoom toggle.
@@ -97,6 +102,19 @@ export default function ImageViewer() {
     objectUploadLoading || (objectError && derivativeLoading) || blobLoading;
   const hasError = (objectError && derivativeError) || blobError;
 
+  const [minimapShowing, setMinimapShowing] = useState(true);
+
+  const displayedImage = (
+    <img
+      ref={imageRef}
+      src={objectUrl || ""}
+      alt={id as string}
+      style={{
+        maxHeight: "100dvh",
+        maxWidth: "100dvw"
+      }}
+    />
+  );
   return (
     <>
       <Head title={formatMessage("imagePreview")} />
@@ -115,11 +133,27 @@ export default function ImageViewer() {
           >
             {({ zoomIn, zoomOut, resetTransform }) => (
               <>
+                <div
+                  style={{
+                    position: "fixed",
+                    zIndex: 5,
+                    top: "50px",
+                    right: "50px"
+                  }}
+                >
+                  <MiniMap width={200} hidden={!minimapShowing}>
+                    {displayedImage}
+                  </MiniMap>
+                </div>
                 <ButtonGroup
                   className="position-absolute top-0 start-50 translate-middle-x mt-3"
                   style={{ zIndex: 10 }}
                 >
-                  <Button variant="primary" onClick={() => zoomIn()}>
+                  <Button
+                    variant="primary"
+                    aria-label="Zoom In"
+                    onClick={() => zoomIn()}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -139,7 +173,11 @@ export default function ImageViewer() {
                       />
                     </svg>
                   </Button>
-                  <Button variant="primary" onClick={() => zoomOut()}>
+                  <Button
+                    variant="primary"
+                    aria-label="Zoom Out"
+                    onClick={() => zoomOut()}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -159,7 +197,11 @@ export default function ImageViewer() {
                       />
                     </svg>
                   </Button>
-                  <Button variant="primary" onClick={() => resetTransform()}>
+                  <Button
+                    variant="primary"
+                    aria-label="Reset"
+                    onClick={() => resetTransform()}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -172,20 +214,26 @@ export default function ImageViewer() {
                       <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
                     </svg>
                   </Button>
+                  <Button
+                    variant="primary"
+                    aria-label="Toggle Minimap"
+                    onClick={() => setMinimapShowing(!minimapShowing)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-images"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+                      <path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2M14 2H4a1 1 0 0 0-1 1h9.002a2 2 0 0 1 2 2v7A1 1 0 0 0 15 11V3a1 1 0 0 0-1-1M2.002 4a1 1 0 0 0-1 1v8l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V5a1 1 0 0 0-1-1z" />
+                    </svg>
+                  </Button>
                 </ButtonGroup>
-                <div>
-                  <TransformComponent>
-                    <img
-                      ref={imageRef}
-                      src={objectUrl || ""}
-                      alt={id as string}
-                      style={{
-                        maxHeight: "100dvh",
-                        maxWidth: "100dvw"
-                      }}
-                    />
-                  </TransformComponent>
-                </div>
+
+                <TransformComponent>{displayedImage}</TransformComponent>
               </>
             )}
           </TransformWrapper>
