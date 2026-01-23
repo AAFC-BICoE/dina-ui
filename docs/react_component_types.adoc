@@ -1,33 +1,503 @@
-= React Component Types
+# UI Common React Component Types
 
-These are some common patterns we use when working with React components:
+## Pages
 
-== Pages
+Stored in "packages/dina-ui/pages". The folder path and filename correspond to the page's URL, which is automatically routed by Next.js.
 
-Stored in "packages/dina-ui/pages". The folder path and filename correspond to the pages's URL, which is automatically routed by Next.js.
+Pages typically use one of the standard page layouts (ViewPageLayout, ListPageLayout, etc.) and integrate with our data fetching patterns using React Query hooks.
 
-More info: https://nextjs.org/docs/basic-features/pages
+## Page Layouts
 
-== Page Layouts
+Standard layouts located in "packages/dina-ui/components":
 
-e.g. ViewPageLayout and ListPageLayout. If a set of pages with a similar layout exists we can make
-page layout components to avoid duplicating code across page Components.
+* **PageLayout** - Base layout with header, footer, and main content area.
+* **ViewPageLayout** - For viewing/displaying a single resource with view/edit modes
+* **ListPageLayout** - For displaying API base lists of resources with filtering and pagination
+* **QueryPage** - For display elasticsearch based list pages.
+* **EditPageLayout** - For editing existing resources
 
-== DinaForm
+These layouts provide consistent structure and behavior across pages, including:
 
-The main way to create forms in dina-ui. It's a wrapper around https://jaredpalmer.com/formik/[Formik] with
-some added props and error message handling.
+- Navigation breadcrumbs
+- Action buttons (Save, Cancel, Delete, etc.)
+- Error handling and loading states
+- Consistent styling and spacing
 
-== Form Fields
+## DinaForm
 
-Usually stored in "packages/common-ui/lib/formik-connected" with the Component name ending in "Field".
-These are form inputs with a "name" prop for the property in the form data the field edits.
+The main way to create forms in dina-ui, located in "packages/common-ui/lib/formik-connected/DinaForm.tsx". 
 
-e.g.
+It's a wrapper around https://jaredpalmer.com/formik/[Formik] that provides:
+
+- Integration with our API layer for saving resources
+- Automatic error message handling and display
+- Support for relationships and linked resources
+- Revision management and conflict detection
+- Bulk editing capabilities
+
+Key props:
+
+- `initialValues` - The initial form data
+- `onSubmit` - Custom submit handler
+- `readOnly` - Makes all fields read-only
+- `enableReinitialize` - Allows form to update when initialValues change
+
+Example form that on submit either shows a success alert or an error message:
+[source,tsx]
+----
+import { DinaForm, SubmitButton, TextField } from "../components";
+
+export default function ExampleFormPage() {
+  const onSubmit: DinaFormOnSubmit = async ({
+    submittedValues,
+    api: { save }
+  }) => {
+    if (!submittedValues.name) {
+      throw new Error("Name must be set.");
+    }
+
+    // Makes a Create or Update call to the back-end.
+    await save(
+      [
+        {
+          resource: submittedValues,
+          type: "my-type"
+        }
+      ],
+      { apiBaseUrl: "/objectstore-api" }
+    );
+  };
+
+  return (
+    <div className="card card-body" style={{ width: "1000px" }}>
+      <DinaForm initialValues={{}} onSubmit={onSubmit}>
+        <TextField name="name" />
+        <TextField name="description" />
+        <SubmitButton />
+      </DinaForm>
+    </div>
+  );
+}
+----
+
+## Form Fields
+
+Form input components that connect to DinaForm via the `name` prop. Located in "packages/common-ui/lib/formik-connected/".
+
+Common field types:
+
+* **TextField** - Text input
+* **TextArea** - Multi-line text input
+* **DateField** - Date picker
+* **NumberField** - Numeric input with optional range
+* **SelectField** - Dropdown selection
+* **CheckBoxField** - Boolean checkbox
+* **ResourceSelectField** - Autocomplete selection from API resources
+* **AutoSuggestTextField** - Text field with dropdown suggestions
+* **FieldSet** - Groups related fields
+* **FieldArray** - Manages arrays of values with add/remove functionality
+* **FilterBuilderField** - Component for creating complex filter queries
+
+All fields support:
+
+- `name` - Property path in form data (supports nested paths like "group.name")
+- `label` - Display label (auto-generated from name if not provided)
+- `readOnly` - Makes field read-only
+- `customName` - Custom label for display
+- `className` - CSS classes (typically Bootstrap grid classes)
+- `removeBottomMargin` - Removes bottom margin for compact layouts
+
+Example:
+[source,tsx]
+----
+<DinaForm initialValues={{ person: { name: "", age: 0 } }}>
+  <TextField name="person.name" className="col-md-6" />
+  <NumberField name="person.age" className="col-md-6" />
+  <SubmitButton />
+</DinaForm>
+----
+
+### Getting a Field value from the form
+
+Sometimes you will want to get a field's value in one component without re-rendering the surrounding component. You can listen to a Field's state using FieldSpy:
 
 [source,tsx]
 ----
-<DinaForm initialValues={{ myField: "initial text" }}>
-  <TextField name="myField" className="col-md-6" />
-</DinaForm>
+import { DinaForm, SubmitButton, TextField, FieldSpy } from "common-ui";
+
+export default function ExampleFormPage() {
+  return (
+    <div className="card card-body" style={{ width: "1000px" }}>
+      <DinaForm initialValues={{}} onSubmit={onSubmit}>
+        <TextField name="name" />
+        <FieldSpy fieldName="name">
+          {value => `Your name is ${value}`}
+        </FieldSpy>
+        <SubmitButton />
+      </DinaForm>
+    </div>
+  );
+}
 ----
+
+### Tooltips
+
+The tooltip is found from the intl messages file using the key "field_{fieldName}_tooltip". As an example:
+
+[source,tsx]
+----
+<TextField name="name" />
+<TextField name="description" />
+
+// In the dina-ui-en.ts file:
+field_name_tooltip: "This message will appear in the name fields tooltip."
+field_description_tooltip: "This message will appear in the description fields tooltip."
+----
+
+Tooltip ids can also be manually added using the `customName` property. This can be handy for fields that share a common name like "description". Here is an example of using a custom tooltip id:
+
+[source,tsx]
+----
+<TextField name="name" customName="metadataName" />
+
+// In the dina-ui-en.ts file:
+field_metadataName_tooltip: "This will be the message that appears for the name fields tooltip."
+----
+
+You are also able to add images and links using the following properties on any of the Field components. Below is a table of all of the different supported properties for images and links.
+
+.Table Tooltip properties
+|===
+|Property Name | Description | Example
+
+| tooltipImage | URL of a image to display in the tooltip. It is displayed under the tooltip texts (if supplied). | tooltipImage="/images/tooltip_image.png"
+| tooltipImageAlt | Accessibility text which should be used when a tooltipImage is provided. Best practice is to use internationalization key so it works in multiple languages. | tooltipImageAlt="tooltip_image_alt"
+| tooltipLink | URL of a link to display at the bottom of the tooltip. | tooltipLink="https://www.google.com"
+| tooltipLinkText | Text identifier to appear in the tooltip link text. Defaults to a generic message if not supplied. | tooltipLinkText="tooltip_link_reference"
+|===
+
+### ResourceSelectField Component
+
+This is a searchable dropdown select component for selecting a back-end resource from a list.
+
+Example usage for selecting a Group from a list:
+[source,tsx]
+----
+import { DinaForm, ResourceSelectField } from "common-ui";
+import { Group } from "../types/user-api/resources/Group";
+
+/**
+ * This page shows a dropdown for selecting a Group. You can type the name of a Group you're
+ * looking for into the input, which sends a filtered query to the back-end API for a Group with
+ * that name. When you select a Group, the onChange callback function sets the selected group into
+ * the page's component state. The page displays a message with the name of the currently selected
+ * Group.
+ */
+export default function ExamplePage() {
+  return (
+    <div className="card card-body" style={{ width: "500px" }}>
+      <DinaForm initialValues={{ myGroup: null }}>
+        {({ values: { myGroup } }) => (
+          <div>
+            <h2>Selected group: {myGroup ? myGroup.groupName : "None"}</h2>
+            <ResourceSelectField<Group>
+              name="myGroup"
+              filter={groupName => ({ groupName })}
+              model="group"
+              optionLabel={group => group.groupName}
+            />
+          </div>
+        )}
+      </DinaForm>
+    </div>
+  );
+}
+----
+
+### AutoSuggestTextField Component
+
+Using the `AutoSuggestTextField` component, you can provide a dropdown of suggestions for a text field as the user types.
+
+The `AutoSuggestTextField` component supports JSON API and elastic search for auto-suggestions, you can even provide both and fallback to the JSON API if the elastic search fails for example.
+
+**Important:** This is used for retrieving text suggestions. The form will be returned a string. Not a UUID for a resource. Checkout the `ResourceSelectField` for that functionality.
+
+#### JSON API example
+
+To configure the JSON API auto-suggestions, you need to setup the `jsonApiBackend` prop:
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  jsonApiBackend={{
+    query: searchValue => ({
+      path: "agent-api/person",
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create<Organism>()
+          .searchFilter("name", searchValue)
+          .build()
+      )
+    }),
+    option: person => person?.name
+  }}
+/>
+----
+
+The `query` defines the path and any filters you wish to use. You can also easily retrieve the current search value to filter by.
+
+The `option` is used to determine the text to display for each suggestion. This is also the value that is returned to the form.
+
+#### Elastic Search example
+
+To configure the Elastic Search auto-suggestions, you need to setup the `elasticSearchBackend` prop:
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  elasticSearchBackend={{
+    indexName: "dina_agent_index",
+    searchField: "data.attributes.name",
+    option: person => person?.name
+  }}
+/>
+----
+
+- `indexName` is the name of the Elastic Search index to use. (required)
+- `searchField` is the name of the field to search in, this needs to be the full path. (required)
+- `additionalField` is another field to search by in addition to the search field. This also needs to the full path. (optional)
+- `restrictedField` is used to filter by a specific field in the index. This also needs to the full path. (optional)
+- `restrictedFieldValue` is the value to search against the restricted field. (optional)
+- `option` is used to determine the text to display for each suggestion. This is also the value that is returned to the form. (required)
+
+#### Typescript Support
+
+The `AutoSuggestTextField` component supports Typescript. To use it, you need to import the `AutoSuggestTextField` component and pass it the type of the resource you are searching for.
+
+For example for a Person (Kitsu Resource):
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person> />
+----
+
+Providing the type, will make the option section of the component more specific:
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  elasticSearchBackend={{
+    indexName: "dina_agent_index",
+    searchField: "data.attributes.name",
+    option: person => person?.name // This part you can now say .name since the type was defined.
+  }}
+/>
+----
+
+If you are using an included search field, ensure the type being used contains the field you are looking for. If it doesn't exist on the type it will not be parsed.
+
+#### Default to elastic search, fall back to JSON API example
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  elasticSearchBackend={{
+    indexName: "dina_agent_index",
+    searchField: "data.attributes.name",
+    option: person => person?.name
+  }}
+  jsonApiBackend={{
+    query: searchValue => ({
+      path: "agent-api/person",
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create<Organism>()
+          .searchFilter("name", searchValue)
+          .build()
+      )
+    }),
+    option: person => person?.name
+  }}
+  preferredBackend={"elastic-search"} // Default to elastic search
+/>
+----
+
+In the example above, both "elastic-search" and "json-api" are supplied. Elastic search will be used first and it will keep using elastic search until any errors occur.
+
+Once an error occurs it will switch to the other available backend, in this case the "json-api".
+
+It's important to make sure both providers work correctly since it will probably be rare that provider will fail.
+
+#### Custom options example
+
+You can provide your own suggestions directly using the `customOptions` prop:
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  customOptions={value => [
+    "suggestion-1",
+    "suggestion-2",
+    "suggestion-" + value
+  ]}
+/>
+----
+
+In this example the following suggestions will be provided if the user types "3" into the text field:
+
+* suggestion-1
+* suggestion-2
+* suggestion-3
+
+While you can provide static options, you can also call an API to populate these results or another function:
+
+[source,tsx]
+----
+<AutoSuggestTextField
+  name={fieldProps("matchValue", index)}
+  blankSearchBackend={"preferred"}
+  customOptions={value =>
+    useElasticSearchDistinctTerm({
+      fieldName:
+        dataFromIndexMapping?.parentPath +
+        "." +
+        dataFromIndexMapping?.path +
+        "." +
+        dataFromIndexMapping?.label,
+      groups: selectedGroups,
+      relationshipType: dataFromIndexMapping?.parentName,
+      indexName
+    })?.filter(suggestion =>
+      suggestion?.toLowerCase()?.includes(value?.toLowerCase())
+    )
+  }
+/>
+----
+
+#### Blank Search provider example
+
+You can even provide suggestions even if the text field is blank. Using the `blankSearchProvider` property, you can configure what happens during a blank search.
+
+If you would like blank searches to occur with the current provider you can use the "preferred" option:
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  elasticSearchBackend={{
+    indexName: "dina_agent_index",
+    searchField: "data.attributes.name",
+    option: person => person?.name
+  }}
+  jsonApiBackend={{
+    query: searchValue => ({
+      path: "agent-api/person",
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create<Organism>()
+          .searchFilter("name", searchValue)
+          .build()
+      )
+    }),
+    option: person => person?.name
+  }}
+  preferredBackend={"elastic-search"}
+  blankSearchBackend={"preferred"}
+/>
+----
+
+In this example elastic search is the default provider. On a blank search elastic search is used unless it fails then the JSON API is used.
+
+Preferred is useful if you don't care which backend provider is used for a blank search.
+
+Otherwise you can specify a specific backend to use for blank searches, even if it differs from the currently selected one.
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  elasticSearchBackend={{
+    indexName: "dina_agent_index",
+    searchField: "data.attributes.name",
+    option: person => person?.name
+  }}
+  jsonApiBackend={{
+    query: searchValue => ({
+      path: "agent-api/person",
+      fiql: simpleSearchFilterToFiql(
+        SimpleSearchFilterBuilder.create<Organism>()
+          .searchFilter("name", searchValue)
+          .build()
+      )
+    }),
+    option: person => person?.name
+  }}
+  preferredBackend={"elastic-search"}
+  blankSearchBackend={"json-api"}
+/>
+----
+
+In the example above, elastic search is the default provider. On a blank search JSON API is used only if the search is blank.
+
+If elastic search fails, then JSON API will be used for both blank and non-blank searches.
+
+If you wish to not display any suggestions on a blank search, you can just remove the `blankSearchBackend` property and no suggestions will appear until a value is provided.
+
+### FilterBuilderField component
+
+The FilterBuilderField component provides a Formik input for creating complex filter queries. The FilterGroupModel value this input provides can be converted to an RSQL string to be included in the API request.
+
+Example usage for filtering PcrPrimers in a list page:
+[source,tsx]
+----
+import { FilterParam } from "kitsu";
+import { useState } from "react";
+import { FilterBuilderField } from "../components/filter-builder/FilterBuilderField";
+import { rsql } from "../components/filter-builder/rsql";
+import Head from "../components/head";
+import Nav from "../components/nav";
+import { QueryTable } from "../components/table/QueryTable";
+import { DinaForm, DinaFormOnSubmit } from "../components/formik-connected/DinaForm";
+
+export default function ExamplePage() {
+  const [filter, setFilter] = useState<FilterParam>();
+
+  const onSubmit: DinaFormOnSubmit = ({ submittedValues: { filter } }) => {
+    setFilter({ rsql: rsql(filter) });
+  };
+
+  return (
+    <div>
+      <Head />
+      <Nav />
+      <div className="container-fluid">
+        <DinaForm initialValues={{}} onSubmit={onSubmit}>
+          <FilterBuilderField
+            filterAttributes={["name", "group.groupName"]}
+            name="filter"
+          />
+          <button type="submit">search</button>
+        </DinaForm>
+        <QueryTable
+          columns={["name", "type", "group.groupName"]}
+          filter={filter}
+          include="group"
+          path="pcrPrimer"
+        />
+      </div>
+    </div>
+  );
+}
+----
+
+## Custom Hooks
+
+Reusable hooks for common patterns:
+
+* **useQuery** - Data fetching
+* **useDinaFormContext** - Access DinaForm context
+* **useApiClient** - Access API client
+* **useBulkEditTab** - Manage bulk editing
+* **useModal** - Modal dialog management
