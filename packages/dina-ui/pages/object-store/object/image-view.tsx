@@ -233,7 +233,14 @@ export default function ImageViewer() {
                   </Button>
                 </ButtonGroup>
 
-                <TransformComponent>{displayedImage}</TransformComponent>
+                <TransformComponent
+                  wrapperStyle={{
+                    width: "100%",
+                    height: "100%"
+                  }}
+                >
+                  {displayedImage}
+                </TransformComponent>
               </>
             )}
           </TransformWrapper>
