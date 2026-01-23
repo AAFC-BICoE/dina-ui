@@ -21,10 +21,6 @@ include::stack.adoc[]
 
 include::dina_design_guidelines.adoc[]
 
-include::react_component_types.adoc[]
-
-include::audit_revisions_ui.adoc[]
-
 include::running_tests.adoc[]
 
 include::versioning.adoc[]
@@ -35,11 +31,9 @@ include::docker_build.adoc[]
 
 :leveloffset: 2
 
-include::forms.adoc[]
+include::react_component_types.adoc[]
 
-include::resource_select_field.adoc[]
-
-include::filter_builder_component.adoc[]
+include::audit_revisions_ui.adoc[]
 
 :leveloffset: 1
 
@@ -52,6 +46,12 @@ include::useQuery_hook_function.adoc[]
 include::write_operations.adoc[]
 
 :leveloffset: 1
+
+= Creating Tests
+
+:leveloffset: 1
+
+include::creating_tests.adoc[]
 
 = Internationalization
 
