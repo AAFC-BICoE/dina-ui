@@ -4,30 +4,105 @@ These are some common patterns we use when working with React components:
 
 == Pages
 
-Stored in "packages/dina-ui/pages". The folder path and filename correspond to the pages's URL, which is automatically routed by Next.js.
+Stored in "packages/dina-ui/pages". The folder path and filename correspond to the page's URL, which is automatically routed by Next.js.
 
-More info: https://nextjs.org/docs/basic-features/pages
+Pages typically use one of the standard page layouts (ViewPageLayout, ListPageLayout, etc.) and integrate with our data fetching patterns using React Query hooks.
 
 == Page Layouts
 
-e.g. ViewPageLayout and ListPageLayout. If a set of pages with a similar layout exists we can make
-page layout components to avoid duplicating code across page Components.
+Standard layouts located in "packages/dina-ui/components":
+
+* **PageLayout** - Base layout with header, footer, and main content area.
+* **ViewPageLayout** - For viewing/displaying a single resource with view/edit modes
+* **ListPageLayout** - For displaying API base lists of resources with filtering and pagination
+* **QueryPage** - For display elasticsearch based list pages.
+* **EditPageLayout** - For editing existing resources
+
+These layouts provide consistent structure and behavior across pages, including:
+
+- Navigation breadcrumbs
+- Action buttons (Save, Cancel, Delete, etc.)
+- Error handling and loading states
+- Consistent styling and spacing
 
 == DinaForm
 
-The main way to create forms in dina-ui. It's a wrapper around https://jaredpalmer.com/formik/[Formik] with
-some added props and error message handling.
+The main way to create forms in dina-ui, located in "packages/common-ui/lib/formik-connected/DinaForm.tsx". 
+
+It's a wrapper around https://jaredpalmer.com/formik/[Formik] that provides:
+
+- Integration with our API layer for saving resources
+- Automatic error message handling and display
+- Support for relationships and linked resources
+- Revision management and conflict detection
+- Bulk editing capabilities
+
+Key props:
+
+- `initialValues` - The initial form data
+- `onSubmit` - Custom submit handler
+- `readOnly` - Makes all fields read-only
+- `enableReinitialize` - Allows form to update when initialValues change
+
+Example:
+[source,tsx]
+----
+<DinaForm<Person>
+  initialValues={{ name: "", email: "" }}
+  onSubmit={async ({ submittedValues }) => {
+    await save([{
+      resource: submittedValues,
+      type: "person"
+    }], { apiBaseUrl: "/agent-api" });
+  }}
+>
+  <TextField name="name" />
+  <TextField name="email" />
+  <SubmitButton />
+</DinaForm>
+----
 
 == Form Fields
 
-Usually stored in "packages/common-ui/lib/formik-connected" with the Component name ending in "Field".
-These are form inputs with a "name" prop for the property in the form data the field edits.
+Form input components that connect to DinaForm via the `name` prop. Located in "packages/common-ui/lib/formik-connected/".
 
-e.g.
+Common field types:
 
+* **TextField** - Text input
+* **TextArea** - Multi-line text input
+* **DateField** - Date picker
+* **NumberField** - Numeric input with optional range
+* **SelectField** - Dropdown selection
+* **CheckBoxField** - Boolean checkbox
+* **ResourceSelectField** - Autocomplete selection from API resources
+* **FieldSet** - Groups related fields
+* **FieldArray** - Manages arrays of values with add/remove functionality
+
+All fields support:
+
+- `name` - Property path in form data (supports nested paths like "group.name")
+- `label` - Display label (auto-generated from name if not provided)
+- `readOnly` - Makes field read-only
+- `customName` - Custom label for display
+- `className` - CSS classes (typically Bootstrap grid classes)
+- `removeBottomMargin` - Removes bottom margin for compact layouts
+
+Example:
 [source,tsx]
 ----
-<DinaForm initialValues={{ myField: "initial text" }}>
-  <TextField name="myField" className="col-md-6" />
+<DinaForm initialValues={{ person: { name: "", age: 0 } }}>
+  <TextField name="person.name" className="col-md-6" />
+  <NumberField name="person.age" className="col-md-6" />
+  <SubmitButton />
 </DinaForm>
 ----
+
+== Custom Hooks
+
+Reusable hooks for common patterns:
+
+* **useQuery** - Data fetching
+* **useDinaFormContext** - Access DinaForm context
+* **useApiClient** - Access API client
+* **useBulkEditTab** - Manage bulk editing
+* **useModal** - Modal dialog management

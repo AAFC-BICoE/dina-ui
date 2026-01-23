@@ -1,18 +1,25 @@
 :sectnums:
 
-= dina-ui docs
+= DINA UI docs
 
 React based user interface for the DINA project.
 
+[IMPORTANT]
+.Development Setup Required
+====
+Run and develop DINA locally using https://aafc-bicoe.github.io/dina-local-deployment/#_developer_environment_setup[dina-local-deployment].
+
+❌ Do NOT run directly through this UI repository. +
+✅ Use the dina-local-deployment setup instead.
+====
+
 :leveloffset: 1
+
+include::getting_started.adoc[]
 
 include::stack.adoc[]
 
 include::dina_design_guidelines.adoc[]
-
-include::dev_tools.adoc[]
-
-include::getting_started.adoc[]
 
 include::react_component_types.adoc[]
 
@@ -21,8 +28,6 @@ include::audit_revisions_ui.adoc[]
 include::running_tests.adoc[]
 
 include::versioning.adoc[]
-
-include::yarn_package_scripts.adoc[]
 
 include::docker_build.adoc[]
 
