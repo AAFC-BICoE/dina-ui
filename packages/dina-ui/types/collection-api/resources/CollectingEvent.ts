@@ -5,7 +5,6 @@ import {
   SourceAdministrativeLevel
 } from "./GeographicPlaceNameSourceDetail";
 import { GeographicThesaurus } from "./GeographicThesaurus";
-import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 import { ManagedAttributeValues } from "./ManagedAttribute";
 
@@ -70,6 +69,8 @@ export interface CollectingEventAttributes {
   extensionValues?: any;
   protocol?: Protocol;
   expedition?: Expedition;
+  geoReferenceAssertions?: GeoReferenceAssertion[];
+  version?: number;
 }
 
 export enum GeographicPlaceNameSource {
@@ -79,8 +80,6 @@ export enum GeographicPlaceNameSource {
 export interface CollectingEventRelationships {
   attachment?: ResourceIdentifierObject[];
   collectors?: KitsuResource[];
-  collectorGroups?: CollectorGroup[];
-  geoReferenceAssertions?: GeoReferenceAssertion[];
 }
 
 export type CollectingEvent = KitsuResource &
