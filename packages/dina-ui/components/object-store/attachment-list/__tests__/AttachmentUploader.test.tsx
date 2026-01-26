@@ -1,22 +1,24 @@
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { AttachmentUploader } from "../AttachmentUploader";
-import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 const mockPost = jest.fn((path) => {
   if (path === "search-api/search-ws/search") {
-    return new Promise((resolve) => resolve);
+    return Promise.resolve({ data: [] });
   } else {
-    return {
+    return Promise.resolve({
       data: {
         dateTimeDigitized: "2003-12-14T12:01:44",
         fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
         fileType: "text",
         size: "500"
       }
-    };
+    });
   }
 });
+
 const mockGet = jest.fn((path) => {
   if (path === "objectstore-api/config/default-values") {
     return {
@@ -35,6 +37,7 @@ const mockGet = jest.fn((path) => {
     };
   }
 });
+
 const mockSave = jest.fn((ops) =>
   ops.map((op, index) => ({
     ...op.resource,
@@ -86,83 +89,75 @@ describe("AttachmentUploader component", () => {
   });
 
   it("Uploads the files and opens the Metadata editor.", async () => {
-    mountWithAppContext(
+    const wrapper = mountWithAppContext(
       <AttachmentUploader afterMetadatasSaved={mockAfterMetadatasSaved} />,
       { apiContext }
     );
+    await waitForLoadingToDisappear();
+
     // Create mock files similar to what the Dropzone would receive:
     const mockAcceptedFiles = [
       new File(["file content"], "file1.pdf", { type: "application/pdf" }),
       new File(["file content"], "file2.pdf", { type: "application/pdf" }),
       new File(["file content"], "file3.pdf", { type: "application/pdf" })
     ];
-    await waitFor(() => {
-      expect(
-        screen.getByRole("combobox", {
-          name: /group select\.\.\./i
-        })
-      ).toBeInTheDocument();
-    });
 
     // Select group
-    fireEvent.mouseDown(
-      screen.getByRole("combobox", {
+    userEvent.click(
+      wrapper.getByRole("combobox", {
         name: /group select\.\.\./i
       })
     );
 
     await waitFor(() => {
       expect(
-        screen.getByRole("option", {
+        wrapper.getByRole("option", {
           name: /aafc/i
         })
       ).toBeInTheDocument();
     });
-    fireEvent.click(
-      screen.getByRole("option", {
+    userEvent.click(
+      wrapper.getByRole("option", {
         name: /aafc/i
       })
     );
+    expect(wrapper.getByText(/aafc/i)).toBeInTheDocument();
 
     // Find the file input in the Dropzone component
-    const fileInput = screen.getByLabelText(/drag and drop files here/i);
-    await waitFor(() => {
-      expect(fileInput).toBeInTheDocument();
-    });
+    const fileInput = wrapper.container.querySelector("input[type='file']");
+    if (!fileInput) throw new Error("Could not find hidden file input");
 
-    // Mock the `FileList` containing the files:
-    Object.defineProperty(fileInput, "files", {
-      value: mockAcceptedFiles
-    });
-
-    // Simulate the file selection
-    fireEvent.change(fileInput);
+    // Simulate uploading files
+    userEvent.upload(fileInput, mockAcceptedFiles);
 
     // Simulate the save upload
     await waitFor(() => {
       expect(
-        screen.getByRole("button", {
+        wrapper.getByRole("button", {
           name: /save/i
         })
       ).toBeInTheDocument();
     });
-    fireEvent.click(
-      screen.getByRole("button", {
+    userEvent.click(
+      wrapper.getByRole("button", {
         name: /save/i
       })
     );
+
+    // Wait for upload to finish and modal to appear.
+    await waitForLoadingToDisappear();
 
     // Should now be at metadata modal
     // Simulate clicking Save All metadata button
     await waitFor(() => {
       expect(
-        screen.getByRole("button", {
+        wrapper.getByRole("button", {
           name: /save all/i
         })
       ).toBeInTheDocument();
     });
-    fireEvent.click(
-      screen.getByRole("button", {
+    userEvent.click(
+      wrapper.getByRole("button", {
         name: /save all/i
       })
     );

@@ -1,0 +1,482 @@
+= Creating Tests for DINA UI
+
+== Test File Structure
+
+[source,typescript]
+----
+import { mountWithAppContext } from "common-ui";
+import { fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
+
+describe("ComponentUnderTest", () => {
+  const mockGet = jest.fn();
+  const mockSave = jest.fn();
+  
+  const apiContext = {
+    apiClient: {
+      get: mockGet
+    },
+    save: mockSave
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should render and fetch data", async () => {
+    mockGet.mockResolvedValueOnce({
+      data: [{ id: "1", type: "person", name: "John" }]
+    });
+
+    const wrapper = mountWithAppContext(
+      <ComponentUnderTest />,
+      { apiContext }
+    );
+
+    // Wait for the component to load and display data
+    await waitFor(() => {
+      expect(wrapper.getByText("John")).toBeInTheDocument();
+    });
+
+    expect(mockGet).toHaveBeenCalledWith("person", { page: { limit: 10 } });
+  });
+});
+----
+
+== Debugging Tests
+
+=== Visual Debugging with Testing Playground
+
+When a test fails or you need to see what the component looks like, use `screen.logTestingPlaygroundURL()` to open an interactive playground in your browser:
+
+[source,typescript]
+----
+import { screen } from "@testing-library/react";
+
+it("should display form elements", async () => {
+  const wrapper = mountWithAppContext(<PersonForm />, { apiContext });
+
+  await waitFor(() => {
+    expect(wrapper.getByRole("textbox", { name: /name/i })).toBeInTheDocument();
+  });
+
+  // Open Testing Playground to visually inspect the DOM
+  screen.logTestingPlaygroundURL();
+
+  // The test will output a URL like:
+  // https://testing-playground.com/#markup=...
+  // Open this URL in your browser to see the rendered component
+  // and get suggestions for better queries
+});
+----
+
+TIP: The Testing Playground URL shows you the component's HTML structure and helps you find the best queries to use. It's especially useful when you're not sure which role or text to query by.
+
+== Mounting Components
+
+[source,typescript]
+----
+import { mountWithAppContext } from "common-ui";
+
+// Basic mount
+const wrapper = mountWithAppContext(<MyComponent />);
+
+// With API context
+const wrapper = mountWithAppContext(
+  <MyComponent />,
+  { apiContext: { apiClient: { get: mockGet }, save: mockSave } }
+);
+----
+
+== Network Mocking Patterns
+
+=== Mock GET Requests
+
+[source,typescript]
+----
+const mockGet = jest.fn();
+
+// Single resource
+mockGet.mockResolvedValueOnce({
+  data: {
+    id: "123",
+    type: "person",
+    attributes: { name: "John" }
+  }
+});
+
+// List of resources
+mockGet.mockResolvedValueOnce({
+  data: [
+    { id: "1", type: "person", name: "John" },
+    { id: "2", type: "person", name: "Jane" }
+  ],
+  meta: { totalResourceCount: 2 }
+});
+
+// With includes
+mockGet.mockResolvedValueOnce({
+  data: [
+    {
+      id: "1",
+      type: "material-sample",
+      relationships: {
+        collection: { data: { id: "col-1", type: "collection" } }
+      }
+    }
+  ],
+  included: [
+    { id: "col-1", type: "collection", name: "Main Collection" }
+  ]
+});
+
+// Conditional mocking based on path
+const mockGet = jest.fn(async (path) => {
+  switch (path) {
+    case "objectstore-api/metadata/123":
+      return { data: TEST_METADATA };
+    case "objectstore-api/license":
+      return { data: TEST_LICENSES };
+    case "agent-api/person":
+      return { data: [] };
+  }
+});
+----
+
+=== Mock BulkGet Operations
+
+[source,typescript]
+----
+const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
+  paths.map((path) => {
+    switch (path) {
+      case "person/123":
+        return {
+          id: "123",
+          type: "person",
+          displayName: "John Doe"
+        };
+    }
+  })
+);
+
+const apiContext: any = {
+  apiClient: { get: mockGet },
+  bulkGet: mockBulkGet,
+  save: mockSave
+};
+----
+
+=== Mock SAVE Operations
+
+[source,typescript]
+----
+const mockSave = jest.fn();
+
+// Create resource
+mockSave.mockResolvedValueOnce([
+  {
+    id: "new-123",
+    type: "person",
+    name: "New Person"
+  }
+]);
+
+// Update resource
+mockSave.mockResolvedValueOnce([
+  {
+    id: "123",
+    type: "person",
+    name: "Updated Person"
+  }
+]);
+
+// Bulk operations - return all saved resources
+mockSave.mockImplementation(async (saves) => {
+  return saves.map(save => ({
+    ...save.resource,
+    id: save.resource.id || "new-id"
+  }));
+});
+----
+
+=== Mock Operations API
+
+[source,typescript]
+----
+const mockPatch = jest.fn();
+
+apiContext.apiClient.axios = { patch: mockPatch } as any;
+
+mockPatch.mockResolvedValueOnce({
+  data: [
+    {
+      data: { id: "1", type: "person", attributes: { name: "John" } },
+      status: 201
+    }
+  ]
+});
+----
+
+=== Mock Errors
+
+[source,typescript]
+----
+// GET error
+mockGet.mockRejectedValueOnce({
+  response: {
+    status: 404,
+    statusText: "Not Found"
+  }
+});
+
+// SAVE error
+mockSave.mockRejectedValueOnce({
+  response: {
+    status: 422,
+    data: {
+      errors: [{
+        detail: "Name is required",
+        source: { pointer: "/data/attributes/name" }
+      }]
+    }
+  }
+});
+----
+
+== Testing Component Behavior
+
+=== Query Elements
+
+[source,typescript]
+----
+import { fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+
+it("should display form elements", async () => {
+  const wrapper = mountWithAppContext(<PersonForm />, { apiContext });
+
+  // Wait for component to load
+  await waitFor(() => {
+    expect(wrapper.getByRole("textbox", { name: /name/i })).toBeInTheDocument();
+  });
+
+  // Query by role
+  const nameInput = wrapper.getByRole("textbox", { name: /name/i });
+  const submitButton = wrapper.getByRole("button", { name: /submit/i });
+  const checkbox = wrapper.getByRole("checkbox", { name: /active/i });
+  const combobox = wrapper.getByRole("combobox", { name: /category/i });
+
+  // Query by text
+  expect(wrapper.getByText(/welcome/i)).toBeInTheDocument();
+  
+  // Query by display value
+  expect(wrapper.getByDisplayValue("John Doe")).toBeInTheDocument();
+  
+  // Check if element has value
+  expect(nameInput).toHaveDisplayValue("John");
+});
+----
+
+=== Test Form Submission
+
+[source,typescript]
+----
+import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+it("should save form data", async () => {
+  mockSave.mockResolvedValueOnce([
+    { id: "123", type: "person", name: "John" }
+  ]);
+
+  const wrapper = mountWithAppContext(<PersonForm />, { apiContext });
+
+  // Wait for form to load
+  await waitFor(() => {
+    expect(wrapper.getByRole("textbox", { name: /name/i })).toBeInTheDocument();
+  });
+
+  // Fill form using fireEvent
+  fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+    target: { value: "John" }
+  });
+
+  // Or use userEvent for more realistic interactions
+  userEvent.click(wrapper.getByRole("button", { name: /submit/i }));
+
+  // Submit form
+  fireEvent.submit(wrapper.container.querySelector("form")!);
+
+  // Wait for save to complete
+  await waitFor(() => {
+    expect(mockSave).toHaveBeenCalledWith(
+      [{
+        resource: { name: "John", type: "person" },
+        type: "person"
+      }],
+      { apiBaseUrl: "/agent-api" }
+    );
+  });
+});
+----
+
+=== Test User Interactions
+
+[source,typescript]
+----
+import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+it("should handle user interactions", async () => {
+  const wrapper = mountWithAppContext(<MyComponent />, { apiContext });
+
+  await waitFor(() => {
+    expect(wrapper.getByRole("button", { name: /add tag/i })).toBeInTheDocument();
+  });
+
+  // Click button
+  userEvent.click(wrapper.getByRole("button", { name: /add tag/i }));
+
+  // Change input
+  fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
+    target: { value: "new tag" }
+  });
+
+  // Select option
+  userEvent.click(wrapper.getByRole("option", { name: /add "new tag"/i }));
+
+  // Toggle switch
+  userEvent.click(wrapper.getByRole("switch"));
+
+  // Remove item
+  userEvent.click(wrapper.getByRole("button", { name: /remove tag1/i }));
+
+  // Wait for new element to appear
+  await waitFor(() => {
+    expect(wrapper.getByText(/new tag/i)).toBeInTheDocument();
+  });
+});
+----
+
+=== Test Dropdown Selection
+
+[source,typescript]
+----
+it("should update dropdown selection", async () => {
+  const wrapper = mountWithAppContext(<MyForm />, { apiContext });
+
+  await waitFor(() => {
+    expect(wrapper.getByRole("combobox", { name: /license/i })).toBeInTheDocument();
+  });
+
+  // Open dropdown
+  userEvent.click(wrapper.getByRole("combobox", { name: /license/i }));
+
+  // Select option
+  userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
+
+  // Verify selection
+  expect(wrapper.getByRole("combobox", { name: /license/i })).toHaveDisplayValue("");
+});
+----
+
+== Mocking Next.js Router
+
+[source,typescript]
+----
+const mockUseRouter = jest.fn();
+
+jest.mock("next/router", () => ({
+  useRouter: () => mockUseRouter()
+}));
+
+describe("My Component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseRouter.mockReturnValue({
+      push: jest.fn(),
+      query: {
+        id: "123"
+      }
+    });
+  });
+
+  it("should use router query params", async () => {
+    const wrapper = mountWithAppContext(<MyComponent />, { apiContext });
+    
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(
+        expect.stringContaining("123")
+      );
+    });
+  });
+});
+----
+
+== Testing Hooks
+
+[source,typescript]
+----
+import { renderHook, waitFor } from "@testing-library/react";
+
+it("should fetch data with hook", async () => {
+  mockGet.mockResolvedValueOnce({
+    data: [{ id: "1", type: "person" }]
+  });
+
+  const { result } = renderHook(
+    () => useApiClient(),
+    {
+      wrapper: ({ children }) => (
+        <ApiClientProvider value={apiContext}>
+          {children}
+        </ApiClientProvider>
+      )
+    }
+  );
+
+  await waitFor(() => {
+    expect(result.current.loading).toBe(false);
+  });
+
+  expect(result.current.data).toHaveLength(1);
+});
+----
+
+== Best Practices
+
+=== Always use waitFor for async operations
+
+[source,typescript]
+----
+await waitFor(() => {
+  expect(wrapper.getByText("Loaded")).toBeInTheDocument();
+});
+----
+
+=== Use appropriate queries
+
+* `getByRole` - preferred for accessibility
+* `getByText` - for text content
+* `getByDisplayValue` - for input values
+* `getByLabelText` - for form fields with labels
+
+=== Check only changed values in saves
+
+[source,typescript]
+----
+expect(mockSave).lastCalledWith(
+  [{
+    resource: {
+      id: "123",
+      type: "metadata",
+      // Only include fields that were changed
+      name: "Updated Name"
+    },
+    type: "metadata"
+  }],
+  { apiBaseUrl: "/objectstore-api" }
+);
+----
