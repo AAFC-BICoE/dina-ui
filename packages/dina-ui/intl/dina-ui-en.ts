@@ -1305,6 +1305,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbook_templateIntegrityWarning_recommended_verify_description:
     "If you choose to proceed with the modified template, carefully review and adjust the column mappings.",
   selectResourceAppendData: "Select resource to append data to",
+  appendDataNoMatchingRecordError:
+    'Append Data Error: No existing material sample found with name "{materialSampleName}" in group "{group}". When Append Data is enabled, the material sample must already exist.',
+  metadataFileNotFoundError:
+    'No uploaded file found for metadata with original filename "{originalFilename}" in group "{group}". Please ensure the file was uploaded before importing the workbook.',
   selectParentMaterialSample:
     "Select Parent Material Sample to link resource to",
   doOperationsFieldError:

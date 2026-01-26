@@ -26,6 +26,7 @@ import {
   BULK_ADD_IDS_KEY
 } from "../../pages/object-store/upload";
 import { getHandlerForType } from "./save-handlers/registry";
+import { WorkbookSaveError } from "./save-handlers/types";
 
 export interface SaveWorkbookProgressProps {
   onWorkbookCanceled: () => void;
@@ -354,7 +355,14 @@ export function SaveWorkbookProgress({
 
       {statusRef.current === "FAILED" && (
         <div className="mt-3 text-center">
-          {error?.message ? (
+          {error instanceof WorkbookSaveError ? (
+            <ErrorBanner
+              errorMessage={formatMessage(
+                error.messageKey as any,
+                error.messageValues
+              )}
+            />
+          ) : error?.message ? (
             <ErrorBanner errorMessage={error?.message} />
           ) : (
             error instanceof DoOperationsError &&
