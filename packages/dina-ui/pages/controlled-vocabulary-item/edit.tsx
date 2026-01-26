@@ -21,6 +21,10 @@ import Link from "next/link";
 import { withRouter } from "next/router";
 import { useState } from "react";
 import { GroupSelectField } from "../../components";
+import {
+  getInitialVocabularyElementType,
+  transformControlledVocabularyItemForForm
+} from "../../components/controlled-vocabulary/controlledVocabularyItemUtils";
 import PageLayout from "../../components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
@@ -96,22 +100,7 @@ function ControlledVocabularyItemForm({
   backButton
 }: ControlledVocabularyItemFormProps) {
   const initialValues: InputResource<ControlledVocabularyItem> = fetchedItem
-    ? {
-        ...fetchedItem,
-        // Convert multilingualDescription to editable Dictionary format:
-        multilingualDescription: _.fromPairs<string | undefined>(
-          fetchedItem.multilingualDescription?.descriptions?.map(
-            ({ desc, lang }) => [lang ?? "", desc ?? ""]
-          )
-        ),
-        // Convert multilingualTitle to editable Dictionary format:
-        multilingualTitle: _.fromPairs<string | undefined>(
-          fetchedItem.multilingualTitle?.titles?.map(({ title, lang }) => [
-            lang ?? "",
-            title ?? ""
-          ])
-        )
-      }
+    ? transformControlledVocabularyItemForForm(fetchedItem)
     : { type: "controlled-vocabulary-item" };
 
   const onSubmit: DinaFormOnSubmit<
@@ -198,13 +187,7 @@ export function ControlledVocabularyItemFormLayout() {
 
   const [vocabularyElementType, setVocabularyElementType] = useState<
     VocabularyElementType | undefined
-  >(
-    initialValues
-      ? initialValues?.acceptedValues?.length
-        ? "PICKLIST"
-        : initialValues.vocabularyElementType
-      : undefined
-  );
+  >(getInitialVocabularyElementType(initialValues));
 
   const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })

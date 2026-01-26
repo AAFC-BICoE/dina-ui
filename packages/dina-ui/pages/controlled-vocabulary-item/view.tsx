@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
-import _ from "lodash";
 import Link from "next/link";
 import { ViewPageLayout } from "../../components";
+import { transformControlledVocabularyItemForForm } from "../../components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 import { ControlledVocabularyItemFormLayout } from "./edit";
@@ -9,39 +9,18 @@ import { ControlledVocabularyItemFormLayout } from "./edit";
 export default function ControlledVocabularyItemViewPage() {
   return (
     <ViewPageLayout<ControlledVocabularyItem>
-      form={(props) => {
-        const item = props.initialValues;
-
-        // Convert multilingualDescription to editable Dictionary format:
-        const formattedItem = {
-          ...item,
-          multilingualDescription: _.fromPairs<string | undefined>(
-            item.multilingualDescription?.descriptions?.map(
-              ({ desc, lang }) => [lang ?? "", desc ?? ""]
-            )
-          ),
-          // Convert multilingualTitle to editable Dictionary format:
-          multilingualTitle: _.fromPairs<string | undefined>(
-            item.multilingualTitle?.titles?.map(({ title, lang }) => [
-              lang ?? "",
-              title ?? ""
-            ])
-          ),
-          // Set vocabularyElementType to PICKLIST if acceptedValues has items
-          vocabularyElementType: item.acceptedValues?.length
-            ? "PICKLIST"
-            : item.vocabularyElementType
-        };
-
-        return (
-          <DinaForm<ControlledVocabularyItem>
-            {...props}
-            initialValues={formattedItem as any}
-          >
-            <ControlledVocabularyItemFormLayout />
-          </DinaForm>
-        );
-      }}
+      form={(props) => (
+        <DinaForm<ControlledVocabularyItem>
+          {...props}
+          initialValues={
+            transformControlledVocabularyItemForForm(
+              props.initialValues
+            ) as ControlledVocabularyItem
+          }
+        >
+          <ControlledVocabularyItemFormLayout />
+        </DinaForm>
+      )}
       query={(id) => ({
         path: `collection-api/controlled-vocabulary-item/${id}`,
         include: "controlledVocabulary"
