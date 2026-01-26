@@ -3,7 +3,7 @@ import { MultilingualDescription, MultilingualTitle } from "../../common";
 import { ControlledVocabulary } from "./ControlledVocabulary";
 
 export interface ControlledVocabularyItemAttributes {
-  type: "controlled-vocabulary";
+  type: "controlled-vocabulary-item";
   name: string;
   key: string;
   group: string;
@@ -26,4 +26,5 @@ export interface ControlledVocabularyItemRelationships {
 }
 
 export type ControlledVocabularyItem = KitsuResource &
-  ControlledVocabularyItemAttributes & ControlledVocabularyItemRelationships;
+  ControlledVocabularyItemAttributes &
+  ControlledVocabularyItemRelationships;

@@ -207,7 +207,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   copyFromParentLabel: "Kopie des Vorfahren",
   count: "Anzahl",
   countryLabel: "Land",
-  creatNewWorkflow: "Neu anlegen",
+  createNewWorkflow: "Neu anlegen",
   create: "Erstellen",
   createAndAssign: "Anlegen und zuodnen",
   createFormTemplate: "Aus einer Vorlage anlegen",
