@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import MetadataViewPage from "../../../../pages/object-store/object/view";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { Metadata } from "../../../../types/objectstore-api";
 import "@testing-library/jest-dom";
 import { waitFor } from "@testing-library/react";
@@ -83,11 +83,15 @@ const mockGet = jest.fn(async (path) => {
       return {};
   }
 });
+
+const mockPost = jest.fn();
+
 const apiContext: any = {
   apiClient: {
     get: mockGet,
     axios: {
-      get: mockGet
+      get: mockGet,
+      post: mockPost
     }
   },
   bulkGet: mockBulkGet
@@ -108,5 +112,54 @@ describe("Single Stored Object details page", () => {
       // Shows the EXIF data:
       expect(wrapper.getByText(/flash did not fire/i)).toBeInTheDocument();
     });
+  });
+
+  it("Ensure custom query page is generating the correct query", async () => {
+    const wrapper = mountWithAppContext(<MetadataViewPage />, { apiContext });
+    await waitForLoadingToDisappear();
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("heading", { name: /attached material samples/i })
+      ).toBeInTheDocument();
+    });
+
+    // Ensure the custom view query has been called correctly.
+    expect(mockPost).toHaveBeenCalledWith(
+      "search-api/search-ws/search",
+      {
+        _source: {
+          includes: [
+            "data.id",
+            "data.type",
+            "data.relationships",
+            "data.attributes.materialSampleName",
+            "included.attributes.determination",
+            "included.attributes.isTarget",
+            "included.id",
+            "included.type"
+          ]
+        },
+        from: 0,
+        query: {
+          bool: {
+            must: [
+              {
+                term: {
+                  "data.relationships.attachment.data.id":
+                    "232eda40-dc97-4255-91c4-f30485e2c707"
+                }
+              }
+            ]
+          }
+        },
+        size: 25
+      },
+      {
+        params: {
+          indexName: "dina_material_sample_index"
+        }
+      }
+    );
   });
 });
