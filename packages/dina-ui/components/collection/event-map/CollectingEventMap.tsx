@@ -1,3 +1,4 @@
+import "./arcgis-config";
 import { useGraphic, useMap } from "esri-loader-hooks";
 import Head from "next/head";
 import React from "react";
@@ -58,7 +59,7 @@ export function CollectingEventMap({
     <div style={{ height: 800 }} ref={ref}>
       <Head>
         <link
-          href="https://js.arcgis.com/4.21/esri/themes/dark/main.css"
+          href="https://js.arcgis.com/4.29/esri/themes/dark/main.css"
           rel="stylesheet"
         />
       </Head>
