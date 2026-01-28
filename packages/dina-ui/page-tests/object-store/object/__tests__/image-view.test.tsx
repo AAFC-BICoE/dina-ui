@@ -102,6 +102,13 @@ const testCtx = {
   }
 };
 
+// Mock ResizeObserver
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn()
+}));
+
 describe("ImageViewer", () => {
   const mockUseRouter = useRouter as jest.Mock;
 
@@ -163,12 +170,11 @@ describe("ImageViewer", () => {
 
     const wrapper = mountWithAppContext(<ImageViewer />, testCtx as any);
     await waitForLoadingToDisappear();
-
     await waitFor(
       () => {
-        const img = wrapper.getByRole("img");
-        expect(img).toHaveAttribute("src", mockObjectURL);
-        expect(img).toHaveAttribute("alt", "success-regular");
+        const img = wrapper.getAllByAltText("success-regular");
+        expect(img[0]).toHaveAttribute("src", mockObjectURL);
+        expect(img[0]).toHaveAttribute("alt", "success-regular");
       },
       { timeout: 3000 }
     );
@@ -184,9 +190,9 @@ describe("ImageViewer", () => {
 
     await waitFor(
       () => {
-        const img = wrapper.getByRole("img");
-        expect(img).toHaveAttribute("src", mockObjectURL);
-        expect(img).toHaveAttribute("alt", "fallback-to-derivative");
+        const img = wrapper.getAllByAltText("fallback-to-derivative");
+        expect(img[0]).toHaveAttribute("src", mockObjectURL);
+        expect(img[0]).toHaveAttribute("alt", "fallback-to-derivative");
       },
       { timeout: 3000 }
     );
