@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.23">
-<title>dina-ui docs</title>
+<title>DINA UI docs</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -436,97 +436,82 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>dina-ui docs</h1>
+<h1>DINA UI docs</h1>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_technology_stack">1. Technology Stack</a></li>
-<li><a href="#_ui_design_guidelines">2. UI Design Guidelines</a>
+<li><a href="#_getting_started">1. Getting Started</a>
 <ul class="sectlevel2">
-<li><a href="#_page_layout">2.1. Page Layout</a></li>
-<li><a href="#_order_of_components">2.2. Order of Components</a></li>
-<li><a href="#_button_bar">2.3. Button Bar</a></li>
-<li><a href="#_header">2.4. Header</a></li>
+<li><a href="#_node_js_and_yarn">1.1. Node.js and Yarn</a></li>
+<li><a href="#_installing_dependencies">1.2. Installing dependencies</a></li>
 </ul>
 </li>
-<li><a href="#_dev_tools">3. Dev tools</a>
+<li><a href="#_technology_stack">2. Technology Stack</a></li>
+<li><a href="#_ui_design_guidelines">3. UI Design Guidelines</a>
 <ul class="sectlevel2">
-<li><a href="#_ide">3.1. IDE</a></li>
-<li><a href="#_browser_extensions">3.2. Browser Extensions</a></li>
+<li><a href="#_page_layout">3.1. Page Layout</a></li>
+<li><a href="#_order_of_components">3.2. Order of Components</a></li>
+<li><a href="#_button_bar">3.3. Button Bar</a></li>
+<li><a href="#_header">3.4. Header</a></li>
 </ul>
 </li>
-<li><a href="#_getting_started">4. Getting Started</a>
+<li><a href="#_running_tests">4. Running Tests</a>
 <ul class="sectlevel2">
-<li><a href="#_node_js_and_yarn">4.1. Node.js and Yarn</a></li>
-<li><a href="#_installing_dependencies">4.2. Installing dependencies</a></li>
+<li><a href="#_run_all_tests">4.1. Run all tests</a></li>
+<li><a href="#_run_individual_tests">4.2. Run individual tests</a></li>
 </ul>
 </li>
-<li><a href="#_react_component_types">5. React Component Types</a>
+<li><a href="#_versioning">5. Versioning</a></li>
+<li><a href="#_building_the_app_docker_images">6. Building the app Docker images</a>
 <ul class="sectlevel2">
-<li><a href="#_pages">5.1. Pages</a></li>
-<li><a href="#_page_layouts">5.2. Page Layouts</a></li>
-<li><a href="#_dinaform">5.3. DinaForm</a></li>
-<li><a href="#_form_fields">5.4. Form Fields</a></li>
+<li><a href="#_environment_variables">6.1. Environment variables</a></li>
 </ul>
 </li>
-<li><a href="#_audit_revisions_ui">6. Audit / Revisions UI</a>
+<li><a href="#_react_components">7. React Components</a>
 <ul class="sectlevel2">
-<li><a href="#_adding_audit_support_for_one_resource_type">6.1. Adding audit support for one Resource Type</a></li>
-<li><a href="#_adding_audit_support_for_a_users_edits_across_a_dina_module">6.2. Adding audit support for a user&#8217;s edits across a DINA module</a></li>
-<li><a href="#_configuring_how_audit_data_is_displayed_in_the_show_changes_section">6.3. Configuring how audit data is displayed in the "Show Changes" section.</a></li>
+<li><a href="#_ui_common_react_component_types">7.1. UI Common React Component Types</a></li>
+<li><a href="#_audit_revisions_ui">7.2. Audit / Revisions UI</a></li>
 </ul>
 </li>
-<li><a href="#_running_tests">7. Running Tests</a>
+<li><a href="#_api_client">8. API Client</a>
 <ul class="sectlevel2">
-<li><a href="#_run_all_tests">7.1. Run all tests</a></li>
-<li><a href="#_run_individual_tests">7.2. Run individual tests</a></li>
+<li><a href="#_usequery_hook_function">8.1. useQuery Hook Function</a></li>
+<li><a href="#_performing_write_operations">8.2. Performing write operations</a></li>
 </ul>
 </li>
-<li><a href="#_versioning">8. Versioning</a></li>
-<li><a href="#_yarn_package_scripts">9. Yarn Package Scripts</a>
+<li><a href="#_creating_tests">9. Creating Tests</a></li>
+<li><a href="#_creating_tests_for_dina_ui">10. Creating Tests for DINA UI</a>
 <ul class="sectlevel2">
-<li><a href="#_top_level_directory">9.1. Top-level directory</a></li>
-<li><a href="#_sub_package_directories">9.2. Sub-package directories</a></li>
+<li><a href="#_test_file_structure">10.1. Test File Structure</a></li>
+<li><a href="#_debugging_tests">10.2. Debugging Tests</a></li>
+<li><a href="#_mounting_components">10.3. Mounting Components</a></li>
+<li><a href="#_network_mocking_patterns">10.4. Network Mocking Patterns</a></li>
+<li><a href="#_testing_component_behavior">10.5. Testing Component Behavior</a></li>
+<li><a href="#_mocking_next_js_router">10.6. Mocking Next.js Router</a></li>
+<li><a href="#_testing_hooks">10.7. Testing Hooks</a></li>
+<li><a href="#_best_practices">10.8. Best Practices</a></li>
 </ul>
 </li>
-<li><a href="#_building_the_app_docker_images">10. Building the app Docker images</a>
+<li><a href="#_internationalization">11. Internationalization</a>
 <ul class="sectlevel2">
-<li><a href="#_environment_variables">10.1. Environment variables</a></li>
+<li><a href="#_internationalization_multiple_languages_support">11.1. Internationalization / Multiple Languages Support</a></li>
 </ul>
 </li>
-<li><a href="#_react_components">11. React Components</a>
+<li><a href="#_wcag_compliance_tools_setup">12. WCAG compliance tools setup</a>
 <ul class="sectlevel2">
-<li><a href="#_forms">11.1. Forms</a></li>
-<li><a href="#_resource_select_field_component">11.2. Resource Select Field Component</a></li>
-<li><a href="#_filterbuilderfield_component">11.3. FilterBuilderField component</a></li>
+<li><a href="#_pa11y">12.1. Pa11y</a></li>
+<li><a href="#_chrome_inspector">12.2. Chrome Inspector</a></li>
 </ul>
 </li>
-<li><a href="#_api_client">12. API Client</a>
+<li><a href="#_pa11y_ci_automation">13. Pa11y-ci automation</a>
 <ul class="sectlevel2">
-<li><a href="#_usequery_hook_function">12.1. useQuery Hook Function</a></li>
-<li><a href="#_performing_write_operations">12.2. Performing write operations</a></li>
+<li><a href="#_follow_below_steps_in_sequence">13.1. Follow below steps in sequence</a></li>
 </ul>
 </li>
-<li><a href="#_internationalization">13. Internationalization</a>
+<li><a href="#_translation_task">14. Translation task</a>
 <ul class="sectlevel2">
-<li><a href="#_internationalization_multiple_languages_support">13.1. Internationalization / Multiple Languages Support</a></li>
-</ul>
-</li>
-<li><a href="#_wcag_compliance_tools_setup">14. WCAG compliance tools setup</a>
-<ul class="sectlevel2">
-<li><a href="#_pa11y">14.1. Pa11y</a></li>
-<li><a href="#_chrome_inspector">14.2. Chrome Inspector</a></li>
-</ul>
-</li>
-<li><a href="#_pa11y_ci_automation">15. Pa11y-ci automation</a>
-<ul class="sectlevel2">
-<li><a href="#_follow_below_steps_in_sequence">15.1. Follow below steps in sequence</a></li>
-</ul>
-</li>
-<li><a href="#_translation_task">16. Translation task</a>
-<ul class="sectlevel2">
-<li><a href="#_to_export_to_csv_file">16.1. To export to csv file</a></li>
-<li><a href="#_to_import_from_translated_csv_file">16.2. To import from translated csv file</a></li>
+<li><a href="#_to_export_to_csv_file">14.1. To export to csv file</a></li>
+<li><a href="#_to_import_from_translated_csv_file">14.2. To import from translated csv file</a></li>
 </ul>
 </li>
 </ul>
@@ -538,10 +523,66 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph">
 <p>React based user interface for the DINA project.</p>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+<div class="title">Development Setup Required</div>
+<div class="paragraph">
+<p>Run and develop DINA locally using <a href="https://aafc-bicoe.github.io/dina-local-deployment/#_developer_environment_setup">dina-local-deployment</a>.</p>
+</div>
+<div class="paragraph">
+<p>❌ Do NOT run directly through this UI repository.<br>
+✅ Use the dina-local-deployment setup instead.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_technology_stack">1. Technology Stack</h2>
+<h2 id="_getting_started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before starting, you will need to setup your dev environment:</p>
+</div>
+<div class="sect2">
+<h3 id="_node_js_and_yarn">1.1. Node.js and Yarn</h3>
+<div class="paragraph">
+<p>See dina-local-deployment <a href="https://aafc-bicoe.github.io/dina-local-deployment/#_prerequisites">prerequisites</a></p>
+</div>
+<div class="paragraph">
+<p>You can check which versions you currently have installed with:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>node -v
+yarn -v</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_installing_dependencies">1.2. Installing dependencies</h3>
+<div class="paragraph">
+<p>After you have downloaded all of the required tools, you will need to install the required dependencies needed to run the app.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s a good idea to run this command when checking out a new branch since the dependencies might have changed.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>yarn</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_technology_stack">2. Technology Stack</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This application is developed using these technologies:</p>
@@ -574,10 +615,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect1">
-<h2 id="_ui_design_guidelines">2. UI Design Guidelines</h2>
+<h2 id="_ui_design_guidelines">3. UI Design Guidelines</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_page_layout">2.1. Page Layout</h3>
+<h3 id="_page_layout">3.1. Page Layout</h3>
 <div class="imageblock">
 <div class="content">
 <img src="./images/dina_design_guidelines/DINA_design_guidelines_page_layout.png" alt="Navigation" width="button bar" height="header">
@@ -595,7 +636,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect2">
-<h3 id="_order_of_components">2.2. Order of Components</h3>
+<h3 id="_order_of_components">3.2. Order of Components</h3>
 <div class="imageblock">
 <div class="content">
 <img src="./images/dina_design_guidelines/DINA_design_guidelines_order_components.png" alt="Navigation" width="button bar" height="header">
@@ -625,7 +666,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect2">
-<h3 id="_button_bar">2.3. Button Bar</h3>
+<h3 id="_button_bar">3.3. Button Bar</h3>
 <div class="imageblock">
 <div class="content">
 <img src="./images/dina_design_guidelines/DINA_design_guidelines_button_bar.png" alt="DINA design guidelines button bar">
@@ -639,7 +680,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect2">
-<h3 id="_header">2.4. Header</h3>
+<h3 id="_header">3.4. Header</h3>
 <div class="imageblock">
 <div class="content">
 <img src="./images/dina_design_guidelines/DINA_design_guidelines_header.png" alt="DINA design guidelines header">
@@ -672,276 +713,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect1">
-<h2 id="_dev_tools">3. Dev tools</h2>
+<h2 id="_running_tests">4. Running Tests</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_ide">3.1. IDE</h3>
-<div class="paragraph">
-<p><a href="https://code.visualstudio.com/">Visual Studio Code</a> is recommended for development.</p>
-</div>
-<div class="sect3">
-<h4 id="_recommended_extensions">3.1.1. Recommended Extensions</h4>
-<div class="paragraph">
-<p>The following extensions are recommended for a better development experience. You can install them using the following terminal commands:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-sh" data-lang="sh">code --install-extension esbenp.prettier-vscode
-code --install-extension dbaeumer.vscode-eslint
-code --install-extension firsttris.vscode-jest-runner
-code --install-extension joaompinto.asciidoctor-vscode</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>These extensions are also included in the <code>.vscode/extensions.json</code> file. They will appear in the Extensions view when you open the project in Visual Studio Code under the <code>Recommended</code> section.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_browser_extensions">3.2. Browser Extensions</h3>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://github.com/facebook/react-devtools">React Developer Tools</a> Lets you inspect the React component hierarchy.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_getting_started">4. Getting Started</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Before starting, you will need to setup your dev environment:</p>
-</div>
-<div class="sect2">
-<h3 id="_node_js_and_yarn">4.1. Node.js and Yarn</h3>
-<div class="paragraph">
-<p>See dina-local-deployment <a href="https://aafc-bicoe.github.io/dina-local-deployment/#_prerequisites">prerequisites</a></p>
-</div>
-<div class="paragraph">
-<p>You can check which versions you currently have installed with:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>node -v
-yarn -v</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_installing_dependencies">4.2. Installing dependencies</h3>
-<div class="paragraph">
-<p>After you have downloaded all of the required tools, you will need to install the required dependencies needed to run the app.</p>
-</div>
-<div class="paragraph">
-<p>It&#8217;s a good idea to run this command when checking out a new branch since the dependencies might have changed.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>yarn</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_react_component_types">5. React Component Types</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>These are some common patterns we use when working with React components:</p>
-</div>
-<div class="sect2">
-<h3 id="_pages">5.1. Pages</h3>
-<div class="paragraph">
-<p>Stored in "packages/dina-ui/pages". The folder path and filename correspond to the pages&#8217;s URL, which is automatically routed by Next.js.</p>
-</div>
-<div class="paragraph">
-<p>More info: <a href="https://nextjs.org/docs/basic-features/pages" class="bare">https://nextjs.org/docs/basic-features/pages</a></p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_page_layouts">5.2. Page Layouts</h3>
-<div class="paragraph">
-<p>e.g. ViewPageLayout and ListPageLayout. If a set of pages with a similar layout exists we can make
-page layout components to avoid duplicating code across page Components.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_dinaform">5.3. DinaForm</h3>
-<div class="paragraph">
-<p>The main way to create forms in dina-ui. It&#8217;s a wrapper around <a href="https://jaredpalmer.com/formik/">Formik</a> with
-some added props and error message handling.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_form_fields">5.4. Form Fields</h3>
-<div class="paragraph">
-<p>Usually stored in "packages/common-ui/lib/formik-connected" with the Component name ending in "Field".
-These are form inputs with a "name" prop for the property in the form data the field edits.</p>
-</div>
-<div class="paragraph">
-<p>e.g.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">&lt;DinaForm initialValues={{ myField: "initial text" }}&gt;
-  &lt;TextField name="myField" className="col-md-6" /&gt;
-&lt;/DinaForm&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_audit_revisions_ui">6. Audit / Revisions UI</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The "revisions" pages show edit history of specific records and user activity.</p>
-</div>
-<div class="paragraph">
-<p>Audit records are fetched from the back-end which is implemented using <a href="http://google.ca">Javers</a>.
-See <a href="https://github.com/AAFC-BICoE/dina-base-api/blob/master/docs/auditing.adoc">the DINA back-and auditing docs</a>.</p>
-</div>
-<div class="sect2">
-<h3 id="_adding_audit_support_for_one_resource_type">6.1. Adding audit support for one Resource Type</h3>
-<div class="paragraph">
-<p>For tracking changes to a single record. This page should be linked to from the record&#8217;s details page.</p>
-</div>
-<div class="paragraph">
-<p>You can re-use the RevisionsPage component to create a revisions page for the specified resource:</p>
-</div>
-<div class="paragraph">
-<p>Example from dina-ui/pages/collection/material-sample/revisions.tsx:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
-import { RevisionsPage } from "../../../components/revisions/RevisionsPageLayout";
-
-export default () =&gt; (
-  &lt;RevisionsPage
-    // The API route to the Javers snapshot list
-    auditSnapshotPath="collection-api/audit-snapshot"
-    // URL to the details page
-    detailsPageLink="/collection/material-sample/view?id="
-    // Query for the current state of the record
-    queryPath="collection-api/material-sample"
-    // The JSONAPI resource "type"
-    resourceType="material-sample"
-    // The row configs are specific to each module (Collection, Object Store, Agent, etc.)
-    revisionRowConfigsByType={COLLECTION_MODULE_REVISION_ROW_CONFIG}
-    // The field on the resource that gives the name. Usuallu this field is called "name"
-    nameField="materialSampleName"
-  /&gt;
-);</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_adding_audit_support_for_a_users_edits_across_a_dina_module">6.2. Adding audit support for a user&#8217;s edits across a DINA module</h3>
-<div class="paragraph">
-<p>For tracking all changes to any record by a user. This page should be linked to from the main UI navigation.</p>
-</div>
-<div class="paragraph">
-<p>There is a separate "revisions-by-user" page per DINA module (Collection, Object Store, Agent, etc.) because the
-back-end is a separate application for each DINA module. There is no way to retrieve a user&#8217;s activity across all
-multiple back-ends in one query.</p>
-</div>
-<div class="paragraph">
-<p>You can re-use the RevisionsByUserPage component to create a revisions page for the specified DINA module:</p>
-</div>
-<div class="paragraph">
-<p>Example from dina-ui/pages/collection/revisions-by-user.tsx:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../components/revisions/revision-modules";
-import RevisionsByUserPage from "../../components/revision-by-user/CommonRevisionsByUserPage";
-
-export default function CollectionRevisionByUserPage() {
-  return (
-    &lt;RevisionsByUserPage
-      // The API route to the Javers snapshot list
-      snapshotPath="collection-api/audit-snapshot"
-      // The row configs are specific to each module (Collection, Object Store, Agent, etc.)
-      revisionRowConfigsByType={COLLECTION_MODULE_REVISION_ROW_CONFIG}
-    /&gt;
-  );
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_configuring_how_audit_data_is_displayed_in_the_show_changes_section">6.3. Configuring how audit data is displayed in the "Show Changes" section.</h3>
-<div class="paragraph">
-<p>The back-end provides historical data as unstructured JSON (in the "state" field), so the UI might not always
-be able to show a good looking UI based on the data it&#8217;s given because the data schema is unknown.
-Simple string or number fields are easily rendered as-is, but the last-resort fallback for an unknown object structure
-is to show stringified JSON in the UI. The Revision UI components are written in a way that unstructured data
-is displayed generically by looping through the key-value pairs of the given JSON, but specific field names
-can be manually overwritten in the code to improve the way that the UI displays those fields.</p>
-</div>
-<div class="paragraph">
-<p>All edited fields will be rendered generically in the Revisions UI, but to manually register fields to be
-rendered in a specific way, go to:</p>
-</div>
-<div class="paragraph">
-<p>dina-ui/components/revisions/revision-modules.ts</p>
-</div>
-<div class="paragraph">
-<p>and add your typename into the map for the correct DINA module.</p>
-</div>
-<div class="paragraph">
-<p>For examples of types added:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { RevisionRowConfigsByType } from "./revision-row-config";
-import { COLLECTING_EVENT_REVISION_ROW_CONFIG } from "./revision-row-configs/collectingevent-revision-row-config";
-import { MATERIAL_SAMPLE_REVISION_ROW_CONFIG } from "./revision-row-configs/material-sample-revision-row-configs";
-import { METADATA_REVISION_ROW_CONFIG } from "./revision-row-configs/metadata-revision-row-config";
-
-/** Custom revision row behavior for Object Store Resources. */
-export const OBJECT_STORE_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
-  metadata: METADATA_REVISION_ROW_CONFIG
-};
-
-/** Custom revision row behavior for Object Store Resources. */
-export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
-  "collecting-event": COLLECTING_EVENT_REVISION_ROW_CONFIG,
-  "material-sample": MATERIAL_SAMPLE_REVISION_ROW_CONFIG
-};</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>In the Object Store module, mappings have been added for the "metadata" type.</p>
-</li>
-<li>
-<p>In the Collection module, mappings have been added for the "collecting-event" and "material-sample" types.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>See the implementation of MATERIAL_SAMPLE_REVISION_ROW_CONFIG for examples of field renderers.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_running_tests">7. Running Tests</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_run_all_tests">7.1. Run all tests</h3>
+<h3 id="_run_all_tests">4.1. Run all tests</h3>
 <div class="paragraph">
 <p>Run <code>yarn test</code> from the top-level dina-ui repo.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_run_individual_tests">7.2. Run individual tests</h3>
+<h3 id="_run_individual_tests">4.2. Run individual tests</h3>
 <div class="paragraph">
 <p>Either</p>
 </div>
@@ -969,7 +750,7 @@ export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_versioning">8. Versioning</h2>
+<h2 id="_versioning">5. Versioning</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Dina UI&#8217;s version is stored in the dina-ui package&#8217;s package.json
@@ -984,81 +765,7 @@ new version of the application by running this command at the repo&#8217;s top l
 </div>
 </div>
 <div class="sect1">
-<h2 id="_yarn_package_scripts">9. Yarn Package Scripts</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_top_level_directory">9.1. Top-level directory</h3>
-<div class="paragraph">
-<p>Commands you can run from the root package:</p>
-</div>
-<div class="sect3">
-<h4 id="_yarn_docs">9.1.1. <code>yarn docs</code></h4>
-<div class="paragraph">
-<p>Compiles the docs (written in <a href="https://asciidoctor.org/docs/what-is-asciidoc/">AsciiDoc</a>) as a
-single HTML file in the "generated-docs" directory.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_yarn_test">9.1.2. <code>yarn test</code></h4>
-<div class="paragraph">
-<p>Runs the tests for all packages (without generating the test coverage reports).</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_yarn_testcoverage">9.1.3. <code>yarn test:coverage</code></h4>
-<div class="paragraph">
-<p>Runs the tests for all packages. Prints the test coverage report to stdout, and writes the coverage report files
-into the "coverage" directory.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_sub_package_directories">9.2. Sub-package directories</h3>
-<div class="paragraph">
-<p>Commands you can run from sub-packages:</p>
-</div>
-<div class="sect3">
-<h4 id="_yarn_build">9.2.1. <code>yarn build</code></h4>
-<div class="paragraph">
-<p>Generates the production build.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_yarn_dev">9.2.2. <code>yarn dev</code></h4>
-<div class="paragraph">
-<p>Runs the UI application at localhost:3000 in dev mode using <a href="https://github.com/zeit/next.js">Next.js</a>.
-When you save a file, you can refresh the page to see your changes without restarting the app.
-Note that this does not let the UI connect to the backend because there is no HTTP proxy set up. See
-"https://github.com/poffm/dina-dev" for the full dev mode with a proxy.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_yarn_next">9.2.3. <code>yarn next</code></h4>
-<div class="paragraph">
-<p>Runs the UI application at localhost:3000 in dev mode using <a href="https://github.com/zeit/next.js">Next.js</a>.
-When you save a file, you can refresh the page to see your changes without restarting the app.
-Note that this does not let the UI connect to the backend because there is no HTTP proxy set up. See
-"https://github.com/poffm/dina-dev" for the full dev mode with a proxy.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_yarn_test_2">9.2.4. <code>yarn test</code></h4>
-<div class="paragraph">
-<p>Runs the tests (without generating the test coverage report).</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_yarn_testcoverage_2">9.2.5. <code>yarn test:coverage</code></h4>
-<div class="paragraph">
-<p>Runs the tests. Prints the test coverage report to stdout, and writes the coverage report files
-into the "coverage" directory.</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_building_the_app_docker_images">10. Building the app Docker images</h2>
+<h2 id="_building_the_app_docker_images">6. Building the app Docker images</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>From the top-level directory, run the following commands to build the dina-ui Docker image:</p>
@@ -1076,9 +783,9 @@ docker build -t dina-ui:dev .</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_environment_variables">10.1. Environment variables</h3>
+<h3 id="_environment_variables">6.1. Environment variables</h3>
 <div class="sect3">
-<h4 id="_required_addresses_for_back_end_apis">10.1.1. Required Addresses for Back-end APIs</h4>
+<h4 id="_required_addresses_for_back_end_apis">6.1.1. Required Addresses for Back-end APIs</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -1137,7 +844,7 @@ docker build -t dina-ui:dev .</code></pre>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_authentication_variables">10.1.2. Authentication Variables</h4>
+<h4 id="_authentication_variables">6.1.2. Authentication Variables</h4>
 <div class="paragraph">
 <p>Configure these variables to enable Keycloak authentication:</p>
 </div>
@@ -1179,7 +886,7 @@ docker build -t dina-ui:dev .</code></pre>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_instance_configuration">10.1.3. Instance Configuration</h4>
+<h4 id="_instance_configuration">6.1.3. Instance Configuration</h4>
 <div class="paragraph">
 <p>Customize your DINA instance with these variables:</p>
 </div>
@@ -1221,7 +928,7 @@ docker build -t dina-ui:dev .</code></pre>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_external_services_optional">10.1.4. External Services (Optional)</h4>
+<h4 id="_external_services_optional">6.1.4. External Services (Optional)</h4>
 <div class="paragraph">
 <p>Configure external data sources and services:</p>
 </div>
@@ -1261,16 +968,108 @@ docker build -t dina-ui:dev .</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_react_components">11. React Components</h2>
+<h2 id="_react_components">7. React Components</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_forms">11.1. Forms</h3>
+<h3 id="_ui_common_react_component_types">7.1. UI Common React Component Types</h3>
+<div class="sect3">
+<h4 id="_pages">7.1.1. Pages</h4>
 <div class="paragraph">
-<p>Forms can be made in this app using <a href="https://jaredpalmer.com/formik/">Formik</a> .</p>
+<p>Stored in "packages/dina-ui/pages". The folder path and filename correspond to the page&#8217;s URL, which is automatically routed by Next.js.</p>
 </div>
 <div class="paragraph">
-<p>Our custom formik-integrated input field components can be found in /components/formik-connected.
-These inputs should be easily re-usable throughout the app.</p>
+<p>Pages typically use one of the standard page layouts (ViewPageLayout, ListPageLayout, etc.) and integrate with our data fetching patterns using React Query hooks.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_page_layouts">7.1.2. Page Layouts</h4>
+<div class="paragraph">
+<p>Standard layouts located in "packages/dina-ui/components":</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>PageLayout</strong> - Base layout with header, footer, and main content area.</p>
+</li>
+<li>
+<p><strong>ViewPageLayout</strong> - For viewing/displaying a single resource with view/edit modes</p>
+</li>
+<li>
+<p><strong>ListPageLayout</strong> - For displaying API base lists of resources with filtering and pagination</p>
+</li>
+<li>
+<p><strong>QueryPage</strong> - For display elasticsearch based list pages.</p>
+</li>
+<li>
+<p><strong>EditPageLayout</strong> - For editing existing resources</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These layouts provide consistent structure and behavior across pages, including:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Navigation breadcrumbs</p>
+</li>
+<li>
+<p>Action buttons (Save, Cancel, Delete, etc.)</p>
+</li>
+<li>
+<p>Error handling and loading states</p>
+</li>
+<li>
+<p>Consistent styling and spacing</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_dinaform">7.1.3. DinaForm</h4>
+<div class="paragraph">
+<p>The main way to create forms in dina-ui, located in "packages/common-ui/lib/formik-connected/DinaForm.tsx".</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s a wrapper around <a href="https://jaredpalmer.com/formik/">Formik</a> that provides:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Integration with our API layer for saving resources</p>
+</li>
+<li>
+<p>Automatic error message handling and display</p>
+</li>
+<li>
+<p>Support for relationships and linked resources</p>
+</li>
+<li>
+<p>Revision management and conflict detection</p>
+</li>
+<li>
+<p>Bulk editing capabilities</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Key props:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>initialValues</code> - The initial form data</p>
+</li>
+<li>
+<p><code>onSubmit</code> - Custom submit handler</p>
+</li>
+<li>
+<p><code>readOnly</code> - Makes all fields read-only</p>
+</li>
+<li>
+<p><code>enableReinitialize</code> - Allows form to update when initialValues change</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
 <p>Example form that on submit either shows a success alert or an error message:</p>
@@ -1297,8 +1096,8 @@ export default function ExampleFormPage() {
         }
       ],
       { apiBaseUrl: "/objectstore-api" }
-    )
-  }
+    );
+  };
 
   return (
     &lt;div className="card card-body" style={{ width: "1000px" }}&gt;
@@ -1312,8 +1111,91 @@ export default function ExampleFormPage() {
 }</code></pre>
 </div>
 </div>
+</div>
 <div class="sect3">
-<h4 id="_getting_a_field_value_from_the_form">11.1.1. Getting a Field value from the form.</h4>
+<h4 id="_form_fields">7.1.4. Form Fields</h4>
+<div class="paragraph">
+<p>Form input components that connect to DinaForm via the <code>name</code> prop. Located in "packages/common-ui/lib/formik-connected/".</p>
+</div>
+<div class="paragraph">
+<p>Common field types:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>TextField</strong> - Text input</p>
+</li>
+<li>
+<p><strong>TextArea</strong> - Multi-line text input</p>
+</li>
+<li>
+<p><strong>DateField</strong> - Date picker</p>
+</li>
+<li>
+<p><strong>NumberField</strong> - Numeric input with optional range</p>
+</li>
+<li>
+<p><strong>SelectField</strong> - Dropdown selection</p>
+</li>
+<li>
+<p><strong>CheckBoxField</strong> - Boolean checkbox</p>
+</li>
+<li>
+<p><strong>ResourceSelectField</strong> - Autocomplete selection from API resources</p>
+</li>
+<li>
+<p><strong>AutoSuggestTextField</strong> - Text field with dropdown suggestions</p>
+</li>
+<li>
+<p><strong>FieldSet</strong> - Groups related fields</p>
+</li>
+<li>
+<p><strong>FieldArray</strong> - Manages arrays of values with add/remove functionality</p>
+</li>
+<li>
+<p><strong>FilterBuilderField</strong> - Component for creating complex filter queries</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>All fields support:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> - Property path in form data (supports nested paths like "group.name")</p>
+</li>
+<li>
+<p><code>label</code> - Display label (auto-generated from name if not provided)</p>
+</li>
+<li>
+<p><code>readOnly</code> - Makes field read-only</p>
+</li>
+<li>
+<p><code>customName</code> - Custom label for display</p>
+</li>
+<li>
+<p><code>className</code> - CSS classes (typically Bootstrap grid classes)</p>
+</li>
+<li>
+<p><code>removeBottomMargin</code> - Removes bottom margin for compact layouts</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">&lt;DinaForm initialValues={{ person: { name: "", age: 0 } }}&gt;
+  &lt;TextField name="person.name" className="col-md-6" /&gt;
+  &lt;NumberField name="person.age" className="col-md-6" /&gt;
+  &lt;SubmitButton /&gt;
+&lt;/DinaForm&gt;</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_getting_a_field_value_from_the_form">Getting a Field value from the form</h5>
 <div class="paragraph">
 <p>Sometimes you will want to get a field&#8217;s value in one component without re-rendering the surrounding component. You can listen to a Field&#8217;s state using FieldSpy:</p>
 </div>
@@ -1337,8 +1219,8 @@ export default function ExampleFormPage() {
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_tooltips">11.1.2. Tooltips</h4>
+<div class="sect4">
+<h5 id="_tooltips">Tooltips</h5>
 <div class="paragraph">
 <p>The tooltip is found from the intl messages file using the key "field_{fieldName}_tooltip". As an example:</p>
 </div>
@@ -1388,13 +1270,13 @@ field_metadataName_tooltip: "This will be the message that appears for the name 
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">tooltipImageAlt</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Accessability text which should be used when a tooltipImage is provided. Best practice is to use internationalization key so it works in multiple languages.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Accessibility text which should be used when a tooltipImage is provided. Best practice is to use internationalization key so it works in multiple languages.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">tooltipImageAlt="tooltip_image_alt"</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">tooltipLink</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL of a link to display at the bottom of the tooltip.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">tooltipLink="https//www.google.com"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">tooltipLink="https://www.google.com"</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">tooltipLinkText</p></td>
@@ -1404,8 +1286,50 @@ field_metadataName_tooltip: "This will be the message that appears for the name 
 </tbody>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_text_field_with_dropdown_suggestions">11.1.3. Text field with dropdown suggestions</h4>
+<div class="sect4">
+<h5 id="_resourceselectfield_component">ResourceSelectField Component</h5>
+<div class="paragraph">
+<p>This is a searchable dropdown select component for selecting a back-end resource from a list.</p>
+</div>
+<div class="paragraph">
+<p>Example usage for selecting a Group from a list:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { DinaForm, ResourceSelectField } from "common-ui";
+import { Group } from "../types/user-api/resources/Group";
+
+/**
+ * This page shows a dropdown for selecting a Group. You can type the name of a Group you're
+ * looking for into the input, which sends a filtered query to the back-end API for a Group with
+ * that name. When you select a Group, the onChange callback function sets the selected group into
+ * the page's component state. The page displays a message with the name of the currently selected
+ * Group.
+ */
+export default function ExamplePage() {
+  return (
+    &lt;div className="card card-body" style={{ width: "500px" }}&gt;
+      &lt;DinaForm initialValues={{ myGroup: null }}&gt;
+        {({ values: { myGroup } }) =&gt; (
+          &lt;div&gt;
+            &lt;h2&gt;Selected group: {myGroup ? myGroup.groupName : "None"}&lt;/h2&gt;
+            &lt;ResourceSelectField&lt;Group&gt;
+              name="myGroup"
+              filter={groupName =&gt; ({ groupName })}
+              model="group"
+              optionLabel={group =&gt; group.groupName}
+            /&gt;
+          &lt;/div&gt;
+        )}
+      &lt;/DinaForm&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_autosuggesttextfield_component">AutoSuggestTextField Component</h5>
 <div class="paragraph">
 <p>Using the <code>AutoSuggestTextField</code> component, you can provide a dropdown of suggestions for a text field as the user types.</p>
 </div>
@@ -1413,10 +1337,10 @@ field_metadataName_tooltip: "This will be the message that appears for the name 
 <p>The <code>AutoSuggestTextField</code> component supports JSON API and elastic search for auto-suggestions, you can even provide both and fallback to the JSON API if the elastic search fails for example.</p>
 </div>
 <div class="paragraph">
-<p>Important: This is used for retrieving text suggestions. The form will be returned a string. Not a UUID for a resource. Checkout the <code>ResourceSelectField</code> for that functionality.</p>
+<p><strong>Important:</strong> This is used for retrieving text suggestions. The form will be returned a string. Not a UUID for a resource. Checkout the <code>ResourceSelectField</code> for that functionality.</p>
 </div>
-<div class="sect4">
-<h5 id="_json_api_example">JSON API example</h5>
+<div class="sect5">
+<h6 id="_json_api_example">JSON API example</h6>
 <div class="paragraph">
 <p>To configure the JSON API auto-suggestions, you need to setup the <code>jsonApiBackend</code> prop:</p>
 </div>
@@ -1445,8 +1369,8 @@ field_metadataName_tooltip: "This will be the message that appears for the name 
 <p>The <code>option</code> is used to determine the text to display for each suggestion. This is also the value that is returned to the form.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_elastic_search_example">Elastic Search example</h5>
+<div class="sect5">
+<h6 id="_elastic_search_example">Elastic Search example</h6>
 <div class="paragraph">
 <p>To configure the Elastic Search auto-suggestions, you need to setup the <code>elasticSearchBackend</code> prop:</p>
 </div>
@@ -1462,20 +1386,33 @@ field_metadataName_tooltip: "This will be the message that appears for the name 
 /&gt;</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p><code>indexName</code> is the name of the Elastic Search index to use. (required)
-<code>searchField</code> is the name of the field to search in, this needs to be the full path. (required)
-<code>additionalField</code> is another field to search by in addition to the search field. This also needs to the full path. (optional)
-<code>restrictedField</code> is used to filter by a specific field in the index. This also needs to the full path. (optional)
-<code>restrictedFieldValue</code> is the value to search against the restricted field. (optional)
-<code>option</code> is used to determine the text to display for each suggestion. This is also the value that is returned to the form. (required)</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>indexName</code> is the name of the Elastic Search index to use. (required)</p>
+</li>
+<li>
+<p><code>searchField</code> is the name of the field to search in, this needs to be the full path. (required)</p>
+</li>
+<li>
+<p><code>additionalField</code> is another field to search by in addition to the search field. This also needs to the full path. (optional)</p>
+</li>
+<li>
+<p><code>restrictedField</code> is used to filter by a specific field in the index. This also needs to the full path. (optional)</p>
+</li>
+<li>
+<p><code>restrictedFieldValue</code> is the value to search against the restricted field. (optional)</p>
+</li>
+<li>
+<p><code>option</code> is used to determine the text to display for each suggestion. This is also the value that is returned to the form. (required)</p>
+</li>
+</ul>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_typescript_support">Typescript Support</h5>
+<div class="sect5">
+<h6 id="_typescript_support">Typescript Support</h6>
 <div class="paragraph">
-<p>The <code>AutoSuggestTextField</code> component supports Typescript.
-To use it, you need to import the <code>AutoSuggestTextField</code> component and pass it the type of the resource you are searching for.</p>
+<p>The <code>AutoSuggestTextField</code> component supports Typescript. To use it, you need to import the <code>AutoSuggestTextField</code> component and pass it the type of the resource you are searching for.</p>
 </div>
 <div class="paragraph">
 <p>For example for a Person (Kitsu Resource):</p>
@@ -1501,12 +1438,11 @@ To use it, you need to import the <code>AutoSuggestTextField</code> component an
 </div>
 </div>
 <div class="paragraph">
-<p>If you are using an included search field, insure the type being used contains the field you are looking for. If it doesn&#8217;t exist on the
-type it will not be parsed.</p>
+<p>If you are using an included search field, ensure the type being used contains the field you are looking for. If it doesn&#8217;t exist on the type it will not be parsed.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_default_to_elastic_search_fall_back_to_json_api_example">Default to elastic search, fall back to JSON API example</h5>
+<div class="sect5">
+<h6 id="_default_to_elastic_search_fall_back_to_json_api_example">Default to elastic search, fall back to JSON API example</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-tsx" data-lang="tsx">&lt;AutoSuggestTextField&lt;Person&gt;
@@ -1541,8 +1477,8 @@ type it will not be parsed.</p>
 <p>It&#8217;s important to make sure both providers work correctly since it will probably be rare that provider will fail.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_custom_options_example">Custom options example</h5>
+<div class="sect5">
+<h6 id="_custom_options_example">Custom options example</h6>
 <div class="paragraph">
 <p>You can provide your own suggestions directly using the <code>customOptions</code> prop:</p>
 </div>
@@ -1601,8 +1537,8 @@ type it will not be parsed.</p>
 </div>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_blank_search_provider_example">Blank Search provider example</h5>
+<div class="sect5">
+<h6 id="_blank_search_provider_example">Blank Search provider example</h6>
 <div class="paragraph">
 <p>You can even provide suggestions even if the text field is blank. Using the <code>blankSearchProvider</code> property, you can configure what happens during a blank search.</p>
 </div>
@@ -1679,55 +1615,10 @@ type it will not be parsed.</p>
 </div>
 </div>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_resource_select_field_component">11.2. Resource Select Field Component</h3>
+<div class="sect4">
+<h5 id="_filterbuilderfield_component">FilterBuilderField component</h5>
 <div class="paragraph">
-<p>This is a searchable dropdown select component for selecting a back-end resource from a list.</p>
-</div>
-<div class="paragraph">
-<p>Example usage for selecting a Group from a list:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { DinaForm, ResourceSelectField } from "common-ui";
-import { Group } from "../types/user-api/resources/Group";
-
-/**
- * This page shows a dropdown for selecting a Group. You can type the name of a Group you're
- * looking for into the input, which sends a filtered query to the back-end API for a Group with
- * that name. When you select a Group, the onChange callback function sets the selected group into
- * the page's component state. The page displays a message with the name of the currently selected
- * Group.
- */
-export default function ExamplePage() {
-  return (
-    &lt;div className="card card-body" style={{ width: "500px" }}&gt;
-      &lt;DinaForm initialValues={{ myGroup: null }}&gt;
-        {({ values: { myGroup } }) =&gt; (
-          &lt;div&gt;
-            &lt;h2&gt;Selected group: {myGroup ? myGroup.groupName : "None"}&lt;/h2&gt;
-            &lt;ResourceSelectField&lt;Group&gt;
-              name="myGroup"
-              filter={groupName =&gt; ({ groupName })}
-              model="group"
-              optionLabel={group =&gt; group.groupName}
-            /&gt;
-          &lt;/div&gt;
-        )}
-      &lt;/div&gt;
-    &lt;/div&gt;
-  );
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_filterbuilderfield_component">11.3. FilterBuilderField component</h3>
-<div class="paragraph">
-<p>The FilterBuilderField component provides a Formik input for creating complex filter queries.
-The FilterGroupModel value this input provides can be converted to an RSQL string to inluded in
-the API request.</p>
+<p>The FilterBuilderField component provides a Formik input for creating complex filter queries. The FilterGroupModel value this input provides can be converted to an RSQL string to be included in the API request.</p>
 </div>
 <div class="paragraph">
 <p>Example usage for filtering PcrPrimers in a list page:</p>
@@ -1746,9 +1637,9 @@ import { DinaForm, DinaFormOnSubmit } from "../components/formik-connected/DinaF
 export default function ExamplePage() {
   const [filter, setFilter] = useState&lt;FilterParam&gt;();
 
-  const onSubmit: DinaFormOnSubmit = ({ submittedvalues:  { filter } }) =&gt; {
+  const onSubmit: DinaFormOnSubmit = ({ submittedValues: { filter } }) =&gt; {
     setFilter({ rsql: rsql(filter) });
-  }
+  };
 
   return (
     &lt;div&gt;
@@ -1776,12 +1667,174 @@ export default function ExamplePage() {
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_custom_hooks">7.1.5. Custom Hooks</h4>
+<div class="paragraph">
+<p>Reusable hooks for common patterns:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>useQuery</strong> - Data fetching</p>
+</li>
+<li>
+<p><strong>useDinaFormContext</strong> - Access DinaForm context</p>
+</li>
+<li>
+<p><strong>useApiClient</strong> - Access API client</p>
+</li>
+<li>
+<p><strong>useBulkEditTab</strong> - Manage bulk editing</p>
+</li>
+<li>
+<p><strong>useModal</strong> - Modal dialog management</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_audit_revisions_ui">7.2. Audit / Revisions UI</h3>
+<div class="paragraph">
+<p>The "revisions" pages show edit history of specific records and user activity.</p>
+</div>
+<div class="paragraph">
+<p>Audit records are fetched from the back-end which is implemented using <a href="http://google.ca">Javers</a>.
+See <a href="https://github.com/AAFC-BICoE/dina-base-api/blob/master/docs/auditing.adoc">the DINA back-and auditing docs</a>.</p>
+</div>
+<div class="sect3">
+<h4 id="_adding_audit_support_for_one_resource_type">7.2.1. Adding audit support for one Resource Type</h4>
+<div class="paragraph">
+<p>For tracking changes to a single record. This page should be linked to from the record&#8217;s details page.</p>
+</div>
+<div class="paragraph">
+<p>You can re-use the RevisionsPage component to create a revisions page for the specified resource:</p>
+</div>
+<div class="paragraph">
+<p>Example from dina-ui/pages/collection/material-sample/revisions.tsx:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
+import { RevisionsPage } from "../../../components/revisions/RevisionsPageLayout";
+
+export default () =&gt; (
+  &lt;RevisionsPage
+    // The API route to the Javers snapshot list
+    auditSnapshotPath="collection-api/audit-snapshot"
+    // URL to the details page
+    detailsPageLink="/collection/material-sample/view?id="
+    // Query for the current state of the record
+    queryPath="collection-api/material-sample"
+    // The JSONAPI resource "type"
+    resourceType="material-sample"
+    // The row configs are specific to each module (Collection, Object Store, Agent, etc.)
+    revisionRowConfigsByType={COLLECTION_MODULE_REVISION_ROW_CONFIG}
+    // The field on the resource that gives the name. Usuallu this field is called "name"
+    nameField="materialSampleName"
+  /&gt;
+);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_adding_audit_support_for_a_users_edits_across_a_dina_module">7.2.2. Adding audit support for a user&#8217;s edits across a DINA module</h4>
+<div class="paragraph">
+<p>For tracking all changes to any record by a user. This page should be linked to from the main UI navigation.</p>
+</div>
+<div class="paragraph">
+<p>There is a separate "revisions-by-user" page per DINA module (Collection, Object Store, Agent, etc.) because the
+back-end is a separate application for each DINA module. There is no way to retrieve a user&#8217;s activity across all
+multiple back-ends in one query.</p>
+</div>
+<div class="paragraph">
+<p>You can re-use the RevisionsByUserPage component to create a revisions page for the specified DINA module:</p>
+</div>
+<div class="paragraph">
+<p>Example from dina-ui/pages/collection/revisions-by-user.tsx:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../components/revisions/revision-modules";
+import RevisionsByUserPage from "../../components/revision-by-user/CommonRevisionsByUserPage";
+
+export default function CollectionRevisionByUserPage() {
+  return (
+    &lt;RevisionsByUserPage
+      // The API route to the Javers snapshot list
+      snapshotPath="collection-api/audit-snapshot"
+      // The row configs are specific to each module (Collection, Object Store, Agent, etc.)
+      revisionRowConfigsByType={COLLECTION_MODULE_REVISION_ROW_CONFIG}
+    /&gt;
+  );
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_configuring_how_audit_data_is_displayed_in_the_show_changes_section">7.2.3. Configuring how audit data is displayed in the "Show Changes" section.</h4>
+<div class="paragraph">
+<p>The back-end provides historical data as unstructured JSON (in the "state" field), so the UI might not always
+be able to show a good looking UI based on the data it&#8217;s given because the data schema is unknown.
+Simple string or number fields are easily rendered as-is, but the last-resort fallback for an unknown object structure
+is to show stringified JSON in the UI. The Revision UI components are written in a way that unstructured data
+is displayed generically by looping through the key-value pairs of the given JSON, but specific field names
+can be manually overwritten in the code to improve the way that the UI displays those fields.</p>
+</div>
+<div class="paragraph">
+<p>All edited fields will be rendered generically in the Revisions UI, but to manually register fields to be
+rendered in a specific way, go to:</p>
+</div>
+<div class="paragraph">
+<p>dina-ui/components/revisions/revision-modules.ts</p>
+</div>
+<div class="paragraph">
+<p>and add your typename into the map for the correct DINA module.</p>
+</div>
+<div class="paragraph">
+<p>For examples of types added:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { RevisionRowConfigsByType } from "./revision-row-config";
+import { COLLECTING_EVENT_REVISION_ROW_CONFIG } from "./revision-row-configs/collectingevent-revision-row-config";
+import { MATERIAL_SAMPLE_REVISION_ROW_CONFIG } from "./revision-row-configs/material-sample-revision-row-configs";
+import { METADATA_REVISION_ROW_CONFIG } from "./revision-row-configs/metadata-revision-row-config";
+
+/** Custom revision row behavior for Object Store Resources. */
+export const OBJECT_STORE_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
+  metadata: METADATA_REVISION_ROW_CONFIG
+};
+
+/** Custom revision row behavior for Object Store Resources. */
+export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
+  "collecting-event": COLLECTING_EVENT_REVISION_ROW_CONFIG,
+  "material-sample": MATERIAL_SAMPLE_REVISION_ROW_CONFIG
+};</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>In the Object Store module, mappings have been added for the "metadata" type.</p>
+</li>
+<li>
+<p>In the Collection module, mappings have been added for the "collecting-event" and "material-sample" types.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>See the implementation of MATERIAL_SAMPLE_REVISION_ROW_CONFIG for examples of field renderers.</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="sect1">
-<h2 id="_api_client">12. API Client</h2>
+<h2 id="_api_client">8. API Client</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_usequery_hook_function">12.1. useQuery Hook Function</h3>
+<h3 id="_usequery_hook_function">8.1. useQuery Hook Function</h3>
 <div class="paragraph">
 <p>useQuery is an API querying function using the <a href="https://reactjs.org/docs/hooks-intro.html">React Hooks API</a>.
 You can use it to easily query the back-end from inside a function component.</p>
@@ -1858,7 +1911,7 @@ function ExampleComponent() {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_performing_write_operations">12.2. Performing write operations</h3>
+<h3 id="_performing_write_operations">8.2. Performing write operations</h3>
 <div class="paragraph">
 <p>This application uses React&#8217;s hooks and context API to provide a "save" function which allows
 you to perform write operations against the back-end API. "save" accepts an array of
@@ -1907,16 +1960,551 @@ export funcion NewRegionButton() {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_internationalization">13. Internationalization</h2>
+<h2 id="_creating_tests">9. Creating Tests</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="_creating_tests_for_dina_ui">10. Creating Tests for DINA UI</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_internationalization_multiple_languages_support">13.1. Internationalization / Multiple Languages Support</h3>
+<h3 id="_test_file_structure">10.1. Test File Structure</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { mountWithAppContext } from "common-ui";
+import { fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
+
+describe("ComponentUnderTest", () =&gt; {
+  const mockGet = jest.fn();
+  const mockSave = jest.fn();
+
+  const apiContext = {
+    apiClient: {
+      get: mockGet
+    },
+    save: mockSave
+  };
+
+  beforeEach(() =&gt; {
+    jest.clearAllMocks();
+  });
+
+  it("should render and fetch data", async () =&gt; {
+    mockGet.mockResolvedValueOnce({
+      data: [{ id: "1", type: "person", name: "John" }]
+    });
+
+    const wrapper = mountWithAppContext(
+      &lt;ComponentUnderTest /&gt;,
+      { apiContext }
+    );
+
+    // Wait for the component to load and display data
+    await waitFor(() =&gt; {
+      expect(wrapper.getByText("John")).toBeInTheDocument();
+    });
+
+    expect(mockGet).toHaveBeenCalledWith("person", { page: { limit: 10 } });
+  });
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_debugging_tests">10.2. Debugging Tests</h3>
+<div class="sect3">
+<h4 id="_visual_debugging_with_testing_playground">10.2.1. Visual Debugging with Testing Playground</h4>
+<div class="paragraph">
+<p>When a test fails or you need to see what the component looks like, use <code>screen.logTestingPlaygroundURL()</code> to open an interactive playground in your browser:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { screen } from "@testing-library/react";
+
+it("should display form elements", async () =&gt; {
+  const wrapper = mountWithAppContext(&lt;PersonForm /&gt;, { apiContext });
+
+  await waitFor(() =&gt; {
+    expect(wrapper.getByRole("textbox", { name: /name/i })).toBeInTheDocument();
+  });
+
+  // Open Testing Playground to visually inspect the DOM
+  screen.logTestingPlaygroundURL();
+
+  // The test will output a URL like:
+  // https://testing-playground.com/#markup=...
+  // Open this URL in your browser to see the rendered component
+  // and get suggestions for better queries
+});</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+The Testing Playground URL shows you the component&#8217;s HTML structure and helps you find the best queries to use. It&#8217;s especially useful when you&#8217;re not sure which role or text to query by.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mounting_components">10.3. Mounting Components</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { mountWithAppContext } from "common-ui";
+
+// Basic mount
+const wrapper = mountWithAppContext(&lt;MyComponent /&gt;);
+
+// With API context
+const wrapper = mountWithAppContext(
+  &lt;MyComponent /&gt;,
+  { apiContext: { apiClient: { get: mockGet }, save: mockSave } }
+);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_network_mocking_patterns">10.4. Network Mocking Patterns</h3>
+<div class="sect3">
+<h4 id="_mock_get_requests">10.4.1. Mock GET Requests</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">const mockGet = jest.fn();
+
+// Single resource
+mockGet.mockResolvedValueOnce({
+  data: {
+    id: "123",
+    type: "person",
+    attributes: { name: "John" }
+  }
+});
+
+// List of resources
+mockGet.mockResolvedValueOnce({
+  data: [
+    { id: "1", type: "person", name: "John" },
+    { id: "2", type: "person", name: "Jane" }
+  ],
+  meta: { totalResourceCount: 2 }
+});
+
+// With includes
+mockGet.mockResolvedValueOnce({
+  data: [
+    {
+      id: "1",
+      type: "material-sample",
+      relationships: {
+        collection: { data: { id: "col-1", type: "collection" } }
+      }
+    }
+  ],
+  included: [
+    { id: "col-1", type: "collection", name: "Main Collection" }
+  ]
+});
+
+// Conditional mocking based on path
+const mockGet = jest.fn(async (path) =&gt; {
+  switch (path) {
+    case "objectstore-api/metadata/123":
+      return { data: TEST_METADATA };
+    case "objectstore-api/license":
+      return { data: TEST_LICENSES };
+    case "agent-api/person":
+      return { data: [] };
+  }
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mock_bulkget_operations">10.4.2. Mock BulkGet Operations</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">const mockBulkGet = jest.fn&lt;any, any&gt;(async (paths: string[]) =&gt;
+  paths.map((path) =&gt; {
+    switch (path) {
+      case "person/123":
+        return {
+          id: "123",
+          type: "person",
+          displayName: "John Doe"
+        };
+    }
+  })
+);
+
+const apiContext: any = {
+  apiClient: { get: mockGet },
+  bulkGet: mockBulkGet,
+  save: mockSave
+};</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mock_save_operations">10.4.3. Mock SAVE Operations</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">const mockSave = jest.fn();
+
+// Create resource
+mockSave.mockResolvedValueOnce([
+  {
+    id: "new-123",
+    type: "person",
+    name: "New Person"
+  }
+]);
+
+// Update resource
+mockSave.mockResolvedValueOnce([
+  {
+    id: "123",
+    type: "person",
+    name: "Updated Person"
+  }
+]);
+
+// Bulk operations - return all saved resources
+mockSave.mockImplementation(async (saves) =&gt; {
+  return saves.map(save =&gt; ({
+    ...save.resource,
+    id: save.resource.id || "new-id"
+  }));
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mock_operations_api">10.4.4. Mock Operations API</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">const mockPatch = jest.fn();
+
+apiContext.apiClient.axios = { patch: mockPatch } as any;
+
+mockPatch.mockResolvedValueOnce({
+  data: [
+    {
+      data: { id: "1", type: "person", attributes: { name: "John" } },
+      status: 201
+    }
+  ]
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mock_errors">10.4.5. Mock Errors</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">// GET error
+mockGet.mockRejectedValueOnce({
+  response: {
+    status: 404,
+    statusText: "Not Found"
+  }
+});
+
+// SAVE error
+mockSave.mockRejectedValueOnce({
+  response: {
+    status: 422,
+    data: {
+      errors: [{
+        detail: "Name is required",
+        source: { pointer: "/data/attributes/name" }
+      }]
+    }
+  }
+});</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_testing_component_behavior">10.5. Testing Component Behavior</h3>
+<div class="sect3">
+<h4 id="_query_elements">10.5.1. Query Elements</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+
+it("should display form elements", async () =&gt; {
+  const wrapper = mountWithAppContext(&lt;PersonForm /&gt;, { apiContext });
+
+  // Wait for component to load
+  await waitFor(() =&gt; {
+    expect(wrapper.getByRole("textbox", { name: /name/i })).toBeInTheDocument();
+  });
+
+  // Query by role
+  const nameInput = wrapper.getByRole("textbox", { name: /name/i });
+  const submitButton = wrapper.getByRole("button", { name: /submit/i });
+  const checkbox = wrapper.getByRole("checkbox", { name: /active/i });
+  const combobox = wrapper.getByRole("combobox", { name: /category/i });
+
+  // Query by text
+  expect(wrapper.getByText(/welcome/i)).toBeInTheDocument();
+
+  // Query by display value
+  expect(wrapper.getByDisplayValue("John Doe")).toBeInTheDocument();
+
+  // Check if element has value
+  expect(nameInput).toHaveDisplayValue("John");
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_test_form_submission">10.5.2. Test Form Submission</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+it("should save form data", async () =&gt; {
+  mockSave.mockResolvedValueOnce([
+    { id: "123", type: "person", name: "John" }
+  ]);
+
+  const wrapper = mountWithAppContext(&lt;PersonForm /&gt;, { apiContext });
+
+  // Wait for form to load
+  await waitFor(() =&gt; {
+    expect(wrapper.getByRole("textbox", { name: /name/i })).toBeInTheDocument();
+  });
+
+  // Fill form using fireEvent
+  fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+    target: { value: "John" }
+  });
+
+  // Or use userEvent for more realistic interactions
+  userEvent.click(wrapper.getByRole("button", { name: /submit/i }));
+
+  // Submit form
+  fireEvent.submit(wrapper.container.querySelector("form")!);
+
+  // Wait for save to complete
+  await waitFor(() =&gt; {
+    expect(mockSave).toHaveBeenCalledWith(
+      [{
+        resource: { name: "John", type: "person" },
+        type: "person"
+      }],
+      { apiBaseUrl: "/agent-api" }
+    );
+  });
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_test_user_interactions">10.5.3. Test User Interactions</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+it("should handle user interactions", async () =&gt; {
+  const wrapper = mountWithAppContext(&lt;MyComponent /&gt;, { apiContext });
+
+  await waitFor(() =&gt; {
+    expect(wrapper.getByRole("button", { name: /add tag/i })).toBeInTheDocument();
+  });
+
+  // Click button
+  userEvent.click(wrapper.getByRole("button", { name: /add tag/i }));
+
+  // Change input
+  fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
+    target: { value: "new tag" }
+  });
+
+  // Select option
+  userEvent.click(wrapper.getByRole("option", { name: /add "new tag"/i }));
+
+  // Toggle switch
+  userEvent.click(wrapper.getByRole("switch"));
+
+  // Remove item
+  userEvent.click(wrapper.getByRole("button", { name: /remove tag1/i }));
+
+  // Wait for new element to appear
+  await waitFor(() =&gt; {
+    expect(wrapper.getByText(/new tag/i)).toBeInTheDocument();
+  });
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_test_dropdown_selection">10.5.4. Test Dropdown Selection</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">it("should update dropdown selection", async () =&gt; {
+  const wrapper = mountWithAppContext(&lt;MyForm /&gt;, { apiContext });
+
+  await waitFor(() =&gt; {
+    expect(wrapper.getByRole("combobox", { name: /license/i })).toBeInTheDocument();
+  });
+
+  // Open dropdown
+  userEvent.click(wrapper.getByRole("combobox", { name: /license/i }));
+
+  // Select option
+  userEvent.click(wrapper.getByRole("option", { name: /&lt;none&gt;/i }));
+
+  // Verify selection
+  expect(wrapper.getByRole("combobox", { name: /license/i })).toHaveDisplayValue("");
+});</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mocking_next_js_router">10.6. Mocking Next.js Router</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">const mockUseRouter = jest.fn();
+
+jest.mock("next/router", () =&gt; ({
+  useRouter: () =&gt; mockUseRouter()
+}));
+
+describe("My Component", () =&gt; {
+  beforeEach(() =&gt; {
+    jest.clearAllMocks();
+    mockUseRouter.mockReturnValue({
+      push: jest.fn(),
+      query: {
+        id: "123"
+      }
+    });
+  });
+
+  it("should use router query params", async () =&gt; {
+    const wrapper = mountWithAppContext(&lt;MyComponent /&gt;, { apiContext });
+
+    await waitFor(() =&gt; {
+      expect(mockGet).toHaveBeenCalledWith(
+        expect.stringContaining("123")
+      );
+    });
+  });
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_testing_hooks">10.7. Testing Hooks</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { renderHook, waitFor } from "@testing-library/react";
+
+it("should fetch data with hook", async () =&gt; {
+  mockGet.mockResolvedValueOnce({
+    data: [{ id: "1", type: "person" }]
+  });
+
+  const { result } = renderHook(
+    () =&gt; useApiClient(),
+    {
+      wrapper: ({ children }) =&gt; (
+        &lt;ApiClientProvider value={apiContext}&gt;
+          {children}
+        &lt;/ApiClientProvider&gt;
+      )
+    }
+  );
+
+  await waitFor(() =&gt; {
+    expect(result.current.loading).toBe(false);
+  });
+
+  expect(result.current.data).toHaveLength(1);
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_best_practices">10.8. Best Practices</h3>
+<div class="sect3">
+<h4 id="_always_use_waitfor_for_async_operations">10.8.1. Always use waitFor for async operations</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">await waitFor(() =&gt; {
+  expect(wrapper.getByText("Loaded")).toBeInTheDocument();
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_use_appropriate_queries">10.8.2. Use appropriate queries</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><code>getByRole</code> - preferred for accessibility</p>
+</li>
+<li>
+<p><code>getByText</code> - for text content</p>
+</li>
+<li>
+<p><code>getByDisplayValue</code> - for input values</p>
+</li>
+<li>
+<p><code>getByLabelText</code> - for form fields with labels</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_check_only_changed_values_in_saves">10.8.3. Check only changed values in saves</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">expect(mockSave).lastCalledWith(
+  [{
+    resource: {
+      id: "123",
+      type: "metadata",
+      // Only include fields that were changed
+      name: "Updated Name"
+    },
+    type: "metadata"
+  }],
+  { apiBaseUrl: "/objectstore-api" }
+);</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_internationalization">11. Internationalization</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_internationalization_multiple_languages_support">11.1. Internationalization / Multiple Languages Support</h3>
 <div class="paragraph">
 <p>This application can display messages in multiple languages using
 <a href="https://github.com/yahoo/react-intl">react-intl</a>.</p>
 </div>
 <div class="sect3">
-<h4 id="_message_components">13.1.1. Message components</h4>
+<h4 id="_message_components">11.1.1. Message components</h4>
 <div class="paragraph">
 <p>When developing UI, you should not hard-code messages into the UI, like this:</p>
 </div>
@@ -1939,7 +2527,7 @@ export funcion NewRegionButton() {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_formatmessage_function">13.1.2. formatMessage function</h4>
+<h4 id="_formatmessage_function">11.1.2. formatMessage function</h4>
 <div class="paragraph">
 <p>You can also use the "formatMessage" function if you want to reference a message outside of a JSX tree:</p>
 </div>
@@ -1962,7 +2550,7 @@ function MyComponent() {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_defining_messages">13.1.3. Defining messages</h4>
+<h4 id="_defining_messages">11.1.3. Defining messages</h4>
 <div class="paragraph">
 <p>The actual text for these messages needs to be defined in a messages file, like dina-en.ts. Each UI app
 ( dina-ui is the only UI app at the moment ) should have its own messages files. common-ui has its
@@ -2001,7 +2589,7 @@ translation as a fallback if the message has no translation for the user&#8217;s
 </div>
 </div>
 <div class="sect3">
-<h4 id="_field_label_messages">13.1.4. Field label messages</h4>
+<h4 id="_field_label_messages">11.1.4. Field label messages</h4>
 <div class="paragraph">
 <p>Some components, like QueryTable, FilterBuilder and FieldWrapper (which wraps our Formik input components)
 take in a list of field names ( e.g. ["name","version","group.groupName"] ) and display auto-generated title-case
@@ -2055,7 +2643,7 @@ the field label&#8217;s message.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_export_messages_as_csv">13.1.5. Export messages as CSV</h4>
+<h4 id="_export_messages_as_csv">11.1.5. Export messages as CSV</h4>
 <div class="paragraph">
 <p>Run the following command to export the messages in CSV format:</p>
 </div>
@@ -2067,7 +2655,7 @@ yarn --silent export-intl-csv &gt; messages.csv</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_import_csv_files_to_update_typescript_message_files">13.1.6. Import CSV files to update Typescript message files</h4>
+<h4 id="_import_csv_files_to_update_typescript_message_files">11.1.6. Import CSV files to update Typescript message files</h4>
 <div class="paragraph">
 <p>Run the following command after editing your CSV file:</p>
 </div>
@@ -2082,10 +2670,10 @@ CSVFILE=messages.csv yarn import-intl-csv</pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_wcag_compliance_tools_setup">14. WCAG compliance tools setup</h2>
+<h2 id="_wcag_compliance_tools_setup">12. WCAG compliance tools setup</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_pa11y">14.1. Pa11y</h3>
+<h3 id="_pa11y">12.1. Pa11y</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2184,7 +2772,7 @@ async function runExample() {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_chrome_inspector">14.2. Chrome Inspector</h3>
+<h3 id="_chrome_inspector">12.2. Chrome Inspector</h3>
 <div class="paragraph">
 <p>To have a visual feedback of which html element has violated the WCAG rule,use Chrome Inspector</p>
 </div>
@@ -2217,28 +2805,28 @@ async function runExample() {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_pa11y_ci_automation">15. Pa11y-ci automation</h2>
+<h2 id="_pa11y_ci_automation">13. Pa11y-ci automation</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>We used pa11y-ci to automate the WCAG compliance detection and
 pa11y-ci-reporter-html to generate report of configured level of severity with good readability.</p>
 </div>
 <div class="sect2">
-<h3 id="_follow_below_steps_in_sequence">15.1. Follow below steps in sequence</h3>
+<h3 id="_follow_below_steps_in_sequence">13.1. Follow below steps in sequence</h3>
 <div class="sect3">
-<h4 id="_go_to_packagesdina_ui_for_object_store_ui_packagesseqdb_ui_for_seqdb_ui">15.1.1. Go to packages/dina-ui for object store UI ( packages/seqdb-ui for seqdb UI )</h4>
+<h4 id="_go_to_packagesdina_ui_for_object_store_ui_packagesseqdb_ui_for_seqdb_ui">13.1.1. Go to packages/dina-ui for object store UI ( packages/seqdb-ui for seqdb UI )</h4>
 <div class="paragraph">
 <p><code>cd packages/dina-ui</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_check_compliance_for_all_configured_pages_and_output_json_format_results">15.1.2. Check compliance for all configured pages and output json format results</h4>
+<h4 id="_check_compliance_for_all_configured_pages_and_output_json_format_results">13.1.2. Check compliance for all configured pages and output json format results</h4>
 <div class="paragraph">
 <p><code>yarn a11y-check</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_generate_user_fridendly_html_report_based_on_above_results">15.1.3. Generate user fridendly html report based on above results</h4>
+<h4 id="_generate_user_fridendly_html_report_based_on_above_results">13.1.3. Generate user fridendly html report based on above results</h4>
 <div class="paragraph">
 <p><code>yarn a11y-generate-report</code></p>
 </div>
@@ -2253,7 +2841,7 @@ pa11y-ci-reporter-html to generate report of configured level of severity with g
 </div>
 </div>
 <div class="sect3">
-<h4 id="_know_issues">15.1.4. Know issues</h4>
+<h4 id="_know_issues">13.1.4. Know issues</h4>
 <div class="paragraph">
 <p>Due to the pa11y implementation, in order to get all compliance level report (A, AA  are the currentl AAFC scope), one will need to change the .pa11yci file to manually switch between the A and AA  to cover both,as the script takes one arg only.</p>
 </div>
@@ -2265,10 +2853,10 @@ pa11y-ci-reporter-html to generate report of configured level of severity with g
 </div>
 </div>
 <div class="sect1">
-<h2 id="_translation_task">16. Translation task</h2>
+<h2 id="_translation_task">14. Translation task</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_to_export_to_csv_file">16.1. To export to csv file</h3>
+<h3 id="_to_export_to_csv_file">14.1. To export to csv file</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2305,7 +2893,7 @@ yarn --silent export-intl-csv &gt; messages.csv</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_to_import_from_translated_csv_file">16.2. To import from translated csv file</h3>
+<h3 id="_to_import_from_translated_csv_file">14.2. To import from translated csv file</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2344,7 +2932,7 @@ CSVFILE=messages.csv yarn import-intl-csv</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-01-15 15:21:44 UTC
+Last updated 2026-01-28 19:44:11 UTC
 </div>
 </div>
 </body>
