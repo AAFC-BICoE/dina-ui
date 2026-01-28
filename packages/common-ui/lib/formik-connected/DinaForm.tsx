@@ -100,7 +100,14 @@ function parseJsonApiErrors(error: any): Record<string, string> {
       const pointer = err?.source?.pointer;
       const fieldName = pointer?.replace(/^\/?data\/attributes\//, "");
       if (fieldName) {
-        fieldErrors[fieldName] = `${err.title}: ${err.detail}`;
+        fieldErrors[fieldName] = err.detail
+          ? `${err.title}: ${err.detail}`
+          : err.title;
+      } else {
+        // If no field is specified, assign general submission error
+        fieldErrors["Form submission issue"] = err.detail
+          ? `${err.title}: ${err.detail}`
+          : err.title;
       }
     }
   }
@@ -135,32 +142,21 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
         account
       });
     } catch (error: any) {
+      scrollToError();
 
-    scrollToError();
-    parseJsonApiErrors(error)
-    // Attempt to extract JSON:API-style errors
-    const errors = error?.cause?.data?.errors ?? error?.response?.data?.errors;
-
-    if (Array.isArray(errors)) {
-      const fieldErrors: Record<string, string> = {};
-
-      for (const err of errors) {
-        const pointer = err?.source?.pointer;
-        const fieldName = pointer?.replace(/^\/?data\/attributes\//, "");
-
-        if (fieldName) {
-          fieldErrors[fieldName] = `${err.title}: ${err.detail}`;
-        }
+      // Attempt to extract JSON:API-style errors
+      const errors =
+        error?.cause?.data?.errors ?? error?.response?.data?.errors;
+      if (Array.isArray(errors)) {
+        const fieldErrors = parseJsonApiErrors(error);
+        formik.setErrors(fieldErrors);
+        return;
       }
 
-      formik.setErrors(fieldErrors);
-      return;
+      // Fallback: show general error
+      throw error;
     }
-
-    // Fallback: show general error
-    throw(error)
-  }
-    });
+  });
 
   const childrenInternal:
     | ((formikProps: FormikProps<Values>) => React.ReactNode)

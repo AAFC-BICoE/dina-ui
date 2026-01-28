@@ -3,7 +3,7 @@ import {
   BulkAddFileInfo
 } from "../../../../pages/object-store/upload";
 import { metadataHandler } from "../MetadataHandler";
-import { SaveResourceContext } from "../types";
+import { SaveResourceContext, WorkbookSaveError } from "../types";
 
 describe("metadataHandler", () => {
   let mockLinkRelationshipAttribute: jest.Mock;
@@ -134,7 +134,7 @@ describe("metadataHandler", () => {
     expect(baseContext.resource.acSubtype).toBe("SAMPLESUBTYPE");
   });
 
-  it("should handle when no matching file found in localStorage", async () => {
+  it("should throw error when no matching file found in localStorage", async () => {
     const uploadedFiles: BulkAddFileInfo = {
       group: "test-group",
       files: [
@@ -147,11 +147,19 @@ describe("metadataHandler", () => {
 
     localStorage.setItem(BULK_ADD_FILES_KEY, JSON.stringify(uploadedFiles));
 
+    await expect(metadataHandler.processResource(baseContext)).rejects.toThrow(
+      WorkbookSaveError
+    );
+
     await expect(
       metadataHandler.processResource(baseContext)
-    ).rejects.toThrowError(
-      "No uploaded file found for metadata with original filename: test-image.jpg in group: test-group"
-    );
+    ).rejects.toMatchObject({
+      messageKey: "metadataFileNotFoundError",
+      messageValues: {
+        originalFilename: "test-image.jpg",
+        group: "test-group"
+      }
+    });
   });
 
   it("should set acMetadataCreator from agentId", async () => {

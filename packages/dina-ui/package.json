@@ -1,6 +1,6 @@
 {
   "name": "dina-ui",
-  "version": "0.209.0",
+  "version": "0.210.0",
   "scripts": {
     "build": "node --require ./next.config.js ../../node_modules/.bin/next build",
     "dev": "next",
@@ -26,6 +26,7 @@
     "react-dropzone-uploader": "^2.11.0",
     "react-switch": "^7.1.0",
     "react-tabs": "^6.1.0",
+    "react-zoom-pan-pinch": "^3.7.0",
     "zod": "^3.11.6"
   },
   "devDependencies": {

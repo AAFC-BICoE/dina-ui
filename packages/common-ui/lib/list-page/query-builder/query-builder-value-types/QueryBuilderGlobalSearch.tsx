@@ -61,7 +61,7 @@ export default function QueryRowGlobalSearchSearch({
       <Tooltip
         id={"queryBuilder_globalSearch_tooltip"}
         link={
-          "https://aafc-bicoe.github.io/dina-documentation/#global_search_syntax"
+          "https://aafc-bicoe.github.io/dina-documentation/concepts-glossary/#global_search_syntax"
         }
         linkText="queryBuilder_globalSearch_tooltipLink"
         placement="left"

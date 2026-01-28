@@ -347,7 +347,8 @@ export class ApiClientImpl implements ApiClientI {
           default:
             throw new Error(`Unsupported single operation: ${operation.op}`);
         }
-      } catch (error) {
+      } catch (error: any) {
+        // If it's a 404 or 410 and returnNullForMissingResource, return null.
         if (
           returnNullForMissingResource &&
           (error.cause.data.errors[0].status.includes("404") ||

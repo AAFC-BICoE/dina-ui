@@ -665,6 +665,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   parentMaterialSample: "Échantillon de matériau parent",
   parentSampleNotFoundLabel: "Échantillon parent non trouvé",
   partial: "Partiel",
+  peopleTitle: "Personnes",
   personListTitle: "Personnes",
   phacAnimalRGLevel: "Niveau de GR animal ASPC",
   phacContainmentLevel: "Niveau de confinement ASPC",

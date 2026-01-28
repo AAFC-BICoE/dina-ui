@@ -191,7 +191,9 @@ export function UploadWorkbookPage() {
                   role="status"
                   aria-hidden="true"
                 />
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">
+                  <DinaMessage id="loadingText" />
+                </span>
               </>
             ) : (
               <DinaMessage id="save" />

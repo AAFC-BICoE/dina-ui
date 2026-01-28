@@ -1,19 +1,23 @@
-import { useAccount } from "common-ui";
+import { GlobalSearch, useAccount } from "common-ui";
+import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
-import React from "react";
-import Container from "react-bootstrap/Container";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
+import { useRouter } from "next/router";
 import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
 import Stack from "react-bootstrap/Stack";
 import { Footer, Head, Nav } from "../components";
 import { DinaMessage, useDinaIntl } from "../intl/dina-ui-intl";
 import { SeqdbMessage } from "../intl/seqdb-intl";
-import { SUPER_USER } from "common-ui/types/DinaRoles";
 
 export function Home() {
   const { isAdmin, rolesPerGroup, subject } = useAccount();
+  const router = useRouter();
+
+  const handleSearch = (searchTerm: string) => {
+    // Navigate to global search results page
+    router.push(`/global-search?q=${encodeURIComponent(searchTerm)}`);
+  };
 
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
@@ -26,64 +30,12 @@ export function Home() {
       <Nav />
       <main role="main">
         <Container fluid={true}>
-          {/* Quick create menu */}
-          <Card bg="light" className="mb-4">
-            <Card.Body>
-              <span className="mx-3">
-                <DinaMessage id="createNewLabel" />:
-              </span>
-
-              <Link
-                href="/collection/material-sample/edit"
-                passHref={true}
-                legacyBehavior
-              >
-                <Button variant="info" className="mx-1 my-1">
-                  <DinaMessage id="materialSample" />
-                </Button>
-              </Link>
-
-              <Link
-                href="/collection/material-sample/bulk-create"
-                passHref={true}
-                legacyBehavior
-              >
-                <Button variant="info" className="mx-1 my-1">
-                  <DinaMessage id="multipleMaterialSamples" />
-                </Button>
-              </Link>
-
-              <Link
-                href="/collection/collecting-event/edit"
-                passHref={true}
-                legacyBehavior
-              >
-                <Button variant="info" className="mx-1 my-1">
-                  <DinaMessage id="collectingEvent" />
-                </Button>
-              </Link>
-
-              <Link
-                href="/loan-transaction/transaction/edit"
-                passHref={true}
-                legacyBehavior
-              >
-                <Button variant="info" className="mx-1 my-1">
-                  <DinaMessage id="loanTransaction" />
-                </Button>
-              </Link>
-
-              <Link href="/object-store/upload" passHref={true} legacyBehavior>
-                <Button
-                  href="/object-store/upload"
-                  variant="info"
-                  className="mx-1 my-1"
-                >
-                  <DinaMessage id="uploadPageTitle" />
-                </Button>
-              </Link>
-            </Card.Body>
-          </Card>
+          {/* Global Search - Centered at 80% width */}
+          <div className="d-flex justify-content-center mb-4">
+            <div style={{ width: "80%" }}>
+              <GlobalSearch onSearch={handleSearch} />
+            </div>
+          </div>
 
           {/* Split page into lg sections */}
           <Row lg={4} md={2} xs={1}>

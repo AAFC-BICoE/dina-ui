@@ -5,7 +5,8 @@ import {
 import {
   ResourceHandler,
   SaveResourceContext,
-  SaveResourceResult
+  SaveResourceResult,
+  WorkbookSaveError
 } from "./types";
 
 export const metadataHandler: ResourceHandler = {
@@ -31,9 +32,10 @@ export const metadataHandler: ResourceHandler = {
 
     // If matchingFile is not found, throw an error.
     if (!matchingFile) {
-      throw new Error(
-        `No uploaded file found for metadata with original filename: ${resource.originalFilename} in group: ${group}`
-      );
+      throw new WorkbookSaveError("metadataFileNotFoundError", {
+        originalFilename: resource.originalFilename,
+        group
+      });
     }
 
     // Bucket must be set from group

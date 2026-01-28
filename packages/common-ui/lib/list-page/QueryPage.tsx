@@ -546,6 +546,15 @@ export function QueryPage<TData extends KitsuResource>({
     let queryDSL;
     if (viewMode) {
       isActionTriggeredQuery.current = true;
+
+      // In view mode, we still need to generate queryDSL from the tree
+      // if we're not using a custom elastic search query
+      if (!customViewElasticSearchQuery) {
+        queryDSL = elasticSearchFormatExport(
+          submittedQueryBuilderTree,
+          queryBuilderConfig
+        );
+      }
     } else {
       queryDSL = elasticSearchFormatExport(
         submittedQueryBuilderTree,
@@ -897,10 +906,13 @@ export function QueryPage<TData extends KitsuResource>({
   /**
    * When the group filter has changed, store the new value for the search.
    */
-  const onGroupChange = useCallback((newGroups: string[]) => {
-    isActionTriggeredQuery.current = true;
-    setGroups(newGroups);
-  }, []);
+  const onGroupChange = useCallback(
+    (newGroups: string[]) => {
+      isActionTriggeredQuery.current = true;
+      setGroups(newGroups);
+    },
+    [setGroups]
+  );
 
   /**
    * When the displayed columns are changed from the column selector, we need to trigger

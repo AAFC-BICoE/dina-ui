@@ -57,7 +57,7 @@ export function ModalProvider({ appElement, children }: ModalProviderProps) {
           <style>{`
             .modal-content {
               margin: auto;
-              max-height: calc(100vh - 3rem) !important;
+              max-height: calc(90vh - 3rem) !important;
               overflow-y: scroll !important;
             }
         `}</style>
