@@ -1,3 +1,5 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "jestrunner.jestCommand": "yarn jest",
+  "jestrunner.configPath": "jest.config.ts"
 }
