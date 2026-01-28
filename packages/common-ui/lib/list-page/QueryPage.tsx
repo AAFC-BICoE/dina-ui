@@ -546,6 +546,15 @@ export function QueryPage<TData extends KitsuResource>({
     let queryDSL;
     if (viewMode) {
       isActionTriggeredQuery.current = true;
+
+      // In view mode, we still need to generate queryDSL from the tree
+      // if we're not using a custom elastic search query
+      if (!customViewElasticSearchQuery) {
+        queryDSL = elasticSearchFormatExport(
+          submittedQueryBuilderTree,
+          queryBuilderConfig
+        );
+      }
     } else {
       queryDSL = elasticSearchFormatExport(
         submittedQueryBuilderTree,
