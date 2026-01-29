@@ -3,25 +3,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 export interface QueryConfig {
   path: string;
-
   filter?: Record<string, any>;
-
   sort?: string;
-
   fields?: Record<string, string>;
-
   include?: string;
 }
 
 interface UseMultiPagedQueryResult<T> {
   data: T[];
-
   loading: boolean;
-
   totalCount: number;
-
   error: any;
-
   reload: () => void;
 }
 
