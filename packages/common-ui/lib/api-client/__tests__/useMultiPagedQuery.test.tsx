@@ -477,6 +477,57 @@ describe("useMultiPagedQuery hook", () => {
     expect(lastCalls.some((call) => call[0] === "resource2")).toBe(true);
   });
 
+  it("Re-fetches when pageSize changes", async () => {
+    mockGet.mockImplementation(async (_path, options) => {
+      if (options?.page?.limit === 0) {
+        return MOCK_QUERY1_COUNT_RESPONSE;
+      }
+      return {
+        data: Array(options?.page?.limit || 0)
+          .fill(null)
+          .map((_, i) => ({
+            id: `${i}`,
+            type: "resource",
+            name: `Resource ${i}`
+          }))
+      };
+    });
+
+    const mockOnResult = jest.fn();
+
+    const { rerender } = mountWithAppContext(
+      <TestComponent
+        queries={[{ path: "resource" }]}
+        pageSize={3}
+        offset={0}
+        onResult={mockOnResult}
+      />,
+      testCtx
+    );
+
+    await waitFor(() => {
+      expect(mockOnResult).toHaveBeenCalledWith(
+        expect.objectContaining({ loading: false })
+      );
+    });
+
+    const callCountAfterFirst = mockGet.mock.calls.length;
+
+    // Change pageSize
+    rerender(
+      <TestComponent
+        queries={[{ path: "resource" }]}
+        pageSize={5}
+        offset={0}
+        onResult={mockOnResult}
+      />
+    );
+
+    await waitFor(() => {
+      expect(mockGet.mock.calls.length).toBeGreaterThan(callCountAfterFirst);
+    });
+  });
+
   it("Returns empty data when offset is beyond total count", async () => {
     mockGet.mockImplementation(async (_path, options) => {
       if (options?.page?.limit === 0) {
