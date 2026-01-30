@@ -222,15 +222,19 @@ export function ControlledVocabularyItemFormLayout() {
           filter={(input) =>
             SimpleSearchFilterBuilder.create<ControlledVocabulary>()
               .searchFilter("name", input)
+              // User editable controlled vocabularies
+              .whereIn("name", ["MANAGED_ATTRIBUTE", "FIELD_EXTENSIONS"])
               .build()
           }
           model="collection-api/controlled-vocabulary"
+          isDisabled={true}
           optionLabel={(cv) => cv.name}
           onChange={(selected) => {
             setSelectedControlledVocabulary(
               selected as PersistedResource<ControlledVocabulary> | null
             );
           }}
+          omitNullOption={true}
         />
       </div>
       <div className="row">
