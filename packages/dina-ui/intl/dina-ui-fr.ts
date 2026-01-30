@@ -135,7 +135,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   coordinateUncertaintyInMeters: "Coordonner l’incertitude en mètres",
   copyFromParentLabel: "Copier du parent",
   countryLabel: "Pays",
-  creatNewWorkflow: "Créer nouveau",
+  createNewWorkflow: "Créer nouveau",
   create: "Créer",
   createAndAssign: "Créer et assigner",
   createFormTemplate: "Créer un modèle de formulaire",
