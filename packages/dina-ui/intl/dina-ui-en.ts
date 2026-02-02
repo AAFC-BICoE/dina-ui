@@ -427,6 +427,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_endEventDateTime_tooltip:
     "End Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_expeditionName: "Expedition name",
+  field_siteName: "Site name",
   field_familyNames: "Family Names",
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_fieldExtensions: "Field Extensions",
