@@ -18,7 +18,7 @@ React-based user interface for AAFC-DINA.
 
 Before you begin, ensure you have the following installed:
 
-- **Node.js** - Version 20
+- **Node.js** - Version 22
 - **Yarn** - Version 1.22
 
 ## 📚 Documentation
