@@ -17,11 +17,12 @@ const config = tseslint.config(
   // Files to be scanned by the linter.
   {files: ["**/*.{js,ts,jsx,tsx}"]},
 
-  // Ignore built files.
+  // Ignore built and auto-generated files.
   {ignores: [
     "**/node_modules/",
     "**/out/",
-    "**/.next/"
+    "**/.next/",
+    "**/next-env.d.ts"
   ]},
 
   // Supported browsers.

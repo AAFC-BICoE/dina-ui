@@ -40,9 +40,10 @@ import { DinaIntlProvider } from "../intl/dina-ui-intl";
  * See: https://github.com/zeit/next.js/#custom-app
  */
 export default function DinaUiApp({ Component, pageProps }: AppProps) {
-  const appElement = process.browser
-    ? document.querySelector<HTMLElement>("#__next")
-    : null;
+  const appElement =
+    typeof window !== "undefined"
+      ? document.querySelector<HTMLElement>("#__next")
+      : null;
 
   return (
     <ApiClientImplProvider>
