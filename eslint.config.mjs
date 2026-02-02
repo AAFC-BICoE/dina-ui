@@ -1,41 +1,41 @@
+import { FlatCompat } from "@eslint/eslintrc";
+import path from "path";
+import { fileURLToPath } from "url";
 import globals from "globals";
 import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from "eslint-config-prettier";
+import jest from "eslint-plugin-jest";
 
-// Create a clean copy of browser globals
-const browserGlobals = {...globals.browser};
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Fix the problematic entry if it exists
-if ('AudioWorkletGlobalScope ' in browserGlobals) {
-  // Copy the value without the trailing space
-  browserGlobals['AudioWorkletGlobalScope'] = browserGlobals['AudioWorkletGlobalScope '];
-  // Remove the problematic entry
-  delete browserGlobals['AudioWorkletGlobalScope '];
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
+const browserGlobals = { ...globals.browser };
+
+// Fix the problematic entry if it exists (note: removed extra space)
+if ('AudioWorkletGlobalScope' in browserGlobals) {
+  browserGlobals['AudioWorkletGlobalScope'] = browserGlobals['AudioWorkletGlobalScope'];
+  delete browserGlobals['AudioWorkletGlobalScope'];
 }
 
-const config = tseslint.config(
-  // Files to be scanned by the linter.
-  {files: ["**/*.{js,ts,jsx,tsx}"]},
-
-  // Ignore built files.
-  {ignores: [
-    "**/node_modules/",
-    "**/out/",
-    "**/.next/"
-  ]},
-
-  // Supported browsers.
-  {languageOptions: { globals: browserGlobals }},
-
-  // Typescript support.
-  tseslint.configs.recommended,
-
-  // Prettier rules to be applied (defined in the .prettierrc file).
-  eslintConfigPrettier,
-
-  // Changes to the default rules:
+const config = [
+  ...compat.extends("next/core-web-vitals"),
   {
+    files: ["**/*.{js,ts,jsx,tsx}"],
+    languageOptions: {
+      globals: browserGlobals,
+      parser: tseslint.parser,
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+      jest: jest
+    },
     rules: {
+      ...tseslint.configs.recommended.rules,
+
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "no-console": ["error", { allow: ["warn", "error"] }],
@@ -47,9 +47,27 @@ const config = tseslint.config(
           "varsIgnorePattern": "^_[^_].*$|^_$",
           "caughtErrorsIgnorePattern": "^_[^_].*$|^_$"
         }
-      ]
-    }
+      ],
+
+      "react-hooks/exhaustive-deps": "off",
+      "react-hooks/rules-of-hooks": "off",
+      "react/display-name": "off",
+      "react/no-unescaped-entities": "off",
+      "@next/next/no-img-element": "off",
+      "import/no-anonymous-default-export": "off",
+      "react/jsx-key": "off",
+
+      ...eslintConfigPrettier.rules,
+    },
+  },
+  {
+    ignores: [
+      "**/node_modules/",
+      "**/out/",
+      "**/.next/",
+      "**/next-env.d.ts"
+    ],
   }
-);
+];
 
 export default config;

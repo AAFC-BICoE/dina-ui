@@ -49,7 +49,7 @@ export function getIntlSupport<TMessages extends MessageDictionary>({
 
     const messages = useMemo(
       () =>
-        process.browser
+        typeof window !== "undefined"
           ? // Show the translated message if it exists, otherwise show the default English message:
             {
               ...defaultMessages,
