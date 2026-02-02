@@ -69,12 +69,4 @@ describe("LanguageSelector component", () => {
       expect(await component.findByText("Français")).not.toBeInTheDocument();
     });
   });
-
-  // Skip: This test relied on process.browser which is deprecated.
-  // The component now uses `typeof window === "undefined"` which cannot be
-  // easily tested in jsdom since window is always defined.
-  it.skip("Doesn't render server-side.", async () => {
-    const component = mountWithAppContext(<LanguageSelector />);
-    expect(await component.queryByTestId("languageSelector")).toBeNull();
-  });
 });
