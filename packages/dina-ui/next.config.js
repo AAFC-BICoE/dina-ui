@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+ 
 
 // SSR polyfills:
 require("setimmediate");
@@ -11,6 +11,8 @@ const appVersion = `${require("./package.json").version}${
   isDevMode ? "-DEVELOPMENT" : ""
 }`;
 
+const path = require("path");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   allowedDevOrigins: ["dina.local"],
@@ -21,9 +23,10 @@ const nextConfig = {
     "react-dnd",
     "react-dnd-html5-backend"
   ],
-  output: "export"
+  output: "export",
+  outputFileTracingRoot: path.join(__dirname)
 };
 
 module.exports = nextConfig;
 
-/* eslint-enable @typescript-eslint/no-require-imports */
+ 

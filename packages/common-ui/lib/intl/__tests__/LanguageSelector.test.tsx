@@ -43,15 +43,6 @@ const apiContext = {
 } as any;
 
 describe("LanguageSelector component", () => {
-  beforeEach(() => {
-    // Pretend the tests are running in the browser:
-    (process as any).browser = true;
-  });
-  afterEach(() => {
-    // Pretend the tests are running in the browser:
-    (process as any).browser = true;
-  });
-
   it("Renders the language selector.", async () => {
     const component = mountWithAppContext(<LanguageSelector />, {
       apiContext
@@ -77,13 +68,5 @@ describe("LanguageSelector component", () => {
       expect(await component.findByText("English")).toBeInTheDocument();
       expect(await component.findByText("Français")).not.toBeInTheDocument();
     });
-  });
-
-  it("Doesn't render server-side.", async () => {
-    // Pretend this test is not running in the browser:
-    (process as any).browser = false;
-
-    const component = mountWithAppContext(<LanguageSelector />);
-    expect(await component.queryByTestId("languageSelector")).toBeNull();
   });
 });

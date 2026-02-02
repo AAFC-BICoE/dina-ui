@@ -10,7 +10,7 @@ export function LanguageSelector() {
 
   // This component fails to server-side render because the user's locale is unknown, so only
   // render it on the client where the locale is retrieved correctly.
-  if (!process.browser) {
+  if (typeof window === "undefined") {
     return null;
   }
   const supportedLanguagesArray: string[] =
