@@ -42,7 +42,6 @@ export interface CollectingEventAttributes {
 
   createdBy?: string;
   createdOn?: string;
-  collectorGroupUuid?: string;
 
   group?: string;
   geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
@@ -67,6 +66,10 @@ export interface CollectingEventAttributes {
   protocol?: Protocol;
   geoReferenceAssertions?: GeoReferenceAssertion[];
   version?: number;
+
+  // Client side only fields
+  collectorGroups?: string[];
+  collectorGroupUuid?: string;
 }
 
 export enum GeographicPlaceNameSource {
