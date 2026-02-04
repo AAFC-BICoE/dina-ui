@@ -80,6 +80,7 @@ import {
   createLastUsedSavedSearchChangedKey,
   createSessionStorageLastUsedTreeKey
 } from "./saved-searches/SavedSearch";
+import { Tooltip, useFieldLabels } from "common-ui";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -313,6 +314,8 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   rowStyling?: (row: Row<TData>) => CSSProperties | undefined;
 
+  columnTooltips?: boolean;
+
   enableDnd?: boolean;
 
   /**
@@ -363,6 +366,7 @@ export function QueryPage<TData extends KitsuResource>({
   customViewElasticSearchQuery,
   customViewFields,
   rowStyling,
+  columnTooltips = true,
   enableDnd = false,
   onSelect,
   onDeselect,
@@ -374,6 +378,7 @@ export function QueryPage<TData extends KitsuResource>({
     useState<boolean>(true);
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
+  const { getFieldLabel } = useFieldLabels();
   const { groupNames } = useAccount();
   const isActionTriggeredQuery = useRef(false);
   const router = useRouter();
@@ -845,8 +850,30 @@ export function QueryPage<TData extends KitsuResource>({
           }
         ]
       : [];
+    // Get unique columns once
+    const uniqueColumns = _.uniqBy(
+      [...selectColumn, ...displayedColumns],
+      "id"
+    );
 
-    return _.uniqBy([...selectColumn, ...displayedColumns], "id");
+    if (!columnTooltips) {
+      return uniqueColumns;
+    }
+
+    // Add tooltips to column headers if enabled
+    return uniqueColumns.map((col) => ({
+      ...col,
+      header: () => (
+        <Tooltip
+          directText={getFieldLabel({ name: col.id ?? "" }).fieldLabel}
+          visibleElement={
+            typeof col.header === "function"
+              ? col.header({} as any)
+              : () => <></>
+          }
+        />
+      )
+    }));
   }, [showRowCheckboxes, selectionMode, displayedColumns, searchResults]);
 
   // Columns generated for the selected resources, only in selection mode.
