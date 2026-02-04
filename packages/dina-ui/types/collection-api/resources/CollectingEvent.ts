@@ -63,7 +63,6 @@ export interface CollectingEventAttributes {
 
   selectedSections?: string[];
   extensionValues?: any;
-  protocol?: Protocol;
   geoReferenceAssertions?: GeoReferenceAssertion[];
   version?: number;
 
@@ -80,6 +79,7 @@ export interface CollectingEventRelationships {
   expedition?: Expedition;
   attachment?: ResourceIdentifierObject[];
   collectors?: KitsuResource[];
+  protocol?: Protocol;
 }
 
 export type CollectingEvent = KitsuResource &
