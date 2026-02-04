@@ -203,7 +203,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
         readOnly: props.readOnly ?? false
       }}
     >
-      <Formik
+      <Formik<Values>
         // Don't use Formik's default validation triggers:
         // Only validate on submit. And remove field error on field value change.
         validateOnChange={false}
