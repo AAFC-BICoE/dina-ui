@@ -1,53 +1,56 @@
-import {
-  DateField,
-  MultilingualDescription,
-  TextField,
-  useDinaFormContext
-} from "common-ui";
-import { GroupSelectField, PersonSelectField } from "../..";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DateField, MultilingualDescription, DinaFormSection } from "common-ui";
+import { AttachmentsField } from "../..";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { AllowAttachmentsConfig } from "../../object-store";
 
-export function SiteFormLayout() {
-  const { readOnly } = useDinaFormContext();
+export function SiteFormLayout({
+  attachmentsConfig
+}: {
+  attachmentsConfig?: AllowAttachmentsConfig;
+}) {
   const { formatMessage } = useDinaIntl();
 
   return (
     <div>
       <div className="row">
-        <TextField
-          className="col-md-6 name"
-          name="name"
-          label={formatMessage("field_siteName")}
-        />
-        {!readOnly && (
-          <GroupSelectField
-            name="group"
-            enableStoredDefaultGroup={true}
-            className="col-md-6"
-          />
-        )}
-      </div>
-      <div className="row">
         <DateField
-          className="col-md-6 startDate"
-          name="startDate"
-          label={formatMessage("field_startDate")}
+          className="col-md-6"
+          name="group"
+          label={formatMessage("group")}
         />
         <DateField
-          className="col-md-6 endDate"
-          name="endDate"
-          label={formatMessage("field_endDate")}
+          className="col-md-6"
+          name="code"
+          label={formatMessage("code")}
         />
       </div>
       <MultilingualDescription />
       <div className="row">
-        <TextField
-          className="col-md-6 status"
-          name="geographicContext"
-          label={formatMessage("field_geographicContext")}
+        <DateField
+          className="col-md-6"
+          name="createdOn"
+          label={formatMessage("field_createdOn")}
+        />
+        <DateField
+          className="col-md-6"
+          name="createdBy"
+          label={formatMessage("field_createdBy")}
         />
       </div>
-      <PersonSelectField name="participants" isMulti={true} />
+      <div className="mb-3">
+        <DinaFormSection
+          componentName="site-component"
+          sectionName="site-attachments-section"
+        >
+          <AttachmentsField
+            name="attachment"
+            title={<DinaMessage id="siteAttachments" />}
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+            allowAttachmentsConfig={attachmentsConfig}
+          />
+        </DinaFormSection>
+      </div>
     </div>
   );
 }

@@ -1373,5 +1373,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination.",
   notPubliclyReleasableWithReason: "Not Publicly Releasable: {reason}",
   clearAllNamesButtonText: "Clear All Names",
-  workflowsLegend: "Molecular Analysis Workflows"
+  workflowsLegend: "Molecular Analysis Workflows",
+  siteAttachments: "Site Attachments",
+  code: "Code"
 };

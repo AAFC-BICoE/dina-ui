@@ -4,20 +4,16 @@ import { MultilingualDescription } from "../../common";
 
 export interface SiteAttributes {
   type: "site";
-  name: string;
-  startDate?: string;
-  endDate?: string;
-  geographicContext?: string;
-  multilingualDescription?: MultilingualDescription;
-  createdOn?: string;
-  createdBy?: string;
+  title?: string;
   group?: string;
+  code?: string | null;
+  multilingualDescription?: MultilingualDescription | null;
+  readonly createdOn?: string;
+  readonly createdBy?: string;
 }
 
 export interface SiteRelationships {
   participants?: ResourceIdentifierObject[];
 }
 
-export type Site = KitsuResource &
-  SiteAttributes &
-  SiteRelationships;
+export type Site = KitsuResource & SiteAttributes & SiteRelationships;
