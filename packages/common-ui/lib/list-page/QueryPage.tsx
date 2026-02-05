@@ -867,9 +867,11 @@ export function QueryPage<TData extends KitsuResource>({
         <Tooltip
           directText={getFieldLabel({ name: col.id ?? "" }).fieldLabel}
           visibleElement={
-            typeof col.header === "function"
-              ? col.header({} as any)
-              : () => <></>
+            <div className="text-truncate">
+              {typeof col.header === "function"
+                ? col.header({} as any)
+                : () => <></>}
+            </div>
           }
         />
       )
