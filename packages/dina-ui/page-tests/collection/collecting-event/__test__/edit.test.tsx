@@ -44,7 +44,10 @@ const mockGet = jest.fn(async (model) => {
     return { data: [testAgent()] };
   } else if (model === "collection-api/vocabulary2/srs") {
     return { data: [testSrs()] };
-  } else if (model === "collection-api/vocabulary2/coordinateSystem") {
+  } else if (
+    model ===
+    "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format"
+  ) {
     return { data: [testCoordinates()] };
   } else if (model === "collection-api/collecting-event") {
     return { data: [] };
