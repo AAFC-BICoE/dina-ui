@@ -1,6 +1,5 @@
 import { useState, FormEvent, useEffect } from "react";
 import { useIntl } from "react-intl";
-import "./global-search.css";
 
 export interface GlobalSearchProps {
   /** Callback function when search is submitted */

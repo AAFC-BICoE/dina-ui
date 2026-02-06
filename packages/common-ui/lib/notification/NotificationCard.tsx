@@ -1,7 +1,6 @@
 import { useState, memo } from "react";
 import moment from "moment";
 import { Notification } from "./types";
-import "./notification.css";
 
 export interface NotificationCardProps {
   notification: Notification;

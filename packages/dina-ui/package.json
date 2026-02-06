@@ -1,11 +1,10 @@
 {
   "name": "dina-ui",
-  "license": "SEE LICENSE FILE",
+  "license": "MIT",
   "version": "0.210.0",
   "scripts": {
     "build": "node --require ./next.config.js ../../node_modules/.bin/next build",
-    "dev": "next",
-    "next": "next",
+    "dev": "next --turbopack",
     "a11y-check": "pa11y-ci -j > pa11y-result.json",
     "a11y-generate-report": "pa11y-ci-reporter-html -s pa11y-result.json --destination ./pa11y-html-report"
   },
