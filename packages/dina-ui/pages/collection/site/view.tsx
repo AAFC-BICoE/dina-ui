@@ -24,9 +24,8 @@ export default function SiteDetailsPage() {
         </DinaForm>
       )}
       query={(id) => ({
-        path: `collection-api/site/${id}?include=participants`
+        path: `collection-api/site/${id}?include=attachment`
       })}
-      nameField={"title"}
       entityLink="/collection/site"
       type="site"
       apiBaseUrl="/collection-api"

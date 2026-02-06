@@ -4,7 +4,7 @@ import { MultilingualDescription } from "../../common";
 
 export interface SiteAttributes {
   type: "site";
-  title?: string;
+  name?: string;
   group?: string;
   code?: string | null;
   multilingualDescription?: MultilingualDescription | null;
@@ -13,7 +13,7 @@ export interface SiteAttributes {
 }
 
 export interface SiteRelationships {
-  participants?: ResourceIdentifierObject[];
+  attachment?: ResourceIdentifierObject[];
 }
 
 export type Site = KitsuResource & SiteAttributes & SiteRelationships;
