@@ -28,6 +28,9 @@ export interface FieldNameProps {
 
   /** Optional flag to make label of the field StartCase. */
   startCaseLabel?: boolean;
+
+  /** Encapsulate the field header with the tooltip, and concatenate the tooltip content with the field header if it is provided. */
+  combineFieldHeaderWithTooltip?: boolean;
 }
 
 /** Get the field label and tooltip given the camelCase field key. */
@@ -41,12 +44,45 @@ export function useFieldLabels() {
     tooltipImageAlt,
     tooltipLink,
     tooltipLinkText,
-    startCaseLabel = true
+    startCaseLabel = true,
+    combineFieldHeaderWithTooltip = true
   }: FieldNameProps) {
     const messageKey = `field_${name}`;
     const tooltipKey = tooltipOverride
       ? tooltipOverride
       : `${messageKey}_tooltip`;
+
+    const fieldLabel = messages[messageKey]
+      ? formatMessage({ id: messageKey as any })
+      : startCaseLabel
+      ? _.startCase(name)
+      : name;
+
+    if (combineFieldHeaderWithTooltip) {
+      const tooltipText =
+        messages[tooltipKey] || tooltipImage || tooltipLink || tooltipOverride
+          ? fieldLabel +
+            ": " +
+            (messages[tooltipKey]
+              ? formatMessage({ id: tooltipKey as any })
+              : tooltipOverride
+              ? tooltipOverride
+              : "")
+          : fieldLabel;
+      const tooltipWithLabel = (
+        <Tooltip
+          id={undefined}
+          directText={tooltipText}
+          image={tooltipImage}
+          altImage={tooltipImageAlt}
+          link={tooltipLink}
+          linkText={tooltipLinkText}
+          visibleElement={<>{fieldLabel}</>}
+        />
+      );
+
+      return { tooltip: tooltipWithLabel, fieldLabel };
+    }
 
     const tooltip =
       messages[tooltipKey] || tooltipImage || tooltipLink || tooltipOverride ? (
@@ -59,12 +95,6 @@ export function useFieldLabels() {
           linkText={tooltipLinkText}
         />
       ) : null;
-
-    const fieldLabel = messages[messageKey]
-      ? formatMessage({ id: messageKey as any })
-      : startCaseLabel
-      ? _.startCase(name)
-      : name;
 
     return { tooltip, fieldLabel };
   }
@@ -86,7 +116,8 @@ export function FieldHeader({
   tooltipImageAlt,
   tooltipLink,
   tooltipLinkText,
-  startCaseLabel
+  startCaseLabel,
+  combineFieldHeaderWithTooltip
 }: FieldNameProps) {
   const { getFieldLabel } = useFieldLabels();
   const { fieldLabel, tooltip } = getFieldLabel({
@@ -96,11 +127,16 @@ export function FieldHeader({
     tooltipImageAlt,
     tooltipLink,
     tooltipLinkText,
-    startCaseLabel
+    startCaseLabel,
+    combineFieldHeaderWithTooltip
   });
 
+  if (combineFieldHeaderWithTooltip) {
+    return <div className={"truncate-text"}>{tooltip}</div>;
+  }
+
   return (
-    <div className={`${customName ?? name}-field-header`}>
+    <div className={`${customName ?? name}-field-header "truncate-text"`}>
       {prefixName ? prefixName + " " : ""}
       {fieldLabel}
       {tooltip}
