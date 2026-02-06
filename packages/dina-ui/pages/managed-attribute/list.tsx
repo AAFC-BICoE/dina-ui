@@ -155,7 +155,7 @@ function GenericManagedAttributeListView({
           original: { id, name }
         }
       }) => <Link href={`${prependLink}/view?id=${id}`}>{name}</Link>,
-      header: "Name",
+      header: () => <FieldHeader name="name" />,
       accessorKey: "name"
     },
     ...(componentSupport

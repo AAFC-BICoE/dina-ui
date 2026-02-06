@@ -315,6 +315,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_attachment: "Attachments",
   field_attributesTemplate: "Set Attributes Template",
   field_analysisType: "Analysis Type",
+  field_molecularAnalysisName: "Molecular Analysis Name",
   field_barcode: "Barcode",
   field_collectingEventCollectionMethod: "Collection Method",
   field_collectingEventCollectionMethod_tooltip:

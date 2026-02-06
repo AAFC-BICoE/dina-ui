@@ -45,7 +45,7 @@ export function useFieldLabels() {
     tooltipLink,
     tooltipLinkText,
     startCaseLabel = true,
-    combineFieldHeaderWithTooltip = true
+    combineFieldHeaderWithTooltip
   }: FieldNameProps) {
     const messageKey = `field_${name}`;
     const tooltipKey = tooltipOverride
@@ -117,7 +117,7 @@ export function FieldHeader({
   tooltipLink,
   tooltipLinkText,
   startCaseLabel,
-  combineFieldHeaderWithTooltip
+  combineFieldHeaderWithTooltip = true
 }: FieldNameProps) {
   const { getFieldLabel } = useFieldLabels();
   const { fieldLabel, tooltip } = getFieldLabel({
@@ -132,11 +132,15 @@ export function FieldHeader({
   });
 
   if (combineFieldHeaderWithTooltip) {
-    return <div className={"truncate-text"}>{tooltip}</div>;
+    return (
+      <div className={`${customName ?? name}-field-header truncate-text`}>
+        {tooltip}
+      </div>
+    );
   }
 
   return (
-    <div className={`${customName ?? name}-field-header "truncate-text"`}>
+    <div className={`${customName ?? name}-field-header truncate-text`}>
       {prefixName ? prefixName + " " : ""}
       {fieldLabel}
       {tooltip}

@@ -123,7 +123,7 @@ export default function MetadataListPage() {
         "data.attributes.originalFilename",
         "data.attributes.resourceExternalURL"
       ],
-      header: () => <DinaMessage id="viewDetails" />,
+      header: () => <FieldHeader name="viewDetails" />,
       enableSorting: false,
       id: "viewDetails"
     },
@@ -188,11 +188,7 @@ export default function MetadataListPage() {
           </button>
         </div>
       ),
-      header: () => (
-        <div id="acPreviewLinksHeader" style={{ whiteSpace: "nowrap" }}>
-          <DinaMessage id="viewPreviewButtonText" />
-        </div>
-      ),
+      header: () => <FieldHeader name="previewLabel" />,
       enableSorting: false
     }
   ];
