@@ -11,7 +11,8 @@ export default function TransactionDetailsPage() {
           <TransactionFormLayout />
         </DinaForm>
       )}
-      customQueryHook={(id) => useTransactionQuery(id, true)}
+      customQueryHook={useTransactionQuery}
+      customQueryHookOptions={{ showPermissions: true }}
       entityLink="/loan-transaction/transaction"
       type="transaction"
       apiBaseUrl="/loan-transaction-api"

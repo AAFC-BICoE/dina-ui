@@ -7,6 +7,7 @@ import {
   QueryOptions,
   QueryState,
   useQuery,
+  CustomQueryHook,
   withResponse
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
@@ -30,12 +31,16 @@ type ViewPageLayoutPropsBase<T extends KitsuResource> =
   | {
       query?: never;
       /** Custom query hook which may have more complicated logic than the usual useQuery hook. */
-      customQueryHook: (id: string) => QueryState<T, unknown>;
+      customQueryHook: CustomQueryHook<T>;
+
+      /** Optional arguments to pass to the custom query hook. */
+      customQueryHookOptions?: any;
     };
 
 export type ViewPageLayoutProps<T extends KitsuResource> =
   ViewPageLayoutPropsBase<T> & {
     queryOptions?: QueryOptions<T, unknown>;
+    customQueryHookOptions?: any;
     form: (formProps: ResourceFormProps<T>) => ReactNode;
     entityLink: string;
     specialListUrl?: string;
@@ -93,6 +98,7 @@ export function ViewPageLayout<T extends KitsuResource>({
   form,
   query,
   customQueryHook,
+  customQueryHookOptions,
   queryOptions,
   entityLink,
   specialListUrl,
@@ -117,7 +123,7 @@ export function ViewPageLayout<T extends KitsuResource>({
   const router = useRouter();
   const id = String(router.query.id);
 
-  const resourceQuery = (customQueryHook?.(id) ??
+  const resourceQuery = (customQueryHook?.(id, customQueryHookOptions) ??
     (query &&
       useQuery(
         { ...query(id), header: { "include-dina-permission": "true" } },

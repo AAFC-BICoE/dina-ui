@@ -11,7 +11,7 @@ export default function PcrBatchDetailsPage() {
       form={(props) => (
         <LoadExternalDataForLibraryPrepBatchForm dinaFormProps={props} />
       )}
-      customQueryHook={(id) => useLibraryPrepBatchQuery(id)}
+      customQueryHook={useLibraryPrepBatchQuery}
       entityLink="/seqdb/library-prep-batch"
       type="library-prep-batch"
       apiBaseUrl="/seqdb-api"

@@ -8,7 +8,7 @@ export default function SeqBatchDetailsPage() {
       form={(props) => (
         <LoadExternalDataForSeqBatchForm dinaFormProps={{ ...props }} />
       )}
-      customQueryHook={(id) => useSeqBatchQuery(id)}
+      customQueryHook={useSeqBatchQuery}
       entityLink="/seqdb/seq-batch"
       type="seq-batch"
       apiBaseUrl="/seqdb-api"

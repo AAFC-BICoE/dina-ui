@@ -1,5 +1,10 @@
 import { DocWithErrors } from "jsonapi-typescript";
-import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
+import {
+  GetParams,
+  KitsuResource,
+  KitsuResponse,
+  KitsuResponseData
+} from "kitsu";
 import _ from "lodash";
 import { useContext, useDebugValue, useMemo } from "react";
 import useSWR from "swr";
@@ -44,6 +49,12 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
   /** Disables the query. */
   disabled?: boolean;
 }
+
+/** Custom query hook type. Includes guaranteed id param, along with options param */
+export type CustomQueryHook<T extends KitsuResource> = (
+  id: string,
+  options?: any
+) => QueryState<T, unknown>;
 
 /**
  * Back-end connected React hook for running queries agains the back-end.

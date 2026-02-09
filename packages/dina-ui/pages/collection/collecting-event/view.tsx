@@ -33,7 +33,7 @@ export default function CollectingEventDetailsPage() {
           </FieldSet>
         </DinaForm>
       )}
-      customQueryHook={(id) => useCollectingEventQuery(id)}
+      customQueryHook={useCollectingEventQuery}
       nameField={["dwcFieldNumber", "dwcRecordNumber", "otherRecordNumbers"]}
       entityLink="/collection/collecting-event"
       type="collecting-event"
