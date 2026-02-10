@@ -3,10 +3,11 @@ import { FormikContextType } from "formik";
 import _ from "lodash";
 import { useRouter } from "next/router";
 import {
-  AreYouSureModal,
   BulkSelectableFormValues,
   CommonMessage,
+  DinaForm,
   FormikButton,
+  SubmitButton,
   useApiClient,
   useModal
 } from "..";
@@ -15,9 +16,15 @@ import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 import { KitsuResource } from "kitsu";
 import { useSessionStorage } from "usehooks-ts";
 import { MdEdit } from "react-icons/md";
-import { FaTrash } from "react-icons/fa";
+import {
+  FaCheck,
+  FaExclamationTriangle,
+  FaTimes,
+  FaTrash
+} from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
 import { TbArrowsSplit2 } from "react-icons/tb";
+import { useState } from "react";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -67,9 +74,7 @@ export function BulkDeleteButton({
   beforeDelete,
   afterDelete
 }: BulkDeleteButtonProps) {
-  const router = useRouter();
   const { openModal } = useModal();
-  const { apiClient } = useApiClient();
 
   return (
     <FormikButton
@@ -81,44 +86,12 @@ export function BulkDeleteButton({
           .map((pair) => pair[0]);
 
         openModal(
-          <AreYouSureModal
-            actionMessage={
-              <span>
-                <CommonMessage id="deleteSelectedButtonText" /> (
-                {resourceIds.length})
-              </span>
-            }
-            onYesButtonClicked={async () => {
-              // Execute pre-deletion logic if provided (e.g., fetch related resources)
-              let beforeDeleteResult: any;
-              if (beforeDelete) {
-                beforeDeleteResult = await beforeDelete(resourceIds);
-              }
-
-              // Delete the records.
-              for (const resourceId of resourceIds) {
-                try {
-                  await apiClient.axios.delete(
-                    `${apiBaseUrl}/${typeName}/${resourceId}`
-                  );
-                } catch (e) {
-                  // If it doesn't exist or has been deleted already, ignore it.
-                  if (e.cause.status === 404 || e.cause.status === 410) {
-                    console.warn(e.cause);
-                  } else {
-                    throw e;
-                  }
-                }
-              }
-
-              // Execute additional cleanup/related operations if provided
-              if (afterDelete) {
-                await afterDelete(resourceIds, beforeDeleteResult);
-              }
-
-              // Refresh the page:
-              router.reload();
-            }}
+          <BulkDeletePopup
+            resourceIds={resourceIds}
+            apiBaseUrl={apiBaseUrl}
+            typeName={typeName}
+            beforeDelete={beforeDelete}
+            afterDelete={afterDelete}
           />
         );
       }}
@@ -126,6 +99,134 @@ export function BulkDeleteButton({
       <FaTrash className="me-2" />
       <CommonMessage id="deleteSelectedButtonText" />
     </FormikButton>
+  );
+}
+
+function BulkDeletePopup({
+  resourceIds,
+  apiBaseUrl,
+  typeName,
+  beforeDelete,
+  afterDelete
+}: { resourceIds: string[] } & BulkDeleteButtonProps) {
+  const router = useRouter();
+  const { closeModal } = useModal();
+  const { apiClient } = useApiClient();
+
+  const [permissionError, setPermissionError] = useState(false);
+  const [generalError, setGeneralError] = useState(false);
+
+  const isError = permissionError || generalError;
+
+  async function onDelete() {
+    if (isError) {
+      closeModal();
+      return;
+    }
+
+    let beforeDeleteResult: any;
+    if (beforeDelete) {
+      beforeDeleteResult = await beforeDelete(resourceIds);
+    }
+
+    for (const resourceId of resourceIds) {
+      try {
+        await apiClient.axios.delete(`${apiBaseUrl}/${typeName}/${resourceId}`);
+      } catch (e: any) {
+        const status = e?.cause?.status ?? e?.response?.status;
+
+        if (status === 404 || status === 410) {
+          console.warn(e);
+        } else if (status === 403) {
+          setPermissionError(true);
+          return;
+        } else {
+          console.error(e);
+          setGeneralError(true);
+          return;
+        }
+      }
+    }
+
+    if (afterDelete) {
+      await afterDelete(resourceIds, beforeDeleteResult);
+    }
+
+    router.reload();
+  }
+
+  return (
+    <DinaForm initialValues={{}} onSubmit={onDelete}>
+      <div className="modal-content are-you-sure-modal">
+        {/* Dynamic Header */}
+        <div className="modal-header">
+          {permissionError ? (
+            <div className="modal-title h3 text-danger">
+              <FaExclamationTriangle className="me-2" />
+              <CommonMessage id="somethingWentWrong" />
+            </div>
+          ) : (
+            <div className="modal-title h3">
+              <CommonMessage id="deleteSelectedButtonText" /> (
+              {resourceIds.length})
+            </div>
+          )}
+        </div>
+
+        {/* Dynamic Body */}
+        <div className="modal-body">
+          <main>
+            <div className="message-body text-center">
+              {permissionError && (
+                <div className="alert alert-danger">
+                  You don't have permissions to delete all records.
+                </div>
+              )}
+
+              {generalError && (
+                <div className="alert alert-danger">
+                  <CommonMessage id="somethingWentWrong" />
+                </div>
+              )}
+
+              {!isError && (
+                <p>
+                  <CommonMessage id="areYouSure" />
+                </p>
+              )}
+            </div>
+          </main>
+        </div>
+
+        {/* Dynamic Footer */}
+        <div className="modal-footer" style={{ justifyContent: "center" }}>
+          <div className="d-flex gap-3">
+            {permissionError ? (
+              <SubmitButton className="btn btn-secondary" showSaveIcon={false}>
+                <FaTimes className="me-2" />
+                <CommonMessage id="closeButtonText" />
+              </SubmitButton>
+            ) : (
+              <>
+                <FormikButton
+                  className="btn btn-dark no-button"
+                  onClick={closeModal}
+                  buttonProps={() => ({ style: { width: "10rem" } })}
+                >
+                  <FaTimes className="me-2" />
+                  <CommonMessage id="no" />
+                </FormikButton>
+
+                <SubmitButton className="yes-button" showSaveIcon={false}>
+                  <FaCheck className="me-2" />
+                  <CommonMessage id="yes" />
+                </SubmitButton>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </DinaForm>
   );
 }
 
