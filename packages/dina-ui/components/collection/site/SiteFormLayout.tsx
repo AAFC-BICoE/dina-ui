@@ -20,11 +20,6 @@ export function SiteFormLayout({
   return (
     <div>
       <div className="row">
-        <TextField
-          className="col-md-6"
-          name="code"
-          label={formatMessage("code")}
-        />
         {!readOnly && (
           <GroupSelectField
             className="col-md-6"
@@ -32,6 +27,18 @@ export function SiteFormLayout({
             enableStoredDefaultGroup={true}
           />
         )}
+      </div>
+      <div className="row">
+        <TextField
+          className="col-md-6"
+          name="name"
+          label={formatMessage("name")}
+        />
+        <TextField
+          className="col-md-6"
+          name="code"
+          label={formatMessage("code")}
+        />
       </div>
       <MultilingualDescription />
       <div className="row">
