@@ -937,5 +937,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_status: "Statut",
   field_openedDate: "Date d'ouverture",
   field_closedDate: "Date de fermeture",
-  field_dueDate: "Date d'échéance"
+  field_dueDate: "Date d'échéance",
+  siteAttachments: "Pièces jointes au site",
+  code: "Code"
 };
