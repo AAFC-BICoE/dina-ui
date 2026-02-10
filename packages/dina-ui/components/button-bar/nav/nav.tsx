@@ -5,7 +5,7 @@ import {
   useAccount,
   useInstanceContext
 } from "common-ui";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
 import { useContext, useState } from "react";
@@ -27,10 +27,10 @@ export interface NavProps {
 }
 
 export function Nav({
-  marginBottom = true, 
-  centered = true, 
-  isCustomizeMode, 
-  setIsCustomizeMode = () => {}  
+  marginBottom = true,
+  centered = true,
+  isCustomizeMode,
+  setIsCustomizeMode = () => {}
 }: NavProps) {
   const router = useRouter();
   const { isAdmin, rolesPerGroup } = useAccount();
@@ -88,45 +88,47 @@ export function Nav({
               <ul className="list-inline">
                 <li className="list-inline-item my-auto">
                   <div className="d-flex align-items-center">
-                    {router.pathname === '/feedback/home2' && (
+                    {router.pathname === "/feedback/home2" && (
                       <Button
-                        variant={isCustomizeMode ? "success" : "outline-secondary"}
+                        variant={
+                          isCustomizeMode ? "success" : "outline-secondary"
+                        }
                         size="sm"
                         className="mr-2"
-                        onClick={() => setIsCustomizeMode(prev => !prev)}
+                        onClick={() => setIsCustomizeMode((prev) => !prev)}
                       >
                         {isCustomizeMode ? "Done" : "Customize"}
                       </Button>
                     )}
                     {/* Conditional rendering of layout switch buttons */}
-                    <div style={{ marginLeft: '20px' }}>
-                    {router.pathname === '/' && (
-                      <Link href="/feedback/home2" passHref legacyBehavior>
-                        <Button
-                          onClick={activateNewLayout}
-                          variant="outline-secondary" 
-                          size="sm" 
-                          className="mr-2 shadow-sm"
-                        >
-                          🎨 Try New Layout
-                        </Button>
-                      </Link>
-                    )}
-                    {router.pathname === '/feedback/home2' && (
-                      <Link href="/" passHref legacyBehavior>
-                        <Button 
-                          onClick={deactivateNewLayout}
-                          variant="outline-secondary" 
-                          size="sm" 
-                          className="mr-2 shadow-sm"                      
-                          style={{ whiteSpace: 'nowrap', width: 'auto' }}
-                        >
-                          📋 Back to Classic Layout
-                        </Button>
-                      </Link>
-                    )}
+                    <div style={{ marginLeft: "20px" }}>
+                      {router.pathname === "/" && (
+                        <Link href="/feedback/home2" passHref legacyBehavior>
+                          <Button
+                            onClick={activateNewLayout}
+                            variant="outline-secondary"
+                            size="sm"
+                            className="mr-2 shadow-sm"
+                          >
+                            🎨 Try New Layout
+                          </Button>
+                        </Link>
+                      )}
+                      {router.pathname === "/feedback/home2" && (
+                        <Link href="/" passHref legacyBehavior>
+                          <Button
+                            onClick={deactivateNewLayout}
+                            variant="outline-secondary"
+                            size="sm"
+                            className="mr-2 shadow-sm"
+                            style={{ whiteSpace: "nowrap", width: "auto" }}
+                          >
+                            📋 Back to Classic Layout
+                          </Button>
+                        </Link>
+                      )}
                     </div>
-                    <div style={{ marginLeft: '20px' }}>
+                    <div style={{ marginLeft: "20px" }}>
                       <NavbarUserControl />
                     </div>
                   </div>
@@ -316,6 +318,11 @@ function NavCollectionDropdown({ formatMessage }) {
       <Link href="/collection/revisions-by-user" passHref={true} legacyBehavior>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="revisionsByUserPageTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/collection/site/list" passHref={true} legacyBehavior>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="siteListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/storage-unit/list" passHref={true} legacyBehavior>
