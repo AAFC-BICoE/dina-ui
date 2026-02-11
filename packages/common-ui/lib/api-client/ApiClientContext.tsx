@@ -290,8 +290,7 @@ export class ApiClientImpl implements ApiClientI {
       const headers = {
         Accept: "application/vnd.api+json",
         "Content-Type": "application/vnd.api+json",
-        "Crnk-Compact": "true",
-        "include-data-permissions": "true"
+        "Crnk-Compact": "true"
       };
       try {
         switch (operation.op.toUpperCase()) {
