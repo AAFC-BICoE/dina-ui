@@ -101,7 +101,6 @@ export function BulkDeleteButton({
     </FormikButton>
   );
 }
-
 function BulkDeletePopup({
   resourceIds,
   apiBaseUrl,
@@ -115,24 +114,34 @@ function BulkDeletePopup({
 
   const [permissionError, setPermissionError] = useState(false);
   const [generalError, setGeneralError] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
+  const total = resourceIds.length;
+  const progressPercent = Math.round((currentIndex / total) * 100);
   const isError = permissionError || generalError;
 
   async function onDelete() {
-    if (isError) {
+    if (isError || isFinished) {
       closeModal();
       return;
     }
 
+    setIsDeleting(true);
     let beforeDeleteResult: any;
     if (beforeDelete) {
       beforeDeleteResult = await beforeDelete(resourceIds);
     }
 
-    for (const resourceId of resourceIds) {
+    for (let i = 0; i < resourceIds.length; i++) {
+      const resourceId = resourceIds[i];
+      setCurrentIndex(i);
+
       try {
         await apiClient.axios.delete(`${apiBaseUrl}/${typeName}/${resourceId}`);
       } catch (e: any) {
+        setIsDeleting(false);
         const status = e?.cause?.status ?? e?.response?.status;
 
         if (status === 404 || status === 410) {
@@ -148,27 +157,42 @@ function BulkDeletePopup({
       }
     }
 
+    setCurrentIndex(total);
+    setIsDeleting(false);
+    setIsFinished(true);
+
     if (afterDelete) {
       await afterDelete(resourceIds, beforeDeleteResult);
     }
-
-    router.reload();
   }
 
+  // Handle the final "Close and Refresh" action
+  const handleFinish = () => {
+    closeModal();
+    router.reload();
+  };
+
   return (
-    <DinaForm initialValues={{}} onSubmit={onDelete}>
+    <DinaForm
+      initialValues={{}}
+      onSubmit={isFinished ? handleFinish : onDelete}
+    >
       <div className="modal-content are-you-sure-modal">
         {/* Dynamic Header */}
         <div className="modal-header">
-          {permissionError ? (
+          {isError ? (
             <div className="modal-title h3 text-danger">
               <FaExclamationTriangle className="me-2" />
               <CommonMessage id="somethingWentWrong" />
             </div>
+          ) : isFinished ? (
+            <div className="modal-title h3 text-success">
+              <FaCheck className="me-2" />
+              <CommonMessage id="deleteSuccess" values={{ count: total }} />
+            </div>
           ) : (
             <div className="modal-title h3">
-              <CommonMessage id="deleteSelectedButtonText" /> (
-              {resourceIds.length})
+              <CommonMessage id="deleteSelectedButtonText" /> ({total})
             </div>
           )}
         </div>
@@ -179,7 +203,7 @@ function BulkDeletePopup({
             <div className="message-body text-center">
               {permissionError && (
                 <div className="alert alert-danger">
-                  You don't have permissions to delete all records.
+                  <CommonMessage id="permissionError" />
                 </div>
               )}
 
@@ -189,7 +213,36 @@ function BulkDeletePopup({
                 </div>
               )}
 
-              {!isError && (
+              {isDeleting && !isError && (
+                <div className="my-3">
+                  <p>
+                    Deleting {currentIndex + 1} of {total}...
+                  </p>
+                  <div className="progress" style={{ height: "25px" }}>
+                    <div
+                      className="progress-bar progress-bar-striped progress-bar-animated"
+                      role="progressbar"
+                      style={{ width: `${progressPercent}%` }}
+                      aria-valuenow={progressPercent}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    >
+                      {progressPercent}%
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {isFinished && (
+                <div className="alert alert-success">
+                  <p className="mb-0">
+                    <strong>{total}</strong> records have been successfully
+                    deleted.
+                  </p>
+                </div>
+              )}
+
+              {!isDeleting && !isFinished && !isError && (
                 <p>
                   <CommonMessage id="areYouSure" />
                 </p>
@@ -201,8 +254,8 @@ function BulkDeletePopup({
         {/* Dynamic Footer */}
         <div className="modal-footer" style={{ justifyContent: "center" }}>
           <div className="d-flex gap-3">
-            {permissionError ? (
-              <SubmitButton className="btn btn-secondary" showSaveIcon={false}>
+            {isError || isFinished ? (
+              <SubmitButton className="btn btn-primary" showSaveIcon={false}>
                 <FaTimes className="me-2" />
                 <CommonMessage id="closeButtonText" />
               </SubmitButton>
@@ -211,13 +264,22 @@ function BulkDeletePopup({
                 <FormikButton
                   className="btn btn-dark no-button"
                   onClick={closeModal}
-                  buttonProps={() => ({ style: { width: "10rem" } })}
+                  buttonProps={() => ({
+                    style: { width: "10rem" },
+                    disabled: isDeleting
+                  })}
                 >
                   <FaTimes className="me-2" />
                   <CommonMessage id="no" />
                 </FormikButton>
 
-                <SubmitButton className="yes-button" showSaveIcon={false}>
+                <SubmitButton
+                  className="yes-button"
+                  showSaveIcon={false}
+                  buttonProps={() => ({
+                    disabled: isDeleting
+                  })}
+                >
                   <FaCheck className="me-2" />
                   <CommonMessage id="yes" />
                 </SubmitButton>
