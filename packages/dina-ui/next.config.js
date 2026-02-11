@@ -1,5 +1,3 @@
- 
-
 // SSR polyfills:
 require("setimmediate");
 CustomEvent = require("custom-event");
@@ -24,9 +22,10 @@ const nextConfig = {
     "react-dnd-html5-backend"
   ],
   output: "export",
-  outputFileTracingRoot: path.join(__dirname)
+  outputFileTracingRoot: path.join(__dirname, "../.."),
+  turbopack: {
+    root: path.join(__dirname, "../..")
+  }
 };
 
 module.exports = nextConfig;
-
- 
