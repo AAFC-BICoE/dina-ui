@@ -217,6 +217,7 @@ function LabelWrapper({
       tooltipLink={tooltipLink}
       tooltipLinkText={tooltipLinkText}
       startCaseLabel={startCaseLabel}
+      combineFieldHeaderWithTooltip={false}
     />
   );
 
