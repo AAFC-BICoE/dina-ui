@@ -27,17 +27,7 @@ exports[`AutoSuggestTextField Elastic Search only provided, results are fetched 
                 <div
                   class="examplePersonNameField-field-header truncate-text"
                 >
-                  <span
-                    class="m-2"
-                  >
-                    <span>
-                      <span
-                        tabindex="0"
-                      >
-                        Example Person Name Field
-                      </span>
-                    </span>
-                  </span>
+                  Example Person Name Field
                 </div>
               </strong>
             </div>
@@ -175,17 +165,7 @@ exports[`AutoSuggestTextField Snapshot test 1`] = `
                 <div
                   class="examplePersonNameField-field-header truncate-text"
                 >
-                  <span
-                    class="m-2"
-                  >
-                    <span>
-                      <span
-                        tabindex="0"
-                      >
-                        Example Person Name Field
-                      </span>
-                    </span>
-                  </span>
+                  Example Person Name Field
                 </div>
               </strong>
             </div>
