@@ -575,15 +575,17 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                       <div
                         class="sourceSet-field-header truncate-text"
                       >
+                        Source Set
                         <span
                           class="m-2"
                         >
                           <span>
-                            <span
+                            <img
+                              alt="User-defined name that can be used to retrieve all material samples that were created in the same batch."
+                              aria-describedby="field_sourceSet_tooltip"
+                              src="/static/images/iconInformation.gif"
                               tabindex="0"
-                            >
-                              Source Set
-                            </span>
+                            />
                           </span>
                         </span>
                       </div>
@@ -1282,15 +1284,17 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                       <div
                         class="sourceSet-field-header truncate-text"
                       >
+                        Source Set
                         <span
                           class="m-2"
                         >
                           <span>
-                            <span
+                            <img
+                              alt="User-defined name that can be used to retrieve all material samples that were created in the same batch."
+                              aria-describedby="field_sourceSet_tooltip"
+                              src="/static/images/iconInformation.gif"
                               tabindex="0"
-                            >
-                              Source Set
-                            </span>
+                            />
                           </span>
                         </span>
                       </div>
