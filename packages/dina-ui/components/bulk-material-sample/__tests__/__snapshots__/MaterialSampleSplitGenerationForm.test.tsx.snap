@@ -573,19 +573,17 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                       class="me-2"
                     >
                       <div
-                        class="sourceSet-field-header"
+                        class="sourceSet-field-header truncate-text"
                       >
-                        Source Set
                         <span
                           class="m-2"
                         >
                           <span>
-                            <img
-                              alt="User-defined name that can be used to retrieve all material samples that were created in the same batch."
-                              aria-describedby="field_sourceSet_tooltip"
-                              src="/static/images/iconInformation.gif"
+                            <span
                               tabindex="0"
-                            />
+                            >
+                              Source Set
+                            </span>
                           </span>
                         </span>
                       </div>
@@ -1282,19 +1280,17 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                       class="me-2"
                     >
                       <div
-                        class="sourceSet-field-header"
+                        class="sourceSet-field-header truncate-text"
                       >
-                        Source Set
                         <span
                           class="m-2"
                         >
                           <span>
-                            <img
-                              alt="User-defined name that can be used to retrieve all material samples that were created in the same batch."
-                              aria-describedby="field_sourceSet_tooltip"
-                              src="/static/images/iconInformation.gif"
+                            <span
                               tabindex="0"
-                            />
+                            >
+                              Source Set
+                            </span>
                           </span>
                         </span>
                       </div>
