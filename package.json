@@ -1,5 +1,6 @@
 {
   "name": "dina-ui-monorepo",
+  "license": "MIT",
   "private": true,
   "workspaces": {
     "packages": [
@@ -22,7 +23,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^12.0.0",
     "@types/jest": "^27.0.3",
-    "@types/node": "^18.17.1",
+    "@types/node": "^22.0.0",
     "@types/react-test-renderer": "^17.0.1",
     "asciidoctor": "^2.2.5",
     "eslint": "^9.17.0",
@@ -40,7 +41,7 @@
     "react-test-renderer": "^18.2.0",
     "react-pdf": "9.2.1",
     "ts-node": "^10.3.0",
-    "typescript": "^4.8.4",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.19.1",
     "xlsx": "npm:@e965/xlsx@0.20.0"
   },

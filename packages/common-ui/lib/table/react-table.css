@@ -62,11 +62,6 @@
   transition: width 2s ease;
 }
 
-/* On hover show full header text */
-.column-header:hover > span > div {
-  white-space: nowrap;
-}
-
 /* Allow content inside header cells to wrap */
 .ReactTable tbody th > *,
 .ReactTable tbody th > span,

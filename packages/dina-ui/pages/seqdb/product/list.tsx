@@ -2,6 +2,7 @@ import {
   ButtonBar,
   ColumnDefinition,
   CreateButton,
+  FieldHeader,
   ListPageLayout,
   dateCell
 } from "common-ui";
@@ -17,10 +18,11 @@ const PRODUCT_TABLE_COLUMNS: ColumnDefinition<Product>[] = [
         original: { id, name }
       }
     }) => <Link href={`/seqdb/product/view?id=${id}`}>{name}</Link>,
-    accessorKey: "name"
+    accessorKey: "name",
+    header: () => <FieldHeader name="name" />
   },
   {
-    header: "UPC",
+    header: () => <FieldHeader name="UPC" />,
     accessorKey: "upc"
   },
   "type",

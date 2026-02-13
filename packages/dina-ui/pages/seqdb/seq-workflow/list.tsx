@@ -3,7 +3,8 @@ import {
   ColumnDefinition,
   dateCell,
   FilterAttribute,
-  ListPageLayout
+  ListPageLayout,
+  FieldHeader
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -28,7 +29,7 @@ const TABLE_COLUMNS: ColumnDefinition<SeqBatch>[] = [
       </Link>
     ),
     accessorKey: "name",
-    header: () => <SeqdbMessage id="seqBatchName" />
+    header: () => <FieldHeader name="seqBatchName" />
   },
   groupCell("group"),
   "createdBy",

@@ -135,7 +135,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   coordinateUncertaintyInMeters: "Coordonner l’incertitude en mètres",
   copyFromParentLabel: "Copier du parent",
   countryLabel: "Pays",
-  creatNewWorkflow: "Créer nouveau",
+  createNewWorkflow: "Créer nouveau",
   create: "Créer",
   createAndAssign: "Créer et assigner",
   createFormTemplate: "Créer un modèle de formulaire",
@@ -937,5 +937,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_status: "Statut",
   field_openedDate: "Date d'ouverture",
   field_closedDate: "Date de fermeture",
-  field_dueDate: "Date d'échéance"
+  field_dueDate: "Date d'échéance",
+  siteAttachments: "Pièces jointes au site",
+  code: "Code"
 };

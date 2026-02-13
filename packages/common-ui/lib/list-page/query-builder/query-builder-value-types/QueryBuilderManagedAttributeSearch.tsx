@@ -436,6 +436,13 @@ export default function QueryRowManagedAttributeSearch({
           menuPlacement={isInColumnSelector ? "bottom" : "auto"}
           menuShouldScrollIntoView={false}
           minMenuHeight={600}
+          menuPortalTarget={document.body}
+          styles={{
+            menuPortal: (base) => ({
+              ...base,
+              zIndex: 9999
+            })
+          }}
         />
       ) : (
         <></>

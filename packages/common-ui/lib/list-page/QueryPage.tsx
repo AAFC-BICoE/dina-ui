@@ -845,8 +845,13 @@ export function QueryPage<TData extends KitsuResource>({
           }
         ]
       : [];
+    // Get unique columns once
+    const uniqueColumns = _.uniqBy(
+      [...selectColumn, ...displayedColumns],
+      "id"
+    );
 
-    return _.uniqBy([...selectColumn, ...displayedColumns], "id");
+    return uniqueColumns;
   }, [showRowCheckboxes, selectionMode, displayedColumns, searchResults]);
 
   // Columns generated for the selected resources, only in selection mode.

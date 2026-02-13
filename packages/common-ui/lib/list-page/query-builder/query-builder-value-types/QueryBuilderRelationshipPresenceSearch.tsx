@@ -120,6 +120,13 @@ export default function QueryRowRelationshipPresenceSearch({
             selectedValue: ""
           })
         }
+        menuPortalTarget={document.body}
+        styles={{
+          menuPortal: (base) => ({
+            ...base,
+            zIndex: 9999
+          })
+        }}
         onInputChange={(inputValue) => setRelationshipSearchValue(inputValue)}
         inputValue={relationshipSearchValue}
         captureMenuScroll={true}
@@ -141,6 +148,13 @@ export default function QueryRowRelationshipPresenceSearch({
                 selectedOperator: selected?.value ?? ""
               })
             }
+            menuPortalTarget={document.body}
+            styles={{
+              menuPortal: (base) => ({
+                ...base,
+                zIndex: 9999
+              })
+            }}
           />
         </>
       )}

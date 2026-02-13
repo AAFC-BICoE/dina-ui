@@ -6,6 +6,7 @@ export * from "./api-client/ApiClientContext";
 export * from "./api-client/client-side-join";
 export * from "./api-client/operations-types";
 export * from "./api-client/useQuery";
+export * from "./api-client/useMultiPagedQuery";
 export * from "./api-client/useElasticSearchQuery";
 export * from "./bulk-edit/useBulkEditTabField";
 export * from "./bulk-edit/bulk-context";

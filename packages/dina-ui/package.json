@@ -1,10 +1,10 @@
 {
   "name": "dina-ui",
-  "version": "0.210.0",
+  "license": "MIT",
+  "version": "0.211.0",
   "scripts": {
     "build": "node --require ./next.config.js ../../node_modules/.bin/next build",
-    "dev": "next",
-    "next": "next",
+    "dev": "next --turbopack",
     "a11y-check": "pa11y-ci -j > pa11y-result.json",
     "a11y-generate-report": "pa11y-ci-reporter-html -s pa11y-result.json --destination ./pa11y-html-report"
   },
@@ -21,6 +21,7 @@
     "esri-loader": "^3.3.0",
     "esri-loader-hooks": "^0.4.0",
     "moment": "^2.29.4",
+    "next": "15.5.7",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dropzone-uploader": "^2.11.0",
@@ -31,6 +32,8 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
-    "@types/bytes": "^3.1.0"
+    "@types/bytes": "^3.1.0",
+    "eslint-config-next": "15.5.7",
+    "eslint-plugin-jest": "^29.12.1"
   }
 }
