@@ -288,6 +288,13 @@ export default function QueryRowIdentifierSearch({
         menuPlacement={isInColumnSelector ? "bottom" : "auto"}
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
+        menuPortalTarget={document.body}
+        styles={{
+          menuPortal: (base) => ({
+            ...base,
+            zIndex: 9999
+          })
+        }}
       />
 
       {/* Operator */}
@@ -306,6 +313,13 @@ export default function QueryRowIdentifierSearch({
           menuPlacement={isInColumnSelector ? "bottom" : "auto"}
           menuShouldScrollIntoView={false}
           minMenuHeight={600}
+          menuPortalTarget={document.body}
+          styles={{
+            menuPortal: (base) => ({
+              ...base,
+              zIndex: 9999
+            })
+          }}
         />
       ) : (
         <></>

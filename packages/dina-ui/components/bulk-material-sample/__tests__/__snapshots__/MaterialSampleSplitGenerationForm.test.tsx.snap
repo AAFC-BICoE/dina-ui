@@ -573,7 +573,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                       class="me-2"
                     >
                       <div
-                        class="sourceSet-field-header"
+                        class="sourceSet-field-header truncate-text"
                       >
                         Source Set
                         <span
@@ -1282,7 +1282,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                       class="me-2"
                     >
                       <div
-                        class="sourceSet-field-header"
+                        class="sourceSet-field-header truncate-text"
                       >
                         Source Set
                         <span

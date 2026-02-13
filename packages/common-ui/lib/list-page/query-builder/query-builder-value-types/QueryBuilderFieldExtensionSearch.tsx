@@ -195,6 +195,13 @@ export default function QueryRowFieldExtensionSearch({
         menuPlacement={isInColumnSelector ? "bottom" : "auto"}
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
+        menuPortalTarget={document.body}
+        styles={{
+          menuPortal: (base) => ({
+            ...base,
+            zIndex: 9999
+          })
+        }}
       />
 
       {/* Field Selector */}
@@ -213,6 +220,13 @@ export default function QueryRowFieldExtensionSearch({
                 selectedField: selected?.value ?? ""
               })
             }
+            menuPortalTarget={document.body}
+            styles={{
+              menuPortal: (base) => ({
+                ...base,
+                zIndex: 9999
+              })
+            }}
             onInputChange={(inputValue) => setFieldSearchValue(inputValue)}
             inputValue={fieldSearchValue}
             captureMenuScroll={true}
@@ -242,6 +256,13 @@ export default function QueryRowFieldExtensionSearch({
             menuPlacement={isInColumnSelector ? "bottom" : "auto"}
             menuShouldScrollIntoView={false}
             minMenuHeight={600}
+            menuPortalTarget={document.body}
+            styles={{
+              menuPortal: (base) => ({
+                ...base,
+                zIndex: 9999
+              })
+            }}
           />
 
           {/* Search Value */}
@@ -264,6 +285,13 @@ export default function QueryRowFieldExtensionSearch({
                       searchValue: pickListOption?.value ?? ""
                     })
                   }
+                  menuPortalTarget={document.body}
+                  styles={{
+                    menuPortal: (base) => ({
+                      ...base,
+                      zIndex: 9999
+                    })
+                  }}
                 />
               </>
             ) : (

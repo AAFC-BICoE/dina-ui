@@ -102,6 +102,13 @@ export default function QueryRowImageLink({
             selectedImageType: selected?.value ?? ""
           })
         }
+        menuPortalTarget={document.body}
+        styles={{
+          menuPortal: (base) => ({
+            ...base,
+            zIndex: 9999
+          })
+        }}
         captureMenuScroll={true}
         menuPlacement={"bottom"}
         menuShouldScrollIntoView={false}
