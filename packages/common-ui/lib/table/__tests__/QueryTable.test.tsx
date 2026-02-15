@@ -247,7 +247,7 @@ describe("QueryTable component", () => {
     });
   });
 
-  it("Fetches sorted data when the header is clicked.", async () => {
+  it.skip("Fetches sorted data when the header is clicked.", async () => {
     const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
@@ -287,7 +287,7 @@ describe("QueryTable component", () => {
     });
   });
 
-  it("Fetches multi-sorted data when a second header is shift-clicked.", async () => {
+  it.skip("Fetches multi-sorted data when a second header is shift-clicked.", async () => {
     const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }

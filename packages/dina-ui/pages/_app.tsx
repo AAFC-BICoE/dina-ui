@@ -33,6 +33,10 @@ import "./bootstrap-print.css";
 import "@react-awesome-query-builder/ui/css/styles.css";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
+import "common-ui/lib/classification/TaxonomyTree.css";
+import "common-ui/lib/global-search/global-search.css";
+import "common-ui/lib/notification/notification.css";
+import "common-ui/lib/settings-button/SettingsButton.css";
 
 /**
  * App component that wraps every page component.

@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import "./SettingsButton.css"; // For styling
 
 interface SettingsButtonProps {
   menuItems: JSX.Element[];

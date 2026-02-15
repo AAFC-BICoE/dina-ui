@@ -3,10 +3,11 @@ import { FormikContextType } from "formik";
 import _ from "lodash";
 import { useRouter } from "next/router";
 import {
-  AreYouSureModal,
   BulkSelectableFormValues,
   CommonMessage,
+  DinaForm,
   FormikButton,
+  SubmitButton,
   useApiClient,
   useModal
 } from "..";
@@ -15,9 +16,15 @@ import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 import { KitsuResource } from "kitsu";
 import { useSessionStorage } from "usehooks-ts";
 import { MdEdit } from "react-icons/md";
-import { FaTrash } from "react-icons/fa";
+import {
+  FaCheck,
+  FaExclamationTriangle,
+  FaTimes,
+  FaTrash
+} from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
 import { TbArrowsSplit2 } from "react-icons/tb";
+import { useState } from "react";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -67,9 +74,7 @@ export function BulkDeleteButton({
   beforeDelete,
   afterDelete
 }: BulkDeleteButtonProps) {
-  const router = useRouter();
   const { openModal } = useModal();
-  const { apiClient } = useApiClient();
 
   return (
     <FormikButton
@@ -81,44 +86,12 @@ export function BulkDeleteButton({
           .map((pair) => pair[0]);
 
         openModal(
-          <AreYouSureModal
-            actionMessage={
-              <span>
-                <CommonMessage id="deleteSelectedButtonText" /> (
-                {resourceIds.length})
-              </span>
-            }
-            onYesButtonClicked={async () => {
-              // Execute pre-deletion logic if provided (e.g., fetch related resources)
-              let beforeDeleteResult: any;
-              if (beforeDelete) {
-                beforeDeleteResult = await beforeDelete(resourceIds);
-              }
-
-              // Delete the records.
-              for (const resourceId of resourceIds) {
-                try {
-                  await apiClient.axios.delete(
-                    `${apiBaseUrl}/${typeName}/${resourceId}`
-                  );
-                } catch (e) {
-                  // If it doesn't exist or has been deleted already, ignore it.
-                  if (e.cause.status === 404 || e.cause.status === 410) {
-                    console.warn(e.cause);
-                  } else {
-                    throw e;
-                  }
-                }
-              }
-
-              // Execute additional cleanup/related operations if provided
-              if (afterDelete) {
-                await afterDelete(resourceIds, beforeDeleteResult);
-              }
-
-              // Refresh the page:
-              router.reload();
-            }}
+          <BulkDeletePopup
+            resourceIds={resourceIds}
+            apiBaseUrl={apiBaseUrl}
+            typeName={typeName}
+            beforeDelete={beforeDelete}
+            afterDelete={afterDelete}
           />
         );
       }}
@@ -126,6 +99,196 @@ export function BulkDeleteButton({
       <FaTrash className="me-2" />
       <CommonMessage id="deleteSelectedButtonText" />
     </FormikButton>
+  );
+}
+function BulkDeletePopup({
+  resourceIds,
+  apiBaseUrl,
+  typeName,
+  beforeDelete,
+  afterDelete
+}: { resourceIds: string[] } & BulkDeleteButtonProps) {
+  const router = useRouter();
+  const { closeModal } = useModal();
+  const { apiClient } = useApiClient();
+
+  const [permissionError, setPermissionError] = useState(false);
+  const [generalError, setGeneralError] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const total = resourceIds.length;
+  const progressPercent = Math.round((currentIndex / total) * 100);
+  const isError = permissionError || generalError;
+
+  async function onDelete() {
+    if (isError || isFinished) {
+      closeModal();
+      return;
+    }
+
+    setIsDeleting(true);
+    let beforeDeleteResult: any;
+    if (beforeDelete) {
+      beforeDeleteResult = await beforeDelete(resourceIds);
+    }
+
+    for (let i = 0; i < resourceIds.length; i++) {
+      const resourceId = resourceIds[i];
+      setCurrentIndex(i);
+
+      try {
+        await apiClient.axios.delete(`${apiBaseUrl}/${typeName}/${resourceId}`);
+      } catch (e: any) {
+        setIsDeleting(false);
+        const status = e?.cause?.status ?? e?.response?.status;
+
+        if (status === 404 || status === 410) {
+          console.warn(e);
+        } else if (status === 403) {
+          setPermissionError(true);
+          return;
+        } else {
+          console.error(e);
+          setGeneralError(true);
+          return;
+        }
+      }
+    }
+
+    setCurrentIndex(total);
+    setIsDeleting(false);
+    setIsFinished(true);
+
+    if (afterDelete) {
+      await afterDelete(resourceIds, beforeDeleteResult);
+    }
+  }
+
+  // Handle the final "Close and Refresh" action
+  const handleFinish = () => {
+    closeModal();
+    router.reload();
+  };
+
+  return (
+    <DinaForm
+      initialValues={{}}
+      onSubmit={isFinished ? handleFinish : onDelete}
+    >
+      <div className="modal-content are-you-sure-modal">
+        {/* Dynamic Header */}
+        <div className="modal-header">
+          {isError ? (
+            <div className="modal-title h3 text-danger">
+              <FaExclamationTriangle className="me-2" />
+              <CommonMessage id="somethingWentWrong" />
+            </div>
+          ) : isFinished ? (
+            <div className="modal-title h3 text-success">
+              <FaCheck className="me-2" />
+              <CommonMessage id="deleteSuccess" values={{ count: total }} />
+            </div>
+          ) : (
+            <div className="modal-title h3">
+              <CommonMessage id="deleteSelectedButtonText" /> ({total})
+            </div>
+          )}
+        </div>
+
+        {/* Dynamic Body */}
+        <div className="modal-body">
+          <main>
+            <div className="message-body text-center">
+              {permissionError && (
+                <div className="alert alert-danger">
+                  <CommonMessage id="permissionError" />
+                </div>
+              )}
+
+              {generalError && (
+                <div className="alert alert-danger">
+                  <CommonMessage id="somethingWentWrong" />
+                </div>
+              )}
+
+              {isDeleting && !isError && (
+                <div className="my-3">
+                  <p>
+                    Deleting {currentIndex + 1} of {total}...
+                  </p>
+                  <div className="progress" style={{ height: "25px" }}>
+                    <div
+                      className="progress-bar progress-bar-striped progress-bar-animated"
+                      role="progressbar"
+                      style={{ width: `${progressPercent}%` }}
+                      aria-valuenow={progressPercent}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    >
+                      {progressPercent}%
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {isFinished && (
+                <div className="alert alert-success">
+                  <p className="mb-0">
+                    <strong>{total}</strong> records have been successfully
+                    deleted.
+                  </p>
+                </div>
+              )}
+
+              {!isDeleting && !isFinished && !isError && (
+                <p>
+                  <CommonMessage id="areYouSure" />
+                </p>
+              )}
+            </div>
+          </main>
+        </div>
+
+        {/* Dynamic Footer */}
+        <div className="modal-footer" style={{ justifyContent: "center" }}>
+          <div className="d-flex gap-3">
+            {isError || isFinished ? (
+              <SubmitButton className="btn btn-primary" showSaveIcon={false}>
+                <FaTimes className="me-2" />
+                <CommonMessage id="closeButtonText" />
+              </SubmitButton>
+            ) : (
+              <>
+                <FormikButton
+                  className="btn btn-dark no-button"
+                  onClick={closeModal}
+                  buttonProps={() => ({
+                    style: { width: "10rem" },
+                    disabled: isDeleting
+                  })}
+                >
+                  <FaTimes className="me-2" />
+                  <CommonMessage id="no" />
+                </FormikButton>
+
+                <SubmitButton
+                  className="yes-button"
+                  showSaveIcon={false}
+                  buttonProps={() => ({
+                    disabled: isDeleting
+                  })}
+                >
+                  <FaCheck className="me-2" />
+                  <CommonMessage id="yes" />
+                </SubmitButton>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </DinaForm>
   );
 }
 

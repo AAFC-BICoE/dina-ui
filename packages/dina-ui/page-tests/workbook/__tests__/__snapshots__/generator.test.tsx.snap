@@ -443,7 +443,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                         class="me-2"
                       >
                         <div
-                          class="type-field-header"
+                          class="type-field-header truncate-text"
                         >
                           Type
                         </div>
@@ -730,9 +730,19 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                                 class="d-flex align-items-center justify-content-center"
                               >
                                 <div
-                                  class="originalFilename-field-header"
+                                  class="originalFilename-field-header truncate-text"
                                 >
-                                  Original Filename
+                                  <span
+                                    class="m-2"
+                                  >
+                                    <span>
+                                      <span
+                                        tabindex="0"
+                                      >
+                                        Original Filename
+                                      </span>
+                                    </span>
+                                  </span>
                                 </div>
                               </span>
                             </div>
@@ -749,9 +759,19 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                                 class="d-flex align-items-center justify-content-center"
                               >
                                 <div
-                                  class="createdBy-field-header"
+                                  class="createdBy-field-header truncate-text"
                                 >
-                                  Created By
+                                  <span
+                                    class="m-2"
+                                  >
+                                    <span>
+                                      <span
+                                        tabindex="0"
+                                      >
+                                        Created By
+                                      </span>
+                                    </span>
+                                  </span>
                                 </div>
                               </span>
                             </div>
@@ -768,9 +788,19 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                                 class="d-flex align-items-center justify-content-center"
                               >
                                 <div
-                                  class="createdOn-field-header"
+                                  class="createdOn-field-header truncate-text"
                                 >
-                                  Created On
+                                  <span
+                                    class="m-2"
+                                  >
+                                    <span>
+                                      <span
+                                        tabindex="0"
+                                      >
+                                        Created On
+                                      </span>
+                                    </span>
+                                  </span>
                                 </div>
                                 <svg
                                   class="-sort-asc"

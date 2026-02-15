@@ -18,14 +18,14 @@ export function ToggleField({
     <FieldWrapper
       {...props}
       readOnlyRender={(value) =>
-        !!value ?? false ? <FaCheckSquare /> : <FaRegSquare />
+        !!value ? <FaCheckSquare /> : <FaRegSquare />
       }
       disableLabelClick={true}
     >
       {({ value, setValue, formik }) => (
         <Switch
           disabled={disableSwitch}
-          checked={!!value ?? false}
+          checked={!!value}
           onChange={(checked) => {
             setValue(checked);
             onChangeExternal?.(checked, formik);

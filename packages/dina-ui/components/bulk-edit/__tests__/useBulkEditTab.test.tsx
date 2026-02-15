@@ -161,7 +161,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/storage-unit-type":
     case "collection-api/vocabulary2/degreeOfEstablishment":
     case "collection-api/vocabulary2/srs":
-    case "collection-api/vocabulary2/coordinateSystem":
+    case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format":
     case "collection-api/form-template":
       return { data: [] };
   }

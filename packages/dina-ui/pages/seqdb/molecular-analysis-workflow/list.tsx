@@ -2,6 +2,7 @@ import {
   ButtonBar,
   ColumnDefinition,
   dateCell,
+  FieldHeader,
   FilterAttribute,
   ListPageLayout,
   LoadingSpinner
@@ -16,7 +17,7 @@ import {
 } from "../../../components";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import useVocabularyOptions from "packages/dina-ui/components/collection/useVocabularyOptions";
 import { useDeleteMolecularAnalysisWorkflows } from "packages/dina-ui/components/molecular-analysis/MolecularAnalysisUtils";
 
@@ -54,7 +55,7 @@ export default function MolecularAnalysisWorkflowListPage() {
         </Link>
       ),
       accessorKey: "name",
-      header: () => <SeqdbMessage id="molecularAnalysisName" />
+      header: () => <FieldHeader name="molecularAnalysisName" />
     },
     {
       cell: ({
@@ -74,10 +75,15 @@ export default function MolecularAnalysisWorkflowListPage() {
         </>
       ),
       accessorKey: "analysisType",
-      header: () => <DinaMessage id="field_analysisType" />
+      header: () => <FieldHeader name="analysisType" />
     },
     groupCell("group"),
-    "createdBy",
+    {
+      id: "createdBy",
+      header: () => <FieldHeader name="createdBy" />,
+      accessorKey: "data.attributes.createdBy",
+      isKeyword: true
+    },
     dateCell("createdOn")
   ];
 

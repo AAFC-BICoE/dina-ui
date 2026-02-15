@@ -49,12 +49,14 @@ export function ErrorViewer({ customErrorViewerMessage }: ErrorViewProps) {
         }
 
         // The error can be a renderable component:
-        const JSXError = typeof error === "function" && error;
+        const JSXError =
+          typeof error === "function" ? (error as React.ComponentType) : null;
 
         const { fieldLabel } = getFieldLabel({ name: field });
         return (
           <div className="error-message" key={index}>
-            {index + 1} : {fieldLabel} - {JSXError ? <JSXError /> : error}
+            {index + 1} : {fieldLabel} -{" "}
+            {JSXError ? <JSXError /> : String(error)}
           </div>
         );
       });

@@ -5,6 +5,7 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";
 import { useMetadataThumbnailPath } from "../object-store/metadata/useMetadataThumbnailPath";
+import { FieldHeader } from "common-ui";
 
 export interface ThumbnailCellProps {
   bucketField: string;
@@ -57,7 +58,7 @@ export function ThumbnailCell<TData extends KitsuResource>({
       );
     },
     enableSorting: false,
-    header: () => <DinaMessage id="thumbnail" />,
+    header: () => <FieldHeader name="thumbnail" />,
     // These fields are required in the elastic search response for this cell to work.
     additionalAccessors: [
       "included.attributes.fileIdentifier",

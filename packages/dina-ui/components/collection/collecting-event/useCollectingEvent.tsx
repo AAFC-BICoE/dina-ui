@@ -220,6 +220,16 @@ export function useCollectingEventSave({
     }
     delete collectingEventDiff.expedition;
 
+    // Convert protocol to a relationship.
+    if (collectingEventDiff?.protocol) {
+      (collectingEventDiff as any).relationships.protocol = {
+        data: collectingEventDiff?.protocol?.id
+          ? _.pick(collectingEventDiff.protocol, "id", "type")
+          : null
+      };
+    }
+    delete collectingEventDiff.protocol;
+
     // First create a copy of what would be the new geographicPlaceNameSourceDetail
     const newSourceDetail = {
       ...(collectingEventDiff.geographicPlaceNameSourceDetail || {})

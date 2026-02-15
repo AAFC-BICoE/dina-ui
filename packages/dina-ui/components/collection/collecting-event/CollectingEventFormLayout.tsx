@@ -57,6 +57,7 @@ import {
   SourceAdministrativeLevel,
   geographicPlaceSourceUrl
 } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import { ControlledVocabularyItem } from "../../../types/collection-api/resources/ControlledVocabularyItem";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
@@ -778,22 +779,17 @@ export function CollectingEventFormLayout({
             )}
 
             <TextField name="dwcVerbatimLocality" />
-            <AutoSuggestTextField<Vocabulary>
+            <AutoSuggestTextField<ControlledVocabularyItem>
               name="dwcVerbatimCoordinateSystem"
               jsonApiBackend={{
                 query: () => ({
-                  path: "collection-api/vocabulary2/coordinateSystem"
+                  path: "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format"
                 }),
                 option: (vocabElement) =>
-                  _.compact(
-                    vocabElement?.vocabularyElements?.map(
-                      (it) =>
-                        _.find(
-                          it?.multilingualTitle?.titles || [],
-                          (item) => item.lang === locale
-                        )?.title
-                    ) ?? []
-                  )
+                  _.find(
+                    vocabElement?.multilingualTitle?.titles || [],
+                    (item) => item.lang === locale
+                  )?.title
               }}
               blankSearchBackend={"json-api"}
               onSuggestionSelected={onSuggestionSelected}

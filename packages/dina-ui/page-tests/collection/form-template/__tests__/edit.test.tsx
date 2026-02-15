@@ -70,7 +70,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/vocabulary2/typeStatus":
     case "collection-api/organism":
     case "collection-api/collection-method":
-    case "collection-api/vocabulary2/coordinateSystem":
+    case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format":
     case "collection-api/vocabulary2/materialSampleType":
     case "objectstore-api/metadata":
     case "user-api/user":
