@@ -18,6 +18,7 @@ import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import {
   DynamicFieldsMappingConfig,
+  RelationshipAutocompleteField,
   TableColumn
 } from "../../../../common-ui/lib/list-page/types";
 import { useState, CSSProperties } from "react";
@@ -378,7 +379,20 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample",
         apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
-      }
+      },
+
+      // Collecting Event - Collectors (Relationship Autocomplete)
+      {
+        type: "relationshipAutocomplete",
+        label: "collectingEventCollectors",
+        path: "included.relationships.collectors.data",
+        referencedBy: "collectingEvent",
+        referencedType: "collecting-event",
+        apiEndpoint: "agent-api/person",
+        optionLabel: "displayName",
+        elasticSearchRelationshipPath:
+          "included.relationships.collectors.data.id"
+      } as RelationshipAutocompleteField
     ]
   };
 
