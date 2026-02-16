@@ -48,11 +48,9 @@ export default function MetagenomicWorkflowRunPage() {
   );
 
   // Loaded PCR Batch.
-  const pcrBatchQuery = usePcrBatchQuery(pcrBatchId, [
-    pcrBatchId,
-    currentStep,
-    reloadPcrBatch
-  ]);
+  const pcrBatchQuery = usePcrBatchQuery(pcrBatchId, {
+    deps: [pcrBatchId, currentStep, reloadPcrBatch]
+  });
 
   // Used to determine if the resource needs to be reloaded.
   const [reloadMetagenomicsBatch] = useState<number>(Date.now());

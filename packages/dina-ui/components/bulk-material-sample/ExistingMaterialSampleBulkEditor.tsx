@@ -16,7 +16,7 @@ export function ExistingMaterialSampleBulkEditor({
   onSaved,
   onPreviousClick
 }: ExistingMaterialSampleBulkEditorProps) {
-  const sampleQueries = ids.map((id) => useMaterialSampleQuery(id));
+  const sampleQueries = ids.map(useMaterialSampleQuery);
 
   /** Whether any query is loading. */
   const isLoading = sampleQueries.reduce(

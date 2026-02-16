@@ -40,10 +40,9 @@ export default function NgsWorkFlowRunPage() {
     string | undefined
   >(router.query.batchId?.toString());
   // Loaded PCR Batch.
-  const libraryPrepBatch = useLibraryPrepBatchQuery(libraryPrepBatchId, [
-    libraryPrepBatchId,
-    currentStep
-  ]);
+  const libraryPrepBatch = useLibraryPrepBatchQuery(libraryPrepBatchId, {
+    deps: [libraryPrepBatchId, currentStep]
+  });
 
   // Update the URL to contain the current step.
   useEffect(() => {

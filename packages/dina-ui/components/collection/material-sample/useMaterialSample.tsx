@@ -49,7 +49,7 @@ import { Person } from "../../../../dina-ui/types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
-import { useGenerateSequence } from "./useGenerateSequence";
+import { generateSequence } from "./useGenerateSequence";
 import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { Alert } from "react-bootstrap";
 import CollectingEventEditAlert from "../collecting-event/CollectingEventEditAlert";
@@ -505,7 +505,8 @@ export function useMaterialSampleSave({
   }
 
   /** Used to get the values of the nested CollectingEvent form. */
-  const colEventFormRef = colEventFormRefProp ?? useRef<FormikProps<any>>(null);
+  const colEventLocalFormRef = useRef<FormikProps<any>>(null);
+  const colEventFormRef = colEventFormRefProp ?? colEventLocalFormRef;
   const [colEventId, setColEventId] = useState<string | null | undefined>(
     isTemplate
       ? colEventTemplateInitialValues?.id
@@ -1113,7 +1114,7 @@ export function useMaterialSampleSave({
     }
 
     if (submittedValues.collection?.id && submittedValues.useNextSequence) {
-      useGenerateSequence({
+      generateSequence({
         collectionId: submittedValues.collection?.id as any,
         amount: 1,
         save

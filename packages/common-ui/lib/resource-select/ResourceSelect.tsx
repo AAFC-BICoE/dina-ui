@@ -76,11 +76,14 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Use a different query hook instead of the REST API. */
   useCustomQuery?: (
     searchQuery: string,
-    querySpec: JsonApiQuerySpec
+    querySpec: JsonApiQuerySpec,
+    options: any
   ) => {
     loading?: boolean;
     response?: { data: PersistedResource<TData>[] };
   };
+
+  customQueryOptions?: any;
 
   /* Remove the default sort by createdOn */
   removeDefaultSort?: boolean;
@@ -133,6 +136,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   selectProps,
   pageSize,
   useCustomQuery,
+  customQueryOptions,
   removeDefaultSort,
   placeholder,
   isLoading: loadingProp,
@@ -176,7 +180,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   };
 
   const { loading: queryIsLoading, response } =
-    useCustomQuery?.(inputValue, querySpec) ?? useQuery<TData[]>(querySpec);
+    useCustomQuery?.(inputValue, querySpec, customQueryOptions) ??
+    useQuery<TData[]>(querySpec);
 
   const isLoading = queryIsLoading || inputValue !== searchValue || loadingProp;
 

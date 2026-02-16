@@ -5,7 +5,7 @@ import {
   useAccount,
   useInstanceContext
 } from "common-ui";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
 import { useContext, useState } from "react";
@@ -27,10 +27,10 @@ export interface NavProps {
 }
 
 export function Nav({
-  marginBottom = true, 
-  centered = true, 
-  isCustomizeMode, 
-  setIsCustomizeMode = () => {}  
+  marginBottom = true,
+  centered = true,
+  isCustomizeMode,
+  setIsCustomizeMode = () => {}
 }: NavProps) {
   const router = useRouter();
   const { isAdmin, rolesPerGroup } = useAccount();
@@ -88,45 +88,47 @@ export function Nav({
               <ul className="list-inline">
                 <li className="list-inline-item my-auto">
                   <div className="d-flex align-items-center">
-                    {router.pathname === '/feedback/home2' && (
+                    {router.pathname === "/feedback/home2" && (
                       <Button
-                        variant={isCustomizeMode ? "success" : "outline-secondary"}
+                        variant={
+                          isCustomizeMode ? "success" : "outline-secondary"
+                        }
                         size="sm"
                         className="mr-2"
-                        onClick={() => setIsCustomizeMode(prev => !prev)}
+                        onClick={() => setIsCustomizeMode((prev) => !prev)}
                       >
                         {isCustomizeMode ? "Done" : "Customize"}
                       </Button>
                     )}
                     {/* Conditional rendering of layout switch buttons */}
-                    <div style={{ marginLeft: '20px' }}>
-                    {router.pathname === '/' && (
-                      <Link href="/feedback/home2" passHref legacyBehavior>
-                        <Button
-                          onClick={activateNewLayout}
-                          variant="outline-secondary" 
-                          size="sm" 
-                          className="mr-2 shadow-sm"
-                        >
-                          🎨 Try New Layout
-                        </Button>
-                      </Link>
-                    )}
-                    {router.pathname === '/feedback/home2' && (
-                      <Link href="/" passHref legacyBehavior>
-                        <Button 
-                          onClick={deactivateNewLayout}
-                          variant="outline-secondary" 
-                          size="sm" 
-                          className="mr-2 shadow-sm"                      
-                          style={{ whiteSpace: 'nowrap', width: 'auto' }}
-                        >
-                          📋 Back to Classic Layout
-                        </Button>
-                      </Link>
-                    )}
+                    <div style={{ marginLeft: "20px" }}>
+                      {router.pathname === "/" && (
+                        <Link href="/feedback/home2" passHref legacyBehavior>
+                          <Button
+                            onClick={activateNewLayout}
+                            variant="outline-secondary"
+                            size="sm"
+                            className="mr-2 shadow-sm"
+                          >
+                            🎨 Try New Layout
+                          </Button>
+                        </Link>
+                      )}
+                      {router.pathname === "/feedback/home2" && (
+                        <Link href="/" passHref legacyBehavior>
+                          <Button
+                            onClick={deactivateNewLayout}
+                            variant="outline-secondary"
+                            size="sm"
+                            className="mr-2 shadow-sm"
+                            style={{ whiteSpace: "nowrap", width: "auto" }}
+                          >
+                            📋 Back to Classic Layout
+                          </Button>
+                        </Link>
+                      )}
                     </div>
-                    <div style={{ marginLeft: '20px' }}>
+                    <div style={{ marginLeft: "20px" }}>
                       <NavbarUserControl />
                     </div>
                   </div>
@@ -233,7 +235,7 @@ function GovernmentLogo() {
   );
 }
 
-function menuDisplayControl() {
+function useMenuDisplayControl() {
   const [show, setShow] = useState(false);
   const showDropdown = () => {
     setShow(true);
@@ -264,7 +266,7 @@ function menuDisplayControl() {
 
 function NavCollectionDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   return (
     <NavDropdown
       title={formatMessage("collectionSectionTitle")}
@@ -348,7 +350,7 @@ function NavCollectionDropdown({ formatMessage }) {
 
 function NavTransactionsDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
 
   return (
     <NavDropdown
@@ -384,7 +386,7 @@ function NavTransactionsDropdown({ formatMessage }) {
 
 function NavObjectStoreDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   return (
     <NavDropdown
       title={formatMessage("objectStoreTitle")}
@@ -438,7 +440,7 @@ function NavObjectStoreDropdown({ formatMessage }) {
 
 function NavAgentDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   return (
     <NavDropdown
       title={formatMessage("agentsSectionTitle")}
@@ -465,7 +467,7 @@ function NavAgentDropdown({ formatMessage }) {
 
 function NavSequenceDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   return (
     <NavDropdown
       title={formatMessage("seqdbTitle")}
@@ -595,7 +597,7 @@ function NavSequenceDropdown({ formatMessage }) {
 
 function NavControlledVocabularyDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   const { isAdmin } = useAccount();
   return (
     <NavDropdown
@@ -678,7 +680,7 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
 
 function NavDinaManagementDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   const { isAdmin } = useAccount();
   return (
     <NavDropdown
@@ -733,7 +735,7 @@ function NavDinaManagementDropdown({ formatMessage }) {
 
 function NavDinaConfigurationDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
 
   const { subject } = useAccount();
 

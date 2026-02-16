@@ -37,10 +37,9 @@ export default function SangerWorkFlowSequencingRunPage() {
   );
 
   // Loaded SEQ Batch.
-  const seqBatchQueryState = useSeqBatchQuery(seqBatchId, [
-    seqBatchId,
-    currentStep
-  ]);
+  const seqBatchQueryState = useSeqBatchQuery(seqBatchId, {
+    deps: [seqBatchId, currentStep]
+  });
 
   // Update the URL to contain the current step.
   useEffect(() => {
