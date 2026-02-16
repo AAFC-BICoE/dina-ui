@@ -1375,6 +1375,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   notPubliclyReleasableWithReason: "Not Publicly Releasable: {reason}",
   clearAllNamesButtonText: "Clear All Names",
   workflowsLegend: "Molecular Analysis Workflows",
+  siteListTitle: "Site",
   siteAttachments: "Site Attachments",
   code: "Code"
 };

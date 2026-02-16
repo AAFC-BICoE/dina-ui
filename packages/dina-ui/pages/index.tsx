@@ -61,6 +61,9 @@ export function Home() {
                 <Link href="/collection/revisions-by-user">
                   <DinaMessage id="revisionsByUserPageTitle" />
                 </Link>
+                <Link href="/collection/site/list">
+                  <DinaMessage id="siteListTitle" />
+                </Link>
                 <Link href="/collection/storage-unit/list">
                   <DinaMessage id="storageUnitListTitle" />
                 </Link>
