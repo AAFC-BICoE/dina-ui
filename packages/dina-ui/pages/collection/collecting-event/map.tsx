@@ -2,6 +2,7 @@ import { withRouter } from "next/router";
 import React from "react";
 import { Footer, Head, Nav, CollectingEventMap } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import NextHead from "next/head";
 
 export function CollectingEventDetailsPage() {
   const { formatMessage } = useDinaIntl();
@@ -16,6 +17,13 @@ export function CollectingEventDetailsPage() {
 
   return (
     <div>
+      <NextHead>
+        <link
+          href="https://js.arcgis.com/4.29/esri/themes/dark/main.css"
+          rel="stylesheet"
+        />
+      </NextHead>
+
       <Head title={formatMessage("collectingEvent")} />
       <Nav />
       <CollectingEventMap

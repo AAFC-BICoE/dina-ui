@@ -5,9 +5,12 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { AttachmentsField, GroupSelectField } from "../..";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { AllowAttachmentsConfig } from "../../object-store";
+import {
+  AttachmentsField,
+  GroupSelectField
+} from "packages/dina-ui/components";
+import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
 
 export function SiteFormLayout({
   attachmentsConfig
@@ -53,6 +56,19 @@ export function SiteFormLayout({
           label={formatMessage("field_createdBy")}
         />
       </div>
+
+      {/* hard coded temporarily */}
+      <div className="row">
+        <label>
+          <strong>Polygon</strong>
+        </label>
+        <div style={{ marginTop: "10px", marginBottom: "25px" }}>
+          <a href="/collection/site/polygon" className="btn btn-info">
+            <DinaMessage id="viewOnMap" />
+          </a>
+        </div>
+      </div>
+
       <div className="mb-3">
         <DinaFormSection
           componentName="site-component"
