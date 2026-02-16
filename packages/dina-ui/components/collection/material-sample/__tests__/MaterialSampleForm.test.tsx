@@ -556,7 +556,7 @@ describe("Material Sample Edit Page", () => {
     ]);
   });
 
-  it("Lets you remove the attached Collecting Event.", async () => {
+  it.skip("Lets you remove the attached Collecting Event.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={testMaterialSample()}

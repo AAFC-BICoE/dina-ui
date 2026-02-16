@@ -141,6 +141,13 @@ export default function QueryRowClassificationSearch({
         menuPlacement={isInColumnSelector ? "bottom" : "auto"}
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
+        menuPortalTarget={document.body}
+        styles={{
+          menuPortal: (base) => ({
+            ...base,
+            zIndex: 9999
+          })
+        }}
       />
 
       {/* Operator Selection */}
@@ -160,6 +167,13 @@ export default function QueryRowClassificationSearch({
             menuPlacement={"auto"}
             menuShouldScrollIntoView={false}
             minMenuHeight={600}
+            menuPortalTarget={document.body}
+            styles={{
+              menuPortal: (base) => ({
+                ...base,
+                zIndex: 9999
+              })
+            }}
           />
         )}
 

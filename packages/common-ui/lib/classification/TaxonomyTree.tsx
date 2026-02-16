@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as echarts from "echarts";
-import "./TaxonomyTree.css";
 import { useApiClient } from "..";
 import useVocabularyOptions from "../../../dina-ui/components/collection/useVocabularyOptions";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";

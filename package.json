@@ -1,6 +1,6 @@
 {
   "name": "dina-ui-monorepo",
-  "license": "SEE LICENSE FILE",
+  "license": "MIT",
   "private": true,
   "workspaces": {
     "packages": [
