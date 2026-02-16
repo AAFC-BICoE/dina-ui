@@ -37,7 +37,7 @@ import "common-ui/lib/classification/TaxonomyTree.css";
 import "common-ui/lib/global-search/global-search.css";
 import "common-ui/lib/notification/notification.css";
 import "common-ui/lib/settings-button/SettingsButton.css";
-import "./collection/arcgis-config";
+import "packages/dina-ui/arcgis-config";
 
 /**
  * App component that wraps every page component.
