@@ -11,6 +11,7 @@ import {
 } from "packages/dina-ui/components";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
+import Link from "next/link";
 
 export function SiteFormLayout({
   attachmentsConfig
@@ -63,9 +64,9 @@ export function SiteFormLayout({
           <strong>Polygon</strong>
         </label>
         <div style={{ marginTop: "10px", marginBottom: "25px" }}>
-          <a href="/collection/site/polygon" className="btn btn-info">
+          <Link href="/collection/site/polygon" className="btn btn-info">
             <DinaMessage id="viewOnMap" />
-          </a>
+          </Link>
         </div>
       </div>
 
