@@ -27,7 +27,7 @@ export const getColumnDefinition: () => ColumnDefinition<Site>[] = () => {
       header: () => <DinaMessage id="viewDetails" />,
       enableSorting: false
     },
-    "title",
+    "name",
     "code",
     groupCell("group"),
     "createdBy",
@@ -38,7 +38,7 @@ export const getColumnDefinition: () => ColumnDefinition<Site>[] = () => {
 export default function SiteListPage() {
   const { formatMessage } = useDinaIntl();
 
-  const SITE_FILTER_ATTRIBUTES = ["createdBy", "title", "code"];
+  const SITE_FILTER_ATTRIBUTES = ["createdBy", "name", "code"];
   const SITE_TABLE_COLUMNS: ColumnDefinition<Site>[] = getColumnDefinition();
 
   return (
