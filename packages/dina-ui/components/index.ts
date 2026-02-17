@@ -19,7 +19,6 @@ export * from "./collection/collecting-event/GeoReferenceAssertionRow";
 export * from "./collection/collecting-event/ParseVerbatimToRangeButton";
 export * from "./collection/collecting-event/useCollectingEvent";
 export * from "./collection/event-map/CollectingEventMap";
-export * from "./collection/site/PolygonMap";
 export * from "./collection/global-names/GlobalNamesField";
 export * from "./collection/global-names/GlobalNamesSearchBox";
 export * from "./collection/classification/ClassificationField";
