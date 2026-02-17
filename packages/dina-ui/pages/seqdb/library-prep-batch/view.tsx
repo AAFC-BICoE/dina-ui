@@ -1,4 +1,4 @@
-import { ViewPageLayout } from "../../../components";
+import { ViewPageLayoutWithCustomHook } from "../../../components";
 import { LibraryPrepBatch } from "../../../types/seqdb-api";
 import {
   useLibraryPrepBatchQuery,
@@ -7,7 +7,7 @@ import {
 
 export default function PcrBatchDetailsPage() {
   return (
-    <ViewPageLayout<LibraryPrepBatch>
+    <ViewPageLayoutWithCustomHook<LibraryPrepBatch>
       form={(props) => (
         <LoadExternalDataForLibraryPrepBatchForm dinaFormProps={props} />
       )}

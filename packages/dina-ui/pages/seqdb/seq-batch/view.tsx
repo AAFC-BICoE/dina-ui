@@ -1,10 +1,10 @@
-import { ViewPageLayout } from "../../../components";
+import { ViewPageLayoutWithCustomHook } from "../../../components";
 import { SeqBatch } from "../../../types/seqdb-api";
 import { useSeqBatchQuery, LoadExternalDataForSeqBatchForm } from "./edit";
 
 export default function SeqBatchDetailsPage() {
   return (
-    <ViewPageLayout<SeqBatch>
+    <ViewPageLayoutWithCustomHook<SeqBatch>
       form={(props) => (
         <LoadExternalDataForSeqBatchForm dinaFormProps={{ ...props }} />
       )}

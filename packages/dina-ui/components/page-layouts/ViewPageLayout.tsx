@@ -21,61 +21,63 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { GenerateLabelDropdownButton } from "../collection/material-sample/GenerateLabelDropdownButton";
 import { FaRegClock } from "react-icons/fa";
 
-/** This Component requires either the "query" or "customQueryHook" prop. */
-type ViewPageLayoutPropsBase<T extends KitsuResource> =
-  | {
-      /** The JSONAPI query. */
-      query: (id: string) => JsonApiQuerySpec;
-      customQueryHook?: never;
-    }
-  | {
-      query?: never;
-      /** Custom query hook which may have more complicated logic than the usual useQuery hook. */
-      customQueryHook: CustomQueryHook<T>;
+type ViewPageLayoutPropsBase<T extends KitsuResource> = {
+  form: (formProps: ResourceFormProps<T>) => ReactNode;
+  entityLink: string;
+  specialListUrl?: string;
+  type: string;
+  apiBaseUrl: string;
 
-      /** Optional arguments to pass to the custom query hook. */
-      customQueryHookOptions?: any;
-    };
+  /** The field on the resource to use as the page title. */
+  nameField?: string | string[] | ((resource: PersistedResource<T>) => string);
+
+  /** main tag class, defaults to "container" */
+  mainClass?: string;
+
+  // Override page elements:
+  editButton?: (formProps: ResourceFormProps<T>) => ReactNode;
+  deleteButton?: (formProps: ResourceFormProps<T>) => ReactNode;
+  showEditButton?: boolean;
+  showDeleteButton?: boolean;
+  showGroup?: boolean;
+  showBackButton?: boolean;
+  /** Show the link to the "revisions" page if there is one. */
+  showRevisionsLink?: boolean;
+  showGenerateLabelButton?: boolean;
+
+  /** Show the link to the "revisions" page at page bottom as link. */
+  showRevisionsLinkAtBottom?: boolean;
+
+  /** Pass a react node of a tooltip, recommend setting the placement to the right. */
+  tooltipNode?: ReactNode;
+
+  alterInitialValues?: (resource: PersistedResource<T>) => any;
+  backButton?: JSX.Element;
+  forceTitleUppercase?: boolean;
+};
+
+/** Props for the ViewPageLayoutWithCustomHook component. */
+export type ViewPageLayoutWithCustomHookProps<T extends KitsuResource> =
+  ViewPageLayoutPropsBase<T> & {
+    /** Custom query hook which may have more complicated logic than the usual useQuery hook. */
+    customQueryHook: CustomQueryHook<T>;
+
+    /** Optional arguments to pass to the custom query hook. */
+    customQueryHookOptions?: any;
+  };
 
 export type ViewPageLayoutProps<T extends KitsuResource> =
   ViewPageLayoutPropsBase<T> & {
+    /** Optional arguments to pass to the useQuery hook. */
     queryOptions?: QueryOptions<T, unknown>;
-    customQueryHookOptions?: any;
-    form: (formProps: ResourceFormProps<T>) => ReactNode;
-    entityLink: string;
-    specialListUrl?: string;
-    type: string;
-    apiBaseUrl: string;
+    /** A function that returns the JsonApiQuerySpec to fetch the resource being viewed. */
+    query: (id: string) => JsonApiQuerySpec;
+  };
 
-    /** The field on the resource to use as the page title. */
-    nameField?:
-      | string
-      | string[]
-      | ((resource: PersistedResource<T>) => string);
-
-    /** main tag class, defaults to "container" */
-    mainClass?: string;
-
-    // Override page elements:
-    editButton?: (formProps: ResourceFormProps<T>) => ReactNode;
-    deleteButton?: (formProps: ResourceFormProps<T>) => ReactNode;
-    showEditButton?: boolean;
-    showDeleteButton?: boolean;
-    showGroup?: boolean;
-    showBackButton?: boolean;
-    /** Show the link to the "revisions" page if there is one. */
-    showRevisionsLink?: boolean;
-    showGenerateLabelButton?: boolean;
-
-    /** Show the link to the "revisions" page at page bottom as link. */
-    showRevisionsLinkAtBottom?: boolean;
-
-    /** Pass a react node of a tooltip, recommend setting the placement to the right. */
-    tooltipNode?: ReactNode;
-
-    alterInitialValues?: (resource: PersistedResource<T>) => any;
-    backButton?: JSX.Element;
-    forceTitleUppercase?: boolean;
+type ViewPageLayoutInnerProps<T extends KitsuResource> =
+  ViewPageLayoutPropsBase<T> & {
+    /** The query state for the resource being viewed, including the data and any loading or error state. */
+    resourceQuery: QueryState<T & HasDinaMetaInfo, unknown>;
   };
 
 export interface ResourceFormProps<T extends KitsuResource> {
@@ -86,20 +88,58 @@ export interface ResourceFormProps<T extends KitsuResource> {
 /**
  * Generic page layout for viewing one record.
  *
- * This component supports the use of queries or custom query hooks.
- *
- * For normal queries, it will add the "include-dina-permission" header automatically. For
- * custom hooks you will need to apply that logic if needed.
+ * It will add the "include-dina-permission" header automatically.
  *
  * If a permissionProvider is returned with the data then the buttons will disappear automatically
  * if the user does not have the correct permissions.
  */
-export function ViewPageLayout<T extends KitsuResource>({
+export function ViewPageLayout<T extends KitsuResource>(
+  props: ViewPageLayoutProps<T>
+) {
+  const router = useRouter();
+  const id = String(router.query.id);
+  const { query, queryOptions } = props;
+  const resourceQuery = useQuery(
+    { ...query(id), header: { "include-dina-permission": "true" } },
+    { disabled: !id, ...queryOptions }
+  ) as QueryState<T & HasDinaMetaInfo, unknown>;
+
+  const viewPageLayoutInnerProps: ViewPageLayoutInnerProps<T> = {
+    ..._.omit(props, "query", "queryOptions"),
+    resourceQuery
+  };
+
+  return <ViewPageLayoutInner {...viewPageLayoutInnerProps} />;
+}
+
+/**
+ * Generic page layout for viewing one record, with a custom query hook that can have more complicated logic than the usual useQuery hook.
+ *
+ * Unlike the normal ViewPageLayout, this component does not automatically add the "include-dina-permission" header.
+ * If you need that header, you must add it manually in your custom query hook.
+ *
+ * If a permissionProvider is returned with the data then the buttons will disappear automatically
+ * if the user does not have the correct permissions.
+ */
+export function ViewPageLayoutWithCustomHook<T extends KitsuResource>(
+  props: ViewPageLayoutWithCustomHookProps<T>
+) {
+  const router = useRouter();
+  const id = String(router.query.id);
+  const { customQueryHook, customQueryHookOptions } = props;
+  const resourceQuery = customQueryHook(id, customQueryHookOptions);
+
+  const viewPageLayoutInnerProps: ViewPageLayoutInnerProps<T> = {
+    ..._.omit(props, "customQueryHook", "customQueryHookOptions"),
+    resourceQuery
+  };
+
+  return <ViewPageLayoutInner {...viewPageLayoutInnerProps} />;
+}
+
+/** The inner component that actually renders the page, used by both ViewPageLayout and ViewPageLayoutWithCustomHook. */
+function ViewPageLayoutInner<T extends KitsuResource>({
   form,
-  query,
-  customQueryHook,
-  customQueryHookOptions,
-  queryOptions,
   entityLink,
   specialListUrl,
   type,
@@ -118,24 +158,15 @@ export function ViewPageLayout<T extends KitsuResource>({
   alterInitialValues,
   showGenerateLabelButton,
   backButton,
-  forceTitleUppercase
-}: ViewPageLayoutProps<T>) {
-  const router = useRouter();
-  const id = String(router.query.id);
-
-  const resourceQuery = (customQueryHook?.(id, customQueryHookOptions) ??
-    (query &&
-      useQuery(
-        { ...query(id), header: { "include-dina-permission": "true" } },
-        { disabled: !id, ...queryOptions }
-      ))) as QueryState<T & HasDinaMetaInfo, unknown>;
-
+  forceTitleUppercase,
+  resourceQuery
+}: ViewPageLayoutInnerProps<T>) {
   return (
     <div>
       <Nav marginBottom={false} />
       {withResponse(resourceQuery, ({ data }) => {
         const resource = data as PersistedResource<T>;
-
+        const id = data.id;
         const formProps = {
           initialValues: alterInitialValues?.(resource) ?? resource,
           readOnly: true
