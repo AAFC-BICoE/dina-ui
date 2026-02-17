@@ -168,7 +168,7 @@ export interface PrepareMetadataSaveOperationParams {
 }
 
 export function useMetadataSave({
-  initialValues,
+  initialValues = {},
   onSaved
 }: UseMetadataSaveParams) {
   const { save } = useApiClient();
