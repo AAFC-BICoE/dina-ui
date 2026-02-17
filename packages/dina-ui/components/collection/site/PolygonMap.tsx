@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { loadModules } from "esri-loader";
+import Head from "next/head";
 import type { GeoPolygon } from "packages/dina-ui/types/geo/geopolygon";
+import "packages/dina-ui/components/collection/event-map/arcgis-config";
 
 export function PolygonMap({ geopolygon }: { geopolygon: GeoPolygon }) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -69,5 +71,15 @@ export function PolygonMap({ geopolygon }: { geopolygon: GeoPolygon }) {
     };
   }, [geopolygon]);
 
-  return <div ref={mapRef} style={{ height: "500px", width: "100%" }} />;
+  return (
+    <>
+      <Head>
+        <link
+          href="https://js.arcgis.com/4.29/esri/themes/dark/main.css"
+          rel="stylesheet"
+        />
+      </Head>
+      <div ref={mapRef} style={{ height: "500px", width: "100%" }} />
+    </>
+  );
 }
