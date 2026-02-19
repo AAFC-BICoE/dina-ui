@@ -940,5 +940,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dueDate: "Date d'échéance",
   siteListTitle: "Site",
   siteAttachments: "Pièces jointes au site",
-  code: "Code"
+  code: "Code",
+  siteCoordinates: "Coordonnées du site",
+  waitingForPolygonData: "En attente des données polygonales..."
 };

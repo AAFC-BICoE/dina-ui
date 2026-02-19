@@ -10,7 +10,7 @@ export default function ArcGISLoader({
 }) {
   useEffect(() => {
     if (!hasLoaded) {
-      import("../../lib/arcgis-config");
+      import("packages/dina-ui/lib/arcgis-config");
       hasLoaded = true;
     }
   }, []);

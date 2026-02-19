@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { loadModules } from "esri-loader";
 import type { GeoPolygon } from "packages/dina-ui/types/geo/geopolygon";
 
-export function PolygonMap({ geopolygon }: { geopolygon: GeoPolygon }) {
+export function PolygonMap({ geoPolygon }: { geoPolygon: GeoPolygon }) {
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,13 +31,13 @@ export function PolygonMap({ geopolygon }: { geopolygon: GeoPolygon }) {
       view = new MapView({
         container: mapRef.current,
         map,
-        center: geopolygon.coordinates[0][0],
-        zoom: 12
+        center: geoPolygon.coordinates[0][0],
+        zoom: 4
       });
 
       // Convert GeoJSON coordinates to ArcGIS rings
       const polygon = new Polygon({
-        rings: geopolygon.coordinates,
+        rings: geoPolygon.coordinates,
         spatialReference: { wkid: 4326 }
       });
 
@@ -57,7 +57,7 @@ export function PolygonMap({ geopolygon }: { geopolygon: GeoPolygon }) {
 
       // Zoom to polygon
       await view.when();
-      view.goTo(polygon);
+      await view.goTo(polygon);
     };
 
     initMap();
@@ -67,7 +67,7 @@ export function PolygonMap({ geopolygon }: { geopolygon: GeoPolygon }) {
         view.destroy();
       }
     };
-  }, [geopolygon]);
+  }, [geoPolygon]);
 
-  return <div ref={mapRef} style={{ height: "500px", width: "100%" }} />;
+  return <div ref={mapRef} style={{ height: "100%", width: "100%" }} />;
 }

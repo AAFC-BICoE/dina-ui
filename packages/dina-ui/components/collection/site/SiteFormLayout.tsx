@@ -11,7 +11,7 @@ import {
 } from "packages/dina-ui/components";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
-import Link from "next/link";
+import GeometryMapEditor from "packages/dina-ui/components/geo/GeometryMapEditor";
 
 export function SiteFormLayout({
   attachmentsConfig
@@ -44,6 +44,22 @@ export function SiteFormLayout({
           label={formatMessage("code")}
         />
       </div>
+      <div className="row">
+        <TextField
+          className="col-md-6"
+          name="siteGeom"
+          label={formatMessage("siteCoordinates")}
+          multiLines={true}
+        />
+        <div style={{ marginTop: "-5px", marginBottom: "25px" }}>
+          <GeometryMapEditor
+            type="Polygon"
+            fieldName="siteGeom"
+            url="/collection/site/polygon"
+            messageId="viewOnMap"
+          />
+        </div>
+      </div>
       <MultilingualDescription />
       <div className="row">
         <DateField
@@ -57,19 +73,6 @@ export function SiteFormLayout({
           label={formatMessage("field_createdBy")}
         />
       </div>
-
-      {/* hard coded temporarily */}
-      <div className="row">
-        <label>
-          <strong>Polygon</strong>
-        </label>
-        <div style={{ marginTop: "10px", marginBottom: "25px" }}>
-          <Link href="/collection/site/polygon" className="btn btn-info">
-            <DinaMessage id="viewOnMap" />
-          </Link>
-        </div>
-      </div>
-
       <div className="mb-3">
         <DinaFormSection
           componentName="site-component"
