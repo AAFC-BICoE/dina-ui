@@ -5,10 +5,50 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";
 import { useMetadataThumbnailPath } from "../object-store/metadata/useMetadataThumbnailPath";
-
 export interface ThumbnailCellProps {
+  original?;
   bucketField: string;
   isJsonApiQuery?: boolean;
+}
+
+function ThumbnailCellInner({
+  original,
+  bucketField,
+  isJsonApiQuery
+}: ThumbnailCellProps) {
+  const {
+    resourceExternalURL,
+    hasExternalResourceDerivative,
+    filePath,
+    altImage
+  } = useMetadataThumbnailPath(original, bucketField, isJsonApiQuery);
+  return resourceExternalURL ? (
+    <div className="d-flex h-100">
+      {hasExternalResourceDerivative ? (
+        <FaExternalLinkAlt className="m-auto me-2 h5" />
+      ) : (
+        <Link
+          href={resourceExternalURL}
+          passHref={true}
+          target="_blank"
+          className="m-auto h5"
+        >
+          <FaExternalLinkAlt />
+        </Link>
+      )}
+      {hasExternalResourceDerivative && (
+        <SmallThumbnail filePath={filePath} altImage={altImage} />
+      )}
+      <Link
+        href={`/object-store/object/external-resource-view?id=${original?.id}`}
+        className="m-auto"
+      >
+        <DinaMessage id="detailsPageLink" />
+      </Link>
+    </div>
+  ) : (
+    <SmallThumbnail filePath={filePath} altImage={altImage} />
+  );
 }
 
 export function ThumbnailCell<TData extends KitsuResource>({
@@ -17,45 +57,13 @@ export function ThumbnailCell<TData extends KitsuResource>({
 }: ThumbnailCellProps): TableColumn<TData> {
   return {
     id: "thumbnail",
-    cell: ({ row: { original } }) => {
-      const {
-        resourceExternalURL,
-        hasExternalResourceDerivative,
-        filePath,
-        altImage
-      } = useMetadataThumbnailPath<TData>(
-        original,
-        bucketField,
-        isJsonApiQuery
-      );
-      return resourceExternalURL ? (
-        <div className="d-flex h-100">
-          {hasExternalResourceDerivative ? (
-            <FaExternalLinkAlt className="m-auto me-2 h5" />
-          ) : (
-            <Link
-              href={resourceExternalURL}
-              passHref={true}
-              target="_blank"
-              className="m-auto h5"
-            >
-              <FaExternalLinkAlt />
-            </Link>
-          )}
-          {hasExternalResourceDerivative && (
-            <SmallThumbnail filePath={filePath} altImage={altImage} />
-          )}
-          <Link
-            href={`/object-store/object/external-resource-view?id=${original?.id}`}
-            className="m-auto"
-          >
-            <DinaMessage id="detailsPageLink" />
-          </Link>
-        </div>
-      ) : (
-        <SmallThumbnail filePath={filePath} altImage={altImage} />
-      );
-    },
+    cell: ({ row: { original } }) => (
+      <ThumbnailCellInner
+        original={original}
+        bucketField={bucketField}
+        isJsonApiQuery={isJsonApiQuery}
+      />
+    ),
     enableSorting: false,
     header: () => <DinaMessage id="thumbnail" />,
     // These fields are required in the elastic search response for this cell to work.
