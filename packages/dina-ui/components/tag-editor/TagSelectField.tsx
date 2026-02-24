@@ -9,7 +9,7 @@ import {
 import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
 import _ from "lodash";
-import { useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
 import { useDebounce } from "use-debounce";
 import { useElasticSearchDistinctTerm } from "../../../common-ui/lib/list-page/useElasticSearchDistinctTerm";
@@ -67,19 +67,32 @@ export function TagSelectField({
         )
       }
     >
-      {({ value, setValue, invalid, placeholder }) => (
-        <TagSelect
-          value={value}
-          onChange={setValue}
-          invalid={invalid}
-          resourcePath={resourcePath}
-          groupSelectorName={props.groupSelectorName}
-          placeholder={placeholder}
-          tagsFieldName={tagsFieldName}
-          tagIncludedType={props.tagIncludedType}
-          indexName={indexName}
-        />
-      )}
+      {({ value, setValue, invalid, placeholder }) =>
+        indexName ? (
+          <TagSelectElasticSearch
+            value={value}
+            onChange={setValue}
+            invalid={invalid}
+            resourcePath={resourcePath}
+            groupSelectorName={props.groupSelectorName}
+            placeholder={placeholder}
+            tagsFieldName={tagsFieldName}
+            tagIncludedType={props.tagIncludedType}
+            indexName={indexName}
+          />
+        ) : (
+          <TagSelect
+            value={value}
+            onChange={setValue}
+            invalid={invalid}
+            resourcePath={resourcePath}
+            groupSelectorName={props.groupSelectorName}
+            placeholder={placeholder}
+            tagsFieldName={tagsFieldName}
+            tagIncludedType={props.tagIncludedType}
+          />
+        )
+      }
     </FieldWrapper>
   );
 }
@@ -96,31 +109,19 @@ interface TagSelectProps {
   indexName?: string;
 }
 
-/** Tag Select/Create field. */
-function TagSelect({
-  value,
-  onChange,
-  resourcePath,
-  invalid,
-  groupSelectorName = "group",
-  tagsFieldName = "tags",
-  tagIncludedType,
-  placeholder,
-  indexName
-}: TagSelectProps) {
-  const { formatMessage } = useDinaIntl();
-  const { isAdmin, groupNames } = useAccount();
+interface TagSelectInnerProps extends TagSelectProps {
+  tagOptions: any;
+  inputValue: any;
+  setInputValue: any;
+  isLoading?: boolean;
+}
 
-  /** The value of the input element. */
+// Tag Select/Create field hooked into Formik with elasticsearch support.
+function TagSelectElasticSearch(props: TagSelectProps) {
+  const { groupNames } = useAccount();
+  const { tagsFieldName, tagIncludedType, indexName } = props;
   const [inputValue, setInputValue] = useState("");
-  /** The debounced input value passed to the fetcher. */
   const [debouncedInputValue] = useDebounce(inputValue, 250);
-  const tagOptions = useRef<TagSelectOption[]>([]);
-  const isLoading = useRef<boolean>(false);
-
-  const typeName = _.last(resourcePath?.split("/"));
-
-  // disabled if no indexName is provided
   const suggestions = useElasticSearchDistinctTerm({
     fieldName: indexName
       ? tagIncludedType
@@ -135,9 +136,36 @@ function TagSelect({
     size: 10,
     relationshipType: tagIncludedType
   });
-  tagOptions.current = suggestions.map((tag) => toOption(tag));
 
-  // handle the situation when tagsFieldName is something like this "contributors[0].roles"
+  const tagOptions = useMemo(
+    () => suggestions.map((tag) => toOption(tag)),
+    [suggestions]
+  );
+
+  return (
+    <TagSelectInner
+      {...props}
+      tagOptions={tagOptions}
+      inputValue={inputValue}
+      setInputValue={setInputValue}
+    />
+  );
+}
+
+// Tag Select/Create field hooked into Formik. Does not use elasticsearch.
+function TagSelect(props: TagSelectProps) {
+  const {
+    resourcePath,
+    groupSelectorName = "group",
+    tagsFieldName = "tags"
+  } = props;
+  const { isAdmin, groupNames } = useAccount();
+
+  const [inputValue, setInputValue] = useState("");
+  const [tagOptions, setTagOptions] = useState<TagSelectOption[]>([]); // ✅ destructure tuple properly
+
+  const typeName = _.last(resourcePath?.split("/"));
+
   const match = tagsFieldName.match(/^(.+?)\[(\d+)\]\.(.+)$/);
   let parsedFieldname = tagsFieldName;
   let numberInsideBracket = -1;
@@ -162,7 +190,7 @@ function TagSelect({
       page: { limit: 100 }
     },
     {
-      disabled: !resourcePath || !!indexName, // disable if no resourcePath or indexName is provided
+      disabled: !resourcePath,
       onSuccess(response) {
         if (
           match &&
@@ -170,7 +198,6 @@ function TagSelect({
           numberInsideBracket > -1 &&
           internalTagFieldName != undefined
         ) {
-          // handle the situation when tagsFieldName is something like this "contributors[0].roles"
           const dataArray = _.uniq(
             _.compact(
               response.data
@@ -181,7 +208,7 @@ function TagSelect({
           const tags = dataArray
             .filter((tag: string) => tag.includes(inputValue))
             .map((tag: string) => toOption(tag));
-          tagOptions.current = tags;
+          setTagOptions(tags);
         } else {
           const tags = _.uniq(
             _.compact(
@@ -190,16 +217,35 @@ function TagSelect({
           )
             .filter((tag) => tag.includes(inputValue))
             .map((tag) => toOption(tag));
-          tagOptions.current = tags;
+          setTagOptions(tags);
         }
       }
     }
   );
-  isLoading.current = loading;
 
-  function toOption(tagText: string): TagSelectOption {
-    return { label: tagText, value: tagText };
-  }
+  return (
+    <TagSelectInner
+      {...props}
+      tagOptions={tagOptions}
+      isLoading={loading}
+      inputValue={inputValue}
+      setInputValue={setInputValue}
+    />
+  );
+}
+
+/** Tag Select/Create field. */
+function TagSelectInner({
+  value,
+  onChange,
+  invalid,
+  placeholder,
+  tagOptions,
+  inputValue,
+  setInputValue,
+  isLoading
+}: TagSelectInnerProps) {
+  const { formatMessage } = useDinaIntl();
 
   const selectedOptions = (value ?? []).map(toOption);
 
@@ -231,10 +277,10 @@ function TagSelect({
       options={[
         {
           label: formatMessage("typeNewTagOrSearchPreviousTags"),
-          options: tagOptions.current
+          options: tagOptions
         }
       ]}
-      isLoading={isLoading.current}
+      isLoading={isLoading}
       // Select config:
       styles={customStyle}
       classNamePrefix="react-select"
@@ -249,6 +295,10 @@ function TagSelect({
       isCreatable={true}
     />
   );
+}
+
+function toOption(tagText: string): TagSelectOption {
+  return { label: tagText, value: tagText };
 }
 
 export interface TagSelectReadOnlyProps {
