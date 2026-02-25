@@ -1,7 +1,7 @@
 import { LoadingSpinner } from "common-ui";
 import { InputResource } from "kitsu";
 import _ from "lodash";
-import { useStorageUnit } from "packages/dina-ui/pages/collection/storage-unit/edit";
+import { useStorageUnits } from "packages/dina-ui/pages/collection/storage-unit/edit";
 import { StorageUnit } from "packages/dina-ui/types/collection-api";
 import { StorageUnitBulkEditor } from "./StorageUnitBulkEditor";
 
@@ -16,7 +16,7 @@ export function ExistingStorageUnitBulkEditor({
   onSaved,
   onPreviousClick
 }: ExistingStorageUnitBulkEditorProps) {
-  const storageUnitQueries = ids.map((id) => useStorageUnit(id));
+  const storageUnitQueries = useStorageUnits(ids);
 
   /** Whether any query is loading. */
   const isLoading = storageUnitQueries.reduce(
@@ -34,9 +34,7 @@ export function ExistingStorageUnitBulkEditor({
     return (
       <div className="alert alert-danger">
         {errors.map((error, index) => (
-          <div key={index}>
-            {error?.errors?.map((e) => e.detail).join("\n") ?? String(error)}
-          </div>
+          <div key={index}>{String(error)}</div>
         ))}
       </div>
     );

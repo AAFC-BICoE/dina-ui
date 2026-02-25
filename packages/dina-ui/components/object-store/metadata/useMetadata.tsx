@@ -3,7 +3,8 @@ import {
   resourceDifference,
   SaveArgs,
   useApiClient,
-  useQuery
+  useQuery,
+  useBulkQueries
 } from "common-ui";
 import { InputResource } from "kitsu";
 import {
@@ -47,6 +48,45 @@ export function useMetadataEditQuery(id?: string | null) {
     }
   );
   return metadataQuery;
+}
+
+/**
+ * Takes array of ids and returns array of metadata queries.
+ * Each query has the same structure as the one returned by useMetadataEditQuery.
+ */
+export function useMetadataEditQueries(ids: (string | null)[]) {
+  const { apiClient } = useApiClient();
+  const metadataQueries = useBulkQueries<Metadata>(
+    ids.map((id) => ({
+      path: `objectstore-api/metadata/${id}`,
+      include: "dcCreator,derivatives"
+    })),
+    {
+      disabled: !ids.length,
+      joinSpecs: [
+        // Join to persons api:
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "dcCreator",
+          joinField: "dcCreator",
+          path: (metadata) => `person/${metadata.dcCreator.id}`
+        }
+      ],
+      onSuccess: async ({ data: metadata }) => {
+        // Get the License resource based on the Metadata's xmpRightsWebStatement field:
+        if (metadata.xmpRightsWebStatement) {
+          const url = metadata.xmpRightsWebStatement;
+          (metadata as any).license = (
+            await apiClient.get<License[]>("objectstore-api/license", {
+              filter: { url }
+            })
+          ).data[0];
+        }
+      }
+    }
+  );
+
+  return metadataQueries;
 }
 
 export function useMetadataViewQuery(id?: string) {

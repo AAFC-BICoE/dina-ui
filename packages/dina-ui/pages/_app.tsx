@@ -33,12 +33,22 @@ import "./bootstrap-print.css";
 import "@react-awesome-query-builder/ui/css/styles.css";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 /**
  * App component that wraps every page component.
  *
  * See: https://github.com/zeit/next.js/#custom-app
  */
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5 // 5 minutes
+    }
+  }
+});
+
 export default function DinaUiApp({ Component, pageProps }: AppProps) {
   const appElement =
     typeof window !== "undefined"
@@ -46,28 +56,30 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
       : null;
 
   return (
-    <ApiClientImplProvider>
-      <InstanceContextProvider>
-        <DevUserAccountProvider>
-          <KeycloakAccountProvider>
-            <AuthenticatedApiClientProvider>
-              <DinaIntlProvider>
-                <FileUploadProviderImpl>
-                  <ErrorBoundaryPage>
-                    <DndProvider backend={HTML5Backend}>
-                      <ModalProvider appElement={appElement}>
-                        <WorkbookUploadContextProvider>
-                          <Component {...pageProps} />
-                        </WorkbookUploadContextProvider>
-                      </ModalProvider>
-                    </DndProvider>
-                  </ErrorBoundaryPage>
-                </FileUploadProviderImpl>
-              </DinaIntlProvider>
-            </AuthenticatedApiClientProvider>
-          </KeycloakAccountProvider>
-        </DevUserAccountProvider>
-      </InstanceContextProvider>
-    </ApiClientImplProvider>
+    <QueryClientProvider client={queryClient}>
+      <ApiClientImplProvider>
+        <InstanceContextProvider>
+          <DevUserAccountProvider>
+            <KeycloakAccountProvider>
+              <AuthenticatedApiClientProvider>
+                <DinaIntlProvider>
+                  <FileUploadProviderImpl>
+                    <ErrorBoundaryPage>
+                      <DndProvider backend={HTML5Backend}>
+                        <ModalProvider appElement={appElement}>
+                          <WorkbookUploadContextProvider>
+                            <Component {...pageProps} />
+                          </WorkbookUploadContextProvider>
+                        </ModalProvider>
+                      </DndProvider>
+                    </ErrorBoundaryPage>
+                  </FileUploadProviderImpl>
+                </DinaIntlProvider>
+              </AuthenticatedApiClientProvider>
+            </KeycloakAccountProvider>
+          </DevUserAccountProvider>
+        </InstanceContextProvider>
+      </ApiClientImplProvider>
+    </QueryClientProvider>
   );
 }
