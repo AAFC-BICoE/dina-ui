@@ -20,6 +20,7 @@ import { ClassificationSearchStates } from "../list-page/query-builder/query-bui
 import { VocabularyElement } from "packages/dina-ui/types/collection-api";
 import {
   getImageLinkColumn,
+  IMAGE_VIEW_LINK,
   ImageLinkStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
 import { FunctionDef } from "../../../dina-ui/types/dina-export-api/resources/DataExport";
@@ -51,35 +52,57 @@ export function getColumnFunctions<TData extends KitsuResource>(
   columnsToExport: TableColumn<TData>[]
 ) {
   return columnsToExport
-    .filter((c) => c.columnSelectorString?.startsWith("columnFunction/"))
+    .filter(
+      (c) =>
+        c.id?.startsWith("imageLink.") ||
+        c.columnSelectorString?.startsWith("columnFunction/")
+    )
     .reduce((prev, curr) => {
-      const columnParts = curr.columnSelectorString?.split("/");
+      if (curr.columnSelectorString?.startsWith("columnFunction/")) {
+        const columnParts = curr.columnSelectorString?.split("/");
 
-      if (columnParts && columnParts.length >= 3) {
-        const functionId = columnParts[1];
-        const functionDef = columnParts[2];
-        const paramString = columnParts[3];
+        if (columnParts && columnParts.length >= 3) {
+          const functionId = columnParts[1];
+          const functionDef = columnParts[2];
+          const paramString = columnParts[3];
 
-        let params: Record<string, any>;
+          let params: Record<string, any>;
 
-        if (functionDef === "CONVERT_COORDINATES_DD") {
-          // Reconstruct the object for coordinates (locked to this specific field for now)
-          params = { column: "collectingEvent.eventGeom" };
-        } else {
-          const parsedParams = JSON.parse(paramString);
-          // Reconstruct the { items: [] } object structure
-          params = {
-            items: parsedParams?.items || []
+          if (functionDef === "CONVERT_COORDINATES_DD") {
+            // Reconstruct the object for coordinates (locked to this specific field for now)
+            params = { column: "collectingEvent.eventGeom" };
+          } else {
+            const parsedParams = JSON.parse(paramString);
+            // Reconstruct the { items: [] } object structure
+            params = {
+              items: parsedParams?.items || []
+            };
+          }
+
+          return {
+            ...prev,
+            [functionId]: {
+              functionDef: functionDef,
+              params: params
+            }
           };
         }
-
-        return {
-          ...prev,
-          [functionId]: {
-            functionDef: functionDef,
-            params: params
-          }
-        };
+      } else if (curr.id?.startsWith("imageLink.")) {
+        if (curr.id.endsWith("ORIGINAL")) {
+          return {
+            ...prev,
+            [curr.id]: {
+              functionDef: "CONCAT",
+              params: {
+                items: ["url", "fileIdentifier"],
+                constants: {
+                  url: `${window.location.origin}${IMAGE_VIEW_LINK}`
+                },
+                separator: ""
+              }
+            }
+          };
+        }
       }
       return prev;
     }, {});
