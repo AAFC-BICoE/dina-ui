@@ -116,7 +116,14 @@ export function PreLibraryPrepTable({
             />
           )
         : ({ row: { index, original }, column: { id: columnId }, table }) => {
-            return protocolCellInner(index, original, columnId, table);
+            return (
+              <ProtocolCellInner
+                index={index}
+                original={original}
+                columnId={columnId}
+                table={table}
+              />
+            );
           },
       header: () => (
         <b>
@@ -142,7 +149,14 @@ export function PreLibraryPrepTable({
             />
           )
         : ({ row: { index, original }, column: { id: columnId }, table }) => {
-            return productCellInner(index, original, columnId, table);
+            return (
+              <ProductCellInner
+                index={index}
+                original={original}
+                columnId={columnId}
+                table={table}
+              />
+            );
           },
       header: () => (
         <b>
@@ -175,6 +189,13 @@ export function PreLibraryPrepTable({
   );
 }
 
+export interface TableCellInnerProps {
+  index;
+  original;
+  columnId;
+  table;
+}
+
 /**
  * Renders a cell component for selecting a protocol in the PreLibraryPrepTable.
  *
@@ -184,7 +205,12 @@ export function PreLibraryPrepTable({
  * @param table - The table instance providing metadata and update methods.
  * @returns A ResourceSelect component configured for protocol selection with state management.
  */
-function protocolCellInner(index, original, columnId, table) {
+function ProtocolCellInner({
+  index,
+  original,
+  columnId,
+  table
+}: TableCellInnerProps) {
   const initialValue = original[columnId];
   const [protocol, setProtocol] = useState<Protocol>(
     original.protocol as PersistedResource<Protocol>
@@ -224,7 +250,12 @@ function protocolCellInner(index, original, columnId, table) {
  * @param table - The table instance providing metadata and update methods.
  * @returns A ResourceSelect component configured for protocol selection with state management.
  */
-function productCellInner(index, original, columnId, table) {
+function ProductCellInner({
+  index,
+  original,
+  columnId,
+  table
+}: TableCellInnerProps) {
   const initialValue = original[columnId];
   const [product, setProduct] = useState<Product>(
     original.product as PersistedResource<Product>
