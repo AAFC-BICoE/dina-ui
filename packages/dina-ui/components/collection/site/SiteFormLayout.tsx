@@ -95,7 +95,11 @@ export function SiteFormLayout({
             <strong>{formatMessage("siteCoordinates")}</strong>
           </div>
           {readOnly ? (
-            <pre>{JSON.stringify(parsePolygon(siteGeom.toString()))}</pre>
+            <pre>
+              {siteGeom
+                ? JSON.stringify(parsePolygon(siteGeom.toString()))
+                : ""}
+            </pre>
           ) : (
             <textarea
               value={JSON.stringify(siteGeom, null, 2)}
@@ -106,12 +110,14 @@ export function SiteFormLayout({
           )}
         </div>
         <div style={{ marginBottom: "25px" }}>
-          <GeometryMapEditorLauncher
-            type="Polygon"
-            fieldName="siteGeom"
-            url={popupUrl}
-            messageId={messageId}
-          />
+          {value && (
+            <GeometryMapEditorLauncher
+              type="Polygon"
+              fieldName="siteGeom"
+              url={popupUrl}
+              messageId={messageId}
+            />
+          )}
         </div>
       </div>
       <MultilingualDescription />
