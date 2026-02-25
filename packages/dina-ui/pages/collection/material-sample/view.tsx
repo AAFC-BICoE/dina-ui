@@ -109,24 +109,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     bool: {
       must: [
         {
-          nested: {
-            path: "included",
-            query: {
-              bool: {
-                must: [
-                  {
-                    term: {
-                      "included.id": id
-                    }
-                  },
-                  {
-                    term: {
-                      "included.type": "material-sample"
-                    }
-                  }
-                ]
-              }
-            }
+          term: {
+            "data.relationships.materialSamples.data.id": id
+          }
+        },
+        {
+          term: {
+            "data.relationships.materialSamples.data.type": "material-sample"
           }
         }
       ]
