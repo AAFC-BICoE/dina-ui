@@ -39,21 +39,23 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
  *
  * See: https://github.com/zeit/next.js/#custom-app
  */
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      refetchOnWindowFocus: false,
-      staleTime: 1000 * 60 * 5 // 5 minutes
-    }
-  }
-});
 
 export default function DinaUiApp({ Component, pageProps }: AppProps) {
   const appElement =
     typeof window !== "undefined"
       ? document.querySelector<HTMLElement>("#__next")
       : null;
+
+  // queryClient for react-query
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 5 // 5 minutes
+      }
+    }
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
