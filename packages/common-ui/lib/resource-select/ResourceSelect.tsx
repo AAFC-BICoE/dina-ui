@@ -127,7 +127,11 @@ export interface AsyncOption<TData extends KitsuResource> {
   getResource: () => Promise<PersistedResource<TData> | undefined>;
 }
 
-/** Dropdown select input for selecting a resource from the API. */
+/**
+ * A debounced search-as-you-type dropdown component that fetches resources
+ * from a JSONAPI-compliant backend.
+ * Use ResourceSelectCustomQuery if you need to use a custom data-fetching hook.
+ */
 export function ResourceSelect<TData extends KitsuResource>(
   props: ResourceSelectProps<TData>
 ) {
@@ -181,6 +185,11 @@ export function ResourceSelect<TData extends KitsuResource>(
   });
 }
 
+/**
+ * A variation of ResourceSelect that allows for a custom data-fetching hook.
+ * Useful when the resource list depends on complex external states or
+ * non-standard API endpoints.
+ */
 export function ResourceSelectCustomQuery<TData extends KitsuResource>(
   props: ResourceSelectCustomQueryProps<TData>
 ) {
@@ -240,6 +249,14 @@ export function ResourceSelectCustomQuery<TData extends KitsuResource>(
   });
 }
 
+/**
+ * Inner component for ResourceSelect.
+ * Takes query and input states as props from wrapper components to allow for shared logic between the standard and custom query versions of ResourceSelect.
+ * @template TData The KitsuResource type being selected.
+ * @param props Combined props from the parent selectors plus internal state
+ * like `inputValue` and `response`.
+ * * @returns A SortableSelect component configured with resource-specific styles and logic.
+ */
 export function ResourceSelectInner<TData extends KitsuResource>({
   isDisabled,
   isMulti = false,
