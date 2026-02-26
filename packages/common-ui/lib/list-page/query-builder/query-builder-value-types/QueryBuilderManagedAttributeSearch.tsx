@@ -90,9 +90,7 @@ export default function QueryRowManagedAttributeSearch({
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = isInColumnSelector
-    ? _.noop
-    : useQueryBuilderEnterToSearch();
+  const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
 
   const [managedAttributeState, setManagedAttributeState] =
     useState<ManagedAttributeSearchStates>(() =>
@@ -436,6 +434,13 @@ export default function QueryRowManagedAttributeSearch({
           menuPlacement={isInColumnSelector ? "bottom" : "auto"}
           menuShouldScrollIntoView={false}
           minMenuHeight={600}
+          menuPortalTarget={document.body}
+          styles={{
+            menuPortal: (base) => ({
+              ...base,
+              zIndex: 9999
+            })
+          }}
         />
       ) : (
         <></>

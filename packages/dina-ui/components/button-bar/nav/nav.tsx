@@ -320,6 +320,11 @@ function NavCollectionDropdown({ formatMessage }) {
           <DinaMessage id="revisionsByUserPageTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/collection/site/list" passHref={true} legacyBehavior>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="siteListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/collection/storage-unit/list" passHref={true} legacyBehavior>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="storageUnitListTitle" />

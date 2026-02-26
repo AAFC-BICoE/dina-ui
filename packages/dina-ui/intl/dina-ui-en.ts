@@ -315,6 +315,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_attachment: "Attachments",
   field_attributesTemplate: "Set Attributes Template",
   field_analysisType: "Analysis Type",
+  field_molecularAnalysisName: "Molecular Analysis Name",
   field_barcode: "Barcode",
   field_collectingEventCollectionMethod: "Collection Method",
   field_collectingEventCollectionMethod_tooltip:
@@ -427,6 +428,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_endEventDateTime_tooltip:
     "End Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_expeditionName: "Expedition name",
+  field_siteName: "Site name",
   field_familyNames: "Family Names",
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_fieldExtensions: "Field Extensions",
@@ -1372,5 +1374,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A real-time, aggregated view of taxonomic hierarchies applied to each primary determination.",
   notPubliclyReleasableWithReason: "Not Publicly Releasable: {reason}",
   clearAllNamesButtonText: "Clear All Names",
-  workflowsLegend: "Molecular Analysis Workflows"
+  workflowsLegend: "Molecular Analysis Workflows",
+  siteListTitle: "Site",
+  siteAttachments: "Site Attachments",
+  code: "Code"
 };

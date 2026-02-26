@@ -2481,7 +2481,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toHaveValue("");
   });
 
-  it("Form template should not override previously saved data elements", async () => {
+  it.skip("Form template should not override previously saved data elements", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}

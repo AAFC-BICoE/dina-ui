@@ -131,7 +131,7 @@ export function useMolecularAnalysisRunColumns({
           />
         );
       },
-      header: () => <DinaMessage id="molecularAnalysisRunItemName" />,
+      header: () => <FieldHeader name="molecularAnalysisRunItemName" />,
       accessorKey: "molecularAnalysisRunItem.name",
       sortingFn: (a: any, b: any): number =>
         compareByStringAndNumber(

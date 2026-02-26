@@ -80,9 +80,7 @@ export default function QueryRowIdentifierSearch({
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = isInColumnSelector
-    ? _.noop
-    : useQueryBuilderEnterToSearch();
+  const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
 
   const [identifierState, setIdentifierState] =
     useState<IdentifierSearchStates>(() =>
@@ -288,6 +286,13 @@ export default function QueryRowIdentifierSearch({
         menuPlacement={isInColumnSelector ? "bottom" : "auto"}
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
+        menuPortalTarget={document.body}
+        styles={{
+          menuPortal: (base) => ({
+            ...base,
+            zIndex: 9999
+          })
+        }}
       />
 
       {/* Operator */}
@@ -306,6 +311,13 @@ export default function QueryRowIdentifierSearch({
           menuPlacement={isInColumnSelector ? "bottom" : "auto"}
           menuShouldScrollIntoView={false}
           minMenuHeight={600}
+          menuPortalTarget={document.body}
+          styles={{
+            menuPortal: (base) => ({
+              ...base,
+              zIndex: 9999
+            })
+          }}
         />
       ) : (
         <></>

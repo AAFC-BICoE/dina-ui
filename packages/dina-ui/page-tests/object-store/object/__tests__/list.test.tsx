@@ -435,6 +435,20 @@ describe("Metadata List Page", () => {
       expect(mockDelete).lastCalledWith(
         `/objectstore-api/metadata/11111111-1111-1111-1111-111111111111`
       );
+    });
+
+    await waitFor(() => {
+      // Shows success message after deletion:
+      expect(
+        pageWrapper.getByText(/records have been successfully deleted\./i)
+      ).toBeInTheDocument();
+    });
+
+    // Click the "Close" button.
+    userEvent.click(pageWrapper.getByRole("button", { name: /close/i }));
+
+    await waitFor(() => {
+      // Verify router.reload() is called at the very end
       expect(mockReload).toHaveBeenCalledTimes(1);
     });
   });

@@ -85,9 +85,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="date original created-field-header"
+                      class="date original created-field-header truncate-text"
                     >
-                      Date Original Created
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Date Original Created
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -115,9 +125,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="shutter speed-field-header"
+                      class="shutter speed-field-header truncate-text"
                     >
-                      Shutter Speed
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Shutter Speed
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -145,9 +165,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="exposure-field-header"
+                      class="exposure-field-header truncate-text"
                     >
-                      Exposure
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Exposure
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -175,9 +205,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="compensation-field-header"
+                      class="compensation-field-header truncate-text"
                     >
-                      Compensation
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Compensation
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -205,9 +245,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="aperture-field-header"
+                      class="aperture-field-header truncate-text"
                     >
-                      Aperture
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Aperture
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -235,9 +285,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="frame rate-field-header"
+                      class="frame rate-field-header truncate-text"
                     >
-                      Frame Rate
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Frame Rate
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -265,9 +325,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="f-number-field-header"
+                      class="f-number-field-header truncate-text"
                     >
-                      F Number
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            F Number
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -295,9 +365,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="resolution-field-header"
+                      class="resolution-field-header truncate-text"
                     >
-                      Resolution
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Resolution
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -325,9 +405,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="self-time mode usage-field-header"
+                      class="self-time mode usage-field-header truncate-text"
                     >
-                      Self Time Mode Usage
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Self Time Mode Usage
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -355,9 +445,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="camera model-field-header"
+                      class="camera model-field-header truncate-text"
                     >
-                      Camera Model
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Camera Model
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -385,19 +485,17 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="orientation-field-header"
+                      class="orientation-field-header truncate-text"
                     >
-                      Orientation
                       <span
                         class="m-2"
                       >
                         <span>
-                          <img
-                            alt="Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8."
-                            aria-describedby="field_orientation_tooltip"
-                            src="/static/images/iconInformation.gif"
+                          <span
                             tabindex="0"
-                          />
+                          >
+                            Orientation
+                          </span>
                         </span>
                       </span>
                     </div>
@@ -427,9 +525,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="metering mode-field-header"
+                      class="metering mode-field-header truncate-text"
                     >
-                      Metering Mode
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Metering Mode
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -457,9 +565,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="ISO speed information-field-header"
+                      class="ISO speed information-field-header truncate-text"
                     >
-                      ISO Speed Information
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            ISO Speed Information
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -487,9 +605,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="pixel dimensions-field-header"
+                      class="pixel dimensions-field-header truncate-text"
                     >
-                      Pixel Dimensions
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Pixel Dimensions
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
@@ -517,9 +645,19 @@ exports[`View Exif page renders exif props when received file upload response 1`
                 >
                   <strong>
                     <div
-                      class="copyright information-field-header"
+                      class="copyright information-field-header truncate-text"
                     >
-                      Copyright Information
+                      <span
+                        class="m-2"
+                      >
+                        <span>
+                          <span
+                            tabindex="0"
+                          >
+                            Copyright Information
+                          </span>
+                        </span>
+                      </span>
                     </div>
                   </strong>
                 </td>
