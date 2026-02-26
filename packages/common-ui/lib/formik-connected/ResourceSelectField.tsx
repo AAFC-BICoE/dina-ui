@@ -7,6 +7,8 @@ import {
   FieldWrapperProps,
   ResourceSelect,
   ResourceSelectProps,
+  ResourceSelectCustomQuery,
+  ResourceSelectCustomQueryProps,
   isShallowReference,
   useBulkGet
 } from "..";
@@ -16,6 +18,28 @@ export type SingleOrArray<T> = null | T | T[];
 
 export interface ResourceSelectFieldProps<TData extends KitsuResource>
   extends Omit<ResourceSelectProps<TData>, "value">,
+    FieldWrapperProps {
+  onChange?: (value?: SingleOrArray<PersistedResource<TData>>) => void;
+  isDisabled?: boolean;
+
+  /** Link that is shown in read-only mode. */
+  readOnlyLink?: string;
+
+  /** If true, disable the dropdown when the selected option is the only one available */
+  cannotBeChanged?: boolean;
+  /**
+   * Sort order + attribute.
+   * Examples:
+   *  - name
+   *  - -description
+   */
+  additionalSort?: string;
+  showGroupCategary?: boolean;
+}
+
+export interface ResourceSelectFieldCustomQueryProps<
+  TData extends KitsuResource
+> extends Omit<ResourceSelectCustomQueryProps<TData>, "value">,
     FieldWrapperProps {
   onChange?: (value?: SingleOrArray<PersistedResource<TData>>) => void;
   isDisabled?: boolean;
@@ -72,6 +96,58 @@ export function ResourceSelectField<TData extends KitsuResource>(
         return (
           <div className={invalid ? "is-invalid" : ""}>
             <ResourceSelect
+              {...resourceSelectProps}
+              invalid={invalid}
+              onChange={onChangeInternal}
+              value={value}
+              showGroupCategary={showGroupCategary}
+              additionalSort={additionalSort}
+              optionLabel={resourceSelectProps.optionLabel}
+              placeholder={placeholder ?? resourceSelectProps?.placeholder}
+            />
+          </div>
+        );
+      }}
+    </FieldWrapper>
+  );
+}
+
+export function ResourceSelectFieldCustomQuery<TData extends KitsuResource>(
+  resourceSelectFieldCustomQueryProps: ResourceSelectFieldCustomQueryProps<TData>
+) {
+  const {
+    onChange,
+    readOnlyRender,
+    showGroupCategary = false,
+    additionalSort,
+    ...resourceSelectProps
+  } = resourceSelectFieldCustomQueryProps;
+
+  const defaultReadOnlyRender = (
+    value?: SingleOrArray<PersistedResource<TData> | null>
+  ) => (
+    <div className="read-only-view">
+      <ReadOnlyResourceLink
+        value={value}
+        resourceSelectFieldProps={resourceSelectFieldCustomQueryProps}
+      />
+    </div>
+  );
+
+  return (
+    <FieldWrapper
+      {...resourceSelectFieldCustomQueryProps}
+      readOnlyRender={readOnlyRender ?? defaultReadOnlyRender}
+    >
+      {({ setValue, value, invalid, placeholder }) => {
+        function onChangeInternal(resource) {
+          setValue(resource);
+          onChange?.(resource);
+        }
+
+        return (
+          <div className={invalid ? "is-invalid" : ""}>
+            <ResourceSelectCustomQuery
               {...resourceSelectProps}
               invalid={invalid}
               onChange={onChangeInternal}
