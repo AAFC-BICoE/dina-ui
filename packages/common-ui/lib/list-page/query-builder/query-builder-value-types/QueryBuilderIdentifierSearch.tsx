@@ -367,7 +367,7 @@ export function transformIdentifierToDSL({
   const fieldPath: string =
     fieldInfo?.path +
     "." +
-    (identifierSearchValue?.selectedIdentifier?.id ?? "");
+    (identifierSearchValue?.selectedIdentifier?.key ?? "");
 
   // Check if identifier can be found within the index map.
   const identifierFieldInfo = fieldValueToIndexSettings(

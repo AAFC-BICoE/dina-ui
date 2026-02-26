@@ -23,8 +23,8 @@ import {
   ImageLinkStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
 import { FunctionDef } from "../../../dina-ui/types/dina-export-api/resources/DataExport";
-import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
-import { ControlledVocabularyFieldHeader } from "packages/dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
+import { ControlledVocabularyItem } from "../../../dina-ui/types/collection-api/resources/ControlledVocabularyItem";
+import { ControlledVocabularyFieldHeader } from "../../../dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
 
 export function convertColumnsToAliases(columns): string[] {
   if (!columns) {
@@ -1129,10 +1129,9 @@ export function IncludedVocabularyLabel({
   );
 }
 
-// Under construction...
 async function getControlledVocabularyColumn<TData extends KitsuResource>(
   path: string,
-  vocabularyKey: string,
+  controlledVocabularyKey: string,
   relationshipName: string | undefined,
   dynamicType: DynamicFieldType,
   apiClient: Kitsu,
@@ -1172,40 +1171,37 @@ async function getControlledVocabularyColumn<TData extends KitsuResource>(
 
   if (!fieldConfigMatch && !relationshipConfigMatch) {
     console.error(
-      "Vocabulary Config could not be found in the dynamic fields mapping."
+      "Controlled Vocabulary Config could not be found in the dynamic fields mapping."
     );
     return;
   }
   if (fieldConfigMatch && relationshipConfigMatch) {
     console.error(
-      "Vocabulary Config found for both field and relationship side. Ensure dynamic configuration is correct."
+      "Controlled Vocabulary Config found for both field and relationship side. Ensure dynamic configuration is correct."
     );
     return;
   }
 
   try {
     if (fieldConfigMatch) {
-      // API request for the vocabulary
-      const vocabularyRequest = await fetchDynamicField(
+      // API request for the controlled vocabulary
+      const controlledVocabularyRequest = await fetchDynamicField(
         apiClient,
         fieldConfigMatch.apiEndpoint,
         params
       );
 
-      // Find the Vocabulary Element based on the vocabulary key.
-      const vocabularyElements =
-        vocabularyRequest as any as VocabularyElement[];
-      const elementsArray = Array.isArray(vocabularyElements)
-        ? vocabularyElements
-        : (vocabularyElements as any)?.vocabularyElements;
-      const vocabularyElement = elementsArray.find(
-        (vocab) => (vocab?.id || vocab.key) === vocabularyKey
+      // Find the Controlled Vocabulary Items based on the controlled vocabulary key.
+      const controlledVocabularyItems =
+        controlledVocabularyRequest as any as ControlledVocabularyItem[];
+      const controlledVocabularyItem = controlledVocabularyItems.find(
+        (vocab) => (vocab?.id || vocab.key) === controlledVocabularyKey
       );
 
-      if (vocabularyElement) {
+      if (controlledVocabularyItem) {
         return getAttributeControlledVocabularyColumn(
           path,
-          vocabularyElement,
+          controlledVocabularyItem,
           fieldConfigMatch
         );
       }
@@ -1213,26 +1209,23 @@ async function getControlledVocabularyColumn<TData extends KitsuResource>(
 
     if (relationshipConfigMatch) {
       // API request for the controlled vocabulary
-      const vocabularyRequest = await fetchDynamicField(
+      const controlledVocabularyRequest = await fetchDynamicField(
         apiClient,
         relationshipConfigMatch.apiEndpoint,
         params
       );
 
-      // Find the Vocabulary Element based on the vocabulary key.
-      const vocabularyElements =
-        vocabularyRequest as any as ControlledVocabularyItem[];
-      const elementsArray = Array.isArray(vocabularyElements)
-        ? vocabularyElements
-        : (vocabularyElements as any)?.vocabularyElements;
-      const vocabularyElement = elementsArray.find(
-        (vocab) => (vocab?.id || vocab.key) === vocabularyKey
+      // Find the Controlled Vocabulary Items based on the Controlled Vocabulary key.
+      const controlledVocabularyItems =
+        controlledVocabularyRequest as any as ControlledVocabularyItem[];
+      const controlledVocabularyItem = controlledVocabularyItems.find(
+        (vocab) => (vocab?.id || vocab.key) === controlledVocabularyKey
       );
 
-      if (vocabularyElement) {
+      if (controlledVocabularyItem) {
         return getIncludedControlledVocabularyColumn(
           path,
-          vocabularyElement,
+          controlledVocabularyItem,
           relationshipConfigMatch
         );
       }
@@ -1243,49 +1236,55 @@ async function getControlledVocabularyColumn<TData extends KitsuResource>(
   }
 }
 
-// Under construction...
 export function getAttributeControlledVocabularyColumn<
   TData extends KitsuResource
 >(
   path: string,
-  vocabulary: ControlledVocabularyItem,
+  controlledVocabularyItem: ControlledVocabularyItem,
   config: DynamicField
 ): TableColumn<TData> {
-  const accessorKey = `${config.path}.${vocabulary.key || vocabulary.id}`;
+  const accessorKey = `${config.path}.${
+    controlledVocabularyItem.key || controlledVocabularyItem.id
+  }`;
   const pathParts = config.path.split(".");
   const fieldName = pathParts[pathParts.length - 1];
 
-  const vocabularyColumn = {
+  const controlledVocabularyColumn = {
     header: () => (
-      <ControlledVocabularyFieldHeader controlledVocabularyItem={vocabulary} />
+      <ControlledVocabularyFieldHeader
+        controlledVocabularyItem={controlledVocabularyItem}
+      />
     ),
     accessorKey,
-    id: `${fieldName}.${vocabulary.key || vocabulary.id}`,
+    id: `${fieldName}.${
+      controlledVocabularyItem.key || controlledVocabularyItem.id
+    }`,
     isKeyword: true,
     isColumnVisible: true,
     config,
-    vocabulary,
+    controlledVocabularyItem,
     sortDescFirst: true,
     columnSelectorString: path
   };
 
-  return vocabularyColumn;
+  return controlledVocabularyColumn;
 }
 
-// Under construction...
 export function getIncludedControlledVocabularyColumn<
   TData extends KitsuResource
 >(
   path: string,
-  vocabulary: VocabularyElement,
+  controlledVocabularyItem: ControlledVocabularyItem,
   config: RelationshipDynamicField
 ): TableColumn<TData> {
-  const accessorKey = `${config.path}.${vocabulary.key || vocabulary.id}`;
+  const accessorKey = `${config.path}.${
+    controlledVocabularyItem.key || controlledVocabularyItem.id
+  }`;
 
   const pathParts = config.path.split(".");
   const fieldName = pathParts[pathParts.length - 1];
 
-  const vocabularyColumn = {
+  const controlledVocabularyColumn = {
     cell: ({ row: { original } }) => {
       const relationshipAccessor = accessorKey?.split(".");
       relationshipAccessor?.splice(
@@ -1298,37 +1297,35 @@ export function getIncludedControlledVocabularyColumn<
       return <>{value}</>;
     },
     header: () => (
-      <IncludedVocabularyLabel
-        vocabulary={vocabulary}
+      <IncludedControlledVocabularyLabel
+        controlledVocabularyItem={controlledVocabularyItem}
         relationship={config.referencedBy}
       />
     ),
     accessorKey,
     id: `${config.referencedBy}.${fieldName}.${
-      vocabulary.key || vocabulary.id
+      controlledVocabularyItem.key || controlledVocabularyItem.id
     }`,
     isKeyword: true,
     isColumnVisible: true,
     relationshipType: config.referencedType,
-    vocabulary,
+    controlledVocabularyItem,
     config,
     columnSelectorString: path
   };
 
-  return vocabularyColumn;
+  return controlledVocabularyColumn;
 }
 
-// Under construction...
 export interface IncludedControlledVocabularyLabelProps {
-  vocabulary: ControlledVocabularyItem;
+  controlledVocabularyItem: ControlledVocabularyItem;
   relationship: string;
 }
 
-// Under construction...
 export function IncludedControlledVocabularyLabel({
-  vocabulary,
+  controlledVocabularyItem,
   relationship
-}: IncludedVocabularyLabelProps) {
+}: IncludedControlledVocabularyLabelProps) {
   const { messages, formatMessage, locale } = useDinaIntl();
 
   const relationshipLabel = messages["title_" + relationship]
@@ -1336,9 +1333,12 @@ export function IncludedControlledVocabularyLabel({
     : _.startCase(relationship);
 
   const label =
-    vocabulary?.multilingualTitle?.titles?.find(
+    controlledVocabularyItem?.multilingualTitle?.titles?.find(
       (title) => title.lang === locale
-    )?.title ?? vocabulary.id;
+    )?.title ??
+    controlledVocabularyItem.name ??
+    controlledVocabularyItem.key ??
+    controlledVocabularyItem.id;
 
   return (
     <>
