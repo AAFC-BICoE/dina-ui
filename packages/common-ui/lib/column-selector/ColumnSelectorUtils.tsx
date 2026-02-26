@@ -23,6 +23,8 @@ import {
   ImageLinkStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
 import { FunctionDef } from "../../../dina-ui/types/dina-export-api/resources/DataExport";
+import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
+import { ControlledVocabularyFieldHeader } from "packages/dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
 
 export function convertColumnsToAliases(columns): string[] {
   if (!columns) {
@@ -442,7 +444,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
       const identifierKey = pathParts[1];
       const relationshipName = parseRelationshipNameFromType(pathParts[0]);
 
-      return getVocabularyColumn(
+      return getControlledVocabularyColumn(
         path,
         identifierKey,
         relationshipName,
@@ -1104,6 +1106,226 @@ export interface IncludedVocabularyLabelProps {
 }
 
 export function IncludedVocabularyLabel({
+  vocabulary,
+  relationship
+}: IncludedVocabularyLabelProps) {
+  const { messages, formatMessage, locale } = useDinaIntl();
+
+  const relationshipLabel = messages["title_" + relationship]
+    ? formatMessage(("title_" + relationship) as any)
+    : _.startCase(relationship);
+
+  const label =
+    vocabulary?.multilingualTitle?.titles?.find(
+      (title) => title.lang === locale
+    )?.title ?? vocabulary.id;
+
+  return (
+    <>
+      {relationshipLabel}
+      {" - "}
+      {label}
+    </>
+  );
+}
+
+// Under construction...
+async function getControlledVocabularyColumn<TData extends KitsuResource>(
+  path: string,
+  vocabularyKey: string,
+  relationshipName: string | undefined,
+  dynamicType: DynamicFieldType,
+  apiClient: Kitsu,
+  dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
+): Promise<TableColumn<TData> | undefined> {
+  // API request params:
+  const params = {
+    page: { limit: 1 }
+  };
+
+  // Figure out API endpoint using the dynamicFieldsMappingConfig.
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find((config) => {
+    // Can't be a field config if a relationship name is provided.
+    if (relationshipName !== undefined) {
+      return false;
+    }
+
+    if (config.type === dynamicType) {
+      return true;
+    }
+  });
+  const relationshipConfigMatch =
+    dynamicFieldsMappingConfig.relationshipFields.find((config) => {
+      // Can't be a relationship config if a relationship is not provided.
+      if (relationshipName === undefined) {
+        return false;
+      }
+
+      // Dynamic field type, component and the relationship need to match.
+      if (
+        config.type === dynamicType &&
+        config.referencedBy === relationshipName
+      ) {
+        return true;
+      }
+    });
+
+  if (!fieldConfigMatch && !relationshipConfigMatch) {
+    console.error(
+      "Vocabulary Config could not be found in the dynamic fields mapping."
+    );
+    return;
+  }
+  if (fieldConfigMatch && relationshipConfigMatch) {
+    console.error(
+      "Vocabulary Config found for both field and relationship side. Ensure dynamic configuration is correct."
+    );
+    return;
+  }
+
+  try {
+    if (fieldConfigMatch) {
+      // API request for the vocabulary
+      const vocabularyRequest = await fetchDynamicField(
+        apiClient,
+        fieldConfigMatch.apiEndpoint,
+        params
+      );
+
+      // Find the Vocabulary Element based on the vocabulary key.
+      const vocabularyElements =
+        vocabularyRequest as any as VocabularyElement[];
+      const elementsArray = Array.isArray(vocabularyElements)
+        ? vocabularyElements
+        : (vocabularyElements as any)?.vocabularyElements;
+      const vocabularyElement = elementsArray.find(
+        (vocab) => (vocab?.id || vocab.key) === vocabularyKey
+      );
+
+      if (vocabularyElement) {
+        return getAttributeControlledVocabularyColumn(
+          path,
+          vocabularyElement,
+          fieldConfigMatch
+        );
+      }
+    }
+
+    if (relationshipConfigMatch) {
+      // API request for the controlled vocabulary
+      const vocabularyRequest = await fetchDynamicField(
+        apiClient,
+        relationshipConfigMatch.apiEndpoint,
+        params
+      );
+
+      // Find the Vocabulary Element based on the vocabulary key.
+      const vocabularyElements =
+        vocabularyRequest as any as ControlledVocabularyItem[];
+      const elementsArray = Array.isArray(vocabularyElements)
+        ? vocabularyElements
+        : (vocabularyElements as any)?.vocabularyElements;
+      const vocabularyElement = elementsArray.find(
+        (vocab) => (vocab?.id || vocab.key) === vocabularyKey
+      );
+
+      if (vocabularyElement) {
+        return getIncludedControlledVocabularyColumn(
+          path,
+          vocabularyElement,
+          relationshipConfigMatch
+        );
+      }
+    }
+  } catch (error) {
+    // Handle the error here, e.g., log it or display an error message.
+    throw error;
+  }
+}
+
+// Under construction...
+export function getAttributeControlledVocabularyColumn<
+  TData extends KitsuResource
+>(
+  path: string,
+  vocabulary: ControlledVocabularyItem,
+  config: DynamicField
+): TableColumn<TData> {
+  const accessorKey = `${config.path}.${vocabulary.key || vocabulary.id}`;
+  const pathParts = config.path.split(".");
+  const fieldName = pathParts[pathParts.length - 1];
+
+  const vocabularyColumn = {
+    header: () => (
+      <ControlledVocabularyFieldHeader controlledVocabularyItem={vocabulary} />
+    ),
+    accessorKey,
+    id: `${fieldName}.${vocabulary.key || vocabulary.id}`,
+    isKeyword: true,
+    isColumnVisible: true,
+    config,
+    vocabulary,
+    sortDescFirst: true,
+    columnSelectorString: path
+  };
+
+  return vocabularyColumn;
+}
+
+// Under construction...
+export function getIncludedControlledVocabularyColumn<
+  TData extends KitsuResource
+>(
+  path: string,
+  vocabulary: VocabularyElement,
+  config: RelationshipDynamicField
+): TableColumn<TData> {
+  const accessorKey = `${config.path}.${vocabulary.key || vocabulary.id}`;
+
+  const pathParts = config.path.split(".");
+  const fieldName = pathParts[pathParts.length - 1];
+
+  const vocabularyColumn = {
+    cell: ({ row: { original } }) => {
+      const relationshipAccessor = accessorKey?.split(".");
+      relationshipAccessor?.splice(
+        1,
+        0,
+        config.referencedBy ? config.referencedBy : ""
+      );
+      const valuePath = relationshipAccessor?.join(".");
+      const value = collectPathValues(original, valuePath);
+      return <>{value}</>;
+    },
+    header: () => (
+      <IncludedVocabularyLabel
+        vocabulary={vocabulary}
+        relationship={config.referencedBy}
+      />
+    ),
+    accessorKey,
+    id: `${config.referencedBy}.${fieldName}.${
+      vocabulary.key || vocabulary.id
+    }`,
+    isKeyword: true,
+    isColumnVisible: true,
+    relationshipType: config.referencedType,
+    vocabulary,
+    config,
+    columnSelectorString: path
+  };
+
+  return vocabularyColumn;
+}
+
+// Under construction...
+export interface IncludedControlledVocabularyLabelProps {
+  vocabulary: ControlledVocabularyItem;
+  relationship: string;
+}
+
+// Under construction...
+export function IncludedControlledVocabularyLabel({
   vocabulary,
   relationship
 }: IncludedVocabularyLabelProps) {
