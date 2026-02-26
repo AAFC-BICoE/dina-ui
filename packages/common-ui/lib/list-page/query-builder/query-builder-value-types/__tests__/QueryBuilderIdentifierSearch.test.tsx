@@ -173,7 +173,7 @@ describe("QueryBuilderIdentifierSearch", () => {
                       testValue as TestValueStructure
                     ).testValue(
                       operator
-                    )}","selectedOperator":"${operator}","selectedIdentifier": {"id":"seqdb_id","type":"identifier-type","vocabularyElementType":"${
+                    )}","selectedOperator":"${operator}","selectedIdentifier": {"key":"seqdb_id","type":"identifier-type","vocabularyElementType":"${
                       (testValue as TestValueStructure).type
                     }","multilingualTitle":{"titles":[{"lang":"en","title":"SeqDB ID"},{"lang":"fr","title":"ID SeqDB"}]}},"selectedType":"${
                       (testValue as TestValueStructure).type
@@ -181,7 +181,7 @@ describe("QueryBuilderIdentifierSearch", () => {
                     fieldInfo: {
                       dynamicField: {
                         type: "identifier",
-                        label: "identifiers",
+                        label: "otherIdentifiers",
                         component: "MATERIAL_SAMPLE",
                         path: "data.attributes.identifiers",
                         apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
@@ -189,7 +189,7 @@ describe("QueryBuilderIdentifierSearch", () => {
                       hideField: true,
                       value: "data.attributes.identifiers",
                       distinctTerm: false,
-                      label: "identifiers",
+                      label: "otherIdentifiers",
                       path: "data.attributes.identifiers",
                       type: "identifier",
                       keywordMultiFieldSupport: (
@@ -224,7 +224,7 @@ describe("QueryBuilderIdentifierSearch", () => {
                       testValue as TestValueStructure
                     ).testValue(
                       operator
-                    )}","selectedOperator":"${operator}","selectedIdentifier": {"id":"seqdb_id","type":"identifier-type","vocabularyElementType":"${
+                    )}","selectedOperator":"${operator}","selectedIdentifier": {"key":"seqdb_id","type":"identifier-type","vocabularyElementType":"${
                       (testValue as TestValueStructure).type
                     }","multilingualTitle":{"titles":[{"lang":"en","title":"SeqDB ID"},{"lang":"fr","title":"ID SeqDB"}]}},"selectedType":"${
                       (testValue as TestValueStructure).type
@@ -232,7 +232,7 @@ describe("QueryBuilderIdentifierSearch", () => {
                     fieldInfo: {
                       dynamicField: {
                         type: "identifier",
-                        label: "identifiers",
+                        label: "otherIdentifiers",
                         component: "COLLECTING_EVENT",
                         path: "included.attributes.identifiers",
                         referencedBy: "parentMaterialSample",
@@ -246,7 +246,7 @@ describe("QueryBuilderIdentifierSearch", () => {
                       value:
                         "included.attributes.identifiers_parentMaterialSample",
                       distinctTerm: false,
-                      label: "identifiers",
+                      label: "otherIdentifiers",
                       path: "included.attributes.identifiers",
                       type: "identifier",
                       keywordMultiFieldSupport: (

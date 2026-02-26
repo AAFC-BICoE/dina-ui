@@ -131,14 +131,14 @@ describe("ColumnSelectorUtils", () => {
           indexMapping: {
             dynamicField: {
               type: "identifier",
-              label: "identifiers",
+              label: "otherIdentifiers",
               component: "MATERIAL_SAMPLE",
               path: "data.attributes.identifiers",
               apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
             },
             value: "data.attributes.identifiers",
             distinctTerm: false,
-            label: "identifiers",
+            label: "otherIdentifiers",
             path: "data.attributes.identifiers",
             type: "identifier",
             keywordMultiFieldSupport: false,
@@ -157,7 +157,7 @@ describe("ColumnSelectorUtils", () => {
           indexMapping: {
             dynamicField: {
               type: "identifier",
-              label: "identifiers",
+              label: "otherIdentifiers",
               component: "MATERIAL_SAMPLE",
               path: "included.attributes.identifiers",
               apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
@@ -167,7 +167,7 @@ describe("ColumnSelectorUtils", () => {
             parentType: "collecting-event",
             value: "included.attributes.identifiers_parentMaterialSample",
             distinctTerm: false,
-            label: "identifiers",
+            label: "otherIdentifiers",
             path: "included.attributes.identifiers",
             type: "identifier",
             keywordMultiFieldSupport: false,

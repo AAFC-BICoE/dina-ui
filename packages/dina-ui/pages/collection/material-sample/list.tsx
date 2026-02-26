@@ -233,7 +233,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
       // Material Sample - Identifiers
       {
         type: "identifier",
-        label: "identifiers",
+        label: "otherIdentifiers",
         component: "MATERIAL_SAMPLE",
         path: "data.attributes.identifiers",
         apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
@@ -363,7 +363,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
       // Parent Material Sample - Material Sample - Identifiers
       {
         type: "identifier",
-        label: "identifiers",
+        label: "otherIdentifiers",
         component: "MATERIAL_SAMPLE",
         path: "included.attributes.identifiers",
         apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`,
