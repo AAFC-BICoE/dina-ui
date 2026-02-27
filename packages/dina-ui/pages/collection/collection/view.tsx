@@ -5,8 +5,14 @@ import { ViewPageLayout } from "../../../components";
 import { Collection } from "../../../types/collection-api";
 import { CollectionFormFields } from "./edit";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import CollectionSampleTypeChart from "./CollectionSampleTypeChart";
+import CollectionRelatedObjectTypeChart from "./CollectionRelatedObjectTypeChart";
+import { useRouter } from "next/router";
 
 export default function CollectionDetailsPage() {
+  const router = useRouter();
+  const uuid = String(router.query.id);
+
   const buildQueryTree = (name: string) => {
     return {
       c: "AND",
@@ -49,6 +55,12 @@ export default function CollectionDetailsPage() {
               <DinaMessage id="viewMaterialSamplesInCollection" />
             </Link>
           )}
+          <div className="w-50">
+            <CollectionSampleTypeChart id={uuid} />
+          </div>
+          <div className="w-50">
+            <CollectionRelatedObjectTypeChart id={uuid} />
+          </div>
         </DinaForm>
       )}
       query={(id) => ({
