@@ -1,21 +1,22 @@
 import { FormattedMessage } from "react-intl";
-import { useField } from "formik";
 import { usePopup } from "packages/dina-ui/hooks/usePopup";
 import { PostMessage } from "packages/dina-ui/types/geo/post-message.types";
 import { PostMessageType } from "packages/dina-ui/types/geo/post-message.types";
 import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
+import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
 
 type Props = {
   type: string;
   fieldName: string;
+  siteGeom: GeoPosition[][] | null;
   url: string;
   messageId: string;
 };
 
 export default function GeometryMapEditorLauncher(props: Props) {
   const { openPopup } = usePopup();
-  const [{ value }] = useField(props.fieldName);
+  const siteGeom = props.siteGeom;
 
   let messageType: string = PostMessageType.PolygonCreated;
   let mode: PolygonEditorMode = POLYGON_EDITOR_MODE.CREATE;
@@ -33,7 +34,7 @@ export default function GeometryMapEditorLauncher(props: Props) {
     const popup = openPopup({ url: `${props.url}?mode=${mode}` });
     if (!popup) return;
 
-    if (value !== undefined) {
+    if (siteGeom !== undefined) {
       // Wait for popup to signal readiness
       const handleMessage = (event: MessageEvent<PostMessage>) => {
         if (event.origin !== window.location.origin) return;
@@ -41,7 +42,7 @@ export default function GeometryMapEditorLauncher(props: Props) {
 
         if (event.data?.type === PostMessageType.PopupReady) {
           popup.postMessage(
-            { type: messageType, coordinates: value },
+            { type: messageType, coordinates: siteGeom },
             window.location.origin
           );
           window.removeEventListener("message", handleMessage);

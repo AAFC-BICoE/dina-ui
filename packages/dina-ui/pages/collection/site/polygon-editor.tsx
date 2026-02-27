@@ -44,6 +44,7 @@ export default function PolygonEditorPage() {
 
       if (
         event.data?.type === PostMessageType.PolygonViewed ||
+        event.data?.type === PostMessageType.PolygonCreated ||
         event.data?.type === PostMessageType.PolygonEdited
       ) {
         setGeoPolygon({

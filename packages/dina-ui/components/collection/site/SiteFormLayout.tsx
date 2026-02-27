@@ -45,7 +45,7 @@ export function SiteFormLayout({
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
   const [{ value }] = useField("siteGeom");
-  const [siteGeom, setSiteGeom] = useState<GeoPosition[][]>(value);
+  const [siteGeom, setSiteGeom] = useState<GeoPosition[][]>(value ?? []);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent<PostMessage>) => {
@@ -55,7 +55,7 @@ export function SiteFormLayout({
         event.data?.type === PostMessageType.PolygonCreated ||
         event.data?.type === PostMessageType.PolygonEdited
       ) {
-        setSiteGeom(event.data.coordinates);
+        setSiteGeom(event.data.coordinates ?? []);
       }
     };
 
@@ -96,13 +96,17 @@ export function SiteFormLayout({
           </div>
           {readOnly ? (
             <pre>
-              {siteGeom
+              {siteGeom.length
                 ? JSON.stringify(parsePolygon(siteGeom.toString()))
                 : ""}
             </pre>
           ) : (
             <textarea
-              value={JSON.stringify(siteGeom, null, 2)}
+              value={
+                siteGeom && siteGeom.length
+                  ? JSON.stringify(siteGeom, null, 2)
+                  : ""
+              }
               readOnly
               className="form-control"
               style={{ height: "80px", marginBottom: "15px" }}
@@ -110,10 +114,11 @@ export function SiteFormLayout({
           )}
         </div>
         <div style={{ marginBottom: "25px" }}>
-          {value && (
+          {(value || messageId !== "viewOnMap") && (
             <GeometryMapEditorLauncher
               type="Polygon"
               fieldName="siteGeom"
+              siteGeom={siteGeom}
               url={popupUrl}
               messageId={messageId}
             />
