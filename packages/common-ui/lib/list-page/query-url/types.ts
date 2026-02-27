@@ -24,4 +24,7 @@ export interface SimpleQueryRow {
 
   // Dynamic field identifier 2 (Useful for field extensions)
   d2?: string;
+
+  // Dynamic field identifier 3 (Useful for identifiers)
+  d3?: string;
 }

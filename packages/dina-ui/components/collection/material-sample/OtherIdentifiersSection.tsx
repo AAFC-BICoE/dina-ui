@@ -16,8 +16,8 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { getFormTemplateCheckboxes } from "../../form-template/formTemplateUtils";
 import { useState } from "react";
-import useTypedVocabularyOptions from "../useTypedVocabularyOptions";
-import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../controlled-vocabulary/controlledVocabularyItemUtils";
+import useControlledVocabularyOptions from "../../controlled-vocabulary/useControlledVocabularyOptions";
 
 export function OtherIdentifiersSection() {
   const { readOnly, isTemplate, formTemplate, isBulkEditAllTab } =
@@ -26,9 +26,9 @@ export function OtherIdentifiersSection() {
   const { getFieldLabel } = useFieldLabels();
   const { openModal } = useModal();
 
-  const { vocabOptions, typedVocabularies } =
-    useTypedVocabularyOptions<IdentifierType>({
-      path: "collection-api/identifier-type"
+  const { vocabOptions, controlledVocabularies } =
+    useControlledVocabularyOptions({
+      path: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
     });
 
   // Determine if the form template sections should be visible.
@@ -174,9 +174,9 @@ export function OtherIdentifiersSection() {
 
                 {/* Each of other identifier rows to be displayed */}
                 {identifiers?.map?.((identifier, index) => {
-                  // Retrieve the identifier type based on the ID selected. By default, string is used.
+                  // Retrieve the controlled vocabulary based on the ID selected. By default, string is used.
                   const identifierType =
-                    typedVocabularies?.find?.(
+                    controlledVocabularies?.find?.(
                       (vocab) => vocab?.id === identifier?.type
                     )?.vocabularyElementType ?? "STRING";
                   const commonProps = {

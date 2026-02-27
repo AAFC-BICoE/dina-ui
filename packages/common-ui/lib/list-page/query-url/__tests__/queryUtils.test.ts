@@ -196,8 +196,10 @@ describe("queryUtils", () => {
           selectedOperator: "startsWith",
           selectedType: "STRING",
           selectedIdentifier: {
-            type: "identifier-type",
-            id: "cc5b8bdc-52b8-41b7-ac5a-8e633034fb15",
+            type: "controlled-vocabulary-item",
+            key: "test-identifier",
+            name: "Test Identifier",
+            group: "test-group",
             vocabularyElementType: "STRING"
           }
         };
@@ -225,7 +227,9 @@ describe("queryUtils", () => {
               o: "startsWith",
               v: identifierStates.searchValue,
               t: "identifier",
-              d: identifierStates?.selectedIdentifier?.id
+              d: identifierStates?.selectedIdentifier?.key,
+              d2: identifierStates?.selectedIdentifier?.name,
+              d3: identifierStates?.selectedIdentifier?.group
             }
           ]
         });
@@ -662,7 +666,9 @@ describe("queryUtils", () => {
               o: "startswith",
               v: "ID123456",
               t: "identifier",
-              d: "cc5b8bdc-52b8-41b7-ac5a-8e633034fb15"
+              d: "test-identifier",
+              d2: "Test Identifier",
+              d3: "test-group"
             }
           ]
         });
@@ -677,7 +683,7 @@ describe("queryUtils", () => {
                 field: "data.attributes.identifiers",
                 operator: "noOperator",
                 value: [
-                  '{"searchValue":"ID123456","selectedOperator":"startswith","selectedType":"","selectedIdentifier":{"id":"cc5b8bdc-52b8-41b7-ac5a-8e633034fb15","type":"identifier-type","vocabularyElementType":"STRING"}}'
+                  '{"searchValue":"ID123456","selectedOperator":"startswith","selectedType":"","selectedIdentifier":{"key":"test-identifier","name":"Test Identifier","group":"test-group","type":"controlled-vocabulary-item","vocabularyElementType":"STRING"}}'
                 ],
                 valueSrc: ["value"],
                 valueType: ["identifier"]
