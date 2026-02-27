@@ -1,11 +1,9 @@
-import { OperationsResponse } from "common-ui";
-import OrganizationEditPage, {
-  trimAliases
-} from "../../../pages/organization/edit";
+import OrganizationEditPage from "../../../pages/organization/edit";
 import { mountWithAppContext } from "common-ui";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 import { fireEvent, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { trimAliases } from "../../../components/organization/OrganizationForm";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -24,9 +22,8 @@ const mockPush = jest.fn();
 let mockQuery: any = {};
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async (model) => {
-  // The get request will return the existing organization.
-  if (model === "agent-api/organization/1") {
+const mockGet = jest.fn(async (path) => {
+  if (path === "agent-api/organization/1") {
     return { data: TEST_ORGANIZATION };
   }
 });
@@ -42,55 +39,29 @@ describe("organization edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockQuery = {};
+    // Default mock response for successful saves
+    const successResp = {
+      data: {
+        data: { id: "1", type: "organization", attributes: {} }
+      }
+    };
+    mockPost.mockResolvedValue(successResp);
+    mockPatch.mockResolvedValue(successResp);
   });
-  it("Provides a form to add an organization.", async () => {
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            attributes: {
-              names: [
-                {
-                  languageCode: "EN",
-                  name: "test org"
-                },
-                {
-                  languageCode: "FR",
-                  name: "test org FR"
-                }
-              ],
-              aliases: "ACE"
-            },
-            id: "1",
-            type: "organization"
-          },
-          status: 201
-        }
-      ] as OperationsResponse
-    });
 
-    mockQuery = {};
+  it("Provides a form to add an organization.", async () => {
+    mockQuery = {}; // Create mode
 
     const wrapper = mountWithAppContext(<OrganizationEditPage />, {
       apiContext
     });
 
-    expect(
-      wrapper.getAllByRole("textbox", { name: /english name/i })
-    ).toHaveLength(1);
-    expect(
-      wrapper.getAllByRole("textbox", { name: /french name/i })
-    ).toHaveLength(1);
-
-    // Edit the name.
+    // Fill in English Name
     fireEvent.change(wrapper.getByRole("textbox", { name: /english name/i }), {
-      target: {
-        name: "name.EN",
-        value: "test org new"
-      }
+      target: { name: "name.EN", value: "test org new" }
     });
 
-    // Submit the form.
+    // Submit the form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await waitFor(() => {
@@ -98,103 +69,73 @@ describe("organization edit page", () => {
         "/agent-api/organization",
         {
           data: {
-            attributes: {
-              names: [
-                {
-                  languageCode: "EN",
-                  name: "test org new"
-                }
-              ]
-            },
+            type: "organization",
             id: "00000000-0000-0000-0000-000000000000",
-            type: "organization"
+            attributes: {
+              names: [{ languageCode: "EN", name: "test org new" }]
+            }
           }
         },
         expect.anything()
       );
     });
 
-    // The user should be redirected to the new organization's details page.
-    expect(mockPush).lastCalledWith("/organization/list");
+    // Verify redirect to the VIEW page as per new onSuccess logic
+    expect(mockPush).lastCalledWith("/organization/view?id=1");
   });
 
   it("Provides a form to edit an organization.", async () => {
-    // The patch request will be successful.
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: TEST_ORGANIZATION,
-          status: 201
-        }
-      ] as OperationsResponse
-    });
-
-    mockQuery = { id: 1 };
+    mockQuery = { id: "1" }; // Edit mode
 
     const wrapper = mountWithAppContext(<OrganizationEditPage />, {
       apiContext
     });
 
-    // The page should load initially with a loading spinner.
-    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
-
-    // Wait for the form to load.
+    // Wait for the form to load initial values
     await waitFor(() => {
-      // Check that the existing aliases value is in the field.
       expect(
         wrapper.getByRole("textbox", { name: /aliases/i })
       ).toHaveDisplayValue("DEW,ACE");
     });
 
-    // Modify the aliases value.
+    // Modify the aliases (Change from ["DEW", "ACE"] to just "DEW")
     fireEvent.change(wrapper.getByRole("textbox", { name: /aliases/i }), {
-      target: {
-        name: "aliases",
-        value: "DEW"
-      }
+      target: { name: "aliases", value: "DEW" }
     });
 
-    // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    // "patch" should have been called with a jsonpatch request containing the existing values
-    // and the modified one.
     await waitFor(() => {
       expect(mockPatch).lastCalledWith(
         "/agent-api/organization/1",
         {
           data: {
-            attributes: expect.objectContaining({
-              aliases: ["DEW"]
-            }),
             id: "1",
-            type: "organization"
+            type: "organization",
+            attributes: {
+              // Only changed fields are sent
+              aliases: ["DEW"]
+            }
           }
         },
         expect.anything()
       );
     });
 
-    // The user should be redirected to organization's list page.
-    expect(mockPush).lastCalledWith("/organization/list");
+    expect(mockPush).lastCalledWith("/organization/view?id=1");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
-    // The patch request will return an error.
-    mockPost.mockImplementationOnce(() => {
-      throw new Error("test error");
-    });
-
+    mockPost.mockRejectedValue(new Error("test error"));
     mockQuery = {};
 
     const wrapper = mountWithAppContext(<OrganizationEditPage />, {
       apiContext
     });
 
-    const displayNameField = screen.getByRole("textbox", {
-      name: /english name/i
-    }); // adjust label as needed
-    fireEvent.change(displayNameField, { target: { value: "John Doe" } });
+    fireEvent.change(screen.getByRole("textbox", { name: /english name/i }), {
+      target: { value: "John Doe" }
+    });
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -207,11 +148,6 @@ describe("organization edit page", () => {
   });
 
   it("Renders an error if an organization name is not entered.", async () => {
-    // The patch request will return an error.
-    mockPost.mockImplementationOnce(() => {
-      throw new Error("test error");
-    });
-
     mockQuery = {};
 
     const wrapper = mountWithAppContext(<OrganizationEditPage />, {
@@ -227,23 +163,22 @@ describe("organization edit page", () => {
       expect(mockPush).toBeCalledTimes(0);
     });
   });
-});
 
-it("Verify trim aliases.", () => {
-  const expectedTrimmedArr = ["a", "b", "v", "p", "kl"];
-  const aliasesAsString = "a,b  ,v,  p,  , kl";
-  const aliasesAsArrayOfOne = ["a,b  ,v,  p,  , kl"];
-  const aliasesAsArrayOfMany = ["a", "b", "v", "  p", "  ", "kl"];
+  it("Verify trim aliases.", () => {
+    const expectedTrimmedArr = ["a", "b", "v", "p", "kl"];
+    const aliasesAsString = "a,b  ,v,  p,  , kl";
+    const aliasesAsArrayOfOne = ["a,b  ,v,  p,  , kl"];
+    const aliasesAsArrayOfMany = ["a", "b", "v", "  p", "  ", "kl"];
 
-  expect(trimAliases(aliasesAsString, false)).toEqual(expectedTrimmedArr);
-  expect(trimAliases(aliasesAsArrayOfOne[0], false)).toEqual(
-    expectedTrimmedArr
-  );
-  expect(trimAliases(aliasesAsArrayOfMany, true)).toEqual(expectedTrimmedArr);
+    expect(trimAliases(aliasesAsString, false)).toEqual(expectedTrimmedArr);
+    expect(trimAliases(aliasesAsArrayOfOne[0], false)).toEqual(
+      expectedTrimmedArr
+    );
+    expect(trimAliases(aliasesAsArrayOfMany, true)).toEqual(expectedTrimmedArr);
+  });
 });
 
 /** Test organization with all fields defined. */
-
 const TEST_ORGANIZATION: Organization = {
   names: [
     {

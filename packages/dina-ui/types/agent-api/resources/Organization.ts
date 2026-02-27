@@ -1,5 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
+import { MultiligualName } from "../../common/resources/MultilingualName";
+
 export interface OrganizationAttributes {
   type: "organization";
   name?: Map<string, string>;
@@ -9,11 +11,6 @@ export interface OrganizationAttributes {
   createdBy?: string;
   createdOn?: string;
 }
-
-export type MultiligualName = {
-  languageCode: string;
-  name: string;
-};
 
 export type Organization = KitsuResource &
   OrganizationAttributes &
