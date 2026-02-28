@@ -51,10 +51,7 @@ export function SiteFormLayout({
     const handleMessage = (event: MessageEvent<PostMessage>) => {
       if (event.origin !== window.location.origin) return;
 
-      if (
-        event.data?.type === PostMessageType.PolygonCreated ||
-        event.data?.type === PostMessageType.PolygonEdited
-      ) {
+      if (event.data?.type === PostMessageType.PolygonEdited) {
         setSiteGeom(event.data.coordinates ?? []);
       }
     };

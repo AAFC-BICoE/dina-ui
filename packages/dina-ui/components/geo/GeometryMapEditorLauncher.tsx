@@ -18,14 +18,11 @@ export default function GeometryMapEditorLauncher(props: Props) {
   const { openPopup } = usePopup();
   const siteGeom = props.siteGeom;
 
-  let messageType: string = PostMessageType.PolygonCreated;
-  let mode: PolygonEditorMode = POLYGON_EDITOR_MODE.CREATE;
+  let messageType: string = PostMessageType.PolygonEdited;
+  let mode: PolygonEditorMode = POLYGON_EDITOR_MODE.EDIT;
   if (props.messageId === "viewOnMap") {
     messageType = PostMessageType.PolygonViewed;
     mode = POLYGON_EDITOR_MODE.VIEW;
-  } else if (props.messageId === "editOnMap") {
-    messageType = PostMessageType.PolygonEdited;
-    mode = POLYGON_EDITOR_MODE.EDIT;
   }
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {

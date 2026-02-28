@@ -92,10 +92,6 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
           sketch.create("polygon");
         }
 
-        if (mode === POLYGON_EDITOR_MODE.CREATE) {
-          sketch.create("polygon");
-        }
-
         sketch.on("create", () => {});
         sketch.on("update", () => {});
 
@@ -141,11 +137,11 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
     if (graphicsLayer.graphics.length > 0) {
       const graphic = graphicsLayer.graphics.getItemAt(0);
 
+      // exclude points
       if (
         graphic?.geometry?.rings?.length &&
         graphic.geometry?.rings[0].length > 2
       ) {
-        // exclude points
         coordinates = await projectPolygon3857To4326(graphic.geometry.rings);
       }
     }
@@ -153,10 +149,7 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
     if (window.opener && !window.opener.closed) {
       window.opener.postMessage(
         {
-          type:
-            mode === POLYGON_EDITOR_MODE.CREATE
-              ? PostMessageType.PolygonCreated
-              : PostMessageType.PolygonEdited,
+          type: PostMessageType.PolygonEdited,
           coordinates
         },
         window.location.origin

@@ -1,5 +1,4 @@
 export const POLYGON_EDITOR_MODE = {
-  CREATE: "create",
   VIEW: "view",
   EDIT: "edit"
 } as const;
