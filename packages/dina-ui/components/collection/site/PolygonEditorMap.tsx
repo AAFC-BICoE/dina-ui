@@ -12,19 +12,18 @@ import {
   projectPolygon3857To4326
 } from "packages/dina-ui/utils/geoUtils";
 
-type PolygonEditorMapProps = {
+type Props = {
   polygon?: GeoPolygon | null;
   mode?: PolygonEditorMode;
 };
 
-export function PolygonEditorMap({ polygon, mode }: PolygonEditorMapProps) {
+export function PolygonEditorMap({ polygon, mode }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const sketchRef = useRef<any>(null);
   const [graphicsLayer, setGraphicsLayer] = useState<any>(null);
   const [polygonRings, setPolygonRings] = useState<GeoPosition[][]>(
     polygon?.coordinates ?? []
   );
-  const erasedRef = useRef(false);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -34,6 +33,7 @@ export function PolygonEditorMap({ polygon, mode }: PolygonEditorMapProps) {
     getMapModules().then(
       ({ Map, MapView, GraphicsLayer, SketchViewModel, Graphic }) => {
         const layer = new GraphicsLayer();
+        setGraphicsLayer(layer);
 
         const map = new Map({
           basemap: "dark-gray-vector",
@@ -67,11 +67,9 @@ export function PolygonEditorMap({ polygon, mode }: PolygonEditorMapProps) {
           updateOnGraphicClick: mode === POLYGON_EDITOR_MODE.EDIT,
           polygonSymbol
         });
-
         sketchRef.current = sketch;
 
-        // Render existing polygon (view + edit)
-        if (polygon?.coordinates && polygon?.coordinates.length) {
+        if (polygon?.coordinates && polygon.coordinates.length) {
           const graphic = new Graphic({
             geometry: {
               type: "polygon",
@@ -83,7 +81,7 @@ export function PolygonEditorMap({ polygon, mode }: PolygonEditorMapProps) {
 
           layer.add(graphic);
 
-          viewInstance.when(() => {
+          viewInstance.when().then(() => {
             viewInstance.goTo(graphic);
 
             if (mode === POLYGON_EDITOR_MODE.EDIT) {
@@ -98,39 +96,17 @@ export function PolygonEditorMap({ polygon, mode }: PolygonEditorMapProps) {
           sketch.create("polygon");
         }
 
-        sketch.on("create", (event: any) => {
-          if (event.state === "complete") {
-            if (erasedRef.current) {
-              erasedRef.current = false;
-              return;
-            }
+        sketch.on("create", () => {});
+        sketch.on("update", () => {});
 
-            const rings3857 = event.graphic.geometry.rings;
-
-            projectPolygon3857To4326(rings3857).then((rings4326) => {
-              setPolygonRings(rings4326);
-            });
+        layer.watch("graphics.length", () => {
+          if (layer.graphics.length > 0) {
+            const rings = layer.graphics.getItemAt(0)?.geometry?.rings ?? [];
+            setPolygonRings(rings);
+          } else {
+            setPolygonRings([]);
           }
         });
-
-        sketch.on("update", (event: any) => {
-          if (event.state === "complete") {
-            if (erasedRef.current) {
-              erasedRef.current = false;
-              return;
-            }
-
-            const rings3857 = event.graphics[0].geometry.rings;
-
-            projectPolygon3857To4326(rings3857).then((rings4326) => {
-              setPolygonRings(rings4326);
-            });
-
-            sketch.cancel();
-          }
-        });
-
-        setGraphicsLayer(layer);
       }
     );
 
@@ -144,15 +120,36 @@ export function PolygonEditorMap({ polygon, mode }: PolygonEditorMapProps) {
   const handleErase = () => {
     if (!graphicsLayer || !sketchRef.current) return;
 
-    erasedRef.current = true;
-
     sketchRef.current.cancel();
     graphicsLayer.removeAll();
-    setPolygonRings([]);
-    sketchRef.current.create("polygon"); // restart drawing
+
+    if (mode !== POLYGON_EDITOR_MODE.VIEW) {
+      sketchRef.current.create("polygon");
+    }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!graphicsLayer || !sketchRef.current) return;
+
+    // Finish any active drawing/edit
+    if (sketchRef.current.state === "active") {
+      sketchRef.current.complete();
+    }
+
+    let coordinates: GeoPosition[][] = [];
+
+    if (graphicsLayer.graphics.length > 0) {
+      const graphic = graphicsLayer.graphics.getItemAt(0);
+
+      if (
+        graphic?.geometry?.rings?.length &&
+        graphic.geometry?.rings[0].length > 2
+      ) {
+        // exclude points
+        coordinates = await projectPolygon3857To4326(graphic.geometry.rings);
+      }
+    }
+
     if (window.opener && !window.opener.closed) {
       window.opener.postMessage(
         {
@@ -160,7 +157,7 @@ export function PolygonEditorMap({ polygon, mode }: PolygonEditorMapProps) {
             mode === POLYGON_EDITOR_MODE.CREATE
               ? PostMessageType.PolygonCreated
               : PostMessageType.PolygonEdited,
-          coordinates: polygonRings
+          coordinates
         },
         window.location.origin
       );
@@ -170,13 +167,13 @@ export function PolygonEditorMap({ polygon, mode }: PolygonEditorMapProps) {
   };
 
   return mode === POLYGON_EDITOR_MODE.VIEW ? (
-    <GeometryMapEditor mapRef={mapRef} buttons={["close"]} />
+    <GeometryMapEditor mapRef={mapRef} />
   ) : (
     <GeometryMapEditor
       mapRef={mapRef}
-      buttons={["save", "erase", "close"]}
-      handleSave={handleSave}
+      buttons={["save", "erase"]}
       coordinates={polygonRings}
+      handleSave={handleSave}
       handleErase={handleErase}
     />
   );

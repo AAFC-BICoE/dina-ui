@@ -1,29 +1,21 @@
 import { FormattedMessage } from "react-intl";
+import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
 
-type Action = "save" | "erase";
-type RequiredAction = "close";
-
-type Props<T extends Action[] = Action[]> = {
+type Props = {
   mapRef: React.MutableRefObject<HTMLDivElement | null>;
-  buttons: [...T, RequiredAction];
-} & (T extends (infer U)[]
-  ? "save" extends U
-    ? { handleSave: () => void; coordinates: number[][][] | null }
-    : { handleSave?: never; coordinates?: never }
-  : never) &
-  (T extends (infer U)[]
-    ? "erase" extends U
-      ? { handleErase: () => void }
-      : { handleErase?: never }
-    : never);
+  buttons?: ("save" | "erase")[];
+  coordinates?: GeoPosition[][];
+  handleSave?: () => void;
+  handleErase?: () => void;
+};
 
-export default function GeometryMapEditor<T extends Action[]>({
+export default function GeometryMapEditor({
   mapRef,
   buttons,
-  handleSave,
   coordinates,
+  handleSave,
   handleErase
-}: Props<T>) {
+}: Props) {
   return (
     <div
       style={{
@@ -46,7 +38,7 @@ export default function GeometryMapEditor<T extends Action[]>({
           background: "#2a2a2a"
         }}
       >
-        {buttons.includes("save") && (
+        {buttons && (
           <button
             onClick={handleSave}
             disabled={!coordinates}
@@ -62,7 +54,7 @@ export default function GeometryMapEditor<T extends Action[]>({
             <FormattedMessage id="save" />
           </button>
         )}
-        {buttons.includes("erase") && (
+        {buttons && (
           <button
             onClick={handleErase}
             style={{
