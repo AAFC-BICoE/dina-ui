@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useApiClient } from "packages/common-ui/lib";
+import { useApiClient } from "common-ui";
 import EBarChart from "./EBarChart";
 
 export default function CollectionRelatedObjectTypeChart({
