@@ -3,6 +3,9 @@ import { fromPairs } from "lodash";
 import { VocabularyElementType } from "../../types/collection-api";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 
+export const MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID =
+  "019c961e-4c0d-7398-b4ae-73687826b3b5";
+
 /**
  * Transforms a ControlledVocabularyItem from the API format to a format suitable for form editing.
  * - Converts multilingualDescription from array format to dictionary format
