@@ -1,5 +1,5 @@
 import { DinaForm, FieldView } from "common-ui";
-import { PersonFormFields } from "../../../dina-ui/components/add-person/PersonFormFields";
+import { PersonFormFields } from "../../components/person/PersonFormFields";
 import { ViewPageLayout } from "../../components";
 import { Person } from "../../types/agent-api/resources/Person";
 

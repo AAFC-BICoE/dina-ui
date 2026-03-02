@@ -1,5 +1,5 @@
-export * from "./add-person/PersonForm";
-export * from "./add-person/PersonFormFields";
+export * from "./person/PersonForm";
+export * from "./person/PersonFormFields";
 export * from "./bulk-edit/useBulkEditTab";
 export * from "./bulk-edit/BulkEditTabWarning";
 export * from "./bulk-material-sample/ExistingMaterialSampleBulkEditor";
@@ -80,5 +80,5 @@ export * from "./home2/CardGrid";
 export * from "./home2/NavigationCard";
 export * from "./home2/CustomizableCardGrid";
 export * from "./home2/CustomizableSectionGrid";
-export * from "./home2/UIPreferenceHook"
-export * from "./page-layouts/TypeFilterSideBarDynamic"
+export * from "./home2/UIPreferenceHook";
+export * from "./page-layouts/TypeFilterSideBarDynamic";
