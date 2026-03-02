@@ -61,7 +61,7 @@ export default function PolygonEditorPage() {
     <div style={{ position: "fixed", inset: 0 }}>
       <NextHead>
         <link
-          href="https://js.arcgis.com/4.29/esri/themes/dark/main.css"
+          href="https://js.arcgis.com/4.29/esri/themes/light/main.css"
           rel="stylesheet"
         />
       </NextHead>

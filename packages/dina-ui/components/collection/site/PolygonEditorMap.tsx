@@ -2,15 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import GeometryMapEditor from "packages/dina-ui/components/geo/GeometryMapEditor";
 import { PostMessageType } from "packages/dina-ui/types/geo/post-message.types";
 import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
+import {
+  getMapModules,
+  projectPolygon3857To4326
+} from "packages/dina-ui/utils/geoUtils";
 import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 import type {
   GeoPosition,
   GeoPolygon
 } from "packages/dina-ui/types/geo/geo.types";
-import {
-  getMapModules,
-  projectPolygon3857To4326
-} from "packages/dina-ui/utils/geoUtils";
 
 type Props = {
   polygon?: GeoPolygon | null;
@@ -21,9 +21,6 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const sketchRef = useRef<any>(null);
   const [graphicsLayer, setGraphicsLayer] = useState<any>(null);
-  const [polygonRings, setPolygonRings] = useState<GeoPosition[][]>(
-    polygon?.coordinates ?? []
-  );
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -36,7 +33,7 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
         setGraphicsLayer(layer);
 
         const map = new Map({
-          basemap: "dark-gray-vector",
+          basemap: "streets-vector",
           layers: [layer]
         });
 
@@ -91,18 +88,6 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
         } else if (mode === POLYGON_EDITOR_MODE.EDIT) {
           sketch.create("polygon");
         }
-
-        sketch.on("create", () => {});
-        sketch.on("update", () => {});
-
-        layer.watch("graphics.length", () => {
-          if (layer.graphics.length > 0) {
-            const rings = layer.graphics.getItemAt(0)?.geometry?.rings ?? [];
-            setPolygonRings(rings);
-          } else {
-            setPolygonRings([]);
-          }
-        });
       }
     );
 
@@ -165,7 +150,6 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
     <GeometryMapEditor
       mapRef={mapRef}
       buttons={["save", "erase"]}
-      coordinates={polygonRings}
       handleSave={handleSave}
       handleErase={handleErase}
     />

@@ -1,10 +1,8 @@
 import { FormattedMessage } from "react-intl";
-import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
 
 type Props = {
   mapRef: React.MutableRefObject<HTMLDivElement | null>;
   buttons?: ("save" | "erase")[];
-  coordinates?: GeoPosition[][];
   handleSave?: () => void;
   handleErase?: () => void;
 };
@@ -12,7 +10,6 @@ type Props = {
 export default function GeometryMapEditor({
   mapRef,
   buttons,
-  coordinates,
   handleSave,
   handleErase
 }: Props) {
@@ -21,7 +18,7 @@ export default function GeometryMapEditor({
       style={{
         width: "100%",
         height: "100%",
-        background: "#1e1e1e",
+        background: "#f2f2f2",
         display: "flex",
         flexDirection: "column",
         borderRadius: "8px",
@@ -35,20 +32,19 @@ export default function GeometryMapEditor({
           display: "flex",
           justifyContent: "flex-end",
           gap: "10px",
-          background: "#2a2a2a"
+          background: "#f2f2f2"
         }}
       >
         {buttons && (
           <button
             onClick={handleSave}
-            disabled={!coordinates}
             style={{
               padding: "8px 16px",
-              background: coordinates ? "#007ac2" : "#444",
-              color: "white",
+              background: "#007ac2",
+              color: "#ffffff",
               border: "none",
               borderRadius: "4px",
-              cursor: coordinates ? "pointer" : "not-allowed"
+              cursor: "pointer"
             }}
           >
             <FormattedMessage id="save" />
@@ -59,8 +55,8 @@ export default function GeometryMapEditor({
             onClick={handleErase}
             style={{
               padding: "8px 16px",
-              background: "#555",
-              color: "white",
+              background: "#e2574c",
+              color: "#ffffff",
               border: "none",
               borderRadius: "4px",
               cursor: "pointer"
@@ -73,8 +69,8 @@ export default function GeometryMapEditor({
           onClick={() => window.close()}
           style={{
             padding: "8px 16px",
-            background: "#444",
-            color: "white",
+            background: "#6c757d",
+            color: "#ffffff",
             border: "none",
             borderRadius: "4px",
             cursor: "pointer"
