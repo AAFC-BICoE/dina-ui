@@ -187,6 +187,18 @@ export function MaterialSampleForm({
   isBulkEditAllTab
 }: MaterialSampleFormProps) {
   const { isTemplate, readOnly } = useContext(DinaFormContext) ?? {};
+
+  const materialSampleSaveResponse = useMaterialSampleSave({
+    formTemplate,
+    collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
+    materialSample,
+    collectingEventInitialValues,
+    onSaved,
+    isTemplate,
+    reduceRendering,
+    visibleManagedAttributeKeys
+  });
+
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -195,18 +207,7 @@ export function MaterialSampleForm({
     setColEventId,
     onSubmit,
     loading
-  } =
-    materialSampleSaveHook ??
-    useMaterialSampleSave({
-      formTemplate,
-      collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
-      materialSample,
-      collectingEventInitialValues,
-      onSaved,
-      isTemplate,
-      reduceRendering,
-      visibleManagedAttributeKeys
-    });
+  } = materialSampleSaveHook ?? materialSampleSaveResponse;
 
   const copyFromNextSample = useCopyToNextSample();
 

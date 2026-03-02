@@ -83,9 +83,7 @@ export default function QueryRowIdentifierSearch({
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = isInColumnSelector
-    ? _.noop
-    : useQueryBuilderEnterToSearch();
+  const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
 
   const [identifierState, setIdentifierState] =
     useState<IdentifierSearchStates>(() =>

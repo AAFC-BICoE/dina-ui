@@ -57,9 +57,7 @@ export default function QueryRowClassificationSearch({
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = isInColumnSelector
-    ? _.noop
-    : useQueryBuilderEnterToSearch();
+  const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
 
   const [classificationState, setClassificationState] =
     useState<ClassificationSearchStates>(() =>

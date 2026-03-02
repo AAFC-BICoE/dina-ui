@@ -9,7 +9,7 @@ import {
 import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
 import _ from "lodash";
-import { useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
 import { useDebounce } from "use-debounce";
 import { useElasticSearchDistinctTerm } from "../../../common-ui/lib/list-page/useElasticSearchDistinctTerm";
@@ -67,19 +67,32 @@ export function TagSelectField({
         )
       }
     >
-      {({ value, setValue, invalid, placeholder }) => (
-        <TagSelect
-          value={value}
-          onChange={setValue}
-          invalid={invalid}
-          resourcePath={resourcePath}
-          groupSelectorName={props.groupSelectorName}
-          placeholder={placeholder}
-          tagsFieldName={tagsFieldName}
-          tagIncludedType={props.tagIncludedType}
-          indexName={indexName}
-        />
-      )}
+      {({ value, setValue, invalid, placeholder }) =>
+        indexName ? (
+          <TagSelectElasticSearch
+            value={value}
+            onChange={setValue}
+            invalid={invalid}
+            resourcePath={resourcePath}
+            groupSelectorName={props.groupSelectorName}
+            placeholder={placeholder}
+            tagsFieldName={tagsFieldName}
+            tagIncludedType={props.tagIncludedType}
+            indexName={indexName}
+          />
+        ) : (
+          <TagSelect
+            value={value}
+            onChange={setValue}
+            invalid={invalid}
+            resourcePath={resourcePath}
+            groupSelectorName={props.groupSelectorName}
+            placeholder={placeholder}
+            tagsFieldName={tagsFieldName}
+            tagIncludedType={props.tagIncludedType}
+          />
+        )
+      }
     </FieldWrapper>
   );
 }
@@ -96,111 +109,143 @@ interface TagSelectProps {
   indexName?: string;
 }
 
-/** Tag Select/Create field. */
-function TagSelect({
-  value,
-  onChange,
-  resourcePath,
-  invalid,
-  groupSelectorName = "group",
-  tagsFieldName = "tags",
-  tagIncludedType,
-  placeholder,
-  indexName
-}: TagSelectProps) {
-  const { formatMessage } = useDinaIntl();
+interface TagSelectInnerProps extends TagSelectProps {
+  tagOptions: any;
+  inputValue: any;
+  setInputValue: any;
+  isLoading?: boolean;
+}
+
+// Tag Select/Create field hooked into Formik with elasticsearch support.
+function TagSelectElasticSearch(props: TagSelectProps) {
+  const { groupNames } = useAccount();
+  const { tagsFieldName, tagIncludedType, indexName } = props;
+  const [inputValue, setInputValue] = useState("");
+  const [debouncedInputValue] = useDebounce(inputValue, 250);
+  const suggestions = useElasticSearchDistinctTerm({
+    fieldName: indexName
+      ? tagIncludedType
+        ? `included.attributes.${tagsFieldName}`
+        : `data.attributes.${tagsFieldName}`
+      : undefined,
+    indexName: indexName ?? "",
+    keywordMultiFieldSupport: true,
+    isFieldArray: true,
+    inputValue: debouncedInputValue,
+    groupNames,
+    size: 10,
+    relationshipType: tagIncludedType
+  });
+
+  const tagOptions = useMemo(
+    () => suggestions.map((tag) => toOption(tag)),
+    [suggestions]
+  );
+
+  return (
+    <TagSelectInner
+      {...props}
+      tagOptions={tagOptions}
+      inputValue={inputValue}
+      setInputValue={setInputValue}
+    />
+  );
+}
+
+// Tag Select/Create field hooked into Formik. Does not use elasticsearch.
+function TagSelect(props: TagSelectProps) {
+  const {
+    resourcePath,
+    groupSelectorName = "group",
+    tagsFieldName = "tags"
+  } = props;
   const { isAdmin, groupNames } = useAccount();
 
-  /** The value of the input element. */
   const [inputValue, setInputValue] = useState("");
-  /** The debounced input value passed to the fetcher. */
-  const [debouncedInputValue] = useDebounce(inputValue, 250);
-  const tagOptions = useRef<TagSelectOption[]>([]);
-  const isLoading = useRef<boolean>(false);
+  const [tagOptions, setTagOptions] = useState<TagSelectOption[]>([]); // ✅ destructure tuple properly
 
   const typeName = _.last(resourcePath?.split("/"));
 
-  if (indexName) {
-    const suggestions = useElasticSearchDistinctTerm({
-      fieldName: tagIncludedType
-        ? `included.attributes.${tagsFieldName}`
-        : `data.attributes.${tagsFieldName}`,
-      indexName,
-      keywordMultiFieldSupport: true,
-      isFieldArray: true,
-      inputValue: debouncedInputValue,
-      groupNames,
-      size: 10,
-      relationshipType: tagIncludedType
-    });
-    tagOptions.current = suggestions.map((tag) => toOption(tag));
-  } else {
-    // handle the situation when tagsFieldName is something like this "contributors[0].roles"
-    const match = tagsFieldName.match(/^(.+?)\[(\d+)\]\.(.+)$/);
-    let parsedFieldname = tagsFieldName;
-    let numberInsideBracket = -1;
-    let internalTagFieldName: string | undefined = undefined;
-    if (match) {
-      parsedFieldname = match[1]; // "contributors"
-      numberInsideBracket = Number(match[2]); // 0 (as a number)
-      internalTagFieldName = match[3]; // "roles"
-    }
+  const match = tagsFieldName.match(/^(.+?)\[(\d+)\]\.(.+)$/);
+  let parsedFieldname = tagsFieldName;
+  let numberInsideBracket = -1;
+  let internalTagFieldName: string | undefined = undefined;
+  if (match) {
+    parsedFieldname = match[1]; // "contributors"
+    numberInsideBracket = Number(match[2]); // 0 (as a number)
+    internalTagFieldName = match[3]; // "roles"
+  }
 
-    const { loading } = useQuery<KitsuResource[]>(
-      {
-        path: resourcePath ?? "",
-        sort: "-createdOn",
-        fields: typeName ? { [typeName]: parsedFieldname } : undefined,
-        filter: SimpleSearchFilterBuilder.create()
-          .where("tags", "NEQ", "null")
-          .when(!isAdmin, (builder) =>
-            builder.whereProvided(groupSelectorName, "IN", groupNames)
-          )
-          .build(),
-        page: { limit: 100 }
-      },
-      {
-        disabled: !resourcePath,
-        onSuccess(response) {
-          if (
-            match &&
-            response.data &&
-            numberInsideBracket > -1 &&
-            internalTagFieldName != undefined
-          ) {
-            // handle the situation when tagsFieldName is something like this "contributors[0].roles"
-            const dataArray = _.uniq(
-              _.compact(
-                response.data
-                  .flatMap((it) => it[parsedFieldname])
-                  .flatMap((it) => it[internalTagFieldName])
-              )
-            );
-            const tags = dataArray
-              .filter((tag: string) => tag.includes(inputValue))
-              .map((tag: string) => toOption(tag));
-            tagOptions.current = tags;
-          } else {
-            const tags = _.uniq(
-              _.compact(
-                (response?.data ?? []).flatMap((it) =>
-                  _.get(it, parsedFieldname)
-                )
-              )
+  const { loading } = useQuery<KitsuResource[]>(
+    {
+      path: resourcePath ?? "",
+      sort: "-createdOn",
+      fields: typeName ? { [typeName]: parsedFieldname } : undefined,
+      filter: SimpleSearchFilterBuilder.create()
+        .where("tags", "NEQ", "null")
+        .when(!isAdmin, (builder) =>
+          builder.whereProvided(groupSelectorName, "IN", groupNames)
+        )
+        .build(),
+      page: { limit: 100 }
+    },
+    {
+      disabled: !resourcePath,
+      onSuccess(response) {
+        if (
+          match &&
+          response.data &&
+          numberInsideBracket > -1 &&
+          internalTagFieldName != undefined
+        ) {
+          const dataArray = _.uniq(
+            _.compact(
+              response.data
+                .flatMap((it) => it[parsedFieldname])
+                .flatMap((it) => it[internalTagFieldName])
             )
-              .filter((tag) => tag.includes(inputValue))
-              .map((tag) => toOption(tag));
-            tagOptions.current = tags;
-          }
+          );
+          const tags = dataArray
+            .filter((tag: string) => tag.includes(inputValue))
+            .map((tag: string) => toOption(tag));
+          setTagOptions(tags);
+        } else {
+          const tags = _.uniq(
+            _.compact(
+              (response?.data ?? []).flatMap((it) => _.get(it, parsedFieldname))
+            )
+          )
+            .filter((tag) => tag.includes(inputValue))
+            .map((tag) => toOption(tag));
+          setTagOptions(tags);
         }
       }
-    );
-    isLoading.current = loading;
-  }
+    }
+  );
 
-  function toOption(tagText: string): TagSelectOption {
-    return { label: tagText, value: tagText };
-  }
+  return (
+    <TagSelectInner
+      {...props}
+      tagOptions={tagOptions}
+      isLoading={loading}
+      inputValue={inputValue}
+      setInputValue={setInputValue}
+    />
+  );
+}
+
+/** Tag Select/Create field. */
+function TagSelectInner({
+  value,
+  onChange,
+  invalid,
+  placeholder,
+  tagOptions,
+  inputValue,
+  setInputValue,
+  isLoading
+}: TagSelectInnerProps) {
+  const { formatMessage } = useDinaIntl();
 
   const selectedOptions = (value ?? []).map(toOption);
 
@@ -232,10 +277,10 @@ function TagSelect({
       options={[
         {
           label: formatMessage("typeNewTagOrSearchPreviousTags"),
-          options: tagOptions.current
+          options: tagOptions
         }
       ]}
-      isLoading={isLoading.current}
+      isLoading={isLoading}
       // Select config:
       styles={customStyle}
       classNamePrefix="react-select"
@@ -250,6 +295,10 @@ function TagSelect({
       isCreatable={true}
     />
   );
+}
+
+function toOption(tagText: string): TagSelectOption {
+  return { label: tagText, value: tagText };
 }
 
 export interface TagSelectReadOnlyProps {
