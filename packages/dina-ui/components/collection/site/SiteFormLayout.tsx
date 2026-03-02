@@ -123,18 +123,20 @@ export function SiteFormLayout({
         </div>
       </div>
       <MultilingualDescription />
-      <div className="row">
-        <DateField
-          className="col-md-6"
-          name="createdOn"
-          label={formatMessage("field_createdOn")}
-        />
-        <TextField
-          className="col-md-6"
-          name="createdBy"
-          label={formatMessage("field_createdBy")}
-        />
-      </div>
+      {readOnly && (
+        <div className="row">
+          <DateField
+            className="col-md-6"
+            name="createdOn"
+            label={formatMessage("field_createdOn")}
+          />
+          <TextField
+            className="col-md-6"
+            name="createdBy"
+            label={formatMessage("field_createdBy")}
+          />
+        </div>
+      )}
       <div className="mb-3">
         <DinaFormSection
           componentName="site-component"

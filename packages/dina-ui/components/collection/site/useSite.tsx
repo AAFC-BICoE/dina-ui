@@ -37,7 +37,19 @@ export function useSiteSave({
   attachmentsConfig?: AllowAttachmentsConfig;
 }) {
   const { save } = useApiClient();
-  const siteInitialValues: Partial<Site> = { ...fetchedSite };
+  const siteInitialValues: Partial<Site> = fetchedSite
+    ? {
+        ...fetchedSite,
+        multilingualDescription: fetchedSite.multilingualDescription
+          ?.descriptions
+          ? _.fromPairs(
+              fetchedSite.multilingualDescription.descriptions.map(
+                ({ lang, desc }) => [lang, desc]
+              )
+            )
+          : {}
+      }
+    : {};
 
   async function saveSite(
     submittedValues: Site,
@@ -66,6 +78,18 @@ export function useSiteSave({
 
       // Delete the 'attachment' attribute because it should stay in the relationships field:
       delete siteDiff.attachment;
+    }
+
+    // If multilingualDescription is provided, transform it to the correct edit format:
+    if (siteDiff?.multilingualDescription) {
+      const transformedDescription = {
+        descriptions: _.toPairs(siteDiff.multilingualDescription).map(
+          ([lang, desc]) => ({ lang, desc })
+        )
+      };
+
+      // Use the transformed description.
+      siteDiff.multilingualDescription = transformedDescription;
     }
 
     // If the relationship section is empty, remove it from the query.
