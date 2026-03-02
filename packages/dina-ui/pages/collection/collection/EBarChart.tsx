@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import * as echarts from "echarts";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 
 export interface EsBarChartProps {
