@@ -125,6 +125,30 @@ describe("organization edit page", () => {
     expect(mockPush).lastCalledWith("/organization/view?id=1");
   });
 
+  it("Making no changes to an organization should not submit changes.", async () => {
+    mockQuery = { id: "1" }; // Edit mode
+
+    const wrapper = mountWithAppContext(<OrganizationEditPage />, {
+      apiContext
+    });
+
+    // Wait for the form to load initial values
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /aliases/i })
+      ).toHaveDisplayValue("DEW,ACE");
+    });
+
+    // Make no changes... Submit the form.
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(mockPatch).toBeCalledTimes(0);
+    });
+
+    expect(mockPush).lastCalledWith("/organization/view?id=1");
+  });
+
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
     mockPost.mockRejectedValue(new Error("test error"));
     mockQuery = {};
