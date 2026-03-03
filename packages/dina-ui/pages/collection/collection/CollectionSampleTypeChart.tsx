@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
-import EBarChart from "./EBarChart";
+import ReactECharts from "echarts-for-react";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export default function CollectionSampleTypeChart({ id }: { id: string }) {
   const { apiClient } = useApiClient();
@@ -75,7 +76,48 @@ export default function CollectionSampleTypeChart({ id }: { id: string }) {
     fetchData();
   }, [id]);
 
+  const options = {
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow"
+      }
+    },
+    xAxis: {
+      type: "category",
+      data: chartData.map((d) => d.name),
+      axisLabel: {
+        interval: 0,
+        rotate: 45,
+        overflow: "break",
+        width: 80,
+        hideOverlap: false
+      }
+    },
+    yAxis: {
+      type: "value"
+    },
+    series: [
+      {
+        name: "Sample Count",
+        type: "bar",
+        data: chartData.map((d) => d.value),
+        itemStyle: {
+          color: "#5470c6"
+        }
+      }
+    ]
+  };
+
   return (
-    <EBarChart data={chartData} titleId="collectionSampleTypeChartTitle" />
+    <div>
+      <strong>
+        <DinaMessage id="collectionSampleTypeChartTitle" />
+      </strong>
+      <ReactECharts
+        option={options}
+        style={{ height: "400px", width: "100%" }}
+      />
+    </div>
   );
 }

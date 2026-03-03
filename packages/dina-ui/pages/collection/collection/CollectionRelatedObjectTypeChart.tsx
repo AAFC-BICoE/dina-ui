@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
-import EBarChart from "./EBarChart";
+import ReactECharts from "echarts-for-react";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export default function CollectionRelatedObjectTypeChart({
   id
@@ -98,10 +99,51 @@ export default function CollectionRelatedObjectTypeChart({
     fetchData();
   }, [id]);
 
+  const options = {
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow"
+      }
+    },
+    xAxis: {
+      type: "category",
+      data: chartData.map((d) => d.name),
+      axisLabel: {
+        interval: 0,
+        rotate: 45,
+        overflow: "break",
+        width: 80,
+        hideOverlap: false
+      }
+    },
+    yAxis: {
+      type: "value",
+      minInterval: 1
+    },
+    series: [
+      {
+        name: "Related Object Count",
+        type: "bar",
+        data: chartData.map((d) => d.value),
+        itemStyle: {
+          color: "#5470c6"
+        }
+      }
+    ]
+  };
+
   return (
-    <EBarChart
-      data={chartData}
-      titleId="collectionRelatedObjectTypeChartTitle"
-    />
+    <div>
+      <div>
+        <strong>
+          <DinaMessage id="collectionRelatedObjectTypeChartTitle" />
+        </strong>
+      </div>
+      <ReactECharts
+        option={options}
+        style={{ height: "400px", width: "100%" }}
+      />
+    </div>
   );
 }
