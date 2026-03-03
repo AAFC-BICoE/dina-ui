@@ -6,47 +6,76 @@ import {
   QueryPage
 } from "common-ui";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
-/**
- * This component displays a table of projects that are linked to a collection through material samples.
- * It first queries for material samples in the collection, then extracts the project IDs from those samples,
- * and finally displays the projects in a table.
- * @param id
- */
 export default function CollectionLinkedProjectsTable({ id }: { id: string }) {
   const { apiClient } = useApiClient();
+  const [projectIds, setProjectIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
-    // Get the material samples in this collection.
-    const sampleResponse = await apiClient.axios.post(
-      "search-api/search-ws/search",
-      {
-        _source: { includes: ["data.relationships"] },
-        query: {
-          bool: {
-            must: [{ term: { "data.relationships.collection.data.id": id } }]
+  const fetchData = useCallback(async () => {
+    if (!id) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Get the material samples in this collection.
+      const sampleResponse = await apiClient.axios.post(
+        "search-api/search-ws/search",
+        {
+          _source: { includes: ["data.relationships"] },
+          query: {
+            bool: {
+              must: [{ term: { "data.relationships.collection.data.id": id } }]
+            }
           }
-        }
-      },
-      { params: { indexName: "dina_material_sample_index" } }
-    );
+        },
+        { params: { indexName: "dina_material_sample_index" } }
+      );
 
-    // Extract and flatten the project IDs from the samples.
-    setProjectIds([
-      ...new Set<string>(
-        sampleResponse.data.hits.hits
-          .flatMap(
-            (hit) =>
-              hit._source?.data?.relationships?.projects?.data?.map(
-                (a) => a.id
-              ) ?? []
-          )
-          .filter((id) => !!id)
-      )
-    ]);
-  };
+      // Extract and flatten the project IDs from the samples.
+      const extractedIds = [
+        ...new Set<string>(
+          sampleResponse.data.hits.hits
+            .flatMap(
+              (hit) =>
+                hit._source?.data?.relationships?.projects?.data?.map(
+                  (a) => a.id
+                ) ?? []
+            )
+            .filter((id): id is string => typeof id === "string" && !!id)
+        )
+      ];
+
+      setProjectIds(extractedIds);
+    } catch (err) {
+      setError(
+        "Failed to load linked projects: " + (err as any)?.message ||
+          "Unknown error"
+      );
+      setProjectIds([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [apiClient, id]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchData().then(() => {
+      if (cancelled) {
+        // Reset state if component unmounted during fetch
+        setProjectIds([]);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchData]);
 
   const PROJECT_TABLE_COLUMNS = [
     {
@@ -87,11 +116,9 @@ export default function CollectionLinkedProjectsTable({ id }: { id: string }) {
     dateCell("createdOn", "data.attributes.createdOn")
   ];
 
-  const [projectIds, setProjectIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    fetchData();
-  }, [id]);
+  if (error) {
+    return <div className="alert alert-danger">{error}</div>;
+  }
 
   return (
     <div>
@@ -100,25 +127,29 @@ export default function CollectionLinkedProjectsTable({ id }: { id: string }) {
           <DinaMessage id="collectionLinkedProjectTableTitle" />
         </strong>
       </div>
-      <QueryPage
-        columns={PROJECT_TABLE_COLUMNS}
-        indexName="dina_project_index"
-        uniqueName="relatedProjects"
-        customViewElasticSearchQuery={{
-          query: {
-            terms: { "data.id": projectIds }
-          }
-        }}
-        viewMode={true}
-        customViewFilterGroups={false}
-        customViewFields={[
-          {
-            fieldName: "data.id",
-            type: "uuid"
-          }
-        ]}
-        enableColumnSelector={false}
-      />
+      {isLoading ? (
+        <div>Loading projects...</div>
+      ) : (
+        <QueryPage
+          columns={PROJECT_TABLE_COLUMNS}
+          indexName="dina_project_index"
+          uniqueName="relatedProjects"
+          customViewElasticSearchQuery={{
+            query: {
+              terms: { "data.id": projectIds }
+            }
+          }}
+          viewMode={true}
+          customViewFilterGroups={false}
+          customViewFields={[
+            {
+              fieldName: "data.id",
+              type: "uuid"
+            }
+          ]}
+          enableColumnSelector={false}
+        />
+      )}
     </div>
   );
 }
