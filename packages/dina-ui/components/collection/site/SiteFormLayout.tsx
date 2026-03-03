@@ -20,17 +20,6 @@ import {
   PostMessageType
 } from "packages/dina-ui/types/geo/post-message.types";
 
-function parsePolygon(value: string): GeoPosition[][] {
-  const nums = value.split(",").map(Number);
-
-  const ring: GeoPosition[] = [];
-  for (let i = 0; i < nums.length; i += 2) {
-    ring.push([nums[i], nums[i + 1]]);
-  }
-
-  return [ring];
-}
-
 type Props = {
   popupUrl: string;
   messageId: string;
@@ -98,27 +87,11 @@ export function SiteFormLayout({
       </div>
       <div className="row">
         <div className={messageId === "viewOnMap" ? "col-md-12" : "col-md-6"}>
-          <div style={{ marginBottom: "10px" }}>
+          <div style={{ marginBottom: "5px" }}>
             <strong>{formatMessage("siteCoordinates")}</strong>
           </div>
-          {readOnly ? (
-            <div className="textWrap">
-              {coords.length
-                ? JSON.stringify(parsePolygon(coords.toString()))
-                : ""}
-            </div>
-          ) : (
-            <textarea
-              value={
-                coords && coords.length ? JSON.stringify(coords, null, 2) : ""
-              }
-              readOnly
-              className="form-control"
-              style={{ height: "80px", marginBottom: "5px" }}
-            />
-          )}
         </div>
-        <div style={{ marginTop: "10px", marginBottom: "25px" }}>
+        <div style={{ marginTop: "5px", marginBottom: "25px" }}>
           {(coords.length || messageId !== "viewOnMap") && (
             <GeometryMapEditorLauncher
               type="Polygon"
