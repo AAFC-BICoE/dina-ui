@@ -51,13 +51,15 @@ export default function CollectionRelatedObjectTypeChart({
             terms: {
               field: "data.attributes.fileExtension", // Or whatever you're charting
               size: 1000,
-              order: { _count: "desc" }
+              order: { _count: "desc" },
+              missing: "NO_FILE_EXTENSION"
             }
           }
         }
       },
       { params: { indexName: "dina_object_store_index" } }
     );
+
     // Helper function to get aggregation key format
     const getAggregationKey = (aggName: string, response: any): string => {
       if (response.aggregations[aggName]) {
