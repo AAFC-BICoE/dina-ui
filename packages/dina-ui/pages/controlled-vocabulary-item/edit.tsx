@@ -1,7 +1,6 @@
 import {
   ButtonBar,
   DinaForm,
-  DinaFormOnSubmit,
   MultilingualDescription,
   MultilingualTitle,
   ResourceSelectField,
@@ -13,6 +12,7 @@ import {
   useAccount,
   useDinaFormContext,
   useQuery,
+  useSubmitHandler,
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
@@ -104,65 +104,66 @@ function ControlledVocabularyItemForm({
     ? transformControlledVocabularyItemForForm(fetchedItem)
     : { type: "controlled-vocabulary-item" };
 
-  const onSubmit: DinaFormOnSubmit<
-    InputResource<ControlledVocabularyItem>
-  > = async ({ api: { save }, submittedValues }) => {
-    // Treat empty array or undefined as null:
-    if (!submittedValues.acceptedValues?.length) {
-      submittedValues.acceptedValues = null as any;
-    }
-
-    if (submittedValues.vocabularyElementType === "PICKLIST") {
-      submittedValues.vocabularyElementType = "STRING";
-    } else if (
-      submittedValues.vocabularyElementType === "INTEGER" ||
-      submittedValues.vocabularyElementType === "STRING"
-    ) {
-      submittedValues.acceptedValues = null as any;
-    }
-
-    // Don't save unit if type is not INTEGER/DECIMAL
-    if (
-      submittedValues.vocabularyElementType !== "INTEGER" &&
-      submittedValues.vocabularyElementType !== "DECIMAL"
-    ) {
-      delete submittedValues.unit;
-    }
-
-    // Convert the editable format to the stored format:
-    submittedValues.multilingualDescription = {
-      descriptions: _.toPairs(submittedValues.multilingualDescription).map(
-        ([lang, desc]) => ({ lang, desc })
-      )
-    };
-
-    submittedValues.multilingualTitle = {
-      titles: _.toPairs(submittedValues.multilingualTitle).map(
-        ([lang, title]) => ({ lang, title })
-      )
-    };
-
-    // Clean up the controlledVocabulary relationship - only keep id and type
-    if (submittedValues.controlledVocabulary) {
-      const cvId = (submittedValues.controlledVocabulary as any).id;
-      submittedValues.controlledVocabulary = {
-        id: cvId,
-        type: "controlled-vocabulary"
-      } as any;
-    }
-
-    const [savedItem] = await save(
-      [
-        {
-          resource: submittedValues,
-          type: "controlled-vocabulary-item"
+  const onSubmit = useSubmitHandler<InputResource<ControlledVocabularyItem>>({
+    resourceType: "controlled-vocabulary-item",
+    original: fetchedItem,
+    saveOptions: { apiBaseUrl: "/collection-api" },
+    relationshipMappings: [
+      {
+        sourceAttribute: "controlledVocabulary",
+        relationshipName: "controlledVocabulary",
+        relationshipType: "SINGLE" as const,
+        removeSourceAttribute: true,
+        entityType: "controlled-vocabulary"
+      }
+    ],
+    transforms: [
+      (submittedValues) => {
+        // Treat empty array or undefined as null:
+        if (!submittedValues.acceptedValues?.length) {
+          submittedValues.acceptedValues = null as any;
         }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
 
-    await router.push(`/controlled-vocabulary-item/view?id=${savedItem.id}`);
-  };
+        if (submittedValues.vocabularyElementType === "PICKLIST") {
+          submittedValues.vocabularyElementType = "STRING";
+        } else if (
+          submittedValues.vocabularyElementType === "INTEGER" ||
+          submittedValues.vocabularyElementType === "STRING"
+        ) {
+          submittedValues.acceptedValues = null as any;
+        }
+
+        // Don't save unit if type is not INTEGER/DECIMAL
+        if (
+          submittedValues.vocabularyElementType !== "INTEGER" &&
+          submittedValues.vocabularyElementType !== "DECIMAL"
+        ) {
+          delete submittedValues.unit;
+        }
+
+        // Convert the editable format to the stored format:
+        if (submittedValues.multilingualDescription) {
+          submittedValues.multilingualDescription = {
+            descriptions: _.toPairs(
+              submittedValues.multilingualDescription
+            ).map(([lang, desc]) => ({ lang, desc }))
+          };
+        }
+        if (submittedValues.multilingualTitle) {
+          submittedValues.multilingualTitle = {
+            titles: _.toPairs(submittedValues.multilingualTitle).map(
+              ([lang, title]) => ({ lang, title })
+            )
+          };
+        }
+
+        return submittedValues;
+      }
+    ],
+    onSuccess: async (savedItem) => {
+      await router.push(`/controlled-vocabulary-item/view?id=${savedItem.id}`);
+    }
+  });
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
@@ -226,10 +227,7 @@ export function ControlledVocabularyItemFormLayout() {
               .searchFilter("name", input)
               .when(!isAdmin, (builder) =>
                 // User editable controlled vocabularies
-                builder.whereIn("name", [
-                  "MANAGED_ATTRIBUTE",
-                  "FIELD_EXTENSIONS"
-                ])
+                builder.whereIn("key", ["managed_attribute", "field_extension"])
               )
               .build()
           }
