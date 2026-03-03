@@ -1,4 +1,9 @@
-import { BULK_EDIT_IDS_KEY, useQuery, withResponse } from "common-ui";
+import {
+  BULK_EDIT_IDS_KEY,
+  useQuery,
+  useBulkQueries,
+  withResponse
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import {
@@ -19,6 +24,29 @@ export function useStorageUnit(id?: string) {
     {
       disabled: !id,
       // parentStorageUnit must be fetched separately to include its hierarchy:
+      joinSpecs: [
+        {
+          apiBaseUrl: "/collection-api",
+          idField: "parentStorageUnit.id",
+          joinField: "parentStorageUnit",
+          path: (storageUnit) =>
+            `storage-unit/${storageUnit.parentStorageUnit?.id}`
+        }
+      ]
+    }
+  );
+}
+
+/**
+ * Takes array of ids and returns array of storage unit queries.
+ */
+export function useStorageUnits(ids: string[]) {
+  return useBulkQueries<StorageUnit>(
+    ids.map((id) => ({
+      path: `collection-api/storage-unit/${id}`,
+      include: "storageUnitType,parentStorageUnit"
+    })),
+    {
       joinSpecs: [
         {
           apiBaseUrl: "/collection-api",

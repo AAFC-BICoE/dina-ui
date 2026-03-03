@@ -1379,5 +1379,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workflowsLegend: "Molecular Analysis Workflows",
   siteListTitle: "Site",
   siteAttachments: "Site Attachments",
-  code: "Code"
+  code: "Code",
+  siteCoordinates: "Site coordinates",
+  waitingForPolygonData: "Waiting for polygon data...",
+  addSite: "Add Site",
+  editSite: "Edit Site",
+  createOnMap: "Create on Map",
+  editOnMap: "Edit on Map",
+  erase: "Erase",
+  close: "Close"
 };

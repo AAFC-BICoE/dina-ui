@@ -61,18 +61,18 @@ export function GroupForm({ group, router }: GroupFormProps) {
           <SubmitButton className="ms-auto" />
         </div>
       </ButtonBar>
-      <GroupFormFields group={group || ({} as Group)} />
+      <GroupFormFields />
     </DinaForm>
   );
 }
 
-export function GroupFormFields({ group }: { group: Group }) {
+export function GroupFormFields() {
   return (
     <div>
       <div className="row">
         <TextField className="col-md-2" name="name" label="name" />
       </div>
-      <GroupLabelsEditor labels={group.labels} valuesPath="labels" />
+      <GroupLabelsEditor valuesPath="labels" />
     </div>
   );
 }

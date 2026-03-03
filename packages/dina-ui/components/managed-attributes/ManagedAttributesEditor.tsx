@@ -49,141 +49,150 @@ export interface ManagedAttributesEditorProps {
   disableClearButton?: boolean;
 }
 
-export function ManagedAttributesEditor({
+interface ManagedAttributesEditorInnerProps
+  extends ManagedAttributesEditorProps {
+  currentValue: Record<string, string | null | undefined> | null | undefined;
+}
+
+// inner component for ManagedAttributesEditor
+function ManagedAttributesEditorInner({
+  currentValue,
   valuesPath,
+  visibleAttributeKeys: visibleAttributeKeysProp, // rename here just like before
   managedAttributeApiPath,
   managedAttributeComponent,
   attributeSelectorWidth = 6,
   fieldSetProps,
   managedAttributeOrderFieldName,
-  visibleAttributeKeys: visibleAttributeKeysProp,
   disableClearButton = false,
   values
-}: ManagedAttributesEditorProps) {
+}: ManagedAttributesEditorInnerProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
 
+  function getAttributeKeysInUse() {
+    const managedAttributeMaps = bulkCtx?.resourceHooks.map((sample) =>
+      _.get(sample.formRef.current?.values, valuesPath)
+    ) || [currentValue];
+
+    // Get all unique ManagedAttribute keys in the given value maps:
+    const initialVisibleKeys = _.uniq(
+      _.flatMap(managedAttributeMaps.map(_.keys))
+    );
+
+    return initialVisibleKeys;
+  }
+
+  const [visibleAttributeKeys, setVisibleAttributeKeys] = useState(
+    getAttributeKeysInUse
+  );
+
+  // When the visibleAttributeKeys prop changes, update the internal visible keys state:
+  useEffect(() => {
+    setVisibleAttributeKeys(
+      visibleAttributeKeysProp ?? getAttributeKeysInUse()
+    );
+  }, [visibleAttributeKeysProp]);
+
+  // Fetch the attributes (to display on the form, not the multiselect list), but omit any that are missing e.g. were deleted.
+
+  const { data: fetchedAttributes, loading } = useManagedAttributeQueries({
+    keys: visibleAttributeKeys,
+    managedAttributeApiPath,
+    managedAttributeComponent,
+    disabled: !visibleAttributeKeys.length
+  });
+
+  // Store the last fetched Attributes in a ref instead of showing a
+  // loading state when the visible attributes change.
+  const lastFetchedAttributes = useRef<PersistedResource<ManagedAttribute>[]>(
+    []
+  );
+
+  if (!visibleAttributeKeys.length) {
+    lastFetchedAttributes.current = [];
+  } else if (fetchedAttributes) {
+    lastFetchedAttributes.current = fetchedAttributes;
+  }
+
+  const visibleAttributes = lastFetchedAttributes.current;
+
   return (
-    <FieldSpy<Record<string, string | null | undefined>> fieldName={valuesPath}>
-      {(currentValue) => {
-        function getAttributeKeysInUse() {
-          const managedAttributeMaps = bulkCtx?.resourceHooks.map((sample) =>
-            _.get(sample.formRef.current?.values, valuesPath)
-          ) || [currentValue];
-
-          // Get all unique ManagedAttribute keys in the given value maps:
-          const initialVisibleKeys = _.uniq(
-            _.flatMap(managedAttributeMaps.map(_.keys))
-          );
-
-          return initialVisibleKeys;
-        }
-
-        const [visibleAttributeKeys, setVisibleAttributeKeys] = useState(
-          getAttributeKeysInUse
-        );
-
-        // When the visibleAttributeKeys prop changes, update the internal visible keys state:
-        useEffect(() => {
-          setVisibleAttributeKeys(
-            visibleAttributeKeysProp ?? getAttributeKeysInUse()
-          );
-        }, [visibleAttributeKeysProp]);
-
-        // Fetch the attributes (to display on the form, not the multiselect list), but omit any that are missing e.g. were deleted.
-
-        const { data: fetchedAttributes, loading } = useManagedAttributeQueries(
-          {
-            keys: visibleAttributeKeys,
-            managedAttributeApiPath,
-            managedAttributeComponent,
-            disabled: !visibleAttributeKeys.length
-          }
-        );
-
-        // Store the last fetched Attributes in a ref instead of showing a
-        // loading state when the visible attributes change.
-        const lastFetchedAttributes = useRef<
-          PersistedResource<ManagedAttribute>[]
-        >([]);
-
-        if (!visibleAttributeKeys.length) {
-          lastFetchedAttributes.current = [];
-        } else if (fetchedAttributes) {
-          lastFetchedAttributes.current = fetchedAttributes;
-        }
-
-        const visibleAttributes = lastFetchedAttributes.current;
-
-        return (
-          <>
-            {!readOnly && (
-              <FieldSet
-                legend={<DinaMessage id="managedAttributes" />}
-                {...fieldSetProps}
-              >
-                <div className="mb-3 managed-attributes-editor">
-                  {isTemplate && managedAttributeOrderFieldName ? (
-                    <ManagedAttributesSorter
-                      managedAttributeComponent={managedAttributeComponent}
-                      name={managedAttributeOrderFieldName}
-                      managedAttributeApiPath={managedAttributeApiPath}
+    <>
+      {!readOnly && (
+        <FieldSet
+          legend={<DinaMessage id="managedAttributes" />}
+          {...fieldSetProps}
+        >
+          <div className="mb-3 managed-attributes-editor">
+            {isTemplate && managedAttributeOrderFieldName ? (
+              <ManagedAttributesSorter
+                managedAttributeComponent={managedAttributeComponent}
+                name={managedAttributeOrderFieldName}
+                managedAttributeApiPath={managedAttributeApiPath}
+                valuesPath={valuesPath}
+              />
+            ) : (
+              <div>
+                <div className="row">
+                  {visibleAttributes.map((attribute) => (
+                    <ManagedAttributeFieldWithLabel
+                      key={attribute.key}
+                      attribute={attribute}
+                      values={values}
                       valuesPath={valuesPath}
+                      onRemoveClick={(attributeKey) =>
+                        setVisibleAttributeKeys((current) =>
+                          current.filter((it) => it != attributeKey)
+                        )
+                      }
+                      disableClearButton={disableClearButton}
                     />
-                  ) : (
-                    <div>
-                      <div className="row">
-                        {visibleAttributes.map((attribute) => (
-                          <ManagedAttributeFieldWithLabel
-                            key={attribute.key}
-                            attribute={attribute}
-                            values={values}
-                            valuesPath={valuesPath}
-                            onRemoveClick={(attributeKey) =>
-                              setVisibleAttributeKeys((current) =>
-                                current.filter((it) => it != attributeKey)
-                              )
-                            }
-                            disableClearButton={disableClearButton}
-                          />
-                        ))}
-                      </div>
-                      <div className="row">
-                        <label
-                          className={`visible-attribute-menu col-sm-${attributeSelectorWidth}`}
-                        >
-                          <ManagedAttributeMultiSelect
-                            managedAttributeApiPath={managedAttributeApiPath}
-                            managedAttributeComponent={
-                              managedAttributeComponent
-                            }
-                            onChange={setVisibleAttributeKeys}
-                            visibleAttributes={visibleAttributes}
-                            loading={loading}
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  )}
+                  ))}
                 </div>
-              </FieldSet>
-            )}
-            {readOnly && (
-              <div className="row">
-                {visibleAttributes.map((attribute) => (
-                  <ManagedAttributeFieldWithLabel
-                    key={attribute.key}
-                    attribute={attribute}
-                    values={values}
-                    valuesPath={valuesPath}
-                    disableClearButton={disableClearButton}
-                  />
-                ))}
+                <div className="row">
+                  <label
+                    className={`visible-attribute-menu col-sm-${attributeSelectorWidth}`}
+                  >
+                    <ManagedAttributeMultiSelect
+                      managedAttributeApiPath={managedAttributeApiPath}
+                      managedAttributeComponent={managedAttributeComponent}
+                      onChange={setVisibleAttributeKeys}
+                      visibleAttributes={visibleAttributes}
+                      loading={loading}
+                    />
+                  </label>
+                </div>
               </div>
             )}
-          </>
-        );
-      }}
+          </div>
+        </FieldSet>
+      )}
+      {readOnly && (
+        <div className="row">
+          {visibleAttributes.map((attribute) => (
+            <ManagedAttributeFieldWithLabel
+              key={attribute.key}
+              attribute={attribute}
+              values={values}
+              valuesPath={valuesPath}
+              disableClearButton={disableClearButton}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+export function ManagedAttributesEditor(props: ManagedAttributesEditorProps) {
+  return (
+    <FieldSpy<Record<string, string | null | undefined>>
+      fieldName={props.valuesPath}
+    >
+      {(currentValue) => (
+        <ManagedAttributesEditorInner {...props} currentValue={currentValue} />
+      )}
     </FieldSpy>
   );
 }
@@ -197,10 +206,14 @@ export interface ManagedAttributeMultiSelectProps {
   loading?: boolean;
 }
 
-export function DynamicResourceSelect<TData extends PersistedResource<TData>>(props: {
+export function DynamicResourceSelect<
+  TData extends PersistedResource<TData>
+>(props: {
   model: string;
   filter?: (input: string) => any;
-  optionLabel?: (item: PersistedResource<TData>) => string | React.ReactElement | null;
+  optionLabel?: (
+    item: PersistedResource<TData>
+  ) => string | React.ReactElement | null;
   value?: PersistedResource<TData> | PersistedResource<TData>[] | null;
   isMulti?: boolean;
   isLoading?: boolean;
@@ -281,26 +294,24 @@ export function DynamicResourceSelect<TData extends PersistedResource<TData>>(pr
 
   // Ensure ResourceSelect receives a non-optional filter function:
   const effectiveFilter: (input: string) => any =
-    filterProp ??
-    ((_input) => SimpleSearchFilterBuilder.create<any>().build());
+    filterProp ?? ((_input) => SimpleSearchFilterBuilder.create<any>().build());
 
   // Ensure ResourceSelect receives a non-optional optionLabel:
   const defaultOptionLabel = useCallback(
-    (r: PersistedResource<TData>) =>
-      (r as any)?.name ?? (r as any)?.id ?? "",
+    (r: PersistedResource<TData>) => (r as any)?.name ?? (r as any)?.id ?? "",
     []
   );
-  
-  const effectiveOptionLabel: 
-    ((r: PersistedResource<TData>) => string | React.ReactElement | null) | undefined 
-    = optionLabelProp ?? defaultOptionLabel;
+
+  const effectiveOptionLabel:
+    | ((r: PersistedResource<TData>) => string | React.ReactElement | null)
+    | undefined = optionLabelProp ?? defaultOptionLabel;
 
   return (
     <ResourceSelect
       {...rest}
       onChange={handleChange}
       onDataLoaded={handleDataLoaded}
-      pageSize={20}  // Fetch more records to account for filtering
+      pageSize={20} // Fetch more records to account for filtering
       // normalize null -> undefined (ResourceSelect doesn't accept null)
       value={value ?? undefined}
       filter={effectiveFilter}

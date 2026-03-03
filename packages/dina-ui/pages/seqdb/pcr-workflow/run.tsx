@@ -43,12 +43,9 @@ export default function PCRWorkFlowRunPage() {
   );
 
   // Loaded PCR Batch.
-  const pcrBatch = usePcrBatchQuery(pcrBatchId, [
-    pcrBatchId,
-    currentStep,
-    reloadPcrBatch
-  ]);
-
+  const pcrBatch = usePcrBatchQuery(pcrBatchId, {
+    deps: [pcrBatchId, currentStep, reloadPcrBatch]
+  });
   // Update the URL to contain the current step.
   useEffect(() => {
     router.push({

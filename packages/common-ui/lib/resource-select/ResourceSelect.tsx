@@ -15,7 +15,7 @@ import { useBulkGet } from "./useBulkGet";
 import { SortableSelect } from "common-ui";
 
 /** ResourceSelect component props. */
-export interface ResourceSelectProps<TData extends KitsuResource> {
+export interface ResourceSelectBaseProps<TData extends KitsuResource> {
   /** Sets the input's value so the value can be controlled externally. */
   value?: ResourceSelectValue<TData>;
 
@@ -28,18 +28,10 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Callback fired when data has been loaded from the API */
   onDataLoaded?: (data: PersistedResource<TData>[] | undefined) => void;
 
-  /** The model type to select resources from. */
-  model: string;
-
   /** Function to get the option label for each resource. */
   optionLabel: (
     resource: PersistedResource<TData>
   ) => string | null | JSX.Element;
-
-  /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
-  filter: (inputValue: string) => FilterParam;
-
-  filterList?: (item: any | undefined) => boolean;
 
   /**
    * Sort order + attribute.
@@ -51,9 +43,6 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** Whether this is a multi-select dropdown. */
   isMulti?: boolean;
-
-  /** The JSONAPI "include" parameter. */
-  include?: string;
 
   /** react-select styles prop. */
   styles?: Partial<StylesConfig<SelectOption<any>, boolean>>;
@@ -68,23 +57,6 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   invalid?: boolean;
 
-  selectProps?: Partial<ComponentProps<typeof SortableSelect>>;
-
-  /** Page limit. */
-  pageSize?: number;
-
-  /** Use a different query hook instead of the REST API. */
-  useCustomQuery?: (
-    searchQuery: string,
-    querySpec: JsonApiQuerySpec
-  ) => {
-    loading?: boolean;
-    response?: { data: PersistedResource<TData>[] };
-  };
-
-  /* Remove the default sort by createdOn */
-  removeDefaultSort?: boolean;
-
   placeholder?: string;
 
   isLoading?: boolean;
@@ -93,6 +65,46 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   cannotBeChanged?: boolean;
 
   showGroupCategary?: boolean;
+
+  /** The model type to select resources from. */
+  model: string;
+
+  selectProps?: Partial<ComponentProps<typeof SortableSelect>>;
+
+  filterList?: (item: any | undefined) => boolean;
+}
+
+export interface ResourceSelectProps<TData extends KitsuResource>
+  extends ResourceSelectBaseProps<TData> {
+  /** The JSONAPI "include" parameter. */
+  include?: string;
+
+  /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
+  filter: (inputValue: string) => FilterParam;
+
+  /** Page limit. */
+  pageSize?: number;
+
+  /* Remove the default sort by createdOn */
+  removeDefaultSort?: boolean;
+}
+
+export interface ResourceSelectCustomQueryProps<TData extends KitsuResource>
+  extends ResourceSelectProps<TData> {
+  useCustomQuery: (options: any) => {
+    loading?: boolean;
+    response?: { data: PersistedResource<TData>[] };
+  };
+  customQueryOptions: any;
+}
+
+export interface ResourceSelectInnerProps<TData extends KitsuResource>
+  extends ResourceSelectBaseProps<TData> {
+  queryIsLoading?: boolean;
+  response?: { data: PersistedResource<TData>[] } | undefined;
+  inputValue: string;
+  setInputValue: (value: string) => void;
+  searchValue?: string;
 }
 
 type ResourceSelectValue<TData extends KitsuResource> =
@@ -115,34 +127,22 @@ export interface AsyncOption<TData extends KitsuResource> {
   getResource: () => Promise<PersistedResource<TData> | undefined>;
 }
 
-/** Dropdown select input for selecting a resource from the API. */
-export function ResourceSelect<TData extends KitsuResource>({
-  filter,
-  filterList,
-  include,
-  isMulti = false,
-  model,
-  onChange: onChangeProp = () => undefined,
-  optionLabel,
-  styles,
-  value,
-  asyncOptions,
-  isDisabled: isDisabledProp,
-  omitNullOption,
-  invalid,
-  selectProps,
-  pageSize,
-  useCustomQuery,
-  removeDefaultSort,
-  placeholder,
-  isLoading: loadingProp,
-  cannotBeChanged,
-  showGroupCategary = false,
-  additionalSort,
-  onDataLoaded
-}: ResourceSelectProps<TData>) {
-  const { formatMessage } = useIntl();
-  const { isAdmin, groupNames } = useAccount();
+/**
+ * A debounced search-as-you-type dropdown component that fetches resources
+ * from a JSONAPI-compliant backend.
+ * Use ResourceSelectCustomQuery if you need to use a custom data-fetching hook.
+ */
+export function ResourceSelect<TData extends KitsuResource>(
+  props: ResourceSelectProps<TData>
+) {
+  const {
+    filter,
+    model,
+    additionalSort,
+    pageSize,
+    removeDefaultSort,
+    include
+  } = props;
 
   /** The value of the input element. */
   const [inputValue, setInputValue] = useState("");
@@ -154,8 +154,6 @@ export function ResourceSelect<TData extends KitsuResource>({
   const filterParam = _.omitBy(filter(searchValue), (val) =>
     ["", undefined].includes(val as string)
   );
-
-  let isDisabled = isDisabledProp;
 
   // "6" is chosen here to give enough room for the main options, the <none> option, and the
   const page = { limit: pageSize ?? 6 };
@@ -175,8 +173,116 @@ export function ResourceSelect<TData extends KitsuResource>({
     )
   };
 
-  const { loading: queryIsLoading, response } =
-    useCustomQuery?.(inputValue, querySpec) ?? useQuery<TData[]>(querySpec);
+  const { loading: queryIsLoading, response } = useQuery<TData[]>(querySpec);
+
+  return ResourceSelectInner<TData>({
+    ...props,
+    inputValue,
+    setInputValue,
+    queryIsLoading,
+    response,
+    searchValue
+  });
+}
+
+/**
+ * A variation of ResourceSelect that allows for a custom data-fetching hook.
+ * Useful when the resource list depends on complex external states or
+ * non-standard API endpoints.
+ */
+export function ResourceSelectCustomQuery<TData extends KitsuResource>(
+  props: ResourceSelectCustomQueryProps<TData>
+) {
+  const {
+    customQueryOptions,
+    useCustomQuery,
+    additionalSort,
+    pageSize,
+    removeDefaultSort,
+    include,
+    filter,
+    model
+  } = props;
+  /** The value of the input element. */
+  const [inputValue, setInputValue] = useState("");
+
+  /** The debounced input value passed to the fetcher. */
+  const [searchValue] = useDebounce(inputValue, 250);
+
+  // Omit blank/null filters:
+  const filterParam = _.omitBy(filter(searchValue), (val) =>
+    ["", undefined].includes(val as string)
+  );
+
+  // "6" is chosen here to give enough room for the main options, the <none> option, and the
+  const page = { limit: pageSize ?? 6 };
+  const sort = additionalSort
+    ? additionalSort
+    : !removeDefaultSort
+    ? "-createdOn"
+    : undefined;
+
+  // Omit undefined values from the GET params, which would otherwise cause an invalid request.
+  // e.g. /api/region?include=undefined
+  const querySpec: JsonApiQuerySpec = {
+    path: model,
+    ..._.omitBy(
+      { filter: filterParam, include, page, sort },
+      (val) => _.isUndefined(val) || _.isEqual(val, {})
+    )
+  };
+
+  const resolvedOptions =
+    typeof customQueryOptions === "function"
+      ? customQueryOptions(searchValue, querySpec)
+      : customQueryOptions;
+
+  const { loading: queryIsLoading, response } = useCustomQuery(resolvedOptions);
+
+  return ResourceSelectInner<TData>({
+    ...props,
+    inputValue,
+    setInputValue,
+    queryIsLoading,
+    response,
+    searchValue
+  });
+}
+
+/**
+ * Inner component for ResourceSelect.
+ * Takes query and input states as props from wrapper components to allow for shared logic between the standard and custom query versions of ResourceSelect.
+ * @template TData The KitsuResource type being selected.
+ * @param props Combined props from the parent selectors plus internal state
+ * like `inputValue` and `response`.
+ * * @returns A SortableSelect component configured with resource-specific styles and logic.
+ */
+export function ResourceSelectInner<TData extends KitsuResource>({
+  isDisabled,
+  isMulti = false,
+  model,
+  onChange: onChangeProp = () => undefined,
+  optionLabel,
+  styles,
+  value,
+  asyncOptions,
+  omitNullOption,
+  invalid,
+  selectProps,
+  placeholder,
+  isLoading: loadingProp,
+  cannotBeChanged,
+  showGroupCategary = false,
+  onDataLoaded,
+  queryIsLoading,
+  response,
+  inputValue,
+  setInputValue,
+  searchValue,
+  filterList
+}: ResourceSelectInnerProps<TData>) {
+  const { formatMessage } = useIntl();
+  const { isAdmin, groupNames } = useAccount();
 
   const isLoading = queryIsLoading || inputValue !== searchValue || loadingProp;
 
@@ -379,7 +485,6 @@ export function ResourceSelect<TData extends KitsuResource>({
       };
     }
   };
-
   return (
     <SortableSelect
       // react-select props:

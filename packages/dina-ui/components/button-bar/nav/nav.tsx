@@ -235,7 +235,7 @@ function GovernmentLogo() {
   );
 }
 
-function menuDisplayControl() {
+function useMenuDisplayControl() {
   const [show, setShow] = useState(false);
   const showDropdown = () => {
     setShow(true);
@@ -266,7 +266,7 @@ function menuDisplayControl() {
 
 function NavCollectionDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   return (
     <NavDropdown
       title={formatMessage("collectionSectionTitle")}
@@ -355,7 +355,7 @@ function NavCollectionDropdown({ formatMessage }) {
 
 function NavTransactionsDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
 
   return (
     <NavDropdown
@@ -391,7 +391,7 @@ function NavTransactionsDropdown({ formatMessage }) {
 
 function NavObjectStoreDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   return (
     <NavDropdown
       title={formatMessage("objectStoreTitle")}
@@ -445,7 +445,7 @@ function NavObjectStoreDropdown({ formatMessage }) {
 
 function NavAgentDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   return (
     <NavDropdown
       title={formatMessage("agentsSectionTitle")}
@@ -472,7 +472,7 @@ function NavAgentDropdown({ formatMessage }) {
 
 function NavSequenceDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   return (
     <NavDropdown
       title={formatMessage("seqdbTitle")}
@@ -602,7 +602,7 @@ function NavSequenceDropdown({ formatMessage }) {
 
 function NavControlledVocabularyDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   const { isAdmin } = useAccount();
   return (
     <NavDropdown
@@ -685,7 +685,7 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
 
 function NavDinaManagementDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
   const { isAdmin } = useAccount();
   return (
     <NavDropdown
@@ -740,7 +740,7 @@ function NavDinaManagementDropdown({ formatMessage }) {
 
 function NavDinaConfigurationDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
-    menuDisplayControl();
+    useMenuDisplayControl();
 
   const { subject } = useAccount();
 

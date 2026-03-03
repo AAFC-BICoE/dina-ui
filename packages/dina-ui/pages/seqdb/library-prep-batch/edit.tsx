@@ -37,7 +37,15 @@ import {
   ThermocyclerProfile
 } from "../../../types/seqdb-api";
 
-export function useLibraryPrepBatchQuery(id?: string, deps?: any[]) {
+interface UseLibraryPrepBatchQueryOptions {
+  deps?: any[];
+}
+export function useLibraryPrepBatchQuery(
+  id?: string,
+  options?: UseLibraryPrepBatchQueryOptions
+) {
+  const { deps } = options || {};
+
   return useQuery<LibraryPrepBatch>(
     {
       path: `seqdb-api/library-prep-batch/${id}`,
