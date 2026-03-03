@@ -145,6 +145,7 @@ export function diffRelationships(
   // Check all relationships from newRelationships
   for (const key of Object.keys(newRelationships)) {
     const nRel = newRelationships[key]?.data;
+    const oRelExists = key in originalRelationships;
     let oRel = originalRelationships[key]?.data;
 
     if (nRel !== null && !Array.isArray(nRel) && Array.isArray(oRel)) {
@@ -157,7 +158,11 @@ export function diffRelationships(
     const finalORel = oRel ?? null;
     const finalNRel = nRel ?? null;
 
-    if (!deepEqual(finalORel, finalNRel)) {
+    // If original is missing and new is empty, don't trigger a diff
+    const isNewEmptyArray =
+      !oRelExists && Array.isArray(finalNRel) && finalNRel.length === 0;
+
+    if (!deepEqual(finalORel, finalNRel) && !isNewEmptyArray) {
       diff[key] = { data: finalNRel };
     }
   }
