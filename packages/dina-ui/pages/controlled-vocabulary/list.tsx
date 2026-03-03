@@ -310,7 +310,15 @@ export default function ControlledVocabularyListPage() {
       titleId="controlledVocabularyTitle"
       buttonBarContent={
         <div className="flex d-flex ms-auto">
-          <CreateButton entityLink="/controlled-vocabulary-item" />
+          <CreateButton
+            entityLink="/controlled-vocabulary"
+            messageKey="createNewControlledVocabulary"
+          />
+          <CreateButton
+            entityLink="/controlled-vocabulary-item"
+            messageKey="createNewControlledVocabularyItem"
+            extraCssClasses="ms-2"
+          />
         </div>
       }
     >

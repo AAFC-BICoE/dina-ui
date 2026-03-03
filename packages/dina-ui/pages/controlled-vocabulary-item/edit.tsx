@@ -10,6 +10,7 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
+  useAccount,
   useDinaFormContext,
   useQuery,
   withResponse
@@ -179,6 +180,7 @@ function ControlledVocabularyItemForm({
 export function ControlledVocabularyItemFormLayout() {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
+  const { isAdmin } = useAccount();
 
   const [selectedControlledVocabulary, setSelectedControlledVocabulary] =
     useState<PersistedResource<ControlledVocabulary> | null>(
@@ -222,12 +224,16 @@ export function ControlledVocabularyItemFormLayout() {
           filter={(input) =>
             SimpleSearchFilterBuilder.create<ControlledVocabulary>()
               .searchFilter("name", input)
-              // User editable controlled vocabularies
-              .whereIn("name", ["MANAGED_ATTRIBUTE", "FIELD_EXTENSIONS"])
+              .when(!isAdmin, (builder) =>
+                // User editable controlled vocabularies
+                builder.whereIn("name", [
+                  "MANAGED_ATTRIBUTE",
+                  "FIELD_EXTENSIONS"
+                ])
+              )
               .build()
           }
           model="collection-api/controlled-vocabulary"
-          isDisabled={true}
           optionLabel={(cv) => cv.name}
           onChange={(selected) => {
             setSelectedControlledVocabulary(
@@ -235,6 +241,14 @@ export function ControlledVocabularyItemFormLayout() {
             );
           }}
           omitNullOption={true}
+          asyncOptions={
+            [
+              // {
+              //   label: <DinaMessage id="createNewControlledVocabulary" />,
+              //   getResource: () => { return undefined }
+              // }
+            ]
+          }
         />
       </div>
       <div className="row">
