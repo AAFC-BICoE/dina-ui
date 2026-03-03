@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useField } from "formik";
+import { useField, useFormikContext } from "formik";
 import {
   DateField,
   MultilingualDescription,
@@ -45,14 +45,24 @@ export function SiteFormLayout({
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
   const [{ value }] = useField("siteGeom");
-  const [siteGeom, setSiteGeom] = useState<GeoPosition[][]>(value ?? []);
+  const [coords, setCoords] = useState<GeoPosition[][]>(
+    value?.coordinates ?? []
+  );
+  const { setFieldValue } = useFormikContext();
+
+  useEffect(() => {
+    setFieldValue("siteGeom", {
+      type: "Polygon",
+      coordinates: coords
+    });
+  }, [coords, setFieldValue]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent<PostMessage>) => {
       if (event.origin !== window.location.origin) return;
 
       if (event.data?.type === PostMessageType.PolygonEdited) {
-        setSiteGeom(event.data.coordinates ?? []);
+        setCoords(event.data.coordinates ?? []);
       }
     };
 
@@ -87,35 +97,33 @@ export function SiteFormLayout({
         />
       </div>
       <div className="row">
-        <div className="col-md-6">
+        <div className={messageId === "viewOnMap" ? "col-md-12" : "col-md-6"}>
           <div style={{ marginBottom: "10px" }}>
             <strong>{formatMessage("siteCoordinates")}</strong>
           </div>
           {readOnly ? (
-            <pre>
-              {siteGeom.length
-                ? JSON.stringify(parsePolygon(siteGeom.toString()))
+            <div className="textWrap">
+              {coords.length
+                ? JSON.stringify(parsePolygon(coords.toString()))
                 : ""}
-            </pre>
+            </div>
           ) : (
             <textarea
               value={
-                siteGeom && siteGeom.length
-                  ? JSON.stringify(siteGeom, null, 2)
-                  : ""
+                coords && coords.length ? JSON.stringify(coords, null, 2) : ""
               }
               readOnly
               className="form-control"
-              style={{ height: "80px", marginBottom: "15px" }}
+              style={{ height: "80px", marginBottom: "5px" }}
             />
           )}
         </div>
-        <div style={{ marginBottom: "25px" }}>
-          {(value || messageId !== "viewOnMap") && (
+        <div style={{ marginTop: "10px", marginBottom: "25px" }}>
+          {(coords.length || messageId !== "viewOnMap") && (
             <GeometryMapEditorLauncher
               type="Polygon"
               fieldName="siteGeom"
-              siteGeom={siteGeom}
+              siteGeom={coords}
               url={popupUrl}
               messageId={messageId}
             />
