@@ -17,10 +17,6 @@ export default function PolygonEditorPage() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
-  if (!router.isReady) {
-    return <div>{formatMessage("loadingSpinner")}</div>;
-  }
-
   const modeParam = router.query.mode;
   const mode = Object.values(POLYGON_EDITOR_MODE).includes(
     modeParam as PolygonEditorMode
@@ -56,6 +52,10 @@ export default function PolygonEditorPage() {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
+
+  if (!router.isReady) {
+    return <div>{formatMessage("loadingSpinner")}</div>;
+  }
 
   return (
     <div style={{ position: "fixed", inset: 0 }}>

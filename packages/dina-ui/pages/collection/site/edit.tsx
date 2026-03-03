@@ -17,15 +17,14 @@ import { SiteFormLayout } from "packages/dina-ui/components/collection/site/Site
 export default function EditPage() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
+  const { id } = router.query;
+  const title = id ? formatMessage("editSite") : formatMessage("addSite");
+
+  const siteQuery = useSiteQuery(id?.toString());
 
   if (!router.isReady) {
     return <div>{formatMessage("loadingSpinner")}</div>;
   }
-
-  const { id } = router.query;
-  const title = id ? formatMessage("editSite") : formatMessage("addSite");
-  const siteQuery = useSiteQuery(id?.toString());
-
   return (
     <PageLayout titleId={title}>
       <Head title={title} />
