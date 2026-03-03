@@ -8,8 +8,8 @@ import {
 import Link from "next/link";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { Site } from "packages/dina-ui/types/collection-api";
-import { groupCell, GroupSelectField, Head } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { groupCell, GroupSelectField, Head } from "packages/dina-ui/components";
+import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 
 export const getColumnDefinition: () => ColumnDefinition<Site>[] = () => {
   return [
@@ -35,9 +35,8 @@ export const getColumnDefinition: () => ColumnDefinition<Site>[] = () => {
   ];
 };
 
-export default function SiteListPage() {
+export default function ListPage() {
   const { formatMessage } = useDinaIntl();
-
   const SITE_FILTER_ATTRIBUTES = ["createdBy", "name", "code"];
   const SITE_TABLE_COLUMNS: ColumnDefinition<Site>[] = getColumnDefinition();
 

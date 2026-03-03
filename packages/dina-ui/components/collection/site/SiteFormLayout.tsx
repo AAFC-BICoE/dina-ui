@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { useField, useFormikContext } from "formik";
 import {
   DateField,
   MultilingualDescription,
@@ -5,17 +7,71 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { AttachmentsField, GroupSelectField } from "../..";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { AllowAttachmentsConfig } from "../../object-store";
+import {
+  AttachmentsField,
+  GroupSelectField
+} from "packages/dina-ui/components";
+import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
+import GeometryMapEditorLauncher from "packages/dina-ui/components/geo/GeometryMapEditorLauncher";
+import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
+import {
+  PostMessage,
+  PostMessageType
+} from "packages/dina-ui/types/geo/post-message.types";
+
+function parsePolygon(value: string): GeoPosition[][] {
+  const nums = value.split(",").map(Number);
+
+  const ring: GeoPosition[] = [];
+  for (let i = 0; i < nums.length; i += 2) {
+    ring.push([nums[i], nums[i + 1]]);
+  }
+
+  return [ring];
+}
+
+type Props = {
+  popupUrl: string;
+  messageId: string;
+  attachmentsConfig?: AllowAttachmentsConfig;
+};
 
 export function SiteFormLayout({
+  popupUrl,
+  messageId,
   attachmentsConfig
-}: {
-  attachmentsConfig?: AllowAttachmentsConfig;
-}) {
+}: Props) {
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
+  const [{ value }] = useField("siteGeom");
+  const [coords, setCoords] = useState<GeoPosition[][]>(
+    value?.coordinates ?? []
+  );
+  const { setFieldValue } = useFormikContext();
+
+  useEffect(() => {
+    setFieldValue("siteGeom", {
+      type: "Polygon",
+      coordinates: coords
+    });
+  }, [coords, setFieldValue]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent<PostMessage>) => {
+      if (event.origin !== window.location.origin) return;
+
+      if (event.data?.type === PostMessageType.PolygonEdited) {
+        setCoords(event.data.coordinates ?? []);
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
 
   return (
     <div>
@@ -40,19 +96,55 @@ export function SiteFormLayout({
           label={formatMessage("code")}
         />
       </div>
-      <MultilingualDescription />
       <div className="row">
-        <DateField
-          className="col-md-6"
-          name="createdOn"
-          label={formatMessage("field_createdOn")}
-        />
-        <TextField
-          className="col-md-6"
-          name="createdBy"
-          label={formatMessage("field_createdBy")}
-        />
+        <div className={messageId === "viewOnMap" ? "col-md-12" : "col-md-6"}>
+          <div style={{ marginBottom: "10px" }}>
+            <strong>{formatMessage("siteCoordinates")}</strong>
+          </div>
+          {readOnly ? (
+            <div className="textWrap">
+              {coords.length
+                ? JSON.stringify(parsePolygon(coords.toString()))
+                : ""}
+            </div>
+          ) : (
+            <textarea
+              value={
+                coords && coords.length ? JSON.stringify(coords, null, 2) : ""
+              }
+              readOnly
+              className="form-control"
+              style={{ height: "80px", marginBottom: "5px" }}
+            />
+          )}
+        </div>
+        <div style={{ marginTop: "10px", marginBottom: "25px" }}>
+          {(coords.length || messageId !== "viewOnMap") && (
+            <GeometryMapEditorLauncher
+              type="Polygon"
+              fieldName="siteGeom"
+              siteGeom={coords}
+              url={popupUrl}
+              messageId={messageId}
+            />
+          )}
+        </div>
       </div>
+      <MultilingualDescription />
+      {readOnly && (
+        <div className="row">
+          <DateField
+            className="col-md-6"
+            name="createdOn"
+            label={formatMessage("field_createdOn")}
+          />
+          <TextField
+            className="col-md-6"
+            name="createdBy"
+            label={formatMessage("field_createdBy")}
+          />
+        </div>
+      )}
       <div className="mb-3">
         <DinaFormSection
           componentName="site-component"

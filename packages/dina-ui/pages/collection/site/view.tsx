@@ -1,10 +1,10 @@
-import { DinaForm } from "common-ui";
 import _ from "lodash";
-import { ViewPageLayout } from "../../../components";
-import { SiteFormLayout } from "../../../components/collection/site/SiteFormLayout";
+import { DinaForm } from "common-ui";
+import { ViewPageLayout } from "packages/dina-ui/components";
+import { SiteFormLayout } from "packages/dina-ui/components/collection/site/SiteFormLayout";
 import { Site } from "packages/dina-ui/types/collection-api";
 
-export default function SiteDetailsPage() {
+export default function ViewPage() {
   return (
     <ViewPageLayout<Site>
       form={(props) => (
@@ -20,7 +20,10 @@ export default function SiteDetailsPage() {
             )
           }}
         >
-          <SiteFormLayout />
+          <SiteFormLayout
+            popupUrl="/collection/site/polygon-editor"
+            messageId="viewOnMap"
+          />
         </DinaForm>
       )}
       query={(id) => ({
