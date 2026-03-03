@@ -19,7 +19,7 @@ export default function CollectionLinkedProjectsTable({ id }: { id: string }) {
   const { apiClient } = useApiClient();
 
   const fetchData = async () => {
-    // Get the material sample IDs that have attachments in this collection.
+    // Get the material samples in this collection.
     const sampleResponse = await apiClient.axios.post(
       "search-api/search-ws/search",
       {
