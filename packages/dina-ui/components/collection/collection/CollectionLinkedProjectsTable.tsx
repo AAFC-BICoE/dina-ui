@@ -7,7 +7,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../../../packages/dina-ui/intl/dina-ui-intl";
 
 export default function CollectionLinkedProjectsTable({ id }: { id: string }) {
   const { apiClient } = useApiClient();
