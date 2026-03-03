@@ -448,6 +448,8 @@ export function Home2() {
   const { getCards, saveCards, getSectionOrder, saveSectionOrder, loading } =
     UIPreferenceHook(sections);
 
+  const { formatMessage } = useDinaIntl();
+
   const sectionConfigs = [
     {
       id: "collectionCardsOrder",
@@ -558,7 +560,7 @@ export function Home2() {
 
   return (
     <div>
-      <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
+      <Head title={formatMessage("dinaHomeH1")} />
       <Nav
         isCustomizeMode={isCustomizeMode}
         setIsCustomizeMode={setIsCustomizeMode}

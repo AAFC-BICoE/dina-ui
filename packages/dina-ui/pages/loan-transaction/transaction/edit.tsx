@@ -47,7 +47,14 @@ export interface TransactionFormProps {
   onSaved: (transaction: PersistedResource<Transaction>) => Promise<void>;
 }
 
-export function useTransactionQuery(id?: string, showPermissions?: boolean) {
+interface UseTransactionQueryOptions {
+  showPermissions?: boolean;
+}
+export function useTransactionQuery(
+  id?: string,
+  options?: UseTransactionQueryOptions
+) {
+  const { showPermissions } = options || {};
   return useQuery<Transaction>(
     {
       path: `loan-transaction-api/transaction/${id}`,

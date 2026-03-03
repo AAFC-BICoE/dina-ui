@@ -139,7 +139,9 @@ function serializeDynamicFields(
         o: identifierStates.selectedOperator,
         v: identifierStates.searchValue,
         t: type,
-        d: identifierStates?.selectedIdentifier?.id
+        d: identifierStates?.selectedIdentifier?.key,
+        d2: identifierStates?.selectedIdentifier?.name,
+        d3: identifierStates?.selectedIdentifier?.group
       };
 
     case "classification":
@@ -314,8 +316,10 @@ function parseDynamicFields(simpleQueryRow: SimpleQueryRow): any {
         selectedOperator: simpleQueryRow.o,
         selectedType: "",
         selectedIdentifier: {
-          id: simpleQueryRow.d ?? "",
-          type: "identifier-type",
+          key: simpleQueryRow.d ?? "",
+          name: simpleQueryRow.d2 ?? "",
+          group: simpleQueryRow.d3 ?? "",
+          type: "controlled-vocabulary-item",
           vocabularyElementType: "STRING"
         }
       };

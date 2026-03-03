@@ -33,6 +33,7 @@ import "./bootstrap-print.css";
 import "@react-awesome-query-builder/ui/css/styles.css";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "common-ui/lib/classification/TaxonomyTree.css";
 import "common-ui/lib/global-search/global-search.css";
 import "common-ui/lib/notification/notification.css";
@@ -43,35 +44,49 @@ import "common-ui/lib/settings-button/SettingsButton.css";
  *
  * See: https://github.com/zeit/next.js/#custom-app
  */
+
 export default function DinaUiApp({ Component, pageProps }: AppProps) {
   const appElement =
     typeof window !== "undefined"
       ? document.querySelector<HTMLElement>("#__next")
       : null;
 
+  // queryClient for react-query
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 5 // 5 minutes
+      }
+    }
+  });
+
   return (
-    <ApiClientImplProvider>
-      <InstanceContextProvider>
-        <DevUserAccountProvider>
-          <KeycloakAccountProvider>
-            <AuthenticatedApiClientProvider>
-              <DinaIntlProvider>
-                <FileUploadProviderImpl>
-                  <ErrorBoundaryPage>
-                    <DndProvider backend={HTML5Backend}>
-                      <ModalProvider appElement={appElement}>
-                        <WorkbookUploadContextProvider>
-                          <Component {...pageProps} />
-                        </WorkbookUploadContextProvider>
-                      </ModalProvider>
-                    </DndProvider>
-                  </ErrorBoundaryPage>
-                </FileUploadProviderImpl>
-              </DinaIntlProvider>
-            </AuthenticatedApiClientProvider>
-          </KeycloakAccountProvider>
-        </DevUserAccountProvider>
-      </InstanceContextProvider>
-    </ApiClientImplProvider>
+    <QueryClientProvider client={queryClient}>
+      <ApiClientImplProvider>
+        <InstanceContextProvider>
+          <DevUserAccountProvider>
+            <KeycloakAccountProvider>
+              <AuthenticatedApiClientProvider>
+                <DinaIntlProvider>
+                  <FileUploadProviderImpl>
+                    <ErrorBoundaryPage>
+                      <DndProvider backend={HTML5Backend}>
+                        <ModalProvider appElement={appElement}>
+                          <WorkbookUploadContextProvider>
+                            <Component {...pageProps} />
+                          </WorkbookUploadContextProvider>
+                        </ModalProvider>
+                      </DndProvider>
+                    </ErrorBoundaryPage>
+                  </FileUploadProviderImpl>
+                </DinaIntlProvider>
+              </AuthenticatedApiClientProvider>
+            </KeycloakAccountProvider>
+          </DevUserAccountProvider>
+        </InstanceContextProvider>
+      </ApiClientImplProvider>
+    </QueryClientProvider>
   );
 }

@@ -1,4 +1,3 @@
-
 /* controlled-vocabulary.module.css */
 
 .cvGrid {
@@ -16,15 +15,14 @@
   width: 280px;
   max-width: 280px;
   position: sticky;
-  top: 0; /* optional: keep visible while scrolling */
+  top: 70px;
 }
-
 
 /* Main (table container) */
 .main,
 .cvMain {
   min-width: 0;
-  overflow-x: auto;   /* fallback scroll when needed */
+  overflow-x: auto; /* fallback scroll when needed */
   overflow-y: visible;
 }
 
@@ -60,11 +58,13 @@
 }
 /* Responsive: stack sidebar above table on small screens */
 @media (max-width: 768px) {
-  .cvGrid { grid-template-columns: 1fr; }
+  .cvGrid {
+    grid-template-columns: 1fr;
+  }
   .cvSidebar {
     max-height: unset;
     border-right: 0;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
   }

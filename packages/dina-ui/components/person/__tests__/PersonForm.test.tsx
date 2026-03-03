@@ -14,9 +14,7 @@ const mockGet = jest.fn(async () => {
 // 1. Define the internal relationship data required for the Diff logic
 const relationshipData = {
   organizations: {
-    data: [
-      { id: "org-1", type: "organization" }
-    ]
+    data: [{ id: "org-1", type: "organization" }]
   }
 };
 
@@ -26,13 +24,12 @@ const TEST_PERSON_WITH_RELATIONSHIPS = {
   displayName: "Original Name",
   email: "test@test.com",
   aliases: ["alias1"],
-  
+
   organizations: [
     { id: "org-1", type: "organization", names: [{ name: "Existing Org" }] }
   ],
 
   relationships: relationshipData
-
 } as unknown as Person; // <--- The magic cast. At runtime, 'relationships' exists.
 
 describe("PersonForm", () => {
@@ -78,57 +75,57 @@ describe("PersonForm", () => {
     });
   });
 
-  
-it("Submits the aliases as an array (create mode via form change).", async () => {
-  // Note: no spy/mocking of useSubmitHandler — use the real form behavior.
-  mockSave.mockResolvedValue([]); 
+  it("Submits the aliases as an array (create mode via form change).", async () => {
+    // Note: no spy/mocking of useSubmitHandler — use the real form behavior.
+    mockSave.mockResolvedValue([]);
 
-  const newPersonInput: Person = { type: "person" };
+    const newPersonInput: Person = { type: "person" };
 
-  const wrapper = mountWithAppContext(<PersonForm person={newPersonInput as any} />, {
-    apiContext: { apiClient: { get: mockGet } as any, save: mockSave }
-  });
-
-  // Fill in displayName and aliases
-  fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
-    target: { value: "New User" }
-  });
-
-  // Add aliases (simulate user typing or using alias input component)
-  fireEvent.change(wrapper.getByRole("textbox", { name: /aliases/i }), {
-    target: { value: "alias1, alias2, alias3" }
-  });
-
-  // Submit
-  fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
-
-  await waitFor(() => {
-
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            type: "person",
-            displayName: "New User",
-            aliases: ["alias1, alias2, alias3"]
-          },
-          type: "person"
-        }
-      ],
-      expect.objectContaining({ apiBaseUrl: "/agent-api" })
+    const wrapper = mountWithAppContext(
+      <PersonForm person={newPersonInput as any} />,
+      {
+        apiContext: { apiClient: { get: mockGet } as any, save: mockSave }
+      }
     );
+
+    // Fill in displayName and aliases
+    fireEvent.change(wrapper.getByRole("textbox", { name: /display name/i }), {
+      target: { value: "New User" }
+    });
+
+    // Add aliases (simulate user typing or using alias input component)
+    fireEvent.change(wrapper.getByRole("textbox", { name: /aliases/i }), {
+      target: { value: "alias1, alias2, alias3" }
+    });
+
+    // Submit
+    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(mockSave).lastCalledWith(
+        [
+          {
+            resource: {
+              type: "person",
+              displayName: "New User",
+              aliases: ["alias1, alias2, alias3"]
+            },
+            type: "person"
+          }
+        ],
+        expect.objectContaining({ apiBaseUrl: "/agent-api" })
+      );
+    });
   });
 
-});
-
-    /**
+  /**
    * TEST 1: DIFFING / PATCHING
    * Verifies that when editing an existing resource, only the changed fields are sent.
    */
   it("Only submits changed fields (Differential Submission / PATCH)", async () => {
     // Setup Mocks
     const mockSave = jest.fn();
-    mockSave.mockResolvedValue([]); 
+    mockSave.mockResolvedValue([]);
 
     const wrapper = mountWithAppContext(
       <PersonForm person={TEST_PERSON_WITH_RELATIONSHIPS} />,
@@ -151,10 +148,10 @@ it("Submits the aliases as an array (create mode via form change).", async () =>
               // ID is present (Update/Patch)
               id: "11111",
               type: "person",
-              
+
               // Only the changed field is present
               displayName: "Updated Name"
-              
+
               // 1. 'relationships' is NOT here (because we provided it in the mock, so the diff was empty)
               // 2. 'aliases' is NOT here (because we didn't touch it)
             },
@@ -165,23 +162,30 @@ it("Submits the aliases as an array (create mode via form change).", async () =>
       );
     });
   });
- /**
+  /**
    * TEST 2: RELATIONSHIP MAPPING
    * Verifies that full objects (Organization) are converted to { id, type } references.
    * We use a "New" person scenario so the submit handler sends the full payload.
    */
   it("Maps Organization relationships to { id, type } references (via form change)", async () => {
-    mockSave.mockResolvedValue([]); 
-    
+    mockSave.mockResolvedValue([]);
+
     // Start with a person that has organizations pre-populated
     const newPersonInput: Person = {
       type: "person",
       displayName: "Initial Name",
       organizations: [
-        { uuid: "org-100", id: "org-100", type: "organization", names: [{
-          name: "Test Org",
-          languageCode: ""
-        }] }
+        {
+          uuid: "org-100",
+          id: "org-100",
+          type: "organization",
+          names: [
+            {
+              name: "Test Org",
+              languageCode: ""
+            }
+          ]
+        }
       ]
     };
 
@@ -210,9 +214,7 @@ it("Submits the aliases as an array (create mode via form change).", async () =>
               // and only sent the relationship reference.
               relationships: {
                 organizations: {
-                  data: [
-                    { id: "org-100", type: "organization" }
-                  ]
+                  data: [{ id: "org-100", type: "organization" }]
                 }
               }
             },
@@ -226,7 +228,7 @@ it("Submits the aliases as an array (create mode via form change).", async () =>
 
   /**
    * TEST 3: ASYNC TRANSFORMS (Identifiers)
-   * This tests the complex logic where Identifiers are saved first, 
+   * This tests the complex logic where Identifiers are saved first,
    * and the resulting IDs are linked to the Person.
    */
   it("Saves new Identifiers first, then links them to the Person", async () => {
@@ -262,10 +264,15 @@ it("Submits the aliases as an array (create mode via form change).", async () =>
     await waitFor(() => {
       // Expect 2 calls to save.
       // Call 1: Saving the Identifier
-      expect(mockSave).toHaveBeenNthCalledWith(1,
+      expect(mockSave).toHaveBeenNthCalledWith(
+        1,
         [
           {
-            resource: { type: "identifier", namespace: "wiki", value: "http://wiki.com" },
+            resource: {
+              type: "identifier",
+              namespace: "wiki",
+              value: "http://wiki.com"
+            },
             type: "identifier"
           }
         ],
@@ -273,7 +280,8 @@ it("Submits the aliases as an array (create mode via form change).", async () =>
       );
 
       // Call 2: Saving the Person with the linked Identifier ID via relationships
-      expect(mockSave).toHaveBeenNthCalledWith(2,
+      expect(mockSave).toHaveBeenNthCalledWith(
+        2,
         [
           {
             resource: {
@@ -282,9 +290,7 @@ it("Submits the aliases as an array (create mode via form change).", async () =>
               // The form maps identifiers to relationships structure
               relationships: {
                 identifiers: {
-                  data: [
-                    { id: "new-identifier-id-99", type: "identifier" }
-                  ]
+                  data: [{ id: "new-identifier-id-99", type: "identifier" }]
                 }
               }
             },
@@ -309,7 +315,12 @@ it("Submits the aliases as an array (create mode via form change).", async () =>
       type: "person",
       displayName: "Person With Identifier",
       identifiers: [
-        { type: "identifier", id: "identifier-to-delete", namespace: "old", value: "val" }
+        {
+          type: "identifier",
+          id: "identifier-to-delete",
+          namespace: "old",
+          value: "val"
+        }
       ]
     };
 
@@ -319,7 +330,9 @@ it("Submits the aliases as an array (create mode via form change).", async () =>
     );
 
     // 1. Find and click the remove button to remove the identifier from the UI
-    const removeBtn = await wrapper.findByRole("button", { name: /remove identifier/i });
+    const removeBtn = await wrapper.findByRole("button", {
+      name: /remove identifier/i
+    });
     fireEvent.click(removeBtn);
 
     // 2. Wait for the Save button to reappear after the remove operation
@@ -328,17 +341,19 @@ it("Submits the aliases as an array (create mode via form change).", async () =>
 
     await waitFor(() => {
       // The afterSave logic should call save with a delete operation for the removed identifier
-      const deleteCall = mockSave.mock.calls.find(call =>
-        call[0]?.[0]?.delete // Find the call that has a 'delete' key
+      const deleteCall = mockSave.mock.calls.find(
+        (call) => call[0]?.[0]?.delete // Find the call that has a 'delete' key
       );
 
       expect(deleteCall).toBeTruthy();
       expect(deleteCall[0]).toEqual([
         {
-          delete: expect.objectContaining({ id: "identifier-to-delete", type: "identifier" })
+          delete: expect.objectContaining({
+            id: "identifier-to-delete",
+            type: "identifier"
+          })
         }
       ]);
     });
   });
-
 });

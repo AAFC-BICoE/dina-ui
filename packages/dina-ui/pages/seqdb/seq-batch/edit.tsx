@@ -45,7 +45,14 @@ import {
 import { useSeqReactionState } from "packages/dina-ui/components/seqdb/seq-workflow/seq-reaction-step/useSeqReactionState";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
-export function useSeqBatchQuery(id?: string, deps?: any[]) {
+interface UseSeqBatchQueryOptions {
+  deps?: any[];
+}
+export function useSeqBatchQuery(
+  id?: string,
+  options?: UseSeqBatchQueryOptions
+) {
+  const { deps } = options || {};
   return useQuery<SeqBatch>(
     {
       path: `seqdb-api/seq-batch/${id}`,

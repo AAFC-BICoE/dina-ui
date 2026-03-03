@@ -1,11 +1,11 @@
 import { FieldSet, FormikButton, useDinaFormContext } from "common-ui";
-import { Person } from "../../../dina-ui/types/objectstore-api";
+import { Person } from "../../types/objectstore-api";
 import React, { useState } from "react";
 import { FieldArray } from "formik";
 import _ from "lodash";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { IdentifierRow } from "../identifier/IdentifierRow";
 
 export interface PersonFormFieldsProps {
