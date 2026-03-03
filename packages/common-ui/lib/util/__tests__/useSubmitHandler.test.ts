@@ -1,5 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { useSubmitHandler } from "../useSubmitHandler";
+import { RelationshipMapping } from "../relationships";
 
 const mockSave = jest.fn();
 const mockApiClient = { save: mockSave } as any;
@@ -148,7 +149,8 @@ describe("useSubmitHandler", () => {
         })
       );
 
-      const savedAttrs = mockSave.mock.calls[0][0][0].resource.managedAttributes;
+      const savedAttrs =
+        mockSave.mock.calls[0][0][0].resource.managedAttributes;
       expect(savedAttrs).toEqual({ attr1: "value1" });
       expect(savedAttrs.attr2).toBeUndefined();
     });
@@ -158,7 +160,10 @@ describe("useSubmitHandler", () => {
         id: "s1",
         type: "material-sample",
         managedAttributes: { field1: "old1", field2: "unchanged1" },
-        preparationManagedAttributes: { prepField1: "oldPrep", prepField2: "unchanged2" }
+        preparationManagedAttributes: {
+          prepField1: "oldPrep",
+          prepField2: "unchanged2"
+        }
       };
 
       mockSave.mockResolvedValueOnce([{ id: "s1", type: "material-sample" }]);
@@ -168,7 +173,10 @@ describe("useSubmitHandler", () => {
           original,
           resourceType: "material-sample",
           saveOptions: { apiBaseUrl: "/collection-api" },
-          managedAttributeFields: ["managedAttributes", "preparationManagedAttributes"]
+          managedAttributeFields: [
+            "managedAttributes",
+            "preparationManagedAttributes"
+          ]
         })
       );
 
@@ -224,9 +232,15 @@ describe("useSubmitHandler", () => {
     it("Should call hooks in correct order", async () => {
       const callOrder: string[] = [];
 
-      const beforeSave = jest.fn(async () => { callOrder.push("beforeSave"); });
-      const onSuccess = jest.fn(async () => { callOrder.push("onSuccess"); });
-      const afterSave = jest.fn(async () => { callOrder.push("afterSave"); });
+      const beforeSave = jest.fn(async () => {
+        callOrder.push("beforeSave");
+      });
+      const onSuccess = jest.fn(async () => {
+        callOrder.push("onSuccess");
+      });
+      const afterSave = jest.fn(async () => {
+        callOrder.push("afterSave");
+      });
 
       mockSave.mockImplementation(async () => {
         callOrder.push("save");
@@ -245,7 +259,12 @@ describe("useSubmitHandler", () => {
 
       await result.current(createSubmitParams({ name: "John" }));
 
-      expect(callOrder).toEqual(["beforeSave", "save", "onSuccess", "afterSave"]);
+      expect(callOrder).toEqual([
+        "beforeSave",
+        "save",
+        "onSuccess",
+        "afterSave"
+      ]);
     });
 
     it("Should re-throw errors from save", async () => {
@@ -300,7 +319,48 @@ describe("useSubmitHandler", () => {
 
       const savedCall = mockSave.mock.calls[0][0][0];
       expect(savedCall.resource.relationships.collectingEvent).toEqual({
-        data: [{ id: "event-123", type: "collecting-event" }]
+        data: { id: "event-123", type: "collecting-event" }
+      });
+      expect(savedCall.resource.collectingEvent).toBeUndefined();
+    });
+
+    it("Should map SINGLE relationship with custom entityType", async () => {
+      const relationshipMappings = [
+        {
+          sourceAttribute: "collectingEvent",
+          relationshipName: "collectingEvent",
+          relationshipType: "SINGLE" as const,
+          entityType: "collecting-event-custom",
+          removeSourceAttribute: true
+        }
+      ];
+
+      mockSave.mockResolvedValueOnce([
+        {
+          id: "sample-1",
+          type: "material-sample",
+          attributes: { materialSampleName: "Sample 1" }
+        }
+      ]);
+
+      const { result } = renderHook(() =>
+        useSubmitHandler({
+          resourceType: "material-sample",
+          saveOptions: { apiBaseUrl: "/collection-api" },
+          relationshipMappings
+        })
+      );
+
+      await result.current(
+        createSubmitParams({
+          materialSampleName: "Sample 1",
+          collectingEvent: { id: "event-123", type: "collecting-event-custom" }
+        })
+      );
+
+      const savedCall = mockSave.mock.calls[0][0][0];
+      expect(savedCall.resource.relationships.collectingEvent).toEqual({
+        data: { id: "event-123", type: "collecting-event-custom" }
       });
       expect(savedCall.resource.collectingEvent).toBeUndefined();
     });
@@ -342,6 +402,49 @@ describe("useSubmitHandler", () => {
         data: [
           { id: "protocol-1", type: "protocol" },
           { id: "protocol-2", type: "protocol" }
+        ]
+      });
+      expect(savedCall.resource.preparationProtocol).toBeUndefined();
+    });
+
+    it("Should map ARRAY relationship with custom entityType", async () => {
+      const relationshipMappings = [
+        {
+          sourceAttribute: "preparationProtocol",
+          relationshipName: "preparationProtocol",
+          relationshipType: "ARRAY" as const,
+          removeSourceAttribute: true,
+          entityType: "preparation-protocol-custom"
+        }
+      ];
+
+      mockSave.mockResolvedValueOnce([
+        { id: "sample-1", type: "material-sample" }
+      ]);
+
+      const { result } = renderHook(() =>
+        useSubmitHandler({
+          resourceType: "material-sample",
+          saveOptions: { apiBaseUrl: "/collection-api" },
+          relationshipMappings
+        })
+      );
+
+      await result.current(
+        createSubmitParams({
+          materialSampleName: "Sample 1",
+          preparationProtocol: [
+            { id: "protocol-1", type: "preparation-protocol-custom" },
+            { id: "protocol-2", type: "preparation-protocol-custom" }
+          ]
+        })
+      );
+
+      const savedCall = mockSave.mock.calls[0][0][0];
+      expect(savedCall.resource.relationships.preparationProtocol).toEqual({
+        data: [
+          { id: "protocol-1", type: "preparation-protocol-custom" },
+          { id: "protocol-2", type: "preparation-protocol-custom" }
         ]
       });
       expect(savedCall.resource.preparationProtocol).toBeUndefined();
@@ -405,7 +508,9 @@ describe("useSubmitHandler", () => {
         type: "material-sample",
         materialSampleName: "Sample 1",
         relationships: {
-          collectingEvent: { data: [{ id: "event-1", type: "collecting-event" }] },
+          collectingEvent: {
+            data: [{ id: "event-1", type: "collecting-event" }]
+          },
           preparationProtocol: {
             data: [{ id: "protocol-1", type: "protocol" }]
           }
@@ -427,7 +532,9 @@ describe("useSubmitHandler", () => {
         }
       ];
 
-      mockSave.mockResolvedValueOnce([{ id: "sample-1", type: "material-sample" }]);
+      mockSave.mockResolvedValueOnce([
+        { id: "sample-1", type: "material-sample" }
+      ]);
 
       const { result } = renderHook(() =>
         useSubmitHandler({
@@ -462,6 +569,99 @@ describe("useSubmitHandler", () => {
       });
       expect(savedCall.resource.relationships.collectingEvent).toBeUndefined();
     });
+
+    it("Should correctly diff ARRAY relationships (Add, Remove, and No Change)", async () => {
+      const original = {
+        id: "sample-1",
+        type: "material-sample",
+        relationships: {
+          // This one will be changed (item added)
+          tags: {
+            data: [{ id: "tag-1", type: "tag" }]
+          },
+          // This one will be changed (item removed)
+          attachments: {
+            data: [
+              { id: "file-1", type: "metadata" },
+              { id: "file-2", type: "metadata" }
+            ]
+          },
+          // This one will remain the same
+          projects: {
+            data: [{ id: "project-1", type: "project" }]
+          }
+        }
+      };
+
+      const relationshipMappings: RelationshipMapping[] = [
+        {
+          sourceAttribute: "tags",
+          relationshipName: "tags",
+          relationshipType: "ARRAY",
+          removeSourceAttribute: true
+        },
+        {
+          sourceAttribute: "attachments",
+          relationshipName: "attachments",
+          relationshipType: "ARRAY",
+          removeSourceAttribute: true
+        },
+        {
+          sourceAttribute: "projects",
+          relationshipName: "projects",
+          relationshipType: "ARRAY",
+          removeSourceAttribute: true
+        }
+      ];
+
+      mockSave.mockResolvedValueOnce([
+        { id: "sample-1", type: "material-sample" }
+      ]);
+
+      const { result } = renderHook(() =>
+        useSubmitHandler({
+          original,
+          resourceType: "material-sample",
+          saveOptions: { apiBaseUrl: "/collection-api" },
+          relationshipMappings
+        })
+      );
+
+      await result.current(
+        createSubmitParams({
+          // 1. Add tag-2
+          tags: [
+            { id: "tag-1", type: "tag" },
+            { id: "tag-2", type: "tag" }
+          ],
+          // 2. Remove file-2
+          attachments: [{ id: "file-1", type: "metadata" }],
+          // 3. Keep project-1 exactly the same
+          projects: [{ id: "project-1", type: "project" }]
+        })
+      );
+
+      const savedCall = mockSave.mock.calls[0][0][0];
+
+      // The resulting relationships diff should:
+      // - Include tags (added item)
+      // - Include attachments (removed item)
+      // - EXCLUDE projects (no change)
+      expect(savedCall.resource.relationships).toEqual({
+        tags: {
+          data: [
+            { id: "tag-1", type: "tag" },
+            { id: "tag-2", type: "tag" }
+          ]
+        },
+        attachments: {
+          data: [{ id: "file-1", type: "metadata" }]
+        }
+      });
+
+      // Verification that 'projects' was omitted
+      expect(savedCall.resource.relationships.projects).toBeUndefined();
+    });
   });
 
   describe("Nested Resources", () => {
@@ -481,8 +681,18 @@ describe("useSubmitHandler", () => {
 
       // First call saves the nested resources
       mockSave.mockResolvedValueOnce([
-        { id: "identifier-1", type: "identifier", namespace: "barcode", value: "123" },
-        { id: "identifier-2", type: "identifier", namespace: "catalog", value: "ABC" }
+        {
+          id: "identifier-1",
+          type: "identifier",
+          namespace: "barcode",
+          value: "123"
+        },
+        {
+          id: "identifier-2",
+          type: "identifier",
+          namespace: "catalog",
+          value: "ABC"
+        }
       ]);
 
       // Second call saves the main resource
@@ -513,7 +723,10 @@ describe("useSubmitHandler", () => {
       // Check nested resources were saved first
       const nestedSaveCall = mockSave.mock.calls[0];
       expect(nestedSaveCall[0]).toEqual([
-        { resource: { namespace: "barcode", value: "123" }, type: "identifier" },
+        {
+          resource: { namespace: "barcode", value: "123" },
+          type: "identifier"
+        },
         { resource: { namespace: "catalog", value: "ABC" }, type: "identifier" }
       ]);
 
@@ -551,12 +764,15 @@ describe("useSubmitHandler", () => {
       ];
 
       mockSave.mockResolvedValueOnce([
-        { id: "identifier-1", type: "identifier", namespace: "barcode", value: "999" }
+        {
+          id: "identifier-1",
+          type: "identifier",
+          namespace: "barcode",
+          value: "999"
+        }
       ]);
 
-      mockSave.mockResolvedValueOnce([
-        { id: "person-1", type: "person" }
-      ]);
+      mockSave.mockResolvedValueOnce([{ id: "person-1", type: "person" }]);
 
       const { result } = renderHook(() =>
         useSubmitHandler({
@@ -580,7 +796,10 @@ describe("useSubmitHandler", () => {
       // Should save only the modified nested resource
       const nestedSaveCall = mockSave.mock.calls[0];
       expect(nestedSaveCall[0]).toEqual([
-        { resource: { id: "identifier-1", namespace: "barcode", value: "999" }, type: "identifier" }
+        {
+          resource: { id: "identifier-1", namespace: "barcode", value: "999" },
+          type: "identifier"
+        }
       ]);
     });
 
@@ -608,9 +827,7 @@ describe("useSubmitHandler", () => {
       ];
 
       mockSave.mockResolvedValueOnce([]);
-      mockSave.mockResolvedValueOnce([
-        { id: "person-1", type: "person" }
-      ]);
+      mockSave.mockResolvedValueOnce([{ id: "person-1", type: "person" }]);
 
       const { result } = renderHook(() =>
         useSubmitHandler({
@@ -662,8 +879,18 @@ describe("useSubmitHandler", () => {
       ];
 
       mockSave.mockResolvedValueOnce([
-        { id: "identifier-3", type: "identifier", namespace: "new", value: "NEW" },
-        { id: "identifier-1", type: "identifier", namespace: "barcode", value: "999" }
+        {
+          id: "identifier-3",
+          type: "identifier",
+          namespace: "new",
+          value: "NEW"
+        },
+        {
+          id: "identifier-1",
+          type: "identifier",
+          namespace: "barcode",
+          value: "999"
+        }
       ]);
 
       mockSave.mockResolvedValueOnce([]);

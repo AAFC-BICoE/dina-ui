@@ -2,7 +2,7 @@ import { LoadingSpinner } from "common-ui";
 import { InputResource } from "kitsu";
 import _ from "lodash";
 import { Metadata } from "../../types/objectstore-api";
-import { useMetadataEditQuery } from "../object-store/metadata/useMetadata";
+import { useMetadataEditQueries } from "../object-store/metadata/useMetadata";
 import {
   MetadataBulkEditor,
   MetadataBulkEditorHandle
@@ -20,7 +20,7 @@ export const ExistingMetadataBulkEditor = forwardRef<
   MetadataBulkEditorHandle,
   ExistingMetadataBulkEditorProps
 >(({ ids, onSaved, onPreviousClick, insideModal }, ref) => {
-  const metadataQueries = ids.map((id) => useMetadataEditQuery(id));
+  const metadataQueries = useMetadataEditQueries(ids);
 
   /** Whether any query is loading. */
   const isLoading = metadataQueries.reduce(
@@ -38,9 +38,7 @@ export const ExistingMetadataBulkEditor = forwardRef<
     return (
       <div className="alert alert-danger">
         {errors.map((error, index) => (
-          <div key={index}>
-            {error?.errors?.map((e) => e.detail).join("\n") ?? String(error)}
-          </div>
+          <div key={index}>{String(error)}</div>
         ))}
       </div>
     );

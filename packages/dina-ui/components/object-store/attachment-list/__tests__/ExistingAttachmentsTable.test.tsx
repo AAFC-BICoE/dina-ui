@@ -111,7 +111,10 @@ const mockGet = jest.fn(async (path) => {
 
 const apiContext: any = {
   apiClient: {
-    get: mockGet
+    get: mockGet,
+    axios: {
+      post: jest.fn().mockResolvedValue({ data: { success: true } })
+    }
   },
   bulkGet: mockBulkGet,
   save: mockSave

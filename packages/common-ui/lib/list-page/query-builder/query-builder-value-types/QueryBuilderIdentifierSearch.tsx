@@ -14,12 +14,15 @@ import { VocabularyOption } from "packages/dina-ui/components/collection/Vocabul
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
 } from "./QueryBuilderNumberSearch";
-import useTypedVocabularyOptions from "../../../../../dina-ui/components/collection/useTypedVocabularyOptions";
-import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
 import QueryBuilderDateSearch, {
   transformDateSearchToDSL
 } from "./QueryBuilderDateSearch";
+import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
+import useControlledVocabularyOptions, {
+  ControlledVocabularyOption
+} from "../../../../../dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../../../dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 interface QueryBuilderIdentifierSearchProps {
   /**
@@ -55,7 +58,7 @@ export interface IdentifierOption extends SelectOption<string> {
 
 export interface IdentifierSearchStates {
   /** The key of the selected identifier to search against. */
-  selectedIdentifier?: IdentifierType;
+  selectedIdentifier?: ControlledVocabularyItem;
 
   /** If possible, the identifier config from the index map */
   selectedIdentifierConfig?: ESIndexMapping;
@@ -80,9 +83,7 @@ export default function QueryRowIdentifierSearch({
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = isInColumnSelector
-    ? _.noop
-    : useQueryBuilderEnterToSearch();
+  const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
 
   const [identifierState, setIdentifierState] =
     useState<IdentifierSearchStates>(() =>
@@ -243,18 +244,18 @@ export default function QueryRowIdentifierSearch({
   }
 
   // Retrieve the vocabulary options
-  const { vocabOptions, loading, typedVocabularies } =
-    useTypedVocabularyOptions<IdentifierType>({
-      path: identifierConfig?.dynamicField?.apiEndpoint ?? ""
+  const { vocabOptions, loading, controlledVocabularies } =
+    useControlledVocabularyOptions({
+      path: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
     });
 
   return (
     <div className={isInColumnSelector ? "" : "row"}>
       {/* Identifier Selection */}
-      <Select<VocabularyOption>
+      <Select<ControlledVocabularyOption>
         options={vocabOptions}
         value={vocabOptions.find(
-          (option) => option.value === identifierSelected?.id
+          (option) => option.value === identifierSelected?.key
         )}
         isLoading={loading}
         placeholder={formatMessage({
@@ -268,8 +269,8 @@ export default function QueryRowIdentifierSearch({
 
           setIdentifierState({
             ...identifierState,
-            selectedIdentifier: typedVocabularies.find(
-              (vocab) => vocab.id === newValue?.value
+            selectedIdentifier: controlledVocabularies.find(
+              (vocab) => vocab.key === newValue?.value
             ),
             selectedIdentifierConfig: fieldValueToIndexSettings(
               fieldPath,
@@ -364,7 +365,7 @@ export function transformIdentifierToDSL({
   const fieldPath: string =
     fieldInfo?.path +
     "." +
-    (identifierSearchValue?.selectedIdentifier?.id ?? "");
+    (identifierSearchValue?.selectedIdentifier?.key ?? "");
 
   // Check if identifier can be found within the index map.
   const identifierFieldInfo = fieldValueToIndexSettings(

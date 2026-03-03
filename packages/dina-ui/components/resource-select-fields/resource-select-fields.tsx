@@ -1,6 +1,8 @@
 import {
   ResourceSelectField,
   ResourceSelectFieldProps,
+  ResourceSelectFieldCustomQuery,
+  ResourceSelectFieldCustomQueryProps,
   SimpleSearchFilterBuilder,
   useAccount,
   useAutocompleteSearchButFallbackToRsqlApiSearch
@@ -23,6 +25,10 @@ import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
 type ProvidedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
+type CustomQueryProvidedProps =
+  | ProvidedProps
+  | "useCustomQuery"
+  | "customQueryOptions";
 
 export function CollectionMethodSelectField(
   props: SetOptional<ResourceSelectFieldProps<CollectionMethod>, ProvidedProps>
@@ -108,23 +114,26 @@ export function UserSelectField(
 }
 
 export function PersonSelectField(
-  props: SetOptional<ResourceSelectFieldProps<Person>, ProvidedProps>
+  props: SetOptional<
+    ResourceSelectFieldCustomQueryProps<Person>,
+    CustomQueryProvidedProps
+  >
 ) {
   const { openAddPersonModal } = useAddPersonModal();
 
   return (
-    <ResourceSelectField<Person>
+    <ResourceSelectFieldCustomQuery<Person>
+      {...props}
       // Experimental: try to use the dina-search-api autocomplete endpoint to get the data
       // but fallback to the regular RSQL search if that fails.
-      useCustomQuery={(searchQuery, querySpec) =>
-        useAutocompleteSearchButFallbackToRsqlApiSearch({
-          searchQuery,
-          querySpec,
-          indexName: "dina_agent_index",
-          searchField: "data.attributes.displayName",
-          additionalField: "data.attributes.aliases"
-        })
-      }
+      useCustomQuery={useAutocompleteSearchButFallbackToRsqlApiSearch}
+      customQueryOptions={(searchQuery, querySpec) => ({
+        searchQuery,
+        querySpec,
+        indexName: "dina_agent_index",
+        searchField: "data.attributes.displayName",
+        additionalField: "data.attributes.aliases"
+      })}
       readOnlyLink="/person/view?id="
       filter={(searchValue: string) =>
         SimpleSearchFilterBuilder.create<Person>()
@@ -146,15 +155,14 @@ export function PersonSelectField(
           getResource: openAddPersonModal
         }
       ]}
-      {...props}
     />
   );
 }
 
 interface StorageUnitSelectFieldProps {
   resourceProps: SetOptional<
-    ResourceSelectFieldProps<StorageUnit>,
-    ProvidedProps
+    ResourceSelectFieldCustomQueryProps<StorageUnit>,
+    CustomQueryProvidedProps
   >;
   restrictedField?: string;
   restrictedFieldValue?: string;
@@ -166,19 +174,19 @@ export function StorageUnitSelectField({
   restrictedFieldValue
 }: StorageUnitSelectFieldProps) {
   return (
-    <ResourceSelectField<StorageUnit>
+    <ResourceSelectFieldCustomQuery<StorageUnit>
+      {...resourceProps}
       // Experimental: try to use the dina-search-api autocomplete endpoint to get the data
       // but fallback to the regular RSQL search if that fails.
-      useCustomQuery={(searchQuery, querySpec) =>
-        useAutocompleteSearchButFallbackToRsqlApiSearch({
-          searchQuery,
-          querySpec,
-          indexName: "dina_storage_index",
-          searchField: "data.attributes.name",
-          restrictedField,
-          restrictedFieldValue
-        })
-      }
+      useCustomQuery={useAutocompleteSearchButFallbackToRsqlApiSearch}
+      customQueryOptions={(searchQuery, querySpec) => ({
+        searchQuery,
+        querySpec,
+        indexName: "dina_storage_index",
+        searchField: "data.attributes.name",
+        restrictedField,
+        restrictedFieldValue
+      })}
       readOnlyLink="/collection/storage-unit/view?id="
       filter={(searchValue: string) =>
         SimpleSearchFilterBuilder.create<StorageUnit>()
@@ -189,7 +197,6 @@ export function StorageUnitSelectField({
       optionLabel={(storageUnit) => {
         return storageUnit.name;
       }}
-      {...resourceProps}
     />
   );
 }

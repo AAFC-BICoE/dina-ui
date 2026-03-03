@@ -116,40 +116,12 @@ export function PreLibraryPrepTable({
             />
           )
         : ({ row: { index, original }, column: { id: columnId }, table }) => {
-            const initialValue = original[columnId];
-            const [protocol, setProtocol] = useState<Protocol>(
-              original.protocol as PersistedResource<Protocol>
-            );
-
-            // If the initialValue is changed external, sync it up with our state
-            useEffect(() => {
-              setProtocol(initialValue);
-            }, [initialValue]);
-
             return (
-              <ResourceSelect<Protocol>
-                placeholder=""
-                value={
-                  !!protocol
-                    ? (protocol as PersistedResource<Protocol>)
-                    : undefined
-                }
-                isMulti={false}
-                onChange={(value) => {
-                  (table.options.meta as any).updateData(
-                    index,
-                    columnId,
-                    value
-                  );
-                  setProtocol(value as PersistedResource<Protocol>);
-                }}
-                filter={(searchValue: string) =>
-                  SimpleSearchFilterBuilder.create<Protocol>()
-                    .searchFilter("name", searchValue)
-                    .build()
-                }
-                model="collection-api/protocol"
-                optionLabel={(resource) => resource.name}
+              <ProtocolCellInner
+                index={index}
+                original={original}
+                columnId={columnId}
+                table={table}
               />
             );
           },
@@ -177,36 +149,12 @@ export function PreLibraryPrepTable({
             />
           )
         : ({ row: { index, original }, column: { id: columnId }, table }) => {
-            const initialValue = original[columnId];
-            const [product, setProduct] = useState<Product>(
-              original.product as PersistedResource<Product>
-            );
-
-            // If the initialValue is changed external, sync it up with our state
-            useEffect(() => {
-              setProduct(initialValue);
-            }, [initialValue]);
-
             return (
-              <ResourceSelect<Product>
-                value={
-                  !!product
-                    ? (product as PersistedResource<Product>)
-                    : undefined
-                }
-                isMulti={false}
-                placeholder=""
-                onChange={(value) => {
-                  (table.options.meta as any).updateData(
-                    index,
-                    columnId,
-                    value
-                  );
-                  setProduct(value as PersistedResource<Product>);
-                }}
-                filter={filterBy(["name"])}
-                model="seqdb-api/product"
-                optionLabel={(resource) => resource.name}
+              <ProductCellInner
+                index={index}
+                original={original}
+                columnId={columnId}
+                table={table}
               />
             );
           },
@@ -237,6 +185,99 @@ export function PreLibraryPrepTable({
       columns={tableColumns}
       onDataChanged={setData}
       enableEditing={!readOnly}
+    />
+  );
+}
+
+export interface TableCellInnerProps {
+  index;
+  original;
+  columnId;
+  table;
+}
+
+/**
+ * Renders a cell component for selecting a protocol in the PreLibraryPrepTable.
+ *
+ * @param index - The row index of the cell in the table.
+ * @param original - The original data object for the current row.
+ * @param columnId - The identifier of the column being rendered.
+ * @param table - The table instance providing metadata and update methods.
+ * @returns A ResourceSelect component configured for protocol selection with state management.
+ */
+function ProtocolCellInner({
+  index,
+  original,
+  columnId,
+  table
+}: TableCellInnerProps) {
+  const initialValue = original[columnId];
+  const [protocol, setProtocol] = useState<Protocol>(
+    original.protocol as PersistedResource<Protocol>
+  );
+
+  // If the initialValue is changed external, sync it up with our state
+  useEffect(() => {
+    setProtocol(initialValue);
+  }, [initialValue]);
+
+  return (
+    <ResourceSelect<Protocol>
+      placeholder=""
+      value={!!protocol ? (protocol as PersistedResource<Protocol>) : undefined}
+      isMulti={false}
+      onChange={(value) => {
+        (table.options.meta as any).updateData(index, columnId, value);
+        setProtocol(value as PersistedResource<Protocol>);
+      }}
+      filter={(searchValue: string) =>
+        SimpleSearchFilterBuilder.create<Protocol>()
+          .searchFilter("name", searchValue)
+          .build()
+      }
+      model="collection-api/protocol"
+      optionLabel={(resource) => resource.name}
+    />
+  );
+}
+
+/**
+ * Renders a cell component for selecting a product in the PreLibraryPrepTable.
+ *
+ * @param index - The row index of the cell in the table.
+ * @param original - The original data object for the current row.
+ * @param columnId - The identifier of the column being rendered.
+ * @param table - The table instance providing metadata and update methods.
+ * @returns A ResourceSelect component configured for protocol selection with state management.
+ */
+function ProductCellInner({
+  index,
+  original,
+  columnId,
+  table
+}: TableCellInnerProps) {
+  const initialValue = original[columnId];
+  const [product, setProduct] = useState<Product>(
+    original.product as PersistedResource<Product>
+  );
+
+  // If the initialValue is changed external, sync it up with our state
+  useEffect(() => {
+    setProduct(initialValue);
+  }, [initialValue]);
+
+  return (
+    <ResourceSelect<Product>
+      value={!!product ? (product as PersistedResource<Product>) : undefined}
+      isMulti={false}
+      placeholder=""
+      onChange={(value) => {
+        (table.options.meta as any).updateData(index, columnId, value);
+        setProduct(value as PersistedResource<Product>);
+      }}
+      filter={filterBy(["name"])}
+      model="seqdb-api/product"
+      optionLabel={(resource) => resource.name}
     />
   );
 }
