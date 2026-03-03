@@ -174,8 +174,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   controlledVocabularyTitle: "Controlled Vocabulary",
   addControlledVocabularyItemTitle: "Add Controlled Vocabulary Item",
   editControlledVocabularyItemTitle: "Edit Controlled Vocabulary Item",
-  addControlledVocabularyTitle: "Add Controlled Vocabulary",
-  editControlledVocabularyTitle: "Edit Controlled Vocabulary",
   field_controlledVocabulary: "Controlled Vocabulary",
   convertToDepthMinMax: "Convert to Depth Min/Max",
   convertToElevationMinMax: "Convert to Elevation Min/Max",
