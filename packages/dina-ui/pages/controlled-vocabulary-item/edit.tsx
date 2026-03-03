@@ -241,14 +241,6 @@ export function ControlledVocabularyItemFormLayout() {
             );
           }}
           omitNullOption={true}
-          asyncOptions={
-            [
-              // {
-              //   label: <DinaMessage id="createNewControlledVocabulary" />,
-              //   getResource: () => { return undefined }
-              // }
-            ]
-          }
         />
       </div>
       <div className="row">

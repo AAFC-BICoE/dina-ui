@@ -29,8 +29,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   collapse: " Collapse",
   configureLabel: "Configure",
   createNew: "Create New",
-  createNewControlledVocabularyItem: "Create New Item",
-  createNewControlledVocabulary: "Create New Type",
   created: "created",
   date: "Date",
   numberInvalid: "Please enter a valid number.",
