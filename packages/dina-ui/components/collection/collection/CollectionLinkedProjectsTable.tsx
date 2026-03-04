@@ -3,13 +3,14 @@ import {
   descriptionCell,
   FieldHeader,
   useApiClient,
-  QueryPage
+  QueryPage,
+  LoadingSpinner
 } from "common-ui";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { DinaMessage } from "../../../../../packages/dina-ui/intl/dina-ui-intl";
 
-export default function CollectionLinkedProjectsTable({ id }: { id: string }) {
+export function CollectionLinkedProjectsTable({ id }: { id: string }) {
   const { apiClient } = useApiClient();
   const [projectIds, setProjectIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -128,7 +129,7 @@ export default function CollectionLinkedProjectsTable({ id }: { id: string }) {
         </strong>
       </div>
       {isLoading ? (
-        <div>Loading projects...</div>
+        <LoadingSpinner loading={isLoading} />
       ) : (
         <QueryPage
           columns={PROJECT_TABLE_COLUMNS}

@@ -23,7 +23,7 @@ import _ from "lodash";
 import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
-import CollectionLinkedProjectsTable from "../../../components/collection/CollectionLinkedProjects";
+import { CollectionLinkedProjectsTable } from "../../../components/collection/collection/CollectionLinkedProjectsTable";
 
 export default function CollectionEditPage() {
   const router = useRouter();
