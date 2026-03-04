@@ -21,7 +21,7 @@ describe("CollectionLinkedProjectsTable", () => {
   });
 
   it("should render loading state initially", async () => {
-    apiContext.apiClient.axios.post.mockImplementation(
+    apiContext.apiClient.axios.post.mockImplementationOnce(
       () => new Promise(() => {}) // Never resolves
     );
 
