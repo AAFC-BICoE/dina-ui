@@ -159,6 +159,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectionMethodNameLabel: "Collection Method Name",
   collectionSectionTitle: "Collection",
   collectionViewTitle: "Collection",
+  collectionRecordAddedChartTitle: "Records Added by Date",
   collectorGroupAgentsLabel: "Collector Group Agents",
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",

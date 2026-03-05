@@ -23,6 +23,7 @@ import _ from "lodash";
 import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
+import CollectionRecordsAddedChart from "packages/dina-ui/components/collection/collection/CollectionRecordsAddedChart";
 
 export default function CollectionEditPage() {
   const router = useRouter();
@@ -124,6 +125,8 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
 export function CollectionFormFields() {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
+  const { query } = useRouter();
+  const id = (query.id as string) || "";
   const typeOptions: SelectOption<string | undefined>[] = [
     {
       label: CollectionIdentifierType.GRSCICOLL,
@@ -186,6 +189,11 @@ export function CollectionFormFields() {
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />
           <TextField className="col-md-6" name="createdBy" />
+        </div>
+      )}
+      {readOnly && (
+        <div className="row">
+          <CollectionRecordsAddedChart id={id} />
         </div>
       )}
     </div>
