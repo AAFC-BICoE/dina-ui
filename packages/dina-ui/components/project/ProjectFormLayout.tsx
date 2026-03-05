@@ -7,7 +7,7 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { AttachmentsField, GroupSelectField } from "..";
+import { AttachmentsField, GroupSelectField, ProjectSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
@@ -44,6 +44,14 @@ export function ProjectFormLayout() {
 
   return (
     <div>
+      <div className="row">
+        <ProjectSelectField
+          className="col-md-6"
+          name="parentProject"
+          label={formatMessage("field_parentProject")}
+          isMulti={false}
+        />
+      </div>
       <div className="row">
         <TextField
           className="col-md-6 status"
