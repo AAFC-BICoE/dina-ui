@@ -90,7 +90,8 @@ export function MolecularAnalysisResultsStep({
       setReloadGenericMolecularAnalysisRun,
       qualityControls,
       updateExistingQualityControls,
-      qualityControlTypes
+      qualityControlTypes,
+      deps: [qualityControlTypes]
     });
 
   // Display loading if network requests from hook are still loading in...

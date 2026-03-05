@@ -13,7 +13,8 @@ import {
   useQuery,
   useRelationshipUsagesCount,
   withoutBlankFields,
-  SimpleSearchFilterBuilder
+  SimpleSearchFilterBuilder,
+  useBulkQueries
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -49,7 +50,7 @@ import { Person } from "../../../../dina-ui/types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
-import { useGenerateSequence } from "./useGenerateSequence";
+import { generateSequence } from "./useGenerateSequence";
 import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { Alert } from "react-bootstrap";
 import CollectingEventEditAlert from "../collecting-event/CollectingEventEditAlert";
@@ -188,6 +189,143 @@ export function useMaterialSampleQuery(id?: string | null) {
 
   return materialSampleQuery;
 }
+
+export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
+  const { bulkGet, apiClient } = useApiClient();
+
+  const materialSampleQueries = useBulkQueries<MaterialSample>(
+    ids.map(
+      (id) => ({
+        path: `collection-api/material-sample/${id}`,
+        include: [
+          "attachment",
+          "collection",
+          "collectingEvent",
+          "preparationProtocol",
+          "preparationType",
+          "preparationMethod",
+          "preparedBy",
+          "organism",
+          "parentMaterialSample",
+          "projects",
+          "assemblages",
+          "storageUnitUsage"
+        ].join(","),
+        optfields: {
+          "material-sample": ["hierarchy", "materialSampleChildren"].join(",")
+        },
+        header: { "include-dina-permission": "true" }
+      }),
+      {
+        disabled: !ids.length,
+        onSuccess: async ({ data }) => {
+          const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
+            `seqdb-api/generic-molecular-analysis-item`,
+            {
+              include: "genericMolecularAnalysis, materialSample",
+              filter: SimpleSearchFilterBuilder.create()
+                .where("materialSample.id", "EQ", data.id)
+                .build()
+            }
+          );
+
+          // Retrieve workflows linked to the material sample
+          if (workflowItems) {
+            data.workflows = [
+              ...new Set(
+                _.compact(workflowItems.data).map(
+                  (item: any) => item.genericMolecularAnalysis
+                )
+              )
+            ];
+          }
+
+          for (const organism of data.organism ?? []) {
+            if (organism?.determination) {
+              // Retrieve determiner arrays on determination.
+              for (const determination of organism.determination) {
+                if (determination.determiner) {
+                  determination.determiner = _.compact(
+                    await bulkGet<Person, true>(
+                      determination.determiner.map(
+                        (personId: string) => `/person/${personId}`
+                      ),
+                      {
+                        apiBaseUrl: "/agent-api",
+                        returnNullForMissingResource: true
+                      }
+                    )
+                  );
+                }
+              }
+            }
+          }
+
+          // Setup the storage unit if it's stored on the storage unit usage.
+          if (data?.storageUnitUsage?.id) {
+            const storageUnit = await apiClient.get<StorageUnitUsage>(
+              `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
+              {
+                include: "storageUnit"
+              }
+            );
+
+            if (storageUnit?.data?.storageUnit) {
+              data.storageUnit = storageUnit.data.storageUnit;
+            }
+          }
+
+          // Process loaded back-end data into data structure that Formik can use
+          if (data.extensionValues) {
+            data.extensionValues = processExtensionValuesLoading(
+              data.extensionValues
+            );
+          }
+
+          // Convert to separated list
+          if (data.restrictionFieldsExtension) {
+            // Process risk groups
+            if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]) {
+              data[RESTRICTIONS_FIELDS[0]] = {
+                extKey: RESTRICTIONS_FIELDS[0],
+                value:
+                  data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]
+                    .risk_group
+              };
+            }
+            if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]) {
+              data[RESTRICTIONS_FIELDS[1]] = {
+                extKey: RESTRICTIONS_FIELDS[1],
+                value:
+                  data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]
+                    .risk_group
+              };
+            }
+
+            // Process levels
+            if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]]) {
+              data[RESTRICTIONS_FIELDS[2]] = {
+                extKey: RESTRICTIONS_FIELDS[2],
+                value:
+                  data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]].level
+              };
+            }
+            if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]]) {
+              data[RESTRICTIONS_FIELDS[3]] = {
+                extKey: RESTRICTIONS_FIELDS[3],
+                value:
+                  data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level
+              };
+            }
+          }
+        }
+      }
+    )
+  );
+
+  return materialSampleQueries;
+}
+
 export interface UseMaterialSampleSaveParams {
   /** Material Sample form initial values. */
   materialSample?: InputResource<MaterialSample>;
@@ -505,7 +643,8 @@ export function useMaterialSampleSave({
   }
 
   /** Used to get the values of the nested CollectingEvent form. */
-  const colEventFormRef = colEventFormRefProp ?? useRef<FormikProps<any>>(null);
+  const colEventLocalFormRef = useRef<FormikProps<any>>(null);
+  const colEventFormRef = colEventFormRefProp ?? colEventLocalFormRef;
   const [colEventId, setColEventId] = useState<string | null | undefined>(
     isTemplate
       ? colEventTemplateInitialValues?.id
@@ -1113,7 +1252,7 @@ export function useMaterialSampleSave({
     }
 
     if (submittedValues.collection?.id && submittedValues.useNextSequence) {
-      useGenerateSequence({
+      generateSequence({
         collectionId: submittedValues.collection?.id as any,
         amount: 1,
         save

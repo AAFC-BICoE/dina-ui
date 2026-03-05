@@ -30,11 +30,12 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
 
   const title = id ? "editObjectSubtypeTitle" : "addObjectSubtypeTitle";
 
-  const query = id
-    ? useQuery<ObjectSubtype>({
-        path: `objectstore-api/object-subtype/${id}`
-      })
-    : null;
+  const query = useQuery<ObjectSubtype>(
+    {
+      path: `objectstore-api/object-subtype/${id}`
+    },
+    { disabled: !id }
+  );
 
   return (
     <div>

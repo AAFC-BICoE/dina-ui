@@ -49,7 +49,7 @@ const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
   dateCell("createdOn")
 ];
 
-export default function protocolListPage() {
+export default function ProtocolListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (

@@ -73,12 +73,12 @@ export function MetadataForm({
 }: MetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
 
-  const { initialValues, onSubmit } =
-    metadataSaveHook ??
-    useMetadataSave({
-      initialValues: metadata,
-      onSaved
-    });
+  const metadataSaveResponse = useMetadataSave({
+    initialValues: metadata,
+    onSaved
+  });
+
+  const { initialValues, onSubmit } = metadataSaveHook ?? metadataSaveResponse;
 
   const metadataOnSubmit = async (submittedValues) => {
     await onSubmit(submittedValues);

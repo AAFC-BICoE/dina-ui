@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../components";
 import { Organization } from "../../types/agent-api/resources/Organization";
-import { OrganizationFields } from "./edit";
+import { OrganizationFields } from "../../components/organization/OrganizationForm";
 
 export default function OrganizationDetailsPage() {
   return (

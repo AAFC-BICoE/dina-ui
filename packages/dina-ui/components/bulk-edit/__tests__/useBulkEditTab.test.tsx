@@ -5,7 +5,7 @@ import { mountWithAppContext } from "common-ui";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   getSampleBulkOverrider,
-  initializeRefHookFormProps
+  useRefHookFormProps
 } from "../../bulk-material-sample/MaterialSampleBulkEditor";
 import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-template/useMaterialSampleFormTemplateSelectState";
 import { MaterialSampleFormProps } from "../../collection/material-sample/MaterialSampleForm";
@@ -42,7 +42,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     sampleHooks: any;
     materialSampleForm: JSX.Element;
     formTemplateProps: Partial<MaterialSampleFormProps>;
-  } = initializeRefHookFormProps(
+  } = useRefHookFormProps(
     [baseSample],
     visibleManagedAttributeKeys,
     selectedTab,

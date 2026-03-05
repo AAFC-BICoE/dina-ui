@@ -47,7 +47,7 @@ export function AgentRolesField({
               forContributor ? (
                 <VocabularyReadOnlyView
                   value={row.original?.roles}
-                  path="collection-api/vocabulary2/projectRole"
+                  path="collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=project_role"
                 />
               ) : (
                 <span>{row.original.roles?.join(", ")}</span>
@@ -123,7 +123,7 @@ export function AgentRolesField({
                 className="col-sm-6"
                 isMulti={true}
                 {...fieldProps("roles")}
-                path="collection-api/vocabulary2/projectRole"
+                path="collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=project_role"
               />
             ) : (
               <TagSelectField

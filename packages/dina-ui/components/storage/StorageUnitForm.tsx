@@ -81,17 +81,17 @@ export function StorageUnitForm({
   storageUnitFormRef,
   isBulkEditTabForm
 }: StorageUnitFormProps) {
-  const { initialValues, onSubmit } =
-    storageUnitSaveHook ??
-    useStorageUnitSave({
-      initialValues: storageUnit || {
-        type: "storage-unit",
-        parentStorageUnit: initialParent,
-        isGeneric: false
-      },
-      onSaved
-    });
+  // If the hook is passed in as a prop, use it. Otherwise, use the internal hook with the onSaved callback from props.
+  const internalHook = useStorageUnitSave({
+    initialValues: storageUnit || {
+      type: "storage-unit",
+      parentStorageUnit: initialParent,
+      isGeneric: false
+    },
+    onSaved
+  });
 
+  const { initialValues, onSubmit } = storageUnitSaveHook ?? internalHook;
   const storageUnitOnSubmit = async (submittedValues) => {
     await onSubmit(submittedValues);
   };

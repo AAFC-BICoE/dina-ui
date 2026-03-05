@@ -38,7 +38,7 @@ const COLLECTION_METHOD_TABLE_COLUMNS: ColumnDefinition<CollectionMethod>[] = [
   dateCell("createdOn")
 ];
 
-export default function collectionMethodListPage() {
+export default function CollectionMethodListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (

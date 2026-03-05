@@ -85,7 +85,7 @@ export function MaterialSampleBulkEditor({
     materialSampleForm: JSX.Element;
     formTemplateProps: Partial<MaterialSampleFormProps>;
     bulkEditCollectingEvtFormRef;
-  } = initializeRefHookFormProps(
+  } = useRefHookFormProps(
     samplesProp,
     visibleManagedAttributeKeys,
     selectedTab,
@@ -196,7 +196,7 @@ export function MaterialSampleBulkEditor({
   );
 }
 
-export function initializeRefHookFormProps(
+export function useRefHookFormProps(
   samplesProp,
   visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
   selectedTab:
