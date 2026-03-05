@@ -126,7 +126,7 @@ export function CollectionFormFields() {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const { query } = useRouter();
-  const id = (query.id as string) || "";
+  const id = (query?.id as string) || "";
   const typeOptions: SelectOption<string | undefined>[] = [
     {
       label: CollectionIdentifierType.GRSCICOLL,
