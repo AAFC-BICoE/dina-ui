@@ -1,17 +1,18 @@
 import { DinaForm } from "common-ui";
-import { ViewPageLayout } from "../../../components";
+import { ViewPageLayoutWithCustomHook } from "../../../components";
 import { Transaction } from "../../../types/loan-transaction-api";
 import { TransactionFormLayout, useTransactionQuery } from "./edit";
 
 export default function TransactionDetailsPage() {
   return (
-    <ViewPageLayout<Transaction>
+    <ViewPageLayoutWithCustomHook<Transaction>
       form={(props) => (
         <DinaForm {...props}>
           <TransactionFormLayout />
         </DinaForm>
       )}
-      customQueryHook={(id) => useTransactionQuery(id, true)}
+      customQueryHook={useTransactionQuery}
+      customQueryHookOptions={{ showPermissions: true }}
       entityLink="/loan-transaction/transaction"
       type="transaction"
       apiBaseUrl="/loan-transaction-api"

@@ -6,7 +6,7 @@ import {
   SaveArgs
 } from "../../../../common-ui/lib";
 
-interface UseGenerateSequenceProps {
+interface GenerateSequenceProps {
   collectionId: string;
   amount: number;
   save: <TData extends KitsuResource = KitsuResource>(
@@ -15,11 +15,11 @@ interface UseGenerateSequenceProps {
   ) => Promise<PersistedResource<TData>[]>;
 }
 
-export async function useGenerateSequence({
+export async function generateSequence({
   collectionId,
   amount,
   save
-}: UseGenerateSequenceProps) {
+}: GenerateSequenceProps) {
   const input: SequenceGenerator = {
     id: collectionId,
     amount,

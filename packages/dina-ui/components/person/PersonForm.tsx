@@ -11,7 +11,7 @@ import {
   useSubmitHandler
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { Organization } from "../../../dina-ui/types/agent-api/resources/Organization";
+import { Organization } from "../../types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
@@ -62,7 +62,10 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   const personSubmitHandler = useSubmitHandler<Person>({
     original: initialValues as Person,
     resourceType: "person",
-    saveOptions: { apiBaseUrl: "/agent-api", skipOperationForSingleRequest: true },
+    saveOptions: {
+      apiBaseUrl: "/agent-api",
+      skipOperationForSingleRequest: true
+    },
 
     // Configure relationships (including nested resources)
     relationshipMappings: [
@@ -83,9 +86,8 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
         relationshipType: "ARRAY"
       }
     ],
-    
+
     onSuccess: onSubmitSuccess
-      
   });
 
   const buttonBar = (

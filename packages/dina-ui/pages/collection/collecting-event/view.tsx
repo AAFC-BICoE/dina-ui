@@ -5,7 +5,10 @@ import {
   SimpleSearchFilterBuilder
 } from "common-ui";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { ViewPageLayout, useCollectingEventQuery } from "../../../components";
+import {
+  ViewPageLayoutWithCustomHook,
+  useCollectingEventQuery
+} from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
@@ -13,7 +16,7 @@ import { getColumnDefinition } from "../material-sample/list";
 
 export default function CollectingEventDetailsPage() {
   return (
-    <ViewPageLayout<CollectingEvent>
+    <ViewPageLayoutWithCustomHook<CollectingEvent>
       form={(props) => (
         <DinaForm<CollectingEvent> {...props}>
           <CollectingEventFormLayout />
@@ -33,7 +36,7 @@ export default function CollectingEventDetailsPage() {
           </FieldSet>
         </DinaForm>
       )}
-      customQueryHook={(id) => useCollectingEventQuery(id)}
+      customQueryHook={useCollectingEventQuery}
       nameField={["dwcFieldNumber", "dwcRecordNumber", "otherRecordNumbers"]}
       entityLink="/collection/collecting-event"
       type="collecting-event"

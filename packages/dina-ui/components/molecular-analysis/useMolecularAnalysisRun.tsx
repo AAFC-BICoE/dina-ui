@@ -1,5 +1,5 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BulkGetOptions,
   filterBy,
@@ -249,13 +249,12 @@ export function useMolecularAnalysisRun({
   const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
     useState<Record<string, string>>({});
 
-  const columns = useMemo(() => {
-    return useMolecularAnalysisRunColumns({
-      type: "seq-reaction",
-      setMolecularAnalysisRunItemNames,
-      readOnly: !editMode
-    });
-  }, [editMode]);
+  const columns = useMolecularAnalysisRunColumns({
+    type: "seq-reaction",
+    setMolecularAnalysisRunItemNames,
+    readOnly: !editMode,
+    deps: [editMode]
+  });
 
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);

@@ -54,7 +54,14 @@ import {
   ThermocyclerProfile
 } from "../../../types/seqdb-api";
 
-export function usePcrBatchQuery(id?: string, deps?: any[]) {
+interface UsePcrBatchQueryOptions {
+  deps?: any[];
+}
+export function usePcrBatchQuery(
+  id?: string,
+  options?: UsePcrBatchQueryOptions
+) {
+  const { deps } = options || {};
   return useQuery<PcrBatch>(
     {
       path: `seqdb-api/pcr-batch/${id}`,

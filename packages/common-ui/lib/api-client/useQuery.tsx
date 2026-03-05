@@ -1,5 +1,10 @@
 import { DocWithErrors } from "jsonapi-typescript";
-import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
+import {
+  GetParams,
+  KitsuResource,
+  KitsuResponse,
+  KitsuResponseData
+} from "kitsu";
 import _ from "lodash";
 import { useContext, useDebugValue, useMemo } from "react";
 import useSWR from "swr";
@@ -8,6 +13,7 @@ import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { ApiClientContext } from "./ApiClientContext";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 import Link from "next/link";
+import { useQueries } from "@tanstack/react-query";
 
 /** Attributes that compose a JsonApi query. */
 export interface JsonApiQuerySpec extends GetParams {
@@ -44,6 +50,12 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
   /** Disables the query. */
   disabled?: boolean;
 }
+
+/** Custom query hook type. Includes guaranteed id param, along with options param */
+export type CustomQueryHook<T extends KitsuResource> = (
+  id: string,
+  options?: any
+) => QueryState<T, unknown>;
 
 /**
  * Back-end connected React hook for running queries agains the back-end.
@@ -143,6 +155,65 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     response: disabled || loading ? undefined : apiResponse,
     isDisabled: disabled
   };
+}
+
+/**
+ * Back-end connected React hook for running queries agains the back-end.
+ * It fetches the data again if the passed query changes.
+ * Takes an array of query specs and returns an array of query states.
+ */
+export function useBulkQueries<
+  TData extends KitsuResponseData,
+  TMeta = undefined
+>(
+  querySpecs: JsonApiQuerySpec[],
+  {
+    deps = [],
+    joinSpecs = [],
+    onSuccess,
+    disabled = false
+  }: QueryOptions<TData, TMeta> = {}
+) {
+  const { apiClient, bulkGet } = useContext(ApiClientContext);
+
+  const results = useQueries({
+    queries: querySpecs.map((spec) => ({
+      // deps are included in the key so that if deps change, all queries re-fetch
+      queryKey: [spec, ...deps],
+      enabled: !disabled,
+      queryFn: async () => {
+        const { path, ...params } = spec;
+        const getParams = _.omitBy(params, _.isUndefined);
+
+        const response = await apiClient.get<TData, TMeta>(path, getParams);
+
+        // Client-side joins happen per-query result
+        if (response?.data && joinSpecs.length > 0) {
+          const resources = _.isArray(response.data)
+            ? response.data
+            : [response.data];
+          for (const joinSpec of joinSpecs) {
+            await new ClientSideJoiner(bulkGet, resources, joinSpec).join();
+          }
+        }
+
+        // Trigger the callback for each successful individual response
+        if (onSuccess) {
+          await onSuccess(response);
+        }
+
+        return response;
+      },
+      retry: false
+    }))
+  });
+
+  return results.map((result) => ({
+    error: result.error,
+    loading: result.isLoading || result.isFetching,
+    response: result.data,
+    isDisabled: disabled
+  }));
 }
 
 interface AuditSnapshotRouterProps {
