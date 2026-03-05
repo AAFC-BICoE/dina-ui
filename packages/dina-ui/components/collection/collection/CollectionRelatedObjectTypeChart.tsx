@@ -40,7 +40,7 @@ export default function CollectionRelatedObjectTypeChart({
       return;
     }
 
-    // 3. Query the Metadata index using those IDs
+    // Query the Metadata index using those IDs
     const metadataResponse = await apiClient.axios.post(
       "search-api/search-ws/search",
       {
@@ -50,7 +50,7 @@ export default function CollectionRelatedObjectTypeChart({
         aggs: {
           by_file_extension: {
             terms: {
-              field: "data.attributes.fileExtension", // Or whatever you're charting
+              field: "data.attributes.fileExtension",
               size: 1000,
               order: { _count: "desc" },
               missing: "NO_FILE_EXTENSION"
@@ -79,7 +79,7 @@ export default function CollectionRelatedObjectTypeChart({
       return aggName;
     };
 
-    // Process aggregations for your chart as usual...
+    // Process aggregations
     if (metadataResponse.data.aggregations) {
       const aggKey = getAggregationKey(
         "by_file_extension",
