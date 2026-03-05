@@ -23,7 +23,7 @@ import _ from "lodash";
 import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
-import CollectionRecordsAddedChart from "packages/dina-ui/components/collection/collection/CollectionRecordsAddedChart";
+import CollectionRecordsAddedChart from "../../../components/collection/collection/CollectionRecordsAddedChart";
 
 export default function CollectionEditPage() {
   const router = useRouter();
