@@ -23,8 +23,8 @@ import _ from "lodash";
 import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
-import CollectionSampleTypeChart from "./CollectionSampleTypeChart";
-import CollectionRelatedObjectTypeChart from "./CollectionRelatedObjectTypeChart";
+import CollectionSampleTypeChart from "../../../components/collection/CollectionSampleTypeChart";
+import CollectionRelatedObjectTypeChart from "../../../components/collection/CollectionSampleTypeChart";
 
 export default function CollectionEditPage() {
   const router = useRouter();
