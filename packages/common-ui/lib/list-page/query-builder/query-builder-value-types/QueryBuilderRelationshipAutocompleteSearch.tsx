@@ -54,14 +54,16 @@ export function QueryRowRelationshipAutocompleteSearch({
   const { formatMessage } = useIntl();
 
   const [searchState, setSearchState] =
-    useState<RelationshipAutocompleteSearchState>(() =>
-      value
-        ? JSON.parse(value)
-        : {
-            selectedResourceUUID: "",
-            selectedResourceLabel: ""
-          }
-    );
+    useState<RelationshipAutocompleteSearchState>(() => {
+      if (value && typeof value === "string") {
+        try {
+          return JSON.parse(value);
+        } catch {
+          // ignore invalid JSON
+        }
+      }
+      return { selectedResourceUUID: "", selectedResourceLabel: "" };
+    });
 
   // Resource options for the autocomplete
   const [resourceOptions, setResourceOptions] = useState<ResourceOption[]>([]);
@@ -245,7 +247,12 @@ export function transformRelationshipAutocompleteToDSL({
     return createNestedQuery(existsQuery(elasticSearchPath));
   }
 
-  // For equals/notEquals, parse the value for the UUID
+  // For equals/notEquals, parse the value for the UUID.
+  // Guard against empty/non-string values to avoid JSON.parse throwing.
+  if (!value || typeof value !== "string") {
+    return;
+  }
+
   try {
     const { selectedResourceUUID }: RelationshipAutocompleteSearchState =
       JSON.parse(value);
