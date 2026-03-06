@@ -119,6 +119,9 @@ describe("ProjectForm.", () => {
               relationships: {
                 attachment: {
                   data: []
+                },
+                parentProject: {
+                  data: null
                 }
               },
               multilingualDescription: {
@@ -142,6 +145,9 @@ describe("ProjectForm.", () => {
         relationships: {
           attachment: {
             data: []
+          },
+          parentProject: {
+            data: null
           }
         },
         multilingualDescription: {
@@ -227,6 +233,9 @@ describe("ProjectForm.", () => {
               relationships: {
                 attachment: {
                   data: []
+                },
+                parentProject: {
+                  data: null
                 }
               },
               type: "project"
@@ -254,6 +263,9 @@ describe("ProjectForm.", () => {
         relationships: {
           attachment: {
             data: []
+          },
+          parentProject: {
+            data: null
           }
         },
         type: "project"

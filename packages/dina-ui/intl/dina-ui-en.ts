@@ -526,6 +526,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_preservationType: "Preservation Type",
   field_preservationType_tooltip:
     "Description of the preservation type of the material sample. Example: Freeze-Dry.",
+  field_parentProject: "Parent Project",
   field_previewLabel: "Preview",
   field_projectName: "Project Name",
   field_projectStatus: "Project Status",
