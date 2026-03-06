@@ -70,7 +70,10 @@ export default function ProjectEditPage() {
   );
 }
 
-export interface ProjectFormValues extends InputResource<Project> {}
+export interface ProjectFormValues
+  extends Omit<InputResource<Project>, "parentProject"> {
+  parentProject?: Project;
+}
 
 export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
   const { save } = useContext(ApiClientContext);
@@ -102,7 +105,9 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
         submittedValues.extensionValues
       );
     }
-    const input: InputResource<Project> = {
+    const input: Omit<InputResource<Project>, "parentProject"> & {
+      parentProject?: Project;
+    } = {
       ...submittedValues,
       // Convert the editable format to the stored format:
       multilingualDescription: {
