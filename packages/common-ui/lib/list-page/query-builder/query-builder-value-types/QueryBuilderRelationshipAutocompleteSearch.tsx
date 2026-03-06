@@ -7,6 +7,7 @@ import {
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import Select from "react-select";
 import { useIntl } from "react-intl";
+import { SimpleSearchFilterBuilder } from "common-ui";
 
 export interface QueryRowRelationshipAutocompleteSearchProps {
   /**
@@ -100,11 +101,9 @@ export function QueryRowRelationshipAutocompleteSearch({
       setIsLoadingResources(true);
       try {
         const response = await apiClient.get<any[]>(apiEndpoint, {
-          filter: resourceSearchInput
-            ? {
-                rsql: `${optionLabelField}==*${resourceSearchInput}*`
-              }
-            : undefined,
+          filter: SimpleSearchFilterBuilder.create()
+            .searchFilter(optionLabelField, resourceSearchInput)
+            .build(),
           page: { limit: 25 }
         });
 
@@ -167,6 +166,12 @@ export function QueryRowRelationshipAutocompleteSearch({
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
         filterOption={() => true} // Disable client-side filtering since we filter server-side
+        styles={{
+          menu: (base) => ({
+            ...base,
+            zIndex: 9999
+          })
+        }}
       />
     </div>
   );
