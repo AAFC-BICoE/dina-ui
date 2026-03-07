@@ -1385,5 +1385,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createOnMap: "Create on Map",
   editOnMap: "Edit on Map",
   erase: "Erase",
-  close: "Close"
+  close: "Close",
+  collectingEventAttachedSites: "Collecting Event Attached Sites",
+  noSitesAttached: "No sites attached",
+  typeToSearchAndAddNew: "Type to search and add new",
+  selectSite: "Select Site",
+  noEntries: "No entries"
 };

@@ -64,6 +64,7 @@ import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimBu
 import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
 import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
+import AttachedSites from "packages/dina-ui/components/collection/collecting-event/AttachedSites";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -1067,6 +1068,11 @@ export function CollectingEventFormLayout({
               </FieldSet>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-md-6">
+          <AttachedSites />
         </div>
       </div>
       <div>
