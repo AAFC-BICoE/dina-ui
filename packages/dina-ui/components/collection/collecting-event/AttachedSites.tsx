@@ -3,9 +3,9 @@ import {
   SimpleSearchFilterBuilder,
   useDinaFormContext
 } from "common-ui";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Site } from "packages/dina-ui/types/collection-api";
-import { FormikMultiResourceSelect } from "packages/common-ui/lib/formik-connected/FormikMultiResourceSelect";
+import { FormikMultiResourceSelect } from "../../../../common-ui/lib/formik-connected/FormikMultiResourceSelect";
 
 export default function AttachedSites() {
   const { formatMessage } = useDinaIntl();

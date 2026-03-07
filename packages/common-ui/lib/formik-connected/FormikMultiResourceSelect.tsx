@@ -6,9 +6,9 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import {
   ResourceSelectField,
   ResourceSelectFieldProps
-} from "packages/common-ui/lib/formik-connected/ResourceSelectField";
-import { Tooltip } from "packages/common-ui/lib";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+} from "../../lib/formik-connected/ResourceSelectField";
+import { Tooltip } from "../../lib";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 
 type Props<T extends KitsuResource> = Omit<
   ResourceSelectFieldProps<T>,
