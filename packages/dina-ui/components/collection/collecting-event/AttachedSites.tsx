@@ -17,7 +17,6 @@ export default function AttachedSites() {
         name="site"
         model="collection-api/site"
         optionLabel={(site) => site.name}
-        placeholder="Type to search and add site"
         omitNullOption={true}
         readOnlyLink="/collection/site/view?id="
         filter={(searchValue: string) =>
@@ -27,7 +26,7 @@ export default function AttachedSites() {
         }
         resourceLink="/collection/site/view?id="
         selectName={formatMessage("selectSite")}
-        emptyMessageId="noSitesAttached"
+        emptyMessage={formatMessage("noSitesAttached")}
         mode={readOnly ? "view" : "edit"}
       />
     </FieldSet>

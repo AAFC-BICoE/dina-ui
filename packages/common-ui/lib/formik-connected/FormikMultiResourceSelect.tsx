@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { FormattedMessage } from "react-intl";
 import { FaTrash } from "react-icons/fa";
 import { useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
@@ -16,7 +15,7 @@ type Props<T extends KitsuResource> = Omit<
 > & {
   resourceLink?: string;
   selectName?: string;
-  emptyMessageId?: string;
+  emptyMessage?: string;
   mode?: string;
 };
 
@@ -26,7 +25,7 @@ export function FormikMultiResourceSelect<
   name,
   resourceLink,
   selectName = `${name}`,
-  emptyMessageId = "noEntries",
+  emptyMessage = "",
   mode,
   ...props
 }: Props<T>) {
@@ -55,10 +54,10 @@ export function FormikMultiResourceSelect<
         <tbody className="border-top-0 border-bottom-0">
           {selected.length ? (
             selected.map((item, index) => (
-              <tr key={index} className={index % 2 ? "-even" : "-odd"}>
+              <tr key={item.id} className={index % 2 ? "-even" : "-odd"}>
                 <td style={{ width: "90%" }}>
                   {resourceLink ? (
-                    <Link className="ms-1" href={`${resourceLink}${item.id}`}>
+                    <Link className="ms-1" href={resourceLink + item.id}>
                       {item.name as string}
                     </Link>
                   ) : (
@@ -72,6 +71,7 @@ export function FormikMultiResourceSelect<
                       placement="right"
                       visibleElement={
                         <button
+                          type="button"
                           onClick={() => removeItem(item.id)}
                           className="bg-transparent border-0"
                         >
@@ -86,9 +86,7 @@ export function FormikMultiResourceSelect<
           ) : (
             <tr>
               <td>
-                <div className="ms-1">
-                  <FormattedMessage id={emptyMessageId} />
-                </div>
+                <div className="ms-1">{emptyMessage}</div>
               </td>
             </tr>
           )}
@@ -109,6 +107,7 @@ export function FormikMultiResourceSelect<
           {...props}
           name={selectName}
           onChange={addItem}
+          placeholder={formatMessage("typeToSearch")}
         />
       )}
     </div>

@@ -1388,7 +1388,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   close: "Close",
   collectingEventAttachedSites: "Collecting Event Attached Sites",
   noSitesAttached: "No sites attached",
-  typeToSearchAndAddNew: "Type to search and add new",
-  selectSite: "Select Site",
-  noEntries: "No entries"
+  typeToSearch: "Type to search",
+  selectSite: "Select Site"
 };
