@@ -11,9 +11,11 @@ export interface StorageUnitAttributes {
   createdBy?: string;
   storageUnitChildren?: StorageUnit[];
   uuid?: string;
-  isMultiple?: boolean | null;
   isGeneric?: boolean;
   barcode?: string;
+
+  // client side
+  isMultiple?: boolean | null;
 }
 
 export interface HierarchyItem {

@@ -5,11 +5,9 @@ import {
   SourceAdministrativeLevel
 } from "./GeographicPlaceNameSourceDetail";
 import { GeographicThesaurus } from "./GeographicThesaurus";
-import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 import { ManagedAttributeValues } from "./ManagedAttribute";
 
-import { JsonValue } from "type-fest";
 import { Protocol } from "./Protocol";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 import { Expedition } from "./Expedition";
@@ -41,11 +39,9 @@ export interface CollectingEventAttributes {
   dwcCountry?: string;
   dwcCountryCode?: string;
   dwcStateProvince?: string;
-  dwcMunicipality?: string;
 
   createdBy?: string;
   createdOn?: string;
-  collectorGroupUuid?: string;
 
   group?: string;
   geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
@@ -63,13 +59,16 @@ export interface CollectingEventAttributes {
   publiclyReleasable?: boolean;
   notPubliclyReleasableReason?: string;
 
-  managedAttributeValues?: ManagedAttributeValues;
-  managedAttributes?: JsonValue;
+  managedAttributes?: ManagedAttributeValues;
 
   selectedSections?: string[];
   extensionValues?: any;
-  protocol?: Protocol;
-  expedition?: Expedition;
+  geoReferenceAssertions?: GeoReferenceAssertion[];
+  version?: number;
+
+  // Client side only fields
+  collectorGroups?: string[];
+  collectorGroupUuid?: string;
 }
 
 export enum GeographicPlaceNameSource {
@@ -77,10 +76,10 @@ export enum GeographicPlaceNameSource {
 }
 
 export interface CollectingEventRelationships {
+  expedition?: Expedition;
   attachment?: ResourceIdentifierObject[];
   collectors?: KitsuResource[];
-  collectorGroups?: CollectorGroup[];
-  geoReferenceAssertions?: GeoReferenceAssertion[];
+  protocol?: Protocol;
 }
 
 export type CollectingEvent = KitsuResource &
