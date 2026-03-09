@@ -24,7 +24,7 @@ import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
 import CollectionSampleTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
-import CollectionRelatedObjectTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
+import CollectionRelatedObjectTypeChart from "../../../components/collection/collection/CollectionRelatedObjectTypeChart";
 
 export default function CollectionEditPage() {
   const router = useRouter();

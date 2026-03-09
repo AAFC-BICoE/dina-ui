@@ -81,6 +81,8 @@ import {
   createSessionStorageLastUsedTreeKey
 } from "./saved-searches/SavedSearch";
 
+import { MaterialSampleCharts } from "../../../dina-ui/components/collection/MaterialSampleCharts";
+
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
   {
@@ -321,6 +323,8 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * Default is true.
    */
   enableColumnSelector?: boolean;
+
+  materialSampleMetricsMode?: boolean;
 }
 
 /**
@@ -366,7 +370,8 @@ export function QueryPage<TData extends KitsuResource>({
   enableDnd = false,
   onSelect,
   onDeselect,
-  enableColumnSelector = true
+  enableColumnSelector = true,
+  materialSampleMetricsMode = false
 }: QueryPageProps<TData>) {
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
@@ -571,10 +576,11 @@ export function QueryPage<TData extends KitsuResource>({
       queryDSL = applyGroupFilters(queryDSL, groups);
     }
 
-    queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
-    queryDSL = applySortingRules(queryDSL, sortingRules, combinedColumns);
-    queryDSL = applySourceFiltering(queryDSL, combinedColumns);
-
+    if (!materialSampleMetricsMode) {
+      queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
+      queryDSL = applySortingRules(queryDSL, sortingRules, combinedColumns);
+      queryDSL = applySourceFiltering(queryDSL, combinedColumns);
+    }
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) {
       return;
@@ -1222,6 +1228,12 @@ export function QueryPage<TData extends KitsuResource>({
                 >
                   <LoadingSpinner loading={true} />
                 </div>
+              ) : materialSampleMetricsMode ? (
+                <MaterialSampleCharts
+                  query={
+                    elasticSearchQuery ? (elasticSearchQuery as any).query : {}
+                  }
+                />
               ) : (
                 <MemoizedReactTable
                   // Column and data props

@@ -386,6 +386,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
   const { bulkGet, doOperations } = useApiClient();
+  const [listLayoutType, setListLayoutType] = useState<string>("TABLE");
 
   const handleBeforeMaterialSampleDelete = async (resourceIds: string[]) => {
     // Fetch the resources with their relationships BEFORE deletion
@@ -517,6 +518,7 @@ export default function MaterialSampleListPage() {
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
       <Nav marginBottom={false} />
+
       <ButtonBar>
         <div className="col-md-12 d-flex gap-2">
           <div className="ms-auto" />
@@ -531,9 +533,17 @@ export default function MaterialSampleListPage() {
         </div>
       </ButtonBar>
       <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="materialSampleListTitle" />
-        </h1>
+        <div>
+          <h1 id="wb-cont">
+            <DinaMessage id="materialSampleListTitle" />
+          </h1>
+          <div className="list-inline-item">
+            <ListLayoutSelector
+              onChange={(newValue) => setListLayoutType(newValue)}
+              value={listLayoutType ?? undefined}
+            />
+          </div>
+        </div>
         <QueryPage
           rowStyling={rowStyling}
           indexName={"dina_material_sample_index"}
@@ -559,9 +569,40 @@ export default function MaterialSampleListPage() {
             entityLink: "/collection/material-sample"
           }}
           bulkSplitPath="/collection/material-sample/bulk-split"
+          materialSampleMetricsMode={listLayoutType === "METRICS"}
         />
       </main>
       <Footer />
+    </div>
+  );
+}
+
+function ListLayoutSelector({ value = "TABLE", onChange }) {
+  const items = [
+    {
+      layoutType: "TABLE",
+      message: <DinaMessage id="metadataListTableLayout" />
+    },
+    {
+      layoutType: "METRICS",
+      message: <DinaMessage id="metadataListGalleryLayout" />
+    }
+  ];
+
+  return (
+    <div className="list-layout-selector list-inline">
+      {items.map(({ message, layoutType }) => (
+        <div className="list-inline-item" key={layoutType}>
+          <label>
+            <input
+              type="radio"
+              checked={value === layoutType}
+              onChange={() => onChange(layoutType)}
+            />
+            {message}
+          </label>
+        </div>
+      ))}
     </div>
   );
 }

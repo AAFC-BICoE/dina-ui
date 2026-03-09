@@ -1,26 +1,67 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+
+export interface CollectionRelatedObjectTypeChartProps {
+  id?: string;
+  query?: any;
+}
+
+function ChartTypeSelector({ value, onChange }) {
+  const items = [
+    {
+      chartType: "BAR",
+      message: "bar"
+    },
+    {
+      chartType: "PIE",
+      message: "pie"
+    }
+  ];
+
+  return (
+    <div className="list-layout-selector list-inline">
+      {items.map(({ message, chartType }) => (
+        <div className="list-inline-item" key={chartType}>
+          <label>
+            <input
+              type="radio"
+              checked={value === chartType}
+              onChange={() => onChange(chartType)}
+            />
+            {message}
+          </label>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function CollectionRelatedObjectTypeChart({
-  id
-}: {
-  id: string;
-}) {
+  id,
+  query
+}: CollectionRelatedObjectTypeChartProps) {
   const { apiClient } = useApiClient();
+  const [chartType, setChartType] = useState("PIE");
 
   const fetchData = async () => {
     // Get the Material Sample IDs that have attachments in this collection
+
     const sampleResponse = await apiClient.axios.post(
       "search-api/search-ws/search",
       {
         _source: { includes: ["data.relationships"] },
-        query: {
-          bool: {
-            must: [{ term: { "data.relationships.collection.data.id": id } }]
-          }
-        }
+        query:
+          query ??
+          (id
+            ? {
+                bool: {
+                  must: [
+                    { term: { "data.relationships.collection.data.id": id } }
+                  ]
+                }
+              }
+            : undefined)
       },
       { params: { indexName: "dina_material_sample_index" } }
     );
@@ -97,7 +138,7 @@ export default function CollectionRelatedObjectTypeChart({
 
   useEffect(() => {
     fetchData();
-  }, [id]);
+  }, [id, query]);
 
   const options = {
     tooltip: {
@@ -125,25 +166,44 @@ export default function CollectionRelatedObjectTypeChart({
       {
         name: "Related Object Count",
         type: "bar",
-        data: chartData.map((d) => d.value),
-        itemStyle: {
-          color: "#5470c6"
+        data: chartData.map((d) => d.value)
+      }
+    ]
+  };
+
+  const pieOptions = {
+    tooltip: {
+      trigger: "item",
+      formatter: "{b}: {c} ({d}%)"
+    },
+    legend: {
+      orient: "horizontal",
+      left: "left"
+    },
+    series: [
+      {
+        name: "Related Object Count",
+        type: "pie",
+        data: chartData,
+
+        label: {
+          formatter: "{b}: {c} ({d}%)"
         }
       }
     ]
   };
 
-  return (
+  return chartData.length != 0 ? (
     <div>
       <div>
-        <strong>
-          <DinaMessage id="collectionRelatedObjectTypeChartTitle" />
-        </strong>
+        <strong>Related Object Types</strong>
+        <ChartTypeSelector value={chartType} onChange={setChartType} />
       </div>
       <ReactECharts
-        option={options}
-        style={{ height: "400px", width: "100%" }}
+        option={chartType === "PIE" ? pieOptions : options}
+        style={{ height: "400px" }}
+        notMerge={true}
       />
     </div>
-  );
+  ) : null;
 }

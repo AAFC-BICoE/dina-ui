@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 
-interface CollectionSampleTypeChartProps {
-  id?: string;
+interface CollectionProjectNameChartProps {
   query?: any;
 }
 
@@ -37,62 +36,49 @@ function ChartTypeSelector({ value, onChange }) {
   );
 }
 
-export default function CollectionSampleTypeChart({
-  id,
+export default function SampleCollectionChart({
   query
-}: CollectionSampleTypeChartProps) {
+}: CollectionProjectNameChartProps) {
   const { apiClient } = useApiClient();
   const [chartType, setChartType] = useState("PIE");
-
-  // Helper function to get aggregation key format
-  const getAggregationKey = (aggName: string, response: any): string => {
-    if (response.aggregations[aggName]) {
-      return aggName;
-    }
-    if (response.aggregations[`sterms#${aggName}`]) {
-      return `sterms#${aggName}`;
-    }
-
-    for (const key of Object.keys(response.aggregations)) {
-      if (key.endsWith(aggName)) {
-        return key;
-      }
-    }
-
-    return aggName;
-  };
-  const dataMap: Record<string, number> = {
-    WHOLE_ORGANISM: 0,
-    MIXED_ORGANISMS: 0,
-    CULTURE_STRAIN: 0,
-    ORGANISM_PART: 0,
-    MOLECULAR_SAMPLE: 0,
-    NO_TYPE: 0
-  };
 
   const fetchData = async () => {
     const response = await apiClient.axios.post(
       "search-api/search-ws/search",
       {
         size: 0,
-        query:
-          query ??
-          (id
-            ? {
-                bool: {
-                  must: [
-                    { term: { "data.relationships.collection.data.id": id } }
-                  ]
+        query: query ?? undefined,
+        aggs: {
+          collection_nested: {
+            nested: {
+              path: "included"
+            },
+            aggs: {
+              only_collection: {
+                filter: {
+                  bool: {
+                    must: [
+                      {
+                        term: {
+                          "included.type": "collection"
+                        }
+                      }
+                    ]
+                  }
+                },
+                aggs: {
+                  project_name: {
+                    terms: {
+                      field: "included.attributes.name.keyword",
+                      missing: "NO_COLLECTION",
+                      size: 100,
+                      order: {
+                        _count: "desc"
+                      }
+                    }
+                  }
                 }
               }
-            : undefined),
-        aggs: {
-          by_sample_type: {
-            terms: {
-              field: "data.attributes.materialSampleType.keyword",
-              size: 10,
-              missing: "NO_TYPE",
-              order: { _count: "desc" }
             }
           }
         }
@@ -101,13 +87,12 @@ export default function CollectionSampleTypeChart({
     );
 
     if (response.data.aggregations) {
-      const aggKey = getAggregationKey("by_sample_type", response.data);
-      const buckets = response.data.aggregations[aggKey]?.buckets ?? [];
-      buckets.map((b) => (dataMap[b.key] = b.doc_count));
+      const buckets =
+        response.data.aggregations["nested#collection_nested"]?.[
+          "filter#only_collection"
+        ]?.["sterms#project_name"].buckets ?? [];
 
-      setChartData(
-        Object.entries(dataMap).map(([name, value]) => ({ name, value }))
-      );
+      setChartData(buckets.map((b) => ({ name: b.key, value: b.doc_count })));
     }
   };
 
@@ -117,7 +102,7 @@ export default function CollectionSampleTypeChart({
 
   useEffect(() => {
     fetchData();
-  }, [id, query]);
+  }, [query]);
 
   const options = {
     tooltip: {
@@ -173,7 +158,7 @@ export default function CollectionSampleTypeChart({
 
   return chartData.length != 0 ? (
     <div>
-      <strong>Sample Count by Type</strong>
+      <strong>Sample Count By Collection</strong>
       <ChartTypeSelector value={chartType} onChange={setChartType} />
       <ReactECharts
         option={chartType === "PIE" ? pieOptions : options}
