@@ -4,8 +4,8 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Site } from "packages/dina-ui/types/collection-api";
-import { FormikMultiResourceSelect } from "../../../../common-ui/lib/formik-connected/FormikMultiResourceSelect";
+import { Site } from "../../../types/collection-api";
+import { MultiSiteSelect } from "./MultiSiteSelect";
 
 export default function AttachedSites() {
   const { formatMessage } = useDinaIntl();
@@ -13,7 +13,7 @@ export default function AttachedSites() {
 
   return (
     <FieldSet legend={<DinaMessage id="collectingEventAttachedSites" />}>
-      <FormikMultiResourceSelect<Site>
+      <MultiSiteSelect<Site>
         name="site"
         model="collection-api/site"
         optionLabel={(site) => site.name}

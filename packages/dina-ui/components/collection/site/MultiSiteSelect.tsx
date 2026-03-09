@@ -5,9 +5,9 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import {
   ResourceSelectField,
   ResourceSelectFieldProps
-} from "../../lib/formik-connected/ResourceSelectField";
-import { Tooltip } from "../../lib";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+} from "../../../../common-ui/lib/formik-connected/ResourceSelectField";
+import { Tooltip } from "../../../../common-ui/lib";
+import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 
 type Props<T extends KitsuResource> = Omit<
   ResourceSelectFieldProps<T>,
@@ -19,9 +19,7 @@ type Props<T extends KitsuResource> = Omit<
   mode?: string;
 };
 
-export function FormikMultiResourceSelect<
-  T extends KitsuResource & { name: string }
->({
+export function MultiSiteSelect<T extends KitsuResource & { name: string }>({
   name,
   resourceLink,
   selectName = `${name}`,
@@ -36,9 +34,14 @@ export function FormikMultiResourceSelect<
   function addItem(item?: PersistedResource<T>) {
     if (!item) return;
 
-    if (selected.some((s) => s.id === item.id)) return;
-
-    setFieldValue(name, [...selected, item]);
+    if (selected.some((s) => s.id === item.id)) {
+      setFieldValue(
+        name,
+        selected.filter((s) => s.id !== item.id)
+      );
+    } else {
+      setFieldValue(name, [...selected, item]);
+    }
   }
 
   function removeItem(id: string) {
@@ -75,7 +78,7 @@ export function FormikMultiResourceSelect<
                           onClick={() => removeItem(item.id)}
                           className="bg-transparent border-0"
                         >
-                          <FaTrash color="red" />
+                          <FaTrash color="#e2574c" />
                         </button>
                       }
                     ></Tooltip>
@@ -92,21 +95,24 @@ export function FormikMultiResourceSelect<
           )}
         </tbody>
       </table>
-      <style jsx>{`
-        .ReactTable tbody tr:last-child td {
-          border-bottom: 0;
-        }
-        .ReactTable td {
-          vertical-align: middle;
-          padding-left: 5px;
-        }
-      `}</style>
+      <style jsx>
+        {`
+          .ReactTable tbody tr:last-child td {
+            border-bottom: 0;
+          }
+          .ReactTable td {
+            vertical-align: middle;
+            padding-left: 5px;
+          }
+        `}
+      </style>
 
       {mode === "edit" && (
         <ResourceSelectField<T>
           {...props}
           name={selectName}
           onChange={addItem}
+          filterList={(item) => !selected.some((s) => s.id === item?.id)}
           placeholder={formatMessage("typeToSearch")}
         />
       )}

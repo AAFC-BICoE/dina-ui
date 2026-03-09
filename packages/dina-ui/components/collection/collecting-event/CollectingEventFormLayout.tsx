@@ -64,7 +64,7 @@ import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimBu
 import { TgnSourceSelection } from "./TgnIntegration";
 import CollectingEventEditAlert from "./CollectingEventEditAlert";
 import { simpleSearchFilterToFiql } from "../../../../common-ui/lib/filter-builder/fiql";
-import AttachedSites from "./AttachedSites";
+import AttachedSites from "../site/AttachedSites";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
