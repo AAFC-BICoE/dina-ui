@@ -154,7 +154,8 @@ describe("queryUtils", () => {
           searchValue: "Extension value",
           selectedOperator: "contains",
           selectedField: "field-test",
-          selectedExtension: "package-test"
+          selectedExtension: "package-test",
+          selectedType: "STRING"
         };
 
         const mockJsonTree = {

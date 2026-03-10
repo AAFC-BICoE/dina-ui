@@ -294,7 +294,8 @@ function parseDynamicFields(simpleQueryRow: SimpleQueryRow): any {
         searchValue: simpleQueryRow.v,
         selectedOperator: simpleQueryRow.o,
         selectedExtension: simpleQueryRow.d ?? "",
-        selectedField: simpleQueryRow.d2 ?? ""
+        selectedField: simpleQueryRow.d2 ?? "",
+        selectedType: ""
       };
 
       return {
