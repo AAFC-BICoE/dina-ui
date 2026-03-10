@@ -128,7 +128,7 @@ export function CollectionFormFields() {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
-  const uuid = String(router.query.id);
+  const uuid = String(router.query?.id ?? "");
   const typeOptions: SelectOption<string | undefined>[] = [
     {
       label: CollectionIdentifierType.GRSCICOLL,
@@ -199,12 +199,12 @@ export function CollectionFormFields() {
               <CollectionSampleTypeChart id={uuid} />
             </div>
             <div className="col-md-6">
-              <CollectionRelatedObjectTypeChart id={uuid} />
+              <CollectionRecordsAddedChart id={uuid} />
             </div>
           </div>
           <div className="row mt-3 mb-3">
             <div className="col-md-6">
-              <CollectionRecordsAddedChart id={uuid} />
+              <CollectionRelatedObjectTypeChart id={uuid} />
             </div>
           </div>
         </>

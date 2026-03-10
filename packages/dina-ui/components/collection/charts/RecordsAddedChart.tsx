@@ -400,7 +400,7 @@ export default function RecordsAddedChart({
 
   return chartData.length != 0 ? (
     <div>
-      <div className="d-flex justify-content-between">
+      <div className="d-flex justify-content-between align-items-center">
         <div>
           <strong className="d-block">
             <DinaMessage id="collectionRecordAddedChartTitle" />
