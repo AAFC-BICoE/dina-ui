@@ -13,6 +13,8 @@ import { useRouter } from "next/router";
 import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { AgentRolesField } from "../collection/AgentRolesField";
 import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
+import ProjectRelatedObjectTypeChart from "./ProjectRelatedObjectTypeChart";
+import ProjectRecordsAddedChart from "./ProjectRecordsAddedChart";
 
 export function ProjectFormLayout() {
   const { readOnly } = useDinaFormContext();
@@ -130,6 +132,17 @@ export function ProjectFormLayout() {
             enableMultiSort: true
           }}
         />
+      )}
+
+      {readOnly && (
+        <div className="row">
+          <div className="col-md-6">
+            <ProjectRecordsAddedChart id={uuid} />
+          </div>
+          <div className="col-md-6">
+            <ProjectRelatedObjectTypeChart id={uuid} />
+          </div>
+        </div>
       )}
     </div>
   );
