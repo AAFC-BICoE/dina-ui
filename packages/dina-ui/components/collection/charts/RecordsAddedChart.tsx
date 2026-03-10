@@ -403,7 +403,7 @@ export default function RecordsAddedChart({
       <div className="d-flex justify-content-between align-items-center">
         <div>
           <strong className="d-block">
-            <DinaMessage id="collectionRecordAddedChartTitle" />
+            <DinaMessage id="recordAddedChartTitle" />
           </strong>
         </div>
         <DropdownButton

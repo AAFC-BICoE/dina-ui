@@ -122,7 +122,7 @@ export default function SampleTypeChart({ query }: SampleTypeChart) {
   return chartData.length != 0 ? (
     <div>
       <strong>
-        <DinaMessage id="collectionSampleTypeChartTitle" />
+        <DinaMessage id="sampleTypeChartTitle" />
       </strong>
       <Card>
         <ReactECharts

@@ -141,7 +141,7 @@ export default function RelatedObjectTypeChart({
     <div>
       <div>
         <strong>
-          <DinaMessage id="collectionRelatedObjectTypeChartTitle" />
+          <DinaMessage id="relatedObjectTypeChartTitle" />
         </strong>
       </div>
       <Card>
