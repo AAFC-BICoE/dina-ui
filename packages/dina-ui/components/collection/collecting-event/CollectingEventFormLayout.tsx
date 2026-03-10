@@ -1080,7 +1080,7 @@ export function CollectingEventFormLayout({
                   .build()
               }
               model="collection-api/site"
-              optionLabel={(site) => site.name + " (" + site.code + ")" || ""}
+              optionLabel={(site) => site.name}
               omitNullOption={false}
               readOnlyLink="/collection/site/view?id="
             />
