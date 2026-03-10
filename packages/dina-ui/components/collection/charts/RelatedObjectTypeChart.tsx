@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Card } from "react-bootstrap";
 interface RelatedObjectTypeChart {
   query?: any;
