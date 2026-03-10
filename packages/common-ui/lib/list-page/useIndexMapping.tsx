@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "..";
-import { DynamicFieldsMappingConfig, ESIndexMapping } from "./types";
+import {
+  DynamicFieldsMappingConfig,
+  ESIndexMapping,
+  RelationshipAutocompleteField
+} from "./types";
 import { RELATIONSHIP_PRESENCE_FIELDNAME } from "./query-builder/useQueryBuilderConfig";
 
 export interface UseIndexMappingProps {
@@ -268,7 +272,11 @@ export function useIndexMapping({
         });
         dynamicFieldMapping.relationshipFields.forEach(
           (relationshipFieldMapping) => {
-            if (relationshipFieldMapping.type !== "unsupported") {
+            // Skip "relationshipAutocomplete" here since it's handled separately below.
+            if (
+              relationshipFieldMapping.type !== "unsupported" &&
+              relationshipFieldMapping.type !== "relationshipAutocomplete"
+            ) {
               result.push({
                 dynamicField: relationshipFieldMapping,
                 parentName: relationshipFieldMapping.referencedBy,
@@ -318,6 +326,34 @@ export function useIndexMapping({
           isReverseRelationship: false
         });
       }
+
+      // Add relationship autocomplete fields to the query builder list.
+      // Each relationship autocomplete config gets its own field entry.
+      const relationshipAutocompleteConfigs =
+        dynamicFieldMapping?.relationshipFields?.filter(
+          (field): field is RelationshipAutocompleteField =>
+            field.type === "relationshipAutocomplete"
+        ) ?? [];
+
+      relationshipAutocompleteConfigs.forEach((config) => {
+        result.push({
+          value: `_relationshipAutocomplete_${config.label}`,
+          label: config.label,
+          type: "relationshipAutocomplete",
+          keywordMultiFieldSupport: true,
+          keywordNumericSupport: false,
+          distinctTerm: false,
+          optimizedPrefix: false,
+          containsSupport: false,
+          endsWithSupport: false,
+          hideField: false,
+          path: config.path,
+          parentName: config.referencedBy,
+          parentPath: "included",
+          parentType: config.referencedType,
+          relationshipAutocompleteConfig: config
+        });
+      });
 
       return result;
     } catch {
