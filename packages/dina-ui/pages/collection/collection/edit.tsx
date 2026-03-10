@@ -24,7 +24,8 @@ import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
 import CollectionSampleTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
-import CollectionRelatedObjectTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
+import CollectionRelatedObjectTypeChart from "../../../components/collection/collection/CollectionRelatedObjectTypeChart";
+import CollectionRecordsAddedChart from "../../../components/collection/collection/CollectionRecordsAddedChart";
 
 export default function CollectionEditPage() {
   const router = useRouter();
@@ -193,12 +194,19 @@ export function CollectionFormFields() {
         </div>
       )}
       {readOnly && (
-        <div className="row">
-          <div className="w-50">
-            <CollectionSampleTypeChart id={uuid} />
+        <div>
+          <div className="row">
+            <div>
+              <CollectionSampleTypeChart id={uuid} />
+            </div>
+            <div>
+              <CollectionRelatedObjectTypeChart id={uuid} />
+            </div>
           </div>
-          <div className="w-50 col-md-6">
-            <CollectionRelatedObjectTypeChart id={uuid} />
+          <div className="row">
+            <div>
+              <CollectionRecordsAddedChart id={uuid} />
+            </div>
           </div>
         </div>
       )}
