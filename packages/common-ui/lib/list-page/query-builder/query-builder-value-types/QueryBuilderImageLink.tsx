@@ -22,14 +22,19 @@ interface QueryRowImageLinkProps {
    * Pass the selected value to the Query Builder to store.
    */
   setValue?: (fieldPath: string) => void;
+
+  /**
+   * When in export mode, only ORIGINAL type is supported.
+   */
+  exportMode?: boolean;
 }
 
 // Supported derivative types for the image link selection.
 // Each of these options should have a translation provided: queryBuilder_imageLink_[TYPE]
 export const SUPPORTED_DERIVATIVE_TYPES: string[] = [
-  // "LARGE_IMAGE",
-  "ORIGINAL"
-  // "THUMBNAIL_IMAGE"
+  "LARGE_IMAGE",
+  "ORIGINAL",
+  "THUMBNAIL_IMAGE"
 ];
 
 export interface ImageLinkStates {
@@ -43,7 +48,8 @@ export interface ImageLinkStates {
  */
 export default function QueryRowImageLink({
   value,
-  setValue
+  setValue,
+  exportMode
 }: QueryRowImageLinkProps) {
   const { formatMessage } = useIntl();
 
@@ -51,7 +57,7 @@ export default function QueryRowImageLink({
     value
       ? JSON.parse(value)
       : {
-          selectedImageType: "LARGE_IMAGE"
+          selectedImageType: exportMode ? "ORIGINAL" : "LARGE_IMAGE"
         }
   );
 
@@ -73,8 +79,11 @@ export default function QueryRowImageLink({
     }
   }, []);
 
-  // Generate the image type options
-  const imageTypeOptions = SUPPORTED_DERIVATIVE_TYPES.map<SelectOption<string>>(
+  // Generate the image type options (export mode only supports ORIGINAL)
+  const availableTypes = exportMode
+    ? SUPPORTED_DERIVATIVE_TYPES.filter((t) => t === "ORIGINAL")
+    : SUPPORTED_DERIVATIVE_TYPES;
+  const imageTypeOptions = availableTypes.map<SelectOption<string>>(
     (option) => ({
       label: formatMessage({ id: "queryBuilder_imageLink_" + option }),
       value: option
