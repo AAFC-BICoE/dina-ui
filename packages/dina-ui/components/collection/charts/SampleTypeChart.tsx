@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { Card } from "react-bootstrap";
 
 interface SampleTypeChart {
   query?: any;
@@ -123,10 +124,12 @@ export default function SampleTypeChart({ query }: SampleTypeChart) {
       <strong>
         <DinaMessage id="collectionSampleTypeChartTitle" />
       </strong>
-      <ReactECharts
-        option={options}
-        style={{ height: "400px", width: "100%" }}
-      />
+      <Card>
+        <ReactECharts
+          option={options}
+          style={{ height: "400px", width: "100%" }}
+        />
+      </Card>
     </div>
   ) : null;
 }

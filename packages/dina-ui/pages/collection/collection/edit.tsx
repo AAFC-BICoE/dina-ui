@@ -187,28 +187,27 @@ export function CollectionFormFields() {
           ) : null
         }
       </Field>
+
       {readOnly && (
-        <div className="row">
-          <DateField className="col-md-6" name="createdOn" />
-          <TextField className="col-md-6" name="createdBy" />
-        </div>
-      )}
-      {readOnly && (
-        <div>
+        <>
           <div className="row">
-            <div>
+            <DateField className="col-md-6" name="createdOn" />
+            <TextField className="col-md-6" name="createdBy" />
+          </div>
+          <div className="row">
+            <div className="col-md-6">
               <CollectionSampleTypeChart id={uuid} />
             </div>
-            <div>
+            <div className="col-md-6">
               <CollectionRelatedObjectTypeChart id={uuid} />
             </div>
           </div>
-          <div className="row">
-            <div>
+          <div className="row mt-3 mb-3">
+            <div className="col-md-6">
               <CollectionRecordsAddedChart id={uuid} />
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

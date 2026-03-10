@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { Dropdown, DropdownButton } from "react-bootstrap";
-
+import { Dropdown, DropdownButton, Card } from "react-bootstrap";
 interface RecordsAddedChartProps {
   inputQuery?: any;
 }
@@ -401,9 +400,9 @@ export default function RecordsAddedChart({
 
   return chartData.length != 0 ? (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between">
         <div>
-          <strong className="d-block mb-1">
+          <strong className="d-block">
             <DinaMessage id="collectionRecordAddedChartTitle" />
           </strong>
         </div>
@@ -484,11 +483,12 @@ export default function RecordsAddedChart({
           </Dropdown.Item>
         </DropdownButton>
       </div>
-
-      <ReactECharts
-        option={options}
-        style={{ height: "400px", width: "100%" }}
-      />
+      <Card>
+        <ReactECharts
+          option={options}
+          style={{ height: "400px", width: "100%" }}
+        />
+      </Card>
     </div>
   ) : null;
 }
