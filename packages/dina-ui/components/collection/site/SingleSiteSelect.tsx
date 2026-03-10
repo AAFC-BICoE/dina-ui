@@ -20,7 +20,7 @@ type Props<T extends KitsuResource> = Omit<
   mode?: string;
 };
 
-export function MultiSiteSelect<T extends KitsuResource & { name: string }>({
+export function SingleSiteSelect<T extends KitsuResource & { name: string }>({
   name,
   resourcePath,
   selectName = `${name}`,
@@ -35,9 +35,7 @@ export function MultiSiteSelect<T extends KitsuResource & { name: string }>({
   const isDisabled = !available.length || selected !== undefined;
 
   function addItem(item?: PersistedResource<T>) {
-    if (!item) return;
-
-    if (selected) return;
+    if (!item || selected) return;
 
     setFieldValue(name, item);
   }

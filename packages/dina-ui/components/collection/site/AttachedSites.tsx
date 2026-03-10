@@ -5,7 +5,7 @@ import {
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Site } from "../../../types/collection-api";
-import { MultiSiteSelect } from "./MultiSiteSelect";
+import { SingleSiteSelect } from "./SingleSiteSelect";
 
 export default function AttachedSites() {
   const { formatMessage } = useDinaIntl();
@@ -13,7 +13,7 @@ export default function AttachedSites() {
 
   return (
     <FieldSet legend={<DinaMessage id="collectingEventAttachedSites" />}>
-      <MultiSiteSelect<Site>
+      <SingleSiteSelect<Site>
         name="site"
         model="collection-api/site"
         optionLabel={(site) => site.name}
