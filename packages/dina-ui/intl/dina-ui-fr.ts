@@ -948,9 +948,5 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createOnMap: "Créer sur la carte",
   editOnMap: "Modifier sur la carte",
   erase: "Effacer",
-  close: "Fermer",
-  collectingEventAttachedSites: "Collecte des sites liés à l'événement",
-  noSitesAttached: "Aucun site associé",
-  typeToSearch: "Saisissez votre recherche",
-  selectSite: "Sélectionner le site"
+  close: "Fermer"
 };

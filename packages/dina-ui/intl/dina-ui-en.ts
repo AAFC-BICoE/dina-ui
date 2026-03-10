@@ -140,6 +140,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
   collectingEventPartOfExpedition: "Collecting Event Expedition",
+  collectingEventSite: "Collecting Event Site",
   collectingEventPermissionAlert:
     "You do not have permission to edit this collecting event. All fields are in read-only mode.",
   collectingEventEditAlertMessage:
@@ -1385,9 +1386,5 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createOnMap: "Create on Map",
   editOnMap: "Edit on Map",
   erase: "Erase",
-  close: "Close",
-  collectingEventAttachedSites: "Collecting Event Attached Sites",
-  noSitesAttached: "No sites attached",
-  typeToSearch: "Type to search",
-  selectSite: "Select Site"
+  close: "Close"
 };
