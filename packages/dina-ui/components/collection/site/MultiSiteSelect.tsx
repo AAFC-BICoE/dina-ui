@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
@@ -13,7 +14,7 @@ type Props<T extends KitsuResource> = Omit<
   ResourceSelectFieldProps<T>,
   "value" | "onChange"
 > & {
-  resourceLink?: string;
+  resourcePath?: string;
   selectName?: string;
   emptyMessage?: string;
   mode?: string;
@@ -21,7 +22,7 @@ type Props<T extends KitsuResource> = Omit<
 
 export function MultiSiteSelect<T extends KitsuResource & { name: string }>({
   name,
-  resourceLink,
+  resourcePath,
   selectName = `${name}`,
   emptyMessage = "",
   mode,
@@ -29,91 +30,67 @@ export function MultiSiteSelect<T extends KitsuResource & { name: string }>({
 }: Props<T>) {
   const { formatMessage } = useDinaIntl();
   const { values, setFieldValue } = useFormikContext<Record<string, any>>();
-  const selected: PersistedResource<T>[] = values[name] ?? [];
+  const selected: PersistedResource<T> = values[name];
+  const [available, setAvailable] = useState<PersistedResource<T>[]>([]);
+  const isDisabled = !available.length || selected !== undefined;
 
   function addItem(item?: PersistedResource<T>) {
     if (!item) return;
 
-    if (selected.some((s) => s.id === item.id)) {
-      setFieldValue(
-        name,
-        selected.filter((s) => s.id !== item.id)
-      );
-    } else {
-      setFieldValue(name, [...selected, item]);
-    }
+    if (selected) return;
+
+    setFieldValue(name, item);
   }
 
-  function removeItem(id: string) {
-    setFieldValue(
-      name,
-      selected.filter((s) => s.id !== id)
-    );
+  function removeItem() {
+    setFieldValue(name, undefined);
+  }
+
+  function onDataLoaded(data) {
+    setAvailable(data ?? []);
   }
 
   return (
     <div>
-      <table className="ReactTable table table-striped">
-        <tbody className="border-top-0 border-bottom-0">
-          {selected.length ? (
-            selected.map((item, index) => (
-              <tr key={item.id} className={index % 2 ? "-even" : "-odd"}>
-                <td style={{ width: "90%" }}>
-                  {resourceLink ? (
-                    <Link className="ms-1" href={resourceLink + item.id}>
-                      {item.name as string}
-                    </Link>
-                  ) : (
-                    <span>{item.name as string}</span>
-                  )}
-                </td>
-                {mode === "edit" && (
-                  <td className="text-center">
-                    <Tooltip
-                      directText={formatMessage("deleteButtonText")}
-                      placement="right"
-                      visibleElement={
-                        <button
-                          type="button"
-                          onClick={() => removeItem(item.id)}
-                          className="bg-transparent border-0"
-                        >
-                          <FaTrash color="#e2574c" />
-                        </button>
-                      }
-                    ></Tooltip>
-                  </td>
-                )}
-              </tr>
-            ))
+      {selected ? (
+        <div className="mb-3">
+          {resourcePath ? (
+            <Link className="ms-1" href={resourcePath + selected.id}>
+              {selected.name as string}
+            </Link>
           ) : (
-            <tr>
-              <td>
-                <div className="ms-1">{emptyMessage}</div>
-              </td>
-            </tr>
+            <span>{selected.name as string}</span>
           )}
-        </tbody>
-      </table>
-      <style jsx>
-        {`
-          .ReactTable tbody tr:last-child td {
-            border-bottom: 0;
-          }
-          .ReactTable td {
-            vertical-align: middle;
-            padding-left: 5px;
-          }
-        `}
-      </style>
-
+          {mode === "edit" && (
+            <Tooltip
+              directText={formatMessage("deleteButtonText")}
+              placement="right"
+              visibleElement={
+                <button
+                  type="button"
+                  onClick={() => removeItem()}
+                  className="bg-transparent border-0"
+                >
+                  <FaTrash color="#e2574c" />
+                </button>
+              }
+              className="float-end"
+            />
+          )}
+        </div>
+      ) : (
+        <div className="mb-3">{emptyMessage}</div>
+      )}
       {mode === "edit" && (
         <ResourceSelectField<T>
           {...props}
-          name={selectName}
+          name={name}
+          label={selectName}
           onChange={addItem}
-          filterList={(item) => !selected.some((s) => s.id === item?.id)}
+          onDataLoaded={onDataLoaded}
+          filterList={() => !selected}
           placeholder={formatMessage("typeToSearch")}
+          isDisabled={isDisabled}
         />
       )}
     </div>

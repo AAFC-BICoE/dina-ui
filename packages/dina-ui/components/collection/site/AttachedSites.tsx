@@ -24,7 +24,7 @@ export default function AttachedSites() {
             .searchFilter("name", searchValue)
             .build()
         }
-        resourceLink="/collection/site/view?id="
+        resourcePath={readOnly ? "/collection/site/view?id=" : undefined}
         selectName={formatMessage("selectSite")}
         emptyMessage={formatMessage("noSitesAttached")}
         mode={readOnly ? "view" : "edit"}
