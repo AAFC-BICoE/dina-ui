@@ -74,7 +74,8 @@ function SiteForm({ site }: { site?: PersistedResource<Site> }) {
 
   const initValues = {
     ...siteInitialValues,
-    type: "site" as const
+    type: "site" as const,
+    name: siteInitialValues.name ?? ""
   };
 
   return (
