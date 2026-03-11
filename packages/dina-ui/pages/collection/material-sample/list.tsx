@@ -27,7 +27,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../../dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
-
+import { QueryPageTabConfig } from "../../../../common-ui/lib/list-page/QueryPage";
+import { ListViewTab } from "../../../../common-ui/lib/list-page/tabs/tabs";
 export const MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
   "assemblages.",
@@ -527,6 +528,14 @@ export default function MaterialSampleListPage() {
     return undefined;
   };
 
+  const MATERIAL_SAMPLE_TABS: QueryPageTabConfig<MaterialSample>[] = [
+    {
+      id: "list",
+      labelKey: "listView",
+      component: ListViewTab
+    }
+  ];
+
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
@@ -573,6 +582,8 @@ export default function MaterialSampleListPage() {
             entityLink: "/collection/material-sample"
           }}
           bulkSplitPath="/collection/material-sample/bulk-split"
+          tabs={MATERIAL_SAMPLE_TABS}
+          defaultTab="list"
         />
       </main>
       <Footer />
