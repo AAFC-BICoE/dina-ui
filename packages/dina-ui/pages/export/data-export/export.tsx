@@ -57,7 +57,8 @@ import {
 import {
   convertColumnsToAliases,
   convertColumnsToPaths,
-  getColumnFunctions
+  getColumnFunctions,
+  getEntityKeyFromIndexName
 } from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
 
 export interface SavedExportOption {
@@ -175,7 +176,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     updateSavedExport,
     setRestrictToCreatedBy,
     setPubliclyReleaseable
-  } = useSavedExports<TData>({ exportType, selectedSeparator });
+  } = useSavedExports<TData>({ exportType, selectedSeparator, entityLink });
 
   const nonExportableColumns: string[] =
     NON_EXPORTABLE_COLUMNS_MAP?.[indexName] ?? [];
@@ -202,14 +203,21 @@ export default function ExportPage<TData extends KitsuResource>() {
         )
     );
 
+    // Get entity key from index name (e.g., "dina_material_sample_index" -> "material-sample")
+    const entityKey = getEntityKeyFromIndexName(indexName);
+
     // Make query to data-export
     const dataExportSaveArg: SaveArgs<DataExport> = {
       resource: {
         type: "data-export",
         source: indexName,
         query: queryString,
-        columns: convertColumnsToPaths(filteredColumns),
-        columnAliases: convertColumnsToAliases(filteredColumns),
+        schema: {
+          [entityKey]: {
+            columns: convertColumnsToPaths(filteredColumns),
+            aliases: convertColumnsToAliases(filteredColumns)
+          }
+        },
         functions:
           Object.keys(columnFunctions ?? {}).length === 0
             ? undefined
