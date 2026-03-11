@@ -4,7 +4,10 @@ import {
   FieldHeader,
   LoadingSpinner,
   QueryPage,
-  stringArrayCell
+  QueryPageTabConfig,
+  stringArrayCell,
+  ListViewTab,
+  GalleryViewTab
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -206,6 +209,23 @@ export default function MetadataListPage() {
     []
   );
 
+  const OBJECT_STORE_TABS: QueryPageTabConfig<Metadata>[] = [
+    {
+      id: "list",
+      labelKey: "listView",
+      component: ListViewTab
+    },
+    {
+      id: "gallery",
+      labelKey: "galleryView",
+      component: GalleryViewTab,
+      config: {
+        previewMetadata,
+        setPreviewMetadata
+      }
+    }
+  ];
+
   return (
     <div>
       <Head title={formatMessage("objectListTitle")} />
@@ -295,6 +315,8 @@ export default function MetadataListPage() {
                     enableMultiSort: true
                   };
                 }}
+                tabs={OBJECT_STORE_TABS}
+                defaultTab="list"
               />
             </div>
           </div>

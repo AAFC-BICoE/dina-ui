@@ -134,6 +134,7 @@ export interface QueryPageTabProps<TData extends KitsuResource> {
   isFullScreen?: boolean;
   setIsFullScreen?: (value: boolean) => void;
   query?: any; // elastic search query
+  CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>;
   // Allow additional custom props
   [key: string]: any;
 }
@@ -1135,25 +1136,53 @@ export function QueryPage<TData extends KitsuResource>({
   /**
    * Common props to pass to all tab components
    */
-  const commonTabProps: Omit<QueryPageTabProps<TData>, keyof any> = {
-    data:
-      viewMode && selectedResources?.length ? selectedResources : searchResults,
-    loading: loading || columnSelectorLoading,
+  const commonTabProps: QueryPageTabProps<TData> = useMemo(() => {
+    return {
+      data:
+        viewMode && selectedResources?.length
+          ? selectedResources
+          : searchResults,
+      loading: loading || columnSelectorLoading,
+      totalRecords,
+      columns: columnsResults,
+      displayedColumns,
+      pageSize,
+      pageOffset,
+      sortingRules,
+      onPageChange: onPageChanged,
+      onPageSizeChange: onPageSizeChanged,
+      onSortingChange: onSortChange,
+      reactTableProps: resolvedReactTableProps,
+      rowStyling,
+      isFullScreen,
+      setIsFullScreen,
+      CheckBoxField: SelectCheckBox,
+      CheckBoxHeader: SelectCheckBoxHeader,
+      query: elasticSearchQuery
+    };
+  }, [
+    viewMode,
+    selectedResources,
+    searchResults,
+    loading,
+    columnSelectorLoading,
     totalRecords,
-    columns: columnsResults,
+    columnsResults,
     displayedColumns,
     pageSize,
     pageOffset,
     sortingRules,
-    onPageChange: onPageChanged,
-    onPageSizeChange: onPageSizeChanged,
-    onSortingChange: onSortChange,
-    reactTableProps: resolvedReactTableProps,
+    onPageChanged,
+    onPageSizeChanged,
+    onSortChange,
+    resolvedReactTableProps,
     rowStyling,
     isFullScreen,
     setIsFullScreen,
-    query: elasticSearchQuery
-  };
+    SelectCheckBox,
+    SelectCheckBoxHeader,
+    elasticSearchQuery
+  ]);
 
   /**
    * Renders tabs using react-tabs

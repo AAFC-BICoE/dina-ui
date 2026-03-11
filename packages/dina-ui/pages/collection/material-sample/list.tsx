@@ -12,7 +12,9 @@ import {
   QueryPage,
   SimpleSearchFilterBuilder,
   stringArrayCell,
-  useApiClient
+  useApiClient,
+  QueryPageTabConfig,
+  ListViewTab
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -27,8 +29,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../../dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
-import { QueryPageTabConfig } from "../../../../common-ui/lib/list-page/QueryPage";
-import { ListViewTab } from "../../../../common-ui/lib/list-page/tabs/tabs";
+
 export const MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
   "assemblages.",
