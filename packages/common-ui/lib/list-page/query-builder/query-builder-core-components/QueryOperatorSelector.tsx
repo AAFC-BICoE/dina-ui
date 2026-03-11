@@ -60,7 +60,7 @@ export function QueryOperatorSelector({
     ?.filter((option) => {
       // Only display the exact match option if keyword support exist.
       if (
-        (option.key === "exactMatch" || option.key === "notEquals") &&
+        option.key === "exactMatch" &&
         !selectedFieldMapping?.keywordMultiFieldSupport
       ) {
         return false;

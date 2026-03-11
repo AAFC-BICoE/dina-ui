@@ -12,20 +12,18 @@ import { FormikContextType, useFormikContext } from "formik";
 import _ from "lodash";
 import { useState } from "react";
 import { PersonSelectField } from "../..";
-import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   Determination,
   MaterialSample,
   Organism,
   ScientificNameSource,
-  Vocabulary
+  ControlledVocabularyItem
 } from "../../../types/collection-api";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { TabbedArrayField } from "../TabbedArrayField";
 import { GlobalNamesField } from "../global-names/GlobalNamesField";
 import { ScientificNameField } from "./ScientificNameField";
-
 export interface DeterminationFieldProps {
   className?: string;
 }
@@ -206,31 +204,17 @@ export function DeterminationField({
                   className="non-strip"
                   sectionName="organism-type-specimen-section"
                 >
-                  <AutoSuggestTextField<Vocabulary>
+                  <AutoSuggestTextField<ControlledVocabularyItem>
                     {...fieldProps("typeStatus")}
                     jsonApiBackend={{
                       query: () => ({
-                        path: "collection-api/vocabulary2/typeStatus"
+                        path: "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=type_status"
                       }),
-                      option: (vocabElement, searchValue) =>
-                        _.compact(
-                          vocabElement?.vocabularyElements
-                            ?.filter((it) => it?.name !== TypeStatusEnum.NONE)
-                            .filter((it) =>
-                              it?.name
-                                ?.toLowerCase?.()
-                                ?.includes(searchValue?.toLowerCase?.())
-                            )
-                            .map(
-                              (it) =>
-                                _.find(
-                                  it?.multilingualTitle?.titles || [],
-                                  (item) => item.lang === locale
-                                )?.title ||
-                                it.name ||
-                                ""
-                            ) ?? []
-                        )
+                      option: (vocabElement) =>
+                        _.find(
+                          vocabElement?.multilingualTitle?.titles || [],
+                          (item) => item.lang === locale
+                        )?.title
                     }}
                     blankSearchBackend={"json-api"}
                   />
