@@ -43,7 +43,8 @@ import {
   GeographicThesaurusSource,
   Protocol,
   Vocabulary,
-  Expedition
+  Expedition,
+  Site
 } from "../../../types/collection-api";
 import {
   CollectingEvent,
@@ -1044,29 +1045,46 @@ export function CollectingEventFormLayout({
       </div>
       <div className="row mb-3">
         <div className="col-md-6">
-          <div className="row">
-            <div className="col">
-              <FieldSet
-                legend={<DinaMessage id="collectingEventPartOfExpedition" />}
-                className="non-strip h-100"
-                componentName={COLLECTING_EVENT_COMPONENT_NAME}
-                sectionName="collecting-event-details"
-              >
-                <ResourceSelectField<Expedition>
-                  name="expedition"
-                  filter={(searchValue: string) =>
-                    SimpleSearchFilterBuilder.create<CollectionMethod>()
-                      .searchFilter("name", searchValue)
-                      .build()
-                  }
-                  model="collection-api/expedition"
-                  optionLabel={(expedition) => expedition.name}
-                  omitNullOption={false}
-                  readOnlyLink="/collection/expedition/view?id="
-                />
-              </FieldSet>
-            </div>
-          </div>
+          <FieldSet
+            legend={<DinaMessage id="collectingEventPartOfExpedition" />}
+            className="non-strip h-100"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="collecting-event-details"
+          >
+            <ResourceSelectField<Expedition>
+              name="expedition"
+              filter={(searchValue: string) =>
+                SimpleSearchFilterBuilder.create<CollectionMethod>()
+                  .searchFilter("name", searchValue)
+                  .build()
+              }
+              model="collection-api/expedition"
+              optionLabel={(expedition) => expedition.name}
+              omitNullOption={false}
+              readOnlyLink="/collection/expedition/view?id="
+            />
+          </FieldSet>
+        </div>
+        <div className="col-md-6">
+          <FieldSet
+            legend={<DinaMessage id="collectingEventSite" />}
+            className="non-strip h-100"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="collecting-event-details"
+          >
+            <ResourceSelectField<Site>
+              name="site"
+              filter={(searchValue: string) =>
+                SimpleSearchFilterBuilder.create<CollectionMethod>()
+                  .searchFilter("name", searchValue)
+                  .build()
+              }
+              model="collection-api/site"
+              optionLabel={(site) => site.name + " (" + site.code + ")" || ""}
+              omitNullOption={false}
+              readOnlyLink="/collection/site/view?id="
+            />
+          </FieldSet>
         </div>
       </div>
       <div>

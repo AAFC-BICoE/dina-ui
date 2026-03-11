@@ -86,7 +86,7 @@ export function SiteFormLayout({
         />
       </div>
       <div className="row">
-        <div className={messageId === "viewOnMap" ? "col-md-12" : "col-md-6"}>
+        <div className="col-md-6">
           <div style={{ marginBottom: "5px" }}>
             <strong>{formatMessage("siteCoordinates")}</strong>
           </div>
