@@ -98,14 +98,14 @@ export default function SampleTypeChart({ query }: SampleTypeChart) {
       data: chartData.map((d) => d.name),
       axisLabel: {
         interval: 0,
-        rotate: 45,
-        overflow: "break",
-        width: 80,
+        rotate: 25,
+        overflow: "breakAll",
         hideOverlap: false
       }
     },
     yAxis: {
-      type: "value"
+      type: "value",
+      minInterval: 1
     },
     series: [
       {
