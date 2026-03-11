@@ -881,17 +881,9 @@ export function QueryPage<TData extends KitsuResource>({
     defaultAvailableItems: selectedResources ?? []
   });
 
-  const computedReactTableProps =
-    typeof reactTableProps === "function"
-      ? reactTableProps(
-          searchResults as PersistedResource<TData>[],
-          SelectCheckBox
-        )
-      : reactTableProps;
-
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     sort: sortingRules,
-    ...computedReactTableProps
+    ...reactTableProps
   };
 
   // Columns generated for the search results.

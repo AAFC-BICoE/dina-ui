@@ -1,4 +1,3 @@
-import { useLocalStorage } from "@rehooks/local-storage";
 import {
   dateCell,
   FieldHeader,
@@ -14,18 +13,13 @@ import {
   DynamicFieldsMappingConfig,
   TableColumn
 } from "../../../../common-ui/lib/list-page/types";
-import { Component, useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Footer, Head, Nav, ThumbnailCell } from "../../../components";
-import {
-  MetadataPreview,
-  StoredObjectGallery
-} from "../../../components/object-store";
+import { MetadataPreview } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import { FaFileArrowUp } from "react-icons/fa6";
-
-type MetadataListLayoutType = "TABLE" | "GALLERY";
 
 export const OBJECT_STORE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
@@ -34,10 +28,6 @@ export const OBJECT_STORE_NON_EXPORTABLE_COLUMNS: string[] = [
   "viewDetails",
   "imageLink."
 ];
-
-const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
-
-const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
 
 export const dynamicFieldMappingForMetadata: DynamicFieldsMappingConfig = {
   fields: [
@@ -59,9 +49,6 @@ export const dynamicFieldMappingForMetadata: DynamicFieldsMappingConfig = {
 
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
-
-  const [listLayoutType, setListLayoutType] =
-    useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
@@ -196,19 +183,6 @@ export default function MetadataListPage() {
     }
   ];
 
-  // Workaround to make sure react-table doesn't unmount TBodyComponent
-  // when MetadataListPage is re-rendered:
-  const TBodyGallery = useMemo(
-    () =>
-      class ReusedTBodyComponent extends Component {
-        public static innerComponent;
-        public render() {
-          return ReusedTBodyComponent.innerComponent;
-        }
-      },
-    []
-  );
-
   const OBJECT_STORE_TABS: QueryPageTabConfig<Metadata>[] = [
     {
       id: "list",
@@ -237,12 +211,7 @@ export default function MetadataListPage() {
               <DinaMessage id="objectListTitle" />
             </h1>
           </div>
-          <div className="list-inline-item">
-            <ListLayoutSelector
-              onChange={(newValue) => setListLayoutType(newValue)}
-              value={listLayoutType ?? undefined}
-            />
-          </div>
+          <div className="list-inline-item"></div>
           <div className="list-inline-item float-end">
             <Link
               href="/object-store/upload"
@@ -285,36 +254,6 @@ export default function MetadataListPage() {
                     id: "xmpMetadataDate"
                   }
                 ]}
-                reactTableProps={(responseData, CheckBoxField) => {
-                  TBodyGallery.innerComponent = (
-                    <StoredObjectGallery
-                      CheckBoxField={CheckBoxField}
-                      metadatas={(responseData as any) ?? []}
-                      previewMetadataId={previewMetadata?.id as any}
-                      onSelectPreviewMetadata={setPreviewMetadata}
-                    />
-                  );
-
-                  return {
-                    TbodyComponent:
-                      listLayoutType === "GALLERY" ? TBodyGallery : undefined,
-                    getTrProps: (_, rowInfo) => {
-                      if (rowInfo) {
-                        const metadata: Metadata = rowInfo.original;
-                        return {
-                          style: {
-                            background:
-                              metadata.id === previewMetadata?.id &&
-                              HIGHLIGHT_COLOR
-                          }
-                        };
-                      }
-                      return {};
-                    },
-                    enableSorting: true,
-                    enableMultiSort: true
-                  };
-                }}
                 tabs={OBJECT_STORE_TABS}
                 defaultTab="list"
               />
@@ -344,36 +283,6 @@ export default function MetadataListPage() {
         </div>
       </main>
       <Footer />
-    </div>
-  );
-}
-
-function ListLayoutSelector({ value = "TABLE", onChange }) {
-  const items = [
-    {
-      layoutType: "TABLE",
-      message: <DinaMessage id="metadataListTableLayout" />
-    },
-    {
-      layoutType: "GALLERY",
-      message: <DinaMessage id="metadataListGalleryLayout" />
-    }
-  ];
-
-  return (
-    <div className="list-layout-selector list-inline">
-      {items.map(({ message, layoutType }) => (
-        <div className="list-inline-item" key={layoutType}>
-          <label>
-            <input
-              type="radio"
-              checked={value === layoutType}
-              onChange={() => onChange(layoutType)}
-            />
-            {message}
-          </label>
-        </div>
-      ))}
     </div>
   );
 }
