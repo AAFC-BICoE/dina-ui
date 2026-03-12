@@ -1,23 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import GeometryMapEditor from "packages/dina-ui/components/geo/GeometryMapEditor";
-import { PostMessageType } from "packages/dina-ui/types/geo/post-message.types";
 import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 import {
   getMapModules,
   projectPolygon3857To4326
 } from "packages/dina-ui/utils/geoUtils";
 import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
-import type {
-  GeoPosition,
-  GeoPolygon
-} from "packages/dina-ui/types/geo/geo.types";
+import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
+import ArcGISLoader from "../../geo/ArcGISLoader";
 
 type Props = {
-  polygon?: GeoPolygon | null;
+  coords: GeoPosition[][];
   mode?: PolygonEditorMode;
+  onCoordsChange: (coords: GeoPosition[][]) => void;
 };
 
-export function PolygonEditorMap({ polygon, mode }: Props) {
+export function PolygonEditorMap({ coords, mode, onCoordsChange }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const sketchRef = useRef<any>(null);
   const [graphicsLayer, setGraphicsLayer] = useState<any>(null);
@@ -66,11 +63,11 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
         });
         sketchRef.current = sketch;
 
-        if (polygon?.coordinates && polygon.coordinates.length) {
+        if (coords && coords.length) {
           const graphic = new Graphic({
             geometry: {
               type: "polygon",
-              rings: polygon.coordinates,
+              rings: coords,
               spatialReference: { wkid: 4326 }
             },
             symbol: polygonSymbol
@@ -96,18 +93,7 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
         viewInstance.destroy();
       }
     };
-  }, [polygon, mode]);
-
-  const handleErase = () => {
-    if (!graphicsLayer || !sketchRef.current) return;
-
-    sketchRef.current.cancel();
-    graphicsLayer.removeAll();
-
-    if (mode !== POLYGON_EDITOR_MODE.VIEW) {
-      sketchRef.current.create("polygon");
-    }
-  };
+  }, []);
 
   const handleSave = async () => {
     if (!graphicsLayer || !sketchRef.current) return;
@@ -117,41 +103,41 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
       sketchRef.current.complete();
     }
 
-    let coordinates: GeoPosition[][] = [];
-
-    if (graphicsLayer.graphics.length > 0) {
-      const graphic = graphicsLayer.graphics.getItemAt(0);
-
-      // exclude points
-      if (
-        graphic?.geometry?.rings?.length &&
-        graphic.geometry?.rings[0].length > 2
-      ) {
-        coordinates = await projectPolygon3857To4326(graphic.geometry.rings);
-      }
+    if (graphicsLayer.graphics.length === 0) {
+      onCoordsChange([]);
+      return;
     }
 
-    if (window.opener && !window.opener.closed) {
-      window.opener.postMessage(
-        {
-          type: PostMessageType.PolygonEdited,
-          coordinates
-        },
-        window.location.origin
-      );
-    }
+    const graphic = graphicsLayer.graphics.getItemAt(0);
 
-    window.close();
+    // exclude points
+    if (
+      graphic?.geometry?.rings?.length &&
+      graphic.geometry?.rings[0].length > 2
+    ) {
+      onCoordsChange(await projectPolygon3857To4326(graphic.geometry.rings));
+    }
   };
 
-  return mode === POLYGON_EDITOR_MODE.VIEW ? (
-    <GeometryMapEditor mapRef={mapRef} />
-  ) : (
-    <GeometryMapEditor
-      mapRef={mapRef}
-      buttons={["save", "erase"]}
-      handleSave={handleSave}
-      handleErase={handleErase}
-    />
+  return (
+    <>
+      <ArcGISLoader>
+        <div
+          className="mt-2 mb-4 w-100 rounded-2 overflow-hidden"
+          style={{
+            height: "200px",
+            background: "#f2f2f2"
+          }}
+        >
+          <div ref={mapRef} className="w-100 h-100" />
+        </div>
+      </ArcGISLoader>
+
+      <div className="float-end">
+        <button type="button" onClick={handleSave}>
+          Save
+        </button>
+      </div>
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "packages/dina-ui/components";
 import { SiteFormLayout } from "packages/dina-ui/components/collection/site/SiteFormLayout";
 import { Site } from "packages/dina-ui/types/collection-api";
+import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 
 export default function ViewPage() {
   return (
@@ -23,6 +24,7 @@ export default function ViewPage() {
           <SiteFormLayout
             popupUrl="/collection/site/polygon-editor"
             messageId="viewOnMap"
+            mode={POLYGON_EDITOR_MODE.VIEW}
           />
         </DinaForm>
       )}

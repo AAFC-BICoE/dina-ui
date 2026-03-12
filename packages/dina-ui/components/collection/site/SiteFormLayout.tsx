@@ -13,31 +13,26 @@ import {
 } from "packages/dina-ui/components";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
-import GeometryMapEditorLauncher from "packages/dina-ui/components/geo/GeometryMapEditorLauncher";
 import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
-import {
-  PostMessage,
-  PostMessageType
-} from "packages/dina-ui/types/geo/post-message.types";
+import { Site } from "packages/dina-ui/types/collection-api";
+import { PolygonEditorMap } from "./PolygonEditorMap";
+import { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 
 type Props = {
   popupUrl: string;
   messageId: string;
+  mode: PolygonEditorMode;
   attachmentsConfig?: AllowAttachmentsConfig;
 };
 
-export function SiteFormLayout({
-  popupUrl,
-  messageId,
-  attachmentsConfig
-}: Props) {
+export function SiteFormLayout({ mode, attachmentsConfig }: Props) {
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
   const [{ value }] = useField("siteGeom");
   const [coords, setCoords] = useState<GeoPosition[][]>(
     value?.coordinates ?? []
   );
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue } = useFormikContext<Site>();
 
   useEffect(() => {
     setFieldValue("siteGeom", {
@@ -45,22 +40,6 @@ export function SiteFormLayout({
       coordinates: coords
     });
   }, [coords, setFieldValue]);
-
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent<PostMessage>) => {
-      if (event.origin !== window.location.origin) return;
-
-      if (event.data?.type === PostMessageType.PolygonEdited) {
-        setCoords(event.data.coordinates ?? []);
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
 
   return (
     <div>
@@ -86,19 +65,15 @@ export function SiteFormLayout({
         />
       </div>
       <div className="row">
-        <div className="col-md-6">
-          <div style={{ marginBottom: "5px" }}>
+        <div className={`col-md-6 ${coords.length === 0 && "mb-4"}`}>
+          <div className="">
             <strong>{formatMessage("siteCoordinates")}</strong>
           </div>
-        </div>
-        <div style={{ marginTop: "5px", marginBottom: "25px" }}>
-          {(coords.length || messageId !== "viewOnMap") && (
-            <GeometryMapEditorLauncher
-              type="Polygon"
-              fieldName="siteGeom"
-              siteGeom={coords}
-              url={popupUrl}
-              messageId={messageId}
+          {(!readOnly || coords.length > 0) && (
+            <PolygonEditorMap
+              coords={coords}
+              mode={mode}
+              onCoordsChange={setCoords}
             />
           )}
         </div>
