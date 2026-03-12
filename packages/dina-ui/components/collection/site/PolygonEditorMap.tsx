@@ -14,7 +14,11 @@ type Props = {
   onCoordsChange: (coords: GeoPosition[][]) => void;
 };
 
-export function PolygonEditorMap({ coords, mode, onCoordsChange }: Props) {
+export default function PolygonEditorMap({
+  coords,
+  mode,
+  onCoordsChange
+}: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const sketchRef = useRef<any>(null);
   const [graphicsLayer, setGraphicsLayer] = useState<any>(null);
@@ -63,7 +67,7 @@ export function PolygonEditorMap({ coords, mode, onCoordsChange }: Props) {
         });
         sketchRef.current = sketch;
 
-        if (coords && coords.length) {
+        if (coords?.length) {
           const graphic = new Graphic({
             geometry: {
               type: "polygon",
@@ -89,55 +93,44 @@ export function PolygonEditorMap({ coords, mode, onCoordsChange }: Props) {
     );
 
     return () => {
-      if (viewInstance) {
-        viewInstance.destroy();
-      }
+      viewInstance?.destroy();
     };
   }, []);
 
-  const handleSave = async () => {
-    if (!graphicsLayer || !sketchRef.current) return;
+  useEffect(() => {
+    if (!graphicsLayer) return;
 
-    // Finish any active drawing/edit
-    if (sketchRef.current.state === "active") {
-      sketchRef.current.complete();
-    }
+    const updateCoords = async () => {
+      const graphic = graphicsLayer.graphics.getItemAt(0);
 
-    if (graphicsLayer.graphics.length === 0) {
-      onCoordsChange([]);
-      return;
-    }
+      if (graphic) {
+        onCoordsChange(await projectPolygon3857To4326(graphic.geometry.rings));
+      } else {
+        onCoordsChange([]);
+        sketchRef.current?.create("polygon");
+      }
+    };
 
-    const graphic = graphicsLayer.graphics.getItemAt(0);
+    const updateHandle = sketchRef.current?.on("update", updateCoords);
+    const changeHandle = graphicsLayer.graphics.on("change", updateCoords);
 
-    // exclude points
-    if (
-      graphic?.geometry?.rings?.length &&
-      graphic.geometry?.rings[0].length > 2
-    ) {
-      onCoordsChange(await projectPolygon3857To4326(graphic.geometry.rings));
-    }
-  };
+    return () => {
+      updateHandle?.remove();
+      changeHandle?.remove();
+    };
+  }, [graphicsLayer]);
 
   return (
-    <>
-      <ArcGISLoader>
-        <div
-          className="mt-2 mb-4 w-100 rounded-2 overflow-hidden"
-          style={{
-            height: "200px",
-            background: "#f2f2f2"
-          }}
-        >
-          <div ref={mapRef} className="w-100 h-100" />
-        </div>
-      </ArcGISLoader>
-
-      <div className="float-end">
-        <button type="button" onClick={handleSave}>
-          Save
-        </button>
+    <ArcGISLoader>
+      <div
+        className="mt-2 mb-4 w-100 rounded-2 overflow-hidden"
+        style={{
+          height: "250px",
+          background: "#f2f2f2"
+        }}
+      >
+        <div ref={mapRef} className="w-100 h-100" />
       </div>
-    </>
+    </ArcGISLoader>
   );
 }

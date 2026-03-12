@@ -15,17 +15,15 @@ import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
 import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
 import { Site } from "packages/dina-ui/types/collection-api";
-import { PolygonEditorMap } from "./PolygonEditorMap";
 import { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
+import PolygonEditorMap from "./PolygonEditorMap";
 
 type Props = {
-  popupUrl: string;
-  messageId: string;
   mode: PolygonEditorMode;
   attachmentsConfig?: AllowAttachmentsConfig;
 };
 
-export function SiteFormLayout({ mode, attachmentsConfig }: Props) {
+export default function SiteFormLayout({ mode, attachmentsConfig }: Props) {
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
   const [{ value }] = useField("siteGeom");
