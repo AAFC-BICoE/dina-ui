@@ -45,6 +45,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
@@ -60,6 +61,7 @@ import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
+import { BibliographicReferencesField } from "../bibliographic-references/BibliographicReferencesField";
 import { CollectionSelectSection } from "../CollectionSelectSection";
 import { ShowParentAttributesField } from "./ShowParentAttributesField";
 import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
@@ -338,6 +340,22 @@ export function MaterialSampleForm({
               messageIdSingle="bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Single"
               messageIdMultiple="bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Multi"
               fieldName="scheduledActions"
+            >
+              {content}
+            </BulkEditTabWarning>
+          )}
+        />
+      ),
+    [BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME]: (id) =>
+      !reduceRendering &&
+      dataComponentState.enableBibliographicReferences && (
+        <BibliographicReferencesField
+          id={id}
+          wrapContent={(content) => (
+            <BulkEditTabWarning
+              messageIdSingle="bulkEditResourceSetWarning_BibliographicReferences_MaterialSample_Single"
+              messageIdMultiple="bulkEditResourceSetWarning_BibliographicReferences_MaterialSample_Multi"
+              fieldName="bibliographicReferences"
             >
               {content}
             </BulkEditTabWarning>

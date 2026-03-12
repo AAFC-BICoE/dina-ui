@@ -41,6 +41,7 @@ import {
   ORGANISMS_COMPONENT_NAME,
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
+  BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
   ScientificNameSource,
@@ -448,6 +449,16 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasBibliographicReferencesTemplate =
+    isTemplate &&
+    !_.isEmpty(
+      _.pickBy(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        (_, key) => key.startsWith(BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME)
+      )
+    );
+
+
   const hasShowParentAttributes =
     isTemplate &&
     (materialSampleTemplateInitialValues?.parentAttributes?.length ?? 0) > 0;
@@ -464,6 +475,7 @@ export function useMaterialSampleSave({
     useState<boolean>(false);
   const [enableAssociations, setEnableAssociations] = useState<boolean>(false);
   const [enableRestrictions, setEnableRestrictions] = useState<boolean>(false);
+  const [enableBibliographicReferences, setEnableBibliographicReferences] = useState<boolean>(false);
 
   // Delete Data Component
   const [deleteCollectingEvent, setDeleteCollectingEvent] =
@@ -582,7 +594,21 @@ export function useMaterialSampleSave({
             )
       )
     );
+
+    setEnableBibliographicReferences(
+      // Show the references section if the field is set or the template enables it:
+      Boolean(
+        hasBibliographicReferencesTemplate
+          ? true
+          : formTemplate
+          ? _.find(formTemplate?.components, {
+              name: BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME
+            })?.visible ?? false
+          : materialSample?.scheduledActions?.length
+      )
+    );
   }, [formTemplate]);
+  
 
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
@@ -619,6 +645,10 @@ export function useMaterialSampleSave({
     enableRestrictions,
     setEnableRestrictions,
     setDeleteRestrictions,
+
+    // Bibliographic References
+    enableBibliographicReferences,
+    setEnableBibliographicReferences,
 
     // Parent Attributes (Form template only)
     enableShowParentAttributes,

@@ -78,6 +78,7 @@ export interface MaterialSampleAttributes {
 
   isRestricted?: boolean;
   restrictionRemarks?: string | null;
+  bibliographicReferences?: BibliographicReference[];
   extensionValues?: any;
   version?: string;
 
@@ -105,6 +106,18 @@ export interface ScheduledAction {
   actionStatus?: string;
   assignedTo?: KitsuResourceLink;
   remarks?: string;
+}
+
+export interface BibliographicReference {
+  doi?: string;
+  title?: string;
+  year?: number;
+  author?: string[];
+  authorID?: string[];
+  journal?: string;
+  volume?: string;
+  pages?: string;
+  referenceRemarks?: string;
 }
 
 export interface MaterialSampleRelationships {
