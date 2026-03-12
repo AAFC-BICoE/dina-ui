@@ -44,11 +44,12 @@ export default function ReportEditPage() {
 
   const title = id ? "editReportTemplateTitle" : "addReportTemplateTitle";
   let query: any;
-  if (id) {
-    query = useQuery<ReportTemplate>({
+  query = useQuery<ReportTemplate>(
+    {
       path: `dina-export-api/report-template/${id}`
-    });
-  }
+    },
+    { disabled: !id }
+  );
 
   return (
     <div>

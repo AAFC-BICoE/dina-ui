@@ -206,5 +206,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   allResults: "All Results",
   searchResultsFor: 'Search Results for "{searchTerm}"',
   resultsFound: "{count} results found",
-  topMatches: "Top Matches"
+  topMatches: "Top Matches",
+  permissionError:
+    "You don't have permissions to delete all of these selected records.",
+  deleteSuccess: "Successfully deleted {count} records."
 };

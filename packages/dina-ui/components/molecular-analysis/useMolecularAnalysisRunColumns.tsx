@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useMemo } from "react";
 import {
   DeleteArgs,
   FieldHeader,
@@ -38,6 +38,7 @@ interface UseMolecularAnalysisRunColumnsProps {
   setSequencingRunItems?: Dispatch<
     SetStateAction<SequencingRunItem[] | undefined>
   >;
+  deps?: any[]; // Dependency array for useMemo, to allow for dynamic dependencies based on input
 }
 
 export function useMolecularAnalysisRunColumns({
@@ -48,7 +49,8 @@ export function useMolecularAnalysisRunColumns({
   qualityControls,
   updateExistingQualityControls,
   qualityControlTypes,
-  setSequencingRunItems
+  setSequencingRunItems,
+  deps = []
 }: UseMolecularAnalysisRunColumnsProps) {
   const { compareByStringAndNumber } = useStringComparator();
   const { save } = useApiClient();
@@ -129,7 +131,7 @@ export function useMolecularAnalysisRunColumns({
           />
         );
       },
-      header: () => <DinaMessage id="molecularAnalysisRunItemName" />,
+      header: () => <FieldHeader name="molecularAnalysisRunItemName" />,
       accessorKey: "molecularAnalysisRunItem.name",
       sortingFn: (a: any, b: any): number =>
         compareByStringAndNumber(
@@ -952,7 +954,8 @@ export function useMolecularAnalysisRunColumns({
       GENERIC_MOLECULAR_ANALYSIS_RESULTS_COLUMNS,
     "quality-control": QUALITY_CONTROL_COLUMNS
   };
-  return MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP[type];
+
+  return useMemo(() => MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP[type], deps);
 
   function handleMolecularAnalysisRunItemNames(
     original: SequencingRunItem,

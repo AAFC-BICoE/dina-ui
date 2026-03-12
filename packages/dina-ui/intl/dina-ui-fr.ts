@@ -937,5 +937,16 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_status: "Statut",
   field_openedDate: "Date d'ouverture",
   field_closedDate: "Date de fermeture",
-  field_dueDate: "Date d'échéance"
+  field_dueDate: "Date d'échéance",
+  siteListTitle: "Site",
+  siteAttachments: "Pièces jointes au site",
+  code: "Code",
+  siteCoordinates: "Coordonnées du site",
+  waitingForPolygonData: "En attente des données polygonales...",
+  addSite: "Ajouter un site",
+  editSite: "Modifier le site",
+  createOnMap: "Créer sur la carte",
+  editOnMap: "Modifier sur la carte",
+  erase: "Effacer",
+  close: "Fermer"
 };

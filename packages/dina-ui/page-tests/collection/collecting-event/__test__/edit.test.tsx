@@ -37,14 +37,17 @@ const mockGet = jest.fn(async (model) => {
   // The get request will return the existing collecting-event.
   if (
     model ===
-    "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition"
+    "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition,site"
   ) {
     return { data: testCollectingEvent() };
   } else if (model === "agent-api/person") {
     return { data: [testAgent()] };
   } else if (model === "collection-api/vocabulary2/srs") {
     return { data: [testSrs()] };
-  } else if (model === "collection-api/vocabulary2/coordinateSystem") {
+  } else if (
+    model ===
+    "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format"
+  ) {
     return { data: [testCoordinates()] };
   } else if (model === "collection-api/collecting-event") {
     return { data: [] };

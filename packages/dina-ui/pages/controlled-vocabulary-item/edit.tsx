@@ -1,17 +1,17 @@
 import {
-  ButtonBar,
+  DateField,
   DinaForm,
-  DinaFormOnSubmit,
   MultilingualDescription,
   MultilingualTitle,
   ResourceSelectField,
   SelectField,
   SimpleSearchFilterBuilder,
   StringArrayField,
-  SubmitButton,
   TextField,
+  useAccount,
   useDinaFormContext,
   useQuery,
+  useSubmitHandler,
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
@@ -19,7 +19,7 @@ import _ from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { useState } from "react";
+import { createContext, RefObject, useContext, useRef, useState } from "react";
 import { GroupSelectField } from "../../components";
 import {
   getInitialVocabularyElementType,
@@ -36,10 +36,22 @@ import {
 } from "../../types/collection-api";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 import { ControlledVocabulary } from "../../types/collection-api/resources/ControlledVocabulary";
+import { FormikProps } from "formik";
+import { FaFloppyDisk } from "react-icons/fa6";
+
+interface FormSubmissionContextType {
+  submitForm?: () => void;
+  formRef?: RefObject<FormikProps<InputResource<ControlledVocabularyItem>>>;
+}
+
+const FormSubmissionContext = createContext<FormSubmissionContextType>({});
+
+function useFormSubmission() {
+  return useContext(FormSubmissionContext);
+}
 
 export function ControlledVocabularyItemEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
-  const { formatMessage } = useDinaIntl();
   const title = id
     ? "editControlledVocabularyItemTitle"
     : "addControlledVocabularyItemTitle";
@@ -52,6 +64,115 @@ export function ControlledVocabularyItemEditPage({ router }: WithRouterProps) {
     { disabled: id === undefined }
   );
 
+  return (
+    <>
+      {id ? (
+        <div>
+          {withResponse(query, ({ data }) => (
+            <ControlledVocabularyItemEditPageContent
+              router={router}
+              fetchedItem={data}
+              title={title}
+            />
+          ))}
+        </div>
+      ) : (
+        <ControlledVocabularyItemEditPageContent
+          router={router}
+          title={title}
+        />
+      )}
+    </>
+  );
+}
+
+interface ControlledVocabularyItemEditPageContentProps {
+  fetchedItem?: PersistedResource<ControlledVocabularyItem>;
+  router: WithRouterProps["router"];
+  title: string;
+}
+
+function ControlledVocabularyItemEditPageContent({
+  fetchedItem,
+  router,
+  title
+}: ControlledVocabularyItemEditPageContentProps) {
+  const { formatMessage } = useDinaIntl();
+  const formRef =
+    useRef<FormikProps<InputResource<ControlledVocabularyItem>>>(null);
+
+  const initialValues: InputResource<ControlledVocabularyItem> = fetchedItem
+    ? transformControlledVocabularyItemForForm(fetchedItem)
+    : { type: "controlled-vocabulary-item" };
+
+  const onSubmit = useSubmitHandler<InputResource<ControlledVocabularyItem>>({
+    resourceType: "controlled-vocabulary-item",
+    original: fetchedItem,
+    saveOptions: { apiBaseUrl: "/collection-api" },
+    relationshipMappings: [
+      {
+        sourceAttribute: "controlledVocabulary",
+        relationshipName: "controlledVocabulary",
+        relationshipType: "SINGLE" as const,
+        removeSourceAttribute: true,
+        entityType: "controlled-vocabulary"
+      }
+    ],
+    transforms: [
+      (submittedValues) => {
+        // Treat empty array or undefined as null:
+        if (!submittedValues.acceptedValues?.length) {
+          submittedValues.acceptedValues = null as any;
+        }
+
+        if (submittedValues.vocabularyElementType === "PICKLIST") {
+          submittedValues.vocabularyElementType = "STRING";
+        } else if (
+          submittedValues.vocabularyElementType === "INTEGER" ||
+          submittedValues.vocabularyElementType === "STRING"
+        ) {
+          submittedValues.acceptedValues = null as any;
+        }
+
+        // Don't save unit if type is not INTEGER/DECIMAL
+        if (
+          submittedValues.vocabularyElementType !== "INTEGER" &&
+          submittedValues.vocabularyElementType !== "DECIMAL"
+        ) {
+          delete submittedValues.unit;
+        }
+
+        // Convert the editable format to the stored format:
+        if (submittedValues.multilingualDescription) {
+          submittedValues.multilingualDescription = {
+            descriptions: _.toPairs(
+              submittedValues.multilingualDescription
+            ).map(([lang, desc]) => ({ lang, desc }))
+          };
+        }
+        if (submittedValues.multilingualTitle) {
+          submittedValues.multilingualTitle = {
+            titles: _.toPairs(submittedValues.multilingualTitle).map(
+              ([lang, title]) => ({ lang, title })
+            )
+          };
+        }
+
+        return submittedValues;
+      }
+    ],
+    onSuccess: async (savedItem) => {
+      await router.push(`/controlled-vocabulary-item/view?id=${savedItem.id}`);
+    }
+  });
+
+  const submitForm = () => {
+    if (formRef.current) {
+      formRef.current.submitForm();
+    }
+  };
+
+  const id = fetchedItem?.id;
   const backButton =
     id === undefined ? (
       <Link
@@ -69,121 +190,51 @@ export function ControlledVocabularyItemEditPage({ router }: WithRouterProps) {
       </Link>
     );
 
+  const buttonBarContent = <ButtonBarContent backButton={backButton} />;
+
   return (
-    <PageLayout titleId={formatMessage(title as any)}>
-      {id ? (
-        <div>
-          {withResponse(query, ({ data }) => (
-            <ControlledVocabularyItemForm
-              router={router}
-              fetchedItem={data}
-              backButton={backButton}
-            />
-          ))}
-        </div>
-      ) : (
-        <ControlledVocabularyItemForm router={router} backButton={backButton} />
-      )}
-    </PageLayout>
+    <FormSubmissionContext.Provider value={{ submitForm, formRef }}>
+      <PageLayout
+        titleId={formatMessage(title as any)}
+        buttonBarContent={buttonBarContent}
+      >
+        <DinaForm
+          initialValues={initialValues}
+          onSubmit={onSubmit}
+          innerRef={formRef}
+        >
+          <ControlledVocabularyItemFormLayout />
+        </DinaForm>
+      </PageLayout>
+    </FormSubmissionContext.Provider>
   );
 }
 
-interface ControlledVocabularyItemFormProps {
-  fetchedItem?: PersistedResource<ControlledVocabularyItem>;
-  router: WithRouterProps["router"];
-  backButton: JSX.Element;
-}
-
-function ControlledVocabularyItemForm({
-  fetchedItem,
-  router,
-  backButton
-}: ControlledVocabularyItemFormProps) {
-  const initialValues: InputResource<ControlledVocabularyItem> = fetchedItem
-    ? transformControlledVocabularyItemForForm(fetchedItem)
-    : { type: "controlled-vocabulary-item" };
-
-  const onSubmit: DinaFormOnSubmit<
-    InputResource<ControlledVocabularyItem>
-  > = async ({ api: { save }, submittedValues }) => {
-    // Treat empty array or undefined as null:
-    if (!submittedValues.acceptedValues?.length) {
-      submittedValues.acceptedValues = null as any;
-    }
-
-    if (submittedValues.vocabularyElementType === "PICKLIST") {
-      submittedValues.vocabularyElementType = "STRING";
-    } else if (
-      submittedValues.vocabularyElementType === "INTEGER" ||
-      submittedValues.vocabularyElementType === "STRING"
-    ) {
-      submittedValues.acceptedValues = null as any;
-    }
-
-    // Don't save unit if type is not INTEGER/DECIMAL
-    if (
-      submittedValues.vocabularyElementType !== "INTEGER" &&
-      submittedValues.vocabularyElementType !== "DECIMAL"
-    ) {
-      delete submittedValues.unit;
-    }
-
-    // Convert the editable format to the stored format:
-    submittedValues.multilingualDescription = {
-      descriptions: _.toPairs(submittedValues.multilingualDescription).map(
-        ([lang, desc]) => ({ lang, desc })
-      )
-    };
-
-    submittedValues.multilingualTitle = {
-      titles: _.toPairs(submittedValues.multilingualTitle).map(
-        ([lang, title]) => ({ lang, title })
-      )
-    };
-
-    // Clean up the controlledVocabulary relationship - only keep id and type
-    if (submittedValues.controlledVocabulary) {
-      const cvId = (submittedValues.controlledVocabulary as any).id;
-      submittedValues.controlledVocabulary = {
-        id: cvId,
-        type: "controlled-vocabulary"
-      } as any;
-    }
-
-    const [savedItem] = await save(
-      [
-        {
-          resource: submittedValues,
-          type: "controlled-vocabulary-item"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-
-    await router.push(`/controlled-vocabulary-item/view?id=${savedItem.id}`);
-  };
+function ButtonBarContent({ backButton }: { backButton: JSX.Element }) {
+  const { submitForm } = useFormSubmission();
 
   return (
-    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar className="mb-3">
-        <div className="col-md-6 col-sm-12 mt-2">{backButton}</div>
-        <div className="col-md-6 col-sm-12 d-flex">
-          <SubmitButton className="ms-auto" />
-        </div>
-      </ButtonBar>
-      <ControlledVocabularyItemFormLayout />
-    </DinaForm>
+    <>
+      <div className="col-md-6 col-sm-12 mt-2">{backButton}</div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <button
+          type="button"
+          className="btn btn-primary ms-auto"
+          style={{ width: "8rem" }}
+          onClick={submitForm}
+        >
+          <FaFloppyDisk className="me-2" />
+          <DinaMessage id="submitBtnText" />
+        </button>
+      </div>
+    </>
   );
 }
 
 export function ControlledVocabularyItemFormLayout() {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
-
-  const [selectedControlledVocabulary, setSelectedControlledVocabulary] =
-    useState<PersistedResource<ControlledVocabulary> | null>(
-      (initialValues?.controlledVocabulary as any) ?? null
-    );
+  const { isAdmin } = useAccount();
 
   const [vocabularyElementType, setVocabularyElementType] = useState<
     VocabularyElementType | undefined
@@ -201,11 +252,6 @@ export function ControlledVocabularyItemFormLayout() {
     value: dataType
   }));
 
-  // Check if MANAGED_ATTRIBUTE is selected
-  const isManagedAttributeSelected =
-    selectedControlledVocabulary?.type === "controlled-vocabulary" &&
-    (selectedControlledVocabulary as any)?.vocabClass === "MANAGED_ATTRIBUTE";
-
   return (
     <>
       <div className="row">
@@ -216,41 +262,35 @@ export function ControlledVocabularyItemFormLayout() {
             enableStoredDefaultGroup={true}
           />
         )}
+      </div>
+      <div className="row">
         <ResourceSelectField<ControlledVocabulary>
           className="col-md-6"
           name="controlledVocabulary"
           filter={(input) =>
             SimpleSearchFilterBuilder.create<ControlledVocabulary>()
               .searchFilter("name", input)
-              // User editable controlled vocabularies
-              .whereIn("name", ["MANAGED_ATTRIBUTE", "FIELD_EXTENSIONS"])
+              .when(!isAdmin, (builder) =>
+                // User editable controlled vocabularies
+                builder.whereIn("key", ["managed_attribute", "field_extension"])
+              )
               .build()
           }
           model="collection-api/controlled-vocabulary"
-          isDisabled={true}
           optionLabel={(cv) => cv.name}
-          onChange={(selected) => {
-            setSelectedControlledVocabulary(
-              selected as PersistedResource<ControlledVocabulary> | null
-            );
-          }}
           omitNullOption={true}
+        />
+        <SelectField
+          className="col-md-6"
+          name="dinaComponent"
+          options={ATTRIBUTE_COMPONENT_OPTIONS}
+          label={formatMessage("field_managedAttributeComponent")}
         />
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
         <TextField className="col-md-6" name="key" readOnly={true} />
       </div>
-      {isManagedAttributeSelected && (
-        <div className="row">
-          <SelectField
-            className="col-md-6"
-            name="dinaComponent"
-            options={ATTRIBUTE_COMPONENT_OPTIONS}
-            label={formatMessage("field_targetDataComponentType" as any)}
-          />
-        </div>
-      )}
       <div className="row">
         <SelectField
           className="col-md-6"
@@ -274,6 +314,20 @@ export function ControlledVocabularyItemFormLayout() {
       )}
       <MultilingualTitle />
       <MultilingualDescription />
+      {readOnly && (
+        <div className="row">
+          <DateField
+            className="col-md-6"
+            name="createdOn"
+            label={formatMessage("field_createdOn")}
+          />
+          <TextField
+            className="col-md-6"
+            name="createdBy"
+            label={formatMessage("field_createdBy")}
+          />
+        </div>
+      )}
     </>
   );
 }

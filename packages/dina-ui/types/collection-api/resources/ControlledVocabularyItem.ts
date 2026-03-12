@@ -20,9 +20,7 @@ export interface ControlledVocabularyItemAttributes {
 }
 
 export interface ControlledVocabularyItemRelationships {
-  controlledVocabulary?: {
-    data: KitsuResource & ControlledVocabulary;
-  };
+  controlledVocabulary?: ControlledVocabulary;
 }
 
 export type ControlledVocabularyItem = KitsuResource &

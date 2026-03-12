@@ -5,7 +5,7 @@ import { mountWithAppContext } from "common-ui";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   getSampleBulkOverrider,
-  initializeRefHookFormProps
+  useRefHookFormProps
 } from "../../bulk-material-sample/MaterialSampleBulkEditor";
 import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-template/useMaterialSampleFormTemplateSelectState";
 import { MaterialSampleFormProps } from "../../collection/material-sample/MaterialSampleForm";
@@ -42,7 +42,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     sampleHooks: any;
     materialSampleForm: JSX.Element;
     formTemplateProps: Partial<MaterialSampleFormProps>;
-  } = initializeRefHookFormProps(
+  } = useRefHookFormProps(
     [baseSample],
     visibleManagedAttributeKeys,
     selectedTab,
@@ -161,7 +161,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/storage-unit-type":
     case "collection-api/vocabulary2/degreeOfEstablishment":
     case "collection-api/vocabulary2/srs":
-    case "collection-api/vocabulary2/coordinateSystem":
+    case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format":
     case "collection-api/form-template":
       return { data: [] };
   }

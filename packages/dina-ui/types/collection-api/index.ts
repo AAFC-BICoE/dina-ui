@@ -25,3 +25,5 @@ export * from "./resources/ManagedAttribute";
 export * from "./resources/MaterialSampleSummary";
 export * from "./resources/GeographicThesaurus";
 export * from "./resources/Expedition";
+export * from "./resources/Site";
+export * from "./resources/ControlledVocabularyItem";

@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "vscjava.vscode-java-pack",
-    "msjsdiag.debugger-for-chrome",
     "ms-azuretools.vscode-docker",
     "gabrielbb.vscode-lombok",
     "esbenp.prettier-vscode",

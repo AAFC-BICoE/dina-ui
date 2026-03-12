@@ -81,6 +81,7 @@ describe("QueryPage test", () => {
       </DinaForm>,
       testCtx
     );
+    await waitForLoadingToDisappear();
 
     const reactTable = await wrapper.findByTestId("ReactTable");
     expect(reactTable).toBeInTheDocument();
@@ -99,6 +100,7 @@ describe("QueryPage test", () => {
       })
     );
 
+    await waitForLoadingToDisappear();
     await waitFor(() => {
       expect(wrapper.getByText(/delete selected \(2\)/i)).toBeInTheDocument();
     });
@@ -127,6 +129,15 @@ describe("QueryPage test", () => {
         apiBaseUrl: "/collection-api"
       }
     );
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/records have been successfully deleted\./i)
+      ).toBeInTheDocument();
+    });
+
+    // Click the "Close" button.
+    userEvent.click(wrapper.getByRole("button", { name: /close/i }));
 
     // Verify router.reload() is called at the very end
     await waitFor(() => {

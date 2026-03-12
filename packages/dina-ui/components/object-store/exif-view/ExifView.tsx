@@ -8,12 +8,13 @@ interface ObjectUploadProps {
 }
 
 export function ExifView({ objectUpload }: ObjectUploadProps) {
+  const { formatMessage } = useDinaIntl();
+
   if (
     objectUpload &&
     objectUpload.exif &&
     Object.keys(objectUpload.exif).length > 0
   ) {
-    const { formatMessage } = useDinaIntl();
     return (
       <CollapsableSection
         collapserId={objectUpload?.id ?? ""}

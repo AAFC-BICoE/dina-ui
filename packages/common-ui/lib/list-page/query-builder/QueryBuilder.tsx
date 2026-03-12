@@ -23,7 +23,9 @@ export interface QueryBuilderContextI {
   groups: string[];
 }
 
-const QueryBuilderContext = createContext<QueryBuilderContextI | null>(null);
+export const QueryBuilderContext = createContext<QueryBuilderContextI | null>(
+  null
+);
 
 export const QueryBuilderContextProvider = QueryBuilderContext.Provider;
 

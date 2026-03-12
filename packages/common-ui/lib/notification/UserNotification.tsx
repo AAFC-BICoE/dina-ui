@@ -3,7 +3,6 @@ import { FaBell, FaCheck } from "react-icons/fa";
 import { useNotification } from "./useNotification";
 import { NotificationCard } from "./NotificationCard";
 import { CommonMessage } from "../intl/common-ui-intl";
-import "./notification.css";
 
 export interface UserNotificationProps {
   /**

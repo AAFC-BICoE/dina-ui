@@ -40,12 +40,13 @@ export function DerivativeForm({
 }: MetadataFormProps) {
   const { formatMessage } = useIntl();
 
+  const derivativeSaveResponse = useDerivativeSave({
+    initialValues: derivative,
+    onSaved
+  });
+
   const { initialValues, onSubmit } =
-    derivativeSaveHook ??
-    useDerivativeSave({
-      initialValues: derivative,
-      onSaved
-    });
+    derivativeSaveHook ?? derivativeSaveResponse;
 
   const derivativeOnSubmit = async (submittedValues) => {
     await onSubmit(submittedValues);

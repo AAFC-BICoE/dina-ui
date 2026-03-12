@@ -18,6 +18,8 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { SWRConfig } from "swr";
 import { PartialDeep } from "type-fest";
 import { screen, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryBuilderContext } from "../list-page/query-builder/QueryBuilder";
 
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
@@ -91,35 +93,60 @@ export function MockAppContextProvider({
 
   const modalWrapperRef = useRef<HTMLDivElement>(null);
 
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: Infinity
+      }
+    }
+  });
+
+  const mockQueryBuilderValue = {
+    performSubmit: jest.fn(),
+    groups: ["test-group"]
+  };
+
   return (
-    <SWRConfig
-      // Reset SWR cache between tests.
-      value={{ provider: () => new Map() }}
-    >
-      <AccountProvider
-        value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
-      >
-        <ApiClientProvider
-          value={_.merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
+    <QueryClientProvider client={queryClient}>
+      <QueryBuilderContext.Provider value={mockQueryBuilderValue}>
+        <SWRConfig
+          // Reset SWR cache between tests.
+          value={{ provider: () => new Map() }}
         >
-          <DinaIntlProvider>
-            <InstanceContextProvider
-              value={{ ...DEFAULT_INSTANCE_CONTEXT_VALUE, ...instanceContext }}
+          <AccountProvider
+            value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
+          >
+            <ApiClientProvider
+              value={_.merge(
+                {},
+                DEFAULT_API_CONTEXT_VALUE,
+                apiContextWithWarnings
+              )}
             >
-              <FileUploadProviderImpl>
-                <DndProvider backend={HTML5Backend}>
-                  <div ref={modalWrapperRef}>
-                    <ModalProvider appElement={modalWrapperRef.current}>
-                      {children}
-                    </ModalProvider>
-                  </div>
-                </DndProvider>
-              </FileUploadProviderImpl>
-            </InstanceContextProvider>
-          </DinaIntlProvider>
-        </ApiClientProvider>
-      </AccountProvider>
-    </SWRConfig>
+              <DinaIntlProvider>
+                <InstanceContextProvider
+                  value={{
+                    ...DEFAULT_INSTANCE_CONTEXT_VALUE,
+                    ...instanceContext
+                  }}
+                >
+                  <FileUploadProviderImpl>
+                    <DndProvider backend={HTML5Backend}>
+                      <div ref={modalWrapperRef}>
+                        <ModalProvider appElement={modalWrapperRef.current}>
+                          {children}
+                        </ModalProvider>
+                      </div>
+                    </DndProvider>
+                  </FileUploadProviderImpl>
+                </InstanceContextProvider>
+              </DinaIntlProvider>
+            </ApiClientProvider>
+          </AccountProvider>
+        </SWRConfig>
+      </QueryBuilderContext.Provider>
+    </QueryClientProvider>
   );
 }
 

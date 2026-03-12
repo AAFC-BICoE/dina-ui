@@ -24,7 +24,7 @@ import {
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
-import { useGenerateSequence } from "../collection/material-sample/useGenerateSequence";
+import { generateSequence } from "../collection/material-sample/useGenerateSequence";
 import { useEffect } from "react";
 import { Collection } from "packages/dina-ui/types/collection-api";
 
@@ -61,7 +61,7 @@ export function MaterialSampleGenerationForm({
   }) => {
     let generatedLowId: number;
     if (useNextSequence) {
-      useGenerateSequence({
+      generateSequence({
         collectionId: submittedValues.collection.id,
         amount: submittedValues.numberToCreate as any,
         save

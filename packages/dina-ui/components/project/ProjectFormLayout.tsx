@@ -7,12 +7,14 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { AttachmentsField, GroupSelectField } from "..";
+import { AttachmentsField, GroupSelectField, ProjectSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { AgentRolesField } from "../collection/AgentRolesField";
 import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
+import ProjectRelatedObjectTypeChart from "./ProjectRelatedObjectTypeChart";
+import ProjectRecordsAddedChart from "./ProjectRecordsAddedChart";
 
 export function ProjectFormLayout() {
   const { readOnly } = useDinaFormContext();
@@ -45,18 +47,6 @@ export function ProjectFormLayout() {
   return (
     <div>
       <div className="row">
-        <TextField
-          className="col-md-6 status"
-          name="status"
-          label={formatMessage("field_projectStatus")}
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="col-md-6 name"
-          name="name"
-          label={formatMessage("field_projectName")}
-        />
         {!readOnly && (
           <GroupSelectField
             name="group"
@@ -64,6 +54,24 @@ export function ProjectFormLayout() {
             className="col-md-6"
           />
         )}
+        <TextField
+          className="col-md-6 name"
+          name="name"
+          label={formatMessage("field_projectName")}
+        />
+      </div>
+      <div className="row">
+        <ProjectSelectField
+          className="col-md-6"
+          name="parentProject"
+          label={formatMessage("field_parentProject")}
+          isMulti={false}
+        />
+        <TextField
+          className="col-md-6 status"
+          name="status"
+          label={formatMessage("field_projectStatus")}
+        />
       </div>
       <div className="row">
         <DateField
@@ -130,6 +138,17 @@ export function ProjectFormLayout() {
             enableMultiSort: true
           }}
         />
+      )}
+
+      {readOnly && (
+        <div className="row">
+          <div className="col-md-6">
+            <ProjectRecordsAddedChart id={uuid} />
+          </div>
+          <div className="col-md-6">
+            <ProjectRelatedObjectTypeChart id={uuid} />
+          </div>
+        </div>
       )}
     </div>
   );

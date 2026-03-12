@@ -204,6 +204,12 @@ export interface ESIndexMapping {
    * Only provided if it was added using a dynamic field config.
    */
   dynamicField?: DynamicField;
+
+  /**
+   * Only provided for relationshipAutocomplete type fields.
+   * Contains the full config for this specific relationship autocomplete.
+   */
+  relationshipAutocompleteConfig?: RelationshipAutocompleteField;
 }
 
 /**
@@ -269,7 +275,8 @@ export const DYNAMIC_FIELD_TYPES = [
   "classification",
   "columnFunction",
   "vocabulary",
-  "imageLink"
+  "imageLink",
+  "relationshipAutocomplete"
 ] as const;
 export type DynamicFieldType = (typeof DYNAMIC_FIELD_TYPES)[number];
 
@@ -320,4 +327,25 @@ export interface DynamicField {
 export interface RelationshipDynamicField extends DynamicField {
   referencedBy: string;
   referencedType: string;
+}
+
+/**
+ * Configuration for relationship autocomplete search fields.
+ * Used to search for specific related records via autocomplete.
+ */
+export interface RelationshipAutocompleteField
+  extends RelationshipDynamicField {
+  /**
+   * The field name on the related resource to display in the autocomplete.
+   * Example: "displayName" for Person
+   */
+  optionLabel: string;
+
+  /**
+   * The path in elastic search to match the relationship UUID.
+   * Used with a nested query on the `included` array, filtering by the
+   * relationship type (referencedType) and matching the selected resource UUID.
+   * Example: "included.relationships.collectors.data.id"
+   */
+  elasticSearchRelationshipPath?: string;
 }

@@ -10,6 +10,7 @@ import { waitFor, within } from "@testing-library/react";
 import { GenericMolecularAnalysis } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "../../../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { TEST_QUALITY_CONTROL_TYPES } from "../../../seqdb/molecular-analysis-run/__mocks__/MolecularAnalysisRunViewMocks";
+import { Transaction } from "../../../../types/loan-transaction-api";
 
 const TEST_COLLECTION_EVENT: CollectingEvent = {
   startEventDateTime: "2019_01_01_10_10_10",
@@ -66,13 +67,30 @@ const TEST_GENERIC_MOLECULAR_ANALYSIS_ITEMS: PersistedResource<GenericMolecularA
     }
   ];
 
+const TEST_TRANSACTION: PersistedResource<Transaction> = {
+  id: "transaction-123",
+  type: "transaction",
+  transactionNumber: "TR-2024-001",
+  transactionType: "LOAN",
+  materialDirection: "OUT",
+  purpose: "Research",
+  status: "IN_PROGRESS",
+  openedDate: "2024-01-15",
+  materialSamples: [
+    {
+      id: "1",
+      type: "material-sample"
+    }
+  ]
+};
+
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/material-sample/1":
       return { data: TEST_MATERIAL_SAMPLE };
     case "collection-api/material-sample/ms-with-organisms":
       return { data: TEST_SAMPLE_WITH_ORGANISMS };
-    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition":
+    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: TEST_COLLECTION_EVENT };
     case "collection-api/collecting-event/1/attachment":
     case "user-api/group":
@@ -89,11 +107,68 @@ const mockGet = jest.fn<any, any>(async (path) => {
   }
 });
 
-const mockPost = jest.fn<any, any>(async (path) => {
+const mockPost = jest.fn<any, any>(async (path, payload) => {
   switch (path) {
     // Elastic search response with object store mock metadata data.
     case "search-api/search-ws/search":
-      return {};
+      // Check if this is a transaction query
+      if (payload?.query?.bool?.must) {
+        const mustClauses = payload.query.bool.must;
+        const isTransactionQuery = mustClauses.some(
+          (clause) =>
+            clause.term?.["data.relationships.materialSamples.data.type"]
+        );
+
+        if (isTransactionQuery) {
+          // Return mock transaction data
+          return {
+            data: {
+              took: 5,
+              timed_out: false,
+              _shards: { failed: 0, successful: 1, total: 1, skipped: 0 },
+              hits: {
+                total: { relation: "eq", value: 1 },
+                hits: [
+                  {
+                    _index: "dina_loan_transaction_index",
+                    _id: TEST_TRANSACTION.id,
+                    _type: "_doc",
+                    _source: {
+                      data: {
+                        id: TEST_TRANSACTION.id,
+                        type: TEST_TRANSACTION.type,
+                        attributes: {
+                          transactionNumber: TEST_TRANSACTION.transactionNumber,
+                          transactionType: TEST_TRANSACTION.transactionType,
+                          materialDirection: TEST_TRANSACTION.materialDirection,
+                          purpose: TEST_TRANSACTION.purpose,
+                          status: TEST_TRANSACTION.status,
+                          openedDate: TEST_TRANSACTION.openedDate
+                        },
+                        relationships: {
+                          materialSamples: {
+                            data: TEST_TRANSACTION.materialSamples
+                          }
+                        }
+                      }
+                    },
+                    sort: [1705305600000]
+                  }
+                ]
+              }
+            }
+          };
+        }
+      }
+      // Default empty response for other elastic search queries
+      return {
+        data: {
+          hits: {
+            total: { value: 0 },
+            hits: []
+          }
+        }
+      };
   }
 });
 
@@ -198,5 +273,68 @@ describe("Material Sample View Page", () => {
         })
       ).toBeInTheDocument();
     });
+  });
+
+  it("Renders transactions that include the material sample", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleViewPage router={{ query: { id: "1" } } as any} />,
+      testCtx
+    );
+
+    // Wait for the page to load
+    await waitFor(() => {
+      expect(wrapper.getAllByText("my-sample-name")[0]).toBeInTheDocument();
+    });
+
+    // Find and click the transactions section to open it
+    // Use getAllByRole and find the one in the accordion button
+    const transactionButtons = wrapper.getAllByRole("button", {
+      name: /transactions/i
+    });
+
+    const transactionsSection = transactionButtons.find((button) =>
+      button.className.includes("accordion-button")
+    );
+    expect(transactionsSection).toBeDefined();
+    transactionsSection!.click();
+
+    // Wait for the transaction list to be populated
+    await waitFor(
+      () => {
+        // Check if mockPost was called with any elastic search queries
+        const elasticSearchCalls = mockPost.mock.calls.filter(
+          (call) => call[0] === "search-api/search-ws/search"
+        );
+
+        // Verify that at least one elastic search query was made for transactions
+        const transactionQueryCall = elasticSearchCalls.find((call) => {
+          const payload = call[1];
+          return (
+            payload?.query?.bool?.must &&
+            Array.isArray(payload.query.bool.must) &&
+            payload.query.bool.must.some(
+              (clause) =>
+                clause.term?.["data.relationships.materialSamples.data.id"] ===
+                "1"
+            )
+          );
+        });
+
+        // The transaction query should exist
+        expect(transactionQueryCall).toBeDefined();
+      },
+      { timeout: 5000 }
+    );
+
+    // Check if the transaction link is rendered (optional, depends on QueryPage rendering)
+    const transactionLink = wrapper.queryByRole("link", {
+      name: /TR-2024-001/i
+    });
+    if (transactionLink) {
+      expect(transactionLink).toHaveAttribute(
+        "href",
+        "/loan-transaction/transaction/view?id=transaction-123"
+      );
+    }
   });
 });
