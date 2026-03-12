@@ -140,7 +140,7 @@ export default function MolecularAnalysisWorkflowRunPage() {
           pathname: "/export/molecular-analysis-export/export",
           query: {
             // Used for the back button to return back to this page.
-            entityLink: "/seqdb/molecular-analysis-workflow/run"
+            entityLink: "/seqdb/molecular-analysis-workflow"
           }
         });
       });
