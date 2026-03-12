@@ -1,6 +1,7 @@
 import {
   BackToListButton,
   DATA_EXPORT_QUERY_KEY,
+  DATA_EXPORT_TOTAL_RECORDS_KEY,
   filterBy,
   LoadingSpinner,
   useApiClient
@@ -24,6 +25,10 @@ import { MolecularAnalysisResultsStep } from "packages/dina-ui/components/seqdb/
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { uuidQuery } from "packages/common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { writeStorage } from "@rehooks/local-storage";
+import { FaTimes } from "react-icons/fa";
+import { FaFloppyDisk } from "react-icons/fa6";
+import { MdEdit } from "react-icons/md";
+import { FiDownload } from "react-icons/fi";
 
 export default function MolecularAnalysisWorkflowRunPage() {
   const { apiClient } = useApiClient();
@@ -125,6 +130,10 @@ export default function MolecularAnalysisWorkflowRunPage() {
         // Generate a query using the material sample IDs and save it into storage.
         const selectedIdsQuery = uuidQuery(materialSampleIds);
         writeStorage<any>(DATA_EXPORT_QUERY_KEY, selectedIdsQuery);
+        sessionStorage.setItem(
+          DATA_EXPORT_TOTAL_RECORDS_KEY,
+          materialSampleIds.length.toString()
+        );
 
         // Redirect to the molecular analysis export page.
         router.push({
@@ -146,6 +155,17 @@ export default function MolecularAnalysisWorkflowRunPage() {
       <div className="col-md-4">
         <BackToListButton entityLink="/seqdb/molecular-analysis-workflow" />
       </div>
+      {currentStep > 2 && (
+        <Button
+          variant={"secondary"}
+          className="ms-auto"
+          onClick={() => onExport()}
+          style={{ width: "10rem", marginRight: "8px" }}
+        >
+          <FiDownload className="me-2" />
+          <SeqdbMessage id="exportButtonText" />
+        </Button>
+      )}
       {editMode ? (
         <>
           <Button
@@ -154,7 +174,8 @@ export default function MolecularAnalysisWorkflowRunPage() {
             onClick={() => setEditMode(false)}
             style={{ width: "10rem" }}
           >
-            Cancel
+            <FaTimes className="me-2" />
+            <DinaMessage id="cancelButtonText" />
           </Button>
 
           <Button
@@ -177,29 +198,23 @@ export default function MolecularAnalysisWorkflowRunPage() {
                 </span>
               </>
             ) : (
-              <DinaMessage id="save" />
+              <>
+                <FaFloppyDisk className="me-2" />
+                <DinaMessage id="save" />
+              </>
             )}
           </Button>
         </>
       ) : (
         currentStep !== 4 && (
           <>
-            {currentStep > 2 && (
-              <Button
-                variant={"secondary"}
-                className="ms-auto"
-                onClick={() => onExport()}
-                style={{ width: "10rem", marginRight: "8px" }}
-              >
-                <SeqdbMessage id="exportButtonText" />
-              </Button>
-            )}
             <Button
               variant={"primary"}
               className={currentStep < 3 ? "ms-auto" : ""}
               onClick={() => setEditMode(true)}
               style={{ width: "10rem", marginRight: "15px" }}
             >
+              <MdEdit size={21} className="me-2" />
               <SeqdbMessage id="editButtonText" />
             </Button>
           </>
