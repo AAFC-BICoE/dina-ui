@@ -3,6 +3,7 @@
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function BOOL based identifier tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
         "bool": Object {
@@ -14,12 +15,8 @@ Object {
         },
       },
       Object {
-        "bool": Object {
-          "must": Object {
-            "term": Object {
-              "data.attributes.identifiers.seqdb_id.keyword": "",
-            },
-          },
+        "term": Object {
+          "data.attributes.identifiers.seqdb_id.keyword": "",
         },
       },
     ],
@@ -38,11 +35,13 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function BOOL based identifier tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
-    "must": Object {
-      "exists": Object {
-        "field": "data.attributes.identifiers.seqdb_id",
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.identifiers.seqdb_id",
+        },
       },
-    },
+    ],
     "must_not": Object {
       "term": Object {
         "data.attributes.identifiers.seqdb_id.keyword": "",
@@ -55,64 +54,55 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function BOOL based identifier tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "should": Array [
-            Object {
-              "bool": Object {
-                "must_not": Object {
-                  "nested": Object {
-                    "path": "included",
-                    "query": Object {
-                      "bool": Object {
-                        "must": Array [
-                          Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must_not": Object {
                             "exists": Object {
                               "field": "included.attributes.identifiers.seqdb_id",
                             },
                           },
-                          Object {
-                            "term": Object {
-                              "included.type": "material-sample",
-                            },
-                          },
-                        ],
+                        },
                       },
-                    },
-                  },
-                },
-              },
-            },
-            Object {
-              "nested": Object {
-                "path": "included",
-                "query": Object {
-                  "bool": Object {
-                    "must": Array [
                       Object {
                         "term": Object {
                           "included.attributes.identifiers.seqdb_id.keyword": "",
                         },
                       },
-                      Object {
-                        "term": Object {
-                          "included.type": "material-sample",
-                        },
-                      },
                     ],
                   },
                 },
-              },
+              ],
             },
-          ],
+          },
         },
       },
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
             },
           },
         },
@@ -154,13 +144,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "exists": Object {
+              "field": "included.attributes.identifiers.seqdb_id",
             },
           },
           Object {
-            "exists": Object {
-              "field": "included.attributes.identifiers.seqdb_id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         ],
@@ -829,40 +819,70 @@ Object {
 
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Attribute level tests Using the notEmpty operator, date_time subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.identifiers.seqdb_id",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.identifiers.seqdb_id",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Attribute level tests Using the notEmpty operator, date_time_optional_tz subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.identifiers.seqdb_id",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.identifiers.seqdb_id",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Attribute level tests Using the notEmpty operator, local_date subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.identifiers.seqdb_id",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.identifiers.seqdb_id",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Attribute level tests Using the notEmpty operator, local_date_time subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.identifiers.seqdb_id",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.identifiers.seqdb_id",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.identifiers.seqdb_id",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.identifiers.seqdb_id",
+        },
+      },
+    ],
   },
 }
 `;
@@ -1513,28 +1533,29 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the empty operator, date_time subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.identifiers.seqdb_id",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "material-sample",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1542,8 +1563,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
             },
           },
         },
@@ -1556,28 +1582,29 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the empty operator, date_time_optional_tz subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.identifiers.seqdb_id",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "material-sample",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1585,8 +1612,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
             },
           },
         },
@@ -1599,28 +1631,29 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the empty operator, local_date subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.identifiers.seqdb_id",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "material-sample",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1628,8 +1661,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
             },
           },
         },
@@ -1642,28 +1680,29 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the empty operator, local_date_time subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.identifiers.seqdb_id",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "material-sample",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1671,8 +1710,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
             },
           },
         },
@@ -1685,28 +1729,29 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DATE based identifier tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.identifiers.seqdb_id",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "material-sample",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1714,8 +1759,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
             },
           },
         },
@@ -3826,8 +3876,14 @@ Object {
 
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL based identifier tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.identifiers.seqdb_id",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.identifiers.seqdb_id",
+        },
+      },
+    ],
   },
 }
 `;
@@ -3905,28 +3961,29 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function DECIMAL based identifier tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.identifiers.seqdb_id",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "material-sample",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -3934,8 +3991,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
             },
           },
         },
@@ -4306,8 +4368,14 @@ Object {
 
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.identifiers.seqdb_id",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.identifiers.seqdb_id",
+        },
+      },
+    ],
   },
 }
 `;
@@ -4385,28 +4453,29 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.identifiers.seqdb_id",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "material-sample",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -4414,8 +4483,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
             },
           },
         },
@@ -4711,6 +4785,7 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
         "bool": Object {
@@ -4722,12 +4797,8 @@ Object {
         },
       },
       Object {
-        "bool": Object {
-          "must": Object {
-            "term": Object {
-              "data.attributes.identifiers.seqdb_id.keyword": "",
-            },
-          },
+        "term": Object {
+          "data.attributes.identifiers.seqdb_id.keyword": "",
         },
       },
     ],
@@ -4784,11 +4855,13 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
-    "must": Object {
-      "exists": Object {
-        "field": "data.attributes.identifiers.seqdb_id",
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.identifiers.seqdb_id",
+        },
       },
-    },
+    ],
     "must_not": Object {
       "term": Object {
         "data.attributes.identifiers.seqdb_id.keyword": "",
@@ -4915,64 +4988,55 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "should": Array [
-            Object {
-              "bool": Object {
-                "must_not": Object {
-                  "nested": Object {
-                    "path": "included",
-                    "query": Object {
-                      "bool": Object {
-                        "must": Array [
-                          Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must_not": Object {
                             "exists": Object {
                               "field": "included.attributes.identifiers.seqdb_id",
                             },
                           },
-                          Object {
-                            "term": Object {
-                              "included.type": "material-sample",
-                            },
-                          },
-                        ],
+                        },
                       },
-                    },
-                  },
-                },
-              },
-            },
-            Object {
-              "nested": Object {
-                "path": "included",
-                "query": Object {
-                  "bool": Object {
-                    "must": Array [
                       Object {
                         "term": Object {
                           "included.attributes.identifiers.seqdb_id.keyword": "",
                         },
                       },
-                      Object {
-                        "term": Object {
-                          "included.type": "material-sample",
-                        },
-                      },
                     ],
                   },
                 },
-              },
+              ],
             },
-          ],
+          },
         },
       },
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "material-sample",
+                },
+              },
             },
           },
         },
@@ -5068,13 +5132,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.type": "material-sample",
+            "exists": Object {
+              "field": "included.attributes.identifiers.seqdb_id",
             },
           },
           Object {
-            "exists": Object {
-              "field": "included.attributes.identifiers.seqdb_id",
+            "term": Object {
+              "included.type": "material-sample",
             },
           },
         ],

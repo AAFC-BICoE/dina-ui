@@ -714,40 +714,70 @@ Object {
 
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the notEmpty operator, date_time subtype, testing with null value 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.dateField",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.dateField",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the notEmpty operator, date_time_optional_tz subtype, testing with null value 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.dateField",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.dateField",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the notEmpty operator, local_date subtype, testing with null value 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.dateField",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.dateField",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the notEmpty operator, local_date_time subtype, testing with null value 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.dateField",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.dateField",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the notEmpty operator, undefined subtype, testing with null value 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.dateField",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.dateField",
+        },
+      },
+    ],
   },
 }
 `;
@@ -1498,28 +1528,29 @@ Object {
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the empty operator, date_time subtype, testing with null value 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collection",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "includes.name",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collection",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1527,8 +1558,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collection",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collection",
+                },
+              },
             },
           },
         },
@@ -1541,28 +1577,29 @@ Object {
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the empty operator, date_time_optional_tz subtype, testing with null value 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collection",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "includes.name",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collection",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1570,8 +1607,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collection",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collection",
+                },
+              },
             },
           },
         },
@@ -1584,28 +1626,29 @@ Object {
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the empty operator, local_date subtype, testing with null value 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collection",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "includes.name",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collection",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1613,8 +1656,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collection",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collection",
+                },
+              },
             },
           },
         },
@@ -1627,28 +1675,29 @@ Object {
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the empty operator, local_date_time subtype, testing with null value 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collection",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "includes.name",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collection",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1656,8 +1705,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collection",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collection",
+                },
+              },
             },
           },
         },
@@ -1670,28 +1724,29 @@ Object {
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the empty operator, undefined subtype, testing with null value 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collection",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "includes.name",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collection",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1699,8 +1754,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collection",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collection",
+                },
+              },
             },
           },
         },
