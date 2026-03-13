@@ -17,28 +17,29 @@ Object {
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Empty operation With relationship as field 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collection",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "includes.name",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collection",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -46,8 +47,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collection",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collection",
+                },
+              },
             },
           },
         },
@@ -91,8 +97,14 @@ Object {
 
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Not empty operation Normal field 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.booleanField",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.booleanField",
+        },
+      },
+    ],
   },
 }
 `;

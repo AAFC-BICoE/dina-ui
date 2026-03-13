@@ -3,6 +3,7 @@
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
         "bool": Object {
@@ -14,12 +15,8 @@ Object {
         },
       },
       Object {
-        "bool": Object {
-          "must": Object {
-            "term": Object {
-              "data.attributes.managedAttributes.attributeName.keyword": "",
-            },
-          },
+        "term": Object {
+          "data.attributes.managedAttributes.attributeName.keyword": "",
         },
       },
     ],
@@ -38,11 +35,13 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
-    "must": Object {
-      "exists": Object {
-        "field": "data.attributes.managedAttributes.attributeName",
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.managedAttributes.attributeName",
+        },
       },
-    },
+    ],
     "must_not": Object {
       "term": Object {
         "data.attributes.managedAttributes.attributeName.keyword": "",
@@ -55,64 +54,55 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "should": Array [
-            Object {
-              "bool": Object {
-                "must_not": Object {
-                  "nested": Object {
-                    "path": "included",
-                    "query": Object {
-                      "bool": Object {
-                        "must": Array [
-                          Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must_not": Object {
                             "exists": Object {
                               "field": "included.attributes.managedAttributes.attributeName",
                             },
                           },
-                          Object {
-                            "term": Object {
-                              "included.type": "collecting-event",
-                            },
-                          },
-                        ],
+                        },
                       },
-                    },
-                  },
-                },
-              },
-            },
-            Object {
-              "nested": Object {
-                "path": "included",
-                "query": Object {
-                  "bool": Object {
-                    "must": Array [
                       Object {
                         "term": Object {
                           "included.attributes.managedAttributes.attributeName.keyword": "",
                         },
                       },
-                      Object {
-                        "term": Object {
-                          "included.type": "collecting-event",
-                        },
-                      },
                     ],
                   },
                 },
-              },
+              ],
             },
-          ],
+          },
         },
       },
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
             },
           },
         },
@@ -154,13 +144,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
             },
           },
           Object {
-            "exists": Object {
-              "field": "included.attributes.managedAttributes.attributeName",
+            "term": Object {
+              "included.type": "collecting-event",
             },
           },
         ],
@@ -829,40 +819,70 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEmpty operator, date_time subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.managedAttributes.attributeName",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.managedAttributes.attributeName",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEmpty operator, date_time_optional_tz subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.managedAttributes.attributeName",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.managedAttributes.attributeName",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEmpty operator, local_date subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.managedAttributes.attributeName",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.managedAttributes.attributeName",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEmpty operator, local_date_time subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.managedAttributes.attributeName",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.managedAttributes.attributeName",
+        },
+      },
+    ],
   },
 }
 `;
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.managedAttributes.attributeName",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.managedAttributes.attributeName",
+        },
+      },
+    ],
   },
 }
 `;
@@ -1513,28 +1533,29 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, date_time subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.managedAttributes.attributeName",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collecting-event",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1542,8 +1563,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
             },
           },
         },
@@ -1556,28 +1582,29 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, date_time_optional_tz subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.managedAttributes.attributeName",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collecting-event",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1585,8 +1612,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
             },
           },
         },
@@ -1599,28 +1631,29 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, local_date subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.managedAttributes.attributeName",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collecting-event",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1628,8 +1661,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
             },
           },
         },
@@ -1642,28 +1680,29 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, local_date_time subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.managedAttributes.attributeName",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collecting-event",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1671,8 +1710,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
             },
           },
         },
@@ -1685,28 +1729,29 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.managedAttributes.attributeName",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collecting-event",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -1714,8 +1759,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
             },
           },
         },
@@ -3826,8 +3876,14 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.managedAttributes.attributeName",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.managedAttributes.attributeName",
+        },
+      },
+    ],
   },
 }
 `;
@@ -3905,28 +3961,29 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.managedAttributes.attributeName",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collecting-event",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -3934,8 +3991,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
             },
           },
         },
@@ -4306,8 +4368,14 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
-  "exists": Object {
-    "field": "data.attributes.managedAttributes.attributeName",
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.managedAttributes.attributeName",
+        },
+      },
+    ],
   },
 }
 `;
@@ -4385,28 +4453,29 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
-              "path": "included",
-              "query": Object {
-                "bool": Object {
-                  "must": Array [
-                    Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
                       "exists": Object {
                         "field": "included.attributes.managedAttributes.attributeName",
                       },
                     },
-                    Object {
-                      "term": Object {
-                        "included.type": "collecting-event",
-                      },
-                    },
-                  ],
+                  },
                 },
-              },
+              ],
             },
           },
         },
@@ -4414,8 +4483,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
             },
           },
         },
@@ -4700,6 +4774,7 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
         "bool": Object {
@@ -4711,12 +4786,8 @@ Object {
         },
       },
       Object {
-        "bool": Object {
-          "must": Object {
-            "term": Object {
-              "data.attributes.managedAttributes.attributeName.keyword": "",
-            },
-          },
+        "term": Object {
+          "data.attributes.managedAttributes.attributeName.keyword": "",
         },
       },
     ],
@@ -4773,11 +4844,13 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
-    "must": Object {
-      "exists": Object {
-        "field": "data.attributes.managedAttributes.attributeName",
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.managedAttributes.attributeName",
+        },
       },
-    },
+    ],
     "must_not": Object {
       "term": Object {
         "data.attributes.managedAttributes.attributeName.keyword": "",
@@ -4855,64 +4928,55 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "should": Array [
-            Object {
-              "bool": Object {
-                "must_not": Object {
-                  "nested": Object {
-                    "path": "included",
-                    "query": Object {
-                      "bool": Object {
-                        "must": Array [
-                          Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must_not": Object {
                             "exists": Object {
                               "field": "included.attributes.managedAttributes.attributeName",
                             },
                           },
-                          Object {
-                            "term": Object {
-                              "included.type": "collecting-event",
-                            },
-                          },
-                        ],
+                        },
                       },
-                    },
-                  },
-                },
-              },
-            },
-            Object {
-              "nested": Object {
-                "path": "included",
-                "query": Object {
-                  "bool": Object {
-                    "must": Array [
                       Object {
                         "term": Object {
                           "included.attributes.managedAttributes.attributeName.keyword": "",
                         },
                       },
-                      Object {
-                        "term": Object {
-                          "included.type": "collecting-event",
-                        },
-                      },
                     ],
                   },
                 },
-              },
+              ],
             },
-          ],
+          },
         },
       },
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
             },
           },
         },
@@ -5008,13 +5072,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
             },
           },
           Object {
-            "exists": Object {
-              "field": "included.attributes.managedAttributes.attributeName",
+            "term": Object {
+              "included.type": "collecting-event",
             },
           },
         ],
@@ -5153,6 +5217,7 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
         "bool": Object {
@@ -5164,12 +5229,8 @@ Object {
         },
       },
       Object {
-        "bool": Object {
-          "must": Object {
-            "term": Object {
-              "data.attributes.managedAttributes.attributeName.keyword": "",
-            },
-          },
+        "term": Object {
+          "data.attributes.managedAttributes.attributeName.keyword": "",
         },
       },
     ],
@@ -5226,11 +5287,13 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
-    "must": Object {
-      "exists": Object {
-        "field": "data.attributes.managedAttributes.attributeName",
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.managedAttributes.attributeName",
+        },
       },
-    },
+    ],
     "must_not": Object {
       "term": Object {
         "data.attributes.managedAttributes.attributeName.keyword": "",
@@ -5357,64 +5420,55 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "should": Array [
-            Object {
-              "bool": Object {
-                "must_not": Object {
-                  "nested": Object {
-                    "path": "included",
-                    "query": Object {
-                      "bool": Object {
-                        "must": Array [
-                          Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must_not": Object {
                             "exists": Object {
                               "field": "included.attributes.managedAttributes.attributeName",
                             },
                           },
-                          Object {
-                            "term": Object {
-                              "included.type": "collecting-event",
-                            },
-                          },
-                        ],
+                        },
                       },
-                    },
-                  },
-                },
-              },
-            },
-            Object {
-              "nested": Object {
-                "path": "included",
-                "query": Object {
-                  "bool": Object {
-                    "must": Array [
                       Object {
                         "term": Object {
                           "included.attributes.managedAttributes.attributeName.keyword": "",
                         },
                       },
-                      Object {
-                        "term": Object {
-                          "included.type": "collecting-event",
-                        },
-                      },
                     ],
                   },
                 },
-              },
+              ],
             },
-          ],
+          },
         },
       },
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
             },
           },
         },
@@ -5510,13 +5564,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.type": "collecting-event",
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
             },
           },
           Object {
-            "exists": Object {
-              "field": "included.attributes.managedAttributes.attributeName",
+            "term": Object {
+              "included.type": "collecting-event",
             },
           },
         ],
