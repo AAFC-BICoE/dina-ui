@@ -1,5 +1,6 @@
 import { ColumnDef, Row } from "@tanstack/react-table";
 import {
+  CheckBoxWithoutWrapper,
   DinaForm,
   FieldHeader,
   FieldSet,
@@ -10,7 +11,7 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { FormikContextType } from "formik";
+import { FormikContextType, FieldArray } from "formik";
 import _ from "lodash";
 import { Fragment, ReactNode, useState } from "react";
 import * as yup from "yup";
@@ -22,12 +23,21 @@ import {
 import React from "react";
 import { MdEdit } from "react-icons/md";
 import Switch from "react-switch";
+import { FaMinus, FaPlus } from "react-icons/fa";
 
 /** Type-safe object with all BibliographicReference fields. */
 export const BIBLIOGRAPHIC_REFERENCE_FIELDS_OBJECT: Required<
   Record<keyof BibliographicReference, true>
 > = {
-  title: true
+  title: true,
+  doi: true,
+  year: true,
+  author: true,
+  authorID: true,
+  journal: true,
+  volume: true,
+  pages: true,
+  referenceRemarks: true
 };
 
 /** All fields of the BibliographicReference type. */
@@ -85,47 +95,105 @@ export function BibliographicReferencesField({
     {
       id: "doi",
       accessorKey: "doi",
-      header: () => <FieldHeader name={formatMessage("doi")} />
+      header: () => <FieldHeader name={formatMessage("doi")} />,
+      cell: ({ getValue }) => {
+        const doi = getValue() as string;
+        return doi ? (
+          <a
+            href={`https://doi.org/${doi}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {doi}
+          </a>
+        ) : null;
+      },
+      meta: {
+        style: { verticalAlign: "top" }
+      }
     },
     {
       id: "title",
       accessorKey: "title",
-      header: () => <FieldHeader name={formatMessage("title")} />
+      header: () => <FieldHeader name={formatMessage("title")} />,
+      meta: {
+        style: { verticalAlign: "top" }
+      }
     },
     {
       id: "year",
       accessorKey: "year",
-      header: () => <FieldHeader name={formatMessage("year")} />
+      header: () => <FieldHeader name={formatMessage("year")} />,
+      meta: {
+        style: { verticalAlign: "top" }
+      }
     },
     {
       id: "author",
       accessorKey: "author",
-      header: () => <FieldHeader name={formatMessage("author")} />
+      header: () => <FieldHeader name={formatMessage("author")} />,
+      meta: {
+        style: { verticalAlign: "top" }
+      }
     },
     {
       id: "authorID",
       accessorKey: "authorID",
-      header: () => <FieldHeader name={formatMessage("authorID")} />
+      header: () => <FieldHeader name={formatMessage("authorID")} />,
+      cell: ({ getValue }) => {
+        const authorIDs = getValue() as string[];
+        if (!authorIDs) return null;
+
+        return (
+          <div className="d-flex flex-column gap-1">
+            {authorIDs.map((id, index) => (
+              <a
+                key={index}
+                href={`${id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {id}
+              </a>
+            ))}
+          </div>
+        );
+      },
+      meta: {
+        style: { verticalAlign: "top" }
+      }
     },
     {
       id: "journal",
       accessorKey: "journal",
-      header: () => <FieldHeader name={formatMessage("journal")} />
+      header: () => <FieldHeader name={formatMessage("journal")} />,
+      meta: {
+        style: { verticalAlign: "top" }
+      }
     },
     {
       id: "volume",
       accessorKey: "volume",
-      header: () => <FieldHeader name={formatMessage("volume")} />
+      header: () => <FieldHeader name={formatMessage("volume")} />,
+      meta: {
+        style: { verticalAlign: "top" }
+      }
     },
     {
       id: "pages",
       accessorKey: "pages",
-      header: () => <FieldHeader name={formatMessage("pages")} />
+      header: () => <FieldHeader name={formatMessage("pages")} />,
+      meta: {
+        style: { verticalAlign: "top" }
+      }
     },
     {
       id: "referenceRemarks",
       accessorKey: "referenceRemarks",
-      header: () => <FieldHeader name={formatMessage("referenceRemarks")} />
+      header: () => <FieldHeader name={formatMessage("referenceRemarks")} />,
+      meta: {
+        style: { verticalAlign: "top" }
+      }
     },
     ...(readOnly
       ? []
@@ -199,7 +267,6 @@ export function BibliographicReferencesField({
                 {hasReferences && (
                   <ReactTable<BibliographicReference>
                     columns={columns}
-                    sort={[{ id: "date", desc: true }]}
                     data={bibliographicReferences}
                     showPagination={false}
                     className="-striped mb-2"
@@ -266,6 +333,7 @@ export function BibliographicReferenceSubForm({
 }: BibliographicReferenceSubFormProps) {
   const { initialValues, isTemplate } = useDinaFormContext();
   const [isManualInput, setIsManualInput] = useState(false);
+  const [doiFetchError, setDoiFetchError] = useState<boolean>(false);
   const { formatMessage } = useDinaIntl();
 
   // TODO: This needs to be fixed.
@@ -326,7 +394,17 @@ export function BibliographicReferenceSubForm({
           initialValues={
             referenceToEdit ??
             referenceTemplateInitialValues ??
-            ({} as BibliographicReference)
+            ({
+              doi: "",
+              title: "",
+              year: undefined,
+              author: [""],
+              authorID: [""],
+              journal: "",
+              volume: "",
+              pages: "",
+              referenceRemarks: ""
+            } as BibliographicReference)
           }
           componentName={BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME}
           sectionName="bibliographic-references-add-section"
@@ -338,43 +416,67 @@ export function BibliographicReferenceSubForm({
               placeholder={formatMessage("doiPlaceholder")}
             />
             {!isManualInput && (
-              <FormikButton
-                className="btn btn-primary mb-3 add-new-button"
-                buttonProps={() => ({ style: { width: "10rem" } })}
-                onClick={(values, formik) => {
-                  const doiValue = values.doi;
-                  if (doiValue) {
-                    const fetchUrl = `https://api.openalex.org/works/https://doi.org/${doiValue}`;
-                    window
-                      .fetch(fetchUrl)
-                      .then((res) => res.json())
-                      .then((json) => {
-                        formik.setFieldValue("title", json.title);
-                        formik.setFieldValue("year", json.publication_year);
-                        formik.setFieldValue(
-                          "author",
-                          json.authorships?.map(
-                            (authorship) => authorship.author.display_name
-                          )
-                        );
-                        formik.setFieldValue(
-                          "authorID",
-                          json.authorships?.map(
-                            (authorship) => authorship.author.orcid
-                          )
-                        );
-                        formik.setFieldValue(
-                          "journal",
-                          json.primary_location?.source?.display_name
-                        );
-                        formik.setFieldValue("volume", json.biblio?.volume);
-                        formik.setFieldValue("pages", `${json.biblio?.first_page}-${json.biblio?.last_page}`);
-                      });
-                  }
-                }}
-              >
-                <DinaMessage id="doisearch" />
-              </FormikButton>
+              <div className="col-sm-6 d-flex align-items-center gap-2">
+                <FieldSpy fieldName="doi">
+                  {(doiValue) => (
+                    <FormikButton
+                      className="btn btn-info add-new-button"
+                      buttonProps={() => ({
+                        style: { width: "10rem" },
+                        disabled: !doiValue?.trim()
+                      })}
+                      onClick={async (values, formik) => {
+                        const doiValue = values.doi;
+                        if (!doiValue) return;
+
+                        const fetchUrl = `https://api.openalex.org/works/https://doi.org/${doiValue}`;
+                        const clearFields = () => {
+                          formik.setFieldValue("title", "");
+                          formik.setFieldValue("year", "");
+                          formik.setFieldValue("author", [""]);
+                          formik.setFieldValue("authorID", [""]);
+                          formik.setFieldValue("journal", "");
+                          formik.setFieldValue("volume", "");
+                          formik.setFieldValue("pages", "");
+                        };
+
+                        const res = await fetch(fetchUrl);
+
+                        if (!res.ok) {
+                          setDoiFetchError(true);
+                          clearFields();
+                          return;
+                        }
+                        setDoiFetchError(false);
+
+                        const json = await res.json();
+
+                        formik.setValues({
+                          ...formik.values,
+                          title: json.title,
+                          year: json.publication_year,
+                          author: json.authorships
+                            ?.map((a) => a.author.display_name)
+                            .filter(Boolean),
+                          authorID: json.authorships
+                            ?.map((a) => a.author.orcid)
+                            .filter(Boolean),
+                          journal: json.primary_location?.source?.display_name,
+                          volume: json.biblio?.volume,
+                          pages: `${json.biblio?.first_page}-${json.biblio?.last_page}`
+                        });
+                      }}
+                    >
+                      <DinaMessage id="doiSearch" />
+                    </FormikButton>
+                  )}
+                </FieldSpy>
+                {doiFetchError && (
+                  <div className="alert alert-danger" role="alert">
+                    <DinaMessage id="doiSearchError" />
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <div className="row">
@@ -390,16 +492,250 @@ export function BibliographicReferenceSubForm({
             />
           </div>
           <div className="row">
-            <TextField
-              {...fieldProps("author")}
-              className="col-sm-6"
-              disabled={!isManualInput}
-            />
-            <TextField
-              {...fieldProps("authorID")}
-              className="col-sm-6"
-              disabled={!isManualInput}
-            />
+            <FieldArray name="author">
+              {({ form, push, remove }) => {
+                const author = form?.values?.author ?? [];
+
+                // If empty, just display one.
+                if (author.length === 0) {
+                  push("");
+                }
+
+                function addAuthor() {
+                  push("");
+                }
+
+                function removeAuthor(index: number) {
+                  remove(index);
+                }
+
+                function containsEmptyObject() {
+                  return (
+                    author.some((obj) => Object.keys(obj).length === 0) ||
+                    author.find((obj) => obj.value === "")
+                  );
+                }
+
+                const disableAddButton =
+                  !isManualInput || containsEmptyObject();
+
+                return (
+                  <div className="author-section col-md-6">
+                    {/* Top header, where the plus icon is displayed */}
+                    <div
+                      className="row"
+                      style={{
+                        borderTop: "0px solid white",
+                        paddingTop: "15px"
+                      }}
+                    >
+                      <div className="col-md-11 d-flex">
+                        {isTemplate && (
+                          <div
+                            style={{ marginTop: "3px", marginRight: "20px" }}
+                          >
+                            <CheckBoxWithoutWrapper
+                              name={`templateCheckboxes['bibreferences-component.author']`}
+                              className={`col-sm-1 templateCheckBox`}
+                            />
+                          </div>
+                        )}
+                        <strong>
+                          <DinaMessage id={"field_author"} />
+                        </strong>
+                      </div>
+                      <div className="col-md-1 d-flex align-items-center justify-content-between">
+                        <FaPlus
+                          className="ms-auto"
+                          style={{
+                            cursor: disableAddButton
+                              ? "not-allowed"
+                              : "pointer",
+                            color: disableAddButton ? "gray" : "black"
+                          }}
+                          onClick={() => {
+                            if (!disableAddButton) {
+                              addAuthor();
+                            }
+                          }}
+                          size="2em"
+                          onMouseOver={(event) => {
+                            if (!disableAddButton) {
+                              event.currentTarget.style.color = "blue";
+                            }
+                          }}
+                          onMouseOut={(event) => {
+                            if (disableAddButton) {
+                              event.currentTarget.style.color = "gray";
+                            } else {
+                              event.currentTarget.style.color = "black";
+                            }
+                          }}
+                          data-testid="add row button"
+                        />
+                      </div>
+                    </div>
+
+                    {author?.map((_, index) => (
+                      <div className="row" key={index}>
+                        <div
+                          className="col-md-11"
+                          data-testid={"author[" + index + "]"}
+                        >
+                          <TextField
+                            name={"author[" + index + "]"}
+                            hideLabel={true}
+                            disableTemplateCheckbox={true}
+                            disabled={isTemplate || !isManualInput}
+                          />
+                        </div>
+                        <div className="col-md-1 d-flex align-items-center justify-content-between">
+                          <FaMinus
+                            className="ms-auto"
+                            style={{
+                              marginTop: "-10px",
+                              cursor: isManualInput ? "pointer" : "not-allowed",
+                              color: isManualInput ? "" : "grey"
+                            }}
+                            onClick={() => isManualInput && removeAuthor(index)}
+                            size="2em"
+                            onMouseOver={(event) => {
+                              if (isManualInput)
+                                event.currentTarget.style.color = "blue";
+                            }}
+                            onMouseOut={(event) => {
+                              if (isManualInput)
+                                event.currentTarget.style.color = "";
+                            }}
+                            data-testid="add row button"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }}
+            </FieldArray>
+            <FieldArray name="authorID">
+              {({ form, push, remove }) => {
+                const authorID = form?.values?.authorID ?? [];
+
+                // If empty, just display one.
+                if (authorID.length === 0) {
+                  push("");
+                }
+
+                function addAuthorID() {
+                  push("");
+                }
+
+                function removeAuthorID(index: number) {
+                  remove(index);
+                }
+
+                function containsEmptyObject() {
+                  return (
+                    authorID.some((obj) => Object.keys(obj).length === 0) ||
+                    authorID.find((obj) => obj.value === "")
+                  );
+                }
+
+                const disableAddButton =
+                  !isManualInput || containsEmptyObject();
+
+                return (
+                  <div className="authorID-section col-md-6">
+                    {/* Top header, where the plus icon is displayed */}
+                    <div
+                      className="row"
+                      style={{
+                        borderTop: "0px solid white",
+                        paddingTop: "15px"
+                      }}
+                    >
+                      <div className="col-md-11 d-flex">
+                        {isTemplate && (
+                          <div
+                            style={{ marginTop: "3px", marginRight: "20px" }}
+                          >
+                            <CheckBoxWithoutWrapper
+                              name={`templateCheckboxes['bibreferences-component.authorID']`}
+                              className={`col-sm-1 templateCheckBox`}
+                            />
+                          </div>
+                        )}
+                        <strong>
+                          <DinaMessage id={"field_authorID"} />
+                        </strong>
+                      </div>
+                      <div className="col-md-1 d-flex align-items-center justify-content-between">
+                        <FaPlus
+                          className="ms-auto"
+                          style={{
+                            cursor: disableAddButton
+                              ? "not-allowed"
+                              : "pointer",
+                            color: disableAddButton ? "gray" : "black"
+                          }}
+                          onClick={() => {
+                            if (!disableAddButton) {
+                              addAuthorID();
+                            }
+                          }}
+                          size="2em"
+                          onMouseOver={(event) => {
+                            if (!disableAddButton) {
+                              event.currentTarget.style.color = "blue";
+                            }
+                          }}
+                          onMouseOut={(event) => {
+                            if (disableAddButton) {
+                              event.currentTarget.style.color = "gray";
+                            } else {
+                              event.currentTarget.style.color = "black";
+                            }
+                          }}
+                          data-testid="add row button"
+                        />
+                      </div>
+                    </div>
+
+                    {authorID?.map((_, index) => (
+                      <div className="row" key={index}>
+                        <div
+                          className="col-md-11"
+                          data-testid={"authorID[" + index + "]"}
+                        >
+                          <TextField
+                            name={"authorID[" + index + "]"}
+                            hideLabel={true}
+                            disableTemplateCheckbox={true}
+                            disabled={isTemplate || !isManualInput}
+                          />
+                        </div>
+                        <div className="col-md-1 d-flex align-items-center justify-content-between">
+                          <FaMinus
+                            className="ms-auto"
+                            style={{ marginTop: "-10px", cursor: "pointer" }}
+                            onClick={() =>
+                              isManualInput && removeAuthorID(index)
+                            }
+                            size="2em"
+                            onMouseOver={(event) =>
+                              (event.currentTarget.style.color = "blue")
+                            }
+                            onMouseOut={(event) =>
+                              (event.currentTarget.style.color = "")
+                            }
+                            data-testid="add row button"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }}
+            </FieldArray>
           </div>
           <div className="row">
             <TextField
@@ -419,8 +755,6 @@ export function BibliographicReferenceSubForm({
               className="col-sm-6"
               disabled={!isManualInput}
             />
-          </div>
-          <div className="row">
             <TextField
               {...fieldProps("referenceRemarks")}
               className="col-sm-6"
