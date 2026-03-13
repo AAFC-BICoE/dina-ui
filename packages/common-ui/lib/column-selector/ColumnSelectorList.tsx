@@ -431,6 +431,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
             <QueryRowImageLink
               setValue={setDynamicFieldValue}
               value={dynamicFieldValue}
+              exportMode={exportMode}
             />
           )}
           <div className="mt-2 d-grid">

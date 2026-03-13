@@ -1,5 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { KitsuResource, PersistedResource } from "kitsu";
+import { get } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
@@ -17,6 +18,18 @@ import {
   Tooltip,
   useApiClient
 } from "packages/common-ui/lib";
+import {
+  convertColumnsToAliases,
+  convertColumnsToPaths,
+  getColumnFunctions
+} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
+import {
+  getExport,
+  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
+  MAX_OBJECT_EXPORT_TOTAL
+} from "packages/common-ui/lib/export/exportUtils";
+import { QueryFieldSelector } from "packages/common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
+import QueryRowManagedAttributeSearch from "packages/common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import {
   DynamicFieldsMappingConfig,
   ESIndexMapping
@@ -39,27 +52,13 @@ import {
   Spinner,
   ToggleButton
 } from "react-bootstrap";
-import { FaTrash } from "react-icons/fa";
+import { FaFileExport, FaHistory, FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
-import useSavedExports, { VISIBILITY_OPTIONS } from "./useSavedExports";
-import { QueryFieldSelector } from "packages/common-ui/lib/list-page/query-builder/query-builder-core-components/QueryFieldSelector";
-import QueryRowManagedAttributeSearch from "packages/common-ui/lib/list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
-import _ from "lodash";
 import { MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS } from "../../collection/material-sample/list";
 import { OBJECT_STORE_NON_EXPORTABLE_COLUMNS } from "../../object-store/object/list";
-import {
-  getExport,
-  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
-  MAX_OBJECT_EXPORT_TOTAL
-} from "packages/common-ui/lib/export/exportUtils";
-import {
-  convertColumnsToAliases,
-  convertColumnsToPaths,
-  getColumnFunctions
-} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
-import { FaFileExport, FaHistory } from "react-icons/fa";
+import useSavedExports, { VISIBILITY_OPTIONS } from "./useSavedExports";
 
 export interface SavedExportOption {
   label?: string;
@@ -216,7 +215,9 @@ export default function ExportPage<TData extends KitsuResource>() {
             ? undefined
             : columnFunctions,
         name: formik?.values?.name,
-        exportOptions: { columnSeparator: selectedSeparator?.value }
+        exportOptions: {
+          columnSeparator: selectedSeparator?.value
+        }
       },
       type: "data-export"
     };
@@ -271,12 +272,12 @@ export default function ExportPage<TData extends KitsuResource>() {
           const filenameAlias: string =
             selectedFilenameAliasField.label === "managedAttributes" &&
             dynamicFieldValue
-              ? _.get(
+              ? get(
                   metadata,
                   JSON.parse(dynamicFieldValue).selectedManagedAttributeConfig
                     .label
                 )
-              : _.get(metadata, selectedFilenameAliasField.label);
+              : get(metadata, selectedFilenameAliasField.label);
           if (metadata.derivatives) {
             // If image has derivative, use large image derivative fileIdentifier
             const largeImageDerivative = metadata.derivatives.find(

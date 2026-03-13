@@ -29,7 +29,8 @@ export const OBJECT_STORE_NON_EXPORTABLE_COLUMNS: string[] = [
   "thumbnail",
   "objectStorePreview",
   "viewDetails",
-  "imageLink."
+  "imageLink.THUMBNAIL",
+  "imageLink.LARGE"
 ];
 
 const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
