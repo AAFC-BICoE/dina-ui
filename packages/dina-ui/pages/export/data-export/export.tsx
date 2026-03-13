@@ -52,7 +52,7 @@ import {
   Spinner,
   ToggleButton
 } from "react-bootstrap";
-import { FaTrash } from "react-icons/fa";
+import { FaFileExport, FaHistory, FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
@@ -392,6 +392,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                   href={`/export/molecular-analysis-export/export?entityLink=${entityLink}`}
                   className="btn btn-primary ms-auto"
                 >
+                  <FaFileExport size={18} style={{ marginRight: "8px" }} />
                   <DinaMessage id="molecularAnalysisExport" />
                 </Link>
               )}
@@ -399,6 +400,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                 href={`/export/data-export/list?entityLink=${entityLink}`}
                 className="btn btn-primary ms-2"
               >
+                <FaHistory size={18} style={{ marginRight: "8px" }} />
                 <DinaMessage id="viewExportHistoryButton" />
               </Link>
             </div>
