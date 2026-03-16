@@ -316,7 +316,7 @@ function getEntityColumn<TData extends KitsuResource>(
   }
 }
 
-function getNestedColumn<TData extends KitsuResource>(
+export function getNestedColumn<TData extends KitsuResource>(
   path: string,
   indexColumn: ESIndexMapping
 ): TableColumn<TData> {
