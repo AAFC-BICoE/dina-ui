@@ -625,50 +625,24 @@ Object {
 exports[`QueryBuilderClassificationSearch transformClassificationToDSL function Operation: notEquals 2`] = `
 Object {
   "bool": Object {
-    "should": Array [
+    "must_not": Array [
       Object {
         "nested": Object {
           "path": "included",
           "query": Object {
             "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "material-sample",
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
                 },
-              },
-              "must_not": Object {
-                "term": Object {
-                  "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
+                Object {
+                  "term": Object {
+                    "included.attributes.targetOrganismPrimaryClassification.kingdom.keyword": "Animalia",
+                  },
                 },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "nested": Object {
-          "path": "included",
-          "query": Object {
-            "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "material-sample",
-                },
-              },
-              "must_not": Object {
-                "exists": Object {
-                  "field": "included.attributes.targetOrganismPrimaryClassification.kingdom",
-                },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+              ],
             },
           },
         },

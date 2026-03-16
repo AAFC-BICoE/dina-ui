@@ -5096,50 +5096,24 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
-    "should": Array [
+    "must_not": Array [
       Object {
         "nested": Object {
           "path": "included",
           "query": Object {
             "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "collecting-event",
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
                 },
-              },
-              "must_not": Object {
-                "term": Object {
-                  "included.attributes.managedAttributes.attributeName.keyword": "option1",
+                Object {
+                  "term": Object {
+                    "included.attributes.managedAttributes.attributeName.keyword": "option1",
+                  },
                 },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "nested": Object {
-          "path": "included",
-          "query": Object {
-            "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "collecting-event",
-                },
-              },
-              "must_not": Object {
-                "exists": Object {
-                  "field": "included.attributes.managedAttributes.attributeName",
-                },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+              ],
             },
           },
         },
@@ -5588,50 +5562,24 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
-    "should": Array [
+    "must_not": Array [
       Object {
         "nested": Object {
           "path": "included",
           "query": Object {
             "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "collecting-event",
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collecting-event",
+                  },
                 },
-              },
-              "must_not": Object {
-                "term": Object {
-                  "included.attributes.managedAttributes.attributeName.keyword": "stringValue",
+                Object {
+                  "term": Object {
+                    "included.attributes.managedAttributes.attributeName.keyword": "stringValue",
+                  },
                 },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "nested": Object {
-          "path": "included",
-          "query": Object {
-            "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "collecting-event",
-                },
-              },
-              "must_not": Object {
-                "exists": Object {
-                  "field": "included.attributes.managedAttributes.attributeName",
-                },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "term": Object {
-              "included.type": "collecting-event",
+              ],
             },
           },
         },

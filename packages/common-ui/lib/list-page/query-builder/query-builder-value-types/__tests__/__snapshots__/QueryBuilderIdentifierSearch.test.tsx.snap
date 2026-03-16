@@ -5156,50 +5156,24 @@ Object {
 exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
-    "should": Array [
+    "must_not": Array [
       Object {
         "nested": Object {
           "path": "included",
           "query": Object {
             "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "material-sample",
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "material-sample",
+                  },
                 },
-              },
-              "must_not": Object {
-                "term": Object {
-                  "included.attributes.identifiers.seqdb_id.keyword": "stringValue",
+                Object {
+                  "term": Object {
+                    "included.attributes.identifiers.seqdb_id.keyword": "stringValue",
+                  },
                 },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "nested": Object {
-          "path": "included",
-          "query": Object {
-            "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "material-sample",
-                },
-              },
-              "must_not": Object {
-                "exists": Object {
-                  "field": "included.attributes.identifiers.seqdb_id",
-                },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "term": Object {
-              "included.type": "material-sample",
+              ],
             },
           },
         },

@@ -429,50 +429,24 @@ Object {
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Not Equals operation With relationship as field 1`] = `
 Object {
   "bool": Object {
-    "should": Array [
+    "must_not": Array [
       Object {
         "nested": Object {
           "path": "included",
           "query": Object {
             "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "collection",
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collection",
+                  },
                 },
-              },
-              "must_not": Object {
-                "term": Object {
-                  "includes.name": "text search",
+                Object {
+                  "term": Object {
+                    "includes.name": "text search",
+                  },
                 },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "nested": Object {
-          "path": "included",
-          "query": Object {
-            "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "collection",
-                },
-              },
-              "must_not": Object {
-                "exists": Object {
-                  "field": "includes.name",
-                },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "term": Object {
-              "included.type": "collection",
+              ],
             },
           },
         },

@@ -152,41 +152,18 @@ export function transformTextSearchToDSL({
       return parentType
         ? {
             bool: {
-              should: [
-                // If the field does exist, then search for everything that does NOT match the term.
+              must_not: [
                 {
                   nested: {
                     path: "included",
                     query: {
                       bool: {
-                        must_not: termQuery(
-                          fieldPath,
-                          value,
-                          keywordMultiFieldSupport
-                        ),
-                        must: includedTypeQuery(parentType)
+                        must: [
+                          includedTypeQuery(parentType),
+                          termQuery(fieldPath, value, keywordMultiFieldSupport)
+                        ]
                       }
                     }
-                  }
-                },
-
-                // If it's included but the field doesn't exist, then it's not equal either.
-                {
-                  nested: {
-                    path: "included",
-                    query: {
-                      bool: {
-                        must_not: existsQuery(fieldPath),
-                        must: includedTypeQuery(parentType)
-                      }
-                    }
-                  }
-                },
-
-                // And if it's not included, then it's not equal either.
-                {
-                  bool: {
-                    must_not: includedTypeQuery(parentType)
                   }
                 }
               ]
