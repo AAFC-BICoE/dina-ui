@@ -612,14 +612,26 @@ describe("ColumnSelectorUtils", () => {
       const mockSingleRow = {
         original: {
           included: {
-            organism: {
-              attributes: {
-                determination: [
-                  {
-                    typeStatus: "Holotype"
-                  }
-                ]
+            organism: [
+              {
+                attributes: {
+                  determination: [
+                    {
+                      scientificName: "Hexapoda",
+                      typeStatus: "Holotype"
+                    }
+                  ]
+                },
+                id: "019ce8e3-08e8-724e-8f32-520695db4c6f",
+                type: "organism"
               }
+            ],
+            collection: {
+              attributes: {
+                name: "Test"
+              },
+              id: "019cdce6-9a89-74d5-bdcf-a4dc92334e1a",
+              type: "collection"
             }
           }
         }

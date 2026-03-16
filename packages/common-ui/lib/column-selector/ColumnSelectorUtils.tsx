@@ -321,7 +321,8 @@ export function getNestedColumn<TData extends KitsuResource>(
   indexColumn: ESIndexMapping
 ): TableColumn<TData> {
   const accessorKeyRelationship = `${indexColumn.parentPath}.${indexColumn.parentName}`;
-  const accessorKeyRelationshipAttribute = `${indexColumn.path}.${indexColumn.label}`;
+  const basePath = indexColumn.path.split(".")[0];
+  const accessorKeyRelationshipAttribute = `${basePath}.${indexColumn.label}`;
   const accessorKeyFull = `${accessorKeyRelationship}.${accessorKeyRelationshipAttribute}`;
   const accessorKeyElasticSearch = `${indexColumn.parentPath}.${accessorKeyRelationshipAttribute}`;
 
@@ -349,16 +350,20 @@ export function getNestedColumn<TData extends KitsuResource>(
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
       cell: ({ row: { original } }) => {
-        const value = _.get(original, accessorKeyRelationship);
-        if (value && Array.isArray(value)) {
-          const values = value
-            .map((val) => _.get(val, accessorKeyRelationshipAttribute))
-            .join(", ");
-          return <>{values}</>;
-        } else {
-          const singleValue = _.get(original, accessorKeyFull);
-          return <>{singleValue}</>;
+        let values: any[] = [original];
+
+        for (const key of accessorKeyFull.split(".")) {
+          values = values
+            .flatMap((v) => {
+              if (v === undefined || v === null) return [];
+
+              const nextValue = v[key];
+              return Array.isArray(nextValue) ? nextValue : [nextValue];
+            })
+            .filter((v) => v !== undefined && v !== null);
         }
+
+        return <>{values.join(", ")}</>;
       },
       relationshipType: indexColumn.parentType,
       columnSelectorString: path
