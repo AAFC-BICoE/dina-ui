@@ -154,7 +154,8 @@ describe("queryUtils", () => {
           searchValue: "Extension value",
           selectedOperator: "contains",
           selectedField: "field-test",
-          selectedExtension: "package-test"
+          selectedExtension: "package-test",
+          selectedType: "STRING"
         };
 
         const mockJsonTree = {
@@ -636,7 +637,7 @@ describe("queryUtils", () => {
                 field: "data.attributes.extension",
                 operator: "noOperator",
                 value: [
-                  '{"searchValue":"Extension value","selectedOperator":"contains","selectedExtension":"package-test","selectedField":"field-test"}'
+                  '{"searchValue":"Extension value","selectedOperator":"contains","selectedExtension":"package-test","selectedField":"field-test","selectedType":""}'
                 ],
                 valueSrc: ["value"],
                 valueType: ["fieldExtension"]
