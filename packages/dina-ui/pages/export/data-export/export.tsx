@@ -59,6 +59,7 @@ import {
   convertColumnsToPaths,
   getColumnFunctions
 } from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
+import { FaFileExport, FaHistory } from "react-icons/fa";
 
 export interface SavedExportOption {
   label?: string;
@@ -390,6 +391,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                   href={`/export/molecular-analysis-export/export?entityLink=${entityLink}`}
                   className="btn btn-primary ms-auto"
                 >
+                  <FaFileExport size={18} style={{ marginRight: "8px" }} />
                   <DinaMessage id="molecularAnalysisExport" />
                 </Link>
               )}
@@ -397,6 +399,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                 href={`/export/data-export/list?entityLink=${entityLink}`}
                 className="btn btn-primary ms-2"
               >
+                <FaHistory size={18} style={{ marginRight: "8px" }} />
                 <DinaMessage id="viewExportHistoryButton" />
               </Link>
             </div>

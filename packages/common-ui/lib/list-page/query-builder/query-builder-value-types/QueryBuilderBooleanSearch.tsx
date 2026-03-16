@@ -2,7 +2,8 @@ import React from "react";
 import {
   includedTypeQuery,
   termQuery,
-  existsQuery
+  emptyFieldQuery,
+  notEmptyFieldQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import Select from "react-select";
 import { TransformToDSLProps } from "../../types";
@@ -79,57 +80,13 @@ export function transformBooleanSearchToDSL({
   const { parentType } = fieldInfo;
 
   switch (operation) {
-    // Empty for the boolean.
+    // Empty values only.
     case "empty":
-      return parentType
-        ? {
-            bool: {
-              should: [
-                {
-                  bool: {
-                    must_not: {
-                      nested: {
-                        path: "included",
-                        query: {
-                          bool: {
-                            must: [
-                              existsQuery(fieldPath),
-                              includedTypeQuery(parentType)
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                {
-                  bool: {
-                    must_not: includedTypeQuery(parentType)
-                  }
-                }
-              ]
-            }
-          }
-        : {
-            bool: {
-              must_not: existsQuery(fieldPath)
-            }
-          };
+      return emptyFieldQuery(fieldPath, parentType);
 
-    // Not Empty for the boolean.
+    // Not empty values only.
     case "notEmpty":
-      return parentType
-        ? {
-            nested: {
-              path: "included",
-              query: {
-                bool: {
-                  must: [existsQuery(fieldPath), includedTypeQuery(parentType)]
-                }
-              }
-            }
-          }
-        : existsQuery(fieldPath);
+      return notEmptyFieldQuery(fieldPath, parentType);
 
     // Exact match for the boolean.
     default:

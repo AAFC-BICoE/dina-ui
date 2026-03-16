@@ -153,11 +153,7 @@ export function QueryRowRelationshipAutocompleteSearch({
           id: "queryBuilder_autocomplete_placeholder"
         })}
         onChange={handleSelectionChange}
-        onInputChange={(inputValue, { action }) => {
-          if (action === "input-change") {
-            setResourceSearchInput(inputValue);
-          }
-        }}
+        onInputChange={(inputValue) => setResourceSearchInput(inputValue)}
         inputValue={resourceSearchInput}
         isLoading={isLoadingResources}
         isClearable={true}

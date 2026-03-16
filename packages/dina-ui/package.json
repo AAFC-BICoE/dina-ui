@@ -1,7 +1,7 @@
 {
   "name": "dina-ui",
   "license": "MIT",
-  "version": "0.213.0",
+  "version": "0.214.0",
   "scripts": {
     "build": "node --require ./next.config.js ../../node_modules/.bin/next build",
     "dev": "next --turbopack",
@@ -19,6 +19,7 @@
     "coordinate-parser": "^1.0.7",
     "dexie": "^3.2.4",
     "dexie-react-hooks": "^1.1.6",
+    "echarts-for-react": "^3.0.6",
     "esri-loader": "^3.3.0",
     "esri-loader-hooks": "^0.4.0",
     "moment": "^2.29.4",

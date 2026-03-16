@@ -1,4 +1,11 @@
-import { BackToListButton, LoadingSpinner } from "common-ui";
+import {
+  BackToListButton,
+  DATA_EXPORT_QUERY_KEY,
+  DATA_EXPORT_TOTAL_RECORDS_KEY,
+  filterBy,
+  LoadingSpinner,
+  useApiClient
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -15,8 +22,16 @@ import { MolecularAnalysisSampleSelectionStep } from "packages/dina-ui/component
 import { MolecularAnalysisGridStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisGridStep";
 import { MolecularAnalysisRunStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisRunStep";
 import { MolecularAnalysisResultsStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisResultsStep";
+import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { uuidQuery } from "packages/common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { writeStorage } from "@rehooks/local-storage";
+import { FaTimes } from "react-icons/fa";
+import { FaFloppyDisk } from "react-icons/fa6";
+import { MdEdit } from "react-icons/md";
+import { FiDownload } from "react-icons/fi";
 
 export default function MolecularAnalysisWorkflowRunPage() {
+  const { apiClient } = useApiClient();
   const router = useRouter();
   const { formatMessage } = useSeqdbIntl();
 
@@ -76,6 +91,61 @@ export default function MolecularAnalysisWorkflowRunPage() {
     });
   }
 
+  async function onExport() {
+    if (!molecularAnalysisId) return;
+
+    // First we need to find all the linked material samples...
+    await apiClient
+      .get<GenericMolecularAnalysisItem[]>(
+        "/seqdb-api/generic-molecular-analysis-item",
+        {
+          filter: filterBy([], {
+            extraFilters: [
+              {
+                selector: "genericMolecularAnalysis.uuid",
+                comparison: "==",
+                arguments: molecularAnalysisId
+              }
+            ]
+          })(""),
+          include: "materialSample",
+          page: {
+            limit: 1000 // Maximum page size.
+          }
+        }
+      )
+      .then((response) => {
+        const molecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
+          response?.data?.filter(
+            (item) => item?.materialSample?.id !== undefined
+          );
+        const materialSampleIds: string[] =
+          molecularAnalysisItems.map(
+            (item) => item?.materialSample?.id as string
+          ) ?? [];
+
+        // Nothing to export, stay on the page...
+        if (materialSampleIds.length === 0) return;
+
+        // Generate a query using the material sample IDs and save it into storage.
+        const selectedIdsQuery = uuidQuery(materialSampleIds);
+        writeStorage<any>(DATA_EXPORT_QUERY_KEY, selectedIdsQuery);
+        sessionStorage.setItem(
+          DATA_EXPORT_TOTAL_RECORDS_KEY,
+          materialSampleIds.length.toString()
+        );
+
+        // Redirect to the molecular analysis export page.
+        router.push({
+          pathname: "/export/molecular-analysis-export/export",
+          query: {
+            // Used for the back button to return back to this page.
+            entityLink: "/seqdb/molecular-analysis-workflow"
+          }
+        });
+      });
+  }
+
   if (molecularAnalysis.loading) {
     return <LoadingSpinner loading={true} />;
   }
@@ -85,6 +155,17 @@ export default function MolecularAnalysisWorkflowRunPage() {
       <div className="col-md-4">
         <BackToListButton entityLink="/seqdb/molecular-analysis-workflow" />
       </div>
+      {currentStep > 2 && (
+        <Button
+          variant={"secondary"}
+          className="ms-auto"
+          onClick={() => onExport()}
+          style={{ width: "10rem", marginRight: "8px" }}
+        >
+          <FiDownload className="me-2" />
+          <SeqdbMessage id="exportButtonText" />
+        </Button>
+      )}
       {editMode ? (
         <>
           <Button
@@ -93,7 +174,8 @@ export default function MolecularAnalysisWorkflowRunPage() {
             onClick={() => setEditMode(false)}
             style={{ width: "10rem" }}
           >
-            Cancel
+            <FaTimes className="me-2" />
+            <DinaMessage id="cancelButtonText" />
           </Button>
 
           <Button
@@ -116,20 +198,26 @@ export default function MolecularAnalysisWorkflowRunPage() {
                 </span>
               </>
             ) : (
-              <DinaMessage id="save" />
+              <>
+                <FaFloppyDisk className="me-2" />
+                <DinaMessage id="save" />
+              </>
             )}
           </Button>
         </>
       ) : (
         currentStep !== 4 && (
-          <Button
-            variant={"primary"}
-            className="ms-auto"
-            onClick={() => setEditMode(true)}
-            style={{ width: "10rem", marginRight: "15px" }}
-          >
-            <SeqdbMessage id="editButtonText" />
-          </Button>
+          <>
+            <Button
+              variant={"primary"}
+              className={currentStep < 3 ? "ms-auto" : ""}
+              onClick={() => setEditMode(true)}
+              style={{ width: "10rem", marginRight: "15px" }}
+            >
+              <MdEdit size={21} className="me-2" />
+              <SeqdbMessage id="editButtonText" />
+            </Button>
+          </>
         )
       )}
     </>
