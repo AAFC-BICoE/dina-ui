@@ -132,6 +132,18 @@ export function BibliographicReferencesField({
       id: "author",
       accessorKey: "author",
       header: () => <FieldHeader name={formatMessage("author")} />,
+      cell: ({ getValue }) => {
+        const authors = getValue() as string[];
+        if (!authors) return null;
+
+        return (
+          <div className="d-flex flex-column gap-1">
+              <span>
+                {authors.join(", ")}
+              </span>
+          </div>
+        );
+      },
       meta: {
         style: { verticalAlign: "top" }
       }
