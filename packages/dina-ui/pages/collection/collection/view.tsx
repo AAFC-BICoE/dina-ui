@@ -5,7 +5,7 @@ import { ViewPageLayout } from "../../../components";
 import { Collection } from "../../../types/collection-api";
 import { CollectionFormFields } from "./edit";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import CollectionMostRecentSample from "packages/dina-ui/components/collection/collection/CollectionMostRecentSample";
+import CollectionMostRecentSample from "../../../components/collection/collection/CollectionMostRecentSample";
 
 export default function CollectionDetailsPage() {
   const buildQueryTree = (name: string) => {

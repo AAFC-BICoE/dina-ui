@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import Link from "next/link";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 interface LatestSampleProps {
   query?: any;

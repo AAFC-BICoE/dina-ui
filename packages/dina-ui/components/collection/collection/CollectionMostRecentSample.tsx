@@ -1,4 +1,4 @@
-import LatestSample from "packages/dina-ui/components/collection/MostRecentSample";
+import LatestSample from "../../../components/collection/MostRecentSample";
 
 export default function CollectionLatestSample({ id }: { id: string }) {
   // Build query for material samples in this collection
