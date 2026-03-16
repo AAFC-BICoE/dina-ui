@@ -138,9 +138,7 @@ export function BibliographicReferencesField({
 
         return (
           <div className="d-flex flex-column gap-1">
-              <span>
-                {authors.join(", ")}
-              </span>
+            <span>{authors.join(", ")}</span>
           </div>
         );
       },
@@ -435,7 +433,8 @@ export function BibliographicReferenceSubForm({
                       className="btn btn-info add-new-button"
                       buttonProps={() => ({
                         style: { width: "10rem" },
-                        disabled: !doiValue?.trim()
+                        disabled:
+                          typeof doiValue === "string" ? !doiValue.trim() : true
                       })}
                       onClick={async (values, formik) => {
                         const doiValue = values.doi;
