@@ -204,7 +204,7 @@ function ExternalResourceMetadataForm({
       metadataWithRelationships?.id
     ) {
       await router.push(
-        `/object-store/object/view?id=${metadataWithRelationships?.id}`
+        `/object-store/object/external-resource-view?id=${metadataWithRelationships?.id}`
       );
     } else {
       const savedMeta = await save(
@@ -212,7 +212,9 @@ function ExternalResourceMetadataForm({
         { apiBaseUrl: "/objectstore-api" }
       );
 
-      await router.push(`/object-store/object/view?id=${savedMeta?.[0].id}`);
+      await router.push(
+        `/object-store/object/external-resource-view?id=${savedMeta?.[0].id}`
+      );
     }
   };
 

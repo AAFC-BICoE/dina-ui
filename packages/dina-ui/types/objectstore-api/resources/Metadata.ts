@@ -33,7 +33,6 @@ export interface MetadataAttributes {
   originalFilename?: string;
   filename?: string;
   notPubliclyReleasableReason?: string;
-  isExternalResource?: boolean;
   publiclyReleasable?: boolean;
   orientation?: number;
 

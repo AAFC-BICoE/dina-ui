@@ -47,7 +47,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       : undefined;
   }
 
-  const isExternalResource = metadata.isExternalResource;
+  const isExternalResource = !!metadata.resourceExternalURL;
   return (
     <div>
       <MetadataAttributeGroup
