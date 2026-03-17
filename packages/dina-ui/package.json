@@ -1,7 +1,7 @@
 {
   "name": "dina-ui",
   "license": "MIT",
-  "version": "0.213.0",
+  "version": "0.214.0",
   "scripts": {
     "build": "node --require ./next.config.js ../../node_modules/.bin/next build",
     "dev": "next --turbopack",

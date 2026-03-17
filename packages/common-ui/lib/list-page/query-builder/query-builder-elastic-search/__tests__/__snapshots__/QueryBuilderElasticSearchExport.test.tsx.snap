@@ -231,6 +231,152 @@ Object {
 }
 `;
 
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions emptyFieldQuery 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "exists": Object {
+        "field": "data.attributes.materialSampleName",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions emptyFieldQuery 2`] = `
+Object {
+  "bool": Object {
+    "minimum_should_match": 1,
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.materialSampleName",
+            },
+          },
+        },
+      },
+      Object {
+        "term": Object {
+          "data.attributes.materialSampleName.keyword": "",
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions emptyFieldQuery 3`] = `
+Object {
+  "bool": Object {
+    "minimum_should_match": 1,
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "project",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "must_not": Object {
+                      "exists": Object {
+                        "field": "included.attributes.name",
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "project",
+                },
+              },
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions emptyFieldQuery 4`] = `
+Object {
+  "bool": Object {
+    "minimum_should_match": 1,
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "project",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must_not": Object {
+                            "exists": Object {
+                              "field": "included.attributes.name",
+                            },
+                          },
+                        },
+                      },
+                      Object {
+                        "term": Object {
+                          "included.attributes.name.keyword": "",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "project",
+                },
+              },
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions existsQuery 1`] = `
 Object {
   "exists": Object {
@@ -884,6 +1030,92 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
 Object {
   "term": Object {
     "included.type": "parentTest",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions notEmptyFieldQuery 1`] = `
+Object {
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.materialSampleName",
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions notEmptyFieldQuery 2`] = `
+Object {
+  "bool": Object {
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.materialSampleName",
+        },
+      },
+    ],
+    "must_not": Object {
+      "term": Object {
+        "data.attributes.materialSampleName.keyword": "",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions notEmptyFieldQuery 3`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "exists": Object {
+              "field": "included.attributes.name",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "project",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions notEmptyFieldQuery 4`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "exists": Object {
+              "field": "included.attributes.name",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "project",
+            },
+          },
+        ],
+        "must_not": Object {
+          "term": Object {
+            "included.attributes.name.keyword": "",
+          },
+        },
+      },
+    },
   },
 }
 `;
