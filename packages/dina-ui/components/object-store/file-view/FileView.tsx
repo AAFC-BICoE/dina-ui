@@ -15,6 +15,7 @@ import RcTooltip from "rc-tooltip";
 import { DownloadButton } from "../derivative-list/DerivativeList";
 import { Badge, Dropdown } from "react-bootstrap";
 import {
+  FaArrowUpRightFromSquare,
   FaDownload,
   FaFile,
   FaFileAudio,
@@ -27,7 +28,7 @@ import {
   FaFileWord,
   FaFileZipper
 } from "react-icons/fa6";
-import { FaFileCode } from "react-icons/fa";
+import { FaFileCode, FaLink } from "react-icons/fa";
 import { MdOutlineRawOn } from "react-icons/md";
 import { IconType } from "react-icons/lib";
 import { PDFViewer } from "./PDFViewer";
@@ -189,11 +190,36 @@ export function FileView({
                 color: "#666"
               }}
             >
-              {fileExtensionToIcon(
-                metadata?.fileExtension,
-                "dropdown-icon mb-2"
+              {(metadata as any)?.isExternalResource ? (
+                <>
+                  <FaLink
+                    className="dropdown-icon mb-3"
+                    style={{ fontSize: "2em" }}
+                  />
+                  <a
+                    href={(metadata as any)?.resourceExternalURL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary"
+                  >
+                    <DinaMessage id="openLink" />
+                    <FaArrowUpRightFromSquare
+                      style={{
+                        marginLeft: "0.5em"
+                      }}
+                      aria-label="Opens in new tab"
+                    />
+                  </a>
+                </>
+              ) : (
+                <>
+                  {fileExtensionToIcon(
+                    metadata?.fileExtension,
+                    "dropdown-icon mb-2"
+                  )}
+                  <DinaMessage id="previewNotAvailable" />
+                </>
               )}
-              <DinaMessage id="previewNotAvailable" />
             </div>
           )}
           {caption && (

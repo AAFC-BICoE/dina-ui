@@ -119,7 +119,15 @@ export default function MetadataViewPage() {
 
   return (
     <div>
-      <Head title={fileName} />
+      <Head
+        title={
+          (fileName ?? metadata?.originalFilename ?? metadata?.acCaption) +
+          " - " +
+          (isExternalResource
+            ? formatMessage("metadataExternalResourceDetailsLabel")
+            : formatMessage("metadataUploadDetailsLabel"))
+        }
+      />
       <Nav marginBottom={false} />
       <style>{OBJECT_DETAILS_PAGE_CSS}</style>
       {buttonBar}
@@ -128,10 +136,12 @@ export default function MetadataViewPage() {
           return (
             <div className="row mt-3">
               <div className="col-md-4">
-                <MetadataFileView
-                  metadata={response.data}
-                  hideDownload={false}
-                />
+                <div style={{ position: "sticky", top: "70px" }}>
+                  <MetadataFileView
+                    metadata={response.data}
+                    hideDownload={false}
+                  />
+                </div>
               </div>
               <div className="col-md-8">
                 <DinaForm initialValues={response.data} readOnly={true}>

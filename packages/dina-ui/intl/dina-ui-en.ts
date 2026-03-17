@@ -803,6 +803,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectSubtypeListTitle: "Object Subtypes",
   objectSubtypeTitle: "Object Subtype",
   openGeographySearchButtonLabel: "Search On Open Street Maps",
+  openLink: "Open Link",
   organism: "Organism",
   organismRemarks: "Organism Remarks",
   organismState: "Organism State",

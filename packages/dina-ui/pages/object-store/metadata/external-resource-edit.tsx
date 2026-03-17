@@ -70,7 +70,7 @@ export default function ExternalResourceMetadataPage() {
 
   return (
     <div>
-      <Head title={formatMessage("externalResourceListTitle")} />
+      <Head title={formatMessage("editExternalResourceTitle")} />
       <Nav />
       <main className="container-fluid">
         {id ? (

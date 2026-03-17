@@ -62,6 +62,34 @@ describe("FileView component", () => {
     );
   });
 
+  it("External Resource is the only thing available, display link.", async () => {
+    const mockExternalUrl = "https://example.com/external-resource";
+
+    const wrapper = mountWithAppContext(
+      <FileView
+        filePath="some-external-path"
+        fileType=""
+        metadata={
+          {
+            isExternalResource: true,
+            resourceExternalURL: mockExternalUrl
+          } as any
+        }
+      />,
+      { apiContext }
+    );
+
+    // Wait for loading to be finished...
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Find the "Open Link" anchor tag
+    const linkElement = wrapper.getByRole("link", { name: /open link/i });
+
+    // Assert the link is rendered with the correct href
+    expect(linkElement).toBeInTheDocument();
+    expect(linkElement).toHaveAttribute("href", mockExternalUrl);
+  });
+
   const noPreviewFileTypes = [
     "doc",
     "docx",
