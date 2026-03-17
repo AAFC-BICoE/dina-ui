@@ -4,10 +4,10 @@ import {
   DinaForm,
   LoadingSpinner,
   generateUUIDTree,
-  BackButton,
   CustomQueryPageView,
   UploadDerivativeButton,
-  withResponse
+  withResponse,
+  BackToListButton
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -72,21 +72,22 @@ export default function MetadataViewPage() {
     ? metadata?.meta?.permissions?.includes("delete") ?? false
     : true;
 
+  const isExternalResource = metadata?.isExternalResource;
+
   const buttonBar = (
     <ButtonBar>
-      <div className="col-md-4 mt-2">
-        <BackButton
-          byPassView={true}
-          className="me-auto"
-          entityId={uuid}
-          entityLink="/object-store/object"
-        />
+      <div className="col-md-4">
+        <BackToListButton entityLink="/object-store/object" />
       </div>
       <div className="col-md-8 flex d-flex gap-2 justify-content-end">
         {canEdit && (
           <>
             <Link
-              href={`/object-store/metadata/edit?id=${uuid}`}
+              href={
+                isExternalResource
+                  ? `/object-store/metadata/external-resource-edit?id=${uuid}`
+                  : `/object-store/metadata/edit?id=${uuid}`
+              }
               className="btn btn-primary ms-auto"
               style={{ width: "5rem" }}
             >
@@ -136,15 +137,23 @@ export default function MetadataViewPage() {
                 <DinaForm initialValues={response.data} readOnly={true}>
                   <div className="row d-flex">
                     <div className="col-md-12">
-                      <h1
-                        style={{ marginTop: 0 }}
-                        className="d-inline-flex flex-row w-100"
-                      >
-                        {fileName}
-                        <div className="ms-auto">
-                          <NotPubliclyReleasableWarning />
+                      {!isExternalResource ? (
+                        <h1
+                          style={{ marginTop: 0 }}
+                          className="d-inline-flex flex-row w-100"
+                        >
+                          {fileName}
+                          <div className="ms-auto">
+                            <NotPubliclyReleasableWarning />
+                          </div>
+                        </h1>
+                      ) : (
+                        <div className="d-inline-flex flex-row w-100">
+                          <div className="ms-auto">
+                            <NotPubliclyReleasableWarning />
+                          </div>
                         </div>
-                      </h1>
+                      )}
                       <TagSelectReadOnly tagsFieldName="acTags" />
                       <TagsAndRestrictionsSection
                         tagsFieldName="acTags"
