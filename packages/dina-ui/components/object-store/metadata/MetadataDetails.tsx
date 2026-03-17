@@ -54,6 +54,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
+          "filename",
           ...(isExternalResource
             ? [
                 {

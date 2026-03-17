@@ -147,23 +147,15 @@ export default function MetadataViewPage() {
                 <DinaForm initialValues={response.data} readOnly={true}>
                   <div className="row d-flex">
                     <div className="col-md-12">
-                      {!isExternalResource ? (
-                        <h1
-                          style={{ marginTop: 0 }}
-                          className="d-inline-flex flex-row w-100"
-                        >
-                          {fileName}
-                          <div className="ms-auto">
-                            <NotPubliclyReleasableWarning />
-                          </div>
-                        </h1>
-                      ) : (
-                        <div className="d-inline-flex flex-row w-100">
-                          <div className="ms-auto">
-                            <NotPubliclyReleasableWarning />
-                          </div>
+                      <h1
+                        style={{ marginTop: 0 }}
+                        className="d-inline-flex flex-row w-100"
+                      >
+                        {fileName}
+                        <div className="ms-auto">
+                          <NotPubliclyReleasableWarning />
                         </div>
-                      )}
+                      </h1>
                       <TagSelectReadOnly tagsFieldName="acTags" />
                       <TagsAndRestrictionsSection
                         tagsFieldName="acTags"

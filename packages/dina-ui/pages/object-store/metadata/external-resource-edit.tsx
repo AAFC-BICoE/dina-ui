@@ -240,6 +240,12 @@ function ExternalResourceMetadataForm({
       />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
+          <TextField className="col-md-6" name="filename" />
+          <TextField
+            className="col-md-6"
+            name="fileExtension"
+            label={formatMessage("metadataFileExtensionLabel")}
+          />
           <TextField
             className="col-md-6"
             name="resourceExternalURL"
@@ -292,11 +298,6 @@ function ExternalResourceMetadataForm({
           </Field>
         </div>
         <div className="row">
-          <TextField
-            className="col-md-6"
-            name="fileExtension"
-            label={formatMessage("metadataFileExtensionLabel")}
-          />
           <PersonSelectField
             className="col-md-6"
             name="dcCreator"

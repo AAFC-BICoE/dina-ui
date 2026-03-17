@@ -117,6 +117,26 @@ export function FileView({
     ? `/object-store/object/image-view?id=${filePathContents[5]}`
     : `/object-store/object/image-view?id=${filePathContents[4]}`;
 
+  const LinkRender = (
+    <>
+      <FaLink className="dropdown-icon mb-3" style={{ fontSize: "2em" }} />
+      <a
+        href={(metadata as any)?.resourceExternalURL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn btn-secondary"
+      >
+        <DinaMessage id="openLink" />
+        <FaArrowUpRightFromSquare
+          style={{
+            marginLeft: "0.5em"
+          }}
+          aria-label="Opens in new tab"
+        />
+      </a>
+    </>
+  );
+
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
       {isLoading ? (
@@ -173,7 +193,28 @@ export function FileView({
             ) : errorStatus === 403 ? (
               <DinaMessage id="unauthorized" />
             ) : (
-              <DinaMessage id="thumbnailNotAvailableText" />
+              <>
+                {(metadata as any)?.isExternalResource ? (
+                  <div
+                    style={{
+                      width: "100%",
+                      aspectRatio: "3/2",
+                      backgroundColor: "#f0f0f0",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      color: "#666"
+                    }}
+                  >
+                    {LinkRender}
+                  </div>
+                ) : (
+                  <DinaMessage id="thumbnailNotAvailableText" />
+                )}
+              </>
             )
           ) : (
             <div
@@ -191,26 +232,7 @@ export function FileView({
               }}
             >
               {(metadata as any)?.isExternalResource ? (
-                <>
-                  <FaLink
-                    className="dropdown-icon mb-3"
-                    style={{ fontSize: "2em" }}
-                  />
-                  <a
-                    href={(metadata as any)?.resourceExternalURL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-secondary"
-                  >
-                    <DinaMessage id="openLink" />
-                    <FaArrowUpRightFromSquare
-                      style={{
-                        marginLeft: "0.5em"
-                      }}
-                      aria-label="Opens in new tab"
-                    />
-                  </a>
-                </>
+                LinkRender
               ) : (
                 <>
                   {fileExtensionToIcon(
