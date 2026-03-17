@@ -102,7 +102,7 @@ export default function MetadataListPage() {
       cell: ({ row: { original } }) =>
         (original as any)?.data?.attributes?.resourceExternalURL ? (
           <Link
-            href={`/object-store/object/external-resource-view?id=${original?.id}`}
+            href={`/object-store/object/view?id=${original?.id}`}
             className="m-auto"
             style={{ whiteSpace: "nowrap" }}
           >
