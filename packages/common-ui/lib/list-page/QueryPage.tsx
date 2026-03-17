@@ -727,6 +727,13 @@ export function QueryPage<TData extends KitsuResource>({
     router?.query?.queryTree
   ]);
 
+  // If column selector is disabled, the loading spinner should be turned off.
+  useEffect(() => {
+    if (!enableColumnSelector) {
+      setColumnSelectorLoading(false);
+    }
+  }, [enableColumnSelector]);
+
   /**
    * Used for selection mode only.
    *
@@ -1143,23 +1150,7 @@ export function QueryPage<TData extends KitsuResource>({
       setIsFullScreen,
       CheckBoxField: SelectCheckBox,
       CheckBoxHeader: SelectCheckBoxHeader,
-      query: elasticSearchQuery,
-      enableColumnSelector,
-      uniqueName,
-      indexMap,
-      dynamicFieldMapping,
-      onDisplayedColumnsChange,
-      excludedRelationshipTypes,
-      mandatoryDisplayedColumns,
-      nonExportableColumns,
-      bulkEditPath,
-      bulkDeleteButtonProps,
-      dataExportProps,
-      bulkSplitPath,
-      attachSelectedButtonsProps,
-      error,
-      singleEditPath,
-      indexName
+      query: elasticSearchQuery
     };
   }, [
     viewMode,
@@ -1182,23 +1173,7 @@ export function QueryPage<TData extends KitsuResource>({
     setIsFullScreen,
     SelectCheckBox,
     SelectCheckBoxHeader,
-    elasticSearchQuery,
-    enableColumnSelector,
-    uniqueName,
-    indexMap,
-    dynamicFieldMapping,
-    onDisplayedColumnsChange,
-    excludedRelationshipTypes,
-    mandatoryDisplayedColumns,
-    nonExportableColumns,
-    bulkEditPath,
-    bulkDeleteButtonProps,
-    dataExportProps,
-    bulkSplitPath,
-    attachSelectedButtonsProps,
-    error,
-    singleEditPath,
-    indexName
+    elasticSearchQuery
   ]);
 
   /**
