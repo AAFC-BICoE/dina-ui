@@ -26,9 +26,7 @@ export default function LatestSample({ query }: LatestSampleProps) {
 
       // Assume hits/hits structure from ES
       const hits = response.data?.hits?.hits ?? [];
-      setLatestSample(
-        hits.length > 0 ? hits[0]?._source?.data?.attributes : null
-      );
+      setLatestSample(hits.length > 0 ? hits[0]?._source?.data?.id : null);
     } catch (error: any) {
       console.error("Error fetching latest sample:", error);
       setLatestSample(null);
@@ -41,11 +39,9 @@ export default function LatestSample({ query }: LatestSampleProps) {
 
   if (!latestSample) return null;
 
-  const sampleId = latestSample?.hierarchy[0].uuid;
-
   return (
     <div>
-      <Link href={`/collection/material-sample/view?id=${sampleId}`}>
+      <Link href={`/collection/material-sample/view?id=${latestSample}`}>
         <button className="btn btn-info">
           <DinaMessage id="latestSampleTitle" />
         </button>
