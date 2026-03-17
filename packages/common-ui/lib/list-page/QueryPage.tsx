@@ -1164,15 +1164,10 @@ export function QueryPage<TData extends KitsuResource>({
     pageSize,
     pageOffset,
     sortingRules,
-    onPageChanged,
-    onPageSizeChanged,
-    onSortChange,
     resolvedReactTableProps,
     rowStyling,
     isFullScreen,
     setIsFullScreen,
-    SelectCheckBox,
-    SelectCheckBoxHeader,
     elasticSearchQuery
   ]);
 
