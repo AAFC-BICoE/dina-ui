@@ -210,5 +210,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   permissionError:
     "You don't have permissions to delete all of these selected records.",
   deleteSuccess: "Successfully deleted {count} records.",
-  noData: "No Data"
+  noData: "No Data",
+  listView: "List",
+  galleryView: "Gallery"
 };
