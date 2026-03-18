@@ -137,7 +137,7 @@ export default function RelatedObjectTypeChart({
     ]
   };
 
-  return chartData.length != 0 ? (
+  return (
     <div>
       <div>
         <strong>
@@ -145,11 +145,26 @@ export default function RelatedObjectTypeChart({
         </strong>
       </div>
       <Card>
-        <ReactECharts
-          option={options}
-          style={{ height: "400px", width: "100%" }}
-        />
+        {chartData.length > 0 ? (
+          <ReactECharts
+            option={options}
+            style={{ height: "400px", width: "100%" }}
+          />
+        ) : (
+          <div
+            style={{
+              height: "400px",
+              justifyContent: "center",
+              alignItems: "center",
+              display: "flex",
+              color: "#999",
+              fontSize: 18
+            }}
+          >
+            <DinaMessage id="noData" />
+          </div>
+        )}
       </Card>
     </div>
-  ) : null;
+  );
 }
