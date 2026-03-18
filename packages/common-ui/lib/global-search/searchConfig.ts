@@ -1,7 +1,7 @@
 import { IconType } from "react-icons";
 import { FaUser, FaCube } from "react-icons/fa";
 import { FaBoxesStacked, FaDiagramProject, FaRightLeft } from "react-icons/fa6";
-import { MdNature } from "react-icons/md";
+import { MdNature, MdEvent } from "react-icons/md";
 
 export interface IndexConfig {
   name: string;
@@ -57,6 +57,18 @@ export const SEARCH_INDEXES: IndexConfig[] = [
     displayAttributes: [
       "data.attributes.name",
       "data.attributes.status",
+      "data.attributes.group"
+    ]
+  },
+  {
+    name: "collectingEventListTitle",
+    indexName: "dina_collecting_event_index",
+    icon: MdEvent,
+    linkAttribute: "data.attributes.collectingEventName",
+    linkPath: "/collection/collecting-event/view?id=",
+    displayAttributes: [
+      "data.attributes.type",
+      "data.attributes.dwcFieldNumber",
       "data.attributes.group"
     ]
   },
