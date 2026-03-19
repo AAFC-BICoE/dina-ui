@@ -15,7 +15,6 @@ const NON_EXPORTABLE_COLUMNS = ["selectColumn"];
 
 export const columns: TableColumn<CollectingEvent>[] = [
   {
-    id: "id",
     cell: ({
       row: {
         original: { id }
@@ -27,9 +26,10 @@ export const columns: TableColumn<CollectingEvent>[] = [
         </Link>
       );
     },
-    accessorKey: "id",
-    header: () => <DinaMessage id="viewDetails" />,
-    enableSorting: false
+    accessorKey: "data.attributes.id",
+    header: () => <FieldHeader name="viewDetails" />,
+    enableSorting: false,
+    id: "viewDetails"
   },
   {
     id: "dwcFieldNumber",
@@ -88,7 +88,11 @@ export default function CollectingEventListPage() {
           enableMultiSort: true
         }}
         enableRelationshipPresence={true}
-        mandatoryDisplayedColumns={["selectColumn", "dwcFieldNumber"]}
+        mandatoryDisplayedColumns={[
+          "selectColumn",
+          "viewDetails",
+          "dwcFieldNumber"
+        ]}
         nonExportableColumns={NON_EXPORTABLE_COLUMNS}
         columns={columns}
         bulkDeleteButtonProps={{

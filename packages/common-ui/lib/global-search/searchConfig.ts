@@ -1,7 +1,12 @@
 import { IconType } from "react-icons";
 import { FaUser, FaCube } from "react-icons/fa";
-import { FaBoxesStacked, FaDiagramProject, FaRightLeft } from "react-icons/fa6";
-import { MdNature, MdEvent } from "react-icons/md";
+import {
+  FaBoxesStacked,
+  FaDiagramProject,
+  FaLocationDot,
+  FaRightLeft
+} from "react-icons/fa6";
+import { MdNature } from "react-icons/md";
 
 export interface IndexConfig {
   name: string;
@@ -9,7 +14,6 @@ export interface IndexConfig {
   icon: IconType;
   linkAttribute: string;
   linkPath: string;
-  displayAttributes: string[];
 }
 
 /**
@@ -21,80 +25,49 @@ export const SEARCH_INDEXES: IndexConfig[] = [
     indexName: "dina_material_sample_index",
     icon: MdNature,
     linkAttribute: "data.attributes.materialSampleName",
-    linkPath: "/collection/material-sample/view?id=",
-    displayAttributes: [
-      "data.attributes.materialSampleName",
-      "data.attributes.materialSampleType",
-      "data.attributes.group"
-    ]
+    linkPath: "/collection/material-sample/view?id="
   },
   {
     name: "objectListTitle",
     indexName: "dina_object_store_index",
     icon: FaCube,
     linkAttribute: "data.attributes.originalFilename",
-    linkPath: "/object-store/object/view?id=",
-    displayAttributes: [
-      "data.attributes.originalFilename",
-      "data.attributes.acCaption",
-      "data.attributes.bucket"
-    ]
+    linkPath: "/object-store/object/view?id="
   },
   {
     name: "storageUnitListTitle",
     indexName: "dina_storage_index",
     icon: FaBoxesStacked,
     linkAttribute: "data.attributes.name",
-    linkPath: "/collection/storage-unit/view?id=",
-    displayAttributes: ["data.attributes.name", "data.attributes.group"]
+    linkPath: "/collection/storage-unit/view?id="
   },
   {
     name: "projectListTitle",
     indexName: "dina_project_index",
     icon: FaDiagramProject,
     linkAttribute: "data.attributes.name",
-    linkPath: "/collection/project/view?id=",
-    displayAttributes: [
-      "data.attributes.name",
-      "data.attributes.status",
-      "data.attributes.group"
-    ]
+    linkPath: "/collection/project/view?id="
   },
   {
     name: "collectingEventListTitle",
     indexName: "dina_collecting_event_index",
-    icon: MdEvent,
-    linkAttribute: "data.attributes.collectingEventName",
-    linkPath: "/collection/collecting-event/view?id=",
-    displayAttributes: [
-      "data.attributes.type",
-      "data.attributes.dwcFieldNumber",
-      "data.attributes.group"
-    ]
+    icon: FaLocationDot,
+    linkAttribute: "data.attributes.dwcFieldNumber",
+    linkPath: "/collection/collecting-event/view?id="
   },
   {
     name: "loanTransactionsSectionTitle",
     indexName: "dina_loan_transaction_index",
     icon: FaRightLeft,
     linkAttribute: "data.attributes.transactionNumber",
-    linkPath: "/loan-transaction/transaction/view?id=",
-    displayAttributes: [
-      "data.attributes.transactionNumber",
-      "data.attributes.materialDirection",
-      "data.attributes.group"
-    ]
+    linkPath: "/loan-transaction/transaction/view?id="
   },
   {
     name: "peopleTitle",
     indexName: "dina_agent_index",
     icon: FaUser,
     linkAttribute: "data.attributes.displayName",
-    linkPath: "/person/view?id=",
-    displayAttributes: [
-      "data.attributes.displayName",
-      "data.attributes.givenNames",
-      "data.attributes.familyNames"
-    ]
+    linkPath: "/person/view?id="
   }
 ];
 
