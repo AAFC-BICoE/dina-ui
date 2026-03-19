@@ -53,6 +53,9 @@ import QueryBuilderVocabularySearch from "./query-builder-value-types/QueryBuild
 import QueryRowClassificationSearch, {
   transformClassificationToDSL
 } from "./query-builder-value-types/QueryBuilderClassificationSearch";
+import QueryBuilderGeoShapeSearch, {
+  transformGeoShapeToDSL
+} from "./query-builder-value-types/QueryBuilderGeoShapeSearch";
 import {
   QueryRowRelationshipAutocompleteSearch,
   transformRelationshipAutocompleteToDSL
@@ -118,6 +121,7 @@ function getQueryBuilderTypeFromIndexType(
     case "identifier":
     case "relationshipPresence":
     case "classification":
+    case "geoShape":
     case "relationshipAutocomplete":
       return type;
 
@@ -630,6 +634,28 @@ export function generateBuilderConfig(
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {
         const indexSettings = fieldValueToIndexSettings(field, indexMap);
         return transformClassificationToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
+    },
+    geoShape: {
+      ...BasicConfig.widgets.text,
+      type: "geoShape",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryBuilderGeoShapeSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          isInColumnSelector={false}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformGeoShapeToDSL({
           fieldPath: indexSettingsToFieldPath(indexSettings),
           operation: op,
           value: val,

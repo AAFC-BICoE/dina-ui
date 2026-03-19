@@ -86,7 +86,9 @@ export function useMultiIndexSearch(config: UseMultiIndexSearchConfig = {}) {
                     "data.type",
                     "data.attributes.name",
                     "data.attributes.displayName",
-                    "data.attributes.materialSampleName"
+                    "data.attributes.materialSampleName",
+                    "data.attributes.originalFilename",
+                    "data.attributes.dwcFieldNumber"
                   ]
                 },
                 highlight: {

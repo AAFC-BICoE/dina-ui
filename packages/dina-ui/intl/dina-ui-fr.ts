@@ -453,6 +453,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_startEventDateTime_tooltip:
     "Le format de date/heure du début de l’événement doit être un sous-ensemble de : AAAA-MM-JJTHH:MM:SS.MMM, si la date est présente, 'T’ est obligatoire",
   field_tags: "Étiquettes",
+  field_targetOrganismPrimaryGeoShape:
+    "Géomorphologie primaire de l'organisme cible",
   field_title: "Titre",
   "field_title.en": "Titre en anglais",
   "field_title.fr": "Titre en français",
@@ -708,6 +710,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   queryBuilder_field_placeholder: "Sélectionner le champ à rechercher",
   queryBuilder_managedAttribute_placeholder:
     "Sélectionner Attribut géré pour faire une recherche...",
+  queryBuilder_geoShape_placeholder: "Sélectionner le rang geoShape...",
   queryBuilder_operator_containsDate: "Contient",
   queryBuilder_operator_empty: "Vide",
   queryBuilder_operator_endsWith: "Se termine par",
@@ -720,6 +723,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   queryBuilder_operator_notEmpty: "N'est pas vide",
   queryBuilder_operator_notEquals: "N'est pas égal à",
   queryBuilder_operator_startsWith: "Commence par ",
+  queryBuilder_operator_intersects: "Intersections",
+  queryBuilder_operator_within: "Dans",
+  queryBuilder_operator_contains: "Contient",
+  queryBuilder_operator_disjoint: "Disjoint",
   queryBuilder_pickList_placeholder: "Sélectionner une valeur acceptée...",
   queryBuilder_value_false: "Faux ",
   queryBuilder_value_number_placeholder: "Saisir le nombre à rechercher",
