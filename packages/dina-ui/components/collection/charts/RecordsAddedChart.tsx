@@ -3,6 +3,7 @@ import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Dropdown, DropdownButton, Card } from "react-bootstrap";
+import _ from "lodash";
 interface RecordsAddedChartProps {
   inputQuery?: any;
 }
@@ -131,7 +132,17 @@ export default function RecordsAddedChart({
       }
     },
     {
-      key: "all-time",
+      key: "all-time-month",
+      label: "All Time",
+      interval: "month",
+      format: "yyyy-MM",
+      getDates: () => ({
+        start: undefined,
+        end: undefined
+      })
+    },
+    {
+      key: "all-time-year",
       label: "All Time",
       interval: "year",
       format: "yyyy",
@@ -144,7 +155,7 @@ export default function RecordsAddedChart({
 
   const buildQuery = () => {
     const query = inputQuery
-      ? structuredClone(inputQuery)
+      ? _.cloneDeep(inputQuery)
       : {
           bool: {
             must: []
@@ -427,7 +438,7 @@ export default function RecordsAddedChart({
 
           <Dropdown.Divider />
           <Dropdown.Header>
-            <DinaMessage id="dateRangeHeaderRecent" />
+            <DinaMessage id="dateRangeHeaderByDay" />
           </Dropdown.Header>
           <Dropdown.Item
             eventKey="last-7-days"
@@ -442,27 +453,24 @@ export default function RecordsAddedChart({
             <DinaMessage id="dateRangeLast30DaysDropdown" />
           </Dropdown.Item>
 
-          <Dropdown.Divider />
-          <Dropdown.Header>
-            <DinaMessage id="dateRangeHeaderByMonth" />
-          </Dropdown.Header>
           <Dropdown.Item
             eventKey="last-3-months"
             active={selectedPreset === "last-3-months"}
           >
             <DinaMessage id="dateRangeLast3MonthsDropdown" />
           </Dropdown.Item>
+
+          <Dropdown.Divider />
+
+          <Dropdown.Header>
+            <DinaMessage id="dateRangeHeaderByMonth" />
+          </Dropdown.Header>
           <Dropdown.Item
             eventKey="last-6-months"
             active={selectedPreset === "last-6-months"}
           >
             <DinaMessage id="dateRangeLast6MonthsDropdown" />
           </Dropdown.Item>
-
-          <Dropdown.Divider />
-          <Dropdown.Header>
-            <DinaMessage id="dateRangeHeaderByYear" />
-          </Dropdown.Header>
           <Dropdown.Item
             eventKey="this-year"
             active={selectedPreset === "this-year"}
@@ -475,11 +483,20 @@ export default function RecordsAddedChart({
           >
             <DinaMessage id="dateRangeLastYearDropdown" />
           </Dropdown.Item>
+          <Dropdown.Item
+            eventKey="all-time-month"
+            active={selectedPreset === "all-time-month"}
+          >
+            <DinaMessage id="dateRangeAllTimeDropdown" />
+          </Dropdown.Item>
 
           <Dropdown.Divider />
+          <Dropdown.Header>
+            <DinaMessage id="dateRangeHeaderByYear" />
+          </Dropdown.Header>
           <Dropdown.Item
-            eventKey="all-time"
-            active={selectedPreset === "all-time"}
+            eventKey="all-time-year"
+            active={selectedPreset === "all-time-year"}
           >
             <DinaMessage id="dateRangeAllTimeDropdown" />
           </Dropdown.Item>
