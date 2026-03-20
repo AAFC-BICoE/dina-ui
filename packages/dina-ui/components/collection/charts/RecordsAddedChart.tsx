@@ -65,8 +65,8 @@ export default function RecordsAddedChart({
     {
       key: "last-3-months",
       label: "Last 3 Months",
-      interval: "week",
-      format: "yyyy-ww",
+      interval: "day",
+      format: "yyyy-MM-dd",
       getDates: () => {
         const now = new Date();
         const start = new Date(
@@ -99,6 +99,20 @@ export default function RecordsAddedChart({
       }
     },
     {
+      key: "this-year",
+      label: "This Year",
+      interval: "month",
+      format: "yyyy-MM",
+      getDates: () => {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 1);
+        return {
+          start: start.toISOString().split("T")[0],
+          end: now.toISOString().split("T")[0]
+        };
+      }
+    },
+    {
       key: "last-year",
       label: "Last Year",
       interval: "month",
@@ -110,20 +124,6 @@ export default function RecordsAddedChart({
           now.getMonth(),
           now.getDate()
         );
-        return {
-          start: start.toISOString().split("T")[0],
-          end: now.toISOString().split("T")[0]
-        };
-      }
-    },
-    {
-      key: "this-year",
-      label: "This Year",
-      interval: "month",
-      format: "yyyy-MM",
-      getDates: () => {
-        const now = new Date();
-        const start = new Date(now.getFullYear(), 0, 1);
         return {
           start: start.toISOString().split("T")[0],
           end: now.toISOString().split("T")[0]
@@ -143,11 +143,13 @@ export default function RecordsAddedChart({
   ];
 
   const buildQuery = () => {
-    const query = inputQuery ?? {
-      bool: {
-        must: []
-      }
-    };
+    const query = inputQuery
+      ? structuredClone(inputQuery)
+      : {
+          bool: {
+            must: []
+          }
+        };
 
     if (dateRange.start || dateRange.end) {
       const rangeFilter: any = {
@@ -462,7 +464,7 @@ export default function RecordsAddedChart({
             <DinaMessage id="dateRangeHeaderByYear" />
           </Dropdown.Header>
           <Dropdown.Item
-            eventKey="year-to-date"
+            eventKey="this-year"
             active={selectedPreset === "this-year"}
           >
             <DinaMessage id="dateRangeThisYearDropdown" />
