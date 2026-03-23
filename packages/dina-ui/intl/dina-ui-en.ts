@@ -1408,12 +1408,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   siteListTitle: "Site",
   siteAttachments: "Site Attachments",
   code: "Code",
-  siteCoordinates: "Site coordinates",
+  siteMap: "Site Map",
+  siteCoordinates: "Site Coordinates",
   waitingForPolygonData: "Waiting for polygon data...",
   addSite: "Add Site",
   editSite: "Edit Site",
   createOnMap: "Create on Map",
   editOnMap: "Edit on Map",
   erase: "Erase",
-  close: "Close"
+  close: "Close",
+  invalidPolygon: "The coordinates are invalid: must be number[][][] and closed"
 };
