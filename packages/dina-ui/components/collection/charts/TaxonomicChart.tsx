@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { Card } from "react-bootstrap";
+//import "echarts/theme/inspired";
 
 const getAggregationKey = (aggName: string, obj: any): string | null => {
   if (!obj || typeof obj !== "object") return null;
@@ -49,6 +50,10 @@ function convertBucketsToSunburst(
 
 export default function TaxonomySunburstChart({ query }) {
   const { apiClient } = useApiClient();
+
+  type SourceFilter = "GNA" | "CUSTOM" | "VERBATIM" | "NO_DETERMINATION" | null;
+
+  const [selectedSource, setSelectedSource] = useState<SourceFilter>(null);
   const [chartData, setChartData] = useState([]);
 
   const TAXON_LEVELS = [
@@ -61,13 +66,61 @@ export default function TaxonomySunburstChart({ query }) {
     "by_species"
   ];
 
-  async function fetchData() {
+  function buildSourceFilter(selectedSource) {
+    switch (selectedSource) {
+      case "GNA":
+        return {
+          term: {
+            "included.attributes.determination.scientificNameSource.keyword":
+              "GNA"
+          }
+        };
+
+      case "CUSTOM":
+        return {
+          term: {
+            "included.attributes.determination.scientificNameSource.keyword":
+              "CUSTOM"
+          }
+        };
+
+      case "VERBATIM":
+        return {
+          exists: {
+            field: "included.attributes.determination.verbatimScientificName"
+          }
+        };
+
+      case "NO_DETERMINATION":
+        return {
+          bool: {
+            must_not: {
+              exists: {
+                field: "included.attributes.determination"
+              }
+            }
+          }
+        };
+
+      default:
+        return null; // no filter applied
+    }
+  }
+
+  async function fetchData(selectedSource) {
     try {
+      const sourceFilter = buildSourceFilter(selectedSource);
+
       const response = await apiClient.axios.post(
         "search-api/search-ws/search",
         {
           size: 0,
-          query,
+          query: {
+            bool: {
+              must: query,
+              ...(sourceFilter ? { filter: sourceFilter } : {})
+            }
+          },
           aggs: {
             by_kingdom: {
               terms: {
@@ -156,8 +209,8 @@ export default function TaxonomySunburstChart({ query }) {
   }
 
   useEffect(() => {
-    fetchData();
-  }, [query, apiClient]);
+    fetchData(selectedSource);
+  }, [query, apiClient, selectedSource]);
 
   const TAXON_LABELS = [
     "Kingdom",
@@ -172,8 +225,11 @@ export default function TaxonomySunburstChart({ query }) {
   const options = {
     tooltip: {
       trigger: "item",
+      padding: 4,
+      borderWidth: 2,
       formatter: function (info) {
         const pathLen = info.treePathInfo ? info.treePathInfo.length : 0;
+        const color = info.color;
 
         const depth = pathLen - 1;
         if (depth === 0) {
@@ -181,8 +237,17 @@ export default function TaxonomySunburstChart({ query }) {
         }
         const labelIndex = depth - 1;
         return `
-        <strong>${TAXON_LABELS[labelIndex]} : ${info.name}</strong><br/>
-        Value: ${info.value}
+        <div style="background:${color};
+        padding:6px 8px;
+        border-radius:4px;
+        font-family:Arial;">
+          <strong style="color:#333; font-size:14px;">
+            ${TAXON_LABELS[labelIndex]} : ${info.name}
+          </strong><br/>
+          <span style="color:#333; font-size:12px;">
+            Value: ${info.value}
+          </span>
+        </div>
       `;
       }
     },
@@ -201,8 +266,22 @@ export default function TaxonomySunburstChart({ query }) {
     <div>
       <strong>Taxonomic Chart</strong>
       <Card>
+        <p>Select a determination type:</p>
+        <select
+          value={selectedSource ?? ""}
+          onChange={(e) =>
+            setSelectedSource((e.target.value || null) as SourceFilter)
+          }
+        >
+          <option value="">All</option>
+          <option value="GNA">Structured</option>
+          <option value="CUSTOM">Structured Manual</option>
+          <option value="VERBATIM">Verbatim</option>
+          <option value="NO_DETERMINATION">No Determination</option>
+        </select>
         <ReactECharts
           option={options}
+          //theme="inspired"
           style={{ height: "700px", width: "100%" }}
         />
       </Card>
