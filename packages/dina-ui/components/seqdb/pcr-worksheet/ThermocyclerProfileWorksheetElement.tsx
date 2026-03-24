@@ -1,7 +1,7 @@
 import {
   DinaFormSection,
-  filterBy,
-  ResourceSelectField
+  ResourceSelectField,
+  SimpleSearchFilterBuilder
 } from "../../../../common-ui/lib";
 import { ThermocyclerProfile } from "../../../../dina-ui/types/seqdb-api";
 import classnames from "classnames";
@@ -39,7 +39,11 @@ export function ThermocyclerProfileWorksheetElement({
         <ResourceSelectField<ThermocyclerProfile>
           className="col-sm-12"
           name="thermocyclerProfile"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<ThermocyclerProfile>()
+              .searchFilter("name", input)
+              .build()
+          }
           model="seqdb-api/thermocycler-profile"
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="

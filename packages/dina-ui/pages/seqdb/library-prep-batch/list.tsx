@@ -62,14 +62,13 @@ export default function LibraryPrepBatchListPage() {
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+            ...(filterForm.group && { fiql: `group==${filterForm.group}` })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
           id="library-prep-batch-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/library-prep-batch",
-            include: ""
+            path: "seqdb-api/library-prep-batch"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

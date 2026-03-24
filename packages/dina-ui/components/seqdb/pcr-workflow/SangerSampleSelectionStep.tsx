@@ -4,7 +4,6 @@ import {
   LoadingSpinner,
   QueryPage,
   SaveArgs,
-  filterBy,
   useAccount,
   useApiClient
 } from "common-ui";
@@ -139,15 +138,7 @@ export function SangerSampleSelectionStep({
   async function fetchSampledIds() {
     await apiClient
       .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId
-            }
-          ]
-        })(""),
+        filter: { "pcrBatch.uuid": { EQ: pcrBatchId } },
         include: "materialSample",
         page: {
           limit: 1000 // Maximum page size.
@@ -233,15 +224,7 @@ export function SangerSampleSelectionStep({
         metagenomicsBatchItemsResp = await apiClient.get<
           MetagenomicsBatchItem[]
         >(`seqdb-api/metagenomics-batch-item`, {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "metagenomicsBatch.uuid",
-                comparison: "==",
-                arguments: metagenomicsBatch.id
-              }
-            ]
-          })(""),
+          filter: { "metagenomicsBatch.uuid": { EQ: metagenomicsBatch.id } },
           page: { limit: 1000 },
           include:
             "molecularAnalysisRunItem,molecularAnalysisRunItem.run,pcrBatchItem"

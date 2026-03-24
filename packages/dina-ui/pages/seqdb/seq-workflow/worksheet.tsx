@@ -2,9 +2,9 @@ import {
   DateField,
   DinaForm,
   DinaFormSection,
-  filterBy,
   LoadingSpinner,
   ResourceSelectField,
+  SimpleSearchFilterBuilder,
   TextField,
   useApiClient
 } from "common-ui";
@@ -125,7 +125,11 @@ export function SeqWorksheetForm({ seqBatch }: SeqWorksheetFormProps) {
               <ResourceSelectField<Region>
                 className="col-sm-12"
                 name="region"
-                filter={filterBy(["name"])}
+                filter={(input) =>
+                  SimpleSearchFilterBuilder.create<Region>()
+                    .searchFilter("name", input)
+                    .build()
+                }
                 model="seqdb-api/region"
                 optionLabel={(region) => region.name}
                 readOnlyLink="/seqdb/region/view?id="
@@ -139,7 +143,11 @@ export function SeqWorksheetForm({ seqBatch }: SeqWorksheetFormProps) {
               <ResourceSelectField<ThermocyclerProfile>
                 className="col-sm-12"
                 name="thermocyclerProfile"
-                filter={filterBy(["name"])}
+                filter={(input) =>
+                  SimpleSearchFilterBuilder.create<ThermocyclerProfile>()
+                    .searchFilter("name", input)
+                    .build()
+                }
                 model="seqdb-api/thermocycler-profile"
                 optionLabel={(profile) => profile.name}
                 readOnlyLink="/seqdb/thermocycler-profile/view?id="

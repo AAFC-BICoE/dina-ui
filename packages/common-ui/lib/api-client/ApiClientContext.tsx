@@ -252,7 +252,8 @@ export class ApiClientImpl implements ApiClientI {
       "/dina-export-api",
       "/objectstore-api",
       "/collection-api",
-      "/loan-transaction-api"
+      "/loan-transaction-api",
+      "/seqdb-api"
     ];
 
     // Remove leading slashes, so "/agent-api" and "agent-api" become identical after normalisation.
@@ -273,7 +274,34 @@ export class ApiClientImpl implements ApiClientI {
       "storage-unit-usage",
       "material-sample-summary",
       "project",
-      "notification"
+      "notification",
+      // seqdb-api resource types
+      "pcr-batch",
+      "pcr-batch-item",
+      "pcr-primer",
+      "seq-batch",
+      "seq-reaction",
+      "seq-submission",
+      "library-prep-batch",
+      "library-prep",
+      "library-pool",
+      "library-pool-content",
+      "index-set",
+      "ngs-index",
+      "product",
+      "region",
+      "sequencing-facility",
+      "managed-attribute",
+      "generic-molecular-analysis",
+      "generic-molecular-analysis-item",
+      "molecular-analysis-run",
+      "molecular-analysis-run-item",
+      "molecular-analysis-result",
+      "metagenomics-batch",
+      "metagenomics-batch-item",
+      "quality-control",
+      "pre-library-prep",
+      "thermocycler-profile"
     ];
 
     // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.

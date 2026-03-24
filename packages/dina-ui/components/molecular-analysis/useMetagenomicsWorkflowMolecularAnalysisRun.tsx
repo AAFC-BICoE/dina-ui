@@ -4,13 +4,7 @@ import {
   MolecularAnalysisRunItemUsageType
 } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useEffect, useState } from "react";
-import {
-  BulkGetOptions,
-  filterBy,
-  SaveArgs,
-  useApiClient,
-  useQuery
-} from "common-ui";
+import { BulkGetOptions, SaveArgs, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
 import { MolecularAnalysisRun } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { KitsuResource, PersistedResource } from "kitsu";
@@ -267,15 +261,7 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
     MetagenomicsBatchItem[]
   >(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "metagenomicsBatch.uuid",
-            comparison: "==",
-            arguments: metagenomicsBatchId
-          }
-        ]
-      })(""),
+      filter: { "metagenomicsBatch.uuid": { EQ: metagenomicsBatchId } },
       page: { limit: 1000 },
       path: `seqdb-api/metagenomics-batch-item`,
       include:

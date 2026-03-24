@@ -73,7 +73,7 @@ export default function MetagenomicsWorkflowListPage() {
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+            ...(filterForm.group && { fiql: `group==${filterForm.group}` })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
           id="metagenomics-workflow-list"

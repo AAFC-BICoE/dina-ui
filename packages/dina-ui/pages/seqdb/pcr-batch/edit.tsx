@@ -7,7 +7,6 @@ import {
   DinaFormProps,
   DinaFormSubmitParams,
   FieldSet,
-  filterBy,
   LoadingSpinner,
   Operation,
   ResourceSelectField,
@@ -65,8 +64,7 @@ export function usePcrBatchQuery(
   return useQuery<PcrBatch>(
     {
       path: `seqdb-api/pcr-batch/${id}`,
-      include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit,storageUnitType,protocol"
+      include: "primerForward,primerReverse,region,thermocyclerProfile"
     },
     { disabled: !id, deps }
   );
@@ -339,7 +337,11 @@ function PcrBatchFormFields({
       <ResourceSelectField<Region>
         className="col-md-6"
         name="region"
-        filter={filterBy(["name"])}
+        filter={(input) =>
+          SimpleSearchFilterBuilder.create<Region>()
+            .searchFilter("name", input)
+            .build()
+        }
         model="seqdb-api/region"
         optionLabel={(region) => region.name}
         readOnlyLink="/seqdb/region/view?id="
@@ -383,7 +385,11 @@ function PcrBatchFormFields({
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<ThermocyclerProfile>()
+              .searchFilter("name", input)
+              .build()
+          }
           model="seqdb-api/thermocycler-profile"
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
@@ -415,11 +421,13 @@ function PcrBatchFormFields({
         <ResourceSelectField<PcrPrimer>
           className="col-md-6"
           name="primerForward"
-          filter={(input) => ({
-            ...filterBy(["name"])(input),
-            direction: { EQ: "F" },
-            "region.id": { EQ: selectedRegion?.id }
-          })}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create()
+              .searchFilter("name", input)
+              .where("direction", "EQ", "F")
+              .whereProvided("region.id", "EQ", selectedRegion?.id)
+              .build()
+          }
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
@@ -428,11 +436,13 @@ function PcrBatchFormFields({
         <ResourceSelectField<PcrPrimer>
           className="col-md-6"
           name="primerReverse"
-          filter={(input) => ({
-            ...filterBy(["name"])(input),
-            direction: { EQ: "R" },
-            "region.id": { EQ: selectedRegion?.id }
-          })}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create()
+              .searchFilter("name", input)
+              .where("direction", "EQ", "R")
+              .whereProvided("region.id", "EQ", selectedRegion?.id)
+              .build()
+          }
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="

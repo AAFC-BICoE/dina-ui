@@ -1,6 +1,6 @@
 import { SeqReaction } from "../../types/seqdb-api";
 import { useState } from "react";
-import { filterBy, useApiClient, useQuery } from "common-ui";
+import { useApiClient, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import {
   attachGenericMolecularAnalysisItems,
@@ -73,15 +73,7 @@ export function useMolecularAnalysisRunView({
   const molecularAnalysisRunItemQuery = useQuery<MolecularAnalysisRunItem[]>(
     {
       path: `seqdb-api/molecular-analysis-run-item`,
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "run.uuid",
-            comparison: "==",
-            arguments: molecularAnalysisRunId
-          }
-        ]
-      })("")
+      filter: { "run.uuid": { EQ: molecularAnalysisRunId } }
     },
     {
       onSuccess: async ({ data: molecularAnalysisRunItems }) => {
@@ -210,15 +202,9 @@ export function useMolecularAnalysisRunView({
               const qualityControlQuery = await apiClient.get<QualityControl>(
                 `seqdb-api/quality-control`,
                 {
-                  filter: filterBy([], {
-                    extraFilters: [
-                      {
-                        selector: "molecularAnalysisRunItem.uuid",
-                        comparison: "==",
-                        arguments: item?.id
-                      }
-                    ]
-                  })(""),
+                  filter: {
+                    "molecularAnalysisRunItem.uuid": { EQ: item?.id }
+                  },
                   include:
                     "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
                 }

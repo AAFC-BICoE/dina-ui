@@ -4,7 +4,7 @@ import {
   DateField,
   DinaForm,
   DinaFormOnSubmit,
-  filterBy,
+  SimpleSearchFilterBuilder,
   NumberField,
   ResourceSelectField,
   SelectField,
@@ -124,7 +124,11 @@ export function PcrPrimerFormFields() {
         <ResourceSelectField<Region>
           className="col-md-2"
           name="region"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<Region>()
+              .searchFilter("name", input)
+              .build()
+          }
           label="Target Gene Region"
           model="seqdb-api/region"
           optionLabel={(region) => region.name}

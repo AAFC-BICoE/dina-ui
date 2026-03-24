@@ -1,11 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import {
-  ApiClientContext,
-  DeleteArgs,
-  filterBy,
-  SaveArgs,
-  useQuery
-} from "common-ui";
+import { ApiClientContext, DeleteArgs, SaveArgs, useQuery } from "common-ui";
 import _ from "lodash";
 import {
   MaterialSample,
@@ -206,15 +200,7 @@ export function useNsgSelectCoordinatesControls({
   // LibraryPrep queries.
   const { loading: materialSampleItemsLoading } = useQuery<LibraryPrep[]>(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "libraryPrepBatch.uuid",
-            comparison: "==",
-            arguments: libraryPrepBatchId
-          }
-        ]
-      })(""),
+      filter: { "libraryPrepBatch.uuid": { EQ: libraryPrepBatchId } },
       page: { limit: 1000 },
       path: `/seqdb-api/library-prep`,
       include: "storageUnitUsage"

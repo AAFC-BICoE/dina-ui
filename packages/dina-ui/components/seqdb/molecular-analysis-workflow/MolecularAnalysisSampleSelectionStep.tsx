@@ -5,7 +5,6 @@ import {
   LoadingSpinner,
   QueryPage,
   SimpleSearchFilterBuilder,
-  filterBy,
   useAccount,
   useApiClient
 } from "common-ui";
@@ -153,15 +152,9 @@ export function MolecularAnalysisSampleSelectionStep({
       .get<GenericMolecularAnalysisItem[]>(
         "/seqdb-api/generic-molecular-analysis-item",
         {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "genericMolecularAnalysis.uuid",
-                comparison: "==",
-                arguments: molecularAnalysisId
-              }
-            ]
-          })(""),
+          filter: {
+            "genericMolecularAnalysis.uuid": { EQ: molecularAnalysisId }
+          },
           include:
             "materialSample,storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run",
           page: {

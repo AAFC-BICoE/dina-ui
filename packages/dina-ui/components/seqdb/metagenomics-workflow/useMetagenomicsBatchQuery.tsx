@@ -1,4 +1,4 @@
-import { filterBy, useApiClient, useQuery } from "common-ui";
+import { useApiClient, useQuery } from "common-ui";
 import { MetagenomicsBatch } from "../../../types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 import { PcrBatchItem } from "../../../types/seqdb-api";
 import { MetagenomicsBatchItem } from "../../../types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
@@ -21,15 +21,7 @@ export function useMetagenomicsBatchQuery(
     const pcrBatchItemsResp = await apiClient.get<PcrBatchItem[]>(
       "/seqdb-api/pcr-batch-item",
       {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId!
-            }
-          ]
-        })("")
+        filter: { "pcrBatch.uuid": { EQ: pcrBatchId! } }
       }
     );
     return pcrBatchItemsResp.data;
@@ -42,15 +34,7 @@ export function useMetagenomicsBatchQuery(
       "/seqdb-api/metagenomics-batch-item",
       {
         include: "metagenomicsBatch",
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatchItem.uuid",
-              comparison: "==",
-              arguments: pcrBatchItems[0].id!
-            }
-          ]
-        })("")
+        filter: { "pcrBatchItem.uuid": { EQ: pcrBatchItems[0].id! } }
       }
     );
     return metagenomicsBatchItem?.data?.[0]?.metagenomicsBatch?.id;

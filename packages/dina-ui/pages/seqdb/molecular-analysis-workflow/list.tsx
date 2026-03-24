@@ -112,7 +112,7 @@ export default function MolecularAnalysisWorkflowListPage() {
           additionalFilters={(filterForm) => ({
             isCompleted: false,
             // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+            ...(filterForm.group && { fiql: `group==${filterForm.group}` })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
           id="molecular-analysis-workflow-list"

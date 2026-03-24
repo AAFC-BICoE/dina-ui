@@ -13,7 +13,7 @@ export default function SeqSubmissionViewPage() {
       )}
       query={(id) => ({
         path: `seqdb-api/seq-submission/${id}`,
-        include: "seqBatch,submittedBy,sequencingFacility"
+        include: "sequencingFacility"
       })}
       entityLink="/seqdb/seq-submission"
       type="seq-submission"

@@ -3,7 +3,7 @@ import {
   useAccount,
   TextField,
   ResourceSelectField,
-  filterBy,
+  SimpleSearchFilterBuilder,
   DateField
 } from "packages/common-ui/lib";
 import {
@@ -36,20 +36,12 @@ export function SeqSubmissionFields() {
           name="seqBatch"
           label={formatMessage("seqBatch")}
           className="col-md-6"
-          filter={filterBy(
-            ["name"],
-            !isAdmin
-              ? {
-                  extraFilters: [
-                    {
-                      selector: "group",
-                      comparison: "==",
-                      arguments: group
-                    }
-                  ]
-                }
-              : undefined
-          )}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<SeqBatch>()
+              .searchFilter("name", input)
+              .when(!isAdmin, (b) => b.whereProvided("group", "EQ", group))
+              .build()
+          }
           isDisabled={!group}
           readOnlyLink="/seqdb/seq-batch/view?id="
           model="seqdb-api/seq-batch"
@@ -61,20 +53,12 @@ export function SeqSubmissionFields() {
           name="sequencingFacility"
           label={formatMessage("sequencingFacility")}
           className="col-md-6"
-          filter={filterBy(
-            ["name"],
-            !isAdmin
-              ? {
-                  extraFilters: [
-                    {
-                      selector: "group",
-                      comparison: "==",
-                      arguments: group
-                    }
-                  ]
-                }
-              : undefined
-          )}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<SequencingFacility>()
+              .searchFilter("name", input)
+              .when(!isAdmin, (b) => b.whereProvided("group", "EQ", group))
+              .build()
+          }
           isDisabled={!group}
           readOnlyLink="/seqdb/sequencing-facility/view?id="
           model="seqdb-api/sequencing-facility"

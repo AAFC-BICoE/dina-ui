@@ -7,7 +7,6 @@ import {
   FormikButton,
   QueryTable,
   ReactTable,
-  filterBy,
   useAccount,
   useApiClient,
   useGroupedCheckBoxes
@@ -147,16 +146,7 @@ export function LibraryPoolContentStep({
     const response = await apiClient.get<LibraryPoolContent[]>(
       "/seqdb-api/library-pool-content",
       {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "libraryPool.uuid",
-              comparison: "==",
-              arguments: libraryPoolId
-            }
-          ]
-        })(""),
-        include: "libraryPool,pooledLibraryPrepBatch,pooledLibraryPool",
+        filter: { "libraryPool.uuid": { EQ: libraryPoolId } },
         page: {
           limit: 1000 // Maximum page size.
         }
@@ -201,11 +191,11 @@ export function LibraryPoolContentStep({
       1000
     );
   const batchFilter: FilterParam = {
-    rsql: `name=='*${nameFilter}*' ${hideUsedItems ? "and dateUsed==null" : ""}`
+    fiql: `name=='*${nameFilter}*'${hideUsedItems ? ";dateUsed==null" : ""}`
   };
   const poolFilter = {
-    rsql: `uuid!=${libraryPool.id} and name=='*${nameFilter}*' ${
-      hideUsedItems ? "and dateUsed==null" : ""
+    fiql: `uuid!=${libraryPool.id};name=='*${nameFilter}*'${
+      hideUsedItems ? ";dateUsed==null" : ""
     }`
   };
 

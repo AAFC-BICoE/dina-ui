@@ -78,6 +78,21 @@ export async function serialize<TData extends KitsuResource>({
   if (origRelationship && Object.keys(origRelationship).length !== 0)
     data.relationships = { ...data.relationships, ...origRelationship };
 
+  // V2 API endpoints only accept { type, id } in relationship data.
+  // Strip any extra attributes that may be present from fully-loaded relationship objects.
+  if (data.relationships) {
+    for (const relName of Object.keys(data.relationships)) {
+      const rel = (data.relationships as any)[relName];
+      if (rel?.data && !Array.isArray(rel.data) && rel.data.id) {
+        rel.data = { type: rel.data.type, id: rel.data.id };
+      } else if (rel?.data && Array.isArray(rel.data)) {
+        rel.data = rel.data.map(
+          ({ type, id }: { type: string; id: string }) => ({ type, id })
+        );
+      }
+    }
+  }
+
   return data;
 }
 

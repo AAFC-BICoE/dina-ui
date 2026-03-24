@@ -12,7 +12,7 @@ export default function SeqSubmissionEditPage() {
 
   const query = useQuery<SeqSubmission>({
     path: `seqdb-api/seq-submission/${id}`,
-    include: "seqBatch,submittedBy,sequencingFacility"
+    include: "sequencingFacility"
   });
 
   const title = id ? "editSeqSubmissionTitle" : "addSeqSubmissionTitle";
