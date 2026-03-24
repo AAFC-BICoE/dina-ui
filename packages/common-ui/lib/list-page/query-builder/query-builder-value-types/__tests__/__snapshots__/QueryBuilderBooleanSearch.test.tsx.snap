@@ -2,6 +2,14 @@
 
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Edge cases If no field value is provided, nothing should be generated. 1`] = `Object {}`;
 
+exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Edge cases If no value is provided for equals operation, it should default to true. 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.booleanField": "true",
+  },
+}
+`;
+
 exports[`QueryBuilderBooleanSearch transformBooleanSearchToDSL function Empty operation Normal field 1`] = `
 Object {
   "bool": Object {
