@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
-import { Card } from "react-bootstrap";
+import { Card, CardHeader } from "react-bootstrap";
 //import "echarts/theme/inspired";
 
 const getAggregationKey = (aggName: string, obj: any): string | null => {
@@ -126,56 +126,49 @@ export default function TaxonomySunburstChart({ query }) {
               terms: {
                 field:
                   "data.attributes.targetOrganismPrimaryClassification.kingdom.keyword",
-                size: 100,
-                missing: "NO_KINGDOM"
+                size: 100
               },
               aggs: {
                 by_phylum: {
                   terms: {
                     field:
                       "data.attributes.targetOrganismPrimaryClassification.phylum.keyword",
-                    size: 100,
-                    missing: "NO_PHYLUM"
+                    size: 100
                   },
                   aggs: {
                     by_class: {
                       terms: {
                         field:
                           "data.attributes.targetOrganismPrimaryClassification.class.keyword",
-                        size: 100,
-                        missing: "NO_CLASS"
+                        size: 100
                       },
                       aggs: {
                         by_order: {
                           terms: {
                             field:
                               "data.attributes.targetOrganismPrimaryClassification.order.keyword",
-                            size: 100,
-                            missing: "NO_ORDER"
+                            size: 100
                           },
                           aggs: {
                             by_family: {
                               terms: {
                                 field:
                                   "data.attributes.targetOrganismPrimaryClassification.family.keyword",
-                                size: 10000,
-                                missing: "NO_FAMILY"
+                                size: 10000
                               },
                               aggs: {
                                 by_genus: {
                                   terms: {
                                     field:
                                       "data.attributes.targetOrganismPrimaryClassification.genus.keyword",
-                                    size: 10000,
-                                    missing: "NO_GENUS"
+                                    size: 10000
                                   },
                                   aggs: {
                                     by_species: {
                                       terms: {
                                         field:
                                           "data.attributes.targetOrganismPrimaryScientificName.keyword",
-                                        size: 10000,
-                                        missing: "NO_SPECIES"
+                                        size: 10000
                                       }
                                     }
                                   }
@@ -222,65 +215,132 @@ export default function TaxonomySunburstChart({ query }) {
     "Species"
   ];
 
-  const options = {
-    tooltip: {
-      trigger: "item",
-      padding: 4,
-      borderWidth: 2,
-      formatter: function (info) {
-        const pathLen = info.treePathInfo ? info.treePathInfo.length : 0;
-        const color = info.color;
+  const graphOptions = {
+    sunburst: {
+      tooltip: {
+        trigger: "item",
+        padding: 4,
+        borderWidth: 2,
+        formatter: function (info) {
+          const pathLen = info.treePathInfo ? info.treePathInfo.length : 0;
+          const color = info.color;
 
-        const depth = pathLen - 1;
-        if (depth === 0) {
-          return "";
+          const depth = pathLen - 1;
+          if (depth === 0) {
+            return "";
+          }
+          const labelIndex = depth - 1;
+          return `
+          <div style="background:${color};
+          padding:6px 8px;
+          border-radius:4px;
+          font-family:Arial;">
+            <strong style="color:#333; font-size:14px;">
+              ${TAXON_LABELS[labelIndex]} : ${info.name}
+            </strong><br/>
+            <span style="color:#333; font-size:12px;">
+              Value: ${info.value}
+            </span>
+          </div>
+        `;
         }
-        const labelIndex = depth - 1;
-        return `
-        <div style="background:${color};
-        padding:6px 8px;
-        border-radius:4px;
-        font-family:Arial;">
-          <strong style="color:#333; font-size:14px;">
-            ${TAXON_LABELS[labelIndex]} : ${info.name}
-          </strong><br/>
-          <span style="color:#333; font-size:12px;">
-            Value: ${info.value}
-          </span>
-        </div>
-      `;
-      }
+      },
+      series: [
+        {
+          type: "sunburst",
+          radius: [0, "95%"],
+          sort: undefined,
+          emphasis: { focus: "ancestor" },
+          data: chartData,
+          label: {
+            rotate: "tangential",
+            minAngle: 6,
+            overflow: "truncate",
+            ellipsis: "..."
+          },
+          labelLayout: {
+            hideOverlap: true
+          }
+        }
+      ]
     },
-    series: [
-      {
-        type: "sunburst",
-        radius: [0, "95%"],
-        sort: undefined,
-        emphasis: { focus: "ancestor" },
-        data: chartData
-      }
-    ]
+    treemap: {
+      series: [
+        {
+          type: "treemap",
+          roam: true,
+          nodeClick: "zoomToNode",
+          breadcrumb: { show: true },
+          data: chartData
+        }
+      ]
+    }
   };
+
+  const [chartType, setChartType] = useState("sunburst");
 
   return chartData.length ? (
     <div>
-      <strong>Taxonomic Chart</strong>
+      <strong>Taxonomic Chart (Structured Entries Only)</strong>
       <Card>
-        <p>Select a determination type:</p>
-        <select
-          value={selectedSource ?? ""}
-          onChange={(e) =>
-            setSelectedSource((e.target.value || null) as SourceFilter)
-          }
+        <CardHeader
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between"
+          }}
         >
-          <option value="">All</option>
-          <option value="GNA">Structured</option>
-          <option value="CUSTOM">Structured Manual</option>
-          <option value="VERBATIM">Verbatim</option>
-          <option value="NO_DETERMINATION">No Determination</option>
-        </select>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "6px"
+            }}
+          >
+            <p>Select a determination type:</p>
+            <select
+              value={selectedSource ?? ""}
+              onChange={(e) =>
+                setSelectedSource((e.target.value || null) as SourceFilter)
+              }
+            >
+              <option value="">All</option>
+              <option value="GNA">Structured</option>
+              <option value="CUSTOM">Structured Manual</option>
+            </select>
+          </div>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button
+              onClick={() => setChartType("sunburst")}
+              style={{
+                padding: "6px 12px",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                background: chartType === "sunburst" ? "#007bff" : "#f0f0f0",
+                color: chartType === "sunburst" ? "white" : "black",
+                cursor: "pointer"
+              }}
+            >
+              Sunburst
+            </button>
+
+            <button
+              onClick={() => setChartType("treemap")}
+              style={{
+                padding: "6px 12px",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                background: chartType === "treemap" ? "#007bff" : "#f0f0f0",
+                color: chartType === "treemap" ? "white" : "black",
+                cursor: "pointer"
+              }}
+            >
+              Treemap
+            </button>
+          </div>
+        </CardHeader>
         <ReactECharts
-          option={options}
+          option={graphOptions[chartType]}
           //theme="inspired"
           style={{ height: "700px", width: "100%" }}
         />

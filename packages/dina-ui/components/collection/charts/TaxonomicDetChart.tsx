@@ -108,6 +108,12 @@ export default function TaxonomicDetChart({ query }: TaxonomicDetChartProps) {
         radius: "65%",
         center: ["50%", "55%"],
         data: chartData,
+        triggerEvent: true,
+        label: {
+          show: true,
+          formatter: "{c}",
+          position: "inside"
+        },
         emphasis: {
           itemStyle: {
             shadowBlur: 10,
