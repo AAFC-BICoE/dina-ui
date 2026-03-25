@@ -18,7 +18,19 @@ export default function PolygonEditorCoordinates({
   const [error, setError] = useState<string>("");
 
   if (mode === POLYGON_EDITOR_MODE.VIEW)
-    return <div className="mb-4">{JSON.stringify(coords)}</div>;
+    return (
+      <pre
+        className="mb-4 col-md-6 border"
+        style={{
+          whiteSpace: "pre-wrap",
+          height: "350px",
+          overflowY: "auto",
+          borderRadius: "5px"
+        }}
+      >
+        {JSON.stringify(coords, null, 2)}
+      </pre>
+    );
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     let parsed: GeoPosition[][];
