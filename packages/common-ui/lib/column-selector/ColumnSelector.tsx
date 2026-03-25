@@ -274,52 +274,55 @@ export function ColumnSelector<TData extends KitsuResource>(
 
     async function loadColumnsFromSavedExport() {
       if (injectedIndexMapping && overrideDisplayedColumns) {
-        const promises = overrideDisplayedColumns?.columns?.map?.(
-          async (localColumn, index) => {
-            let columnFunctionPath: string | undefined = undefined;
+        // Extract columns and aliases from the schema (first entity key)
+        const entityKey = Object.keys(
+          overrideDisplayedColumns?.schema ?? {}
+        )[0];
+        const columns =
+          overrideDisplayedColumns?.schema?.[entityKey]?.columns ?? [];
+        const columnAliases =
+          overrideDisplayedColumns?.schema?.[entityKey]?.aliases ?? [];
 
-            // Determine if this is a function column and construct the path
-            if (localColumn.includes("function")) {
-              const funcData =
-                overrideDisplayedColumns.functions?.[localColumn];
-              if (funcData) {
-                let finalParams = funcData.params;
+        const promises = columns?.map?.(async (localColumn, index) => {
+          let columnFunctionPath: string | undefined = undefined;
 
-                // Check if we are using the old format (where params was just an array of strings)
-                // If so, convert it to the new object format { items: [...] }
-                if (
-                  funcData.functionDef === "CONCAT" &&
-                  Array.isArray(finalParams)
-                ) {
-                  finalParams = { items: finalParams };
-                }
+          // Determine if this is a function column and construct the path
+          if (localColumn.includes("function")) {
+            const funcData = overrideDisplayedColumns.functions?.[localColumn];
+            if (funcData) {
+              let finalParams = funcData.params;
 
-                // Format: columnFunction/functionId/functionDef[/paramJson]
-                columnFunctionPath =
-                  `columnFunction/${localColumn}/${funcData.functionDef}` +
-                  (funcData.params
-                    ? "/" + JSON.stringify(funcData.params)
-                    : "");
+              // Check if we are using the old format (where params was just an array of strings)
+              // If so, convert it to the new object format { items: [...] }
+              if (
+                funcData.functionDef === "CONCAT" &&
+                Array.isArray(finalParams)
+              ) {
+                finalParams = { items: finalParams };
               }
+
+              // Format: columnFunction/functionId/functionDef[/paramJson]
+              columnFunctionPath =
+                `columnFunction/${localColumn}/${funcData.functionDef}` +
+                (funcData.params ? "/" + JSON.stringify(funcData.params) : "");
             }
-
-            const newColumnDefinition = await generateColumnDefinition({
-              indexMappings: injectedIndexMapping,
-              dynamicFieldsMappingConfig,
-              apiClient,
-              defaultColumns,
-              path: columnFunctionPath ?? localColumn
-            });
-
-            // Set the column header if saved.
-            if (newColumnDefinition) {
-              newColumnDefinition.exportHeader =
-                overrideDisplayedColumns?.columnAliases?.[index] ?? "";
-            }
-
-            return newColumnDefinition;
           }
-        );
+
+          const newColumnDefinition = await generateColumnDefinition({
+            indexMappings: injectedIndexMapping,
+            dynamicFieldsMappingConfig,
+            apiClient,
+            defaultColumns,
+            path: columnFunctionPath ?? localColumn
+          });
+
+          // Set the column header if saved.
+          if (newColumnDefinition) {
+            newColumnDefinition.exportHeader = columnAliases?.[index] ?? "";
+          }
+
+          return newColumnDefinition;
+        });
         if (promises) {
           const columns = (await Promise.all(promises)).filter(isDefinedColumn);
           setDisplayedColumns(columns);
@@ -360,9 +363,9 @@ export function ColumnSelector<TData extends KitsuResource>(
     showDropdown: showDropdownMenu,
     hideDropdown: hideDropdownMenu,
     onKeyDown: onKeyPressDown
-  } = menuDisplayControl();
+  } = useMenuDisplayControl();
 
-  function menuDisplayControl() {
+  function useMenuDisplayControl() {
     const [show, setShow] = useState(false);
 
     const showDropdown = () => {

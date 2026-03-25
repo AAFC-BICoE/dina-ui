@@ -276,7 +276,8 @@ export const DYNAMIC_FIELD_TYPES = [
   "columnFunction",
   "vocabulary",
   "imageLink",
-  "relationshipAutocomplete"
+  "relationshipAutocomplete",
+  "geoShape"
 ] as const;
 export type DynamicFieldType = (typeof DYNAMIC_FIELD_TYPES)[number];
 
