@@ -948,6 +948,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   siteListTitle: "Site",
   siteAttachments: "Pièces jointes au site",
   code: "Code",
+  siteMap: "Plan du site",
   siteCoordinates: "Coordonnées du site",
   waitingForPolygonData: "En attente des données polygonales...",
   addSite: "Ajouter un site",
@@ -955,5 +956,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createOnMap: "Créer sur la carte",
   editOnMap: "Modifier sur la carte",
   erase: "Effacer",
-  close: "Fermer"
+  close: "Fermer",
+  invalidPolygon:
+    "Les coordonnées sont invalides : elles doivent être de type nombre[][][] et fermées"
 };
