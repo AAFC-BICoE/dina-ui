@@ -51,7 +51,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return { data: [TEST_GROUP_1] };
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/321?include=collectors,attachment,collectionMethod,protocol,expedition":
+    case "collection-api/collecting-event/321?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: testCollectionEvent() };
     case "collection-api/preparation-type":
       return { data: [TEST_PREP_TYPE] };
@@ -67,7 +67,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/collection":
     case "collection-api/project":
     case "collection-api/vocabulary2/materialSampleType":
-    case "collection-api/vocabulary2/typeStatus":
+    case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=type_status":
     case "collection-api/organism":
     case "collection-api/collection-method":
     case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format":

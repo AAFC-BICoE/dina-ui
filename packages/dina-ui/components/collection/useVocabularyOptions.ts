@@ -15,7 +15,14 @@ export default function useVocabularyOptions({ path }) {
   });
   const { locale } = useDinaIntl();
 
-  const vocabOptions = response?.data?.vocabularyElements?.map(toOption) ?? [];
+  // If using new endpoint, parse the response differently
+  const vocabOptions = path.includes(
+    "collection-api/controlled-vocabulary-item"
+  )
+    ? response?.data instanceof Array
+      ? response.data.map(toOption) ?? []
+      : [toOption(response?.data as any as VocabularyElement)]
+    : response?.data?.vocabularyElements?.map(toOption) ?? [];
 
   function toOption(value: string | VocabularyElement): VocabularyOption {
     if (typeof value === "string") {
@@ -29,9 +36,9 @@ export default function useVocabularyOptions({ path }) {
         value?.multilingualTitle?.titles || [],
         (item) => item.lang === locale
       )?.title ||
-      value.name ||
+      value?.name ||
       "";
-    return { label, value: value.key };
+    return { label, value: value?.key };
   }
 
   return { toOption, loading, vocabOptions };

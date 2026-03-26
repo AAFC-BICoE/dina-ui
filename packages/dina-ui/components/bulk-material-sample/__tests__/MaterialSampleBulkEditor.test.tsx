@@ -99,7 +99,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           name: "Attribute 1"
         }
       });
-    case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod,protocol,expedition":
+    case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: TEST_COLLECTING_EVENT };
     case "collection-api/storage-unit":
       if (params?.filter?.rsql === "parentStorageUnit.uuid==su-1") {
@@ -146,21 +146,6 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           }
         ]
       };
-    case "search-api/search-ws/mapping":
-    case "collection-api/storage-unit-type":
-    case "collection-api/collection":
-    case "collection-api/collection-method":
-    case "collection-api/collecting-event":
-    case "objectstore-api/metadata":
-    case "agent-api/person":
-    case "collection-api/vocabulary2/typeStatus":
-    case "collection-api/vocabulary2/degreeOfEstablishment":
-    case "collection-api/preparation-type":
-    case "collection-api/material-sample":
-    case "collection-api/managed-attribute":
-    case "collection-api/vocabulary2/materialSampleState":
-    case "collection-api/material-sample-type":
-    case "collection-api/project":
     case "user-api/group":
       return {
         data: [
@@ -177,6 +162,21 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         },
         meta: { totalResourceCount: 1, moduleVersion: "0.16" }
       };
+    case "search-api/search-ws/mapping":
+    case "collection-api/storage-unit-type":
+    case "collection-api/collection":
+    case "collection-api/collection-method":
+    case "collection-api/collecting-event":
+    case "objectstore-api/metadata":
+    case "agent-api/person":
+    case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=type_status":
+    case "collection-api/vocabulary2/degreeOfEstablishment":
+    case "collection-api/preparation-type":
+    case "collection-api/material-sample":
+    case "collection-api/managed-attribute":
+    case "collection-api/vocabulary2/materialSampleState":
+    case "collection-api/material-sample-type":
+    case "collection-api/project":
     case "collection-api/vocabulary2/associationType":
     case "collection-api/vocabulary2/srs":
     case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format":

@@ -53,6 +53,13 @@ import QueryBuilderVocabularySearch from "./query-builder-value-types/QueryBuild
 import QueryRowClassificationSearch, {
   transformClassificationToDSL
 } from "./query-builder-value-types/QueryBuilderClassificationSearch";
+import QueryBuilderGeoShapeSearch, {
+  transformGeoShapeToDSL
+} from "./query-builder-value-types/QueryBuilderGeoShapeSearch";
+import {
+  QueryRowRelationshipAutocompleteSearch,
+  transformRelationshipAutocompleteToDSL
+} from "./query-builder-value-types/QueryBuilderRelationshipAutocompleteSearch";
 import { MdPlaylistAdd } from "react-icons/md";
 import { LuParentheses } from "react-icons/lu";
 
@@ -114,6 +121,8 @@ function getQueryBuilderTypeFromIndexType(
     case "identifier":
     case "relationshipPresence":
     case "classification":
+    case "geoShape":
+    case "relationshipAutocomplete":
       return type;
 
     // If it's stored directly as a keyword, it's considered a text field.
@@ -632,6 +641,55 @@ export function generateBuilderConfig(
           fieldInfo: indexSettings
         });
       }
+    },
+    geoShape: {
+      ...BasicConfig.widgets.text,
+      type: "geoShape",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryBuilderGeoShapeSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          isInColumnSelector={false}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformGeoShapeToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
+    },
+    relationshipAutocomplete: {
+      ...BasicConfig.widgets.text,
+      type: "relationshipAutocomplete",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowRelationshipAutocompleteSearch
+          matchType={factoryProps?.operator}
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          fieldMapping={
+            (factoryProps?.fieldDefinition?.fieldSettings as any)
+              ?.mapping as ESIndexMapping
+          }
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformRelationshipAutocompleteToDSL({
+          fieldPath: field,
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings,
+          indexMap
+        });
+      }
     }
   };
 
@@ -792,6 +850,15 @@ export function generateBuilderConfig(
       widgets: {
         classification: {
           operators: ["noOperator"]
+        }
+      }
+    },
+    relationshipAutocomplete: {
+      valueSources: ["value"],
+      defaultOperator: "equals",
+      widgets: {
+        relationshipAutocomplete: {
+          operators: ["equals", "notEquals", "empty", "notEmpty"]
         }
       }
     }

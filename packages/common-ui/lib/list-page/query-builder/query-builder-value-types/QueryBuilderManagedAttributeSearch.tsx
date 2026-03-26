@@ -446,7 +446,7 @@ export default function QueryRowManagedAttributeSearch({
         <></>
       )}
 
-      {/* Value Searching (changes based ont he type selected) */}
+      {/* Value Searching (changes based on the type selected) */}
       {!isInColumnSelector && (
         <div className="col ps-0 flex-grow-expand">
           {supportedValueForType(managedAttributeType)}

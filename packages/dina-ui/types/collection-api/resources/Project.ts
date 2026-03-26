@@ -20,6 +20,7 @@ export interface ProjectAttributes {
 
 export interface ProjectRelationships {
   attachment?: ResourceIdentifierObject[];
+  parentProject?: Project;
 }
 
 export type Project = KitsuResource &

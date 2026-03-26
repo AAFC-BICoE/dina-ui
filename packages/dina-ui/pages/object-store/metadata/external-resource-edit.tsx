@@ -70,7 +70,7 @@ export default function ExternalResourceMetadataPage() {
 
   return (
     <div>
-      <Head title={formatMessage("externalResourceListTitle")} />
+      <Head title={formatMessage("editExternalResourceTitle")} />
       <Nav />
       <main className="container-fluid">
         {id ? (
@@ -204,7 +204,7 @@ function ExternalResourceMetadataForm({
       metadataWithRelationships?.id
     ) {
       await router.push(
-        `/object-store/object/external-resource-view?id=${metadataWithRelationships?.id}`
+        `/object-store/object/view?id=${metadataWithRelationships?.id}`
       );
     } else {
       const savedMeta = await save(
@@ -212,9 +212,7 @@ function ExternalResourceMetadataForm({
         { apiBaseUrl: "/objectstore-api" }
       );
 
-      await router.push(
-        `/object-store/object/external-resource-view?id=${savedMeta?.[0].id}`
-      );
+      await router.push(`/object-store/object/view?id=${savedMeta?.[0].id}`);
     }
   };
 
@@ -242,6 +240,12 @@ function ExternalResourceMetadataForm({
       />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
+          <TextField className="col-md-6" name="filename" />
+          <TextField
+            className="col-md-6"
+            name="fileExtension"
+            label={formatMessage("metadataFileExtensionLabel")}
+          />
           <TextField
             className="col-md-6"
             name="resourceExternalURL"
@@ -294,11 +298,6 @@ function ExternalResourceMetadataForm({
           </Field>
         </div>
         <div className="row">
-          <TextField
-            className="col-md-6"
-            name="fileExtension"
-            label={formatMessage("metadataFileExtensionLabel")}
-          />
           <PersonSelectField
             className="col-md-6"
             name="dcCreator"

@@ -24,6 +24,9 @@ import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
 import { CollectionLinkedProjectsTable } from "../../../components/collection/collection/CollectionLinkedProjectsTable";
+import CollectionSampleTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
+import CollectionRelatedObjectTypeChart from "../../../components/collection/collection/CollectionRelatedObjectTypeChart";
+import CollectionRecordsAddedChart from "../../../components/collection/collection/CollectionRecordsAddedChart";
 
 export default function CollectionEditPage() {
   const router = useRouter();
@@ -125,8 +128,8 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
 export function CollectionFormFields() {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
-  const { query } = useRouter();
-  const uuid = (query?.id as string) ?? "";
+  const router = useRouter();
+  const uuid = String(router.query?.id ?? "");
   const typeOptions: SelectOption<string | undefined>[] = [
     {
       label: CollectionIdentifierType.GRSCICOLL,
@@ -185,11 +188,27 @@ export function CollectionFormFields() {
           ) : null
         }
       </Field>
+
       {readOnly && (
-        <div className="row">
-          <DateField className="col-md-6" name="createdOn" />
-          <TextField className="col-md-6" name="createdBy" />
-        </div>
+        <>
+          <div className="row">
+            <DateField className="col-md-6" name="createdOn" />
+            <TextField className="col-md-6" name="createdBy" />
+          </div>
+          <div className="row">
+            <div className="col-md-6">
+              <CollectionSampleTypeChart id={uuid} />
+            </div>
+            <div className="col-md-6">
+              <CollectionRecordsAddedChart id={uuid} />
+            </div>
+          </div>
+          <div className="row mt-3 mb-3">
+            <div className="col-md-6">
+              <CollectionRelatedObjectTypeChart id={uuid} />
+            </div>
+          </div>
+        </>
       )}
       {readOnly && (
         <div className="row">

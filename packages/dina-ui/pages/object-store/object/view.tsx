@@ -4,10 +4,10 @@ import {
   DinaForm,
   LoadingSpinner,
   generateUUIDTree,
-  BackButton,
   CustomQueryPageView,
   UploadDerivativeButton,
-  withResponse
+  withResponse,
+  BackToListButton
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -72,21 +72,22 @@ export default function MetadataViewPage() {
     ? metadata?.meta?.permissions?.includes("delete") ?? false
     : true;
 
+  const isExternalResource = metadata?.isExternalResource;
+
   const buttonBar = (
     <ButtonBar>
-      <div className="col-md-4 mt-2">
-        <BackButton
-          byPassView={true}
-          className="me-auto"
-          entityId={uuid}
-          entityLink="/object-store/object"
-        />
+      <div className="col-md-4">
+        <BackToListButton entityLink="/object-store/object" />
       </div>
       <div className="col-md-8 flex d-flex gap-2 justify-content-end">
         {canEdit && (
           <>
             <Link
-              href={`/object-store/metadata/edit?id=${uuid}`}
+              href={
+                isExternalResource
+                  ? `/object-store/metadata/external-resource-edit?id=${uuid}`
+                  : `/object-store/metadata/edit?id=${uuid}`
+              }
               className="btn btn-primary ms-auto"
               style={{ width: "5rem" }}
             >
@@ -118,7 +119,15 @@ export default function MetadataViewPage() {
 
   return (
     <div>
-      <Head title={fileName} />
+      <Head
+        title={
+          (fileName ?? metadata?.originalFilename ?? metadata?.acCaption) +
+          " - " +
+          (isExternalResource
+            ? formatMessage("metadataExternalResourceDetailsLabel")
+            : formatMessage("metadataUploadDetailsLabel"))
+        }
+      />
       <Nav marginBottom={false} />
       <style>{OBJECT_DETAILS_PAGE_CSS}</style>
       {buttonBar}
@@ -127,10 +136,12 @@ export default function MetadataViewPage() {
           return (
             <div className="row mt-3">
               <div className="col-md-4">
-                <MetadataFileView
-                  metadata={response.data}
-                  hideDownload={false}
-                />
+                <div style={{ position: "sticky", top: "70px" }}>
+                  <MetadataFileView
+                    metadata={response.data}
+                    hideDownload={false}
+                  />
+                </div>
               </div>
               <div className="col-md-8">
                 <DinaForm initialValues={response.data} readOnly={true}>

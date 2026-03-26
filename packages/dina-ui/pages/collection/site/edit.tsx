@@ -12,7 +12,8 @@ import { Head, useSiteQuery, useSiteSave } from "packages/dina-ui/components";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { Site } from "packages/dina-ui/types/collection-api/resources/Site";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { SiteFormLayout } from "packages/dina-ui/components/collection/site/SiteFormLayout";
+import SiteFormLayout from "packages/dina-ui/components/collection/site/SiteFormLayout";
+import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 
 export default function EditPage() {
   const { formatMessage } = useDinaIntl();
@@ -45,8 +46,6 @@ export default function EditPage() {
 
 function SiteForm({ site }: { site?: PersistedResource<Site> }) {
   const router = useRouter();
-  const { id } = router.query;
-  const messageId = id ? "editOnMap" : "createOnMap";
   const { siteInitialValues, saveSite } = useSiteSave({ fetchedSite: site });
 
   const onSubmit: DinaFormOnSubmit<Site> = async ({
@@ -74,7 +73,8 @@ function SiteForm({ site }: { site?: PersistedResource<Site> }) {
 
   const initValues = {
     ...siteInitialValues,
-    type: "site" as const
+    type: "site" as const,
+    name: siteInitialValues.name ?? ""
   };
 
   return (
@@ -84,10 +84,7 @@ function SiteForm({ site }: { site?: PersistedResource<Site> }) {
       enableReinitialize={true}
     >
       {buttonBar}
-      <SiteFormLayout
-        popupUrl="/collection/site/polygon-editor"
-        messageId={messageId}
-      />
+      <SiteFormLayout mode={POLYGON_EDITOR_MODE.EDIT} />
     </DinaForm>
   );
 }

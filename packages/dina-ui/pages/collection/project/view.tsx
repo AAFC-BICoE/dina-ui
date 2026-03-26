@@ -38,7 +38,7 @@ export default function ProjectDetailsPage() {
       )}
       query={(id) => ({
         path: `collection-api/project/${id}`,
-        include: "attachment"
+        include: "attachment,parentProject"
       })}
       entityLink="/collection/project"
       type="project"

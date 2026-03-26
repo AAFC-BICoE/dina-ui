@@ -13,31 +13,27 @@ import {
 } from "packages/dina-ui/components";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
-import GeometryMapEditorLauncher from "packages/dina-ui/components/geo/GeometryMapEditorLauncher";
+import { Site } from "packages/dina-ui/types/collection-api";
+import PolygonEditorMap from "./PolygonEditorMap";
+import { MapToggleSwitch } from "./MapToggleSwitch";
+import PolygonEditorCoordinates from "./PolygonEditorCoordinates";
+import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
-import {
-  PostMessage,
-  PostMessageType
-} from "packages/dina-ui/types/geo/post-message.types";
 
-type Props = {
-  popupUrl: string;
-  messageId: string;
-  attachmentsConfig?: AllowAttachmentsConfig;
-};
-
-export function SiteFormLayout({
-  popupUrl,
-  messageId,
+export default function SiteFormLayout({
+  mode,
   attachmentsConfig
-}: Props) {
+}: {
+  mode: PolygonEditorMode;
+  attachmentsConfig?: AllowAttachmentsConfig;
+}) {
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
   const [{ value }] = useField("siteGeom");
   const [coords, setCoords] = useState<GeoPosition[][]>(
     value?.coordinates ?? []
   );
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue } = useFormikContext<Site>();
 
   useEffect(() => {
     setFieldValue("siteGeom", {
@@ -46,21 +42,7 @@ export function SiteFormLayout({
     });
   }, [coords, setFieldValue]);
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent<PostMessage>) => {
-      if (event.origin !== window.location.origin) return;
-
-      if (event.data?.type === PostMessageType.PolygonEdited) {
-        setCoords(event.data.coordinates ?? []);
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
+  const [showMap, setShowMap] = useState(true);
 
   return (
     <div>
@@ -86,20 +68,33 @@ export function SiteFormLayout({
         />
       </div>
       <div className="row">
-        <div className={messageId === "viewOnMap" ? "col-md-12" : "col-md-6"}>
-          <div style={{ marginBottom: "5px" }}>
-            <strong>{formatMessage("siteCoordinates")}</strong>
+        {readOnly && coords.length === 0 && (
+          <div className="col-md-6 mb-4">
+            <strong>{formatMessage("siteMap")}</strong>
           </div>
-        </div>
-        <div style={{ marginTop: "5px", marginBottom: "25px" }}>
-          {(coords.length || messageId !== "viewOnMap") && (
-            <GeometryMapEditorLauncher
-              type="Polygon"
-              fieldName="siteGeom"
-              siteGeom={coords}
-              url={popupUrl}
-              messageId={messageId}
-            />
+        )}
+        <div className={readOnly && !showMap ? "col-md-12" : "col-md-6"}>
+          {(!readOnly || coords.length > 0) && (
+            <>
+              <MapToggleSwitch
+                showMap={showMap}
+                onToggle={setShowMap}
+                formatMessage={formatMessage}
+              />
+              {showMap ? (
+                <PolygonEditorMap
+                  coords={coords}
+                  mode={mode}
+                  onCoordsChange={setCoords}
+                />
+              ) : (
+                <PolygonEditorCoordinates
+                  coords={coords}
+                  mode={mode}
+                  onCoordsChange={setCoords}
+                />
+              )}
+            </>
           )}
         </div>
       </div>

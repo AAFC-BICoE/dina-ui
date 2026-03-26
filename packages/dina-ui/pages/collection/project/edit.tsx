@@ -37,7 +37,7 @@ export default function ProjectEditPage() {
 
   const query = useQuery<Project>(
     {
-      path: `collection-api/project/${id}?include=attachment`
+      path: `collection-api/project/${id}?include=attachment,parentProject`
     },
     {
       onSuccess: async ({ data: project }) => {
@@ -70,7 +70,10 @@ export default function ProjectEditPage() {
   );
 }
 
-export interface ProjectFormValues extends InputResource<Project> {}
+export interface ProjectFormValues
+  extends Omit<InputResource<Project>, "parentProject"> {
+  parentProject?: Project;
+}
 
 export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
   const { save } = useContext(ApiClientContext);
@@ -102,7 +105,9 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
         submittedValues.extensionValues
       );
     }
-    const input: InputResource<Project> = {
+    const input: Omit<InputResource<Project>, "parentProject"> & {
+      parentProject?: Project;
+    } = {
       ...submittedValues,
       // Convert the editable format to the stored format:
       multilingualDescription: {
@@ -131,6 +136,14 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
 
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete input.attachment;
+
+    // Handle parentProject relationship:
+    (input as any).relationships.parentProject = {
+      data: input.parentProject
+        ? { id: input.parentProject.id, type: "project" }
+        : null
+    };
+    delete input.parentProject;
 
     // Make a separte request to handle the Resource's extensionValues due to Crnk bug in backend where extensionValues are not correctly
     // Changed when the Resource has multilingualDescription

@@ -804,6 +804,7 @@ export function WorkbookColumnMapping({
               )
             );
           }
+          break;
         case WorkbookDataTypeEnum.DATE:
           if (!isDate(row[fieldPath])) {
             param.dataType = WorkbookDataTypeEnum.DATE;

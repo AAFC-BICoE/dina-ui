@@ -87,7 +87,18 @@ export default function collectionMethodListPage() {
               apiEndpoint: "collection-api/extension"
             }
           ],
-          relationshipFields: []
+          relationshipFields: [
+            // Parent Field Extensions
+            {
+              type: "fieldExtension",
+              label: "fieldExtensions",
+              component: "PROJECT",
+              path: "included.attributes.extensionValues",
+              apiEndpoint: "collection-api/extension",
+              referencedBy: "parentProject",
+              referencedType: "project"
+            }
+          ]
         }}
       />
     </PageLayout>

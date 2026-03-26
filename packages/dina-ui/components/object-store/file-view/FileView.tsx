@@ -15,6 +15,7 @@ import RcTooltip from "rc-tooltip";
 import { DownloadButton } from "../derivative-list/DerivativeList";
 import { Badge, Dropdown } from "react-bootstrap";
 import {
+  FaArrowUpRightFromSquare,
   FaDownload,
   FaFile,
   FaFileAudio,
@@ -27,7 +28,7 @@ import {
   FaFileWord,
   FaFileZipper
 } from "react-icons/fa6";
-import { FaFileCode } from "react-icons/fa";
+import { FaFileCode, FaLink } from "react-icons/fa";
 import { MdOutlineRawOn } from "react-icons/md";
 import { IconType } from "react-icons/lib";
 import { PDFViewer } from "./PDFViewer";
@@ -116,6 +117,26 @@ export function FileView({
     ? `/object-store/object/image-view?id=${filePathContents[5]}`
     : `/object-store/object/image-view?id=${filePathContents[4]}`;
 
+  const LinkRender = (
+    <>
+      <FaLink className="dropdown-icon mb-3" style={{ fontSize: "2em" }} />
+      <a
+        href={(metadata as any)?.resourceExternalURL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn btn-secondary"
+      >
+        <DinaMessage id="openLink" />
+        <FaArrowUpRightFromSquare
+          style={{
+            marginLeft: "0.5em"
+          }}
+          aria-label="Opens in new tab"
+        />
+      </a>
+    </>
+  );
+
   return (
     <div className="file-viewer-wrapper text-center" ref={visibleRef}>
       {isLoading ? (
@@ -172,7 +193,28 @@ export function FileView({
             ) : errorStatus === 403 ? (
               <DinaMessage id="unauthorized" />
             ) : (
-              <DinaMessage id="thumbnailNotAvailableText" />
+              <>
+                {(metadata as any)?.isExternalResource ? (
+                  <div
+                    style={{
+                      width: "100%",
+                      aspectRatio: "3/2",
+                      backgroundColor: "#f0f0f0",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      color: "#666"
+                    }}
+                  >
+                    {LinkRender}
+                  </div>
+                ) : (
+                  <DinaMessage id="thumbnailNotAvailableText" />
+                )}
+              </>
             )
           ) : (
             <div
@@ -189,11 +231,17 @@ export function FileView({
                 color: "#666"
               }}
             >
-              {fileExtensionToIcon(
-                metadata?.fileExtension,
-                "dropdown-icon mb-2"
+              {(metadata as any)?.isExternalResource ? (
+                LinkRender
+              ) : (
+                <>
+                  {fileExtensionToIcon(
+                    metadata?.fileExtension,
+                    "dropdown-icon mb-2"
+                  )}
+                  <DinaMessage id="previewNotAvailable" />
+                </>
               )}
-              <DinaMessage id="previewNotAvailable" />
             </div>
           )}
           {caption && (

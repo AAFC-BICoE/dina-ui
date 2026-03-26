@@ -26,6 +26,18 @@ import { FunctionDef } from "../../../dina-ui/types/dina-export-api/resources/Da
 import { ControlledVocabularyItem } from "../../../dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 import { ControlledVocabularyFieldHeader } from "../../../dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
 
+/**
+ * Convert ElasticSearch index name to entity key (kebab-case).
+ * Examples: dina_material_sample_index -> material-sample
+ */
+export function getEntityKeyFromIndexName(indexName: string): string {
+  // Remove dina_ prefix and _index suffix, then convert underscores to hyphens
+  return indexName
+    .replace(/^dina_/, "")
+    .replace(/_index$/, "")
+    .replace(/_/g, "-");
+}
+
 export function convertColumnsToAliases(columns): string[] {
   if (!columns) {
     return [];
@@ -316,12 +328,13 @@ function getEntityColumn<TData extends KitsuResource>(
   }
 }
 
-function getNestedColumn<TData extends KitsuResource>(
+export function getNestedColumn<TData extends KitsuResource>(
   path: string,
   indexColumn: ESIndexMapping
 ): TableColumn<TData> {
   const accessorKeyRelationship = `${indexColumn.parentPath}.${indexColumn.parentName}`;
-  const accessorKeyRelationshipAttribute = `${indexColumn.path}.${indexColumn.label}`;
+  const basePath = indexColumn.path.split(".")[0];
+  const accessorKeyRelationshipAttribute = `${basePath}.${indexColumn.label}`;
   const accessorKeyFull = `${accessorKeyRelationship}.${accessorKeyRelationshipAttribute}`;
   const accessorKeyElasticSearch = `${indexColumn.parentPath}.${accessorKeyRelationshipAttribute}`;
 
@@ -349,16 +362,20 @@ function getNestedColumn<TData extends KitsuResource>(
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
       cell: ({ row: { original } }) => {
-        const value = _.get(original, accessorKeyRelationship);
-        if (value && Array.isArray(value)) {
-          const values = value
-            .map((val) => _.get(val, accessorKeyRelationshipAttribute))
-            .join(", ");
-          return <>{values}</>;
-        } else {
-          const singleValue = _.get(original, accessorKeyFull);
-          return <>{singleValue}</>;
+        let values: any[] = [original];
+
+        for (const key of accessorKeyFull.split(".")) {
+          values = values
+            .flatMap((v) => {
+              if (v === undefined || v === null) return [];
+
+              const nextValue = v[key];
+              return Array.isArray(nextValue) ? nextValue : [nextValue];
+            })
+            .filter((v) => v !== undefined && v !== null);
         }
+
+        return <>{values.join(", ")}</>;
       },
       relationshipType: indexColumn.parentType,
       columnSelectorString: path
