@@ -39,7 +39,7 @@ export function StorageUnitChildrenViewer({
   }, []);
 
   async function moveAllContent(targetUnit: PersistedResource<StorageUnit>) {
-    const childStoragePath = `collection-api/storage-unit/${storageUnit?.id}?include=storageUnitChildren`;
+    const childStoragePath = `collection-api/storage-unit/${storageUnit?.id}?optFields[storage-unit]=storageUnitChildren`;
 
     const {
       data: { storageUnitChildren: nestedStorages }
