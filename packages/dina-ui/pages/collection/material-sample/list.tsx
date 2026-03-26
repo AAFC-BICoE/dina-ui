@@ -270,10 +270,10 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
       // GeoShape
       {
         type: "geoShape",
-        label: "targetOrganismPrimaryGeoShape",
-        component: "MATERIAL_SAMPLE",
-        path: "data.attributes.targetOrganismPrimaryGeoShape",
-        apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
+        label: "siteMap",
+        component: "SITE",
+        path: "data.attributes.siteGeom",
+        apiEndpoint: ""
       }
     ],
     relationshipFields: [
