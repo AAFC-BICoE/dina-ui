@@ -13,17 +13,20 @@ import {
 } from "packages/dina-ui/components";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
-import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
 import { Site } from "packages/dina-ui/types/collection-api";
-import { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 import PolygonEditorMap from "./PolygonEditorMap";
+import { MapToggleSwitch } from "./MapToggleSwitch";
+import PolygonEditorCoordinates from "./PolygonEditorCoordinates";
+import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
+import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
 
-type Props = {
+export default function SiteFormLayout({
+  mode,
+  attachmentsConfig
+}: {
   mode: PolygonEditorMode;
   attachmentsConfig?: AllowAttachmentsConfig;
-};
-
-export default function SiteFormLayout({ mode, attachmentsConfig }: Props) {
+}) {
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
   const [{ value }] = useField("siteGeom");
@@ -38,6 +41,8 @@ export default function SiteFormLayout({ mode, attachmentsConfig }: Props) {
       coordinates: coords
     });
   }, [coords, setFieldValue]);
+
+  const [showMap, setShowMap] = useState(true);
 
   return (
     <div>
@@ -63,16 +68,33 @@ export default function SiteFormLayout({ mode, attachmentsConfig }: Props) {
         />
       </div>
       <div className="row">
-        <div className={`col-md-6 ${coords.length === 0 && "mb-4"}`}>
-          <div className="">
-            <strong>{formatMessage("siteCoordinates")}</strong>
+        {readOnly && coords.length === 0 && (
+          <div className="col-md-6 mb-4">
+            <strong>{formatMessage("siteMap")}</strong>
           </div>
+        )}
+        <div className={readOnly && !showMap ? "col-md-12" : "col-md-6"}>
           {(!readOnly || coords.length > 0) && (
-            <PolygonEditorMap
-              coords={coords}
-              mode={mode}
-              onCoordsChange={setCoords}
-            />
+            <>
+              <MapToggleSwitch
+                showMap={showMap}
+                onToggle={setShowMap}
+                formatMessage={formatMessage}
+              />
+              {showMap ? (
+                <PolygonEditorMap
+                  coords={coords}
+                  mode={mode}
+                  onCoordsChange={setCoords}
+                />
+              ) : (
+                <PolygonEditorCoordinates
+                  coords={coords}
+                  mode={mode}
+                  onCoordsChange={setCoords}
+                />
+              )}
+            </>
           )}
         </div>
       </div>

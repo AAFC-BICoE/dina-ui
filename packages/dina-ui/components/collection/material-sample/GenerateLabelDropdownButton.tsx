@@ -9,8 +9,7 @@ import {
   useAccount,
   useQuery,
   downloadBlobFile,
-  useApiClient,
-  simpleSearchFilterToFiql
+  useApiClient
 } from "common-ui";
 import { FaTag } from "react-icons/fa6";
 
@@ -46,11 +45,9 @@ export function GenerateLabelDropdownButton({
   useQuery<ReportTemplate[]>(
     {
       path: "dina-export-api/report-template",
-      fiql: simpleSearchFilterToFiql(
-        SimpleSearchFilterBuilder.create<ReportTemplate>()
-          .whereIn("group", groupNames)
-          .build()
-      )
+      filter: SimpleSearchFilterBuilder.create<ReportTemplate>()
+        .whereIn("group", groupNames)
+        .build()
     },
     {
       onSuccess: async ({ data }) => {
