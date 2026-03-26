@@ -215,7 +215,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dateRangeThisYearDropdown: "This Year",
   dateRangeAllTimeDropdown: "All Time",
   dateRangeHeaderRealTime: "Real-time",
-  dateRangeHeaderRecent: "Recent",
+  dateRangeHeaderByDay: "By Day",
   dateRangeHeaderByMonth: "By Month",
   dateRangeHeaderByYear: "By Year",
   decimalLatLong: "Decimal Lat/Long",

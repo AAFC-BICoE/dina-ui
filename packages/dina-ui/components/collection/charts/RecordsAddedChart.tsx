@@ -3,6 +3,7 @@ import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Dropdown, DropdownButton, Card } from "react-bootstrap";
+import _ from "lodash";
 interface RecordsAddedChartProps {
   inputQuery?: any;
 }
@@ -65,8 +66,8 @@ export default function RecordsAddedChart({
     {
       key: "last-3-months",
       label: "Last 3 Months",
-      interval: "week",
-      format: "yyyy-ww",
+      interval: "day",
+      format: "yyyy-MM-dd",
       getDates: () => {
         const now = new Date();
         const start = new Date(
@@ -99,6 +100,20 @@ export default function RecordsAddedChart({
       }
     },
     {
+      key: "this-year",
+      label: "This Year",
+      interval: "month",
+      format: "yyyy-MM",
+      getDates: () => {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 1);
+        return {
+          start: start.toISOString().split("T")[0],
+          end: now.toISOString().split("T")[0]
+        };
+      }
+    },
+    {
       key: "last-year",
       label: "Last Year",
       interval: "month",
@@ -117,21 +132,17 @@ export default function RecordsAddedChart({
       }
     },
     {
-      key: "this-year",
-      label: "This Year",
+      key: "all-time-month",
+      label: "All Time",
       interval: "month",
       format: "yyyy-MM",
-      getDates: () => {
-        const now = new Date();
-        const start = new Date(now.getFullYear(), 0, 1);
-        return {
-          start: start.toISOString().split("T")[0],
-          end: now.toISOString().split("T")[0]
-        };
-      }
+      getDates: () => ({
+        start: undefined,
+        end: undefined
+      })
     },
     {
-      key: "all-time",
+      key: "all-time-year",
       label: "All Time",
       interval: "year",
       format: "yyyy",
@@ -143,11 +154,13 @@ export default function RecordsAddedChart({
   ];
 
   const buildQuery = () => {
-    const query = inputQuery ?? {
-      bool: {
-        must: []
-      }
-    };
+    const query = inputQuery
+      ? _.cloneDeep(inputQuery)
+      : {
+          bool: {
+            must: []
+          }
+        };
 
     if (dateRange.start || dateRange.end) {
       const rangeFilter: any = {
@@ -425,7 +438,7 @@ export default function RecordsAddedChart({
 
           <Dropdown.Divider />
           <Dropdown.Header>
-            <DinaMessage id="dateRangeHeaderRecent" />
+            <DinaMessage id="dateRangeHeaderByDay" />
           </Dropdown.Header>
           <Dropdown.Item
             eventKey="last-7-days"
@@ -440,29 +453,26 @@ export default function RecordsAddedChart({
             <DinaMessage id="dateRangeLast30DaysDropdown" />
           </Dropdown.Item>
 
-          <Dropdown.Divider />
-          <Dropdown.Header>
-            <DinaMessage id="dateRangeHeaderByMonth" />
-          </Dropdown.Header>
           <Dropdown.Item
             eventKey="last-3-months"
             active={selectedPreset === "last-3-months"}
           >
             <DinaMessage id="dateRangeLast3MonthsDropdown" />
           </Dropdown.Item>
+
+          <Dropdown.Divider />
+
+          <Dropdown.Header>
+            <DinaMessage id="dateRangeHeaderByMonth" />
+          </Dropdown.Header>
           <Dropdown.Item
             eventKey="last-6-months"
             active={selectedPreset === "last-6-months"}
           >
             <DinaMessage id="dateRangeLast6MonthsDropdown" />
           </Dropdown.Item>
-
-          <Dropdown.Divider />
-          <Dropdown.Header>
-            <DinaMessage id="dateRangeHeaderByYear" />
-          </Dropdown.Header>
           <Dropdown.Item
-            eventKey="year-to-date"
+            eventKey="this-year"
             active={selectedPreset === "this-year"}
           >
             <DinaMessage id="dateRangeThisYearDropdown" />
@@ -473,11 +483,20 @@ export default function RecordsAddedChart({
           >
             <DinaMessage id="dateRangeLastYearDropdown" />
           </Dropdown.Item>
+          <Dropdown.Item
+            eventKey="all-time-month"
+            active={selectedPreset === "all-time-month"}
+          >
+            <DinaMessage id="dateRangeAllTimeDropdown" />
+          </Dropdown.Item>
 
           <Dropdown.Divider />
+          <Dropdown.Header>
+            <DinaMessage id="dateRangeHeaderByYear" />
+          </Dropdown.Header>
           <Dropdown.Item
-            eventKey="all-time"
-            active={selectedPreset === "all-time"}
+            eventKey="all-time-year"
+            active={selectedPreset === "all-time-year"}
           >
             <DinaMessage id="dateRangeAllTimeDropdown" />
           </Dropdown.Item>
