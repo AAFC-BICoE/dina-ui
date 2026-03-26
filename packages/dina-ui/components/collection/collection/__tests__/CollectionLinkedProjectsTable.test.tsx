@@ -46,7 +46,7 @@ describe("CollectionLinkedProjectsTable", () => {
       expect(mockPost).toHaveBeenCalledWith(
         "search-api/search-ws/search",
         {
-          _source: { includes: ["data.relationships"] },
+          size: 0,
           query: {
             bool: {
               must: [
@@ -56,6 +56,14 @@ describe("CollectionLinkedProjectsTable", () => {
                   }
                 }
               ]
+            }
+          },
+          aggs: {
+            unique_projects: {
+              terms: {
+                field: "data.relationships.projects.data.id",
+                size: 10000
+              }
             }
           }
         },
