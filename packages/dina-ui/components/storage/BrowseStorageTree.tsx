@@ -110,7 +110,8 @@ export function StorageTreeList({
   const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>(
     {
       path: `collection-api/storage-unit`,
-      include: "storageUnitChildren,storageUnitType",
+      include: "storageUnitType",
+      optfields: { "storage-unit": "storageUnitChildren" },
       page: { limit, offset },
       sort: "storageUnitType.name,name",
       filter: SimpleSearchFilterBuilder.create()

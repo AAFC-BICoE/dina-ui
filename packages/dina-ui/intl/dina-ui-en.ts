@@ -215,7 +215,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dateRangeThisYearDropdown: "This Year",
   dateRangeAllTimeDropdown: "All Time",
   dateRangeHeaderRealTime: "Real-time",
-  dateRangeHeaderRecent: "Recent",
+  dateRangeHeaderByDay: "By Day",
   dateRangeHeaderByMonth: "By Month",
   dateRangeHeaderByYear: "By Year",
   decimalLatLong: "Decimal Lat/Long",
@@ -600,6 +600,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "License",
+  field_isExternalResource: "Is External Resource",
   fileTooBig: "File too big",
   filterAttribute: "Filter Attribute",
   filterByGroup: "Filter By Group",
@@ -804,6 +805,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectSubtypeListTitle: "Object Subtypes",
   objectSubtypeTitle: "Object Subtype",
   openGeographySearchButtonLabel: "Search On Open Street Maps",
+  openLink: "Open Link",
   organism: "Organism",
   organismRemarks: "Organism Remarks",
   organismState: "Organism State",
@@ -1408,12 +1410,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   siteListTitle: "Site",
   siteAttachments: "Site Attachments",
   code: "Code",
-  siteCoordinates: "Site coordinates",
+  siteMap: "Site Map",
+  siteCoordinates: "Site Coordinates",
   waitingForPolygonData: "Waiting for polygon data...",
   addSite: "Add Site",
   editSite: "Edit Site",
   createOnMap: "Create on Map",
   editOnMap: "Edit on Map",
   erase: "Erase",
-  close: "Close"
+  close: "Close",
+  invalidPolygon: "The coordinates are invalid: must be number[][][] and closed"
 };

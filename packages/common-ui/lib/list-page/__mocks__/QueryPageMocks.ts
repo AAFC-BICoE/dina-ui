@@ -270,3 +270,31 @@ export const mockResponses = {
       }
     }
 };
+
+export const mockResponsesTabs = {
+  "search-api/search-ws/search": {
+    data: {
+      hits: {
+        total: { value: 2 },
+        hits: [
+          {
+            _id: "test-1",
+            _source: {
+              id: "test-1",
+              type: "test-resource",
+              name: "Resource 1"
+            }
+          },
+          {
+            _id: "test-2",
+            _source: {
+              id: "test-2",
+              type: "test-resource",
+              name: "Resource 2"
+            }
+          }
+        ]
+      }
+    }
+  }
+};

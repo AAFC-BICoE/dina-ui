@@ -22,6 +22,7 @@ import { Metadata } from "../../../types/objectstore-api";
 import { derivativeTypeToLabel } from "../../../components/object-store";
 import { useDinaIntl, DinaMessage } from "../../../intl/dina-ui-intl";
 import { useMemo } from "react";
+import { MdEdit } from "react-icons/md";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -48,8 +49,10 @@ export default function DerivativeViewPage() {
 
   const derivative = derivativeQuery.response?.data;
 
-  const parentFileName = (derivative?.acDerivedFrom as Metadata)
-    ?.originalFilename;
+  const parentFileName =
+    (derivative?.acDerivedFrom as Metadata)?.filename ??
+    (derivative?.acDerivedFrom as Metadata)?.originalFilename ??
+    "Parent File";
 
   const headTitle =
     derivative?.objectUpload?.originalFilename ||
@@ -85,6 +88,7 @@ export default function DerivativeViewPage() {
               className="btn btn-primary ms-auto"
               style={{ width: "5rem" }}
             >
+              <MdEdit className="me-2" />
               <DinaMessage id="editButtonText" />
             </Link>
           </>

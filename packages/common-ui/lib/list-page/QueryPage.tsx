@@ -19,6 +19,7 @@ import {
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   ColumnSelectorMemo,
   FormikButton,
@@ -111,6 +112,45 @@ export const getGroupStorageKey = (indexName: string): string => {
 
   return `${indexName}_groupStorage`;
 };
+
+/**
+ * Props for the individual tab components used in the QueryPage. Each tab will receive all props,
+ * but does not have to use all of them.
+ */
+export interface QueryPageTabProps<TData extends KitsuResource> {
+  data: TData[];
+  loading: boolean;
+  totalRecords: number;
+  columns: TableColumn<TData>[];
+  displayedColumns: TableColumn<TData>[];
+  pageSize: number;
+  pageOffset: number;
+  sortingRules: SortingState;
+  onPageChange: (newPage: number) => void;
+  onPageSizeChange: (newPageSize: number) => void;
+  onSortingChange: (newSort: ColumnSort[]) => void;
+  reactTableProps?: Partial<ReactTableProps<TData>>;
+  rowStyling?: (row: Row<TData>) => CSSProperties | undefined;
+  isFullScreen?: boolean;
+  setIsFullScreen?: (value: boolean) => void;
+  query?: any; // elastic search query
+  CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>;
+  // Allow additional custom props
+  [key: string]: any;
+}
+
+/**
+ * Configuration for tabs in the QueryPage. Each tab will have its own component and
+ * can be used to display the same data in different ways or to
+ * display different subsets of data based on the same query.
+ */
+export interface QueryPageTabConfig<TData extends KitsuResource> {
+  id: string;
+  labelKey: string; // For i18n
+  component: React.ComponentType<QueryPageTabProps<TData>>;
+  // Optional: Tab-specific configuration
+  config?: any;
+}
 
 export interface QueryPageProps<TData extends KitsuResource> {
   /**
@@ -321,6 +361,17 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * Default is true.
    */
   enableColumnSelector?: boolean;
+
+  /**
+   * Optional tabs configuration. If provided, the results will be rendered
+   * in tabs instead of a single table.
+   */
+  tabs?: QueryPageTabConfig<TData>[];
+
+  /**
+   * Default active tab (if tabs are provided)
+   */
+  defaultTab?: string;
 }
 
 /**
@@ -333,6 +384,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
  * * Filtering using ElasticSearch Indexing
  * * Saved Searches
  * * Column Selector
+ * * Multiple View Tabs
  */
 export function QueryPage<TData extends KitsuResource>({
   indexName,
@@ -366,7 +418,9 @@ export function QueryPage<TData extends KitsuResource>({
   enableDnd = false,
   onSelect,
   onDeselect,
-  enableColumnSelector = true
+  enableColumnSelector = true,
+  tabs,
+  defaultTab
 }: QueryPageProps<TData>) {
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
@@ -457,6 +511,18 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Fullscreen state
   const [isFullScreen, setIsFullScreen] = useState(false);
+
+  // Active tab index
+  const defaultTabIndex = useMemo(() => {
+    if (!tabs || tabs.length === 0) return 0;
+    const index = tabs.findIndex((tab) => tab.id === defaultTab);
+    return index >= 0 ? index : 0;
+  }, [tabs, defaultTab]);
+
+  const [activeTabIndex, setActiveTabIndex] = useLocalStorage<number>(
+    `${uniqueName}-active-tab-index`,
+    defaultTabIndex
+  );
 
   const defaultGroups = useMemo(() => {
     return { group: groups };
@@ -815,17 +881,9 @@ export function QueryPage<TData extends KitsuResource>({
     defaultAvailableItems: selectedResources ?? []
   });
 
-  const computedReactTableProps =
-    typeof reactTableProps === "function"
-      ? reactTableProps(
-          searchResults as PersistedResource<TData>[],
-          SelectCheckBox
-        )
-      : reactTableProps;
-
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     sort: sortingRules,
-    ...computedReactTableProps
+    ...reactTableProps
   };
 
   // Columns generated for the search results.
@@ -1032,6 +1090,120 @@ export function QueryPage<TData extends KitsuResource>({
     }
   }
 
+  /**
+   * Renders the default table view (MemoizedReactTable)
+   */
+  const renderDefaultTableView = () => (
+    <MemoizedReactTable
+      columns={columnsResults as any}
+      data={
+        (viewMode
+          ? customViewFields
+            ? searchResults
+            : selectedResources
+          : searchResults) ?? []
+      }
+      loading={loading || columnSelectorLoading}
+      manualPagination={viewMode && selectedResources?.length ? false : true}
+      pageSize={pageSize}
+      pageCount={totalRecords ? Math.ceil(totalRecords / pageSize) : 0}
+      page={pageOffset / pageSize}
+      onPageChange={onPageChanged}
+      onPageSizeChange={onPageSizeChanged}
+      manualSorting={viewMode && selectedResources?.length ? false : true}
+      onSortingChange={onSortChange}
+      sort={sortingRules}
+      {...resolvedReactTableProps}
+      className="-striped react-table-overflow"
+      rowStyling={rowStyling}
+      showPagination={true}
+      showPaginationTop={true}
+      smallPaginationButtons={selectionMode}
+      enableFullscreen={true}
+      isFullscreen={isFullScreen}
+      setIsFullscreen={setIsFullScreen}
+    />
+  );
+
+  /**
+   * Common props to pass to all tab components
+   */
+  const commonTabProps: QueryPageTabProps<TData> = useMemo(() => {
+    return {
+      data:
+        viewMode && selectedResources?.length
+          ? selectedResources
+          : searchResults,
+      loading: loading || columnSelectorLoading,
+      totalRecords,
+      columns: columnsResults,
+      displayedColumns,
+      pageSize,
+      pageOffset,
+      sortingRules,
+      onPageChange: onPageChanged,
+      onPageSizeChange: onPageSizeChanged,
+      onSortingChange: onSortChange,
+      reactTableProps: resolvedReactTableProps,
+      rowStyling,
+      isFullScreen,
+      setIsFullScreen,
+      CheckBoxField: SelectCheckBox,
+      CheckBoxHeader: SelectCheckBoxHeader,
+      query: elasticSearchQuery
+    };
+  }, [
+    viewMode,
+    selectedResources,
+    searchResults,
+    loading,
+    columnSelectorLoading,
+    totalRecords,
+    columnsResults,
+    displayedColumns,
+    pageSize,
+    pageOffset,
+    sortingRules,
+    resolvedReactTableProps,
+    rowStyling,
+    isFullScreen,
+    setIsFullScreen,
+    elasticSearchQuery
+  ]);
+
+  /**
+   * Renders tabs using react-tabs
+   */
+  const renderTabsContent = () => {
+    if (!tabs || tabs.length === 0) {
+      return renderDefaultTableView();
+    }
+
+    return (
+      <Tabs
+        selectedIndex={activeTabIndex}
+        onSelect={(index) => setActiveTabIndex(index)}
+      >
+        <TabList>
+          {tabs.map((tab) => (
+            <Tab key={tab.id}>
+              <CommonMessage id={tab.labelKey as any} />
+            </Tab>
+          ))}
+        </TabList>
+
+        {tabs.map((tab) => {
+          const TabComponent = tab.component;
+          return (
+            <TabPanel key={tab.id}>
+              <TabComponent {...commonTabProps} {...tab.config} />
+            </TabPanel>
+          );
+        })}
+      </Tabs>
+    );
+  };
+
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
@@ -1171,24 +1343,27 @@ export function QueryPage<TData extends KitsuResource>({
         >
           <div className="row">
             <div className={selectionMode ? "col-5" : "col-12"}>
-              <div className="d-flex align-items-end">
-                <span id="queryPageCount">
-                  {/* Loading indicator when total is not calculated yet. */}
-                  {loading || columnSelectorLoading ? (
-                    <></>
-                  ) : (
-                    <CommonMessage
-                      id="tableTotalCount"
-                      values={{ totalCount: formatNumber(totalRecords) }}
-                    />
-                  )}
-                </span>
+              <div className="d-flex align-items-end justify-content-between">
+                <div className="d-flex align-items-end">
+                  <span id="queryPageCount">
+                    {/* Loading indicator when total is not calculated yet. */}
+                    {loading || columnSelectorLoading ? (
+                      <></>
+                    ) : (
+                      <CommonMessage
+                        id="tableTotalCount"
+                        values={{ totalCount: formatNumber(totalRecords) }}
+                      />
+                    )}
+                  </span>
 
-                {/* Multi sort tooltip - Only shown if it's possible to sort */}
-                {resolvedReactTableProps.enableMultiSort && (
-                  <MultiSortTooltip />
-                )}
+                  {/* Multi sort tooltip - Only shown if it's possible to sort */}
+                  {resolvedReactTableProps.enableMultiSort && (
+                    <MultiSortTooltip />
+                  )}
+                </div>
               </div>
+
               {error && (
                 <div
                   className="alert alert-danger"
@@ -1213,6 +1388,7 @@ export function QueryPage<TData extends KitsuResource>({
                   </button>
                 </div>
               )}
+
               {loading || columnSelectorLoading ? (
                 <div
                   className={
@@ -1223,47 +1399,9 @@ export function QueryPage<TData extends KitsuResource>({
                   <LoadingSpinner loading={true} />
                 </div>
               ) : (
-                <MemoizedReactTable
-                  // Column and data props
-                  columns={columnsResults as any}
-                  data={
-                    (viewMode
-                      ? customViewFields
-                        ? searchResults
-                        : selectedResources
-                      : searchResults) ?? []
-                  }
-                  // Loading Table props
-                  loading={loading || columnSelectorLoading}
-                  // Pagination props
-                  manualPagination={
-                    viewMode && selectedResources?.length ? false : true
-                  }
-                  pageSize={pageSize}
-                  pageCount={
-                    totalRecords ? Math.ceil(totalRecords / pageSize) : 0
-                  }
-                  page={pageOffset / pageSize}
-                  onPageChange={onPageChanged}
-                  onPageSizeChange={onPageSizeChanged}
-                  // Sorting props
-                  manualSorting={
-                    viewMode && selectedResources?.length ? false : true
-                  }
-                  onSortingChange={onSortChange}
-                  sort={sortingRules}
-                  // Table customization props
-                  {...resolvedReactTableProps}
-                  className="-striped react-table-overflow"
-                  rowStyling={rowStyling}
-                  showPagination={true}
-                  showPaginationTop={true}
-                  smallPaginationButtons={selectionMode}
-                  enableFullscreen={true}
-                  isFullscreen={isFullScreen}
-                  setIsFullscreen={setIsFullScreen}
-                />
+                renderTabsContent()
               )}
+
               <div className="mt-2">
                 {/* Loading indicator when total is not calculated yet. */}
                 {loading || columnSelectorLoading ? (

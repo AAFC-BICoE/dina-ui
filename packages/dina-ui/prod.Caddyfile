@@ -25,7 +25,11 @@ rewrite @internetexplorer /static/unsupported-browser.html
 try_files {path}.html {path}
 
 # Provide the Keycloak config to the front-end code:
-respond /keycloak.json "{ 
+@keycloak_config {
+    path /keycloak.json
+    method GET
+}
+respond @keycloak_config "{ 
 	\"realm\": \"{$KEYCLOAK_REALM}\", 
 	\"auth-server-url\": \"{$KEYCLOAK_PUBLIC_URL}\",
 	\"resource\": \"{$KEYCLOAK_CLIENTID}\", 
@@ -34,7 +38,12 @@ respond /keycloak.json "{
 	\"confidential-port\": 0
 }"
 
-respond /api/instance.json "{ 
+# Provide instance specific information
+@instance {
+  path /api/instance.json
+  method GET
+}
+respond @instance "{ 
 	\"instance-mode\": \"{$INSTANCE_MODE}\",
 	\"instance-name\": \"{$INSTANCE_NAME}\",
 	\"instance-banner-color\": \"{$INSTANCE_BANNER_COLOR}\",
@@ -44,6 +53,16 @@ respond /api/instance.json "{
 	\"scientific-names-search-endpoint\": \"{$SCIENTIFIC_NAMES_SEARCH_ENDPOINT}\",
 	\"scientific-names-datasets-endpoint\": \"{$SCIENTIFIC_NAMES_DATASETS_ENDPOINT}\"
 }"
+
+# Block non-GET methods
+@respond_endpoints_not_get {
+  path /keycloak.json /api/instance.json
+  not method GET
+}
+handle @respond_endpoints_not_get {
+	header Allow "GET"
+	respond "Method Not Allowed" 405
+}
 
 # Proxy to the back-end Object Store API:
 route /api/objectstore-api/* {

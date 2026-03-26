@@ -26,6 +26,18 @@ import { FunctionDef } from "../../../dina-ui/types/dina-export-api/resources/Da
 import { ControlledVocabularyItem } from "../../../dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 import { ControlledVocabularyFieldHeader } from "../../../dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
 
+/**
+ * Convert ElasticSearch index name to entity key (kebab-case).
+ * Examples: dina_material_sample_index -> material-sample
+ */
+export function getEntityKeyFromIndexName(indexName: string): string {
+  // Remove dina_ prefix and _index suffix, then convert underscores to hyphens
+  return indexName
+    .replace(/^dina_/, "")
+    .replace(/_index$/, "")
+    .replace(/_/g, "-");
+}
+
 export function convertColumnsToAliases(columns): string[] {
   if (!columns) {
     return [];

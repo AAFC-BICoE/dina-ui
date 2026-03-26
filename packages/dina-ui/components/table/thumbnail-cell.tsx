@@ -42,7 +42,7 @@ function ThumbnailCellInner({
         <SmallThumbnail filePath={filePath} altImage={altImage} />
       )}
       <Link
-        href={`/object-store/object/external-resource-view?id=${original?.id}`}
+        href={`/object-store/object/view?id=${original?.id}`}
         className="m-auto"
       >
         <DinaMessage id="detailsPageLink" />

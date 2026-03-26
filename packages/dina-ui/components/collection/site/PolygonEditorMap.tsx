@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ArcGISLoader from "../../geo/ArcGISLoader";
 import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 import {
   getMapModules,
@@ -6,19 +7,16 @@ import {
 } from "packages/dina-ui/utils/geoUtils";
 import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
-import ArcGISLoader from "../../geo/ArcGISLoader";
-
-type Props = {
-  coords: GeoPosition[][];
-  mode?: PolygonEditorMode;
-  onCoordsChange: (coords: GeoPosition[][]) => void;
-};
 
 export default function PolygonEditorMap({
   coords,
   mode,
   onCoordsChange
-}: Props) {
+}: {
+  coords: GeoPosition[][];
+  mode?: PolygonEditorMode;
+  onCoordsChange: (coords: GeoPosition[][]) => void;
+}) {
   const mapRef = useRef<HTMLDivElement>(null);
   const sketchRef = useRef<any>(null);
   const [graphicsLayer, setGraphicsLayer] = useState<any>(null);
@@ -125,7 +123,7 @@ export default function PolygonEditorMap({
       <div
         className="mt-2 mb-4 w-100 rounded-2 overflow-hidden"
         style={{
-          height: "250px",
+          height: "350px",
           background: "#f2f2f2"
         }}
       >

@@ -50,13 +50,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
           <div className="row align-items-center preview-buttonbar">
             <div className="col">
               {" "}
-              <Link
-                href={`/object-store/object/${
-                  metadata?.resourceExternalURL
-                    ? "external-resource-view"
-                    : "view"
-                }?id=${metadataId}`}
-              >
+              <Link href={`/object-store/object/view?id=${metadataId}`}>
                 <DinaMessage id="detailsPageLink" />
               </Link>
             </div>
