@@ -23,33 +23,36 @@ export function CollectionLinkedProjectsTable({ id }: { id: string }) {
     setError(null);
 
     try {
-      // Get the material samples in this collection.
+      // Use an aggregation to get all unique project IDs linked to the material samples
       const sampleResponse = await apiClient.axios.post(
         "search-api/search-ws/search",
         {
-          _source: { includes: ["data.relationships"] },
+          size: 0,
           query: {
             bool: {
               must: [{ term: { "data.relationships.collection.data.id": id } }]
+            }
+          },
+          aggs: {
+            unique_projects: {
+              terms: {
+                field: "data.relationships.projects.data.id",
+                size: 10000
+              }
             }
           }
         },
         { params: { indexName: "dina_material_sample_index" } }
       );
 
-      // Extract and flatten the project IDs from the samples.
-      const extractedIds = [
-        ...new Set<string>(
-          sampleResponse.data.hits.hits
-            .flatMap(
-              (hit) =>
-                hit._source?.data?.relationships?.projects?.data?.map(
-                  (a) => a.id
-                ) ?? []
-            )
-            .filter((id): id is string => typeof id === "string" && !!id)
-        )
-      ];
+      // Extract the project IDs from the aggregation buckets
+      const buckets =
+        sampleResponse.data.aggregations?.["sterms#unique_projects"]?.buckets ||
+        [];
+
+      const extractedIds = buckets
+        .map((bucket: any) => bucket.key)
+        .filter((key: string) => !!key);
 
       setProjectIds(extractedIds);
     } catch (err) {
