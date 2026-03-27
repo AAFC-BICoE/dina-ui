@@ -122,6 +122,7 @@ function getQueryBuilderTypeFromIndexType(
     case "relationshipPresence":
     case "classification":
     case "relationshipAutocomplete":
+    case "geoShape":
       return type;
 
     // If it's stored directly as a keyword, it's considered a text field.
@@ -139,9 +140,6 @@ function getQueryBuilderTypeFromIndexType(
     case "scaled_float":
     case "unsigned":
       return "number";
-
-    case "object":
-      return "geoShape";
   }
 
   // Unsupported type, this will cause an error with the query builder.
@@ -339,22 +337,6 @@ export function generateBuilderConfig(
     // Special case not to display any operators.
     noOperator: {
       label: "noOperator",
-      cardinality: 1
-    },
-    intersects: {
-      label: formatMessage({ id: "queryBuilder_operator_intersects" }),
-      cardinality: 1
-    },
-    within: {
-      label: formatMessage({ id: "queryBuilder_operator_within" }),
-      cardinality: 1
-    },
-    contains: {
-      label: formatMessage({ id: "queryBuilder_operator_contains" }),
-      cardinality: 1
-    },
-    disjoint: {
-      label: formatMessage({ id: "queryBuilder_operator_disjoint" }),
       cardinality: 1
     }
   };
@@ -662,7 +644,7 @@ export function generateBuilderConfig(
     },
     geoShape: {
       ...BasicConfig.widgets.text,
-      type: "geo_shape",
+      type: "geoShape",
       valueSrc: "value",
       factory: (factoryProps) => (
         <QueryBuilderGeoShapeSearch
@@ -882,10 +864,10 @@ export function generateBuilderConfig(
     },
     geoShape: {
       valueSources: ["value"],
-      defaultOperator: "intersects",
+      defaultOperator: "noOperator",
       widgets: {
-        relationshipAutocomplete: {
-          operators: ["intersects", "within", "contains", "disjoint"]
+        geoShape: {
+          operators: ["noOperator"]
         }
       }
     }

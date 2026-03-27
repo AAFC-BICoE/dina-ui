@@ -1,14 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
 import _ from "lodash";
-import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
+// import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
 import { ESIndexMapping, TransformToDSLProps } from "../../types";
 import { transformTextSearchToDSL } from "./QueryBuilderTextSearch";
-import useVocabularyOptions from "../../../../../dina-ui/components/collection/useVocabularyOptions";
-import { VocabularyOption } from "packages/dina-ui/components";
 
 interface QueryBuilderGeoShapeSearchProps {
   /**
@@ -53,7 +51,7 @@ export default function QueryBuilderGeoShapeSearch({
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
+  // const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
 
   const [geoShapeSearch, setGoeShapeSearch] = useState<GeoShapeSearch>(() =>
     value
@@ -80,18 +78,6 @@ export default function QueryBuilderGeoShapeSearch({
     }
   }, []);
 
-  // Retrieve the classification options
-  const { loading, vocabOptions: taxonomicRankOptions } = useVocabularyOptions({
-    path: "collection-api/vocabulary2/taxonomicRank"
-  });
-
-  // Capitalize each label for the taxonomic rank options.
-  useMemo(() => {
-    taxonomicRankOptions.forEach((option) => {
-      option.label = _.startCase(option.label);
-    });
-  }, [taxonomicRankOptions]);
-
   // Generate the operator options
   const operatorOptions = SUPPORTED_GEO_SHAPE_OPERATORS.map<
     SelectOption<string>
@@ -107,30 +93,19 @@ export default function QueryBuilderGeoShapeSearch({
 
   return (
     <div className={isInColumnSelector ? "" : "row"}>
-      {/* Classification Rank Selection */}
-      <Select<VocabularyOption>
-        options={taxonomicRankOptions}
-        value={taxonomicRankOptions.find(
-          (option) => option.value === geoShapeSearch.selectedGeoShapeRank
-        )}
-        isLoading={loading}
-        placeholder={formatMessage({
-          id: "queryBuilder_geoShape_placeholder"
-        })}
-        onChange={(newValue) => {
+      {/* Operator Selection */}
+      <Select<SelectOption<string>>
+        options={operatorOptions}
+        className={`col me-1 ps-0`}
+        value={selectedOperator}
+        onChange={(selected) =>
           setGoeShapeSearch({
             ...geoShapeSearch,
-            selectedGeoShapeRank: newValue?.value ?? "",
-            selectedOperator: "",
-            searchValue: ""
-          });
-        }}
-        controlShouldRenderValue={true}
-        isClearable={false}
-        className={isInColumnSelector ? "ps-0 mt-2 mb-3" : "col me-1 ms-2 ps-0"}
-        onKeyDown={onKeyDown}
+            selectedOperator: selected?.value ?? ""
+          })
+        }
         captureMenuScroll={true}
-        menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+        menuPlacement={"auto"}
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
         menuPortalTarget={document.body}
@@ -141,39 +116,6 @@ export default function QueryBuilderGeoShapeSearch({
           })
         }}
       />
-
-      {/* Operator Selection */}
-      {!isInColumnSelector && (
-        <Select<SelectOption<string>>
-          options={operatorOptions}
-          className={`col me-1 ps-0`}
-          value={selectedOperator}
-          onChange={(selected) =>
-            setGoeShapeSearch({
-              ...geoShapeSearch,
-              selectedOperator: selected?.value ?? ""
-            })
-          }
-          captureMenuScroll={true}
-          menuPlacement={"auto"}
-          menuShouldScrollIntoView={false}
-          minMenuHeight={600}
-          menuPortalTarget={document.body}
-          styles={{
-            menuPortal: (base) => ({
-              ...base,
-              zIndex: 9999
-            })
-          }}
-        />
-      )}
-
-      {/* Search Value Input */}
-      {!isInColumnSelector &&
-        geoShapeSearch.selectedOperator !== "empty" &&
-        geoShapeSearch.selectedOperator !== "notEmpty" && (
-          <div>:: Map shown here :: </div>
-        )}
     </div>
   );
 }
