@@ -103,7 +103,7 @@ export default function CollectingEventListPage() {
           fields: [],
           relationshipFields: [
             {
-              label: "siteGoem",
+              label: "siteGeom",
               path: "included.attributes.siteGeom",
               type: "geoShape",
               referencedBy: "site",

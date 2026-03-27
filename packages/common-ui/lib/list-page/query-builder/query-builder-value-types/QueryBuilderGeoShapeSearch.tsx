@@ -86,11 +86,11 @@ export default function QueryBuilderGeoShapeSearch({
   );
 
   return (
-    <div className={isInColumnSelector ? "" : "row"}>
+    <div className={isInColumnSelector ? "" : ""}>
       {/* Operator Selection */}
       <Select<SelectOption<string>>
         options={operatorOptions}
-        className={`col me-1 ps-0`}
+        className={`col-md-12 me-1 ps-0`}
         value={selectedOperator}
         onChange={(selected) =>
           setGoeShapeSearch({
@@ -127,14 +127,20 @@ export default function QueryBuilderGeoShapeSearch({
 }
 
 /**
- * Using the query row for a target organism primary geoShape search, generate the elastic
- * search request to be made.
+ * Using the query row for a geoShape search, generate the elastic search request to be made.
  */
 export function transformGeoShapeToDSL({
   value,
+  fieldPath,
   fieldInfo
 }: TransformToDSLProps): any {
-  // Parse the geoShape search options. Trim the search value.
+  if (!fieldInfo) {
+    return {};
+  }
+
+  const { parentType } = fieldInfo;
+
+  // Parse the geoShape search options.
   let geoShapeSearch: GeoShapeSearchStates;
   try {
     geoShapeSearch = JSON.parse(value);
@@ -146,5 +152,25 @@ export function transformGeoShapeToDSL({
   console.warn(geoShapeSearch);
   console.warn(fieldInfo);
 
-  return {};
+  const geoShapeQuery = {
+    geo_shape: {
+      [fieldPath]: {
+        shape: {
+          type: "polygon",
+          coordinates: geoShapeSearch.searchShape
+        },
+        relation: geoShapeSearch.selectedOperator
+      }
+    }
+  };
+
+  // Apply the nested query if needed.
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: geoShapeQuery
+        }
+      }
+    : geoShapeQuery;
 }
