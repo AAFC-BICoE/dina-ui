@@ -1,8 +1,6 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
-import { useEffect } from "react";
-import _ from "lodash";
 import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
 import { TransformToDSLProps } from "../../types";
 import PolygonEditorMap from "../../../../../dina-ui/components/collection/site/PolygonEditorMap";
@@ -27,105 +25,106 @@ interface QueryBuilderGeoShapeSearchProps {
 
 export interface GeoShapeSearchStates {
   /** Operator to be used on the geo search search. */
-  selectedOperator: string;
+  selectedOperator: GeoShapeOperator;
 
   /** The geo shape to search against. */
   searchShape: GeoPosition[][];
 }
 
+export function parseGeoShapeValue(
+  value: string | undefined
+): GeoShapeSearchStates | null {
+  if (!value) return null;
+
+  try {
+    const parsed = JSON.parse(value);
+
+    if (
+      typeof parsed?.selectedOperator !== "string" ||
+      !SUPPORTED_GEO_SHAPE_OPERATORS.includes(parsed.selectedOperator) ||
+      !Array.isArray(parsed?.searchShape)
+    ) {
+      console.warn("Invalid GeoShapeSearch value:", parsed);
+      return null;
+    }
+
+    return parsed as GeoShapeSearchStates;
+  } catch (e) {
+    console.error("Failed to parse GeoShapeSearch value:", e);
+    return null;
+  }
+}
+
+// Operators supported for the geoshape search
 export const SUPPORTED_GEO_SHAPE_OPERATORS = [
   "intersects",
   "within",
   "contains",
   "disjoint"
-];
+] as const;
+export type GeoShapeOperator = (typeof SUPPORTED_GEO_SHAPE_OPERATORS)[number];
 
 export default function QueryBuilderGeoShapeSearch({
   value,
-  setValue,
-  isInColumnSelector
+  setValue
 }: QueryBuilderGeoShapeSearchProps) {
   const { formatMessage } = useIntl();
 
-  const [geoShapeSearch, setGoeShapeSearch] = useState<GeoShapeSearchStates>(
+  const geoShapeSearch = parseGeoShapeValue(value) ?? {
+    selectedOperator: "intersects" as GeoShapeOperator,
+    searchShape: []
+  };
+
+  const updateSearch = (updated: GeoShapeSearchStates) => {
+    setValue?.(JSON.stringify(updated));
+  };
+
+  const operatorOptions = useMemo(
     () =>
-      value
-        ? JSON.parse(value)
-        : {
-            selectedOperator: "intersects",
-            searchShape: []
-          }
+      SUPPORTED_GEO_SHAPE_OPERATORS.map<SelectOption<string>>((option) => ({
+        label: formatMessage({ id: "queryBuilder_operator_" + option }),
+        value: option
+      })),
+    [formatMessage]
   );
 
-  // Convert the state in this component to a value that can be stored in the Query Builder.
-  useEffect(() => {
-    if (setValue) {
-      setValue(JSON.stringify(geoShapeSearch));
-    }
-  }, [geoShapeSearch, setValue]);
-
-  // Convert a value from Query Builder into the geoShapeSearch in this component.
-  // Dependent on the identifierConfig to indicate when it's changed.
-  useEffect(() => {
-    if (value) {
-      setGoeShapeSearch(JSON.parse(value));
-    }
-  }, []);
-
-  // Generate the operator options
-  const operatorOptions = SUPPORTED_GEO_SHAPE_OPERATORS.map<
-    SelectOption<string>
-  >((option) => ({
-    label: formatMessage({ id: "queryBuilder_operator_" + option }),
-    value: option
-  }));
-
-  // Currently selected option, if no option can be found just select the first one.
-  const selectedOperator = operatorOptions?.find(
+  const selectedOperator = operatorOptions.find(
     (operator) => operator.value === geoShapeSearch.selectedOperator
   );
 
   return (
-    <div className={isInColumnSelector ? "" : ""}>
-      {/* Operator Selection */}
+    <div>
       <Select<SelectOption<string>>
         options={operatorOptions}
-        className={`col-md-12 me-1 ps-0`}
+        className="col-md-12 me-1 ps-0"
         value={selectedOperator}
         onChange={(selected) =>
-          setGoeShapeSearch({
+          updateSearch({
             ...geoShapeSearch,
-            selectedOperator: selected?.value ?? ""
+            selectedOperator: selected?.value as GeoShapeOperator
           })
         }
         captureMenuScroll={true}
-        menuPlacement={"auto"}
+        menuPlacement="auto"
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
         menuPortalTarget={document.body}
-        styles={{
-          menuPortal: (base) => ({
-            ...base,
-            zIndex: 9999
-          })
-        }}
+        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
       />
 
-      {/* Map */}
       <PolygonEditorMap
         coords={geoShapeSearch.searchShape}
-        mode={"edit"}
-        onCoordsChange={(coords) => {
-          setGoeShapeSearch({
+        mode="edit"
+        onCoordsChange={(coords) =>
+          updateSearch({
             ...geoShapeSearch,
             searchShape: coords
-          });
-        }}
+          })
+        }
       />
     </div>
   );
 }
-
 /**
  * Using the query row for a geoShape search, generate the elastic search request to be made.
  */
@@ -137,20 +136,15 @@ export function transformGeoShapeToDSL({
   if (!fieldInfo) {
     return {};
   }
-
   const { parentType } = fieldInfo;
 
-  // Parse the geoShape search options.
-  let geoShapeSearch: GeoShapeSearchStates;
-  try {
-    geoShapeSearch = JSON.parse(value);
-  } catch (e) {
-    console.error(e);
-    return;
-  }
+  // Parse the geoShape states to get the values out of it.
+  const geoShapeSearch = parseGeoShapeValue(value);
 
-  console.warn(geoShapeSearch);
-  console.warn(fieldInfo);
+  // Don't build a query with an empty shape
+  if (!geoShapeSearch || geoShapeSearch.searchShape.length === 0) {
+    return {};
+  }
 
   const geoShapeQuery = {
     geo_shape: {
