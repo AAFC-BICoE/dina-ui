@@ -1197,6 +1197,59 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ]);
   });
 
+  it("Run exists, in edit mode, Quality control attachments exist, edit the quality control", async () => {
+    const wrapper = mountWithAppContext(
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Change the quality control type.
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(wrapper.getByRole("option", { name: /meoh blank/i }));
+
+    // Click the save button.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // No errors should be present at this point.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Expect the network request to properly delete the quality control and attachments.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
+            resource: {
+              id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
+              qcType: "meoh_blank",
+              type: "quality-control"
+            },
+            type: "quality-control"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ]
+    ]);
+  });
+
   it("Run exists, in edit mode, Add another attachment to an existing quality control", async () => {
     const wrapper = mountWithAppContext(
       <TestComponent
