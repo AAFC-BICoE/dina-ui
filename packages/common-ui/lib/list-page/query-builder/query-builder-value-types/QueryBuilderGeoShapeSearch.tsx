@@ -3,10 +3,10 @@ import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
 import _ from "lodash";
-// import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
-import { ESIndexMapping, TransformToDSLProps } from "../../types";
-import { transformTextSearchToDSL } from "./QueryBuilderTextSearch";
+import { TransformToDSLProps } from "../../types";
+import PolygonEditorMap from "../../../../../dina-ui/components/collection/site/PolygonEditorMap";
+import { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
 
 interface QueryBuilderGeoShapeSearchProps {
   /**
@@ -25,15 +25,12 @@ interface QueryBuilderGeoShapeSearchProps {
   isInColumnSelector: boolean;
 }
 
-export interface GeoShapeSearch {
-  // ClassificationSearchStates {
-  selectedGeoShapeRank: string;
-
-  /** Operator to be used on the classification search. */
+export interface GeoShapeSearchStates {
+  /** Operator to be used on the geo search search. */
   selectedOperator: string;
 
-  /** The value the user wishes to search. */
-  searchValue: string;
+  /** The geo shape to search against. */
+  searchShape: GeoPosition[][];
 }
 
 export const SUPPORTED_GEO_SHAPE_OPERATORS = [
@@ -50,17 +47,14 @@ export default function QueryBuilderGeoShapeSearch({
 }: QueryBuilderGeoShapeSearchProps) {
   const { formatMessage } = useIntl();
 
-  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  // const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
-
-  const [geoShapeSearch, setGoeShapeSearch] = useState<GeoShapeSearch>(() =>
-    value
-      ? JSON.parse(value)
-      : {
-          searchValue: "",
-          selectedOperator: "",
-          selectedGeoShapeRank: ""
-        }
+  const [geoShapeSearch, setGoeShapeSearch] = useState<GeoShapeSearchStates>(
+    () =>
+      value
+        ? JSON.parse(value)
+        : {
+            selectedOperator: "intersects",
+            searchShape: []
+          }
   );
 
   // Convert the state in this component to a value that can be stored in the Query Builder.
@@ -116,6 +110,18 @@ export default function QueryBuilderGeoShapeSearch({
           })
         }}
       />
+
+      {/* Map */}
+      <PolygonEditorMap
+        coords={geoShapeSearch.searchShape}
+        mode={"edit"}
+        onCoordsChange={(coords) => {
+          setGoeShapeSearch({
+            ...geoShapeSearch,
+            searchShape: coords
+          });
+        }}
+      />
     </div>
   );
 }
@@ -129,40 +135,16 @@ export function transformGeoShapeToDSL({
   fieldInfo
 }: TransformToDSLProps): any {
   // Parse the geoShape search options. Trim the search value.
-  let geoShapeSearch: GeoShapeSearch;
+  let geoShapeSearch: GeoShapeSearchStates;
   try {
     geoShapeSearch = JSON.parse(value);
   } catch (e) {
     console.error(e);
     return;
   }
-  geoShapeSearch.searchValue = geoShapeSearch.searchValue.trim();
 
-  if (
-    geoShapeSearch.selectedOperator !== "empty" &&
-    geoShapeSearch.selectedOperator !== "notEmpty"
-  ) {
-    if (!geoShapeSearch.searchValue) {
-      return undefined;
-    }
-  }
+  console.warn(geoShapeSearch);
+  console.warn(fieldInfo);
 
-  // The path to search against elastic search. Using the rank to generate this path.
-  const fieldPath: string = fieldInfo?.path + "." + geoShapeSearch;
-
-  const commonProps = {
-    fieldPath,
-    operation: geoShapeSearch.selectedOperator,
-    queryType: "",
-    value: geoShapeSearch.searchValue,
-    fieldInfo: {
-      ...fieldInfo,
-      distinctTerm: false,
-
-      // All managed attributes have keyword support.
-      keywordMultiFieldSupport: true
-    } as ESIndexMapping
-  };
-
-  return transformTextSearchToDSL({ ...commonProps });
+  return {};
 }
