@@ -158,6 +158,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
   collectionMethodListTitle: "Collection Method",
   collectionMethodNameLabel: "Collection Method Name",
+  collectionLinkedProjectTableTitle: "Linked Projects",
   sampleTypeChartTitle: "Material Sample Types",
   recordAddedChartTitle: "Records Added by Date",
   relatedObjectTypeChartTitle: "Related Object Types",

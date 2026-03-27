@@ -1069,7 +1069,8 @@ export function useGenericMolecularAnalysisRun({
       }
 
       const hasNameOrTypeChanged =
-        qc.name !== matchingLoadedQc.name || qc.type !== matchingLoadedQc.type;
+        qc.name !== matchingLoadedQc.name ||
+        qc.qcType !== matchingLoadedQc.qcType;
 
       return (
         qc.id &&
