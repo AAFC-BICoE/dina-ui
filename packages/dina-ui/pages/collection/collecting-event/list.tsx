@@ -99,6 +99,18 @@ export default function CollectingEventListPage() {
           typeName: "collecting-event",
           apiBaseUrl: "/collection-api"
         }}
+        dynamicFieldMapping={{
+          fields: [],
+          relationshipFields: [
+            {
+              label: "siteGeom",
+              path: "included.attributes.siteGeom",
+              type: "geoShape",
+              referencedBy: "site",
+              referencedType: "site"
+            }
+          ]
+        }}
       />
     </PageLayout>
   );

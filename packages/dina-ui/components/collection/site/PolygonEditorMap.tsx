@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import ArcGISLoader from "../../geo/ArcGISLoader";
-import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
+import { POLYGON_EDITOR_MODE } from "../../../types/geo/polygon-editor-mode.types";
 import {
   getMapModules,
   projectPolygon3857To4326
-} from "packages/dina-ui/utils/geoUtils";
-import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
-import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
+} from "../../../utils/geoUtils";
+import type { PolygonEditorMode } from "../../../types/geo/polygon-editor-mode.types";
+import type { GeoPosition } from "../../../types/geo/geo.types";
 
 export default function PolygonEditorMap({
   coords,
@@ -20,6 +20,11 @@ export default function PolygonEditorMap({
   const mapRef = useRef<HTMLDivElement>(null);
   const sketchRef = useRef<any>(null);
   const [graphicsLayer, setGraphicsLayer] = useState<any>(null);
+
+  const onCoordsChangeRef = useRef(onCoordsChange);
+  useEffect(() => {
+    onCoordsChangeRef.current = onCoordsChange;
+  }, [onCoordsChange]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -102,9 +107,11 @@ export default function PolygonEditorMap({
       const graphic = graphicsLayer.graphics.getItemAt(0);
 
       if (graphic) {
-        onCoordsChange(await projectPolygon3857To4326(graphic.geometry.rings));
+        onCoordsChangeRef.current(
+          await projectPolygon3857To4326(graphic.geometry.rings)
+        );
       } else {
-        onCoordsChange([]);
+        onCoordsChangeRef.current([]);
         sketchRef.current?.create("polygon");
       }
     };
