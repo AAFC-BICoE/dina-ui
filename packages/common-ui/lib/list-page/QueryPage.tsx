@@ -1150,7 +1150,9 @@ export function QueryPage<TData extends KitsuResource>({
       setIsFullScreen,
       CheckBoxField: SelectCheckBox,
       CheckBoxHeader: SelectCheckBoxHeader,
-      query: elasticSearchQuery
+      query: elasticSearchQuery,
+      queryBuilderTree,
+      setQueryBuilderTree
     };
   }, [
     viewMode,

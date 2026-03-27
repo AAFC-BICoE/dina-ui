@@ -3,12 +3,23 @@ import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Card } from "react-bootstrap";
+import { Utils } from "@react-awesome-query-builder/ui";
+import _ from "lodash";
 
 interface SampleTypeChart {
   query?: any;
+  addFilter?: boolean;
+  setQuery?: any;
+  setQueryBuilderTree?: any;
+  queryBuilderTree?: any;
 }
 
-export default function SampleTypeChart({ query }: SampleTypeChart) {
+export default function SampleTypeChart({
+  query,
+  setQueryBuilderTree,
+  queryBuilderTree,
+  addFilter
+}: SampleTypeChart) {
   const { apiClient } = useApiClient();
 
   // Helper function to get aggregation key format
@@ -27,6 +38,54 @@ export default function SampleTypeChart({ query }: SampleTypeChart) {
     }
 
     return aggName;
+  };
+
+  const addClickToQuery = (params: { name: string }) => {
+    if (!queryBuilderTree || !setQueryBuilderTree) return;
+
+    const jsonTree = _.cloneDeep(Utils.getTree(queryBuilderTree));
+
+    // If the clicked bar is "NO_TYPE", we want to filter for documents where materialSampleType is empty. Otherwise, we filter for the specific materialSampleType.
+    const newRule =
+      params.name === "NO_TYPE"
+        ? {
+            id: Utils.uuid(),
+            type: "rule",
+            properties: {
+              field: "data.attributes.materialSampleType",
+              operator: "empty",
+              value: [],
+              valueSrc: [],
+              valueType: [],
+              valueError: [],
+              fieldError: undefined,
+              fieldSrc: "field"
+            }
+          }
+        : {
+            id: Utils.uuid(),
+            type: "rule",
+            properties: {
+              field: "data.attributes.materialSampleType",
+              operator: "equals",
+              value: [params.name],
+              valueSrc: [],
+              valueType: [],
+              valueError: [],
+              fieldError: undefined,
+              fieldSrc: "field"
+            }
+          };
+
+    if (!jsonTree.children1) {
+      jsonTree.children1 = [newRule as any];
+    } else {
+      jsonTree.children1 = [...jsonTree.children1, newRule] as any;
+    }
+
+    const newTree = Utils.loadTree(jsonTree);
+
+    setQueryBuilderTree(newTree);
   };
   const dataMap: Record<string, number> = {
     WHOLE_ORGANISM: 0,
@@ -129,6 +188,7 @@ export default function SampleTypeChart({ query }: SampleTypeChart) {
           <ReactECharts
             option={options}
             style={{ height: "400px", width: "100%" }}
+            onEvents={addFilter ? { click: addClickToQuery } : {}}
           />
         ) : (
           <div
