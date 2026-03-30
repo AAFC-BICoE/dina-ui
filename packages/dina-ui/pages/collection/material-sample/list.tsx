@@ -547,6 +547,7 @@ export default function MaterialSampleListPage() {
     {
       id: "visualization",
       labelKey: "visualization",
+      showActionButtons: false, // Hide action buttons in the visualization tab
       component: MaterialSampleVisualizationTab
     }
   ];

@@ -147,6 +147,7 @@ export interface QueryPageTabProps<TData extends KitsuResource> {
 export interface QueryPageTabConfig<TData extends KitsuResource> {
   id: string;
   labelKey: string; // For i18n
+  showActionButtons?: boolean; // Whether to show action buttons (column selector, export, delete, edit) in this tab
   component: React.ComponentType<QueryPageTabProps<TData>>;
   // Optional: Tab-specific configuration
   config?: any;
@@ -534,6 +535,8 @@ export function QueryPage<TData extends KitsuResource>({
       defaultJsonTree
     );
 
+  // State to control whether action buttons (column selector, export, delete, edit) are shown. This is updated based on the active tab's configuration.
+  const [showActionButtons, setShowActionButtons] = useState(true);
   /** If column selector is not being used, just load the default columns in. */
   useEffect(() => {
     if (!enableColumnSelector) {
@@ -1184,7 +1187,11 @@ export function QueryPage<TData extends KitsuResource>({
     return (
       <Tabs
         selectedIndex={activeTabIndex}
-        onSelect={(index) => setActiveTabIndex(index)}
+        // When a tab is selected, we need to update the active tab index, but also determine whether to show the action buttons based on the new tab's configuration.
+        onSelect={(index) => {
+          setActiveTabIndex(index);
+          setShowActionButtons(tabs[index].showActionButtons ?? true);
+        }}
       >
         <TabList>
           {tabs.map((tab) => (
@@ -1263,7 +1270,7 @@ export function QueryPage<TData extends KitsuResource>({
                 groups={groups}
               />
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
-              {!selectionMode && (
+              {!selectionMode && showActionButtons && (
                 <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
                   {enableColumnSelector && (
                     <ColumnSelectorMemo
@@ -1315,7 +1322,7 @@ export function QueryPage<TData extends KitsuResource>({
           <DinaFormSection horizontal={"flex"}>
             <div className="row">
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
-              {!selectionMode && (
+              {!selectionMode && showActionButtons && (
                 <div className="col-md-12 mt-3 d-flex gap-2 justify-content-end align-items-start">
                   {enableColumnSelector && (
                     <ColumnSelectorMemo
