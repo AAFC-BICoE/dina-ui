@@ -22,6 +22,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addExistingStorageUnitAsChild: "Add Existing Storage Unit",
   addExternalResourceTitle: "Add New External Resource",
   addFilesButton: "Add Files",
+  addFilterTooltip:
+    "Click on a bar to add a filter to the query for that value.",
   addGroup: "Add Group",
   addIdentifier: "Add Identifier",
   addInstitutionTitle: "Add Institution",

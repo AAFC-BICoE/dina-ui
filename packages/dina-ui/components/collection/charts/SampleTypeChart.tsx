@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useApiClient } from "common-ui";
+import { useApiClient, Tooltip } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Card } from "react-bootstrap";
@@ -215,6 +215,7 @@ export default function SampleTypeChart({
     <div>
       <strong>
         <DinaMessage id="sampleTypeChartTitle" />
+        {addFilter && <Tooltip id="addFilterTooltip" />}
       </strong>
       <Card>
         {chartData.length > 0 ? (

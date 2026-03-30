@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useApiClient } from "common-ui";
+import { useApiClient, Tooltip } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Dropdown, DropdownButton, Card } from "react-bootstrap";
@@ -577,6 +577,7 @@ export default function RecordsAddedChart({
             {chartTitle(
               datePresets.find((p) => p.key === selectedPreset)?.interval || ""
             )}
+            {addFilter && <Tooltip id="addFilterTooltip" />}
           </strong>
         </div>
         <DropdownButton
