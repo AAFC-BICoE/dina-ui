@@ -8,7 +8,8 @@ import RelatedObjectTypeChart from "../../../../dina-ui/components/collection/ch
 export function MaterialSampleVisualizationTab<TData extends KitsuResource>({
   query,
   queryBuilderTree,
-  setQueryBuilderTree
+  setQueryBuilderTree,
+  setSubmittedQueryBuilderTree
 }: QueryPageTabProps<TData>) {
   const queryParams = query.query;
   return (
@@ -20,6 +21,7 @@ export function MaterialSampleVisualizationTab<TData extends KitsuResource>({
             queryBuilderTree={queryBuilderTree}
             setQueryBuilderTree={setQueryBuilderTree}
             addFilter={true}
+            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
           />
         </div>
         <div className="col-md-6">
@@ -28,6 +30,7 @@ export function MaterialSampleVisualizationTab<TData extends KitsuResource>({
             queryBuilderTree={queryBuilderTree}
             setQueryBuilderTree={setQueryBuilderTree}
             addFilter={true}
+            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
           />
         </div>
       </div>

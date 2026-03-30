@@ -1155,7 +1155,8 @@ export function QueryPage<TData extends KitsuResource>({
       CheckBoxHeader: SelectCheckBoxHeader,
       query: elasticSearchQuery,
       queryBuilderTree,
-      setQueryBuilderTree
+      setQueryBuilderTree,
+      setSubmittedQueryBuilderTree
     };
   }, [
     viewMode,

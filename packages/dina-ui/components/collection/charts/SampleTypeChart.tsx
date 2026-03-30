@@ -23,6 +23,11 @@ interface SampleTypeChart {
    * queryBuilderTree state value from the parent component, needed to add filter on bar click
    */
   queryBuilderTree?: any;
+
+  /**
+   * submittedQueryBuilderTree state value from the parent component, needed to add filter on bar click
+   */
+  setSubmittedQueryBuilderTree?: any;
 }
 
 /**
@@ -35,6 +40,7 @@ interface SampleTypeChart {
  * @param {Function} props.addFilter - Whether to add a filter to the parent query when clicking on a bar in the chart. If true, clicking a bar will add a filter for the corresponding date value to the query builder tree in the parent component. This requires passing down the queryBuilderTree and setQueryBuilderTree props as well.
  * @param {Function} props.setQueryBuilderTree - queryBuilderTree state setter from the parent component, needed to add filter on bar click
  * @param {any} props.queryBuilderTree - queryBuilderTree state value from the parent component, needed to add filter on bar click
+ * @param {Function} props.setSubmittedQueryBuilderTree - submittedQueryBuilderTree state setter from the parent component, needed to add filter on bar click
  *
  * @returns {JSX.Element} The rendered chart component.
  */
@@ -42,7 +48,8 @@ export default function SampleTypeChart({
   query,
   setQueryBuilderTree,
   queryBuilderTree,
-  addFilter
+  addFilter,
+  setSubmittedQueryBuilderTree
 }: SampleTypeChart) {
   const { apiClient } = useApiClient();
 
@@ -110,6 +117,8 @@ export default function SampleTypeChart({
     const newTree = Utils.loadTree(jsonTree);
 
     setQueryBuilderTree(newTree);
+
+    setSubmittedQueryBuilderTree(newTree);
   };
   const dataMap: Record<string, number> = {
     WHOLE_ORGANISM: 0,
