@@ -7,13 +7,37 @@ import { Utils } from "@react-awesome-query-builder/ui";
 import _ from "lodash";
 
 interface SampleTypeChart {
+  /**
+   * The query object from the parent component, used as the base query for fetching data for the chart. This allows the chart to reflect any filters applied in the parent component. The component will add additional filters based on the selected date range preset to this input query when fetching data.
+   */
   query?: any;
+  /**
+   * Whether to add a filter to the parent query when clicking on a bar in the chart. If true, clicking a bar will add a filter for the corresponding date value to the query builder tree in the parent component. This requires passing down the queryBuilderTree and setQueryBuilderTree props as well.
+   */
   addFilter?: boolean;
-  setQuery?: any;
+  /**
+   * queryBuilderTree state setter from the parent component, needed to add filter on bar click
+   */
   setQueryBuilderTree?: any;
+  /**
+   * queryBuilderTree state value from the parent component, needed to add filter on bar click
+   */
   queryBuilderTree?: any;
 }
 
+/**
+ * SampleTypeChart component.
+ *
+ * Renders a chart displaying sample types based on the provided query.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.inputQuery - The query object from the parent component, used as the base query for fetching data for the chart. This allows the chart to reflect any filters applied in the parent component. The component will add additional filters based on the selected date range preset to this input query when fetching data.
+ * @param {Function} props.addFilter - Whether to add a filter to the parent query when clicking on a bar in the chart. If true, clicking a bar will add a filter for the corresponding date value to the query builder tree in the parent component. This requires passing down the queryBuilderTree and setQueryBuilderTree props as well.
+ * @param {Function} props.setQueryBuilderTree - queryBuilderTree state setter from the parent component, needed to add filter on bar click
+ * @param {any} props.queryBuilderTree - queryBuilderTree state value from the parent component, needed to add filter on bar click
+ *
+ * @returns {JSX.Element} The rendered chart component.
+ */
 export default function SampleTypeChart({
   query,
   setQueryBuilderTree,

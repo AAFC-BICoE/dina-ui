@@ -23,7 +23,12 @@ export function MaterialSampleVisualizationTab<TData extends KitsuResource>({
           />
         </div>
         <div className="col-md-6">
-          <RecordsAddedChart inputQuery={queryParams} />
+          <RecordsAddedChart
+            inputQuery={queryParams}
+            queryBuilderTree={queryBuilderTree}
+            setQueryBuilderTree={setQueryBuilderTree}
+            addFilter={true}
+          />
         </div>
       </div>
       <div className="row mt-3 mb-3">

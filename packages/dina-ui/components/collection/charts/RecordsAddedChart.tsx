@@ -4,12 +4,49 @@ import ReactECharts from "echarts-for-react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Dropdown, DropdownButton, Card } from "react-bootstrap";
 import _ from "lodash";
+import { Utils } from "@react-awesome-query-builder/ui";
+
 interface RecordsAddedChartProps {
+  /**
+   * The query object from the parent component, used as the base query for fetching data for the chart. This allows the chart to reflect any filters applied in the parent component. The component will add additional filters based on the selected date range preset and bar clicks to this input query when fetching data.
+   */
   inputQuery?: any;
+
+  /**
+   * Whether to add a filter to the parent query when clicking on a bar in the chart. If true, clicking a bar will add a filter for the corresponding date value to the query builder tree in the parent component. This requires passing down the queryBuilderTree and setQueryBuilderTree props as well.
+   */
+  addFilter?: boolean;
+
+  /**
+   * queryBuilderTree state setter from the parent component, needed to add filter on bar click
+   */
+  setQueryBuilderTree?: any;
+  /**
+   * queryBuilderTree state value from the parent component, needed to add filter on bar click
+   */
+  queryBuilderTree?: any;
 }
 
+/**
+ * RecordsAddedChart component.
+ *
+ * Renders a chart displaying records added,
+ * supporting custom input queries, additional filters,
+ * and integration with a Query Builder UI.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.inputQuery - The query object from the parent component, used as the base query for fetching data for the chart. This allows the chart to reflect any filters applied in the parent component. The component will add additional filters based on the selected date range preset to this input query when fetching data.
+ * @param {Function} props.addFilter - Whether to add a filter to the parent query when clicking on a bar in the chart. If true, clicking a bar will add a filter for the corresponding date value to the query builder tree in the parent component. This requires passing down the queryBuilderTree and setQueryBuilderTree props as well.
+ * @param {Function} props.setQueryBuilderTree - queryBuilderTree state setter from the parent component, needed to add filter on bar click
+ * @param {any} props.queryBuilderTree - queryBuilderTree state value from the parent component, needed to add filter on bar click
+ *
+ * @returns {JSX.Element} The rendered chart component.
+ */
 export default function RecordsAddedChart({
-  inputQuery
+  inputQuery,
+  addFilter,
+  setQueryBuilderTree,
+  queryBuilderTree
 }: RecordsAddedChartProps) {
   const { apiClient } = useApiClient();
 
@@ -18,7 +55,7 @@ export default function RecordsAddedChart({
   const [dateRange, setDateRange] = useState<{ start?: string; end?: string }>(
     {}
   );
-  const [selectedPreset, setSelectedPreset] = useState("all-time");
+  const [selectedPreset, setSelectedPreset] = useState("all-time-year");
 
   const datePresets = [
     {
@@ -152,6 +189,104 @@ export default function RecordsAddedChart({
       })
     }
   ];
+
+  const addClickToQuery = (params: { name: string }) => {
+    if (!queryBuilderTree || !setQueryBuilderTree) return;
+
+    const jsonTree = _.cloneDeep(Utils.getTree(queryBuilderTree));
+
+    /**
+     * Helper function to create a rule based on the selected date preset and the clicked date value. It handles different intervals (hour, day, month, year) and constructs the appropriate rule for filtering the query.
+     * @param selectedPreset selected date preset key
+     * @param dateStr date string from the clicked bar (format depends on the preset's interval)
+     * @returns new rule object to be added to the query builder tree
+     */
+    function createDateRule(selectedPreset: string, dateStr: string): any {
+      // get the preset object based on the selected preset key
+      const preset = datePresets.find((p) => p.key === selectedPreset);
+
+      // For hour and day intervals, we can filter for an exact match on the createdOn field.
+      // For month and year intervals, we filter on a range that covers the entire month or year.
+      if (preset?.interval === "day" || preset?.interval === "hour") {
+        const dateArr = dateStr.split("-");
+        const year = parseInt(dateArr[0], 10);
+        const month = parseInt(dateArr[1], 10) - 1;
+        const day = parseInt(dateArr[2], 10);
+
+        // Remove time component from date
+        const date = new Date(year, month, day).toISOString().split("T")[0];
+        return {
+          id: Utils.uuid(),
+          type: "rule",
+          properties: {
+            field: "data.attributes.createdOn",
+            operator: "equals",
+            value: [date],
+            valueSrc: ["value"],
+            valueType: ["date"],
+            valueError: [],
+            fieldError: undefined,
+            fieldSrc: "field"
+          }
+        };
+      } else if (preset?.interval === "month") {
+        const dateArr = dateStr.split("-");
+        const year = parseInt(dateArr[0], 10);
+        const month = parseInt(dateArr[1], 10) - 1;
+
+        const start = new Date(year, month, 1).toISOString().split("T")[0];
+        const end = new Date(year, month + 1, 0).toISOString().split("T")[0];
+
+        return {
+          id: Utils.uuid(),
+          type: "rule",
+          properties: {
+            field: "data.attributes.createdOn",
+            operator: "between",
+            value: [`{ "low": "${start}", "high": "${end}" }`],
+            valueSrc: ["value"],
+            valueType: ["date"],
+            valueError: [],
+            fieldError: undefined,
+            fieldSrc: "field"
+          }
+        };
+      } else {
+        const year = parseInt(dateStr, 10);
+
+        const start = new Date(year, 0, 1).toISOString().split("T")[0];
+        const end = new Date(year, 11, 31).toISOString().split("T")[0];
+
+        return {
+          id: Utils.uuid(),
+          type: "rule",
+          properties: {
+            field: "data.attributes.createdOn",
+            operator: "between",
+            value: [`{ "low": "${start}", "high": "${end}" }`],
+            valueSrc: ["value"],
+            valueType: ["date"],
+            valueError: [],
+            fieldError: undefined,
+            fieldSrc: "field"
+          }
+        };
+      }
+    }
+
+    const dateRule = createDateRule(selectedPreset, params.name);
+
+    // queryTree should come with group filter already, create children1 just in case it doesn't.
+    if (!jsonTree.children1) {
+      jsonTree.children1 = [dateRule as any];
+    } else {
+      jsonTree.children1 = [...jsonTree.children1, dateRule] as any;
+    }
+
+    const newTree = Utils.loadTree(jsonTree);
+
+    setQueryBuilderTree(newTree);
+  };
 
   const buildQuery = () => {
     const query = inputQuery
@@ -411,12 +546,30 @@ export default function RecordsAddedChart({
   const currentPresetLabel =
     datePresets.find((p) => p.key === selectedPreset)?.label || "All Time";
 
+  // Show different chart title based on the selected date preset's interval
+  function chartTitle(format: string) {
+    switch (format) {
+      case "year":
+        return <DinaMessage id="recordAddedChartTitleYear" />;
+      case "month":
+        return <DinaMessage id="recordAddedChartTitleMonth" />;
+      case "day":
+        return <DinaMessage id="recordAddedChartTitleDay" />;
+      case "hour":
+        return <DinaMessage id="recordAddedChartTitleHour" />;
+      default:
+        return <DinaMessage id="recordAddedChartTitle" />;
+    }
+  }
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center">
         <div>
           <strong className="d-block">
-            <DinaMessage id="recordAddedChartTitle" />
+            {chartTitle(
+              datePresets.find((p) => p.key === selectedPreset)?.interval || ""
+            )}
           </strong>
         </div>
         <DropdownButton
@@ -507,6 +660,7 @@ export default function RecordsAddedChart({
           <ReactECharts
             option={options}
             style={{ height: "400px", width: "100%" }}
+            onEvents={addFilter ? { click: addClickToQuery } : {}}
           />
         ) : (
           <div
