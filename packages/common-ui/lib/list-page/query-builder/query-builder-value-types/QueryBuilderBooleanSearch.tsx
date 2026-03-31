@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   includedTypeQuery,
   termQuery,
-  existsQuery
+  emptyFieldQuery,
+  notEmptyFieldQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import Select from "react-select";
 import { TransformToDSLProps } from "../../types";
@@ -36,6 +37,13 @@ export default function QueryBuilderBooleanSearch({
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
   const onKeyDown = useQueryBuilderEnterToSearch();
 
+  // Use true as the default.
+  useEffect(() => {
+    if (matchType === "equals" && !value) {
+      setValue?.("true");
+    }
+  }, [matchType, value, setValue]);
+
   /**
    * The possible states of a boolean if the Equals match is being used.
    */
@@ -44,8 +52,9 @@ export default function QueryBuilderBooleanSearch({
     { label: formatMessage({ id: "queryBuilder_value_false" }), value: "false" }
   ];
 
+  const safeValue = value || "true";
   const selectedOption = QueryBuilderBooleanOptions.find(
-    (option) => option.value === value
+    (option) => option.value === safeValue
   );
 
   return (
@@ -78,58 +87,16 @@ export function transformBooleanSearchToDSL({
 
   const { parentType } = fieldInfo;
 
-  switch (operation) {
-    // Empty for the boolean.
-    case "empty":
-      return parentType
-        ? {
-            bool: {
-              should: [
-                {
-                  bool: {
-                    must_not: {
-                      nested: {
-                        path: "included",
-                        query: {
-                          bool: {
-                            must: [
-                              existsQuery(fieldPath),
-                              includedTypeQuery(parentType)
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                {
-                  bool: {
-                    must_not: includedTypeQuery(parentType)
-                  }
-                }
-              ]
-            }
-          }
-        : {
-            bool: {
-              must_not: existsQuery(fieldPath)
-            }
-          };
+  const safeValue = value || "true";
 
-    // Not Empty for the boolean.
+  switch (operation) {
+    // Empty values only.
+    case "empty":
+      return emptyFieldQuery(fieldPath, parentType);
+
+    // Not empty values only.
     case "notEmpty":
-      return parentType
-        ? {
-            nested: {
-              path: "included",
-              query: {
-                bool: {
-                  must: [existsQuery(fieldPath), includedTypeQuery(parentType)]
-                }
-              }
-            }
-          }
-        : existsQuery(fieldPath);
+      return notEmptyFieldQuery(fieldPath, parentType);
 
     // Exact match for the boolean.
     default:
@@ -140,13 +107,13 @@ export function transformBooleanSearchToDSL({
               query: {
                 bool: {
                   must: [
-                    termQuery(fieldPath, value, false),
+                    termQuery(fieldPath, safeValue, false),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
-        : termQuery(fieldPath, value, false);
+        : termQuery(fieldPath, safeValue, false);
   }
 }

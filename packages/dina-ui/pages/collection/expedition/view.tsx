@@ -7,7 +7,7 @@ import {
 import _ from "lodash";
 import { ViewPageLayout } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { getColumnDefinition } from "../collecting-event/list";
+import { columns } from "../collecting-event/list";
 import { ExpeditionFormLayout } from "../../../components/collection/expedition/ExpeditionFormLayout";
 import {
   Expedition,
@@ -34,7 +34,7 @@ export default function ExpeditionDetailsPage() {
           <FieldSet legend={<DinaMessage id="collectingEvents" />}>
             <QueryTable<CollectingEvent>
               path="collection-api/collecting-event"
-              columns={getColumnDefinition()}
+              columns={columns}
               filter={SimpleSearchFilterBuilder.create<Expedition>()
                 .where(
                   "expedition.uuid" as any,

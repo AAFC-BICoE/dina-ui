@@ -141,6 +141,7 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function Edge cases If 
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Empty operation Normal field 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
         "bool": Object {
@@ -152,12 +153,8 @@ Object {
         },
       },
       Object {
-        "bool": Object {
-          "must": Object {
-            "term": Object {
-              "data.attributes.textField.keyword": "",
-            },
-          },
+        "term": Object {
+          "data.attributes.textField.keyword": "",
         },
       },
     ],
@@ -168,64 +165,55 @@ Object {
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Empty operation With relationship as field 1`] = `
 Object {
   "bool": Object {
+    "minimum_should_match": 1,
     "should": Array [
       Object {
-        "bool": Object {
-          "should": Array [
-            Object {
-              "bool": Object {
-                "must_not": Object {
-                  "nested": Object {
-                    "path": "included",
-                    "query": Object {
-                      "bool": Object {
-                        "must": Array [
-                          Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collection",
+                  },
+                },
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must_not": Object {
                             "exists": Object {
                               "field": "includes.name",
                             },
                           },
-                          Object {
-                            "term": Object {
-                              "included.type": "collection",
-                            },
-                          },
-                        ],
+                        },
                       },
-                    },
-                  },
-                },
-              },
-            },
-            Object {
-              "nested": Object {
-                "path": "included",
-                "query": Object {
-                  "bool": Object {
-                    "must": Array [
                       Object {
                         "term": Object {
                           "includes.name.keyword": "",
                         },
                       },
-                      Object {
-                        "term": Object {
-                          "included.type": "collection",
-                        },
-                      },
                     ],
                   },
                 },
-              },
+              ],
             },
-          ],
+          },
         },
       },
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "included.type": "collection",
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "term": Object {
+                  "included.type": "collection",
+                },
+              },
             },
           },
         },
@@ -441,50 +429,24 @@ Object {
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Not Equals operation With relationship as field 1`] = `
 Object {
   "bool": Object {
-    "should": Array [
+    "must_not": Array [
       Object {
         "nested": Object {
           "path": "included",
           "query": Object {
             "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "collection",
+              "must": Array [
+                Object {
+                  "term": Object {
+                    "included.type": "collection",
+                  },
                 },
-              },
-              "must_not": Object {
-                "term": Object {
-                  "includes.name": "text search",
+                Object {
+                  "term": Object {
+                    "includes.name": "text search",
+                  },
                 },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "nested": Object {
-          "path": "included",
-          "query": Object {
-            "bool": Object {
-              "must": Object {
-                "term": Object {
-                  "included.type": "collection",
-                },
-              },
-              "must_not": Object {
-                "exists": Object {
-                  "field": "includes.name",
-                },
-              },
-            },
-          },
-        },
-      },
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "term": Object {
-              "included.type": "collection",
+              ],
             },
           },
         },
@@ -497,11 +459,13 @@ Object {
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Not empty operation Normal field 1`] = `
 Object {
   "bool": Object {
-    "must": Object {
-      "exists": Object {
-        "field": "data.attributes.textField",
+    "must": Array [
+      Object {
+        "exists": Object {
+          "field": "data.attributes.textField",
+        },
       },
-    },
+    ],
     "must_not": Object {
       "term": Object {
         "data.attributes.textField.keyword": "",
@@ -519,13 +483,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.type": "collection",
+            "exists": Object {
+              "field": "includes.name",
             },
           },
           Object {
-            "exists": Object {
-              "field": "includes.name",
+            "term": Object {
+              "included.type": "collection",
             },
           },
         ],

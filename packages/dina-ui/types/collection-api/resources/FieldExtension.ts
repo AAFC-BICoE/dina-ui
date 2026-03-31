@@ -1,5 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { MultilingualDescription } from "../../common";
+import { MultilingualTitle } from "./VocabularyElement";
 
 export interface FieldExtensionAttributes {
   type: "extension";
@@ -13,12 +14,15 @@ export interface FieldExtensionAttributes {
 
 export type ExtensionField = {
   key: string;
-  term: string;
   name: string;
+  term: string;
+  unit: string;
+  vocabularyElementType: string;
   definition: string;
   dinaComponent: string;
   acceptedValues: string[];
   multilingualDescription: MultilingualDescription;
+  multilingualTitle: MultilingualTitle;
 };
 
 export type FieldExtension = KitsuResource & FieldExtensionAttributes;
