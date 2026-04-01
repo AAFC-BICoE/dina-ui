@@ -21,7 +21,8 @@ import {
 import {
   convertColumnsToAliases,
   convertColumnsToPaths,
-  getColumnFunctions
+  getColumnFunctions,
+  getEntityKeyFromIndexName
 } from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
 import {
   getExport,
@@ -59,18 +60,6 @@ import { useSessionStorage } from "usehooks-ts";
 import { MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS } from "../../collection/material-sample/list";
 import { OBJECT_STORE_NON_EXPORTABLE_COLUMNS } from "../../object-store/object/list";
 import useSavedExports, { VISIBILITY_OPTIONS } from "./useSavedExports";
-import {
-  getExport,
-  MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
-  MAX_OBJECT_EXPORT_TOTAL
-} from "packages/common-ui/lib/export/exportUtils";
-import {
-  convertColumnsToAliases,
-  convertColumnsToPaths,
-  getColumnFunctions,
-  getEntityKeyFromIndexName
-} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
-import { FaFileExport, FaHistory } from "react-icons/fa";
 
 export interface SavedExportOption {
   label?: string;
