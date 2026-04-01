@@ -1,8 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
+//import { UncontrolledTreeEnvironment, Tree, StaticTreeDataProvider, TreeItem } from 'react-complex-tree';
 import { Card, CardHeader } from "react-bootstrap";
 //import "echarts/theme/inspired";
+import { useMessage } from "../context/MessageContext";
+
+const TAXON_LEVELS = [
+  "by_kingdom",
+  "by_phylum",
+  "by_class",
+  "by_order",
+  "by_family",
+  "by_genus",
+  "by_species"
+];
 
 const getAggregationKey = (aggName: string, obj: any): string | null => {
   if (!obj || typeof obj !== "object") return null;
@@ -40,31 +52,33 @@ function convertBucketsToSunburst(
     const nextAggKey = getAggregationKey(aggName, bucket);
     const childrenBuckets = nextAggKey ? bucket[nextAggKey]?.buckets ?? [] : [];
 
+    const children = convertBucketsToSunburst(
+      childrenBuckets,
+      aggNames,
+      depth + 1
+    );
+
     return {
+      id: bucket.key,
       name: bucket.key,
       value: bucket.doc_count,
-      children: convertBucketsToSunburst(childrenBuckets, aggNames, depth + 1)
+      children: Array.isArray(children) ? children : []
     };
   });
 }
 
 export default function TaxonomySunburstChart({ query }) {
   const { apiClient } = useApiClient();
+  const { message } = useMessage();
+  const chartRef = useRef<any>(null);
+  const [chartType, setChartType] = useState("sunburst");
 
   type SourceFilter = "GNA" | "CUSTOM" | "VERBATIM" | "NO_DETERMINATION" | null;
 
   const [selectedSource, setSelectedSource] = useState<SourceFilter>(null);
   const [chartData, setChartData] = useState([]);
-
-  const TAXON_LEVELS = [
-    "by_kingdom",
-    "by_phylum",
-    "by_class",
-    "by_order",
-    "by_family",
-    "by_genus",
-    "by_species"
-  ];
+  const [chartReady, setChartReady] = useState(false);
+  //const [treeItems, setTreeItems] = useState<Record<string, TreeItem> | null>(null);
 
   function buildSourceFilter(selectedSource) {
     switch (selectedSource) {
@@ -201,10 +215,6 @@ export default function TaxonomySunburstChart({ query }) {
     }
   }
 
-  useEffect(() => {
-    fetchData(selectedSource);
-  }, [query, apiClient, selectedSource]);
-
   const TAXON_LABELS = [
     "Kingdom",
     "Phylum",
@@ -215,8 +225,78 @@ export default function TaxonomySunburstChart({ query }) {
     "Species"
   ];
 
-  const graphOptions = {
-    sunburst: {
+  function getLevelOption() {
+    return [
+      {
+        itemStyle: {
+          borderColor: "#666",
+          borderWidth: 0,
+          gapWidth: 1
+        },
+        upperLabel: { show: false }
+      },
+
+      {
+        colorSaturation: [0.25, 0.35],
+        itemStyle: {
+          borderColor: "#444",
+          borderWidth: 4,
+          gapWidth: 1
+        },
+        emphasis: {
+          itemStyle: { borderColor: "#ccc" }
+        }
+      },
+
+      {
+        colorSaturation: [0.25, 0.35],
+        itemStyle: {
+          borderWidth: 4,
+          gapWidth: 1,
+          borderColorSaturation: 0.25
+        }
+      },
+
+      {
+        colorSaturation: [0.35, 0.45],
+        itemStyle: {
+          borderWidth: 4,
+          gapWidth: 1,
+          borderColorSaturation: 0.35
+        }
+      },
+
+      {
+        colorSaturation: [0.45, 0.55],
+        itemStyle: {
+          borderWidth: 4,
+          gapWidth: 1,
+          borderColorSaturation: 0.4
+        }
+      },
+
+      {
+        colorSaturation: [0.55, 0.65],
+        itemStyle: {
+          borderWidth: 4,
+          gapWidth: 1,
+          borderColorSaturation: 0.5
+        }
+      },
+
+      {
+        colorSaturation: [0.65, 0.75],
+        itemStyle: {
+          borderWidth: 3,
+          gapWidth: 1,
+          borderColorSaturation: 0.6
+        }
+      }
+    ];
+  }
+
+  const graphOptions = useMemo(() => {
+    const sunburstOption = {
       tooltip: {
         trigger: "item",
         padding: 4,
@@ -263,21 +343,149 @@ export default function TaxonomySunburstChart({ query }) {
           }
         }
       ]
-    },
-    treemap: {
+    };
+    const treemapOption = {
+      tooltip: {
+        trigger: "item",
+        padding: 4,
+        borderWidth: 2,
+        formatter: function (info) {
+          const pathLen = info.treePathInfo ? info.treePathInfo.length : 0;
+          const depth = pathLen - 1;
+
+          if (depth === 0) return "";
+
+          const labelIndex = depth - 1;
+          const label = TAXON_LABELS[labelIndex] || "";
+
+          return `
+            <div style="background:#fff;
+            padding:6px 8px;
+            border-radius:4px;
+            font-family:Arial;">
+              <strong style="color:#333; font-size:14px;">
+                ${label} : ${info.name}
+              </strong><br/>
+              <span style="color:#333; font-size:12px;">
+                Value: ${info.value}
+              </span>
+            </div>
+          `;
+        }
+      },
+
       series: [
         {
+          name: "ALL",
           type: "treemap",
           roam: true,
-          nodeClick: "zoomToNode",
           breadcrumb: { show: true },
+          initialTreeDepth: -1,
+          leafDepth: null,
+
+          upperLabel: {
+            show: true,
+            position: "insideTopLeft",
+            height: 22,
+            fontSize: 12
+          },
+          itemStyle: {
+            borderColor: "#fff"
+          },
+          levels: getLevelOption(),
+
           data: chartData
         }
       ]
-    }
+    };
+    return {
+      sunburst: sunburstOption,
+      treemap: treemapOption
+    };
+  }, [chartData]);
+
+  const dataReady = graphOptions?.[chartType]?.series?.[0]?.data?.length > 0;
+
+  const option = useMemo(() => {
+    if (!dataReady) return { series: [] };
+    return graphOptions[chartType];
+  }, [chartType, dataReady, graphOptions]);
+
+  useEffect(() => {
+    if (!chartReady) return;
+    if (!chartRef.current) return;
+    if (!message) return;
+
+    const echartsInstance = chartRef.current;
+    if (!echartsInstance) return;
+
+    const id = setTimeout(() => {
+      if (chartType === "sunburst") {
+        echartsInstance.dispatchAction({
+          type: "sunburstRootToNode",
+          seriesIndex: 0,
+          targetNodeId: message
+        });
+      }
+      if (chartType === "treemap") {
+        const series = echartsInstance.getModel().getSeriesByIndex(0);
+        const tree = series.getData().tree;
+        const node = tree.getNodeById(message);
+
+        if (!node) return;
+
+        const isLeaf = !node.children || node.children.length === 0;
+
+        if (isLeaf) {
+          echartsInstance.dispatchAction({
+            type: "highlight",
+            seriesIndex: 0,
+            dataIndex: node.dataIndex
+          });
+          return;
+        }
+
+        echartsInstance.dispatchAction({
+          type: "treemapRootToNode",
+          seriesIndex: 0,
+          targetNodeId: message
+        });
+      }
+    }, 100);
+
+    return () => clearTimeout(id);
+  }, [message, chartReady, chartType]);
+
+  const onChartReady = (instance: any) => {
+    chartRef.current = instance;
+    setChartReady(true);
+
+    instance.off("click"); //avoid duplicate handlers
+    instance.on("click", (params: any) => {
+      if (!params || typeof params !== "object") return;
+
+      const isBreadcrumb =
+        params.targetType === "breadcrumb" ||
+        (Array.isArray(params.treePathInfo) && !params.data);
+
+      if (isBreadcrumb) {
+        return;
+      }
+
+      const node = params.data;
+      if (!node) return;
+
+      instance.dispatchAction({
+        type: "treemapRootToNode",
+        seriesIndex: 0,
+        targetNodeId: node.id
+      });
+    });
   };
 
-  const [chartType, setChartType] = useState("sunburst");
+  useEffect(() => {
+    fetchData(selectedSource);
+  }, [selectedSource]);
 
   return chartData.length ? (
     <div>
@@ -311,6 +519,7 @@ export default function TaxonomySunburstChart({ query }) {
           </div>
           <div style={{ display: "flex", gap: "8px" }}>
             <button
+              type="button"
               onClick={() => setChartType("sunburst")}
               style={{
                 padding: "6px 12px",
@@ -325,6 +534,7 @@ export default function TaxonomySunburstChart({ query }) {
             </button>
 
             <button
+              type="button"
               onClick={() => setChartType("treemap")}
               style={{
                 padding: "6px 12px",
@@ -340,9 +550,13 @@ export default function TaxonomySunburstChart({ query }) {
           </div>
         </CardHeader>
         <ReactECharts
-          option={graphOptions[chartType]}
+          option={option}
           //theme="inspired"
-          style={{ height: "700px", width: "100%" }}
+          style={{ height: "800px", width: "100%" }}
+          ref={chartRef}
+          onChartReady={onChartReady}
+          notMerge={false}
+          lazyUpdate={true}
         />
       </Card>
     </div>
