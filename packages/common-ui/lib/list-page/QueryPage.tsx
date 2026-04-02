@@ -2,6 +2,7 @@ import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
 import { ColumnSort, Row, SortingState } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
+import SimpleQueryBuilderFacet from "../../../dina-ui/components/collection/SimpleQueryBuilderFacet";
 import _ from "lodash";
 import React, {
   useCallback,
@@ -51,6 +52,7 @@ import {
   defaultQueryTree,
   emptyQueryTree
 } from "./query-builder/QueryBuilder";
+import QueryViewer from "./query-builder/QueryViewer";
 import {
   applyGroupFilters,
   applyPagination,
@@ -81,6 +83,8 @@ import {
   createLastUsedSavedSearchChangedKey,
   createSessionStorageLastUsedTreeKey
 } from "./saved-searches/SavedSearch";
+import { ToggleButton, ToggleButtonGroup, Offcanvas, Button } from 'react-bootstrap';
+import { FaArrowRotateLeft } from "react-icons/fa6";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -266,11 +270,11 @@ export interface QueryPageProps<TData extends KitsuResource> {
   bulkSplitPath?: string;
 
   reactTableProps?:
-    | Partial<ReactTableProps<TData>>
-    | ((
-        responseData: PersistedResource<TData>[] | undefined,
-        CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>
-      ) => Partial<ReactTableProps<TData>>);
+  | Partial<ReactTableProps<TData>>
+  | ((
+    responseData: PersistedResource<TData>[] | undefined,
+    CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>
+  ) => Partial<ReactTableProps<TData>>);
 
   /**
    * When enabled, the user will see the results table with a selection table.
@@ -372,6 +376,23 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * Default active tab (if tabs are provided)
    */
   defaultTab?: string;
+
+  /**
+   * Whether to enable the simple query builder
+   */
+  enableSimpleQueryBuilder?: boolean;
+
+  /**
+   * Function that adds the aggregations used to generate fields, 
+   * values, and value counts for the simple query builder
+   */
+  applyFilterBuilderAggregations?: any;
+
+   /**
+   * Function that processes the aggregations used to generate fields, 
+   * values, and value counts for the simple query builder
+   */
+  processFilterBuilderAggregations?: any;
 }
 
 /**
@@ -420,7 +441,10 @@ export function QueryPage<TData extends KitsuResource>({
   onDeselect,
   enableColumnSelector = true,
   tabs,
-  defaultTab
+  defaultTab,
+  enableSimpleQueryBuilder,
+  applyFilterBuilderAggregations,
+  processFilterBuilderAggregations
 }: QueryPageProps<TData>) {
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
@@ -434,6 +458,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
+  const [aggregations, setAggregations] = useState<any>({});
   const [elasticSearchQuery, setElasticSearchQuery] = useState();
 
   // Total number of records from the query. This is not the total displayed on the screen.
@@ -496,9 +521,9 @@ export function QueryPage<TData extends KitsuResource>({
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(
     bulkDeleteButtonProps ||
-      bulkEditPath ||
-      dataExportProps ||
-      attachSelectedButtonsProps
+    bulkEditPath ||
+    dataExportProps ||
+    attachSelectedButtonsProps
   );
 
   // Query Page error message state
@@ -533,6 +558,8 @@ export function QueryPage<TData extends KitsuResource>({
       createSessionStorageLastUsedTreeKey(uniqueName),
       defaultJsonTree
     );
+
+  const [queryBuilderMode, setQueryBuilderMode] = useState<string>('simple');
 
   /** If column selector is not being used, just load the default columns in. */
   useEffect(() => {
@@ -640,6 +667,9 @@ export function QueryPage<TData extends KitsuResource>({
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
     queryDSL = applySortingRules(queryDSL, sortingRules, combinedColumns);
     queryDSL = applySourceFiltering(queryDSL, combinedColumns);
+    if (enableSimpleQueryBuilder) {
+      queryDSL = applyFilterBuilderAggregations(queryDSL);
+    }
 
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) {
@@ -657,7 +687,12 @@ export function QueryPage<TData extends KitsuResource>({
       // The included section will be transformed from an array to an object with the type name for each relationship.
       elasticSearchRequest(queryDSL)
         .then((result) => {
+          setAggregations(result.aggregations);
+
+          result = result.hits;
+
           const processedResult = processResults(result);
+
 
           // If we have reached the count limit, we will need to perform another request for the true
           // query size.
@@ -672,6 +707,7 @@ export function QueryPage<TData extends KitsuResource>({
           } else {
             setTotalRecords(result?.total?.value ?? 0);
           }
+
 
           setAvailableResources(processedResult);
           setSearchResults(processedResult);
@@ -836,7 +872,7 @@ export function QueryPage<TData extends KitsuResource>({
         }
       }
     );
-    return resp?.data?.hits;
+    return resp?.data
   }
 
   /**
@@ -892,16 +928,16 @@ export function QueryPage<TData extends KitsuResource>({
 
     const selectColumn = showSelectColumn
       ? [
-          {
-            id: "selectColumn",
-            cell: ({ row: { original: resource } }) => (
-              <SelectCheckBox key={resource.id} resource={resource} />
-            ),
-            header: () => <SelectCheckBoxHeader />,
-            enableSorting: false,
-            size: 50
-          }
-        ]
+        {
+          id: "selectColumn",
+          cell: ({ row: { original: resource } }) => (
+            <SelectCheckBox key={resource.id} resource={resource} />
+          ),
+          header: () => <SelectCheckBoxHeader />,
+          enableSorting: false,
+          size: 50
+        }
+      ]
       : [];
     // Get unique columns once
     const uniqueColumns = _.uniqBy(
@@ -916,16 +952,16 @@ export function QueryPage<TData extends KitsuResource>({
   const columnsSelected: TableColumn<TData>[] = [
     ...(selectionMode
       ? [
-          {
-            id: "columnSelected",
-            cell: ({ row: { original: resource } }) => (
-              <DeselectCheckBox key={resource.id} resource={resource} />
-            ),
-            header: () => <DeselectCheckBoxHeader />,
-            enableSorting: false,
-            size: 50
-          }
-        ]
+        {
+          id: "columnSelected",
+          cell: ({ row: { original: resource } }) => (
+            <DeselectCheckBox key={resource.id} resource={resource} />
+          ),
+          header: () => <DeselectCheckBoxHeader />,
+          enableSorting: false,
+          size: 50
+        }
+      ]
       : []),
     ...columns
   ];
@@ -943,6 +979,7 @@ export function QueryPage<TData extends KitsuResource>({
     setSortingRules(defaultSort ?? DEFAULT_SORT);
     setError(undefined);
     setPageOffset(0);
+    resetFacet();
 
     // Reset the query to empty.
     router.push(
@@ -965,6 +1002,14 @@ export function QueryPage<TData extends KitsuResource>({
     setPageOffset(0);
     setSessionStorageQueryTree(Utils.getTree(queryBuilderTree));
   };
+
+  const onSimpleSubmit = (newTree) => {
+    isActionTriggeredQuery.current = true;
+    setQueryBuilderTree(newTree);
+    setSubmittedQueryBuilderTree(newTree);
+    setPageOffset(0);
+    setSessionStorageQueryTree(Utils.getTree(newTree));
+  }
 
   /**
    * When the group filter has changed, store the new value for the search.
@@ -1207,262 +1252,371 @@ export function QueryPage<TData extends KitsuResource>({
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
+  const simpleFilterData = useMemo(() => {
+
+    const aggs = processFilterBuilderAggregations(aggregations ?? {});
+
+    return aggs
+
+  }, [aggregations]);
+
+  // Reset filter when switching from advanced to simple filter builder
+  function onQueryBuilderModeChange(mode: string) {
+    if (mode == 'simple') {
+      setQueryBuilderTree(defaultQueryTree());
+      setQueryBuilderMode(mode);
+    } else {
+      setQueryBuilderMode(mode);
+    }
+  }
+
+
+  // Utils for resizing content to fit simple filter builder
+  const getTableSectionWidth = (width) => {
+    if (width < 1100) {
+      return 5;
+    } else if (width < 1200) {
+      return 6;
+    } else if (width < 1500) {
+      return 7;
+    } else if (width < 1800) {
+      return 8;
+    } else if (width < 2000) {
+      return 9;
+    } else if (width < 2300) {
+      return 10;
+    } else if (width < 2400) {
+      return 11;
+    } else {
+      return 12;
+    }
+  };
+
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup function to remove event listener on component unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  const tableSectionWidth = queryBuilderMode === 'simple'
+    ? getTableSectionWidth(screenWidth)
+    : 12;
+
+
+  // Utils for resetting simple query builder
+  const facetRef = useRef();
+
+  const resetFacet = () => {
+    if (facetRef.current) {
+      (facetRef.current as any).resetFacet();
+    }
+  }
+
   return (
     <>
-      {!viewMode && (
-        <>
-          {validationErrors.length > 0 && (
-            <div
-              className="alert alert-danger"
-              style={{
-                whiteSpace: "pre-line"
+      {
+        enableSimpleQueryBuilder && <Offcanvas
+          show={queryBuilderMode === 'simple'}
+          placement="end"
+          scroll={true}
+          backdrop={false}
+          onHide={() => setQueryBuilderMode('advanced')}
+        >
+          <Offcanvas.Header closeButton={true}>
+            <Offcanvas.Title>
+              {"Filters"}
+            </Offcanvas.Title>
+          </Offcanvas.Header>
+          <Offcanvas.Body>
+            <Button
+              onClick={() => {
+                onReset();
               }}
+              variant="secondary"
+              className="me-2"
             >
-              <h5>Validation Errors</h5>
-              <ul>
-                {validationErrors.map((validationError: ValidationError) => (
-                  <li key={validationError.fieldName}>
-                    <strong>{validationError.fieldName}: </strong>
-                    {validationError.errorMessage}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <QueryBuilderMemo
-            onCopyToClipboard={onCopyToClipboard}
-            indexName={indexName}
-            queryBuilderTree={queryBuilderTree}
-            setQueryBuilderTree={onQueryBuildTreeChange}
-            queryBuilderConfig={queryBuilderConfig}
-            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-            setPageOffset={setPageOffset}
-            onSubmit={onSubmit}
-            onReset={onReset}
-            setGroups={setGroups}
-            groups={groups}
-            uniqueName={uniqueName}
-            validationErrors={validationErrors}
-            triggerSearch={isActionTriggeredQuery}
-          />
-        </>
-      )}
+              <FaArrowRotateLeft className="me-2" />
+              <CommonMessage id="resetButtonText" />
+            </Button>
+            <SimpleQueryBuilderFacet
+              data={simpleFilterData}
+              queryBuilderTree={queryBuilderTree}
+              onFilterChange={onSimpleSubmit}
+              ref={facetRef} />
+          </Offcanvas.Body>
+        </Offcanvas>
+      }
 
-      <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
-        {/* Group Selection */}
-        {!viewMode ? (
-          <DinaFormSection horizontal={"flex"}>
-            <div className="row">
-              <GroupSelectFieldMemoized
-                isMulti={true}
-                name="group"
-                className="col-md-4 mt-3"
-                onChange={onGroupChange}
+      <div className={`table-section col-${tableSectionWidth}`}>
+        {!viewMode && (
+          <>
+            {validationErrors.length > 0 && (
+              <div
+                className="alert alert-danger"
+                style={{
+                  whiteSpace: "pre-line"
+                }}
+              >
+                <h5>Validation Errors</h5>
+                <ul>
+                  {validationErrors.map((validationError: ValidationError) => (
+                    <li key={validationError.fieldName}>
+                      <strong>{validationError.fieldName}: </strong>
+                      {validationError.errorMessage}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {queryBuilderMode === 'simple' && enableSimpleQueryBuilder ?
+              <QueryViewer tree={queryBuilderTree} config={queryBuilderConfig} /> :
+              <QueryBuilderMemo
+                onCopyToClipboard={onCopyToClipboard}
+                indexName={indexName}
+                queryBuilderTree={queryBuilderTree}
+                setQueryBuilderTree={onQueryBuildTreeChange}
+                queryBuilderConfig={queryBuilderConfig}
+                setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+                setPageOffset={setPageOffset}
+                onSubmit={onSubmit}
+                onReset={onReset}
+                setGroups={setGroups}
                 groups={groups}
+                uniqueName={uniqueName}
+                validationErrors={validationErrors}
+                triggerSearch={isActionTriggeredQuery}
               />
-              {/* Bulk edit buttons - Only shown when not in selection mode. */}
-              {!selectionMode && (
-                <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
-                  {enableColumnSelector && (
-                    <ColumnSelectorMemo
-                      uniqueName={uniqueName}
-                      exportMode={false}
-                      indexMapping={indexMap}
-                      dynamicFieldsMappingConfig={dynamicFieldMapping}
-                      displayedColumns={displayedColumns as any}
-                      setDisplayedColumns={onDisplayedColumnsChange as any}
-                      defaultColumns={columns as any}
-                      setColumnSelectorLoading={setColumnSelectorLoading}
-                      excludedRelationshipTypes={excludedRelationshipTypes}
-                      mandatoryDisplayedColumns={mandatoryDisplayedColumns}
-                      nonExportableColumns={nonExportableColumns}
-                    />
-                  )}
-                  {bulkEditPath && (
-                    <BulkEditButton
-                      pathname={bulkEditPath}
-                      singleEditPathName={singleEditPath}
-                    />
-                  )}
-                  {bulkDeleteButtonProps && (
-                    <BulkDeleteButton {...bulkDeleteButtonProps} />
-                  )}
-                  {dataExportProps && (
-                    <DataExportButton
-                      pathname={dataExportProps.dataExportPath}
-                      entityLink={dataExportProps.entityLink}
-                      totalRecords={totalRecords}
-                      query={elasticSearchQuery}
-                      uniqueName={uniqueName}
-                      columns={columns}
-                      dynamicFieldMapping={dynamicFieldMapping}
-                      indexName={indexName}
-                    />
-                  )}
-                  {bulkSplitPath && (
-                    <BulkSplitButton pathname={bulkSplitPath} />
-                  )}
-                  {attachSelectedButtonsProps && (
-                    <AttachSelectedButton {...attachSelectedButtonsProps} />
-                  )}
-                </div>
-              )}
-            </div>
-          </DinaFormSection>
-        ) : (
-          <DinaFormSection horizontal={"flex"}>
-            <div className="row">
-              {/* Bulk edit buttons - Only shown when not in selection mode. */}
-              {!selectionMode && (
-                <div className="col-md-12 mt-3 d-flex gap-2 justify-content-end align-items-start">
-                  {enableColumnSelector && (
-                    <ColumnSelectorMemo
-                      uniqueName={uniqueName}
-                      exportMode={false}
-                      indexMapping={indexMap}
-                      displayedColumns={displayedColumns as any}
-                      setDisplayedColumns={onDisplayedColumnsChange as any}
-                      defaultColumns={columns as any}
-                      setColumnSelectorLoading={setColumnSelectorLoading}
-                      dynamicFieldsMappingConfig={dynamicFieldMapping}
-                      excludedRelationshipTypes={excludedRelationshipTypes}
-                      mandatoryDisplayedColumns={mandatoryDisplayedColumns}
-                      nonExportableColumns={nonExportableColumns}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
-          </DinaFormSection>
+            }
+          </>
         )}
 
-        <div
-          className="query-table-wrapper"
-          role="search"
-          aria-label={formatMessage({ id: "queryTable" })}
-        >
-          <div className="row">
-            <div className={selectionMode ? "col-5" : "col-12"}>
-              <div className="d-flex align-items-end justify-content-between">
-                <div className="d-flex align-items-end">
-                  <span id="queryPageCount">
-                    {/* Loading indicator when total is not calculated yet. */}
-                    {loading || columnSelectorLoading ? (
-                      <></>
-                    ) : (
-                      <CommonMessage
-                        id="tableTotalCount"
-                        values={{ totalCount: formatNumber(totalRecords) }}
+        <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
+          {/* Group Selection */}
+          {!viewMode ? (
+            <DinaFormSection horizontal={"flex"}>
+              <div className="row">
+                <GroupSelectFieldMemoized
+                  isMulti={true}
+                  name="group"
+                  className="col-md-4 mt-3"
+                  onChange={onGroupChange}
+                  groups={groups}
+                />
+                {
+                  enableSimpleQueryBuilder && <ToggleButtonGroup type="radio" name="options" value={queryBuilderMode} onChange={onQueryBuilderModeChange}>
+                    <ToggleButton id="tbg-radio-1" value={'simple'}>Simple</ToggleButton>
+                    <ToggleButton id="tbg-radio-2" value={'advanced'}>Advanced</ToggleButton>
+                  </ToggleButtonGroup>
+                }
+
+                {/* Bulk edit buttons - Only shown when not in selection mode. */}
+                {!selectionMode && (
+                  <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
+                    {enableColumnSelector && (
+                      <ColumnSelectorMemo
+                        uniqueName={uniqueName}
+                        exportMode={false}
+                        indexMapping={indexMap}
+                        dynamicFieldsMappingConfig={dynamicFieldMapping}
+                        displayedColumns={displayedColumns as any}
+                        setDisplayedColumns={onDisplayedColumnsChange as any}
+                        defaultColumns={columns as any}
+                        setColumnSelectorLoading={setColumnSelectorLoading}
+                        excludedRelationshipTypes={excludedRelationshipTypes}
+                        mandatoryDisplayedColumns={mandatoryDisplayedColumns}
+                        nonExportableColumns={nonExportableColumns}
                       />
                     )}
-                  </span>
+                    {bulkEditPath && (
+                      <BulkEditButton
+                        pathname={bulkEditPath}
+                        singleEditPathName={singleEditPath}
+                      />
+                    )}
+                    {bulkDeleteButtonProps && (
+                      <BulkDeleteButton {...bulkDeleteButtonProps} />
+                    )}
+                    {dataExportProps && (
+                      <DataExportButton
+                        pathname={dataExportProps.dataExportPath}
+                        entityLink={dataExportProps.entityLink}
+                        totalRecords={totalRecords}
+                        query={elasticSearchQuery}
+                        uniqueName={uniqueName}
+                        columns={columns}
+                        dynamicFieldMapping={dynamicFieldMapping}
+                        indexName={indexName}
+                      />
+                    )}
+                    {bulkSplitPath && (
+                      <BulkSplitButton pathname={bulkSplitPath} />
+                    )}
+                    {attachSelectedButtonsProps && (
+                      <AttachSelectedButton {...attachSelectedButtonsProps} />
+                    )}
+                  </div>
+                )}
+              </div>
+            </DinaFormSection>
+          ) : (
+            <DinaFormSection horizontal={"flex"}>
+              <div className="row">
+                {/* Bulk edit buttons - Only shown when not in selection mode. */}
+                {!selectionMode && (
+                  <div className="col-md-12 mt-3 d-flex gap-2 justify-content-end align-items-start">
+                    {enableColumnSelector && (
+                      <ColumnSelectorMemo
+                        uniqueName={uniqueName}
+                        exportMode={false}
+                        indexMapping={indexMap}
+                        displayedColumns={displayedColumns as any}
+                        setDisplayedColumns={onDisplayedColumnsChange as any}
+                        defaultColumns={columns as any}
+                        setColumnSelectorLoading={setColumnSelectorLoading}
+                        dynamicFieldsMappingConfig={dynamicFieldMapping}
+                        excludedRelationshipTypes={excludedRelationshipTypes}
+                        mandatoryDisplayedColumns={mandatoryDisplayedColumns}
+                        nonExportableColumns={nonExportableColumns}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            </DinaFormSection>
+          )}
 
-                  {/* Multi sort tooltip - Only shown if it's possible to sort */}
-                  {resolvedReactTableProps.enableMultiSort && (
-                    <MultiSortTooltip />
+          <div
+            className="query-table-wrapper"
+            role="search"
+            aria-label={formatMessage({ id: "queryTable" })}
+          >
+            <div className="row">
+              <div className={selectionMode ? "col-5" : "col-12"}>
+                <div className="d-flex align-items-end justify-content-between">
+                  <div className="d-flex align-items-end">
+                    <span id="queryPageCount">
+                      {/* Loading indicator when total is not calculated yet. */}
+                      {loading || columnSelectorLoading ? (
+                        <></>
+                      ) : (
+                        <CommonMessage
+                          id="tableTotalCount"
+                          values={{ totalCount: formatNumber(totalRecords) }}
+                        />
+                      )}
+                    </span>
+
+                    {/* Multi sort tooltip - Only shown if it's possible to sort */}
+                    {resolvedReactTableProps.enableMultiSort && (
+                      <MultiSortTooltip />
+                    )}
+                  </div>
+                </div>
+
+                {error && (
+                  <div
+                    className="alert alert-danger"
+                    style={{
+                      whiteSpace: "pre-line"
+                    }}
+                  >
+                    <p>
+                      {error.errors?.map((e) => e.detail).join("\n") ??
+                        String(error)}
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => {
+                        const newSort = defaultSort ?? DEFAULT_SORT;
+                        setError(undefined);
+                        onSortChange(newSort);
+                      }}
+                    >
+                      <CommonMessage id="resetSort" />
+                    </button>
+                  </div>
+                )}
+
+                {loading || columnSelectorLoading ? (
+                  <div
+                    className={
+                      "d-flex justify-content-center align-items-center h-100 query-page-loading-spinner " +
+                      (isFullScreen ? "fullscreen" : "")
+                    }
+                  >
+                    <LoadingSpinner loading={true} />
+                  </div>
+                ) : (
+                  renderTabsContent()
+                )}
+
+                <div className="mt-2">
+                  {/* Loading indicator when total is not calculated yet. */}
+                  {loading || columnSelectorLoading ? (
+                    <></>
+                  ) : (
+                    <CommonMessage
+                      id="tableTotalCount"
+                      values={{ totalCount: formatNumber(totalRecords) }}
+                    />
                   )}
                 </div>
               </div>
-
-              {error && (
-                <div
-                  className="alert alert-danger"
-                  style={{
-                    whiteSpace: "pre-line"
-                  }}
-                >
-                  <p>
-                    {error.errors?.map((e) => e.detail).join("\n") ??
-                      String(error)}
-                  </p>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => {
-                      const newSort = defaultSort ?? DEFAULT_SORT;
-                      setError(undefined);
-                      onSortChange(newSort);
-                    }}
-                  >
-                    <CommonMessage id="resetSort" />
-                  </button>
-                </div>
-              )}
-
-              {loading || columnSelectorLoading ? (
-                <div
-                  className={
-                    "d-flex justify-content-center align-items-center h-100 query-page-loading-spinner " +
-                    (isFullScreen ? "fullscreen" : "")
-                  }
-                >
-                  <LoadingSpinner loading={true} />
-                </div>
-              ) : (
-                renderTabsContent()
-              )}
-
-              <div className="mt-2">
-                {/* Loading indicator when total is not calculated yet. */}
-                {loading || columnSelectorLoading ? (
-                  <></>
-                ) : (
-                  <CommonMessage
-                    id="tableTotalCount"
-                    values={{ totalCount: formatNumber(totalRecords) }}
-                  />
-                )}
-              </div>
-            </div>
-            {selectionMode && (
-              <>
-                <div className="col-2 mt-5">
-                  <div className="select-all-checked-button">
-                    <FormikButton
-                      className="btn btn-primary w-100 mb-5"
-                      onClick={moveSelectedResultsToSelectedResources}
-                    >
-                      <div data-testid="move-resources-over">
-                        <FiChevronRight />
-                      </div>
-                    </FormikButton>
+              {selectionMode && (
+                <>
+                  <div className="col-2 mt-5">
+                    <div className="select-all-checked-button">
+                      <FormikButton
+                        className="btn btn-primary w-100 mb-5"
+                        onClick={moveSelectedResultsToSelectedResources}
+                      >
+                        <div data-testid="move-resources-over">
+                          <FiChevronRight />
+                        </div>
+                      </FormikButton>
+                    </div>
+                    <div className="deselect-all-checked-button">
+                      <FormikButton
+                        className="btn btn-dark w-100 mb-5"
+                        onClick={removeSelectedResources}
+                      >
+                        <div data-testid="remove-resources">
+                          <FiChevronLeft />
+                        </div>
+                      </FormikButton>
+                    </div>
                   </div>
-                  <div className="deselect-all-checked-button">
-                    <FormikButton
-                      className="btn btn-dark w-100 mb-5"
-                      onClick={removeSelectedResources}
-                    >
-                      <div data-testid="remove-resources">
-                        <FiChevronLeft />
-                      </div>
-                    </FormikButton>
-                  </div>
-                </div>
-                <div className="col-5">
-                  <span id="selectedResourceCount">
-                    <CommonMessage
-                      id="tableSelectedCount"
-                      values={{ totalCount: selectedResources?.length ?? 0 }}
+                  <div className="col-5">
+                    <span id="selectedResourceCount">
+                      <CommonMessage
+                        id="tableSelectedCount"
+                        values={{ totalCount: selectedResources?.length ?? 0 }}
+                      />
+                    </span>
+                    <ReactTable<TData>
+                      loading={loading}
+                      columns={columnsSelected}
+                      data={selectedResources ?? []}
+                      onRowMove={onRowMove}
+                      enableDnd={enableDnd}
+                      enableSorting={!enableDnd}
+                      showPagination={!enableDnd}
+                      manualPagination={true}
+                      smallPaginationButtons={true}
+                      enableFullscreen={true}
                     />
-                  </span>
-                  <ReactTable<TData>
-                    loading={loading}
-                    columns={columnsSelected}
-                    data={selectedResources ?? []}
-                    onRowMove={onRowMove}
-                    enableDnd={enableDnd}
-                    enableSorting={!enableDnd}
-                    showPagination={!enableDnd}
-                    manualPagination={true}
-                    smallPaginationButtons={true}
-                    enableFullscreen={true}
-                  />
-                </div>
-              </>
-            )}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </DinaForm>
+        </DinaForm>
+      </div>
     </>
   );
 }

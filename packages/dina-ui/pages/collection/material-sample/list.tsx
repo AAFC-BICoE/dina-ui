@@ -212,6 +212,68 @@ export function SampleListLayout({
   );
 }
 
+export function applyMaterialSampleAggregations(queryDSL) {
+
+    queryDSL.aggs = {
+        materialSampleType: {
+            terms: {
+                field: "data.attributes.materialSampleType.keyword",
+                size: 10,
+                order: { _count: "desc" }
+            }
+        },
+        createdBy: {
+            terms: {
+                field: "data.attributes.createdBy.keyword",
+                size: 10,
+                order: { _count: "desc" }
+            }
+        }
+    }
+
+    return queryDSL;
+}
+
+const getAggregationKey = (aggName: string, aggregations: any): string => {
+    if (aggName in aggregations) {
+        return aggName;
+    }
+    if (`sterms#${aggName}` in aggregations) {
+        return `sterms#${aggName}`;
+    }
+
+    for (const key of Object.keys(aggregations)) {
+        if (key.endsWith(aggName)) {
+            return key;
+        }
+    }
+
+    return aggName;
+};
+
+export function processMaterialSampleAggregations(aggs) {
+
+    const aggKey1 = getAggregationKey("materialSampleType", aggs);
+    const buckets1 = aggs[aggKey1]?.buckets ?? [];
+    const dataMap1: Record<string, number> = {
+        WHOLE_ORGANISM: 0,
+        MIXED_ORGANISMS: 0,
+        CULTURE_STRAIN: 0,
+        ORGANISM_PART: 0,
+        MOLECULAR_SAMPLE: 0
+    };
+    buckets1.map((b) => (dataMap1[b.key] = b.doc_count));
+
+    const aggKey2 = getAggregationKey("createdBy", aggs);
+    const buckets2 = aggs[aggKey2]?.buckets ?? [];
+    const dataMap2 = {};
+    buckets2.map((b) => (dataMap2[b.key] = b.doc_count));
+    return {
+        "materialSampleType": dataMap1,
+        "createdBy": dataMap2
+    }
+}
+
 export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
   {
     fields: [
@@ -582,6 +644,9 @@ export default function MaterialSampleListPage() {
             entityLink: "/collection/material-sample"
           }}
           bulkSplitPath="/collection/material-sample/bulk-split"
+          enableSimpleQueryBuilder={true}
+          applyFilterBuilderAggregations={applyMaterialSampleAggregations}
+          processFilterBuilderAggregations={processMaterialSampleAggregations}
         />
       </main>
       <Footer />
