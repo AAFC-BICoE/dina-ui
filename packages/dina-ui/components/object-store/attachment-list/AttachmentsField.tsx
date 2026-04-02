@@ -23,7 +23,7 @@ import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
 import classNames from "classnames";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { ColumnDef } from "@tanstack/react-table";
-import { FaPaperclip, FaTimes } from "react-icons/fa";
+import { FaPaperclip, FaTimes, FaUnlink } from "react-icons/fa";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -169,23 +169,27 @@ export function AttachmentsEditor({
     {
       id: "actionColumn",
       size: 0,
-      header: () => <FieldHeader name={formatMessage("remove")} />,
+      header: () => <FieldHeader name={formatMessage("actions")} />,
       cell: ({
         row: {
           original: { id: mId }
         }
       }) => (
-        <button
-          className="btn btn-dark remove-attachment"
-          onClick={() =>
-            removeMetadata(
-              mId?.replace("?include=derivatives", "") ?? "unknown"
-            )
-          }
-          type="button"
-        >
-          <DinaMessage id="remove" />
-        </button>
+        <div className="settings-button-container">
+          <button
+            className="btn btn-danger remove-attachment"
+            onClick={() =>
+              removeMetadata(
+                mId?.replace("?include=derivatives", "") ?? "unknown"
+              )
+            }
+            type="button"
+            style={{ paddingLeft: "15px", paddingRight: "15px", width: "9rem" }}
+          >
+            <FaUnlink className="me-2" />
+            <DinaMessage id="detach" />
+          </button>
+        </div>
       )
     }
   ];
