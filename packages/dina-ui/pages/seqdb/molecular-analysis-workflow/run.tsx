@@ -155,7 +155,7 @@ export default function MolecularAnalysisWorkflowRunPage() {
       <div className="col-md-4">
         <BackToListButton entityLink="/seqdb/molecular-analysis-workflow" />
       </div>
-      {currentStep > 2 && (
+      {currentStep > 2 && !editMode && (
         <Button
           variant={"secondary"}
           className="ms-auto"

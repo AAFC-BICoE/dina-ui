@@ -22,6 +22,8 @@ import { MolecularAnalysisRunItem } from "../../../types/seqdb-api/resources/mol
 import { useMolecularAnalysisRunColumns } from "../../molecular-analysis/useMolecularAnalysisRunColumns";
 import { useState } from "react";
 import { FaMagic } from "react-icons/fa";
+import { AttachmentsEditor } from "../../object-store";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 export interface MolecularAnalysisResultsStepProps {
   molecularAnalysisId: string;
@@ -51,7 +53,9 @@ export function MolecularAnalysisResultsStep({
     setReloadGenericMolecularAnalysisRun,
     qualityControls,
     qualityControlTypes,
-    updateExistingQualityControls
+    updateExistingQualityControls,
+    attachments,
+    setAttachments
   } = useGenericMolecularAnalysisRun({
     editMode,
     setEditMode,
@@ -93,6 +97,15 @@ export function MolecularAnalysisResultsStep({
       qualityControlTypes,
       deps: [qualityControlTypes]
     });
+
+  // Attachments saving for the Sequencing run
+  const saveAttachments = async (
+    newAttachments: ResourceIdentifierObject[]
+  ) => {
+    setAttachments(newAttachments);
+    setEditMode(true);
+    setPerformSave(true);
+  };
 
   // Display loading if network requests from hook are still loading in...
   if (loading) {
@@ -395,6 +408,23 @@ export function MolecularAnalysisResultsStep({
               </div>
             </div>
           )}
+
+          {/* Run Attachments */}
+          <div className="mt-3">
+            <DinaForm
+              initialValues={{ attachments: attachments }}
+              readOnly={!editMode}
+            >
+              <AttachmentsEditor
+                name="attachments"
+                onChange={saveAttachments}
+                value={attachments}
+                title={
+                  <DinaMessage id="molecularAnalysisRunStep_attachments" />
+                }
+              />
+            </DinaForm>
+          </div>
         </>
       ) : (
         <div className="row">
