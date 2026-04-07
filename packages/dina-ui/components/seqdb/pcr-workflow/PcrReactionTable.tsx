@@ -3,7 +3,6 @@ import {
   AutoSuggestTextField,
   FieldHeader,
   ReactTable,
-  filterBy,
   useApiClient,
   useDinaFormContext,
   useStringComparator
@@ -42,15 +41,7 @@ export function usePcrReactionData(pcrBatchId?: string) {
       setLoading(true);
       apiClient
         .get<PcrBatchItem[]>("seqdb-api/pcr-batch-item", {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "pcrBatch.uuid",
-                comparison: "==",
-                arguments: pcrBatchId
-              }
-            ]
-          })(""),
+          filter: { "pcrBatch.uuid": { EQ: pcrBatchId } },
           include: "materialSample,storageUnitUsage",
           page: {
             limit: 1000 // Maximum page limit

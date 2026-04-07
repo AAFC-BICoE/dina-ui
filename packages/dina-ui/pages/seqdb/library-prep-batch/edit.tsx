@@ -5,7 +5,6 @@ import {
   DinaForm,
   DinaFormProps,
   DinaFormSubmitParams,
-  filterBy,
   NumberField,
   ResourceSelectField,
   SimpleSearchFilterBuilder,
@@ -49,8 +48,7 @@ export function useLibraryPrepBatchQuery(
   return useQuery<LibraryPrepBatch>(
     {
       path: `seqdb-api/library-prep-batch/${id}`,
-      include:
-        "product,protocol,thermocyclerProfile,storageUnit,storageUnitType,indexSet"
+      include: "product,protocol,thermocyclerProfile,storageUnit,indexSet"
     },
     { disabled: !id, deps }
   );
@@ -301,7 +299,11 @@ function LibraryPrepBatchFormFields() {
         <ResourceSelectField<Product>
           className="col-md-6"
           name="product"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<Product>()
+              .searchFilter("name", input)
+              .build()
+          }
           model="seqdb-api/product"
           optionLabel={(product) => product.name}
         />
@@ -338,7 +340,11 @@ function LibraryPrepBatchFormFields() {
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<ThermocyclerProfile>()
+              .searchFilter("name", input)
+              .build()
+          }
           model="seqdb-api/thermocycler-profile"
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
@@ -346,7 +352,11 @@ function LibraryPrepBatchFormFields() {
         <ResourceSelectField<IndexSet>
           className="col-md-6"
           name="indexSet"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<IndexSet>()
+              .searchFilter("name", input)
+              .build()
+          }
           model="seqdb-api/index-set"
           optionLabel={(set) => set.name}
           readOnlyLink="/seqdb/index-set/view?id="

@@ -75,8 +75,7 @@ export default function NgsWorkflowPoolingListPage() {
           id="ngs-workflow-pooling-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/library-pool",
-            include: ""
+            path: "seqdb-api/library-pool"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

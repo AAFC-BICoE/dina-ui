@@ -1,7 +1,6 @@
 import {
   DoOperationsError,
   LoadingSpinner,
-  filterBy,
   useAccount,
   useApiClient
 } from "common-ui";
@@ -74,15 +73,7 @@ export function PreLibraryPrepStep({
     // fetch all libraryPrep IDs
     const libraryPreps = (
       await apiClient.get<LibraryPrep[]>("/seqdb-api/library-prep", {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "libraryPrepBatch.uuid",
-              comparison: "==",
-              arguments: batchId
-            }
-          ]
-        })(""),
+        filter: { "libraryPrepBatch.uuid": { EQ: batchId } },
         include: "materialSample,libraryPrepBatch",
         page: {
           limit: 1000 // Maximum page size.

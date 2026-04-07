@@ -4,7 +4,6 @@ import {
   LoadingSpinner,
   QueryPage,
   SaveArgs,
-  filterBy,
   useAccount,
   useApiClient
 } from "common-ui";
@@ -139,27 +138,23 @@ export function SangerSampleSelectionStep({
   async function fetchSampledIds() {
     await apiClient
       .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId
-            }
-          ]
-        })(""),
+        filter: { "pcrBatch.uuid": { EQ: pcrBatchId } },
         include: "materialSample",
         page: {
           limit: 1000 // Maximum page size.
         }
       })
       .then((response) => {
-        const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
-          response?.data?.filter(
-            (item) => item?.materialSample?.id !== undefined
-          );
+        const pcrBatchItems: PersistedResource<PcrBatchItem>[] = (
+          response?.data as any[]
+        )?.filter(
+          (item) => item?.relationships?.materialSample?.data?.id !== undefined
+        );
         const materialSampleIds: string[] =
-          pcrBatchItems.map((item) => item?.materialSample?.id as string) ?? [];
+          pcrBatchItems.map(
+            (item) =>
+              (item as any)?.relationships.materialSample?.data?.id as string
+          ) ?? [];
 
         setPreviouslySelectedResources(pcrBatchItems);
         fetchSamples(materialSampleIds);
@@ -233,15 +228,7 @@ export function SangerSampleSelectionStep({
         metagenomicsBatchItemsResp = await apiClient.get<
           MetagenomicsBatchItem[]
         >(`seqdb-api/metagenomics-batch-item`, {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "metagenomicsBatch.uuid",
-                comparison: "==",
-                arguments: metagenomicsBatch.id
-              }
-            ]
-          })(""),
+          filter: { "metagenomicsBatch.uuid": { EQ: metagenomicsBatch.id } },
           page: { limit: 1000 },
           include:
             "molecularAnalysisRunItem,molecularAnalysisRunItem.run,pcrBatchItem"

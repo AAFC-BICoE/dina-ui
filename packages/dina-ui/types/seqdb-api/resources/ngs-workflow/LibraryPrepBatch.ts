@@ -26,6 +26,8 @@ interface LibraryPrepBatchRelationships {
   thermocyclerProfile?: ThermocyclerProfile;
   libraryPreps?: LibraryPrep[];
   storageUnit?: ResourceIdentifierObject;
+  // TODO add this later
+  // storageUnitType?: ResourceIdentifierObject;
 }
 
 export type LibraryPrepBatch = KitsuResource &

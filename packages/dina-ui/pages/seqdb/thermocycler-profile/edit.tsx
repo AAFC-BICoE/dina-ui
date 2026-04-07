@@ -13,10 +13,15 @@ export function ThermocyclerProfileEditPage({ router }: WithRouterProps) {
     ? "editThermocyclerProfileTitle"
     : "addThermocyclerProfileTitle";
 
-  const query = useQuery<ThermocyclerProfile>({
-    include: "region",
-    path: `seqdb-api/thermocycler-profile/${id}`
-  });
+  const query = useQuery<ThermocyclerProfile>(
+    {
+      include: "region",
+      path: `seqdb-api/thermocycler-profile/${id}`
+    },
+    {
+      disabled: !id
+    }
+  );
 
   return (
     <div>

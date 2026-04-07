@@ -9,7 +9,6 @@ import { MolecularAnalysisResult } from "../../types/seqdb-api/resources/molecul
 import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
-  filterBy,
   getExport,
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
   useApiClient
@@ -443,16 +442,10 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
       const { data: newQualityControlItems } = await apiClient.get<
         MolecularAnalysisRunItem[]
       >("seqdb-api/molecular-analysis-run-item", {
-        filter: filterBy([], {
-          extraFilters: [
-            { selector: "run.uuid", comparison: "=in=", arguments: runIds },
-            {
-              selector: "usageType",
-              comparison: "==",
-              arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
-            }
-          ]
-        })(""),
+        filter: {
+          "run.uuid": { IN: runIds },
+          usageType: { EQ: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL }
+        },
         include: "result,run",
         page: { limit: 100 }
       });
@@ -471,11 +464,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
         const { data: qualityControlResultsResponse } = await apiClient.get<
           MolecularAnalysisResult[]
         >("seqdb-api/molecular-analysis-result", {
-          filter: filterBy([], {
-            extraFilters: [
-              { selector: "uuid", comparison: "=in=", arguments: resultIds }
-            ]
-          })(""),
+          filter: { uuid: { IN: resultIds } },
           include: "attachments",
           page: { limit: 100 }
         });
@@ -485,15 +474,11 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
         const { data: qualityControlNamesResponse } = await apiClient.get<
           QualityControl[]
         >("seqdb-api/quality-control", {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "molecularAnalysisRunItem.uuid",
-                comparison: "=in=",
-                arguments: newQualityControlItems.map((item) => item?.id ?? "")
-              }
-            ]
-          })(""),
+          filter: {
+            "molecularAnalysisRunItem.uuid": {
+              IN: newQualityControlItems.map((item) => item?.id ?? "")
+            }
+          },
           include: "molecularAnalysisRunItem",
           page: { limit: 100 }
         });

@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { filterBy, SaveArgs, useApiClient, useQuery } from "common-ui";
+import { SaveArgs, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
@@ -223,15 +223,9 @@ export function useGenericMolecularAnalysisRun({
   // Network Requests, starting with the GenericMolecularAnalysisItem
   useQuery<GenericMolecularAnalysisItem[]>(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "genericMolecularAnalysis.uuid",
-            comparison: "==",
-            arguments: molecularAnalysisId
-          }
-        ]
-      })(""),
+      filter: {
+        "genericMolecularAnalysis.uuid": { EQ: molecularAnalysisId }
+      },
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
       include:
@@ -587,20 +581,12 @@ export function useGenericMolecularAnalysisRun({
       const qualityControlItemQuery = await apiClient.get(
         `seqdb-api/molecular-analysis-run-item`,
         {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "run.uuid",
-                comparison: "==",
-                arguments: run?.id
-              },
-              {
-                selector: "usageType",
-                comparison: "==",
-                arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
-              }
-            ]
-          })("")
+          filter: {
+            "run.uuid": { EQ: run?.id },
+            usageType: {
+              EQ: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+            }
+          }
         }
       );
 
@@ -616,15 +602,9 @@ export function useGenericMolecularAnalysisRun({
           const qualityControlQuery = await apiClient.get<QualityControl>(
             `seqdb-api/quality-control`,
             {
-              filter: filterBy([], {
-                extraFilters: [
-                  {
-                    selector: "molecularAnalysisRunItem.uuid",
-                    comparison: "==",
-                    arguments: item?.id
-                  }
-                ]
-              })(""),
+              filter: {
+                "molecularAnalysisRunItem.uuid": { EQ: item?.id }
+              },
               include:
                 "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
             }

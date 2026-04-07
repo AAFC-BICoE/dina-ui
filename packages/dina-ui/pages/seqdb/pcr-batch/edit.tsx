@@ -7,9 +7,7 @@ import {
   DinaFormProps,
   DinaFormSubmitParams,
   FieldSet,
-  filterBy,
   LoadingSpinner,
-  Operation,
   ResourceSelectField,
   SimpleSearchFilterBuilder,
   SubmitButton,
@@ -66,7 +64,7 @@ export function usePcrBatchQuery(
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit,storageUnitType,protocol"
+        "primerForward,primerReverse,region,thermocyclerProfile,protocol,experimenters,storageUnit"
     },
     { disabled: !id, deps }
   );
@@ -133,7 +131,7 @@ export function PcrBatchForm({
   isMetagenomicsWorkflow
 }: PcrBatchFormProps) {
   const { username } = useAccount();
-  const { doOperations } = useApiClient();
+  const { bulkUpdateResources } = useApiClient();
 
   const initialValues = pcrBatch || {
     // TODO let the back-end set this:
@@ -151,20 +149,14 @@ export function PcrBatchForm({
       value: results[id]
     }));
     if (resultsWithId.length > 0) {
-      // Using the results, generate the operations.
-      const operations = resultsWithId.map<Operation>((result) => ({
-        op: "PATCH",
-        path: "pcr-batch-item/" + result.id,
-        value: {
+      await bulkUpdateResources(
+        resultsWithId.map((result) => ({
           id: result.id,
           type: "pcr-batch-item",
-          attributes: {
-            result: result.value
-          }
-        }
-      }));
-
-      await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
+          result: result.value
+        })),
+        { apiBaseUrl: "/seqdb-api", resourceType: "pcr-batch-item" }
+      );
     }
   }
 
@@ -339,7 +331,11 @@ function PcrBatchFormFields({
       <ResourceSelectField<Region>
         className="col-md-6"
         name="region"
-        filter={filterBy(["name"])}
+        filter={(input) =>
+          SimpleSearchFilterBuilder.create<Region>()
+            .searchFilter("name", input)
+            .build()
+        }
         model="seqdb-api/region"
         optionLabel={(region) => region.name}
         readOnlyLink="/seqdb/region/view?id="
@@ -383,7 +379,11 @@ function PcrBatchFormFields({
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<ThermocyclerProfile>()
+              .searchFilter("name", input)
+              .build()
+          }
           model="seqdb-api/thermocycler-profile"
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
@@ -415,11 +415,13 @@ function PcrBatchFormFields({
         <ResourceSelectField<PcrPrimer>
           className="col-md-6"
           name="primerForward"
-          filter={(input) => ({
-            ...filterBy(["name"])(input),
-            direction: { EQ: "F" },
-            "region.id": { EQ: selectedRegion?.id }
-          })}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create()
+              .searchFilter("name", input)
+              .where("direction", "EQ", "F")
+              .whereProvided("region.uuid", "EQ", selectedRegion?.id)
+              .build()
+          }
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
@@ -428,11 +430,13 @@ function PcrBatchFormFields({
         <ResourceSelectField<PcrPrimer>
           className="col-md-6"
           name="primerReverse"
-          filter={(input) => ({
-            ...filterBy(["name"])(input),
-            direction: { EQ: "R" },
-            "region.id": { EQ: selectedRegion?.id }
-          })}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create()
+              .searchFilter("name", input)
+              .where("direction", "EQ", "R")
+              .whereProvided("region.uuid", "EQ", selectedRegion?.id)
+              .build()
+          }
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="

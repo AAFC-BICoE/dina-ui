@@ -1,12 +1,6 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
 import { useEffect, useState } from "react";
-import {
-  BulkGetOptions,
-  filterBy,
-  SaveArgs,
-  useApiClient,
-  useQuery
-} from "common-ui";
+import { BulkGetOptions, SaveArgs, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "../../types/collection-api";
@@ -281,15 +275,7 @@ export function useMolecularAnalysisRun({
   // Network Requests, starting with the SeqReaction
   const { loading: loadingSeqReactions } = useQuery<SeqReaction[]>(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "seqBatch.uuid",
-            comparison: "==",
-            arguments: seqBatchId
-          }
-        ]
-      })(""),
+      filter: { "seqBatch.uuid": { EQ: seqBatchId } },
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
       include:

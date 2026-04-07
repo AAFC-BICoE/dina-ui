@@ -1,6 +1,11 @@
 import { SeqReaction } from "../../types/seqdb-api";
 import { useState } from "react";
-import { filterBy, useApiClient, useQuery } from "common-ui";
+import {
+  filterBy,
+  SimpleSearchFilterBuilder,
+  useApiClient,
+  useQuery
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import {
   attachGenericMolecularAnalysisItems,
@@ -73,22 +78,16 @@ export function useMolecularAnalysisRunView({
   const molecularAnalysisRunItemQuery = useQuery<MolecularAnalysisRunItem[]>(
     {
       path: `seqdb-api/molecular-analysis-run-item`,
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "run.uuid",
-            comparison: "==",
-            arguments: molecularAnalysisRunId
-          }
-        ]
-      })("")
+      filter: SimpleSearchFilterBuilder.create()
+        .where("metagenomicsBatch.uuid", "EQ", molecularAnalysisRunId ?? "")
+        .build()
     },
     {
       onSuccess: async ({ data: molecularAnalysisRunItems }) => {
         async function fetchSeqReactions() {
           const fetchPaths = molecularAnalysisRunItems.map(
             (molecularAnalysisRunItem) =>
-              `seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+              `seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[molecularAnalysisRunItem.uuid][EQ]=${molecularAnalysisRunItem.id}`
           );
           const seqReactions: PersistedResource<SeqReaction>[] = [];
           for (const path of fetchPaths) {
@@ -107,7 +106,7 @@ export function useMolecularAnalysisRunView({
             )
             .map(
               (molecularAnalysisRunItem) =>
-                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${molecularAnalysisRunItem.id}`
             );
           const genericMolecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
             [];
@@ -125,7 +124,7 @@ export function useMolecularAnalysisRunView({
         async function fetchMetagenomicsBatchItems() {
           const fetchPaths = molecularAnalysisRunItems.map(
             (molecularAnalysisRunItem) =>
-              `seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+              `seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${molecularAnalysisRunItem.id}`
           );
           const metagenomicsBatchItems: PersistedResource<MetagenomicsBatchItem>[] =
             [];

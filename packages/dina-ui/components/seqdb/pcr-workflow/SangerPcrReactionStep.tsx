@@ -1,4 +1,4 @@
-import { DinaForm, LoadingSpinner, Operation, useApiClient } from "common-ui";
+import { DinaForm, LoadingSpinner, useApiClient } from "common-ui";
 import { FormikProps } from "formik";
 import { Ref, useEffect, useRef } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
@@ -36,7 +36,7 @@ export function SangerPcrReactionStep({
   setReloadPcrBatch,
   onSaved
 }: SangerPcrReactionProps) {
-  const { doOperations, save } = useApiClient();
+  const { bulkUpdateResources, save } = useApiClient();
   const formRef: Ref<FormikProps<Partial<PcrBatchItem>>> = useRef(null);
   const { loading, materialSamples, pcrBatchItems, setPcrBatchItems } =
     usePcrReactionData(pcrBatchId);
@@ -58,29 +58,19 @@ export function SangerPcrReactionStep({
         value: results[id]
       }));
       if (resultsWithId.length > 0) {
-        // Using the results, generate the operations.
-        const operations = resultsWithId.map<Operation>((result) => ({
-          op: "PATCH",
-          path: "pcr-batch-item/" + result.id,
-          value: {
+        const savedResult = await bulkUpdateResources(
+          resultsWithId.map((result) => ({
             id: result.id,
             type: "pcr-batch-item",
-            attributes: {
-              result: result.value
-            }
-          }
-        }));
-
-        const savedResult = await doOperations(operations, {
-          apiBaseUrl: "/seqdb-api"
-        });
+            result: result.value
+          })),
+          { apiBaseUrl: "/seqdb-api", resourceType: "pcr-batch-item" }
+        );
         const newItems = [...pcrBatchItems];
-        for (const rst of savedResult) {
-          const id = rst.data["id"];
-          const result = rst.data["attributes"].result;
-          const found = newItems.find((itm) => itm.id === id);
+        for (const rst of savedResult.data.data) {
+          const found = newItems.find((itm) => itm.id === rst.id);
           if (found) {
-            found.result = result;
+            found.result = rst.result;
           }
         }
         setPcrBatchItems(newItems);

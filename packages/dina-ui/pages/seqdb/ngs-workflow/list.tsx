@@ -74,8 +74,7 @@ export default function NgsWorkflowListPage() {
           id="ngs-workflow-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/library-prep-batch",
-            include: ""
+            path: "seqdb-api/library-prep-batch"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

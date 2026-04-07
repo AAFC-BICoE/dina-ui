@@ -7,7 +7,6 @@ import {
   FormikButton,
   QueryTable,
   ReactTable,
-  filterBy,
   useAccount,
   useApiClient,
   useGroupedCheckBoxes
@@ -55,7 +54,7 @@ export function LibraryPoolContentStep({
   performSave,
   setPerformSave
 }: LibraryPoolContentStepProps) {
-  const { apiClient, doOperations, save } = useApiClient();
+  const { apiClient, bulkDeleteResources, save } = useApiClient();
   const { username } = useAccount();
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -112,12 +111,9 @@ export function LibraryPoolContentStep({
       }
 
       if (toDelete.length > 0) {
-        await doOperations(
-          toDelete.map((content) => ({
-            op: "DELETE",
-            path: `/library-pool-content/${content.id}`
-          })),
-          { apiBaseUrl: "/seqdb-api" }
+        await bulkDeleteResources(
+          toDelete.map((content) => content.id as string),
+          { apiBaseUrl: "/seqdb-api", resourceType: "library-pool-content" }
         );
       }
       setEditMode(false);
@@ -147,16 +143,7 @@ export function LibraryPoolContentStep({
     const response = await apiClient.get<LibraryPoolContent[]>(
       "/seqdb-api/library-pool-content",
       {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "libraryPool.uuid",
-              comparison: "==",
-              arguments: libraryPoolId
-            }
-          ]
-        })(""),
-        include: "libraryPool,pooledLibraryPrepBatch,pooledLibraryPool",
+        filter: { "libraryPool.uuid": { EQ: libraryPoolId } },
         page: {
           limit: 1000 // Maximum page size.
         }
@@ -201,11 +188,11 @@ export function LibraryPoolContentStep({
       1000
     );
   const batchFilter: FilterParam = {
-    rsql: `name=='*${nameFilter}*' ${hideUsedItems ? "and dateUsed==null" : ""}`
+    fiql: `name=='*${nameFilter}*'${hideUsedItems ? ";dateUsed==null" : ""}`
   };
   const poolFilter = {
-    rsql: `uuid!=${libraryPool.id} and name=='*${nameFilter}*' ${
-      hideUsedItems ? "and dateUsed==null" : ""
+    fiql: `uuid!=${libraryPool.id};name=='*${nameFilter}*'${
+      hideUsedItems ? ";dateUsed==null" : ""
     }`
   };
 

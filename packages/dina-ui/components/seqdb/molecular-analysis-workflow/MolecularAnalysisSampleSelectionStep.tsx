@@ -5,7 +5,6 @@ import {
   LoadingSpinner,
   QueryPage,
   SimpleSearchFilterBuilder,
-  filterBy,
   useAccount,
   useApiClient
 } from "common-ui";
@@ -30,12 +29,6 @@ import {
   MappedDataRow,
   SampleSelectionMappingTable
 } from "../../molecular-analysis/SampleSelectionMappingTable";
-import {
-  handeDeleteMolecularAnalysisRunItems,
-  handleDeleteGenericMolecularAnalysisItems,
-  handleDeleteMolecularAnalysisRun,
-  handleDeleteStorageUnitUsage
-} from "../../molecular-analysis/MolecularAnalysisUtils";
 
 export interface MolecularAnalysisSampleSelectionStepProps {
   molecularAnalysisId: string;
@@ -55,7 +48,12 @@ export function MolecularAnalysisSampleSelectionStep({
   performSave,
   setPerformSave
 }: MolecularAnalysisSampleSelectionStepProps) {
-  const { apiClient, bulkGet, save } = useApiClient();
+  const {
+    apiClient,
+    bulkLoadResources,
+    bulkCreateResources,
+    bulkDeleteResources
+  } = useApiClient();
   const { username } = useAccount();
   const { PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN } =
     useMaterialSampleRelationshipColumns();
@@ -153,15 +151,9 @@ export function MolecularAnalysisSampleSelectionStep({
       .get<GenericMolecularAnalysisItem[]>(
         "/seqdb-api/generic-molecular-analysis-item",
         {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "genericMolecularAnalysis.uuid",
-                comparison: "==",
-                arguments: molecularAnalysisId
-              }
-            ]
-          })(""),
+          filter: {
+            "genericMolecularAnalysis.uuid": { EQ: molecularAnalysisId }
+          },
           include:
             "materialSample,storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run",
           page: {
@@ -191,22 +183,28 @@ export function MolecularAnalysisSampleSelectionStep({
    * @param sampleIds array of UUIDs.
    */
   async function fetchSamples(sampleIds: string[]) {
-    await bulkGet<MaterialSampleSummary>(
-      sampleIds.map((id) => `/material-sample-summary/${id}`),
-      { apiBaseUrl: "/collection-api" }
-    ).then((response) => {
-      const sorted = sortMaterialSamples(response ?? []);
-      setSelectedResources(sorted);
+    if (sampleIds.length === 0) {
+      setSelectedResources([]);
+      return;
+    }
+    const response = await bulkLoadResources(sampleIds, {
+      apiBaseUrl: "/collection-api",
+      resourceType: "material-sample-summary"
     });
+    const sorted = sortMaterialSamples(
+      (response.data.data as PersistedResource<MaterialSampleSummary>[]) ?? []
+    );
+    setSelectedResources(sorted);
   }
 
   async function saveMolecularAnalysisItems() {
     try {
-      const { data: genericMolecularAnalysis } =
-        await apiClient.get<GenericMolecularAnalysis>(
-          `seqdb-api/generic-molecular-analysis/${molecularAnalysisId}`,
-          {}
-        );
+      const genericMolecularAnalysisResponse = await bulkLoadResources(
+        [molecularAnalysisId],
+        { apiBaseUrl: "/seqdb-api", resourceType: "generic-molecular-analysis" }
+      );
+      const genericMolecularAnalysis = genericMolecularAnalysisResponse.data
+        .data[0] as GenericMolecularAnalysis;
 
       // Convert to UUID arrays to compare the two arrays.
       const selectedResourceUUIDs = _.compact(
@@ -247,60 +245,62 @@ export function MolecularAnalysisSampleSelectionStep({
         // molecular analysis run item.
         let molecularRunItemsCreated: MolecularAnalysisRunItem[] = [];
         if (runId) {
-          molecularRunItemsCreated = await save<MolecularAnalysisRunItem>(
+          const createdRunItemsResponse = await bulkCreateResources(
             itemsToCreate.map((_) => ({
-              resource: {
-                type: "molecular-analysis-run-item",
-                usageType:
-                  MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
-                relationships: {
-                  run: {
-                    data: {
-                      type: "molecular-analysis-run",
-                      id: runId
-                    }
+              type: "molecular-analysis-run-item",
+              usageType:
+                MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+              relationships: {
+                run: {
+                  data: {
+                    type: "molecular-analysis-run",
+                    id: runId
                   }
                 }
-              },
-              type: "molecular-analysis-run-item"
+              }
             })),
-            { apiBaseUrl: "/seqdb-api" }
+            {
+              apiBaseUrl: "/seqdb-api",
+              resourceType: "molecular-analysis-run-item"
+            }
           );
+          molecularRunItemsCreated = createdRunItemsResponse.data
+            .data as MolecularAnalysisRunItem[];
         }
 
-        await save(
+        await bulkCreateResources(
           itemsToCreate.map((materialUUID, index) => ({
-            resource: {
-              type: "generic-molecular-analysis-item",
-              createdBy: username ?? "",
-              genericMolecularAnalysis: _.pick(
-                genericMolecularAnalysis,
-                "id",
-                "type"
-              ),
-              relationships: {
-                materialSample: {
-                  data: {
-                    id: materialUUID,
-                    type: "material-sample"
-                  }
-                },
-                // Included only if molecular run items were created.
-                molecularAnalysisRunItem:
-                  molecularRunItemsCreated.length > 0 &&
-                  molecularRunItemsCreated[index]
-                    ? {
-                        data: {
-                          type: "molecular-analysis-run-item",
-                          id: molecularRunItemsCreated[index].id
-                        }
+            type: "generic-molecular-analysis-item",
+            createdBy: username ?? "",
+            genericMolecularAnalysis: _.pick(
+              genericMolecularAnalysis,
+              "id",
+              "type"
+            ),
+            relationships: {
+              materialSample: {
+                data: {
+                  id: materialUUID,
+                  type: "material-sample"
+                }
+              },
+              // Included only if molecular run items were created.
+              molecularAnalysisRunItem:
+                molecularRunItemsCreated.length > 0 &&
+                molecularRunItemsCreated[index]
+                  ? {
+                      data: {
+                        type: "molecular-analysis-run-item",
+                        id: molecularRunItemsCreated[index].id
                       }
-                    : undefined
-              }
-            },
-            type: "generic-molecular-analysis-item"
+                    }
+                  : undefined
+            }
           })),
-          { apiBaseUrl: "/seqdb-api" }
+          {
+            apiBaseUrl: "/seqdb-api",
+            resourceType: "generic-molecular-analysis-item"
+          }
         );
       }
 
@@ -309,26 +309,25 @@ export function MolecularAnalysisSampleSelectionStep({
         const genericMolecularAnalysisItemIds: string[] = itemsToDelete
           .map((itemsToDelete) => itemsToDelete.molecularAnalysisItemUUID)
           .filter((id): id is string => id !== undefined);
-        await handleDeleteGenericMolecularAnalysisItems(
-          save,
-          genericMolecularAnalysisItemIds
-        );
+        await bulkDeleteResources(genericMolecularAnalysisItemIds, {
+          apiBaseUrl: "/seqdb-api",
+          resourceType: "generic-molecular-analysis-item"
+        });
 
         // Delete the storage unit usage if linked.
-        const storageUnitUsageUUIDs = itemsToDelete
+        const storageUnitUsageIdsToDelete: string[] = itemsToDelete
           .map(
             (item) =>
               previouslySelectedResources.find(
                 (resource) => resource.id === item.molecularAnalysisItemUUID
               )?.storageUnitUsage?.id
           )
-          .filter((item) => item);
-        if (storageUnitUsageUUIDs.length > 0) {
-          const storageUnitUsageIdsToDelete: string[] =
-            storageUnitUsageUUIDs.filter(
-              (id): id is string => id !== undefined
-            );
-          await handleDeleteStorageUnitUsage(save, storageUnitUsageIdsToDelete);
+          .filter((id): id is string => id !== undefined);
+        if (storageUnitUsageIdsToDelete.length > 0) {
+          await bulkDeleteResources(storageUnitUsageIdsToDelete, {
+            apiBaseUrl: "/collection-api",
+            resourceType: "storage-unit-usage"
+          });
         }
 
         // Check if molecular analysis items need to be deleted as well.
@@ -342,14 +341,17 @@ export function MolecularAnalysisSampleSelectionStep({
                 )?.molecularAnalysisRunItem?.id
             )
             .filter((id): id is string => id !== undefined);
-          await handeDeleteMolecularAnalysisRunItems(
-            save,
-            molecularAnalysisRunItemIdsToDelete
-          );
+          await bulkDeleteResources(molecularAnalysisRunItemIdsToDelete, {
+            apiBaseUrl: "/seqdb-api",
+            resourceType: "molecular-analysis-run-item"
+          });
 
           // Delete the run if all seq-reactions are being deleted.
           if (itemsToDelete.length === previouslySelectedResources.length) {
-            await handleDeleteMolecularAnalysisRun(save, runId);
+            await bulkDeleteResources([runId], {
+              apiBaseUrl: "/seqdb-api",
+              resourceType: "molecular-analysis-run"
+            });
           }
         }
       }

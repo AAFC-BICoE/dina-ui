@@ -1,4 +1,8 @@
-import { filterBy, ResourceSelectField, TextField } from "common-ui";
+import {
+  ResourceSelectField,
+  SimpleSearchFilterBuilder,
+  TextField
+} from "common-ui";
 import { GroupSelectField } from "..";
 import { Region } from "../../types/seqdb-api/resources/Region";
 import { FieldArray } from "formik";
@@ -31,7 +35,11 @@ export function ThermocyclerProfileFormFields({
         <ResourceSelectField<Region>
           className="col-md-2"
           name="region"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<Region>()
+              .searchFilter("name", input)
+              .build()
+          }
           label="Gene Region"
           model="seqdb-api/region"
           optionLabel={(region) => region.name}

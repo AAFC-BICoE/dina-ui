@@ -7,7 +7,6 @@ import {
   DinaFormProps,
   DinaFormSubmitParams,
   FieldSet,
-  filterBy,
   ResourceSelectField,
   SimpleSearchFilterBuilder,
   SubmitButton,
@@ -56,8 +55,7 @@ export function useSeqBatchQuery(
   return useQuery<SeqBatch>(
     {
       path: `seqdb-api/seq-batch/${id}`,
-      include:
-        "region,thermocyclerProfile,experimenters,protocol,storageUnit,storageUnitType"
+      include: "region,thermocyclerProfile"
     },
     { disabled: !id, deps }
   );
@@ -278,7 +276,11 @@ export function SeqBatchFormFields() {
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<ThermocyclerProfile>()
+              .searchFilter("name", input)
+              .build()
+          }
           model="seqdb-api/thermocycler-profile"
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
@@ -292,7 +294,11 @@ export function SeqBatchFormFields() {
         <ResourceSelectField<Region>
           className="col-md-6"
           name="region"
-          filter={filterBy(["name"])}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<Region>()
+              .searchFilter("name", input)
+              .build()
+          }
           model="seqdb-api/region"
           optionLabel={(region) => region.name}
           readOnlyLink="/seqdb/region/view?id="

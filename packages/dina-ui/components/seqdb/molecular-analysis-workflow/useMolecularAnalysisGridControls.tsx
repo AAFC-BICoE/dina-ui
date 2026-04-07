@@ -2,7 +2,6 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   DeleteArgs,
-  filterBy,
   SaveArgs,
   useQuery,
   useStringComparator
@@ -100,15 +99,9 @@ export function useMolecularAnalysisGridControls({
     GenericMolecularAnalysisItem[]
   >(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "genericMolecularAnalysis.uuid",
-            comparison: "==",
-            arguments: molecularAnalysisId
-          }
-        ]
-      })(""),
+      filter: {
+        "genericMolecularAnalysis.uuid": { EQ: molecularAnalysisId }
+      },
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
       include: "materialSample,storageUnitUsage"
