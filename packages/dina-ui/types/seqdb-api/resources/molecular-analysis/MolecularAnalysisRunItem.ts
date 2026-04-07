@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { MolecularAnalysisRun } from "./MolecularAnalysisRun";
 import { MolecularAnalysisResult } from "./MolecularAnalysisResult";
+import type { SeqReaction } from "../SeqReaction";
 
 // Common usage types.
 export enum MolecularAnalysisRunItemUsageType {
@@ -21,6 +22,7 @@ export interface MolecularAnalysisRunItemAttributes {
 export interface MolecularAnalysisRunItemRelationships {
   run?: MolecularAnalysisRun;
   result?: MolecularAnalysisResult;
+  seqReaction?: SeqReaction;
 }
 
 export type MolecularAnalysisRunItem = KitsuResource &

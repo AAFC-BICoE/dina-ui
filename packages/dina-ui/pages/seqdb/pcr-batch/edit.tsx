@@ -8,7 +8,6 @@ import {
   DinaFormSubmitParams,
   FieldSet,
   LoadingSpinner,
-  Operation,
   ResourceSelectField,
   SimpleSearchFilterBuilder,
   SubmitButton,
@@ -64,7 +63,8 @@ export function usePcrBatchQuery(
   return useQuery<PcrBatch>(
     {
       path: `seqdb-api/pcr-batch/${id}`,
-      include: "primerForward,primerReverse,region,thermocyclerProfile"
+      include:
+        "primerForward,primerReverse,region,thermocyclerProfile,protocol,experimenters,storageUnit"
     },
     { disabled: !id, deps }
   );
@@ -131,7 +131,7 @@ export function PcrBatchForm({
   isMetagenomicsWorkflow
 }: PcrBatchFormProps) {
   const { username } = useAccount();
-  const { doOperations } = useApiClient();
+  const { bulkUpdateResources } = useApiClient();
 
   const initialValues = pcrBatch || {
     // TODO let the back-end set this:
@@ -149,20 +149,14 @@ export function PcrBatchForm({
       value: results[id]
     }));
     if (resultsWithId.length > 0) {
-      // Using the results, generate the operations.
-      const operations = resultsWithId.map<Operation>((result) => ({
-        op: "PATCH",
-        path: "pcr-batch-item/" + result.id,
-        value: {
+      await bulkUpdateResources(
+        resultsWithId.map((result) => ({
           id: result.id,
           type: "pcr-batch-item",
-          attributes: {
-            result: result.value
-          }
-        }
-      }));
-
-      await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
+          result: result.value
+        })),
+        { apiBaseUrl: "/seqdb-api", resourceType: "pcr-batch-item" }
+      );
     }
   }
 
@@ -425,7 +419,7 @@ function PcrBatchFormFields({
             SimpleSearchFilterBuilder.create()
               .searchFilter("name", input)
               .where("direction", "EQ", "F")
-              .whereProvided("region.id", "EQ", selectedRegion?.id)
+              .whereProvided("region.uuid", "EQ", selectedRegion?.id)
               .build()
           }
           model="seqdb-api/pcr-primer"
@@ -440,7 +434,7 @@ function PcrBatchFormFields({
             SimpleSearchFilterBuilder.create()
               .searchFilter("name", input)
               .where("direction", "EQ", "R")
-              .whereProvided("region.id", "EQ", selectedRegion?.id)
+              .whereProvided("region.uuid", "EQ", selectedRegion?.id)
               .build()
           }
           model="seqdb-api/pcr-primer"

@@ -54,7 +54,7 @@ export function LibraryPoolContentStep({
   performSave,
   setPerformSave
 }: LibraryPoolContentStepProps) {
-  const { apiClient, doOperations, save } = useApiClient();
+  const { apiClient, bulkDeleteResources, save } = useApiClient();
   const { username } = useAccount();
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -111,12 +111,9 @@ export function LibraryPoolContentStep({
       }
 
       if (toDelete.length > 0) {
-        await doOperations(
-          toDelete.map((content) => ({
-            op: "DELETE",
-            path: `/library-pool-content/${content.id}`
-          })),
-          { apiBaseUrl: "/seqdb-api" }
+        await bulkDeleteResources(
+          toDelete.map((content) => content.id as string),
+          { apiBaseUrl: "/seqdb-api", resourceType: "library-pool-content" }
         );
       }
       setEditMode(false);

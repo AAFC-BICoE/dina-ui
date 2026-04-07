@@ -145,12 +145,16 @@ export function SangerSampleSelectionStep({
         }
       })
       .then((response) => {
-        const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
-          response?.data?.filter(
-            (item) => item?.materialSample?.id !== undefined
-          );
+        const pcrBatchItems: PersistedResource<PcrBatchItem>[] = (
+          response?.data as any[]
+        )?.filter(
+          (item) => item?.relationships?.materialSample?.data?.id !== undefined
+        );
         const materialSampleIds: string[] =
-          pcrBatchItems.map((item) => item?.materialSample?.id as string) ?? [];
+          pcrBatchItems.map(
+            (item) =>
+              (item as any)?.relationships.materialSample?.data?.id as string
+          ) ?? [];
 
         setPreviouslySelectedResources(pcrBatchItems);
         fetchSamples(materialSampleIds);

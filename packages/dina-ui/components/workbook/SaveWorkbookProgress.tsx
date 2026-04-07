@@ -55,7 +55,7 @@ export function SaveWorkbookProgress({
     appendData
   } = useWorkbookContext();
 
-  const { save, apiClient, doOperations } = useApiClient();
+  const { save, apiClient, bulkDeleteResources } = useApiClient();
 
   const { agentId } = useAccount();
 
@@ -269,20 +269,16 @@ export function SaveWorkbookProgress({
     const materialSampleIds = fetchedMaterialSamples?.data.map(
       (materialSample) => materialSample.id
     );
-    await doOperations(
-      materialSampleIds.map((id) => ({
-        op: "DELETE",
-        path: `material-sample/${id}`
-      })),
-      { apiBaseUrl }
-    );
-    await doOperations(
-      collectingEventIds.map((id) => ({
-        op: "DELETE",
-        path: `collecting-event/${id}`
-      })),
-      { apiBaseUrl, returnNullForMissingResource: true }
-    );
+    if (apiBaseUrl) {
+      await bulkDeleteResources(materialSampleIds as string[], {
+        apiBaseUrl,
+        resourceType: "material-sample"
+      });
+      await bulkDeleteResources(collectingEventIds as string[], {
+        apiBaseUrl,
+        resourceType: "collecting-event"
+      });
+    }
 
     onWorkbookFailed?.();
   }
