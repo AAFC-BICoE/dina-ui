@@ -18,7 +18,7 @@ export default function IndexSetViewPage() {
           <strong>NGS indexes:</strong>
           <QueryTable
             columns={["name", "lotNumber", "direction"]}
-            path={`seqdb-api/index-set/${props.initialValues.id}/ngsIndexes`}
+            path={`seqdb-api/ngs-index?filter[indexSet.uuid]=${props.initialValues.id}`}
           />
         </DinaForm>
       )}

@@ -4,7 +4,8 @@ import {
   CreateButton,
   dateCell,
   FilterAttribute,
-  ListPageLayout
+  ListPageLayout,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -60,10 +61,11 @@ export default function LibraryPrepBatchListPage() {
       <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage("libraryPrepBatchListTitle")}</h1>
         <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            // Apply group filter:
-            ...(filterForm.group && { fiql: `group==${filterForm.group}` })
-          })}
+          additionalFilters={(filterForm) =>
+            SimpleSearchFilterBuilder.create<LibraryPrepBatch>()
+              .whereProvided("group", "EQ", filterForm.group)
+              .build()
+          }
           filterAttributes={FILTER_ATTRIBUTES}
           id="library-prep-batch-list"
           queryTableProps={{
@@ -81,6 +83,7 @@ export default function LibraryPrepBatchListPage() {
               </div>
             </div>
           )}
+          useFiql={true}
         />
       </main>
       <Footer />

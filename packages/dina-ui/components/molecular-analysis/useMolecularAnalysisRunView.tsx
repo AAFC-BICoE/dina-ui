@@ -1,6 +1,11 @@
 import { SeqReaction } from "../../types/seqdb-api";
 import { useState } from "react";
-import { useApiClient, useQuery } from "common-ui";
+import {
+  filterBy,
+  SimpleSearchFilterBuilder,
+  useApiClient,
+  useQuery
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import {
   attachGenericMolecularAnalysisItems,
@@ -42,7 +47,7 @@ export interface UseMolecularAnalysisRunViewProps {
 export function useMolecularAnalysisRunView({
   molecularAnalysisRunId
 }: UseMolecularAnalysisRunViewProps) {
-  const { apiClient, bulkGet, bulkLoadResources } = useApiClient();
+  const { apiClient, bulkGet } = useApiClient();
 
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -73,69 +78,61 @@ export function useMolecularAnalysisRunView({
   const molecularAnalysisRunItemQuery = useQuery<MolecularAnalysisRunItem[]>(
     {
       path: `seqdb-api/molecular-analysis-run-item`,
-      filter: { "run.uuid": { EQ: molecularAnalysisRunId } },
-      include: "seqReaction"
+      filter: SimpleSearchFilterBuilder.create()
+        .where("metagenomicsBatch.uuid", "EQ", molecularAnalysisRunId ?? "")
+        .build()
     },
     {
       onSuccess: async ({ data: molecularAnalysisRunItems }) => {
         async function fetchSeqReactions() {
-          const seqReactionIds = molecularAnalysisRunItems
-            .map((item) => item.seqReaction?.id)
-            .filter((id): id is string => id !== undefined);
-
-          if (seqReactionIds.length === 0) return [];
-
-          const response = await bulkLoadResources(seqReactionIds, {
-            apiBaseUrl: "/seqdb-api",
-            resourceType: "seq-reaction",
-            include: ["storageUnitUsage", "pcrBatchItem", "seqPrimer"]
-          });
-
-          return response.data.data as PersistedResource<SeqReaction>[];
+          const fetchPaths = molecularAnalysisRunItems.map(
+            (molecularAnalysisRunItem) =>
+              `seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[molecularAnalysisRunItem.uuid][EQ]=${molecularAnalysisRunItem.id}`
+          );
+          const seqReactions: PersistedResource<SeqReaction>[] = [];
+          for (const path of fetchPaths) {
+            const seqReaction = await apiClient.get<SeqReaction[]>(path, {});
+            seqReactions.push(seqReaction.data[0]);
+          }
+          return seqReactions;
         }
 
         async function fetchGenericMolecularAnalysisItems() {
-          const filteredItems = molecularAnalysisRunItems.filter(
-            (runItem) =>
-              runItem.usageType !==
-              MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
-          );
+          const fetchPaths = molecularAnalysisRunItems
+            .filter(
+              (runItem) =>
+                runItem.usageType !==
+                MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+            )
+            .map(
+              (molecularAnalysisRunItem) =>
+                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${molecularAnalysisRunItem.id}`
+            );
           const genericMolecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
             [];
-          for (const molecularAnalysisRunItem of filteredItems) {
-            const result = await apiClient.get<GenericMolecularAnalysisItem[]>(
-              `seqdb-api/generic-molecular-analysis-item`,
-              {
-                include:
-                  "storageUnitUsage,materialSample,molecularAnalysisRunItem",
-                filter: {
-                  "molecularAnalysisRunItem.uuid": {
-                    EQ: molecularAnalysisRunItem.id
-                  }
-                }
-              }
+          for (const path of fetchPaths) {
+            const genericMolecularAnalysisItem = await apiClient.get<
+              GenericMolecularAnalysisItem[]
+            >(path, {});
+            genericMolecularAnalysisItems.push(
+              genericMolecularAnalysisItem.data[0]
             );
-            genericMolecularAnalysisItems.push(result.data[0]);
           }
           return genericMolecularAnalysisItems;
         }
 
         async function fetchMetagenomicsBatchItems() {
+          const fetchPaths = molecularAnalysisRunItems.map(
+            (molecularAnalysisRunItem) =>
+              `seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${molecularAnalysisRunItem.id}`
+          );
           const metagenomicsBatchItems: PersistedResource<MetagenomicsBatchItem>[] =
             [];
-          for (const molecularAnalysisRunItem of molecularAnalysisRunItems) {
-            const result = await apiClient.get<MetagenomicsBatchItem[]>(
-              `seqdb-api/metagenomics-batch-item`,
-              {
-                include: "pcrBatchItem,molecularAnalysisRunItem",
-                filter: {
-                  "molecularAnalysisRunItem.uuid": {
-                    EQ: molecularAnalysisRunItem.id
-                  }
-                }
-              }
-            );
-            metagenomicsBatchItems.push(result.data[0]);
+          for (const path of fetchPaths) {
+            const metagenomicsBatchItem = await apiClient.get<
+              MetagenomicsBatchItem[]
+            >(path, {});
+            metagenomicsBatchItems.push(metagenomicsBatchItem.data[0]);
           }
           return metagenomicsBatchItems;
         }
@@ -212,9 +209,15 @@ export function useMolecularAnalysisRunView({
               const qualityControlQuery = await apiClient.get<QualityControl>(
                 `seqdb-api/quality-control`,
                 {
-                  filter: {
-                    "molecularAnalysisRunItem.uuid": { EQ: item?.id }
-                  },
+                  filter: filterBy([], {
+                    extraFilters: [
+                      {
+                        selector: "molecularAnalysisRunItem.uuid",
+                        comparison: "==",
+                        arguments: item?.id
+                      }
+                    ]
+                  })(""),
                   include:
                     "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
                 }

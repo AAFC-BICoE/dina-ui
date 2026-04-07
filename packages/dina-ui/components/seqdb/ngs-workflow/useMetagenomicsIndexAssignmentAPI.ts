@@ -3,6 +3,7 @@ import {
   DinaFormSubmitParams,
   filterBy,
   SaveArgs,
+  SimpleSearchFilterBuilder,
   useQuery
 } from "common-ui";
 import _, { Dictionary } from "lodash";
@@ -66,15 +67,9 @@ export function useMetagenomicsIndexAssignmentAPI({
     {
       include: "indexI5,indexI7,pcrBatchItem",
       page: { limit: 1000 },
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "metagenomicsBatch.uuid",
-            comparison: "==",
-            arguments: metagenomicsBatch?.id ?? ""
-          }
-        ]
-      })(""),
+      filter: SimpleSearchFilterBuilder.create()
+        .where("metagenomicsBatch.uuid", "EQ", metagenomicsBatch?.id ?? "")
+        .build(),
       path: `seqdb-api/metagenomics-batch-item`
     },
     {

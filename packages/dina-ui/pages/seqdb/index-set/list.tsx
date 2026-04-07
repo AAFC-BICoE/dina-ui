@@ -56,6 +56,7 @@ export default function IndexSetListPage() {
             columns: INDEX_SET_TABLE_COLUMNS,
             path: "seqdb-api/index-set"
           }}
+          useFiql={true}
         />
       </main>
       <Footer />

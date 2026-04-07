@@ -3,7 +3,8 @@ import {
   ColumnDefinition,
   dateCell,
   FilterAttribute,
-  ListPageLayout
+  ListPageLayout,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -24,10 +25,7 @@ const TABLE_COLUMNS: ColumnDefinition<MetagenomicsBatch>[] = [
         original: { id, name }
       }
     }) => (
-      <Link
-        href={`/seqdb/metagenomics-workflow/run?pcrBatchId=${id}`}
-        legacyBehavior
-      >
+      <Link href={`/seqdb/metagenomics-workflow/run?pcrBatchId=${id}`}>
         {name || id}
       </Link>
     ),
@@ -71,10 +69,12 @@ export default function MetagenomicsWorkflowListPage() {
       <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage("metagenomicsWorkflowTitle")}</h1>
         <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            // Apply group filter:
-            ...(filterForm.group && { fiql: `group==${filterForm.group}` })
-          })}
+          additionalFilters={(filterForm) =>
+            SimpleSearchFilterBuilder.create<MetagenomicsBatch>()
+              .whereProvided("group", "EQ", filterForm.group)
+              .build()
+          }
+          useFiql={true}
           filterAttributes={FILTER_ATTRIBUTES}
           id="metagenomics-workflow-list"
           queryTableProps={{
