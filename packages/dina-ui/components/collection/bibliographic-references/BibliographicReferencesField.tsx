@@ -68,6 +68,7 @@ export function BibliographicReferencesField({
   const [referenceToEdit, setReferenceToEdit] = useState<
     "NEW" | { index: number } | null
   >(null);
+  const [viewDetailTable, setViewDetailTable] = useState<boolean>(false);
 
   const isEditing = !!referenceToEdit;
   function openRowEditor(row: Row<BibliographicReference>) {
@@ -243,6 +244,16 @@ export function BibliographicReferencesField({
       componentName={BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME}
       sectionName="bibliographic-references-add-section"
     >
+      <div className="d-flex align-items-center justify-content-end mb-2">
+        <label className="me-2" htmlFor="viewDetailTableSwitch">
+          <DinaMessage id="viewDetailButtonLabel" />
+        </label>
+        <Switch
+          id="viewDetailTableSwitch"
+          checked={viewDetailTable}
+          onChange={() => setViewDetailTable((prev) => !prev)}
+        />
+      </div>
       {wrapContent(
         <FieldSpy fieldName={fieldName}>
           {(value, { form }) => {
@@ -274,34 +285,95 @@ export function BibliographicReferencesField({
 
             return (
               <>
-                {hasReferences && (
-                  <ReactTable<BibliographicReference>
-                    columns={columns}
-                    data={bibliographicReferences}
-                    showPagination={false}
-                    className="-striped mb-2"
-                    getRowCanExpand={() => true}
-                    renderSubComponent={({ row }) => (
-                      <div className="m-2">
-                        <BibliographicReferenceSubForm
-                          referenceToEdit={row.original}
-                          onSaveReference={(newReference) => {
-                            row.getToggleExpandedHandler()();
-                            return saveReference(newReference);
-                          }}
-                          onCancelClick={
-                            hasReferences
-                              ? () => {
-                                  setReferenceToEdit(null);
-                                  row.getToggleExpandedHandler()();
-                                }
-                              : undefined
-                          }
-                        />
+                {hasReferences &&
+                  (viewDetailTable ? (
+                    <ReactTable<BibliographicReference>
+                      columns={columns}
+                      data={bibliographicReferences}
+                      showPagination={false}
+                      className="-striped mb-2"
+                      getRowCanExpand={() => true}
+                      renderSubComponent={({ row }) => (
+                        <div className="m-2">
+                          <BibliographicReferenceSubForm
+                            referenceToEdit={row.original}
+                            onSaveReference={(newReference) => {
+                              row.getToggleExpandedHandler()();
+                              return saveReference(newReference);
+                            }}
+                            onCancelClick={
+                              hasReferences
+                                ? () => {
+                                    setReferenceToEdit(null);
+                                    row.getToggleExpandedHandler()();
+                                  }
+                                : undefined
+                            }
+                          />
+                        </div>
+                      )}
+                    />
+                  ) : (
+                    <>
+                      <div className="mb-3">
+                        <ul>
+                          {bibliographicReferences.map((ref, index) => {
+                            const authors = ref.author?.length
+                              ? ref.author.length > 1
+                                ? `${ref.author[0]} et al.`
+                                : `${ref.author[0]}`
+                              : null;
+                            const year = ref.year ? `(${ref.year})` : null;
+                            const title = ref.title || null;
+                            const journal = ref.journal || null;
+                            const volume = ref.volume ? ref.volume : null;
+                            const pages = ref.pages ? `:${ref.pages}` : null;
+                            const doi = ref.doi
+                              ? `https://doi.org/${ref.doi}`
+                              : null;
+
+                            return (
+                              <li key={index}>
+                                <div>
+                                  {authors && <>{authors} </>}
+                                  {year && <>{year}. </>}
+                                  {title && (
+                                    <span className="fw-bold">{title}</span>
+                                  )}
+                                  {title && ". "}
+                                  {journal && <>{journal}. </>}
+                                  {volume && (
+                                    <>
+                                      {volume}
+                                      {pages || ""}.{" "}
+                                    </>
+                                  )}
+                                  {doi && (
+                                    <a
+                                      href={doi}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      {doi}
+                                    </a>
+                                  )}
+                                </div>
+                                {ref.referenceRemarks && (
+                                  <div className="ms-3">
+                                    <span>
+                                      <DinaMessage id="field_remarks" />
+                                      {": "}
+                                    </span>
+                                    <em>{ref.referenceRemarks}</em>
+                                  </div>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
                       </div>
-                    )}
-                  />
-                )}
+                    </>
+                  ))}
                 {readOnly ? null : !hasReferences ||
                   referenceToEdit === "NEW" ? (
                   <BibliographicReferenceSubForm
