@@ -1,5 +1,4 @@
 import {
-  AreYouSureModal,
   ButtonBar,
   FieldSpy,
   FieldWrapper,
@@ -28,6 +27,7 @@ import { BrowseStorageTree } from "./BrowseStorageTree";
 import { StorageSearchSelector } from "./StorageSearchSelector";
 import { Button } from "react-bootstrap";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { FaTrash, FaUnlink } from "react-icons/fa";
 
 export interface StorageLinkerProps {
   name?: string;
@@ -365,7 +365,7 @@ export function StorageLinkerField({
 }
 
 function usePromptToDeleteEmptyStorage() {
-  const { apiClient, save } = useApiClient();
+  const { apiClient } = useApiClient();
   const { openModal } = useModal();
 
   async function promptToDeleteEmptyStorage(
@@ -404,39 +404,39 @@ function usePromptToDeleteEmptyStorage() {
       ).data;
 
       openModal(
-        <AreYouSureModal
-          actionMessage={<DinaMessage id="warning" />}
-          messageBody={
-            <DinaMessage
-              id="deleteEmptyStorageWarning"
-              values={{ storageName: storageToDelete.name }}
-            />
-          }
-          onYesButtonClicked={async () => {
-            const operations: Parameters<typeof save>[0] = [
-              // If unlinking an existing content type:
-              ...(currentContent
-                ? [
-                    {
-                      resource: {
-                        id: currentContent.id,
-                        type: currentContent.type,
-                        [currentContent.type === "storage-unit"
-                          ? "parentStorageUnit"
-                          : "storageUnit"]: { id: null }
-                      },
-                      type: currentContent.type
-                    }
-                  ]
-                : []),
-              { delete: { id: storageId, type: "storage-unit" } }
-            ];
-
-            await save(operations, {
-              apiBaseUrl: "/collection-api"
-            });
-          }}
-        />
+        <div
+          className="modal-content"
+          style={{ minWidth: "600px", overflowY: "hidden" }}
+        >
+          <div className="modal-header">
+            <h2>
+              <DinaMessage id="unlinkStorageUnit" />
+            </h2>
+          </div>
+          <div className="modal-body">
+            <p>
+              <DinaMessage
+                id="unlinkStorageUnitDescription"
+                values={{
+                  storageUnitName: <strong>{storageToDelete.name ?? ""}</strong>
+                }}
+              />
+            </p>
+            <p>
+              <DinaMessage id="unlinkStorageUnitEmptyWarning" />
+            </p>
+          </div>
+          <div className="modal-footer">
+            <button className="btn btn-secondary " onClick={() => {}}>
+              <FaUnlink className="me-2" />
+              <DinaMessage id="unlinkOnlyButtonText" />
+            </button>
+            <button className="btn btn-danger ms-auto" onClick={() => {}}>
+              <FaTrash className="me-2" />
+              <DinaMessage id="unlinkAndDeleteButtonText" />
+            </button>
+          </div>
+        </div>
       );
     }
   }
