@@ -245,8 +245,6 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   deleteAllStorageUnit: "Standort aus allen Lagereinheiten löschen",
   deleteButtonText: "Löschen",
   deleteConfig: "Konfiguration löschen",
-  deleteEmptyStorageWarning:
-    "Lagereinheit {storageName} ist leer. Wollen Sie diese Lagereinheit dauerhaft löschen?",
   deleteFailedImport: "Fehlgeschlagenen Import löschen",
   deleteThisAttributesTemplate: "Diese Vorlage löschen",
   deleteThisView: "Diesen View löschen",
