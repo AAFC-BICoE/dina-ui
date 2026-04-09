@@ -226,13 +226,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   defaultValuesConfigs: "Default Values Configs",
   deleteButtonText: "Delete",
   deleteConfig: "Delete Config",
-  unlinkStorageUnit: "Empty Storage Unit Warning",
-  unlinkStorageUnitDescription:
-    "{storageUnitName} will be removed as the storage location for this Material Sample. This will leave the storage unit empty.",
-  unlinkStorageUnitEmptyWarning:
-    "Would you also like to permanently delete this storage unit?",
-  unlinkOnlyButtonText: "Detach Only",
-  unlinkAndDeleteButtonText: "Detach & Delete Storage Unit",
   deleteThisAttributesTemplate: "Delete This Template",
   deleteThisView: "Delete This View",
   deleted: "Deleted",
