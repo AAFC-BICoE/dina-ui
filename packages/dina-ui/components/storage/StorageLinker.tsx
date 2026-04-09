@@ -2,32 +2,23 @@ import {
   ButtonBar,
   FieldSpy,
   FieldWrapper,
-  SimpleSearchFilterBuilder,
   SubmitButton,
-  useApiClient,
   useBulkEditTabContext,
   useDinaFormContext,
-  useFieldLabels,
-  useModal
+  useFieldLabels
 } from "common-ui";
-import { useField } from "formik";
-import { KitsuResource, PersistedResource } from "kitsu";
+import { PersistedResource } from "kitsu";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Promisable } from "type-fest";
 import { StorageActionMode, StorageUnitForm } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import {
-  MaterialSample,
-  StorageUnit,
-  StorageUnitType
-} from "../../types/collection-api";
+import { StorageUnit, StorageUnitType } from "../../types/collection-api";
 import { AssignedStorage } from "./AssignedStorage";
 import { BrowseStorageTree } from "./BrowseStorageTree";
 import { StorageSearchSelector } from "./StorageSearchSelector";
 import { Button } from "react-bootstrap";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { FaTrash, FaUnlink } from "react-icons/fa";
 
 export interface StorageLinkerProps {
   name?: string;
@@ -58,11 +49,6 @@ export function StorageLinker({
   const [activeTab, setActiveTab] = useState(0);
   const { readOnly } = useDinaFormContext();
   const bulkEditContext = useBulkEditTabContext();
-
-  const formId = useField<string | undefined>("id")[0].value;
-  const formType = useField<string | undefined>("type")[0].value;
-
-  const { promptToDeleteEmptyStorage } = usePromptToDeleteEmptyStorage();
 
   /**
    * Generates an Elasticsearch query object for filtering storage units by type
@@ -144,15 +130,6 @@ export function StorageLinker({
     newValue: PersistedResource<StorageUnit> | { id: null }
   ) {
     await onChangeProp?.(newValue);
-
-    // When removing the parent which becomes empty, prompt to delete the parent:
-    const oldParentId = value?.id;
-    if (!newValue?.id && oldParentId) {
-      await promptToDeleteEmptyStorage(
-        oldParentId,
-        formId && formType ? { id: formId, type: formType } : undefined
-      );
-    }
 
     // If being changed to a new value, the deleted state needs to be removed.
     if (newValue?.id && name) {
@@ -362,84 +339,4 @@ export function StorageLinkerField({
       )}
     </FieldWrapper>
   );
-}
-
-function usePromptToDeleteEmptyStorage() {
-  const { apiClient } = useApiClient();
-  const { openModal } = useModal();
-
-  async function promptToDeleteEmptyStorage(
-    storageId: string,
-    currentContent?: KitsuResource
-  ) {
-    const hasChildUnits = !!(
-      await apiClient.get<StorageUnit[]>("collection-api/storage-unit", {
-        filter: SimpleSearchFilterBuilder.create()
-          .where("parentStorageUnit.uuid", "EQ", storageId)
-          .whereProvided("uuid", "NEQ", currentContent?.id)
-          .build(),
-        page: { limit: 1 }
-      })
-    ).data.length;
-
-    const hasChildSamples = !!(
-      await apiClient.get<MaterialSample[]>("collection-api/material-sample", {
-        filter: SimpleSearchFilterBuilder.create()
-          .where("storageUnitUsage.storageUnit.uuid", "EQ", storageId)
-          .whereProvided("uuid", "NEQ", currentContent?.id)
-          .build(),
-        page: { limit: 1 },
-        include: "storageUnitUsage"
-      })
-    ).data.length;
-
-    const isEmpty = !hasChildUnits && !hasChildSamples;
-
-    if (isEmpty) {
-      const storageToDelete = (
-        await apiClient.get<StorageUnit>(
-          `collection-api/storage-unit/${storageId}`,
-          {}
-        )
-      ).data;
-
-      openModal(
-        <div
-          className="modal-content"
-          style={{ minWidth: "600px", overflowY: "hidden" }}
-        >
-          <div className="modal-header">
-            <h2>
-              <DinaMessage id="unlinkStorageUnit" />
-            </h2>
-          </div>
-          <div className="modal-body">
-            <p>
-              <DinaMessage
-                id="unlinkStorageUnitDescription"
-                values={{
-                  storageUnitName: <strong>{storageToDelete.name ?? ""}</strong>
-                }}
-              />
-            </p>
-            <p>
-              <DinaMessage id="unlinkStorageUnitEmptyWarning" />
-            </p>
-          </div>
-          <div className="modal-footer">
-            <button className="btn btn-secondary " onClick={() => {}}>
-              <FaUnlink className="me-2" />
-              <DinaMessage id="unlinkOnlyButtonText" />
-            </button>
-            <button className="btn btn-danger ms-auto" onClick={() => {}}>
-              <FaTrash className="me-2" />
-              <DinaMessage id="unlinkAndDeleteButtonText" />
-            </button>
-          </div>
-        </div>
-      );
-    }
-  }
-
-  return { promptToDeleteEmptyStorage };
 }
