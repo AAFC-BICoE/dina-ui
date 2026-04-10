@@ -792,7 +792,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
 
       // Expect existing attachments to be shown for QC 1
       expect(
-        wrapper.getByText(TEST_METADATA_1?.originalFilename ?? "")
+        wrapper.getAllByText(TEST_METADATA_1?.originalFilename ?? "")[0]
       ).toBeInTheDocument();
       expect(
         wrapper.getByText(TEST_METADATA_2?.originalFilename ?? "")
@@ -1262,6 +1262,48 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
               type: "molecular-analysis-result"
             },
             type: "molecular-analysis-result"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
+    });
+  });
+
+  describe("Sequencing Run Attachments Section", () => {
+    it("Detaches an existing run attachment", async () => {
+      const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
+      await waitForLoadingToDisappear();
+
+      // The run attachment (japan.jpg / TEST_METADATA_1) should be visible
+      expect(
+        wrapper.getAllByText(TEST_METADATA_1.originalFilename ?? "")[1]
+      ).toBeInTheDocument();
+
+      // Find and click the detach button for that attachment
+      const detachButtons = wrapper.getAllByRole("button", { name: /detach/i });
+      // The last detach button belongs to the run attachments table
+      userEvent.click(detachButtons[detachButtons.length - 1]);
+
+      // Trigger the save
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalled();
+      });
+
+      // The attachment should have been saved with it removed
+      expect(mockSave).toHaveBeenCalledWith(
+        [
+          {
+            id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
+            resource: {
+              id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
+              relationships: {
+                attachments: {
+                  data: []
+                }
+              },
+              type: "molecular-analysis-run"
+            },
+            type: "molecular-analysis-run"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }
