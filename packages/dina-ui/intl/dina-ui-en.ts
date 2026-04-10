@@ -226,8 +226,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   defaultValuesConfigs: "Default Values Configs",
   deleteButtonText: "Delete",
   deleteConfig: "Delete Config",
-  deleteEmptyStorageWarning:
-    "Storage {storageName} is empty. Would you like to permanently delete this Storage Container?",
   deleteThisAttributesTemplate: "Delete This Template",
   deleteThisView: "Delete This View",
   deleted: "Deleted",

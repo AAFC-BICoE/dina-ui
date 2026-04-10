@@ -165,8 +165,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   defaultValuesConfigs: "Configuratsions des valeurs par défaut ",
   deleteButtonText: "Supprimer",
   deleteConfig: "Supprimer la configuration",
-  deleteEmptyStorageWarning:
-    "L'espace d'entreposage {storageName} est vide. Souhaitez-vous supprimer ce contenant d'entreposage définitivement?",
   deleteThisAttributesTemplate: "Supprimer ce modèle",
   deleteThisView: "Supprimer cette vue",
   deleted: "Supprimé",
