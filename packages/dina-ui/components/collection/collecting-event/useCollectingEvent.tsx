@@ -240,6 +240,16 @@ export function useCollectingEventSave({
     }
     delete collectingEventDiff.protocol;
 
+    // Convert collecting mehtod to a relationship.
+    if (collectingEventDiff?.collectionMethod) {
+      (collectingEventDiff as any).relationships.collectionMethod = {
+        data: collectingEventDiff?.collectionMethod?.id
+          ? _.pick(collectingEventDiff.collectionMethod, "id", "type")
+          : null
+      };
+    }
+    delete collectingEventDiff.collectionMethod;
+
     // First create a copy of what would be the new geographicPlaceNameSourceDetail
     const newSourceDetail = {
       ...(collectingEventDiff.geographicPlaceNameSourceDetail || {})
