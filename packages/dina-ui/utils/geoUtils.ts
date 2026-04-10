@@ -11,6 +11,10 @@ let mapModulesPromise: Promise<{
   GraphicsLayer: any;
   SketchViewModel: any;
   Graphic: any;
+  BasemapToggle: any;
+  Search: any;
+  ScaleBar: any;
+  Fullscreen: any;
 }> | null = null;
 
 /**
@@ -18,22 +22,39 @@ let mapModulesPromise: Promise<{
  */
 export async function getMapModules() {
   if (!mapModulesPromise) {
-    mapModulesPromise = loadModules(
-      [
-        "esri/Map",
-        "esri/views/MapView",
-        "esri/layers/GraphicsLayer",
-        "esri/widgets/Sketch/SketchViewModel",
-        "esri/Graphic"
-      ],
-      { css: false }
-    ).then(([Map, MapView, GraphicsLayer, SketchViewModel, Graphic]) => ({
-      Map,
-      MapView,
-      GraphicsLayer,
-      SketchViewModel,
-      Graphic
-    }));
+    mapModulesPromise = loadModules([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/GraphicsLayer",
+      "esri/widgets/Sketch/SketchViewModel",
+      "esri/Graphic",
+      "esri/widgets/BasemapToggle",
+      "esri/widgets/Search",
+      "esri/widgets/ScaleBar",
+      "esri/widgets/Fullscreen"
+    ]).then(
+      ([
+        Map,
+        MapView,
+        GraphicsLayer,
+        SketchViewModel,
+        Graphic,
+        BasemapToggle,
+        Search,
+        ScaleBar,
+        Fullscreen
+      ]) => ({
+        Map,
+        MapView,
+        GraphicsLayer,
+        SketchViewModel,
+        Graphic,
+        BasemapToggle,
+        Search,
+        ScaleBar,
+        Fullscreen
+      })
+    );
   }
 
   return mapModulesPromise;
