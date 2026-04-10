@@ -73,6 +73,11 @@ describe("QueryPage test", () => {
     expect(
       reactTable.querySelectorAll("table tbody tr")[0].getAttribute("style")
     ).toBeNull();
+
+    // Samples with a material sample state should be styled with reduced opacity
+    expect(
+      reactTable.querySelectorAll("table tbody tr")[1].getAttribute("style")
+    ).toEqual("opacity: 0.4;");
   });
 
   it("Bulk Delete button works for material-samples", async () => {
@@ -180,6 +185,11 @@ describe("QueryPage test", () => {
     expect(
       reactTable.querySelectorAll("table tbody tr")[0].getAttribute("style")
     ).toBeNull();
+
+    // Samples with a material sample state should be styled with reduced opacity
+    expect(
+      reactTable.querySelectorAll("table tbody tr")[1].getAttribute("style")
+    ).toEqual("opacity: 0.4;");
   });
 
   it("Bulk Delete button works for material-samples", async () => {
