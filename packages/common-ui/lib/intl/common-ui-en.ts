@@ -212,5 +212,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   deleteSuccess: "Successfully deleted {count} records.",
   noData: "No Data",
   listView: "List",
-  galleryView: "Gallery"
+  galleryView: "Gallery",
+  taxonomyTreeView: "Taxonomic Hierarchy"
 };

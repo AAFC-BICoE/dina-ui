@@ -12,7 +12,10 @@ import {
   QueryPage,
   SimpleSearchFilterBuilder,
   stringArrayCell,
-  useApiClient
+  useApiClient,
+  ListViewTab,
+  TaxonomyTreeTab,
+  QueryPageTabConfig
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -527,6 +530,19 @@ export default function MaterialSampleListPage() {
     return undefined;
   };
 
+  const MATERIAL_SAMPLE_TABS: QueryPageTabConfig<MaterialSample>[] = [
+    {
+      id: "list",
+      labelKey: "listView",
+      component: ListViewTab
+    },
+    {
+      id: "taxonomyTree",
+      labelKey: "taxonomyTreeView",
+      component: TaxonomyTreeTab
+    }
+  ];
+
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
@@ -573,6 +589,8 @@ export default function MaterialSampleListPage() {
             entityLink: "/collection/material-sample"
           }}
           bulkSplitPath="/collection/material-sample/bulk-split"
+          tabs={MATERIAL_SAMPLE_TABS}
+          defaultTab="list"
         />
       </main>
       <Footer />

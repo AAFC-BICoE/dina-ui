@@ -31,7 +31,14 @@ interface ElasticsearchResponse {
   };
 }
 
-export default function TaxonomyTree() {
+export interface TaxonomyTreeProps {
+  /**
+   * Optional query to filter the material samples for the taxonomy data.
+   */
+  inputQuery?: any;
+}
+
+export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
   const [error, setError] = useState<string | null>(null);
   const [taxonomicRanks, setTaxonomicRanks] = useState<string[]>([]);
   const [treeData, setTreeData] = useState<TreeNode>({ name: "Taxonomy" });
@@ -64,10 +71,10 @@ export default function TaxonomyTree() {
       if (ranks.length > 0) {
         setTaxonomicRanks(ranks);
         // Only fetch the top level (kingdom) initially
-        fetchTaxonomyData(ranks[0]);
+        fetchTaxonomyData(ranks[0], undefined, undefined, inputQuery);
       }
     }
-  }, [loading]);
+  }, [loading, inputQuery]);
 
   // Update the chart whenever treeData changes
   useEffect(() => {
@@ -79,7 +86,8 @@ export default function TaxonomyTree() {
   // Build optimized query for taxonomic aggregations
   const buildTaxonomyQuery = (
     rank: string,
-    parentRanksAndValues: Array<{ rank: string; value: string }> = []
+    parentRanksAndValues: Array<{ rank: string; value: string }> = [],
+    inputQuery?: any
   ): Record<string, any> => {
     // Create the query structure
     const query: Record<string, any> = {
@@ -109,8 +117,19 @@ export default function TaxonomyTree() {
           must
         }
       };
-    }
+      // If there's an input query, add it to the must array
+      if (inputQuery) {
+        query.query.bool.must.push(inputQuery);
+      }
 
+      // If no query is provided, we still want to filter by input query.
+    } else if (inputQuery) {
+      query.query = {
+        bool: {
+          must: [inputQuery]
+        }
+      };
+    }
     return query;
   };
 
@@ -136,10 +155,11 @@ export default function TaxonomyTree() {
   const fetchTaxonomyData = async (
     rank: string,
     parentNodePath: Array<{ rank: string; value: string }> = [],
-    parentNodeId?: string
+    parentNodeId?: string,
+    inputQuery?: any
   ): Promise<void> => {
     try {
-      const query = buildTaxonomyQuery(rank, parentNodePath);
+      const query = buildTaxonomyQuery(rank, parentNodePath, inputQuery);
 
       const response = await apiClient.axios.post<ElasticsearchResponse>(
         `search-api/search-ws/search`,
@@ -247,7 +267,7 @@ export default function TaxonomyTree() {
         value: node.name
       });
 
-      fetchTaxonomyData(nextRank, parentPath, node.id);
+      fetchTaxonomyData(nextRank, parentPath, node.id, inputQuery);
     } else if (node.loaded) {
       // Toggle expanded state if already loaded
       if (expandedNodesRef.current.has(node.id)) {
