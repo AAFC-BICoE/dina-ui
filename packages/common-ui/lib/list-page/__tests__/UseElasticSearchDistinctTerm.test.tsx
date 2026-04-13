@@ -144,7 +144,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
               terms: { field: FIELD_NAME + ".keyword", size: 100 }
             }
           },
-          query: { terms: { "data.attributes.group.keyword": GROUPS } },
+          query: { terms: { "data.attributes.group": GROUPS } },
           size: 0
         },
         { params: { indexName: INDEX_NAME } }
@@ -185,7 +185,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
               terms: { field: FIELD_NAME, size: 100 }
             }
           },
-          query: { terms: { "data.attributes.group.keyword": GROUPS } },
+          query: { terms: { "data.attributes.group": GROUPS } },
           size: 0
         },
         { params: { indexName: INDEX_NAME } }
@@ -223,7 +223,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         "search-api/search-ws/search",
         {
           size: 0,
-          query: { terms: { "data.attributes.group.keyword": GROUPS } },
+          query: { terms: { "data.attributes.group": GROUPS } },
           aggs: {
             included_aggregation: {
               nested: { path: "included" },
