@@ -14,6 +14,7 @@ import { Protocol } from "./Protocol";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 import { Expedition } from "./Expedition";
 import { Site } from "./Site";
+import { CollectionMethod } from "./CollectionMethod";
 
 export interface CollectingEventAttributes {
   type: "collecting-event";
@@ -83,6 +84,7 @@ export interface CollectingEventRelationships {
   collectors?: KitsuResource[];
   collectorGroups?: CollectorGroup[];
   geoReferenceAssertions?: GeoReferenceAssertion[];
+  collectionMethod?: CollectionMethod;
 }
 
 export type CollectingEvent = KitsuResource &
