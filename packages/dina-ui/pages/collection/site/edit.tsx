@@ -84,7 +84,10 @@ function SiteForm({ site }: { site?: PersistedResource<Site> }) {
       enableReinitialize={true}
     >
       {buttonBar}
-      <SiteFormLayout mode={POLYGON_EDITOR_MODE.EDIT} />
+      <SiteFormLayout
+        mode={POLYGON_EDITOR_MODE.EDIT}
+        id={siteInitialValues?.id ?? ""}
+      />
     </DinaForm>
   );
 }
