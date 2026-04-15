@@ -1,5 +1,10 @@
 import { KitsuResource } from "kitsu";
-import { ExportType, ExportOptions, FunctionDef } from "./DataExport";
+import {
+  ExportType,
+  ExportOptions,
+  FunctionDef,
+  EntitySchema
+} from "./DataExport";
 
 export interface DataExportTemplateAttributes {
   type: "data-export-template";
@@ -14,8 +19,7 @@ export interface DataExportTemplateAttributes {
   exportType: ExportType;
   exportOptions?: ExportOptions;
 
-  columns?: string[];
-  columnAliases?: string[];
+  schema?: Record<string, EntitySchema>;
   functions?: Record<string, FunctionDef>;
 }
 

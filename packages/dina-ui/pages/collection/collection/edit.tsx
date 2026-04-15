@@ -23,6 +23,7 @@ import _ from "lodash";
 import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
+import { CollectionLinkedProjectsTable } from "../../../components/collection/collection/CollectionLinkedProjectsTable";
 import CollectionSampleTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
 import CollectionRelatedObjectTypeChart from "../../../components/collection/collection/CollectionRelatedObjectTypeChart";
 import CollectionRecordsAddedChart from "../../../components/collection/collection/CollectionRecordsAddedChart";
@@ -216,6 +217,11 @@ export function CollectionFormFields() {
             <Drilldown id={uuid} />
           </div>
         </>
+      )}
+      {readOnly && (
+        <div className="row">
+          <CollectionLinkedProjectsTable id={uuid} />
+        </div>
       )}
     </div>
   );

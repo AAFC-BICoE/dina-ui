@@ -401,9 +401,7 @@ export function applyGroupFilters(elasticSearchQuery: any, groups: string[]) {
           ...(elasticSearchQuery?.query?.bool?.must ?? []),
           {
             [multipleGroups ? "terms" : "term"]: {
-              "data.attributes.group.keyword": multipleGroups
-                ? groups
-                : groups[0]
+              "data.attributes.group": multipleGroups ? groups : groups[0]
             }
           }
         ]

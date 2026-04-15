@@ -121,6 +121,9 @@ export function QualityControlSection({
                       captureMenuScroll={true}
                       menuShouldScrollIntoView={false}
                       minMenuHeight={600}
+                      styles={{
+                        menu: (base) => ({ ...base, zIndex: 9999 })
+                      }}
                     />
                   ) : (
                     <p className="mb-0">

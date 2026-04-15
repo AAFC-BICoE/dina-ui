@@ -178,6 +178,20 @@ describe("QueryBuilderBooleanSearch", () => {
           })
         ).toMatchSnapshot();
       });
+
+      // This is a fallback, should not be possible to have an empty value for a boolean search,
+      // but just in case, ensure it does not break anything and defaults to true.
+      test("If no value is provided for equals operation, it should default to true.", async () => {
+        expect(
+          transformBooleanSearchToDSL({
+            operation: "equals",
+            value: "",
+            fieldInfo: {} as any,
+            fieldPath: "data.attributes.booleanField",
+            queryType: "equals"
+          })
+        ).toMatchSnapshot();
+      });
     });
   });
 });
