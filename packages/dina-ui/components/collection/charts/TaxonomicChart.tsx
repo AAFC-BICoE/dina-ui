@@ -1,10 +1,13 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
-//import { UncontrolledTreeEnvironment, Tree, StaticTreeDataProvider, TreeItem } from 'react-complex-tree';
 import { Card, CardHeader } from "react-bootstrap";
-//import "echarts/theme/inspired";
 import { useMessage } from "../context/MessageContext";
+
+interface TaxonNode {
+  name: any;
+  children: TaxonNode[];
+}
 
 const TAXON_LEVELS = [
   "by_kingdom",
@@ -14,6 +17,16 @@ const TAXON_LEVELS = [
   "by_family",
   "by_genus",
   "by_species"
+];
+
+const TAXON_LABELS = [
+  "Kingdom",
+  "Phylum",
+  "Class",
+  "Order",
+  "Family",
+  "Genus",
+  "Species"
 ];
 
 const getAggregationKey = (aggName: string, obj: any): string | null => {
@@ -67,6 +80,38 @@ function convertBucketsToSunburst(
   });
 }
 
+export function prunePlaceholders(node) {
+  if (!node) return null;
+
+  const isPlaceholder = node.name === "MISSING";
+
+  if (!node.children || node.children.length === 0) {
+    return isPlaceholder ? null : node;
+  }
+
+  const prunedChildren = node.children.map(prunePlaceholders).filter(Boolean);
+
+  if (prunedChildren.length === 0) {
+    return isPlaceholder ? null : { ...node, children: [] };
+  }
+
+  return { ...node, children: prunedChildren };
+}
+
+export function transformTreeForEcharts(tree) {
+  function makeEchartsNode(node) {
+    const { name, value, children } = node;
+    return {
+      name,
+      value: value || 1,
+      children:
+        children && children.length ? children.map(makeEchartsNode) : undefined
+    };
+  }
+  const processedTree = prunePlaceholders(tree);
+  return makeEchartsNode(processedTree);
+}
+
 export default function TaxonomySunburstChart({ query }) {
   const { apiClient } = useApiClient();
   const { message } = useMessage();
@@ -76,9 +121,8 @@ export default function TaxonomySunburstChart({ query }) {
   type SourceFilter = "GNA" | "CUSTOM" | "VERBATIM" | "NO_DETERMINATION" | null;
 
   const [selectedSource, setSelectedSource] = useState<SourceFilter>(null);
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState<TaxonNode | null>();
   const [chartReady, setChartReady] = useState(false);
-  //const [treeItems, setTreeItems] = useState<Record<string, TreeItem> | null>(null);
 
   function buildSourceFilter(selectedSource) {
     switch (selectedSource) {
@@ -140,49 +184,62 @@ export default function TaxonomySunburstChart({ query }) {
               terms: {
                 field:
                   "data.attributes.targetOrganismPrimaryClassification.kingdom.keyword",
-                size: 100
+                size: 100,
+                order: { _count: "desc" },
+                missing: "MISSING"
               },
               aggs: {
                 by_phylum: {
                   terms: {
                     field:
                       "data.attributes.targetOrganismPrimaryClassification.phylum.keyword",
-                    size: 100
+                    size: 100,
+                    order: { _count: "desc" },
+                    missing: "MISSING"
                   },
                   aggs: {
                     by_class: {
                       terms: {
                         field:
                           "data.attributes.targetOrganismPrimaryClassification.class.keyword",
-                        size: 100
+                        size: 100,
+                        order: { _count: "desc" },
+                        missing: "MISSING"
                       },
                       aggs: {
                         by_order: {
                           terms: {
                             field:
                               "data.attributes.targetOrganismPrimaryClassification.order.keyword",
-                            size: 100
+                            size: 100,
+                            order: { _count: "desc" },
+                            missing: "MISSING"
                           },
                           aggs: {
                             by_family: {
                               terms: {
                                 field:
                                   "data.attributes.targetOrganismPrimaryClassification.family.keyword",
-                                size: 10000
+                                size: 10000,
+                                order: { _count: "desc" },
+                                missing: "MISSING"
                               },
                               aggs: {
                                 by_genus: {
                                   terms: {
                                     field:
                                       "data.attributes.targetOrganismPrimaryClassification.genus.keyword",
-                                    size: 10000
+                                    size: 10000,
+                                    order: { _count: "desc" },
+                                    missing: "MISSING"
                                   },
                                   aggs: {
                                     by_species: {
                                       terms: {
                                         field:
-                                          "data.attributes.targetOrganismPrimaryScientificName.keyword",
-                                        size: 10000
+                                          "data.attributes.targetOrganismPrimaryClassification.species.keyword",
+                                        size: 10000,
+                                        order: { _count: "desc" }
                                       }
                                     }
                                   }
@@ -204,26 +261,23 @@ export default function TaxonomySunburstChart({ query }) {
 
       const aggKey = getAggregationKey("by_kingdom", response);
       if (!aggKey) return null;
+
       const buckets = response.data.aggregations[aggKey]?.buckets ?? [];
 
-      const hierarchy = convertBucketsToSunburst(buckets, TAXON_LEVELS);
+      const rawTrees = convertBucketsToSunburst(buckets, TAXON_LEVELS);
 
-      setChartData(hierarchy);
+      const mergedTree = transformTreeForEcharts({
+        id: "root",
+        name: "Life",
+        children: rawTrees
+      });
+
+      setChartData(mergedTree);
     } catch (err) {
       console.error("Error fetching taxonomy data:", err);
-      setChartData([]);
+      setChartData(null);
     }
   }
-
-  const TAXON_LABELS = [
-    "Kingdom",
-    "Phylum",
-    "Class",
-    "Order",
-    "Family",
-    "Genus",
-    "Species"
-  ];
 
   function getLevelOption() {
     return [
@@ -331,7 +385,7 @@ export default function TaxonomySunburstChart({ query }) {
           radius: [0, "95%"],
           sort: undefined,
           emphasis: { focus: "ancestor" },
-          data: chartData,
+          data: chartData?.children,
           label: {
             rotate: "tangential",
             minAngle: 6,
@@ -394,7 +448,7 @@ export default function TaxonomySunburstChart({ query }) {
           },
           levels: getLevelOption(),
 
-          data: chartData
+          data: chartData?.children
         }
       ]
     };
@@ -487,7 +541,7 @@ export default function TaxonomySunburstChart({ query }) {
     fetchData(selectedSource);
   }, [selectedSource]);
 
-  return chartData.length ? (
+  return chartData?.children ? (
     <div>
       <strong>Taxonomic Chart (Structured Entries Only)</strong>
       <Card>
@@ -551,7 +605,6 @@ export default function TaxonomySunburstChart({ query }) {
         </CardHeader>
         <ReactECharts
           option={option}
-          //theme="inspired"
           style={{ height: "800px", width: "100%" }}
           ref={chartRef}
           onChartReady={onChartReady}

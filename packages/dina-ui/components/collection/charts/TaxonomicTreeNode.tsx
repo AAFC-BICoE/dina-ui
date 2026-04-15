@@ -2,6 +2,24 @@ import React, { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import { useMessage } from "../context/MessageContext";
 
+export function prunePlaceholders(node) {
+  if (!node) return null;
+
+  const isPlaceholder = node.name === "MISSING";
+
+  if (!node.children || node.children.length === 0) {
+    return isPlaceholder ? null : node;
+  }
+
+  const prunedChildren = node.children.map(prunePlaceholders).filter(Boolean);
+
+  if (prunedChildren.length === 0) {
+    return isPlaceholder ? null : { ...node, children: [] };
+  }
+
+  return { ...node, children: prunedChildren };
+}
+
 export default function TaxonomicTreeNode({ query }) {
   const { apiClient } = useApiClient();
   const { setMessage } = useMessage();
@@ -62,48 +80,54 @@ export default function TaxonomicTreeNode({ query }) {
                 terms: {
                   field:
                     "data.attributes.targetOrganismPrimaryClassification.kingdom.keyword",
-                  size: 100
+                  size: 100,
+                  missing: "MISSING"
                 },
                 aggs: {
                   by_phylum: {
                     terms: {
                       field:
                         "data.attributes.targetOrganismPrimaryClassification.phylum.keyword",
-                      size: 100
+                      size: 100,
+                      missing: "MISSING"
                     },
                     aggs: {
                       by_class: {
                         terms: {
                           field:
                             "data.attributes.targetOrganismPrimaryClassification.class.keyword",
-                          size: 100
+                          size: 100,
+                          missing: "MISSING"
                         },
                         aggs: {
                           by_order: {
                             terms: {
                               field:
                                 "data.attributes.targetOrganismPrimaryClassification.order.keyword",
-                              size: 100
+                              size: 100,
+                              missing: "MISSING"
                             },
                             aggs: {
                               by_family: {
                                 terms: {
                                   field:
                                     "data.attributes.targetOrganismPrimaryClassification.family.keyword",
-                                  size: 10000
+                                  size: 10000,
+                                  missing: "MISSING"
                                 },
                                 aggs: {
                                   by_genus: {
                                     terms: {
                                       field:
                                         "data.attributes.targetOrganismPrimaryClassification.genus.keyword",
-                                      size: 10000
+                                      size: 10000,
+                                      missing: "MISSING"
                                     },
                                     aggs: {
                                       by_species: {
                                         terms: {
                                           field:
-                                            "data.attributes.targetOrganismPrimaryScientificName.keyword",
+                                            "data.attributes.targetOrganismPrimaryClassification.species.keyword",
                                           size: 10000
                                         }
                                       }
@@ -135,7 +159,9 @@ export default function TaxonomicTreeNode({ query }) {
           children: buildTree(buckets, "kingdom")
         };
 
-        setRoot(tree);
+        const prunedTree = prunePlaceholders(tree);
+
+        setRoot(prunedTree);
       } catch (err) {
         console.error("Error loading taxonomy:", err);
       }
