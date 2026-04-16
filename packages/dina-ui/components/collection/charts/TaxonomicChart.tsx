@@ -71,8 +71,11 @@ function convertBucketsToSunburst(
       depth + 1
     );
 
+    //ensures different ids for drilldown
+    let newID = bucket.key + bucket.doc_count;
+
     return {
-      id: bucket.key,
+      id: newID,
       name: bucket.key,
       value: bucket.doc_count,
       children: Array.isArray(children) ? children : []
@@ -100,8 +103,9 @@ export function prunePlaceholders(node) {
 
 export function transformTreeForEcharts(tree) {
   function makeEchartsNode(node) {
-    const { name, value, children } = node;
+    const { id, name, value, children } = node;
     return {
+      id,
       name,
       value: value || 1,
       children:

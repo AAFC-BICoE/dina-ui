@@ -40,10 +40,11 @@ export default function TaxonomicTreeNode({ query }) {
     return key ? obj[key] : undefined;
   }
 
-  function buildTree(buckets: any[], rank: string): TreeNodeData[] {
+  function buildTree(buckets: any[]): TreeNodeData[] {
     return buckets.map((b) => {
+      //ensures different ids for drilldown
       const node: TreeNodeData = {
-        id: `${rank}:${b.key}`,
+        id: b.key + b.doc_count,
         name: b.key,
         count: b.doc_count ?? 0,
         children: []
@@ -56,12 +57,12 @@ export default function TaxonomicTreeNode({ query }) {
       const genusAgg = findAgg(b, "by_genus");
       const speciesAgg = findAgg(b, "by_species");
 
-      if (phylumAgg) node.children = buildTree(phylumAgg.buckets, "phylum");
-      if (classAgg) node.children = buildTree(classAgg.buckets, "class");
-      if (orderAgg) node.children = buildTree(orderAgg.buckets, "order");
-      if (familyAgg) node.children = buildTree(familyAgg.buckets, "family");
-      if (genusAgg) node.children = buildTree(genusAgg.buckets, "genus");
-      if (speciesAgg) node.children = buildTree(speciesAgg.buckets, "species");
+      if (phylumAgg) node.children = buildTree(phylumAgg.buckets);
+      if (classAgg) node.children = buildTree(classAgg.buckets);
+      if (orderAgg) node.children = buildTree(orderAgg.buckets);
+      if (familyAgg) node.children = buildTree(familyAgg.buckets);
+      if (genusAgg) node.children = buildTree(genusAgg.buckets);
+      if (speciesAgg) node.children = buildTree(speciesAgg.buckets);
 
       return node;
     });
@@ -156,7 +157,7 @@ export default function TaxonomicTreeNode({ query }) {
           id: "root",
           name: "Taxonomic Tree",
           count: 0,
-          children: buildTree(buckets, "kingdom")
+          children: buildTree(buckets)
         };
 
         const prunedTree = prunePlaceholders(tree);
@@ -204,7 +205,7 @@ export default function TaxonomicTreeNode({ query }) {
             <span style={{ width: 12, display: "inline-block" }}>•</span>
           )}
 
-          <span onClick={() => setMessage(node.name)}>{node.name}</span>
+          <span onClick={() => setMessage(node.id)}>{node.name}</span>
 
           {node.id !== "root" && (
             <span
