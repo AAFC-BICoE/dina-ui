@@ -9,7 +9,8 @@ import {
 } from "common-ui";
 import {
   AttachmentsField,
-  GroupSelectField
+  GroupSelectField,
+  ManagedAttributesEditor
 } from "packages/dina-ui/components";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
@@ -99,6 +100,15 @@ export default function SiteFormLayout({
         </div>
       </div>
       <MultilingualDescription />
+      <ManagedAttributesEditor
+        valuesPath="managedAttributes"
+        managedAttributeApiPath="collection-api/managed-attribute"
+        managedAttributeComponent="SITE"
+        fieldSetProps={{
+          legend: <DinaMessage id="siteManagedAttributes" />
+        }}
+        disableClearButton={true}
+      />
       {readOnly && (
         <div className="row">
           <DateField

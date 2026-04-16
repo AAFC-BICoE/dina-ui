@@ -67,6 +67,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   assemblageAttachments: "Assemblage Attachments",
   assemblageListTitle: "Assemblages",
   assemblageManagedAttributes: "Assemblage Managed Attributes",
+  siteManagedAttributes: "Site Managed Attributes",
   assemblage_tooltip:
     "Mechanism used to group material samples according to some organizational theme.",
   assemblages: "Assemblages",
@@ -1416,6 +1417,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   waitingForPolygonData: "Waiting for polygon data...",
   addSite: "Add Site",
   editSite: "Edit Site",
+  site: "Site",
   createOnMap: "Create on Map",
   editOnMap: "Edit on Map",
   erase: "Erase",
