@@ -28,7 +28,7 @@ import CollectionSampleTypeChart from "../../../components/collection/collection
 import CollectionRelatedObjectTypeChart from "../../../components/collection/collection/CollectionRelatedObjectTypeChart";
 import CollectionRecordsAddedChart from "../../../components/collection/collection/CollectionRecordsAddedChart";
 import CollectionTaxonomicDetChart from "../../../components/collection/collection/CollectionTaxonomicDetChart";
-import Drilldown from "../../../components/collection/Drilldown";
+import CollectionDrilldown from "../../../components/collection/CollectionDrilldown";
 
 export default function CollectionEditPage() {
   const router = useRouter();
@@ -214,7 +214,7 @@ export function CollectionFormFields() {
             </div>
           </div>
           <div className="row mt-3 mb-3">
-            <Drilldown id={uuid} />
+            <CollectionDrilldown id={uuid} />
           </div>
         </>
       )}
