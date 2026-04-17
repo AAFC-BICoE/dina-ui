@@ -15,6 +15,7 @@ export interface Notification {
   title: string;
   message: string;
   messageParams?: Record<string, NotificationMessageParam[]>;
+  notificationParams?: Record<string, any>;
   status: NotificationStatus;
   expiresOn?: string;
   createdOn: string;

@@ -2,9 +2,10 @@ import { useState, memo } from "react";
 import moment from "moment";
 import { Notification } from "./types";
 import {
-  DataExportReadyNotification,
-  NOTIFICATION_TYPE_DATA_EXPORT_READY
-} from "./notification-types/DataExportReadyNotification";
+  ExportReadyNotification,
+  NOTIFICATION_TYPE_DATA_EXPORT_READY,
+  NOTIFICATION_TYPE_OBJECT_EXPORT_READY
+} from "./notification-types/ExportReadyNotification";
 import React from "react";
 
 export interface NotificationCardProps {
@@ -145,8 +146,11 @@ export const NotificationCard = memo(function NotificationCard({
 
   // Render different actions based on notification type
   const renderActions = () => {
-    if (notification.type === NOTIFICATION_TYPE_DATA_EXPORT_READY) {
-      return <DataExportReadyNotification notification={notification} />;
+    if (
+      notification.type === NOTIFICATION_TYPE_DATA_EXPORT_READY ||
+      notification.type === NOTIFICATION_TYPE_OBJECT_EXPORT_READY
+    ) {
+      return <ExportReadyNotification notification={notification} />;
     }
 
     return null;

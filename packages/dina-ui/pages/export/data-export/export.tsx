@@ -25,7 +25,6 @@ import {
   getEntityKeyFromIndexName
 } from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
 import {
-  getExport,
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
   MAX_OBJECT_EXPORT_TOTAL
 } from "packages/common-ui/lib/export/exportUtils";
@@ -85,7 +84,7 @@ const NON_EXPORTABLE_COLUMNS_MAP: { [key: string]: string[] } = {
 
 export default function ExportPage<TData extends KitsuResource>() {
   const { formatNumber } = useIntl();
-  const { bulkGet, apiClient, save } = useApiClient();
+  const { bulkGet, save } = useApiClient();
   const router = useRouter();
 
   // Unique name to be used for the local storage.
@@ -310,19 +309,9 @@ export default function ExportPage<TData extends KitsuResource>() {
       };
 
       try {
-        const objectExportResponse = await save<ObjectExport>(
-          [objectExportSaveArg],
-          {
-            apiBaseUrl: "/objectstore-api"
-          }
-        );
-        await getExport(
-          objectExportResponse,
-          setLoading,
-          setDataExportError,
-          apiClient,
-          formik
-        );
+        await save<ObjectExport>([objectExportSaveArg], {
+          apiBaseUrl: "/objectstore-api"
+        });
       } catch (e) {
         setDataExportError(
           <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
