@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import ArcGISLoader from "../../geo/ArcGISLoader";
-import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
+import { POLYGON_EDITOR_MODE } from "../../../types/geo/polygon-editor-mode.types";
 import {
   getMapModules,
   projectPolygon3857To4326
-} from "packages/dina-ui/utils/geoUtils";
-import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
-import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
+} from "../../../utils/geoUtils";
+import type { PolygonEditorMode } from "../../../types/geo/polygon-editor-mode.types";
+import type { GeoPosition } from "../../../types/geo/geo.types";
 
 export default function PolygonEditorMap({
   coords,
@@ -21,13 +21,28 @@ export default function PolygonEditorMap({
   const sketchRef = useRef<any>(null);
   const [graphicsLayer, setGraphicsLayer] = useState<any>(null);
 
+  const onCoordsChangeRef = useRef(onCoordsChange);
+  useEffect(() => {
+    onCoordsChangeRef.current = onCoordsChange;
+  }, [onCoordsChange]);
+
   useEffect(() => {
     if (!mapRef.current) return;
 
     let viewInstance: any;
 
     getMapModules().then(
-      ({ Map, MapView, GraphicsLayer, SketchViewModel, Graphic }) => {
+      ({
+        Map,
+        MapView,
+        GraphicsLayer,
+        SketchViewModel,
+        Graphic,
+        BasemapToggle,
+        Search,
+        ScaleBar,
+        Fullscreen
+      }) => {
         const layer = new GraphicsLayer();
         setGraphicsLayer(layer);
 
@@ -48,6 +63,48 @@ export default function PolygonEditorMap({
           }
         });
 
+        // Map layer toggle
+        const basemapToggle = new BasemapToggle({
+          view: viewInstance,
+          nextBasemap: "hybrid"
+        });
+        viewInstance.ui.add(basemapToggle, "bottom-right");
+
+        // Search
+        if (mode === POLYGON_EDITOR_MODE.EDIT) {
+          const search = new Search({ view: viewInstance });
+          viewInstance.ui.add(search, "bottom-left");
+        }
+
+        // Scalebar
+        const scaleBar = new ScaleBar({
+          view: viewInstance,
+          unit: "metric"
+        });
+        viewInstance.ui.add(scaleBar, "bottom-left");
+
+        // Fullscreen button
+        const fullscreen = new Fullscreen({
+          view: viewInstance
+        });
+        viewInstance.ui.add(fullscreen, "top-right");
+
+        // Clear button
+        if (mode === POLYGON_EDITOR_MODE.EDIT) {
+          const clearButton = document.createElement("div");
+          clearButton.className =
+            "esri-widget esri-widget--button esri-interactive";
+          clearButton.title = "Clear polygon";
+          clearButton.innerHTML = `<span class="esri-icon esri-icon-trash" aria-label="Clear polygon"></span>`;
+          clearButton.addEventListener("click", () => {
+            sketchRef.current?.cancel();
+            layer.removeAll();
+            sketchRef.current?.create("polygon");
+          });
+
+          viewInstance.ui.add(clearButton, "top-right");
+        }
+
         const polygonSymbol = {
           type: "simple-fill",
           color: [226, 119, 40, 0.2],
@@ -61,7 +118,53 @@ export default function PolygonEditorMap({
           view: viewInstance,
           layer,
           updateOnGraphicClick: mode === POLYGON_EDITOR_MODE.EDIT,
-          polygonSymbol
+          polygonSymbol,
+
+          activeVertexSymbol: {
+            type: "simple-marker",
+            style: "circle",
+            color: [226, 119, 40],
+            size: "12px",
+            outline: {
+              color: "white",
+              width: 2
+            }
+          },
+
+          vertexSymbol: {
+            type: "simple-marker",
+            style: "circle",
+            color: "white",
+            size: "10px",
+            outline: {
+              color: [226, 119, 40],
+              width: 2
+            }
+          },
+
+          activeLineSymbol: {
+            type: "simple-line",
+            color: [226, 119, 40],
+            width: 2,
+            style: "dash"
+          },
+
+          tooltipOptions: {
+            enabled: true
+          },
+
+          defaultCreateOptions: {
+            mode: "click",
+            hasZ: false
+          },
+
+          defaultUpdateOptions: {
+            tool: "reshape",
+            toggleToolOnClick: true,
+            enableRotation: true,
+            enableScaling: true,
+            multipleSelectionEnabled: false
+          }
         });
         sketchRef.current = sketch;
 
@@ -102,9 +205,11 @@ export default function PolygonEditorMap({
       const graphic = graphicsLayer.graphics.getItemAt(0);
 
       if (graphic) {
-        onCoordsChange(await projectPolygon3857To4326(graphic.geometry.rings));
+        onCoordsChangeRef.current(
+          await projectPolygon3857To4326(graphic.geometry.rings)
+        );
       } else {
-        onCoordsChange([]);
+        onCoordsChangeRef.current([]);
         sketchRef.current?.create("polygon");
       }
     };

@@ -4,14 +4,45 @@ import {
   dateCell,
   QueryPage,
   stringArrayCell,
-  FieldHeader
+  FieldHeader,
+  ColumnDefinition
 } from "common-ui";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { CollectingEvent } from "packages/dina-ui/types/collection-api";
+import { groupCell } from "packages/dina-ui/components";
 
 const NON_EXPORTABLE_COLUMNS = ["selectColumn"];
+
+export const apiColumns: ColumnDefinition<CollectingEvent>[] = [
+  {
+    cell: ({
+      row: {
+        original: { id }
+      }
+    }) => {
+      return (
+        <Link href={`/collection/collecting-event/view?id=${id}`}>
+          <DinaMessage id="viewDetails" />
+        </Link>
+      );
+    },
+    accessorKey: "data.attributes.id",
+    header: () => <FieldHeader name="viewDetails" />,
+    enableSorting: false,
+    id: "viewDetails"
+  },
+  "dwcFieldNumber",
+  "dwcRecordNumber",
+  stringArrayCell("otherRecordNumbers"),
+  "startEventDateTime",
+  "endEventDateTime",
+  "verbatimEventDateTime",
+  groupCell("group"),
+  "createdBy",
+  dateCell("createdOn")
+];
 
 export const columns: TableColumn<CollectingEvent>[] = [
   {
@@ -98,6 +129,18 @@ export default function CollectingEventListPage() {
         bulkDeleteButtonProps={{
           typeName: "collecting-event",
           apiBaseUrl: "/collection-api"
+        }}
+        dynamicFieldMapping={{
+          fields: [],
+          relationshipFields: [
+            {
+              label: "siteGeom",
+              path: "included.attributes.siteGeom",
+              type: "geoShape",
+              referencedBy: "site",
+              referencedType: "site"
+            }
+          ]
         }}
       />
     </PageLayout>

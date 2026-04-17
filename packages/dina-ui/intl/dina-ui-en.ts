@@ -160,6 +160,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
   collectionMethodListTitle: "Collection Method",
   collectionMethodNameLabel: "Collection Method Name",
+  collectionLinkedProjectTableTitle: "Linked Projects",
   sampleTypeChartTitle: "Material Sample Types",
   recordAddedChartTitle: "Records Added by Date",
   recordAddedChartTitleYear: "Records Added by Date (Year)",
@@ -231,8 +232,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   defaultValuesConfigs: "Default Values Configs",
   deleteButtonText: "Delete",
   deleteConfig: "Delete Config",
-  deleteEmptyStorageWarning:
-    "Storage {storageName} is empty. Would you like to permanently delete this Storage Container?",
   deleteThisAttributesTemplate: "Delete This Template",
   deleteThisView: "Delete This View",
   deleted: "Deleted",
@@ -415,7 +414,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcOtherRecordNumbers: "Other Record Numbers",
   field_dwcRecordNumber: "Collector's Number",
   field_dwcRecordNumber_tooltip:
-    "An identifier given to the Occurrence, by the collector, at the time it was recorded. Often serves as a link between field notes and an Occurrence record, such as a specimen collectorâs number.",
+    "An identifier given to the Occurrence, by the collector, at the time it was recorded. Often serves as a link between field notes and an Occurrence record, such as a specimen collector's number.",
   field_dwcRecordedBy: "Verbatim Collectors",
   field_dwcStateProvince: "State/Province",
   field_dwcVerbatimCoordinateSystem: "Verbatim Coordinate System",

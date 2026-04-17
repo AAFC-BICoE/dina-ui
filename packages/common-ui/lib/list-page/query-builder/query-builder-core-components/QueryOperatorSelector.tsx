@@ -58,14 +58,6 @@ export function QueryOperatorSelector({
   // Some options are displayed only if it is supported.
   const operationOptions = options
     ?.filter((option) => {
-      // Only display the exact match option if keyword support exist.
-      if (
-        option.key === "exactMatch" &&
-        !selectedFieldMapping?.keywordMultiFieldSupport
-      ) {
-        return false;
-      }
-
       // Only display the infix option if it is supported in the mapping.
       if (
         option.key === "containsText" &&
@@ -92,7 +84,8 @@ export function QueryOperatorSelector({
       // Between for the text type should only be displayed if numeric keyword exists.
       if (
         option.key === "between" &&
-        selectedFieldMapping?.type === "text" &&
+        (selectedFieldMapping?.type === "text" ||
+          selectedFieldMapping?.type === "keyword") &&
         !selectedFieldMapping?.keywordNumericSupport
       ) {
         return false;

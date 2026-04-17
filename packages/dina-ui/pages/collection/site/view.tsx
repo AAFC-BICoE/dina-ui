@@ -21,7 +21,10 @@ export default function ViewPage() {
             )
           }}
         >
-          <SiteFormLayout mode={POLYGON_EDITOR_MODE.VIEW} />
+          <SiteFormLayout
+            mode={POLYGON_EDITOR_MODE.VIEW}
+            id={props.initialValues.id}
+          />
         </DinaForm>
       )}
       query={(id) => ({

@@ -121,8 +121,8 @@ function getQueryBuilderTypeFromIndexType(
     case "identifier":
     case "relationshipPresence":
     case "classification":
-    case "geoShape":
     case "relationshipAutocomplete":
+    case "geoShape":
       return type;
 
     // If it's stored directly as a keyword, it's considered a text field.
@@ -859,6 +859,15 @@ export function generateBuilderConfig(
       widgets: {
         relationshipAutocomplete: {
           operators: ["equals", "notEquals", "empty", "notEmpty"]
+        }
+      }
+    },
+    geoShape: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        geoShape: {
+          operators: ["noOperator"]
         }
       }
     }

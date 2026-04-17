@@ -26,7 +26,8 @@ export const OBJECT_STORE_NON_EXPORTABLE_COLUMNS: string[] = [
   "thumbnail",
   "objectStorePreview",
   "viewDetails",
-  "imageLink."
+  "imageLink.THUMBNAIL",
+  "imageLink.LARGE"
 ];
 
 export const dynamicFieldMappingForMetadata: DynamicFieldsMappingConfig = {

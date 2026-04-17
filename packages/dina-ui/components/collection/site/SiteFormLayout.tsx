@@ -5,7 +5,10 @@ import {
   MultilingualDescription,
   DinaFormSection,
   TextField,
-  useDinaFormContext
+  useDinaFormContext,
+  FieldSet,
+  QueryTable,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import {
   AttachmentsField,
@@ -13,17 +16,20 @@ import {
 } from "packages/dina-ui/components";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
-import { Site } from "packages/dina-ui/types/collection-api";
+import { CollectingEvent, Site } from "packages/dina-ui/types/collection-api";
 import PolygonEditorMap from "./PolygonEditorMap";
 import { MapToggleSwitch } from "./MapToggleSwitch";
 import PolygonEditorCoordinates from "./PolygonEditorCoordinates";
 import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
 import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
+import { apiColumns } from "packages/dina-ui/pages/collection/collecting-event/list";
 
 export default function SiteFormLayout({
+  id,
   mode,
   attachmentsConfig
 }: {
+  id: string;
   mode: PolygonEditorMode;
   attachmentsConfig?: AllowAttachmentsConfig;
 }) {
@@ -100,18 +106,29 @@ export default function SiteFormLayout({
       </div>
       <MultilingualDescription />
       {readOnly && (
-        <div className="row">
-          <DateField
-            className="col-md-6"
-            name="createdOn"
-            label={formatMessage("field_createdOn")}
-          />
-          <TextField
-            className="col-md-6"
-            name="createdBy"
-            label={formatMessage("field_createdBy")}
-          />
-        </div>
+        <>
+          <div className="row">
+            <DateField
+              className="col-md-6"
+              name="createdOn"
+              label={formatMessage("field_createdOn")}
+            />
+            <TextField
+              className="col-md-6"
+              name="createdBy"
+              label={formatMessage("field_createdBy")}
+            />
+          </div>
+          <FieldSet legend={<DinaMessage id="collectingEvents" />}>
+            <QueryTable<CollectingEvent>
+              path="collection-api/collecting-event"
+              columns={apiColumns}
+              filter={SimpleSearchFilterBuilder.create<Site>()
+                .where("site.uuid" as any, "EQ", `${id}`)
+                .build()}
+            />
+          </FieldSet>
+        </>
       )}
       <div className="mb-3">
         <DinaFormSection
