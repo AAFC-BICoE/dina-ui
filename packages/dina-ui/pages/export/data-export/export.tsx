@@ -230,17 +230,9 @@ export default function ExportPage<TData extends KitsuResource>() {
       type: "data-export"
     };
 
-    const dataExportPostResponse = await save<DataExport>([dataExportSaveArg], {
+    await save<DataExport>([dataExportSaveArg], {
       apiBaseUrl: "/dina-export-api"
     });
-
-    await getExport(
-      dataExportPostResponse,
-      setLoading,
-      setDataExportError,
-      apiClient,
-      formik
-    );
     setLoading(false);
   }
 

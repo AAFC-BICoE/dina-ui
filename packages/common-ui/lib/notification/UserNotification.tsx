@@ -3,7 +3,6 @@ import { FaBell, FaCheck } from "react-icons/fa";
 import { useNotification } from "./useNotification";
 import { NotificationCard } from "./NotificationCard";
 import { CommonMessage } from "../intl/common-ui-intl";
-import { ToastContainer } from "react-bootstrap";
 import useLocalStorage from "@rehooks/local-storage";
 
 export interface UserNotificationProps {
@@ -21,6 +20,7 @@ export function UserNotification({
   const [toastNotificationIds, setToastNotificationIds] = useState<string[]>(
     []
   );
+  const [shownToastIds, setShownToastIds] = useState<string[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -47,13 +47,21 @@ export function UserNotification({
     const newNotifications = notifications.filter((n) => !seen.includes(n.id));
 
     if (newNotifications.length > 0) {
-      setToastNotificationIds(newNotifications.map((n) => n.id));
+      const newIds = newNotifications.map((n) => n.id);
+
+      // Append to existing toasts instead of replacing them
+      setToastNotificationIds((prev) => [...prev, ...newIds]);
       setSeenNotificationIds(notifications.map((n) => n.id));
+
+      setTimeout(() => {
+        // Append to existing shown toasts instead of replacing them
+        setShownToastIds((prev) => [...prev, ...newIds]);
+      }, 0);
     }
   }, [notifications]);
 
   const dismissToast = (id: string) => {
-    setToastNotificationIds((prev) => prev.filter((toastId) => toastId !== id));
+    setShownToastIds((prev) => prev.filter((shownId) => shownId !== id));
   };
 
   // Close dropdown when clicking outside
@@ -143,10 +151,10 @@ export function UserNotification({
       </button>
 
       {/* New notification toasts */}
-      <ToastContainer
-        position="bottom-end"
-        containerPosition="fixed"
-        className="p-4 notification-toast-container"
+      <div
+        className="notification-toast-container"
+        aria-live="polite"
+        aria-atomic="true"
       >
         {toastNotifications.map((notification) => (
           <NotificationCard
@@ -154,11 +162,11 @@ export function UserNotification({
             notification={notification}
             onMarkAsRead={markAsRead}
             displayAsToast={true}
-            showToast={true}
+            showToast={shownToastIds.includes(notification.id)}
             onDismissToast={() => dismissToast(notification.id)}
           />
         ))}
-      </ToastContainer>
+      </div>
 
       {/* Notification dropdown */}
       {isOpen && (

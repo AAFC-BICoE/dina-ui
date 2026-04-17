@@ -1,8 +1,11 @@
 import { useState, memo } from "react";
 import moment from "moment";
 import { Notification } from "./types";
-import { Toast } from "react-bootstrap";
-import { NOTIFICATION_TYPE_DATA_EXPORT_READY } from "./notification-types/DataExportReadyNotification";
+import {
+  DataExportReadyNotification,
+  NOTIFICATION_TYPE_DATA_EXPORT_READY
+} from "./notification-types/DataExportReadyNotification";
+import React from "react";
 
 export interface NotificationCardProps {
   notification: Notification;
@@ -143,7 +146,7 @@ export const NotificationCard = memo(function NotificationCard({
   // Render different actions based on notification type
   const renderActions = () => {
     if (notification.type === NOTIFICATION_TYPE_DATA_EXPORT_READY) {
-      return <>Test</>;
+      return <DataExportReadyNotification notification={notification} />;
     }
 
     return null;
@@ -171,24 +174,33 @@ export const NotificationCard = memo(function NotificationCard({
 
   if (displayAsToast) {
     return (
-      <Toast
-        show={showToast}
-        onClose={onDismissToast}
-        autohide
-        delay={60000}
-        animation={true}
+      <div
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        className={`notification-toast ${
+          showToast ? "notification-toast--show" : ""
+        }`}
       >
-        <Toast.Header closeButton={true}>
+        <div className="notification-toast__header">
           <strong className="me-auto">
-            {title && <div className="notification-title fw-bold">{title}</div>}
+            {title && (
+              <span className="notification-title fw-bold">{title}</span>
+            )}
           </strong>
           <small>{moment(createdOn).fromNow()}</small>
-        </Toast.Header>
-        <Toast.Body>
+          <button
+            type="button"
+            className="btn-close ms-2"
+            aria-label="Close"
+            onClick={onDismissToast}
+          />
+        </div>
+        <div className="notification-toast__body">
           {renderParsedMessage()}
           {renderActions()}
-        </Toast.Body>
-      </Toast>
+        </div>
+      </div>
     );
   }
 
