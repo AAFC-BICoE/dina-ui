@@ -3,6 +3,8 @@ import { FaBell, FaCheck } from "react-icons/fa";
 import { useNotification } from "./useNotification";
 import { NotificationCard } from "./NotificationCard";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { ToastContainer } from "react-bootstrap";
+import useLocalStorage from "@rehooks/local-storage";
 
 export interface UserNotificationProps {
   /**
@@ -16,6 +18,9 @@ export function UserNotification({
   pollingInterval = 30000
 }: UserNotificationProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
+  const [toastNotificationIds, setToastNotificationIds] = useState<string[]>(
+    []
+  );
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -28,6 +33,28 @@ export function UserNotification({
   } = useNotification({
     pollingInterval
   });
+
+  // Store the IDs of all notifications we have already seen
+  const [seenNotificationIds, setSeenNotificationIds] = useLocalStorage<
+    string[]
+  >("seen-notification-ids", []);
+
+  // Detect new notifications and queue them as toasts
+  useEffect(() => {
+    if (!notifications?.length) return;
+
+    const seen = seenNotificationIds ?? [];
+    const newNotifications = notifications.filter((n) => !seen.includes(n.id));
+
+    if (newNotifications.length > 0) {
+      setToastNotificationIds(newNotifications.map((n) => n.id));
+      setSeenNotificationIds(notifications.map((n) => n.id));
+    }
+  }, [notifications]);
+
+  const dismissToast = (id: string) => {
+    setToastNotificationIds((prev) => prev.filter((toastId) => toastId !== id));
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -89,6 +116,13 @@ export function UserNotification({
     ));
   }, [notifications, loading, error, markAsRead]);
 
+  // Derive the full notification objects for the active toasts
+  const toastNotifications = useMemo(
+    () =>
+      (notifications ?? []).filter((n) => toastNotificationIds.includes(n.id)),
+    [notifications, toastNotificationIds]
+  );
+
   return (
     <div className="notification-container" ref={dropdownRef}>
       {/* Bell icon button */}
@@ -107,6 +141,24 @@ export function UserNotification({
           </span>
         )}
       </button>
+
+      {/* New notification toasts */}
+      <ToastContainer
+        position="bottom-end"
+        containerPosition="fixed"
+        className="p-4 notification-toast-container"
+      >
+        {toastNotifications.map((notification) => (
+          <NotificationCard
+            key={notification.id}
+            notification={notification}
+            onMarkAsRead={markAsRead}
+            displayAsToast={true}
+            showToast={true}
+            onDismissToast={() => dismissToast(notification.id)}
+          />
+        ))}
+      </ToastContainer>
 
       {/* Notification dropdown */}
       {isOpen && (

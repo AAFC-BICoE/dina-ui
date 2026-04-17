@@ -1,15 +1,43 @@
 import { useState, memo } from "react";
 import moment from "moment";
 import { Notification } from "./types";
+import { Toast } from "react-bootstrap";
+import { NOTIFICATION_TYPE_DATA_EXPORT_READY } from "./notification-types/DataExportReadyNotification";
 
 export interface NotificationCardProps {
   notification: Notification;
   onMarkAsRead: (id: string) => Promise<void>;
+
+  /**
+   * Whether to display the notification as a toast instead of a card in the dropdown.
+   * If true, the notification will be rendered as a toast and won't be part of the dropdown list.
+   * This is useful for showing real-time notifications without requiring the user to open the dropdown.
+   *
+   * Default: false (render as card in dropdown)
+   */
+  displayAsToast?: boolean;
+
+  /**
+   * Only used when displayAsToast is true. Controls the visibility of the toast notification.
+   * The parent component (e.g. UserNotification) should manage this state to show/hide the toast
+   * when new notifications arrive.
+   */
+  showToast?: boolean;
+
+  /**
+   * Only used when displayAsToast is true. Called when the toast is dismissed, either by the user
+   * closing it or after the auto-hide delay has elapsed. The parent component should use this to
+   * remove the notification from its active toast list.
+   */
+  onDismissToast?: () => void;
 }
 
 export const NotificationCard = memo(function NotificationCard({
   notification,
-  onMarkAsRead
+  onMarkAsRead,
+  displayAsToast = false,
+  showToast = false,
+  onDismissToast
 }: NotificationCardProps) {
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -112,6 +140,15 @@ export const NotificationCard = memo(function NotificationCard({
     });
   };
 
+  // Render different actions based on notification type
+  const renderActions = () => {
+    if (notification.type === NOTIFICATION_TYPE_DATA_EXPORT_READY) {
+      return <>Test</>;
+    }
+
+    return null;
+  };
+
   const handleCardClick = async (e: React.MouseEvent<HTMLLIElement>) => {
     // Don't mark as read if clicking on a link
     const target = e.target as HTMLElement;
@@ -131,6 +168,29 @@ export const NotificationCard = memo(function NotificationCard({
       }
     }
   };
+
+  if (displayAsToast) {
+    return (
+      <Toast
+        show={showToast}
+        onClose={onDismissToast}
+        autohide
+        delay={60000}
+        animation={true}
+      >
+        <Toast.Header closeButton={true}>
+          <strong className="me-auto">
+            {title && <div className="notification-title fw-bold">{title}</div>}
+          </strong>
+          <small>{moment(createdOn).fromNow()}</small>
+        </Toast.Header>
+        <Toast.Body>
+          {renderParsedMessage()}
+          {renderActions()}
+        </Toast.Body>
+      </Toast>
+    );
+  }
 
   return (
     <li
@@ -159,6 +219,9 @@ export const NotificationCard = memo(function NotificationCard({
       {message && (
         <div className="notification-message">{renderParsedMessage()}</div>
       )}
+
+      {/* Actions */}
+      {renderActions()}
     </li>
   );
 });

@@ -593,3 +593,11 @@ body:has(.offcanvas.offcanvas-end.show) .ReactTable.fullscreen-mode {
   align-items: center;
 }
 
+/* Notification */
+.notification-toast-container {
+  z-index: 999999;
+}
+
+.toast-body {
+  text-align: left !important;
+}
