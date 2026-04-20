@@ -7,7 +7,7 @@ import { LoadingSpinner } from "../../loading-spinner/LoadingSpinner";
 import { downloadDataExport, useApiClient } from "../..";
 import { ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { FaFileZipper } from "react-icons/fa6";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 export const NOTIFICATION_TYPE_DATA_EXPORT_READY = "DATA_EXPORT_READY";
 export const NOTIFICATION_TYPE_OBJECT_EXPORT_READY = "OBJECT_EXPORT_READY";
