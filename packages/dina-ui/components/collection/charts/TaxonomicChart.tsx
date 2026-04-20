@@ -86,7 +86,7 @@ function convertBucketsToSunburst(
 export function prunePlaceholders(node) {
   if (!node) return null;
 
-  const isPlaceholder = node.name === "MISSING";
+  const isPlaceholder = node.name.includes("MISSING");
 
   if (!node.children || node.children.length === 0) {
     return isPlaceholder ? null : node;
@@ -190,7 +190,7 @@ export default function TaxonomySunburstChart({ query }) {
                   "data.attributes.targetOrganismPrimaryClassification.kingdom.keyword",
                 size: 100,
                 order: { _count: "desc" },
-                missing: "MISSING"
+                missing: "MISSING KINGDOM"
               },
               aggs: {
                 by_phylum: {
@@ -199,7 +199,7 @@ export default function TaxonomySunburstChart({ query }) {
                       "data.attributes.targetOrganismPrimaryClassification.phylum.keyword",
                     size: 100,
                     order: { _count: "desc" },
-                    missing: "MISSING"
+                    missing: "MISSING PHYLUM"
                   },
                   aggs: {
                     by_class: {
@@ -208,7 +208,7 @@ export default function TaxonomySunburstChart({ query }) {
                           "data.attributes.targetOrganismPrimaryClassification.class.keyword",
                         size: 100,
                         order: { _count: "desc" },
-                        missing: "MISSING"
+                        missing: "MISSING CLASS"
                       },
                       aggs: {
                         by_order: {
@@ -217,7 +217,7 @@ export default function TaxonomySunburstChart({ query }) {
                               "data.attributes.targetOrganismPrimaryClassification.order.keyword",
                             size: 100,
                             order: { _count: "desc" },
-                            missing: "MISSING"
+                            missing: "MISSING ORDER"
                           },
                           aggs: {
                             by_family: {
@@ -226,7 +226,7 @@ export default function TaxonomySunburstChart({ query }) {
                                   "data.attributes.targetOrganismPrimaryClassification.family.keyword",
                                 size: 10000,
                                 order: { _count: "desc" },
-                                missing: "MISSING"
+                                missing: "MISSING FAMILY"
                               },
                               aggs: {
                                 by_genus: {
@@ -235,7 +235,7 @@ export default function TaxonomySunburstChart({ query }) {
                                       "data.attributes.targetOrganismPrimaryClassification.genus.keyword",
                                     size: 10000,
                                     order: { _count: "desc" },
-                                    missing: "MISSING"
+                                    missing: "MISSING GENUS"
                                   },
                                   aggs: {
                                     by_species: {
