@@ -213,5 +213,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   noData: "No Data",
   listView: "List",
   galleryView: "Gallery",
-  taxonomyTreeView: "Taxonomic Hierarchy"
+  taxonomyTreeView: "Taxonomic Hierarchy",
+  visualization: "Visualizations"
 };

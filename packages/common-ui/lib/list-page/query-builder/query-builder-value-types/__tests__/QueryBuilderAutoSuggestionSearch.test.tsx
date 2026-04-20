@@ -226,7 +226,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
           },
           query: {
             terms: {
-              "data.attributes.group.keyword": ["aafc", "cnc"]
+              "data.attributes.group": ["aafc", "cnc"]
             }
           },
           size: 0

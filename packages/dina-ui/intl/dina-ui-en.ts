@@ -22,6 +22,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addExistingStorageUnitAsChild: "Add Existing Storage Unit",
   addExternalResourceTitle: "Add New External Resource",
   addFilesButton: "Add Files",
+  addFilterTooltip:
+    "Click on a bar to add a filter to the query for that value.",
   addGroup: "Add Group",
   addIdentifier: "Add Identifier",
   addInstitutionTitle: "Add Institution",
@@ -161,6 +163,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectionLinkedProjectTableTitle: "Linked Projects",
   sampleTypeChartTitle: "Material Sample Types",
   recordAddedChartTitle: "Records Added by Date",
+  recordAddedChartTitleYear: "Records Added by Date (Year)",
+  recordAddedChartTitleMonth: "Records Added by Date (Month)",
+  recordAddedChartTitleDay: "Records Added by Date (Day)",
+  recordAddedChartTitleHour: "Records Added by Date (Hour)",
   relatedObjectTypeChartTitle: "Related Object Types",
   collectionSectionTitle: "Collection",
   collectionViewTitle: "Collection",
@@ -226,8 +232,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   defaultValuesConfigs: "Default Values Configs",
   deleteButtonText: "Delete",
   deleteConfig: "Delete Config",
-  deleteEmptyStorageWarning:
-    "Storage {storageName} is empty. Would you like to permanently delete this Storage Container?",
   deleteThisAttributesTemplate: "Delete This Template",
   deleteThisView: "Delete This View",
   deleted: "Deleted",
@@ -410,7 +414,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcOtherRecordNumbers: "Other Record Numbers",
   field_dwcRecordNumber: "Collector's Number",
   field_dwcRecordNumber_tooltip:
-    "An identifier given to the Occurrence, by the collector, at the time it was recorded. Often serves as a link between field notes and an Occurrence record, such as a specimen collectorâs number.",
+    "An identifier given to the Occurrence, by the collector, at the time it was recorded. Often serves as a link between field notes and an Occurrence record, such as a specimen collector's number.",
   field_dwcRecordedBy: "Verbatim Collectors",
   field_dwcStateProvince: "State/Province",
   field_dwcVerbatimCoordinateSystem: "Verbatim Coordinate System",

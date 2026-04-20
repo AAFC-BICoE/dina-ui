@@ -1140,11 +1140,11 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Remove all the attachments for the quality control
-    userEvent.click(wrapper.getAllByRole("button", { name: /remove/i })[0]);
+    userEvent.click(wrapper.getAllByRole("button", { name: /detach/i })[0]);
     await waitForElementToBeRemoved(
       wrapper.queryAllByText(/loading\.\.\./i)[0]
     );
-    userEvent.click(wrapper.getAllByRole("button", { name: /remove/i })[0]);
+    userEvent.click(wrapper.getAllByRole("button", { name: /detach/i })[0]);
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
