@@ -12,7 +12,10 @@ import {
   QueryPage,
   SimpleSearchFilterBuilder,
   stringArrayCell,
-  useApiClient
+  useApiClient,
+  QueryPageTabConfig,
+  ListViewTab,
+  MaterialSampleVisualizationTab
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -27,7 +30,6 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../../dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
-
 export const MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
   "assemblages.",
@@ -527,6 +529,20 @@ export default function MaterialSampleListPage() {
     return undefined;
   };
 
+  const MATERIAL_SAMPLE_TABS: QueryPageTabConfig<MaterialSample>[] = [
+    {
+      id: "list",
+      labelKey: "listView",
+      component: ListViewTab
+    },
+    {
+      id: "visualization",
+      labelKey: "visualization",
+      showActionButtons: false, // Hide action buttons in the visualization tab
+      component: MaterialSampleVisualizationTab
+    }
+  ];
+
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
@@ -573,6 +589,8 @@ export default function MaterialSampleListPage() {
             entityLink: "/collection/material-sample"
           }}
           bulkSplitPath="/collection/material-sample/bulk-split"
+          tabs={MATERIAL_SAMPLE_TABS}
+          defaultTab="list"
         />
       </main>
       <Footer />

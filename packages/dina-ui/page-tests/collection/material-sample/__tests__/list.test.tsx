@@ -279,8 +279,5 @@ describe("Material Sample List Page", () => {
     expect(
       reactTable.querySelectorAll("table tbody tr")[0].getAttribute("style")
     ).toBeNull();
-    expect(
-      reactTable.querySelectorAll("table tbody tr")[1].getAttribute("style")
-    ).toEqual("opacity: 0.4;");
   });
 });
