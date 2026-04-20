@@ -30,7 +30,6 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../../dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
-
 export const MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
   "assemblages.",
