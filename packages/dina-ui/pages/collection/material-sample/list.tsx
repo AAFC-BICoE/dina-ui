@@ -15,7 +15,8 @@ import {
   useApiClient,
   QueryPageTabConfig,
   ListViewTab,
-  TaxonomicChartsTab
+  TaxonomicChartsTab,
+  MaterialSampleVisualizationTab
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -540,6 +541,12 @@ export default function MaterialSampleListPage() {
       labelKey: "taxonomy",
       showActionButtons: false, // Hide action buttons in the visualization tab
       component: TaxonomicChartsTab
+    },
+    {
+      id: "visualization",
+      labelKey: "visualization",
+      showActionButtons: false, // Hide action buttons in the visualization tab
+      component: MaterialSampleVisualizationTab
     }
   ];
 
