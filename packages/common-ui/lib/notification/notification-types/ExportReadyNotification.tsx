@@ -7,7 +7,7 @@ import { LoadingSpinner } from "../../loading-spinner/LoadingSpinner";
 import { downloadDataExport, useApiClient } from "../..";
 import { ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { FaFileZipper } from "react-icons/fa6";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { useIntl } from "react-intl";
 
 export const NOTIFICATION_TYPE_DATA_EXPORT_READY = "DATA_EXPORT_READY";
 export const NOTIFICATION_TYPE_OBJECT_EXPORT_READY = "OBJECT_EXPORT_READY";
@@ -26,6 +26,7 @@ export function ExportReadyNotification({
   notification,
   isVisible
 }: ExportReadyNotificationProps) {
+  const { formatMessage } = useIntl();
   const { apiClient } = useApiClient();
   const id = notification.notificationParams?.id;
   const { loading, error, response } = useQuery<DataExport>(
@@ -69,7 +70,7 @@ export function ExportReadyNotification({
     console.error("Error fetching data export details: ", error);
     return (
       <div className="alert alert-danger">
-        <DinaMessage id="errorFetchingExport" />
+        {formatMessage({ id: "errorFetchingExport" })}
       </div>
     );
   }
@@ -105,7 +106,7 @@ export function ExportReadyNotification({
         onClick={handleDownload}
       >
         <FaDownload />
-        <DinaMessage id="downloadFile" />
+        {formatMessage({ id: "downloadFile" })}
       </Button>
     </div>
   );
