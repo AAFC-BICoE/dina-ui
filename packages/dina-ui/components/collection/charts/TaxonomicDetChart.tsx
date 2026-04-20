@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { Card } from "react-bootstrap";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 interface TaxonomicDetChartProps {
   query?: any;
@@ -127,15 +128,30 @@ export default function TaxonomicDetChart({ query }: TaxonomicDetChartProps) {
 
   const hasData = chartData.some((item) => item.value > 0);
 
-  return hasData ? (
+  return (
     <div>
       <strong>Taxonomic Determinations</strong>
       <Card>
-        <ReactECharts
-          option={options}
-          style={{ height: "400px", width: "100%" }}
-        />
+        {hasData ? (
+          <ReactECharts
+            option={options}
+            style={{ height: "400px", width: "100%" }}
+          />
+        ) : (
+          <div
+            style={{
+              height: "400px",
+              justifyContent: "center",
+              alignItems: "center",
+              display: "flex",
+              color: "#999",
+              fontSize: 18
+            }}
+          >
+            <DinaMessage id="noData" />
+          </div>
+        )}
       </Card>
     </div>
-  ) : null;
+  );
 }

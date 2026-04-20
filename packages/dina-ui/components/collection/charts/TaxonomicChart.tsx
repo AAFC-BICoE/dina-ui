@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { Card, CardHeader } from "react-bootstrap";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useMessage } from "../context/MessageContext";
 
 interface TaxonNode {
@@ -545,77 +546,92 @@ export default function TaxonomySunburstChart({ query }) {
     fetchData(selectedSource);
   }, [selectedSource]);
 
-  return chartData?.children ? (
+  return (
     <div>
       <strong>Taxonomic Chart (Structured Entries Only)</strong>
-      <Card>
-        <CardHeader
+      <CardHeader
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between"
+        }}
+      >
+        <div
           style={{
             display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between"
+            flexDirection: "column",
+            gap: "6px"
           }}
         >
-          <div
+          <p>Select a determination type:</p>
+          <select
+            value={selectedSource ?? ""}
+            onChange={(e) =>
+              setSelectedSource((e.target.value || null) as SourceFilter)
+            }
+          >
+            <option value="">All</option>
+            <option value="GNA">Structured</option>
+            <option value="CUSTOM">Structured Manual</option>
+          </select>
+        </div>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button
+            type="button"
+            onClick={() => setChartType("sunburst")}
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "6px"
+              padding: "6px 12px",
+              borderRadius: "6px",
+              border: "1px solid #ccc",
+              background: chartType === "sunburst" ? "#007bff" : "#f0f0f0",
+              color: chartType === "sunburst" ? "white" : "black",
+              cursor: "pointer"
             }}
           >
-            <p>Select a determination type:</p>
-            <select
-              value={selectedSource ?? ""}
-              onChange={(e) =>
-                setSelectedSource((e.target.value || null) as SourceFilter)
-              }
-            >
-              <option value="">All</option>
-              <option value="GNA">Structured</option>
-              <option value="CUSTOM">Structured Manual</option>
-            </select>
-          </div>
-          <div style={{ display: "flex", gap: "8px" }}>
-            <button
-              type="button"
-              onClick={() => setChartType("sunburst")}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-                background: chartType === "sunburst" ? "#007bff" : "#f0f0f0",
-                color: chartType === "sunburst" ? "white" : "black",
-                cursor: "pointer"
-              }}
-            >
-              Sunburst
-            </button>
+            Sunburst
+          </button>
 
-            <button
-              type="button"
-              onClick={() => setChartType("treemap")}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-                background: chartType === "treemap" ? "#007bff" : "#f0f0f0",
-                color: chartType === "treemap" ? "white" : "black",
-                cursor: "pointer"
-              }}
-            >
-              Treemap
-            </button>
+          <button
+            type="button"
+            onClick={() => setChartType("treemap")}
+            style={{
+              padding: "6px 12px",
+              borderRadius: "6px",
+              border: "1px solid #ccc",
+              background: chartType === "treemap" ? "#007bff" : "#f0f0f0",
+              color: chartType === "treemap" ? "white" : "black",
+              cursor: "pointer"
+            }}
+          >
+            Treemap
+          </button>
+        </div>
+      </CardHeader>
+      <Card>
+        {chartData?.children?.length ? (
+          <ReactECharts
+            option={option}
+            style={{ height: "800px", width: "100%" }}
+            ref={chartRef}
+            onChartReady={onChartReady}
+            notMerge={false}
+            lazyUpdate={true}
+          />
+        ) : (
+          <div
+            style={{
+              height: "400px",
+              justifyContent: "center",
+              alignItems: "center",
+              display: "flex",
+              color: "#999",
+              fontSize: 18
+            }}
+          >
+            <DinaMessage id="noData" />
           </div>
-        </CardHeader>
-        <ReactECharts
-          option={option}
-          style={{ height: "800px", width: "100%" }}
-          ref={chartRef}
-          onChartReady={onChartReady}
-          notMerge={false}
-          lazyUpdate={true}
-        />
+        )}
       </Card>
     </div>
-  ) : null;
+  );
 }
