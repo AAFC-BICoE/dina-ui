@@ -1,24 +1,32 @@
 import { Notification } from "../types";
 import { Button } from "react-bootstrap";
-import { FaFileExport, FaDownload } from "react-icons/fa";
+import { FaDownload, FaFileExcel } from "react-icons/fa";
 import { useQuery } from "../../api-client/useQuery";
 import { DataExport } from "packages/dina-ui/types/dina-export-api/resources/DataExport";
 import { LoadingSpinner } from "../../loading-spinner/LoadingSpinner";
 import { downloadDataExport, useApiClient } from "../..";
 import { ObjectExport } from "packages/dina-ui/types/objectstore-api";
+import { FaFileZipper } from "react-icons/fa6";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export const NOTIFICATION_TYPE_DATA_EXPORT_READY = "DATA_EXPORT_READY";
 export const NOTIFICATION_TYPE_OBJECT_EXPORT_READY = "OBJECT_EXPORT_READY";
 
 interface ExportReadyNotificationProps {
   notification: Notification;
+
+  /**
+   * Can the user see the notification currently or is it out of view?
+   * This is used to determine whether to trigger the data export API call to fetch export details.
+   */
+  isVisible?: boolean;
 }
 
 export function ExportReadyNotification({
-  notification
+  notification,
+  isVisible
 }: ExportReadyNotificationProps) {
   const { apiClient } = useApiClient();
-
   const id = notification.notificationParams?.id;
   const { loading, error, response } = useQuery<DataExport>(
     {
@@ -28,7 +36,7 @@ export function ExportReadyNotification({
       }
     },
     {
-      disabled: !id
+      disabled: !id || !isVisible
     }
   );
 
@@ -61,7 +69,7 @@ export function ExportReadyNotification({
     console.error("Error fetching data export details: ", error);
     return (
       <div className="alert alert-danger">
-        Error fetching export details. Please try again later.
+        <DinaMessage id="errorFetchingExport" />
       </div>
     );
   }
@@ -81,7 +89,11 @@ export function ExportReadyNotification({
     <div className="d-flex align-items-center justify-content-between gap-3 p-2">
       {/* Export file info */}
       <div className="d-flex align-items-center gap-2 text-truncate">
-        <FaFileExport className="text-primary flex-shrink-0" />
+        {notification.type === NOTIFICATION_TYPE_DATA_EXPORT_READY ? (
+          <FaFileExcel className="text-success flex-shrink-0" />
+        ) : (
+          <FaFileZipper className="text-primary flex-shrink-0" />
+        )}
         <span className="text-truncate small fw-semibold">{exportName}</span>
       </div>
 
@@ -93,7 +105,7 @@ export function ExportReadyNotification({
         onClick={handleDownload}
       >
         <FaDownload />
-        Download
+        <DinaMessage id="downloadFile" />
       </Button>
     </div>
   );

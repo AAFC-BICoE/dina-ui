@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, memo, useRef } from "react";
 import moment from "moment";
 import { Notification } from "./types";
 import {
@@ -7,6 +7,7 @@ import {
   NOTIFICATION_TYPE_OBJECT_EXPORT_READY
 } from "./notification-types/ExportReadyNotification";
 import React from "react";
+import { useIsVisible } from "../visibility/useIsVisible";
 
 export interface NotificationCardProps {
   notification: Notification;
@@ -47,6 +48,14 @@ export const NotificationCard = memo(function NotificationCard({
 
   const { id, message, messageParams, title, status, createdOn } = notification;
   const isUnread = status === "NEW";
+
+  const visibleRef = useRef<HTMLDivElement>(null);
+  const isVisible = useIsVisible({
+    ref: visibleRef,
+    doNotReset: true,
+    // Start loading images when it's 300px below the view port.
+    offset: "0px 0px 300px 0px"
+  });
 
   // Parse message template with parameters and render as React elements
   const renderParsedMessage = () => {
@@ -150,7 +159,12 @@ export const NotificationCard = memo(function NotificationCard({
       notification.type === NOTIFICATION_TYPE_DATA_EXPORT_READY ||
       notification.type === NOTIFICATION_TYPE_OBJECT_EXPORT_READY
     ) {
-      return <ExportReadyNotification notification={notification} />;
+      return (
+        <ExportReadyNotification
+          notification={notification}
+          isVisible={isVisible}
+        />
+      );
     }
 
     return null;
@@ -185,6 +199,7 @@ export const NotificationCard = memo(function NotificationCard({
         className={`notification-toast ${
           showToast ? "notification-toast--show" : ""
         }`}
+        ref={visibleRef}
       >
         <div className="notification-toast__header">
           <strong className="me-auto">
@@ -209,35 +224,37 @@ export const NotificationCard = memo(function NotificationCard({
   }
 
   return (
-    <li
-      className={`list-group-item notification-card ${
-        isUnread ? "unread" : "read"
-      } ${isProcessing ? "processing" : ""}`}
-      onClick={handleCardClick}
-    >
-      {/* Title row with timestamp */}
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <div className="d-flex align-items-center gap-2 flex-grow-1 text-start">
-          {/* Title */}
-          {title && <div className="notification-title fw-bold">{title}</div>}
-          {/* Unread indicator dot */}
-          {isUnread && <span className="notification-unread-dot" />}
-        </div>
-        {/* Timestamp */}
-        {createdOn && (
-          <div className="notification-timestamp text-muted">
-            {moment(createdOn).fromNow()}
+    <div ref={visibleRef}>
+      <li
+        className={`list-group-item notification-card ${
+          isUnread ? "unread" : "read"
+        } ${isProcessing ? "processing" : ""}`}
+        onClick={handleCardClick}
+      >
+        {/* Title row with timestamp */}
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <div className="d-flex align-items-center gap-2 flex-grow-1 text-start">
+            {/* Title */}
+            {title && <div className="notification-title fw-bold">{title}</div>}
+            {/* Unread indicator dot */}
+            {isUnread && <span className="notification-unread-dot" />}
           </div>
+          {/* Timestamp */}
+          {createdOn && (
+            <div className="notification-timestamp text-muted">
+              {moment(createdOn).fromNow()}
+            </div>
+          )}
+        </div>
+
+        {/* Message */}
+        {message && (
+          <div className="notification-message">{renderParsedMessage()}</div>
         )}
-      </div>
 
-      {/* Message */}
-      {message && (
-        <div className="notification-message">{renderParsedMessage()}</div>
-      )}
-
-      {/* Actions */}
-      {renderActions()}
-    </li>
+        {/* Actions */}
+        {renderActions()}
+      </li>
+    </div>
   );
 });

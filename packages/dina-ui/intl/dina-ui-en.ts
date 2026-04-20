@@ -1418,5 +1418,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editOnMap: "Edit on Map",
   erase: "Erase",
   close: "Close",
-  invalidPolygon: "The coordinates are invalid: must be number[][][] and closed"
+  invalidPolygon:
+    "The coordinates are invalid: must be number[][][] and closed",
+  errorFetchingExport: "Error fetching export details. Please try again later."
 };
