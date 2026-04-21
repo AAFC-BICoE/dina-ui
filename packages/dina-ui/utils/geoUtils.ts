@@ -16,6 +16,8 @@ let mapModulesPromise: Promise<{
   Search: any;
   ScaleBar: any;
   Fullscreen: any;
+  webMercatorUtils: any;
+  projection: any;
 }> | null = null;
 
 /**
@@ -33,7 +35,9 @@ export async function getMapModules() {
       "esri/widgets/BasemapToggle",
       "esri/widgets/Search",
       "esri/widgets/ScaleBar",
-      "esri/widgets/Fullscreen"
+      "esri/widgets/Fullscreen",
+      "esri/geometry/support/webMercatorUtils",
+      "esri/geometry/projection"
     ]).then(
       ([
         Map,
@@ -45,7 +49,9 @@ export async function getMapModules() {
         BasemapToggle,
         Search,
         ScaleBar,
-        Fullscreen
+        Fullscreen,
+        webMercatorUtils,
+        projection
       ]) => ({
         Map,
         MapView,
@@ -56,7 +62,9 @@ export async function getMapModules() {
         BasemapToggle,
         Search,
         ScaleBar,
-        Fullscreen
+        Fullscreen,
+        webMercatorUtils,
+        projection
       })
     );
   }
