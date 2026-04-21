@@ -673,7 +673,9 @@ export default function ExportPage<TData extends KitsuResource>() {
                         as="h3"
                         className="m-0 d-flex justify-content-between align-items-center"
                       >
-                        <span>Export Job Submitted</span>
+                        <span>
+                          <DinaMessage id="exportRequestSubmittedTitle" />
+                        </span>
                         <IoClose
                           style={{ cursor: "pointer" }}
                           onClick={() => {
@@ -684,8 +686,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                       <Popover.Body className="d-flex flex-column align-items-center text-center gap-2">
                         <FaCheckCircle className="text-success fs-1" />
                         <span>
-                          Your export is being processed. You will receive a
-                          notification when it's ready to download.
+                          <DinaMessage id="exportRequestSubmittedMessage" />
                         </span>
                       </Popover.Body>
                     </Popover>

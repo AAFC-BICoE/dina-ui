@@ -17,10 +17,6 @@ export function UserNotification({
   pollingInterval = 30000
 }: UserNotificationProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
-  const [toastNotificationIds, setToastNotificationIds] = useState<string[]>(
-    []
-  );
-  const [shownToastIds, setShownToastIds] = useState<string[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -30,11 +26,18 @@ export function UserNotification({
     error,
     markAsRead,
     markAllAsRead
-  } = useNotification({
-    pollingInterval
-  });
+  } = useNotification({ pollingInterval });
 
-  // Store the IDs of all notifications we have already seen
+  const [activeToastIds, setActiveToastIds] = useLocalStorage<string[]>(
+    "active-toast-ids",
+    []
+  );
+
+  const [shownToastIds, setShownToastIds] = useLocalStorage<string[]>(
+    "shown-toast-ids",
+    []
+  );
+
   const [seenNotificationIds, setSeenNotificationIds] = useLocalStorage<
     string[]
   >("seen-notification-ids", []);
@@ -43,25 +46,43 @@ export function UserNotification({
   useEffect(() => {
     if (!notifications?.length) return;
 
+    const currentIds = notifications.map((n) => n.id);
     const seen = seenNotificationIds ?? [];
-    const newNotifications = notifications.filter((n) => !seen.includes(n.id));
 
-    if (newNotifications.length > 0) {
-      const newIds = newNotifications.map((n) => n.id);
+    const newIds = currentIds.filter((id) => !seen.includes(id));
 
-      // Append to existing toasts instead of replacing them
-      setToastNotificationIds((prev) => [...prev, ...newIds]);
-      setSeenNotificationIds(notifications.map((n) => n.id));
+    if (newIds.length > 0) {
+      setActiveToastIds([...new Set([...(activeToastIds ?? []), ...newIds])]);
 
+      // Defer so the DOM elements are mounted before we trigger the
+      // "shown" state that drives the CSS enter transition.
       setTimeout(() => {
-        // Append to existing shown toasts instead of replacing them
-        setShownToastIds((prev) => [...prev, ...newIds]);
+        setShownToastIds([...new Set([...(shownToastIds ?? []), ...newIds])]);
       }, 0);
     }
-  }, [notifications]);
+
+    // Prune seenNotificationIds to only IDs still present in the
+    // current notification list, preventing unbounded growth.
+    const prunedSeen = seen.filter((id) => currentIds.includes(id));
+    const mergedSeen = [...new Set([...prunedSeen, ...currentIds])];
+
+    // Only write if something actually changed to avoid render loops
+    if (
+      mergedSeen.length !== seen.length ||
+      mergedSeen.some((id) => !seen.includes(id))
+    ) {
+      setSeenNotificationIds(mergedSeen);
+    }
+  }, [notifications, activeToastIds, shownToastIds, seenNotificationIds]);
 
   const dismissToast = (id: string) => {
-    setShownToastIds((prev) => prev.filter((shownId) => shownId !== id));
+    setShownToastIds((shownToastIds ?? []).filter((shownId) => shownId !== id));
+    // Remove from active list after the dismiss animation has time to play
+    setTimeout(() => {
+      setActiveToastIds(
+        (activeToastIds ?? []).filter((activeId) => activeId !== id)
+      );
+    }, 300);
   };
 
   // Close dropdown when clicking outside
@@ -127,8 +148,10 @@ export function UserNotification({
   // Derive the full notification objects for the active toasts
   const toastNotifications = useMemo(
     () =>
-      (notifications ?? []).filter((n) => toastNotificationIds.includes(n.id)),
-    [notifications, toastNotificationIds]
+      (notifications ?? []).filter((n) =>
+        (activeToastIds ?? []).includes(n.id)
+      ),
+    [notifications, activeToastIds]
   );
 
   return (
@@ -162,7 +185,7 @@ export function UserNotification({
             notification={notification}
             onMarkAsRead={markAsRead}
             displayAsToast={true}
-            showToast={shownToastIds.includes(notification.id)}
+            showToast={(shownToastIds ?? []).includes(notification.id)}
             onDismissToast={() => dismissToast(notification.id)}
           />
         ))}
