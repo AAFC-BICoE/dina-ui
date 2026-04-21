@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Tooltip, useApiClient } from "common-ui";
 import { useMessage } from "../../context/MessageContext";
+import { LoadingSpinner } from "common-ui";
 
 export function prunePlaceholders(node) {
   if (!node) return null;
@@ -253,7 +254,12 @@ export default function TaxonomicTreeNode({ query }) {
     );
   }
 
-  if (!root) return <div>Loading taxonomy…</div>;
+  if (!root)
+    return (
+      <div>
+        <LoadingSpinner loading={!root} />
+      </div>
+    );
 
   return <RenderNode node={root} />;
 }

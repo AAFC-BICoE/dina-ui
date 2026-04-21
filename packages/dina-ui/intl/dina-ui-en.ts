@@ -1098,6 +1098,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   tags: "Tags",
   tag: "Tag",
   target: "Target",
+  taxonomicChartDet: "Select a determination type:",
+  taxonomicChartTitle: "Taxonomic Chart (Structured Entries Only)",
+  taxonomicChartSunburst: "Sunburst",
+  taxonomicChartTreemap: "Treemap",
+  taxonomicDetChartTitle: "Taxonomic Determinations",
   template: "Template",
   thisWillRemoveYourTemplate:
     "This will remove your selected template fields and default values.",

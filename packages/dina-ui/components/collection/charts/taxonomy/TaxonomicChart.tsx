@@ -566,7 +566,7 @@ export default function TaxonomySunburstChart({ query }) {
   return (
     <div>
       <strong>
-        Taxonomic Chart (Structured Entries Only)
+        <DinaMessage id="taxonomicChartTitle" />
         <Tooltip id="addTaxonomicChartTooltip" />
       </strong>
       <CardHeader
@@ -583,7 +583,7 @@ export default function TaxonomySunburstChart({ query }) {
             gap: "6px"
           }}
         >
-          <p>Select a determination type:</p>
+          <DinaMessage id="taxonomicChartDet" />
           <select
             value={selectedSource ?? ""}
             onChange={(e) =>
@@ -608,7 +608,7 @@ export default function TaxonomySunburstChart({ query }) {
               cursor: "pointer"
             }}
           >
-            Sunburst
+            <DinaMessage id="taxonomicChartSunburst" />
           </button>
 
           <button
@@ -623,7 +623,7 @@ export default function TaxonomySunburstChart({ query }) {
               cursor: "pointer"
             }}
           >
-            Treemap
+            <DinaMessage id="taxonomicChartTreemap" />
           </button>
         </div>
       </CardHeader>

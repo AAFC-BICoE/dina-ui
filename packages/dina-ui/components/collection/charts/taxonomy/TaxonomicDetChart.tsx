@@ -139,7 +139,9 @@ export default function TaxonomicDetChart({ query }: TaxonomicDetChartProps) {
 
   return (
     <div>
-      <strong>Taxonomic Determinations</strong>
+      <strong>
+        <DinaMessage id="taxonomicDetChartTitle" />
+      </strong>
       <Card>
         {hasData ? (
           <ReactECharts
