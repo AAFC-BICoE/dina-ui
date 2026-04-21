@@ -24,6 +24,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addFilesButton: "Add Files",
   addFilterTooltip:
     "Click on a bar to add a filter to the query for that value.",
+  addTaxonomicChartTooltip:
+    "If Sunburst: Click on a ring to drill down to that rank, click blue center circle to drill up. If Treemap: Click on a box to drill down to that rank, click ALL at the bottom of the screen to reset.",
+  addTaxonomicTreeTooltip:
+    "Click arrow to expand tree, Click name to choose ranks displayed on Taxanomic Chart.",
   addGroup: "Add Group",
   addIdentifier: "Add Identifier",
   addInstitutionTitle: "Add Institution",
@@ -1094,6 +1098,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   tags: "Tags",
   tag: "Tag",
   target: "Target",
+  taxonomicChartDet: "Select a determination type:",
+  taxonomicChartTitle: "Taxonomic Chart (Structured Entries Only)",
+  taxonomicChartSunburst: "Sunburst",
+  taxonomicChartTreemap: "Treemap",
+  taxonomicDetChartTitle: "Taxonomic Determinations",
   template: "Template",
   thisWillRemoveYourTemplate:
     "This will remove your selected template fields and default values.",

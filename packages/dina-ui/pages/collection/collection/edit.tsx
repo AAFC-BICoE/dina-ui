@@ -27,6 +27,8 @@ import { CollectionLinkedProjectsTable } from "../../../components/collection/co
 import CollectionSampleTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
 import CollectionRelatedObjectTypeChart from "../../../components/collection/collection/CollectionRelatedObjectTypeChart";
 import CollectionRecordsAddedChart from "../../../components/collection/collection/CollectionRecordsAddedChart";
+import CollectionTaxonomicDetChart from "../../../components/collection/collection/CollectionTaxonomicDetChart";
+import CollectionDrilldown from "../../../components/collection/CollectionDrilldown";
 
 export default function CollectionEditPage() {
   const router = useRouter();
@@ -207,6 +209,12 @@ export function CollectionFormFields() {
             <div className="col-md-6">
               <CollectionRelatedObjectTypeChart id={uuid} />
             </div>
+            <div className="col-md-6">
+              <CollectionTaxonomicDetChart id={uuid} />
+            </div>
+          </div>
+          <div className="row mt-3 mb-3">
+            <CollectionDrilldown id={uuid} />
           </div>
         </>
       )}
