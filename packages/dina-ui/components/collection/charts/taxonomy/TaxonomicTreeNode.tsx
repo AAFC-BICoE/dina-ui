@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useApiClient } from "common-ui";
-import { useMessage } from "../context/MessageContext";
+import { Tooltip, useApiClient } from "common-ui";
+import { useMessage } from "../../context/MessageContext";
 
 export function prunePlaceholders(node) {
   if (!node) return null;
 
-  const isPlaceholder = node.name === "MISSING";
+  const isPlaceholder = node.name.includes("MISSING");
 
   if (!node.children || node.children.length === 0) {
     return isPlaceholder ? null : node;
@@ -19,6 +19,15 @@ export function prunePlaceholders(node) {
 
   return { ...node, children: prunedChildren };
 }
+
+/**
+ * TaxonomicTreeNode component.
+ *
+ * Renders a node linked to its children displaying taxonomic ranks, compatible with Query Builder UI,
+ * interacts with TaxonomicChart to affect data displayed.
+ *
+ * @returns {JSX.Element} The rendered node component.
+ */
 
 export default function TaxonomicTreeNode({ query }) {
   const { apiClient } = useApiClient();
@@ -82,7 +91,7 @@ export default function TaxonomicTreeNode({ query }) {
                   field:
                     "data.attributes.targetOrganismPrimaryClassification.kingdom.keyword",
                   size: 100,
-                  missing: "MISSING"
+                  missing: "MISSING KINGDOM"
                 },
                 aggs: {
                   by_phylum: {
@@ -90,7 +99,7 @@ export default function TaxonomicTreeNode({ query }) {
                       field:
                         "data.attributes.targetOrganismPrimaryClassification.phylum.keyword",
                       size: 100,
-                      missing: "MISSING"
+                      missing: "MISSING PHYLUM"
                     },
                     aggs: {
                       by_class: {
@@ -98,7 +107,7 @@ export default function TaxonomicTreeNode({ query }) {
                           field:
                             "data.attributes.targetOrganismPrimaryClassification.class.keyword",
                           size: 100,
-                          missing: "MISSING"
+                          missing: "MISSING CLASS"
                         },
                         aggs: {
                           by_order: {
@@ -106,7 +115,7 @@ export default function TaxonomicTreeNode({ query }) {
                               field:
                                 "data.attributes.targetOrganismPrimaryClassification.order.keyword",
                               size: 100,
-                              missing: "MISSING"
+                              missing: "MISSING ORDER"
                             },
                             aggs: {
                               by_family: {
@@ -114,7 +123,7 @@ export default function TaxonomicTreeNode({ query }) {
                                   field:
                                     "data.attributes.targetOrganismPrimaryClassification.family.keyword",
                                   size: 10000,
-                                  missing: "MISSING"
+                                  missing: "MISSING FAMILY"
                                 },
                                 aggs: {
                                   by_genus: {
@@ -122,7 +131,7 @@ export default function TaxonomicTreeNode({ query }) {
                                       field:
                                         "data.attributes.targetOrganismPrimaryClassification.genus.keyword",
                                       size: 10000,
-                                      missing: "MISSING"
+                                      missing: "MISSING GENUS"
                                     },
                                     aggs: {
                                       by_species: {
@@ -189,6 +198,10 @@ export default function TaxonomicTreeNode({ query }) {
             color: "#222"
           }}
         >
+          {node.name === "Taxonomic Tree" ? (
+            <Tooltip id="addTaxonomicTreeTooltip" />
+          ) : null}
+
           {hasChildren ? (
             <span
               onClick={() => hasChildren && setExpanded(!expanded)}

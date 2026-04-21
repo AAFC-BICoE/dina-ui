@@ -1,6 +1,6 @@
 import { MessageProvider } from "./context/MessageContext";
-import GraphSender from "./charts/TaxonomicTreeNode";
-import GraphReceiver from "./charts/TaxonomicChart";
+import GraphSender from "./charts/taxonomy/TaxonomicTreeNode";
+import GraphReceiver from "./charts/taxonomy/TaxonomicChart";
 
 export default function App({ id }: { id: string }) {
   const query = {

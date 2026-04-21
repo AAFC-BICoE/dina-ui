@@ -1,4 +1,4 @@
-import TaxonomicDetChart from "../charts/TaxonomicDetChart";
+import TaxonomicDetChart from "../charts/taxonomy/TaxonomicDetChart";
 
 export default function CollectionTaxonomicDetChart({ id }: { id: string }) {
   // Build query to filter for material samples in this collection

@@ -1,8 +1,8 @@
 import { QueryPageTabProps } from "../QueryPage";
 import React from "react";
 import { KitsuResource } from "kitsu";
-import TaxonomicDetChart from "../../../../dina-ui/components/collection/charts/TaxonomicDetChart";
-import Drilldown from "../../../../dina-ui/components/collection/Drilldown";
+import TaxonomicDetChart from "dina-ui/components/collection/charts/taxonomy/TaxonomicDetChart";
+import Drilldown from "dina-ui/components/collection/charts/TaxonomicDrilldown";
 
 export function TaxonomicChartsTab<TData extends KitsuResource>({
   query

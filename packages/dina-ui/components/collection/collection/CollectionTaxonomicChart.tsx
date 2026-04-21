@@ -1,4 +1,4 @@
-import TaxonomicChart from "../charts/TaxonomicChart";
+import TaxonomicChart from "../charts/taxonomy/TaxonomicChart";
 
 export default function CollectionTaxonomicChart({ id }: { id: string }) {
   // Build query to filter for material samples in this collection

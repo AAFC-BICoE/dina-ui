@@ -2,11 +2,20 @@ import { useEffect, useState } from "react";
 import { useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { Card } from "react-bootstrap";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../../../intl/dina-ui-intl";
 
 interface TaxonomicDetChartProps {
   query?: any;
 }
+
+/**
+ * TaxonomicDetChart component.
+ *
+ * Renders a chart displaying the determination types of taxonomic entries (how the organism was labeled), compatible with Query Builder UI.
+ *
+ * @param {any} props.query - The query object from the parent component, used as the base query for fetching data for the chart. This allows the chart to reflect any filters applied in the parent component.
+ * @returns {JSX.Element} The rendered chart component.
+ */
 
 export default function TaxonomicDetChart({ query }: TaxonomicDetChartProps) {
   const { apiClient } = useApiClient();

@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import { useApiClient } from "common-ui";
+import { Tooltip, useApiClient } from "common-ui";
 import ReactECharts from "echarts-for-react";
 import { Card, CardHeader } from "react-bootstrap";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { useMessage } from "../context/MessageContext";
+import { DinaMessage } from "../../../../intl/dina-ui-intl";
+import { useMessage } from "../../context/MessageContext";
 
 interface TaxonNode {
   name: any;
@@ -116,6 +116,15 @@ export function transformTreeForEcharts(tree) {
   const processedTree = prunePlaceholders(tree);
   return makeEchartsNode(processedTree);
 }
+
+/**
+ * TaxonomicChart component.
+ *
+ * Renders a chart displaying taxonomic ranks, compatible with Query Builder UI,
+ * interacts with TaxonomicTreeNode to affect data displayed.
+ *
+ * @returns {JSX.Element} The rendered chart component.
+ */
 
 export default function TaxonomySunburstChart({ query }) {
   const { apiClient } = useApiClient();
@@ -284,6 +293,7 @@ export default function TaxonomySunburstChart({ query }) {
     }
   }
 
+  //styling for each rank level of the treemap
   function getLevelOption() {
     return [
       {
@@ -354,6 +364,8 @@ export default function TaxonomySunburstChart({ query }) {
     ];
   }
 
+  //const that contains the options for the chart type
+  //useMemo makes sure that the options aren't generated until chartData changes/ is ready
   const graphOptions = useMemo(() => {
     const sunburstOption = {
       tooltip: {
@@ -465,6 +477,8 @@ export default function TaxonomySunburstChart({ query }) {
 
   const dataReady = graphOptions?.[chartType]?.series?.[0]?.data?.length > 0;
 
+  //const that choses the chart type
+  //useMemo makes sure that the option isn't generated until chart type is chosen/changed, graphOptions is ready/changed, and if data is not ready do not add midloaded data
   const option = useMemo(() => {
     if (!dataReady) return { series: [] };
     return graphOptions[chartType];
@@ -478,6 +492,7 @@ export default function TaxonomySunburstChart({ query }) {
     const echartsInstance = chartRef.current;
     if (!echartsInstance) return;
 
+    //setTimeout ensures there is a buffer between renders when clicking on a TaxonomicTreeNode
     const id = setTimeout(() => {
       if (chartType === "sunburst") {
         echartsInstance.dispatchAction({
@@ -515,6 +530,7 @@ export default function TaxonomySunburstChart({ query }) {
     return () => clearTimeout(id);
   }, [message, chartReady, chartType]);
 
+  //forcing drill down to work while clicking on the treemap
   const onChartReady = (instance: any) => {
     chartRef.current = instance;
     setChartReady(true);
@@ -523,6 +539,7 @@ export default function TaxonomySunburstChart({ query }) {
     instance.on("click", (params: any) => {
       if (!params || typeof params !== "object") return;
 
+      //making sure clicks on breadcrumb do not register as clicks on a node
       const isBreadcrumb =
         params.targetType === "breadcrumb" ||
         (Array.isArray(params.treePathInfo) && !params.data);
@@ -548,7 +565,10 @@ export default function TaxonomySunburstChart({ query }) {
 
   return (
     <div>
-      <strong>Taxonomic Chart (Structured Entries Only)</strong>
+      <strong>
+        Taxonomic Chart (Structured Entries Only)
+        <Tooltip id="addTaxonomicChartTooltip" />
+      </strong>
       <CardHeader
         style={{
           display: "flex",
