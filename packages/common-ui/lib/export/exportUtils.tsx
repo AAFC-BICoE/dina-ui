@@ -145,7 +145,8 @@ export async function downloadDataExport(
     }
 
     // Download the data
-    downloadBlobFile(getFileResponse as any, `${fileName}${fileExtension}`);
+    const baseFileName = fileName.replace(/\.[^/.]+$/, "");
+    downloadBlobFile(getFileResponse as any, `${baseFileName}${fileExtension}`);
   }
 }
 

@@ -3,6 +3,7 @@ import { FaBell, FaCheck } from "react-icons/fa";
 import { useNotification } from "./useNotification";
 import { NotificationCard } from "./NotificationCard";
 import { CommonMessage } from "../intl/common-ui-intl";
+import useLocalStorage from "@rehooks/local-storage";
 
 export interface UserNotificationProps {
   /**
@@ -25,9 +26,64 @@ export function UserNotification({
     error,
     markAsRead,
     markAllAsRead
-  } = useNotification({
-    pollingInterval
-  });
+  } = useNotification({ pollingInterval });
+
+  const [activeToastIds, setActiveToastIds] = useLocalStorage<string[]>(
+    "active-toast-ids",
+    []
+  );
+
+  const [shownToastIds, setShownToastIds] = useLocalStorage<string[]>(
+    "shown-toast-ids",
+    []
+  );
+
+  const [seenNotificationIds, setSeenNotificationIds] = useLocalStorage<
+    string[]
+  >("seen-notification-ids", []);
+
+  // Detect new notifications and queue them as toasts
+  useEffect(() => {
+    if (!notifications?.length) return;
+
+    const currentIds = notifications.map((n) => n.id);
+    const seen = seenNotificationIds ?? [];
+
+    const newIds = currentIds.filter((id) => !seen.includes(id));
+
+    if (newIds.length > 0) {
+      setActiveToastIds([...new Set([...(activeToastIds ?? []), ...newIds])]);
+
+      // Defer so the DOM elements are mounted before we trigger the
+      // "shown" state that drives the CSS enter transition.
+      setTimeout(() => {
+        setShownToastIds([...new Set([...(shownToastIds ?? []), ...newIds])]);
+      }, 0);
+    }
+
+    // Prune seenNotificationIds to only IDs still present in the
+    // current notification list, preventing unbounded growth.
+    const prunedSeen = seen.filter((id) => currentIds.includes(id));
+    const mergedSeen = [...new Set([...prunedSeen, ...currentIds])];
+
+    // Only write if something actually changed to avoid render loops
+    if (
+      mergedSeen.length !== seen.length ||
+      mergedSeen.some((id) => !seen.includes(id))
+    ) {
+      setSeenNotificationIds(mergedSeen);
+    }
+  }, [notifications, activeToastIds, shownToastIds, seenNotificationIds]);
+
+  const dismissToast = (id: string) => {
+    setShownToastIds((shownToastIds ?? []).filter((shownId) => shownId !== id));
+    // Remove from active list after the dismiss animation has time to play
+    setTimeout(() => {
+      setActiveToastIds(
+        (activeToastIds ?? []).filter((activeId) => activeId !== id)
+      );
+    }, 300);
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -89,6 +145,15 @@ export function UserNotification({
     ));
   }, [notifications, loading, error, markAsRead]);
 
+  // Derive the full notification objects for the active toasts
+  const toastNotifications = useMemo(
+    () =>
+      (notifications ?? []).filter((n) =>
+        (activeToastIds ?? []).includes(n.id)
+      ),
+    [notifications, activeToastIds]
+  );
+
   return (
     <div className="notification-container" ref={dropdownRef}>
       {/* Bell icon button */}
@@ -107,6 +172,24 @@ export function UserNotification({
           </span>
         )}
       </button>
+
+      {/* New notification toasts */}
+      <div
+        className="notification-toast-container"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {toastNotifications.map((notification) => (
+          <NotificationCard
+            key={notification.id}
+            notification={notification}
+            onMarkAsRead={markAsRead}
+            displayAsToast={true}
+            showToast={(shownToastIds ?? []).includes(notification.id)}
+            onDismissToast={() => dismissToast(notification.id)}
+          />
+        ))}
+      </div>
 
       {/* Notification dropdown */}
       {isOpen && (
