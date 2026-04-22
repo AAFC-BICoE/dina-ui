@@ -36,7 +36,14 @@ export function useSystemInfoCheck(apiConfigs: ApiConfigInfo[]) {
             messageProducerEnabled: false,
             messageConsumerEnabled: false,
             attentionRequired: true,
-            errorMessage: err?.message ?? "Unable to reach service."
+            errorMessage:
+              err?.cause?.data?.error ??
+              err?.message ??
+              "Unable to reach service.",
+            errorStatus: err?.cause?.status,
+            errorStatusText: err?.cause?.data?.path
+              ? `${err.cause.data.path}`
+              : err?.cause?.statusText
           };
         }
       })

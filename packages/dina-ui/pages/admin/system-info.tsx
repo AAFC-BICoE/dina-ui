@@ -5,6 +5,7 @@ import { ModuleCard } from "../../components/system-info/ModuleCard";
 import { useSystemInfoCheck } from "../../components/system-info/useSystemInfoCheck";
 import { Button } from "react-bootstrap";
 import moment from "moment";
+import { useEffect, useState } from "react";
 
 /**
  * System Info Configuration:
@@ -34,12 +35,21 @@ export function SystemInfo() {
     SYSTEM_INFO_API_CONFIG
   );
 
+  // Force react refresh this component every 10 seconds to keep the module statuses up to date.
+  // This is not doing API requests every 10 seconds - the API requests are only made when the
+  // "Refresh" button is clicked.
+  const [, forceUpdate] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => forceUpdate((n) => n + 1), 10000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Button to refresh the status of all modules
   const buttonBar = (
     <>
       <Button
         variant="primary"
-        className="ms-auto"
+        className="ms-auto me-3"
         onClick={() => refresh()}
         style={{ width: "10rem" }}
         disabled={loading}

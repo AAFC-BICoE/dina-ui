@@ -14,6 +14,8 @@ export interface ApiModule {
   attentionRequired?: boolean;
   moduleInfo?: Map<string, any>;
   errorMessage?: string;
+  errorStatus?: string;
+  errorStatusText?: string;
 }
 
 export interface SystemInfoData {

@@ -104,7 +104,14 @@ export function ModuleCard({ module }: { module: ApiModule }) {
         {module.errorMessage && (
           <div className="alert alert-danger d-flex align-items-start gap-2 py-2 px-2 mb-0 small">
             <FaExclamationTriangle className="mt-1 flex-shrink-0" size={12} />
-            {module.errorMessage}
+            <div>
+              {(module.errorStatus || module.errorStatusText) && (
+                <div className="fw-bold">
+                  {module.errorStatus} {module.errorStatusText}
+                </div>
+              )}
+              {module.errorMessage}
+            </div>
           </div>
         )}
 
