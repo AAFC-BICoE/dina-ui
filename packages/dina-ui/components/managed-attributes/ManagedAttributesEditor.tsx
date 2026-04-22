@@ -47,6 +47,14 @@ export interface ManagedAttributesEditorProps {
 
   /** Whether to show a clear button beside the managed attribute selector. Default false. */
   disableClearButton?: boolean;
+
+  /**
+   * Whether the managed attributes are from a controlled vocabulary endpoint (e.g. collection-api/controlled-vocabulary-item) or from a regular managed attribute endpoint (e.g. collection-api/managed-attribute).
+   * This changes how some of the network requests are performed.
+   *
+   * Eventually, all managed attributes will be from controlled vocabulary endpoints and this prop can be removed, but for now it is needed to support both the existing managed attributes and the new controlled vocabulary items.
+   */
+  isControlledVocabulary?: boolean;
 }
 
 interface ManagedAttributesEditorInnerProps
@@ -65,7 +73,8 @@ function ManagedAttributesEditorInner({
   fieldSetProps,
   managedAttributeOrderFieldName,
   disableClearButton = false,
-  values
+  values,
+  isControlledVocabulary = false
 }: ManagedAttributesEditorInnerProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
@@ -160,6 +169,7 @@ function ManagedAttributesEditorInner({
                       onChange={setVisibleAttributeKeys}
                       visibleAttributes={visibleAttributes}
                       loading={loading}
+                      isControlledVocabulary={isControlledVocabulary}
                     />
                   </label>
                 </div>
@@ -332,22 +342,26 @@ export function ManagedAttributeMultiSelect({
   managedAttributeApiPath,
   onChange,
   visibleAttributes,
-  loading
+  loading,
+  isControlledVocabulary = false
 }: {
   managedAttributeComponent?: string;
   managedAttributeApiPath: string;
   onChange: (newKeys: string[]) => void;
   visibleAttributes: PersistedResource<ManagedAttribute>[];
   loading?: boolean;
+  isControlledVocabulary: boolean;
 }) {
   // Memoize the filter function
   const filter = useCallback(
     (input: string) =>
-      SimpleSearchFilterBuilder.create<ManagedAttribute>()
+      SimpleSearchFilterBuilder.create<any>()
         .searchFilter("name", input)
         .when(!!managedAttributeComponent, (builder) =>
           builder.where(
-            "managedAttributeComponent",
+            isControlledVocabulary
+              ? "dinaComponent"
+              : "managedAttributeComponent",
             "EQ",
             managedAttributeComponent!
           )

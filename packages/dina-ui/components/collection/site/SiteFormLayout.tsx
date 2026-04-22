@@ -102,12 +102,13 @@ export default function SiteFormLayout({
       <MultilingualDescription />
       <ManagedAttributesEditor
         valuesPath="managedAttributes"
-        managedAttributeApiPath="collection-api/managed-attribute"
+        managedAttributeApiPath="collection-api/controlled-vocabulary-item"
         managedAttributeComponent="SITE"
         fieldSetProps={{
           legend: <DinaMessage id="siteManagedAttributes" />
         }}
         disableClearButton={true}
+        isControlledVocabulary={true}
       />
       {readOnly && (
         <div className="row">
