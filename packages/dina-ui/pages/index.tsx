@@ -277,6 +277,9 @@ export function Home() {
                       <Link href="/export/report-template/upload">
                         <DinaMessage id="reportTemplateUpload" />
                       </Link>
+                      <Link href="/admin/system-info">
+                        <DinaMessage id="systemInfoTitle" />
+                      </Link>
                     </>
                   )}
                 </Stack>
