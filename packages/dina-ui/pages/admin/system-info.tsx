@@ -6,6 +6,8 @@ import { useSystemInfoCheck } from "../../components/system-info/useSystemInfoCh
 import { Button } from "react-bootstrap";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import { useAccount } from "common-ui";
+import { useRouter } from "next/router";
 
 /**
  * System Info Configuration:
@@ -30,6 +32,15 @@ const SYSTEM_INFO_API_CONFIG: ApiConfigInfo[] = [
 ];
 
 export function SystemInfo() {
+  const { isAdmin } = useAccount();
+  const router = useRouter();
+
+  // Ensure the user is admin before allowing access to the page.
+  if (!isAdmin) {
+    // Route to homepage...
+    router.push("/");
+  }
+
   // The useSystemInfoCheck hook handles fetching the status and info for all modules defined in the config.
   const { modules, lastRefreshed, refresh, loading } = useSystemInfoCheck(
     SYSTEM_INFO_API_CONFIG
