@@ -1423,6 +1423,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workflowsLegend: "Molecular Analysis Workflows",
   siteListTitle: "Site",
   siteAttachments: "Site Attachments",
+  systemInfoTitle: "System Information",
   code: "Code",
   siteMap: "Site Map",
   siteCoordinates: "Site Coordinates",

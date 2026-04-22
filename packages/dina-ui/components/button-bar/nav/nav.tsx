@@ -724,12 +724,22 @@ function NavDinaManagementDropdown({ formatMessage }) {
           </Link>
           <Link
             href="/export/report-template/upload"
-            onKeyDown={onKeyDownLastItem}
+            onKeyDown={onKeyDown}
             passHref={true}
             legacyBehavior
           >
             <NavDropdown.Item role="menuitem">
               <DinaMessage id="reportTemplateUpload" />
+            </NavDropdown.Item>
+          </Link>
+          <Link
+            href="/admin/system-info"
+            onKeyDown={onKeyDownLastItem}
+            passHref={true}
+            legacyBehavior
+          >
+            <NavDropdown.Item role="menuitem">
+              <DinaMessage id="systemInfoTitle" />
             </NavDropdown.Item>
           </Link>
         </>
