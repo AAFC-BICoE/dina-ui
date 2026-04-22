@@ -3,9 +3,7 @@ import { Badge } from "react-bootstrap";
 import {
   FaCheckCircle,
   FaTimesCircle,
-  FaLink,
   FaExclamationTriangle,
-  FaInfoCircle,
   FaExclamationCircle
 } from "react-icons/fa";
 
@@ -119,7 +117,6 @@ export function ModuleCard({ module }: { module: ApiModule }) {
           <div className="flex-grow-1">
             <MicroLabel>Endpoint</MicroLabel>
             <div className="d-flex align-items-center gap-1">
-              <FaLink size={10} className="text-muted" />
               <code className="small text-break">
                 <>
                   {"/api/"}
@@ -155,11 +152,8 @@ export function ModuleCard({ module }: { module: ApiModule }) {
 
         {/* Module info — only rendered when extra info exists */}
         {hasModuleInfo && (
-          <div>
-            <div className="d-inline-flex align-items-center gap-1 small text-muted mb-2">
-              <FaInfoCircle size={10} />
-              Module Info
-            </div>
+          <div className="pt-2">
+            <MicroLabel>Module Info</MicroLabel>
             <table className="table table-sm table-bordered mb-0 small">
               <tbody>
                 {Array.from(module.moduleInfo!.entries()).map(

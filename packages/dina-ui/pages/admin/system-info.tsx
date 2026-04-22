@@ -1,62 +1,69 @@
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { ApiModule } from "packages/dina-ui/types/system-info/SystemInfo";
+import { ApiConfigInfo } from "packages/dina-ui/types/system-info/SystemInfo";
 import { FaSyncAlt } from "react-icons/fa";
 import { ModuleCard } from "../../components/system-info/ModuleCard";
+import { useSystemInfoCheck } from "../../components/system-info/useSystemInfoCheck";
+import { Button } from "react-bootstrap";
+import moment from "moment";
+
+/**
+ * System Info Configuration:
+ *
+ * To add a new module to the System Info page, simply add a new entry to the SYSTEM_INFO_API_CONFIG
+ * array with the module's name and API endpoint. The useSystemInfoCheck hook will automatically
+ * fetch the module's info and status based on the provided API endpoint.
+ */
+const SYSTEM_INFO_API_CONFIG: ApiConfigInfo[] = [
+  {
+    moduleName: "Collection API",
+    apiEndpoint: "collection-api"
+  },
+  {
+    moduleName: "DINA User API",
+    apiEndpoint: "user-api"
+  },
+  {
+    moduleName: "Object Store API",
+    apiEndpoint: "objectstore-api"
+  }
+];
 
 export function SystemInfo() {
-  const MOCK_MODULES: ApiModule[] = [
-    {
-      moduleVersion: "2.1.0",
-      status: "online",
-      apiConfig: {
-        moduleName: "Collection API",
-        apiEndpoint: "collection-api"
-      },
-      messageProducerEnabled: true,
-      messageConsumerEnabled: true,
-      attentionRequired: false
-    },
-    {
-      moduleVersion: "1.2.5",
-      status: "online",
-      apiConfig: {
-        moduleName: "DINA User API",
-        apiEndpoint: "user-api"
-      },
-      messageProducerEnabled: false,
-      messageConsumerEnabled: false,
-      attentionRequired: false
-    },
-    {
-      moduleVersion: "3.0.1",
-      status: "offline",
-      apiConfig: {
-        moduleName: "Object Store API",
-        apiEndpoint: "objectstore-api"
-      },
-      messageProducerEnabled: true,
-      messageConsumerEnabled: false,
-      attentionRequired: true,
-      moduleInfo: new Map<string, any>([["imageMagick", true]]),
-      errorMessage:
-        "Connection refused: Unable to reach the service. The host may be down or unreachable."
-    }
-  ];
+  // The useSystemInfoCheck hook handles fetching the status and info for all modules defined in the config.
+  const { modules, lastRefreshed, refresh, loading } = useSystemInfoCheck(
+    SYSTEM_INFO_API_CONFIG
+  );
 
-  const PAGE_LAST_REFRESHED = new Date("2026-04-22T10:30:05Z");
+  // Button to refresh the status of all modules
+  const buttonBar = (
+    <>
+      <Button
+        variant="primary"
+        className="ms-auto"
+        onClick={() => refresh()}
+        style={{ width: "10rem" }}
+        disabled={loading}
+      >
+        <FaSyncAlt className="me-2" />
+        Refresh
+      </Button>
+    </>
+  );
 
   return (
-    <PageLayout titleId="systemInfoTitle">
+    <PageLayout titleId="systemInfoTitle" buttonBarContent={buttonBar}>
       <div className="system-info-page">
         {/* Last refreshed */}
-        <div className="d-flex align-items-center gap-2 text-muted small mb-3">
-          <FaSyncAlt size={12} />
-          Last refreshed:{" "}
-          <strong>
-            {PAGE_LAST_REFRESHED.toLocaleDateString()}{" "}
-            {PAGE_LAST_REFRESHED.toLocaleTimeString()}
-          </strong>
-        </div>
+        {lastRefreshed && (
+          <div className="d-flex align-items-center gap-2 text-muted small mb-3">
+            <FaSyncAlt size={12} />
+            Last refreshed:{" "}
+            <strong>
+              {moment(lastRefreshed).fromNow()} (
+              {moment(lastRefreshed).format("YYYY-MM-DD HH:mm:ss")})
+            </strong>
+          </div>
+        )}
 
         {/* Module cards grid */}
         <div
@@ -66,7 +73,7 @@ export function SystemInfo() {
             gap: "1.25rem"
           }}
         >
-          {MOCK_MODULES.map((module) => (
+          {modules.map((module) => (
             <ModuleCard key={module.apiConfig.moduleName} module={module} />
           ))}
         </div>
