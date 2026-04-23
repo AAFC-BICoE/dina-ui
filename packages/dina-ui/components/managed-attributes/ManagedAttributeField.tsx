@@ -13,13 +13,16 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../types/collection-api";
+import {
+  ControlledVocabularyItem,
+  ManagedAttribute
+} from "../../types/collection-api";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { useFormikContext } from "formik";
 import _ from "lodash";
 
 export interface ManagedAttributeFieldProps {
-  attribute: PersistedResource<ManagedAttribute>;
+  attribute: PersistedResource<ManagedAttribute | ControlledVocabularyItem>;
   values?: object;
   valuesPath: string;
   disableClearButton?: boolean;
@@ -96,7 +99,7 @@ export function ManagedAttributeFieldWithLabel(
 }
 
 export function getManagedAttributeTooltipText(
-  attribute: PersistedResource<ManagedAttribute>,
+  attribute: PersistedResource<ManagedAttribute | ControlledVocabularyItem>,
   locale: string,
   formatMessage: any
 ) {

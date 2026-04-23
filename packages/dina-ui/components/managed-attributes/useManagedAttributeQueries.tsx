@@ -1,13 +1,17 @@
 import useSWR from "swr";
-import { useApiClient } from "common-ui";
-import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
+import { SimpleSearchFilterBuilder, useApiClient } from "common-ui";
 import _ from "lodash";
+import {
+  ControlledVocabularyItem,
+  ManagedAttribute
+} from "../../types/collection-api";
 
 export interface UseBulkGetParams {
   managedAttributeApiPath: string;
   managedAttributeComponent?: string;
   keys: string[];
   disabled?: boolean;
+  isControlledVocabulary?: boolean;
 }
 
 /**
@@ -18,6 +22,7 @@ export interface UseBulkGetParams {
  * @param {string} params.managedAttributeComponent - Component name used to construct resource URLs.
  * @param {string[]} params.keys - Array of managed attribute keys to fetch.
  * @param {boolean} [params.disabled=false] - If true, disables fetching.
+ * @param {boolean} [params.isControlledVocabulary=false] - If true, fetches controlled vocabulary items instead of managed attributes.
  * @returns {Object} An object containing:
  *   - data: Array of fetched managed attribute data, or undefined if not fetched.
  *   - loading: Boolean indicating if the fetch is in progress.
@@ -30,26 +35,37 @@ export function useManagedAttributeQueries({
   managedAttributeApiPath,
   managedAttributeComponent = "",
   keys,
-  disabled = false
+  disabled = false,
+  isControlledVocabulary = false
 }: UseBulkGetParams) {
   const { apiClient } = useApiClient();
 
   const fetchResources = async (keys: string[]) => {
-    const paths = managedAttributeComponent
-      ? keys.map(
-          (key) =>
-            `${managedAttributeApiPath}/${managedAttributeComponent}.${key}`
-        )
-      : keys.map((key) => `${managedAttributeApiPath}/${key}`);
-
     const headers = {
       Accept: "application/vnd.api+json",
       "Content-Type": "application/vnd.api+json",
       "Crnk-Compact": "true"
     };
 
-    const promises = paths.map((url) =>
-      apiClient.get<ManagedAttribute>(url, { header: headers })
+    const promises = keys.map((key) =>
+      apiClient.get<ManagedAttribute | ControlledVocabularyItem>(
+        managedAttributeApiPath,
+        {
+          header: headers,
+          filter: SimpleSearchFilterBuilder.create()
+            .when(!!managedAttributeComponent, (builder) =>
+              builder.where(
+                isControlledVocabulary
+                  ? "dinaComponent"
+                  : "managedAttributeComponent",
+                "EQ",
+                managedAttributeComponent!
+              )
+            )
+            .where("key", "EQ", key)
+            .build()
+        }
+      )
     );
 
     // Catch errors for each promise to avoid failing the entire batch.

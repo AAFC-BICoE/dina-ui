@@ -10,7 +10,10 @@ import {
 import { PersistedResource } from "kitsu";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../types/collection-api";
+import {
+  ControlledVocabularyItem,
+  ManagedAttribute
+} from "../../types/collection-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
 import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
 import { useManagedAttributeQueries } from "./useManagedAttributeQueries";
@@ -109,14 +112,15 @@ function ManagedAttributesEditorInner({
     keys: visibleAttributeKeys,
     managedAttributeApiPath,
     managedAttributeComponent,
-    disabled: !visibleAttributeKeys.length
+    disabled: !visibleAttributeKeys.length,
+    isControlledVocabulary
   });
 
   // Store the last fetched Attributes in a ref instead of showing a
   // loading state when the visible attributes change.
-  const lastFetchedAttributes = useRef<PersistedResource<ManagedAttribute>[]>(
-    []
-  );
+  const lastFetchedAttributes = useRef<
+    PersistedResource<ManagedAttribute | ControlledVocabularyItem>[]
+  >([]);
 
   if (!visibleAttributeKeys.length) {
     lastFetchedAttributes.current = [];
@@ -348,7 +352,9 @@ export function ManagedAttributeMultiSelect({
   managedAttributeComponent?: string;
   managedAttributeApiPath: string;
   onChange: (newKeys: string[]) => void;
-  visibleAttributes: PersistedResource<ManagedAttribute>[];
+  visibleAttributes: PersistedResource<
+    ManagedAttribute | ControlledVocabularyItem
+  >[];
   loading?: boolean;
   isControlledVocabulary: boolean;
 }) {
@@ -372,7 +378,7 @@ export function ManagedAttributeMultiSelect({
 
   // Memoize the label function
   const optionLabel = useCallback(
-    (attribute: ManagedAttribute) =>
+    (attribute: ManagedAttribute | ControlledVocabularyItem) =>
       _.get(attribute, "name") ||
       _.get(attribute, "key") ||
       _.get(attribute, "id") ||
@@ -384,8 +390,8 @@ export function ManagedAttributeMultiSelect({
   const onChangeInternal = useCallback(
     (
       newValues:
-        | PersistedResource<ManagedAttribute>
-        | PersistedResource<ManagedAttribute>[]
+        | PersistedResource<ManagedAttribute | ControlledVocabularyItem>
+        | PersistedResource<ManagedAttribute | ControlledVocabularyItem>[]
     ) => {
       const newAttributes = _.castArray(newValues); // Ensure it's always an array
       const newKeys = newAttributes.map((it) => _.get(it, "key")); // Extract just the keys
