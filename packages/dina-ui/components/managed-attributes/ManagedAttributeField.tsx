@@ -48,6 +48,9 @@ export function ManagedAttributeFieldWithLabel(
     formatMessage
   );
 
+  // Use multilingualTitle if available, otherwise fall back to name
+  const displayName = getManagedAttributeTitle(attribute, locale);
+
   const { values } = useFormikContext<any>();
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: attributePath,
@@ -63,7 +66,7 @@ export function ManagedAttributeFieldWithLabel(
     >
       <div className="d-flex align-items-center mb-2">
         <strong className="me-auto">
-          {attribute.name ?? attributeKey}
+          {displayName}
           <Tooltip directText={tooltipText} />
         </strong>
         <BulkEditBadge bulkTab={bulkTab} />
@@ -96,6 +99,33 @@ export function ManagedAttributeFieldWithLabel(
       <ManagedAttributeField {...props} />
     </label>
   );
+}
+
+/**
+ * Helper function to get the display title of a Managed Attribute or Controlled Vocabulary Item,
+ * with fallbacks.
+ *
+ * @param attribute The managed attribute or controlled vocabulary item to get the title for.
+ * @param locale
+ * @returns The display title for the attribute, using the following fallback order:
+ *   1. Localized title in the current locale
+ *   2. Localized title in any other locale
+ *   3. The `name` property of the managed attribute
+ *   4. The `key` property of the managed attribute
+ */
+export function getManagedAttributeTitle(
+  attribute: PersistedResource<ManagedAttribute | ControlledVocabularyItem>,
+  locale: string
+): string {
+  const localizedTitle = (
+    attribute as ControlledVocabularyItem
+  )?.multilingualTitle?.titles?.find((t) => t.lang === locale)?.title;
+
+  const fallbackTitle = (
+    attribute as ControlledVocabularyItem
+  )?.multilingualTitle?.titles?.find((t) => t.lang !== locale)?.title;
+
+  return localizedTitle || fallbackTitle || attribute.name || attribute.key;
 }
 
 export function getManagedAttributeTooltipText(

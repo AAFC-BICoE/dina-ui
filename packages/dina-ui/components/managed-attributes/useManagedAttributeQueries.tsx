@@ -77,7 +77,7 @@ export function useManagedAttributeQueries({
     const results = await Promise.all(caught_promises);
 
     // Filter out any null results (e.g. if the resource was not found).
-    return _.compact(results).map((result) => result.data);
+    return _.compact(results).flatMap((result) => _.castArray(result.data));
   };
 
   const shouldFetch = keys?.length > 0 && !disabled;
