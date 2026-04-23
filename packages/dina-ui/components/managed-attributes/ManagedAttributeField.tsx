@@ -106,7 +106,7 @@ export function ManagedAttributeFieldWithLabel(
  * with fallbacks.
  *
  * @param attribute The managed attribute or controlled vocabulary item to get the title for.
- * @param locale
+ * @param locale The current locale being used (e.g: "en", "fr", etc.) to find the appropriate localized title.
  * @returns The display title for the attribute, using the following fallback order:
  *   1. Localized title in the current locale
  *   2. Localized title in any other locale

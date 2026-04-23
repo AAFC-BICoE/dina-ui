@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   ControlledVocabularyItem,
   ManagedAttribute
@@ -358,6 +358,8 @@ export function ManagedAttributeMultiSelect({
   loading?: boolean;
   isControlledVocabulary: boolean;
 }) {
+  const { locale } = useDinaIntl();
+
   // Memoize the filter function
   const filter = useCallback(
     (input: string) =>
@@ -378,12 +380,23 @@ export function ManagedAttributeMultiSelect({
 
   // Memoize the label function
   const optionLabel = useCallback(
-    (attribute: ManagedAttribute | ControlledVocabularyItem) =>
-      _.get(attribute, "name") ||
-      _.get(attribute, "key") ||
-      _.get(attribute, "id") ||
-      "",
-    []
+    (attribute: ManagedAttribute | ControlledVocabularyItem) => {
+      const localizedTitle = (
+        attribute as ControlledVocabularyItem
+      )?.multilingualTitle?.titles?.find((t) => t.lang === locale)?.title;
+      const fallbackTitle = (
+        attribute as ControlledVocabularyItem
+      )?.multilingualTitle?.titles?.find((t) => t.lang !== locale)?.title;
+      return (
+        localizedTitle ||
+        fallbackTitle ||
+        _.get(attribute, "name") ||
+        _.get(attribute, "key") ||
+        _.get(attribute, "id") ||
+        ""
+      );
+    },
+    [locale]
   );
 
   // Stable onChange handler ( this handles on change for )
