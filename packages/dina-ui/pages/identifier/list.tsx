@@ -4,6 +4,7 @@ import {
   intlContext,
   ListLayoutFilterType,
   ListPageLayout,
+  SimpleSearchFilterBuilder,
   titleCell
 } from "common-ui";
 import Link from "next/link";
@@ -144,11 +145,12 @@ function AgentIdentifiersListView() {
           columns: AGENT_IDENTIFIERS_LIST_COLUMNS,
           path: "agent-api/identifier-type?page[limit]=1000"
         }}
-        additionalFilters={(filterForm) => ({
-          isCompleted: false,
-          // Apply group filter:
-          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-        })}
+        additionalFilters={(filterForm) =>
+          SimpleSearchFilterBuilder.create<AgentIdentifierType>()
+            .whereProvided("group", "EQ", filterForm.group)
+            .where("isCompleted", "EQ", false)
+            .build()
+        }
         filterFormchildren={({ submitForm }) => (
           <div className="mb-3">
             <div style={{ width: "300px" }}>
