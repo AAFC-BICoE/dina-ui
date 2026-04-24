@@ -174,7 +174,6 @@ export function SampleListLayout({
           .whereProvided("group", "EQ", filterForm.group)
           .build()
       }
-      useFiql={true}
       filterAttributes={MATERIAL_SAMPLE_FILTER_ATTRIBUTES}
       id="material-sample-list"
       queryTableProps={{

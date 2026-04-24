@@ -133,7 +133,6 @@ export default function MolecularAnalysisWorkflowListPage() {
               </div>
             </div>
           )}
-          useFiql={true}
         />
       </main>
       <Footer />

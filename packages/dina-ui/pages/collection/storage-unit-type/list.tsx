@@ -65,7 +65,6 @@ export default function StorageUnitTypeListPage() {
             </div>
           </div>
         )}
-        useFiql={true}
       />
     </PageLayout>
   );

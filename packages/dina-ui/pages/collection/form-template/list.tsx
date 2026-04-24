@@ -147,7 +147,6 @@ export default function MaterialSampleFormTemplateListPage() {
             </div>
           </div>
         )}
-        useFiql={true}
       />
     </PageLayout>
   );

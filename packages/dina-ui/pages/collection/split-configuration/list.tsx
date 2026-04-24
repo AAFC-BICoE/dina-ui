@@ -71,7 +71,6 @@ export default function AgentListPage() {
             .whereProvided("group", "EQ", filterForm.group)
             .build()
         }
-        useFiql={true}
       />
     </PageLayout>
   );

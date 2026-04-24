@@ -73,7 +73,6 @@ export default function ExpeditionListPage() {
             </div>
           </div>
         )}
-        useFiql={true}
       />
     </PageLayout>
   );

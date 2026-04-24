@@ -83,7 +83,6 @@ export default function LibraryPrepBatchListPage() {
               </div>
             </div>
           )}
-          useFiql={true}
         />
       </main>
       <Footer />

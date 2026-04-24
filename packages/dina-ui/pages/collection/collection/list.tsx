@@ -78,7 +78,6 @@ export default function CollectionListPage() {
             </div>
           </div>
         )}
-        useFiql={true}
       />
     </PageLayout>
   );

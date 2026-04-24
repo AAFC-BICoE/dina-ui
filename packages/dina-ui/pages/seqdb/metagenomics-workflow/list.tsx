@@ -74,7 +74,6 @@ export default function MetagenomicsWorkflowListPage() {
               .whereProvided("group", "EQ", filterForm.group)
               .build()
           }
-          useFiql={true}
           filterAttributes={FILTER_ATTRIBUTES}
           id="metagenomics-workflow-list"
           queryTableProps={{

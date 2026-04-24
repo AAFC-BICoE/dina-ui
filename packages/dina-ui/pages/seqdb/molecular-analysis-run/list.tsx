@@ -38,7 +38,6 @@ export default function MolecularAnalysisListPage() {
           columns: MOLECULAR_ANALYSIS_RUN_TABLE_COLUMNS,
           path: "seqdb-api/molecular-analysis-run"
         }}
-        useFiql={true}
       />
     </PageLayout>
   );
