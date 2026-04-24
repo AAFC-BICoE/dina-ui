@@ -53,6 +53,9 @@ import QueryBuilderVocabularySearch from "./query-builder-value-types/QueryBuild
 import QueryRowClassificationSearch, {
   transformClassificationToDSL
 } from "./query-builder-value-types/QueryBuilderClassificationSearch";
+import QueryBuilderGeoShapeSearch, {
+  transformGeoShapeToDSL
+} from "./query-builder-value-types/QueryBuilderGeoShapeSearch";
 import {
   QueryRowRelationshipAutocompleteSearch,
   transformRelationshipAutocompleteToDSL
@@ -119,6 +122,7 @@ function getQueryBuilderTypeFromIndexType(
     case "relationshipPresence":
     case "classification":
     case "relationshipAutocomplete":
+    case "geoShape":
       return type;
 
     // If it's stored directly as a keyword, it's considered a text field.
@@ -638,6 +642,28 @@ export function generateBuilderConfig(
         });
       }
     },
+    geoShape: {
+      ...BasicConfig.widgets.text,
+      type: "geoShape",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryBuilderGeoShapeSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          isInColumnSelector={false}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformGeoShapeToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
+    },
     relationshipAutocomplete: {
       ...BasicConfig.widgets.text,
       type: "relationshipAutocomplete",
@@ -833,6 +859,15 @@ export function generateBuilderConfig(
       widgets: {
         relationshipAutocomplete: {
           operators: ["equals", "notEquals", "empty", "notEmpty"]
+        }
+      }
+    },
+    geoShape: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        geoShape: {
+          operators: ["noOperator"]
         }
       }
     }

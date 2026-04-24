@@ -172,6 +172,11 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                               />
                             </svg>
                           </button>
+                          <div
+                            aria-atomic="true"
+                            aria-live="polite"
+                            class="notification-toast-container"
+                          />
                         </div>
                         <button
                           class="btn btn-info logout-button my-auto"

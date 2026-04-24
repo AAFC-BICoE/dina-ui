@@ -46,11 +46,13 @@ export interface UseSavedExportsProp {
     value: ColumnSeparator;
     label: string;
   };
+  entityLink?: string;
 }
 
 export default function useSavedExports<TData extends KitsuResource>({
   exportType,
-  selectedSeparator
+  selectedSeparator,
+  entityLink
 }: UseSavedExportsProp) {
   const { apiClient } = useApiClient();
   const { groupNames } = useAccount();
@@ -186,6 +188,16 @@ export default function useSavedExports<TData extends KitsuResource>({
    */
   async function performUpdateSavedExport(): Promise<DataExportTemplate> {
     const columnFunctions = getColumnFunctions(columnsToExport);
+    const entityKey = entityLink
+      ? entityLink.split("/").pop()
+      : Object.keys(selectedSavedExport?.schema ?? {})[0];
+
+    if (!entityKey) {
+      throw new Error(
+        "Cannot determine entity key for export update. No entityLink or schema provided."
+      );
+    }
+
     const updatedSavedExportResp = await apiClient.axios.patch(
       `/dina-export-api/data-export-template/${selectedSavedExport?.id}`,
       {
@@ -193,8 +205,12 @@ export default function useSavedExports<TData extends KitsuResource>({
           id: selectedSavedExport?.id,
           type: selectedSavedExport?.type,
           attributes: {
-            columns: convertColumnsToPaths(columnsToExport),
-            columnAliases: convertColumnsToAliases(columnsToExport),
+            schema: {
+              [entityKey]: {
+                columns: convertColumnsToPaths(columnsToExport),
+                aliases: convertColumnsToAliases(columnsToExport)
+              }
+            },
             name: selectedSavedExport?.name,
             restrictToCreatedBy: restrictToCreatedBy,
             publiclyReleasable: publiclyReleasable,
@@ -245,14 +261,28 @@ export default function useSavedExports<TData extends KitsuResource>({
    */
   async function performCreateSavedExport(): Promise<DataExportTemplate> {
     const columnFunctions = getColumnFunctions(columnsToExport);
+    const entityKey = entityLink
+      ? entityLink.split("/").pop()
+      : Object.keys(selectedSavedExport?.schema ?? {})[0];
+
+    if (!entityKey) {
+      throw new Error(
+        "Cannot determine entity key for export creation. No entityLink or schema provided."
+      );
+    }
+
     const createdSavedExportResp = await apiClient.axios.post(
       `/dina-export-api/data-export-template`,
       {
         data: {
           type: "data-export-template",
           attributes: {
-            columns: convertColumnsToPaths(columnsToExport),
-            columnAliases: convertColumnsToAliases(columnsToExport),
+            schema: {
+              [entityKey]: {
+                columns: convertColumnsToPaths(columnsToExport),
+                aliases: convertColumnsToAliases(columnsToExport)
+              }
+            },
             name: savedExportName.trim(),
             restrictToCreatedBy: restrictToCreatedBy,
             publiclyReleasable: publiclyReleasable,
@@ -399,7 +429,7 @@ export default function useSavedExports<TData extends KitsuResource>({
         // Now persist the migrated object to the backend
         performSavedExportMigration(migratedExport);
       } else {
-        // No migration needed, just load paths:
+        // No migration needed, just load the saved export:
         setColumnPathsToExport(selectedSavedExport);
       }
     }
@@ -411,11 +441,19 @@ export default function useSavedExports<TData extends KitsuResource>({
     const columnsToExportPaths = convertColumnsToPaths(columnsToExport);
     const columnsToExportAliases = convertColumnsToAliases(columnsToExport);
 
+    // Extract columns and aliases from the schema (first entity key)
+    const entityKey = entityLink
+      ? entityLink.split("/").pop()
+      : Object.keys(selectedSavedExport?.schema ?? {})[0];
+
     setChangesMade(
-      !_.isEqual(columnsToExportPaths, selectedSavedExport?.columns ?? []) ||
+      !_.isEqual(
+        columnsToExportPaths,
+        selectedSavedExport?.schema?.[entityKey ?? ""]?.columns ?? []
+      ) ||
         !_.isEqual(
           columnsToExportAliases,
-          selectedSavedExport?.columnAliases ?? []
+          selectedSavedExport?.schema?.[entityKey ?? ""]?.aliases ?? []
         )
     );
   }, [columnsToExport]);

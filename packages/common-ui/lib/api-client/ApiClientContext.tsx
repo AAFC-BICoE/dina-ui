@@ -268,6 +268,7 @@ export class ApiClientImpl implements ApiClientI {
       "object-upload",
       "metadata",
       "material-sample",
+      "organism",
       "collecting-event",
       "user",
       "storage-unit",

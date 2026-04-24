@@ -275,11 +275,19 @@ describe("Metadata List Page", () => {
 
     await waitFor(() => {
       // Renders initially with the table view:
-      expect(wrapper.getByRole("radio", { name: /table/i })).toBeChecked();
+      expect(
+        wrapper.getByRole("tab", {
+          name: /list/i
+        })
+      ).toBeInTheDocument();
     });
 
     // Switch to gallery view.
-    userEvent.click(wrapper.getByRole("radio", { name: /gallery/i }));
+    userEvent.click(
+      wrapper.getByRole("tab", {
+        name: /gallery/i
+      })
+    );
 
     await waitFor(
       () => {

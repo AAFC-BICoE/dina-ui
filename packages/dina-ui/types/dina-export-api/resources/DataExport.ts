@@ -10,6 +10,11 @@ export interface FunctionDef {
   params: { [key: string]: any };
 }
 
+export interface EntitySchema {
+  columns: string[];
+  aliases?: string[];
+}
+
 export interface DataExportAttributes {
   type: "data-export";
   status?: ExportStatus;
@@ -17,11 +22,10 @@ export interface DataExportAttributes {
   createdBy?: string;
   source?: string;
   query?: string;
-  columns?: string[];
   name?: string;
   exportType: ExportType;
   exportOptions?: ExportOptions;
-  columnAliases?: string[];
+  schema?: Record<string, EntitySchema>;
   functions?: Record<string, FunctionDef>;
 }
 

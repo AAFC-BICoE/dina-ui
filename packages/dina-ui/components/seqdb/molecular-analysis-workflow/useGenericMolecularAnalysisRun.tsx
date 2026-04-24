@@ -446,7 +446,13 @@ export function useGenericMolecularAnalysisRun({
             );
 
             if (runQuery && (runQuery as any)?.data?.attachments) {
-              setAttachments((runQuery as any)?.data?.attachments);
+              const loadedAttachments = (runQuery as any)?.data?.attachments;
+              setAttachments(loadedAttachments);
+              // Also update the sequencingRun so the comparison works correctly
+              setSequencingRun({
+                ...run,
+                attachments: loadedAttachments
+              });
             }
           }
         }
@@ -686,23 +692,22 @@ export function useGenericMolecularAnalysisRun({
     attachments1: ResourceIdentifierObject[],
     attachments2: ResourceIdentifierObject[]
   ): boolean {
+    const normalized1 = attachments1 ?? [];
+    const normalized2 = attachments2 ?? [];
+
     // Both do not contain attachments, no changes.
-    if (!attachments1 && !attachments2) {
+    if (normalized1.length === 0 && normalized2.length === 0) {
       return false;
     }
 
     // Length or one is undefined/null, changes made.
-    if (
-      !attachments1 ||
-      !attachments2 ||
-      attachments1.length !== attachments2.length
-    ) {
+    if (normalized1.length !== normalized2.length) {
       return true;
     }
 
     // Final case is same length but different ids.
-    const ids1 = attachments1.map((a) => a.id).sort();
-    const ids2 = attachments2.map((a) => a.id).sort();
+    const ids1 = normalized1.map((a) => a.id).sort();
+    const ids2 = normalized2.map((a) => a.id).sort();
     return !_.isEqual(ids1, ids2);
   }
 
@@ -1049,7 +1054,8 @@ export function useGenericMolecularAnalysisRun({
       }
 
       const hasNameOrTypeChanged =
-        qc.name !== matchingLoadedQc.name || qc.type !== matchingLoadedQc.type;
+        qc.name !== matchingLoadedQc.name ||
+        qc.qcType !== matchingLoadedQc.qcType;
 
       return (
         qc.id &&

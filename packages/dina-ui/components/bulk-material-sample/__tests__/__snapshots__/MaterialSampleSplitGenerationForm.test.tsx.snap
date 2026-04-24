@@ -172,6 +172,11 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                               />
                             </svg>
                           </button>
+                          <div
+                            aria-atomic="true"
+                            aria-live="polite"
+                            class="notification-toast-container"
+                          />
                         </div>
                         <button
                           class="btn btn-info logout-button my-auto"
@@ -875,6 +880,11 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                               />
                             </svg>
                           </button>
+                          <div
+                            aria-atomic="true"
+                            aria-live="polite"
+                            class="notification-toast-container"
+                          />
                         </div>
                         <button
                           class="btn btn-info logout-button my-auto"

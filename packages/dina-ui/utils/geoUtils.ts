@@ -2,7 +2,8 @@ import { loadModules } from "esri-loader";
 import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
 
 /**
- * Internal cached ArcGIS map modules and projection modules
+ * Internal cached ArcGIS map modules and projection modules.
+ * Once we upgrade to use @arcgis/core, we can improve type safety.
  */
 let mapModulesPromise: Promise<{
   Map: any;
@@ -10,6 +11,10 @@ let mapModulesPromise: Promise<{
   GraphicsLayer: any;
   SketchViewModel: any;
   Graphic: any;
+  BasemapToggle: any;
+  Search: any;
+  ScaleBar: any;
+  Fullscreen: any;
 }> | null = null;
 
 /**
@@ -17,27 +22,45 @@ let mapModulesPromise: Promise<{
  */
 export async function getMapModules() {
   if (!mapModulesPromise) {
-    mapModulesPromise = loadModules(
-      [
-        "esri/Map",
-        "esri/views/MapView",
-        "esri/layers/GraphicsLayer",
-        "esri/widgets/Sketch/SketchViewModel",
-        "esri/Graphic"
-      ],
-      { css: false }
-    ).then(([Map, MapView, GraphicsLayer, SketchViewModel, Graphic]) => ({
-      Map,
-      MapView,
-      GraphicsLayer,
-      SketchViewModel,
-      Graphic
-    }));
+    mapModulesPromise = loadModules([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/GraphicsLayer",
+      "esri/widgets/Sketch/SketchViewModel",
+      "esri/Graphic",
+      "esri/widgets/BasemapToggle",
+      "esri/widgets/Search",
+      "esri/widgets/ScaleBar",
+      "esri/widgets/Fullscreen"
+    ]).then(
+      ([
+        Map,
+        MapView,
+        GraphicsLayer,
+        SketchViewModel,
+        Graphic,
+        BasemapToggle,
+        Search,
+        ScaleBar,
+        Fullscreen
+      ]) => ({
+        Map,
+        MapView,
+        GraphicsLayer,
+        SketchViewModel,
+        Graphic,
+        BasemapToggle,
+        Search,
+        ScaleBar,
+        Fullscreen
+      })
+    );
   }
 
   return mapModulesPromise;
 }
 
+// Singleton cache
 let projectionModulesPromise: Promise<{
   Polygon: any;
   projection: any;
@@ -53,12 +76,15 @@ async function getProjectionModules() {
       "esri/geometry/Polygon",
       "esri/geometry/projection",
       "esri/geometry/SpatialReference"
-    ]).then(async ([Polygon, projection, SpatialReference]) => {
-      // Load projection engine ONCE
-      await projection.load();
-
-      return { Polygon, projection, SpatialReference };
-    });
+    ])
+      .then(async ([Polygon, projection, SpatialReference]) => {
+        await projection.load();
+        return { Polygon, projection, SpatialReference };
+      })
+      .catch((err) => {
+        projectionModulesPromise = null; // allow retry
+        throw err;
+      });
   }
 
   return projectionModulesPromise;
@@ -90,4 +116,47 @@ export async function projectPolygon3857To4326(
   }
 
   return polygon4326.rings as GeoPosition[][];
+}
+
+// An empty polygon ([]) is considered valid
+export function validatePolygon(polygon: GeoPosition[][]): boolean {
+  if (!Array.isArray(polygon)) {
+    return false;
+  }
+
+  for (let i = 0; i < polygon.length; i++) {
+    const ring = polygon[i];
+
+    if (!Array.isArray(ring) || ring.length < 4) {
+      return false;
+    }
+
+    for (const pos of ring) {
+      if (
+        !Array.isArray(pos) ||
+        pos.length !== 2 ||
+        typeof pos[0] !== "number" ||
+        typeof pos[1] !== "number" ||
+        !isFinite(pos[0]) ||
+        !isFinite(pos[1])
+      ) {
+        return false;
+      }
+
+      const [lng, lat] = pos;
+
+      if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+        return false;
+      }
+    }
+
+    const first = ring[0];
+    const last = ring[ring.length - 1];
+
+    if (first[0] !== last[0] || first[1] !== last[1]) {
+      return false;
+    }
+  }
+
+  return true;
 }

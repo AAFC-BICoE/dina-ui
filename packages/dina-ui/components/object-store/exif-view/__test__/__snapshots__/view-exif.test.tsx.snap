@@ -21,7 +21,7 @@ exports[`View Exif page renders exif props when received file upload response 1`
             height="1em"
             stroke="currentColor"
             stroke-width="0"
-            style="color: rgb(0, 0, 0); font-size: 1.5rem; transform: rotate(0deg); transition: transform 2s cubic-bezier(.4,2,.55,.44); will-change: transform;"
+            style="color: rgb(0, 0, 0); font-size: 1.5rem; margin-top: 2px; transform: rotate(0deg); transition: transform 2s cubic-bezier(.4,2,.55,.44); will-change: transform;"
             viewBox="0 0 448 512"
             width="1em"
             xmlns="http://www.w3.org/2000/svg"
