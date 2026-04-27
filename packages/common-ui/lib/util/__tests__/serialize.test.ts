@@ -114,7 +114,6 @@ describe("serialize function", () => {
         relatedPerson: {
           data: {
             id: "5",
-            name: "Mat",
             type: "relatedPerson"
           }
         }

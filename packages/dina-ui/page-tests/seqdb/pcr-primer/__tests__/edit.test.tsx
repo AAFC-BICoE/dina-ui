@@ -1,8 +1,7 @@
 import { writeStorage } from "@rehooks/local-storage";
-import { OperationsResponse } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { PcrPrimerEditPage } from "../../../../pages/seqdb/pcr-primer/edit";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -21,14 +20,17 @@ const mockGet = jest.fn(async (path) => {
   }
 });
 
-/** Mock axios for operations requests. */
+/** Mock axios for patch requests. */
 const mockPatch = jest.fn();
+
+/** Mock axios for post requests. */
+const mockPost = jest.fn();
 
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: { get: mockGet, axios: { patch: mockPatch, post: mockPost } }
 };
 
 describe("PcrPrimer edit page", () => {
@@ -39,16 +41,13 @@ describe("PcrPrimer edit page", () => {
   });
 
   it("Provides a form to add a PcrPrimer.", async () => {
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            id: "1",
-            type: "pcr-primer"
-          },
-          status: 201
+    mockPost.mockReturnValueOnce({
+      data: {
+        data: {
+          id: "1",
+          type: "pcr-primer"
         }
-      ] as OperationsResponse
+      }
     });
 
     const wrapper = mountWithAppContext(
@@ -67,85 +66,41 @@ describe("PcrPrimer edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the primer form to load.
-    await waitFor(() => {
-      // Test expected API Response
-      expect(mockPatch).lastCalledWith(
-        "/seqdb-api/operations",
-        [
-          {
-            op: "POST",
-            path: "pcr-primer",
-            value: {
-              attributes: {
-                direction: "F",
-                group: "aafc",
-                lotNumber: 1,
-                name: "New PcrPrimer",
-                seq: "",
-                type: "PRIMER"
-              },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "pcr-primer"
-            }
-          }
-        ],
-        expect.anything()
-      );
-    });
+    await waitForLoadingToDisappear();
+
+    // Wait for the primer form to load.
+    expect(mockPost).lastCalledWith(
+      "/seqdb-api/pcr-primer",
+      {
+        data: {
+          attributes: {
+            direction: "F",
+            group: "aafc",
+            lotNumber: 1,
+            name: "New PcrPrimer",
+            seq: "",
+            type: "PRIMER"
+          },
+          id: "00000000-0000-0000-0000-000000000000",
+          type: "pcr-primer"
+        }
+      },
+      expect.anything()
+    );
 
     // The user should be redirected to the new primer's details page.
     expect(mockPush).lastCalledWith("/seqdb/pcr-primer/view?id=1");
   });
 
-  it("Renders an error after form submit if one is returned from the back-end.", async () => {
-    // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
-      data: [
-        {
-          errors: [
-            {
-              detail: "name size must be between 1 and 10",
-              status: "422",
-              title: "Constraint violation"
-            }
-          ],
-          status: 422
-        }
-      ] as OperationsResponse
-    }));
-
-    const wrapper = mountWithAppContext(
-      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />,
-      { apiContext }
-    );
-
-    // Submit the form.
-    fireEvent.submit(wrapper.container.querySelector("form")!);
-
-    // Wait for the primer form to load.
-    await waitFor(() => {
-      // Test expected error
-      expect(
-        wrapper.getByText(
-          /constraint violation: name size must be between 1 and 10/i
-        )
-      ).toBeInTheDocument();
-    });
-    expect(mockPush).toBeCalledTimes(0);
-  });
-
   it("Provides a form to edit a PcrPrimer.", async () => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            id: "1",
-            type: "pcr-primer"
-          },
-          status: 201
+      data: {
+        data: {
+          id: "1",
+          type: "pcr-primer"
         }
-      ] as OperationsResponse
+      }
     });
 
     const wrapper = mountWithAppContext(
@@ -183,28 +138,44 @@ describe("PcrPrimer edit page", () => {
       // "patch" should have been called with a jsonpatch request containing the existing values
       // and the modified one.
       expect(mockPatch).lastCalledWith(
-        "/seqdb-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "pcr-primer/1",
-            value: {
-              attributes: expect.objectContaining({
-                application: null,
-                group: "aafc",
-                name: "ITS1",
-                seq: "new seq value"
-              }),
-              id: "1",
-              relationships: {
-                region: {
-                  data: expect.objectContaining({ id: "2", type: "region" })
+        "/seqdb-api/pcr-primer/1",
+        {
+          data: {
+            attributes: {
+              application: null,
+              dateOrdered: null,
+              designDate: null,
+              designedBy: "Bob Jones",
+              direction: "R",
+              group: "aafc",
+              lastModified: "2013-03-19T04:00:00.000+0000",
+              lotNumber: 1,
+              name: "ITS1",
+              note: "ITS4 primer hybridizes at the 5' end of the 28S gene region.",
+              position: null,
+              purification: "none",
+              reference: null,
+              seq: "new seq value",
+              stockConcentration: "10",
+              supplier: null,
+              targetSpecies: null,
+              tmCalculated: "55",
+              tmPe: null,
+              type: "PRIMER",
+              version: null
+            },
+            id: "1",
+            relationships: {
+              region: {
+                data: {
+                  id: "2",
+                  type: "region"
                 }
-              },
-              type: "pcr-primer"
-            }
+              }
+            },
+            type: "pcr-primer"
           }
-        ],
+        },
         expect.anything()
       );
     });

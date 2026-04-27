@@ -44,7 +44,7 @@ const mockGet = jest.fn(async (path) => {
   if (path === "seqdb-api/index-set/100") {
     return { data: TEST_INDEX_SET };
   }
-  if (path === "seqdb-api/index-set/100/ngsIndexes") {
+  if (path === "seqdb-api/ngs-index?filter[indexSet.uuid]=100") {
     return { data: TEST_NGS_INDEXES };
   }
   return { data: [] };

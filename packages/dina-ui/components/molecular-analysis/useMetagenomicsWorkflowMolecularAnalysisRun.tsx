@@ -264,6 +264,7 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
       filter: { "metagenomicsBatch.uuid": { EQ: metagenomicsBatchId } },
       page: { limit: 1000 },
       path: `seqdb-api/metagenomics-batch-item`,
+      // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
       include:
         "indexI5,indexI7,pcrBatchItem,molecularAnalysisRunItem,molecularAnalysisRunItem.run"
     },

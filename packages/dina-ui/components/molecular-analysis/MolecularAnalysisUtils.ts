@@ -32,6 +32,7 @@ export function useDeleteMolecularAnalysisWorkflows() {
         filter: SimpleSearchFilterBuilder.create()
           .where("genericMolecularAnalysis.uuid", "EQ", resourceId)
           .build(),
+        // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
         include:
           "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result",
         page: { limit: 1000 }
@@ -182,6 +183,7 @@ async function handleDeleteQualityControl(
           molecularAnalysisRunItem.id ?? ""
         )
         .build(),
+      // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
       include: "molecularAnalysisRunItem,molecularAnalysisRunItem.result",
       page: { limit: 1000 }
     }

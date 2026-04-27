@@ -154,6 +154,7 @@ export function MolecularAnalysisSampleSelectionStep({
           filter: {
             "genericMolecularAnalysis.uuid": { EQ: molecularAnalysisId }
           },
+          // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
           include:
             "materialSample,storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run",
           page: {

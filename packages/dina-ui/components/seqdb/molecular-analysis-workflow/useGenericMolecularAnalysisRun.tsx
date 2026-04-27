@@ -228,6 +228,7 @@ export function useGenericMolecularAnalysisRun({
       },
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
+      // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
       include:
         "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result"
     },
@@ -611,6 +612,7 @@ export function useGenericMolecularAnalysisRun({
               filter: {
                 "molecularAnalysisRunItem.uuid": { EQ: item?.id }
               },
+              // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
               include:
                 "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
             }
