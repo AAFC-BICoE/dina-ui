@@ -1,6 +1,7 @@
 import {
   DoOperationsError,
   LoadingSpinner,
+  SimpleSearchFilterBuilder,
   useAccount,
   useApiClient
 } from "common-ui";
@@ -101,11 +102,9 @@ export function PreLibraryPrepStep({
     const savedPreLibraryPreps = await apiClient.get<PreLibraryPrep[]>(
       "seqdb-api/pre-library-prep",
       {
-        filter: {
-          rsql: libraryPrepIds.length
-            ? `libraryPrep.uuid=in=(${libraryPrepIds})`
-            : ""
-        },
+        filter: SimpleSearchFilterBuilder.create()
+          .whereIn("libraryPrep.uuid", libraryPrepIds)
+          .build(),
         include: "libraryPrep,product,protocol",
         page: { limit: 1000 }
       }

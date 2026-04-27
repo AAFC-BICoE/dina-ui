@@ -1008,13 +1008,6 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@molgenis/rsql@0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@molgenis/rsql/-/rsql-0.1.2.tgz#1e0c7658d6e6e558995418a35766880e5ef41fa3"
-  integrity sha512-VoRSD4wVUPemYgT+/2pR2ZWjQxxJW+F6UX+vvcQiwo+IOC6AjjfhYUPXtAbmg8JeooGo3KOFXWY6HRjxDcnixg==
-  dependencies:
-    mdurl "^1.0.1"
-
 "@napi-rs/wasm-runtime@^0.2.11":
   version "0.2.12"
   resolved "https://registry.yarnpkg.com/@napi-rs/wasm-runtime/-/wasm-runtime-0.2.12.tgz#3e78a8b96e6c33a6c517e1894efbd5385a7cb6f2"
@@ -2802,7 +2795,6 @@ commander@~3.0.2:
     "@dnd-kit/accessibility" "^3.1.1"
     "@dnd-kit/core" "^6.3.1"
     "@dnd-kit/sortable" "^10.0.0"
-    "@molgenis/rsql" "0.1.2"
     "@react-awesome-query-builder/ui" "^6.3.0"
     "@rehooks/local-storage" "2.4.0"
     "@tanstack/react-table" "^8.9.3"
@@ -5579,11 +5571,6 @@ mathjs@^10.0.0:
     seedrandom "^3.0.5"
     tiny-emitter "^2.1.0"
     typed-function "^2.1.0"
-
-mdurl@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/mdurl/-/mdurl-1.0.1.tgz#fe85b2ec75a59037f2adfec100fd6c601761152e"
-  integrity sha512-/sKlQJCBYVY9Ers9hqzKou4H6V5UWc/M59TH2dvkt+84itfnq7uFOMLpOiOS4ujvHP4etln18fmIxA5R5fll0g==
 
 memoize-one@^6.0.0:
   version "6.0.0"
