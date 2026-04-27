@@ -18,7 +18,9 @@ interface RsqlOperandGroup {
   operator: string;
 }
 
-/** Converts a FilterGroupModel to an RSQL expression. */
+/** Converts a FilterGroupModel to an RSQL expression.
+ * @deprecated RSQL is no longer supported, fiql or simple filters should be used instead.
+ */
 export function rsql(
   filter: FilterGroupModel | FilterRowModel | FreeTextSearchFilterModel | null
 ): string {

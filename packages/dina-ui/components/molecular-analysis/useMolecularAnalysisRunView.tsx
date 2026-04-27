@@ -1,11 +1,6 @@
 import { SeqReaction } from "../../types/seqdb-api";
 import { useState } from "react";
-import {
-  filterBy,
-  SimpleSearchFilterBuilder,
-  useApiClient,
-  useQuery
-} from "common-ui";
+import { SimpleSearchFilterBuilder, useApiClient, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import {
   attachGenericMolecularAnalysisItems,
@@ -209,15 +204,13 @@ export function useMolecularAnalysisRunView({
               const qualityControlQuery = await apiClient.get<QualityControl>(
                 `seqdb-api/quality-control`,
                 {
-                  filter: filterBy([], {
-                    extraFilters: [
-                      {
-                        selector: "molecularAnalysisRunItem.uuid",
-                        comparison: "==",
-                        arguments: item?.id
-                      }
-                    ]
-                  })(""),
+                  filter: SimpleSearchFilterBuilder.create()
+                    .where(
+                      "molecularAnalysisRunItem.uuid",
+                      "EQ",
+                      item?.id ?? ""
+                    )
+                    .build(),
                   include:
                     "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
                 }

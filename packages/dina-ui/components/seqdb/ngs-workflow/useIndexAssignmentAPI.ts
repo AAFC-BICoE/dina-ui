@@ -1,8 +1,8 @@
 import {
   ApiClientContext,
   DinaFormSubmitParams,
-  filterBy,
   SaveArgs,
+  SimpleSearchFilterBuilder,
   useQuery
 } from "common-ui";
 import _, { Dictionary } from "lodash";
@@ -54,15 +54,9 @@ export function useIndexAssignmentAPI({
     {
       include: "indexI5,indexI7,storageUnitUsage,materialSample",
       page: { limit: 1000 },
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "libraryPrepBatch.uuid",
-            comparison: "==",
-            arguments: libraryPrepBatch?.id ?? ""
-          }
-        ]
-      })(""),
+      filter: SimpleSearchFilterBuilder.create()
+        .where("libraryPrepBatch.uuid", "EQ", libraryPrepBatch?.id ?? "")
+        .build(),
       path: `seqdb-api/library-prep`
     },
     {
@@ -133,15 +127,9 @@ export function useIndexAssignmentAPI({
   useQuery<NgsIndex[]>(
     {
       page: { limit: 1000 },
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "indexSet.uuid",
-            comparison: "==",
-            arguments: libraryPrepBatch?.indexSet?.id ?? ""
-          }
-        ]
-      })(""),
+      filter: SimpleSearchFilterBuilder.create()
+        .where("indexSet.uuid", "EQ", libraryPrepBatch?.indexSet?.id ?? "")
+        .build(),
       path: `seqdb-api/ngs-index`
     },
     {

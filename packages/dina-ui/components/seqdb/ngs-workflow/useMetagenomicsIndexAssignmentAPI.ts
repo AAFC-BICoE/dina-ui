@@ -1,7 +1,6 @@
 import {
   ApiClientContext,
   DinaFormSubmitParams,
-  filterBy,
   SaveArgs,
   SimpleSearchFilterBuilder,
   useQuery
@@ -166,15 +165,9 @@ export function useMetagenomicsIndexAssignmentAPI({
   useQuery<NgsIndex[]>(
     {
       page: { limit: 1000 },
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "indexSet.uuid",
-            comparison: "==",
-            arguments: metagenomicsBatch?.indexSet?.id ?? ""
-          }
-        ]
-      })(""),
+      filter: SimpleSearchFilterBuilder.create()
+        .where("indexSet.uuid", "EQ", metagenomicsBatch?.indexSet?.id ?? "")
+        .build(),
       path: `seqdb-api/ngs-index`
     },
     {

@@ -2,8 +2,8 @@ import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
 import {
   DeleteArgs,
   DoOperationsOptions,
-  filterBy,
   SaveArgs,
+  SimpleSearchFilterBuilder,
   useApiClient
 } from "../../../common-ui/lib";
 import { GenericMolecularAnalysisItem } from "../../types/seqdb-api/resources/GenericMolecularAnalysisItem";
@@ -29,15 +29,9 @@ export function useDeleteMolecularAnalysisWorkflows() {
       const genericMolecularAnalysisItemsResp = await apiClient.get<
         GenericMolecularAnalysisItem[]
       >(`/seqdb-api/generic-molecular-analysis-item`, {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "genericMolecularAnalysis.uuid",
-              comparison: "==",
-              arguments: resourceId
-            }
-          ]
-        })(""),
+        filter: SimpleSearchFilterBuilder.create()
+          .where("genericMolecularAnalysis.uuid", "EQ", resourceId)
+          .build(),
         include:
           "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result",
         page: { limit: 1000 }
@@ -83,22 +77,18 @@ export function useDeleteMolecularAnalysisWorkflows() {
           const qualityControlItemQuery = await apiClient.get<
             MolecularAnalysisRunItem[]
           >(`seqdb-api/molecular-analysis-run-item`, {
-            filter: filterBy([], {
-              extraFilters: [
-                {
-                  selector: "run.uuid",
-                  comparison: "==",
-                  arguments:
-                    genericMolecularAnalysisItems[0].molecularAnalysisRunItem
-                      .run.id
-                },
-                {
-                  selector: "usageType",
-                  comparison: "==",
-                  arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
-                }
-              ]
-            })(""),
+            filter: SimpleSearchFilterBuilder.create()
+              .where(
+                "run.uuid",
+                "EQ",
+                genericMolecularAnalysisItems[0].molecularAnalysisRunItem.run.id
+              )
+              .where(
+                "usageType",
+                "EQ",
+                MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+              )
+              .build(),
             page: { limit: 1000 }
           });
           if (qualityControlItemQuery.data.length > 0) {
@@ -185,15 +175,13 @@ async function handleDeleteQualityControl(
   const qualityControlsQuery = await apiClient.get<QualityControl[]>(
     `seqdb-api/quality-control`,
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "molecularAnalysisRunItem.uuid",
-            comparison: "==",
-            arguments: molecularAnalysisRunItem.id!
-          }
-        ]
-      })(""),
+      filter: SimpleSearchFilterBuilder.create()
+        .where(
+          "molecularAnalysisRunItem.uuid",
+          "EQ",
+          molecularAnalysisRunItem.id ?? ""
+        )
+        .build(),
       include: "molecularAnalysisRunItem,molecularAnalysisRunItem.result",
       page: { limit: 1000 }
     }

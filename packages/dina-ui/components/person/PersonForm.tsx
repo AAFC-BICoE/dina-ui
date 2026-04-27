@@ -1,6 +1,5 @@
 import {
   DinaForm,
-  filterBy,
   SubmitButton,
   TextField,
   useModal,
@@ -8,7 +7,8 @@ import {
   ResourceSelectField,
   BackButton,
   ButtonBar,
-  useSubmitHandler
+  useSubmitHandler,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { Organization } from "../../types/agent-api/resources/Organization";
@@ -130,7 +130,11 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       <div style={{ width: "30rem" }}>
         <ResourceSelectField<Organization>
           name="organizations"
-          filter={filterBy(["names[0].name"])}
+          filter={(value) =>
+            SimpleSearchFilterBuilder.create()
+              .searchFilter("names.name", value)
+              .build()
+          }
           model="agent-api/organization"
           isMulti={true}
           optionLabel={(organization) => organization.names?.[0].name}
