@@ -3,10 +3,11 @@ import { getMapModules } from "../../utils/geoUtils";
 import { useApiClient } from "common-ui";
 
 function zoomToPrecision(zoom) {
-  if (zoom >= 15) return 8;
-  if (zoom >= 12) return 7;
-  if (zoom >= 9) return 6;
-  if (zoom >= 6) return 5;
+  if (zoom >= 12) return 15;
+  if (zoom >= 9) return 13;
+  if (zoom >= 7) return 10;
+  if (zoom >= 6) return 8;
+  if (zoom >= 5) return 6;
   if (zoom >= 3) return 4;
   return 3;
 }
@@ -17,13 +18,13 @@ export default function MaterialSampleMap(totalRecords) {
   const featureLayerRef = useRef<any>(null);
   const { apiClient } = useApiClient();
 
-  const CLUSTER_THRESHOLD = 10; // threshold to switch between raw points and clusters
+  const CLUSTER_THRESHOLD = 500; // threshold to switch between raw points and clusters
 
   useEffect(() => {
     if (!mapRef.current) return;
     let watchHandle = null;
     let debounceTimer = null;
-    const DEBOUNCE_DELAY = 100;
+    const DEBOUNCE_DELAY = 250;
 
     getMapModules().then(
       ({
@@ -94,16 +95,14 @@ export default function MaterialSampleMap(totalRecords) {
                 const group = feature.graphic.attributes.group || "";
 
                 div.innerHTML = `
-        <ul>
-          <li>
+
             <a href="/collection/material-sample/view?id=${sampleID}" 
                target="_blank" 
                rel="noopener noreferrer">
-              ${sampleName}
-            </a>
-          </li>
-          ${group ? `<li>Group: ${group}</li>` : ""}
-        </ul>`;
+              ${sampleName ?? sampleID}
+            </a>  <br>
+          ${group ? `Group: ${group}` : ""} 
+        `;
               } else {
                 div.innerHTML = `Cluster of ${feature.graphic.attributes.count} samples`;
               }
@@ -162,7 +161,7 @@ export default function MaterialSampleMap(totalRecords) {
         }
 
         async function fetchDataWithinExtent(extent) {
-          const { zoom } = extent;
+          const zoom = (viewRef.current as any).zoom;
 
           if (extent.spatialReference.isWebMercator) {
             extent = webMercatorUtils.webMercatorToGeographic(extent);
