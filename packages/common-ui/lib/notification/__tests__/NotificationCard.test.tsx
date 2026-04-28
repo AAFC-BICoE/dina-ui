@@ -168,6 +168,32 @@ describe("NotificationCard", () => {
     });
   });
 
+  describe("Popup rendering", () => {
+    it("Renders popup with title and message", () => {
+      const notification: Notification = {
+        id: "1",
+        userIdentifier: "test-user",
+        group: "aafc",
+        type: "info",
+        title: "Popup Title",
+        message: "Popup message content",
+        status: "NEW",
+        createdOn: "2024-01-15T10:00:00Z"
+      };
+
+      const wrapper = render(
+        <NotificationCard
+          notification={notification}
+          onMarkAsRead={mockOnMarkAsRead}
+          displayAsToast={true}
+        />
+      );
+
+      // Compare snapshot for popup rendering
+      expect(wrapper.container).toMatchSnapshot();
+    });
+  });
+
   describe("Message parsing", () => {
     it("Renders simple message without parameters", () => {
       const notification: Notification = {

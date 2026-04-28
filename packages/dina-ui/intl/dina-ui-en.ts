@@ -22,6 +22,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addExistingStorageUnitAsChild: "Add Existing Storage Unit",
   addExternalResourceTitle: "Add New External Resource",
   addFilesButton: "Add Files",
+  addFilterTooltip:
+    "Click on a bar to add a filter to the query for that value.",
+  addTaxonomicChartTooltip:
+    "If Sunburst: Click on a ring to drill down to that rank, click blue center circle to drill up. If Treemap: Click on a box to drill down to that rank, click ALL at the bottom of the screen to reset.",
+  addTaxonomicTreeTooltip:
+    "Click arrow to expand tree, Click name to choose ranks displayed on Taxanomic Chart.",
   addGroup: "Add Group",
   addIdentifier: "Add Identifier",
   addInstitutionTitle: "Add Institution",
@@ -161,6 +167,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectionLinkedProjectTableTitle: "Linked Projects",
   sampleTypeChartTitle: "Material Sample Types",
   recordAddedChartTitle: "Records Added by Date",
+  recordAddedChartTitleYear: "Records Added by Date (Year)",
+  recordAddedChartTitleMonth: "Records Added by Date (Month)",
+  recordAddedChartTitleDay: "Records Added by Date (Day)",
+  recordAddedChartTitleHour: "Records Added by Date (Hour)",
   relatedObjectTypeChartTitle: "Related Object Types",
   collectionSectionTitle: "Collection",
   collectionViewTitle: "Collection",
@@ -1088,6 +1098,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   tags: "Tags",
   tag: "Tag",
   target: "Target",
+  taxonomicChartDet: "Select a determination type:",
+  taxonomicChartTitle: "Taxonomic Chart (Structured Entries Only)",
+  taxonomicChartSunburst: "Sunburst",
+  taxonomicChartTreemap: "Treemap",
+  taxonomicDetChartTitle: "Taxonomic Determinations",
   template: "Template",
   thisWillRemoveYourTemplate:
     "This will remove your selected template fields and default values.",
@@ -1408,6 +1423,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workflowsLegend: "Molecular Analysis Workflows",
   siteListTitle: "Site",
   siteAttachments: "Site Attachments",
+  systemInfoTitle: "System Information",
   code: "Code",
   siteMap: "Site Map",
   siteCoordinates: "Site Coordinates",
@@ -1418,5 +1434,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editOnMap: "Edit on Map",
   erase: "Erase",
   close: "Close",
-  invalidPolygon: "The coordinates are invalid: must be number[][][] and closed"
+  invalidPolygon:
+    "The coordinates are invalid: must be number[][][] and closed",
+  errorFetchingExport: "Error fetching export details. Please try again later.",
+  exportRequestSubmittedTitle: "Export Request Submitted",
+  exportRequestSubmittedMessage:
+    "Your export is being processed. You will receive a notification when it's ready to download."
 };

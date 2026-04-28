@@ -16,7 +16,8 @@ export function ListViewTab<TData extends KitsuResource>({
   onPageChange,
   onPageSizeChange,
   onSortingChange,
-  sortingRules
+  sortingRules,
+  rowStyling
 }: QueryPageTabProps<TData>) {
   return (
     <MemoizedReactTable
@@ -33,6 +34,9 @@ export function ListViewTab<TData extends KitsuResource>({
       onSortingChange={onSortingChange}
       sort={sortingRules}
       className="-striped react-table-overflow"
+      rowStyling={rowStyling}
+      showPagination={true}
+      showPaginationTop={true}
     />
   );
 }
