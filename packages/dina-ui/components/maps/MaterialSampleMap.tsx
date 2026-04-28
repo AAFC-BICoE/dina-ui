@@ -116,9 +116,9 @@ export default function MaterialSampleMap({
                 type: "size",
                 field: "count",
                 minDataValue: 1,
-                maxDataValue: totalRecordsRef.current ?? 1000, // Scale size based on count relative to total records in view.
-                minSize: 30,
-                maxSize: 60
+                maxDataValue: totalRecordsRef.current, // Scale size based on count relative to total records in view.
+                minSize: 7,
+                maxSize: 150
               }
             ]
           },
@@ -275,92 +275,145 @@ export default function MaterialSampleMap({
 
           /**
            * Build Elasticsearch query with geo bounding box filter.
-           * Combines provided query (if any) with location filter.
-           * @returns Elasticsearch query object
+           *
+           * Constructs a nested Elasticsearch query that filters for collecting events with geometry
+           * within the current map bounds. If a parent query is provided, the geo filter is added to it;
+           * otherwise, a new query is created with just the geo filter.
+           *
+           * The query structure:
+           * - Searches within the 'included' nested path for collecting-event documents
+           * - Requires the eventGeom field to exist
+           * - Applies geo_bounding_box filter based on current map extent
+           * - Only applies bounds filter when zoom level > 1
+           *
+           * @returns {Object} Elasticsearch query object ready for API request
            */
           function buildQuery() {
-            // If parent query exists, add geo filter to it
-            if (query && query.bool && query.bool.must) {
-              query.bool.must.push({
-                nested: {
-                  path: "included",
-                  query: {
-                    bool: {
-                      must: [
-                        {
-                          exists: {
-                            field: "included.attributes.eventGeom"
-                          }
-                        },
-                        {
-                          term: { "included.type": "collecting-event" }
+            const sampleQuery = {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        exists: {
+                          field: "included.attributes.eventGeom"
                         }
-                      ],
-                      filter: [
-                        {
-                          geo_bounding_box: {
-                            "included.attributes.eventGeom": {
-                              top_left: {
-                                lat: topleft[1],
-                                lon: topleft[0]
-                              },
-                              bottom_right: {
-                                lat: bottomright[1],
-                                lon: bottomright[0]
-                              }
-                            }
-                          }
-                        }
-                      ]
+                      },
+                      {
+                        term: { "included.type": "collecting-event" }
+                      }
+                    ]
+                  }
+                }
+              }
+            };
+
+            const filter = [
+              {
+                geo_bounding_box: {
+                  "included.attributes.eventGeom": {
+                    top_left: {
+                      lat: topleft[1],
+                      lon: topleft[0]
+                    },
+                    bottom_right: {
+                      lat: bottomright[1],
+                      lon: bottomright[0]
                     }
                   }
                 }
-              });
+              }
+            ];
+
+            if (zoom > 1) {
+              sampleQuery.nested.query.bool["filter"] = filter;
+            }
+            if (query && query.bool && query.bool.must) {
+              query.bool.must.push(sampleQuery);
               return query;
             } else {
               // Build new query with just geo filter
-              return {
-                bool: {
-                  must: [
-                    {
-                      nested: {
-                        path: "included",
-                        query: {
-                          bool: {
-                            must: [
-                              {
-                                exists: {
-                                  field: "included.attributes.eventGeom"
-                                }
-                              },
-                              {
-                                term: { "included.type": "collecting-event" }
-                              }
-                            ],
-                            filter: [
-                              {
-                                geo_bounding_box: {
-                                  "included.attributes.eventGeom": {
-                                    top_left: {
-                                      lat: topleft[1],
-                                      lon: topleft[0]
-                                    },
-                                    bottom_right: {
-                                      lat: bottomright[1],
-                                      lon: bottomright[0]
-                                    }
-                                  }
-                                }
-                              }
-                            ]
+              return sampleQuery;
+            }
+          }
+
+          /**
+           * Build Elasticsearch aggregation for geographic clustering.
+           *
+           * Creates a geotile_grid aggregation that groups material samples by geographic tiles.
+           * This aggregation is used when the data count exceeds the cluster threshold, allowing
+           * efficient display of large datasets through geographic clustering.
+           *
+           * The aggregation structure:
+           * - Uses nested aggregation on 'included' path to reach collecting-event documents
+           * - Filters for documents where type is 'collecting-event'
+           * - Applies geotile_grid with precision that scales dynamically with zoom level
+           * - Calculates geo_centroid for each tile to determine cluster center point
+           * - Restricts results to current map bounds when zoom level > 1
+           *
+           * @returns {Object} Elasticsearch aggregation object containing geotile clusters with centroids
+           */
+          function buildAggs() {
+            const baseAggs = {
+              included_events: {
+                nested: {
+                  path: "included"
+                },
+                aggs: {
+                  event_type: {
+                    filter: {
+                      term: {
+                        "included.type": "collecting-event"
+                      }
+                    },
+                    aggs: {
+                      by_tile: {
+                        // Use geotile_grid for geographic clustering
+                        geotile_grid: {
+                          field: "included.attributes.eventGeom",
+                          precision: zoomToPrecision(zoom), // Precision scales with zoom
+                          bounds: {
+                            top_left: {
+                              lat: topleft[1],
+                              lon: topleft[0]
+                            },
+                            bottom_right: {
+                              lat: bottomright[1],
+                              lon: bottomright[0]
+                            }
+                          }
+                        },
+                        // Calculate centroid for each tile
+                        aggs: {
+                          centroid: {
+                            geo_centroid: {
+                              field: "included.attributes.eventGeom"
+                            }
                           }
                         }
                       }
                     }
-                  ]
+                  }
                 }
-              };
+              }
+            };
+
+            if (zoom > 1) {
+              baseAggs.included_events.aggs.event_type.aggs.by_tile.geotile_grid.bounds =
+                {
+                  top_left: {
+                    lat: topleft[1],
+                    lon: topleft[0]
+                  },
+                  bottom_right: {
+                    lat: bottomright[1],
+                    lon: bottomright[0]
+                  }
+                };
             }
+
+            return baseAggs;
           }
 
           try {
@@ -437,49 +490,7 @@ export default function MaterialSampleMap({
                   size: 0,
                   query,
                   // Aggregate data into geographic tiles based on zoom level
-                  aggs: {
-                    included_events: {
-                      nested: {
-                        path: "included"
-                      },
-                      aggs: {
-                        event_type: {
-                          filter: {
-                            term: {
-                              "included.type": "collecting-event"
-                            }
-                          },
-                          aggs: {
-                            by_tile: {
-                              // Use geotile_grid for geographic clustering
-                              geotile_grid: {
-                                field: "included.attributes.eventGeom",
-                                precision: zoomToPrecision(zoom), // Precision scales with zoom
-                                bounds: {
-                                  top_left: {
-                                    lat: topleft[1],
-                                    lon: topleft[0]
-                                  },
-                                  bottom_right: {
-                                    lat: bottomright[1],
-                                    lon: bottomright[0]
-                                  }
-                                }
-                              },
-                              // Calculate centroid for each tile
-                              aggs: {
-                                centroid: {
-                                  geo_centroid: {
-                                    field: "included.attributes.eventGeom"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
+                  aggs: buildAggs()
                 },
                 { params: { indexName: "dina_material_sample_index" } }
               );
