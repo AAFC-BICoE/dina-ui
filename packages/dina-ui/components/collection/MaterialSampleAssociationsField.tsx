@@ -3,9 +3,7 @@ import {
   AssociatedMaterialSampleSearchBoxField,
   DinaFormSection,
   MaterialSampleSearchHelper,
-  TextField,
-  useQuery,
-  withResponse
+  TextField
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -58,7 +56,7 @@ export function MaterialSampleAssociationsField({
       )}
       renderTab={(assoc, index) => {
         const hasName = Boolean(
-          (assoc.associationType || assoc.associatedSample?.id)?.trim()
+          (assoc.associationType || assoc.associatedSample?.id) && assoc.id
         );
 
         return hasName ? (
@@ -70,10 +68,11 @@ export function MaterialSampleAssociationsField({
               />
             )}
             {assoc.associatedSample?.id && (
-              <MaterialSampleLink
-                id={assoc.associatedSample.id}
-                disableLink={true}
-              />
+              <Link
+                href={`/collection/material-sample/view?id=${assoc.associatedSample?.id}`}
+              >
+                {assoc.associatedSample?.materialSampleName}
+              </Link>
             )}
           </div>
         ) : (
@@ -140,22 +139,4 @@ function AssociationTabPanel({ fieldProps, index }: TabPanelCtx<Association>) {
       />
     </DinaFormSection>
   );
-}
-
-/** Displays the material sample name and link given the ID. */
-export function MaterialSampleLink({ id, disableLink = false }) {
-  const sampleQuery = useQuery<MaterialSample>({
-    path: `collection-api/material-sample/${id}`
-  });
-  return withResponse(sampleQuery, ({ data: sample }) => {
-    const name =
-      sample.materialSampleName ||
-      sample.dwcOtherCatalogNumbers?.join?.(", ") ||
-      id;
-    return disableLink ? (
-      name
-    ) : (
-      <Link href={`/collection/material-sample/view?id=${id}`}>{name}</Link>
-    );
-  });
 }

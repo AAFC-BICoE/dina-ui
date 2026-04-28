@@ -184,6 +184,20 @@ export function useMaterialSampleQuery(id?: string | null) {
             };
           }
         }
+
+        // Retrieve associations linked to the material sample
+        const associations = await apiClient.get<Association[]>(
+          `collection-api/association`,
+          {
+            filter: SimpleSearchFilterBuilder.create()
+              .where("sample.uuid", "EQ", data.id)
+              .build(),
+            include: "associatedSample,sample"
+          }
+        );
+        if (associations) {
+          data.associations = associations.data;
+        }
       }
     }
   );
@@ -855,6 +869,7 @@ export function useMaterialSampleSave({
     delete materialSampleInput.cfia_ppc;
     delete materialSampleInput.useTargetOrganism;
     delete materialSampleInput.parentAttributes;
+    delete materialSampleInput.associations;
 
     return materialSampleInput;
   }
@@ -1212,73 +1227,70 @@ export function useMaterialSampleSave({
     const submittedAssociations = sample.associations ?? [];
     const initialAssociations = msInitialValues.associations ?? [];
 
-    // Determine associations to create (no id) or update (has id with changes)
-    const associationsToSave: SaveArgs<Association>[] = submittedAssociations
-      .filter((submitted) => {
-        // Always include new associations (no id)
-        if (!submitted.id) {
-          return true;
-        }
-
-        // Include existing associations only if they have changed
-        const original = initialAssociations.find(
-          (initial) => initial.id === submitted.id
-        );
-        return !original || !_.isEqual(submitted, original);
-      })
-      .map((association) => {
-        // Strip out relationship fields from the attributes
-        const {
-          sample: _sample,
-          associatedSample: _associatedSample,
-          ...attributes
-        } = association;
-
-        return {
-          resource: {
-            ...attributes,
-            // Explicitly declare relationships
-            relationships: {
-              ...(sample.id && {
-                sample: {
-                  data: { id: sample.id, type: "material-sample" }
-                }
-              }),
-              ...(association.associatedSample && {
-                associatedSample: {
-                  data: {
-                    id:
-                      typeof association.associatedSample === "string"
-                        ? association.associatedSample
-                        : association.associatedSample.id,
-                    type: "material-sample"
-                  }
-                }
-              })
-            }
-          } as InputResource<Association> & { relationships: any },
-          type: "association"
-        };
-      });
-
-    // Determine associations to delete (present in initial values but not in submitted values)
-    const associationsToDelete: SaveArgs<Association>[] = initialAssociations
-      .filter(
-        (initial) =>
-          initial.id &&
-          !submittedAssociations.some(
-            (submitted) => submitted.id === initial.id
+    // If the associations section was toggled off, delete all existing associations,
+    // otherwise only delete associations that were removed from the submitted values.
+    const associationsToDelete = (
+      deleteAssociations
+        ? initialAssociations
+        : initialAssociations.filter(
+            (initial) =>
+              initial.id &&
+              !submittedAssociations.some(
+                (submitted) => submitted.id === initial.id
+              )
           )
-      )
-      .map((association) => ({
-        resource: {
-          delete: {
-            id: association.id as string,
-            type: "association"
-          }
-        } as any,
-        type: "association"
-      }));
+    ).filter((association) => association.id);
+
+    // Associations to be created/updated. If the associations section was toggled off,
+    // there are no associations to create/update.
+    const associationsToSave: SaveArgs<Association>[] = deleteAssociations
+      ? []
+      : submittedAssociations
+          .filter((submitted) => {
+            // Always include new associations (no id)
+            if (!submitted.id) {
+              return true;
+            }
+
+            // Include existing associations only if they have changed
+            const original = initialAssociations.find(
+              (initial) => initial.id === submitted.id
+            );
+            return !original || !_.isEqual(submitted, original);
+          })
+          .map((association) => {
+            // Strip out relationship fields from the attributes
+            const {
+              sample: _sample,
+              associatedSample: _associatedSample,
+              ...attributes
+            } = association;
+
+            return {
+              resource: {
+                ...attributes,
+                // Explicitly declare relationships
+                relationships: {
+                  // Always set the sample relationship to the current material sample being edited
+                  sample: {
+                    data: { id: sample.id, type: "material-sample" }
+                  },
+                  ...(association.associatedSample && {
+                    associatedSample: {
+                      data: {
+                        id:
+                          typeof association.associatedSample === "string"
+                            ? association.associatedSample
+                            : association.associatedSample.id,
+                        type: "material-sample"
+                      }
+                    }
+                  })
+                }
+              } as InputResource<Association> & { relationships: any },
+              type: "association"
+            };
+          });
 
     // No changes, skip API requests
     if (associationsToSave.length === 0 && associationsToDelete.length === 0) {
@@ -1316,35 +1328,16 @@ export function useMaterialSampleSave({
       }
     }
 
-    // Perform deletes
-    if (associationsToDelete.length > 0) {
-      try {
-        await save<Association>(associationsToDelete, {
-          apiBaseUrl: "/collection-api"
-        });
-      } catch (error: unknown) {
-        if (error instanceof DoOperationsError) {
-          const newErrors = error.individualErrors.map<OperationError>(
-            (err) => ({
-              fieldErrors: _.mapKeys(
-                err.fieldErrors,
-                (_, field) => `associations[${err.index}].${field}`
-              ),
-              errorMessage: err.errorMessage,
-              index: err.index
-            })
-          );
-
-          const overallFieldErrors = newErrors.reduce(
-            (total, curr) => ({ ...total, ...curr.fieldErrors }),
-            {}
-          );
-
-          throw new DoOperationsError(error.message, overallFieldErrors);
-        } else {
-          throw error;
+    // Perform deletes individually using the REST endpoint
+    for (const association of associationsToDelete) {
+      await apiClient.axios.delete(
+        `collection-api/association/${association.id}`,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json"
+          }
         }
-      }
+      );
     }
   }
 
@@ -1405,7 +1398,7 @@ export function useMaterialSampleSave({
 
       // Save associations after the material sample has been saved so we have the ID available.
       // This is especially important when creating a new material sample.
-      if (enableAssociations) {
+      if (enableAssociations || deleteAssociations) {
         await saveAssociations({
           ...submittedValues,
           id: savedMaterialSample.id

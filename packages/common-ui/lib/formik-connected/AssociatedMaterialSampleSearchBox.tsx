@@ -3,9 +3,9 @@ import { FastField } from "formik";
 import React from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FieldWrapper } from "..";
-import { MaterialSampleLink } from "../../../dina-ui/components";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
+import Link from "next/link";
 
 export function AssociatedMaterialSampleSearchBoxField({
   showSearchBtn,
@@ -16,7 +16,13 @@ export function AssociatedMaterialSampleSearchBoxField({
   const { formatMessage } = useDinaIntl();
 
   function defaultReadOnlyRender(value) {
-    return value && <MaterialSampleLink id={value} />;
+    return (
+      value && (
+        <Link href={`/collection/material-sample/view?id=${value?.id}`}>
+          {value?.materialSampleName}
+        </Link>
+      )
+    );
   }
 
   return (

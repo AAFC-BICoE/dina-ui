@@ -266,11 +266,14 @@ const mockSave = jest.fn<any, any>(async (saves) => {
   });
 });
 
+const mockDelete = jest.fn();
+
 const testCtx = {
   apiContext: {
     save: mockSave,
     apiClient: {
-      get: mockGet
+      get: mockGet,
+      delete: mockDelete
     }
   }
 };
@@ -2838,10 +2841,26 @@ describe("Material Sample Edit Page", () => {
                 resource: {
                   id: "333",
                   type: "material-sample",
-                  hostOrganism: null,
-                  associations: []
+                  hostOrganism: null
                 },
                 type: "material-sample"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+
+      // Check that the association is deleted.
+      await waitFor(() =>
+        expect(mockDelete.mock.calls).toEqual([
+          [
+            [
+              {
+                delete: {
+                  id: "1",
+                  type: "association"
+                }
               }
             ],
             { apiBaseUrl: "/collection-api" }
@@ -2901,6 +2920,28 @@ describe("Material Sample Edit Page", () => {
               }
             ],
             { apiBaseUrl: "/collection-api" }
+          ],
+          [
+            [
+              {
+                resource: {
+                  associationType: "host",
+                  relationships: {
+                    associatedSample: {
+                      data: { id: "1", type: "material-sample" }
+                    },
+                    sample: {
+                      data: { id: "333", type: "material-sample" }
+                    }
+                  },
+                  type: "association"
+                },
+                type: "association"
+              }
+            ],
+            {
+              apiBaseUrl: "/collection-api"
+            }
           ]
         ])
       );
