@@ -24,7 +24,7 @@ export default function MaterialSampleMap(totalRecords) {
     if (!mapRef.current) return;
     let watchHandle = null;
     let debounceTimer = null;
-    const DEBOUNCE_DELAY = 250;
+    const DEBOUNCE_DELAY = 250; // ms
 
     getMapModules().then(
       ({
@@ -33,7 +33,10 @@ export default function MaterialSampleMap(totalRecords) {
         FeatureLayer,
         Graphic,
         webMercatorUtils,
-        projection
+        projection,
+        BasemapToggle,
+        ScaleBar,
+        Fullscreen
       }) => {
         const layer = new FeatureLayer({
           source: [],
@@ -129,6 +132,26 @@ export default function MaterialSampleMap(totalRecords) {
             fillOpacity: 0
           }
         });
+
+        // Map layer toggle
+        const basemapToggle = new BasemapToggle({
+          view: mapViewInstance,
+          nextBasemap: "hybrid"
+        });
+        mapViewInstance.ui.add(basemapToggle, "bottom-right");
+
+        // Scalebar
+        const scaleBar = new ScaleBar({
+          view: mapViewInstance,
+          unit: "metric"
+        });
+        mapViewInstance.ui.add(scaleBar, "bottom-left");
+
+        // Fullscreen button
+        const fullscreen = new Fullscreen({
+          view: mapViewInstance
+        });
+        mapViewInstance.ui.add(fullscreen, "top-right");
 
         async function updateMapPoints(points) {
           // Prepare new graphics
