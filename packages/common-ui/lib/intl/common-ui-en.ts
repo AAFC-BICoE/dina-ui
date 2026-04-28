@@ -214,5 +214,13 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   listView: "List",
   galleryView: "Gallery",
   visualization: "Visualizations",
-  taxonomy: "Taxonomy"
+  taxonomy: "Taxonomy",
+  last24hours: "Last 24 hours",
+  last7days: "Last 7 days",
+  last30days: "Last 30 days",
+  last3months: "Last 3 months",
+  last6months: "Last 6 months",
+  lastYear: "Last Year",
+  thisYear: "This Year",
+  allTime: "All Time"
 };

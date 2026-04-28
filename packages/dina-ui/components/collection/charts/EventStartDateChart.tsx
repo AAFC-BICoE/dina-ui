@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApiClient, Tooltip } from "common-ui";
 import ReactECharts from "echarts-for-react";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Dropdown, DropdownButton, Card } from "react-bootstrap";
 import _ from "lodash";
 import { Utils } from "@react-awesome-query-builder/ui";
@@ -54,6 +54,7 @@ export default function EventStartDateChart({
   queryBuilderTree,
   setSubmittedQueryBuilderTree
 }: EventStartDateChartProps) {
+  const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
 
   const [interval, setInterval] = useState("month");
@@ -66,7 +67,7 @@ export default function EventStartDateChart({
   const datePresets = [
     {
       key: "last-24-hours",
-      label: "Last 24 Hours",
+      label: formatMessage("last24hours"),
       interval: "hour",
       format: "yyyy-MM-dd HH:00",
       getDates: () => {
@@ -80,7 +81,7 @@ export default function EventStartDateChart({
     },
     {
       key: "last-7-days",
-      label: "Last 7 Days",
+      label: formatMessage("last7days"),
       interval: "day",
       format: "yyyy-MM-dd",
       getDates: () => {
@@ -94,7 +95,7 @@ export default function EventStartDateChart({
     },
     {
       key: "last-30-days",
-      label: "Last 30 Days",
+      label: formatMessage("last30days"),
       interval: "day",
       format: "yyyy-MM-dd",
       getDates: () => {
@@ -108,7 +109,7 @@ export default function EventStartDateChart({
     },
     {
       key: "last-3-months",
-      label: "Last 3 Months",
+      label: formatMessage("last3months"),
       interval: "day",
       format: "yyyy-MM-dd",
       getDates: () => {
@@ -126,7 +127,7 @@ export default function EventStartDateChart({
     },
     {
       key: "last-6-months",
-      label: "Last 6 Months",
+      label: formatMessage("last6months"),
       interval: "month",
       format: "yyyy-MM",
       getDates: () => {
@@ -144,7 +145,7 @@ export default function EventStartDateChart({
     },
     {
       key: "this-year",
-      label: "This Year",
+      label: formatMessage("thisYear"),
       interval: "month",
       format: "yyyy-MM",
       getDates: () => {
@@ -158,7 +159,7 @@ export default function EventStartDateChart({
     },
     {
       key: "last-year",
-      label: "Last Year",
+      label: formatMessage("lastYear"),
       interval: "month",
       format: "yyyy-MM",
       getDates: () => {
@@ -176,7 +177,7 @@ export default function EventStartDateChart({
     },
     {
       key: "all-time-month",
-      label: "All Time",
+      label: formatMessage("allTime"),
       interval: "month",
       format: "yyyy-MM",
       getDates: () => ({
@@ -186,7 +187,7 @@ export default function EventStartDateChart({
     },
     {
       key: "all-time-year",
-      label: "All Time",
+      label: formatMessage("allTime"),
       interval: "year",
       format: "yyyy",
       getDates: () => ({
@@ -329,6 +330,7 @@ export default function EventStartDateChart({
         }
       };
 
+      // Add date range filters based on the selected date preset
       if (dateRange.start) {
         rangeFilter.range["included.attributes.startEventDateTime"].gte =
           dateRange.start;
@@ -379,32 +381,6 @@ export default function EventStartDateChart({
     };
   };
 
-  const getAggregationKey = (aggName: string, response: any): string => {
-    if (response?.aggregations?.[aggName]) {
-      return aggName;
-    }
-
-    if (response?.aggregations?.[`nested#${aggName}`]) {
-      return `nested#${aggName}`;
-    }
-
-    if (response?.aggregations?.[`filter#${aggName}`]) {
-      return `filter#${aggName}`;
-    }
-
-    if (response?.aggregations?.[`date_histogram#${aggName}`]) {
-      return `date_histogram#${aggName}`;
-    }
-
-    for (const key of Object.keys(response?.aggregations ?? {})) {
-      if (key.endsWith(aggName)) {
-        return key;
-      }
-    }
-
-    return aggName;
-  };
-
   async function fetchData() {
     const query = buildQuery();
 
@@ -416,18 +392,10 @@ export default function EventStartDateChart({
       );
       if (response.data.aggregations) {
         // Navigate through nested aggregation structure
-        const byDateKey = getAggregationKey("by_date", response.data);
-        const byDateAgg = response.data.aggregations[byDateKey];
-        const filteredByTypeKey = getAggregationKey(
-          "filtered_by_type",
-          byDateAgg
-        );
-        const filteredByType = byDateAgg?.[filteredByTypeKey];
-        const dateHistogramKey = getAggregationKey(
-          "date_histogram_agg",
-          filteredByType
-        );
-        const buckets = filteredByType?.[dateHistogramKey]?.buckets ?? [];
+        const buckets =
+          response.data.aggregations["nested#by_date"]?.[
+            "filter#filtered_by_type"
+          ]?.["date_histogram#date_histogram_agg"]?.buckets ?? [];
 
         setChartData(
           buckets.map((b) => ({ name: b.key_as_string, value: b.doc_count }))
