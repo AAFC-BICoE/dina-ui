@@ -540,18 +540,19 @@ export default function MaterialSampleListPage() {
     {
       id: "taxonomy",
       labelKey: "taxonomy",
-      showActionButtons: false, // Hide action buttons in the visualization tab
+      showActionButtons: false,
       component: TaxonomicChartsTab
     },
     {
       id: "visualization",
       labelKey: "visualization",
-      showActionButtons: false, // Hide action buttons in the visualization tab
+      showActionButtons: false,
       component: MaterialSampleVisualizationTab
     },
     {
       id: "map",
       labelKey: "mapView",
+      showActionButtons: false,
       component: MaterialSampleMapTab
     }
   ];
