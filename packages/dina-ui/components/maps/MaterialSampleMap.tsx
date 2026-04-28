@@ -1,7 +1,23 @@
+/**
+ * MaterialSampleMap Component
+ *
+ * Displays material sample locations on an interactive map with clustering.
+ * - Shows individual pins when below the cluster threshold
+ * - Aggregates data into clusters when above the threshold
+ * - Dynamically adjusts precision based on zoom level
+ * - Fetches data from Elasticsearch API based on map extent
+ */
+
 import { useEffect, useRef } from "react";
 import { getMapModules } from "../../utils/geoUtils";
 import { useApiClient } from "common-ui";
 
+/**
+ * Converts map zoom level to geotile precision for Elasticsearch clustering.
+ * Higher zoom levels result in finer precision (more granular tiles).
+ * @param zoom - Current map zoom level (typically 0-28)
+ * @returns Precision value (3-15) for geotile_grid aggregation
+ */
 function zoomToPrecision(zoom) {
   if (zoom >= 12) return 15;
   if (zoom >= 9) return 13;
@@ -12,20 +28,52 @@ function zoomToPrecision(zoom) {
   return 3;
 }
 
-export default function MaterialSampleMap(totalRecords) {
+/**
+ * Props for the MaterialSampleMap component.
+ */
+export interface MaterialSampleMapProps {
+  /** Total number of records available (used for size scaling) */
+  totalRecords: number;
+  /** Optional Elasticsearch query object to filter material samples */
+  query?: any;
+  /** Delay in milliseconds to debounce map extent changes (default: 250ms) */
+  debounceDelay?: number;
+  /** Threshold above which to use clustering instead of raw points (default: 500) */
+  clusterThreshold?: number;
+}
+
+/**
+ * MaterialSampleMap Component
+ *
+ * Renders an interactive map displaying material sample locations with smart clustering.
+ * Uses Esri ArcGIS Maps SDK to handle mapping, and Elasticsearch for efficient data fetching.
+ *
+ * @param props - Component props
+ * @returns React component with map container
+ */
+export default function MaterialSampleMap({
+  totalRecords,
+  query,
+  debounceDelay = 250,
+  clusterThreshold = 500
+}: MaterialSampleMapProps) {
+  // Refs for map components and state
   const mapRef = useRef(null);
   const viewRef = useRef(null);
   const featureLayerRef = useRef<any>(null);
+  const totalRecordsRef = useRef(totalRecords);
   const { apiClient } = useApiClient();
 
-  const CLUSTER_THRESHOLD = 500; // threshold to switch between raw points and clusters
-
+  /**
+   * Initialize map on component mount.
+   * Sets up the ArcGIS map, layers, controls, and event listeners.
+   */
   useEffect(() => {
     if (!mapRef.current) return;
     let watchHandle = null;
     let debounceTimer = null;
-    const DEBOUNCE_DELAY = 250; // ms
 
+    // Dynamically load ArcGIS modules
     getMapModules().then(
       ({
         Map,
@@ -38,12 +86,14 @@ export default function MaterialSampleMap(totalRecords) {
         ScaleBar,
         Fullscreen
       }) => {
+        // Initialize feature layer for displaying material sample points/clusters
         const layer = new FeatureLayer({
-          source: [],
+          source: [], // Initially empty, populated by API calls
           objectIdField: "ObjectID",
           geometryType: "point",
-          spatialReference: { wkid: 4326 },
+          spatialReference: { wkid: 4326 }, // WGS84
           outFields: ["*"],
+          // Define fields for the feature layer
           fields: [
             { name: "ObjectID", type: "oid" },
             { name: "count", type: "integer" },
@@ -52,6 +102,7 @@ export default function MaterialSampleMap(totalRecords) {
             { name: "sampleName", type: "string" },
             { name: "group", type: "string" }
           ],
+          // Configure symbol rendering with size based on count
           renderer: {
             type: "simple",
             field: "count",
@@ -65,16 +116,17 @@ export default function MaterialSampleMap(totalRecords) {
                 type: "size",
                 field: "count",
                 minDataValue: 1,
-                maxDataValue: totalRecords ?? 1000,
-                minSize: 10,
-                maxSize: 30
+                maxDataValue: totalRecordsRef.current ?? 1000, // Scale size based on count relative to total records in view.
+                minSize: 30,
+                maxSize: 60
               }
             ]
           },
+          // Add labels showing count for clustered points
           labelingInfo: [
             {
               labelExpressionInfo: { expression: "$feature.count" },
-              where: "count > 1", // Only clusters
+              where: "count > 1", // Only show labels for clusters with multiple samples
               symbol: {
                 type: "text",
                 color: "black",
@@ -82,15 +134,19 @@ export default function MaterialSampleMap(totalRecords) {
                 haloSize: 1,
                 font: { size: 12, weight: "bold" }
               },
-              labelPlacement: "center-center"
+              labelPlacement: "center-center",
+              deconflictionStrategy: "none"
             }
           ],
+          // Configure popup template for when users click on points
           popupTemplate: {
             title: "{count} sample(s) here",
             outFields: ["*"],
             content: (feature) => {
+              // Generate popup content dynamically
               const div = document.createElement("div");
 
+              // Show single sample with link or cluster info
               if (feature.graphic.attributes.count === 1) {
                 const sampleID = feature.graphic.attributes.sampleID || "";
                 const sampleName =
@@ -107,6 +163,7 @@ export default function MaterialSampleMap(totalRecords) {
           ${group ? `Group: ${group}` : ""} 
         `;
               } else {
+                // For clusters, show count
                 div.innerHTML = `Cluster of ${feature.graphic.attributes.count} samples`;
               }
 
@@ -116,15 +173,17 @@ export default function MaterialSampleMap(totalRecords) {
         });
         featureLayerRef.current = layer;
 
+        // Initialize the base map
         const map = new Map({
           basemap: "streets-vector",
           layers: [layer]
         });
 
+        // Initialize the map view
         const mapViewInstance = new MapView({
           container: mapRef.current,
           map,
-          center: [-95, 40],
+          center: [-95, 40], // Center on continental US
           zoom: 4,
           highlightOptions: {
             color: [226, 119, 40],
@@ -133,28 +192,34 @@ export default function MaterialSampleMap(totalRecords) {
           }
         });
 
-        // Map layer toggle
+        // Add basemap toggle control (streets <-> hybrid view)
         const basemapToggle = new BasemapToggle({
           view: mapViewInstance,
           nextBasemap: "hybrid"
         });
         mapViewInstance.ui.add(basemapToggle, "bottom-right");
 
-        // Scalebar
+        // Add scale bar control
         const scaleBar = new ScaleBar({
           view: mapViewInstance,
           unit: "metric"
         });
         mapViewInstance.ui.add(scaleBar, "bottom-left");
 
-        // Fullscreen button
+        // Add fullscreen toggle button
         const fullscreen = new Fullscreen({
           view: mapViewInstance
         });
         mapViewInstance.ui.add(fullscreen, "top-right");
 
+        /**
+         * Update map points with new graphics.
+         * Clears existing features and adds new ones.
+         * @param points - Array of point objects with coordinates and attributes
+         */
         async function updateMapPoints(points) {
-          // Prepare new graphics
+          // Prepare graphics from point data
+          // Convert point data to Esri Graphic objects
           const graphics = points.map(
             (pt) =>
               new Graphic({
@@ -162,7 +227,7 @@ export default function MaterialSampleMap(totalRecords) {
                   type: "point",
                   longitude: pt.coordinates[0],
                   latitude: pt.coordinates[1],
-                  spatialReference: { wkid: 4326 }
+                  spatialReference: { wkid: 4326 } // WGS84
                 },
                 attributes: {
                   count: pt.attributes?.count ?? 1,
@@ -174,154 +239,149 @@ export default function MaterialSampleMap(totalRecords) {
               })
           );
 
-          // First clear, then add
+          // Apply edits: delete old features, add new ones
           featureLayerRef.current.queryFeatures().then((result) => {
             featureLayerRef.current.applyEdits({
-              deleteFeatures: result.features, // ✅ actual feature objects
+              deleteFeatures: result.features,
               addFeatures: graphics
             });
           });
         }
 
+        /**
+         * Fetch material sample data for the current map extent.
+         * Chooses between raw points (below threshold) or aggregated clusters.
+         * @param extent - Current map extent
+         */
         async function fetchDataWithinExtent(extent) {
           const zoom = (viewRef.current as any).zoom;
 
+          // Convert extent to WGS84 (EPSG:4326) for consistent processing
           if (extent.spatialReference.isWebMercator) {
             extent = webMercatorUtils.webMercatorToGeographic(extent);
           }
-          // Already WGS84
+          // Already in WGS84
           else if (extent.spatialReference.wkid === 4326) {
             extent = extent;
           }
-          // Other projections - use projection engine
+          // Other projections - convert using projection engine
           else {
             extent = projection.project(extent, { wkid: 4326 });
           }
 
+          // Extract bounding box coordinates from extent
           const topleft = [extent.xmin.toFixed(8), extent.ymax.toFixed(8)];
           const bottomright = [extent.xmax.toFixed(8), extent.ymin.toFixed(8)];
 
-          try {
-            // COUNT FIRST
-            const count_response = await apiClient.axios.post(
-              "search-api/search-ws/search",
-              {
-                size: 0,
-                query: {
-                  bool: {
-                    must: [
-                      {
-                        nested: {
-                          path: "included",
-                          query: {
-                            bool: {
-                              must: [
-                                {
-                                  exists: {
-                                    field: "included.attributes.eventGeom"
-                                  }
-                                },
-                                {
-                                  term: { "included.type": "collecting-event" }
-                                }
-                              ],
-                              filter: [
-                                {
-                                  geo_bounding_box: {
-                                    "included.attributes.eventGeom": {
-                                      top_left: {
-                                        lat: topleft[1],
-                                        lon: topleft[0]
-                                      },
-                                      bottom_right: {
-                                        lat: bottomright[1],
-                                        lon: bottomright[0]
-                                      }
-                                    }
-                                  }
-                                }
-                              ]
-                            }
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              },
-              { params: { indexName: "dina_material_sample_index" } }
-            );
-            const total_count = count_response.data.hits.total.value;
-
-            featureLayerRef.current.renderer = {
-              type: "simple",
-              field: "count",
-              symbol: {
-                type: "simple-marker",
-                color: [0, 128, 255, 0.7],
-                outline: { color: [255, 255, 255], width: 1 }
-              },
-              visualVariables: [
-                {
-                  type: "size",
-                  field: "count",
-                  minDataValue: 1,
-                  maxDataValue: total_count,
-                  minSize: 10,
-                  maxSize: 30
-                }
-              ]
-            };
-
-            if (total_count < CLUSTER_THRESHOLD) {
-              // --- RAW POINTS ---
-              const points_response = await apiClient.axios.post(
-                "search-api/search-ws/search",
-                {
-                  size: 5000,
+          /**
+           * Build Elasticsearch query with geo bounding box filter.
+           * Combines provided query (if any) with location filter.
+           * @returns Elasticsearch query object
+           */
+          function buildQuery() {
+            // If parent query exists, add geo filter to it
+            if (query && query.bool && query.bool.must) {
+              query.bool.must.push({
+                nested: {
+                  path: "included",
                   query: {
                     bool: {
                       must: [
                         {
-                          nested: {
-                            path: "included",
-                            query: {
-                              bool: {
-                                must: [
-                                  {
-                                    exists: {
-                                      field: "included.attributes.eventGeom"
-                                    }
-                                  },
-                                  {
-                                    term: {
-                                      "included.type": "collecting-event"
-                                    }
-                                  }
-                                ],
-                                filter: [
-                                  {
-                                    geo_bounding_box: {
-                                      "included.attributes.eventGeom": {
-                                        top_left: {
-                                          lat: topleft[1],
-                                          lon: topleft[0]
-                                        },
-                                        bottom_right: {
-                                          lat: bottomright[1],
-                                          lon: bottomright[0]
-                                        }
-                                      }
-                                    }
-                                  }
-                                ]
+                          exists: {
+                            field: "included.attributes.eventGeom"
+                          }
+                        },
+                        {
+                          term: { "included.type": "collecting-event" }
+                        }
+                      ],
+                      filter: [
+                        {
+                          geo_bounding_box: {
+                            "included.attributes.eventGeom": {
+                              top_left: {
+                                lat: topleft[1],
+                                lon: topleft[0]
+                              },
+                              bottom_right: {
+                                lat: bottomright[1],
+                                lon: bottomright[0]
                               }
                             }
                           }
                         }
                       ]
                     }
-                  },
+                  }
+                }
+              });
+              return query;
+            } else {
+              // Build new query with just geo filter
+              return {
+                bool: {
+                  must: [
+                    {
+                      nested: {
+                        path: "included",
+                        query: {
+                          bool: {
+                            must: [
+                              {
+                                exists: {
+                                  field: "included.attributes.eventGeom"
+                                }
+                              },
+                              {
+                                term: { "included.type": "collecting-event" }
+                              }
+                            ],
+                            filter: [
+                              {
+                                geo_bounding_box: {
+                                  "included.attributes.eventGeom": {
+                                    top_left: {
+                                      lat: topleft[1],
+                                      lon: topleft[0]
+                                    },
+                                    bottom_right: {
+                                      lat: bottomright[1],
+                                      lon: bottomright[0]
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              };
+            }
+          }
+
+          try {
+            // First, fetch total count of matching records in extent
+            const count_response = await apiClient.axios.post(
+              "search-api/search-ws/search",
+              {
+                size: 0,
+                query: buildQuery()
+              },
+              { params: { indexName: "dina_material_sample_index" } }
+            );
+            totalRecordsRef.current = count_response.data.hits.total.value;
+
+            if (count_response.data.hits.total.value < clusterThreshold) {
+              // Below threshold: fetch and display individual sample points
+              const points_response = await apiClient.axios.post(
+                "search-api/search-ws/search",
+                {
+                  size: 5000,
+                  query: buildQuery(),
                   _source: {
                     includes: [
                       "data.id",
@@ -335,11 +395,14 @@ export default function MaterialSampleMap(totalRecords) {
                 { params: { indexName: "dina_material_sample_index" } }
               );
 
+              // Transform Elasticsearch documents into point objects
               const hits = points_response.data.hits.hits;
               const points = hits
                 .map((doc) => {
+                  // Extract location and attributes from nested document structure
                   const id = doc._id;
                   const includedArr = doc._source?.included ?? [];
+                  // Find the collecting event with geometry
                   const collectingEvent = includedArr.find(
                     (e) =>
                       e.type === "collecting-event" &&
@@ -350,6 +413,7 @@ export default function MaterialSampleMap(totalRecords) {
                   const coords = collectingEvent?.attributes?.eventGeom;
                   const group = attributes.group;
                   const sampleName = attributes.materialSampleName;
+                  // Return point or null if required fields missing
                   return coords && id
                     ? {
                         attributes: {
@@ -366,11 +430,13 @@ export default function MaterialSampleMap(totalRecords) {
 
               updateMapPoints(points);
             } else {
-              // --- AGGREGATIONS / CLUSTERS ---
+              // Above threshold: use geotile aggregation for clustering
               const response = await apiClient.axios.post(
                 "search-api/search-ws/search",
                 {
                   size: 0,
+                  query,
+                  // Aggregate data into geographic tiles based on zoom level
                   aggs: {
                     included_events: {
                       nested: {
@@ -385,9 +451,10 @@ export default function MaterialSampleMap(totalRecords) {
                           },
                           aggs: {
                             by_tile: {
+                              // Use geotile_grid for geographic clustering
                               geotile_grid: {
                                 field: "included.attributes.eventGeom",
-                                precision: zoomToPrecision(zoom),
+                                precision: zoomToPrecision(zoom), // Precision scales with zoom
                                 bounds: {
                                   top_left: {
                                     lat: topleft[1],
@@ -399,6 +466,7 @@ export default function MaterialSampleMap(totalRecords) {
                                   }
                                 }
                               },
+                              // Calculate centroid for each tile
                               aggs: {
                                 centroid: {
                                   geo_centroid: {
@@ -415,19 +483,22 @@ export default function MaterialSampleMap(totalRecords) {
                 },
                 { params: { indexName: "dina_material_sample_index" } }
               );
+              // Extract aggregation buckets from response
               const buckets =
                 response.data.aggregations["nested#included_events"][
                   "filter#event_type"
                 ]["geotile_grid#by_tile"]?.buckets ?? [];
 
+              // Convert buckets to map points with cluster info
               const points = buckets
                 .filter((bucket) => bucket["geo_centroid#centroid"]?.location)
                 .map((bucket) => {
+                  // Use centroid location and document count from bucket
                   const doc_count = bucket.doc_count;
                   const { lat, lon } = bucket["geo_centroid#centroid"].location;
                   return {
                     coordinates: [lon, lat],
-                    attributes: { count: doc_count, tileKey: bucket.key }
+                    attributes: { count: doc_count, tileKey: bucket.key } // count is cluster size
                   };
                 });
 
@@ -435,37 +506,40 @@ export default function MaterialSampleMap(totalRecords) {
             }
           } catch (error) {
             console.error("Error fetching data within extent:", error);
-            updateMapPoints([]); // clear points if error
+            updateMapPoints([]); // Clear points on error
           }
         }
 
         viewRef.current = mapViewInstance;
 
-        // Debounced extent watcher
+        // Watch for extent changes and fetch data with debouncing
+        // Debouncing prevents excessive API calls while user is panning/zooming
         watchHandle = mapViewInstance.watch("extent", (extent) => {
           if (debounceTimer) clearTimeout(debounceTimer);
           debounceTimer = setTimeout(() => {
             fetchDataWithinExtent(extent);
-          }, DEBOUNCE_DELAY) as any;
+          }, debounceDelay) as any;
         }) as any;
       }
     );
 
-    // Cleanup function on unmount
+    // Cleanup: remove watchers and timers when component unmounts
     return () => {
       if (debounceTimer) clearTimeout(debounceTimer);
       if (watchHandle) (watchHandle as any).remove();
     };
   }, []);
 
+  // Render map container with fixed height
   return (
     <div
       className="mt-2 mb-4 w-100 rounded-2 overflow-hidden"
       style={{
         height: "350px",
-        background: "#f2f2f2"
+        background: "#f2f2f2" // Loading background color
       }}
     >
+      {/* Map element mounted here by ArcGIS MapView */}
       <div ref={mapRef} className="w-100 h-100" />
     </div>
   );

@@ -6,5 +6,6 @@ export function MaterialSampleMapTab<TData extends KitsuResource>({
   query,
   totalRecords
 }: QueryPageTabProps<TData>) {
-  return <MaterialSampleMap query={query} totalRecords={totalRecords} />;
+  const queryParams = query.query;
+  return <MaterialSampleMap query={queryParams} totalRecords={totalRecords} />;
 }
