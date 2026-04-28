@@ -15,14 +15,12 @@ import {
   VocabularyReadOnlyView,
   VocabularySelectField
 } from "..";
-import {
-  MaterialSample,
-  MaterialSampleAssociation
-} from "../../types/collection-api/resources/MaterialSample";
+import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { TabbedArrayField, TabPanelCtx } from "./TabbedArrayField";
 import { useFormikContext } from "formik";
 import { ASSOCIATIONS_COMPONENT_NAME } from "../../../dina-ui/types/collection-api";
+import { Association } from "packages/dina-ui/types/collection-api/resources/Association";
 
 export interface MaterialSampleAssociationsFieldProps {
   className?: string;
@@ -35,10 +33,12 @@ export function MaterialSampleAssociationsField({
   const { formatMessage } = useDinaIntl();
 
   return (
-    <TabbedArrayField<MaterialSampleAssociation>
+    <TabbedArrayField<Association>
       legend={<DinaMessage id="materialSampleAssociationLegend" />}
       typeName={formatMessage("association")}
-      makeNewElement={() => ({})}
+      makeNewElement={() => ({
+        type: "association"
+      })}
       name={fieldName}
       sectionId="associations-tabs"
       className={classNames(className, "non-strip")}
@@ -58,7 +58,7 @@ export function MaterialSampleAssociationsField({
       )}
       renderTab={(assoc, index) => {
         const hasName = Boolean(
-          (assoc.associationType || assoc.associatedSample)?.trim()
+          (assoc.associationType || assoc.associatedSample?.id)?.trim()
         );
 
         return hasName ? (
@@ -69,9 +69,9 @@ export function MaterialSampleAssociationsField({
                 path="collection-api/vocabulary2/associationType"
               />
             )}
-            {assoc.associatedSample && (
+            {assoc.associatedSample?.id && (
               <MaterialSampleLink
-                id={assoc.associatedSample}
+                id={assoc.associatedSample.id}
                 disableLink={true}
               />
             )}
@@ -85,14 +85,11 @@ export function MaterialSampleAssociationsField({
   );
 }
 
-function AssociationTabPanel({
-  fieldProps,
-  index
-}: TabPanelCtx<MaterialSampleAssociation>) {
+function AssociationTabPanel({ fieldProps, index }: TabPanelCtx<Association>) {
   const [showSearch, setShowSearch] = useState(false);
   const formikCtx = useFormikContext<MaterialSample>();
   const [showSearchBtn, setShowSearchBtn] = useState(
-    formikCtx.values.associations?.[index].associatedSample ? false : true
+    formikCtx.values.associations?.[index].associatedSample?.id ? false : true
   );
 
   function resetSearchState() {

@@ -27,7 +27,6 @@ function createMaterialSample(overrides: Partial<any> = {}): any {
     organism: [],
     storageUnitUsage: { id: null, type: "storage-unit-usage" },
     collectingEvent: { id: null, type: "collecting-event" },
-    associations: [],
     hostOrganism: null
   };
   return { ...defaultSample, ...overrides };

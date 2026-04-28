@@ -270,8 +270,6 @@ describe("Material sample bulk edit tab", () => {
         // Keeps the name and type:
         type: "material-sample",
         materialSampleName: "test-sample",
-        // Sets the default association because it's enabled and there are no values set in the other tabs:
-        associations: [{}],
         // Sets the default organism because it's enabled and there are no values set in the other tabs:
         organism: [{}],
         organismsQuantity: 1
