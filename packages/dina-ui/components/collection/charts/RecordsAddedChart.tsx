@@ -56,8 +56,8 @@ export default function RecordsAddedChart({
 }: RecordsAddedChartProps) {
   const { apiClient } = useApiClient();
 
-  const [interval, setInterval] = useState("month");
-  const [format, setFormat] = useState("yyyy-MM");
+  const [interval, setInterval] = useState("year");
+  const [format, setFormat] = useState("yyyy");
   const [dateRange, setDateRange] = useState<{ start?: string; end?: string }>(
     {}
   );
