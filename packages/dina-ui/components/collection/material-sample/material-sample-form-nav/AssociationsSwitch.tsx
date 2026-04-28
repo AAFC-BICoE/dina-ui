@@ -1,14 +1,13 @@
 import { FieldSpy, useBulkEditTabContext } from "common-ui";
+import { Association } from "packages/dina-ui/types/collection-api/resources/Association";
 import Switch from "react-switch";
-import { MaterialSampleAssociation } from "../../../../types/collection-api";
 
 /** The associations switch adds an initial association if there isn't one already. */
-
 export function AssociationsSwitch(props) {
   const bulkTabCtx = useBulkEditTabContext();
 
   return (
-    <FieldSpy<MaterialSampleAssociation[]> fieldName="associations">
+    <FieldSpy<Association[]> fieldName="associations">
       {(associations, { form: { setFieldValue } }) => (
         <Switch
           {...props}

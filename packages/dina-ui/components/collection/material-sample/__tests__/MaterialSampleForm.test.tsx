@@ -756,7 +756,12 @@ describe("Material Sample Edit Page", () => {
           id: "333",
           materialSampleName: "test-ms",
           associations: [
-            { associatedSample: "test name", associationType: "host" }
+            {
+              type: "association",
+              associatedSample: { id: "1", type: "material-sample" },
+              sample: { id: "333", type: "material-sample" },
+              associationType: "host"
+            }
           ]
         }}
         onSaved={mockOnSaved}
@@ -785,7 +790,14 @@ describe("Material Sample Edit Page", () => {
           ...testMaterialSample(),
           id: "333",
           materialSampleName: "test-ms",
-          associations: [{ associatedSample: "1", associationType: "host" }]
+          associations: [
+            {
+              type: "association",
+              associatedSample: { id: "1", type: "material-sample" },
+              sample: { id: "333", type: "material-sample" },
+              associationType: "host"
+            }
+          ]
         }}
         onSaved={mockOnSaved}
       />,
@@ -2654,7 +2666,14 @@ describe("Material Sample Edit Page", () => {
               name: "Test Host Organism",
               remarks: "Original remarks"
             },
-            associations: [{ associatedSample: "1", associationType: "host" }]
+            associations: [
+              {
+                type: "association",
+                associatedSample: { id: "1", type: "material-sample" },
+                sample: { id: "333", type: "material-sample" },
+                associationType: "host"
+              }
+            ]
           }}
           onSaved={mockOnSaved}
         />,
@@ -2687,7 +2706,14 @@ describe("Material Sample Edit Page", () => {
               name: "Test Host Organism",
               remarks: "Original remarks"
             },
-            associations: [{ associatedSample: "1", associationType: "host" }]
+            associations: [
+              {
+                type: "association",
+                associatedSample: { id: "1", type: "material-sample" },
+                sample: { id: "333", type: "material-sample" },
+                associationType: "host"
+              }
+            ]
           }}
           onSaved={mockOnSaved}
         />,
@@ -2766,7 +2792,14 @@ describe("Material Sample Edit Page", () => {
               name: "Test Host Organism",
               remarks: "Original remarks"
             },
-            associations: [{ associatedSample: "1", associationType: "host" }]
+            associations: [
+              {
+                type: "association",
+                associatedSample: { id: "1", type: "material-sample" },
+                sample: { id: "333", type: "material-sample" },
+                associationType: "host"
+              }
+            ]
           }}
           onSaved={mockOnSaved}
         />,
@@ -2824,7 +2857,14 @@ describe("Material Sample Edit Page", () => {
             ...testMaterialSample(),
             id: "333",
             materialSampleName: "test-ms",
-            associations: [{ associatedSample: "1", associationType: "host" }]
+            associations: [
+              {
+                type: "association",
+                associatedSample: { id: "1", type: "material-sample" },
+                sample: { id: "333", type: "material-sample" },
+                associationType: "host"
+              }
+            ]
           }}
           onSaved={mockOnSaved}
         />,
