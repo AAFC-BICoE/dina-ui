@@ -1319,6 +1319,57 @@ describe("Material Sample Edit Page", () => {
     });
   });
 
+  it("Validates that associations require an associated sample and association type before saving.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm onSaved={mockOnSaved} />,
+      testCtx
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".enable-associations .react-switch-bg"
+        )[0]
+      ).toBeInTheDocument()
+    );
+
+    // Enable association:
+    const associationToggle = wrapper.container.querySelectorAll(
+      ".enable-associations .react-switch-bg"
+    );
+    if (!associationToggle) {
+      fail("Association toggle needs to exist at this point.");
+    }
+    fireEvent.click(associationToggle[0]);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("button", { name: /search\.\.\./i })
+      ).toBeInTheDocument()
+    );
+
+    // Add some remarks.
+    const tabpanel = wrapper.getByRole("tabpanel");
+    const remarkTextbox = within(tabpanel).getByRole("textbox", {
+      name: /remarks/i
+    });
+    userEvent.type(remarkTextbox, "Remarks Test");
+
+    // Leave the other required fields blank.
+
+    // Attempt to save without filling in required fields:
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitForLoadingToDisappear();
+
+    // Both required field errors should be displayed:
+    await waitFor(() => {
+      expect(
+        wrapper.getAllByText(/required field/i).length
+      ).toBeGreaterThanOrEqual(2);
+    });
+
+    // No save should have been made:
+    expect(mockSave).not.toHaveBeenCalled();
+  });
+
   it("Lets you add an organism to an existing Material Sample", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm

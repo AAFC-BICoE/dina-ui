@@ -870,7 +870,6 @@ export function useMaterialSampleSave({
     delete materialSampleInput.cfia_ppc;
     delete materialSampleInput.useTargetOrganism;
     delete materialSampleInput.parentAttributes;
-    delete materialSampleInput.associations;
 
     return materialSampleInput;
   }
