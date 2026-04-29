@@ -266,14 +266,11 @@ const mockSave = jest.fn<any, any>(async (saves) => {
   });
 });
 
-const mockDelete = jest.fn();
-
 const testCtx = {
   apiContext: {
     save: mockSave,
     apiClient: {
-      get: mockGet,
-      delete: mockDelete
+      get: mockGet
     }
   }
 };
@@ -2800,7 +2797,8 @@ describe("Material Sample Edit Page", () => {
                 type: "association",
                 associatedSample: { id: "1", type: "material-sample" },
                 sample: { id: "333", type: "material-sample" },
-                associationType: "host"
+                associationType: "host",
+                id: "association-1"
               }
             ]
           }}
@@ -2833,6 +2831,8 @@ describe("Material Sample Edit Page", () => {
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+      await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -2847,23 +2847,19 @@ describe("Material Sample Edit Page", () => {
               }
             ],
             { apiBaseUrl: "/collection-api" }
-          ]
-        ])
-      );
-
-      // Check that the association is deleted.
-      await waitFor(() =>
-        expect(mockDelete.mock.calls).toEqual([
+          ],
           [
             [
               {
                 delete: {
-                  id: "1",
+                  id: "association-1",
                   type: "association"
                 }
               }
             ],
-            { apiBaseUrl: "/collection-api" }
+            {
+              apiBaseUrl: "/collection-api"
+            }
           ]
         ])
       );

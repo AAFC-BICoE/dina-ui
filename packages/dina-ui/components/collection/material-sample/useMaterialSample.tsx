@@ -14,7 +14,8 @@ import {
   useRelationshipUsagesCount,
   withoutBlankFields,
   SimpleSearchFilterBuilder,
-  useBulkQueries
+  useBulkQueries,
+  DeleteArgs
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -1329,15 +1330,18 @@ export function useMaterialSampleSave({
     }
 
     // Perform deletes individually using the REST endpoint
-    for (const association of associationsToDelete) {
-      await apiClient.axios.delete(
-        `collection-api/association/${association.id}`,
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json"
+    if (associationsToDelete.length > 0) {
+      const deleteAssociationArgs: DeleteArgs[] = associationsToDelete.map(
+        (association) => ({
+          delete: {
+            id: association.id ?? "",
+            type: "association"
           }
-        }
+        })
       );
+      await save<Association>(deleteAssociationArgs, {
+        apiBaseUrl: "/collection-api"
+      });
     }
   }
 
