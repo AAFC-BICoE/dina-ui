@@ -1354,6 +1354,15 @@ export function useMaterialSampleSave({
     const fieldErrors: Record<string, string> = {};
 
     associations.forEach((association, index) => {
+      // Skip completely empty associations
+      if (
+        !association.associatedSample &&
+        !association.associationType &&
+        !association.remarks
+      ) {
+        return;
+      }
+
       if (!association.associatedSample) {
         fieldErrors[`associations[${index}].associatedSample`] =
           formatMessage("requiredField");
