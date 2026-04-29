@@ -1309,16 +1309,14 @@ describe("Material Sample Edit Page", () => {
 
     // Select one sample from search result list
     userEvent.click(wrapper.getByRole("button", { name: /select/i }));
-    await waitFor(() =>
-      expect(
-        wrapper.getByRole("link", { name: /my\-sample\-name/i })
-      ).toBeInTheDocument()
-    );
+    await waitForLoadingToDisappear();
 
-    // Expect the selected sample being populated to the sample input
-    expect(
-      wrapper.getByRole("link", { name: /my\-sample\-name/i })
-    ).toBeInTheDocument();
+    // Test name should be displayed.
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("link", { name: /test name/i })
+      ).toBeInTheDocument();
+    });
   });
 
   it("Lets you add an organism to an existing Material Sample", async () => {
@@ -2711,7 +2709,8 @@ describe("Material Sample Edit Page", () => {
                 type: "association",
                 associatedSample: { id: "1", type: "material-sample" },
                 sample: { id: "333", type: "material-sample" },
-                associationType: "host"
+                associationType: "host",
+                id: "association-1"
               }
             ]
           }}

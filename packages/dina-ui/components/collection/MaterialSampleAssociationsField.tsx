@@ -100,7 +100,7 @@ function AssociationTabPanel({ fieldProps, index }: TabPanelCtx<Association>) {
     sample: PersistedResource<MaterialSample>
   ) {
     const fieldName = fieldProps("associatedSample").name;
-    formikCtx.setFieldValue(fieldName, sample.id);
+    formikCtx.setFieldValue(fieldName, sample);
     formikCtx.setFieldError(fieldName, undefined);
     resetSearchState();
     setShowSearchBtn(false);
