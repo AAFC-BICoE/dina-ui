@@ -439,7 +439,7 @@ export default function DateHistogram({
           query,
           aggs: {
             by_date: {
-              nested: { path: "included" },
+              nested: { path: nestedQuery.path },
               aggs: nestedQuery.typeField
                 ? {
                     filtered_by_type: {
@@ -735,8 +735,10 @@ export default function DateHistogram({
             eventKey="last-24-hours"
             active={selectedPreset === "last-24-hours"}
           >
-            {datePresets.find((preset) => preset.key === "last-24-hours")
-              ?.label || "Last 24 Hours"}
+            {
+              datePresets.find((preset) => preset.key === "last-24-hours")
+                ?.label
+            }
           </Dropdown.Item>
 
           <Dropdown.Divider />
@@ -745,19 +747,22 @@ export default function DateHistogram({
             eventKey="last-7-days"
             active={selectedPreset === "last-7-days"}
           >
-            {formatMessage("last7days")}
+            {datePresets.find((preset) => preset.key === "last-7-days")?.label}
           </Dropdown.Item>
           <Dropdown.Item
             eventKey="last-30-days"
             active={selectedPreset === "last-30-days"}
           >
-            {formatMessage("last30days")}
+            {datePresets.find((preset) => preset.key === "last-30-days")?.label}
           </Dropdown.Item>
           <Dropdown.Item
             eventKey="last-3-months"
             active={selectedPreset === "last-3-months"}
           >
-            {formatMessage("last3months")}
+            {
+              datePresets.find((preset) => preset.key === "last-3-months")
+                ?.label
+            }
           </Dropdown.Item>
 
           <Dropdown.Divider />
@@ -766,25 +771,31 @@ export default function DateHistogram({
             eventKey="last-6-months"
             active={selectedPreset === "last-6-months"}
           >
-            {formatMessage("last6months")}
+            {
+              datePresets.find((preset) => preset.key === "last-6-months")
+                ?.label
+            }
           </Dropdown.Item>
           <Dropdown.Item
             eventKey="this-year"
             active={selectedPreset === "this-year"}
           >
-            {formatMessage("thisYear")}
+            {datePresets.find((preset) => preset.key === "this-year")?.label}
           </Dropdown.Item>
           <Dropdown.Item
             eventKey="last-year"
             active={selectedPreset === "last-year"}
           >
-            {formatMessage("lastYear")}
+            {datePresets.find((preset) => preset.key === "last-year")?.label}
           </Dropdown.Item>
           <Dropdown.Item
             eventKey="all-time-month"
             active={selectedPreset === "all-time-month"}
           >
-            {formatMessage("allTime")}
+            {
+              datePresets.find((preset) => preset.key === "all-time-month")
+                ?.label
+            }
           </Dropdown.Item>
 
           <Dropdown.Divider />
@@ -793,7 +804,10 @@ export default function DateHistogram({
             eventKey="all-time-year"
             active={selectedPreset === "all-time-year"}
           >
-            {formatMessage("allTime")}
+            {
+              datePresets.find((preset) => preset.key === "all-time-year")
+                ?.label
+            }
           </Dropdown.Item>
         </DropdownButton>
       </div>
