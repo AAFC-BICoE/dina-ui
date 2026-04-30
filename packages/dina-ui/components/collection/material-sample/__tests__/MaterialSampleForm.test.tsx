@@ -760,7 +760,8 @@ describe("Material Sample Edit Page", () => {
               type: "association",
               associatedSample: { id: "1", type: "material-sample" },
               sample: { id: "333", type: "material-sample" },
-              associationType: "host"
+              associationType: "host",
+              id: "assocation-1"
             }
           ]
         }}
@@ -793,9 +794,14 @@ describe("Material Sample Edit Page", () => {
           associations: [
             {
               type: "association",
-              associatedSample: { id: "1", type: "material-sample" },
+              associatedSample: {
+                id: "1",
+                type: "material-sample",
+                materialSampleName: "My sample name"
+              },
               sample: { id: "333", type: "material-sample" },
-              associationType: "host"
+              associationType: "host",
+              id: "assocation-1"
             }
           ]
         }}
@@ -803,6 +809,8 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
+    await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
         wrapper.getByRole("link", { name: /my\-sample\-name/i })
@@ -2720,7 +2728,8 @@ describe("Material Sample Edit Page", () => {
                 type: "association",
                 associatedSample: { id: "1", type: "material-sample" },
                 sample: { id: "333", type: "material-sample" },
-                associationType: "host"
+                associationType: "host",
+                id: "assocation-1"
               }
             ]
           }}
