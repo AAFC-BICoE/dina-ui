@@ -333,6 +333,14 @@ export function getSampleBulkOverrider(
       ...withoutBlankFields(bulkEditSample?.hostOrganism)
     };
 
+    // Handle associations...
+    const bulkAssociations = formik.values.associations;
+    const mergedAssociations =
+      bulkEditSampleHook.dataComponentState.enableAssociations &&
+      bulkAssociations !== undefined
+        ? bulkAssociations // Replace with bulk edit associations
+        : baseSample.associations;
+
     const newSample: InputResource<MaterialSample> = {
       ...baseSample,
       ...overrides,
@@ -344,6 +352,9 @@ export function getSampleBulkOverrider(
       }),
       ...(!_.isEmpty(newHostOrganism) && {
         hostOrganism: newHostOrganism
+      }),
+      ...(mergedAssociations !== undefined && {
+        associations: mergedAssociations
       })
     };
 
@@ -433,6 +444,8 @@ function useBulkSampleSave({
       const preProcessSample = samplePreProcessor?.();
 
       const saveOperations: SaveArgs<MaterialSample>[] = [];
+      const submittedValuesList: InputResource<MaterialSample>[] = [];
+
       for (let index = 0; index < sampleHooks.length; index++) {
         const { formRef, resource, saveHook } = sampleHooks[index];
         const formik = formRef.current;
@@ -444,9 +457,13 @@ function useBulkSampleSave({
           );
         }
 
-        // TODO get rid of these try/catches when we can save
-        // the Col Event + material sample all at once.
         try {
+          const processedSample = preProcessSample
+            ? await preProcessSample(formik.values)
+            : formik.values;
+
+          submittedValuesList.push(processedSample);
+
           const saveOp = await saveHook.prepareSampleSaveOperation({
             submittedValues: formik.values,
             preProcessSample: async (original) => {
@@ -537,6 +554,39 @@ function useBulkSampleSave({
         for (let i = 0; i < savedSamples.length; i++) {
           const originalIndex = nonEmptyIndices[i];
           resultSamples[originalIndex] = savedSamples[i];
+        }
+      }
+
+      // Save associations for each sample after material samples are saved
+      for (let i = 0; i < sampleHooks.length; i++) {
+        const { saveHook } = sampleHooks[i];
+        const savedSample = resultSamples[i];
+        const submittedValues = submittedValuesList[i];
+
+        // Only save associations if the associations section is enabled
+        // or if we need to delete them
+        if (
+          saveHook.dataComponentState.enableAssociations ||
+          saveHook.dataComponentState.deleteAssociations
+        ) {
+          try {
+            await saveHook.saveAssociations({
+              ...submittedValues,
+              id: savedSample.id
+            });
+          } catch (error: unknown) {
+            if (error instanceof DoOperationsError) {
+              throw new DoOperationsError(
+                error.message,
+                error.fieldErrors,
+                error.individualErrors.map((operationError) => ({
+                  ...operationError,
+                  index: i
+                }))
+              );
+            }
+            throw error;
+          }
         }
       }
 

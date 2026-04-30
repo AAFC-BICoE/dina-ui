@@ -1546,6 +1546,7 @@ export function useMaterialSampleSave({
     onSubmit,
     prepareSampleInput,
     prepareSampleSaveOperation,
+    saveAssociations,
     loading,
     colEventFormRef
   };

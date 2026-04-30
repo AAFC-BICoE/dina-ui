@@ -97,7 +97,15 @@ export const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[
           determination: [{ verbatimScientificName: "initial determination 2" }]
         }
       ],
-      associations: [{ associatedSample: "500", remarks: "initial remarks" }],
+      associations: [
+        {
+          id: "assocation-id",
+          type: "association",
+          associatedSample: { id: "500", type: "material-sample" },
+          sample: { id: "1", type: "material-sample" },
+          remarks: "initial remarks"
+        }
+      ],
       attachment: [{ id: "initial-attachment-1", type: "metadata" }],
       scheduledActions: [
         { actionType: "my-action-type", remarks: "initial action" }
