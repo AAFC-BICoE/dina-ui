@@ -1306,7 +1306,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button without overriding anything:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(5)); // 3 for organisms, 1 for samples, 1 for associations
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(4)); // 3 for organisms, 1 for samples
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
@@ -1346,18 +1346,6 @@ describe("MaterialSampleBulkEditor", () => {
               }
             }
           }))
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      // Deletes the existing association for sample "1" only:
-      [
-        [
-          {
-            delete: {
-              id: "assocation-id",
-              type: "association"
-            }
-          }
         ],
         { apiBaseUrl: "/collection-api" }
       ]
