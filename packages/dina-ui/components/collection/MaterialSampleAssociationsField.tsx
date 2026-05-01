@@ -47,8 +47,15 @@ export function MaterialSampleAssociationsField({
           messageIdMultiple="bulkEditResourceSetWarning_Associations_MaterialSample_Multi"
           fieldName={fieldName}
           setDefaultValue={(ctx) =>
-            // Auto-create the first association:
-            ctx.bulkEditFormRef?.current?.setFieldValue(fieldName, [{}])
+            // Set an explicit initial state for the first association entry
+            ctx.bulkEditFormRef?.current?.setFieldValue(fieldName, [
+              {
+                type: "association",
+                associationType: null,
+                remarks: "",
+                associatedSample: null
+              }
+            ])
           }
         >
           {content}
