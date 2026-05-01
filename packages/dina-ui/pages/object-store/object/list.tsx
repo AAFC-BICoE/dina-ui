@@ -6,7 +6,8 @@ import {
   QueryPageTabConfig,
   stringArrayCell,
   ListViewTab,
-  GalleryViewTab
+  GalleryViewTab,
+  ObjectStoreVisualizationTab
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -198,6 +199,12 @@ export default function MetadataListPage() {
         previewMetadata,
         setPreviewMetadata
       }
+    },
+    {
+      id: "visualization",
+      labelKey: "visualization",
+      component: ObjectStoreVisualizationTab,
+      showActionButtons: false
     }
   ];
 

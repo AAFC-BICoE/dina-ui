@@ -73,8 +73,8 @@ function createDateHistogramPresets(
     {
       key: "last-3-months",
       label: labels.last3Months,
-      interval: "day",
-      format: "yyyy-MM-dd",
+      interval: "month",
+      format: "yyyy-MM",
       getDates: () => {
         const now = new Date();
         const start = new Date(
@@ -755,6 +755,9 @@ export default function DateHistogram({
           >
             {datePresets.find((preset) => preset.key === "last-30-days")?.label}
           </Dropdown.Item>
+
+          <Dropdown.Divider />
+          <Dropdown.Header>{menuSectionLabels.byMonth}</Dropdown.Header>
           <Dropdown.Item
             eventKey="last-3-months"
             active={selectedPreset === "last-3-months"}
@@ -764,9 +767,6 @@ export default function DateHistogram({
                 ?.label
             }
           </Dropdown.Item>
-
-          <Dropdown.Divider />
-          <Dropdown.Header>{menuSectionLabels.byMonth}</Dropdown.Header>
           <Dropdown.Item
             eventKey="last-6-months"
             active={selectedPreset === "last-6-months"}
