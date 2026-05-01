@@ -813,13 +813,13 @@ describe("Material Sample Edit Page", () => {
 
     await waitFor(() =>
       expect(
-        wrapper.getByRole("link", { name: /my\-sample\-name/i })
+        wrapper.getByRole("link", { name: /my sample name/i })
       ).toBeInTheDocument()
     );
 
     // Expect to the associated sample:
     expect(
-      wrapper.getByRole("link", { name: /my\-sample\-name/i })
+      wrapper.getByRole("link", { name: /my sample name/i })
     ).toBeInTheDocument();
 
     // Change the remark text.
@@ -838,17 +838,20 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              associations: [
-                {
-                  associatedSample: "1",
-                  associationType: "host",
-                  remarks: "New Remark"
+              id: "assocation-1",
+              type: "association",
+              associationType: "host",
+              remarks: "New Remark",
+              relationships: {
+                associatedSample: {
+                  data: { id: "1", type: "material-sample" }
+                },
+                sample: {
+                  data: { id: "333", type: "material-sample" }
                 }
-              ],
-              id: "333",
-              type: "material-sample"
+              }
             },
-            type: "material-sample"
+            type: "association"
           }
         ],
         { apiBaseUrl: "/collection-api" }

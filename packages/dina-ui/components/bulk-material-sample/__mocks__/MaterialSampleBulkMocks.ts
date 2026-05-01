@@ -101,6 +101,7 @@ export const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[
         {
           id: "assocation-id",
           type: "association",
+          associationType: "host",
           associatedSample: { id: "500", type: "material-sample" },
           sample: { id: "1", type: "material-sample" },
           remarks: "initial remarks"
