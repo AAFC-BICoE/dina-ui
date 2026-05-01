@@ -1258,6 +1258,15 @@ export function useMaterialSampleSave({
       ? []
       : submittedAssociations
           .filter((submitted) => {
+            // Skip completely empty associations (no meaningful data)
+            if (
+              !submitted.associatedSample &&
+              !submitted.associationType &&
+              !submitted.remarks
+            ) {
+              return false;
+            }
+
             // Always include new associations (no id)
             if (!submitted.id) {
               return true;

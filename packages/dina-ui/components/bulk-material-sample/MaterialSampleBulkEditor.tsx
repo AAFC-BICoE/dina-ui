@@ -311,6 +311,7 @@ export function getSampleBulkOverrider(
     const overrides = withoutBlankFields(bulkEditSample, formik.values);
     delete overrides.managedAttributes; // Handled separately below.
     delete overrides.preparationManagedAttributes; // Handled separately below.
+    delete overrides.associations; // Handled separately below.
 
     // Material Sample Managed Attribute Handling:
     const materialSampleManagedAttributes = bulkEditAllManagedAttributes(
@@ -335,10 +336,16 @@ export function getSampleBulkOverrider(
 
     // Handle associations...
     const bulkAssociations = formik.values.associations;
+
+    const hasNonEmptyBulkAssociations = bulkAssociations?.some(
+      (assoc) =>
+        assoc.associatedSample || assoc.associationType || assoc.remarks
+    );
+
     const mergedAssociations =
       bulkEditSampleHook.dataComponentState.enableAssociations &&
-      bulkAssociations !== undefined
-        ? bulkAssociations // Replace with bulk edit associations
+      hasNonEmptyBulkAssociations
+        ? bulkAssociations
         : baseSample.associations;
 
     const newSample: InputResource<MaterialSample> = {
