@@ -3,7 +3,8 @@ import * as echarts from "echarts";
 import { useApiClient } from "..";
 import useVocabularyOptions from "../../../dina-ui/components/collection/useVocabularyOptions";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-
+import { useIntl } from "react-intl";
+import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 interface TreeNode {
   name: string;
   value?: number;
@@ -46,6 +47,7 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
   const chartInstance = useRef<echarts.ECharts | null>(null);
   const expandedNodesRef = useRef<Set<string>>(new Set()); // Track expanded nodes
   const { apiClient } = useApiClient();
+  const { formatMessage } = useIntl();
 
   // Retrieve the classification options
   const { loading, vocabOptions: taxonomicRankOptions } = useVocabularyOptions({
@@ -395,14 +397,11 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
       toolbox: {
         show: true,
         feature: {
-          restore: { show: true, title: "Reset View" },
-          saveAsImage: { show: true, title: "Save as Image" },
-          dataZoom: {
+          restore: { show: true, title: formatMessage({ id: "resetView" }) },
+          saveAsImage: {
             show: true,
-            title: {
-              zoom: "Zoom",
-              back: "Back"
-            }
+            name: "taxonomic_tree",
+            title: formatMessage({ id: "saveAsImage" })
           }
         },
         orient: "vertical",
@@ -432,7 +431,7 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
   };
 
   if (loading) {
-    return <div className="loading">Loading taxonomy data...</div>;
+    return <LoadingSpinner loading={loading} />;
   }
 
   if (error) {
