@@ -1,7 +1,7 @@
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import DateHistogram, { HistogramInterval } from "./base-charts/DateHistogram";
 
-interface RecordsAddedChartProps {
+interface DigitalizationDateChartProps {
   /** Optional Elasticsearch query used as the starting point for the chart query. */
   inputQuery?: any;
   /** Enables the add-filter action for the chart. */
@@ -15,36 +15,36 @@ interface RecordsAddedChartProps {
 }
 
 /**
- * Records added histogram chart with preset date ranges and optional query-builder filtering.
+ * Digitalization date histogram chart with preset date ranges and optional query-builder filtering.
  */
-export default function RecordsAddedChart({
+export default function DigitalizationDateChart({
   inputQuery,
   addFilter,
   setQueryBuilderTree,
   queryBuilderTree,
   setSubmittedQueryBuilderTree
-}: RecordsAddedChartProps) {
+}: DigitalizationDateChartProps) {
   const renderTitle = (interval: HistogramInterval) => {
     switch (interval) {
       case "year":
-        return <DinaMessage id="recordAddedChartTitleYear" />;
+        return <DinaMessage id="digitalizationDateChartTitleYear" />;
       case "month":
-        return <DinaMessage id="recordAddedChartTitleMonth" />;
+        return <DinaMessage id="digitalizationDateChartTitleMonth" />;
       case "day":
-        return <DinaMessage id="recordAddedChartTitleDay" />;
+        return <DinaMessage id="digitalizationDateChartTitleDay" />;
       case "hour":
-        return <DinaMessage id="recordAddedChartTitleHour" />;
+        return <DinaMessage id="digitalizationDateChartTitleHour" />;
       default:
-        return <DinaMessage id="recordAddedChartTitle" />;
+        return <DinaMessage id="digitalizationDateChartTitle" />;
     }
   };
 
   return (
     <DateHistogram
       inputQuery={inputQuery}
-      indexName={"dina_material_sample_index"}
-      dateFieldPath="data.attributes.createdOn"
-      queryBuilderFieldPath="data.attributes.createdOn"
+      indexName={"dina_object_store_index"}
+      dateFieldPath="data.attributes.acDigitizationDate"
+      queryBuilderFieldPath="data.attributes.acDigitizationDate"
       renderTitle={renderTitle}
       addFilter={addFilter}
       setQueryBuilderTree={setQueryBuilderTree}

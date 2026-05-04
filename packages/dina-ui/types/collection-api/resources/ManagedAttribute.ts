@@ -31,7 +31,8 @@ export const COLLECTION_MODULE_TYPES = [
   "DETERMINATION",
   "MATERIAL_SAMPLE",
   "ORGANISM",
-  "PREPARATION"
+  "PREPARATION",
+  "SITE"
 ] as const;
 export type CollectionModuleType = (typeof COLLECTION_MODULE_TYPES)[number];
 export const COLLECTION_MODULE_TYPE_LABELS: Record<
@@ -43,7 +44,8 @@ export const COLLECTION_MODULE_TYPE_LABELS: Record<
   DETERMINATION: "determination",
   MATERIAL_SAMPLE: "materialSample",
   ORGANISM: "organism",
-  PREPARATION: "preparation"
+  PREPARATION: "preparation",
+  SITE: "site"
 };
 
 export const SEQDB_MODULE_TYPES = ["GENERIC_MOLECULAR_ANALYSIS"] as const;

@@ -1,7 +1,7 @@
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import DateHistogram, { HistogramInterval } from "./base-charts/DateHistogram";
 
-interface RecordsAddedChartProps {
+interface EventStartDateChartProps {
   /** Optional Elasticsearch query used as the starting point for the chart query. */
   inputQuery?: any;
   /** Enables the add-filter action for the chart. */
@@ -15,27 +15,27 @@ interface RecordsAddedChartProps {
 }
 
 /**
- * Records added histogram chart with preset date ranges and optional query-builder filtering.
+ * Material sample record created date histogram chart with preset date ranges and optional query-builder filtering.
  */
-export default function RecordsAddedChart({
+export default function EventStartDateChart({
   inputQuery,
   addFilter,
   setQueryBuilderTree,
   queryBuilderTree,
   setSubmittedQueryBuilderTree
-}: RecordsAddedChartProps) {
+}: EventStartDateChartProps) {
   const renderTitle = (interval: HistogramInterval) => {
     switch (interval) {
       case "year":
-        return <DinaMessage id="recordAddedChartTitleYear" />;
+        return <DinaMessage id="eventStartDateChartTitleYear" />;
       case "month":
-        return <DinaMessage id="recordAddedChartTitleMonth" />;
+        return <DinaMessage id="eventStartDateChartTitleMonth" />;
       case "day":
-        return <DinaMessage id="recordAddedChartTitleDay" />;
+        return <DinaMessage id="eventStartDateChartTitleDay" />;
       case "hour":
-        return <DinaMessage id="recordAddedChartTitleHour" />;
+        return <DinaMessage id="eventStartDateChartTitleHour" />;
       default:
-        return <DinaMessage id="recordAddedChartTitle" />;
+        return <DinaMessage id="eventStartDateChartTitle" />;
     }
   };
 
@@ -43,13 +43,18 @@ export default function RecordsAddedChart({
     <DateHistogram
       inputQuery={inputQuery}
       indexName={"dina_material_sample_index"}
-      dateFieldPath="data.attributes.createdOn"
-      queryBuilderFieldPath="data.attributes.createdOn"
+      dateFieldPath="included.attributes.startEventDateTime"
+      queryBuilderFieldPath="collectingEvent.startEventDateTime"
       renderTitle={renderTitle}
       addFilter={addFilter}
       setQueryBuilderTree={setQueryBuilderTree}
       queryBuilderTree={queryBuilderTree}
       setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+      nestedQuery={{
+        path: "included",
+        typeField: "type",
+        typeValue: "collecting-event"
+      }}
       menuSectionLabels={{
         realTime: <DinaMessage id="dateRangeHeaderRealTime" />,
         byDay: <DinaMessage id="dateRangeHeaderByDay" />,

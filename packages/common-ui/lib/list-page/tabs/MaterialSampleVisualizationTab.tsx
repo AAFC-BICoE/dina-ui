@@ -3,6 +3,7 @@ import React from "react";
 import { KitsuResource } from "kitsu";
 import SampleTypeChart from "../../../../dina-ui/components/collection/charts/SampleTypeChart";
 import RecordsAddedChart from "../../../../dina-ui/components/collection/charts/RecordsAddedChart";
+import EventStartDateChart from "../../../../dina-ui/components/collection/charts/EventStartDateChart";
 import RelatedObjectTypeChart from "../../../../dina-ui/components/collection/charts/RelatedObjectTypeChart";
 
 export function MaterialSampleVisualizationTab<TData extends KitsuResource>({
@@ -25,7 +26,7 @@ export function MaterialSampleVisualizationTab<TData extends KitsuResource>({
           />
         </div>
         <div className="col-md-6">
-          <RecordsAddedChart
+          <EventStartDateChart
             inputQuery={queryParams}
             queryBuilderTree={queryBuilderTree}
             setQueryBuilderTree={setQueryBuilderTree}
@@ -35,6 +36,15 @@ export function MaterialSampleVisualizationTab<TData extends KitsuResource>({
         </div>
       </div>
       <div className="row mt-3 mb-3">
+        <div className="col-md-6">
+          <RecordsAddedChart
+            inputQuery={queryParams}
+            queryBuilderTree={queryBuilderTree}
+            setQueryBuilderTree={setQueryBuilderTree}
+            addFilter={true}
+            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+          />
+        </div>
         <div className="col-md-6">
           <RelatedObjectTypeChart query={queryParams} />
         </div>
