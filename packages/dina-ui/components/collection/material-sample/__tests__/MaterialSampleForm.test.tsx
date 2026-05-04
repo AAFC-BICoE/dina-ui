@@ -162,44 +162,27 @@ const mockGeographicSearchResults = [
   }
 ];
 
-const mockGet = jest.fn<any, any>(async (path) => {
+const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_1":
-      return Promise.resolve({
-        data: { id: "1", key: "attribute_1", name: "Attribute 1" }
-      });
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_2":
-      return Promise.resolve({
-        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
-      });
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_3":
-      return Promise.resolve({
-        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
-      });
-    case "collection-api/managed-attribute/COLLECTING_EVENT.attribute_2":
-      return Promise.resolve({
-        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
-      });
-    case "collection-api/managed-attribute/COLLECTING_EVENT.attribute_3":
-      return Promise.resolve({
-        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
-      });
-    case "collection-api/managed-attribute/ORGANISM.attribute_2":
-      return Promise.resolve({
-        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
-      });
-    case "collection-api/managed-attribute/ORGANISM.attribute_3":
-      return Promise.resolve({
-        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
-      });
-    case "collection-api/managed-attribute/DETERMINATION.attribute_2":
-      return Promise.resolve({
-        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
-      });
-    case "collection-api/managed-attribute/DETERMINATION.attribute_3":
-      return Promise.resolve({
-        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
-      });
+    case "collection-api/managed-attribute":
+      // Handle filter-based lookups used by useManagedAttributeQueries
+      if (params?.filter?.key?.EQ === "attribute_1") {
+        return Promise.resolve({
+          data: [{ id: "1", key: "attribute_1", name: "Attribute 1" }]
+        });
+      }
+      if (params?.filter?.key?.EQ === "attribute_2") {
+        return Promise.resolve({
+          data: [{ id: "2", key: "attribute_2", name: "Attribute 2" }]
+        });
+      }
+      if (params?.filter?.key?.EQ === "attribute_3") {
+        return Promise.resolve({
+          data: [{ id: "3", key: "attribute_3", name: "Attribute 3" }]
+        });
+      }
+      // return all for the multiselect dropdown
+      return { data: [], meta: { totalResourceCount: 0 } };
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
     case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition,site":

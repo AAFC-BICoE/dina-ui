@@ -25,7 +25,6 @@ import {
   getEntityKeyFromIndexName
 } from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
 import {
-  getExport,
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
   MAX_OBJECT_EXPORT_TOTAL
 } from "packages/common-ui/lib/export/exportUtils";
@@ -45,21 +44,29 @@ import {
   ExportType
 } from "packages/dina-ui/types/dina-export-api";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
-import { ReactNode, useState } from "react";
+import { ReactNode, useRef, useState } from "react";
 import {
   Button,
   ButtonGroup,
   Card,
+  Overlay,
+  Popover,
   Spinner,
   ToggleButton
 } from "react-bootstrap";
-import { FaFileExport, FaHistory, FaTrash } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaFileExport,
+  FaHistory,
+  FaTrash
+} from "react-icons/fa";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useSessionStorage } from "usehooks-ts";
 import { MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS } from "../../collection/material-sample/list";
 import { OBJECT_STORE_NON_EXPORTABLE_COLUMNS } from "../../object-store/object/list";
 import useSavedExports, { VISIBILITY_OPTIONS } from "./useSavedExports";
+import { IoClose } from "react-icons/io5";
 
 export interface SavedExportOption {
   label?: string;
@@ -85,7 +92,7 @@ const NON_EXPORTABLE_COLUMNS_MAP: { [key: string]: string[] } = {
 
 export default function ExportPage<TData extends KitsuResource>() {
   const { formatNumber } = useIntl();
-  const { bulkGet, apiClient, save } = useApiClient();
+  const { bulkGet, save } = useApiClient();
   const router = useRouter();
 
   // Unique name to be used for the local storage.
@@ -109,6 +116,9 @@ export default function ExportPage<TData extends KitsuResource>() {
   // State holding the current export type. For example, Data export / Object export.
   const [exportType, setExportType] = useState<ExportType>("TABULAR_DATA");
 
+  // State to determine if the export API request has been submitted.
+  const [exportRequestSubmitted, setExportRequestSubmitted] = useState(false);
+
   // Local storage for Export Objects
   const [localStorageExportObjectIds] = useSessionStorage<string[]>(
     OBJECT_EXPORT_IDS_KEY,
@@ -129,6 +139,8 @@ export default function ExportPage<TData extends KitsuResource>() {
     value: "COMMA",
     label: "Comma"
   });
+
+  const submitButtonRef = useRef(null);
 
   const { indexMap } = useIndexMapping({
     indexName,
@@ -230,17 +242,13 @@ export default function ExportPage<TData extends KitsuResource>() {
       type: "data-export"
     };
 
-    const dataExportPostResponse = await save<DataExport>([dataExportSaveArg], {
+    await save<DataExport>([dataExportSaveArg], {
       apiBaseUrl: "/dina-export-api"
     });
 
-    await getExport(
-      dataExportPostResponse,
-      setLoading,
-      setDataExportError,
-      apiClient,
-      formik
-    );
+    // Display export request submitted message to user after submitting export request
+    setExportRequestSubmitted(true);
+
     setLoading(false);
   }
 
@@ -318,24 +326,17 @@ export default function ExportPage<TData extends KitsuResource>() {
       };
 
       try {
-        const objectExportResponse = await save<ObjectExport>(
-          [objectExportSaveArg],
-          {
-            apiBaseUrl: "/objectstore-api"
-          }
-        );
-        await getExport(
-          objectExportResponse,
-          setLoading,
-          setDataExportError,
-          apiClient,
-          formik
-        );
+        await save<ObjectExport>([objectExportSaveArg], {
+          apiBaseUrl: "/objectstore-api"
+        });
       } catch (e) {
         setDataExportError(
           <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
         );
       }
+
+      // Display export request submitted message to user after submitting export request
+      setExportRequestSubmitted(true);
 
       setLoading(false);
     }
@@ -642,11 +643,11 @@ export default function ExportPage<TData extends KitsuResource>() {
                 </div>
               </Card.Body>
               <Card.Footer className="d-flex">
-                <div className="me-auto">
+                <div className="me-auto" ref={submitButtonRef}>
                   <SubmitButton
                     buttonProps={(formik) => ({
                       style: { width: "8rem" },
-                      disabled: loading,
+                      disabled: loading || exportRequestSubmitted,
                       onClick: () => {
                         if (exportType === "TABULAR_DATA") {
                           exportData(formik);
@@ -662,6 +663,34 @@ export default function ExportPage<TData extends KitsuResource>() {
                       <DinaMessage id="exportButtonText" />
                     )}
                   </SubmitButton>
+                  <Overlay
+                    target={submitButtonRef.current}
+                    show={exportRequestSubmitted}
+                    placement="right"
+                  >
+                    <Popover id="popover-basic">
+                      <Popover.Header
+                        as="h3"
+                        className="m-0 d-flex justify-content-between align-items-center"
+                      >
+                        <span>
+                          <DinaMessage id="exportRequestSubmittedTitle" />
+                        </span>
+                        <IoClose
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {
+                            setExportRequestSubmitted(false);
+                          }}
+                        />
+                      </Popover.Header>
+                      <Popover.Body className="d-flex flex-column align-items-center text-center gap-2">
+                        <FaCheckCircle className="text-success fs-1" />
+                        <span>
+                          <DinaMessage id="exportRequestSubmittedMessage" />
+                        </span>
+                      </Popover.Body>
+                    </Popover>
+                  </Overlay>
                   {uniqueName === "object-store-list" &&
                     disableObjectExportButton && (
                       <Tooltip id="exportObjectsMaxLimitTooltip" />

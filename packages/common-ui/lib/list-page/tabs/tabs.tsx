@@ -35,6 +35,8 @@ export function ListViewTab<TData extends KitsuResource>({
       sort={sortingRules}
       className="-striped react-table-overflow"
       rowStyling={rowStyling}
+      showPagination={true}
+      showPaginationTop={true}
     />
   );
 }

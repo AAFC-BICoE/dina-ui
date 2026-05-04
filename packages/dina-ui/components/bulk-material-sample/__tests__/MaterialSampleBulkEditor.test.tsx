@@ -46,59 +46,74 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           materialSampleName: "material-sample-500"
         }
       };
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.m1":
-      return Promise.resolve({
-        data: {
-          type: "managed-attribute",
-          id: "1",
-          key: "m1",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          name: "Managed Attribute 1"
-        }
-      });
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.m2":
-      return Promise.resolve({
-        data: {
-          type: "managed-attribute",
-          id: "2",
-          key: "m2",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          name: "Managed Attribute 2"
-        }
-      });
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.m3":
-      return Promise.resolve({
-        data: {
-          type: "managed-attribute",
-          id: "3",
-          key: "m3",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          name: "Managed Attribute 3"
-        }
-      });
-    case "managed-attribute/MATERIAL_SAMPLE.sample_attribute_1":
-      return Promise.resolve({
-        id: "1",
-        key: "sample_attribute_1",
-        name: "Attribute 1"
-      });
-    case "managed-attribute/DETERMINATION.determination_attribute_1":
-      return Promise.resolve({
-        id: "1",
-        key: "determination_attribute_1",
-        name: "Attribute 1"
-      });
-    case "managed-attribute/COLLECTING_EVENT.collecting_event_attribute_1":
-      return Promise.resolve({
-        data: {
-          id: "1",
-          key: "collecting_event_attribute_1",
-          name: "Attribute 1"
-        }
-      });
+    case "collection-api/managed-attribute":
+      if (params?.filter?.key?.EQ === "m1") {
+        return Promise.resolve({
+          data: [
+            {
+              type: "managed-attribute",
+              id: "1",
+              key: "m1",
+              vocabularyElementType: "STRING",
+              managedAttributeComponent: "MATERIAL_SAMPLE",
+              name: "Managed Attribute 1"
+            }
+          ]
+        });
+      }
+      if (params?.filter?.key?.EQ === "m2") {
+        return Promise.resolve({
+          data: [
+            {
+              type: "managed-attribute",
+              id: "2",
+              key: "m2",
+              vocabularyElementType: "STRING",
+              managedAttributeComponent: "MATERIAL_SAMPLE",
+              name: "Managed Attribute 2"
+            }
+          ]
+        });
+      }
+      if (params?.filter?.key?.EQ === "m3") {
+        return Promise.resolve({
+          data: [
+            {
+              type: "managed-attribute",
+              id: "3",
+              key: "m3",
+              vocabularyElementType: "STRING",
+              managedAttributeComponent: "MATERIAL_SAMPLE",
+              name: "Managed Attribute 3"
+            }
+          ]
+        });
+      }
+      if (params?.filter?.key?.EQ === "sample_attribute_1") {
+        return Promise.resolve({
+          data: [{ id: "1", key: "sample_attribute_1", name: "Attribute 1" }]
+        });
+      }
+      if (params?.filter?.key?.EQ === "determination_attribute_1") {
+        return Promise.resolve({
+          data: [
+            { id: "1", key: "determination_attribute_1", name: "Attribute 1" }
+          ]
+        });
+      }
+      if (params?.filter?.key?.EQ === "collecting_event_attribute_1") {
+        return Promise.resolve({
+          data: [
+            {
+              id: "1",
+              key: "collecting_event_attribute_1",
+              name: "Attribute 1"
+            }
+          ]
+        });
+      }
+      // return empty for the multiselect dropdown
+      return { data: [] };
     case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: TEST_COLLECTING_EVENT };
     case "collection-api/storage-unit":
@@ -173,7 +188,6 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/vocabulary2/degreeOfEstablishment":
     case "collection-api/preparation-type":
     case "collection-api/material-sample":
-    case "collection-api/managed-attribute":
     case "collection-api/vocabulary2/materialSampleState":
     case "collection-api/material-sample-type":
     case "collection-api/project":

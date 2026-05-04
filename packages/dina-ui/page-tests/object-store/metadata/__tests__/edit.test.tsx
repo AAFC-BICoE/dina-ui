@@ -7,25 +7,29 @@ import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
-const mockGet = jest.fn(async (path) => {
+const mockGet = jest.fn(async (path, params) => {
   switch (path) {
     case "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612":
       return { data: TEST_METADATA };
     case "objectstore-api/managed-attribute":
+      if (params?.filter?.key?.EQ === "test_managed_attribute") {
+        return Promise.resolve({
+          data: [
+            {
+              id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
+              name: "test-managed-attribute",
+              key: "test_managed_attribute",
+              vocabularyElementType: "STRING"
+            }
+          ]
+        });
+      }
+      // return all for the multiselect dropdown
       return { data: [TEST_MANAGED_ATTRIBUTE] };
     case "objectstore-api/license":
       return { data: TEST_LICENSES };
     case "objectstore-api/license/open-government-license-canada":
       return { data: TEST_LICENSES[0] };
-    case "objectstore-api/managed-attribute/test_managed_attribute":
-      return Promise.resolve({
-        data: {
-          id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
-          name: "test-managed-attribute",
-          key: "test_managed_attribute",
-          vocabularyElementType: "STRING"
-        }
-      });
     case "agent-api/person":
     case "objectstore-api/metadata":
     case "objectstore-api/object-subtype":
