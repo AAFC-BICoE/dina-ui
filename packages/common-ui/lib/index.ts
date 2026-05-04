@@ -120,6 +120,7 @@ export * from "./list-page/QueryPage";
 export * from "./list-page/tabs/tabs";
 export * from "./list-page/tabs/TaxonomicChartsTab";
 export * from "./list-page/tabs/MaterialSampleVisualizationTab";
+export * from "./list-page/tabs/ObjectStoreVisualizationTab";
 export * from "./table/QueryTable";
 export * from "./column-selector/ColumnSelector";
 export * from "./column-selector/ColumnSelectorList";

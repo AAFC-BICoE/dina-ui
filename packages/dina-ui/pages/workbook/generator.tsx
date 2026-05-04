@@ -265,7 +265,7 @@ export function WorkbookTemplateGenerator() {
             onClick={async () => {
               setLoading(true);
               await handleDownloadLink(
-                `/objectstore-api/file/aafc/${original.fileIdentifier}`,
+                `/objectstore-api/file/${original.bucket}/${original.fileIdentifier}`,
                 apiClient,
                 setLoading
               );
