@@ -78,7 +78,7 @@ export interface MaterialSampleAttributes {
 
   isRestricted?: boolean;
   restrictionRemarks?: string | null;
-  bibliographicReferences?: BibliographicReference[];
+  citations?: Citation[];
   extensionValues?: any;
   version?: string;
 
@@ -108,7 +108,7 @@ export interface ScheduledAction {
   remarks?: string;
 }
 
-export interface BibliographicReference {
+export interface Citation {
   doi?: string;
   title?: string;
   year?: number;
@@ -117,7 +117,7 @@ export interface BibliographicReference {
   journal?: string;
   volume?: string;
   pages?: string;
-  referenceRemarks?: string;
+  citationRemarks?: string;
 }
 
 export interface MaterialSampleRelationships {

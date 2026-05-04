@@ -10,7 +10,7 @@ import {
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
-  BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME
+  CITATIONS_COMPONENT_NAME
 } from "../../../../types/collection-api";
 import { ScrollTarget } from "./MaterialSampleFormNav";
 import { AssociationsSwitch } from "./AssociationsSwitch";
@@ -84,9 +84,9 @@ export function useMaterialSampleSectionOrder({
       disabled: !dataComponentState.enableScheduledActions,
       setEnabled: dataComponentState.setEnableScheduledActions
     },
-    [BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME]: {
-      disabled: !dataComponentState.enableBibliographicReferences,
-      setEnabled: dataComponentState.setEnableBibliographicReferences
+    [CITATIONS_COMPONENT_NAME]: {
+      disabled: !dataComponentState.enableCitations,
+      setEnabled: dataComponentState.setEnableCitations
     }
   };
 

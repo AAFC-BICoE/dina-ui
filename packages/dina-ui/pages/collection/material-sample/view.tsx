@@ -40,7 +40,7 @@ import {
   withOrganismEditorValues,
   MaterialSampleWorkflows
 } from "../../../components";
-import { BibliographicReferencesField } from "../../../components/collection/bibliographic-references/BibliographicReferencesField";
+import { CitationsField } from "../../../components/collection/citations/CitationsField";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
 import { MaterialSampleBadges } from "../../../components/collection/material-sample/MaterialSampleBadges";
@@ -445,9 +445,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 {!!materialSample?.scheduledActions?.length && (
                   <ScheduledActionsField />
                 )}
-                {!!materialSample?.bibliographicReferences?.length && (
-                  <BibliographicReferencesField />
-                )}
+                {!!materialSample?.citations?.length && <CitationsField />}
                 <DataEntryViewer
                   name={"extensionValues"}
                   legend={<DinaMessage id="materialSampleFieldExtensions" />}

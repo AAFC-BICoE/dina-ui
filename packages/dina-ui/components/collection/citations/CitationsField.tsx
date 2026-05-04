@@ -18,17 +18,17 @@ import { Fragment, ReactNode, useState } from "react";
 import * as yup from "yup";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME,
-  BibliographicReference
+  CITATIONS_COMPONENT_NAME,
+  Citation
 } from "../../../types/collection-api";
 import React from "react";
 import { MdEdit } from "react-icons/md";
 import Switch from "react-switch";
 import { FaMinus, FaPlus } from "react-icons/fa";
 
-/** Type-safe object with all BibliographicReference fields. */
+/** Type-safe object with all Citation fields. */
 export const BIBLIOGRAPHIC_REFERENCE_FIELDS_OBJECT: Required<
-  Record<keyof BibliographicReference, true>
+  Record<keyof Citation, true>
 > = {
   title: true,
   doi: true,
@@ -38,30 +38,30 @@ export const BIBLIOGRAPHIC_REFERENCE_FIELDS_OBJECT: Required<
   journal: true,
   volume: true,
   pages: true,
-  referenceRemarks: true
+  citationRemarks: true
 };
 
-/** All fields of the BibliographicReference type. */
+/** All fields of the Citation type. */
 export const BIBLIOGRAPHIC_REFERENCE_FIELDS = Object.keys(
   BIBLIOGRAPHIC_REFERENCE_FIELDS_OBJECT
 );
 
-export const bibliographicReferenceSchema = yup.object({
+export const citationSchema = yup.object({
   title: yup.string().required()
 });
 
-export interface BibliographicReferencesFieldProps {
+export interface CitationsFieldProps {
   className?: string;
   wrapContent?: (content: ReactNode) => ReactNode;
   id?: string;
 }
 
-export function BibliographicReferencesField({
+export function CitationsField({
   className,
   wrapContent = (content) => content,
-  id = BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME
-}: BibliographicReferencesFieldProps) {
-  const fieldName = "bibliographicReferences";
+  id = CITATIONS_COMPONENT_NAME
+}: CitationsFieldProps) {
+  const fieldName = "citations";
 
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
@@ -72,28 +72,24 @@ export function BibliographicReferencesField({
   const [viewDetailTable, setViewDetailTable] = useState<boolean>(false);
 
   const isEditing = !!referenceToEdit;
-  function openRowEditor(row: Row<BibliographicReference>) {
+  function openRowEditor(row: Row<Citation>) {
     row.getToggleExpandedHandler()();
     setReferenceToEdit({ index: row.index });
   }
 
-  function removeAction(
-    formik: FormikContextType<BibliographicReference>,
-    index: number
-  ) {
+  function removeAction(formik: FormikContextType<Citation>, index: number) {
     setReferenceToEdit(null);
-    const bibliographicReferences =
-      formik.getFieldMeta<BibliographicReference[]>(fieldName).value ?? [];
+    const citations = formik.getFieldMeta<Citation[]>(fieldName).value ?? [];
     // Remove the item at the index:
     formik.setFieldValue(fieldName, [
-      ...bibliographicReferences.slice(0, index),
-      ...bibliographicReferences.slice(index + 1)
+      ...citations.slice(0, index),
+      ...citations.slice(index + 1)
     ]);
   }
 
   const buttonProps = () => ({ disabled: isEditing, style: { width: "7rem" } });
 
-  const columns: ColumnDef<BibliographicReference>[] = [
+  const columns: ColumnDef<Citation>[] = [
     {
       id: "doi",
       accessorKey: "doi",
@@ -200,9 +196,9 @@ export function BibliographicReferencesField({
       }
     },
     {
-      id: "referenceRemarks",
-      accessorKey: "referenceRemarks",
-      header: () => <FieldHeader name={formatMessage("referenceRemarks")} />,
+      id: "citationRemarks",
+      accessorKey: "citationRemarks",
+      header: () => <FieldHeader name={formatMessage("citationRemarks")} />,
       meta: {
         style: { verticalAlign: "top" }
       }
@@ -240,10 +236,10 @@ export function BibliographicReferencesField({
     <FieldSet
       className={className}
       id={id}
-      legend={<DinaMessage id="bibliographicReferences" />}
+      legend={<DinaMessage id="citations" />}
       fieldName={fieldName}
-      componentName={BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME}
-      sectionName="bibliographic-references-add-section"
+      componentName={CITATIONS_COMPONENT_NAME}
+      sectionName="citations-add-section"
     >
       <div className="d-flex align-items-center justify-content-end mb-2">
         <label className="me-2" htmlFor="viewDetailTableSwitch">
@@ -258,23 +254,17 @@ export function BibliographicReferencesField({
       {wrapContent(
         <FieldSpy fieldName={fieldName}>
           {(value, { form }) => {
-            const bibliographicReferences = (value ??
-              []) as BibliographicReference[];
+            const citations = (value ?? []) as Citation[];
 
-            const hasReferences = !!bibliographicReferences.length;
+            const hasReferences = !!citations.length;
 
-            async function saveReference(
-              savedReference: BibliographicReference
-            ) {
+            async function saveReference(savedReference: Citation) {
               if (referenceToEdit === "NEW" || !referenceToEdit) {
-                form.setFieldValue(fieldName, [
-                  ...bibliographicReferences,
-                  savedReference
-                ]);
+                form.setFieldValue(fieldName, [...citations, savedReference]);
               } else {
                 form.setFieldValue(
                   fieldName,
-                  bibliographicReferences.map((reference, index) =>
+                  citations.map((reference, index) =>
                     index === referenceToEdit?.index
                       ? savedReference
                       : reference
@@ -288,15 +278,15 @@ export function BibliographicReferencesField({
               <>
                 {hasReferences &&
                   (viewDetailTable ? (
-                    <ReactTable<BibliographicReference>
+                    <ReactTable<Citation>
                       columns={columns}
-                      data={bibliographicReferences}
+                      data={citations}
                       showPagination={false}
                       className="-striped mb-2"
                       getRowCanExpand={() => true}
                       renderSubComponent={({ row }) => (
                         <div className="m-2">
-                          <BibliographicReferenceSubForm
+                          <CitationSubForm
                             referenceToEdit={row.original}
                             onSaveReference={(newReference) => {
                               row.getToggleExpandedHandler()();
@@ -318,7 +308,7 @@ export function BibliographicReferencesField({
                     <>
                       <div className="mb-3">
                         <ul>
-                          {bibliographicReferences.map((ref, index) => {
+                          {citations.map((ref, index) => {
                             const authors = ref.author?.length
                               ? ref.author.length > 1
                                 ? `${ref.author[0]} et al.`
@@ -359,13 +349,13 @@ export function BibliographicReferencesField({
                                     </a>
                                   )}
                                 </div>
-                                {ref.referenceRemarks && (
+                                {ref.citationRemarks && (
                                   <div className="ms-3">
                                     <span>
                                       <DinaMessage id="field_remarks" />
                                       {": "}
                                     </span>
-                                    <em>{ref.referenceRemarks}</em>
+                                    <em>{ref.citationRemarks}</em>
                                   </div>
                                 )}
                               </li>
@@ -377,7 +367,7 @@ export function BibliographicReferencesField({
                   ))}
                 {readOnly ? null : !hasReferences ||
                   referenceToEdit === "NEW" ? (
-                  <BibliographicReferenceSubForm
+                  <CitationSubForm
                     onSaveReference={(newReference) => {
                       return saveReference(newReference);
                     }}
@@ -403,17 +393,17 @@ export function BibliographicReferencesField({
   );
 }
 
-export interface BibliographicReferenceSubFormProps {
-  onSaveReference: (reference: BibliographicReference) => Promise<void>;
+export interface CitationSubFormProps {
+  onSaveReference: (reference: Citation) => Promise<void>;
   onCancelClick?: () => void;
-  referenceToEdit?: BibliographicReference;
+  referenceToEdit?: Citation;
 }
 
-export function BibliographicReferenceSubForm({
+export function CitationSubForm({
   onSaveReference,
   onCancelClick,
   referenceToEdit
-}: BibliographicReferenceSubFormProps) {
+}: CitationSubFormProps) {
   const { initialValues, isTemplate } = useDinaFormContext();
   const [isManualInput, setIsManualInput] = useState(false);
   const [doiFetchError, setDoiFetchError] = useState<boolean>(false);
@@ -423,7 +413,7 @@ export function BibliographicReferenceSubForm({
   const enabledFields: string[] = [];
 
   const referenceTemplateInitialValues = enabledFields
-    ? initialValues.bibliographicReference
+    ? initialValues.citation
     : undefined;
 
   function disableEnterToSubmitOuterForm(e) {
@@ -438,8 +428,8 @@ export function BibliographicReferenceSubForm({
   const FormWrapper = isTemplate ? Fragment : DinaForm;
 
   /** Applies name prefix to field props */
-  function fieldProps(fieldName: keyof BibliographicReference) {
-    const templateFieldName = `bibliographicReference.${fieldName}`;
+  function fieldProps(fieldName: keyof Citation) {
+    const templateFieldName = `citation.${fieldName}`;
     return {
       name: isTemplate ? templateFieldName : fieldName,
       // If the first determination is enabled, then enable multiple determinations:
@@ -461,7 +451,7 @@ export function BibliographicReferenceSubForm({
 
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
-      <FieldSet legend={<DinaMessage id="addBibliographicReference" />}>
+      <FieldSet legend={<DinaMessage id="addCitation" />}>
         <div className="d-flex align-items-center justify-content-end mb-2">
           <label className="me-2" htmlFor="manualInput">
             <DinaMessage id="manual" />
@@ -473,7 +463,7 @@ export function BibliographicReferenceSubForm({
           />
         </div>
         <FormWrapper
-          validationSchema={bibliographicReferenceSchema}
+          validationSchema={citationSchema}
           initialValues={
             referenceToEdit ??
             referenceTemplateInitialValues ??
@@ -486,11 +476,11 @@ export function BibliographicReferenceSubForm({
               journal: "",
               volume: "",
               pages: "",
-              referenceRemarks: ""
-            } as BibliographicReference)
+              citationRemarks: ""
+            } as Citation)
           }
-          componentName={BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME}
-          sectionName="bibliographic-references-add-section"
+          componentName={CITATIONS_COMPONENT_NAME}
+          sectionName="citations-add-section"
         >
           <div className="row">
             <DOIField
@@ -842,7 +832,7 @@ export function BibliographicReferenceSubForm({
               disabled={!isManualInput}
             />
             <TextField
-              {...fieldProps("referenceRemarks")}
+              {...fieldProps("citationRemarks")}
               className="col-sm-6"
             />
           </div>

@@ -16,8 +16,7 @@ export const STORAGE_COMPONENT_NAME: string = "storage-component";
 export const RESTRICTION_COMPONENT_NAME: string = "restriction-component";
 export const SCHEDULED_ACTIONS_COMPONENT_NAME: string =
   "scheduled-actions-component";
-export const BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME: string =
-  "bibliographic-references-component";
+export const CITATIONS_COMPONENT_NAME: string = "citations-component";
 export const MANAGED_ATTRIBUTES_COMPONENT_NAME: string =
   "managed-attributes-component";
 export const MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME: string =
@@ -617,19 +616,19 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
     ]
   },
   {
-    id: BIBLIOGRAPHIC_REFERENCES_COMPONENT_NAME,
-    labelKey: "bibliographicReferences",
+    id: CITATIONS_COMPONENT_NAME,
+    labelKey: "citations",
     maxGridSizeX: 2,
-    switchClassName: "enable-bibliographic-references",
+    switchClassName: "enable-citations",
     sections: [
       {
-        id: "bibliographic-references-general-section",
-        labelKey: "bibliographicReferences",
+        id: "citations-general-section",
+        labelKey: "citations",
         maxGridSizeX: 2,
         items: [
           {
-            id: "bibliographicReferences[0].title"
-          },
+            id: "citations[0].title"
+          }
         ]
       }
     ]

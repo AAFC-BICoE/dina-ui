@@ -12,7 +12,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
-  addBibliographicReference: "Add Bibliographic Reference",
+  addCitation: "Add Citation",
   addCataloguedObjectTitle: "Add Catalogued Object",
   addCollectingEventTitle: "Add Collecting Event",
   addCollectionMethodTitle: "Add Collection Method",
@@ -89,7 +89,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   backToParentUnit: "Back To Parent Unit",
   baseNameLabel: "Base Name",
   batchModeInfo: "Batch Mode: All Material Samples have the same ID.",
-  bibliographicReferences: "Bibliographic References",
+  citations: "Citations",
   browseContents: "Browse Contents",
   browseStorageTree: "Browse Storage Tree",
   bulkCreate: "Create Multiple New",
@@ -1407,7 +1407,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   journal: "Journal",
   volume: "Volume",
   pages: "Pages",
-  referenceRemarks: "Reference Remarks",
+  citationRemarks: "Citation Remarks",
   invalidDOIValue:
     "Invalid DOI value. A DOI should start with 'https://doi.org/'. For example: 'https://doi.org/10.1234/abcd5678'"
 };
