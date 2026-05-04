@@ -118,7 +118,7 @@ export default function MaterialSampleMap({
                 minDataValue: 1,
                 maxDataValue: totalRecordsRef.current, // Scale size based on count relative to total records in view.
                 minSize: 7,
-                maxSize: 150
+                maxSize: 125
               }
             ]
           },
@@ -325,13 +325,14 @@ export default function MaterialSampleMap({
                 }
               }
             ];
-
             if (zoom > 1) {
               sampleQuery.nested.query.bool["filter"] = filter;
             }
+
             if (query && query.bool && query.bool.must) {
-              query.bool.must.push(sampleQuery);
-              return query;
+              const inputQuery = JSON.parse(JSON.stringify(query)); // Deep copy to avoid mutation
+              inputQuery.bool.must.push(sampleQuery);
+              return inputQuery;
             } else {
               // Build new query with just geo filter
               return sampleQuery;
@@ -372,17 +373,7 @@ export default function MaterialSampleMap({
                         // Use geotile_grid for geographic clustering
                         geotile_grid: {
                           field: "included.attributes.eventGeom",
-                          precision: zoomToPrecision(zoom), // Precision scales with zoom
-                          bounds: {
-                            top_left: {
-                              lat: topleft[1],
-                              lon: topleft[0]
-                            },
-                            bottom_right: {
-                              lat: bottomright[1],
-                              lon: bottomright[0]
-                            }
-                          }
+                          precision: zoomToPrecision(zoom) // Precision scales with zoom
                         },
                         // Calculate centroid for each tile
                         aggs: {
@@ -398,20 +389,6 @@ export default function MaterialSampleMap({
                 }
               }
             };
-
-            if (zoom > 1) {
-              baseAggs.included_events.aggs.event_type.aggs.by_tile.geotile_grid.bounds =
-                {
-                  top_left: {
-                    lat: topleft[1],
-                    lon: topleft[0]
-                  },
-                  bottom_right: {
-                    lat: bottomright[1],
-                    lon: bottomright[0]
-                  }
-                };
-            }
 
             return baseAggs;
           }
@@ -488,7 +465,7 @@ export default function MaterialSampleMap({
                 "search-api/search-ws/search",
                 {
                   size: 0,
-                  query,
+                  query: buildQuery(),
                   // Aggregate data into geographic tiles based on zoom level
                   aggs: buildAggs()
                 },
