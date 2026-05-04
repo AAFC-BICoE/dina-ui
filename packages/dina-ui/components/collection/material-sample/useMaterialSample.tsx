@@ -603,7 +603,7 @@ export function useMaterialSampleSave({
           ? _.find(formTemplate?.components, {
               name: CITATIONS_COMPONENT_NAME
             })?.visible ?? false
-          : materialSample?.scheduledActions?.length
+          : materialSample?.citations?.length
       )
     );
   }, [formTemplate]);
@@ -644,7 +644,7 @@ export function useMaterialSampleSave({
     setEnableRestrictions,
     setDeleteRestrictions,
 
-    // Bibliographic References
+    // Citations
     enableCitations,
     setEnableCitations,
 
