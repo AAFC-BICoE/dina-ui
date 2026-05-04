@@ -236,9 +236,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   userProfile: "User Profile",
   disabledForChildMaterialSamples: "Disabled for child Material Samples",
   discardUploadedFiles: "Discard uploaded files",
-  doiPlaceholder: "Enter DOI value only (e.g., 10.1234/example.doi)",
-  doiSearch: "Search DOI", 
-  doiSearchError: "Failed to fetch provided DOI", 
+  doiPlaceholder: "Enter DOI as URL as https://doi.org/...",
+  doiSearch: "Search DOI",
+  doiSearchError: "Failed to fetch provided DOI",
   dragDropInstructionsHeader: "To rearrange the attribute order:",
   dragDropKeyboardInstructions:
     "Tab to the attribute, then press space to select it. Use the arrow keys to move the item, then press space to place it.",
@@ -1408,4 +1408,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   volume: "Volume",
   pages: "Pages",
   referenceRemarks: "Reference Remarks",
+  invalidDOIValue:
+    "Invalid DOI value. A DOI should start with 'https://doi.org/'. For example: 'https://doi.org/10.1234/abcd5678'"
 };

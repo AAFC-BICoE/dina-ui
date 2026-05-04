@@ -9,6 +9,7 @@ import {
   OnFormikSubmit,
   ReactTable,
   TextField,
+  DOIField,
   useDinaFormContext
 } from "common-ui";
 import { FormikContextType, FieldArray } from "formik";
@@ -492,7 +493,7 @@ export function BibliographicReferenceSubForm({
           sectionName="bibliographic-references-add-section"
         >
           <div className="row">
-            <TextField
+            <DOIField
               {...fieldProps("doi")}
               className="col-sm-6"
               placeholder={formatMessage("doiPlaceholder")}
@@ -506,13 +507,15 @@ export function BibliographicReferenceSubForm({
                       buttonProps={() => ({
                         style: { width: "10rem" },
                         disabled:
-                          typeof doiValue === "string" ? !doiValue.trim() : true
+                          typeof doiValue === "string"
+                            ? !doiValue.trim().startsWith("https://doi.org/")
+                            : true
                       })}
                       onClick={async (values, formik) => {
                         const doiValue = values.doi;
                         if (!doiValue) return;
 
-                        const fetchUrl = `https://api.openalex.org/works/https://doi.org/${doiValue}`;
+                        const fetchUrl = `https://api.openalex.org/works/${doiValue}`;
                         const clearFields = () => {
                           formik.setFieldValue("title", "");
                           formik.setFieldValue("year", "");
@@ -850,7 +853,7 @@ export function BibliographicReferenceSubForm({
                 buttonProps={() => ({ style: { width: "10rem" } })}
                 onClick={submitAction}
               >
-                <DinaMessage id={referenceToEdit ? "submitBtnText" : "add"} />
+                <DinaMessage id={referenceToEdit ? "submitBtnText" : "save"} />
               </FormikButton>
               {onCancelClick && (
                 <FormikButton
