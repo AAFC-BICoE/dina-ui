@@ -63,8 +63,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     original: initialValues as Person,
     resourceType: "person",
     saveOptions: {
-      apiBaseUrl: "/agent-api",
-      skipOperationForSingleRequest: true
+      apiBaseUrl: "/agent-api"
     },
 
     // Configure relationships (including nested resources)

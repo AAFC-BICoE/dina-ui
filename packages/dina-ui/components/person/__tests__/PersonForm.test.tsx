@@ -70,7 +70,7 @@ describe("PersonForm", () => {
             type: "person"
           }
         ],
-        { apiBaseUrl: "/agent-api", skipOperationForSingleRequest: true }
+        { apiBaseUrl: "/agent-api" }
       );
     });
   });

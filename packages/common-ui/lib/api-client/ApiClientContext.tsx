@@ -74,12 +74,6 @@ export interface DoOperationsOptions {
   returnNullForMissingResource?: boolean;
 
   overridePatchOperation?: boolean;
-
-  /**
-   * If true, the client will handle requests with only 1 request as a single request instead of an
-   * operation. Default is false for now to keep the same behavior as before for backwards compatibility.
-   */
-  skipOperationForSingleRequest?: boolean;
 }
 
 /** Api client interface. */
@@ -216,18 +210,10 @@ export class ApiClientImpl implements ApiClientI {
 
   /**
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.
-   *
-   * If a single request is provided, it will perform the request without the
-   * operation directly. It will still return like an operation response. This is only enabled if
-   * skipOperationForSingleRequest is set to true.
    */
   public async doOperations(
     operations: Operation[],
-    {
-      apiBaseUrl = "",
-      returnNullForMissingResource,
-      skipOperationForSingleRequest
-    }: DoOperationsOptions = {}
+    { apiBaseUrl = "", returnNullForMissingResource }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
     // Check if no operations were provided and skip performing anything.
     if (operations.length === 0) {
@@ -240,77 +226,11 @@ export class ApiClientImpl implements ApiClientI {
 
     // This array will hold the responses from either the single or bulk request
     let responses: OperationsResponse | BulkGetOperation[] = [];
+    const resourceType = operations[0].path.split("/").filter(Boolean)[0];
 
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
-    const resourceType = operations[0].path.split("/").filter(Boolean)[0];
-
-    // APIs using Repository V2.
-    const supportedBaseApis = [
-      "/agent-api",
-      "/user-api",
-      "/dina-export-api",
-      "/objectstore-api",
-      "/collection-api",
-      "/loan-transaction-api",
-      "/seqdb-api"
-    ];
-
-    // Remove leading slashes, so "/agent-api" and "agent-api" become identical after normalisation.
-    const stripLeadingSlash = (s: string) => s.replace(/^\/+/, "");
-    const supportedBaseApisNorm = supportedBaseApis.map(stripLeadingSlash);
-    const apiBaseUrlNorm = stripLeadingSlash(apiBaseUrl);
-
-    // Resource types that are supported for bulk operations.
-    const supportedResourceTypes = [
-      "person",
-      "identifier",
-      "object-upload",
-      "metadata",
-      "material-sample",
-      "organism",
-      "collecting-event",
-      "user",
-      "storage-unit",
-      "storage-unit-usage",
-      "material-sample-summary",
-      "project",
-      "notification",
-      // seqdb-api resource types
-      "pcr-batch",
-      "pcr-batch-item",
-      "pcr-primer",
-      "seq-batch",
-      "seq-reaction",
-      "seq-submission",
-      "library-prep-batch",
-      "library-prep",
-      "library-pool",
-      "library-pool-content",
-      "index-set",
-      "ngs-index",
-      "product",
-      "region",
-      "sequencing-facility",
-      "managed-attribute",
-      "generic-molecular-analysis",
-      "generic-molecular-analysis-item",
-      "molecular-analysis-run",
-      "molecular-analysis-run-item",
-      "molecular-analysis-result",
-      "metagenomics-batch",
-      "metagenomics-batch-item",
-      "quality-control",
-      "pre-library-prep",
-      "thermocycler-profile"
-    ];
-
-    // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
-    if (supportedBaseApisNorm.includes(apiBaseUrlNorm)) {
-      skipOperationForSingleRequest = true;
-    }
-
-    if (operations.length === 1 && skipOperationForSingleRequest) {
+    if (operations.length === 1) {
       // Single Request Only
       const operation = operations[0];
 
@@ -394,124 +314,102 @@ export class ApiClientImpl implements ApiClientI {
         }
       }
     } else {
-      // use new bulk functions if using the new api and using a supported resource type.
-      if (
-        supportedBaseApisNorm.includes(apiBaseUrlNorm) &&
-        supportedResourceTypes.includes(resourceType)
-      ) {
-        switch (operations[0].op.toUpperCase()) {
-          case "GET":
-            const includeSet = new Set<string>();
+      switch (operations[0].op.toUpperCase()) {
+        case "GET":
+          const includeSet = new Set<string>();
 
-            const ids = operations.map((operation) => {
-              // Split path by "?"
-              const pathParts = operation.path.split("?");
+          const ids = operations.map((operation) => {
+            // Split path by "?"
+            const pathParts = operation.path.split("?");
 
-              // Get the "include" part, after '?', if exists
-              const includePart =
-                pathParts.length > 1 ? pathParts[1].split("=")[1] : null;
-              if (includePart) {
-                // Split by comma and add each to the Set
-                includePart.split(",").forEach((includeItem) => {
-                  includeSet.add(includeItem);
-                });
-              }
-
-              // Extract the ID from before the '?' by splitting by '/' and getting the second item
-              return pathParts[0].split("/").filter(Boolean)[1];
-            });
-
-            const include: string[] | undefined =
-              includeSet.size > 0 ? [...includeSet] : undefined;
-            const getResponse = await this.bulkLoadResources(ids, {
-              apiBaseUrl,
-              resourceType,
-              include,
-              returnNullForMissingResource
-            });
-            responses = getResponse.data.data.map((response) => ({
-              data: response,
-              included: getResponse.data.included,
-              status: response ? getResponse.status : 404
-            }));
-            break;
-
-          case "DELETE":
-            const deleteIds = operations.map((operation) => {
-              // Split path by "?"
-              const pathParts = operation.path.split("/");
-
-              // Extract the ID from before the '?' by splitting by '/' and getting the second item
-              return pathParts[1];
-            });
-
-            const deleteResponse = await this.bulkDeleteResources(deleteIds, {
-              apiBaseUrl,
-              resourceType
-            });
-
-            responses = deleteIds.map(() => ({
-              status: deleteResponse.status
-            })) as any;
-            break;
-
-          case "POST":
-            // For agent-api, we need to do a bulk create
-            const postResources: InputResource<KitsuResource>[] = operations
-              .map((op) => op.value)
-              .filter(
-                (value): value is InputResource<KitsuResource> =>
-                  value !== undefined
-              );
-            const postResponse = await this.bulkCreateResources(postResources, {
-              apiBaseUrl,
-              resourceType
-            });
-            responses = postResponse.data.data.map((response) => ({
-              data: response,
-              included: postResponse.data.included,
-              status: response ? postResponse.status : 404
-            }));
-
-            break;
-          case "PATCH":
-            const patchResources: InputResource<KitsuResource>[] = operations
-              .map((op) => op.value)
-              .filter(
-                (value): value is InputResource<KitsuResource> =>
-                  value !== undefined
-              );
-            const patchResponse = await this.bulkUpdateResources(
-              patchResources,
-              {
-                apiBaseUrl,
-                resourceType
-              }
-            );
-
-            responses = patchResponse.data.data.map((response) => ({
-              data: response,
-              included: patchResponse.data.included,
-              status: response ? patchResponse.status : 404
-            }));
-
-            break;
-        }
-      } else {
-        const axiosResponse = await axios.patch(
-          `${apiBaseUrl}/operations`,
-          operations,
-          {
-            headers: {
-              Accept: "application/json-patch+json",
-              "Content-Type": "application/json-patch+json",
-              "Crnk-Compact": "true"
+            // Get the "include" part, after '?', if exists
+            const includePart =
+              pathParts.length > 1 ? pathParts[1].split("=")[1] : null;
+            if (includePart) {
+              // Split by comma and add each to the Set
+              includePart.split(",").forEach((includeItem) => {
+                includeSet.add(includeItem);
+              });
             }
-          }
-        );
 
-        responses = axiosResponse.data;
+            // Extract the ID from before the '?' by splitting by '/' and getting the second item
+            return pathParts[0].split("/").filter(Boolean)[1];
+          });
+
+          const include: string[] | undefined =
+            includeSet.size > 0 ? [...includeSet] : undefined;
+          const getResponse = await this.bulkLoadResources(ids, {
+            apiBaseUrl,
+            resourceType,
+            include,
+            returnNullForMissingResource
+          });
+          responses = getResponse.data.data.map((response) => ({
+            data: response,
+            included: getResponse.data.included,
+            status: response ? getResponse.status : 404
+          }));
+          break;
+
+        case "DELETE":
+          const deleteIds = operations.map((operation) => {
+            // Split path by "?"
+            const pathParts = operation.path.split("/");
+
+            // Extract the ID from before the '?' by splitting by '/' and getting the second item
+            return pathParts[1];
+          });
+
+          const deleteResponse = await this.bulkDeleteResources(deleteIds, {
+            apiBaseUrl,
+            resourceType
+          });
+
+          responses = deleteIds.map(() => ({
+            status: deleteResponse.status
+          })) as any;
+          break;
+
+        case "POST":
+          // For agent-api, we need to do a bulk create
+          const postResources: InputResource<KitsuResource>[] = operations
+            .map((op) => op.value)
+            .filter(
+              (value): value is InputResource<KitsuResource> =>
+                value !== undefined
+            );
+          const postResponse = await this.bulkCreateResources(postResources, {
+            apiBaseUrl,
+            resourceType
+          });
+          responses = postResponse.data.data.map((response) => ({
+            data: response,
+            included: postResponse.data.included,
+            status: response ? postResponse.status : 404
+          }));
+
+          break;
+        case "PATCH":
+          const patchResources: InputResource<KitsuResource>[] = operations
+            .map((op) => op.value)
+            .filter(
+              (value): value is InputResource<KitsuResource> =>
+                value !== undefined
+            );
+          const patchResponse = await this.bulkUpdateResources(patchResources, {
+            apiBaseUrl,
+            resourceType
+          });
+
+          responses = patchResponse.data.data.map((response) => ({
+            data: response,
+            included: patchResponse.data.included,
+            status: response ? patchResponse.status : 404
+          }));
+
+          break;
       }
+      [];
     }
 
     // Optionally return null instead of throwing an error for missing resources:

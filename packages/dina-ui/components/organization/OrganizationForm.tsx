@@ -44,8 +44,7 @@ export function OrganizationForm({
     original: initialValues as Organization,
     resourceType: "organization",
     saveOptions: {
-      apiBaseUrl: "/agent-api",
-      skipOperationForSingleRequest: true
+      apiBaseUrl: "/agent-api"
     },
 
     transforms: [
