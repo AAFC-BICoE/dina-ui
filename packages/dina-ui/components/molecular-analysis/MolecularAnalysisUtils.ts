@@ -32,14 +32,43 @@ export function useDeleteMolecularAnalysisWorkflows() {
         filter: SimpleSearchFilterBuilder.create()
           .where("genericMolecularAnalysis.uuid", "EQ", resourceId)
           .build(),
-        // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
-        include:
-          "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result",
+        include: "storageUnitUsage,molecularAnalysisRunItem",
         page: { limit: 1000 }
       });
 
       const genericMolecularAnalysisItems =
         genericMolecularAnalysisItemsResp.data;
+
+      // Fetch run and result for each molecularAnalysisRunItem separately
+      const molecularAnalysisRunItemIds: string[] =
+        genericMolecularAnalysisItems
+          .map((item) => item.molecularAnalysisRunItem?.id)
+          .filter((id): id is string => id !== undefined);
+
+      if (molecularAnalysisRunItemIds.length > 0) {
+        const runItemsResp = await apiClient.get<MolecularAnalysisRunItem[]>(
+          `seqdb-api/molecular-analysis-run-item`,
+          {
+            filter: SimpleSearchFilterBuilder.create()
+              .where("uuid", "IN", molecularAnalysisRunItemIds.join(","))
+              .build(),
+            include: "run,result",
+            page: { limit: 1000 }
+          }
+        );
+
+        // Stitch run and result back onto the genericMolecularAnalysisItems
+        const runItemById = Object.fromEntries(
+          runItemsResp.data.map((runItem) => [runItem.id, runItem])
+        );
+        for (const item of genericMolecularAnalysisItems) {
+          if (item.molecularAnalysisRunItem?.id) {
+            item.molecularAnalysisRunItem =
+              runItemById[item.molecularAnalysisRunItem.id] ??
+              item.molecularAnalysisRunItem;
+          }
+        }
+      }
 
       const genericMolecularAnalysisItemIds =
         genericMolecularAnalysisItemsResp.data.map(
@@ -63,13 +92,12 @@ export function useDeleteMolecularAnalysisWorkflows() {
 
       // Delete MolecularAnalysisRun and MolecularAnalysisRunItems if exist
       if (genericMolecularAnalysisItems?.[0]?.molecularAnalysisRunItem?.id) {
-        const molecularAnalysisRunItemIds: string[] =
-          genericMolecularAnalysisItems
-            .map(
-              (genericMolecularAnalysisItem) =>
-                genericMolecularAnalysisItem.molecularAnalysisRunItem?.id
-            )
-            .filter((id): id is string => id !== undefined);
+        const runItemIdsToDelete: string[] = genericMolecularAnalysisItems
+          .map(
+            (genericMolecularAnalysisItem) =>
+              genericMolecularAnalysisItem.molecularAnalysisRunItem?.id
+          )
+          .filter((id): id is string => id !== undefined);
 
         // Retrieve MolecularAnalysisRunItems with Quality Control usageType
         if (
@@ -117,7 +145,7 @@ export function useDeleteMolecularAnalysisWorkflows() {
             item?.molecularAnalysisRunItem?.result?.id
         );
         const molecularAnalysisResultIds: string[] = resultsToDelete.map(
-          (item) => item.id
+          (item) => item.molecularAnalysisRunItem!.result!.id!
         );
         if (resultsToDelete.length > 0) {
           await handleDeleteMolecularAnalysisResult(
@@ -127,10 +155,7 @@ export function useDeleteMolecularAnalysisWorkflows() {
         }
 
         // Delete MolecularAnalysisRunItems
-        await handeDeleteMolecularAnalysisRunItems(
-          save,
-          molecularAnalysisRunItemIds
-        );
+        await handeDeleteMolecularAnalysisRunItems(save, runItemIdsToDelete);
 
         // Delete MolecularAnalysisRun
         if (
@@ -183,12 +208,42 @@ async function handleDeleteQualityControl(
           molecularAnalysisRunItem.id ?? ""
         )
         .build(),
-      // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
-      include: "molecularAnalysisRunItem,molecularAnalysisRunItem.result",
+      include: "molecularAnalysisRunItem",
       page: { limit: 1000 }
     }
   );
   const qualityControls = qualityControlsQuery.data;
+
+  // Fetch result for each molecularAnalysisRunItem separately
+  const qcRunItemIds: string[] = qualityControls
+    .map((item) => item.molecularAnalysisRunItem?.id)
+    .filter((id): id is string => id !== undefined);
+
+  if (qcRunItemIds.length > 0) {
+    const qcRunItemsResp = await apiClient.get<MolecularAnalysisRunItem[]>(
+      `seqdb-api/molecular-analysis-run-item`,
+      {
+        filter: SimpleSearchFilterBuilder.create()
+          .where("uuid", "IN", qcRunItemIds.join(","))
+          .build(),
+        include: "result",
+        page: { limit: 1000 }
+      }
+    );
+
+    // Stitch result back onto the qualityControls
+    const qcRunItemById = Object.fromEntries(
+      qcRunItemsResp.data.map((runItem) => [runItem.id, runItem])
+    );
+    for (const qc of qualityControls) {
+      if (qc.molecularAnalysisRunItem?.id) {
+        qc.molecularAnalysisRunItem =
+          qcRunItemById[qc.molecularAnalysisRunItem.id] ??
+          qc.molecularAnalysisRunItem;
+      }
+    }
+  }
+
   await save(
     qualityControls.map((item) => ({
       delete: { id: item?.id ?? "", type: "quality-control" }
@@ -214,7 +269,7 @@ async function handleDeleteQualityControl(
       item?.molecularAnalysisRunItem?.result?.id
   );
   const molecularAnalysisResultIds: string[] = resultsToDelete.map(
-    (item) => item.id
+    (item) => item.molecularAnalysisRunItem!.result!.id!
   );
   if (resultsToDelete.length > 0) {
     await handleDeleteMolecularAnalysisResult(save, molecularAnalysisResultIds);

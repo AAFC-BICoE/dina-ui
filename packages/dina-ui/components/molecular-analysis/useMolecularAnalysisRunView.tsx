@@ -211,15 +211,26 @@ export function useMolecularAnalysisRunView({
                       item?.id ?? ""
                     )
                     .build(),
-                  // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
-                  include:
-                    "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
+                  include: "molecularAnalysisRunItem"
                 }
               );
 
               const qualityControlFound = qualityControlQuery
                 ?.data?.[0] as QualityControlWithAttachment;
               if (qualityControlFound) {
+                // Fetch result for the molecularAnalysisRunItem separately since multi-level includes are not supported.
+                if (qualityControlFound.molecularAnalysisRunItem?.id) {
+                  const runItemResp =
+                    await apiClient.get<MolecularAnalysisRunItem>(
+                      `seqdb-api/molecular-analysis-run-item/${qualityControlFound.molecularAnalysisRunItem.id}`,
+                      {
+                        include: "result"
+                      }
+                    );
+                  qualityControlFound.molecularAnalysisRunItem =
+                    runItemResp.data;
+                }
+
                 // If a result exists, we need to perform a get request to retrieve the metadata to be displayed.
                 let attachments: ResourceIdentifierObject[] = [];
                 if (qualityControlFound.molecularAnalysisRunItem?.result?.id) {

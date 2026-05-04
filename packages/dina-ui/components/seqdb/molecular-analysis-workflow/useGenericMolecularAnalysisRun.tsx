@@ -1,5 +1,10 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { SaveArgs, useApiClient, useQuery } from "common-ui";
+import {
+  SaveArgs,
+  SimpleSearchFilterBuilder,
+  useApiClient,
+  useQuery
+} from "common-ui";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
@@ -228,9 +233,7 @@ export function useGenericMolecularAnalysisRun({
       },
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
-      // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
-      include:
-        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result"
+      include: "storageUnitUsage,materialSample,molecularAnalysisRunItem"
     },
     {
       deps: [reloadGenericMolecularAnalysisRun, editMode],
@@ -248,6 +251,36 @@ export function useGenericMolecularAnalysisRun({
         setLoadedQualityControls([]);
         setAttachments([]);
         setErrorMessage(undefined);
+
+        // Fetch run and result for each molecularAnalysisRunItem separately since multi-level includes are not supported.
+        const runItemIds: string[] = genericMolecularAnalysisItems
+          .map((item) => item.molecularAnalysisRunItem?.id)
+          .filter((id): id is string => id !== undefined);
+
+        if (runItemIds.length > 0) {
+          const runItemsResp = await apiClient.get<MolecularAnalysisRunItem[]>(
+            `seqdb-api/molecular-analysis-run-item`,
+            {
+              filter: SimpleSearchFilterBuilder.create()
+                .where("uuid", "IN", runItemIds.join(","))
+                .build(),
+              include: "run,result",
+              page: { limit: 1000 }
+            }
+          );
+
+          // Stitch run and result back onto the generic molecular analysis items.
+          const runItemById = Object.fromEntries(
+            runItemsResp.data.map((runItem) => [runItem.id, runItem])
+          );
+          for (const item of genericMolecularAnalysisItems) {
+            if (item.molecularAnalysisRunItem?.id) {
+              item.molecularAnalysisRunItem =
+                runItemById[item.molecularAnalysisRunItem.id] ??
+                item.molecularAnalysisRunItem;
+            }
+          }
+        }
 
         /**
          * Fetch StorageUnitUsage linked to each GenericMolecularAnalysisItems. This will perform the API request
@@ -612,15 +645,24 @@ export function useGenericMolecularAnalysisRun({
               filter: {
                 "molecularAnalysisRunItem.uuid": { EQ: item?.id }
               },
-              // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
-              include:
-                "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
+              include: "molecularAnalysisRunItem"
             }
           );
 
           const qualityControlFound = qualityControlQuery
             ?.data?.[0] as QualityControlWithAttachment;
           if (qualityControlFound) {
+            // Fetch result for the molecularAnalysisRunItem separately since multi-level includes are not supported.
+            if (qualityControlFound.molecularAnalysisRunItem?.id) {
+              const runItemResp = await apiClient.get<MolecularAnalysisRunItem>(
+                `seqdb-api/molecular-analysis-run-item/${qualityControlFound.molecularAnalysisRunItem.id}`,
+                {
+                  include: "result"
+                }
+              );
+              qualityControlFound.molecularAnalysisRunItem = runItemResp.data;
+            }
+
             // If a result exists, we need to perform a get request to retrieve the metadata to be displayed.
             let attachments: ResourceIdentifierObject[] = [];
             if (qualityControlFound.molecularAnalysisRunItem?.result?.id) {

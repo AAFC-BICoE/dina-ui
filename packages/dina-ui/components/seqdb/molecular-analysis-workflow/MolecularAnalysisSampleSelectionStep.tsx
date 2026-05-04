@@ -154,15 +154,43 @@ export function MolecularAnalysisSampleSelectionStep({
           filter: {
             "genericMolecularAnalysis.uuid": { EQ: molecularAnalysisId }
           },
-          // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
-          include:
-            "materialSample,storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run",
+          include: "materialSample,storageUnitUsage,molecularAnalysisRunItem",
           page: {
             limit: 1000 // Maximum page size.
           }
         }
       )
-      .then((response) => {
+      .then(async (response) => {
+        // Fetch run for each molecularAnalysisRunItem separately since multi-level includes are not supported.
+        const runItemIds: string[] = response.data
+          .map((item) => item.molecularAnalysisRunItem?.id)
+          .filter((id): id is string => id !== undefined);
+
+        if (runItemIds.length > 0) {
+          const runItemsResp = await apiClient.get<MolecularAnalysisRunItem[]>(
+            `seqdb-api/molecular-analysis-run-item`,
+            {
+              filter: SimpleSearchFilterBuilder.create()
+                .where("uuid", "IN", runItemIds.join(","))
+                .build(),
+              include: "run",
+              page: { limit: 1000 }
+            }
+          );
+
+          // Stitch run back onto the generic molecular analysis items.
+          const runItemById = Object.fromEntries(
+            runItemsResp.data.map((runItem) => [runItem.id, runItem])
+          );
+          for (const item of response.data) {
+            if (item.molecularAnalysisRunItem?.id) {
+              item.molecularAnalysisRunItem =
+                runItemById[item.molecularAnalysisRunItem.id] ??
+                item.molecularAnalysisRunItem;
+            }
+          }
+        }
+
         const molecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
           response?.data?.filter(
             (item) => item?.materialSample?.id !== undefined

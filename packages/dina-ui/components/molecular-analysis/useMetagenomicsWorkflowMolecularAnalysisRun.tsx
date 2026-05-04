@@ -4,7 +4,13 @@ import {
   MolecularAnalysisRunItemUsageType
 } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useEffect, useState } from "react";
-import { BulkGetOptions, SaveArgs, useApiClient, useQuery } from "common-ui";
+import {
+  BulkGetOptions,
+  SaveArgs,
+  SimpleSearchFilterBuilder,
+  useApiClient,
+  useQuery
+} from "common-ui";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
 import { MolecularAnalysisRun } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { KitsuResource, PersistedResource } from "kitsu";
@@ -227,7 +233,7 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
   performSave,
   setPerformSave
 }: UseMetagenomicsWorkflowMolecularAnalysisRunProps): UseMolecularAnalysisRunReturn {
-  const { bulkGet, save } = useApiClient();
+  const { bulkGet, save, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
   // Map of MolecularAnalysisRunItem {id:name}
   const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
@@ -264,13 +270,42 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
       filter: { "metagenomicsBatch.uuid": { EQ: metagenomicsBatchId } },
       page: { limit: 1000 },
       path: `seqdb-api/metagenomics-batch-item`,
-      // TODO: included can't do multiple levels, so we may need another request to get the run name for each item.
-      include:
-        "indexI5,indexI7,pcrBatchItem,molecularAnalysisRunItem,molecularAnalysisRunItem.run"
+      include: "indexI5,indexI7,pcrBatchItem,molecularAnalysisRunItem"
     },
     {
       deps: [reloadResource],
+
       onSuccess: async ({ data: metagenomicsBatchItems }) => {
+        // Fetch run for each molecularAnalysisRunItem separately.
+        const runItemIds: string[] = metagenomicsBatchItems
+          .map((item) => item.molecularAnalysisRunItem?.id)
+          .filter((id): id is string => id !== undefined);
+
+        if (runItemIds.length > 0) {
+          const runItemsResp = await apiClient.get<MolecularAnalysisRunItem[]>(
+            `seqdb-api/molecular-analysis-run-item`,
+            {
+              filter: SimpleSearchFilterBuilder.create()
+                .where("uuid", "IN", runItemIds.join(","))
+                .build(),
+              include: "run",
+              page: { limit: 1000 }
+            }
+          );
+
+          // Stitch run back onto the metagenomics batch items.
+          const runItemById = Object.fromEntries(
+            runItemsResp.data.map((runItem) => [runItem.id, runItem])
+          );
+          for (const item of metagenomicsBatchItems) {
+            if (item.molecularAnalysisRunItem?.id) {
+              item.molecularAnalysisRunItem =
+                runItemById[item.molecularAnalysisRunItem.id] ??
+                item.molecularAnalysisRunItem;
+            }
+          }
+        }
+
         /**
          * Go through each of the MetagenomicsBatchItems and retrieve the Molecular Analysis Run. There
          * should only be one for a set of MetagenomicsBatchItems
