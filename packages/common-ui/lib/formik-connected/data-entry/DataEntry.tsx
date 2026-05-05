@@ -1,12 +1,12 @@
 import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
-import useVocabularyOptions from "../../../../dina-ui/components/collection/useVocabularyOptions";
-import { ProtocolElement } from "../../../../dina-ui/types/collection-api";
+import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOptions";
+import { ProtocolElement } from "@dina-ui/types/collection-api";
 import {
   ExtensionField,
   FieldExtension,
   FieldExtensionValue
-} from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
+} from "@dina-ui/types/collection-api/resources/FieldExtension";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import {
@@ -19,10 +19,7 @@ import {
   useBulkGet,
   useQuery
 } from "../..";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { DataBlock } from "./DataBlock";
 import { DataEntryFieldProps } from "./DataEntryField";
 import _ from "lodash";
@@ -52,37 +49,32 @@ export function DataEntry({
   let extensionValues =
     formik?.values?.[name] ?? getBulkContextExtensionValues(bulkContext, name);
 
-  function queryBlockOptions() {
-    if (readOnly) {
-      if (isVocabularyBasedEnabledForBlock) {
-        return useVocabularyOptions({
-          path: blockOptionsEndpoint
-        });
-      }
-      const ids: string[] = [];
-      _.forOwn(extensionValues, (extensionValue, extensionKey) => {
-        _.forOwn(extensionValue.rows, (_fieldValue, fieldKey) => {
-          ids.push(`${extensionKey}.${fieldKey}`);
-        });
-      });
-      // Bulk get individual extension values in readOnly
-      return useBulkGet<FieldExtensionValue>({
-        ids,
-        listPath: "collection-api/field-extension-value"
-      });
-    }
-    if (isVocabularyBasedEnabledForBlock) {
-      return useVocabularyOptions({
-        path: blockOptionsEndpoint
-      });
-    } else {
-      return useQuery<FieldExtension[]>({
-        path: blockOptionsEndpoint,
-        filter: blockOptionsFilter
-      });
-    }
-  }
-  const blockOptionsQuery: any = queryBlockOptions();
+  const ids: string[] = [];
+  _.forOwn(extensionValues, (extensionValue, extensionKey) => {
+    _.forOwn(extensionValue.rows, (_fieldValue, fieldKey) => {
+      ids.push(`${extensionKey}.${fieldKey}`);
+    });
+  });
+
+  const vocabOptions = useVocabularyOptions({
+    path: blockOptionsEndpoint
+  });
+
+  const extensionValuesQuery = useBulkGet<FieldExtensionValue>({
+    ids,
+    listPath: "collection-api/field-extension-value"
+  });
+
+  const fieldExtensionQuery = useQuery<FieldExtension[]>({
+    path: blockOptionsEndpoint,
+    filter: blockOptionsFilter
+  });
+
+  const blockOptionsQuery: any = isVocabularyBasedEnabledForBlock
+    ? vocabOptions
+    : readOnly
+    ? extensionValuesQuery
+    : fieldExtensionQuery;
 
   function getBlockOptions() {
     if (readOnly) {
@@ -150,11 +142,9 @@ export function DataEntry({
     fetchAllProtocolElements();
   }, []);
 
-  const vocabQuery = unitOptionsEndpoint
-    ? useVocabularyOptions({
-        path: unitOptionsEndpoint
-      })
-    : undefined;
+  const vocabQuery = useVocabularyOptions({
+    path: unitOptionsEndpoint
+  });
 
   // If user changes field extensions in Bulk Edit, write Bulk Edit values to Formik form once
   const [bulkExtensionValuesOverride, setBulkExtensionValuesOverride] =
