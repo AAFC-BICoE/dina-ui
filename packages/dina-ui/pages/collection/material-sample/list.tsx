@@ -17,7 +17,8 @@ import {
   TaxonomyTreeTab,
   QueryPageTabConfig,
   TaxonomicChartsTab,
-  MaterialSampleVisualizationTab
+  MaterialSampleVisualizationTab,
+  MaterialSampleMapTab
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -540,7 +541,7 @@ export default function MaterialSampleListPage() {
     {
       id: "taxonomy",
       labelKey: "taxonomy",
-      showActionButtons: false, // Hide action buttons in the visualization tab
+      showActionButtons: false,
       component: TaxonomicChartsTab
     },
     {
@@ -548,6 +549,12 @@ export default function MaterialSampleListPage() {
       labelKey: "visualization",
       showActionButtons: false,
       component: MaterialSampleVisualizationTab
+    },
+    {
+      id: "map",
+      labelKey: "mapView",
+      showActionButtons: false,
+      component: MaterialSampleMapTab
     },
     {
       id: "taxonomyTree",
