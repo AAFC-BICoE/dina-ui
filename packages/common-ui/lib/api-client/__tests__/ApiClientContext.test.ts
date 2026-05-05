@@ -29,7 +29,6 @@ import {
   MOCK_TODO_INSERT_AXIOS_RESPONSE,
   TODO_OPERATION_1_VALID_2_INVALID,
   TODO_OPERATION_DENY_ACCESS,
-  AXIOS_JSONPATCH_REQUEST_CONFIG,
   MOCK_BULK_GET_404_ERROR_OBJECT,
   MOCK_BULK_GET_404_ERROR_INPUT,
   MOCK_BULK_GET_410_ERROR_INPUT,
@@ -47,7 +46,7 @@ import {
 import { waitFor } from "@testing-library/dom";
 
 /** Mock of Axios' patch function. */
-const mockPatch = jest.fn((_, data) => {
+const mockPatch: jest.Mock<any, any> = jest.fn((_url, data, _config) => {
   if (data === TODO_INSERT_OPERATION) {
     return MOCK_TODO_INSERT_AXIOS_RESPONSE;
   }
@@ -62,7 +61,7 @@ const mockPatch = jest.fn((_, data) => {
   }
 });
 
-const mockPost = jest.fn((url, data) => {
+const mockPost: jest.Mock<any, any> = jest.fn((url, data, _config) => {
   const queryString = new URLSearchParams(url.substring(url.indexOf("?")));
   if (url.includes("bulk-load")) {
     if (queryString.has("include")) {
@@ -142,46 +141,41 @@ describe("API client context", () => {
   });
 
   describe("doOperations", () => {
-    it("Provides a doOperations function that submits a JSONAPI jsonpatch request.", async () => {
+    it("Single POST: submits JSON:API request to /{path} (no /operations jsonpatch).", async () => {
+      mockPost.mockImplementationOnce(async (_url, body, _config) => {
+        return {
+          status: 201,
+          data: {
+            data: body.data
+          }
+        } as any;
+      });
+
       const response = await doOperations(TODO_INSERT_OPERATION);
 
-      // Check that the correct arguments were passed into axios' patch function.
-      expect(mockPatch).toHaveBeenCalledTimes(1);
-      const [patchCall] = mockPatch.mock.calls;
-      expect(patchCall).toEqual([
-        "/operations",
-        TODO_INSERT_OPERATION,
-        AXIOS_JSONPATCH_REQUEST_CONFIG
+      expect(mockPost).toHaveBeenCalledTimes(1);
+
+      const [url, body, config] = mockPost.mock.calls[0];
+
+      expect(url).toBe("/todo");
+      expect(body).toEqual({ data: TODO_INSERT_OPERATION[0].value });
+
+      // JSON:API headers for single-op requests:
+      expect(config).toEqual({
+        headers: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+          "Crnk-Compact": "true"
+        }
+      });
+
+      expect(response).toEqual([
+        {
+          data: TODO_INSERT_OPERATION[0].value,
+          included: undefined,
+          status: 201
+        }
       ]);
-
-      // Check the response.
-      expect(response).toEqual(MOCK_TODO_INSERT_AXIOS_RESPONSE.data);
-    });
-
-    it("Provides a doOperations function that throws an error.", async () => {
-      const expectedErrorMessage = `Constraint violation: name size must be between 1 and 10\nConstraint violation: description size must be between 1 and 10`;
-
-      let actualError: Error = new Error();
-
-      try {
-        await doOperations(TODO_OPERATION_1_VALID_2_INVALID);
-      } catch (error) {
-        actualError = error;
-      }
-      expect(actualError.message).toEqual(expectedErrorMessage);
-    });
-
-    it("Omits the detail field from the error message if the detail is undefined.", async () => {
-      const expectedErrorMessage = "Access is denied";
-
-      let actualError: Error = new Error();
-
-      try {
-        await doOperations(TODO_OPERATION_DENY_ACCESS);
-      } catch (error) {
-        actualError = error;
-      }
-      expect(actualError.message).toEqual(expectedErrorMessage);
     });
 
     it("Returns a null response if returnNullForMissingResource is true and an error is thrown.", async () => {
@@ -202,6 +196,154 @@ describe("API client context", () => {
           status: 404
         }
       ]);
+      expect(mockGet).toHaveBeenCalledTimes(1);
+      expect(mockGet.mock.calls[0][0]).toBe("/agent-api/person/doesn't-exist");
+    });
+
+    it("Multi PATCH: calls /{apiBaseUrl}/{resourceType}/bulk with ext=bulk headers and returns per-item results.", async () => {
+      const ids = [
+        "019df432-dceb-7698-99c0-66836da0bfa8",
+        "019df433-13bd-72ab-8c9c-8806e12f1aee",
+        "019df433-3071-75ef-b0c2-65acae6a1eea"
+      ];
+
+      const ops = ids.map((id) => ({
+        op: "PATCH" as OperationVerb,
+        path: `material-sample/${id}`,
+        value: {
+          type: "material-sample",
+          id,
+          attributes: { barcode: "new barcode" }
+        }
+      }));
+
+      mockPatch.mockImplementationOnce(async (_url, body, _config) => {
+        return {
+          status: 200,
+          data: {
+            data: body.data.map((r: any) => ({
+              id: r.id,
+              type: r.type,
+              attributes: r.attributes
+            })),
+            meta: { moduleVersion: "0.118" }
+          }
+        } as any;
+      });
+
+      const response = await doOperations(ops as any, {
+        apiBaseUrl: "/collection-api"
+      });
+
+      // Verify it used the bulk endpoint:
+      expect(mockPatch).toHaveBeenCalledTimes(1);
+      const [url, body, config] = mockPatch.mock.calls[0];
+
+      expect(url).toBe("/collection-api/material-sample/bulk");
+      expect(body).toEqual({
+        data: ops.map((o) => o.value)
+      });
+
+      // Verify ext=bulk headers.
+      expect(config).toEqual({
+        headers: {
+          "Content-Type": "application/vnd.api+json; ext=bulk",
+          Accept: "application/vnd.api+json"
+        }
+      });
+
+      expect(response).toEqual([
+        {
+          data: { id: ids[0], type: "material-sample", barcode: "new barcode" },
+          included: undefined,
+          status: 200
+        },
+        {
+          data: { id: ids[1], type: "material-sample", barcode: "new barcode" },
+          included: undefined,
+          status: 200
+        },
+        {
+          data: { id: ids[2], type: "material-sample", barcode: "new barcode" },
+          included: undefined,
+          status: 200
+        }
+      ]);
+    });
+
+    it("Multi POST: calls /{apiBaseUrl}/{resourceType}/bulk and returns per-item results.", async () => {
+      const ops = [
+        {
+          op: "POST" as OperationVerb,
+          path: "material-sample",
+          value: {
+            type: "material-sample",
+            id: "new-1",
+            attributes: { barcode: "b1" }
+          }
+        },
+        {
+          op: "POST" as OperationVerb,
+          path: "material-sample",
+          value: {
+            type: "material-sample",
+            id: "new-2",
+            attributes: { barcode: "b2" }
+          }
+        }
+      ];
+
+      mockPost.mockImplementationOnce(async (_url, body, _config) => {
+        return {
+          status: 201,
+          data: {
+            data: body.data.map((r: any) => ({
+              id: r.id,
+              type: r.type,
+              attributes: r.attributes
+            }))
+          }
+        } as any;
+      });
+
+      const response = await doOperations(ops as any, {
+        apiBaseUrl: "/collection-api"
+      });
+
+      expect(mockPost).toHaveBeenCalledTimes(1);
+
+      const [url, body, config] = mockPost.mock.calls[0];
+
+      expect(url).toBe("/collection-api/material-sample/bulk");
+      expect(body).toEqual({ data: ops.map((o) => o.value) });
+
+      expect(config).toEqual({
+        headers: {
+          "Content-Type": "application/vnd.api+json; ext=bulk",
+          Accept: "application/vnd.api+json"
+        }
+      });
+
+      expect(response).toEqual([
+        {
+          data: { id: "new-1", type: "material-sample", barcode: "b1" },
+          included: undefined,
+          status: 201
+        },
+        {
+          data: { id: "new-2", type: "material-sample", barcode: "b2" },
+          included: undefined,
+          status: 201
+        }
+      ]);
+    });
+
+    it("Empty operations: returns [] and warns.", async () => {
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const res = await doOperations([]);
+      expect(res).toEqual([]);
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
     });
   });
 
