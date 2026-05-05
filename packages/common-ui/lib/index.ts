@@ -120,6 +120,7 @@ export * from "./table/DateCell";
 export * from "./table/BooleanCell";
 export * from "./list-page/QueryPage";
 export * from "./list-page/tabs/tabs";
+export * from "./list-page/tabs/TaxonomyTreeTab";
 export * from "./list-page/tabs/TaxonomicChartsTab";
 export * from "./list-page/tabs/MaterialSampleVisualizationTab";
 export * from "./list-page/tabs/MaterialSampleMapTab";

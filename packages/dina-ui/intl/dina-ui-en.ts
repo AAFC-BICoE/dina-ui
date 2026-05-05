@@ -1451,5 +1451,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   errorFetchingExport: "Error fetching export details. Please try again later.",
   exportRequestSubmittedTitle: "Export Request Submitted",
   exportRequestSubmittedMessage:
-    "Your export is being processed. You will receive a notification when it's ready to download."
+    "Your export is being processed. You will receive a notification when it's ready to download.",
+  resetView: "Reset View",
+  saveAsImage: "Save as Image"
 };
