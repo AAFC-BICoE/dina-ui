@@ -13,8 +13,9 @@ import {
   SimpleSearchFilterBuilder,
   stringArrayCell,
   useApiClient,
-  QueryPageTabConfig,
   ListViewTab,
+  TaxonomyTreeTab,
+  QueryPageTabConfig,
   TaxonomicChartsTab,
   MaterialSampleVisualizationTab
 } from "common-ui";
@@ -545,8 +546,14 @@ export default function MaterialSampleListPage() {
     {
       id: "visualization",
       labelKey: "visualization",
-      showActionButtons: false, // Hide action buttons in the visualization tab
+      showActionButtons: false,
       component: MaterialSampleVisualizationTab
+    },
+    {
+      id: "taxonomyTree",
+      labelKey: "taxonomyTreeView",
+      showActionButtons: false,
+      component: TaxonomyTreeTab
     }
   ];
 
