@@ -15,6 +15,7 @@ import { Person } from "../../objectstore-api";
 import { StorageUnitUsage } from "./StorageUnitUsage";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 import { GenericMolecularAnalysis } from "../../seqdb-api/resources/GenericMolecularAnalysis";
+import { Association } from "./Association";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -62,7 +63,6 @@ export interface MaterialSampleAttributes {
   allowDuplicateName?: boolean;
 
   hostOrganism?: HostOrganism | null;
-  associations?: MaterialSampleAssociation[];
 
   stateChangedOn?: string;
   stateChangeRemarks?: string;
@@ -86,16 +86,13 @@ export interface MaterialSampleAttributes {
 
   // Client side for parent attributes
   parentAttributes?: any;
+
+  // Client side for associations. This is not stored on the material sample, but is used to display and manage associations on the UI. Associations are stored separately and linked to the material sample through relationships.
+  associations?: Association[];
 }
 
 export interface HostOrganism {
   name?: string;
-  remarks?: string;
-}
-
-export interface MaterialSampleAssociation {
-  associatedSample?: string;
-  associationType?: string;
   remarks?: string;
 }
 
@@ -129,7 +126,6 @@ export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
   return {
     ...BLANK_PREPARATION,
     ...BLANK_RESTRICTION,
-    associations: [],
     hostOrganism: null,
     organism: []
   };

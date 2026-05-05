@@ -1352,7 +1352,6 @@ describe("MaterialSampleBulkEditor", () => {
             type: "material-sample",
             resource: {
               id: sample.id,
-              associations: [],
               type: sample.type,
               relationships: {
                 organism: {
@@ -2122,7 +2121,6 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
-              associations: [],
               hostOrganism: {
                 name: "test host organism",
                 remarks: "bulk-edit-remarks"
@@ -2138,7 +2136,6 @@ describe("MaterialSampleBulkEditor", () => {
                 name: "test host organism",
                 remarks: "bulk-edit-remarks"
               },
-              associations: [],
               type: "material-sample"
             },
             type: "material-sample"

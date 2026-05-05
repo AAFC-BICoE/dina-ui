@@ -14,7 +14,8 @@ import {
   useRelationshipUsagesCount,
   withoutBlankFields,
   SimpleSearchFilterBuilder,
-  useBulkQueries
+  useBulkQueries,
+  DeleteArgs
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -55,6 +56,7 @@ import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resou
 import { Alert } from "react-bootstrap";
 import CollectingEventEditAlert from "../collecting-event/CollectingEventEditAlert";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { Association } from "../../../types/collection-api/resources/Association";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet, apiClient } = useApiClient();
@@ -183,6 +185,20 @@ export function useMaterialSampleQuery(id?: string | null) {
             };
           }
         }
+
+        // Retrieve associations linked to the material sample
+        const associations = await apiClient.get<Association[]>(
+          `collection-api/association`,
+          {
+            filter: SimpleSearchFilterBuilder.create()
+              .where("sample.uuid", "EQ", data.id)
+              .build(),
+            include: "associatedSample,sample"
+          }
+        );
+        if (associations) {
+          data.associations = associations.data;
+        }
       }
     }
   );
@@ -194,133 +210,144 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
   const { bulkGet, apiClient } = useApiClient();
 
   const materialSampleQueries = useBulkQueries<MaterialSample>(
-    ids.map(
-      (id) => ({
-        path: `collection-api/material-sample/${id}`,
-        include: [
-          "attachment",
-          "collection",
-          "collectingEvent",
-          "preparationProtocol",
-          "preparationType",
-          "preparationMethod",
-          "preparedBy",
-          "organism",
-          "parentMaterialSample",
-          "projects",
-          "assemblages",
-          "storageUnitUsage"
-        ].join(","),
-        optfields: {
-          "material-sample": ["hierarchy", "materialSampleChildren"].join(",")
-        },
-        header: { "include-dina-permission": "true" }
-      }),
-      {
-        disabled: !ids.length,
-        onSuccess: async ({ data }) => {
-          const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
-            `seqdb-api/generic-molecular-analysis-item`,
-            {
-              include: "genericMolecularAnalysis, materialSample",
-              filter: SimpleSearchFilterBuilder.create()
-                .where("materialSample.id", "EQ", data.id)
-                .build()
-            }
-          );
+    ids.map((id) => ({
+      path: `collection-api/material-sample/${id}`,
+      include: [
+        "attachment",
+        "collection",
+        "collectingEvent",
+        "preparationProtocol",
+        "preparationType",
+        "preparationMethod",
+        "preparedBy",
+        "organism",
+        "parentMaterialSample",
+        "projects",
+        "assemblages",
+        "storageUnitUsage"
+      ].join(","),
+      optfields: {
+        "material-sample": ["hierarchy", "materialSampleChildren"].join(",")
+      },
+      header: { "include-dina-permission": "true" }
+    })),
+    {
+      disabled: !ids.length,
+      onSuccess: async ({ data }) => {
+        const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
+          `seqdb-api/generic-molecular-analysis-item`,
+          {
+            include: "genericMolecularAnalysis, materialSample",
+            filter: SimpleSearchFilterBuilder.create()
+              .where("materialSample.id", "EQ", data.id)
+              .build()
+          }
+        );
 
-          // Retrieve workflows linked to the material sample
-          if (workflowItems) {
-            data.workflows = [
-              ...new Set(
-                _.compact(workflowItems.data).map(
-                  (item: any) => item.genericMolecularAnalysis
-                )
+        if (workflowItems) {
+          data.workflows = [
+            ...new Set(
+              _.compact(workflowItems.data).map(
+                (item: any) => item.genericMolecularAnalysis
               )
-            ];
-          }
+            )
+          ];
+        }
 
-          for (const organism of data.organism ?? []) {
-            if (organism?.determination) {
-              // Retrieve determiner arrays on determination.
-              for (const determination of organism.determination) {
-                if (determination.determiner) {
-                  determination.determiner = _.compact(
-                    await bulkGet<Person, true>(
-                      determination.determiner.map(
-                        (personId: string) => `/person/${personId}`
-                      ),
-                      {
-                        apiBaseUrl: "/agent-api",
-                        returnNullForMissingResource: true
-                      }
-                    )
-                  );
-                }
+        for (const organism of data.organism ?? []) {
+          if (organism?.determination) {
+            // Retrieve determiner arrays on determination.
+            for (const determination of organism.determination) {
+              if (determination.determiner) {
+                determination.determiner = _.compact(
+                  await bulkGet<Person, true>(
+                    determination.determiner.map(
+                      (personId: string) => `/person/${personId}`
+                    ),
+                    {
+                      apiBaseUrl: "/agent-api",
+                      returnNullForMissingResource: true
+                    }
+                  )
+                );
               }
-            }
-          }
-
-          // Setup the storage unit if it's stored on the storage unit usage.
-          if (data?.storageUnitUsage?.id) {
-            const storageUnit = await apiClient.get<StorageUnitUsage>(
-              `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
-              {
-                include: "storageUnit"
-              }
-            );
-
-            if (storageUnit?.data?.storageUnit) {
-              data.storageUnit = storageUnit.data.storageUnit;
-            }
-          }
-
-          // Process loaded back-end data into data structure that Formik can use
-          if (data.extensionValues) {
-            data.extensionValues = processExtensionValuesLoading(
-              data.extensionValues
-            );
-          }
-
-          // Convert to separated list
-          if (data.restrictionFieldsExtension) {
-            // Process risk groups
-            if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]) {
-              data[RESTRICTIONS_FIELDS[0]] = {
-                extKey: RESTRICTIONS_FIELDS[0],
-                value:
-                  data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]
-                    .risk_group
-              };
-            }
-            if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]) {
-              data[RESTRICTIONS_FIELDS[1]] = {
-                extKey: RESTRICTIONS_FIELDS[1],
-                value:
-                  data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]
-                    .risk_group
-              };
-            }
-
-            // Process levels
-            if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]]) {
-              data[RESTRICTIONS_FIELDS[2]] = {
-                extKey: RESTRICTIONS_FIELDS[2],
-                value:
-                  data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]].level
-              };
-            }
-            if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]]) {
-              data[RESTRICTIONS_FIELDS[3]] = {
-                extKey: RESTRICTIONS_FIELDS[3],
-                value:
-                  data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level
-              };
             }
           }
         }
+
+        // Setup the storage unit if it's stored on the storage unit usage.
+        if (data?.storageUnitUsage?.id) {
+          const storageUnit = await apiClient.get<StorageUnitUsage>(
+            `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
+            {
+              include: "storageUnit"
+            }
+          );
+
+          if (storageUnit?.data?.storageUnit) {
+            data.storageUnit = storageUnit.data.storageUnit;
+          }
+        }
+
+        // Process loaded back-end data into data structure that Formik can use
+        if (data.extensionValues) {
+          data.extensionValues = processExtensionValuesLoading(
+            data.extensionValues
+          );
+        }
+
+        // Convert to separated list
+        if (data.restrictionFieldsExtension) {
+          // Process risk groups
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]) {
+            data[RESTRICTIONS_FIELDS[0]] = {
+              extKey: RESTRICTIONS_FIELDS[0],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]
+                  .risk_group
+            };
+          }
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]) {
+            data[RESTRICTIONS_FIELDS[1]] = {
+              extKey: RESTRICTIONS_FIELDS[1],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]
+                  .risk_group
+            };
+          }
+
+          // Process levels
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]]) {
+            data[RESTRICTIONS_FIELDS[2]] = {
+              extKey: RESTRICTIONS_FIELDS[2],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]].level
+            };
+          }
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]]) {
+            data[RESTRICTIONS_FIELDS[3]] = {
+              extKey: RESTRICTIONS_FIELDS[3],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level
+            };
+          }
+        }
+
+        // Fetch associations for each sample
+        const associations = await apiClient.get<Association[]>(
+          `collection-api/association`,
+          {
+            filter: SimpleSearchFilterBuilder.create()
+              .where("sample.uuid", "EQ", data.id)
+              .build(),
+            include: "associatedSample,sample"
+          }
+        );
+        if (associations) {
+          data.associations = associations.data;
+        }
       }
-    )
+    }
   );
 
   return materialSampleQueries;
@@ -954,6 +981,11 @@ export function useMaterialSampleSave({
       }
     }
 
+    // Validate associations before saving
+    if (enableAssociations && msPreprocessed.associations?.length) {
+      validateAssociations(msPreprocessed.associations);
+    }
+
     // Check if there is any changes to the storage unit or storage unit usage.
     if (msDiff?.storageUnit?.id || msDiff?.storageUnitUsage?.id) {
       // Create new storageUnitUsage, the storageUnit is saved here.
@@ -1087,6 +1119,7 @@ export function useMaterialSampleSave({
     };
 
     // These values are not submitted to the back-end:
+    delete msInputWithRelationships.associations;
     delete msInputWithRelationships.organismsIndividualEntry;
     delete msInputWithRelationships.organismsQuantity;
 
@@ -1104,13 +1137,6 @@ export function useMaterialSampleSave({
       delete msInputWithRelationships.relationships;
     }
 
-    // delete the association if associated sample is left unfilled
-    if (
-      msInputWithRelationships.associations?.length === 1 &&
-      !msInputWithRelationships.associations[0].associatedSample
-    ) {
-      msInputWithRelationships.associations = [];
-    }
     const saveOperation = {
       resource: msInputWithRelationships,
       type: "material-sample"
@@ -1199,6 +1225,180 @@ export function useMaterialSampleSave({
     }
   }
 
+  /**
+   * Responsible for saving the associations to the back-end and linking them to the sample.
+   *
+   * Associations are now their own resource, where multiple Associations can be linked to a
+   * Material Sample, so this function needs to handle creating/updating/deleting multiple
+   * Associations and linking them to the sample.
+   *
+   * @param sample
+   */
+  async function saveAssociations(sample: InputResource<MaterialSample>) {
+    const submittedAssociations = sample.associations ?? [];
+    const initialAssociations = msInitialValues.associations ?? [];
+
+    // If the associations section was toggled off, delete all existing associations,
+    // otherwise only delete associations that were removed from the submitted values.
+    const associationsToDelete = (
+      deleteAssociations
+        ? initialAssociations
+        : initialAssociations.filter(
+            (initial) =>
+              initial.id &&
+              !submittedAssociations.some(
+                (submitted) => submitted.id === initial.id
+              )
+          )
+    ).filter((association) => association.id);
+
+    // Associations to be created/updated. If the associations section was toggled off,
+    // there are no associations to create/update.
+    const associationsToSave: SaveArgs<Association>[] = deleteAssociations
+      ? []
+      : submittedAssociations
+          .filter((submitted) => {
+            // Skip completely empty associations (no meaningful data)
+            if (
+              !submitted.associatedSample &&
+              !submitted.associationType &&
+              !submitted.remarks
+            ) {
+              return false;
+            }
+
+            // Always include new associations (no id)
+            if (!submitted.id) {
+              return true;
+            }
+
+            // Include existing associations only if they have changed
+            const original = initialAssociations.find(
+              (initial) => initial.id === submitted.id
+            );
+            return !original || !_.isEqual(submitted, original);
+          })
+          .map((association) => {
+            // Strip out relationship fields from the attributes
+            const {
+              sample: _sample,
+              associatedSample: _associatedSample,
+              ...attributes
+            } = association;
+
+            return {
+              resource: {
+                ...attributes,
+                // Explicitly declare relationships
+                relationships: {
+                  // Always set the sample relationship to the current material sample being edited
+                  sample: {
+                    data: { id: sample.id, type: "material-sample" }
+                  },
+                  ...(association.associatedSample && {
+                    associatedSample: {
+                      data: {
+                        id:
+                          typeof association.associatedSample === "string"
+                            ? association.associatedSample
+                            : association.associatedSample.id,
+                        type: "material-sample"
+                      }
+                    }
+                  })
+                }
+              } as InputResource<Association> & { relationships: any },
+              type: "association"
+            };
+          });
+
+    // No changes, skip API requests
+    if (associationsToSave.length === 0 && associationsToDelete.length === 0) {
+      return;
+    }
+
+    // Perform saves (creates/updates)
+    if (associationsToSave.length > 0) {
+      try {
+        await save<Association>(associationsToSave, {
+          apiBaseUrl: "/collection-api"
+        });
+      } catch (error: unknown) {
+        if (error instanceof DoOperationsError) {
+          const newErrors = error.individualErrors.map<OperationError>(
+            (err) => ({
+              fieldErrors: _.mapKeys(
+                err.fieldErrors,
+                (_, field) => `associations[${err.index}].${field}`
+              ),
+              errorMessage: err.errorMessage,
+              index: err.index
+            })
+          );
+
+          const overallFieldErrors = newErrors.reduce(
+            (total, curr) => ({ ...total, ...curr.fieldErrors }),
+            {}
+          );
+
+          throw new DoOperationsError(error.message, overallFieldErrors);
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    // Perform deletes individually using the REST endpoint
+    if (associationsToDelete.length > 0) {
+      const deleteAssociationArgs: DeleteArgs[] = associationsToDelete.map(
+        (association) => ({
+          delete: {
+            id: association.id ?? "",
+            type: "association"
+          }
+        })
+      );
+      await save<Association>(deleteAssociationArgs, {
+        apiBaseUrl: "/collection-api"
+      });
+    }
+  }
+
+  /**
+   * Validates the associations before saving them to the back-end.
+   *
+   * @param associations - The associations to validate.
+   * @throws DoOperationsError if any associations are invalid.
+   */
+  function validateAssociations(associations: Association[]) {
+    const fieldErrors: Record<string, string> = {};
+
+    associations.forEach((association, index) => {
+      // Skip completely empty associations
+      if (
+        !association.associatedSample &&
+        !association.associationType &&
+        !association.remarks
+      ) {
+        return;
+      }
+
+      if (!association.associatedSample) {
+        fieldErrors[`associations[${index}].associatedSample`] =
+          formatMessage("requiredField");
+      }
+
+      if (!association.associationType) {
+        fieldErrors[`associations[${index}].associationType`] =
+          formatMessage("requiredField");
+      }
+    });
+
+    if (Object.keys(fieldErrors).length > 0) {
+      throw new DoOperationsError("", fieldErrors);
+    }
+  }
+
   async function onSubmit({
     submittedValues,
     formik
@@ -1227,6 +1427,15 @@ export function useMaterialSampleSave({
         },
         formik
       );
+
+      // Save associations after the material sample has been saved so we have the ID available.
+      // This is especially important when creating a new material sample.
+      if (enableAssociations || deleteAssociations) {
+        await saveAssociations({
+          ...submittedValues,
+          id: savedMaterialSample.id
+        });
+      }
 
       // Delete storageUnitUsage if there is one when no StorageUnit linked
       if (
@@ -1357,6 +1566,7 @@ export function useMaterialSampleSave({
     onSubmit,
     prepareSampleInput,
     prepareSampleSaveOperation,
+    saveAssociations,
     loading,
     colEventFormRef
   };
