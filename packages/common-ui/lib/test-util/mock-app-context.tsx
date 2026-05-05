@@ -10,8 +10,8 @@ import {
   ModalProvider
 } from "common-ui";
 import _ from "lodash";
-import { FileUploadProviderImpl } from "../../../dina-ui/components/object-store/file-upload/FileUploadProvider";
-import { DinaIntlProvider } from "../../../dina-ui/intl/dina-ui-intl";
+import { FileUploadProviderImpl } from "@dina-ui/components/object-store/file-upload/FileUploadProvider";
+import { DinaIntlProvider } from "@dina-ui/intl/dina-ui-intl";
 import { useMemo, useRef } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";

@@ -1,10 +1,10 @@
 import { QueryPageTabProps } from "../QueryPage";
 import React from "react";
 import { KitsuResource } from "kitsu";
-import SampleTypeChart from "../../../../dina-ui/components/collection/charts/SampleTypeChart";
-import RecordsAddedChart from "../../../../dina-ui/components/collection/charts/RecordsAddedChart";
-import EventStartDateChart from "../../../../dina-ui/components/collection/charts/EventStartDateChart";
-import RelatedObjectTypeChart from "../../../../dina-ui/components/collection/charts/RelatedObjectTypeChart";
+import SampleTypeChart from "@dina-ui/components/collection/charts/SampleTypeChart";
+import RecordsAddedChart from "@dina-ui/components/collection/charts/RecordsAddedChart";
+import EventStartDateChart from "@dina-ui/components/collection/charts/EventStartDateChart";
+import RelatedObjectTypeChart from "@dina-ui/components/collection/charts/RelatedObjectTypeChart";
 
 export function MaterialSampleVisualizationTab<TData extends KitsuResource>({
   query,

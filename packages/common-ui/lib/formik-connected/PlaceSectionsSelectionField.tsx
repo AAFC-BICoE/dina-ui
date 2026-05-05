@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { useFormikContext } from "formik";
 import { Dispatch, SetStateAction } from "react";
-import { SourceAdministrativeLevel } from "../../../dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import { SourceAdministrativeLevel } from "@dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { ReactTable } from "../table/ReactTable";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";

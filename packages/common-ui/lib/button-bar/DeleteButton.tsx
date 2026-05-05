@@ -8,9 +8,9 @@ import {
 import { CommonMessage } from "../intl/common-ui-intl";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
 import { useModal } from "../modal/modal";
-import { MaterialSample } from "../../../dina-ui/types/collection-api";
+import { MaterialSample } from "@dina-ui/types/collection-api";
 import { KitsuResponse } from "kitsu";
-import { StorageUnitUsage } from "../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { FaTrash } from "react-icons/fa";
 
 interface DeleteButtonProps {

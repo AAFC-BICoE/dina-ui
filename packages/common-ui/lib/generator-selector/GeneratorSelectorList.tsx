@@ -5,7 +5,7 @@ import {
   SimpleSearchFilterBuilder,
   TooltipSelectOption
 } from "..";
-import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "react-bootstrap";
 import { GeneratorItem } from "./GeneratorItem";

@@ -1,4 +1,4 @@
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../../../../dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { transformIdentifierToDSL } from "../QueryBuilderIdentifierSearch";
 
 interface TestValueStructure {

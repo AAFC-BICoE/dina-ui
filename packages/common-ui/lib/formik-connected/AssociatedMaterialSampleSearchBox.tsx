@@ -3,8 +3,8 @@ import { FastField } from "formik";
 import React from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FieldWrapper } from "..";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
+import { SampleListLayout } from "@dina-ui/pages/collection/material-sample/list";
 import Link from "next/link";
 
 export function AssociatedMaterialSampleSearchBoxField({

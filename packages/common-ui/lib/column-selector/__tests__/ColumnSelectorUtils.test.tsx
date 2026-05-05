@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../../dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   collectPathValues,
   generateColumnPath,

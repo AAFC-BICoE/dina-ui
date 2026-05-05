@@ -1,11 +1,5 @@
-import {
-  getDeterminations,
-  getScientificNames
-} from "../../../dina-ui/components";
-import {
-  MaterialSample,
-  Determination
-} from "../../../dina-ui/types/collection-api";
+import { getDeterminations, getScientificNames } from "@dina-ui/components";
+import { MaterialSample, Determination } from "@dina-ui/types/collection-api";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { TableColumn } from "../list-page/types";
 
