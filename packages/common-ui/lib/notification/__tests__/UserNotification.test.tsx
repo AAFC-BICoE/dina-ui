@@ -493,6 +493,11 @@ describe("UserNotification", () => {
       // (This is implicitly tested through the component rendering)
       expect(mockGet).toHaveBeenCalledWith("user-api/notification", {
         page: { limit: 100 },
+        filter: {
+          userIdentifier: {
+            EQ: ""
+          }
+        },
         sort: "-createdOn"
       });
     });
