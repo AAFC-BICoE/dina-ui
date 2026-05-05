@@ -6,7 +6,7 @@ import {
   getErrorMessages,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
-import { OperationVerb, SuccessfulOperation } from "../operations-types";
+import { OperationVerb } from "../operations-types";
 import { isEqual } from "lodash";
 interface TestPcrPrimer {
   name: string;
@@ -14,8 +14,6 @@ interface TestPcrPrimer {
   type: string;
 }
 import {
-  MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID,
-  MOCK_AXIOS_RESPONSE_ACCESS_DENIED,
   MOCK_BULK_CREATE_DATA,
   MOCK_BULK_CREATE_INPUT,
   MOCK_BULK_DELETE_RESPONSE,
@@ -26,9 +24,6 @@ import {
   MOCK_BULK_UPDATE_INPUT,
   MOCK_BULK_UPDATE_RESPONSE,
   TODO_INSERT_OPERATION,
-  MOCK_TODO_INSERT_AXIOS_RESPONSE,
-  TODO_OPERATION_1_VALID_2_INVALID,
-  TODO_OPERATION_DENY_ACCESS,
   MOCK_BULK_GET_404_ERROR_OBJECT,
   MOCK_BULK_GET_404_ERROR_INPUT,
   MOCK_BULK_GET_410_ERROR_INPUT,
@@ -47,15 +42,6 @@ import { waitFor } from "@testing-library/dom";
 
 /** Mock of Axios' patch function. */
 const mockPatch: jest.Mock<any, any> = jest.fn((_url, data, _config) => {
-  if (data === TODO_INSERT_OPERATION) {
-    return MOCK_TODO_INSERT_AXIOS_RESPONSE;
-  }
-  if (data === TODO_OPERATION_1_VALID_2_INVALID) {
-    return MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID;
-  }
-  if (data === TODO_OPERATION_DENY_ACCESS) {
-    return MOCK_AXIOS_RESPONSE_ACCESS_DENIED;
-  }
   if (isEqual(data, MOCK_BULK_UPDATE_DATA)) {
     return MOCK_BULK_UPDATE_RESPONSE;
   }
@@ -97,7 +83,7 @@ const mockPost: jest.Mock<any, any> = jest.fn((url, data, _config) => {
   }
 });
 
-const mockDelete = jest.fn((_, data) => {
+const mockDelete: jest.Mock<any, any> = jest.fn((_, data) => {
   if (isEqual(data.data, MOCK_BULK_GET_DATA)) {
     return MOCK_BULK_DELETE_RESPONSE;
   }
@@ -348,33 +334,16 @@ describe("API client context", () => {
   });
 
   describe("save", () => {
-    it("Provides a save function that can create resources.", async () => {
-      // Mock POST responses.
-      mockPatch.mockImplementationOnce(() => ({
-        data: [
-          {
-            data: {
-              attributes: {
-                lotNumber: 1,
-                name: "testPrimer1"
-              },
-              id: "123",
-              type: "pcrPrimer"
-            },
-            status: 201
-          },
-          {
-            data: {
-              attributes: {
-                lotNumber: 1,
-                name: "testPrimer2"
-              },
-              id: "124",
-              type: "pcrPrimer"
-            },
-            status: 201
-          }
-        ]
+    it("Provides a save function that can create resources (bulk POST).", async () => {
+      mockPost.mockImplementationOnce(async (_url, body) => ({
+        status: 201,
+        data: {
+          data: body.data.map((r: any, i: number) => ({
+            id: String(123 + i),
+            type: r.type,
+            attributes: r.attributes
+          }))
+        }
       }));
 
       const response = await save([
@@ -396,33 +365,10 @@ describe("API client context", () => {
         }
       ]);
 
-      // Expect correct patch args.
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [
-          {
-            op: "POST",
-            path: "pcrPrimer",
-            value: {
-              attributes: { lotNumber: 1, name: "testPrimer1" },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "pcrPrimer"
-            }
-          },
-          {
-            op: "POST",
-            path: "pcrPrimer",
-            value: {
-              attributes: { lotNumber: 1, name: "testPrimer2" },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "pcrPrimer"
-            }
-          }
-        ],
-        expect.anything()
-      );
+      // bulk POST is used
+      expect(mockPost).toHaveBeenCalledTimes(1);
+      expect(mockPost.mock.calls[0][0]).toBe("/pcrPrimer/bulk");
 
-      // Expect correct response.
       expect(response).toEqual([
         {
           id: "123",
@@ -439,33 +385,16 @@ describe("API client context", () => {
       ]);
     });
 
-    it("Provides a save function that can update resources.", async () => {
-      // Mock PATCH responses.
-      mockPatch.mockImplementationOnce(() => ({
-        data: [
-          {
-            data: {
-              attributes: {
-                lotNumber: 1,
-                name: "testPrimer1 edited"
-              },
-              id: "123",
-              type: "pcrPrimer"
-            },
-            status: 201
-          },
-          {
-            data: {
-              attributes: {
-                lotNumber: 1,
-                name: "testPrimer2 edited"
-              },
-              id: "124",
-              type: "pcrPrimer"
-            },
-            status: 201
-          }
-        ]
+    it("Provides a save function that can update resources (bulk PATCH).", async () => {
+      mockPatch.mockImplementationOnce(async (_url, body) => ({
+        status: 200,
+        data: {
+          data: body.data.map((r: any) => ({
+            id: r.id,
+            type: r.type,
+            attributes: r.attributes
+          }))
+        }
       }));
 
       const response = await save([
@@ -489,30 +418,8 @@ describe("API client context", () => {
         }
       ]);
 
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [
-          {
-            op: "PATCH",
-            path: "pcrPrimer/123",
-            value: {
-              attributes: { lotNumber: 1, name: "testPrimer1 edited" },
-              id: "123",
-              type: "pcrPrimer"
-            }
-          },
-          {
-            op: "PATCH",
-            path: "pcrPrimer/124",
-            value: {
-              attributes: { lotNumber: 1, name: "testPrimer2 edited" },
-              id: "124",
-              type: "pcrPrimer"
-            }
-          }
-        ],
-        expect.anything()
-      );
+      expect(mockPatch).toHaveBeenCalledTimes(1);
+      expect(mockPatch.mock.calls[0][0]).toBe("/pcrPrimer/bulk");
 
       expect(response).toEqual([
         {
@@ -530,39 +437,34 @@ describe("API client context", () => {
       ]);
     });
 
-    it("Provides a save function that can delete resources.", async () => {
-      mockPatch.mockImplementationOnce(() => ({
-        data: [{ status: 204 } as SuccessfulOperation]
+    it("Provides a save function that can delete resources (single DELETE).", async () => {
+      mockDelete.mockImplementationOnce(async () => ({
+        status: 204
       }));
 
       const response = await save([
         { delete: { id: "1234", type: "test-type" } }
       ]);
 
+      expect(mockDelete).toHaveBeenCalledTimes(1);
+      expect(mockDelete.mock.calls[0][0]).toBe("/test-type/1234");
+
+      // delete returns undefined resource
       expect(response).toEqual([undefined]);
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [{ op: "DELETE", path: "test-type/1234" }],
-        expect.anything()
-      );
     });
 
-    it("Removed the 'meta' field when saving to the back-end.", async () => {
-      // Mock PATCH response:
-      mockPatch.mockImplementationOnce(() => ({
-        data: [
-          {
-            data: {
-              attributes: {
-                lotNumber: 1,
-                name: "testPrimer1 edited"
-              },
-              id: "123",
-              type: "pcrPrimer"
-            },
-            status: 201
-          }
-        ]
+    it("Removes the 'meta' field when saving to the back-end.", async () => {
+      mockPatch.mockImplementationOnce(async (_url, body) => ({
+        status: 200,
+        data: {
+          data: [
+            {
+              id: body.data.id,
+              type: body.data.type,
+              attributes: body.data.attributes
+            }
+          ]
+        }
       }));
 
       await save([
@@ -571,57 +473,31 @@ describe("API client context", () => {
             id: "123",
             lotNumber: 1,
             name: "testPrimer1 edited",
-            // Sometimes the initial GET operation include the "meta" field:
             meta: {
-              permissions: ["create", "update", "delete"],
-              permissionsProvider: "GroupAuthorizationService"
+              permissions: ["create", "update"]
             },
             type: "pcrPrimer"
-          } as TestPcrPrimer,
+          } as any,
           type: "pcrPrimer"
         }
       ]);
 
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [
-          // The "meta" field should be excluded from the save operation:
-          {
-            op: "PATCH",
-            path: "pcrPrimer/123",
-            value: {
-              attributes: { lotNumber: 1, name: "testPrimer1 edited" },
-              id: "123",
-              type: "pcrPrimer"
-            }
-          }
-        ],
-        expect.anything()
-      );
+      const [, body] = mockPatch.mock.calls[0];
+      expect(body.data.meta).toBeUndefined();
     });
   });
 
   describe("bulkGet", () => {
-    it("Provides a bulk-get-by-ID function.", async () => {
-      mockPatch.mockImplementationOnce(() => ({
-        data: [
-          {
-            data: {
-              attributes: { name: "primer 123" },
-              id: "123",
-              type: "pcrPrimer"
-            },
-            status: 201
-          },
-          {
-            data: {
-              attributes: { name: "primer 124" },
-              id: "124",
-              type: "pcrPrimer"
-            },
-            status: 201
-          }
-        ]
+    it("Provides a bulk-get-by-ID function (via bulk-load).", async () => {
+      mockPost.mockImplementationOnce(async (_url, body) => ({
+        status: 200,
+        data: {
+          data: body.data.map((r: any) => ({
+            id: r.id,
+            type: "pcrPrimer",
+            attributes: { name: `primer ${r.id}` }
+          }))
+        }
       }));
 
       const response = await bulkGet<TestPcrPrimer>([
@@ -629,17 +505,9 @@ describe("API client context", () => {
         "pcrPrimer/124"
       ]);
 
-      // Bulk-requests by ID:
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [
-          { op: "GET", path: "pcrPrimer/123" },
-          { op: "GET", path: "pcrPrimer/124" }
-        ],
-        expect.anything()
-      );
+      expect(mockPost).toHaveBeenCalledTimes(1);
+      expect(mockPost.mock.calls[0][0]).toBe("/pcrPrimer/bulk-load");
 
-      // Returns an array of primers:
       expect(response).toEqual([
         { id: "123", name: "primer 123", type: "pcrPrimer" },
         { id: "124", name: "primer 124", type: "pcrPrimer" }
@@ -647,89 +515,85 @@ describe("API client context", () => {
     });
 
     it("bulkGet can return null entries instead of throwing errors on 404 responses.", async () => {
-      mockPatch.mockImplementationOnce(() => ({
-        data: [
-          {
-            data: {
-              attributes: { name: "primer 123" },
-              id: "123",
-              type: "pcrPrimer"
-            },
-            status: 201
-          },
-          {
-            errors: [],
-            status: 404
+      const missingIdError: any = {
+        isAxiosError: true,
+        config: { url: "/pcrPrimer/bulk-load" },
+        response: {
+          status: 404,
+          statusText: "Not Found",
+          data: {
+            errors: [
+              {
+                source: { pointer: "/data/id/000" }
+              }
+            ]
           }
-        ]
-      }));
+        }
+      };
 
-      const response = await bulkGet(["primer/123", "primer/000"], {
+      mockPost.mockImplementationOnce((_url, _body, _config) => {
+        makeAxiosErrorMoreReadable(missingIdError);
+        return undefined as any;
+      });
+
+      mockPost.mockImplementationOnce(async (_url, body, _config) => {
+        expect(body).toEqual({
+          data: [{ type: "pcrPrimer", id: "123" }]
+        });
+
+        return {
+          status: 200,
+          data: {
+            data: [
+              {
+                id: "123",
+                type: "pcrPrimer",
+                attributes: { name: "primer 123" }
+              }
+            ]
+          }
+        } as any;
+      });
+
+      const response = await bulkGet(["pcrPrimer/123", "pcrPrimer/000"], {
         returnNullForMissingResource: true
       });
 
       expect(response).toEqual([
-        {
-          id: "123",
-          name: "primer 123",
-          type: "pcrPrimer"
-        },
+        { id: "123", name: "primer 123", type: "pcrPrimer" },
         null
       ]);
+
+      // bulk-load should have been attempted twice (error then retry)
+      expect(mockPost).toHaveBeenCalledTimes(2);
+      expect(mockPost.mock.calls[0][0]).toBe("/pcrPrimer/bulk-load");
+      expect(mockPost.mock.calls[1][0]).toBe("/pcrPrimer/bulk-load");
     });
 
-    it("bulkGet batches together the same ID to avoid sending duplicate find-one requests.", async () => {
-      mockPatch.mockImplementationOnce((_, operations) => ({
-        data: operations.map((op) => {
-          const id = op.path.replace("primer/", "");
-
-          return {
-            data: {
-              attributes: { name: `primer ${id}` },
-              id,
-              type: "primer"
-            },
-            status: 200
-          };
-        })
+    it("bulkGet batches duplicate IDs and preserves order.", async () => {
+      mockPost.mockImplementationOnce(async (_url, body) => ({
+        status: 200,
+        data: {
+          data: body.data.map((r: any) => ({
+            id: r.id,
+            type: "primer",
+            attributes: { name: `primer ${r.id}` }
+          }))
+        }
       }));
 
       const response = await bulkGet(
-        // Has duplicates:
         ["primer/100", "primer/100", "primer/200", "primer/200"],
         { returnNullForMissingResource: true }
       );
 
-      expect(response.length).toEqual(4);
-      expect(response.map((primer) => primer?.id)).toEqual([
-        "100",
-        "100",
-        "200",
-        "200"
-      ]);
+      expect(response.map((r) => r?.id)).toEqual(["100", "100", "200", "200"]);
 
-      // Only 2 unique GET calls are made even though 4 paths were passed to bulkGet:
-      expect(mockPatch.mock.calls).toEqual([
-        [
-          "/operations",
-          [
-            {
-              op: "GET",
-              path: "primer/100"
-            },
-            {
-              op: "GET",
-              path: "primer/200"
-            }
-          ],
-          {
-            headers: {
-              Accept: "application/json-patch+json",
-              "Content-Type": "application/json-patch+json",
-              "Crnk-Compact": "true"
-            }
-          }
-        ]
+      // only unique IDs sent to bulk-load
+      const body = mockPost.mock.calls[0][1];
+      expect(body.data).toEqual([
+        { type: "primer", id: "100" },
+        { type: "primer", id: "200" }
       ]);
     });
   });
