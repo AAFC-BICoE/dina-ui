@@ -70,6 +70,7 @@ export function useCollapser(
           <FaAngleDown
             style={{
               fontSize: "1.5rem",
+              marginTop: "2px",
               color: "#000",
               transform: collapsed ? "rotate(180deg)" : "rotate(0deg)",
               transition: "transform 2s cubic-bezier(.4,2,.55,.44)",

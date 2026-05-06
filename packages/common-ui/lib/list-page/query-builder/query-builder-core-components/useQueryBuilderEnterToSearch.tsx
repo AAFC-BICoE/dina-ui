@@ -1,7 +1,7 @@
 import { useQueryBuilderContext } from "../QueryBuilder";
 
 export function useQueryBuilderEnterToSearch(disabled = false) {
-  const { performSubmit } = useQueryBuilderContext() || {};
+  const { performSubmit } = useQueryBuilderContext(false) || {};
   const handleKeyDown = (event) => {
     if (event.key === "Enter" && performSubmit) {
       performSubmit?.();

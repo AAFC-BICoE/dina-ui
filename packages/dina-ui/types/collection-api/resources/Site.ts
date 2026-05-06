@@ -6,7 +6,7 @@ import type { GeoPolygon } from "packages/dina-ui/types/geo/geo.types";
 
 export type SiteAttributes = {
   type: "site";
-  name?: string;
+  name: string;
   group?: string;
   code?: string | null;
   siteGeom?: GeoPolygon;

@@ -401,9 +401,7 @@ export function applyGroupFilters(elasticSearchQuery: any, groups: string[]) {
           ...(elasticSearchQuery?.query?.bool?.must ?? []),
           {
             [multipleGroups ? "terms" : "term"]: {
-              "data.attributes.group.keyword": multipleGroups
-                ? groups
-                : groups[0]
+              "data.attributes.group": multipleGroups ? groups : groups[0]
             }
           }
         ]
@@ -1031,4 +1029,93 @@ export function betweenQuery(
           }
         }
       };
+}
+
+/**
+ * Generates an Elasticsearch query to find records where a specific field is empty.
+ * An empty field is defined as missing entirely.
+ *
+ * If checkEmptyString is true, it will also treat an empty string "" as empty (only safe for Text/String fields).
+ * If a parentType is provided, it will also match records that completely lack that parent relationship.
+ */
+export function emptyFieldQuery(
+  fieldPath: string,
+  parentType?: string,
+  checkEmptyString: boolean = false
+) {
+  // Define what makes a field "empty" locally
+  const fieldEmptyCheck = checkEmptyString
+    ? {
+        bool: {
+          should: [
+            { bool: { must_not: existsQuery(fieldPath) } },
+            termQuery(fieldPath, "", true)
+          ],
+          minimum_should_match: 1
+        }
+      }
+    : {
+        bool: { must_not: existsQuery(fieldPath) }
+      };
+
+  return parentType
+    ? {
+        bool: {
+          should: [
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [includedTypeQuery(parentType), fieldEmptyCheck]
+                  }
+                }
+              }
+            },
+            {
+              bool: {
+                must_not: {
+                  nested: {
+                    path: "included",
+                    query: includedTypeQuery(parentType)
+                  }
+                }
+              }
+            }
+          ],
+          minimum_should_match: 1
+        }
+      }
+    : fieldEmptyCheck;
+}
+
+/**
+ * Generates an Elasticsearch query to find records where a specific field is not empty.
+ * Meaning it must exist. If checkEmptyString is true, it must also not be an empty string "".
+ */
+export function notEmptyFieldQuery(
+  fieldPath: string,
+  parentType?: string,
+  checkEmptyString: boolean = false
+) {
+  const mustClauses: any[] = [existsQuery(fieldPath)];
+  if (parentType) mustClauses.push(includedTypeQuery(parentType));
+
+  const boolQuery: any = {
+    must: mustClauses
+  };
+
+  // Only add the empty string restriction if we are explicitly told it's a string
+  if (checkEmptyString) {
+    boolQuery.must_not = termQuery(fieldPath, "", true);
+  }
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: { bool: boolQuery }
+        }
+      }
+    : { bool: boolQuery };
 }

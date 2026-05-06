@@ -141,7 +141,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       }
     case "collection-api/storage-unit-type":
       return { data: [], meta: { totalResourceCount: 0 } };
-    case "collection-api/storage-unit/A?include=storageUnitChildren":
+    case "collection-api/storage-unit/A?optFields[storage-unit]=storageUnitChildren":
       // The fetcher for all current children before executing the Save operation:
       return {
         data: STORAGE_A,

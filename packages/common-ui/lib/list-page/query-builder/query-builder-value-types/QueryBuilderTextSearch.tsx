@@ -10,7 +10,9 @@ import {
   infixQuery,
   wildcardQuery,
   inTextQuery,
-  betweenQuery
+  betweenQuery,
+  emptyFieldQuery,
+  notEmptyFieldQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
@@ -150,41 +152,18 @@ export function transformTextSearchToDSL({
       return parentType
         ? {
             bool: {
-              should: [
-                // If the field does exist, then search for everything that does NOT match the term.
+              must_not: [
                 {
                   nested: {
                     path: "included",
                     query: {
                       bool: {
-                        must_not: termQuery(
-                          fieldPath,
-                          value,
-                          keywordMultiFieldSupport
-                        ),
-                        must: includedTypeQuery(parentType)
+                        must: [
+                          includedTypeQuery(parentType),
+                          termQuery(fieldPath, value, keywordMultiFieldSupport)
+                        ]
                       }
                     }
-                  }
-                },
-
-                // If it's included but the field doesn't exist, then it's not equal either.
-                {
-                  nested: {
-                    path: "included",
-                    query: {
-                      bool: {
-                        must_not: existsQuery(fieldPath),
-                        must: includedTypeQuery(parentType)
-                      }
-                    }
-                  }
-                },
-
-                // And if it's not included, then it's not equal either.
-                {
-                  bool: {
-                    must_not: includedTypeQuery(parentType)
                   }
                 }
               ]
@@ -211,93 +190,13 @@ export function transformTextSearchToDSL({
             }
           };
 
-    // Empty values only. (only if the value is not mandatory)
+    // Empty values only.
     case "empty":
-      return parentType
-        ? {
-            bool: {
-              should: [
-                {
-                  bool: {
-                    should: [
-                      {
-                        bool: {
-                          must_not: {
-                            nested: {
-                              path: "included",
-                              query: {
-                                bool: {
-                                  must: [
-                                    existsQuery(fieldPath),
-                                    includedTypeQuery(parentType)
-                                  ]
-                                }
-                              }
-                            }
-                          }
-                        }
-                      },
-                      {
-                        nested: {
-                          path: "included",
-                          query: {
-                            bool: {
-                              must: [
-                                termQuery(fieldPath, "", true),
-                                includedTypeQuery(parentType)
-                              ]
-                            }
-                          }
-                        }
-                      }
-                    ]
-                  }
-                },
-                {
-                  bool: {
-                    must_not: includedTypeQuery(parentType)
-                  }
-                }
-              ]
-            }
-          }
-        : {
-            bool: {
-              should: [
-                {
-                  bool: {
-                    must_not: existsQuery(fieldPath)
-                  }
-                },
-                {
-                  bool: {
-                    must: termQuery(fieldPath, "", true)
-                  }
-                }
-              ]
-            }
-          };
+      return emptyFieldQuery(fieldPath, parentType, true);
 
-    // Not empty values only. (only if the value is not mandatory)
+    // Not empty values only.
     case "notEmpty":
-      return parentType
-        ? {
-            nested: {
-              path: "included",
-              query: {
-                bool: {
-                  must_not: termQuery(fieldPath, "", true),
-                  must: [includedTypeQuery(parentType), existsQuery(fieldPath)]
-                }
-              }
-            }
-          }
-        : {
-            bool: {
-              must: existsQuery(fieldPath),
-              must_not: termQuery(fieldPath, "", true)
-            }
-          };
+      return notEmptyFieldQuery(fieldPath, parentType, true);
 
     // Equals match type.
     case "equals":

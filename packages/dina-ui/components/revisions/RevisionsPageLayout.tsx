@@ -202,7 +202,7 @@ export function RevisionsPage({
   const { formatMessage } = useDinaIntl();
 
   const router = useRouter();
-  const { id, isExternalResourceMetadata } = router.query;
+  const { id } = router.query;
 
   const query = useQuery<KitsuResource>({ path: `${queryPath}/${id}` });
   const resource = query?.response?.data;
@@ -219,9 +219,7 @@ export function RevisionsPage({
       <Nav marginBottom={false} />
       <ButtonBar>
         <Link
-          href={`${detailsPageLink}/${
-            isExternalResourceMetadata ? "external-resource-view" : "view"
-          }?id=${id}`}
+          href={`${detailsPageLink}/view?id=${id}`}
           className="back-button my-auto me-auto mt-2"
         >
           <DinaMessage id="detailsPageLink" />

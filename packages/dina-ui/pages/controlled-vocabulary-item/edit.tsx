@@ -312,6 +312,13 @@ export function ControlledVocabularyItemFormLayout() {
           </div>
         </div>
       )}
+      <div className="row">
+        <TextField
+          className="col-md-6"
+          name="term"
+          link={initialValues?.term ?? ""}
+        />
+      </div>
       <MultilingualTitle />
       <MultilingualDescription />
       {readOnly && (

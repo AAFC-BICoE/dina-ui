@@ -1,7 +1,7 @@
 {
   "name": "dina-ui",
   "license": "MIT",
-  "version": "0.212.0",
+  "version": "0.218.0",
   "scripts": {
     "build": "node --require ./next.config.js ../../node_modules/.bin/next build",
     "dev": "next --turbopack",
@@ -19,10 +19,13 @@
     "coordinate-parser": "^1.0.7",
     "dexie": "^3.2.4",
     "dexie-react-hooks": "^1.1.6",
+    "echarts-for-react": "^3.0.6",
     "esri-loader": "^3.3.0",
     "esri-loader-hooks": "^0.4.0",
     "moment": "^2.29.4",
-    "next": "15.5.7",
+    "next": "15.5.15",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dropzone-uploader": "^2.11.0",
@@ -34,7 +37,7 @@
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
     "@types/bytes": "^3.1.0",
-    "eslint-config-next": "15.5.7",
+    "eslint-config-next": "15.5.15",
     "eslint-plugin-jest": "^29.12.1"
   }
 }

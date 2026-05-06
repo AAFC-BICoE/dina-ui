@@ -350,9 +350,9 @@ describe("UserNotification", () => {
       fireEvent.click(button);
 
       await waitFor(() => {
-        expect(wrapper.getByText("Notification 1")).toBeInTheDocument();
-        expect(wrapper.getByText("Notification 2")).toBeInTheDocument();
-        expect(wrapper.getByText("Notification 3")).toBeInTheDocument();
+        expect(wrapper.getAllByText("Notification 1")[0]).toBeInTheDocument();
+        expect(wrapper.getAllByText("Notification 2")[0]).toBeInTheDocument();
+        expect(wrapper.getAllByText("Notification 3")[0]).toBeInTheDocument();
       });
     });
 
@@ -493,6 +493,11 @@ describe("UserNotification", () => {
       // (This is implicitly tested through the component rendering)
       expect(mockGet).toHaveBeenCalledWith("user-api/notification", {
         page: { limit: 100 },
+        filter: {
+          userIdentifier: {
+            EQ: ""
+          }
+        },
         sort: "-createdOn"
       });
     });
@@ -601,7 +606,7 @@ describe("UserNotification", () => {
       fireEvent.click(button);
 
       await waitFor(() => {
-        expect(wrapper.getByText("Notification 1")).toBeInTheDocument();
+        expect(wrapper.getAllByText("Notification 1")[0]).toBeInTheDocument();
       });
 
       // Click on first unread notification card

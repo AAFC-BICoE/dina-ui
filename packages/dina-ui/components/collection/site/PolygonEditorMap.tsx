@@ -1,26 +1,30 @@
 import { useEffect, useRef, useState } from "react";
-import GeometryMapEditor from "packages/dina-ui/components/geo/GeometryMapEditor";
-import { PostMessageType } from "packages/dina-ui/types/geo/post-message.types";
-import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
+import ArcGISLoader from "../../geo/ArcGISLoader";
+import { POLYGON_EDITOR_MODE } from "../../../types/geo/polygon-editor-mode.types";
 import {
   getMapModules,
   projectPolygon3857To4326
-} from "packages/dina-ui/utils/geoUtils";
-import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
-import type {
-  GeoPosition,
-  GeoPolygon
-} from "packages/dina-ui/types/geo/geo.types";
+} from "../../../utils/geoUtils";
+import type { PolygonEditorMode } from "../../../types/geo/polygon-editor-mode.types";
+import type { GeoPosition } from "../../../types/geo/geo.types";
 
-type Props = {
-  polygon?: GeoPolygon | null;
+export default function PolygonEditorMap({
+  coords,
+  mode,
+  onCoordsChange
+}: {
+  coords: GeoPosition[][];
   mode?: PolygonEditorMode;
-};
-
-export function PolygonEditorMap({ polygon, mode }: Props) {
+  onCoordsChange: (coords: GeoPosition[][]) => void;
+}) {
   const mapRef = useRef<HTMLDivElement>(null);
   const sketchRef = useRef<any>(null);
   const [graphicsLayer, setGraphicsLayer] = useState<any>(null);
+
+  const onCoordsChangeRef = useRef(onCoordsChange);
+  useEffect(() => {
+    onCoordsChangeRef.current = onCoordsChange;
+  }, [onCoordsChange]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -28,7 +32,17 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
     let viewInstance: any;
 
     getMapModules().then(
-      ({ Map, MapView, GraphicsLayer, SketchViewModel, Graphic }) => {
+      ({
+        Map,
+        MapView,
+        GraphicsLayer,
+        SketchViewModel,
+        Graphic,
+        BasemapToggle,
+        Search,
+        ScaleBar,
+        Fullscreen
+      }) => {
         const layer = new GraphicsLayer();
         setGraphicsLayer(layer);
 
@@ -49,6 +63,48 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
           }
         });
 
+        // Map layer toggle
+        const basemapToggle = new BasemapToggle({
+          view: viewInstance,
+          nextBasemap: "hybrid"
+        });
+        viewInstance.ui.add(basemapToggle, "bottom-right");
+
+        // Search
+        if (mode === POLYGON_EDITOR_MODE.EDIT) {
+          const search = new Search({ view: viewInstance });
+          viewInstance.ui.add(search, "bottom-left");
+        }
+
+        // Scalebar
+        const scaleBar = new ScaleBar({
+          view: viewInstance,
+          unit: "metric"
+        });
+        viewInstance.ui.add(scaleBar, "bottom-left");
+
+        // Fullscreen button
+        const fullscreen = new Fullscreen({
+          view: viewInstance
+        });
+        viewInstance.ui.add(fullscreen, "top-right");
+
+        // Clear button
+        if (mode === POLYGON_EDITOR_MODE.EDIT) {
+          const clearButton = document.createElement("div");
+          clearButton.className =
+            "esri-widget esri-widget--button esri-interactive";
+          clearButton.title = "Clear polygon";
+          clearButton.innerHTML = `<span class="esri-icon esri-icon-trash" aria-label="Clear polygon"></span>`;
+          clearButton.addEventListener("click", () => {
+            sketchRef.current?.cancel();
+            layer.removeAll();
+            sketchRef.current?.create("polygon");
+          });
+
+          viewInstance.ui.add(clearButton, "top-right");
+        }
+
         const polygonSymbol = {
           type: "simple-fill",
           color: [226, 119, 40, 0.2],
@@ -62,15 +118,61 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
           view: viewInstance,
           layer,
           updateOnGraphicClick: mode === POLYGON_EDITOR_MODE.EDIT,
-          polygonSymbol
+          polygonSymbol,
+
+          activeVertexSymbol: {
+            type: "simple-marker",
+            style: "circle",
+            color: [226, 119, 40],
+            size: "12px",
+            outline: {
+              color: "white",
+              width: 2
+            }
+          },
+
+          vertexSymbol: {
+            type: "simple-marker",
+            style: "circle",
+            color: "white",
+            size: "10px",
+            outline: {
+              color: [226, 119, 40],
+              width: 2
+            }
+          },
+
+          activeLineSymbol: {
+            type: "simple-line",
+            color: [226, 119, 40],
+            width: 2,
+            style: "dash"
+          },
+
+          tooltipOptions: {
+            enabled: true
+          },
+
+          defaultCreateOptions: {
+            mode: "click",
+            hasZ: false
+          },
+
+          defaultUpdateOptions: {
+            tool: "reshape",
+            toggleToolOnClick: true,
+            enableRotation: true,
+            enableScaling: true,
+            multipleSelectionEnabled: false
+          }
         });
         sketchRef.current = sketch;
 
-        if (polygon?.coordinates && polygon.coordinates.length) {
+        if (coords?.length) {
           const graphic = new Graphic({
             geometry: {
               type: "polygon",
-              rings: polygon.coordinates,
+              rings: coords,
               spatialReference: { wkid: 4326 }
             },
             symbol: polygonSymbol
@@ -92,66 +194,46 @@ export function PolygonEditorMap({ polygon, mode }: Props) {
     );
 
     return () => {
-      if (viewInstance) {
-        viewInstance.destroy();
-      }
+      viewInstance?.destroy();
     };
-  }, [polygon, mode]);
+  }, []);
 
-  const handleErase = () => {
-    if (!graphicsLayer || !sketchRef.current) return;
+  useEffect(() => {
+    if (!graphicsLayer) return;
 
-    sketchRef.current.cancel();
-    graphicsLayer.removeAll();
-
-    if (mode !== POLYGON_EDITOR_MODE.VIEW) {
-      sketchRef.current.create("polygon");
-    }
-  };
-
-  const handleSave = async () => {
-    if (!graphicsLayer || !sketchRef.current) return;
-
-    // Finish any active drawing/edit
-    if (sketchRef.current.state === "active") {
-      sketchRef.current.complete();
-    }
-
-    let coordinates: GeoPosition[][] = [];
-
-    if (graphicsLayer.graphics.length > 0) {
+    const updateCoords = async () => {
       const graphic = graphicsLayer.graphics.getItemAt(0);
 
-      // exclude points
-      if (
-        graphic?.geometry?.rings?.length &&
-        graphic.geometry?.rings[0].length > 2
-      ) {
-        coordinates = await projectPolygon3857To4326(graphic.geometry.rings);
+      if (graphic) {
+        onCoordsChangeRef.current(
+          await projectPolygon3857To4326(graphic.geometry.rings)
+        );
+      } else {
+        onCoordsChangeRef.current([]);
+        sketchRef.current?.create("polygon");
       }
-    }
+    };
 
-    if (window.opener && !window.opener.closed) {
-      window.opener.postMessage(
-        {
-          type: PostMessageType.PolygonEdited,
-          coordinates
-        },
-        window.location.origin
-      );
-    }
+    const updateHandle = sketchRef.current?.on("update", updateCoords);
+    const changeHandle = graphicsLayer.graphics.on("change", updateCoords);
 
-    window.close();
-  };
+    return () => {
+      updateHandle?.remove();
+      changeHandle?.remove();
+    };
+  }, [graphicsLayer]);
 
-  return mode === POLYGON_EDITOR_MODE.VIEW ? (
-    <GeometryMapEditor mapRef={mapRef} />
-  ) : (
-    <GeometryMapEditor
-      mapRef={mapRef}
-      buttons={["save", "erase"]}
-      handleSave={handleSave}
-      handleErase={handleErase}
-    />
+  return (
+    <ArcGISLoader>
+      <div
+        className="mt-2 mb-4 w-100 rounded-2 overflow-hidden"
+        style={{
+          height: "350px",
+          background: "#f2f2f2"
+        }}
+      >
+        <div ref={mapRef} className="w-100 h-100" />
+      </div>
+    </ArcGISLoader>
   );
 }

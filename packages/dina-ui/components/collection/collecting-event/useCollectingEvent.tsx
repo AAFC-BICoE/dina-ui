@@ -27,7 +27,7 @@ export function useCollectingEventQuery(id?: string | null) {
 
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
-      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod,protocol,expedition`,
+      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod,protocol,expedition,site`,
       header: { "include-dina-permission": "true" }
     },
     {
@@ -220,6 +220,16 @@ export function useCollectingEventSave({
     }
     delete collectingEventDiff.expedition;
 
+    // Convert site to a relationship.
+    if (collectingEventDiff?.site) {
+      (collectingEventDiff as any).relationships.site = {
+        data: collectingEventDiff?.site?.id
+          ? _.pick(collectingEventDiff.site, "id", "type")
+          : null
+      };
+    }
+    delete collectingEventDiff.site;
+
     // Convert protocol to a relationship.
     if (collectingEventDiff?.protocol) {
       (collectingEventDiff as any).relationships.protocol = {
@@ -229,6 +239,16 @@ export function useCollectingEventSave({
       };
     }
     delete collectingEventDiff.protocol;
+
+    // Convert collecting mehtod to a relationship.
+    if (collectingEventDiff?.collectionMethod) {
+      (collectingEventDiff as any).relationships.collectionMethod = {
+        data: collectingEventDiff?.collectionMethod?.id
+          ? _.pick(collectingEventDiff.collectionMethod, "id", "type")
+          : null
+      };
+    }
+    delete collectingEventDiff.collectionMethod;
 
     // First create a copy of what would be the new geographicPlaceNameSourceDetail
     const newSourceDetail = {

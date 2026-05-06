@@ -162,53 +162,36 @@ const mockGeographicSearchResults = [
   }
 ];
 
-const mockGet = jest.fn<any, any>(async (path) => {
+const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_1":
-      return Promise.resolve({
-        data: { id: "1", key: "attribute_1", name: "Attribute 1" }
-      });
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_2":
-      return Promise.resolve({
-        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
-      });
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_3":
-      return Promise.resolve({
-        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
-      });
-    case "collection-api/managed-attribute/COLLECTING_EVENT.attribute_2":
-      return Promise.resolve({
-        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
-      });
-    case "collection-api/managed-attribute/COLLECTING_EVENT.attribute_3":
-      return Promise.resolve({
-        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
-      });
-    case "collection-api/managed-attribute/ORGANISM.attribute_2":
-      return Promise.resolve({
-        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
-      });
-    case "collection-api/managed-attribute/ORGANISM.attribute_3":
-      return Promise.resolve({
-        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
-      });
-    case "collection-api/managed-attribute/DETERMINATION.attribute_2":
-      return Promise.resolve({
-        data: { id: "2", key: "attribute_2", name: "Attribute 2" }
-      });
-    case "collection-api/managed-attribute/DETERMINATION.attribute_3":
-      return Promise.resolve({
-        data: { id: "3", key: "attribute_3", name: "Attribute 3" }
-      });
+    case "collection-api/managed-attribute":
+      // Handle filter-based lookups used by useManagedAttributeQueries
+      if (params?.filter?.key?.EQ === "attribute_1") {
+        return Promise.resolve({
+          data: [{ id: "1", key: "attribute_1", name: "Attribute 1" }]
+        });
+      }
+      if (params?.filter?.key?.EQ === "attribute_2") {
+        return Promise.resolve({
+          data: [{ id: "2", key: "attribute_2", name: "Attribute 2" }]
+        });
+      }
+      if (params?.filter?.key?.EQ === "attribute_3") {
+        return Promise.resolve({
+          data: [{ id: "3", key: "attribute_3", name: "Attribute 3" }]
+        });
+      }
+      // return all for the multiselect dropdown
+      return { data: [], meta: { totalResourceCount: 0 } };
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition":
+    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: testCollectionEvent() };
-    case "collection-api/collecting-event/2?include=collectors,attachment,collectionMethod,protocol,expedition":
+    case "collection-api/collecting-event/2?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: testCollectionEventWithGeographicalPlace() };
-    case "collection-api/collecting-event/3?include=collectors,attachment,collectionMethod,protocol,expedition":
+    case "collection-api/collecting-event/3?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: testCollectionEventWithPermissions() };
-    case "collection-api/collecting-event/4?include=collectors,attachment,collectionMethod,protocol,expedition":
+    case "collection-api/collecting-event/4?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return {
         data: testCollectionEventWithGeographicalPlaceCustomPlaceName()
       };
@@ -756,7 +739,13 @@ describe("Material Sample Edit Page", () => {
           id: "333",
           materialSampleName: "test-ms",
           associations: [
-            { associatedSample: "test name", associationType: "host" }
+            {
+              type: "association",
+              associatedSample: { id: "1", type: "material-sample" },
+              sample: { id: "333", type: "material-sample" },
+              associationType: "host",
+              id: "assocation-1"
+            }
           ]
         }}
         onSaved={mockOnSaved}
@@ -785,21 +774,35 @@ describe("Material Sample Edit Page", () => {
           ...testMaterialSample(),
           id: "333",
           materialSampleName: "test-ms",
-          associations: [{ associatedSample: "1", associationType: "host" }]
+          associations: [
+            {
+              type: "association",
+              associatedSample: {
+                id: "1",
+                type: "material-sample",
+                materialSampleName: "My sample name"
+              },
+              sample: { id: "333", type: "material-sample" },
+              associationType: "host",
+              id: "assocation-1"
+            }
+          ]
         }}
         onSaved={mockOnSaved}
       />,
       testCtx
     );
+    await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
-        wrapper.getByRole("link", { name: /my\-sample\-name/i })
+        wrapper.getByRole("link", { name: /my sample name/i })
       ).toBeInTheDocument()
     );
 
     // Expect to the associated sample:
     expect(
-      wrapper.getByRole("link", { name: /my\-sample\-name/i })
+      wrapper.getByRole("link", { name: /my sample name/i })
     ).toBeInTheDocument();
 
     // Change the remark text.
@@ -818,17 +821,20 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              associations: [
-                {
-                  associatedSample: "1",
-                  associationType: "host",
-                  remarks: "New Remark"
+              id: "assocation-1",
+              type: "association",
+              associationType: "host",
+              remarks: "New Remark",
+              relationships: {
+                associatedSample: {
+                  data: { id: "1", type: "material-sample" }
+                },
+                sample: {
+                  data: { id: "333", type: "material-sample" }
                 }
-              ],
-              id: "333",
-              type: "material-sample"
+              }
             },
-            type: "material-sample"
+            type: "association"
           }
         ],
         { apiBaseUrl: "/collection-api" }
@@ -1297,16 +1303,65 @@ describe("Material Sample Edit Page", () => {
 
     // Select one sample from search result list
     userEvent.click(wrapper.getByRole("button", { name: /select/i }));
+    await waitForLoadingToDisappear();
+
+    // Test name should be displayed.
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("link", { name: /test name/i })
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("Validates that associations require an associated sample and association type before saving.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm onSaved={mockOnSaved} />,
+      testCtx
+    );
     await waitFor(() =>
       expect(
-        wrapper.getByRole("link", { name: /my\-sample\-name/i })
+        wrapper.container.querySelectorAll(
+          ".enable-associations .react-switch-bg"
+        )[0]
       ).toBeInTheDocument()
     );
 
-    // Expect the selected sample being populated to the sample input
-    expect(
-      wrapper.getByRole("link", { name: /my\-sample\-name/i })
-    ).toBeInTheDocument();
+    // Enable association:
+    const associationToggle = wrapper.container.querySelectorAll(
+      ".enable-associations .react-switch-bg"
+    );
+    if (!associationToggle) {
+      fail("Association toggle needs to exist at this point.");
+    }
+    fireEvent.click(associationToggle[0]);
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("button", { name: /search\.\.\./i })
+      ).toBeInTheDocument()
+    );
+
+    // Add some remarks.
+    const tabpanel = wrapper.getByRole("tabpanel");
+    const remarkTextbox = within(tabpanel).getByRole("textbox", {
+      name: /remarks/i
+    });
+    userEvent.type(remarkTextbox, "Remarks Test");
+
+    // Leave the other required fields blank.
+
+    // Attempt to save without filling in required fields:
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitForLoadingToDisappear();
+
+    // Both required field errors should be displayed:
+    await waitFor(() => {
+      expect(
+        wrapper.getAllByText(/required field/i).length
+      ).toBeGreaterThanOrEqual(2);
+    });
+
+    // No save should have been made:
+    expect(mockSave).not.toHaveBeenCalled();
   });
 
   it("Lets you add an organism to an existing Material Sample", async () => {
@@ -2654,7 +2709,15 @@ describe("Material Sample Edit Page", () => {
               name: "Test Host Organism",
               remarks: "Original remarks"
             },
-            associations: [{ associatedSample: "1", associationType: "host" }]
+            associations: [
+              {
+                type: "association",
+                associatedSample: { id: "1", type: "material-sample" },
+                sample: { id: "333", type: "material-sample" },
+                associationType: "host",
+                id: "assocation-1"
+              }
+            ]
           }}
           onSaved={mockOnSaved}
         />,
@@ -2687,7 +2750,15 @@ describe("Material Sample Edit Page", () => {
               name: "Test Host Organism",
               remarks: "Original remarks"
             },
-            associations: [{ associatedSample: "1", associationType: "host" }]
+            associations: [
+              {
+                type: "association",
+                associatedSample: { id: "1", type: "material-sample" },
+                sample: { id: "333", type: "material-sample" },
+                associationType: "host",
+                id: "association-1"
+              }
+            ]
           }}
           onSaved={mockOnSaved}
         />,
@@ -2766,7 +2837,15 @@ describe("Material Sample Edit Page", () => {
               name: "Test Host Organism",
               remarks: "Original remarks"
             },
-            associations: [{ associatedSample: "1", associationType: "host" }]
+            associations: [
+              {
+                type: "association",
+                associatedSample: { id: "1", type: "material-sample" },
+                sample: { id: "333", type: "material-sample" },
+                associationType: "host",
+                id: "association-1"
+              }
+            ]
           }}
           onSaved={mockOnSaved}
         />,
@@ -2797,6 +2876,8 @@ describe("Material Sample Edit Page", () => {
 
       // Save the form
       userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+      await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -2805,13 +2886,25 @@ describe("Material Sample Edit Page", () => {
                 resource: {
                   id: "333",
                   type: "material-sample",
-                  hostOrganism: null,
-                  associations: []
+                  hostOrganism: null
                 },
                 type: "material-sample"
               }
             ],
             { apiBaseUrl: "/collection-api" }
+          ],
+          [
+            [
+              {
+                delete: {
+                  id: "association-1",
+                  type: "association"
+                }
+              }
+            ],
+            {
+              apiBaseUrl: "/collection-api"
+            }
           ]
         ])
       );
@@ -2824,7 +2917,14 @@ describe("Material Sample Edit Page", () => {
             ...testMaterialSample(),
             id: "333",
             materialSampleName: "test-ms",
-            associations: [{ associatedSample: "1", associationType: "host" }]
+            associations: [
+              {
+                type: "association",
+                associatedSample: { id: "1", type: "material-sample" },
+                sample: { id: "333", type: "material-sample" },
+                associationType: "host"
+              }
+            ]
           }}
           onSaved={mockOnSaved}
         />,
@@ -2861,6 +2961,28 @@ describe("Material Sample Edit Page", () => {
               }
             ],
             { apiBaseUrl: "/collection-api" }
+          ],
+          [
+            [
+              {
+                resource: {
+                  associationType: "host",
+                  relationships: {
+                    associatedSample: {
+                      data: { id: "1", type: "material-sample" }
+                    },
+                    sample: {
+                      data: { id: "333", type: "material-sample" }
+                    }
+                  },
+                  type: "association"
+                },
+                type: "association"
+              }
+            ],
+            {
+              apiBaseUrl: "/collection-api"
+            }
           ]
         ])
       );

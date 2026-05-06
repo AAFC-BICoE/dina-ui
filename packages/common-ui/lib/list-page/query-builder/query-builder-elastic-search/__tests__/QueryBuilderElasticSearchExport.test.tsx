@@ -19,7 +19,9 @@ import {
   inRangeQuery,
   betweenQuery,
   inDateQuery,
-  processResults
+  processResults,
+  emptyFieldQuery,
+  notEmptyFieldQuery
 } from "../QueryBuilderElasticSearchExport";
 
 const ELASTIC_SEARCH_QUERY: any = {
@@ -909,6 +911,54 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
           "collecting-event",
           "number"
         )
+      ).toMatchSnapshot();
+    });
+
+    test("emptyFieldQuery", async () => {
+      // 1. No parentType, checkEmptyString = false (e.g. Booleans, Numbers, Dates)
+      expect(
+        emptyFieldQuery("data.attributes.materialSampleName")
+      ).toMatchSnapshot();
+
+      // 2. No parentType, checkEmptyString = true (e.g. Text fields)
+      expect(
+        emptyFieldQuery("data.attributes.materialSampleName", undefined, true)
+      ).toMatchSnapshot();
+
+      // 3. With parentType, checkEmptyString = false (e.g. Nested Booleans, Numbers, Dates)
+      expect(
+        emptyFieldQuery("included.attributes.name", "project")
+      ).toMatchSnapshot();
+
+      // 4. With parentType, checkEmptyString = true (e.g. Nested Text fields)
+      expect(
+        emptyFieldQuery("included.attributes.name", "project", true)
+      ).toMatchSnapshot();
+    });
+
+    test("notEmptyFieldQuery", async () => {
+      // 1. No parentType, checkEmptyString = false (e.g. Booleans, Numbers, Dates)
+      expect(
+        notEmptyFieldQuery("data.attributes.materialSampleName")
+      ).toMatchSnapshot();
+
+      // 2. No parentType, checkEmptyString = true (e.g. Text fields)
+      expect(
+        notEmptyFieldQuery(
+          "data.attributes.materialSampleName",
+          undefined,
+          true
+        )
+      ).toMatchSnapshot();
+
+      // 3. With parentType, checkEmptyString = false (e.g. Nested Booleans, Numbers, Dates)
+      expect(
+        notEmptyFieldQuery("included.attributes.name", "project")
+      ).toMatchSnapshot();
+
+      // 4. With parentType, checkEmptyString = true (e.g. Nested Text fields)
+      expect(
+        notEmptyFieldQuery("included.attributes.name", "project", true)
       ).toMatchSnapshot();
     });
   });

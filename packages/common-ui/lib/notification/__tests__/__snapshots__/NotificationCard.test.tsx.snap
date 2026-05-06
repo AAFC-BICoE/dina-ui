@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NotificationCard Popup rendering Renders popup with title and message 1`] = `
+<div>
+  <div
+    aria-atomic="true"
+    aria-live="assertive"
+    class="notification-toast "
+    role="alert"
+  >
+    <div
+      class="notification-toast__header"
+    >
+      <strong
+        class="me-auto"
+      >
+        <span
+          class="notification-title fw-bold"
+        >
+          Popup Title
+        </span>
+      </strong>
+      <small>
+        2 hours ago
+      </small>
+      <button
+        aria-label="Close"
+        class="btn-close ms-2"
+        type="button"
+      />
+    </div>
+    <div
+      class="notification-toast__body"
+    >
+      <span>
+        Popup message content
+      </span>
+    </div>
+  </div>
+</div>
+`;

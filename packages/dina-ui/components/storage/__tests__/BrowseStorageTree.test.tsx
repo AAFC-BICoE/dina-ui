@@ -170,7 +170,8 @@ describe("BrowseStorageTree component", () => {
             IN: "aafc,cnc"
           }
         },
-        include: "storageUnitChildren,storageUnitType",
+        include: "storageUnitType",
+        optfields: { "storage-unit": "storageUnitChildren" },
         page: {
           limit: 100,
           offset: 0
@@ -194,7 +195,8 @@ describe("BrowseStorageTree component", () => {
             IN: "aafc,cnc"
           }
         },
-        include: "storageUnitChildren,storageUnitType",
+        include: "storageUnitType",
+        optfields: { "storage-unit": "storageUnitChildren" },
         page: {
           limit: 100,
           offset: 0
@@ -212,7 +214,8 @@ describe("BrowseStorageTree component", () => {
       expect(lastCall[0]).toBe("collection-api/storage-unit");
       expect(lastCall[1]).toMatchObject({
         filter: {},
-        include: "storageUnitChildren,storageUnitType",
+        include: "storageUnitType",
+        optfields: { "storage-unit": "storageUnitChildren" },
         page: {
           limit: 100,
           offset: 0

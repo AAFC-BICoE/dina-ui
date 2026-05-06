@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React, { PropsWithChildren } from "react";
 import { CommonMessage } from "../../lib/intl/common-ui-intl";
+import { FaArrowLeft } from "react-icons/fa";
 
 interface BackToListButtonProps {
   /** The link type for where to redirect the user. Gets appended with "/" + entityLink + "/list/". */
@@ -21,6 +22,7 @@ export function BackToListButton({
       href={`${entityLink}/list`}
       className={`btn btn-secondary ${className}`}
     >
+      <FaArrowLeft className="me-2" />
       {children || <CommonMessage id="backToList" />}
     </Link>
   );

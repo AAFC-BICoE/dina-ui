@@ -1,7 +1,9 @@
+import { render } from "@testing-library/react";
 import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../../dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   collectPathValues,
   generateColumnPath,
+  getNestedColumn,
   parseRelationshipNameFromType
 } from "../ColumnSelectorUtils";
 
@@ -500,6 +502,171 @@ describe("ColumnSelectorUtils", () => {
     test("returns the object itself for empty path", () => {
       const obj = { a: "value" };
       expect(collectPathValues(obj, "")).toBe(obj);
+    });
+  });
+
+  describe("getNestedColumn", () => {
+    it("One level column definition", async () => {
+      const nestedColumn = getNestedColumn("attachment.acCaption", {
+        label: "acCaption",
+        value: "attachment.acCaption",
+        hideField: false,
+        type: "text",
+        path: "attributes",
+        parentName: "attachment",
+        parentType: "metadata",
+        parentPath: "included",
+        keywordMultiFieldSupport: true,
+        keywordNumericSupport: false,
+        optimizedPrefix: false,
+        containsSupport: false,
+        endsWithSupport: false,
+        isReverseRelationship: false
+      } as any);
+
+      // Verify the column definition
+      expect(nestedColumn).toEqual({
+        id: "attachment.acCaption",
+        accessorKey: "included.attributes.acCaption",
+        columnSelectorString: "attachment.acCaption",
+        relationshipType: "metadata",
+        cell: expect.anything(),
+        header: expect.anything(),
+        isKeyword: true,
+        isColumnVisible: true
+      });
+
+      const CellComponent = nestedColumn.cell as Function;
+
+      // Test the cell function with a sample row data
+      const mockSingleRow = {
+        original: {
+          included: {
+            attachment: {
+              attributes: {
+                acCaption: "Sample Caption"
+              }
+            }
+          }
+        }
+      };
+
+      const { container: singleContainer } = render(
+        CellComponent({ row: mockSingleRow } as any)
+      );
+      expect(singleContainer.textContent).toBe("Sample Caption");
+
+      // Test array handling in cell function
+      const mockArrayRow = {
+        original: {
+          included: {
+            attachment: [
+              { attributes: { acCaption: "Caption 1" } },
+              { attributes: { acCaption: "Caption 2" } }
+            ]
+          }
+        }
+      };
+
+      const { container: arrayContainer } = render(
+        CellComponent({ row: mockArrayRow } as any)
+      );
+      expect(arrayContainer.textContent).toBe("Caption 1, Caption 2");
+    });
+
+    it("Two level column definition", async () => {
+      const nestedColumn = getNestedColumn(
+        "organism.determination.typeStatus",
+        {
+          label: "determination.typeStatus",
+          value: "organism.determination.typeStatus",
+          hideField: false,
+          type: "text",
+          path: "attributes.determination",
+          parentName: "organism",
+          parentType: "organism",
+          parentPath: "included",
+          keywordMultiFieldSupport: false,
+          keywordNumericSupport: false,
+          optimizedPrefix: false,
+          containsSupport: false,
+          endsWithSupport: false,
+          isReverseRelationship: false
+        } as any
+      );
+
+      expect(nestedColumn).toEqual({
+        id: "organism.determination.typeStatus",
+        accessorKey: "included.attributes.determination.typeStatus",
+        columnSelectorString: "organism.determination.typeStatus",
+        relationshipType: "organism",
+        cell: expect.anything(),
+        header: expect.anything(),
+        isKeyword: false,
+        isColumnVisible: true
+      });
+
+      const CellComponent = nestedColumn.cell as Function;
+
+      // Test the cell function with a sample row data
+      const mockSingleRow = {
+        original: {
+          included: {
+            organism: [
+              {
+                attributes: {
+                  determination: [
+                    {
+                      scientificName: "Hexapoda",
+                      typeStatus: "Holotype"
+                    }
+                  ]
+                },
+                id: "019ce8e3-08e8-724e-8f32-520695db4c6f",
+                type: "organism"
+              }
+            ],
+            collection: {
+              attributes: {
+                name: "Test"
+              },
+              id: "019cdce6-9a89-74d5-bdcf-a4dc92334e1a",
+              type: "collection"
+            }
+          }
+        }
+      };
+
+      const { container: singleContainer } = render(
+        CellComponent({ row: mockSingleRow } as any)
+      );
+      expect(singleContainer.textContent).toBe("Holotype");
+
+      // Test array handling in cell function
+      // Test the cell function with a sample row data
+      const mockArrayRow = {
+        original: {
+          included: {
+            organism: {
+              attributes: {
+                determination: [
+                  {
+                    typeStatus: "Holotype"
+                  },
+                  {
+                    typeStatus: "Paratype"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      };
+
+      const { container: arrayContainer } = render(
+        CellComponent({ row: mockArrayRow } as any)
+      );
+      expect(arrayContainer.textContent).toBe("Holotype, Paratype");
     });
   });
 });

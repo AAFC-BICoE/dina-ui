@@ -81,9 +81,52 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   );
 }
 
-const mockGet = jest.fn<any, any>(async (path) => {
+const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/managed-attribute":
+      if (params?.filter?.key?.EQ === "a") {
+        return {
+          data: [
+            {
+              id: "1",
+              type: "managed-attribute",
+              vocabularyElementType: "STRING",
+              managedAttributeComponent: "MATERIAL_SAMPLE",
+              key: "a",
+              name: "Managed Attribute 1"
+            }
+          ]
+        };
+      }
+      if (params?.filter?.key?.EQ === "b") {
+        return {
+          data: [
+            {
+              id: "2",
+              type: "managed-attribute",
+              vocabularyElementType: "STRING",
+              managedAttributeComponent: "MATERIAL_SAMPLE",
+              key: "b",
+              name: "Managed Attribute 2"
+            }
+          ]
+        };
+      }
+      if (params?.filter?.key?.EQ === "c") {
+        return {
+          data: [
+            {
+              id: "3",
+              type: "managed-attribute",
+              vocabularyElementType: "STRING",
+              managedAttributeComponent: "MATERIAL_SAMPLE",
+              key: "c",
+              name: "Managed Attribute 3"
+            }
+          ]
+        };
+      }
+      // return all for the multiselect dropdown
       return {
         data: [
           {
@@ -111,39 +154,6 @@ const mockGet = jest.fn<any, any>(async (path) => {
             name: "Managed Attribute 3"
           }
         ]
-      };
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.a":
-      return {
-        data: {
-          id: "1",
-          type: "managed-attribute",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          key: "a",
-          name: "Managed Attribute 1"
-        }
-      };
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.b":
-      return {
-        data: {
-          id: "2",
-          type: "managed-attribute",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          key: "b",
-          name: "Managed Attribute 2"
-        }
-      };
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.c":
-      return {
-        data: {
-          id: "3",
-          type: "managed-attribute",
-          vocabularyElementType: "STRING",
-          managedAttributeComponent: "MATERIAL_SAMPLE",
-          key: "c",
-          name: "Managed Attribute 3"
-        }
       };
     case "agent-api/person":
     case "collection-api/collection":
@@ -270,8 +280,6 @@ describe("Material sample bulk edit tab", () => {
         // Keeps the name and type:
         type: "material-sample",
         materialSampleName: "test-sample",
-        // Sets the default association because it's enabled and there are no values set in the other tabs:
-        associations: [{}],
         // Sets the default organism because it's enabled and there are no values set in the other tabs:
         organism: [{}],
         organismsQuantity: 1

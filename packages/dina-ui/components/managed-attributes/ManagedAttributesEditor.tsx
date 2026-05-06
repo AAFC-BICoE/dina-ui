@@ -9,8 +9,11 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { DinaMessage } from "../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../types/collection-api";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import {
+  ControlledVocabularyItem,
+  ManagedAttribute
+} from "../../types/collection-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
 import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
 import { useManagedAttributeQueries } from "./useManagedAttributeQueries";
@@ -47,6 +50,14 @@ export interface ManagedAttributesEditorProps {
 
   /** Whether to show a clear button beside the managed attribute selector. Default false. */
   disableClearButton?: boolean;
+
+  /**
+   * Whether the managed attributes are from a controlled vocabulary endpoint (e.g. collection-api/controlled-vocabulary-item) or from a regular managed attribute endpoint (e.g. collection-api/managed-attribute).
+   * This changes how some of the network requests are performed.
+   *
+   * Eventually, all managed attributes will be from controlled vocabulary endpoints and this prop can be removed, but for now it is needed to support both the existing managed attributes and the new controlled vocabulary items.
+   */
+  isControlledVocabulary?: boolean;
 }
 
 interface ManagedAttributesEditorInnerProps
@@ -65,7 +76,8 @@ function ManagedAttributesEditorInner({
   fieldSetProps,
   managedAttributeOrderFieldName,
   disableClearButton = false,
-  values
+  values,
+  isControlledVocabulary = false
 }: ManagedAttributesEditorInnerProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
@@ -100,14 +112,15 @@ function ManagedAttributesEditorInner({
     keys: visibleAttributeKeys,
     managedAttributeApiPath,
     managedAttributeComponent,
-    disabled: !visibleAttributeKeys.length
+    disabled: !visibleAttributeKeys.length,
+    isControlledVocabulary
   });
 
   // Store the last fetched Attributes in a ref instead of showing a
   // loading state when the visible attributes change.
-  const lastFetchedAttributes = useRef<PersistedResource<ManagedAttribute>[]>(
-    []
-  );
+  const lastFetchedAttributes = useRef<
+    PersistedResource<ManagedAttribute | ControlledVocabularyItem>[]
+  >([]);
 
   if (!visibleAttributeKeys.length) {
     lastFetchedAttributes.current = [];
@@ -160,6 +173,7 @@ function ManagedAttributesEditorInner({
                       onChange={setVisibleAttributeKeys}
                       visibleAttributes={visibleAttributes}
                       loading={loading}
+                      isControlledVocabulary={isControlledVocabulary}
                     />
                   </label>
                 </div>
@@ -332,22 +346,30 @@ export function ManagedAttributeMultiSelect({
   managedAttributeApiPath,
   onChange,
   visibleAttributes,
-  loading
+  loading,
+  isControlledVocabulary = false
 }: {
   managedAttributeComponent?: string;
   managedAttributeApiPath: string;
   onChange: (newKeys: string[]) => void;
-  visibleAttributes: PersistedResource<ManagedAttribute>[];
+  visibleAttributes: PersistedResource<
+    ManagedAttribute | ControlledVocabularyItem
+  >[];
   loading?: boolean;
+  isControlledVocabulary: boolean;
 }) {
+  const { locale } = useDinaIntl();
+
   // Memoize the filter function
   const filter = useCallback(
     (input: string) =>
-      SimpleSearchFilterBuilder.create<ManagedAttribute>()
+      SimpleSearchFilterBuilder.create<any>()
         .searchFilter("name", input)
         .when(!!managedAttributeComponent, (builder) =>
           builder.where(
-            "managedAttributeComponent",
+            isControlledVocabulary
+              ? "dinaComponent"
+              : "managedAttributeComponent",
             "EQ",
             managedAttributeComponent!
           )
@@ -358,20 +380,31 @@ export function ManagedAttributeMultiSelect({
 
   // Memoize the label function
   const optionLabel = useCallback(
-    (attribute: ManagedAttribute) =>
-      _.get(attribute, "name") ||
-      _.get(attribute, "key") ||
-      _.get(attribute, "id") ||
-      "",
-    []
+    (attribute: ManagedAttribute | ControlledVocabularyItem) => {
+      const localizedTitle = (
+        attribute as ControlledVocabularyItem
+      )?.multilingualTitle?.titles?.find((t) => t.lang === locale)?.title;
+      const fallbackTitle = (
+        attribute as ControlledVocabularyItem
+      )?.multilingualTitle?.titles?.find((t) => t.lang !== locale)?.title;
+      return (
+        localizedTitle ||
+        fallbackTitle ||
+        _.get(attribute, "name") ||
+        _.get(attribute, "key") ||
+        _.get(attribute, "id") ||
+        ""
+      );
+    },
+    [locale]
   );
 
   // Stable onChange handler ( this handles on change for )
   const onChangeInternal = useCallback(
     (
       newValues:
-        | PersistedResource<ManagedAttribute>
-        | PersistedResource<ManagedAttribute>[]
+        | PersistedResource<ManagedAttribute | ControlledVocabularyItem>
+        | PersistedResource<ManagedAttribute | ControlledVocabularyItem>[]
     ) => {
       const newAttributes = _.castArray(newValues); // Ensure it's always an array
       const newKeys = newAttributes.map((it) => _.get(it, "key")); // Extract just the keys

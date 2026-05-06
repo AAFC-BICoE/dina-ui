@@ -5,7 +5,9 @@ import {
   rangeQuery,
   existsQuery,
   betweenQuery,
-  inDateQuery
+  inDateQuery,
+  emptyFieldQuery,
+  notEmptyFieldQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { DATE_REGEX_NO_TIME, DATE_REGEX_PARTIAL } from "common-ui";
@@ -238,57 +240,13 @@ export function transformDateSearchToDSL({
             }
           };
 
-    // Empty values only. (only if the value is not mandatory)
+    // Empty values only.
     case "empty":
-      return parentType
-        ? {
-            bool: {
-              should: [
-                {
-                  bool: {
-                    must_not: {
-                      nested: {
-                        path: "included",
-                        query: {
-                          bool: {
-                            must: [
-                              existsQuery(fieldPath),
-                              includedTypeQuery(parentType)
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                {
-                  bool: {
-                    must_not: includedTypeQuery(parentType)
-                  }
-                }
-              ]
-            }
-          }
-        : {
-            bool: {
-              must_not: existsQuery(fieldPath)
-            }
-          };
+      return emptyFieldQuery(fieldPath, parentType);
 
-    // Not empty values only. (only if the value is not mandatory)
+    // Not empty values only.
     case "notEmpty":
-      return parentType
-        ? {
-            nested: {
-              path: "included",
-              query: {
-                bool: {
-                  must: [existsQuery(fieldPath), includedTypeQuery(parentType)]
-                }
-              }
-            }
-          }
-        : existsQuery(fieldPath);
+      return notEmptyFieldQuery(fieldPath, parentType);
 
     // default case
     default:

@@ -209,5 +209,20 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   topMatches: "Top Matches",
   permissionError:
     "You don't have permissions to delete all of these selected records.",
-  deleteSuccess: "Successfully deleted {count} records."
+  deleteSuccess: "Successfully deleted {count} records.",
+  noData: "No Data",
+  listView: "List",
+  galleryView: "Gallery",
+  mapView: "Map",
+  taxonomyTreeView: "Taxonomic Hierarchy",
+  visualization: "Visualizations",
+  taxonomy: "Taxonomy",
+  last24hours: "Last 24 hours",
+  last7days: "Last 7 days",
+  last30days: "Last 30 days",
+  last3months: "Last 3 months",
+  last6months: "Last 6 months",
+  lastYear: "Last Year",
+  thisYear: "This Year",
+  allTime: "All Time"
 };

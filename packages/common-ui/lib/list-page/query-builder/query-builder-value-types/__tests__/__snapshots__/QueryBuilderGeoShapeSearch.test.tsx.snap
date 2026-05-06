@@ -1,0 +1,303 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryBuilderGeoShapeSearch transformGeoShapeToDSL function All operators nested 1`] = `
+Object {
+  "contains": Object {
+    "nested": Object {
+      "path": "included",
+      "query": Object {
+        "geo_shape": Object {
+          "geometry": Object {
+            "relation": "contains",
+            "shape": Object {
+              "coordinates": Array [
+                Array [
+                  Array [
+                    100,
+                    0,
+                  ],
+                  Array [
+                    101,
+                    0,
+                  ],
+                  Array [
+                    101,
+                    1,
+                  ],
+                  Array [
+                    100,
+                    1,
+                  ],
+                  Array [
+                    100,
+                    0,
+                  ],
+                ],
+              ],
+              "type": "polygon",
+            },
+          },
+        },
+      },
+    },
+  },
+  "disjoint": Object {
+    "nested": Object {
+      "path": "included",
+      "query": Object {
+        "geo_shape": Object {
+          "geometry": Object {
+            "relation": "disjoint",
+            "shape": Object {
+              "coordinates": Array [
+                Array [
+                  Array [
+                    100,
+                    0,
+                  ],
+                  Array [
+                    101,
+                    0,
+                  ],
+                  Array [
+                    101,
+                    1,
+                  ],
+                  Array [
+                    100,
+                    1,
+                  ],
+                  Array [
+                    100,
+                    0,
+                  ],
+                ],
+              ],
+              "type": "polygon",
+            },
+          },
+        },
+      },
+    },
+  },
+  "intersects": Object {
+    "nested": Object {
+      "path": "included",
+      "query": Object {
+        "geo_shape": Object {
+          "geometry": Object {
+            "relation": "intersects",
+            "shape": Object {
+              "coordinates": Array [
+                Array [
+                  Array [
+                    100,
+                    0,
+                  ],
+                  Array [
+                    101,
+                    0,
+                  ],
+                  Array [
+                    101,
+                    1,
+                  ],
+                  Array [
+                    100,
+                    1,
+                  ],
+                  Array [
+                    100,
+                    0,
+                  ],
+                ],
+              ],
+              "type": "polygon",
+            },
+          },
+        },
+      },
+    },
+  },
+  "within": Object {
+    "nested": Object {
+      "path": "included",
+      "query": Object {
+        "geo_shape": Object {
+          "geometry": Object {
+            "relation": "within",
+            "shape": Object {
+              "coordinates": Array [
+                Array [
+                  Array [
+                    100,
+                    0,
+                  ],
+                  Array [
+                    101,
+                    0,
+                  ],
+                  Array [
+                    101,
+                    1,
+                  ],
+                  Array [
+                    100,
+                    1,
+                  ],
+                  Array [
+                    100,
+                    0,
+                  ],
+                ],
+              ],
+              "type": "polygon",
+            },
+          },
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderGeoShapeSearch transformGeoShapeToDSL function All operators non-nested 1`] = `
+Object {
+  "contains": Object {
+    "geo_shape": Object {
+      "geometry": Object {
+        "relation": "contains",
+        "shape": Object {
+          "coordinates": Array [
+            Array [
+              Array [
+                100,
+                0,
+              ],
+              Array [
+                101,
+                0,
+              ],
+              Array [
+                101,
+                1,
+              ],
+              Array [
+                100,
+                1,
+              ],
+              Array [
+                100,
+                0,
+              ],
+            ],
+          ],
+          "type": "polygon",
+        },
+      },
+    },
+  },
+  "disjoint": Object {
+    "geo_shape": Object {
+      "geometry": Object {
+        "relation": "disjoint",
+        "shape": Object {
+          "coordinates": Array [
+            Array [
+              Array [
+                100,
+                0,
+              ],
+              Array [
+                101,
+                0,
+              ],
+              Array [
+                101,
+                1,
+              ],
+              Array [
+                100,
+                1,
+              ],
+              Array [
+                100,
+                0,
+              ],
+            ],
+          ],
+          "type": "polygon",
+        },
+      },
+    },
+  },
+  "intersects": Object {
+    "geo_shape": Object {
+      "geometry": Object {
+        "relation": "intersects",
+        "shape": Object {
+          "coordinates": Array [
+            Array [
+              Array [
+                100,
+                0,
+              ],
+              Array [
+                101,
+                0,
+              ],
+              Array [
+                101,
+                1,
+              ],
+              Array [
+                100,
+                1,
+              ],
+              Array [
+                100,
+                0,
+              ],
+            ],
+          ],
+          "type": "polygon",
+        },
+      },
+    },
+  },
+  "within": Object {
+    "geo_shape": Object {
+      "geometry": Object {
+        "relation": "within",
+        "shape": Object {
+          "coordinates": Array [
+            Array [
+              Array [
+                100,
+                0,
+              ],
+              Array [
+                101,
+                0,
+              ],
+              Array [
+                101,
+                1,
+              ],
+              Array [
+                100,
+                1,
+              ],
+              Array [
+                100,
+                0,
+              ],
+            ],
+          ],
+          "type": "polygon",
+        },
+      },
+    },
+  },
+}
+`;

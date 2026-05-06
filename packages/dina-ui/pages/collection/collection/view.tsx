@@ -5,6 +5,7 @@ import { ViewPageLayout } from "../../../components";
 import { Collection } from "../../../types/collection-api";
 import { CollectionFormFields } from "./edit";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import CollectionMostRecentSample from "../../../components/collection/collection/CollectionMostRecentSample";
 
 export default function CollectionDetailsPage() {
   const buildQueryTree = (name: string) => {
@@ -48,6 +49,11 @@ export default function CollectionDetailsPage() {
             >
               <DinaMessage id="viewMaterialSamplesInCollection" />
             </Link>
+          )}
+          {props.initialValues.id && (
+            <div className="mt-3">
+              <CollectionMostRecentSample id={props.initialValues.id} />
+            </div>
           )}
         </DinaForm>
       )}

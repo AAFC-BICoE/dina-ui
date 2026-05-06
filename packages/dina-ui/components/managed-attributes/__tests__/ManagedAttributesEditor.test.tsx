@@ -57,6 +57,17 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/managed-attribute":
+      // Handle filter-based lookups used by useManagedAttributeQueries
+      if (params?.filter?.key?.EQ === "example_attribute_1") {
+        return { data: [EXAMPLE_MA_1] };
+      }
+      if (params?.filter?.key?.EQ === "example_attribute_2") {
+        return { data: [EXAMPLE_MA_2] };
+      }
+      if (params?.filter?.key?.EQ === "example_attribute_3") {
+        return { data: [EXAMPLE_MA_3] };
+      }
+      // Default: return all for the multiselect dropdown
       return { data: [EXAMPLE_MA_1, EXAMPLE_MA_2] };
     case "collection-api/form-template/existing-view-id":
       return {
@@ -73,13 +84,6 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           data: [TEST_COLLECTING_EVENT_CUSTOM_VIEW]
         };
       }
-    case "collection-api/managed-attribute/COLLECTING_EVENT.example_attribute_1":
-      return { data: EXAMPLE_MA_1 };
-    case "collection-api/managed-attribute/COLLECTING_EVENT.example_attribute_2":
-      return { data: EXAMPLE_MA_2 };
-    case "collection-api/managed-attribute/COLLECTING_EVENT.example_attribute_3":
-      return { data: EXAMPLE_MA_3 };
-    case "collection-api/form-template":
     case "user-api/group":
       return { data: [] };
   }
@@ -121,44 +125,50 @@ describe("ManagedAttributesEditor component", () => {
       { apiContext }
     );
 
-    // Wait for the data to load and ensure mockBulkGet was called with expected arguments.
+    // Wait for the data to load and ensure mockGet was called with expected arguments.
     await waitFor(() => {
-      expect(mockGet.mock.calls).toEqual([
-        [
-          "collection-api/managed-attribute",
-          {
-            filter: {
-              managedAttributeComponent: {
-                EQ: "COLLECTING_EVENT"
+      expect(mockGet.mock.calls).toEqual(
+        expect.arrayContaining([
+          // Fetch for example_attribute_1 using filter query
+          [
+            "collection-api/managed-attribute",
+            {
+              header: {
+                Accept: "application/vnd.api+json",
+                "Content-Type": "application/vnd.api+json",
+                "Crnk-Compact": "true"
+              },
+              filter: {
+                managedAttributeComponent: {
+                  EQ: "COLLECTING_EVENT"
+                },
+                key: {
+                  EQ: "example_attribute_1"
+                }
               }
-            },
-            page: {
-              limit: 20
-            },
-            sort: "-createdOn"
-          }
-        ],
-        [
-          "collection-api/managed-attribute/COLLECTING_EVENT.example_attribute_1",
-          {
-            header: {
-              Accept: "application/vnd.api+json",
-              "Content-Type": "application/vnd.api+json",
-              "Crnk-Compact": "true"
             }
-          }
-        ],
-        [
-          "collection-api/managed-attribute/COLLECTING_EVENT.example_attribute_2",
-          {
-            header: {
-              Accept: "application/vnd.api+json",
-              "Content-Type": "application/vnd.api+json",
-              "Crnk-Compact": "true"
+          ],
+          // Fetch for example_attribute_2 using filter query
+          [
+            "collection-api/managed-attribute",
+            {
+              header: {
+                Accept: "application/vnd.api+json",
+                "Content-Type": "application/vnd.api+json",
+                "Crnk-Compact": "true"
+              },
+              filter: {
+                managedAttributeComponent: {
+                  EQ: "COLLECTING_EVENT"
+                },
+                key: {
+                  EQ: "example_attribute_2"
+                }
+              }
             }
-          }
-        ]
-      ]);
+          ]
+        ])
+      );
     });
 
     // Verify that the correct input values are rendered.
@@ -216,5 +226,122 @@ describe("ManagedAttributesEditor component", () => {
         managedAttributes: { ...exampleValues, example_attribute_2: undefined }
       });
     });
+  });
+
+  it("Uses dinaComponent filter instead of managedAttributeComponent when isControlledVocabulary is true", async () => {
+    const EXAMPLE_CV_1 = {
+      id: "1",
+      key: "example_attribute_1",
+      name: "Example Attribute 1",
+      vocabularyElementType: "STRING",
+      dinaComponent: "SITE"
+    };
+
+    const EXAMPLE_CV_2 = {
+      id: "2",
+      key: "example_attribute_2",
+      name: "Example Attribute 2",
+      vocabularyElementType: "STRING",
+      dinaComponent: "SITE"
+    };
+
+    const mockGetCV = jest.fn<any, any>(async (path, params) => {
+      switch (path) {
+        case "collection-api/controlled-vocabulary-item":
+          if (params?.filter?.key?.EQ === "example_attribute_1") {
+            return { data: [EXAMPLE_CV_1] };
+          }
+          if (params?.filter?.key?.EQ === "example_attribute_2") {
+            return { data: [EXAMPLE_CV_2] };
+          }
+          return { data: [EXAMPLE_CV_1, EXAMPLE_CV_2] };
+        case "user-api/group":
+          return { data: [] };
+      }
+    });
+
+    const cvApiContext = {
+      apiClient: {
+        get: mockGetCV
+      },
+      bulkGet: mockBulkGet,
+      save: mockSave
+    };
+
+    const { container } = mountWithAppContext(
+      <DinaForm initialValues={{ managedAttributes: exampleValues }}>
+        <ManagedAttributesEditor
+          valuesPath="managedAttributes"
+          managedAttributeApiPath="collection-api/controlled-vocabulary-item"
+          managedAttributeComponent="SITE"
+          disableClearButton={true}
+          isControlledVocabulary={true}
+        />
+      </DinaForm>,
+      { apiContext: cvApiContext }
+    );
+
+    // Wait for the data to load and ensure the filter uses dinaComponent instead of managedAttributeComponent.
+    await waitFor(() => {
+      expect(mockGetCV.mock.calls).toEqual(
+        expect.arrayContaining([
+          // Fetch for example_attribute_1 using dinaComponent filter
+          [
+            "collection-api/controlled-vocabulary-item",
+            {
+              header: {
+                Accept: "application/vnd.api+json",
+                "Content-Type": "application/vnd.api+json",
+                "Crnk-Compact": "true"
+              },
+              filter: {
+                dinaComponent: {
+                  EQ: "SITE"
+                },
+                key: {
+                  EQ: "example_attribute_1"
+                }
+              }
+            }
+          ],
+          // Fetch for example_attribute_2 using dinaComponent filter
+          [
+            "collection-api/controlled-vocabulary-item",
+            {
+              header: {
+                Accept: "application/vnd.api+json",
+                "Content-Type": "application/vnd.api+json",
+                "Crnk-Compact": "true"
+              },
+              filter: {
+                dinaComponent: {
+                  EQ: "SITE"
+                },
+                key: {
+                  EQ: "example_attribute_2"
+                }
+              }
+            }
+          ]
+        ])
+      );
+
+      // Also verify managedAttributeComponent filter was never used
+      const calls = mockGetCV.mock.calls;
+      calls.forEach(([_, params]) => {
+        expect(params?.filter).not.toHaveProperty("managedAttributeComponent");
+      });
+    });
+
+    // Verify that the correct input values are still rendered correctly.
+    const exampleAttribute1Input = container.querySelector(
+      ".example_attribute_1-field input"
+    ) as HTMLInputElement;
+    const exampleAttribute2Input = container.querySelector(
+      ".example_attribute_2-field input"
+    ) as HTMLInputElement;
+
+    expect(exampleAttribute1Input.value).toEqual("example-value-1");
+    expect(exampleAttribute2Input.value).toEqual("example-value-2");
   });
 });
