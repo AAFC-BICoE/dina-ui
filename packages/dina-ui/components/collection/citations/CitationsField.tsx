@@ -33,8 +33,7 @@ export const BIBLIOGRAPHIC_REFERENCE_FIELDS_OBJECT: Required<
   title: true,
   doi: true,
   year: true,
-  author: true,
-  authorID: true,
+  authors: true,
   journal: true,
   volume: true,
   pages: true,
@@ -97,11 +96,7 @@ export function CitationsField({
       cell: ({ getValue }) => {
         const doi = getValue() as string;
         return doi ? (
-          <a
-            href={`https://doi.org/${doi}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={`${doi}`} target="_blank" rel="noopener noreferrer">
             {doi}
           </a>
         ) : null;
@@ -127,43 +122,24 @@ export function CitationsField({
       }
     },
     {
-      id: "author",
-      accessorKey: "author",
-      header: () => <FieldHeader name={formatMessage("author")} />,
+      id: "authors",
+      accessorKey: "authors",
+      header: () => <FieldHeader name={formatMessage("authors")} />,
       cell: ({ getValue }) => {
-        const authors = getValue() as string[];
-        if (!authors) return null;
+        const authors = getValue() as {
+          given_names: string;
+          family_names: string;
+          id: string;
+        }[];
+        if (!authors || !authors.length) return null;
 
         return (
           <div className="d-flex flex-column gap-1">
-            <span>{authors.join(", ")}</span>
-          </div>
-        );
-      },
-      meta: {
-        style: { verticalAlign: "top" }
-      }
-    },
-    {
-      id: "authorID",
-      accessorKey: "authorID",
-      header: () => <FieldHeader name={formatMessage("authorID")} />,
-      cell: ({ getValue }) => {
-        const authorIDs = getValue() as string[];
-        if (!authorIDs) return null;
-
-        return (
-          <div className="d-flex flex-column gap-1">
-            {authorIDs.map((id, index) => (
-              <a
-                key={index}
-                href={`${id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {id}
-              </a>
-            ))}
+            <span>
+              {authors
+                .map((author) => `${author.given_names} ${author.family_names}`)
+                .join(", ")}
+            </span>
           </div>
         );
       },
@@ -309,19 +285,35 @@ export function CitationsField({
                       <div className="mb-3">
                         <ul>
                           {citations.map((ref, index) => {
-                            const authors = ref.author?.length
-                              ? ref.author.length > 1
-                                ? `${ref.author[0]} et al.`
-                                : `${ref.author[0]}`
-                              : null;
                             const year = ref.year ? `(${ref.year})` : null;
                             const title = ref.title || null;
                             const journal = ref.journal || null;
                             const volume = ref.volume ? ref.volume : null;
-                            const pages = ref.pages ? `:${ref.pages}` : null;
-                            const doi = ref.doi
-                              ? `https://doi.org/${ref.doi}`
-                              : null;
+                            const pages = ref.pages || null;
+                            const doi = ref.doi ? `${ref.doi}` : null;
+
+                            const firstAuthor = ref.authors?.[0];
+
+                            const authorText = `${firstAuthor?.family_names}, ${firstAuthor?.given_names[0]}.`;
+                            const multipleAuthors =
+                              ref.authors && ref.authors.length > 1;
+
+                            const authors = authorText ? (
+                              firstAuthor?.id ? (
+                                <>
+                                  <a
+                                    href={firstAuthor.id}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    {authorText}
+                                  </a>
+                                  {multipleAuthors && " et al."}
+                                </>
+                              ) : (
+                                authorText
+                              )
+                            ) : null;
 
                             return (
                               <li key={index}>
@@ -331,22 +323,30 @@ export function CitationsField({
                                   {title && (
                                     <span className="fw-bold">{title}</span>
                                   )}
-                                  {title && ". "}
-                                  {journal && <>{journal}. </>}
-                                  {volume && (
+                                  {title && "."}
+                                  {journal ? <>-- {journal}. </> : " "}
+                                  {volume && volume.includes("(") ? (
                                     <>
-                                      {volume}
-                                      {pages || ""}.{" "}
+                                      <span className="fw-bold">
+                                        {volume.split("(")[0]}
+                                      </span>
+                                      {"(" + volume.split("(")[1]}
                                     </>
+                                  ) : (
+                                    <span className="fw-bold">{volume} </span>
                                   )}
+                                  {pages && `: ${pages}.`}
                                   {doi && (
-                                    <a
-                                      href={doi}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      {doi}
-                                    </a>
+                                    <>
+                                      {" "}
+                                      <a
+                                        href={doi}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
+                                        {doi}
+                                      </a>
+                                    </>
                                   )}
                                 </div>
                                 {ref.citationRemarks && (
@@ -471,8 +471,7 @@ export function CitationSubForm({
               doi: "",
               title: "",
               year: undefined,
-              author: [""],
-              authorID: [""],
+              authors: [{ given_names: "", family_names: "", id: "" }],
               journal: "",
               volume: "",
               pages: "",
@@ -505,12 +504,13 @@ export function CitationSubForm({
                         const doiValue = values.doi;
                         if (!doiValue) return;
 
-                        const fetchUrl = `https://api.openalex.org/works/${doiValue}`;
+                        const fetchUrl = `https://api.crossref.org/works/${doiValue}`;
                         const clearFields = () => {
                           formik.setFieldValue("title", "");
                           formik.setFieldValue("year", "");
-                          formik.setFieldValue("author", [""]);
-                          formik.setFieldValue("authorID", [""]);
+                          formik.setFieldValue("authors", [
+                            { given_names: "", family_names: "", id: "" }
+                          ]);
                           formik.setFieldValue("journal", "");
                           formik.setFieldValue("volume", "");
                           formik.setFieldValue("pages", "");
@@ -526,20 +526,35 @@ export function CitationSubForm({
                         setDoiFetchError(false);
 
                         const json = await res.json();
-
+                        const item = json.message;
                         formik.setValues({
                           ...formik.values,
-                          title: json.title,
-                          year: json.publication_year,
-                          author: json.authorships
-                            ?.map((a) => a.author.display_name)
-                            .filter(Boolean),
-                          authorID: json.authorships
-                            ?.map((a) => a.author.orcid)
-                            .filter(Boolean),
-                          journal: json.primary_location?.source?.display_name,
-                          volume: json.biblio?.volume,
-                          pages: `${json.biblio?.first_page}-${json.biblio?.last_page}`
+                          title: item.title[0],
+                          year: item.issued["date-parts"][0][0],
+                          authors: item.author
+                            ?.map((a) => {
+                              const family_names = a.family || "";
+                              const given_names = a.given || "";
+                              const authorId = a.ORCID || "";
+                              return {
+                                given_names,
+                                family_names,
+                                id: authorId
+                              };
+                            })
+                            .filter(
+                              (author) =>
+                                author.given_names || author.family_names
+                            ),
+                          journal: item["container-title"]
+                            ? item["container-title"][0]
+                            : "",
+                          volume: item.volume
+                            ? item["journal-issue"]
+                              ? `${item["volume"][0]} (${item["journal-issue"].issue})`
+                              : ""
+                            : "",
+                          pages: item.page || ""
                         });
                       }}
                     >
@@ -568,17 +583,17 @@ export function CitationSubForm({
             />
           </div>
           <div className="row">
-            <FieldArray name="author">
+            <FieldArray name="authors">
               {({ form, push, remove }) => {
-                const author = form?.values?.author ?? [];
+                const authors = form?.values?.authors ?? [];
 
                 // If empty, just display one.
-                if (author.length === 0) {
-                  push("");
+                if (authors.length === 0) {
+                  push({ given_names: "", family_names: "", id: "" });
                 }
 
                 function addAuthor() {
-                  push("");
+                  push({ given_names: "", family_names: "", id: "" });
                 }
 
                 function removeAuthor(index: number) {
@@ -586,9 +601,8 @@ export function CitationSubForm({
                 }
 
                 function containsEmptyObject() {
-                  return (
-                    author.some((obj) => Object.keys(obj).length === 0) ||
-                    author.find((obj) => obj.value === "")
+                  return authors.some(
+                    (obj) => !obj.given_names.trim() || !obj.family_names.trim()
                   );
                 }
 
@@ -596,7 +610,7 @@ export function CitationSubForm({
                   !isManualInput || containsEmptyObject();
 
                 return (
-                  <div className="author-section col-md-6">
+                  <div className="authors-section col-md-6">
                     {/* Top header, where the plus icon is displayed */}
                     <div
                       className="row"
@@ -611,13 +625,13 @@ export function CitationSubForm({
                             style={{ marginTop: "3px", marginRight: "20px" }}
                           >
                             <CheckBoxWithoutWrapper
-                              name={`templateCheckboxes['bibreferences-component.author']`}
+                              name={`templateCheckboxes['citation-component.authors']`}
                               className={`col-sm-1 templateCheckBox`}
                             />
                           </div>
                         )}
                         <strong>
-                          <DinaMessage id={"field_author"} />
+                          <DinaMessage id={"field_authors"} />
                         </strong>
                       </div>
                       <div className="col-md-1 d-flex align-items-center justify-content-between">
@@ -652,18 +666,38 @@ export function CitationSubForm({
                       </div>
                     </div>
 
-                    {author?.map((_, index) => (
+                    {authors?.map((_, index) => (
                       <div className="row" key={index}>
-                        <div
-                          className="col-md-11"
-                          data-testid={"author[" + index + "]"}
-                        >
-                          <TextField
-                            name={"author[" + index + "]"}
-                            hideLabel={true}
-                            disableTemplateCheckbox={true}
-                            disabled={isTemplate || !isManualInput}
-                          />
+                        <div className="col-md-11">
+                          <div className="row">
+                            <div className="col-md-4">
+                              <TextField
+                                name={`authors[${index}].given_names`}
+                                placeholder="Given names"
+                                hideLabel={true}
+                                disableTemplateCheckbox={true}
+                                disabled={isTemplate || !isManualInput}
+                              />
+                            </div>
+                            <div className="col-md-4">
+                              <TextField
+                                name={`authors[${index}].family_names`}
+                                placeholder="Family names"
+                                hideLabel={true}
+                                disableTemplateCheckbox={true}
+                                disabled={isTemplate || !isManualInput}
+                              />
+                            </div>
+                            <div className="col-md-4">
+                              <TextField
+                                name={`authors[${index}].id`}
+                                placeholder="ID"
+                                hideLabel={true}
+                                disableTemplateCheckbox={true}
+                                disabled={isTemplate || !isManualInput}
+                              />
+                            </div>
+                          </div>
                         </div>
                         <div className="col-md-1 d-flex align-items-center justify-content-between">
                           <FaMinus
@@ -683,126 +717,6 @@ export function CitationSubForm({
                               if (isManualInput)
                                 event.currentTarget.style.color = "";
                             }}
-                            data-testid="add row button"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                );
-              }}
-            </FieldArray>
-            <FieldArray name="authorID">
-              {({ form, push, remove }) => {
-                const authorID = form?.values?.authorID ?? [];
-
-                // If empty, just display one.
-                if (authorID.length === 0) {
-                  push("");
-                }
-
-                function addAuthorID() {
-                  push("");
-                }
-
-                function removeAuthorID(index: number) {
-                  remove(index);
-                }
-
-                function containsEmptyObject() {
-                  return (
-                    authorID.some((obj) => Object.keys(obj).length === 0) ||
-                    authorID.find((obj) => obj.value === "")
-                  );
-                }
-
-                const disableAddButton =
-                  !isManualInput || containsEmptyObject();
-
-                return (
-                  <div className="authorID-section col-md-6">
-                    {/* Top header, where the plus icon is displayed */}
-                    <div
-                      className="row"
-                      style={{
-                        borderTop: "0px solid white",
-                        paddingTop: "15px"
-                      }}
-                    >
-                      <div className="col-md-11 d-flex">
-                        {isTemplate && (
-                          <div
-                            style={{ marginTop: "3px", marginRight: "20px" }}
-                          >
-                            <CheckBoxWithoutWrapper
-                              name={`templateCheckboxes['bibreferences-component.authorID']`}
-                              className={`col-sm-1 templateCheckBox`}
-                            />
-                          </div>
-                        )}
-                        <strong>
-                          <DinaMessage id={"field_authorID"} />
-                        </strong>
-                      </div>
-                      <div className="col-md-1 d-flex align-items-center justify-content-between">
-                        <FaPlus
-                          className="ms-auto"
-                          style={{
-                            cursor: disableAddButton
-                              ? "not-allowed"
-                              : "pointer",
-                            color: disableAddButton ? "gray" : "black"
-                          }}
-                          onClick={() => {
-                            if (!disableAddButton) {
-                              addAuthorID();
-                            }
-                          }}
-                          size="2em"
-                          onMouseOver={(event) => {
-                            if (!disableAddButton) {
-                              event.currentTarget.style.color = "blue";
-                            }
-                          }}
-                          onMouseOut={(event) => {
-                            if (disableAddButton) {
-                              event.currentTarget.style.color = "gray";
-                            } else {
-                              event.currentTarget.style.color = "black";
-                            }
-                          }}
-                          data-testid="add row button"
-                        />
-                      </div>
-                    </div>
-
-                    {authorID?.map((_, index) => (
-                      <div className="row" key={index}>
-                        <div
-                          className="col-md-11"
-                          data-testid={"authorID[" + index + "]"}
-                        >
-                          <TextField
-                            name={"authorID[" + index + "]"}
-                            hideLabel={true}
-                            disableTemplateCheckbox={true}
-                            disabled={isTemplate || !isManualInput}
-                          />
-                        </div>
-                        <div className="col-md-1 d-flex align-items-center justify-content-between">
-                          <FaMinus
-                            className="ms-auto"
-                            style={{ marginTop: "-10px", cursor: "pointer" }}
-                            onClick={() =>
-                              isManualInput && removeAuthorID(index)
-                            }
-                            size="2em"
-                            onMouseOver={(event) =>
-                              (event.currentTarget.style.color = "blue")
-                            }
-                            onMouseOut={(event) =>
-                              (event.currentTarget.style.color = "")
-                            }
                             data-testid="add row button"
                           />
                         </div>

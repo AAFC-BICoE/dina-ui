@@ -112,8 +112,7 @@ export interface Citation {
   doi?: string;
   title?: string;
   year?: number;
-  author?: string[];
-  authorID?: string[];
+  authors?: { given_names: string; family_names: string; id: string }[];
   journal?: string;
   volume?: string;
   pages?: string;
