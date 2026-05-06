@@ -18,6 +18,10 @@ export default function useVocabularyOptions({ path }) {
   );
   const { locale } = useDinaIntl();
 
+  if (!path) {
+    return;
+  }
+
   // If using new endpoint, parse the response differently
   const vocabOptions = path.includes(
     "collection-api/controlled-vocabulary-item"
