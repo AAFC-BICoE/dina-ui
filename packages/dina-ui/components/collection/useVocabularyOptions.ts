@@ -19,7 +19,7 @@ export default function useVocabularyOptions({ path }) {
   const { locale } = useDinaIntl();
 
   if (!path) {
-    return;
+    return { toOption, loading: false, vocabOptions: [] };
   }
 
   // If using new endpoint, parse the response differently
