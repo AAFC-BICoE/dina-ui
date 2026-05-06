@@ -300,7 +300,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
   projectFieldExtensions: "Project Field Extensions",
-  field_authors: "Authors",
+  field_author: "Author",
   field_includeQualityControls: "Include Quality Controls and Blanks",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",

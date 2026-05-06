@@ -10,7 +10,7 @@ export function DOIField(props: TextFieldProps) {
   /** Only allow values that start with https://doi.org/ or blank values. */
   function validate(val: any) {
     const valString = val?.toString?.()?.trim();
-    return !valString || valString.startsWith("https://doi.org/")
+    return !valString || valString.startsWith("https://doi.org/10.")
       ? undefined
       : formatMessage({ id: "invalidDOIValue" });
   }

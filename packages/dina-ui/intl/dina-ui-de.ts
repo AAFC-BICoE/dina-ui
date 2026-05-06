@@ -1355,5 +1355,15 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   year: "Jahr",
   yearMonth: "Jahr-Monat",
   yearMonthDay: "Jahr-Monat-Tag",
-  yearMonthDayTime: "Jahr-Monat-Tag-Zeit"
+  yearMonthDayTime: "Jahr-Monat-Tag-Zeit",
+  citations: "Zitationen",
+  doi: "DOI",
+  title: "Titel",
+  authors: "Autoren",
+  journal: "Journal",
+  volume: "Volume",
+  pages: "Seiten",
+  citationRemarks: "Bemerkungen zur Zitation",
+  invalidDOIValue:
+    "Ungültiger DOI-Wert. Eine DOI sollte mit 'https://doi.org/' beginnen. Beispiel: 'https://doi.org/10.1234/abcd5678'"
 };

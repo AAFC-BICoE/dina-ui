@@ -9,6 +9,7 @@ import {
   OnFormikSubmit,
   ReactTable,
   TextField,
+  NumberField,
   DOIField,
   useDinaFormContext
 } from "common-ui";
@@ -576,7 +577,7 @@ export function CitationSubForm({
               className="col-sm-6"
               disabled={!isManualInput}
             />
-            <TextField
+            <NumberField
               {...fieldProps("year")}
               className="col-sm-6"
               disabled={!isManualInput}
@@ -631,7 +632,7 @@ export function CitationSubForm({
                           </div>
                         )}
                         <strong>
-                          <DinaMessage id={"field_authors"} />
+                          <DinaMessage id={"authors"} />
                         </strong>
                       </div>
                       <div className="col-md-1 d-flex align-items-center justify-content-between">
@@ -673,7 +674,7 @@ export function CitationSubForm({
                             <div className="col-md-4">
                               <TextField
                                 name={`authors[${index}].given_names`}
-                                placeholder="Given names"
+                                placeholder={formatMessage("field_givenNames")}
                                 hideLabel={true}
                                 disableTemplateCheckbox={true}
                                 disabled={isTemplate || !isManualInput}
@@ -682,7 +683,7 @@ export function CitationSubForm({
                             <div className="col-md-4">
                               <TextField
                                 name={`authors[${index}].family_names`}
-                                placeholder="Family names"
+                                placeholder={formatMessage("field_familyNames")}
                                 hideLabel={true}
                                 disableTemplateCheckbox={true}
                                 disabled={isTemplate || !isManualInput}
