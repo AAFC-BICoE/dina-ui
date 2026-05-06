@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { useQuery } from "../../../common-ui/lib";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   Vocabulary,
   VocabularyElement

@@ -14,7 +14,7 @@ import { useRef } from "react";
 import { GiMove } from "react-icons/gi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../../dina-ui/types/collection-api";
+import { ManagedAttribute } from "../../../types/collection-api";
 import { ManagedAttributeField } from "../ManagedAttributeField";
 import {
   DndContext,

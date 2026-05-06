@@ -6,7 +6,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FaFolderOpen } from "react-icons/fa";
-import { Assemblage } from "../../../dina-ui/types/collection-api/resources/Assemblage";
+import { Assemblage } from "../../types/collection-api/resources/Assemblage";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
 

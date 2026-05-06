@@ -17,7 +17,7 @@ import { NextRouter, withRouter } from "next/router";
 import {
   SequencingFacilityContacts,
   SequencingFacilityProps
-} from "../../../../dina-ui/components/seqdb";
+} from "../../../components/seqdb";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import {

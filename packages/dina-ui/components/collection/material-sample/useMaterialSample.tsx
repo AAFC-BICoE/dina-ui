@@ -46,13 +46,13 @@ import {
   STORAGE_COMPONENT_NAME,
   ScientificNameSource,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
-} from "../../../../dina-ui/types/collection-api";
-import { Person } from "../../../../dina-ui/types/objectstore-api";
+} from "../../../types/collection-api";
+import { Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { generateSequence } from "./useGenerateSequence";
-import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { Alert } from "react-bootstrap";
 import CollectingEventEditAlert from "../collecting-event/CollectingEventEditAlert";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";

@@ -9,7 +9,7 @@ import {
   FormikButton,
   useInstanceContext
 } from "../../../common-ui/lib";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface GroupLabelsEditorProps {
   valuesPath: string;

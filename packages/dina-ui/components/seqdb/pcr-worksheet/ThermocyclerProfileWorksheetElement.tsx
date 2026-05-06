@@ -3,7 +3,7 @@ import {
   filterBy,
   ResourceSelectField
 } from "../../../../common-ui/lib";
-import { ThermocyclerProfile } from "../../../../dina-ui/types/seqdb-api";
+import { ThermocyclerProfile } from "../../../types/seqdb-api";
 import classnames from "classnames";
 import styles from "./ThermocylerProfileWorksheetElement.module.css";
 

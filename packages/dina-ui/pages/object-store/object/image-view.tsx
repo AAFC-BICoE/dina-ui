@@ -9,7 +9,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useRef } from "react";
 import { ObjectUpload, Derivative } from "../../../types/objectstore-api";
 import { Head } from "../../../components/head";
-import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   TransformWrapper,
   TransformComponent,
