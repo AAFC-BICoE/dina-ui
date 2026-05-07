@@ -2,7 +2,7 @@ import useLocalStorage from "@rehooks/local-storage";
 import { KitsuResource } from "kitsu";
 import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import { useApiClient } from "../api-client/ApiClientContext";
 import {
   DynamicFieldsMappingConfig,
@@ -11,7 +11,7 @@ import {
 } from "../list-page/types";
 import { ColumnSelectorList } from "./ColumnSelectorList";
 import { generateColumnDefinition } from "./ColumnSelectorUtils";
-import { DataExportTemplate } from "../../../dina-ui/types/dina-export-api";
+import { DataExportTemplate } from "@dina-ui/types/dina-export-api";
 import { FaColumns } from "react-icons/fa";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";

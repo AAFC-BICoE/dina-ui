@@ -8,8 +8,8 @@ import {
 import { useEffect, useState } from "react";
 import { Button, ButtonGroup, Dropdown, Spinner } from "react-bootstrap";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import PageLayout from "../../../../dina-ui/components/page/PageLayout";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import PageLayout from "../../../components/page/PageLayout";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { LibraryPool } from "../../../types/seqdb-api";
 

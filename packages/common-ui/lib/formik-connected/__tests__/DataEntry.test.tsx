@@ -1,7 +1,7 @@
 import { DinaForm } from "../DinaForm";
 import { mountWithAppContext } from "common-ui";
 import { DataEntryField } from "../data-entry/DataEntryField";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import {
   fireEvent,
   waitFor,

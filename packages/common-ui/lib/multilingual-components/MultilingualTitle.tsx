@@ -1,4 +1,4 @@
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { useDinaFormContext } from "../formik-connected/DinaForm";
 import { TextField } from "../formik-connected/TextField";
 import { useInstanceContext } from "../instance/InstanceContextProvider";

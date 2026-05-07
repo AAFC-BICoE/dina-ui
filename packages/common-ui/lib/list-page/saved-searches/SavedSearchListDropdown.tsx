@@ -1,4 +1,4 @@
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import React from "react";
 import { Modal, Dropdown } from "react-bootstrap";
 import { FaRegSadTear, FaRegFrown } from "react-icons/fa";

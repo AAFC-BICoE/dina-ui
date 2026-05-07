@@ -10,11 +10,8 @@ import {
   TextField,
   useDinaFormContext
 } from "../../../../common-ui/lib";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../dina-ui/intl/dina-ui-intl";
-import { Protocol } from "../../../../dina-ui/types/collection-api";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { Protocol } from "../../../types/collection-api";
 import { useContext } from "react";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { AttachmentsField } from "../../object-store/attachment-list/AttachmentsField";

@@ -2,8 +2,8 @@ import { DinaForm } from "common-ui";
 import {
   ProtocolFormLayout,
   ProtocolFormValue
-} from "../../../../dina-ui/components/collection/protocol/ProtocolForm";
-import { useProtocolFormConverter } from "../../../../dina-ui/components/collection/protocol/useProtocolFormConverter";
+} from "../../../components/collection/protocol/ProtocolForm";
+import { useProtocolFormConverter } from "../../../components/collection/protocol/useProtocolFormConverter";
 import { ViewPageLayout } from "../../../components";
 import { Protocol } from "../../../types/collection-api/resources/Protocol";
 

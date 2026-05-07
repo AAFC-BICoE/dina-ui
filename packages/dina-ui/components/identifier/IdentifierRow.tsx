@@ -1,5 +1,5 @@
 import { SelectOption, TextField, SelectField } from "common-ui";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Fragment } from "react";
 import Link from "next/link";
 import { VocabularySelectField } from "../collection/VocabularySelectField";

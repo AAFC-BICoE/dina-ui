@@ -8,7 +8,7 @@ import {
   useApiClient,
   VISIBLE_INDEX_LOCAL_STORAGE_KEY
 } from "..";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import { QueryFieldSelector } from "../list-page/query-builder/query-builder-core-components/QueryFieldSelector";
 import QueryRowFieldExtensionSearch, {
   FieldExtensionSearchStates
@@ -37,7 +37,7 @@ import { FaArrowRotateLeft, FaPlus } from "react-icons/fa6";
 import QueryRowImageLink, {
   ImageLinkStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
-import { FunctionDef } from "../../../dina-ui/types/dina-export-api";
+import { FunctionDef } from "@dina-ui/types/dina-export-api";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {

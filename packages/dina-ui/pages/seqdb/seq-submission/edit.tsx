@@ -1,5 +1,5 @@
 import { useQuery, withResponse } from "common-ui";
-import { SeqSubmission } from "../../../../dina-ui/types/seqdb-api/resources/SeqSubmission";
+import { SeqSubmission } from "../../../types/seqdb-api/resources/SeqSubmission";
 import { Footer, Head, Nav } from "../../../components";
 import { useRouter } from "next/router";
 import { SeqdbMessage, useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";

@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { useQuery } from "../../../common-ui/lib";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   Vocabulary,
   VocabularyElement
@@ -9,11 +9,18 @@ import { VocabularyOption } from "./VocabularySelectField";
 
 /** Gets the vocab options from the back-end. */
 export default function useVocabularyOptions({ path }) {
-  const { response, loading } = useQuery<Vocabulary>({
-    path,
-    page: { limit: 1000 }
-  });
+  const { response, loading } = useQuery<Vocabulary>(
+    {
+      path,
+      page: { limit: 1000 }
+    },
+    { disabled: !path }
+  );
   const { locale } = useDinaIntl();
+
+  if (!path) {
+    return { toOption, loading: false, vocabOptions: [] };
+  }
 
   // If using new endpoint, parse the response differently
   const vocabOptions = path.includes(

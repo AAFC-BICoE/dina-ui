@@ -12,7 +12,7 @@ import {
 import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
 import moment from "moment";
-import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
+import { ScientificNameSourceDetails } from "../../../types/collection-api/resources/Determination";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   GlobalNamesSearchResult,

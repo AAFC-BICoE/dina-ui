@@ -10,7 +10,7 @@ import {
   useAccount,
   useApiClient
 } from "../../../common-ui/lib";
-import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";

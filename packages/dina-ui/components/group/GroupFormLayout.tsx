@@ -4,11 +4,11 @@ import {
   withResponse,
   useBulkGet
 } from "../../../common-ui/lib";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
-import { GroupMembership } from "../../../dina-ui/types/user-api/resources/GroupMembership";
+import { GroupMembership } from "../../types/user-api/resources/GroupMembership";
 import Link from "next/link";
-import { Person } from "../../../dina-ui/types/agent-api";
+import { Person } from "../../types/agent-api";
 
 export function GroupFormLayout() {
   const router = useRouter();

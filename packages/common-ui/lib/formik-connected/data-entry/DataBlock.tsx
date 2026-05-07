@@ -9,7 +9,7 @@ import {
   SelectField
 } from "../../../../common-ui/lib";
 import { DataRow } from "../../../../common-ui/lib";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 
 export interface DataBlockProps extends FieldWrapperProps {
   removeBlock?: (blockPath) => void;

@@ -8,7 +8,7 @@ import {
 import { PersistedResource } from "kitsu";
 import _ from "lodash";
 import { ReactNode, useContext, useEffect, useState } from "react";
-import { ORIENTATION_OPTIONS } from "../../../../dina-ui/pages/object-store/metadata/edit";
+import { ORIENTATION_OPTIONS } from "../../../pages/object-store/metadata/edit";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { License, Metadata } from "../../../types/objectstore-api";
 import { GroupLabel } from "../../group-select/GroupFieldView";
