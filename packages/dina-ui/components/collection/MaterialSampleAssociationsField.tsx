@@ -3,23 +3,20 @@ import {
   AssociatedMaterialSampleSearchBoxField,
   DinaFormSection,
   MaterialSampleSearchHelper,
-  TextField
+  TextField,
+  ResourceSelectField
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import React, { useState } from "react";
-import {
-  BulkEditTabWarning,
-  VocabularyReadOnlyView,
-  VocabularySelectField
-} from "..";
+import { BulkEditTabWarning, VocabularyReadOnlyView } from "..";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { TabbedArrayField, TabPanelCtx } from "./TabbedArrayField";
 import { useFormikContext } from "formik";
 import { ASSOCIATIONS_COMPONENT_NAME } from "../../../dina-ui/types/collection-api";
 import { Association } from "packages/dina-ui/types/collection-api/resources/Association";
-
+import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 export interface MaterialSampleAssociationsFieldProps {
   className?: string;
 }
@@ -71,7 +68,7 @@ export function MaterialSampleAssociationsField({
             {assoc.associationType && (
               <VocabularyReadOnlyView
                 value={assoc.associationType}
-                path="collection-api/vocabulary2/associationType"
+                path="collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=association_type"
               />
             )}
             {assoc.associatedSample?.id && (
@@ -120,9 +117,17 @@ function AssociationTabPanel({ fieldProps, index }: TabPanelCtx<Association>) {
       <div className="row">
         <div className="col-sm-6">
           <div className="association-type">
-            <VocabularySelectField
+            <ResourceSelectField<ControlledVocabularyItem>
               {...fieldProps("associationType")}
-              path="collection-api/vocabulary2/associationType"
+              className="w-100"
+              model="collection-api/controlled-vocabulary-item"
+              filter={(input) => ({
+                name: { ILIKE: `${input}%` },
+                "controlledVocabulary.key": { EQ: "association_type" }
+              })}
+              optionLabel={(item) => item.name || item.key || item.id}
+              readOnlyLink="/controlled-vocabulary-item/view?id="
+              omitNullOption={true}
             />
           </div>
           <div className="associated-sample">
