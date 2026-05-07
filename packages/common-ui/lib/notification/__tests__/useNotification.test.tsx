@@ -95,6 +95,11 @@ describe("useNotification", () => {
       await waitFor(() => {
         expect(mockGet).toHaveBeenCalledWith("user-api/notification", {
           page: { limit: 100 },
+          filter: {
+            userIdentifier: {
+              EQ: "test-user-id"
+            }
+          },
           sort: "-createdOn"
         });
       });

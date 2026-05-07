@@ -213,6 +213,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   noData: "No Data",
   listView: "List",
   galleryView: "Gallery",
+  mapView: "Map",
+  taxonomyTreeView: "Taxonomic Hierarchy",
   visualization: "Visualizations",
   taxonomy: "Taxonomy",
   last24hours: "Last 24 hours",

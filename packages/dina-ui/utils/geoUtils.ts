@@ -9,12 +9,15 @@ let mapModulesPromise: Promise<{
   Map: any;
   MapView: any;
   GraphicsLayer: any;
+  FeatureLayer: any;
   SketchViewModel: any;
   Graphic: any;
   BasemapToggle: any;
   Search: any;
   ScaleBar: any;
   Fullscreen: any;
+  webMercatorUtils: any;
+  projection: any;
 }> | null = null;
 
 /**
@@ -26,33 +29,42 @@ export async function getMapModules() {
       "esri/Map",
       "esri/views/MapView",
       "esri/layers/GraphicsLayer",
+      "esri/layers/FeatureLayer",
       "esri/widgets/Sketch/SketchViewModel",
       "esri/Graphic",
       "esri/widgets/BasemapToggle",
       "esri/widgets/Search",
       "esri/widgets/ScaleBar",
-      "esri/widgets/Fullscreen"
+      "esri/widgets/Fullscreen",
+      "esri/geometry/support/webMercatorUtils",
+      "esri/geometry/projection"
     ]).then(
       ([
         Map,
         MapView,
         GraphicsLayer,
+        FeatureLayer,
         SketchViewModel,
         Graphic,
         BasemapToggle,
         Search,
         ScaleBar,
-        Fullscreen
+        Fullscreen,
+        webMercatorUtils,
+        projection
       ]) => ({
         Map,
         MapView,
         GraphicsLayer,
+        FeatureLayer,
         SketchViewModel,
         Graphic,
         BasemapToggle,
         Search,
         ScaleBar,
-        Fullscreen
+        Fullscreen,
+        webMercatorUtils,
+        projection
       })
     );
   }
@@ -116,6 +128,45 @@ export async function projectPolygon3857To4326(
   }
 
   return polygon4326.rings as GeoPosition[][];
+}
+
+let PROJECTION_MODULES: {
+  Point?: any;
+  projection?: any;
+  SpatialReference?: any;
+} = {};
+
+export async function loadProjectionModules() {
+  const [Point, projection, SpatialReference] = await loadModules([
+    "esri/geometry/Point",
+    "esri/geometry/projection",
+    "esri/geometry/SpatialReference"
+  ]);
+  await projection.load();
+  PROJECTION_MODULES = { Point, projection, SpatialReference };
+}
+
+export function projectPoint3857To4326(x: number, y: number): GeoPosition {
+  const { Point, projection, SpatialReference } = PROJECTION_MODULES;
+  if (!Point || !projection || !SpatialReference)
+    throw new Error("Projection modules not loaded");
+  const point3857 = new Point({
+    x,
+    y,
+    spatialReference: new SpatialReference({ wkid: 3857 })
+  });
+  const point4326 = projection.project(
+    point3857,
+    new SpatialReference({ wkid: 4326 })
+  );
+  if (
+    !point4326 ||
+    typeof point4326.x !== "number" ||
+    typeof point4326.y !== "number"
+  ) {
+    throw new Error(`Projection failed from WKID 3857 to WKID 4326`);
+  }
+  return [point4326.x, point4326.y] as GeoPosition;
 }
 
 // An empty polygon ([]) is considered valid

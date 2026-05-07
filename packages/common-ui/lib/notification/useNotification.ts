@@ -4,6 +4,7 @@ import { useApiClient } from "../api-client/ApiClientContext";
 import { Notification, NotificationUpdatePayload } from "./types";
 import { Operation } from "../api-client/operations-types";
 import { useAccount } from "../account/AccountProvider";
+import { SimpleSearchFilterBuilder } from "../util/simpleSearchFilterBuilder";
 
 export interface UseNotificationParams {
   /**
@@ -54,7 +55,10 @@ export function useNotification({
       "user-api/notification",
       {
         page: { limit: 100 },
-        sort: "-createdOn"
+        sort: "-createdOn",
+        filter: SimpleSearchFilterBuilder.create<Notification>()
+          .where("userIdentifier", "EQ", userId ?? "")
+          .build()
       }
     );
 
