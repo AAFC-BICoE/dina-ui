@@ -1,4 +1,4 @@
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { BsFillFileEarmarkCheckFill } from "react-icons/bs";
 import Link from "next/link";
 import { FaInfoCircle } from "react-icons/fa";

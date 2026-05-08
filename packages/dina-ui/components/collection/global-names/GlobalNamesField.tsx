@@ -8,7 +8,7 @@ import Switch from "react-switch";
 import {
   ScientificNameSource,
   ScientificNameSourceDetails
-} from "../../../../dina-ui/types/collection-api";
+} from "../../../types/collection-api";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ClassificationField } from "../classification/ClassificationField";
 import { GlobalNamesSearchBox } from "../global-names/GlobalNamesSearchBox";

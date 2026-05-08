@@ -7,7 +7,7 @@ import {
   SimpleSearchFilterBuilder
 } from "common-ui";
 import { FaInbox } from "react-icons/fa";
-import { Collection } from "../../../dina-ui/types/collection-api/resources/Collection";
+import { Collection } from "../../types/collection-api/resources/Collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
 

@@ -8,7 +8,7 @@ import {
 import {
   SeqReaction,
   pcrBatchItemResultColor
-} from "../../../../../dina-ui/types/seqdb-api";
+} from "../../../../types/seqdb-api";
 
 export interface SeqReactionDnDTableProps {
   selectedSeqReactions: SeqReaction[];

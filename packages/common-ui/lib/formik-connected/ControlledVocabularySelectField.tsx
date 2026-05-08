@@ -1,9 +1,9 @@
-import { Vocabulary } from "../../../dina-ui/types/collection-api/resources/VocabularyElement";
+import { Vocabulary } from "@dina-ui/types/collection-api/resources/VocabularyElement";
 
 import classNames from "classnames";
 import _ from "lodash";
 import { ReadOnlyValue } from "..";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import {
   JsonApiQuerySpec,
   useQuery,

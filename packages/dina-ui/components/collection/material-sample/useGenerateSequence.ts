@@ -1,5 +1,5 @@
 import { KitsuResource, PersistedResource } from "kitsu";
-import { SequenceGenerator } from "../../../../dina-ui/types/collection-api/resources/SequenceGenerator";
+import { SequenceGenerator } from "../../../types/collection-api/resources/SequenceGenerator";
 import {
   DeleteArgs,
   DoOperationsOptions,

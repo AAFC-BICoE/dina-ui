@@ -7,7 +7,7 @@ import {
 import { mockResponses, mockResponsesTabs } from "../__mocks__/QueryPageMocks";
 import { waitFor } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
-import MaterialSampleListPage from "../../../../dina-ui/pages/collection/material-sample/list";
+import MaterialSampleListPage from "@dina-ui/pages/collection/material-sample/list";
 import "@testing-library/jest-dom";
 import { QueryPage } from "common-ui";
 import { KitsuResource } from "kitsu";

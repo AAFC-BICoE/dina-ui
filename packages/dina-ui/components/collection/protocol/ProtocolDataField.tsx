@@ -1,5 +1,5 @@
 import { DataEntryField, DinaFormContext } from "../../../../common-ui/lib";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useContext } from "react";
 
 export function ProtocolsField() {

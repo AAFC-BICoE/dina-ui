@@ -1,7 +1,7 @@
 import { useQuery, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { ProtocolForm } from "../../../../dina-ui/components/collection/protocol/ProtocolForm";
+import { ProtocolForm } from "../../../components/collection/protocol/ProtocolForm";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Protocol } from "../../../types/collection-api/resources/Protocol";

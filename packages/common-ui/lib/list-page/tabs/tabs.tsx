@@ -1,8 +1,8 @@
-import { Metadata } from "../../../../dina-ui/types/objectstore-api/resources/Metadata";
+import { Metadata } from "@dina-ui/types/objectstore-api/resources/Metadata";
 
 import { MemoizedReactTable } from "../QueryPageTable";
 import { QueryPageTabProps } from "../QueryPage";
-import { StoredObjectGallery } from "../../../../dina-ui/components/object-store";
+import { StoredObjectGallery } from "@dina-ui/components/object-store";
 import React, { Component, useMemo } from "react";
 import { KitsuResource } from "kitsu";
 

@@ -25,7 +25,9 @@ const config: Config.InitialOptions = {
     "\\.scss$": "identity-obj-proxy",
     "^react-pdf$": "<rootDir>/__mocks__/empty.js",
     "^pdfjs-dist/legacy/build/pdf\\.worker\\.min\\.mjs$":
-      "<rootDir>/__mocks__/empty.js"
+      "<rootDir>/__mocks__/empty.js",
+    "^@dina-ui/(.*)$": "<rootDir>/packages/dina-ui/$1",
+    "^common-ui$": "<rootDir>/packages/common-ui/lib/index.ts"
   },
   setupFiles: ["<rootDir>/jest.setup.js"],
   testPathIgnorePatterns: ["/.next/", "/node_modules/"],

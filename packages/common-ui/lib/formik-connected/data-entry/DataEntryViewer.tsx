@@ -5,7 +5,7 @@ import {
   processExtensionValuesLoading
 } from "common-ui";
 import { DataEntry, DataEntryProps } from "./DataEntry";
-import { FIELD_EXTENSIONS_COMPONENT_NAME } from "../../../../dina-ui/types/collection-api";
+import { FIELD_EXTENSIONS_COMPONENT_NAME } from "@dina-ui/types/collection-api";
 
 export interface DataEntryViewerProps extends DataEntryProps {
   extensionValues?: any;

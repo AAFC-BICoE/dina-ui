@@ -8,7 +8,7 @@ import {
   FormikValues
 } from "formik";
 import _ from "lodash";
-import { FormTemplate } from "../../../dina-ui/types/collection-api";
+import { FormTemplate } from "@dina-ui/types/collection-api";
 import {
   createContext,
   PropsWithChildren,
