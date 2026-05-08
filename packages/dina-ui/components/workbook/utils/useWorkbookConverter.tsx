@@ -10,7 +10,7 @@ import {
   WorkbookColumnMap,
   WorkbookDataTypeEnum
 } from "..";
-import { ScientificNameSource } from "../../../../dina-ui/types/collection-api";
+import { ScientificNameSource } from "../../../types/collection-api";
 import {
   CollectingEventSelectField,
   CollectionMethodSelectField,
@@ -611,9 +611,11 @@ export function useWorkbookConverter(
               }
             }
             if (valueToLink) {
-              const valuesToAdd = Array.isArray(valueToLink) ? valueToLink : [valueToLink];
+              const valuesToAdd = Array.isArray(valueToLink)
+                ? valueToLink
+                : [valueToLink];
               valuesForRelationship.push(
-                ...valuesToAdd.map(v => _.pick(v, ["id", "type"]))
+                ...valuesToAdd.map((v) => _.pick(v, ["id", "type"]))
               );
             } else {
               if (

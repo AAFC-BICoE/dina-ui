@@ -1,7 +1,7 @@
 import Kitsu, { PersistedResource } from "kitsu";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import { DataExport } from "../../../dina-ui/types/dina-export-api";
-import { ObjectExport } from "../../../dina-ui/types/objectstore-api";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
+import { DataExport } from "@dina-ui/types/dina-export-api";
+import { ObjectExport } from "@dina-ui/types/objectstore-api";
 import { ReactNode } from "react";
 
 /**

@@ -6,10 +6,7 @@ import Select from "react-select";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { TableColumn } from "../../types";
 import { KitsuResource } from "kitsu";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { RAW_EXTS } from "dina-ui/components/object-store/object-store-utils";
 
 interface QueryRowImageLinkProps {

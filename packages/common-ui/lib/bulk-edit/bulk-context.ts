@@ -1,8 +1,8 @@
 import { FormikProps } from "formik";
 import { InputResource, KitsuResource } from "kitsu";
 import { createContext, MutableRefObject, RefObject, useContext } from "react";
-import type { useMaterialSampleSave } from "../../../dina-ui/components";
-import type { MaterialSample } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
+import type { useMaterialSampleSave } from "@dina-ui/components";
+import type { MaterialSample } from "@dina-ui/types/collection-api/resources/MaterialSample";
 
 export interface SampleWithHooks {
   key: string;

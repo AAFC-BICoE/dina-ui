@@ -8,7 +8,7 @@ import {
   SubmitButton,
   TextField
 } from "../../../common-ui/lib";
-import { Group } from "../../../dina-ui/types/user-api";
+import { Group } from "../../types/user-api";
 import { GroupLabelsEditor } from "./GroupLabelsEditor";
 
 export interface GroupFormProps {

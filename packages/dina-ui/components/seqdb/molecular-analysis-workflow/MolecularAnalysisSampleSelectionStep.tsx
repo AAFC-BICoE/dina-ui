@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import {
   MaterialSample,
   MaterialSampleSummary
-} from "../../../../dina-ui/types/collection-api";
+} from "../../../types/collection-api";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { GenericMolecularAnalysis } from "../../../types/seqdb-api/resources/GenericMolecularAnalysis";

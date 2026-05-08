@@ -1,12 +1,12 @@
 import {
   ExtensionValue,
   FieldExtension
-} from "../../../dina-ui/types/collection-api/resources/FieldExtension";
+} from "@dina-ui/types/collection-api/resources/FieldExtension";
 
 import { FaExclamationTriangle } from "react-icons/fa";
 import Select from "react-select";
 import { Tooltip } from "..";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import {
   JsonApiQuerySpec,
   useQuery,

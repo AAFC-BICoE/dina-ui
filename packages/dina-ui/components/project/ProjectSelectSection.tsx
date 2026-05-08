@@ -6,7 +6,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { IoIosListBox } from "react-icons/io";
-import { Project } from "../../../dina-ui/types/collection-api/resources/Project";
+import { Project } from "../../types/collection-api/resources/Project";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
 

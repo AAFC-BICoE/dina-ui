@@ -18,22 +18,16 @@ import _ from "lodash";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { Promisable } from "type-fest";
-import {
-  MaterialSampleForm,
-  useMaterialSampleSave
-} from "../../../../dina-ui/components";
+import { MaterialSampleForm, useMaterialSampleSave } from "../../../components";
 import {
   getMaterialSampleComponentValues,
   getComponentOrderFromTemplate,
   getComponentValues,
   getFormTemplateCheckboxes
-} from "../../../../dina-ui/components/form-template/formTemplateUtils";
-import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
-import PageLayout from "../../../../dina-ui/components/page/PageLayout";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../dina-ui/intl/dina-ui-intl";
+} from "../../../components/form-template/formTemplateUtils";
+import { GroupSelectField } from "../../../components/group-select/GroupSelectField";
+import PageLayout from "../../../components/page/PageLayout";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,

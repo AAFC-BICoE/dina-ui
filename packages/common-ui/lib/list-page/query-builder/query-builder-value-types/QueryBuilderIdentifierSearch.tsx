@@ -21,8 +21,8 @@ import QueryBuilderDateSearch, {
 import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 import useControlledVocabularyOptions, {
   ControlledVocabularyOption
-} from "../../../../../dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../../../dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+} from "@dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 interface QueryBuilderIdentifierSearchProps {
   /**

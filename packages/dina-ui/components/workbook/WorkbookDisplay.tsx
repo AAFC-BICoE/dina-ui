@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { Card } from "react-bootstrap";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { WorkbookJSON, WorkbookRow } from "./types/Workbook";
 
 /**

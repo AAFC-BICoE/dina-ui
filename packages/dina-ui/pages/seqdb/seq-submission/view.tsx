@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { SeqSubmission } from "../../../../dina-ui/types/seqdb-api/resources/SeqSubmission";
+import { SeqSubmission } from "../../../types/seqdb-api/resources/SeqSubmission";
 import { ViewPageLayout } from "../../../components";
 import { SeqSubmissionFields } from "../../../components/seqdb/seq-submission/SeqSubmissionFields";
 

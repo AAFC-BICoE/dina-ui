@@ -25,6 +25,13 @@ const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, "../.."),
   turbopack: {
     root: path.join(__dirname, "../..")
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@": path.resolve(__dirname)
+    };
+    return config;
   }
 };
 

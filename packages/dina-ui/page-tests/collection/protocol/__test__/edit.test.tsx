@@ -1,5 +1,5 @@
 import { makeAxiosErrorMoreReadable } from "common-ui";
-import { ProtocolForm } from "../../../../../dina-ui/components/collection/protocol/ProtocolForm";
+import { ProtocolForm } from "../../../../components/collection/protocol/ProtocolForm";
 import ProtocolEditPage from "../../../../pages/collection/protocol/edit";
 import { mountWithAppContext } from "common-ui";
 import { fireEvent, waitFor } from "@testing-library/react";

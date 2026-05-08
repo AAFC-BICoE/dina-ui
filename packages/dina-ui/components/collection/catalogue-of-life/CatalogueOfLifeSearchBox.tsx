@@ -8,7 +8,7 @@ import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
 import moment from "moment";
 import { useState } from "react";
-import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
+import { ScientificNameSourceDetails } from "../../../types/collection-api/resources/Determination";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { DataSetResult } from "./dataset-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";

@@ -1,4 +1,4 @@
-import { DinaMessage } from "../../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import Button from "react-bootstrap/Button";
 
 interface QueryConjunctionSwitchProps {

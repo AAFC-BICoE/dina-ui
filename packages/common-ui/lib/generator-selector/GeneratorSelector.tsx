@@ -6,7 +6,7 @@ import {
   DynamicFieldsMappingConfig,
   RelationshipDynamicField
 } from "../list-page/types";
-import { FieldOptionType } from "../../../dina-ui/components/workbook/utils/workbookMappingUtils";
+import { FieldOptionType } from "@dina-ui/components/workbook/utils/workbookMappingUtils";
 
 /**
  * Used to keep track of all of the columns selected to be generated the aliases

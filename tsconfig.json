@@ -16,6 +16,8 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "paths": {
+      "@dina-ui/*": ["./packages/dina-ui/*"],
+      "common-ui": ["./packages/common-ui/lib/index.ts"],
       // Use our own Kitsu type definitions instead of the incomplete provided types.
       "kitsu": [
         "./packages/common-ui/types/kitsu",

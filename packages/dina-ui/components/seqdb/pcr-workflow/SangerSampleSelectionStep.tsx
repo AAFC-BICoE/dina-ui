@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import {
   MaterialSample,
   MaterialSampleSummary
-} from "../../../../dina-ui/types/collection-api";
+} from "../../../types/collection-api";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";

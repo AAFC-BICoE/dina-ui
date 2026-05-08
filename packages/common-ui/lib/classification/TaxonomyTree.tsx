@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as echarts from "echarts";
 import { useApiClient } from "..";
-import useVocabularyOptions from "../../../dina-ui/components/collection/useVocabularyOptions";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOptions";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 interface TreeNode {

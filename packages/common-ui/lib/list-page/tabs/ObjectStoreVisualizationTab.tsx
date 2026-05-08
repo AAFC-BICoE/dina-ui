@@ -1,7 +1,7 @@
 import { QueryPageTabProps } from "../QueryPage";
 import React from "react";
 import { KitsuResource } from "kitsu";
-import DigitalizationDateChart from "../../../../dina-ui/components/collection/charts/DigitalizationDateChart";
+import DigitalizationDateChart from "@dina-ui/components/collection/charts/DigitalizationDateChart";
 export function ObjectStoreVisualizationTab<TData extends KitsuResource>({
   query,
   queryBuilderTree,

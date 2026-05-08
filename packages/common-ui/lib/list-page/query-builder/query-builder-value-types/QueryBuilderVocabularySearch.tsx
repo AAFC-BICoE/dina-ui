@@ -2,7 +2,7 @@ import React from "react";
 import { ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
-import useVocabularyOptions from "../../../../../dina-ui/components/collection/useVocabularyOptions";
+import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOptions";
 import { LoadingSpinner } from "common-ui";
 import Select from "react-select";
 

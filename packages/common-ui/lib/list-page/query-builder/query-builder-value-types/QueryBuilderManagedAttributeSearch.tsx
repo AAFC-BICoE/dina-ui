@@ -8,7 +8,7 @@ import {
   SelectOption,
   SimpleSearchFilterBuilder
 } from "common-ui";
-import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
+import { ManagedAttribute } from "@dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL,
   validateNumber

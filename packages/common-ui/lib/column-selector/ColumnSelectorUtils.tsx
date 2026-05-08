@@ -3,7 +3,7 @@ import _ from "lodash";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { FieldHeader, dateCell } from "..";
 import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
 import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
@@ -23,9 +23,9 @@ import {
   IMAGE_VIEW_LINK,
   ImageLinkStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
-import { FunctionDef } from "../../../dina-ui/types/dina-export-api/resources/DataExport";
-import { ControlledVocabularyItem } from "../../../dina-ui/types/collection-api/resources/ControlledVocabularyItem";
-import { ControlledVocabularyFieldHeader } from "../../../dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
+import { FunctionDef } from "@dina-ui/types/dina-export-api/resources/DataExport";
+import { ControlledVocabularyItem } from "@dina-ui/types/collection-api/resources/ControlledVocabularyItem";
+import { ControlledVocabularyFieldHeader } from "@dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
 
 /**
  * Convert ElasticSearch index name to entity key (kebab-case).
