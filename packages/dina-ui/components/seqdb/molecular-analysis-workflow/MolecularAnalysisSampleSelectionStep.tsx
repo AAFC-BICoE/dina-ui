@@ -5,7 +5,6 @@ import {
   LoadingSpinner,
   QueryPage,
   SimpleSearchFilterBuilder,
-  useAccount,
   useApiClient
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -54,7 +53,6 @@ export function MolecularAnalysisSampleSelectionStep({
     bulkCreateResources,
     bulkDeleteResources
   } = useApiClient();
-  const { username } = useAccount();
   const { PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN } =
     useMaterialSampleRelationshipColumns();
 
@@ -300,18 +298,16 @@ export function MolecularAnalysisSampleSelectionStep({
         await bulkCreateResources(
           itemsToCreate.map((materialUUID, index) => ({
             type: "generic-molecular-analysis-item",
-            createdBy: username ?? "",
-            genericMolecularAnalysis: _.pick(
-              genericMolecularAnalysis,
-              "id",
-              "type"
-            ),
+            attributes: {},
             relationships: {
               materialSample: {
                 data: {
                   id: materialUUID,
                   type: "material-sample"
                 }
+              },
+              genericMolecularAnalysis: {
+                data: _.pick(genericMolecularAnalysis, "id", "type")
               },
               // Included only if molecular run items were created.
               molecularAnalysisRunItem:

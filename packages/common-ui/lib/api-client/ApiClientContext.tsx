@@ -371,7 +371,6 @@ export class ApiClientImpl implements ApiClientI {
           break;
 
         case "POST":
-          // For agent-api, we need to do a bulk create
           const postResources: InputResource<KitsuResource>[] = operations
             .map((op) => op.value)
             .filter(
@@ -914,37 +913,36 @@ export class CustomDinaKitsu extends Kitsu {
         timeout
       });
 
-      // Preserve the relationships object before Kitsu's deserialise removes it
-      // We need this for proper diffing in useSubmitHandler
-      const originalRelationships = data?.data?.relationships
-        ? JSON.parse(JSON.stringify(data.data.relationships))
-        : undefined;
-
       const deserialized = await deserialise(data);
 
-      // Handle relationships - denormalize them into the main object if not already present
-      const relationships = originalRelationships;
-      for (const key of _.keys(relationships)) {
-        if (relationships?.[key]?.data === null) {
-          // Remove null relationships from the relationships object
-          delete relationships[key];
-        } else if (relationships?.[key]?.data && !deserialized.data[key]) {
-          // If relationship exists but wasn't resolved by Kitsu, create basic object with id/type.
-          const relData = relationships[key].data;
+      // Get the list of requested includes
+      const requestedIncludes = (params.include as string)?.split(",") ?? [];
+
+      // Handle both single object and array responses
+      const items = Array.isArray(deserialized.data)
+        ? deserialized.data
+        : [deserialized.data];
+
+      const rawItems = Array.isArray(data?.data) ? data.data : [data?.data];
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const rawRelationships = rawItems[i]?.relationships ?? {};
+
+        for (const key of requestedIncludes) {
+          // Already resolved at top level, skip
+          if (item[key] !== undefined) continue;
+
+          const relData = rawRelationships[key]?.data;
+          if (!relData) continue;
+
+          // Promote stub(s) to top level
           if (Array.isArray(relData)) {
-            deserialized.data[key] = relData.map((item) => ({
-              id: item.id,
-              type: item.type
-            }));
+            item[key] = relData.map((r: any) => ({ id: r.id, type: r.type }));
           } else {
-            deserialized.data[key] = { id: relData.id, type: relData.type };
+            item[key] = { id: relData.id, type: relData.type };
           }
         }
-      }
-
-      // Restore the relationships object on the deserialized data for diffing purposes
-      if (relationships && Object.keys(relationships).length > 0) {
-        deserialized.data.relationships = relationships;
       }
 
       return deserialized;
