@@ -10,6 +10,8 @@ import {
   DinaFormSection,
   FieldSet,
   LoadingSpinner,
+  ResourceSelectField,
+  SimpleSearchFilterBuilder,
   SubmitButton
 } from "common-ui";
 import { Fragment, ReactNode, Ref, useContext } from "react";
@@ -479,6 +481,28 @@ export function MaterialSampleForm({
                   <TagsAndRestrictionsSection
                     resourcePath="collection-api/material-sample"
                     indexName="dina_material_sample_index"
+                  />
+                  <ResourceSelectField<MaterialSample>
+                    name="parentMaterialSample"
+                    filter={(searchValue) => {
+                      let fb = SimpleSearchFilterBuilder.create().searchFilter(
+                        "materialSampleName",
+                        searchValue
+                      );
+                      for (const hierarchyItem of initialValues.hierarchy ??
+                        []) {
+                        fb = fb.where(
+                          `hierarchy.uuid`,
+                          "NEQ",
+                          hierarchyItem.uuid
+                        );
+                      }
+                      return fb.build();
+                    }}
+                    optionLabel={(option) =>
+                      option.materialSampleName || option.id
+                    }
+                    model="collection-api/material-sample"
                   />
                 </div>
               </div>

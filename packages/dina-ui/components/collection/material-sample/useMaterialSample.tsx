@@ -1114,6 +1114,13 @@ export function useMaterialSampleSave({
               ? _.pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
               : null
           }
+        }),
+        ...(msDiffWithOrganisms.parentMaterialSample && {
+          parentMaterialSample: {
+            data: msDiffWithOrganisms.parentMaterialSample?.id
+              ? _.pick(msDiffWithOrganisms.parentMaterialSample, "id", "type")
+              : null
+          }
         })
       }
     };
