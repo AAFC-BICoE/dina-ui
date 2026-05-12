@@ -317,18 +317,38 @@ export class ApiClientImpl implements ApiClientI {
       switch (operations[0].op.toUpperCase()) {
         case "GET":
           const includeSet = new Set<string>();
+          const optfieldsMap: Record<string, string[]> = {};
 
           const ids = operations.map((operation) => {
             // Split path by "?"
             const pathParts = operation.path.split("?");
 
-            // Get the "include" part, after '?', if exists
-            const includePart =
-              pathParts.length > 1 ? pathParts[1].split("=")[1] : null;
-            if (includePart) {
-              // Split by comma and add each to the Set
-              includePart.split(",").forEach((includeItem) => {
-                includeSet.add(includeItem);
+            // Parse query params if they exist
+            if (pathParts.length > 1) {
+              const queryParams = new URLSearchParams(pathParts[1]);
+
+              // Handle include
+              const includePart = queryParams.get("include");
+              if (includePart) {
+                includePart.split(",").forEach((includeItem) => {
+                  includeSet.add(includeItem);
+                });
+              }
+
+              // Handle optfields[type]=fields
+              queryParams.forEach((value, key) => {
+                const optfieldsMatch = key.match(/^optfields\[(.+)\]$/);
+                if (optfieldsMatch) {
+                  const type = optfieldsMatch[1];
+                  if (!optfieldsMap[type]) {
+                    optfieldsMap[type] = [];
+                  }
+                  value.split(",").forEach((field) => {
+                    if (!optfieldsMap[type].includes(field)) {
+                      optfieldsMap[type].push(field);
+                    }
+                  });
+                }
               });
             }
 
@@ -338,10 +358,14 @@ export class ApiClientImpl implements ApiClientI {
 
           const include: string[] | undefined =
             includeSet.size > 0 ? [...includeSet] : undefined;
+          const optfields =
+            Object.keys(optfieldsMap).length > 0 ? optfieldsMap : undefined;
+
           const getResponse = await this.bulkLoadResources(ids, {
             apiBaseUrl,
             resourceType,
             include,
+            optfields,
             returnNullForMissingResource
           });
           responses = getResponse.data.data.map((response) => ({

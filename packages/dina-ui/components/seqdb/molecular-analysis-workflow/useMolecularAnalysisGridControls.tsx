@@ -124,7 +124,7 @@ export function useMolecularAnalysisGridControls({
                 (item) =>
                   "/storage-unit-usage/" +
                   item.storageUnitUsage?.id +
-                  "?include=storageUnit"
+                  "?include=storageUnit&optfields[storage-unit-usage]=cellNumber"
               ),
             { apiBaseUrl: "/collection-api" }
           );
