@@ -74,7 +74,7 @@ export function useMolecularAnalysisRunView({
     {
       path: `seqdb-api/molecular-analysis-run-item`,
       filter: SimpleSearchFilterBuilder.create()
-        .where("metagenomicsBatch.uuid", "EQ", molecularAnalysisRunId ?? "")
+        .where("run.uuid", "EQ", molecularAnalysisRunId ?? "")
         .build()
     },
     {
