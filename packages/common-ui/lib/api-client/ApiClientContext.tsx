@@ -943,6 +943,10 @@ export class CustomDinaKitsu extends Kitsu {
             item[key] = { id: relData.id, type: relData.type };
           }
         }
+
+        // Remove the raw relationships object Kitsu leaves behind when
+        // it cannot resolve relationships via included
+        delete item?.relationships;
       }
 
       return deserialized;

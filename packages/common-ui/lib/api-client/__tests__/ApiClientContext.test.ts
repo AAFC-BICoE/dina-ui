@@ -928,73 +928,444 @@ describe("API client context", () => {
     });
   });
 
-  it("Sends a get request without omitting the end of a login URL more than 2 slashes.", async () => {
-    const kitsu = new CustomDinaKitsu({
-      baseURL: "/base-url",
-      headers: { myHeader: "my-value" }
+  describe("get", () => {
+    let kitsu: CustomDinaKitsu;
+    let mockAxiosGet: jest.Mock;
+
+    beforeEach(() => {
+      kitsu = new CustomDinaKitsu({
+        baseURL: "/base-url",
+        headers: { myHeader: "my-value" }
+      });
+      mockAxiosGet = jest.fn();
+      kitsu.axios = { get: mockAxiosGet } as any;
     });
 
-    const mockAxiosGet = jest.fn(async () => ({
-      data: {
+    it("Sends a get request without omitting the end of a login URL more than 2 slashes.", async () => {
+      const mockAxiosGet = jest.fn(async () => ({
+        data: {
+          data: [
+            {
+              type: "articles",
+              id: "200",
+              attributes: {
+                title: "JSON:API paints my bikeshed!"
+              },
+              relationships: {
+                author: {
+                  data: { id: "42", type: "people" }
+                }
+              }
+            }
+          ],
+          included: [
+            {
+              type: "people",
+              id: "42",
+              attributes: {
+                name: "John"
+              }
+            }
+          ]
+        }
+      }));
+
+      // Mock axios GET method to make sure called correctly:
+      const mockAxios = { get: mockAxiosGet };
+      kitsu.axios = mockAxios as any;
+
+      const response = await kitsu.get("my-api/topic/100/articles/200", {
+        include: "author"
+      });
+
+      expect(mockAxiosGet).lastCalledWith("my-api/topic/100/articles/200", {
+        headers: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+          myHeader: "my-value"
+        },
+        params: {
+          include: "author"
+        }
+        // paramsSerializer: expect.anything()
+      });
+
+      expect(response).toEqual({
         data: [
           {
-            type: "articles",
-            id: "200",
-            attributes: {
-              title: "JSON:API paints my bikeshed!"
+            author: {
+              id: "42",
+              name: "John",
+              type: "people"
             },
+            id: "200",
+            title: "JSON:API paints my bikeshed!",
+            type: "articles"
+          }
+        ]
+      });
+    });
+
+    it("Promotes an external single relationship stub to top level on an array response when not in included", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                    type: "material-sample"
+                  }
+                }
+              }
+            },
+            {
+              type: "generic-molecular-analysis-item",
+              id: "047bf907-494f-42d1-98b4-fc38164efbff",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "019e1846-7b67-735b-b7fa-771c0e276369",
+                    type: "material-sample"
+                  }
+                }
+              }
+            }
+          ]
+          // No included - external relationship
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        {
+          include: "materialSample"
+        }
+      );
+
+      expect(response).toEqual({
+        data: [
+          {
+            id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+            type: "generic-molecular-analysis-item",
+            materialSample: {
+              id: "019e1846-54ad-719e-9c15-75adca3862d3",
+              type: "material-sample"
+            }
+          },
+          {
+            id: "047bf907-494f-42d1-98b4-fc38164efbff",
+            type: "generic-molecular-analysis-item",
+            materialSample: {
+              id: "019e1846-7b67-735b-b7fa-771c0e276369",
+              type: "material-sample"
+            }
+          }
+        ]
+      });
+    });
+
+    it("Promotes an external single relationship stub to top level on a single object response", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: {
+            type: "generic-molecular-analysis-item",
+            id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+            attributes: {},
             relationships: {
-              author: {
-                data: { id: "42", type: "people" }
+              materialSample: {
+                data: {
+                  id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                  type: "material-sample"
+                }
               }
             }
           }
-        ],
-        included: [
+          // No included - external relationship
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item/dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+        { include: "materialSample" }
+      );
+
+      expect(response).toEqual({
+        data: {
+          id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+          type: "generic-molecular-analysis-item",
+          materialSample: {
+            id: "019e1846-54ad-719e-9c15-75adca3862d3",
+            type: "material-sample"
+          }
+        }
+      });
+    });
+
+    it("Does not overwrite a relationship that was already resolved via included", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "articles",
+              id: "200",
+              attributes: { title: "JSON:API paints my bikeshed!" },
+              relationships: {
+                author: {
+                  data: { id: "42", type: "people" }
+                }
+              }
+            }
+          ],
+          included: [
+            {
+              type: "people",
+              id: "42",
+              attributes: { name: "John" }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get("my-api/articles", {
+        include: "author"
+      });
+
+      // Should have full resolved data from included, not just the stub
+      expect(response).toEqual({
+        data: [
           {
-            type: "people",
-            id: "42",
-            attributes: {
+            id: "200",
+            type: "articles",
+            title: "JSON:API paints my bikeshed!",
+            author: {
+              id: "42",
+              type: "people",
               name: "John"
             }
           }
         ]
-      }
-    }));
-
-    // Mock axios GET method to make sure called correctly:
-    const mockAxios = { get: mockAxiosGet };
-    kitsu.axios = mockAxios as any;
-
-    const response = await kitsu.get("my-api/topic/100/articles/200", {
-      include: "author"
+      });
     });
 
-    expect(mockAxiosGet).lastCalledWith("my-api/topic/100/articles/200", {
-      headers: {
-        Accept: "application/vnd.api+json",
-        "Content-Type": "application/vnd.api+json",
-        myHeader: "my-value"
-      },
-      params: {
-        include: "author"
-      }
-      // paramsSerializer: expect.anything()
-    });
-
-    expect(response).toEqual({
-      data: [
-        {
-          author: {
-            id: "42",
-            name: "John",
-            type: "people"
-          },
-          id: "200",
-          title: "JSON:API paints my bikeshed!",
-          type: "articles"
+    it("Promotes multiple external relationship stubs to top level", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                    type: "material-sample"
+                  }
+                },
+                storageUnitUsage: {
+                  data: {
+                    id: "abc123",
+                    type: "storage-unit-usage"
+                  }
+                },
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "def456",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              }
+            }
+          ]
         }
-      ]
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        {
+          include: "materialSample,storageUnitUsage,molecularAnalysisRunItem"
+        }
+      );
+
+      expect(response).toEqual({
+        data: [
+          {
+            id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+            type: "generic-molecular-analysis-item",
+            materialSample: {
+              id: "019e1846-54ad-719e-9c15-75adca3862d3",
+              type: "material-sample"
+            },
+            storageUnitUsage: {
+              id: "abc123",
+              type: "storage-unit-usage"
+            },
+            molecularAnalysisRunItem: {
+              id: "def456",
+              type: "molecular-analysis-run-item"
+            }
+          }
+        ]
+      });
+    });
+
+    it("Promotes an external to-many relationship stub array to top level", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSamples: {
+                  data: [
+                    {
+                      id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                      type: "material-sample"
+                    },
+                    {
+                      id: "019e1846-7b67-735b-b7fa-771c0e276369",
+                      type: "material-sample"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        {
+          include: "materialSamples"
+        }
+      );
+
+      expect(response).toEqual({
+        data: [
+          {
+            id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+            type: "generic-molecular-analysis-item",
+            materialSamples: [
+              {
+                id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                type: "material-sample"
+              },
+              {
+                id: "019e1846-7b67-735b-b7fa-771c0e276369",
+                type: "material-sample"
+              }
+            ]
+          }
+        ]
+      });
+    });
+
+    it("Does not promote a relationship that was not requested in include", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                    type: "material-sample"
+                  }
+                },
+                storageUnitUsage: {
+                  data: {
+                    id: "abc123",
+                    type: "storage-unit-usage"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      // Only request materialSample, not storageUnitUsage
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        {
+          include: "materialSample"
+        }
+      );
+
+      expect((response.data as any[])[0].materialSample).toBeDefined();
+      expect((response.data as any[])[0].storageUnitUsage).toBeUndefined();
+    });
+
+    it("Handles items with no relationships gracefully", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {}
+              // No relationships at all
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        {
+          include: "materialSample"
+        }
+      );
+
+      expect(response).toEqual({
+        data: [
+          {
+            id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+            type: "generic-molecular-analysis-item"
+          }
+        ]
+      });
+    });
+
+    it("Does nothing when no include param is provided", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                    type: "material-sample"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      // No include param
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item"
+      );
+
+      expect((response.data as any[])[0].materialSample).toBeUndefined();
     });
   });
 });
