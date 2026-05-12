@@ -55,7 +55,7 @@ export function useSeqBatchQuery(
   return useQuery<SeqBatch>(
     {
       path: `seqdb-api/seq-batch/${id}`,
-      include: "region,thermocyclerProfile"
+      include: "region,thermocyclerProfile,experimenters,protocol,storageUnit"
     },
     { disabled: !id, deps }
   );
