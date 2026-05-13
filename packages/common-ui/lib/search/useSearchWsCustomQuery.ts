@@ -17,14 +17,18 @@ interface SearchWsResponse {
 
 export interface SearchWsCustomQueryOptions {
   indexName: string;
+  // search query string, used as an argument for the query if the query is a function
   searchQuery?: string;
-  query: any | ((searchQuery: string) => any);
+  //function that takes the search query as an argument
+  query: (searchQuery: string) => any;
   size?: number;
 }
 
 export interface DoSearchWsParams {
   indexName: string;
+  // function to generate the query based on the search query, which is passed as an argument. The search query is optional and can be an empty string if not needed for the query.
   queryBuilder: (searchQuery: string) => any;
+  // search query string, used as an argument for the queryBuilder if it is a function
   searchQuery?: string;
   size?: number;
 }
@@ -88,8 +92,15 @@ export function useSearchWsCustomQuery<TData extends KitsuResource>({
   return { loading, response };
 }
 
-/** Executes a search-ws/search query and returns deserialized resources. */
-export async function doSearchWsSearch<TData extends KitsuResource>(
+/**
+ * Does the search against the search-ws/search API and returns deserialized resources.
+ * @param axios axios instance to use for the request
+ * @param indexName index to search against
+ * @param queryBuilder function to generate the query based on the search query, which is passed as an argument. The search query is optional and can be an empty string if not needed for the query.
+ * @param searchQuery search query string, used as an argument for the queryBuilder if it is a function
+ * @returns deserialized resources returned from the search API
+ */
+async function doSearchWsSearch<TData extends KitsuResource>(
   axios: Pick<AxiosInstance, "post">,
   { indexName, queryBuilder, searchQuery = "", size = 20 }: DoSearchWsParams
 ): Promise<PersistedResource<TData>[]> {
