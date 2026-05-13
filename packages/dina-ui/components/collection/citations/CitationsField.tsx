@@ -295,7 +295,12 @@ export function CitationsField({
 
                             const firstAuthor = ref.authors?.[0];
 
-                            const authorText = `${firstAuthor?.family_names}, ${firstAuthor?.given_names[0]}.`;
+                            // If no authors, display empty string. If family names exist, display them.
+                            const authorText = firstAuthor?.family_names
+                              ? firstAuthor?.given_names?.[0]
+                                ? `${firstAuthor.family_names}, ${firstAuthor.given_names[0]}.`
+                                : firstAuthor.family_names
+                              : "";
                             const multipleAuthors =
                               ref.authors && ref.authors.length > 1;
 
@@ -312,7 +317,10 @@ export function CitationsField({
                                   {multipleAuthors && " et al."}
                                 </>
                               ) : (
-                                authorText
+                                <>
+                                  {authorText}
+                                  {multipleAuthors && " et al."}
+                                </>
                               )
                             ) : null;
 
