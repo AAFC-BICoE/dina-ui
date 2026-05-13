@@ -19,7 +19,6 @@ import { TabbedArrayField, TabPanelCtx } from "./TabbedArrayField";
 import { useFormikContext } from "formik";
 import { ASSOCIATIONS_COMPONENT_NAME } from "../../types/collection-api";
 import { Association } from "packages/dina-ui/types/collection-api/resources/Association";
-
 export interface MaterialSampleAssociationsFieldProps {
   className?: string;
 }
@@ -71,7 +70,7 @@ export function MaterialSampleAssociationsField({
             {assoc.associationType && (
               <VocabularyReadOnlyView
                 value={assoc.associationType}
-                path="collection-api/vocabulary2/associationType"
+                path="collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=association_type"
               />
             )}
             {assoc.associatedSample?.id && (
@@ -122,7 +121,8 @@ function AssociationTabPanel({ fieldProps, index }: TabPanelCtx<Association>) {
           <div className="association-type">
             <VocabularySelectField
               {...fieldProps("associationType")}
-              path="collection-api/vocabulary2/associationType"
+              canAdd={false}
+              path="collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=association_type"
             />
           </div>
           <div className="associated-sample">

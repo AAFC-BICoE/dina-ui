@@ -1,6 +1,6 @@
 import { FieldWrapper, FieldWrapperProps } from "common-ui";
 import _ from "lodash";
-import { GroupBase } from "react-select";
+import Select, { GroupBase } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import useVocabularyOptions from "./useVocabularyOptions";
@@ -13,6 +13,7 @@ export interface VocabularySelectFieldProps extends FieldWrapperProps {
     CreatableProps<VocabularyOption, true, GroupBase<VocabularyOption>>
   >;
   isDisabled?: boolean;
+  canAdd?: boolean;
 }
 
 export interface VocabularyOption {
@@ -22,13 +23,15 @@ export interface VocabularyOption {
 
 /**
  * Multi-select field backed by the vocabulary endpoint.
- * Allows the user to add options not found from the list.
+ * Allows the user to add options not found from the list, unless canAdd is set to false.
+ * Sets value to option's value (the key of the vocabulary element) when an option is selected.
  */
 export function VocabularySelectField({
   path,
   selectProps,
   isMulti,
   isDisabled,
+  canAdd = true,
   ...labelWrapperProps
 }: VocabularySelectFieldProps) {
   const { formatMessage } = useDinaIntl();
@@ -60,28 +63,53 @@ export function VocabularySelectField({
 
         return (
           <div className={invalid ? "is-invalid" : ""}>
-            <CreatableSelect<VocabularyOption, boolean>
-              isDisabled={isDisabled}
-              isClearable={true}
-              options={vocabOptions}
-              isLoading={loading}
-              isMulti={isMulti}
-              onChange={setFormValue}
-              value={selectValue}
-              formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
-              placeholder={placeholder ?? formatMessage("selectOrType")}
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  ...(invalid && {
-                    borderColor: "rgb(148, 26, 37)",
-                    "&:hover": { borderColor: "rgb(148, 26, 37)" }
+            {canAdd ? (
+              <CreatableSelect<VocabularyOption, boolean>
+                isDisabled={isDisabled}
+                isClearable={true}
+                options={vocabOptions}
+                isLoading={loading}
+                isMulti={isMulti}
+                onChange={setFormValue}
+                value={selectValue}
+                formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
+                placeholder={placeholder ?? formatMessage("selectOrType")}
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    ...(invalid && {
+                      borderColor: "rgb(148, 26, 37)",
+                      "&:hover": { borderColor: "rgb(148, 26, 37)" }
+                    })
                   })
-                })
-              }}
-              classNamePrefix="react-select"
-              {...selectProps}
-            />
+                }}
+                classNamePrefix="react-select"
+                {...selectProps}
+              />
+            ) : (
+              <Select<VocabularyOption, boolean>
+                isDisabled={isDisabled}
+                isClearable={true}
+                options={vocabOptions}
+                isLoading={loading}
+                isMulti={isMulti}
+                onChange={setFormValue}
+                value={selectValue}
+                formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
+                placeholder={placeholder ?? formatMessage("selectOrType")}
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    ...(invalid && {
+                      borderColor: "rgb(148, 26, 37)",
+                      "&:hover": { borderColor: "rgb(148, 26, 37)" }
+                    })
+                  })
+                }}
+                classNamePrefix="react-select"
+                {...selectProps}
+              />
+            )}
           </div>
         );
       }}

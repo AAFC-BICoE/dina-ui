@@ -42,11 +42,6 @@ export function useAccount(): AccountContextI {
 export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   const accountContext = useContext(AccountContext);
 
-  // Check if the context already exists.
-  if (accountContext) {
-    return <>{children}</>;
-  }
-
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -63,7 +58,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       .init({
         onLoad: "check-sso",
         silentCheckSsoRedirectUri:
-          typeof window !== undefined
+          typeof window !== "undefined"
             ? `${window.location.origin}/static/silent-check-sso.xhtml`
             : undefined,
         checkLoginIframe: false
@@ -78,8 +73,17 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         } else {
           setInitialized(true);
         }
+      })
+      .catch((error) => {
+        console.error("Failed to initialize Keycloak", error);
+        setInitialized(true);
       });
   }, [accountContext]);
+
+  // Check if the context already exists.
+  if (accountContext) {
+    return <>{children}</>;
+  }
 
   // Non-authenticated users should never see the the full website. Display a loading indicator.
   if (!authenticated || !initialized || !keycloak) {
@@ -119,7 +123,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 
   const getCurrentToken = async () => {
     // If it expires in the next 30 seconds, generate a new one.
-    await keycloak.updateToken(30).catch(login);
+    await keycloak.updateToken(30).catch(() => login());
     return keycloak.token;
   };
 

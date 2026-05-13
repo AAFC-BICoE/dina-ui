@@ -122,6 +122,7 @@ export function AgentRolesField({
               <VocabularySelectField
                 className="col-sm-6"
                 isMulti={true}
+                canAdd={false}
                 {...fieldProps("roles")}
                 path="collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=project_role"
               />

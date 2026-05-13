@@ -19,7 +19,14 @@ import _ from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { createContext, RefObject, useContext, useRef, useState } from "react";
+import {
+  createContext,
+  RefObject,
+  useContext,
+  useRef,
+  useState,
+  Fragment
+} from "react";
 import { GroupSelectField } from "../../components";
 import {
   getInitialVocabularyElementType,
@@ -156,6 +163,9 @@ function ControlledVocabularyItemEditPageContent({
               ([lang, title]) => ({ lang, title })
             )
           };
+        }
+        if (!submittedValues.uriTemplate?.includes("$1")) {
+          submittedValues.uriTemplate = `${submittedValues.uriTemplate}$1`;
         }
 
         return submittedValues;
@@ -317,6 +327,26 @@ export function ControlledVocabularyItemFormLayout() {
           className="col-md-6"
           name="term"
           link={initialValues?.term ?? ""}
+        />
+        <TextField
+          className="col-md-6"
+          name={"uriTemplate"}
+          readOnlyRender={(value) => {
+            try {
+              const url = new URL(value);
+              if (url.protocol === "http:" || url.protocol === "https:") {
+                return (
+                  <Fragment key={value}>
+                    <Link href={value} passHref={true}>
+                      {value}
+                    </Link>
+                  </Fragment>
+                );
+              }
+            } catch (_) {
+              return value;
+            }
+          }}
         />
       </div>
       <MultilingualTitle />
