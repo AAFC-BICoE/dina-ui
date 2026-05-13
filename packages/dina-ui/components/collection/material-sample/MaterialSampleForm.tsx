@@ -10,8 +10,6 @@ import {
   DinaFormSection,
   FieldSet,
   LoadingSpinner,
-  ResourceSelectField,
-  SimpleSearchFilterBuilder,
   SubmitButton
 } from "common-ui";
 import { Fragment, ReactNode, Ref, useContext } from "react";
@@ -65,6 +63,7 @@ import { RestrictionField } from "./RestrictionField";
 import { CollectionSelectSection } from "../CollectionSelectSection";
 import { ShowParentAttributesField } from "./ShowParentAttributesField";
 import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
+import { ParentSelectSection } from "../ParentSelectSection";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -429,6 +428,10 @@ export function MaterialSampleForm({
     ...formSectionPairs
   ]);
 
+  const currentHierarchyItem = initialValues?.hierarchy?.find(
+    (item) => item.uuid === initialValues?.id
+  );
+
   const formLayout = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem", maxWidth: "20rem" }}>
@@ -476,33 +479,14 @@ export function MaterialSampleForm({
                 <div className="col-md-8">
                   <CollectionSelectSection resourcePath="collection-api/collection" />
                   <ProjectSelectSection resourcePath="collection-api/project" />
+                  <ParentSelectSection
+                    currentHierarchyItem={currentHierarchyItem}
+                  />
                   <AssemblageSelectSection resourcePath="collection-api/assemblage" />
                   <NotPubliclyReleasableSection />
                   <TagsAndRestrictionsSection
                     resourcePath="collection-api/material-sample"
                     indexName="dina_material_sample_index"
-                  />
-                  <ResourceSelectField<MaterialSample>
-                    name="parentMaterialSample"
-                    filter={(searchValue) => {
-                      let fb = SimpleSearchFilterBuilder.create().searchFilter(
-                        "materialSampleName",
-                        searchValue
-                      );
-                      for (const hierarchyItem of initialValues.hierarchy ??
-                        []) {
-                        fb = fb.where(
-                          `hierarchy.uuid`,
-                          "NEQ",
-                          hierarchyItem.uuid
-                        );
-                      }
-                      return fb.build();
-                    }}
-                    optionLabel={(option) =>
-                      option.materialSampleName || option.id
-                    }
-                    model="collection-api/material-sample"
                   />
                 </div>
               </div>
