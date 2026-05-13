@@ -137,9 +137,26 @@ export function CitationsField({
         return (
           <div className="d-flex flex-column gap-1">
             <span>
-              {authors
-                .map((author) => `${author.given_names} ${author.family_names}`)
-                .join(", ")}
+              {authors.map((author, index) => {
+                const name = `${author.given_names ?? ""} ${
+                  author.family_names ?? ""
+                }`.trim();
+
+                const content = author.id ? (
+                  <a href={author.id} target="_blank" rel="noopener noreferrer">
+                    {name}
+                  </a>
+                ) : (
+                  name
+                );
+
+                return (
+                  <span key={author.id ?? `${name}-${index}`}>
+                    {index > 0 && ", "}
+                    {content}
+                  </span>
+                );
+              })}
             </span>
           </div>
         );
