@@ -17,6 +17,7 @@ export interface ControlledVocabularyItemAttributes {
   dinaComponent?: string;
   createdOn?: string;
   createdBy?: string;
+  uriTemplate?: string;
 }
 
 export interface ControlledVocabularyItemRelationships {
