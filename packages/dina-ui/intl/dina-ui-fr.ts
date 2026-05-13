@@ -758,6 +758,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   rolesPerGroup: "Rôles par groupe",
   runWorkflow: "Exécuter le flux des travaux",
   save: "Enregistrer",
+  bulkEditingAllSamples: "Modification de {total} échantillons",
+  bulkEditingSampleOf: "Modification de l'échantillon {current} sur {total}",
+  bulkEditLoadingProgress: "Chargement des données... {loaded} sur {total}",
   saveAll: "Enregistrer tout",
   saveAndCopyToNext: "Sauvegarder et copier au prochain",
   saveAndCreateNewMaterialSampleButton:

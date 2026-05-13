@@ -124,6 +124,13 @@ export function MaterialSampleBulkEditor({
     bulkEditSampleHook
   });
 
+  const selectedSampleIndex = selectedTab
+    ? sampleHooks.findIndex(
+        (hook: ResourceWithHooks) => hook.key === selectedTab.key
+      )
+    : -1;
+  const isEditAll = selectedTab?.key === "EDIT_ALL";
+
   return (
     <div>
       <DinaForm initialValues={{}}>
@@ -160,6 +167,24 @@ export function MaterialSampleBulkEditor({
           </div>
         </ButtonBar>
       </DinaForm>
+      {selectedTab && (
+        <div className="alert alert-info py-2 px-3 mb-2 bulk-edit-status-banner">
+          {isEditAll ? (
+            <DinaMessage
+              id="bulkEditingAllSamples"
+              values={{ total: sampleHooks.length }}
+            />
+          ) : (
+            <DinaMessage
+              id="bulkEditingSampleOf"
+              values={{
+                current: selectedSampleIndex + 1,
+                total: sampleHooks.length
+              }}
+            />
+          )}
+        </div>
+      )}
       {selectedTab && (
         <BulkEditNavigator
           selectedTab={selectedTab}

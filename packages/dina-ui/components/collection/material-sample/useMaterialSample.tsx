@@ -92,7 +92,8 @@ export function useMaterialSampleQuery(id?: string | null) {
             include: "genericMolecularAnalysis, materialSample",
             filter: SimpleSearchFilterBuilder.create()
               .where("materialSample.id", "EQ", data.id)
-              .build()
+              .build(),
+            page: { limit: 1000 }
           }
         );
 
@@ -193,7 +194,8 @@ export function useMaterialSampleQuery(id?: string | null) {
             filter: SimpleSearchFilterBuilder.create()
               .where("sample.uuid", "EQ", data.id)
               .build(),
-            include: "associatedSample,sample"
+            include: "associatedSample,sample",
+            page: { limit: 1000 }
           }
         );
         if (associations) {
@@ -233,6 +235,7 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
     })),
     {
       disabled: !ids.length,
+      concurrency: 150,
       onSuccess: async ({ data }) => {
         const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
           `seqdb-api/generic-molecular-analysis-item`,
@@ -240,7 +243,8 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
             include: "genericMolecularAnalysis, materialSample",
             filter: SimpleSearchFilterBuilder.create()
               .where("materialSample.id", "EQ", data.id)
-              .build()
+              .build(),
+            page: { limit: 1000 }
           }
         );
 
@@ -340,7 +344,8 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
             filter: SimpleSearchFilterBuilder.create()
               .where("sample.uuid", "EQ", data.id)
               .build(),
-            include: "associatedSample,sample"
+            include: "associatedSample,sample",
+            page: { limit: 1000 }
           }
         );
         if (associations) {
@@ -652,7 +657,11 @@ export function useMaterialSampleSave({
     setEnableShowParentAttributes
   };
 
-  const { loading, lastUsedCollection } = useLastUsedCollection();
+  const { loading, lastUsedCollection } = useLastUsedCollection(
+    // When editing an existing sample, skip the query — lastUsedCollection
+    // is only used for the default values of a new sample.
+    !!materialSample
+  );
 
   const defaultValues: InputResource<MaterialSample> = {
     type: "material-sample",
