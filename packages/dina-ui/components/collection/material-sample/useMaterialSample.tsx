@@ -42,6 +42,7 @@ import {
   ORGANISMS_COMPONENT_NAME,
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
   ScientificNameSource,
@@ -475,6 +476,15 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasCitationsTemplate =
+    isTemplate &&
+    !_.isEmpty(
+      _.pickBy(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        (_, key) => key.startsWith(CITATIONS_COMPONENT_NAME)
+      )
+    );
+
   const hasShowParentAttributes =
     isTemplate &&
     (materialSampleTemplateInitialValues?.parentAttributes?.length ?? 0) > 0;
@@ -491,6 +501,7 @@ export function useMaterialSampleSave({
     useState<boolean>(false);
   const [enableAssociations, setEnableAssociations] = useState<boolean>(false);
   const [enableRestrictions, setEnableRestrictions] = useState<boolean>(false);
+  const [enableCitations, setEnableCitations] = useState<boolean>(false);
 
   // Delete Data Component
   const [deleteCollectingEvent, setDeleteCollectingEvent] =
@@ -609,6 +620,19 @@ export function useMaterialSampleSave({
             )
       )
     );
+
+    setEnableCitations(
+      // Show the references section if the field is set or the template enables it:
+      Boolean(
+        hasCitationsTemplate
+          ? true
+          : formTemplate
+          ? _.find(formTemplate?.components, {
+              name: CITATIONS_COMPONENT_NAME
+            })?.visible ?? false
+          : materialSample?.citations?.length
+      )
+    );
   }, [formTemplate]);
 
   // The state describing which Data components (Form sections) are enabled:
@@ -646,6 +670,10 @@ export function useMaterialSampleSave({
     enableRestrictions,
     setEnableRestrictions,
     setDeleteRestrictions,
+
+    // Citations
+    enableCitations,
+    setEnableCitations,
 
     // Parent Attributes (Form template only)
     enableShowParentAttributes,

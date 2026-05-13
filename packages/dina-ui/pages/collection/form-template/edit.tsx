@@ -30,6 +30,7 @@ import PageLayout from "../../../components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
   FIELD_EXTENSIONS_COMPONENT_NAME,
   FormTemplate,
@@ -349,6 +350,8 @@ function getDataComponentsStateMap(dataComponentState) {
     dataComponentState.enableRestrictions;
   dataComponentEnabledMap[SCHEDULED_ACTIONS_COMPONENT_NAME] =
     dataComponentState.enableScheduledActions;
+  dataComponentEnabledMap[CITATIONS_COMPONENT_NAME] =
+    dataComponentState.enableCitations;
   dataComponentEnabledMap[STORAGE_COMPONENT_NAME] =
     dataComponentState.enableStorage;
   dataComponentEnabledMap[FIELD_EXTENSIONS_COMPONENT_NAME] = true;

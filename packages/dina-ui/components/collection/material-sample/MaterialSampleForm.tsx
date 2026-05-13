@@ -45,6 +45,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
@@ -60,6 +61,7 @@ import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
+import { CitationsField } from "../citations/CitationsField";
 import { CollectionSelectSection } from "../CollectionSelectSection";
 import { ShowParentAttributesField } from "./ShowParentAttributesField";
 import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
@@ -338,6 +340,22 @@ export function MaterialSampleForm({
               messageIdSingle="bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Single"
               messageIdMultiple="bulkEditResourceSetWarning_ScheduledActions_MaterialSample_Multi"
               fieldName="scheduledActions"
+            >
+              {content}
+            </BulkEditTabWarning>
+          )}
+        />
+      ),
+    [CITATIONS_COMPONENT_NAME]: (id) =>
+      !reduceRendering &&
+      dataComponentState.enableCitations && (
+        <CitationsField
+          id={id}
+          wrapContent={(content) => (
+            <BulkEditTabWarning
+              messageIdSingle="bulkEditResourceSetWarning_Citations_MaterialSample_Single"
+              messageIdMultiple="bulkEditResourceSetWarning_Citations_MaterialSample_Multi"
+              fieldName="citations"
             >
               {content}
             </BulkEditTabWarning>
