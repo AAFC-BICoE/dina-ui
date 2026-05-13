@@ -1460,7 +1460,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   pages: "Pages",
   citationRemarks: "Citation Remarks",
   invalidDOIValue:
-    "Invalid DOI value. A DOI should start with 'https://doi.org/'. For example: 'https://doi.org/10.1234/abcd5678'"
+    "Invalid DOI value. A DOI should start with 'https://doi.org/'. For example: 'https://doi.org/10.1234/abcd5678'",
   invalidPolygon:
     "The coordinates are invalid: must be number[][][] and closed",
   errorFetchingExport: "Error fetching export details. Please try again later.",
