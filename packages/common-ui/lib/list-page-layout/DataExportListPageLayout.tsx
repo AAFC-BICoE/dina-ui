@@ -73,7 +73,7 @@ export function DataExportListPageLayout({
         id="data-export-list"
         queryTableProps={{
           columns: TABLE_COLUMNS,
-          path: `dina-export-api/data-export/`,
+          path: `dina-export-api/data-export`,
           topRightCorner: (
             <div className="d-flex gap-3">
               {
