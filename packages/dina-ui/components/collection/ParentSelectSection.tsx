@@ -4,26 +4,26 @@ import {
   ResourceSelectFieldCustomQuery,
   ResourceSelectFieldCustomQueryProps,
   useDinaFormContext,
-  useSearchWsCustomQuery
+  useSearchWsCustomQuery,
+  useBulkEditTabContext
 } from "common-ui";
-import { HierarchyItem, MaterialSample } from "../../types/collection-api";
+import { MaterialSample } from "../../types/collection-api";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import _ from "lodash";
 import { FaDna } from "react-icons/fa";
 
 /**
  * Generates query-generating function to search by material sample name or id and exclude descendants.
- * @param currentHierarchyItem the current hierarchy item, used to determine the rank and id for excluding descendants. If not provided, no items will be excluded.
+ * @param currentHierarchyIds list of ids to exclude from search results (the current material sample(s) and its descendants). If undefined, no items will be excluded.
  * @returns options for ResourceSelectFieldCustomQuery to search for parent material samples, excluding descendants of the current hierarchy item.
  */
 function getCustomQueryOptions(
-  currentHierarchyItem?: HierarchyItem
+  currentHierarchyIds?: String[]
 ): ResourceSelectFieldCustomQueryProps<MaterialSample>["customQueryOptions"] {
   return (searchQuery) => ({
     indexName: "dina_material_sample_index",
-    searchQuery, // search term
+    searchQuery,
     query: (value: string) => ({
-      // function to generate the query based on the search term
       bool: {
         ...(value
           ? {
@@ -42,16 +42,17 @@ function getCustomQueryOptions(
               minimum_should_match: 1
             }
           : { must: [{ match_all: {} }] }),
-        ...(currentHierarchyItem
+        ...(currentHierarchyIds?.length
           ? {
               must_not: [
                 {
                   nested: {
                     path: "data.attributes.hierarchy",
                     query: {
-                      term: {
-                        "data.attributes.hierarchy.uuid":
-                          currentHierarchyItem.uuid
+                      bool: {
+                        should: currentHierarchyIds.map((id) => ({
+                          term: { "data.attributes.hierarchy.uuid": id }
+                        }))
                       }
                     }
                   }
@@ -67,8 +68,6 @@ function getCustomQueryOptions(
 export interface ParentSelectSectionProps {
   resourcePath?: string;
   classNames?: string;
-  filterList?: (item: MaterialSample) => boolean;
-  currentHierarchyItem?: HierarchyItem;
   enableCollectingEvent?: boolean;
 }
 
@@ -77,13 +76,11 @@ export interface ParentSelectSectionProps {
  * and its descendants from the parent select options. The parent select field is only
  * rendered if the form is not read-only. Uses elasticsearch for custom query.
  * @param classNames optional additional class names for the section container
- * @param currentHierarchyItem the current hierarchy item, used to determine which items to exclude from the parent select options. If not provided, no items will be excluded.
  * @param enableCollectingEvent disables parent select field when collecting event is enabled.
  * @returns Parent select field.
  */
 export function ParentSelectSection({
   classNames,
-  currentHierarchyItem,
   enableCollectingEvent
 }: ParentSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
@@ -93,7 +90,6 @@ export function ParentSelectSection({
       <DinaFormSection horizontal="flex">
         <div className="d-flex flex-row gap-1">
           <ParentSelectField
-            currentHierarchyItem={currentHierarchyItem}
             enableCollectingEvent={enableCollectingEvent}
             className="flex-grow-1 mb-2"
           />
@@ -105,24 +101,38 @@ export function ParentSelectSection({
 
 interface ParentSelectFieldProps {
   resourcePath?: string;
-  currentHierarchyItem?: HierarchyItem;
   className?: string;
   enableCollectingEvent?: boolean;
 }
 
 function ParentSelectField({
   resourcePath = "collection-api/material-sample",
-  currentHierarchyItem,
-  className,
-  enableCollectingEvent
+  enableCollectingEvent,
+  className
 }: ParentSelectFieldProps) {
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
+  const currentHierarchyItemId = initialValues?.hierarchy?.find(
+    (item) => item.rank === 1
+  )?.uuid; // find the hierarchy item with rank 1 (the material sample itself) from form initial values to determine which items to exclude from parent select options
+  const bulkEditCtx = useBulkEditTabContext();
+
+  const currentHierarchyIds: String[] | undefined = bulkEditCtx
+    ? bulkEditCtx.resourceHooks.map(
+        (hook) =>
+          (
+            hook.formRef.current?.initialValues as MaterialSample
+          )?.hierarchy?.find((item) => item.rank === 1)?.uuid
+      ) // find the hierarchy item with rank 1 (the material sample itself) for each resource in bulk edit context
+    : currentHierarchyItemId
+    ? [currentHierarchyItemId]
+    : undefined; // if not in bulk edit context, use the current hierarchy item id if available, otherwise undefined
+
   return (
     <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
       <ResourceSelectFieldCustomQuery<MaterialSample>
         name="parentMaterialSample"
         useCustomQuery={useSearchWsCustomQuery}
-        customQueryOptions={getCustomQueryOptions(currentHierarchyItem)}
+        customQueryOptions={getCustomQueryOptions(currentHierarchyIds)}
         filter={() => ({})}
         readOnlyLink="/collection/material-sample/view?id="
         model={resourcePath}

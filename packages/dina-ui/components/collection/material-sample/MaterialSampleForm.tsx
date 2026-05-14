@@ -428,10 +428,6 @@ export function MaterialSampleForm({
     ...formSectionPairs
   ]);
 
-  const currentHierarchyItem = initialValues?.hierarchy?.find(
-    (item) => item.uuid === initialValues?.id
-  );
-
   const formLayout = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem", maxWidth: "20rem" }}>
@@ -480,7 +476,6 @@ export function MaterialSampleForm({
                   <CollectionSelectSection resourcePath="collection-api/collection" />
                   <ProjectSelectSection resourcePath="collection-api/project" />
                   <ParentSelectSection
-                    currentHierarchyItem={currentHierarchyItem}
                     enableCollectingEvent={
                       dataComponentState.enableCollectingEvent
                     }
