@@ -9,7 +9,6 @@ import {
 } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import _ from "lodash";
 import { FaDna } from "react-icons/fa";
 
 /**
@@ -17,8 +16,8 @@ import { FaDna } from "react-icons/fa";
  * @param currentHierarchyIds list of ids to exclude from search results (the current material sample(s) and its descendants). If undefined, no items will be excluded.
  * @returns options for ResourceSelectFieldCustomQuery to search for parent material samples, excluding descendants of the current hierarchy item.
  */
-function getCustomQueryOptions(
-  currentHierarchyIds?: String[]
+export function getCustomQueryOptions(
+  currentHierarchyIds?: string[]
 ): ResourceSelectFieldCustomQueryProps<MaterialSample>["customQueryOptions"] {
   return (searchQuery) => ({
     indexName: "dina_material_sample_index",
@@ -116,7 +115,7 @@ function ParentSelectField({
   )?.uuid; // find the hierarchy item with rank 1 (the material sample itself) from form initial values to determine which items to exclude from parent select options
   const bulkEditCtx = useBulkEditTabContext();
 
-  const currentHierarchyIds: String[] | undefined = bulkEditCtx
+  const currentHierarchyIds: string[] | undefined = bulkEditCtx
     ? bulkEditCtx.resourceHooks.map(
         (hook) =>
           (

@@ -13,6 +13,30 @@ import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { useSearchWsCustomQuery } from "../../../../common-ui/lib/search/useSearchWsCustomQuery";
+
+/**
+ * Reusable mock block for tests that render components using `useSearchWsCustomQuery`.
+ * Copy this block into other test files to avoid real search-ws API calls.
+ */
+jest.mock("../../../../common-ui/lib/search/useSearchWsCustomQuery", () => {
+  const actual = jest.requireActual(
+    "../../../../common-ui/lib/search/useSearchWsCustomQuery"
+  );
+  return {
+    ...actual,
+    useSearchWsCustomQuery: jest
+      .fn()
+      .mockReturnValue({ loading: false, response: { data: [] } })
+  };
+});
+
+function mockUseSearchWsResults(data: any[] = []) {
+  (useSearchWsCustomQuery as jest.Mock).mockReturnValue({
+    loading: false,
+    response: { data }
+  });
+}
 
 const mockSubmitOverride = jest.fn();
 
@@ -192,7 +216,10 @@ const testCtx = {
 };
 
 describe("Material sample bulk edit tab", () => {
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseSearchWsResults();
+  });
 
   it("Without changing any fields, overrides nothing", async () => {
     const wrapper = mountWithAppContext(<BulkEditTab />, testCtx);
