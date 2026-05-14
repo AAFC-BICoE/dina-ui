@@ -761,6 +761,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   bulkEditingAllSamples: "Modification de {total} échantillons",
   bulkEditingSampleOf: "Modification de l'échantillon {current} sur {total}",
   bulkEditLoadingProgress: "Chargement des données... {loaded} sur {total}",
+  bulkEditMetadataLoadingProgress:
+    "Chargement des métadonnées... {loaded} sur {total}",
   saveAll: "Enregistrer tout",
   saveAndCopyToNext: "Sauvegarder et copier au prochain",
   saveAndCreateNewMaterialSampleButton:

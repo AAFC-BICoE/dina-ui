@@ -15,7 +15,8 @@ import {
   withoutBlankFields,
   SimpleSearchFilterBuilder,
   useBulkQueries,
-  DeleteArgs
+  DeleteArgs,
+  BULK_QUERY_CONCURRENCY
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -235,7 +236,7 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
     })),
     {
       disabled: !ids.length,
-      concurrency: 150,
+      concurrency: BULK_QUERY_CONCURRENCY,
       onSuccess: async ({ data }) => {
         const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
           `seqdb-api/generic-molecular-analysis-item`,

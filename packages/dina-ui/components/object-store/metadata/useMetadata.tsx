@@ -4,7 +4,8 @@ import {
   SaveArgs,
   useApiClient,
   useQuery,
-  useBulkQueries
+  useBulkQueries,
+  BULK_QUERY_CONCURRENCY
 } from "common-ui";
 import { InputResource } from "kitsu";
 import {
@@ -63,6 +64,7 @@ export function useMetadataEditQueries(ids: (string | null)[]) {
     })),
     {
       disabled: !ids.length,
+      concurrency: BULK_QUERY_CONCURRENCY,
       joinSpecs: [
         // Join to persons api:
         {

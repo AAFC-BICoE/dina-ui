@@ -8,6 +8,7 @@ import {
   MetadataBulkEditorHandle
 } from "./MetadataBulkEditor";
 import { forwardRef } from "react";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface ExistingMetadataBulkEditorProps {
   ids: string[];
@@ -30,8 +31,21 @@ export const ExistingMetadataBulkEditor = forwardRef<
 
   const errors = _.compact(metadataQueries.map((query) => query.error));
 
+  const loadedCount = metadataQueries.filter((q) => !q.loading).length;
+  const total = ids.length;
+
   if (isLoading) {
-    return <LoadingSpinner loading={true} />;
+    return (
+      <div className="d-flex flex-column align-items-center gap-2 mt-4">
+        <LoadingSpinner loading={true} />
+        <div className="text-muted">
+          <DinaMessage
+            id="bulkEditMetadataLoadingProgress"
+            values={{ loaded: loadedCount, total }}
+          />
+        </div>
+      </div>
+    );
   }
 
   if (errors.length) {
