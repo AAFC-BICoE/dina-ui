@@ -230,6 +230,11 @@ const DataComponentNavItem = ({
       );
     } else {
       section.setEnabled?.(newVal);
+      // When disableRemovePrompt is true (e.g. Edit All tab), we still need to mark
+      // the section as deleted so its formik values are cleared and not applied as overrides.
+      if (!newVal) {
+        section.setDeleted?.(true);
+      }
     }
   }
 

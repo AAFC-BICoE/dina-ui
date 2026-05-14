@@ -916,12 +916,25 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
+    // The collectingEvent relationship is always managed explicitly in the block below
+    // (which uses the freshly-saved ID from saveCollectingEvent). We want to avoid
+    // attribute-level diff to control it, because the fetched object is
+    // mutated in-place by the onSuccess callback (adding geoReferenceAssertions, attachment,
+    // collectors arrays, etc.) *after* DinaForm has already cloned the initial values.
+    // That race means resourceDifference would see a spurious shape change and include
+    // collectingEvent in the diff even when the user did not touch it.
+    delete (msDiff as any).collectingEvent;
+
     // Save and link the Collecting Event if enabled:
     const colEventFormRefToUse = colEventFormRef?.current?.values
       ? colEventFormRef
       : collectingEventRefExternal;
     if (colEventFormRefToUse?.current) {
       const collectingEventValues = {
+        // Seed with the known colEventId so the id is preserved even if the
+        // nested form mounted before its fetch resolved (race condition when
+        // loading=false immediately and colEventQuery is still in-flight).
+        ...(colEventId ? { id: colEventId } : {}),
         ...withoutBlankFields(colEventFormRef?.current?.values),
         ...withoutBlankFields(collectingEventRefExternal?.current?.values)
       };
