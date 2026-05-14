@@ -89,6 +89,25 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     <div>
       {bulkEditTab.content(true)}
       <button
+        className="set-parent"
+        type="button"
+        onClick={() => {
+          const formik = bulkEditFormRef.current;
+          if (formik) {
+            formik.setValues({
+              ...formik.values,
+              parentMaterialSample: {
+                id: "parent-1",
+                type: "material-sample",
+                materialSampleName: "Parent Sample"
+              }
+            });
+          }
+        }}
+      >
+        Set Parent
+      </button>
+      <button
         className="get-overrides"
         type="button"
         onClick={async () => {
@@ -219,6 +238,28 @@ describe("Material sample bulk edit tab", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseSearchWsResults();
+  });
+
+  it("assigns a new parent sample via bulk edit", async () => {
+    const wrapper = mountWithAppContext(<BulkEditTab />, testCtx);
+
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("button", { name: /get overrides/i })
+      ).toBeInTheDocument()
+    );
+
+    // Set the parent on the bulk edit form programmatically
+    fireEvent.click(wrapper.getByRole("button", { name: /set parent/i }));
+
+    // Request overrides and assert parent is present
+    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
+
+    await waitFor(() => expect(mockSubmitOverride).toHaveBeenCalled());
+
+    const overridden = mockSubmitOverride.mock.calls[0][0];
+    expect(overridden.parentMaterialSample).toBeDefined();
+    expect(overridden.parentMaterialSample.id).toEqual("parent-1");
   });
 
   it("Without changing any fields, overrides nothing", async () => {

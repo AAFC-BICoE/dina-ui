@@ -380,6 +380,61 @@ describe("Material Sample Edit Page", () => {
     ]);
   });
 
+  it("Assigns a parent material sample and saves the relationship", async () => {
+    // Mock the search-ws results to return a single parent sample option.
+    mockUseSearchWsResults([
+      {
+        id: "parent-1",
+        type: "material-sample",
+        materialSampleName: "parent-sample-name"
+      }
+    ]);
+
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm onSaved={mockOnSaved} />,
+      testCtx
+    );
+
+    await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+    // Find the parent select field container and its combobox input.
+    const parentField = wrapper.container.querySelector(
+      ".parent-material-sample-field"
+    );
+    if (!parentField) {
+      fail("Parent select field not found in form.");
+    }
+
+    const combo = within(parentField as any).getByRole("combobox");
+
+    // Open the dropdown and type to trigger the custom query (debounced in component).
+    userEvent.click(combo);
+    userEvent.type(combo, "parent");
+
+    // Select the mocked parent option.
+    const option = await within(parentField as any).findByText(
+      /parent-sample-name/i
+    );
+    userEvent.click(option);
+
+    screen.logTestingPlaygroundURL();
+
+    // Save the form.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    // Expect save to be called and include the parentMaterialSample relationship.
+    await waitFor(() => expect(mockSave).toHaveBeenCalled());
+
+    const firstCallSaves = mockSave.mock.calls[0][0];
+    // The save payloads are arrays of save objects; find the material-sample save.
+    const msSave = firstCallSaves.find(
+      (s: any) => s.type === "material-sample"
+    );
+    expect(msSave).toBeDefined();
+    expect(msSave.resource.parentMaterialSample).toBeDefined();
+    expect(msSave.resource.parentMaterialSample.id).toEqual("parent-1");
+  });
+
   it("Submits a new material-sample linked to an existing CollectingEvent.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
