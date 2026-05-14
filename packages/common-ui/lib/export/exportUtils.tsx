@@ -1,8 +1,6 @@
-import Kitsu, { PersistedResource } from "kitsu";
-import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
+import Kitsu from "kitsu";
 import { DataExport } from "@dina-ui/types/dina-export-api";
 import { ObjectExport } from "@dina-ui/types/objectstore-api";
-import { ReactNode } from "react";
 
 /**
  * Total number of objects allowed to be exported in the UI.
@@ -16,91 +14,6 @@ export const MAX_OBJECT_EXPORT_TOTAL = 1000;
  * analysis export.
  */
 export const MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT = 700;
-
-/**
- * How many retrys will be performed before failing the get export.
- */
-const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
-
-/**
- * Base delay to be applied before trying again. Extra time is added on-top of this base for each
- * retry.
- */
-const BASE_DELAY_EXPORT_FETCH_MS = 2000;
-
-/**
- * Polls export status, downloads on complete, handles errors.
- *
- * Repeatedly checks export status using the export ID from `exportPostResponse`.
- * On `COMPLETED`, it downloads the export. On `ERROR` or timeout, it sets an error state.
- *
- * Manages loading state via `setLoading`.
- */
-export async function getExport(
-  exportPostResponse: PersistedResource<DataExport | ObjectExport>[],
-  setLoading: (loading: boolean) => void,
-  setDataExportError: (error: ReactNode | undefined) => void,
-  apiClient: Kitsu,
-  formik?: any
-) {
-  let isFetchingDataExport = true;
-  let fetchDataExportRetries = 0;
-  let dataExportGetResponse;
-
-  while (isFetchingDataExport) {
-    if (fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES) {
-      if (dataExportGetResponse?.data?.status === "COMPLETED") {
-        // Get the exported data
-        await downloadDataExport(
-          apiClient,
-          exportPostResponse[0],
-          formik?.values?.name
-        );
-        isFetchingDataExport = false;
-      } else if (dataExportGetResponse?.data?.status === "ERROR") {
-        isFetchingDataExport = false;
-        setLoading(false);
-        setDataExportError(
-          <div className="alert alert-danger">
-            <DinaMessage id="dataExportError" />
-          </div>
-        );
-      } else {
-        try {
-          dataExportGetResponse = await apiClient.get<DataExport>(
-            `dina-export-api/data-export/${exportPostResponse[0].id}`,
-            {}
-          );
-        } catch (e) {
-          if (e.cause.status === 404) {
-            console.warn(e.cause);
-          } else {
-            throw e;
-          }
-        }
-
-        // Exponential Backoff
-        await new Promise((resolve) =>
-          setTimeout(
-            resolve,
-            BASE_DELAY_EXPORT_FETCH_MS * 2 ** fetchDataExportRetries
-          )
-        );
-        fetchDataExportRetries += 1;
-      }
-    } else {
-      // Max retries reached
-      isFetchingDataExport = false;
-      setLoading(false);
-      setDataExportError(
-        <div className="alert alert-danger">
-          <DinaMessage id="dataExportError" />
-        </div>
-      );
-    }
-  }
-  isFetchingDataExport = false;
-}
 
 /**
  * Downloads an exported data file from the server and initiates a download in the browser.

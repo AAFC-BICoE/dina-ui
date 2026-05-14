@@ -10,7 +10,6 @@ import {
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   filterBy,
-  getExport,
   MAX_MATERIAL_SAMPLES_FOR_MOLECULAR_ANALYSIS_EXPORT,
   useApiClient
 } from "common-ui";
@@ -49,6 +48,9 @@ export interface UseMolecularAnalysisExportAPIReturn {
   dataExportError: ReactNode | undefined;
 
   performExport: (formik: any) => void;
+
+  exportRequestSubmitted: boolean;
+  setExportRequestSubmitted: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExportAPIReturn {
@@ -82,6 +84,9 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
 
   // Have the quality controls been loaded already, do not run it again if it is true.
   const [qualityControlsLoaded, setQualityControlsLoaded] = useState(false);
+
+  // State to determine if the export API request has been submitted.
+  const [exportRequestSubmitted, setExportRequestSubmitted] = useState(false);
 
   // ElasticSearch query to be used to perform the export against.
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
@@ -745,19 +750,9 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     };
 
     try {
-      const objectExportResponse = await save<ObjectExport>(
-        [objectExportSaveArg],
-        {
-          apiBaseUrl: "/objectstore-api"
-        }
-      );
-      await getExport(
-        objectExportResponse,
-        setExportLoading,
-        setDataExportError,
-        apiClient,
-        formik
-      );
+      await save<ObjectExport>([objectExportSaveArg], {
+        apiBaseUrl: "/objectstore-api"
+      });
     } catch (e) {
       setDataExportError(
         <Alert variant="danger" className="mb-2">
@@ -767,6 +762,7 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     }
 
     setExportLoading(false);
+    setExportRequestSubmitted(true);
   }
 
   return {
@@ -778,6 +774,8 @@ export default function useMolecularAnalysisExportAPI(): UseMolecularAnalysisExp
     networkLoading,
     exportLoading,
     dataExportError,
-    performExport
+    performExport,
+    exportRequestSubmitted,
+    setExportRequestSubmitted
   };
 }
