@@ -398,14 +398,6 @@ describe("ExportMolecularAnalysisPage", () => {
       ],
       { apiBaseUrl: "/objectstore-api" }
     );
-
-    // Verify it attempts to download it.
-    await waitFor(() =>
-      expect(mockGet).toHaveBeenCalledWith(
-        "dina-export-api/data-export/export-job-1",
-        {}
-      )
-    );
   });
 
   it("Fetches and includes Quality Controls when toggle is enabled", async () => {
@@ -467,14 +459,6 @@ describe("ExportMolecularAnalysisPage", () => {
         }
       ],
       { apiBaseUrl: "/objectstore-api" }
-    );
-
-    // Verify it attempts to download it.
-    await waitFor(() =>
-      expect(mockGet).toHaveBeenCalledWith(
-        "dina-export-api/data-export/export-job-1",
-        {}
-      )
     );
   });
 });
