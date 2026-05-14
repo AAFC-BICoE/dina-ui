@@ -41,7 +41,16 @@ function MicroLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function EnabledBadge({ enabled }: { enabled: boolean }) {
+function EnabledBadge({ enabled }: { enabled?: boolean }) {
+  // If undefined, we don't know if it's enabled or disabled, so show "Unknown" badge.
+  if (enabled === undefined) {
+    return (
+      <Badge bg="warning" text="dark" className="fw-normal">
+        Unknown
+      </Badge>
+    );
+  }
+
   return enabled ? (
     <Badge bg="success" className="fw-normal">
       Enabled
@@ -139,22 +148,18 @@ export function ModuleCard({ module }: { module: ApiModule }) {
 
         {/* Message producer / consumer */}
         <div className="d-flex flex-wrap gap-3">
-          {module.messageProducerEnabled !== undefined && (
-            <div>
-              <MicroLabel>Message Producer</MicroLabel>
-              <div className="d-flex align-items-center gap-1 mt-1">
-                <EnabledBadge enabled={module.messageProducerEnabled} />
-              </div>
+          <div>
+            <MicroLabel>Message Producer</MicroLabel>
+            <div className="d-flex align-items-center gap-1 mt-1">
+              <EnabledBadge enabled={module.messageProducerEnabled} />
             </div>
-          )}
-          {module.messageConsumerEnabled !== undefined && (
-            <div>
-              <MicroLabel>Message Consumer</MicroLabel>
-              <div className="d-flex align-items-center gap-1 mt-1">
-                <EnabledBadge enabled={module.messageConsumerEnabled} />
-              </div>
+          </div>
+          <div>
+            <MicroLabel>Message Consumer</MicroLabel>
+            <div className="d-flex align-items-center gap-1 mt-1">
+              <EnabledBadge enabled={module.messageConsumerEnabled} />
             </div>
-          )}
+          </div>
         </div>
 
         {/* Module info — only rendered when extra info exists */}
