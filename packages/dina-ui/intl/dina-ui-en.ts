@@ -1453,5 +1453,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   exportRequestSubmittedMessage:
     "Your export is being processed. You will receive a notification when it's ready to download.",
   resetView: "Reset View",
-  saveAsImage: "Save as Image"
+  saveAsImage: "Save as Image",
+  parentMaterialSampleDisabledTooltip:
+    "Material Sample can only have a single link to one of the following relationships: Parent Material Sample or a collecting event."
 };

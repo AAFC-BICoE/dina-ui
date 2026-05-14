@@ -481,6 +481,9 @@ export function MaterialSampleForm({
                   <ProjectSelectSection resourcePath="collection-api/project" />
                   <ParentSelectSection
                     currentHierarchyItem={currentHierarchyItem}
+                    enableCollectingEvent={
+                      dataComponentState.enableCollectingEvent
+                    }
                   />
                   <AssemblageSelectSection resourcePath="collection-api/assemblage" />
                   <NotPubliclyReleasableSection />

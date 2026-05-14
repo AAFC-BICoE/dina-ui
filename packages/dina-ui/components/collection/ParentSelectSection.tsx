@@ -1,5 +1,6 @@
 import {
   DinaFormSection,
+  Tooltip,
   ResourceSelectFieldCustomQuery,
   ResourceSelectFieldCustomQueryProps,
   useDinaFormContext,
@@ -8,6 +9,7 @@ import {
 import { HierarchyItem, MaterialSample } from "../../types/collection-api";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import _ from "lodash";
+import { FaDna } from "react-icons/fa";
 
 /**
  * Generates query-generating function to search by material sample name or id and exclude descendants.
@@ -67,6 +69,7 @@ export interface ParentSelectSectionProps {
   classNames?: string;
   filterList?: (item: MaterialSample) => boolean;
   currentHierarchyItem?: HierarchyItem;
+  enableCollectingEvent?: boolean;
 }
 
 /**
@@ -74,13 +77,14 @@ export interface ParentSelectSectionProps {
  * and its descendants from the parent select options. The parent select field is only
  * rendered if the form is not read-only. Uses elasticsearch for custom query.
  * @param classNames optional additional class names for the section container
- * @param filterList optional function to further filter the parent select options
  * @param currentHierarchyItem the current hierarchy item, used to determine which items to exclude from the parent select options. If not provided, no items will be excluded.
+ * @param enableCollectingEvent disables parent select field when collecting event is enabled.
  * @returns Parent select field.
  */
 export function ParentSelectSection({
   classNames,
-  currentHierarchyItem
+  currentHierarchyItem,
+  enableCollectingEvent
 }: ParentSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
 
@@ -90,6 +94,7 @@ export function ParentSelectSection({
         <div className="d-flex flex-row gap-1">
           <ParentSelectField
             currentHierarchyItem={currentHierarchyItem}
+            enableCollectingEvent={enableCollectingEvent}
             className="flex-grow-1 mb-2"
           />
         </div>
@@ -102,15 +107,16 @@ interface ParentSelectFieldProps {
   resourcePath?: string;
   currentHierarchyItem?: HierarchyItem;
   className?: string;
+  enableCollectingEvent?: boolean;
 }
 
 function ParentSelectField({
   resourcePath = "collection-api/material-sample",
   currentHierarchyItem,
-  className
+  className,
+  enableCollectingEvent
 }: ParentSelectFieldProps) {
   const { readOnly } = useDinaFormContext();
-
   return (
     <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
       <ResourceSelectFieldCustomQuery<MaterialSample>
@@ -126,7 +132,16 @@ function ParentSelectField({
         removeLabel={readOnly}
         removeBottomMargin={true}
         disableTemplateCheckbox={true}
-        label={<DinaMessage id="parentMaterialSample" />}
+        isDisabled={enableCollectingEvent}
+        label={
+          <span>
+            <FaDna className="me-2" />
+            <DinaMessage id="parentMaterialSample" />
+            {enableCollectingEvent && (
+              <Tooltip id="parentMaterialSampleDisabledTooltip" />
+            )}
+          </span>
+        }
       />
     </DinaFormSection>
   );
