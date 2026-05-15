@@ -58,9 +58,7 @@ export default function QueryRowImageLink({
   const [imageLinkState, setImageLinkState] = useState<ImageLinkStates>(() =>
     value
       ? JSON.parse(value)
-      : {
-          selectedImageType: exportMode ? "ORIGINAL" : "LARGE_IMAGE"
-        }
+      : { selectedImageType: exportMode ? "ORIGINAL" : "LARGE_IMAGE" }
   );
 
   // Convert the state in this component to a value that can be stored in the Query Builder.
@@ -76,7 +74,7 @@ export default function QueryRowImageLink({
       setImageLinkState(JSON.parse(value));
     } else {
       setImageLinkState({
-        selectedImageType: "LARGE_IMAGE"
+        selectedImageType: exportMode ? "ORIGINAL" : "LARGE_IMAGE"
       });
     }
   }, []);
