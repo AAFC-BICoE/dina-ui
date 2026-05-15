@@ -27,7 +27,7 @@ export interface SearchWsCustomQueryOptions {
 export interface DoSearchWsParams {
   indexName: string;
   // function to generate the query based on the search query, which is passed as an argument. The search query is optional and can be an empty string if not needed for the query.
-  queryBuilder: (searchQuery: string) => any;
+  queryBuilder: (searchQuery?: string) => any;
   // search query string, used as an argument for the queryBuilder if it is a function
   searchQuery?: string;
   size?: number;
@@ -62,13 +62,10 @@ export function useSearchWsCustomQuery<TData extends KitsuResource>({
     async function fetchSearchResults() {
       setLoading(true);
       try {
-        const builtQuery =
-          typeof query === "function" ? query(searchQuery ?? "") : query;
-
         const results = await doSearchWsSearch<TData>(apiClient.axios, {
           indexName,
-          queryBuilder: () => builtQuery,
-          searchQuery: searchQuery ?? "",
+          queryBuilder: query,
+          searchQuery: searchQuery,
           size
         });
 

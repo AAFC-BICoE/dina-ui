@@ -33,8 +33,25 @@ export function getCustomQueryOptions(
                   }
                 },
                 {
-                  wildcard: {
-                    "data.id": `*${value}*`
+                  bool: {
+                    must: [
+                      {
+                        wildcard: {
+                          "data.id": `*${value}*`
+                        }
+                      },
+                      {
+                        bool: {
+                          must_not: [
+                            {
+                              exists: {
+                                field: "data.attributes.materialSampleName"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
                   }
                 }
               ],
