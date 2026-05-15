@@ -24,6 +24,10 @@ interface QueryRowImageLinkProps {
    * When in export mode, only ORIGINAL type is supported.
    */
   exportMode?: boolean;
+  /**
+   * Image types that should be excluded from the selector (already displayed).
+   */
+  excludedImageTypes?: string[];
 }
 
 // Supported derivative types for the image link selection.
@@ -46,7 +50,8 @@ export interface ImageLinkStates {
 export default function QueryRowImageLink({
   value,
   setValue,
-  exportMode
+  exportMode,
+  excludedImageTypes
 }: QueryRowImageLinkProps) {
   const { formatMessage } = useIntl();
 
@@ -77,9 +82,13 @@ export default function QueryRowImageLink({
   }, []);
 
   // Generate the image type options (export mode only supports ORIGINAL)
-  const availableTypes = exportMode
+  const availableTypesBase = exportMode
     ? SUPPORTED_DERIVATIVE_TYPES.filter((t) => t === "ORIGINAL")
     : SUPPORTED_DERIVATIVE_TYPES;
+
+  const availableTypes = availableTypesBase.filter(
+    (t) => !(excludedImageTypes ?? []).includes(t)
+  );
   const imageTypeOptions = availableTypes.map<SelectOption<string>>(
     (option) => ({
       label: formatMessage({ id: "queryBuilder_imageLink_" + option }),
