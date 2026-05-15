@@ -101,7 +101,7 @@ async function doSearchWsSearch<TData extends KitsuResource>(
   axios: Pick<AxiosInstance, "post">,
   { indexName, queryBuilder, searchQuery = "", size = 20 }: DoSearchWsParams
 ): Promise<PersistedResource<TData>[]> {
-  const query = queryBuilder(searchQuery);
+  const query = queryBuilder(searchQuery.toLowerCase());
 
   if (!query) {
     return [];
