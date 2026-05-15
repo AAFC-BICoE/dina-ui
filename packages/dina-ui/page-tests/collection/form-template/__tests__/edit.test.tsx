@@ -23,6 +23,30 @@ import {
 } from "../../../../types/collection-api";
 import { fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
+
+/**
+ * Reusable mock block for tests that render components using `useSearchWsCustomQuery`.
+ * Copy this block into other test files to avoid real search-ws API calls.
+ */
+jest.mock("../../../../../common-ui/lib/search/useSearchWsCustomQuery", () => {
+  const actual = jest.requireActual(
+    "../../../../../common-ui/lib/search/useSearchWsCustomQuery"
+  );
+  return {
+    ...actual,
+    useSearchWsCustomQuery: jest
+      .fn()
+      .mockReturnValue({ loading: false, response: { data: [] } })
+  };
+});
+
+function mockUseSearchWsResults(data: unknown[] = []) {
+  (useSearchWsCustomQuery as jest.Mock).mockReturnValue({
+    loading: false,
+    response: { data }
+  });
+}
 const mockOnSaved = jest.fn();
 
 const TEST_GROUP_1 = {
@@ -1811,7 +1835,10 @@ const expected = {
 };
 
 describe("Form template edit page", () => {
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseSearchWsResults();
+  });
 
   it("Renders the blank template edit page", async () => {
     const { wrapper } = await mountForm();
