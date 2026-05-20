@@ -25,7 +25,7 @@ export default function MaterialSampleBulkEditPage() {
 
   useEffect(() => {
     localStorage.removeItem(BULK_EDIT_RESULT_IDS_KEY);
-  }, [ids]);
+  }, ids);
 
   const { formatMessage } = useDinaIntl();
 

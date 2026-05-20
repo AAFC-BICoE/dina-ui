@@ -64,12 +64,12 @@ export function useNotification({
 
     // Ensure we always return an array
     return Array.isArray(response?.data) ? response.data : [];
-  }, [apiClient, disabled, userId]);
+  }, [apiClient, disabled]);
 
   // Generate cache key
   const cacheKey = useMemo(
-    () => [CACHE_KEY_PREFIX, userId, disabled ? "disabled" : "enabled"],
-    [userId, disabled]
+    () => [CACHE_KEY_PREFIX, disabled ? "disabled" : "enabled"],
+    [disabled]
   );
 
   // Use SWR for data fetching with polling

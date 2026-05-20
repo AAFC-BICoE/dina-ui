@@ -116,7 +116,7 @@ export function useIndexMapping({
       }
     }
     getIndexMapping();
-  }, [apiClient, indexName, dynamicFieldMapping, enableRelationshipPresence]);
+  }, []);
 
   /**
    * The query builder options are generated from the elastic search index. This method will

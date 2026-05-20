@@ -140,7 +140,7 @@ export function DataEntry({
     }
 
     fetchAllProtocolElements();
-  }, [apiClient, locale, typeOptionsEndpoint]);
+  }, []);
 
   const vocabQuery = useVocabularyOptions({
     path: unitOptionsEndpoint

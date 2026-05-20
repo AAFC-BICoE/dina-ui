@@ -24,7 +24,7 @@ export default function MaterialSampleBulkResult() {
 
   useEffect(() => {
     localStorage.removeItem(BULK_EDIT_RESULT_IDS_KEY);
-  }, [ids]);
+  }, ids);
 
   const parentSampleId = router.query.parentSampleId?.toString?.();
 
