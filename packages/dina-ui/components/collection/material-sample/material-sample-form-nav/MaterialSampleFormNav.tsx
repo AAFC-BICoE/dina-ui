@@ -121,7 +121,7 @@ export function MaterialSampleFormNav({
 
   useEffect(() => {
     onChangeNavOrder?.(items);
-  }, [items]);
+  }, [items, onChangeNavOrder]);
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>

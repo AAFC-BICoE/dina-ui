@@ -256,10 +256,8 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   const [searchValue, setSearchValue] = useState<string>("");
 
   // Debounced version of the search value. This is used to limit the number of queries. The timeout
-  // can be configured in the props.
-  const [debouncedSearchValue] = timeoutMs
-    ? useDebounce(searchValue, timeoutMs)
-    : [searchValue];
+  // can be configured in the props. Always call the hook to preserve hook order.
+  const [debouncedSearchValue] = useDebounce(searchValue, timeoutMs);
 
   // Boolean to determine if the suggestion text field currently being used.
   const [focus, setFocus] = useState<boolean>(false);
@@ -350,7 +348,10 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   });
 
   // Put the ResourceSelect's input into the Search hook's for elastic search.
-  useEffect(() => setInputValue(debouncedSearchValue), [debouncedSearchValue]);
+  useEffect(
+    () => setInputValue(debouncedSearchValue),
+    [debouncedSearchValue, setInputValue]
+  );
 
   // Remove the role from react auto suggest generated div to fix WCAG issues, see #23517.
   useEffect(() => {
@@ -374,7 +375,13 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
       setBackend("elastic-search");
       return;
     }
-  }, [elasticSearchError, jsonApiError]);
+  }, [
+    elasticSearchError,
+    jsonApiError,
+    backend,
+    jsonApiBackend,
+    elasticSearchBackend
+  ]);
 
   const isLoading: boolean =
     elasticSearchLoading || (jsonApiLoading && !jsonApiIsDisabled);

@@ -76,7 +76,7 @@ export default function TaxonomyTree({ inputQuery }: TaxonomyTreeProps) {
         fetchTaxonomyData(ranks[0], undefined, undefined, inputQuery);
       }
     }
-  }, [loading, inputQuery]);
+  }, [loading, taxonomicRankOptions, inputQuery]);
 
   // Update the chart whenever treeData changes
   useEffect(() => {

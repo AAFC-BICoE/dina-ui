@@ -23,7 +23,7 @@ export function SetDefaultSampleName() {
     }
 
     previousDefaultName.current = defaultSampleName;
-  }, [values.collection]);
+  }, [values.collection, values.materialSampleName, setFieldValue]);
 
   return null;
 }

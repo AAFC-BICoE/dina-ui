@@ -633,7 +633,19 @@ export function useMaterialSampleSave({
           : materialSample?.citations?.length
       )
     );
-  }, [formTemplate]);
+  }, [
+    formTemplate,
+    hasShowParentAttributes,
+    hasColEventTemplate,
+    hasPreparationsTemplate,
+    hasOrganismsTemplate,
+    hasStorageTemplate,
+    hasScheduledActionsTemplate,
+    hasAssociationsTemplate,
+    hasRestrictionsTemplate,
+    hasCitationsTemplate,
+    materialSample
+  ]);
 
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {

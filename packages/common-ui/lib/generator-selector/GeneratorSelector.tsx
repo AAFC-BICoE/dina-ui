@@ -82,7 +82,7 @@ export function GeneratorSelector(props: GeneratorSelectorProps) {
     setDisplayedColumns([]);
     setLoading(false);
     setGeneratorSelectorLoading?.(false);
-  }, []);
+  }, [setDisplayedColumns, setGeneratorSelectorLoading]);
 
   return <GeneratorSelectorList {...props} loading={loading} />;
 }

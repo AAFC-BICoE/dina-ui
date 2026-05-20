@@ -43,7 +43,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
       formik?.setFieldValue?.(fieldName, selectedSectionsDefault);
       formik?.setFieldValue?.(selectAllName, true);
     }
-  }, []);
+  }, [defaultAvailableItems, formik, fieldName]);
 
   function CheckBoxField({
     resource,

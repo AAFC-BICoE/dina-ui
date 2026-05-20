@@ -73,7 +73,15 @@ export function UserNotification({
     ) {
       setSeenNotificationIds(mergedSeen);
     }
-  }, [notifications, activeToastIds, shownToastIds, seenNotificationIds]);
+  }, [
+    notifications,
+    activeToastIds,
+    shownToastIds,
+    seenNotificationIds,
+    setActiveToastIds,
+    setShownToastIds,
+    setSeenNotificationIds
+  ]);
 
   const dismissToast = (id: string) => {
     setShownToastIds((shownToastIds ?? []).filter((shownId) => shownId !== id));
