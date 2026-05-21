@@ -37,19 +37,18 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   const { formatMessage } = useIntl();
   const formik = useFormikContext<any>();
   const selectAllName = `${SELECT_ALL_PREFIX}.${fieldName}`;
+  const defaultAvailableItemsRef = useRef(defaultAvailableItems);
 
-  const hasInitialized = useRef(false);
-
+  // Set on load, use mount-time value
   useEffect(() => {
-    if (hasInitialized.current) return;
-
-    const selectedSectionsDefault = defaultAvailableItems?.map((_data) => true);
+    const selectedSectionsDefault = defaultAvailableItemsRef.current?.map(
+      (_data) => true
+    );
     if (selectedSectionsDefault && selectedSectionsDefault?.length > 0) {
-      hasInitialized.current = true; // only set when actually ran
       formik?.setFieldValue?.(fieldName, selectedSectionsDefault);
       formik?.setFieldValue?.(selectAllName, true);
     }
-  }, [defaultAvailableItems]);
+  }, []);
 
   function CheckBoxField({
     resource,
