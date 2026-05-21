@@ -72,16 +72,12 @@ export interface GeneratorSelectorProps {
 }
 
 export function GeneratorSelector(props: GeneratorSelectorProps) {
-  const { setGeneratorSelectorLoading, setDisplayedColumns } = props;
-
   // Loading state, specifically for dynamically loaded columns.
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Load in the default values on load.
+  // Set loading to false once the component mounts.
   useEffect(() => {
-    setDisplayedColumns([]);
     setLoading(false);
-    setGeneratorSelectorLoading?.(false);
   }, []);
 
   return <GeneratorSelectorList {...props} loading={loading} />;
