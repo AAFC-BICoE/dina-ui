@@ -179,7 +179,7 @@ export function useIndexAssignmentAPI({
       }
     }
     fetchStorageUnitTypeLayout();
-  }, [libraryPrepBatch]);
+  }, [libraryPrepBatch, apiClient]);
 
   /**
    * Index Grid Form Submit
