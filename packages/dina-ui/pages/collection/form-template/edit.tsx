@@ -325,7 +325,7 @@ export function FormTemplateEditPageLoaded({
             templateInitialValues={initialValues}
             materialSampleSaveHook={materialSampleSaveHook}
             navOrder={navOrder}
-            onChangeNavOrder={(newOrder) => setNavOrder(newOrder)}
+            onChangeNavOrder={setNavOrder}
           />
         </DinaFormSection>
       </PageLayout>
