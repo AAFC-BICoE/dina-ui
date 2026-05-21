@@ -162,7 +162,7 @@ export function ApiClientImplProvider({
   children,
   ...cfg
 }: PropsWithChildren<ApiClientConfig> = {}) {
-  const apiContext = useMemo(() => new ApiClientImpl(cfg), []);
+  const apiContext = useMemo(() => new ApiClientImpl(cfg), [cfg]);
   return <ApiClientProvider value={apiContext}>{children}</ApiClientProvider>;
 }
 
