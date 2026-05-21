@@ -49,7 +49,6 @@ const config = [
         }
       ],
 
-      "react-hooks/exhaustive-deps": "off",
       "react/display-name": "off",
       "react/no-unescaped-entities": "off",
       "@next/next/no-img-element": "off",
