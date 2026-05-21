@@ -417,8 +417,6 @@ describe("Material Sample Edit Page", () => {
     );
     userEvent.click(option);
 
-    screen.logTestingPlaygroundURL();
-
     // Save the form.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
@@ -450,11 +448,12 @@ describe("Material Sample Edit Page", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
-    await waitFor(() =>
+
+    await waitFor(() => {
       expect(
         wrapper.getByRole("button", { name: /select/i })
-      ).toBeInTheDocument()
-    );
+      ).toBeInTheDocument();
+    });
 
     userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),

@@ -8,7 +8,7 @@ import {
   useModal,
   FieldSpy
 } from "common-ui";
-import { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren, useEffect, useState, useRef } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface BulkEditTabWarningProps {
@@ -51,8 +51,23 @@ export function BulkEditTabWarning({
   const [manualOverride, setManualOverride] = useState(false);
 
   // Set the initial value based on the tab values:
+  const bulkEditCtxRef = useRef(bulkEditCtx);
+  const setDefaultValueRef = useRef(setDefaultValue);
+
   useEffect(() => {
-    if (!bulkField || !bulkEditCtx) {
+    bulkEditCtxRef.current = bulkEditCtx;
+  }, [bulkEditCtx]);
+
+  useEffect(() => {
+    setDefaultValueRef.current = setDefaultValue;
+  }, [setDefaultValue]);
+
+  // Set the initial value based on the tab values
+  // Use a ref to track whether the initial value has been set
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (hasInitialized.current || !bulkField || !bulkEditCtxRef.current) {
       return;
     }
 
@@ -60,16 +75,17 @@ export function BulkEditTabWarning({
       bulkField;
 
     if (!hasBulkEditValue) {
+      hasInitialized.current = true;
       if (hasNoValues) {
-        setDefaultValue?.(bulkEditCtx);
+        setDefaultValueRef.current?.(bulkEditCtxRef.current);
       } else if (hasSameValues) {
-        bulkEditCtx.bulkEditFormRef?.current?.setFieldValue(
+        bulkEditCtxRef.current.bulkEditFormRef?.current?.setFieldValue(
           fieldName,
           commonValue
         );
       }
     }
-  }, [bulkField, bulkEditCtx, setDefaultValue, fieldName]);
+  }, [bulkField, fieldName]);
 
   if (bulkEditCtx && bulkField) {
     const { hasBulkEditValue, hasNoValues, hasSameValues } = bulkField;
