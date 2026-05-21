@@ -166,7 +166,7 @@ export function WorkbookTemplateGenerator() {
     } else {
       setColumnsToGenerate([]);
     }
-  }, [type, newFieldOptions]);
+  }, [type, newFieldOptions, formatMessage]);
 
   async function generateTemplate() {
     setLoading(true);
