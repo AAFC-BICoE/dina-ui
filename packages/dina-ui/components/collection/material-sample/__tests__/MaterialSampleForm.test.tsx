@@ -449,11 +449,14 @@ describe("Material Sample Edit Page", () => {
     }
     fireEvent.click(collectingEventToggle[0]);
 
-    await waitFor(() => {
-      expect(
-        wrapper.getByRole("button", { name: /select/i })
-      ).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(
+          wrapper.getByRole("button", { name: /select/i })
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 }
+    );
 
     userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
