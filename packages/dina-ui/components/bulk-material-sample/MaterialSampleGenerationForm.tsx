@@ -240,7 +240,7 @@ function GeneratorFields({
     if (!formikForm.values.baseName) {
       formikForm.setFieldValue("baseName", baseName);
     }
-  }, []);
+  }, [baseName]);
 
   const SUFFIX_TYPE_OPTIONS = INCREMENT_MODES.map((mode) => ({
     label: formatMessage(mode),
