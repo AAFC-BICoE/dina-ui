@@ -66,7 +66,7 @@ function TestComponent({
     if (onResult) {
       onResult(result);
     }
-  }, [result.data, result.loading, result.totalCount, result.error, onResult]);
+  }, [result, onResult]);
 
   return null;
 }
