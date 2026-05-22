@@ -24,10 +24,7 @@ export const ExistingMetadataBulkEditor = forwardRef<
   const metadataQueries = useMetadataEditQueries(ids);
 
   /** Whether any query is loading. */
-  const isLoading = metadataQueries.reduce(
-    (prev, current) => prev || current.loading,
-    false
-  );
+  const isLoading = metadataQueries.some((q) => q.loading);
 
   const errors = _.compact(metadataQueries.map((query) => query.error));
 
