@@ -109,7 +109,7 @@ export function WorkbookTemplateGenerator() {
 
   const newFieldOptions = useMemo(() => {
     return generateWorkbookFieldOptions(flattenedConfig, formatMessage);
-  }, [flattenedConfig]);
+  }, [flattenedConfig, formatMessage]);
 
   // Automatically add required fields when type changes
   useEffect(() => {
