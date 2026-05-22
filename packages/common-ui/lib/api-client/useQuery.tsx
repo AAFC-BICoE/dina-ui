@@ -6,7 +6,7 @@ import {
   KitsuResponseData
 } from "kitsu";
 import _ from "lodash";
-import { useContext, useDebugValue, useMemo } from "react";
+import { useContext, useDebugValue, useEffect, useState } from "react";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
@@ -134,8 +134,12 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
 
   const queryKey = JSON.stringify({ querySpec, disabled, deps });
 
+  const [cacheId, setCacheId] = useState(uuidv4());
+
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
-  const cacheId = useMemo(() => uuidv4(), [queryKey]);
+  useEffect(() => {
+    setCacheId(uuidv4());
+  }, [queryKey]);
 
   const {
     data: apiResponse,
