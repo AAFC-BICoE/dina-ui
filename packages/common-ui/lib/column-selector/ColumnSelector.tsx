@@ -1,6 +1,6 @@
 import useLocalStorage from "@rehooks/local-storage";
 import { KitsuResource } from "kitsu";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import { useApiClient } from "../api-client/ApiClientContext";
@@ -131,20 +131,25 @@ export function ColumnSelector<TData extends KitsuResource>(
     );
 
   // Inject mandatory columns if they're missing from local storage
-  useEffect(() => {
-    if (mandatoryDisplayedColumns) {
-      const updatedColumns = [
-        ...new Set([
-          ...mandatoryDisplayedColumns,
-          ...localStorageDisplayedColumns
-        ])
-      ];
+  const localStorageDisplayedColumnsRef = useRef(localStorageDisplayedColumns);
+  localStorageDisplayedColumnsRef.current = localStorageDisplayedColumns;
 
-      if (updatedColumns.length !== localStorageDisplayedColumns.length) {
-        setLocalStorageDisplayedColumns(updatedColumns);
-      }
+  useEffect(() => {
+    if (!mandatoryDisplayedColumns) return;
+
+    const current = localStorageDisplayedColumnsRef.current;
+    const updatedColumns = [
+      ...new Set([...mandatoryDisplayedColumns, ...current])
+    ];
+
+    if (updatedColumns.length !== current.length) {
+      setLocalStorageDisplayedColumns(updatedColumns);
     }
-  }, [props.displayedColumns]);
+  }, [
+    props.displayedColumns,
+    mandatoryDisplayedColumns,
+    setLocalStorageDisplayedColumns
+  ]);
 
   useEffect(() => {
     let injectedMappings: (ESIndexMapping | undefined)[] = [];
