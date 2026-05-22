@@ -182,7 +182,7 @@ export function useMultiPagedQuery<T = any>(
     return () => {
       cancelled = true;
     };
-  }, [queriesKey, pageSize, offset, reloadTrigger, apiClient]);
+  }, [queriesKey, pageSize, offset, reloadTrigger, apiClient, queries]);
 
   return {
     data,
