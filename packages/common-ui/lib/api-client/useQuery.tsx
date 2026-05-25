@@ -49,6 +49,13 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
 
   /** Disables the query. */
   disabled?: boolean;
+
+  /**
+   * Limits how many queries run concurrently. Useful for bulk operations to avoid
+   * overwhelming the server. Each slot covers the full pipeline including any
+   * onSuccess sub-requests, so total concurrent HTTP requests ≈ concurrency × N.
+   */
+  concurrency?: number;
 }
 
 /** Custom query hook type. Includes guaranteed id param, along with options param */
@@ -157,6 +164,27 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   };
 }
 
+/** Semaphore that limits how many async operations run at the same time. */
+function createSemaphore(limit: number) {
+  let active = 0;
+  const queue: Array<() => void> = [];
+  return {
+    async acquire() {
+      if (active < limit) {
+        active++;
+        return;
+      }
+      await new Promise<void>((resolve) => queue.push(resolve));
+      active++;
+    },
+    release() {
+      active--;
+      const next = queue.shift();
+      if (next) next();
+    }
+  };
+}
+
 /**
  * Back-end connected React hook for running queries agains the back-end.
  * It fetches the data again if the passed query changes.
@@ -171,10 +199,16 @@ export function useBulkQueries<
     deps = [],
     joinSpecs = [],
     onSuccess,
-    disabled = false
+    disabled = false,
+    concurrency
   }: QueryOptions<TData, TMeta> = {}
 ) {
   const { apiClient, bulkGet } = useContext(ApiClientContext);
+
+  const semaphore = useMemo(
+    () => (concurrency ? createSemaphore(concurrency) : null),
+    [concurrency]
+  );
 
   const results = useQueries({
     queries: querySpecs.map((spec) => ({
@@ -182,27 +216,32 @@ export function useBulkQueries<
       queryKey: [spec, ...deps],
       enabled: !disabled,
       queryFn: async () => {
-        const { path, ...params } = spec;
-        const getParams = _.omitBy(params, _.isUndefined);
+        await semaphore?.acquire();
+        try {
+          const { path, ...params } = spec;
+          const getParams = _.omitBy(params, _.isUndefined);
 
-        const response = await apiClient.get<TData, TMeta>(path, getParams);
+          const response = await apiClient.get<TData, TMeta>(path, getParams);
 
-        // Client-side joins happen per-query result
-        if (response?.data && joinSpecs.length > 0) {
-          const resources = _.isArray(response.data)
-            ? response.data
-            : [response.data];
-          for (const joinSpec of joinSpecs) {
-            await new ClientSideJoiner(bulkGet, resources, joinSpec).join();
+          // Client-side joins happen per-query result
+          if (response?.data && joinSpecs.length > 0) {
+            const resources = _.isArray(response.data)
+              ? response.data
+              : [response.data];
+            for (const joinSpec of joinSpecs) {
+              await new ClientSideJoiner(bulkGet, resources, joinSpec).join();
+            }
           }
-        }
 
-        // Trigger the callback for each successful individual response
-        if (onSuccess) {
-          await onSuccess(response);
-        }
+          // Trigger the callback for each successful individual response
+          if (onSuccess) {
+            await onSuccess(response);
+          }
 
-        return response;
+          return response;
+        } finally {
+          semaphore?.release();
+        }
       },
       retry: false
     }))

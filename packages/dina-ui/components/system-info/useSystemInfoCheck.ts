@@ -33,8 +33,8 @@ export function useSystemInfoCheck(apiConfigs: ApiConfigInfo[]) {
             apiConfig: config,
             moduleVersion: "unknown",
             status: "offline",
-            messageProducerEnabled: false,
-            messageConsumerEnabled: false,
+            messageProducerEnabled: undefined,
+            messageConsumerEnabled: undefined,
             attentionRequired: true,
             errorMessage:
               err?.cause?.data?.error ??

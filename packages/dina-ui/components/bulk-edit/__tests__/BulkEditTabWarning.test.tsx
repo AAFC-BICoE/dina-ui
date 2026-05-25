@@ -8,6 +8,30 @@ import { MaterialSampleBulkEditor } from "../../bulk-material-sample/MaterialSam
 import _ from "lodash";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { useSearchWsCustomQuery } from "../../../../common-ui/lib/search/useSearchWsCustomQuery";
+
+/**
+ * Reusable mock block for tests that render components using `useSearchWsCustomQuery`.
+ * Copy this block into other test files to avoid real search-ws API calls.
+ */
+jest.mock("../../../../common-ui/lib/search/useSearchWsCustomQuery", () => {
+  const actual = jest.requireActual(
+    "../../../../common-ui/lib/search/useSearchWsCustomQuery"
+  );
+  return {
+    ...actual,
+    useSearchWsCustomQuery: jest
+      .fn()
+      .mockReturnValue({ loading: false, response: { data: [] } })
+  };
+});
+
+function mockUseSearchWsResults(data: any[] = []) {
+  (useSearchWsCustomQuery as jest.Mock).mockReturnValue({
+    loading: false,
+    response: { data }
+  });
+}
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -183,7 +207,10 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
 ];
 
 describe("BulkEditTabWarning", () => {
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseSearchWsResults();
+  });
 
   it("Shows the warning when there are multiple determination values in the individual samples.", async () => {
     const wrapper = mountWithAppContext(

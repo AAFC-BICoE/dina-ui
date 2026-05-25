@@ -12,6 +12,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
+  addCitation: "Add Citation",
   addCataloguedObjectTitle: "Add Catalogued Object",
   addCollectingEventTitle: "Add Collecting Event",
   addCollectionMethodTitle: "Add Collection Method",
@@ -95,6 +96,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   backToParentUnit: "Back To Parent Unit",
   baseNameLabel: "Base Name",
   batchModeInfo: "Batch Mode: All Material Samples have the same ID.",
+  citations: "Citations",
   browseContents: "Browse Contents",
   browseStorageTree: "Browse Storage Tree",
   bulkCreate: "Create Multiple New",
@@ -270,6 +272,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   userProfile: "User Profile",
   disabledForChildMaterialSamples: "Disabled for child Material Samples",
   discardUploadedFiles: "Discard uploaded files",
+  doiPlaceholder: "Enter DOI as URL as https://doi.org/...",
+  doiSearch: "Search DOI",
+  doiSearchError: "Failed to fetch provided DOI",
   dragDropInstructionsHeader: "To rearrange the attribute order:",
   dragDropKeyboardInstructions:
     "Tab to the attribute, then press space to select it. Use the arrow keys to move the item, then press space to place it.",
@@ -331,6 +336,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
   projectFieldExtensions: "Project Field Extensions",
+  field_author: "Author",
   field_includeQualityControls: "Include Quality Controls and Blanks",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
@@ -986,6 +992,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   rolesPerGroup: "Roles Per Group",
   runWorkflow: "Run Workflow",
   save: "Save",
+  bulkEditingAllSamples: "Editing {total} samples",
+  bulkEditingSampleOf: "Editing sample {current} of {total}",
+  bulkEditingAllMetadata: "Editing {total} metadata records",
+  bulkEditingMetadataOf: "Editing metadata {current} of {total}",
+  bulkEditLoadingProgress: "Loading sample data... {loaded} of {total}",
+  bulkEditMetadataLoadingProgress: "Loading metadata... {loaded} of {total}",
   saveAll: "Save All",
   saveAndCopyToNext: "Save & Copy To Next",
   saveAndCopyToNextWarning:
@@ -1446,6 +1458,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editOnMap: "Edit on Map",
   erase: "Erase",
   close: "Close",
+  doi: "DOI",
+  title: "Title",
+  authors: "Authors",
+  journal: "Journal",
+  volume: "Volume",
+  pages: "Pages",
+  citationRemarks: "Citation Remarks",
+  invalidDOIValue:
+    "Invalid DOI value. A DOI should start with 'https://doi.org/'. For example: 'https://doi.org/10.1234/abcd5678'",
   invalidPolygon:
     "The coordinates are invalid: must be number[][][] and closed",
   errorFetchingExport: "Error fetching export details. Please try again later.",
@@ -1453,5 +1474,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   exportRequestSubmittedMessage:
     "Your export is being processed. You will receive a notification when it's ready to download.",
   resetView: "Reset View",
-  saveAsImage: "Save as Image"
+  saveAsImage: "Save as Image",
+  parentMaterialSampleDisabledTooltip:
+    "Material Sample can only have a single link to one of the following relationships: Parent Material Sample or a collecting event."
 };

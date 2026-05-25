@@ -35,7 +35,8 @@ import QueryRowClassificationSearch, {
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
 import { FaArrowRotateLeft, FaPlus } from "react-icons/fa6";
 import QueryRowImageLink, {
-  ImageLinkStates
+  ImageLinkStates,
+  SUPPORTED_DERIVATIVE_TYPES
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderImageLink";
 import { FunctionDef } from "@dina-ui/types/dina-export-api";
 
@@ -344,6 +345,27 @@ export function ColumnSelectorList<TData extends KitsuResource>({
           return false;
         }
 
+        // Special handling for imageLink dynamic fields: if all supported image types
+        // (or ORIGINAL when in export mode) are already displayed, do not show the
+        // generic imageLink option in the add-column list.
+        if (mapping.dynamicField?.type === "imageLink") {
+          const displayedImageTypes = displayedColumns
+            .map((c) =>
+              c?.columnSelectorString?.startsWith("imageLink/")
+                ? c.columnSelectorString.split("/")[1]
+                : undefined
+            )
+            .filter((v) => v !== undefined) as string[];
+
+          const neededTypes = exportMode
+            ? ["ORIGINAL"]
+            : SUPPORTED_DERIVATIVE_TYPES;
+
+          const displayedSet = new Set(displayedImageTypes);
+          const allDisplayed = neededTypes.every((t) => displayedSet.has(t));
+          if (allDisplayed) return false;
+        }
+
         if (exportMode) {
           return !(nonExportableColumns ?? []).some((id) =>
             mapping?.parentType
@@ -432,6 +454,15 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               setValue={setDynamicFieldValue}
               value={dynamicFieldValue}
               exportMode={exportMode}
+              excludedImageTypes={
+                displayedColumns
+                  .map((c) =>
+                    c?.columnSelectorString?.startsWith("imageLink/")
+                      ? c.columnSelectorString.split("/")[1]
+                      : undefined
+                  )
+                  .filter((v) => v !== undefined) as string[]
+              }
             />
           )}
           <div className="mt-2 d-grid">

@@ -45,6 +45,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  CITATIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
@@ -60,9 +61,11 @@ import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
+import { CitationsField } from "../citations/CitationsField";
 import { CollectionSelectSection } from "../CollectionSelectSection";
 import { ShowParentAttributesField } from "./ShowParentAttributesField";
 import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
+import { ParentSelectSection } from "../ParentSelectSection";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -344,6 +347,22 @@ export function MaterialSampleForm({
           )}
         />
       ),
+    [CITATIONS_COMPONENT_NAME]: (id) =>
+      !reduceRendering &&
+      dataComponentState.enableCitations && (
+        <CitationsField
+          id={id}
+          wrapContent={(content) => (
+            <BulkEditTabWarning
+              messageIdSingle="bulkEditResourceSetWarning_Citations_MaterialSample_Single"
+              messageIdMultiple="bulkEditResourceSetWarning_Citations_MaterialSample_Multi"
+              fieldName="citations"
+            >
+              {content}
+            </BulkEditTabWarning>
+          )}
+        />
+      ),
     [FIELD_EXTENSIONS_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
         <DinaFormSection
@@ -474,6 +493,11 @@ export function MaterialSampleForm({
                 <div className="col-md-8">
                   <CollectionSelectSection resourcePath="collection-api/collection" />
                   <ProjectSelectSection resourcePath="collection-api/project" />
+                  <ParentSelectSection
+                    enableCollectingEvent={
+                      dataComponentState.enableCollectingEvent
+                    }
+                  />
                   <AssemblageSelectSection resourcePath="collection-api/assemblage" />
                   <NotPubliclyReleasableSection />
                   <TagsAndRestrictionsSection

@@ -22,12 +22,32 @@ const SYSTEM_INFO_API_CONFIG: ApiConfigInfo[] = [
     apiEndpoint: "collection-api"
   },
   {
-    moduleName: "DINA User API",
+    moduleName: "User API",
     apiEndpoint: "user-api"
   },
   {
     moduleName: "Object Store API",
     apiEndpoint: "objectstore-api"
+  },
+  {
+    moduleName: "SeqDB API",
+    apiEndpoint: "seqdb-api"
+  },
+  {
+    moduleName: "Agent API",
+    apiEndpoint: "agent-api"
+  },
+  {
+    moduleName: "Loan Transaction API",
+    apiEndpoint: "loan-transaction-api"
+  },
+  {
+    moduleName: "Export API",
+    apiEndpoint: "dina-export-api"
+  },
+  {
+    moduleName: "Search WS API",
+    apiEndpoint: "search-api/search-ws"
   }
 ];
 
@@ -65,7 +85,7 @@ export function SystemInfo() {
         style={{ width: "10rem" }}
         disabled={loading}
       >
-        <FaSyncAlt className="me-2" />
+        <FaSyncAlt className={"me-2 " + (loading ? "spin-slow" : "")} />
         Refresh
       </Button>
     </>
@@ -73,31 +93,50 @@ export function SystemInfo() {
 
   return (
     <PageLayout titleId="systemInfoTitle" buttonBarContent={buttonBar}>
-      <div className="system-info-page">
-        {/* Last refreshed */}
-        {lastRefreshed && (
-          <div className="d-flex align-items-center gap-2 text-muted small mb-3">
-            <FaSyncAlt size={12} />
-            Last refreshed:{" "}
-            <strong>
-              {moment(lastRefreshed).fromNow()} (
-              {moment(lastRefreshed).format("YYYY-MM-DD HH:mm:ss")})
-            </strong>
-          </div>
-        )}
+      <style>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        .spin-slow {
+          animation: spin-slow 2s linear infinite;
+        }
+      `}</style>
 
-        {/* Module cards grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-            gap: "1.25rem"
-          }}
-        >
-          {modules.map((module) => (
-            <ModuleCard key={module.apiConfig.moduleName} module={module} />
-          ))}
-        </div>
+      <div className="system-info-page">
+        {loading ? (
+          <div className="d-flex align-items-center gap-2 text-muted small mb-3">
+            <FaSyncAlt size={12} className="spin-slow" />
+            Fetching system info...
+          </div>
+        ) : (
+          <>
+            {/* Last refreshed */}
+            {lastRefreshed && (
+              <div className="d-flex align-items-center gap-2 text-muted small mb-3">
+                <FaSyncAlt size={12} />
+                Last refreshed:{" "}
+                <strong>
+                  {moment(lastRefreshed).fromNow()} (
+                  {moment(lastRefreshed).format("YYYY-MM-DD HH:mm:ss")})
+                </strong>
+              </div>
+            )}
+
+            {/* Module cards grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+                gap: "1.25rem"
+              }}
+            >
+              {modules.map((module) => (
+                <ModuleCard key={module.apiConfig.moduleName} module={module} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </PageLayout>
   );

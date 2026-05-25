@@ -33,6 +33,31 @@ import {
   TEST_FORM_TEMPLATE_COMPONENTS_DISABLED,
   TEST_MATERIAL_SAMPLES_MULTIPLE_VALUES
 } from "../__mocks__/MaterialSampleBulkMocks";
+import { useSearchWsCustomQuery } from "../../../../common-ui/lib/search/useSearchWsCustomQuery";
+
+/**
+ * Reusable mock block for tests that render components using `useSearchWsCustomQuery`.
+ * Parent sample searches should return an empty result set.
+ */
+jest.mock("../../../../common-ui/lib/search/useSearchWsCustomQuery", () => {
+  const actual = jest.requireActual(
+    "../../../../common-ui/lib/search/useSearchWsCustomQuery"
+  );
+  return {
+    ...actual,
+    useSearchWsCustomQuery: jest.fn()
+  };
+});
+
+function mockSearchWsQueryResults() {
+  (useSearchWsCustomQuery as jest.Mock).mockImplementation((options) => {
+    if (options?.indexName === "dina_material_sample_index") {
+      return { loading: false, response: { data: [] } };
+    }
+
+    return { loading: false, response: { data: [] } };
+  });
+}
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
@@ -485,6 +510,7 @@ describe("MaterialSampleBulkEditor", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
+    mockSearchWsQueryResults();
   });
 
   it("Bulk creates material samples.", async () => {
