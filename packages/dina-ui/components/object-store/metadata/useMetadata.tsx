@@ -4,7 +4,8 @@ import {
   SaveArgs,
   useApiClient,
   useQuery,
-  useBulkQueries
+  useBulkQueries,
+  BULK_QUERY_CONCURRENCY
 } from "common-ui";
 import { InputResource } from "kitsu";
 import {
@@ -13,6 +14,7 @@ import {
   ObjectUpload,
   Derivative
 } from "../../../types/objectstore-api";
+import { Person } from "../../../types/agent-api";
 import _ from "lodash";
 
 export function useMetadataEditQuery(id?: string | null) {
@@ -63,25 +65,34 @@ export function useMetadataEditQueries(ids: (string | null)[]) {
     })),
     {
       disabled: !ids.length,
-      joinSpecs: [
-        // Join to persons api:
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "dcCreator",
-          joinField: "dcCreator",
-          path: (metadata) => `person/${metadata.dcCreator.id}`
-        }
-      ],
+      concurrency: BULK_QUERY_CONCURRENCY,
       onSuccess: async ({ data: metadata }) => {
-        // Get the License resource based on the Metadata's xmpRightsWebStatement field:
-        if (metadata.xmpRightsWebStatement) {
-          const url = metadata.xmpRightsWebStatement;
-          (metadata as any).license = (
-            await apiClient.get<License[]>("objectstore-api/license", {
-              filter: { url }
-            })
-          ).data[0];
-        }
+        // Fire all independent network calls in parallel so each metadata's slot
+        // in the semaphore isn't held through sequential round-trips.
+        await Promise.all([
+          // Fetch the dcCreator Person from agent-api:
+          ...(metadata.dcCreator?.id
+            ? [
+                apiClient
+                  .get<Person>(`agent-api/person/${metadata.dcCreator.id}`, {})
+                  .then((r) => {
+                    (metadata as any).dcCreator = r.data;
+                  })
+              ]
+            : []),
+          // Fetch the License resource based on the Metadata's xmpRightsWebStatement field:
+          ...(metadata.xmpRightsWebStatement
+            ? [
+                apiClient
+                  .get<License[]>("objectstore-api/license", {
+                    filter: { url: metadata.xmpRightsWebStatement }
+                  })
+                  .then((r) => {
+                    (metadata as any).license = r.data[0];
+                  })
+              ]
+            : [])
+        ]);
       }
     }
   );

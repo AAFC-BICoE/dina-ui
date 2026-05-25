@@ -114,6 +114,7 @@ export * from "./util/useMaterialSampleNameComparator";
 export * from "./util/simpleSearchFilterBuilder";
 export * from "./filter-builder/fiql";
 export * from "./util/bulkEditAllManagedAttributes";
+export * from "./util/bulkQueryUtils";
 export * from "./table/ReactTable";
 export * from "./table/Pagination";
 export * from "./table/RowComponents";

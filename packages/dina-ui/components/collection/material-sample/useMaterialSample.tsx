@@ -15,7 +15,8 @@ import {
   withoutBlankFields,
   SimpleSearchFilterBuilder,
   useBulkQueries,
-  DeleteArgs
+  DeleteArgs,
+  BULK_QUERY_CONCURRENCY
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -93,7 +94,8 @@ export function useMaterialSampleQuery(id?: string | null) {
             include: "genericMolecularAnalysis, materialSample",
             filter: SimpleSearchFilterBuilder.create()
               .where("materialSample.id", "EQ", data.id)
-              .build()
+              .build(),
+            page: { limit: 1000 }
           }
         );
 
@@ -194,7 +196,8 @@ export function useMaterialSampleQuery(id?: string | null) {
             filter: SimpleSearchFilterBuilder.create()
               .where("sample.uuid", "EQ", data.id)
               .build(),
-            include: "associatedSample,sample"
+            include: "associatedSample,sample",
+            page: { limit: 1000 }
           }
         );
         if (associations) {
@@ -234,16 +237,38 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
     })),
     {
       disabled: !ids.length,
+      concurrency: BULK_QUERY_CONCURRENCY,
       onSuccess: async ({ data }) => {
-        const workflowItems = await apiClient.get<GenericMolecularAnalysis[]>(
-          `seqdb-api/generic-molecular-analysis-item`,
-          {
-            include: "genericMolecularAnalysis, materialSample",
+        // Fire all independent network calls in parallel so each sample's slot
+        // in the semaphore isn't held through sequential round-trips.
+        const [workflowItems, storageUnit, associations] = await Promise.all([
+          // Workflow items linked to this material sample
+          apiClient.get<GenericMolecularAnalysis[]>(
+            `seqdb-api/generic-molecular-analysis-item`,
+            {
+              include: "genericMolecularAnalysis, materialSample",
+              filter: SimpleSearchFilterBuilder.create()
+                .where("materialSample.id", "EQ", data.id)
+                .build(),
+              page: { limit: 1000 }
+            }
+          ),
+          // Storage unit (only fetched when a storageUnitUsage id exists)
+          data?.storageUnitUsage?.id
+            ? apiClient.get<StorageUnitUsage>(
+                `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
+                { include: "storageUnit" }
+              )
+            : Promise.resolve(null),
+          // Associations linked to this material sample
+          apiClient.get<Association[]>(`collection-api/association`, {
             filter: SimpleSearchFilterBuilder.create()
-              .where("materialSample.id", "EQ", data.id)
-              .build()
-          }
-        );
+              .where("sample.uuid", "EQ", data.id)
+              .build(),
+            include: "associatedSample,sample",
+            page: { limit: 1000 }
+          })
+        ]);
 
         if (workflowItems) {
           data.workflows = [
@@ -255,10 +280,18 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
           ];
         }
 
-        for (const organism of data.organism ?? []) {
-          if (organism?.determination) {
-            // Retrieve determiner arrays on determination.
-            for (const determination of organism.determination) {
+        if (storageUnit?.data?.storageUnit) {
+          data.storageUnit = storageUnit.data.storageUnit;
+        }
+
+        if (associations) {
+          data.associations = associations.data;
+        }
+
+        // Retrieve determiner Person objects for all determinations in parallel.
+        await Promise.all(
+          (data.organism ?? []).flatMap((organism) =>
+            (organism?.determination ?? []).map(async (determination) => {
               if (determination.determiner) {
                 determination.determiner = _.compact(
                   await bulkGet<Person, true>(
@@ -272,23 +305,9 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
                   )
                 );
               }
-            }
-          }
-        }
-
-        // Setup the storage unit if it's stored on the storage unit usage.
-        if (data?.storageUnitUsage?.id) {
-          const storageUnit = await apiClient.get<StorageUnitUsage>(
-            `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
-            {
-              include: "storageUnit"
-            }
-          );
-
-          if (storageUnit?.data?.storageUnit) {
-            data.storageUnit = storageUnit.data.storageUnit;
-          }
-        }
+            })
+          )
+        );
 
         // Process loaded back-end data into data structure that Formik can use
         if (data.extensionValues) {
@@ -332,20 +351,6 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
                 data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level
             };
           }
-        }
-
-        // Fetch associations for each sample
-        const associations = await apiClient.get<Association[]>(
-          `collection-api/association`,
-          {
-            filter: SimpleSearchFilterBuilder.create()
-              .where("sample.uuid", "EQ", data.id)
-              .build(),
-            include: "associatedSample,sample"
-          }
-        );
-        if (associations) {
-          data.associations = associations.data;
         }
       }
     }
@@ -680,7 +685,11 @@ export function useMaterialSampleSave({
     setEnableShowParentAttributes
   };
 
-  const { loading, lastUsedCollection } = useLastUsedCollection();
+  const { loading, lastUsedCollection } = useLastUsedCollection(
+    // When editing an existing sample, skip the query — lastUsedCollection
+    // is only used for the default values of a new sample.
+    !!materialSample
+  );
 
   const defaultValues: InputResource<MaterialSample> = {
     type: "material-sample",
@@ -935,12 +944,25 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
+    // The collectingEvent relationship is always managed explicitly in the block below
+    // (which uses the freshly-saved ID from saveCollectingEvent). We want to avoid
+    // attribute-level diff to control it, because the fetched object is
+    // mutated in-place by the onSuccess callback (adding geoReferenceAssertions, attachment,
+    // collectors arrays, etc.) *after* DinaForm has already cloned the initial values.
+    // That race means resourceDifference would see a spurious shape change and include
+    // collectingEvent in the diff even when the user did not touch it.
+    delete (msDiff as any).collectingEvent;
+
     // Save and link the Collecting Event if enabled:
     const colEventFormRefToUse = colEventFormRef?.current?.values
       ? colEventFormRef
       : collectingEventRefExternal;
     if (colEventFormRefToUse?.current) {
       const collectingEventValues = {
+        // Seed with the known colEventId so the id is preserved even if the
+        // nested form mounted before its fetch resolved (race condition when
+        // loading=false immediately and colEventQuery is still in-flight).
+        ...(colEventId ? { id: colEventId } : {}),
         ...withoutBlankFields(colEventFormRef?.current?.values),
         ...withoutBlankFields(collectingEventRefExternal?.current?.values)
       };

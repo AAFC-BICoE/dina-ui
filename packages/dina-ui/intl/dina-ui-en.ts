@@ -992,6 +992,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   rolesPerGroup: "Roles Per Group",
   runWorkflow: "Run Workflow",
   save: "Save",
+  bulkEditingAllSamples: "Editing {total} samples",
+  bulkEditingSampleOf: "Editing sample {current} of {total}",
+  bulkEditingAllMetadata: "Editing {total} metadata records",
+  bulkEditingMetadataOf: "Editing metadata {current} of {total}",
+  bulkEditLoadingProgress: "Loading sample data... {loaded} of {total}",
+  bulkEditMetadataLoadingProgress: "Loading metadata... {loaded} of {total}",
   saveAll: "Save All",
   saveAndCopyToNext: "Save & Copy To Next",
   saveAndCopyToNextWarning:
