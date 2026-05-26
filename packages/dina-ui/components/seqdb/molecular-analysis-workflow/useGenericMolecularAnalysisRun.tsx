@@ -357,6 +357,16 @@ export function useGenericMolecularAnalysisRun({
               molecularAnalysisResultPaths,
               { apiBaseUrl: "/seqdb-api" }
             );
+          if (
+            molecularAnalysisResultQuery &&
+            molecularAnalysisResultQuery.length > 0
+          ) {
+            for (const r of molecularAnalysisResultQuery) {
+              if (r && !(r as any).id && (r as any).uuid) {
+                (r as any).id = (r as any).uuid;
+              }
+            }
+          }
           if (molecularAnalysisResultQuery.length > 0) {
             for (const molecularAnalysisResult of molecularAnalysisResultQuery) {
               const originalAttachments =
@@ -404,12 +414,27 @@ export function useGenericMolecularAnalysisRun({
 
           return sequencingRunItem.map((runItem) => {
             const queryMolecularAnalysisResult =
-              molecularAnalysisResultQuery.find(
-                (molecularAnalysisResult) =>
-                  molecularAnalysisResult?.id ===
-                  runItem?.molecularAnalysisRunItem?.result?.id
-              );
-            if (runItem.molecularAnalysisRunItem?.result) {
+              molecularAnalysisResultQuery.find((molecularAnalysisResult) => {
+                const runItemResult = runItem?.molecularAnalysisRunItem
+                  ?.result as any;
+                const runItemResultId =
+                  runItemResult?.id ?? runItemResult?.uuid;
+                return molecularAnalysisResult?.id === runItemResultId;
+              });
+
+            if (
+              runItem.molecularAnalysisRunItem?.result &&
+              queryMolecularAnalysisResult
+            ) {
+              if (
+                !(queryMolecularAnalysisResult as any).id &&
+                (queryMolecularAnalysisResult as any).uuid
+              ) {
+                (queryMolecularAnalysisResult as any).id = (
+                  queryMolecularAnalysisResult as any
+                ).uuid;
+              }
+
               runItem.molecularAnalysisRunItem.result =
                 queryMolecularAnalysisResult;
             }
@@ -674,6 +699,19 @@ export function useGenericMolecularAnalysisRun({
                 }
               );
               qualityControlFound.molecularAnalysisRunItem = runItemResp.data;
+              if (
+                qualityControlFound.molecularAnalysisRunItem?.result &&
+                !(qualityControlFound.molecularAnalysisRunItem.result as any)
+                  .id &&
+                (qualityControlFound.molecularAnalysisRunItem.result as any)
+                  .uuid
+              ) {
+                (
+                  qualityControlFound.molecularAnalysisRunItem.result as any
+                ).id = (
+                  qualityControlFound.molecularAnalysisRunItem.result as any
+                ).uuid;
+              }
             }
 
             // If a result exists, we need to perform a get request to retrieve the metadata to be displayed.
