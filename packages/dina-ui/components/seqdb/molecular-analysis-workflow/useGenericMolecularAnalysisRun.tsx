@@ -691,7 +691,19 @@ export function useGenericMolecularAnalysisRun({
             ?.data?.[0] as QualityControlWithAttachment;
           if (qualityControlFound) {
             // Fetch result for the molecularAnalysisRunItem separately since multi-level includes are not supported.
-            if (qualityControlFound.molecularAnalysisRunItem?.id) {
+            // Only fetch the run item if it does not already contain a result with an id/uuid.
+            const existingRunItem =
+              qualityControlFound.molecularAnalysisRunItem as any | undefined;
+            const hasExistingResult = !!(
+              existingRunItem?.result &&
+              ((existingRunItem.result as any).id ||
+                (existingRunItem.result as any).uuid)
+            );
+
+            if (
+              qualityControlFound.molecularAnalysisRunItem?.id &&
+              !hasExistingResult
+            ) {
               const runItemResp = await apiClient.get<MolecularAnalysisRunItem>(
                 `seqdb-api/molecular-analysis-run-item/${qualityControlFound.molecularAnalysisRunItem.id}`,
                 {
@@ -699,19 +711,19 @@ export function useGenericMolecularAnalysisRun({
                 }
               );
               qualityControlFound.molecularAnalysisRunItem = runItemResp.data;
-              if (
-                qualityControlFound.molecularAnalysisRunItem?.result &&
-                !(qualityControlFound.molecularAnalysisRunItem.result as any)
-                  .id &&
-                (qualityControlFound.molecularAnalysisRunItem.result as any)
-                  .uuid
-              ) {
+            }
+
+            // Normalize result id from uuid if present on the existing or fetched run item.
+            if (
+              qualityControlFound.molecularAnalysisRunItem?.result &&
+              !(qualityControlFound.molecularAnalysisRunItem.result as any)
+                .id &&
+              (qualityControlFound.molecularAnalysisRunItem.result as any).uuid
+            ) {
+              (qualityControlFound.molecularAnalysisRunItem.result as any).id =
                 (
                   qualityControlFound.molecularAnalysisRunItem.result as any
-                ).id = (
-                  qualityControlFound.molecularAnalysisRunItem.result as any
                 ).uuid;
-              }
             }
 
             // If a result exists, we need to perform a get request to retrieve the metadata to be displayed.
