@@ -136,29 +136,31 @@ export function SangerSampleSelectionStep({
    * Retrieve all of the PCR Batch Items that are associated with the PCR Batch from step 1.
    */
   async function fetchSampledIds() {
-    await apiClient
-      .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
+    const response = await apiClient.get<PcrBatchItem[]>(
+      "/seqdb-api/pcr-batch-item",
+      {
         filter: { "pcrBatch.uuid": { EQ: pcrBatchId } },
         include: "materialSample",
         page: {
           limit: 1000 // Maximum page size.
         }
-      })
-      .then((response) => {
-        const pcrBatchItems: PersistedResource<PcrBatchItem>[] = (
-          response?.data as any[]
-        )?.filter(
-          (item) => item?.relationships?.materialSample?.data?.id !== undefined
-        );
-        const materialSampleIds: string[] =
-          pcrBatchItems.map(
-            (item) =>
-              (item as any)?.relationships.materialSample?.data?.id as string
-          ) ?? [];
+      }
+    );
 
-        setPreviouslySelectedResources(pcrBatchItems);
-        fetchSamples(materialSampleIds);
-      });
+    const pcrBatchItems: PersistedResource<PcrBatchItem>[] = (
+      (response?.data as any[]) ?? []
+    ).filter((item) => item !== undefined && item !== null);
+
+    const materialSampleIds: string[] = pcrBatchItems
+      .map(
+        (item) =>
+          (item as any)?.materialSample?.id ??
+          (item as any)?.relationships?.materialSample?.data?.id
+      )
+      .filter((id) => id !== undefined && id !== null) as string[];
+
+    setPreviouslySelectedResources(pcrBatchItems);
+    fetchSamples(materialSampleIds);
   }
 
   /**
