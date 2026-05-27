@@ -32,7 +32,6 @@ import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { MdOutlineLibraryAdd } from "react-icons/md";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../../components/controlled-vocabulary/controlledVocabularyItemUtils";
 export const MATERIAL_SAMPLE_NON_EXPORTABLE_COLUMNS: string[] = [
   "selectColumn",
   "assemblages.",
@@ -242,7 +241,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         label: "otherIdentifiers",
         component: "MATERIAL_SAMPLE",
         path: "data.attributes.identifiers",
-        apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
+        apiEndpoint: `collection-api/controlled-vocabulary-item`
       },
 
       // Preparation - Managed Attributes
@@ -372,7 +371,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         label: "otherIdentifiers",
         component: "MATERIAL_SAMPLE",
         path: "included.attributes.identifiers",
-        apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`,
+        apiEndpoint: `collection-api/controlled-vocabulary-item`,
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },

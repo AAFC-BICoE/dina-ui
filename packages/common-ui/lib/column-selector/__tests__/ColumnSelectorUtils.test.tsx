@@ -1,5 +1,4 @@
 import { render } from "@testing-library/react";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   collectPathValues,
   generateColumnPath,
@@ -136,7 +135,7 @@ describe("ColumnSelectorUtils", () => {
               label: "otherIdentifiers",
               component: "MATERIAL_SAMPLE",
               path: "data.attributes.identifiers",
-              apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
+              apiEndpoint: `collection-api/controlled-vocabulary-item`
             },
             value: "data.attributes.identifiers",
             distinctTerm: false,
@@ -162,7 +161,7 @@ describe("ColumnSelectorUtils", () => {
               label: "otherIdentifiers",
               component: "MATERIAL_SAMPLE",
               path: "included.attributes.identifiers",
-              apiEndpoint: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
+              apiEndpoint: `collection-api/controlled-vocabulary-item`
             },
             parentName: "parentMaterialSample",
             parentPath: "included",
