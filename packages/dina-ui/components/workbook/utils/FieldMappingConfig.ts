@@ -264,12 +264,17 @@ const FieldMappingConfig: FieldMappingConfigType = {
         sex: { dataType: WorkbookDataTypeEnum.STRING },
         remarks: { dataType: WorkbookDataTypeEnum.STRING },
         isTarget: { dataType: WorkbookDataTypeEnum.BOOLEAN },
+        dwcVernacularName: { dataType: WorkbookDataTypeEnum.STRING },
         determination: {
           dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
           attributes: {
             verbatimScientificName: { dataType: WorkbookDataTypeEnum.STRING },
             verbatimDeterminer: { dataType: WorkbookDataTypeEnum.STRING },
             verbatimDate: { dataType: WorkbookDataTypeEnum.DATE },
+            determinedOn: { dataType: WorkbookDataTypeEnum.DATE },
+            determinationRemarks: { dataType: WorkbookDataTypeEnum.STRING },
+            transcriberRemarks: { dataType: WorkbookDataTypeEnum.STRING },
+            typeStatusEvidence: { dataType: WorkbookDataTypeEnum.STRING },
             typeStatus: { dataType: WorkbookDataTypeEnum.STRING },
             scientificName: { dataType: WorkbookDataTypeEnum.STRING },
             scientificNameDetails: {
