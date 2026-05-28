@@ -432,7 +432,6 @@ export class ApiClientImpl implements ApiClientI {
 
           break;
       }
-      [];
     }
 
     // Optionally return null instead of throwing an error for missing resources:
@@ -920,6 +919,15 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   throw error;
 }
 
+function normalizeId(obj: any): void {
+  if (obj && typeof obj === "object") {
+    if (!obj.id && obj.uuid) {
+      obj.id = obj.uuid;
+      delete obj.uuid;
+    }
+  }
+}
+
 export class CustomDinaKitsu extends Kitsu {
   /**
    * The default Kitsu 'get' method omits the last part of URLs with multiple slashes.
@@ -965,6 +973,18 @@ export class CustomDinaKitsu extends Kitsu {
             item[key] = relData.map((r: any) => ({ id: r.id, type: r.type }));
           } else {
             item[key] = { id: relData.id, type: relData.type };
+          }
+        }
+
+        // Normalize uuid to id on the item itself and any promoted relationships
+        normalizeId(item);
+        for (const key of requestedIncludes) {
+          if (item[key]) {
+            if (Array.isArray(item[key])) {
+              item[key].forEach(normalizeId);
+            } else {
+              normalizeId(item[key]);
+            }
           }
         }
 

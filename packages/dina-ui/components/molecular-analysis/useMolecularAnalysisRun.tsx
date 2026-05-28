@@ -294,10 +294,9 @@ export function useMolecularAnalysisRun({
         async function findMolecularAnalysisRun(
           sequencingRunItem: SequencingRunItem[]
         ) {
-          const hasRunId = sequencingRunItem.some((item) => {
-            const run = item?.molecularAnalysisRunItem?.run as any;
-            return !!(run?.id ?? run?.uuid);
-          });
+          const hasRunId = sequencingRunItem.some(
+            (item) => !!item?.molecularAnalysisRunItem?.run?.id
+          );
           if (!hasRunId) {
             // Nothing to attach.
             return;
@@ -306,10 +305,7 @@ export function useMolecularAnalysisRun({
           // Extract unique run IDs (use id or uuid)
           const uniqueRunIds = new Set(
             sequencingRunItem
-              .map((item) => {
-                const run = item?.molecularAnalysisRunItem?.run as any;
-                return run?.id ?? run?.uuid;
-              })
+              .map((item) => item?.molecularAnalysisRunItem?.run?.id)
               .filter((id): id is string => !!id)
           );
           if (uniqueRunIds.size === 0) {
@@ -323,20 +319,14 @@ export function useMolecularAnalysisRun({
           }
 
           const firstRunId = [...uniqueRunIds][0];
-          const firstSequencingRun = sequencingRunItem.find((item) => {
-            const run = item?.molecularAnalysisRunItem?.run as any;
-            return (run?.id ?? run?.uuid) === firstRunId;
-          })?.molecularAnalysisRunItem?.run as any;
+          const firstSequencingRun = sequencingRunItem.find(
+            (item) => item?.molecularAnalysisRunItem?.run?.id === firstRunId
+          )?.molecularAnalysisRunItem?.run;
 
           if (firstSequencingRun) {
-            const normalizedRun: MolecularAnalysisRun = {
-              ...(firstSequencingRun as any),
-              id: firstSequencingRun.id ?? firstSequencingRun.uuid
-            } as any;
-
-            setSequencingRun(normalizedRun);
-            setSequencingRunName(normalizedRun.name);
-            await findMolecularAnalysisRunAttachments(normalizedRun);
+            setSequencingRun(firstSequencingRun);
+            setSequencingRunName(firstSequencingRun.name);
+            await findMolecularAnalysisRunAttachments(firstSequencingRun);
           }
         }
 
@@ -344,10 +334,9 @@ export function useMolecularAnalysisRun({
           run: MolecularAnalysisRun
         ) {
           // Only perform the request if a sequencing run exists.
-          const runId = (run as any)?.id ?? (run as any)?.uuid;
-          if (runId) {
+          if (run?.id) {
             const runQuery = await apiClient.get(
-              `seqdb-api/molecular-analysis-run/${runId}`,
+              `seqdb-api/molecular-analysis-run/${run?.id}`,
               {
                 include: "attachments"
               }
