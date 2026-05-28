@@ -34,7 +34,11 @@ import {
   MolecularAnalysisRunStep,
   MolecularAnalysisRunStepProps
 } from "../MolecularAnalysisRunStep";
-import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import {
+  MolecularAnalysisRunItem,
+  MolecularAnalysisRunItemUsageType
+} from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { PersistedResource } from "kitsu";
 
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
@@ -105,42 +109,104 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "search-api/search-ws/mapping":
       return MOCK_INDEX_MAPPING_RESP;
-    case "/seqdb-api/generic-molecular-analysis-item":
-      switch (params.filter.rsql) {
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID:
+    case "/seqdb-api/generic-molecular-analysis-item": {
+      const uuid = params.filter?.["genericMolecularAnalysis.uuid"]?.EQ;
+      switch (uuid) {
+        case TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN };
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID:
+        case TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN };
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID:
+        case TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN };
       }
+    }
 
     case "seqdb-api/molecular-analysis-run/" + TEST_MOLECULAR_ANALYSIS_RUN_ID:
       return { data: TEST_MOLECULAR_ANALYSIS_RUN };
 
-    case "seqdb-api/molecular-analysis-run-item":
-      switch (params.filter.rsql) {
-        case "run.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_RUN_ID +
-          ";usageType==" +
-          MolecularAnalysisRunItemUsageType.QUALITY_CONTROL:
-          return { data: TEST_QUALITY_CONTROL_RUN_ITEMS };
+    case "seqdb-api/molecular-analysis-run-item": {
+      const runUuid = params.filter?.["run.uuid"]?.EQ;
+      const usageType = params.filter?.usageType?.EQ;
+      const uuidIn = params.filter?.uuid?.IN;
+
+      if (uuidIn) {
+        const requestedUuids = uuidIn.split(",");
+        const allRunItems: PersistedResource<MolecularAnalysisRunItem>[] = [
+          {
+            id: "f65ed036-eb92-40d9-af03-d027646e8948",
+            type: "molecular-analysis-run-item",
+            name: "Provided run item name",
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+            run: TEST_MOLECULAR_ANALYSIS_RUN
+          },
+          {
+            id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+            type: "molecular-analysis-run-item",
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+            run: TEST_MOLECULAR_ANALYSIS_RUN
+          },
+          {
+            id: "aaa00000-0000-0000-0000-000000000001",
+            type: "molecular-analysis-run-item",
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+            run: TEST_MOLECULAR_ANALYSIS_RUN
+          },
+          {
+            id: "aaa00000-0000-0000-0000-000000000002",
+            type: "molecular-analysis-run-item",
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+            run: {
+              id: "9ec624c9-8465-4f00-b3d4-1bbab5f1e2f2",
+              type: "molecular-analysis-run",
+              name: "run-name-2"
+            }
+          },
+          {
+            id: "aaa00000-0000-0000-0000-000000000003",
+            type: "molecular-analysis-run-item",
+            usageType:
+              MolecularAnalysisRunItemUsageType.GENERIC_MOLECULAR_ANALYSIS_ITEM,
+            run: {
+              id: "9ec624c9-8465-4f00-b3d4-1bbab5f1e2f2",
+              type: "molecular-analysis-run",
+              name: "run-name-2"
+            }
+          }
+        ];
+        return {
+          data: allRunItems.filter((item) => requestedUuids.includes(item.id))
+        };
       }
+
+      if (
+        runUuid === TEST_MOLECULAR_ANALYSIS_RUN_ID &&
+        usageType === MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+      ) {
+        return { data: TEST_QUALITY_CONTROL_RUN_ITEMS };
+      }
+    }
+
+    case "seqdb-api/molecular-analysis-run-item/" +
+      TEST_QUALITY_CONTROL_RUN_ITEMS[1].id:
+      return { data: TEST_QUALITY_CONTROL_RUN_ITEMS[1] };
 
     case "seqdb-api/molecular-analysis-result/" +
       TEST_MOLECULAR_ANALYSIS_RESULT.id:
       return { data: TEST_MOLECULAR_ANALYSIS_RESULT };
 
-    case "seqdb-api/quality-control":
-      switch (params.filter.rsql) {
-        case "molecularAnalysisRunItem.uuid==2a3b15ce-6781-466b-bc1e-49e35af3df58":
+    case "seqdb-api/quality-control": {
+      const runItemUuid = params.filter?.["molecularAnalysisRunItem.uuid"]?.EQ;
+      switch (runItemUuid) {
+        case "2a3b15ce-6781-466b-bc1e-49e35af3df58":
           return { data: TEST_QUALITY_CONTROL_1 };
-        case "molecularAnalysisRunItem.uuid==e9e39b72-ece7-454b-893a-2fc2d075e7b7":
+        case "e9e39b72-ece7-454b-893a-2fc2d075e7b7":
           return { data: TEST_QUALITY_CONTROL_2 };
       }
+    }
 
     case "seqdb-api/vocabulary/qualityControlType":
       return { data: TEST_QUALITY_CONTROL_TYPES };
@@ -203,16 +269,19 @@ const mockBulkGet = jest.fn(async (paths) => {
       case "metadata/" +
         TEST_METADATA_1.id +
         "?include=acMetadataCreator,derivatives":
+      case "metadata/" + TEST_METADATA_1.id:
         return TEST_METADATA_1;
       case "metadata/" + TEST_METADATA_2.id + "?include=derivatives":
       case "metadata/" +
         TEST_METADATA_2.id +
         "?include=acMetadataCreator,derivatives":
+      case "metadata/" + TEST_METADATA_2.id:
         return TEST_METADATA_2;
       case "metadata/" + TEST_METADATA_3.id + "?include=derivatives":
       case "metadata/" +
         TEST_METADATA_3.id +
         "?include=acMetadataCreator,derivatives":
+      case "metadata/" + TEST_METADATA_3.id:
         return TEST_METADATA_3;
     }
   });

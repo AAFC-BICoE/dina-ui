@@ -436,7 +436,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN: PersistedResource<Gener
       genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
       materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[0],
       molecularAnalysisRunItem: {
-        id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+        id: "aaa00000-0000-0000-0000-000000000001",
         type: "molecular-analysis-run-item",
         usageType: "hrms",
         run: TEST_MOLECULAR_ANALYSIS_RUN
@@ -452,7 +452,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN: PersistedResource<Gener
       genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
       materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[1],
       molecularAnalysisRunItem: {
-        id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+        id: "aaa00000-0000-0000-0000-000000000002",
         type: "molecular-analysis-run-item",
         usageType: "hrms",
         run: {
@@ -472,7 +472,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN: PersistedResource<Gener
       genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
       materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[2],
       molecularAnalysisRunItem: {
-        id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+        id: "aaa00000-0000-0000-0000-000000000003",
         type: "molecular-analysis-run-item",
         usageType: "hrms",
         run: {
