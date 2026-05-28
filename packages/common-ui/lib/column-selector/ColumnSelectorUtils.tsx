@@ -1,7 +1,7 @@
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
 import _ from "lodash";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
-import { FieldHeader, dateCell } from "..";
+import { FieldHeader, SimpleSearchFilterBuilder, dateCell } from "..";
 import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
 import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
@@ -1179,7 +1179,10 @@ async function getControlledVocabularyColumn<TData extends KitsuResource>(
 ): Promise<TableColumn<TData> | undefined> {
   // API request params:
   const params = {
-    page: { limit: 1 }
+    page: { limit: 1 },
+    filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+      .where("uuid", "EQ", controlledVocabularyKey)
+      .build()
   };
 
   // Figure out API endpoint using the dynamicFieldsMappingConfig.
