@@ -62,7 +62,9 @@ export function SangerPcrReactionStep({
           resultsWithId.map((result) => ({
             id: result.id,
             type: "pcr-batch-item",
-            result: result.value
+            attributes: {
+              result: result.value
+            }
           })),
           { apiBaseUrl: "/seqdb-api", resourceType: "pcr-batch-item" }
         );
