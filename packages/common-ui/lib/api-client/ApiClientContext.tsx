@@ -970,9 +970,13 @@ export class CustomDinaKitsu extends Kitsu {
 
           // Promote stub(s) to top level
           if (Array.isArray(relData)) {
-            item[key] = relData.map((r: any) => ({ id: r.id, type: r.type }));
+            item[key] = relData.map((r: any) => ({
+              ...r,
+              id: r.id,
+              type: r.type
+            }));
           } else {
-            item[key] = { id: relData.id, type: relData.type };
+            item[key] = { ...relData, id: relData.id, type: relData.type };
           }
         }
 

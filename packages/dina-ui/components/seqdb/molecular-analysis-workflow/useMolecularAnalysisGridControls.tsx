@@ -146,9 +146,6 @@ export function useMolecularAnalysisGridControls({
             const storageUnitToLoad = storageUnitUsageQuery.find(
               (su) => su?.storageUnit?.id === firstStorageUnitId
             )?.storageUnit;
-            setStorageUnit(storageUnitToLoad);
-            setLoadedStorageUnit(storageUnitToLoad);
-            setInitialStorageUnit(storageUnitToLoad);
 
             // Now we need to load the storage unit type.
             const storageUnitResponse = await apiClient.get<StorageUnit>(
@@ -156,6 +153,14 @@ export function useMolecularAnalysisGridControls({
               { include: "storageUnitType" }
             );
 
+            const fullStorageUnit: PersistedResource<StorageUnit> = {
+              ...storageUnitToLoad,
+              storageUnitType: storageUnitResponse.data.storageUnitType
+            } as PersistedResource<StorageUnit>;
+
+            setStorageUnit(fullStorageUnit);
+            setLoadedStorageUnit(fullStorageUnit);
+            setInitialStorageUnit(fullStorageUnit);
             setStorageUnitType(storageUnitResponse.data.storageUnitType as any);
           }
 

@@ -1367,5 +1367,129 @@ describe("API client context", () => {
 
       expect((response.data as any[])[0].materialSample).toBeUndefined();
     });
+
+    it("Normalizes uuid to id on the primary item when id is missing", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "material-sample",
+              uuid: "019e1846-54ad-719e-9c15-75adca3862d3",
+              attributes: { name: "Sample 1" }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get("seqdb-api/material-sample");
+
+      expect(response.data[0].id).toBe("019e1846-54ad-719e-9c15-75adca3862d3");
+      expect(response.data[0].uuid).toBeUndefined();
+    });
+
+    it("Normalizes uuid to id on a single promoted relationship stub", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    uuid: "019e1846-54ad-719e-9c15-75adca3862d3",
+                    type: "material-sample"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        { include: "materialSample" }
+      );
+
+      const promotedSample = response.data[0].materialSample;
+      expect(promotedSample.id).toBe("019e1846-54ad-719e-9c15-75adca3862d3");
+      expect(promotedSample.uuid).toBeUndefined();
+    });
+
+    it("Normalizes uuid to id on all items inside a promoted to-many relationship stub array", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSamples: {
+                  data: [
+                    {
+                      uuid: "019e1846-54ad-719e-9c15-75adca3862d3",
+                      type: "material-sample"
+                    },
+                    {
+                      uuid: "019e1846-7b67-735b-b7fa-771c0e276369",
+                      type: "material-sample"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        { include: "materialSamples" }
+      );
+
+      const promotedSamples = response.data[0].materialSamples;
+      expect(promotedSamples[0].id).toBe(
+        "019e1846-54ad-719e-9c15-75adca3862d3"
+      );
+      expect(promotedSamples[0].uuid).toBeUndefined();
+      expect(promotedSamples[1].id).toBe(
+        "019e1846-7b67-735b-b7fa-771c0e276369"
+      );
+      expect(promotedSamples[1].uuid).toBeUndefined();
+    });
+
+    it("Does not alter properties if the item has no uuid or if an id is already present", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "existing-id",
+              uuid: "should-be-ignored-or-removed", // Your function triggers if !obj.id, so if id exists it won't swap it
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "sample-id",
+                    type: "material-sample"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        { include: "materialSample" }
+      );
+
+      expect(response.data[0].id).toBe("existing-id");
+      expect(response.data[0].materialSample.id).toBe("sample-id");
+    });
   });
 });
