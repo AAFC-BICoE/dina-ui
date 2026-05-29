@@ -27,8 +27,6 @@ describe("Collapser", () => {
     const wrapper = render(<TestComponent />);
     expect(wrapper.queryByText("Collapsed content")).toBeInTheDocument();
 
-    screen.logTestingPlaygroundURL();
-
     // Collapse the content:
     const button = wrapper.getByRole("button", { name: /collapse section/i });
     fireEvent.click(button);

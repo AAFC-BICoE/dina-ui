@@ -417,8 +417,6 @@ describe("Material Sample Edit Page", () => {
     );
     userEvent.click(option);
 
-    screen.logTestingPlaygroundURL();
-
     // Save the form.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
