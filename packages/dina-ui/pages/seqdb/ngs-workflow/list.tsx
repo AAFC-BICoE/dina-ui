@@ -3,7 +3,8 @@ import {
   ColumnDefinition,
   dateCell,
   FilterAttribute,
-  ListPageLayout
+  ListPageLayout,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -65,11 +66,11 @@ export default function NgsWorkflowListPage() {
       <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage("ngsWorkflowWholeGenomeSeqTitle")}</h1>
         <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            isCompleted: false,
-            // Apply group filter:
-            ...(filterForm.group && { group: filterForm.group })
-          })}
+          additionalFilters={(filterForm) =>
+            SimpleSearchFilterBuilder.create<LibraryPrepBatch>()
+              .whereProvided("group", "EQ", filterForm.group)
+              .build()
+          }
           filterAttributes={FILTER_ATTRIBUTES}
           id="ngs-workflow-list"
           queryTableProps={{

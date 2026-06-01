@@ -4,7 +4,8 @@ import {
   dateCell,
   FilterAttribute,
   ListPageLayout,
-  FieldHeader
+  FieldHeader,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -67,11 +68,12 @@ export default function SangerWorkflowSequencingListPage() {
           {formatMessage("sangerWorkflowSequencingListTitle")}
         </h1>
         <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            isCompleted: false,
-            // Apply group filter:
-            ...(filterForm.group && { group: filterForm.group })
-          })}
+          additionalFilters={(filterForm) =>
+            SimpleSearchFilterBuilder.create<SeqBatch>()
+              .whereProvided("group", "EQ", filterForm.group)
+              .where("isCompleted", "EQ", false)
+              .build()
+          }
           filterAttributes={FILTER_ATTRIBUTES}
           id="seq-workflow-list"
           queryTableProps={{

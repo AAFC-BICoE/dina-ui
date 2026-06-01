@@ -5,7 +5,8 @@ import {
   useApiClient,
   LoadingSpinner,
   DinaForm,
-  BulkDeleteButton
+  BulkDeleteButton,
+  SimpleSearchFilterBuilder
 } from "..";
 import { DataExport } from "@dina-ui/types/dina-export-api";
 import { Button } from "react-bootstrap";
@@ -69,7 +70,9 @@ export function DataExportListPageLayout({
           typeName: "data-export",
           apiBaseUrl: "/dina-export-api"
         }}
-        additionalFilters={{ createdBy: username || "" }}
+        additionalFilters={SimpleSearchFilterBuilder.create<DataExport>()
+          .where("createdBy", "EQ", username)
+          .build()}
         id="data-export-list"
         queryTableProps={{
           columns: TABLE_COLUMNS,
