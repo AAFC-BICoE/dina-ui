@@ -487,92 +487,59 @@ export class ApiClientImpl implements ApiClientI {
       path: `${deleteArg.delete.type}/${deleteArg.delete.id}`
     }));
 
-    // If using repository v2, split different operation types into separate requests.
-    if (options?.apiBaseUrl && ["/agent-api"].includes(options?.apiBaseUrl)) {
-      const postOperations: any = [];
-      const patchOperations: any = [];
+    const postOperations: any = [];
+    const patchOperations: any = [];
 
-      for (const jsonapiResource of serialized) {
-        if (jsonapiResource.id) {
-          patchOperations.push({
-            op: "PATCH",
-            path: `${jsonapiResource.type}/${jsonapiResource.id}`,
-            value: {
-              ...jsonapiResource,
-              id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-            }
-          });
-        } else {
-          postOperations.push({
-            op: "POST",
-            path: jsonapiResource.type,
-            value: {
-              ...jsonapiResource,
-              id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-            }
-          });
-        }
+    for (const jsonapiResource of serialized) {
+      if (jsonapiResource.id) {
+        patchOperations.push({
+          op: "PATCH",
+          path: `${jsonapiResource.type}/${jsonapiResource.id}`,
+          value: {
+            ...jsonapiResource,
+            id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
+          }
+        });
+      } else {
+        postOperations.push({
+          op: "POST",
+          path: jsonapiResource.type,
+          value: {
+            ...jsonapiResource,
+            id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
+          }
+        });
       }
-
-      // only do the operations if there are any.
-      const postResponses = postOperations.length
-        ? await this.doOperations(postOperations, options)
-        : [];
-      const patchResponses = patchOperations.length
-        ? await this.doOperations(patchOperations, options)
-        : [];
-      const deleteResponses = deleteOperations.length
-        ? await this.doOperations(deleteOperations, options)
-        : [];
-
-      // Deserialize the responses to Kitsu format.
-      const deserializedPostPromises = postResponses.map((response) =>
-        deserialise(response)
-      );
-      const deserializedPatchPromises = patchResponses.map((response) =>
-        deserialise(response)
-      );
-      const deserializedDeletePromises = deleteResponses.map((response) =>
-        deserialise(response)
-      );
-      const deserialized = await Promise.all([
-        ...deserializedPostPromises,
-        ...deserializedPatchPromises,
-        ...deserializedDeletePromises
-      ]);
-      const kitsuResources = deserialized.map(({ data }) => data);
-      return kitsuResources;
-    } else {
-      const saveOperations = serialized.map<Operation>((jsonapiResource) => ({
-        op: options?.overridePatchOperation
-          ? "POST"
-          : jsonapiResource.id
-          ? "PATCH"
-          : "POST",
-        path: options?.overridePatchOperation
-          ? jsonapiResource.type
-          : jsonapiResource.id
-          ? `${jsonapiResource.type}/${jsonapiResource.id}`
-          : jsonapiResource.type,
-        value: {
-          ...jsonapiResource,
-          id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-        }
-      }));
-
-      const operations = [...saveOperations, ...deleteOperations];
-
-      // Do the operations request.
-      const responses = await this.doOperations(operations, options);
-
-      // Deserialize the responses to Kitsu format.
-      const deserializePromises = responses.map((response) =>
-        deserialise(response)
-      );
-      const deserialized = await Promise.all(deserializePromises);
-      const kitsuResources = deserialized.map(({ data }) => data);
-      return kitsuResources;
     }
+
+    // only do the operations if there are any.
+    const postResponses = postOperations.length
+      ? await this.doOperations(postOperations, options)
+      : [];
+    const patchResponses = patchOperations.length
+      ? await this.doOperations(patchOperations, options)
+      : [];
+    const deleteResponses = deleteOperations.length
+      ? await this.doOperations(deleteOperations, options)
+      : [];
+
+    // Deserialize the responses to Kitsu format.
+    const deserializedPostPromises = postResponses.map((response) =>
+      deserialise(response)
+    );
+    const deserializedPatchPromises = patchResponses.map((response) =>
+      deserialise(response)
+    );
+    const deserializedDeletePromises = deleteResponses.map((response) =>
+      deserialise(response)
+    );
+    const deserialized = await Promise.all([
+      ...deserializedPostPromises,
+      ...deserializedPatchPromises,
+      ...deserializedDeletePromises
+    ]);
+    const kitsuResources = deserialized.map(({ data }) => data);
+    return kitsuResources;
   }
 
   /**

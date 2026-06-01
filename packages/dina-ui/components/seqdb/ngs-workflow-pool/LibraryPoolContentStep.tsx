@@ -107,7 +107,7 @@ export function LibraryPoolContentStep({
         return { resource: item, type: item.type };
       });
       if (resources.length > 0) {
-        await save(resources, { apiBaseUrl: "seqdb-api/library-pool-content" });
+        await save(resources, { apiBaseUrl: "/seqdb-api" });
       }
 
       if (toDelete.length > 0) {

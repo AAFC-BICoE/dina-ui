@@ -198,7 +198,7 @@ export function PreLibraryPrepStep({
         return { resource: item, type: item.type };
       });
 
-      await save(resources, { apiBaseUrl: "seqdb-api/pre-library-prep" });
+      await save(resources, { apiBaseUrl: "/seqdb-api" });
       setEditMode(false);
     } catch (e) {
       if (e.toString() === "Error: Access is denied") {

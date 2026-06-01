@@ -106,7 +106,7 @@ export default function MolecularAnalysisWorkflowListPage() {
         <h1 id="wb-cont">{formatMessage("molecularAnalysisWorkflowTitle")}</h1>
         <ListPageLayout
           bulkDeleteButtonProps={{
-            apiBaseUrl: "/seqdb",
+            apiBaseUrl: "/seqdb-api",
             typeName: "molecular-analysis-workflow",
             beforeDelete: handleDeleteMolecularAnalysisWorkflows
           }}

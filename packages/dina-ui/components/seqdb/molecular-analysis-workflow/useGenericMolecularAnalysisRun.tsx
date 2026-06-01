@@ -959,6 +959,7 @@ export function useGenericMolecularAnalysisRun({
    */
   async function createNewQualityControls(molecularAnalysisRunId: string) {
     const groupName = molecularAnalysis.group;
+    const username = molecularAnalysis.createdBy;
 
     if (!_.isEqual(qualityControls, loadedQualityControls)) {
       const qualityControlsWithoutId = qualityControls.filter(
@@ -980,6 +981,7 @@ export function useGenericMolecularAnalysisRun({
                 resource: {
                   type: "molecular-analysis-result",
                   group: groupName,
+                  createdBy: username,
                   relationships: {
                     attachments: {
                       data: _.map(qualityControl.attachments, (item) =>
@@ -1101,6 +1103,7 @@ export function useGenericMolecularAnalysisRun({
     updatedQualityControlsCopy?: QualityControlWithAttachment[]
   ) {
     const groupName = molecularAnalysis.group;
+    const username = molecularAnalysis.createdBy;
 
     const sourceQualityControls = updatedQualityControlsCopy ?? qualityControls;
 
@@ -1191,6 +1194,7 @@ export function useGenericMolecularAnalysisRun({
             resource: {
               type: "molecular-analysis-result",
               group: groupName,
+              createdBy: username,
               relationships: {
                 attachments: {
                   data: _.map(currentAttachments, (item) =>
