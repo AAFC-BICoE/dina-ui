@@ -261,6 +261,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
           {
             resource: {
               group: "aafc",
+              createdBy: "test-user",
               relationships: {
                 attachments: {
                   data: [
@@ -276,7 +277,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             type: "molecular-analysis-result"
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+        { apiBaseUrl: "/seqdb-api" }
       );
 
       // Check the 2nd call: Saving the Molecular Analysis Run Item (linked to the result)
@@ -299,7 +300,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             type: "molecular-analysis-run-item"
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-run-item" }
+        { apiBaseUrl: "/seqdb-api" }
       );
 
       // Verify alert appears indicating attachment found
@@ -506,7 +507,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             type: "molecular-analysis-run-item"
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-run-item" }
+        { apiBaseUrl: "/seqdb-api" }
       );
 
       // Now delete the result itself
@@ -520,7 +521,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             }
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+        { apiBaseUrl: "/seqdb-api" }
       );
     });
 
@@ -655,7 +656,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             type: "molecular-analysis-run-item"
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-run-item" }
+        { apiBaseUrl: "/seqdb-api" }
       );
 
       // Delete the result itself now it has been unlinked.
@@ -669,7 +670,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             }
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+        { apiBaseUrl: "/seqdb-api" }
       );
     });
 
@@ -793,7 +794,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
             type: "molecular-analysis-result"
           }
         ],
-        { apiBaseUrl: "seqdb-api/molecular-analysis-result" }
+        { apiBaseUrl: "/seqdb-api" }
       );
     });
   });
