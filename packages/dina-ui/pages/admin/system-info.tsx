@@ -47,7 +47,7 @@ const SYSTEM_INFO_API_CONFIG: ApiConfigInfo[] = [
   },
   {
     moduleName: "Search WS API",
-    apiEndpoint: "search-api/search-ws"
+    apiEndpoint: "search-api"
   }
 ];
 
