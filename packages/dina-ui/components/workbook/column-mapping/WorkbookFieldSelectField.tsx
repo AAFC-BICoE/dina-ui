@@ -15,6 +15,7 @@ import {
 import { VocabularyOption } from "../../collection/VocabularySelectField";
 import { WorkbookColumnMappingFields } from "./WorkbookColumnMapping";
 import { useColumnMapping } from "./useColumnMapping";
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface WorkbookFieldSelectFieldProps {
   columnIndex: number;
@@ -242,6 +243,34 @@ export function WorkbookFieldSelectField({
               menuPortalTarget: document.body,
               styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
             }}
+          />
+        </div>
+      )}
+
+      {fieldMap[columnIndex]?.targetField === "otherIdentifiers" && (
+        <div className="flex-fill">
+          <ResourceSelectField<any>
+            name={`fieldMap[${columnIndex}].targetKey`}
+            hideLabel={true}
+            isDisabled={disabled}
+            selectProps={{
+              className: "ms-2",
+              menuPortalTarget: document.body,
+              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+            }}
+            model="collection-api/controlled-vocabulary-item"
+            filter={(input: string) =>
+              SimpleSearchFilterBuilder.create<any>()
+                .where(
+                  "controlledVocabulary.uuid",
+                  "EQ",
+                  MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+                )
+                .where("dinaComponent", "EQ", "MATERIAL_SAMPLE")
+                .searchFilter("name", input)
+                .build()
+            }
+            optionLabel={(item) => item.name}
           />
         </div>
       )}
