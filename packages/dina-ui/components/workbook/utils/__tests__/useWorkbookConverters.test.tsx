@@ -8,7 +8,6 @@ import {
 } from "../..";
 import { useWorkbookConverter } from "../useWorkbookConverter";
 import { DinaIntlProvider } from "../../../../intl/dina-ui-intl";
-import { SimpleSearchFilterBuilder } from "common-ui";
 import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 const mockConfig: FieldMappingConfigType = {
@@ -36,14 +35,10 @@ const mockConfig: FieldMappingConfigType = {
     },
     controlledVocabularyField: {
       dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
-      filter: SimpleSearchFilterBuilder.create()
-        .where(
-          "controlledVocabulary.uuid",
-          "EQ",
-          MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
-        )
-        .where("dinaComponent", "EQ", "MATERIAL_SAMPLE")
-        .build()
+      filter: {
+        "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,
+        dinaComponent: "MATERIAL_SAMPLE"
+      }
     },
     enumField: {
       dataType: WorkbookDataTypeEnum.ENUM,

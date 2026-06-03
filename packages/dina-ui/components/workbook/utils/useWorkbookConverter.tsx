@@ -83,7 +83,7 @@ export function useWorkbookConverter(
             if (filter) {
               // Load available Controlled Vocabulary Items based on the filter defined in FieldMappingConfig.
               apiClient
-                .get("controlled-vocabulary-item", {
+                .get("collection-api/controlled-vocabulary-item", {
                   filter,
                   page: { limit: 1000 }
                 })

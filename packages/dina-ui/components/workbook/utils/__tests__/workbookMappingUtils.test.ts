@@ -55,7 +55,7 @@ const mockConfig: FieldMappingConfigType = {
       filter: {
         "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,
         dinaComponent: "MATERIAL_SAMPLE"
-      } as any
+      }
     },
     objectField1: {
       dataType: WorkbookDataTypeEnum.OBJECT,
