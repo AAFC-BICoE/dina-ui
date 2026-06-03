@@ -4,6 +4,8 @@ import {
   LinkOrCreateSetting,
   WorkbookDataTypeEnum
 } from "../";
+import { SimpleSearchFilterBuilder } from "common-ui";
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 const FieldMappingConfig: FieldMappingConfigType = {
   "material-sample": {
@@ -41,6 +43,17 @@ const FieldMappingConfig: FieldMappingConfigType = {
       dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
       endpoint: "collection-api/managed-attribute",
       managedAttributeComponent: "MATERIAL_SAMPLE"
+    },
+    otherIdentifiers: {
+      dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+      filter: SimpleSearchFilterBuilder.create()
+        .where(
+          "controlledVocabulary.uuid",
+          "EQ",
+          MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+        )
+        .where("dinaComponent", "EQ", "MATERIAL_SAMPLE")
+        .build()
     },
     organismsIndividualEntry: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     useTargetOrganism: { dataType: WorkbookDataTypeEnum.BOOLEAN },

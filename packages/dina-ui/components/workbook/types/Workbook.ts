@@ -1,4 +1,4 @@
-import { InputResource, KitsuResource } from "kitsu";
+import { FilterParam, InputResource, KitsuResource } from "kitsu";
 import { WorkbookDataTypeEnum } from "./WorkbookDataTypeEnum";
 
 export enum LinkOrCreateSetting {
@@ -83,6 +83,11 @@ export interface ManagedAttributeField {
   endpoint: string;
 }
 
+export interface ControlledVocabularyField {
+  dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY;
+  filter: FilterParam;
+}
+
 export interface VocabularyField {
   dataType: WorkbookDataTypeEnum.VOCABULARY;
   endpoint: string;
@@ -119,6 +124,7 @@ export type FieldConfigType =
   | VocabularyField
   | EnumField
   | ManagedAttributeField
+  | ControlledVocabularyField
   | ObjectField
   | ClassificationType;
 

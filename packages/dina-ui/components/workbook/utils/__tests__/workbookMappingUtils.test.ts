@@ -1,3 +1,4 @@
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   convertDateTime,
   detectEntityType,
@@ -48,6 +49,13 @@ const mockConfig: FieldMappingConfigType = {
       dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
       endpoint: "managed attribute endpoint",
       managedAttributeComponent: "component"
+    },
+    controlledVocabularyField: {
+      dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+      filter: {
+        "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,
+        dinaComponent: "MATERIAL_SAMPLE"
+      } as any
     },
     objectField1: {
       dataType: WorkbookDataTypeEnum.OBJECT,
@@ -1030,6 +1038,11 @@ describe("workbookMappingUtils functions", () => {
   it("flattenObject", () => {
     expect(flattenObject(mockConfig)).toEqual({
       "mockEntity.booleanField.dataType": "boolean",
+      "mockEntity.controlledVocabularyField.dataType": "controlledVocabulary",
+      "mockEntity.controlledVocabularyField.filter.controlledVocabulary.uuid":
+        "019c961e-4c0d-7398-b4ae-73687826b3b5",
+      "mockEntity.controlledVocabularyField.filter.dinaComponent":
+        "MATERIAL_SAMPLE",
       "mockEntity.mapField.dataType": "managedAttributes",
       "mockEntity.mapField.endpoint": "managed attribute endpoint",
       "mockEntity.mapField.managedAttributeComponent": "component",

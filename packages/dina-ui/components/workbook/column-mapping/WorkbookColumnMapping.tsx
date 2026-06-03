@@ -309,6 +309,24 @@ export function WorkbookColumnMapping({
                 )
               );
             }
+            // validate if any controlled vocabularies targetKey not set
+            if (
+              fieldMapType.skipped === false &&
+              fieldMapType.targetField !== undefined &&
+              flattenedConfig[fieldMapType.targetField].dataType ===
+                WorkbookDataTypeEnum.CONTROLLED_VOCABULARY &&
+              !fieldMapType.targetKey
+            ) {
+              errors.push(
+                new ValidationError(
+                  formatMessage(
+                    "workBookControlledVocabularyKeysTargetKeyIsRequired"
+                  ),
+                  fieldMapType.targetField,
+                  `fieldMap[${i}].targetKey`
+                )
+              );
+            }
             // validate if any mappings are not set and not skipped
             if (
               fieldMapType.targetField === undefined &&

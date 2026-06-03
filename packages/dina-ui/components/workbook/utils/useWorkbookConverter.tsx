@@ -78,6 +78,19 @@ export function useWorkbookConverter(
                 });
             }
             break;
+          case WorkbookDataTypeEnum.CONTROLLED_VOCABULARY:
+            const filter = (recordFieldsMap[recordField] as any).filter;
+            if (filter) {
+              // Load available Controlled Vocabulary Items based on the filter defined in FieldMappingConfig.
+              apiClient
+                .get("controlled-vocabulary-item", {
+                  filter,
+                  page: { limit: 1000 }
+                })
+                .then((response) => {
+                  fieldToVocabElemsMap.set(recordField, response.data);
+                });
+            }
           default:
             break;
         }
@@ -92,6 +105,10 @@ export function useWorkbookConverter(
     [WorkbookDataTypeEnum.STRING_ARRAY]: convertStringArray,
     [WorkbookDataTypeEnum.NUMBER_ARRAY]: convertNumberArray,
     [WorkbookDataTypeEnum.MANAGED_ATTRIBUTES]: (
+      value: any,
+      _fieldName?: string
+    ) => value,
+    [WorkbookDataTypeEnum.CONTROLLED_VOCABULARY]: (
       value: any,
       _fieldName?: string
     ) => value,

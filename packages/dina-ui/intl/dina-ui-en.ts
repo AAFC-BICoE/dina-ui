@@ -1210,6 +1210,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
   workBookManagedAttributeKeysTargetKeyIsRequired:
     "Please select a Managed Attribute value",
+  workBookControlledVocabularyKeysTargetKeyIsRequired:
+    "Please select a Controlled Vocabulary value",
   workBookStorageUnitIsRequired:
     "Storage unit not provided. Must provide valid storage unit for well row and well column.",
   workbookGroupUploadTitle: "Upload Workbook",

@@ -8,6 +8,8 @@ import {
 } from "../..";
 import { useWorkbookConverter } from "../useWorkbookConverter";
 import { DinaIntlProvider } from "../../../../intl/dina-ui-intl";
+import { SimpleSearchFilterBuilder } from "common-ui";
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 const mockConfig: FieldMappingConfigType = {
   mockEntity: {
@@ -31,6 +33,17 @@ const mockConfig: FieldMappingConfigType = {
     vocabularyField: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
       endpoint: "vocabulary endpoint"
+    },
+    controlledVocabularyField: {
+      dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+      filter: SimpleSearchFilterBuilder.create()
+        .where(
+          "controlledVocabulary.uuid",
+          "EQ",
+          MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+        )
+        .where("dinaComponent", "EQ", "MATERIAL_SAMPLE")
+        .build()
     },
     enumField: {
       dataType: WorkbookDataTypeEnum.ENUM,
@@ -1023,8 +1036,12 @@ describe("useWorkbookConverters", () => {
       ]);
 
       // Verify no extra fields like 'name' are included
-      expect(mockResource.relationships.projects.data[0]).not.toHaveProperty("name");
-      expect(mockResource.relationships.projects.data[1]).not.toHaveProperty("name");
+      expect(mockResource.relationships.projects.data[0]).not.toHaveProperty(
+        "name"
+      );
+      expect(mockResource.relationships.projects.data[1]).not.toHaveProperty(
+        "name"
+      );
     });
 
     it("linkRelationshipAttribute should handle multi-person selection (preparedBy) with full objects", async () => {
@@ -1107,10 +1124,18 @@ describe("useWorkbookConverters", () => {
       ]);
 
       // Verify no extra fields like 'displayName' or 'email' are included
-      expect(mockResource.relationships.preparedBy.data[0]).not.toHaveProperty("displayName");
-      expect(mockResource.relationships.preparedBy.data[0]).not.toHaveProperty("email");
-      expect(mockResource.relationships.preparedBy.data[1]).not.toHaveProperty("displayName");
-      expect(mockResource.relationships.preparedBy.data[1]).not.toHaveProperty("email");
+      expect(mockResource.relationships.preparedBy.data[0]).not.toHaveProperty(
+        "displayName"
+      );
+      expect(mockResource.relationships.preparedBy.data[0]).not.toHaveProperty(
+        "email"
+      );
+      expect(mockResource.relationships.preparedBy.data[1]).not.toHaveProperty(
+        "displayName"
+      );
+      expect(mockResource.relationships.preparedBy.data[1]).not.toHaveProperty(
+        "email"
+      );
     });
 
     it("linkRelationshipAttribute should strip extra fields from single relationship", async () => {
@@ -1176,8 +1201,12 @@ describe("useWorkbookConverters", () => {
       });
 
       // Verify no extra fields are included
-      expect(mockResource.relationships.collection.data).not.toHaveProperty("name");
-      expect(mockResource.relationships.collection.data).not.toHaveProperty("code");
+      expect(mockResource.relationships.collection.data).not.toHaveProperty(
+        "name"
+      );
+      expect(mockResource.relationships.collection.data).not.toHaveProperty(
+        "code"
+      );
     });
 
     it("linkRelationshipAttribute should handle array of relationships when valueToLink is an array", async () => {
@@ -1253,10 +1282,18 @@ describe("useWorkbookConverters", () => {
       ]);
 
       // Verify no extra fields are included
-      expect(mockResource.relationships.collectors.data[0]).not.toHaveProperty("displayName");
-      expect(mockResource.relationships.collectors.data[0]).not.toHaveProperty("givenNames");
-      expect(mockResource.relationships.collectors.data[1]).not.toHaveProperty("displayName");
-      expect(mockResource.relationships.collectors.data[1]).not.toHaveProperty("givenNames");
+      expect(mockResource.relationships.collectors.data[0]).not.toHaveProperty(
+        "displayName"
+      );
+      expect(mockResource.relationships.collectors.data[0]).not.toHaveProperty(
+        "givenNames"
+      );
+      expect(mockResource.relationships.collectors.data[1]).not.toHaveProperty(
+        "displayName"
+      );
+      expect(mockResource.relationships.collectors.data[1]).not.toHaveProperty(
+        "givenNames"
+      );
     });
   });
 });
