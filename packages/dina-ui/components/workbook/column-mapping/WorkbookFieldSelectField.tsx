@@ -247,7 +247,7 @@ export function WorkbookFieldSelectField({
         </div>
       )}
 
-      {fieldMap[columnIndex]?.targetField === "otherIdentifiers" && (
+      {fieldMap[columnIndex]?.targetField === "identifiers" && (
         <div className="flex-fill">
           <ResourceSelectField<any>
             name={`fieldMap[${columnIndex}].targetKey`}

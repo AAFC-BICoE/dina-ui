@@ -9,7 +9,11 @@ import {
   useQuery
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute, Vocabulary } from "../../../types/collection-api";
+import {
+  ControlledVocabularyItem,
+  ManagedAttribute,
+  Vocabulary
+} from "../../../types/collection-api";
 import { useWorkbookContext } from "../WorkbookProvider";
 import {
   LinkOrCreateSetting,
@@ -32,7 +36,11 @@ import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { ResourceNameIdentifier } from "../../../types/common/resources/ResourceNameIdentifier";
-import { PersonSelectField, ProjectSelectField } from "../../resource-select-fields/resource-select-fields";
+import {
+  PersonSelectField,
+  ProjectSelectField
+} from "../../resource-select-fields/resource-select-fields";
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export function useColumnMapping() {
   const { formatMessage } = useDinaIntl();
@@ -94,6 +102,21 @@ export function useColumnMapping() {
         "PREPARATION",
         "COLLECTING_EVENT"
       ])
+      .build(),
+    page: { limit: 1000 }
+  });
+
+  const {
+    loading: attrLoadingMaterialSampleOtherIdentifiers,
+    response: attrRespMaterialSampleOtherIdentifiers
+  } = useQuery<ControlledVocabularyItem[]>({
+    path: "collection-api/controlled-vocabulary-item",
+    filter: SimpleSearchFilterBuilder.create()
+      .where(
+        "controlledVocabulary.uuid",
+        "EQ",
+        MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+      )
       .build(),
     page: { limit: 1000 }
   });
@@ -220,12 +243,15 @@ export function useColumnMapping() {
     projectLoading ||
     personLoading ||
     taxonomicRankLoading ||
-    metadataLoading;
+    metadataLoading ||
+    attrLoadingMaterialSampleOtherIdentifiers;
 
   const managedAttributes = [
     ...(attrRespMaterialSample?.data ?? []),
     ...(attrRespMetadata?.data ?? [])
   ];
+
+  const identifiers = attrRespMaterialSampleOtherIdentifiers?.data ?? [];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
   const assemblages = (assemblageResp?.data || []).map((item) => ({
     ...item,
@@ -291,6 +317,49 @@ export function useColumnMapping() {
           columnHeader: {
             id: targetManagedAttr.id,
             type: targetManagedAttr.type
+          }
+        }
+      };
+    } else {
+      newWorkbookColumnMap[columnHeader] = {
+        fieldPath,
+        originalColumnName: originalColumnHeader,
+        showOnUI: true,
+        mapRelationship: false,
+        numOfUniqueValues: Object.keys(
+          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+        ).length,
+        valueMapping: {}
+      };
+    }
+  }
+
+  function handleOtherIdentifierMapping(
+    columnHeader: string,
+    newWorkbookColumnMap: WorkbookColumnMap
+  ) {
+    const originalColumnHeader = columnHeader;
+    columnHeader = columnHeader.replaceAll(".", "_");
+
+    const fieldPath = "identifiers";
+    const targetIdentifierAttr = identifiers.find(
+      (item) =>
+        item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+    );
+
+    if (targetIdentifierAttr) {
+      newWorkbookColumnMap[columnHeader] = {
+        fieldPath,
+        originalColumnName: originalColumnHeader,
+        showOnUI: true,
+        mapRelationship: false,
+        numOfUniqueValues: Object.keys(
+          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+        ).length,
+        valueMapping: {
+          columnHeader: {
+            id: targetIdentifierAttr.id,
+            type: targetIdentifierAttr.type
           }
         }
       };
@@ -441,6 +510,8 @@ export function useColumnMapping() {
       handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath === "managedAttributes") {
       handleManagedAttributeMapping(originalColumnHeader, newWorkbookColumnMap);
+    } else if (fieldPath === "identifiers") {
+      handleOtherIdentifierMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath?.startsWith("parentMaterialSample")) {
       const { valueMapping, multipleValueMappings } =
         await resolveParentMapping(originalColumnHeader);
@@ -713,8 +784,10 @@ export function useColumnMapping() {
             theRelationshipMapping[columnHeader][sanitizedKey] = [found];
           } else {
             // Store only id and type for single-select
-            theRelationshipMapping[columnHeader][sanitizedKey] =
-              _.pick(found, ["id", "type"]);
+            theRelationshipMapping[columnHeader][sanitizedKey] = _.pick(found, [
+              "id",
+              "type"
+            ]);
           }
         } else {
           // No value was found without string splitting

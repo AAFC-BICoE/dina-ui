@@ -43,7 +43,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
       endpoint: "collection-api/managed-attribute",
       managedAttributeComponent: "MATERIAL_SAMPLE"
     },
-    otherIdentifiers: {
+    identifiers: {
       dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
       filter: {
         "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,

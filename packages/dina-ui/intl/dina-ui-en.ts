@@ -627,6 +627,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "License",
   field_isExternalResource: "Is External Resource",
+  field_identifiers: "Other Identifiers",
   fileTooBig: "File too big",
   filterAttribute: "Filter Attribute",
   filterByGroup: "Filter By Group",
