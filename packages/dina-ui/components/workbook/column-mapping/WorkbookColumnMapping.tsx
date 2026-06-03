@@ -11,6 +11,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
 import {
+  ControlledVocabularyItem,
   ManagedAttribute,
   VocabularyElement
 } from "packages/dina-ui/types/collection-api";
@@ -55,7 +56,7 @@ export type FieldMapType = {
   columnHeader: string;
   originalColumn?: string;
   targetField: string | undefined;
-  targetKey?: ManagedAttribute | VocabularyElement; // When targetField is managedAttribute, targetKey stores the matching managed attribute
+  targetKey?: ManagedAttribute | VocabularyElement | ControlledVocabularyItem; // When targetField is managedAttribute, targetKey stores the matching managed attribute
   // When targetField is scientificNameDetails, targetKey stores the matching taxonomicRank
   skipped: boolean;
 };

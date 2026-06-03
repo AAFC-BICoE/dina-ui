@@ -11,7 +11,6 @@ import {
 } from "../../";
 import {
   convertDate,
-  convertMap,
   convertNumber,
   convertNumberArray,
   convertStringArray,
@@ -657,22 +656,6 @@ describe("workbookMappingUtils functions", () => {
     expect(convertNumberArray("111, 222.22, abcdef, false, ")).toEqual([
       111, 222.22
     ]);
-  });
-
-  it("convertMap", () => {
-    expect(convertMap("key1:value1, key2 : 2, key3 : false")).toEqual({
-      key1: "value1",
-      key2: 2,
-      key3: false
-    });
-    expect(convertMap('key1:"value1 with , and :"')).toEqual({
-      key1: "value1 with , and :"
-    });
-    expect(convertMap("key1: , :value2, key3:value3")).toEqual({
-      key3: "value3"
-    });
-    expect(convertMap("223:value3")).toEqual({ "223": "value3" });
-    expect(convertMap("223ddd:value3")).toEqual({ "223ddd": "value3" });
   });
 
   describe("isDate", () => {

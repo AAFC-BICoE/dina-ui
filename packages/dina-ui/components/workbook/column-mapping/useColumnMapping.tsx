@@ -358,7 +358,7 @@ export function useColumnMapping() {
         ).length,
         valueMapping: {
           columnHeader: {
-            id: targetIdentifierAttr.id,
+            id: targetIdentifierAttr.key,
             type: targetIdentifierAttr.type
           }
         }
@@ -505,6 +505,17 @@ export function useColumnMapping() {
         ) > -1
       ) {
         handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
+      } else if (
+        identifiers.findIndex(
+          (item) =>
+            item.name.toLowerCase().trim() ===
+            columnHeaderValue.toLowerCase().trim()
+        ) > -1
+      ) {
+        handleOtherIdentifierMapping(
+          originalColumnHeader,
+          newWorkbookColumnMap
+        );
       }
     } else if (fieldPath === "organism.determination.scientificNameDetails") {
       handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
@@ -600,6 +611,13 @@ export function useColumnMapping() {
               columnHeaderValue.toLowerCase().trim()
           );
 
+        // check if the columnHeaderValue is one of identifiers
+        const identifierTargetAttr = identifiers.find(
+          (item) =>
+            item.name.toLowerCase().trim() ===
+            columnHeaderValue.toLowerCase().trim()
+        );
+
         // check if the columnHeaderValue is one of taxonomicRankss
         const targetTaxonomicRank = taxonomicRanks.find(
           (item) =>
@@ -651,6 +669,14 @@ export function useColumnMapping() {
             targetField: "organism.determination.scientificNameDetails",
             skipped: false,
             targetKey: targetTaxonomicRank,
+            columnHeader: columnHeader.columnHeader,
+            originalColumn: columnHeader.originalColumn
+          });
+        } else if (identifierTargetAttr) {
+          map.push({
+            targetField: "identifiers",
+            skipped: false,
+            targetKey: identifierTargetAttr,
             columnHeader: columnHeader.columnHeader,
             originalColumn: columnHeader.originalColumn
           });

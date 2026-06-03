@@ -815,49 +815,6 @@ export function convertBooleanArray(value: any, fieldName?: string): boolean[] {
 }
 
 /**
- * convert string into a map
- * @param value Map type of string.
- *
- * Here is an example of the data:
- * "key1:value1, key2:value2, key3: value3"
- *
- * If a value contains a comman (,) or a colon (:), please wrap the value with double quote. For example:
- * 'key1: "abc,def:123", key2: value2'
- *
- * Any item in the value string has no key or value will be filtered out.
- *
- */
-export function convertMap(
-  value: any,
-  _fieldName?: string
-): { [key: string]: any } {
-  const regx = /:(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/;
-  const items = value
-    .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
-    .map((str) => _.trim(str));
-  const map = {} as { [key: string]: any };
-  for (const keyValue of items) {
-    if (keyValue) {
-      const arr = keyValue
-        .split(regx)
-        .map((str) => _.trim(_.trim(str, '"').replace('"', "")));
-      if (arr && arr.length === 2 && arr[0] !== "" && arr[1] !== "") {
-        const key = arr[0];
-        const strVal = arr[1];
-        if (isBoolean(strVal)) {
-          map[key] = convertBoolean(strVal);
-        } else if (isNumber(strVal)) {
-          map[key] = convertNumber(strVal);
-        } else {
-          map[key] = strVal;
-        }
-      }
-    }
-  }
-  return map;
-}
-
-/**
  * Check if a value is a valid ISO date string (YYYY-MM-DD)
  */
 export function isDate(value: string | null | undefined): boolean {
