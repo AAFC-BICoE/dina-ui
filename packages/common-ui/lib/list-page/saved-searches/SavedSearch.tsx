@@ -548,8 +548,7 @@ export function SavedSearch({
         type: "user-preference"
       };
       await save([saveArgs], {
-        apiBaseUrl: "/user-api",
-        skipOperationForSingleRequest: true
+        apiBaseUrl: "/user-api"
       });
 
       // Trigger a reload of the user preferences.
@@ -592,8 +591,7 @@ export function SavedSearch({
           type: "user-preference"
         };
         await save([saveArgs], {
-          apiBaseUrl: "/user-api",
-          skipOperationForSingleRequest: true
+          apiBaseUrl: "/user-api"
         });
 
         // Unselect the saved search.

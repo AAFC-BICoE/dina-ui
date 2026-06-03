@@ -1,6 +1,7 @@
 import { ResourceObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { kebab, serialise } from "kitsu-core";
+import { cloneDeep } from "lodash";
 
 /** Params for the serialize util function. */
 interface SerializeParams<TData extends KitsuResource> {
@@ -77,6 +78,36 @@ export async function serialize<TData extends KitsuResource>({
   data.attributes = { ...data.attributes, ...nestedObjects };
   if (origRelationship && Object.keys(origRelationship).length !== 0)
     data.relationships = { ...data.relationships, ...origRelationship };
+
+  // V2 API endpoints only accept { type, id } in relationship data.
+  // Strip any extra attributes that may be present from fully-loaded relationship objects.
+  if (data.relationships) {
+    const clonedRelationships = cloneDeep(data.relationships);
+
+    for (const relationshipName of Object.keys(clonedRelationships)) {
+      const relationship = (clonedRelationships as any)[relationshipName];
+      const relationshipData = relationship?.data;
+
+      if (
+        relationshipData &&
+        !Array.isArray(relationshipData) &&
+        relationshipData.id
+      ) {
+        // Single relationship: strip everything except type and id
+        relationship.data = {
+          type: relationshipData.type,
+          id: relationshipData.id
+        };
+      } else if (relationshipData && Array.isArray(relationshipData)) {
+        // To-many relationship: strip everything except type and id from each item
+        relationship.data = relationshipData.map(
+          ({ type, id }: { type: string; id: string }) => ({ type, id })
+        );
+      }
+    }
+
+    data.relationships = clonedRelationships;
+  }
 
   return data;
 }

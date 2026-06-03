@@ -62,8 +62,7 @@ export function useSeqReactionState(seqBatchId?: string) {
           "pcrBatchItem",
           "seqPrimer",
           "storageUnitUsage",
-          "molecularAnalysisRunItem",
-          "molecularAnalysisRunItem.run"
+          "molecularAnalysisRunItem"
         ].join(","),
         sort: "pcrBatchItem",
         page: { limit: 1000 }

@@ -1,11 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import {
-  ApiClientContext,
-  DeleteArgs,
-  filterBy,
-  SaveArgs,
-  useQuery
-} from "common-ui";
+import { ApiClientContext, DeleteArgs, SaveArgs, useQuery } from "common-ui";
 import _ from "lodash";
 import {
   MaterialSample,
@@ -214,15 +208,7 @@ export function useSeqSelectCoordinatesControls({
   // SeqBatchItem queries.
   const { loading: materialSampleItemsLoading } = useQuery<SeqReaction[]>(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "seqBatch.uuid",
-            comparison: "==",
-            arguments: seqBatchId
-          }
-        ]
-      })(""),
+      filter: { "seqBatch.uuid": { EQ: seqBatchId } },
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
       include: "pcrBatchItem,seqBatch,seqPrimer,storageUnitUsage"

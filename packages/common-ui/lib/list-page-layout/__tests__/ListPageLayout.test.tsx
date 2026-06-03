@@ -23,7 +23,6 @@ describe("ListPageLayout component", () => {
           columns: ["name", "type"],
           path: "pcrPrimer"
         }}
-        useFiql={true}
       />,
       { apiContext: mockApiCtx }
     );
@@ -74,7 +73,6 @@ describe("ListPageLayout component", () => {
           columns: ["name", "type"],
           path: "pcrPrimer"
         }}
-        useFiql={true}
       />,
       { apiContext: mockApiCtx }
     );
@@ -114,7 +112,6 @@ describe("ListPageLayout component", () => {
           columns: ["name", "type"],
           path: "pcrPrimer"
         }}
-        useFiql={true}
       />,
       { apiContext: mockApiCtx }
     );
@@ -136,7 +133,6 @@ describe("ListPageLayout component", () => {
         additionalFilters={SimpleSearchFilterBuilder.create()
           .where("group", "EQ", "testGroup")
           .build()}
-        useFiql={true}
         defaultSort={[{ id: "createdOn", desc: true }]}
         filterAttributes={["name"]}
         queryTableProps={{
@@ -161,7 +157,6 @@ describe("ListPageLayout component", () => {
     const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"
-        useFiql={true}
         filterAttributes={["name"]}
         queryTableProps={{
           columns: ["name", "type"],
@@ -203,7 +198,6 @@ describe("ListPageLayout component", () => {
     const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"
-        useFiql={true}
         additionalFiqlFilters="status==active"
         additionalFilters={SimpleSearchFilterBuilder.create()
           .where("group", "EQ", "testGroup")
@@ -239,29 +233,5 @@ describe("ListPageLayout component", () => {
         })
       );
     });
-  });
-
-  it("Throws an error when additionalFiqlFilters is used without useFiql.", () => {
-    // Mock console.error to suppress error output in test
-    const consoleError = jest.spyOn(console, "error").mockImplementation();
-
-    expect(() => {
-      mountWithAppContext(
-        <ListPageLayout
-          id="test-layout"
-          additionalFiqlFilters="status==active"
-          filterAttributes={["name"]}
-          queryTableProps={{
-            columns: ["name", "type"],
-            path: "pcrPrimer"
-          }}
-        />,
-        { apiContext: mockApiCtx }
-      );
-    }).toThrow(
-      "additionalFiqlFilters prop can only be used when useFiql is enabled"
-    );
-
-    consoleError.mockRestore();
   });
 });

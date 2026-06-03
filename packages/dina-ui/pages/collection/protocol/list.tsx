@@ -71,7 +71,6 @@ export default function ProtocolListPage() {
               .whereProvided("group", "EQ", filterForm.group)
               .build()
           }
-          useFiql={true}
           filterAttributes={PROTOCOL_FILTER_ATTRIBUTES}
           id="protocol-list"
           queryTableProps={{

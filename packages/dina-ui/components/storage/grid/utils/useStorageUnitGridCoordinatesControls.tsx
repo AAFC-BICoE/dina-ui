@@ -91,7 +91,7 @@ export function useGridCoordinatesControls({
 
     try {
       const storageUnitUsagesQuery = await apiClient.get<StorageUnitUsage[]>(
-        "collection-api/storage-unit-usage/",
+        "collection-api/storage-unit-usage",
         {
           include: "storageUnit",
           filter: SimpleSearchFilterBuilder.create()

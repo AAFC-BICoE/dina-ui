@@ -141,8 +141,6 @@ function toPredicate(
   if (searchType === "BLANK_FIELD") {
     const comparison = predicate === "IS" ? "==" : "!=";
     const operator = predicate === "IS" ? "OR" : "AND";
-
-    // The rsql version checks for both null and empty string, but FIQL does not support empty string checks.
     return {
       operands: [
         {

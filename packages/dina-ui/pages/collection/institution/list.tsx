@@ -58,7 +58,6 @@ export default function InstitutionListPage() {
             columns: TABLE_COLUMNS,
             path: "collection-api/institution"
           }}
-          useFiql={true}
         />
       </main>
       <Footer />

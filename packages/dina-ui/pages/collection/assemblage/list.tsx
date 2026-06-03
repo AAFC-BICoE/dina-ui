@@ -59,7 +59,6 @@ export default function assemblageListPage() {
           columns: ASSEMBLAGE_TABLE_COLUMNS,
           path: "collection-api/assemblage"
         }}
-        useFiql={true}
       />
     </PageLayout>
   );

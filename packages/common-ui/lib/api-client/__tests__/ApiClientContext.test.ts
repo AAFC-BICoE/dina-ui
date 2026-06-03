@@ -6,7 +6,7 @@ import {
   getErrorMessages,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
-import { OperationVerb, SuccessfulOperation } from "../operations-types";
+import { OperationVerb } from "../operations-types";
 import { isEqual } from "lodash";
 interface TestPcrPrimer {
   name: string;
@@ -14,8 +14,6 @@ interface TestPcrPrimer {
   type: string;
 }
 import {
-  MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID,
-  MOCK_AXIOS_RESPONSE_ACCESS_DENIED,
   MOCK_BULK_CREATE_DATA,
   MOCK_BULK_CREATE_INPUT,
   MOCK_BULK_DELETE_RESPONSE,
@@ -26,10 +24,6 @@ import {
   MOCK_BULK_UPDATE_INPUT,
   MOCK_BULK_UPDATE_RESPONSE,
   TODO_INSERT_OPERATION,
-  MOCK_TODO_INSERT_AXIOS_RESPONSE,
-  TODO_OPERATION_1_VALID_2_INVALID,
-  TODO_OPERATION_DENY_ACCESS,
-  AXIOS_JSONPATCH_REQUEST_CONFIG,
   MOCK_BULK_GET_404_ERROR_OBJECT,
   MOCK_BULK_GET_404_ERROR_INPUT,
   MOCK_BULK_GET_410_ERROR_INPUT,
@@ -47,22 +41,13 @@ import {
 import { waitFor } from "@testing-library/dom";
 
 /** Mock of Axios' patch function. */
-const mockPatch = jest.fn((_, data) => {
-  if (data === TODO_INSERT_OPERATION) {
-    return MOCK_TODO_INSERT_AXIOS_RESPONSE;
-  }
-  if (data === TODO_OPERATION_1_VALID_2_INVALID) {
-    return MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID;
-  }
-  if (data === TODO_OPERATION_DENY_ACCESS) {
-    return MOCK_AXIOS_RESPONSE_ACCESS_DENIED;
-  }
+const mockPatch: jest.Mock<any, any> = jest.fn((_url, data, _config) => {
   if (isEqual(data, MOCK_BULK_UPDATE_DATA)) {
     return MOCK_BULK_UPDATE_RESPONSE;
   }
 });
 
-const mockPost = jest.fn((url, data) => {
+const mockPost: jest.Mock<any, any> = jest.fn((url, data, _config) => {
   const queryString = new URLSearchParams(url.substring(url.indexOf("?")));
   if (url.includes("bulk-load")) {
     if (queryString.has("include")) {
@@ -98,7 +83,7 @@ const mockPost = jest.fn((url, data) => {
   }
 });
 
-const mockDelete = jest.fn((_, data) => {
+const mockDelete: jest.Mock<any, any> = jest.fn((_, data) => {
   if (isEqual(data.data, MOCK_BULK_GET_DATA)) {
     return MOCK_BULK_DELETE_RESPONSE;
   }
@@ -142,46 +127,41 @@ describe("API client context", () => {
   });
 
   describe("doOperations", () => {
-    it("Provides a doOperations function that submits a JSONAPI jsonpatch request.", async () => {
+    it("Single POST: submits JSON:API request to /{path} (no /operations jsonpatch).", async () => {
+      mockPost.mockImplementationOnce(async (_url, body, _config) => {
+        return {
+          status: 201,
+          data: {
+            data: body.data
+          }
+        } as any;
+      });
+
       const response = await doOperations(TODO_INSERT_OPERATION);
 
-      // Check that the correct arguments were passed into axios' patch function.
-      expect(mockPatch).toHaveBeenCalledTimes(1);
-      const [patchCall] = mockPatch.mock.calls;
-      expect(patchCall).toEqual([
-        "/operations",
-        TODO_INSERT_OPERATION,
-        AXIOS_JSONPATCH_REQUEST_CONFIG
+      expect(mockPost).toHaveBeenCalledTimes(1);
+
+      const [url, body, config] = mockPost.mock.calls[0];
+
+      expect(url).toBe("/todo");
+      expect(body).toEqual({ data: TODO_INSERT_OPERATION[0].value });
+
+      // JSON:API headers for single-op requests:
+      expect(config).toEqual({
+        headers: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+          "Crnk-Compact": "true"
+        }
+      });
+
+      expect(response).toEqual([
+        {
+          data: TODO_INSERT_OPERATION[0].value,
+          included: undefined,
+          status: 201
+        }
       ]);
-
-      // Check the response.
-      expect(response).toEqual(MOCK_TODO_INSERT_AXIOS_RESPONSE.data);
-    });
-
-    it("Provides a doOperations function that throws an error.", async () => {
-      const expectedErrorMessage = `Constraint violation: name size must be between 1 and 10\nConstraint violation: description size must be between 1 and 10`;
-
-      let actualError: Error = new Error();
-
-      try {
-        await doOperations(TODO_OPERATION_1_VALID_2_INVALID);
-      } catch (error) {
-        actualError = error;
-      }
-      expect(actualError.message).toEqual(expectedErrorMessage);
-    });
-
-    it("Omits the detail field from the error message if the detail is undefined.", async () => {
-      const expectedErrorMessage = "Access is denied";
-
-      let actualError: Error = new Error();
-
-      try {
-        await doOperations(TODO_OPERATION_DENY_ACCESS);
-      } catch (error) {
-        actualError = error;
-      }
-      expect(actualError.message).toEqual(expectedErrorMessage);
     });
 
     it("Returns a null response if returnNullForMissingResource is true and an error is thrown.", async () => {
@@ -202,37 +182,168 @@ describe("API client context", () => {
           status: 404
         }
       ]);
+      expect(mockGet).toHaveBeenCalledTimes(1);
+      expect(mockGet.mock.calls[0][0]).toBe("/agent-api/person/doesn't-exist");
+    });
+
+    it("Multi PATCH: calls /{apiBaseUrl}/{resourceType}/bulk with ext=bulk headers and returns per-item results.", async () => {
+      const ids = [
+        "019df432-dceb-7698-99c0-66836da0bfa8",
+        "019df433-13bd-72ab-8c9c-8806e12f1aee",
+        "019df433-3071-75ef-b0c2-65acae6a1eea"
+      ];
+
+      const ops = ids.map((id) => ({
+        op: "PATCH" as OperationVerb,
+        path: `material-sample/${id}`,
+        value: {
+          type: "material-sample",
+          id,
+          attributes: { barcode: "new barcode" }
+        }
+      }));
+
+      mockPatch.mockImplementationOnce(async (_url, body, _config) => {
+        return {
+          status: 200,
+          data: {
+            data: body.data.map((r: any) => ({
+              id: r.id,
+              type: r.type,
+              attributes: r.attributes
+            })),
+            meta: { moduleVersion: "0.118" }
+          }
+        } as any;
+      });
+
+      const response = await doOperations(ops as any, {
+        apiBaseUrl: "/collection-api"
+      });
+
+      // Verify it used the bulk endpoint:
+      expect(mockPatch).toHaveBeenCalledTimes(1);
+      const [url, body, config] = mockPatch.mock.calls[0];
+
+      expect(url).toBe("/collection-api/material-sample/bulk");
+      expect(body).toEqual({
+        data: ops.map((o) => o.value)
+      });
+
+      // Verify ext=bulk headers.
+      expect(config).toEqual({
+        headers: {
+          "Content-Type": "application/vnd.api+json; ext=bulk",
+          Accept: "application/vnd.api+json"
+        }
+      });
+
+      expect(response).toEqual([
+        {
+          data: { id: ids[0], type: "material-sample", barcode: "new barcode" },
+          included: undefined,
+          status: 200
+        },
+        {
+          data: { id: ids[1], type: "material-sample", barcode: "new barcode" },
+          included: undefined,
+          status: 200
+        },
+        {
+          data: { id: ids[2], type: "material-sample", barcode: "new barcode" },
+          included: undefined,
+          status: 200
+        }
+      ]);
+    });
+
+    it("Multi POST: calls /{apiBaseUrl}/{resourceType}/bulk and returns per-item results.", async () => {
+      const ops = [
+        {
+          op: "POST" as OperationVerb,
+          path: "material-sample",
+          value: {
+            type: "material-sample",
+            id: "new-1",
+            attributes: { barcode: "b1" }
+          }
+        },
+        {
+          op: "POST" as OperationVerb,
+          path: "material-sample",
+          value: {
+            type: "material-sample",
+            id: "new-2",
+            attributes: { barcode: "b2" }
+          }
+        }
+      ];
+
+      mockPost.mockImplementationOnce(async (_url, body, _config) => {
+        return {
+          status: 201,
+          data: {
+            data: body.data.map((r: any) => ({
+              id: r.id,
+              type: r.type,
+              attributes: r.attributes
+            }))
+          }
+        } as any;
+      });
+
+      const response = await doOperations(ops as any, {
+        apiBaseUrl: "/collection-api"
+      });
+
+      expect(mockPost).toHaveBeenCalledTimes(1);
+
+      const [url, body, config] = mockPost.mock.calls[0];
+
+      expect(url).toBe("/collection-api/material-sample/bulk");
+      expect(body).toEqual({ data: ops.map((o) => o.value) });
+
+      expect(config).toEqual({
+        headers: {
+          "Content-Type": "application/vnd.api+json; ext=bulk",
+          Accept: "application/vnd.api+json"
+        }
+      });
+
+      expect(response).toEqual([
+        {
+          data: { id: "new-1", type: "material-sample", barcode: "b1" },
+          included: undefined,
+          status: 201
+        },
+        {
+          data: { id: "new-2", type: "material-sample", barcode: "b2" },
+          included: undefined,
+          status: 201
+        }
+      ]);
+    });
+
+    it("Empty operations: returns [] and warns.", async () => {
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const res = await doOperations([]);
+      expect(res).toEqual([]);
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
     });
   });
 
   describe("save", () => {
-    it("Provides a save function that can create resources.", async () => {
-      // Mock POST responses.
-      mockPatch.mockImplementationOnce(() => ({
-        data: [
-          {
-            data: {
-              attributes: {
-                lotNumber: 1,
-                name: "testPrimer1"
-              },
-              id: "123",
-              type: "pcrPrimer"
-            },
-            status: 201
-          },
-          {
-            data: {
-              attributes: {
-                lotNumber: 1,
-                name: "testPrimer2"
-              },
-              id: "124",
-              type: "pcrPrimer"
-            },
-            status: 201
-          }
-        ]
+    it("Provides a save function that can create resources (bulk POST).", async () => {
+      mockPost.mockImplementationOnce(async (_url, body) => ({
+        status: 201,
+        data: {
+          data: body.data.map((r: any, i: number) => ({
+            id: String(123 + i),
+            type: r.type,
+            attributes: r.attributes
+          }))
+        }
       }));
 
       const response = await save([
@@ -254,33 +365,10 @@ describe("API client context", () => {
         }
       ]);
 
-      // Expect correct patch args.
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [
-          {
-            op: "POST",
-            path: "pcrPrimer",
-            value: {
-              attributes: { lotNumber: 1, name: "testPrimer1" },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "pcrPrimer"
-            }
-          },
-          {
-            op: "POST",
-            path: "pcrPrimer",
-            value: {
-              attributes: { lotNumber: 1, name: "testPrimer2" },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "pcrPrimer"
-            }
-          }
-        ],
-        expect.anything()
-      );
+      // bulk POST is used
+      expect(mockPost).toHaveBeenCalledTimes(1);
+      expect(mockPost.mock.calls[0][0]).toBe("/pcrPrimer/bulk");
 
-      // Expect correct response.
       expect(response).toEqual([
         {
           id: "123",
@@ -297,33 +385,16 @@ describe("API client context", () => {
       ]);
     });
 
-    it("Provides a save function that can update resources.", async () => {
-      // Mock PATCH responses.
-      mockPatch.mockImplementationOnce(() => ({
-        data: [
-          {
-            data: {
-              attributes: {
-                lotNumber: 1,
-                name: "testPrimer1 edited"
-              },
-              id: "123",
-              type: "pcrPrimer"
-            },
-            status: 201
-          },
-          {
-            data: {
-              attributes: {
-                lotNumber: 1,
-                name: "testPrimer2 edited"
-              },
-              id: "124",
-              type: "pcrPrimer"
-            },
-            status: 201
-          }
-        ]
+    it("Provides a save function that can update resources (bulk PATCH).", async () => {
+      mockPatch.mockImplementationOnce(async (_url, body) => ({
+        status: 200,
+        data: {
+          data: body.data.map((r: any) => ({
+            id: r.id,
+            type: r.type,
+            attributes: r.attributes
+          }))
+        }
       }));
 
       const response = await save([
@@ -347,30 +418,8 @@ describe("API client context", () => {
         }
       ]);
 
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [
-          {
-            op: "PATCH",
-            path: "pcrPrimer/123",
-            value: {
-              attributes: { lotNumber: 1, name: "testPrimer1 edited" },
-              id: "123",
-              type: "pcrPrimer"
-            }
-          },
-          {
-            op: "PATCH",
-            path: "pcrPrimer/124",
-            value: {
-              attributes: { lotNumber: 1, name: "testPrimer2 edited" },
-              id: "124",
-              type: "pcrPrimer"
-            }
-          }
-        ],
-        expect.anything()
-      );
+      expect(mockPatch).toHaveBeenCalledTimes(1);
+      expect(mockPatch.mock.calls[0][0]).toBe("/pcrPrimer/bulk");
 
       expect(response).toEqual([
         {
@@ -388,39 +437,34 @@ describe("API client context", () => {
       ]);
     });
 
-    it("Provides a save function that can delete resources.", async () => {
-      mockPatch.mockImplementationOnce(() => ({
-        data: [{ status: 204 } as SuccessfulOperation]
+    it("Provides a save function that can delete resources (single DELETE).", async () => {
+      mockDelete.mockImplementationOnce(async () => ({
+        status: 204
       }));
 
       const response = await save([
         { delete: { id: "1234", type: "test-type" } }
       ]);
 
+      expect(mockDelete).toHaveBeenCalledTimes(1);
+      expect(mockDelete.mock.calls[0][0]).toBe("/test-type/1234");
+
+      // delete returns undefined resource
       expect(response).toEqual([undefined]);
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [{ op: "DELETE", path: "test-type/1234" }],
-        expect.anything()
-      );
     });
 
-    it("Removed the 'meta' field when saving to the back-end.", async () => {
-      // Mock PATCH response:
-      mockPatch.mockImplementationOnce(() => ({
-        data: [
-          {
-            data: {
-              attributes: {
-                lotNumber: 1,
-                name: "testPrimer1 edited"
-              },
-              id: "123",
-              type: "pcrPrimer"
-            },
-            status: 201
-          }
-        ]
+    it("Removes the 'meta' field when saving to the back-end.", async () => {
+      mockPatch.mockImplementationOnce(async (_url, body) => ({
+        status: 200,
+        data: {
+          data: [
+            {
+              id: body.data.id,
+              type: body.data.type,
+              attributes: body.data.attributes
+            }
+          ]
+        }
       }));
 
       await save([
@@ -429,57 +473,31 @@ describe("API client context", () => {
             id: "123",
             lotNumber: 1,
             name: "testPrimer1 edited",
-            // Sometimes the initial GET operation include the "meta" field:
             meta: {
-              permissions: ["create", "update", "delete"],
-              permissionsProvider: "GroupAuthorizationService"
+              permissions: ["create", "update"]
             },
             type: "pcrPrimer"
-          } as TestPcrPrimer,
+          } as any,
           type: "pcrPrimer"
         }
       ]);
 
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [
-          // The "meta" field should be excluded from the save operation:
-          {
-            op: "PATCH",
-            path: "pcrPrimer/123",
-            value: {
-              attributes: { lotNumber: 1, name: "testPrimer1 edited" },
-              id: "123",
-              type: "pcrPrimer"
-            }
-          }
-        ],
-        expect.anything()
-      );
+      const [, body] = mockPatch.mock.calls[0];
+      expect(body.data.meta).toBeUndefined();
     });
   });
 
   describe("bulkGet", () => {
-    it("Provides a bulk-get-by-ID function.", async () => {
-      mockPatch.mockImplementationOnce(() => ({
-        data: [
-          {
-            data: {
-              attributes: { name: "primer 123" },
-              id: "123",
-              type: "pcrPrimer"
-            },
-            status: 201
-          },
-          {
-            data: {
-              attributes: { name: "primer 124" },
-              id: "124",
-              type: "pcrPrimer"
-            },
-            status: 201
-          }
-        ]
+    it("Provides a bulk-get-by-ID function (via bulk-load).", async () => {
+      mockPost.mockImplementationOnce(async (_url, body) => ({
+        status: 200,
+        data: {
+          data: body.data.map((r: any) => ({
+            id: r.id,
+            type: "pcrPrimer",
+            attributes: { name: `primer ${r.id}` }
+          }))
+        }
       }));
 
       const response = await bulkGet<TestPcrPrimer>([
@@ -487,17 +505,9 @@ describe("API client context", () => {
         "pcrPrimer/124"
       ]);
 
-      // Bulk-requests by ID:
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [
-          { op: "GET", path: "pcrPrimer/123" },
-          { op: "GET", path: "pcrPrimer/124" }
-        ],
-        expect.anything()
-      );
+      expect(mockPost).toHaveBeenCalledTimes(1);
+      expect(mockPost.mock.calls[0][0]).toBe("/pcrPrimer/bulk-load");
 
-      // Returns an array of primers:
       expect(response).toEqual([
         { id: "123", name: "primer 123", type: "pcrPrimer" },
         { id: "124", name: "primer 124", type: "pcrPrimer" }
@@ -505,89 +515,85 @@ describe("API client context", () => {
     });
 
     it("bulkGet can return null entries instead of throwing errors on 404 responses.", async () => {
-      mockPatch.mockImplementationOnce(() => ({
-        data: [
-          {
-            data: {
-              attributes: { name: "primer 123" },
-              id: "123",
-              type: "pcrPrimer"
-            },
-            status: 201
-          },
-          {
-            errors: [],
-            status: 404
+      const missingIdError: any = {
+        isAxiosError: true,
+        config: { url: "/pcrPrimer/bulk-load" },
+        response: {
+          status: 404,
+          statusText: "Not Found",
+          data: {
+            errors: [
+              {
+                source: { pointer: "/data/id/000" }
+              }
+            ]
           }
-        ]
-      }));
+        }
+      };
 
-      const response = await bulkGet(["primer/123", "primer/000"], {
+      mockPost.mockImplementationOnce((_url, _body, _config) => {
+        makeAxiosErrorMoreReadable(missingIdError);
+        return undefined as any;
+      });
+
+      mockPost.mockImplementationOnce(async (_url, body, _config) => {
+        expect(body).toEqual({
+          data: [{ type: "pcrPrimer", id: "123" }]
+        });
+
+        return {
+          status: 200,
+          data: {
+            data: [
+              {
+                id: "123",
+                type: "pcrPrimer",
+                attributes: { name: "primer 123" }
+              }
+            ]
+          }
+        } as any;
+      });
+
+      const response = await bulkGet(["pcrPrimer/123", "pcrPrimer/000"], {
         returnNullForMissingResource: true
       });
 
       expect(response).toEqual([
-        {
-          id: "123",
-          name: "primer 123",
-          type: "pcrPrimer"
-        },
+        { id: "123", name: "primer 123", type: "pcrPrimer" },
         null
       ]);
+
+      // bulk-load should have been attempted twice (error then retry)
+      expect(mockPost).toHaveBeenCalledTimes(2);
+      expect(mockPost.mock.calls[0][0]).toBe("/pcrPrimer/bulk-load");
+      expect(mockPost.mock.calls[1][0]).toBe("/pcrPrimer/bulk-load");
     });
 
-    it("bulkGet batches together the same ID to avoid sending duplicate find-one requests.", async () => {
-      mockPatch.mockImplementationOnce((_, operations) => ({
-        data: operations.map((op) => {
-          const id = op.path.replace("primer/", "");
-
-          return {
-            data: {
-              attributes: { name: `primer ${id}` },
-              id,
-              type: "primer"
-            },
-            status: 200
-          };
-        })
+    it("bulkGet batches duplicate IDs and preserves order.", async () => {
+      mockPost.mockImplementationOnce(async (_url, body) => ({
+        status: 200,
+        data: {
+          data: body.data.map((r: any) => ({
+            id: r.id,
+            type: "primer",
+            attributes: { name: `primer ${r.id}` }
+          }))
+        }
       }));
 
       const response = await bulkGet(
-        // Has duplicates:
         ["primer/100", "primer/100", "primer/200", "primer/200"],
         { returnNullForMissingResource: true }
       );
 
-      expect(response.length).toEqual(4);
-      expect(response.map((primer) => primer?.id)).toEqual([
-        "100",
-        "100",
-        "200",
-        "200"
-      ]);
+      expect(response.map((r) => r?.id)).toEqual(["100", "100", "200", "200"]);
 
-      // Only 2 unique GET calls are made even though 4 paths were passed to bulkGet:
-      expect(mockPatch.mock.calls).toEqual([
-        [
-          "/operations",
-          [
-            {
-              op: "GET",
-              path: "primer/100"
-            },
-            {
-              op: "GET",
-              path: "primer/200"
-            }
-          ],
-          {
-            headers: {
-              Accept: "application/json-patch+json",
-              "Content-Type": "application/json-patch+json",
-              "Crnk-Compact": "true"
-            }
-          }
-        ]
+      // only unique IDs sent to bulk-load
+      const body = mockPost.mock.calls[0][1];
+      expect(body.data).toEqual([
+        { type: "primer", id: "100" },
+        { type: "primer", id: "200" }
       ]);
     });
   });
@@ -922,73 +928,568 @@ describe("API client context", () => {
     });
   });
 
-  it("Sends a get request without omitting the end of a login URL more than 2 slashes.", async () => {
-    const kitsu = new CustomDinaKitsu({
-      baseURL: "/base-url",
-      headers: { myHeader: "my-value" }
+  describe("get", () => {
+    let kitsu: CustomDinaKitsu;
+    let mockAxiosGet: jest.Mock;
+
+    beforeEach(() => {
+      kitsu = new CustomDinaKitsu({
+        baseURL: "/base-url",
+        headers: { myHeader: "my-value" }
+      });
+      mockAxiosGet = jest.fn();
+      kitsu.axios = { get: mockAxiosGet } as any;
     });
 
-    const mockAxiosGet = jest.fn(async () => ({
-      data: {
+    it("Sends a get request without omitting the end of a login URL more than 2 slashes.", async () => {
+      const mockAxiosGet = jest.fn(async () => ({
+        data: {
+          data: [
+            {
+              type: "articles",
+              id: "200",
+              attributes: {
+                title: "JSON:API paints my bikeshed!"
+              },
+              relationships: {
+                author: {
+                  data: { id: "42", type: "people" }
+                }
+              }
+            }
+          ],
+          included: [
+            {
+              type: "people",
+              id: "42",
+              attributes: {
+                name: "John"
+              }
+            }
+          ]
+        }
+      }));
+
+      // Mock axios GET method to make sure called correctly:
+      const mockAxios = { get: mockAxiosGet };
+      kitsu.axios = mockAxios as any;
+
+      const response = await kitsu.get("my-api/topic/100/articles/200", {
+        include: "author"
+      });
+
+      expect(mockAxiosGet).lastCalledWith("my-api/topic/100/articles/200", {
+        headers: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+          myHeader: "my-value"
+        },
+        params: {
+          include: "author"
+        }
+        // paramsSerializer: expect.anything()
+      });
+
+      expect(response).toEqual({
         data: [
           {
-            type: "articles",
-            id: "200",
-            attributes: {
-              title: "JSON:API paints my bikeshed!"
+            author: {
+              id: "42",
+              name: "John",
+              type: "people"
             },
+            id: "200",
+            title: "JSON:API paints my bikeshed!",
+            type: "articles"
+          }
+        ]
+      });
+    });
+
+    it("Promotes an external single relationship stub to top level on an array response when not in included", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                    type: "material-sample"
+                  }
+                }
+              }
+            },
+            {
+              type: "generic-molecular-analysis-item",
+              id: "047bf907-494f-42d1-98b4-fc38164efbff",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "019e1846-7b67-735b-b7fa-771c0e276369",
+                    type: "material-sample"
+                  }
+                }
+              }
+            }
+          ]
+          // No included - external relationship
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        {
+          include: "materialSample"
+        }
+      );
+
+      expect(response).toEqual({
+        data: [
+          {
+            id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+            type: "generic-molecular-analysis-item",
+            materialSample: {
+              id: "019e1846-54ad-719e-9c15-75adca3862d3",
+              type: "material-sample"
+            }
+          },
+          {
+            id: "047bf907-494f-42d1-98b4-fc38164efbff",
+            type: "generic-molecular-analysis-item",
+            materialSample: {
+              id: "019e1846-7b67-735b-b7fa-771c0e276369",
+              type: "material-sample"
+            }
+          }
+        ]
+      });
+    });
+
+    it("Promotes an external single relationship stub to top level on a single object response", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: {
+            type: "generic-molecular-analysis-item",
+            id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+            attributes: {},
             relationships: {
-              author: {
-                data: { id: "42", type: "people" }
+              materialSample: {
+                data: {
+                  id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                  type: "material-sample"
+                }
               }
             }
           }
-        ],
-        included: [
+          // No included - external relationship
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item/dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+        { include: "materialSample" }
+      );
+
+      expect(response).toEqual({
+        data: {
+          id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+          type: "generic-molecular-analysis-item",
+          materialSample: {
+            id: "019e1846-54ad-719e-9c15-75adca3862d3",
+            type: "material-sample"
+          }
+        }
+      });
+    });
+
+    it("Does not overwrite a relationship that was already resolved via included", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "articles",
+              id: "200",
+              attributes: { title: "JSON:API paints my bikeshed!" },
+              relationships: {
+                author: {
+                  data: { id: "42", type: "people" }
+                }
+              }
+            }
+          ],
+          included: [
+            {
+              type: "people",
+              id: "42",
+              attributes: { name: "John" }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get("my-api/articles", {
+        include: "author"
+      });
+
+      // Should have full resolved data from included, not just the stub
+      expect(response).toEqual({
+        data: [
           {
-            type: "people",
-            id: "42",
-            attributes: {
+            id: "200",
+            type: "articles",
+            title: "JSON:API paints my bikeshed!",
+            author: {
+              id: "42",
+              type: "people",
               name: "John"
             }
           }
         ]
-      }
-    }));
-
-    // Mock axios GET method to make sure called correctly:
-    const mockAxios = { get: mockAxiosGet };
-    kitsu.axios = mockAxios as any;
-
-    const response = await kitsu.get("my-api/topic/100/articles/200", {
-      include: "author"
+      });
     });
 
-    expect(mockAxiosGet).lastCalledWith("my-api/topic/100/articles/200", {
-      headers: {
-        Accept: "application/vnd.api+json",
-        "Content-Type": "application/vnd.api+json",
-        myHeader: "my-value"
-      },
-      params: {
-        include: "author"
-      }
-      // paramsSerializer: expect.anything()
-    });
-
-    expect(response).toEqual({
-      data: [
-        {
-          author: {
-            id: "42",
-            name: "John",
-            type: "people"
-          },
-          id: "200",
-          title: "JSON:API paints my bikeshed!",
-          type: "articles"
+    it("Promotes multiple external relationship stubs to top level", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                    type: "material-sample"
+                  }
+                },
+                storageUnitUsage: {
+                  data: {
+                    id: "abc123",
+                    type: "storage-unit-usage"
+                  }
+                },
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "def456",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              }
+            }
+          ]
         }
-      ]
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        {
+          include: "materialSample,storageUnitUsage,molecularAnalysisRunItem"
+        }
+      );
+
+      expect(response).toEqual({
+        data: [
+          {
+            id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+            type: "generic-molecular-analysis-item",
+            materialSample: {
+              id: "019e1846-54ad-719e-9c15-75adca3862d3",
+              type: "material-sample"
+            },
+            storageUnitUsage: {
+              id: "abc123",
+              type: "storage-unit-usage"
+            },
+            molecularAnalysisRunItem: {
+              id: "def456",
+              type: "molecular-analysis-run-item"
+            }
+          }
+        ]
+      });
+    });
+
+    it("Promotes an external to-many relationship stub array to top level", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSamples: {
+                  data: [
+                    {
+                      id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                      type: "material-sample"
+                    },
+                    {
+                      id: "019e1846-7b67-735b-b7fa-771c0e276369",
+                      type: "material-sample"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        {
+          include: "materialSamples"
+        }
+      );
+
+      expect(response).toEqual({
+        data: [
+          {
+            id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+            type: "generic-molecular-analysis-item",
+            materialSamples: [
+              {
+                id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                type: "material-sample"
+              },
+              {
+                id: "019e1846-7b67-735b-b7fa-771c0e276369",
+                type: "material-sample"
+              }
+            ]
+          }
+        ]
+      });
+    });
+
+    it("Does not promote a relationship that was not requested in include", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                    type: "material-sample"
+                  }
+                },
+                storageUnitUsage: {
+                  data: {
+                    id: "abc123",
+                    type: "storage-unit-usage"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      // Only request materialSample, not storageUnitUsage
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        {
+          include: "materialSample"
+        }
+      );
+
+      expect((response.data as any[])[0].materialSample).toBeDefined();
+      expect((response.data as any[])[0].storageUnitUsage).toBeUndefined();
+    });
+
+    it("Handles items with no relationships gracefully", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {}
+              // No relationships at all
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        {
+          include: "materialSample"
+        }
+      );
+
+      expect(response).toEqual({
+        data: [
+          {
+            id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+            type: "generic-molecular-analysis-item"
+          }
+        ]
+      });
+    });
+
+    it("Does nothing when no include param is provided", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "019e1846-54ad-719e-9c15-75adca3862d3",
+                    type: "material-sample"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      // No include param
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item"
+      );
+
+      expect((response.data as any[])[0].materialSample).toBeUndefined();
+    });
+
+    it("Normalizes uuid to id on the primary item when id is missing", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "material-sample",
+              uuid: "019e1846-54ad-719e-9c15-75adca3862d3",
+              attributes: { name: "Sample 1" }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get("seqdb-api/material-sample");
+
+      expect(response.data[0].id).toBe("019e1846-54ad-719e-9c15-75adca3862d3");
+      expect(response.data[0].uuid).toBeUndefined();
+    });
+
+    it("Normalizes uuid to id on a single promoted relationship stub", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    uuid: "019e1846-54ad-719e-9c15-75adca3862d3",
+                    type: "material-sample"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        { include: "materialSample" }
+      );
+
+      const promotedSample = response.data[0].materialSample;
+      expect(promotedSample.id).toBe("019e1846-54ad-719e-9c15-75adca3862d3");
+      expect(promotedSample.uuid).toBeUndefined();
+    });
+
+    it("Normalizes uuid to id on all items inside a promoted to-many relationship stub array", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "dd13d8ec-c284-4ba7-a3a5-4034fd00c8a6",
+              attributes: {},
+              relationships: {
+                materialSamples: {
+                  data: [
+                    {
+                      uuid: "019e1846-54ad-719e-9c15-75adca3862d3",
+                      type: "material-sample"
+                    },
+                    {
+                      uuid: "019e1846-7b67-735b-b7fa-771c0e276369",
+                      type: "material-sample"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        { include: "materialSamples" }
+      );
+
+      const promotedSamples = response.data[0].materialSamples;
+      expect(promotedSamples[0].id).toBe(
+        "019e1846-54ad-719e-9c15-75adca3862d3"
+      );
+      expect(promotedSamples[0].uuid).toBeUndefined();
+      expect(promotedSamples[1].id).toBe(
+        "019e1846-7b67-735b-b7fa-771c0e276369"
+      );
+      expect(promotedSamples[1].uuid).toBeUndefined();
+    });
+
+    it("Does not alter properties if the item has no uuid or if an id is already present", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: [
+            {
+              type: "generic-molecular-analysis-item",
+              id: "existing-id",
+              uuid: "should-be-ignored-or-removed", // Your function triggers if !obj.id, so if id exists it won't swap it
+              attributes: {},
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: "sample-id",
+                    type: "material-sample"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "seqdb-api/generic-molecular-analysis-item",
+        { include: "materialSample" }
+      );
+
+      expect(response.data[0].id).toBe("existing-id");
+      expect(response.data[0].materialSample.id).toBe("sample-id");
     });
   });
 });

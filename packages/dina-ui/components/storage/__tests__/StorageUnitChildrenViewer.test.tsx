@@ -34,15 +34,6 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
   storageUnitChildren: STORAGE_UNIT_CHILDREN
 };
 
-/** Target container. */
-const STORAGE_B: PersistedResource<StorageUnit> = {
-  id: "B",
-  group: "group",
-  name: "B",
-  isGeneric: false,
-  type: "storage-unit"
-};
-
 const MAPPING = {
   attributes: [
     {
@@ -108,37 +99,8 @@ jest.mock("next/router", () => ({
   })
 }));
 
-const mockGet = jest.fn<any, any>(async (path, params) => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
-    case "collection-api/storage-unit":
-      switch (params?.include) {
-        case "hierarchy,storageUnitChildren,storageUnitType":
-          switch (params?.filter?.rsql) {
-            case "parentStorageUnit.uuid==A":
-              // The initial Storage Unit's children:
-              return {
-                data: STORAGE_UNIT_CHILDREN,
-                meta: { totalResourceCount: 3 }
-              };
-            case "parentStorageUnit.uuid==X":
-              // The initial Storage Unit's children:
-              return {
-                data: [],
-                meta: { totalResourceCount: 0 }
-              };
-          }
-        case "hierarchy,storageUnitType":
-          switch (params?.filter?.rsql) {
-            case "uuid!=X;group=in=(aafc,cnc,overy-lab)":
-            case "group=in=(aafc,cnc,overy-lab)":
-            case "":
-              // The searchable table results:
-              return {
-                data: [STORAGE_B],
-                meta: { totalResourceCount: 1 }
-              };
-          }
-      }
     case "collection-api/storage-unit-type":
       return { data: [], meta: { totalResourceCount: 0 } };
     case "collection-api/storage-unit/A?optFields[storage-unit]=storageUnitChildren":
@@ -148,12 +110,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         meta: { totalResourceCount: 1 }
       };
     case "collection-api/material-sample":
-      // Stored material samples:
-      if (params?.filter?.rsql === "storageUnitUsage.storageUnit.uuid==A") {
-        return { data: [{ id: "ms-1", type: "material-sample" }] };
-      } else {
-        return { data: [{ id: "ms-1", type: "material-sample" }] };
-      }
+      return { data: [{ id: "ms-1", type: "material-sample" }] };
     case "search-api/search-ws/mapping":
       return { data: MAPPING, meta: { totalResourceCount: 0 } };
   }

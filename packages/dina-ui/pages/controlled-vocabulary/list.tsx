@@ -322,7 +322,6 @@ export default function ControlledVocabularyListPage() {
       />
       <ListPageLayout<ControlledVocabularyItem>
         id="controlled-vocabulary-items-list"
-        useFiql={false}
         filterType={ListLayoutFilterType.FILTER_BUILDER}
         filterAttributes={CV_FILTER_ATTRIBUTES}
         additionalFilters={(filterForm) => {

@@ -104,7 +104,7 @@ export function DinaUserForm({
           type: updatedUser.type
         }
       ],
-      { apiBaseUrl: "/user-api", skipOperationForSingleRequest: true }
+      { apiBaseUrl: "/user-api" }
     );
 
     await router.push(`/dina-user/view?id=${submittedValues.id}`);

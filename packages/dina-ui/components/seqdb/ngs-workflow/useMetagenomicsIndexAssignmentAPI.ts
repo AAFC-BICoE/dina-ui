@@ -1,8 +1,8 @@
 import {
   ApiClientContext,
   DinaFormSubmitParams,
-  filterBy,
   SaveArgs,
+  SimpleSearchFilterBuilder,
   useQuery
 } from "common-ui";
 import _, { Dictionary } from "lodash";
@@ -66,15 +66,9 @@ export function useMetagenomicsIndexAssignmentAPI({
     {
       include: "indexI5,indexI7,pcrBatchItem",
       page: { limit: 1000 },
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "metagenomicsBatch.uuid",
-            comparison: "==",
-            arguments: metagenomicsBatch?.id ?? ""
-          }
-        ]
-      })(""),
+      filter: SimpleSearchFilterBuilder.create()
+        .where("metagenomicsBatch.uuid", "EQ", metagenomicsBatch?.id ?? "")
+        .build(),
       path: `seqdb-api/metagenomics-batch-item`
     },
     {
@@ -171,15 +165,9 @@ export function useMetagenomicsIndexAssignmentAPI({
   useQuery<NgsIndex[]>(
     {
       page: { limit: 1000 },
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "indexSet.uuid",
-            comparison: "==",
-            arguments: metagenomicsBatch?.indexSet?.id ?? ""
-          }
-        ]
-      })(""),
+      filter: SimpleSearchFilterBuilder.create()
+        .where("indexSet.uuid", "EQ", metagenomicsBatch?.indexSet?.id ?? "")
+        .build(),
       path: `seqdb-api/ngs-index`
     },
     {

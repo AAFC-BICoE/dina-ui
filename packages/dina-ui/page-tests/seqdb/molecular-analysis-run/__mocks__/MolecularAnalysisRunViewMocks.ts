@@ -281,7 +281,11 @@ export const TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS: PersistedResource<
       createdBy: "dina-admin",
       createdOn: "2024-12-11T20:52:48.43824Z",
       name: "Seq Reaction Run Item 1",
-      usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION
+      usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
+      seqReaction: {
+        id: "f8a95f23-e004-422d-8a2a-5d1cc8160371",
+        type: "seq-reaction"
+      } as any
     },
     {
       id: "41d6ec20-f81f-4b4f-a37f-71265544484e",
@@ -289,7 +293,11 @@ export const TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS: PersistedResource<
       createdBy: "dina-admin",
       createdOn: "2024-12-11T20:52:48.43824Z",
       name: "Seq Reaction Run Item 2",
-      usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION
+      usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
+      seqReaction: {
+        id: "cd73c561-098f-4068-84f8-48b5bc9e5300",
+        type: "seq-reaction"
+      } as any
     },
     {
       id: "6c1a6afe-6ad8-4dfc-9a2f-26a23cda108a",
@@ -297,7 +305,11 @@ export const TEST_MOLECULAR_ANALYSIS_RUN_ITEMS_SEQ_REACTIONS: PersistedResource<
       createdBy: "dina-admin",
       createdOn: "2024-12-11T20:52:48.43824Z",
       name: "Seq Reaction Run Item 3",
-      usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION
+      usageType: MolecularAnalysisRunItemUsageType.SEQ_REACTION,
+      seqReaction: {
+        id: "e0f49fe6-aa2c-4265-b4f7-88724ed7802f",
+        type: "seq-reaction"
+      } as any
     }
   ];
 

@@ -3,7 +3,7 @@ import {
   useAccount,
   TextField,
   ResourceSelectField,
-  filterBy,
+  SimpleSearchFilterBuilder,
   DateField
 } from "packages/common-ui/lib";
 import {
@@ -11,7 +11,7 @@ import {
   PersonSelectField
 } from "packages/dina-ui/components";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { SeqBatch, SequencingFacility } from "packages/dina-ui/types/seqdb-api";
+import { SequencingFacility } from "packages/dina-ui/types/seqdb-api";
 
 export function SeqSubmissionFields() {
   const { formatMessage } = useDinaIntl();
@@ -32,49 +32,16 @@ export function SeqSubmissionFields() {
       </div>
       <div className="row">
         <PersonSelectField className="col-md-6" name="submittedBy" />
-        <ResourceSelectField<SeqBatch>
-          name="seqBatch"
-          label={formatMessage("seqBatch")}
-          className="col-md-6"
-          filter={filterBy(
-            ["name"],
-            !isAdmin
-              ? {
-                  extraFilters: [
-                    {
-                      selector: "group",
-                      comparison: "==",
-                      arguments: group
-                    }
-                  ]
-                }
-              : undefined
-          )}
-          isDisabled={!group}
-          readOnlyLink="/seqdb/seq-batch/view?id="
-          model="seqdb-api/seq-batch"
-          optionLabel={(seqBatch) => `${seqBatch.name || seqBatch.id}`}
-        />
-      </div>
-      <div className="row">
         <ResourceSelectField<SequencingFacility>
           name="sequencingFacility"
           label={formatMessage("sequencingFacility")}
           className="col-md-6"
-          filter={filterBy(
-            ["name"],
-            !isAdmin
-              ? {
-                  extraFilters: [
-                    {
-                      selector: "group",
-                      comparison: "==",
-                      arguments: group
-                    }
-                  ]
-                }
-              : undefined
-          )}
+          filter={(input) =>
+            SimpleSearchFilterBuilder.create<SequencingFacility>()
+              .searchFilter("name", input)
+              .when(!isAdmin, (b) => b.whereProvided("group", "EQ", group))
+              .build()
+          }
           isDisabled={!group}
           readOnlyLink="/seqdb/sequencing-facility/view?id="
           model="seqdb-api/sequencing-facility"

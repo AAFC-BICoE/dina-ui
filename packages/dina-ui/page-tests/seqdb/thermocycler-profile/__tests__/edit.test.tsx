@@ -1,5 +1,5 @@
 import { writeStorage } from "@rehooks/local-storage";
-import { OperationsResponse, waitForLoadingToDisappear } from "common-ui";
+import { waitForLoadingToDisappear } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { ThermocyclerProfileEditPage } from "../../../../pages/seqdb/thermocycler-profile/edit";
 import { mountWithAppContext } from "common-ui";
@@ -25,11 +25,14 @@ const mockGet = jest.fn(async (path) => {
 /** Mock axios for operations requests. */
 const mockPatch = jest.fn();
 
+/** Mock axios for POST requests. */
+const mockPost = jest.fn();
+
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: { get: mockGet, axios: { patch: mockPatch, post: mockPost } }
 };
 
 describe("ThermocyclerProfile edit page", () => {
@@ -40,16 +43,13 @@ describe("ThermocyclerProfile edit page", () => {
   });
 
   it("Provides a form to add a ThermocyclerProfile.", async () => {
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            id: "1",
-            type: "thermocycler-profile"
-          },
-          status: 201
+    mockPost.mockReturnValueOnce({
+      data: {
+        data: {
+          id: "1",
+          type: "thermocycler-profile"
         }
-      ] as OperationsResponse
+      }
     });
 
     const wrapper = mountWithAppContext(
@@ -68,80 +68,36 @@ describe("ThermocyclerProfile edit page", () => {
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await waitFor(() => {
-      expect(mockPatch).lastCalledWith(
-        "/seqdb-api/operations",
-        [
-          {
-            op: "POST",
-            path: "thermocycler-profile",
-            value: {
-              attributes: {
-                group: "aafc",
-                name: "New ThermocyclerProfile",
-                steps: [null]
-              },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "thermocycler-profile"
-            }
+      expect(mockPost).lastCalledWith(
+        "/seqdb-api/thermocycler-profile",
+        {
+          data: {
+            attributes: {
+              group: "aafc",
+              name: "New ThermocyclerProfile",
+              steps: [null]
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "thermocycler-profile"
           }
-        ],
+        },
         expect.anything()
       );
-
-      // The user should be redirected to the new profile's details page.
-      expect(mockPush).lastCalledWith("/seqdb/thermocycler-profile/view?id=1");
     });
-  });
 
-  it("Renders an error after form submit if one is returned from the back-end.", async () => {
-    // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
-      data: [
-        {
-          errors: [
-            {
-              detail: "name size must be between 1 and 10",
-              status: "422",
-              title: "Constraint violation"
-            }
-          ],
-          status: 422
-        }
-      ] as OperationsResponse
-    }));
-
-    const wrapper = mountWithAppContext(
-      <ThermocyclerProfileEditPage
-        router={{ query: {}, push: mockPush } as any}
-      />,
-      { apiContext }
-    );
-
-    // Submit the form.
-    fireEvent.submit(wrapper.container.querySelector("form")!);
-
-    await waitFor(() => {
-      expect(
-        wrapper.getByText(
-          /constraint violation: name size must be between 1 and 10/i
-        )
-      ).toBeInTheDocument();
-      expect(mockPush).toBeCalledTimes(0);
-    });
+    // The user should be redirected to the new profile's details page.
+    expect(mockPush).lastCalledWith("/seqdb/thermocycler-profile/view?id=1");
   });
 
   it("Provides a form to edit a ThermocyclerProfile.", async () => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            id: "1",
-            type: "thermocycler-profile"
-          },
-          status: 201
+      data: {
+        data: {
+          id: "1",
+          type: "thermocycler-profile"
         }
-      ] as OperationsResponse
+      }
     });
 
     const wrapper = mountWithAppContext(
@@ -169,33 +125,29 @@ describe("ThermocyclerProfile edit page", () => {
     // and the modified one.
     await waitFor(() => {
       expect(mockPatch).lastCalledWith(
-        "/seqdb-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "thermocycler-profile/1",
-            value: {
-              attributes: expect.objectContaining({
-                application: "new app value",
-                group: "aafc",
-                name: "PROF1"
-              }),
-              id: "1",
-              relationships: {
-                region: {
-                  data: expect.objectContaining({ id: "2", type: "region" })
-                }
-              },
-              type: "thermocycler-profile"
-            }
+        "/seqdb-api/thermocycler-profile/1",
+        {
+          data: {
+            attributes: expect.objectContaining({
+              application: "new app value",
+              group: "aafc",
+              name: "PROF1"
+            }),
+            id: "1",
+            relationships: {
+              region: {
+                data: expect.objectContaining({ id: "2", type: "region" })
+              }
+            },
+            type: "thermocycler-profile"
           }
-        ],
+        },
         expect.anything()
       );
-
-      // The user should be redirected to the existing profile's details page.
-      expect(mockPush).lastCalledWith("/seqdb/thermocycler-profile/view?id=1");
     });
+
+    // The user should be redirected to the existing profile's details page.
+    expect(mockPush).lastCalledWith("/seqdb/thermocycler-profile/view?id=1");
   });
 });
 

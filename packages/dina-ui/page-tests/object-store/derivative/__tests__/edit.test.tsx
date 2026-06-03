@@ -3,7 +3,7 @@ import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import DerivativeEditPage from "../../../../pages/object-store/derivative/edit";
-import { screen, cleanup } from "@testing-library/react";
+import { cleanup } from "@testing-library/react";
 
 const mockGet = jest.fn(async (path) => {
   switch (path) {
@@ -181,8 +181,6 @@ describe("Derivative single record edit page.", () => {
     await waitFor(() => {
       expect(wrapper.getByText(/IMAGE/i)).toBeInTheDocument();
     });
-
-    screen.logTestingPlaygroundURL();
 
     expect(wrapper.getByText(/specimen/i)).toBeInTheDocument();
     expect(wrapper.getByText(/paleontology/i)).toBeInTheDocument();
