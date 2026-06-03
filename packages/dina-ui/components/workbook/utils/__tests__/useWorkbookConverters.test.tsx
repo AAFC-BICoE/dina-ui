@@ -428,6 +428,17 @@ describe("useWorkbookConverters", () => {
       stringField: {
         dataType: "string"
       },
+      controlledVocabularyField: {
+        dataType: "controlledVocabulary",
+        filter: {
+          "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,
+          dinaComponent: "MATERIAL_SAMPLE"
+        }
+      },
+      "controlledVocabularyField.filter": {
+        "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,
+        dinaComponent: "MATERIAL_SAMPLE"
+      },
       vocabularyField: {
         dataType: "vocabulary",
         endpoint: "vocabulary endpoint"

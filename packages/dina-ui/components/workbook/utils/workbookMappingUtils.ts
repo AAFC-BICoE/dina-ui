@@ -359,17 +359,30 @@ export function getFlattenedConfig(
   if (_.has(mappingConfig, entityName)) {
     const flattened = flattenObject(mappingConfig[entityName]);
     for (const key of Object.keys(flattened)) {
-      const lastPos = key.lastIndexOf(".");
-      if (lastPos > -1) {
-        const path = key.substring(0, lastPos);
-        if (!path.endsWith(".relationshipConfig")) {
+      let path = key;
+      while (true) {
+        const lastPos = path.lastIndexOf(".");
+        if (lastPos > -1) {
+          const candidate = path.substring(0, lastPos);
+          if (candidate.endsWith(".relationshipConfig")) {
+            path = candidate;
+            continue;
+          }
+          const value = _.get(mappingConfig, entityName + "." + candidate);
+          if (value !== undefined) {
+            config[candidate.replaceAll(".attributes.", ".")] = value;
+            break;
+          }
+          path = candidate;
+          continue;
+        } else {
+          // No dot left, try the full path as a top-level property.
           const value = _.get(mappingConfig, entityName + "." + path);
-          config[path.replaceAll(".attributes.", ".")] = value;
+          if (value !== undefined) {
+            config[path.replaceAll(".attributes.", ".")] = value;
+          }
+          break;
         }
-      } else {
-        const path = key;
-        const value = _.get(mappingConfig, entityName + "." + path);
-        config[path] = value;
       }
     }
   }
