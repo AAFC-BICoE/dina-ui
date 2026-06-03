@@ -139,7 +139,11 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
 
       <MetadataAttributeGroup
         metadata={metadata}
-        fields={["dcRights", { name: "xmpRightsWebStatement", value: license }]}
+        fields={[
+          "dcRights",
+          { name: "xmpRightsWebStatement", value: license },
+          "xmpRightsOwner"
+        ]}
         title={formatMessage("metadataRightsDetailsLabel")}
       />
       {!isExternalResource && (
