@@ -4,6 +4,7 @@ import { WorkbookDataTypeEnum } from "./WorkbookDataTypeEnum";
 export enum LinkOrCreateSetting {
   LINK = "LINK", // Find the existing object then set to relationships. It will ignore if not found.
   CREATE = "CREATE", // Create a new object then set to relationships
+  LINK_UUID_ONLY = "LINK_UUID_ONLY", // Find the existing object by uuid then set it as attributes. ["<uuid>"]
   LINK_OR_CREATE = "LINK_OR_CREATE", // Try to find an existing object, if not found, then create one, then set to relationships
   LINK_OR_ERROR = "LINK_OR_ERROR" // Try to find an existing object, if not found, then throw an new error
 }

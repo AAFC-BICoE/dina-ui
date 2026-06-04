@@ -288,7 +288,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
               relationshipConfig: {
                 hasGroup: false,
                 type: "person",
-                linkOrCreateSetting: LinkOrCreateSetting.LINK,
+                linkOrCreateSetting: LinkOrCreateSetting.LINK_UUID_ONLY,
                 baseApiPath: "agent-api"
               },
               attributes: {

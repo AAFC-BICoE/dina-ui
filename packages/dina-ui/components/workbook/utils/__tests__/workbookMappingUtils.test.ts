@@ -93,6 +93,30 @@ const mockConfig: FieldMappingConfigType = {
           }
         }
       }
+    },
+    objectFieldUuid: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      relationshipConfig: {
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_UUID_ONLY,
+        hasGroup: true,
+        type: "uuid-object",
+        baseApiPath: "apiPath"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
+    objectArrayFieldUuid: {
+      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+      relationshipConfig: {
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_UUID_ONLY,
+        hasGroup: true,
+        type: "uuid-array-object",
+        baseApiPath: "apiPath"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING }
+      }
     }
   }
 };
@@ -1061,6 +1085,22 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.objectField2.attributes.address.attributes.province.dataType":
         "string",
       "mockEntity.objectField2.attributes.address.dataType": "object",
+      "mockEntity.objectFieldUuid.attributes.name.dataType": "string",
+      "mockEntity.objectFieldUuid.dataType": "object",
+      "mockEntity.objectFieldUuid.relationshipConfig.baseApiPath": "apiPath",
+      "mockEntity.objectFieldUuid.relationshipConfig.hasGroup": true,
+      "mockEntity.objectFieldUuid.relationshipConfig.linkOrCreateSetting":
+        "LINK_UUID_ONLY",
+      "mockEntity.objectFieldUuid.relationshipConfig.type": "uuid-object",
+      "mockEntity.objectArrayFieldUuid.attributes.name.dataType": "string",
+      "mockEntity.objectArrayFieldUuid.dataType": "object[]",
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.baseApiPath":
+        "apiPath",
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.hasGroup": true,
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.linkOrCreateSetting":
+        "LINK_UUID_ONLY",
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.type":
+        "uuid-array-object",
       "mockEntity.objectField2.attributes.age.dataType": "number",
       "mockEntity.objectField2.attributes.name.dataType": "string",
       "mockEntity.objectField2.dataType": "object",

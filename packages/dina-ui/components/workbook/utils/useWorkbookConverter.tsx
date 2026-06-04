@@ -462,7 +462,9 @@ export function useWorkbookConverter(
           relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.LINK_OR_CREATE ||
           relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.LINK_OR_ERROR
+            LinkOrCreateSetting.LINK_OR_ERROR ||
+          relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_UUID_ONLY
         ) {
           // get valueToLink from workbookColumnMap
           const columnMap = searchColumnMap(fieldPath, workbookColumnMap);
@@ -485,6 +487,23 @@ export function useWorkbookConverter(
             }
           }
           if (valueToLink) {
+            // For LINK_UUID_ONLY store the uuid as an attribute (string)
+            if (
+              relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK_UUID_ONLY
+            ) {
+              let idVal: any;
+              if (Array.isArray(valueToLink)) {
+                idVal = valueToLink[0]?.id ?? valueToLink[0];
+              } else if (valueToLink && typeof valueToLink === "object") {
+                idVal = valueToLink.id;
+              } else {
+                idVal = valueToLink;
+              }
+              resource[attributeName] = idVal ? String(idVal) : idVal;
+              return;
+            }
+
             if (!resource.relationships) {
               resource.relationships = {};
             }
@@ -496,9 +515,11 @@ export function useWorkbookConverter(
           } else {
             if (
               relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK
+                LinkOrCreateSetting.LINK ||
+              relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK_UUID_ONLY
             ) {
-              // if the field is link only, and there is no matching record, then ignore it.
+              // if the field is link only (or uuid-only), and there is no matching record, then ignore it.
               delete resource[attributeName];
               return;
             } else if (
@@ -590,6 +611,7 @@ export function useWorkbookConverter(
       }
     } else if (Array.isArray(value) && value.length > 0) {
       const valuesForRelationship: { id: string; type: string }[] = [];
+      const uuidValuesForAttribute: string[] = [];
       let hasRelationshipConfig = false;
       for (const valueInArray of value) {
         const relationshipConfig = valueInArray.relationshipConfig;
@@ -605,7 +627,9 @@ export function useWorkbookConverter(
             relationshipConfig.linkOrCreateSetting ===
               LinkOrCreateSetting.LINK_OR_CREATE ||
             relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK_OR_ERROR
+              LinkOrCreateSetting.LINK_OR_ERROR ||
+            relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK_UUID_ONLY
           ) {
             // get valueToLink from workbookColumnMap
             const columnMap = searchColumnMap(fieldPath, workbookColumnMap);
@@ -632,15 +656,30 @@ export function useWorkbookConverter(
               const valuesToAdd = Array.isArray(valueToLink)
                 ? valueToLink
                 : [valueToLink];
-              valuesForRelationship.push(
-                ...valuesToAdd.map((v) => _.pick(v, ["id", "type"]))
-              );
+              if (
+                relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK_UUID_ONLY
+              ) {
+                for (const v of valuesToAdd) {
+                  if (v && typeof v === "object" && v.id) {
+                    uuidValuesForAttribute.push(String(v.id));
+                  } else if (typeof v === "string") {
+                    uuidValuesForAttribute.push(v);
+                  }
+                }
+              } else {
+                valuesForRelationship.push(
+                  ...valuesToAdd.map((v) => _.pick(v, ["id", "type"]))
+                );
+              }
             } else {
               if (
                 relationshipConfig.linkOrCreateSetting ===
-                LinkOrCreateSetting.LINK
+                  LinkOrCreateSetting.LINK ||
+                relationshipConfig.linkOrCreateSetting ===
+                  LinkOrCreateSetting.LINK_UUID_ONLY
               ) {
-                // if the field is link only, and there is no matching record, then ignore it.
+                // if the field is link only (or uuid-only), and there is no matching record, then ignore it.
                 delete resource[attributeName];
                 return;
               } else if (
@@ -718,16 +757,23 @@ export function useWorkbookConverter(
       }
       // Only process as relationship and delete if the array contained relationship objects
       if (hasRelationshipConfig) {
-        if (!resource.relationships) {
-          resource.relationships = {};
+        // If we collected uuid-only values, set the attribute to the array of uuids.
+        if (uuidValuesForAttribute.length) {
+          resource[attributeName] = uuidValuesForAttribute;
+        } else {
+          if (!resource.relationships) {
+            resource.relationships = {};
+          }
+          if (valuesForRelationship.length) {
+            resource.relationships[attributeName] = {
+              data: valuesForRelationship
+            };
+          }
         }
-        if (valuesForRelationship.length) {
-          resource.relationships[attributeName] = {
-            data: valuesForRelationship
-          };
+        // Delete the original attribute (it will either be replaced above or moved to relationships)
+        if (resource.relationships && resource.relationships[attributeName]) {
+          delete resource[attributeName];
         }
-        // Delete the attribute that should be in relationships
-        delete resource[attributeName];
       }
     }
   }
