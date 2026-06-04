@@ -231,6 +231,53 @@ export function WorkbookFieldSelectField({
         </>
       )}
 
+      {fieldMap[columnIndex]?.targetField === "organism.managedAttributes" && (
+        <>
+          <ResourceSelectField<ManagedAttribute>
+            name={`fieldMap[${columnIndex}].targetKey`}
+            hideLabel={true}
+            isDisabled={disabled}
+            selectProps={{
+              className: "flex-fill ms-2",
+              menuPortalTarget: document.body,
+              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+            }}
+            filter={(input: string) =>
+              SimpleSearchFilterBuilder.create<ManagedAttribute>()
+                .where("managedAttributeComponent", "EQ", "ORGANISM")
+                .searchFilter("name", input)
+                .build()
+            }
+            model="collection-api/managed-attribute"
+            optionLabel={(cm) => cm.name}
+          />
+        </>
+      )}
+
+      {fieldMap[columnIndex]?.targetField ===
+        "organism.determination.managedAttributes" && (
+        <>
+          <ResourceSelectField<ManagedAttribute>
+            name={`fieldMap[${columnIndex}].targetKey`}
+            hideLabel={true}
+            isDisabled={disabled}
+            selectProps={{
+              className: "flex-fill ms-2",
+              menuPortalTarget: document.body,
+              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+            }}
+            filter={(input: string) =>
+              SimpleSearchFilterBuilder.create<ManagedAttribute>()
+                .where("managedAttributeComponent", "EQ", "DETERMINATION")
+                .searchFilter("name", input)
+                .build()
+            }
+            model="collection-api/managed-attribute"
+            optionLabel={(cm) => cm.name}
+          />
+        </>
+      )}
+
       {fieldMap[columnIndex]?.targetField ===
         "organism.determination.scientificNameDetails" && (
         <div className="flex-fill">

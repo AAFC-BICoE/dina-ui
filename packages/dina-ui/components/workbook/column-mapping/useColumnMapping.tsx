@@ -100,7 +100,9 @@ export function useColumnMapping() {
       .where("managedAttributeComponent", "IN", [
         "MATERIAL_SAMPLE",
         "PREPARATION",
-        "COLLECTING_EVENT"
+        "COLLECTING_EVENT",
+        "ORGANISM",
+        "DETERMINATION"
       ])
       .build(),
     page: { limit: 1000 }
@@ -655,6 +657,26 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
+          } else if (
+            targetManagedAttr.managedAttributeComponent === "ORGANISM"
+          ) {
+            map.push({
+              targetField: "organism.managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr,
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
+            });
+          } else if (
+            targetManagedAttr.managedAttributeComponent === "DETERMINATION"
+          ) {
+            map.push({
+              targetField: "organism.determination.managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr,
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
+            });
           } else {
             map.push({
               targetField: "managedAttributes",
@@ -890,6 +912,7 @@ export function useColumnMapping() {
             projects.find((item) => compareAlphanumeric(item.name, value));
           break;
         case "collectingEvent.collectors.displayName":
+        case "organism.determination.determiner.displayName":
         case "preparedBy.displayName":
         case "dcCreator.displayName":
           found =
@@ -996,6 +1019,7 @@ export function useColumnMapping() {
         targetType = "project";
         break;
       case "collectingEvent.collectors.displayName":
+      case "organism.determination.determiner.displayName":
       case "preparedBy.displayName":
       case "dcCreator.displayName":
         options = persons.map((resource) => ({

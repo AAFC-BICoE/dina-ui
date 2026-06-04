@@ -152,6 +152,8 @@ const SYNONYMS_MAP_BY_TYPE = new Map<string, Map<string, string>>([
       ["assemblages", "assemblages.name"],
       ["collectors", "collectingEvent.collectors.displayName"],
       ["collector", "collectingEvent.collectors.displayName"],
+      ["determiners", "organism.determination.determiner.displayName"],
+      ["determiner", "organism.determination.determiner.displayName"],
       ["attachment", "attachment.name"],
       ["attachments", "attachment.name"],
       ["hostorganism", "hostOrganism.name"],
@@ -1306,5 +1308,6 @@ export function trimSpace(workbookData: WorkbookJSON) {
 export const MULTI_SELECT_FIELDS = new Set([
   "preparedBy.displayName",
   "collectingEvent.collectors.displayName",
+  "organism.determination.determiner.displayName",
   "projects.name"
 ]);
