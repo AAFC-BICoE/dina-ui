@@ -547,6 +547,7 @@ export function useWorkbookConverter(
             // Supply the mandatory usage type.
             value["usageType"] = "material-sample";
           }
+          _.unset(value, "relationshipConfig");
 
           const newCreatedValue = await save(
             [
@@ -672,6 +673,7 @@ export function useWorkbookConverter(
               );
             }
 
+            _.unset(valueInArray, "relationshipConfig");
             const newCreatedValue = await save(
               [
                 {
@@ -694,6 +696,24 @@ export function useWorkbookConverter(
               valuesForRelationship.push(newCreatedValue);
             }
           }
+        }
+        // If no relationshipConfig was present on the array elements, recurse
+        // into each element's children so nested relationshipConfigs (e.g.
+        // determiner inside determination) are handled.
+        if (!hasRelationshipConfig) {
+          for (const valueInArray of value) {
+            if (isObject(valueInArray)) {
+              for (const childName of Object.keys(valueInArray)) {
+                await linkRelationshipAttribute(
+                  valueInArray,
+                  workbookColumnMap,
+                  fieldPath + "." + childName,
+                  group
+                );
+              }
+            }
+          }
+          return;
         }
       }
       // Only process as relationship and delete if the array contained relationship objects

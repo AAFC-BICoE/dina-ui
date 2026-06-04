@@ -176,16 +176,29 @@ export function SaveWorkbookProgress({
         // If handler says to pause, save what we have and pause
         if (result.shouldPause) {
           if (chunkedResources.slice(0, i - 1).length > 0) {
-            const savedSoFar = await save(
-              chunkedResources.slice(0, i - 1).map(
-                (item) =>
-                  ({
-                    resource: item,
-                    type
-                  } as any)
-              ),
-              { apiBaseUrl }
+            // Clean any leftover `relationshipConfig` from nested objects
+            const toSave = chunkedResources.slice(0, i - 1).map(
+              (item) =>
+                ({
+                  resource: item,
+                  type
+                } as any)
             );
+            function deepRemoveRelationshipConfig(obj: any) {
+              if (!obj || typeof obj !== "object") return;
+              if (Array.isArray(obj)) {
+                for (const el of obj) deepRemoveRelationshipConfig(el);
+                return;
+              }
+              if (obj.relationshipConfig) {
+                delete obj.relationshipConfig;
+              }
+              for (const k of Object.keys(obj))
+                deepRemoveRelationshipConfig(obj[k]);
+            }
+            for (const op of toSave) deepRemoveRelationshipConfig(op.resource);
+
+            const savedSoFar = await save(toSave, { apiBaseUrl });
             setSavedResources([...savedResources, ...savedSoFar]);
             setNow(progressInternal - 1);
             saveProgress(progressInternal - 1);
@@ -200,16 +213,24 @@ export function SaveWorkbookProgress({
         userSelectedSameNameParentSample.current = undefined;
       }
 
-      const savedArgs = await save(
-        chunkedResources.map(
-          (item) =>
-            ({
-              resource: item,
-              type
-            } as any)
-        ),
-        { apiBaseUrl }
+      // Clean any leftover `relationshipConfig` from nested objects before final save
+      const toSaveFinal = chunkedResources.map(
+        (item) => ({ resource: item, type } as any)
       );
+      function deepRemoveRelationshipConfig(obj: any) {
+        if (!obj || typeof obj !== "object") return;
+        if (Array.isArray(obj)) {
+          for (const el of obj) deepRemoveRelationshipConfig(el);
+          return;
+        }
+        if (obj.relationshipConfig) {
+          delete obj.relationshipConfig;
+        }
+        for (const k of Object.keys(obj)) deepRemoveRelationshipConfig(obj[k]);
+      }
+      for (const op of toSaveFinal) deepRemoveRelationshipConfig(op.resource);
+
+      const savedArgs = await save(toSaveFinal, { apiBaseUrl });
       setSavedResources([...savedResources, ...savedArgs]);
     }
 
