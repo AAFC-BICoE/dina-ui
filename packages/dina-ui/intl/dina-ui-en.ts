@@ -1047,6 +1047,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   columnSelector_addNewColumn: "Add a new column:",
   columnSelector_selectManagedAttribute: "Select managed attribute:",
   columnSelector_selectClassification: "Select classification:",
+  columnSelector_selectIdentifier: "Select identifier:",
   columnSelector_addColumnButton: "Add Column",
   columnSelector_resetButton: "Reset Columns",
   field_columnFunction: "Functions",

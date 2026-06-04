@@ -16,6 +16,9 @@ import { useFormikContext } from "formik";
 import QueryRowClassificationSearch, {
   ClassificationSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
+import QueryRowIdentifierSearch, {
+  IdentifierSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 
 export interface GeneratorSelectorListProps extends GeneratorSelectorProps {
   loading: boolean;
@@ -373,6 +376,26 @@ export function GeneratorSelectorList({
                 isInColumnSelector={true}
               />
             </>
+          )}
+          {selectedField?.dynamicConfig?.type === "identifier" && (
+            <div className="mb-3">
+              <strong>
+                <DinaMessage id="columnSelector_selectIdentifier" />
+              </strong>
+              <QueryRowIdentifierSearch
+                setValue={(newValue) => {
+                  const parsedValue = JSON.parse(
+                    newValue
+                  ) as IdentifierSearchStates;
+                  setDynamicFieldValue(parsedValue?.selectedIdentifier?.key);
+                  setDynamicFieldLabel(
+                    _.startCase(parsedValue?.selectedIdentifier?.name)
+                  );
+                }}
+                value={dynamicFieldValue}
+                isInColumnSelector={true}
+              />
+            </div>
           )}
           <div className="d-grid">
             <Button
