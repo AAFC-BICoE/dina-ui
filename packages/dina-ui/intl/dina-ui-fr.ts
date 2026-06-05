@@ -483,6 +483,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_xmpMetadataDate_tooltip:
     "Date et heure de la dernière mise à jour du dossier.",
   field_xmpRightsWebStatement: "Licence",
+  field_xmpRightsOwner: "Propriétaire",
   fileTooBig: "Fichier trop volumineux",
   filterAttribute: "Attribut filtre",
   filterByGroup: "Filtrer par groupe",

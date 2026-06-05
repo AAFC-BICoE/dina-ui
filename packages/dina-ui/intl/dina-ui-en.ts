@@ -623,6 +623,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_vocabularyElementType_text_label: "Text",
   field_webpage: "Web Page",
   field_xmpMetadataDate: "Last Updated On",
+  field_xmpRightsOwner: "Owner",
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "License",
