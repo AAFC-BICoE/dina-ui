@@ -283,7 +283,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         apiEndpoint: "collection-api/managed-attribute"
       },
 
-      // Collecting Event
+      // Collecting Event Managed Attributes
       {
         type: "managedAttribute",
         label: "managedAttributes",
@@ -293,6 +293,8 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedType: "collecting-event",
         apiEndpoint: "collection-api/managed-attribute"
       },
+
+      // Collecting Event Field Extensions
       {
         type: "fieldExtension",
         label: "fieldExtensions",
@@ -303,13 +305,24 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         apiEndpoint: "collection-api/extension"
       },
 
-      // Determination
+      // Organism Managed Attributes
+      {
+        type: "managedAttribute",
+        label: "managedAttributes",
+        component: "ORGANISM",
+        path: "included.attributes.managedAttributes",
+        referencedBy: "organism",
+        referencedType: "organism",
+        apiEndpoint: "collection-api/managed-attribute"
+      },
+
+      // Determination Managed Attributes
       {
         type: "managedAttribute",
         label: "managedAttributes",
         component: "DETERMINATION",
         path: "included.attributes.determination.managedAttributes",
-        referencedBy: "organism",
+        referencedBy: "organism.determination",
         referencedType: "organism",
         apiEndpoint: "collection-api/managed-attribute"
       },
