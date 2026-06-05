@@ -55,7 +55,7 @@ export function SaveWorkbookProgress({
     appendData
   } = useWorkbookContext();
 
-  const { save, apiClient, doOperations } = useApiClient();
+  const { save, apiClient, bulkDeleteResources } = useApiClient();
 
   const { agentId } = useAccount();
 
@@ -176,29 +176,16 @@ export function SaveWorkbookProgress({
         // If handler says to pause, save what we have and pause
         if (result.shouldPause) {
           if (chunkedResources.slice(0, i - 1).length > 0) {
-            // Clean any leftover `relationshipConfig` from nested objects
-            const toSave = chunkedResources.slice(0, i - 1).map(
-              (item) =>
-                ({
-                  resource: item,
-                  type
-                } as any)
+            const savedSoFar = await save(
+              chunkedResources.slice(0, i - 1).map(
+                (item) =>
+                  ({
+                    resource: item,
+                    type
+                  } as any)
+              ),
+              { apiBaseUrl }
             );
-            function deepRemoveRelationshipConfig(obj: any) {
-              if (!obj || typeof obj !== "object") return;
-              if (Array.isArray(obj)) {
-                for (const el of obj) deepRemoveRelationshipConfig(el);
-                return;
-              }
-              if (obj.relationshipConfig) {
-                delete obj.relationshipConfig;
-              }
-              for (const k of Object.keys(obj))
-                deepRemoveRelationshipConfig(obj[k]);
-            }
-            for (const op of toSave) deepRemoveRelationshipConfig(op.resource);
-
-            const savedSoFar = await save(toSave, { apiBaseUrl });
             setSavedResources([...savedResources, ...savedSoFar]);
             setNow(progressInternal - 1);
             saveProgress(progressInternal - 1);
@@ -213,24 +200,16 @@ export function SaveWorkbookProgress({
         userSelectedSameNameParentSample.current = undefined;
       }
 
-      // Clean any leftover `relationshipConfig` from nested objects before final save
-      const toSaveFinal = chunkedResources.map(
-        (item) => ({ resource: item, type } as any)
+      const savedArgs = await save(
+        chunkedResources.map(
+          (item) =>
+            ({
+              resource: item,
+              type
+            } as any)
+        ),
+        { apiBaseUrl }
       );
-      function deepRemoveRelationshipConfig(obj: any) {
-        if (!obj || typeof obj !== "object") return;
-        if (Array.isArray(obj)) {
-          for (const el of obj) deepRemoveRelationshipConfig(el);
-          return;
-        }
-        if (obj.relationshipConfig) {
-          delete obj.relationshipConfig;
-        }
-        for (const k of Object.keys(obj)) deepRemoveRelationshipConfig(obj[k]);
-      }
-      for (const op of toSaveFinal) deepRemoveRelationshipConfig(op.resource);
-
-      const savedArgs = await save(toSaveFinal, { apiBaseUrl });
       setSavedResources([...savedResources, ...savedArgs]);
     }
 
@@ -290,20 +269,16 @@ export function SaveWorkbookProgress({
     const materialSampleIds = fetchedMaterialSamples?.data.map(
       (materialSample) => materialSample.id
     );
-    await doOperations(
-      materialSampleIds.map((id) => ({
-        op: "DELETE",
-        path: `material-sample/${id}`
-      })),
-      { apiBaseUrl }
-    );
-    await doOperations(
-      collectingEventIds.map((id) => ({
-        op: "DELETE",
-        path: `collecting-event/${id}`
-      })),
-      { apiBaseUrl, returnNullForMissingResource: true }
-    );
+    if (apiBaseUrl) {
+      await bulkDeleteResources(materialSampleIds as string[], {
+        apiBaseUrl,
+        resourceType: "material-sample"
+      });
+      await bulkDeleteResources(collectingEventIds as string[], {
+        apiBaseUrl,
+        resourceType: "collecting-event"
+      });
+    }
 
     onWorkbookFailed?.();
   }

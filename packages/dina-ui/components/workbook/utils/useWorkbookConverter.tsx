@@ -187,7 +187,9 @@ export function useWorkbookConverter(
           parentConfig.relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.LINK_OR_CREATE ||
           parentConfig.relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.LINK_OR_ERROR)
+            LinkOrCreateSetting.LINK_OR_ERROR ||
+          parentConfig.relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_UUID_ONLY)
       );
     }
     return false;

@@ -539,13 +539,16 @@ export function useColumnMapping() {
         multipleValueMappings
       };
     } else {
+      const lastDotIndex = fieldPath.lastIndexOf(".");
+
       const mapRelationship =
         // Check if there's a dot in the fieldPath
-        fieldPath.lastIndexOf(".") > -1 &&
+        lastDotIndex > -1 &&
         // Extract everything except the last dot
-        flattenedConfig[fieldPath.substring(0, fieldPath.lastIndexOf("."))]
-          ?.relationshipConfig?.linkOrCreateSetting ===
-          LinkOrCreateSetting.LINK;
+        [LinkOrCreateSetting.LINK, LinkOrCreateSetting.LINK_UUID_ONLY].includes(
+          flattenedConfig[fieldPath.substring(0, lastDotIndex)]
+            ?.relationshipConfig?.linkOrCreateSetting
+        );
 
       newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
