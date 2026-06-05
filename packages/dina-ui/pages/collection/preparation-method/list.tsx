@@ -57,7 +57,6 @@ export default function preparationMethodListPage() {
             .whereProvided("group", "EQ", filterForm.group)
             .build()
         }
-        useFiql={true}
         filterAttributes={PREPARATION_METHOD_FILTER_ATTRIBUTES}
         id="preparation-method-list"
         queryTableProps={{

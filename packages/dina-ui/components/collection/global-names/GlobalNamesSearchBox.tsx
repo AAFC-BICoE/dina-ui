@@ -320,8 +320,7 @@ export function GlobalNamesSearchBox({
                           type: "user-preference"
                         };
                         await save([saveArgs], {
-                          apiBaseUrl: "/user-api",
-                          skipOperationForSingleRequest: true
+                          apiBaseUrl: "/user-api"
                         });
 
                         // Trigger a reload of the user preferences.

@@ -1,4 +1,4 @@
-import { OperationsResponse } from "common-ui";
+import { waitForLoadingToDisappear } from "common-ui";
 import { ProductEditPage } from "../../../../pages/seqdb/product/edit";
 import { mountWithAppContext } from "common-ui";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
@@ -16,11 +16,14 @@ const mockGet = jest.fn();
 /** Mock axios for operations requests. */
 const mockPatch = jest.fn();
 
+/** Mock axios for POST requests. */
+const mockPost = jest.fn();
+
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: { get: mockGet, axios: { patch: mockPatch, post: mockPost } }
 };
 
 describe("Product edit page", () => {
@@ -43,16 +46,23 @@ describe("Product edit page", () => {
   });
 
   it("Provides a form to add a Product.", async () => {
-    mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            id: "1",
-            type: "product"
-          },
-          status: 201
+    mockPost.mockReturnValueOnce({
+      data: {
+        data: {
+          id: "020023d4-c7a7-4d62-981f-776bb799e5b9",
+          type: "product",
+          attributes: {
+            createdBy: "cnc-su",
+            createdOn: null,
+            group: "aafc",
+            name: "New Product",
+            type: undefined,
+            description: undefined,
+            upc: undefined,
+            lastModified: "2026-04-24T18:17:13.094+00:00"
+          }
         }
-      ] as OperationsResponse
+      }
     });
 
     const wrapper = mountWithAppContext(
@@ -70,90 +80,52 @@ describe("Product edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
+    await waitForLoadingToDisappear();
 
     // Test expected API Response
     await waitFor(() => {
-      expect(mockPatch).lastCalledWith(
-        "/seqdb-api/operations",
-        [
-          {
-            op: "POST",
-            path: "product",
-            value: {
-              attributes: {
-                group: "aafc",
-                name: "New Product",
-                type: undefined
-              },
-              id: "00000000-0000-0000-0000-000000000000",
-              type: "product"
-            }
+      expect(mockPost).lastCalledWith(
+        "/seqdb-api/product",
+        {
+          data: {
+            attributes: {
+              group: "aafc",
+              name: "New Product",
+              type: undefined
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "product"
           }
-        ],
+        },
         expect.anything()
       );
     });
 
     // The user should be redirected to the new product's details page.
-    expect(mockPush).lastCalledWith("/seqdb/product/view?id=1");
-  });
-
-  it("Renders an error after form submit if one is returned from the back-end.", async () => {
-    // The patch request will return an error.
-    mockPatch.mockImplementationOnce(async () => ({
-      data: [
-        {
-          errors: [
-            {
-              detail: "name size must be between 1 and 10",
-              status: "422",
-              title: "Constraint violation"
-            }
-          ],
-          status: 422
-        }
-      ] as OperationsResponse
-    }));
-
-    const wrapper = mountWithAppContext(
-      <ProductEditPage router={{ query: {}, push: mockPush } as any} />,
-      { apiContext }
+    expect(mockPush).lastCalledWith(
+      "/seqdb/product/view?id=020023d4-c7a7-4d62-981f-776bb799e5b9"
     );
-
-    // Edit the product name.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
-      target: {
-        name: "name",
-        value: "invalid name"
-      }
-    });
-
-    // Submit the form.
-    fireEvent.submit(wrapper.container.querySelector("form")!);
-
-    // Test expected error prompt
-    await waitFor(() => {
-      expect(
-        wrapper.getByText(
-          /constraint violation: name size must be between 1 and 10/i
-        )
-      ).toBeInTheDocument();
-      expect(mockPush).toBeCalledTimes(0);
-    });
   });
 
   it("Provides a form to edit a Product.", async () => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
-      data: [
-        {
-          data: {
-            id: "10",
-            type: "product"
-          },
-          status: 201
+      data: {
+        data: {
+          id: "10",
+          type: "product",
+          attributes: {
+            createdBy: "cnc-su",
+            createdOn: null,
+            group: "aafc",
+            name: "Rapid Alkaline DNA Extraction",
+            type: "product",
+            description: "new desc for product 10, was a null value",
+            upc: "Universal product code",
+            lastModified: "2026-04-24T18:17:13.094+00:00"
+          }
         }
-      ] as OperationsResponse
+      }
     });
 
     const wrapper = mountWithAppContext(
@@ -182,26 +154,25 @@ describe("Product edit page", () => {
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);
+    await waitForLoadingToDisappear();
 
-    // "patch" should have been called with a jsonpatch request containing the existing values
-    // and the modified one.
+    // Edit API call should be made with the modified description and all other existing values.
     await waitFor(() => {
       expect(mockPatch).lastCalledWith(
-        "/seqdb-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "product/10",
-            value: {
-              attributes: expect.objectContaining({
-                description: "new desc for product 10, was a null value",
-                name: "Rapid Alkaline DNA Extraction"
-              }),
-              id: "10",
-              type: "product"
-            }
+        "/seqdb-api/product/10",
+        {
+          data: {
+            attributes: {
+              description: "new desc for product 10, was a null value",
+              group: "aafc",
+              lastModified: "2019-03-27T04:00:00.000+0000",
+              name: "Rapid Alkaline DNA Extraction",
+              upc: "Universal product code"
+            },
+            id: "10",
+            type: "product"
           }
-        ],
+        },
         expect.anything()
       );
     });

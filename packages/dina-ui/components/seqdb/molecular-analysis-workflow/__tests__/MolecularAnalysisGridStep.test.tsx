@@ -31,15 +31,12 @@ const mockSave = jest.fn();
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "/seqdb-api/generic-molecular-analysis-item":
-      switch (params.filter.rsql) {
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID:
+      switch (params.filter?.["genericMolecularAnalysis.uuid"]?.["EQ"]) {
+        case TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN };
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID:
+        case TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_STORAGE };
-        case "genericMolecularAnalysis.uuid==" +
-          TEST_MOLECULAR_ANALYSIS_MULTIPLE_STORAGE_ID:
+        case TEST_MOLECULAR_ANALYSIS_MULTIPLE_STORAGE_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_STORAGE };
       }
       break;
@@ -71,19 +68,19 @@ const mockBulkGet = jest.fn(async (paths) => {
       // Storage Unit Usage Requests
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_1.id +
-        "?include=storageUnit":
+        "?include=storageUnit&optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_1;
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_2.id +
-        "?include=storageUnit":
+        "?include=storageUnit&optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_2;
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_3.id +
-        "?include=storageUnit":
+        "?include=storageUnit&optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_3;
       case "/storage-unit-usage/" +
         STORAGE_UNIT_USAGE_4.id +
-        "?include=storageUnit":
+        "?include=storageUnit&optfields[storage-unit-usage]=cellNumber":
         return STORAGE_UNIT_USAGE_4;
 
       // Material Sample Summary

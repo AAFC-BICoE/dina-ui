@@ -1,6 +1,6 @@
 import { SeqReaction } from "../../types/seqdb-api";
 import { useState } from "react";
-import { filterBy, useApiClient, useQuery } from "common-ui";
+import { SimpleSearchFilterBuilder, useApiClient, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import {
   attachGenericMolecularAnalysisItems,
@@ -73,22 +73,16 @@ export function useMolecularAnalysisRunView({
   const molecularAnalysisRunItemQuery = useQuery<MolecularAnalysisRunItem[]>(
     {
       path: `seqdb-api/molecular-analysis-run-item`,
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "run.uuid",
-            comparison: "==",
-            arguments: molecularAnalysisRunId
-          }
-        ]
-      })("")
+      filter: SimpleSearchFilterBuilder.create()
+        .where("run.uuid", "EQ", molecularAnalysisRunId ?? "")
+        .build()
     },
     {
       onSuccess: async ({ data: molecularAnalysisRunItems }) => {
         async function fetchSeqReactions() {
           const fetchPaths = molecularAnalysisRunItems.map(
             (molecularAnalysisRunItem) =>
-              `seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+              `seqdb-api/seq-reaction?include=storageUnitUsage,pcrBatchItem,seqPrimer&filter[molecularAnalysisRunItem.uuid][EQ]=${molecularAnalysisRunItem.id}`
           );
           const seqReactions: PersistedResource<SeqReaction>[] = [];
           for (const path of fetchPaths) {
@@ -107,7 +101,7 @@ export function useMolecularAnalysisRunView({
             )
             .map(
               (molecularAnalysisRunItem) =>
-                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${molecularAnalysisRunItem.id}`
             );
           const genericMolecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
             [];
@@ -125,7 +119,7 @@ export function useMolecularAnalysisRunView({
         async function fetchMetagenomicsBatchItems() {
           const fetchPaths = molecularAnalysisRunItems.map(
             (molecularAnalysisRunItem) =>
-              `seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+              `seqdb-api/metagenomics-batch-item?include=pcrBatchItem,molecularAnalysisRunItem&filter[molecularAnalysisRunItem.uuid][EQ]=${molecularAnalysisRunItem.id}`
           );
           const metagenomicsBatchItems: PersistedResource<MetagenomicsBatchItem>[] =
             [];
@@ -210,23 +204,33 @@ export function useMolecularAnalysisRunView({
               const qualityControlQuery = await apiClient.get<QualityControl>(
                 `seqdb-api/quality-control`,
                 {
-                  filter: filterBy([], {
-                    extraFilters: [
-                      {
-                        selector: "molecularAnalysisRunItem.uuid",
-                        comparison: "==",
-                        arguments: item?.id
-                      }
-                    ]
-                  })(""),
-                  include:
-                    "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
+                  filter: SimpleSearchFilterBuilder.create()
+                    .where(
+                      "molecularAnalysisRunItem.uuid",
+                      "EQ",
+                      item?.id ?? ""
+                    )
+                    .build(),
+                  include: "molecularAnalysisRunItem"
                 }
               );
 
               const qualityControlFound = qualityControlQuery
                 ?.data?.[0] as QualityControlWithAttachment;
               if (qualityControlFound) {
+                // Fetch result for the molecularAnalysisRunItem separately since multi-level includes are not supported.
+                if (qualityControlFound.molecularAnalysisRunItem?.id) {
+                  const runItemResp =
+                    await apiClient.get<MolecularAnalysisRunItem>(
+                      `seqdb-api/molecular-analysis-run-item/${qualityControlFound.molecularAnalysisRunItem.id}`,
+                      {
+                        include: "result"
+                      }
+                    );
+                  qualityControlFound.molecularAnalysisRunItem =
+                    runItemResp.data;
+                }
+
                 // If a result exists, we need to perform a get request to retrieve the metadata to be displayed.
                 let attachments: ResourceIdentifierObject[] = [];
                 if (qualityControlFound.molecularAnalysisRunItem?.result?.id) {

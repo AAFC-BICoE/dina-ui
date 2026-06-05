@@ -222,8 +222,7 @@ export async function processNestedResources(
       }));
 
       savedResources = await api.save(saveArgs, {
-        apiBaseUrl,
-        skipOperationForSingleRequest: true
+        apiBaseUrl
       });
     }
 

@@ -18,12 +18,7 @@ const MOLECULAR_ANALYSIS_RUN_TABLE_COLUMNS: ColumnDefinition<MolecularAnalysisRu
           original: { id, name }
         }
       }) => (
-        <Link
-          href={`/seqdb/molecular-analysis-run/view?id=${id}`}
-          legacyBehavior
-        >
-          {name}
-        </Link>
+        <Link href={`/seqdb/molecular-analysis-run/view?id=${id}`}>{name}</Link>
       ),
       accessorKey: "name",
       header: () => <FieldHeader name="name" />

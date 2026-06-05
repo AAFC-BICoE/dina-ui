@@ -74,12 +74,6 @@ export interface DoOperationsOptions {
   returnNullForMissingResource?: boolean;
 
   overridePatchOperation?: boolean;
-
-  /**
-   * If true, the client will handle requests with only 1 request as a single request instead of an
-   * operation. Default is false for now to keep the same behavior as before for backwards compatibility.
-   */
-  skipOperationForSingleRequest?: boolean;
 }
 
 /** Api client interface. */
@@ -216,18 +210,10 @@ export class ApiClientImpl implements ApiClientI {
 
   /**
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.
-   *
-   * If a single request is provided, it will perform the request without the
-   * operation directly. It will still return like an operation response. This is only enabled if
-   * skipOperationForSingleRequest is set to true.
    */
   public async doOperations(
     operations: Operation[],
-    {
-      apiBaseUrl = "",
-      returnNullForMissingResource,
-      skipOperationForSingleRequest
-    }: DoOperationsOptions = {}
+    { apiBaseUrl = "", returnNullForMissingResource }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
     // Check if no operations were provided and skip performing anything.
     if (operations.length === 0) {
@@ -240,50 +226,11 @@ export class ApiClientImpl implements ApiClientI {
 
     // This array will hold the responses from either the single or bulk request
     let responses: OperationsResponse | BulkGetOperation[] = [];
+    const resourceType = operations[0].path.split("/").filter(Boolean)[0];
 
     // Depending on the number of requests being made determines if it's an operation or just a
     // single request.
-    const resourceType = operations[0].path.split("/").filter(Boolean)[0];
-
-    // APIs using Repository V2.
-    const supportedBaseApis = [
-      "/agent-api",
-      "/user-api",
-      "/dina-export-api",
-      "/objectstore-api",
-      "/collection-api",
-      "/loan-transaction-api"
-    ];
-
-    // Remove leading slashes, so "/agent-api" and "agent-api" become identical after normalisation.
-    const stripLeadingSlash = (s: string) => s.replace(/^\/+/, "");
-    const supportedBaseApisNorm = supportedBaseApis.map(stripLeadingSlash);
-    const apiBaseUrlNorm = stripLeadingSlash(apiBaseUrl);
-
-    // Resource types that are supported for bulk operations.
-    const supportedResourceTypes = [
-      "person",
-      "identifier",
-      "object-upload",
-      "metadata",
-      "material-sample",
-      "association",
-      "organism",
-      "collecting-event",
-      "user",
-      "storage-unit",
-      "storage-unit-usage",
-      "material-sample-summary",
-      "project",
-      "notification"
-    ];
-
-    // If the apiBaseUrl is an API using a repository that doesn't support operations, we will skip the operation for single requests.
-    if (supportedBaseApisNorm.includes(apiBaseUrlNorm)) {
-      skipOperationForSingleRequest = true;
-    }
-
-    if (operations.length === 1 && skipOperationForSingleRequest) {
+    if (operations.length === 1) {
       // Single Request Only
       const operation = operations[0];
 
@@ -367,123 +314,123 @@ export class ApiClientImpl implements ApiClientI {
         }
       }
     } else {
-      // use new bulk functions if using the new api and using a supported resource type.
-      if (
-        supportedBaseApisNorm.includes(apiBaseUrlNorm) &&
-        supportedResourceTypes.includes(resourceType)
-      ) {
-        switch (operations[0].op.toUpperCase()) {
-          case "GET":
-            const includeSet = new Set<string>();
+      switch (operations[0].op.toUpperCase()) {
+        case "GET":
+          const includeSet = new Set<string>();
+          const optfieldsMap: Record<string, string[]> = {};
 
-            const ids = operations.map((operation) => {
-              // Split path by "?"
-              const pathParts = operation.path.split("?");
+          const ids = operations.map((operation) => {
+            // Split path by "?"
+            const pathParts = operation.path.split("?");
 
-              // Get the "include" part, after '?', if exists
-              const includePart =
-                pathParts.length > 1 ? pathParts[1].split("=")[1] : null;
+            // Parse query params if they exist
+            if (pathParts.length > 1) {
+              const queryParams = new URLSearchParams(pathParts[1]);
+
+              // Handle include
+              const includePart = queryParams.get("include");
               if (includePart) {
-                // Split by comma and add each to the Set
                 includePart.split(",").forEach((includeItem) => {
                   includeSet.add(includeItem);
                 });
               }
 
-              // Extract the ID from before the '?' by splitting by '/' and getting the second item
-              return pathParts[0].split("/").filter(Boolean)[1];
-            });
-
-            const include: string[] | undefined =
-              includeSet.size > 0 ? [...includeSet] : undefined;
-            const getResponse = await this.bulkLoadResources(ids, {
-              apiBaseUrl,
-              resourceType,
-              include,
-              returnNullForMissingResource
-            });
-            responses = getResponse.data.data.map((response) => ({
-              data: response,
-              included: getResponse.data.included,
-              status: response ? getResponse.status : 404
-            }));
-            break;
-
-          case "DELETE":
-            const deleteIds = operations.map((operation) => {
-              // Split path by "?"
-              const pathParts = operation.path.split("/");
-
-              // Extract the ID from before the '?' by splitting by '/' and getting the second item
-              return pathParts[1];
-            });
-
-            const deleteResponse = await this.bulkDeleteResources(deleteIds, {
-              apiBaseUrl,
-              resourceType
-            });
-
-            responses = deleteIds.map(() => ({
-              status: deleteResponse.status
-            })) as any;
-            break;
-
-          case "POST":
-            // For agent-api, we need to do a bulk create
-            const postResources: InputResource<KitsuResource>[] = operations
-              .map((op) => op.value)
-              .filter(
-                (value): value is InputResource<KitsuResource> =>
-                  value !== undefined
-              );
-            const postResponse = await this.bulkCreateResources(postResources, {
-              apiBaseUrl,
-              resourceType
-            });
-            responses = postResponse.data.data.map((response) => ({
-              data: response,
-              included: postResponse.data.included,
-              status: response ? postResponse.status : 404
-            }));
-
-            break;
-          case "PATCH":
-            const patchResources: InputResource<KitsuResource>[] = operations
-              .map((op) => op.value)
-              .filter(
-                (value): value is InputResource<KitsuResource> =>
-                  value !== undefined
-              );
-            const patchResponse = await this.bulkUpdateResources(
-              patchResources,
-              {
-                apiBaseUrl,
-                resourceType
-              }
-            );
-
-            responses = patchResponse.data.data.map((response) => ({
-              data: response,
-              included: patchResponse.data.included,
-              status: response ? patchResponse.status : 404
-            }));
-
-            break;
-        }
-      } else {
-        const axiosResponse = await axios.patch(
-          `${apiBaseUrl}/operations`,
-          operations,
-          {
-            headers: {
-              Accept: "application/json-patch+json",
-              "Content-Type": "application/json-patch+json",
-              "Crnk-Compact": "true"
+              // Handle optfields[type]=fields
+              queryParams.forEach((value, key) => {
+                const optfieldsMatch = key.match(/^optfields\[(.+)\]$/);
+                if (optfieldsMatch) {
+                  const type = optfieldsMatch[1];
+                  if (!optfieldsMap[type]) {
+                    optfieldsMap[type] = [];
+                  }
+                  value.split(",").forEach((field) => {
+                    if (!optfieldsMap[type].includes(field)) {
+                      optfieldsMap[type].push(field);
+                    }
+                  });
+                }
+              });
             }
-          }
-        );
 
-        responses = axiosResponse.data;
+            // Extract the ID from before the '?' by splitting by '/' and getting the second item
+            return pathParts[0].split("/").filter(Boolean)[1];
+          });
+
+          const include: string[] | undefined =
+            includeSet.size > 0 ? [...includeSet] : undefined;
+          const optfields =
+            Object.keys(optfieldsMap).length > 0 ? optfieldsMap : undefined;
+
+          const getResponse = await this.bulkLoadResources(ids, {
+            apiBaseUrl,
+            resourceType,
+            include,
+            optfields,
+            returnNullForMissingResource
+          });
+          responses = getResponse.data.data.map((response) => ({
+            data: response,
+            included: getResponse.data.included,
+            status: response ? getResponse.status : 404
+          }));
+          break;
+
+        case "DELETE":
+          const deleteIds = operations.map((operation) => {
+            // Split path by "?"
+            const pathParts = operation.path.split("/");
+
+            // Extract the ID from before the '?' by splitting by '/' and getting the second item
+            return pathParts[1];
+          });
+
+          const deleteResponse = await this.bulkDeleteResources(deleteIds, {
+            apiBaseUrl,
+            resourceType
+          });
+
+          responses = deleteIds.map(() => ({
+            status: deleteResponse.status
+          })) as any;
+          break;
+
+        case "POST":
+          const postResources: InputResource<KitsuResource>[] = operations
+            .map((op) => op.value)
+            .filter(
+              (value): value is InputResource<KitsuResource> =>
+                value !== undefined
+            );
+          const postResponse = await this.bulkCreateResources(postResources, {
+            apiBaseUrl,
+            resourceType
+          });
+          responses = postResponse.data.data.map((response) => ({
+            data: response,
+            included: postResponse.data.included,
+            status: response ? postResponse.status : 404
+          }));
+
+          break;
+        case "PATCH":
+          const patchResources: InputResource<KitsuResource>[] = operations
+            .map((op) => op.value)
+            .filter(
+              (value): value is InputResource<KitsuResource> =>
+                value !== undefined
+            );
+          const patchResponse = await this.bulkUpdateResources(patchResources, {
+            apiBaseUrl,
+            resourceType
+          });
+
+          responses = patchResponse.data.data.map((response) => ({
+            data: response,
+            included: patchResponse.data.included,
+            status: response ? patchResponse.status : 404
+          }));
+
+          break;
       }
     }
 
@@ -540,92 +487,59 @@ export class ApiClientImpl implements ApiClientI {
       path: `${deleteArg.delete.type}/${deleteArg.delete.id}`
     }));
 
-    // If using repository v2, split different operation types into separate requests.
-    if (options?.apiBaseUrl && ["/agent-api"].includes(options?.apiBaseUrl)) {
-      const postOperations: any = [];
-      const patchOperations: any = [];
+    const postOperations: any = [];
+    const patchOperations: any = [];
 
-      for (const jsonapiResource of serialized) {
-        if (jsonapiResource.id) {
-          patchOperations.push({
-            op: "PATCH",
-            path: `${jsonapiResource.type}/${jsonapiResource.id}`,
-            value: {
-              ...jsonapiResource,
-              id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-            }
-          });
-        } else {
-          postOperations.push({
-            op: "POST",
-            path: jsonapiResource.type,
-            value: {
-              ...jsonapiResource,
-              id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-            }
-          });
-        }
+    for (const jsonapiResource of serialized) {
+      if (jsonapiResource.id) {
+        patchOperations.push({
+          op: "PATCH",
+          path: `${jsonapiResource.type}/${jsonapiResource.id}`,
+          value: {
+            ...jsonapiResource,
+            id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
+          }
+        });
+      } else {
+        postOperations.push({
+          op: "POST",
+          path: jsonapiResource.type,
+          value: {
+            ...jsonapiResource,
+            id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
+          }
+        });
       }
-
-      // only do the operations if there are any.
-      const postResponses = postOperations.length
-        ? await this.doOperations(postOperations, options)
-        : [];
-      const patchResponses = patchOperations.length
-        ? await this.doOperations(patchOperations, options)
-        : [];
-      const deleteResponses = deleteOperations.length
-        ? await this.doOperations(deleteOperations, options)
-        : [];
-
-      // Deserialize the responses to Kitsu format.
-      const deserializedPostPromises = postResponses.map((response) =>
-        deserialise(response)
-      );
-      const deserializedPatchPromises = patchResponses.map((response) =>
-        deserialise(response)
-      );
-      const deserializedDeletePromises = deleteResponses.map((response) =>
-        deserialise(response)
-      );
-      const deserialized = await Promise.all([
-        ...deserializedPostPromises,
-        ...deserializedPatchPromises,
-        ...deserializedDeletePromises
-      ]);
-      const kitsuResources = deserialized.map(({ data }) => data);
-      return kitsuResources;
-    } else {
-      const saveOperations = serialized.map<Operation>((jsonapiResource) => ({
-        op: options?.overridePatchOperation
-          ? "POST"
-          : jsonapiResource.id
-          ? "PATCH"
-          : "POST",
-        path: options?.overridePatchOperation
-          ? jsonapiResource.type
-          : jsonapiResource.id
-          ? `${jsonapiResource.type}/${jsonapiResource.id}`
-          : jsonapiResource.type,
-        value: {
-          ...jsonapiResource,
-          id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-        }
-      }));
-
-      const operations = [...saveOperations, ...deleteOperations];
-
-      // Do the operations request.
-      const responses = await this.doOperations(operations, options);
-
-      // Deserialize the responses to Kitsu format.
-      const deserializePromises = responses.map((response) =>
-        deserialise(response)
-      );
-      const deserialized = await Promise.all(deserializePromises);
-      const kitsuResources = deserialized.map(({ data }) => data);
-      return kitsuResources;
     }
+
+    // only do the operations if there are any.
+    const postResponses = postOperations.length
+      ? await this.doOperations(postOperations, options)
+      : [];
+    const patchResponses = patchOperations.length
+      ? await this.doOperations(patchOperations, options)
+      : [];
+    const deleteResponses = deleteOperations.length
+      ? await this.doOperations(deleteOperations, options)
+      : [];
+
+    // Deserialize the responses to Kitsu format.
+    const deserializedPostPromises = postResponses.map((response) =>
+      deserialise(response)
+    );
+    const deserializedPatchPromises = patchResponses.map((response) =>
+      deserialise(response)
+    );
+    const deserializedDeletePromises = deleteResponses.map((response) =>
+      deserialise(response)
+    );
+    const deserialized = await Promise.all([
+      ...deserializedPostPromises,
+      ...deserializedPatchPromises,
+      ...deserializedDeletePromises
+    ]);
+    const kitsuResources = deserialized.map(({ data }) => data);
+    return kitsuResources;
   }
 
   /**
@@ -972,6 +886,15 @@ export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   throw error;
 }
 
+function normalizeId(obj: any): void {
+  if (obj && typeof obj === "object") {
+    if (!obj.id && obj.uuid) {
+      obj.id = obj.uuid;
+      delete obj.uuid;
+    }
+  }
+}
+
 export class CustomDinaKitsu extends Kitsu {
   /**
    * The default Kitsu 'get' method omits the last part of URLs with multiple slashes.
@@ -989,37 +912,56 @@ export class CustomDinaKitsu extends Kitsu {
         timeout
       });
 
-      // Preserve the relationships object before Kitsu's deserialise removes it
-      // We need this for proper diffing in useSubmitHandler
-      const originalRelationships = data?.data?.relationships
-        ? JSON.parse(JSON.stringify(data.data.relationships))
-        : undefined;
-
       const deserialized = await deserialise(data);
 
-      // Handle relationships - denormalize them into the main object if not already present
-      const relationships = originalRelationships;
-      for (const key of _.keys(relationships)) {
-        if (relationships?.[key]?.data === null) {
-          // Remove null relationships from the relationships object
-          delete relationships[key];
-        } else if (relationships?.[key]?.data && !deserialized.data[key]) {
-          // If relationship exists but wasn't resolved by Kitsu, create basic object with id/type.
-          const relData = relationships[key].data;
+      // Get the list of requested includes
+      const requestedIncludes = (params.include as string)?.split(",") ?? [];
+
+      // Handle both single object and array responses
+      const items = Array.isArray(deserialized.data)
+        ? deserialized.data
+        : [deserialized.data];
+
+      const rawItems = Array.isArray(data?.data) ? data.data : [data?.data];
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const rawRelationships = rawItems[i]?.relationships ?? {};
+
+        for (const key of requestedIncludes) {
+          // Already resolved at top level, skip
+          if (item[key] !== undefined) continue;
+
+          const relData = rawRelationships[key]?.data;
+          if (!relData) continue;
+
+          // Promote stub(s) to top level
           if (Array.isArray(relData)) {
-            deserialized.data[key] = relData.map((item) => ({
-              id: item.id,
-              type: item.type
+            item[key] = relData.map((r: any) => ({
+              ...r,
+              id: r.id,
+              type: r.type
             }));
           } else {
-            deserialized.data[key] = { id: relData.id, type: relData.type };
+            item[key] = { ...relData, id: relData.id, type: relData.type };
           }
         }
-      }
 
-      // Restore the relationships object on the deserialized data for diffing purposes
-      if (relationships && Object.keys(relationships).length > 0) {
-        deserialized.data.relationships = relationships;
+        // Normalize uuid to id on the item itself and any promoted relationships
+        normalizeId(item);
+        for (const key of requestedIncludes) {
+          if (item[key]) {
+            if (Array.isArray(item[key])) {
+              item[key].forEach(normalizeId);
+            } else {
+              normalizeId(item[key]);
+            }
+          }
+        }
+
+        // Remove the raw relationships object Kitsu leaves behind when
+        // it cannot resolve relationships via included
+        delete item?.relationships;
       }
 
       return deserialized;

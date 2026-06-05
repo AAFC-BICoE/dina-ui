@@ -2,7 +2,6 @@ import {
   BackToListButton,
   DATA_EXPORT_QUERY_KEY,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
-  filterBy,
   LoadingSpinner,
   useApiClient
 } from "common-ui";
@@ -99,15 +98,9 @@ export default function MolecularAnalysisWorkflowRunPage() {
       .get<GenericMolecularAnalysisItem[]>(
         "/seqdb-api/generic-molecular-analysis-item",
         {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "genericMolecularAnalysis.uuid",
-                comparison: "==",
-                arguments: molecularAnalysisId
-              }
-            ]
-          })(""),
+          filter: {
+            "genericMolecularAnalysis.uuid": { EQ: molecularAnalysisId }
+          },
           include: "materialSample",
           page: {
             limit: 1000 // Maximum page size.

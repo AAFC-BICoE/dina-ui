@@ -8,7 +8,6 @@ import {
   FieldHeader,
   FilterAttribute,
   ListPageLayout,
-  Operation,
   QueryPage,
   SimpleSearchFilterBuilder,
   stringArrayCell,
@@ -176,7 +175,6 @@ export function SampleListLayout({
           .whereProvided("group", "EQ", filterForm.group)
           .build()
       }
-      useFiql={true}
       filterAttributes={MATERIAL_SAMPLE_FILTER_ATTRIBUTES}
       id="material-sample-list"
       queryTableProps={{
@@ -416,7 +414,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
 
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
-  const { bulkGet, doOperations } = useApiClient();
+  const { bulkGet, bulkDeleteResources } = useApiClient();
 
   const handleBeforeMaterialSampleDelete = async (resourceIds: string[]) => {
     // Fetch the resources with their relationships BEFORE deletion
@@ -436,16 +434,14 @@ export default function MaterialSampleListPage() {
   ) => {
     // Delete resources linked to the deleted material samples
     if (materialSamples && materialSamples.length > 0) {
-      const deleteOperations: Operation[] = materialSamples
+      const storageUnitUsageIds = materialSamples
         .filter((materialSample) => !!materialSample?.storageUnitUsage?.id)
-        .map((materialSample) => ({
-          op: "DELETE",
-          path: `storage-unit-usage/${materialSample?.storageUnitUsage?.id}`
-        }));
+        .map((materialSample) => materialSample.storageUnitUsage!.id as string);
 
-      if (deleteOperations.length > 0) {
-        await doOperations(deleteOperations, {
-          apiBaseUrl: "/collection-api"
+      if (storageUnitUsageIds.length > 0) {
+        await bulkDeleteResources(storageUnitUsageIds, {
+          apiBaseUrl: "/collection-api",
+          resourceType: "storage-unit-usage"
         });
       }
     }

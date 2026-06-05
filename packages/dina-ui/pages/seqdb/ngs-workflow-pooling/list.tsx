@@ -3,7 +3,8 @@ import {
   ColumnDefinition,
   dateCell,
   FilterAttribute,
-  ListPageLayout
+  ListPageLayout,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -67,16 +68,16 @@ export default function NgsWorkflowPoolingListPage() {
           {formatMessage("ngsWorkflowWholeGenomeSeqPoolingTitle")}
         </h1>
         <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            // Apply group filter:
-            ...(filterForm.group && { group: filterForm.group })
-          })}
+          additionalFilters={(filterForm) =>
+            SimpleSearchFilterBuilder.create<LibraryPool>()
+              .whereProvided("group", "EQ", filterForm.group)
+              .build()
+          }
           filterAttributes={FILTER_ATTRIBUTES}
           id="ngs-workflow-pooling-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/library-pool",
-            include: ""
+            path: "seqdb-api/library-pool"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

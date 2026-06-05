@@ -1,12 +1,6 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
 import { useEffect, useState } from "react";
-import {
-  BulkGetOptions,
-  filterBy,
-  SaveArgs,
-  useApiClient,
-  useQuery
-} from "common-ui";
+import { BulkGetOptions, SaveArgs, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "../../types/collection-api";
@@ -281,15 +275,7 @@ export function useMolecularAnalysisRun({
   // Network Requests, starting with the SeqReaction
   const { loading: loadingSeqReactions } = useQuery<SeqReaction[]>(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "seqBatch.uuid",
-            comparison: "==",
-            arguments: seqBatchId
-          }
-        ]
-      })(""),
+      filter: { "seqBatch.uuid": { EQ: seqBatchId } },
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
       include:
@@ -308,20 +294,19 @@ export function useMolecularAnalysisRun({
         async function findMolecularAnalysisRun(
           sequencingRunItem: SequencingRunItem[]
         ) {
-          if (
-            !sequencingRunItem.some(
-              (item) => item?.molecularAnalysisRunItem?.run?.id
-            )
-          ) {
+          const hasRunId = sequencingRunItem.some(
+            (item) => !!item?.molecularAnalysisRunItem?.run?.id
+          );
+          if (!hasRunId) {
             // Nothing to attach.
             return;
           }
 
-          // Extract unique run IDs
+          // Extract unique run IDs (use id or uuid)
           const uniqueRunIds = new Set(
             sequencingRunItem
-              .filter((item) => item?.molecularAnalysisRunItem?.run?.id)
               .map((item) => item?.molecularAnalysisRunItem?.run?.id)
+              .filter((id): id is string => !!id)
           );
           if (uniqueRunIds.size === 0) {
             // Nothing to attach.
@@ -333,10 +318,11 @@ export function useMolecularAnalysisRun({
             setMultipleRunWarning(true);
           }
 
+          const firstRunId = [...uniqueRunIds][0];
           const firstSequencingRun = sequencingRunItem.find(
-            (item) =>
-              item?.molecularAnalysisRunItem?.run?.id === [...uniqueRunIds][0]
+            (item) => item?.molecularAnalysisRunItem?.run?.id === firstRunId
           )?.molecularAnalysisRunItem?.run;
+
           if (firstSequencingRun) {
             setSequencingRun(firstSequencingRun);
             setSequencingRunName(firstSequencingRun.name);

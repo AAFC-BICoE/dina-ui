@@ -3,7 +3,8 @@ import {
   ColumnDefinition,
   dateCell,
   FilterAttribute,
-  ListPageLayout
+  ListPageLayout,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -68,11 +69,12 @@ export default function PCRWorkflowListPage() {
       <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage("pcrWorkflowListTitle")}</h1>
         <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            isCompleted: false,
-            // Apply group filter:
-            ...(filterForm.group && { group: filterForm.group })
-          })}
+          additionalFilters={(filterForm) =>
+            SimpleSearchFilterBuilder.create<PcrBatch>()
+              .whereProvided("group", "EQ", filterForm.group)
+              .where("isCompleted", "EQ", false)
+              .build()
+          }
           filterAttributes={FILTER_ATTRIBUTES}
           id="pcr-workflow-list"
           queryTableProps={{

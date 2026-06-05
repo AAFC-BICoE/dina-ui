@@ -3,7 +3,6 @@ import {
   DoOperationsError,
   LoadingSpinner,
   QueryPage,
-  filterBy,
   useAccount,
   useApiClient
 } from "common-ui";
@@ -130,15 +129,7 @@ export function NgsSampleSelectionStep({
   async function fetchSampledIds() {
     await apiClient
       .get<LibraryPrep[]>("/seqdb-api/library-prep", {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "libraryPrepBatch.uuid",
-              comparison: "==",
-              arguments: batchId
-            }
-          ]
-        })(""),
+        filter: { "libraryPrepBatch.uuid": { EQ: batchId } },
         include: "materialSample",
         page: {
           limit: 1000 // Maximum page size.

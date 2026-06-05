@@ -2,7 +2,6 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   DeleteArgs,
-  filterBy,
   SaveArgs,
   useQuery,
   useStringComparator
@@ -100,15 +99,9 @@ export function useMolecularAnalysisGridControls({
     GenericMolecularAnalysisItem[]
   >(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "genericMolecularAnalysis.uuid",
-            comparison: "==",
-            arguments: molecularAnalysisId
-          }
-        ]
-      })(""),
+      filter: {
+        "genericMolecularAnalysis.uuid": { EQ: molecularAnalysisId }
+      },
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
       include: "materialSample,storageUnitUsage"
@@ -131,7 +124,7 @@ export function useMolecularAnalysisGridControls({
                 (item) =>
                   "/storage-unit-usage/" +
                   item.storageUnitUsage?.id +
-                  "?include=storageUnit"
+                  "?include=storageUnit&optfields[storage-unit-usage]=cellNumber"
               ),
             { apiBaseUrl: "/collection-api" }
           );
@@ -153,9 +146,6 @@ export function useMolecularAnalysisGridControls({
             const storageUnitToLoad = storageUnitUsageQuery.find(
               (su) => su?.storageUnit?.id === firstStorageUnitId
             )?.storageUnit;
-            setStorageUnit(storageUnitToLoad);
-            setLoadedStorageUnit(storageUnitToLoad);
-            setInitialStorageUnit(storageUnitToLoad);
 
             // Now we need to load the storage unit type.
             const storageUnitResponse = await apiClient.get<StorageUnit>(
@@ -163,6 +153,14 @@ export function useMolecularAnalysisGridControls({
               { include: "storageUnitType" }
             );
 
+            const fullStorageUnit: PersistedResource<StorageUnit> = {
+              ...storageUnitToLoad,
+              storageUnitType: storageUnitResponse.data.storageUnitType
+            } as PersistedResource<StorageUnit>;
+
+            setStorageUnit(fullStorageUnit);
+            setLoadedStorageUnit(fullStorageUnit);
+            setInitialStorageUnit(fullStorageUnit);
             setStorageUnitType(storageUnitResponse.data.storageUnitType as any);
           }
 

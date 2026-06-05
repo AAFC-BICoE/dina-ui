@@ -2,9 +2,9 @@ import {
   DateField,
   DinaForm,
   DinaFormSection,
-  filterBy,
   LoadingSpinner,
   ResourceSelectField,
+  SimpleSearchFilterBuilder,
   TextField,
   useApiClient
 } from "common-ui";
@@ -149,7 +149,11 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
               <ResourceSelectField<Region>
                 className="col-sm-12"
                 name="region"
-                filter={filterBy(["name"])}
+                filter={(input) =>
+                  SimpleSearchFilterBuilder.create<Region>()
+                    .searchFilter("name", input)
+                    .build()
+                }
                 model="seqdb-api/region"
                 optionLabel={(region) => region.name}
                 readOnlyLink="/seqdb/region/view?id="

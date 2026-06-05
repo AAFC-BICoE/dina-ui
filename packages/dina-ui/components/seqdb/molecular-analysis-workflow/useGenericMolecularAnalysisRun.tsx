@@ -1,5 +1,10 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { filterBy, SaveArgs, useApiClient, useQuery } from "common-ui";
+import {
+  SaveArgs,
+  SimpleSearchFilterBuilder,
+  useApiClient,
+  useQuery
+} from "common-ui";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
@@ -223,19 +228,12 @@ export function useGenericMolecularAnalysisRun({
   // Network Requests, starting with the GenericMolecularAnalysisItem
   useQuery<GenericMolecularAnalysisItem[]>(
     {
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "genericMolecularAnalysis.uuid",
-            comparison: "==",
-            arguments: molecularAnalysisId
-          }
-        ]
-      })(""),
+      filter: {
+        "genericMolecularAnalysis.uuid": { EQ: molecularAnalysisId }
+      },
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
-      include:
-        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run,molecularAnalysisRunItem.result"
+      include: "storageUnitUsage,materialSample,molecularAnalysisRunItem"
     },
     {
       deps: [reloadGenericMolecularAnalysisRun, editMode],
@@ -253,6 +251,36 @@ export function useGenericMolecularAnalysisRun({
         setLoadedQualityControls([]);
         setAttachments([]);
         setErrorMessage(undefined);
+
+        // Fetch run and result for each molecularAnalysisRunItem separately since multi-level includes are not supported.
+        const runItemIds: string[] = genericMolecularAnalysisItems
+          .map((item) => item.molecularAnalysisRunItem?.id)
+          .filter((id): id is string => id !== undefined);
+
+        if (runItemIds.length > 0) {
+          const runItemsResp = await apiClient.get<MolecularAnalysisRunItem[]>(
+            `seqdb-api/molecular-analysis-run-item`,
+            {
+              filter: SimpleSearchFilterBuilder.create()
+                .where("uuid", "IN", runItemIds.join(","))
+                .build(),
+              include: "run,result",
+              page: { limit: 1000 }
+            }
+          );
+
+          // Stitch run and result back onto the generic molecular analysis items.
+          const runItemById = Object.fromEntries(
+            runItemsResp.data.map((runItem) => [runItem.id, runItem])
+          );
+          for (const item of genericMolecularAnalysisItems) {
+            if (item.molecularAnalysisRunItem?.id) {
+              item.molecularAnalysisRunItem =
+                runItemById[item.molecularAnalysisRunItem.id] ??
+                item.molecularAnalysisRunItem;
+            }
+          }
+        }
 
         /**
          * Fetch StorageUnitUsage linked to each GenericMolecularAnalysisItems. This will perform the API request
@@ -376,12 +404,17 @@ export function useGenericMolecularAnalysisRun({
 
           return sequencingRunItem.map((runItem) => {
             const queryMolecularAnalysisResult =
-              molecularAnalysisResultQuery.find(
-                (molecularAnalysisResult) =>
-                  molecularAnalysisResult?.id ===
-                  runItem?.molecularAnalysisRunItem?.result?.id
-              );
-            if (runItem.molecularAnalysisRunItem?.result) {
+              molecularAnalysisResultQuery.find((molecularAnalysisResult) => {
+                const runItemResult = runItem?.molecularAnalysisRunItem
+                  ?.result as any;
+                const runItemResultId = runItemResult?.id;
+                return molecularAnalysisResult?.id === runItemResultId;
+              });
+
+            if (
+              runItem.molecularAnalysisRunItem?.result &&
+              queryMolecularAnalysisResult
+            ) {
               runItem.molecularAnalysisRunItem.result =
                 queryMolecularAnalysisResult;
             }
@@ -402,20 +435,19 @@ export function useGenericMolecularAnalysisRun({
         async function findMolecularAnalysisRun(
           sequencingRunItem: SequencingRunItem[]
         ) {
-          if (
-            !sequencingRunItem.some(
-              (item) => item?.molecularAnalysisRunItem?.run?.id
-            )
-          ) {
+          const hasRunId = sequencingRunItem.some(
+            (item) => !!item?.molecularAnalysisRunItem?.run?.id
+          );
+          if (!hasRunId) {
             // Nothing to attach.
             return;
           }
 
-          // Extract unique run IDs
+          // Extract unique run IDs (use id or uuid)
           const uniqueRunIds = new Set(
             sequencingRunItem
-              .filter((item) => item?.molecularAnalysisRunItem?.run?.id)
               .map((item) => item?.molecularAnalysisRunItem?.run?.id)
+              .filter((id): id is string => !!id)
           );
           if (uniqueRunIds.size === 0) {
             // Nothing to attach.
@@ -427,10 +459,11 @@ export function useGenericMolecularAnalysisRun({
             setMultipleRunWarning(true);
           }
 
+          const firstRunId = [...uniqueRunIds][0];
           const firstSequencingRun = sequencingRunItem.find(
-            (item) =>
-              item?.molecularAnalysisRunItem?.run?.id === [...uniqueRunIds][0]
+            (item) => item?.molecularAnalysisRunItem?.run?.id === firstRunId
           )?.molecularAnalysisRunItem?.run;
+
           if (firstSequencingRun) {
             setSequencingRun(firstSequencingRun);
             setSequencingRunName(firstSequencingRun.name);
@@ -593,20 +626,12 @@ export function useGenericMolecularAnalysisRun({
       const qualityControlItemQuery = await apiClient.get(
         `seqdb-api/molecular-analysis-run-item`,
         {
-          filter: filterBy([], {
-            extraFilters: [
-              {
-                selector: "run.uuid",
-                comparison: "==",
-                arguments: run?.id
-              },
-              {
-                selector: "usageType",
-                comparison: "==",
-                arguments: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
-              }
-            ]
-          })("")
+          filter: {
+            "run.uuid": { EQ: run?.id },
+            usageType: {
+              EQ: MolecularAnalysisRunItemUsageType.QUALITY_CONTROL
+            }
+          }
         }
       );
 
@@ -622,23 +647,39 @@ export function useGenericMolecularAnalysisRun({
           const qualityControlQuery = await apiClient.get<QualityControl>(
             `seqdb-api/quality-control`,
             {
-              filter: filterBy([], {
-                extraFilters: [
-                  {
-                    selector: "molecularAnalysisRunItem.uuid",
-                    comparison: "==",
-                    arguments: item?.id
-                  }
-                ]
-              })(""),
-              include:
-                "molecularAnalysisRunItem,molecularAnalysisRunItem.result"
+              filter: {
+                "molecularAnalysisRunItem.uuid": { EQ: item?.id }
+              },
+              include: "molecularAnalysisRunItem"
             }
           );
 
           const qualityControlFound = qualityControlQuery
             ?.data?.[0] as QualityControlWithAttachment;
           if (qualityControlFound) {
+            // Fetch result for the molecularAnalysisRunItem separately since multi-level includes are not supported.
+            // Only fetch the run item if it does not already contain a result with an id/uuid.
+            const existingRunItem =
+              qualityControlFound.molecularAnalysisRunItem as any | undefined;
+            const hasExistingResult = !!(
+              existingRunItem?.result &&
+              ((existingRunItem.result as any).id ||
+                (existingRunItem.result as any).uuid)
+            );
+
+            if (
+              qualityControlFound.molecularAnalysisRunItem?.id &&
+              !hasExistingResult
+            ) {
+              const runItemResp = await apiClient.get<MolecularAnalysisRunItem>(
+                `seqdb-api/molecular-analysis-run-item/${qualityControlFound.molecularAnalysisRunItem.id}`,
+                {
+                  include: "result"
+                }
+              );
+              qualityControlFound.molecularAnalysisRunItem = runItemResp.data;
+            }
+
             // If a result exists, we need to perform a get request to retrieve the metadata to be displayed.
             let attachments: ResourceIdentifierObject[] = [];
             if (qualityControlFound.molecularAnalysisRunItem?.result?.id) {
@@ -918,6 +959,7 @@ export function useGenericMolecularAnalysisRun({
    */
   async function createNewQualityControls(molecularAnalysisRunId: string) {
     const groupName = molecularAnalysis.group;
+    const username = molecularAnalysis.createdBy;
 
     if (!_.isEqual(qualityControls, loadedQualityControls)) {
       const qualityControlsWithoutId = qualityControls.filter(
@@ -939,6 +981,7 @@ export function useGenericMolecularAnalysisRun({
                 resource: {
                   type: "molecular-analysis-result",
                   group: groupName,
+                  createdBy: username,
                   relationships: {
                     attachments: {
                       data: _.map(qualityControl.attachments, (item) =>
@@ -1060,6 +1103,7 @@ export function useGenericMolecularAnalysisRun({
     updatedQualityControlsCopy?: QualityControlWithAttachment[]
   ) {
     const groupName = molecularAnalysis.group;
+    const username = molecularAnalysis.createdBy;
 
     const sourceQualityControls = updatedQualityControlsCopy ?? qualityControls;
 
@@ -1150,6 +1194,7 @@ export function useGenericMolecularAnalysisRun({
             resource: {
               type: "molecular-analysis-result",
               group: groupName,
+              createdBy: username,
               relationships: {
                 attachments: {
                   data: _.map(currentAttachments, (item) =>

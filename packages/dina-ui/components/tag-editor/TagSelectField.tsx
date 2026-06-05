@@ -20,7 +20,7 @@ export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
   resourcePath?: string;
   groupSelectorName?: string;
-  /** The field name to use when finding other tags via RSQL filter. */
+  /** The field name to use when finding other tags via filter. */
   tagsFieldName?: string;
 
   /** The relationship type of the tag to include in the search. Only available with elasticsearch. */

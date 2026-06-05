@@ -29,16 +29,24 @@ import { useState, useEffect } from "react";
 import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
-  switch (path) {
-    case "/seqdb-api/seq-reaction":
-      switch (params.filter.rsql) {
-        case "seqBatch.uuid==" + SEQ_BATCH_ID_MULTIPLE_RUNS:
-          return SEQ_REACTIONS_MULTIPLE;
-        case "seqBatch.uuid==" + SEQ_BATCH_ID:
-          return SEQ_REACTIONS;
-        case "seqBatch.uuid==" + SEQ_BATCH_NO_RUNS:
-          return SEQ_REACTIONS_NO_RUNS;
+  const normalizedPath =
+    (typeof path === "string" ? path.replace(/^\/+/, "") : path) || "";
+
+  switch (normalizedPath) {
+    case "seqdb-api/seq-reaction": {
+      if (params?.filter && params.filter["seqBatch.uuid"]) {
+        const eqVal = params.filter["seqBatch.uuid"].EQ;
+        switch (eqVal) {
+          case SEQ_BATCH_ID_MULTIPLE_RUNS:
+            return SEQ_REACTIONS_MULTIPLE;
+          case SEQ_BATCH_ID:
+            return SEQ_REACTIONS;
+          case SEQ_BATCH_NO_RUNS:
+            return SEQ_REACTIONS_NO_RUNS;
+        }
       }
+      break;
+    }
 
     case "seqdb-api/molecular-analysis-run/" + TEST_MOLECULAR_ANALYSIS_RUN_ID:
       return { data: TEST_MOLECULAR_ANALYSIS_RUN };
