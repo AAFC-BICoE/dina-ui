@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import RcTooltip from "rc-tooltip";
 import { useEffect, useMemo, useState } from "react";
-import { DndContext, DragEndEvent, useDroppable } from "@dnd-kit/core";
+import { useDroppable } from "@dnd-kit/core";
 import { ReactTable } from "../../../../common-ui/lib";
 import { DraggableItemBox } from "./DraggableItemBox";
 
@@ -98,6 +98,7 @@ export function ContainerGrid<
                 batchItemSample={cellGrid[coords]}
                 editMode={editMode}
                 coordinates={coords.replace("_", "")}
+                coordinatesKey={coords}
               />
             </div>
           );
@@ -125,40 +126,33 @@ export function ContainerGrid<
           overflow-x: auto;
         }
       `}</style>
-      <DndContext
-        onDragEnd={(event: DragEndEvent) => {
-          const { active, over } = event;
-          if (!over) return;
-          const item = active.data.current?.batchItemSample;
-          const coords = over.data.current?.coords;
-          if (item && coords) {
-            onDrop(item, coords);
-          }
-        }}
-      >
-        <ReactTable<any>
-          className={className}
-          columns={tableColumns}
-          data={tableData}
-          showPagination={false}
-          enableSorting={false}
-        />
-      </DndContext>
+      <ReactTable<any>
+        className={className}
+        columns={tableColumns}
+        data={tableData}
+        showPagination={false}
+        enableSorting={false}
+      />
     </div>
   );
+}
+
+interface GridCellPropsInternal<ItemType> extends GridCellProps<ItemType> {
+  coordinatesKey: string;
 }
 
 function GridCell<ItemType extends { sampleName?: string }>({
   batchItemSample: batchItemSample,
   coordinates,
+  coordinatesKey,
   movedItems,
   editMode
-}: GridCellProps<ItemType>) {
+}: GridCellPropsInternal<ItemType>) {
   const [hover, setHover] = useState<boolean>(false);
 
   const { setNodeRef: drop, isOver: dragHover } = useDroppable({
-    id: `droppable-cell-${coordinates}`,
-    data: { coords: coordinates }
+    id: `droppable-cell-${coordinatesKey}`,
+    data: { coords: coordinatesKey }
   });
 
   return (

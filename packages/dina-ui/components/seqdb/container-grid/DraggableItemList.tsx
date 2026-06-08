@@ -1,5 +1,4 @@
 import { useDroppable } from "@dnd-kit/core";
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { DraggableItemBox } from "./DraggableItemBox";
 
 interface DraggableItemListProps<ItemType> {
@@ -18,7 +17,6 @@ export function DraggableItemList<
   movedItems,
   selectedItems,
   onClick,
-  onDrop,
   editMode
 }: DraggableItemListProps<ItemType>) {
   const {
@@ -32,41 +30,32 @@ export function DraggableItemList<
   const dragging = !!active;
 
   return (
-    <DndContext
-      onDragEnd={(event: DragEndEvent) => {
-        const { over, active } = event;
-        if (over?.id === "draggable-item-list" && editMode) {
-          onDrop(active.data.current as any);
-        }
+    <ul
+      className="list-group available-sample-list"
+      ref={dropRef}
+      style={{
+        minHeight: "400px",
+        maxHeight: "400px",
+        overflowY: "scroll",
+        border: dragHover
+          ? "3px dashed #1C6EA4"
+          : dragging
+          ? "3px dashed #78909c"
+          : undefined,
+        background: dragHover ? "#f7fbff" : dragging ? "#f2f2f2" : undefined
       }}
     >
-      <ul
-        className="list-group available-sample-list"
-        ref={dropRef}
-        style={{
-          minHeight: "400px",
-          maxHeight: "400px",
-          overflowY: "scroll",
-          border: dragHover
-            ? "3px dashed #1C6EA4"
-            : dragging
-            ? "3px dashed #78909c"
-            : undefined,
-          background: dragHover ? "#f7fbff" : dragging ? "#f2f2f2" : undefined
-        }}
-      >
-        {availableItems.map((item, index) => (
-          <DraggableItemBox<ItemType>
-            key={index}
-            wasMoved={movedItems.includes(item)}
-            batchItemSample={item}
-            onClick={(e) => onClick(item, e)}
-            selected={selectedItems.includes(item)}
-            editMode={editMode}
-            coordinates={null}
-          />
-        ))}
-      </ul>
-    </DndContext>
+      {availableItems.map((item, index) => (
+        <DraggableItemBox<ItemType>
+          key={index}
+          wasMoved={movedItems.includes(item)}
+          batchItemSample={item}
+          onClick={(e) => onClick(item, e)}
+          selected={selectedItems.includes(item)}
+          editMode={editMode}
+          coordinates={null}
+        />
+      ))}
+    </ul>
   );
 }
