@@ -10,6 +10,7 @@ import {
   useSensors,
   DragEndEvent
 } from "@dnd-kit/core";
+import { FaGripVertical } from "react-icons/fa6";
 
 export function DefaultRow<TData>({
   row,
@@ -73,11 +74,8 @@ export function DraggableRow<TData>({
     <tr
       className={className}
       ref={combinedRef}
-      {...attributes}
-      {...listeners}
       style={{
         opacity: isDragging ? 0.5 : 1,
-        cursor: isDragging ? "grabbing" : "grab",
         ...(transform
           ? {
               transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`
@@ -86,6 +84,21 @@ export function DraggableRow<TData>({
         ...style
       }}
     >
+      <td
+        {...listeners}
+        {...attributes}
+        style={{
+          cursor: isDragging ? "grabbing" : "grab",
+          width: "1rem",
+          padding: "0 0.5rem",
+          textAlign: "center",
+          color: "#aaa",
+          userSelect: "none"
+        }}
+        title="Drag to reorder"
+      >
+        <FaGripVertical />
+      </td>
       {row.getVisibleCells().map((cell) => {
         const cellClassNames: string =
           (cell.column.columnDef.meta as any)?.className ?? "";
@@ -111,7 +124,13 @@ export function DraggableTableBody<TData>({
   onRowMove?: (from: number, to: number) => void;
   renderRow: (row: Row<TData>) => React.ReactNode;
 }) {
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8
+      }
+    })
+  );
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
