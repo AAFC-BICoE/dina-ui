@@ -650,6 +650,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_vocabularyElementType_text_label: "Text",
   field_webpage: "Webseite",
   field_xmpMetadataDate: "zuletzt geändert am",
+  field_xmpRightsOwner: "Rechteinhaber",
   field_xmpMetadataDate_tooltip:
     "Datum und Uhrzeit der letzten Änderung des Eintrags",
   field_xmpRightsWebStatement: "Lizenz",
