@@ -667,6 +667,13 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
           <DinaMessage id="protocolListTitle" />
         </NavDropdown.Item>
       </Link>
+      {isAdmin && (
+        <Link href="/controlled-vocabulary/list" passHref={true} legacyBehavior>
+          <NavDropdown.Item role="menuitem">
+            <DinaMessage id="controlledVocabularyTitle" />
+          </NavDropdown.Item>
+        </Link>
+      )}
       <Link
         href="/collection/storage-unit-type/list"
         passHref={true}
