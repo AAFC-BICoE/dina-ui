@@ -4,6 +4,7 @@ import {
   LinkOrCreateSetting,
   WorkbookDataTypeEnum
 } from "../";
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 const FieldMappingConfig: FieldMappingConfigType = {
   "material-sample": {
@@ -41,6 +42,13 @@ const FieldMappingConfig: FieldMappingConfigType = {
       dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
       endpoint: "collection-api/managed-attribute",
       managedAttributeComponent: "MATERIAL_SAMPLE"
+    },
+    identifiers: {
+      dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+      filter: {
+        "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,
+        dinaComponent: "MATERIAL_SAMPLE"
+      }
     },
     organismsIndividualEntry: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     useTargetOrganism: { dataType: WorkbookDataTypeEnum.BOOLEAN },
@@ -265,11 +273,28 @@ const FieldMappingConfig: FieldMappingConfigType = {
         remarks: { dataType: WorkbookDataTypeEnum.STRING },
         isTarget: { dataType: WorkbookDataTypeEnum.BOOLEAN },
         dwcVernacularName: { dataType: WorkbookDataTypeEnum.STRING },
+        managedAttributes: {
+          dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+          endpoint: "collection-api/managed-attribute",
+          managedAttributeComponent: "ORGANISM"
+        },
         determination: {
           dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
           attributes: {
             verbatimScientificName: { dataType: WorkbookDataTypeEnum.STRING },
             verbatimDeterminer: { dataType: WorkbookDataTypeEnum.STRING },
+            determiner: {
+              dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+              relationshipConfig: {
+                hasGroup: false,
+                type: "person",
+                linkOrCreateSetting: LinkOrCreateSetting.LINK_UUID_ONLY,
+                baseApiPath: "agent-api"
+              },
+              attributes: {
+                displayName: { dataType: WorkbookDataTypeEnum.STRING }
+              }
+            },
             verbatimDate: { dataType: WorkbookDataTypeEnum.DATE },
             determinedOn: { dataType: WorkbookDataTypeEnum.DATE },
             determinationRemarks: { dataType: WorkbookDataTypeEnum.STRING },
@@ -279,6 +304,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
             scientificName: { dataType: WorkbookDataTypeEnum.STRING },
             scientificNameDetails: {
               dataType: WorkbookDataTypeEnum.CLASSIFICATION
+            },
+            managedAttributes: {
+              dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+              endpoint: "collection-api/managed-attribute",
+              managedAttributeComponent: "DETERMINATION"
             }
           }
         }

@@ -1,3 +1,4 @@
+import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   convertDateTime,
   detectEntityType,
@@ -10,7 +11,6 @@ import {
 } from "../../";
 import {
   convertDate,
-  convertMap,
   convertNumber,
   convertNumberArray,
   convertStringArray,
@@ -49,6 +49,13 @@ const mockConfig: FieldMappingConfigType = {
       endpoint: "managed attribute endpoint",
       managedAttributeComponent: "component"
     },
+    controlledVocabularyField: {
+      dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+      filter: {
+        "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,
+        dinaComponent: "MATERIAL_SAMPLE"
+      }
+    },
     objectField1: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
@@ -85,6 +92,30 @@ const mockConfig: FieldMappingConfigType = {
             postalCode: { dataType: WorkbookDataTypeEnum.STRING }
           }
         }
+      }
+    },
+    objectFieldUuid: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      relationshipConfig: {
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_UUID_ONLY,
+        hasGroup: true,
+        type: "uuid-object",
+        baseApiPath: "apiPath"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
+    objectArrayFieldUuid: {
+      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+      relationshipConfig: {
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_UUID_ONLY,
+        hasGroup: true,
+        type: "uuid-array-object",
+        baseApiPath: "apiPath"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     }
   }
@@ -651,22 +682,6 @@ describe("workbookMappingUtils functions", () => {
     ]);
   });
 
-  it("convertMap", () => {
-    expect(convertMap("key1:value1, key2 : 2, key3 : false")).toEqual({
-      key1: "value1",
-      key2: 2,
-      key3: false
-    });
-    expect(convertMap('key1:"value1 with , and :"')).toEqual({
-      key1: "value1 with , and :"
-    });
-    expect(convertMap("key1: , :value2, key3:value3")).toEqual({
-      key3: "value3"
-    });
-    expect(convertMap("223:value3")).toEqual({ "223": "value3" });
-    expect(convertMap("223ddd:value3")).toEqual({ "223ddd": "value3" });
-  });
-
   describe("isDate", () => {
     describe("Valid inputs", () => {
       it("should accept valid ISO date string", () => {
@@ -1030,6 +1045,11 @@ describe("workbookMappingUtils functions", () => {
   it("flattenObject", () => {
     expect(flattenObject(mockConfig)).toEqual({
       "mockEntity.booleanField.dataType": "boolean",
+      "mockEntity.controlledVocabularyField.dataType": "controlledVocabulary",
+      "mockEntity.controlledVocabularyField.filter.controlledVocabulary.uuid":
+        "019c961e-4c0d-7398-b4ae-73687826b3b5",
+      "mockEntity.controlledVocabularyField.filter.dinaComponent":
+        "MATERIAL_SAMPLE",
       "mockEntity.mapField.dataType": "managedAttributes",
       "mockEntity.mapField.endpoint": "managed attribute endpoint",
       "mockEntity.mapField.managedAttributeComponent": "component",
@@ -1065,6 +1085,22 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.objectField2.attributes.address.attributes.province.dataType":
         "string",
       "mockEntity.objectField2.attributes.address.dataType": "object",
+      "mockEntity.objectFieldUuid.attributes.name.dataType": "string",
+      "mockEntity.objectFieldUuid.dataType": "object",
+      "mockEntity.objectFieldUuid.relationshipConfig.baseApiPath": "apiPath",
+      "mockEntity.objectFieldUuid.relationshipConfig.hasGroup": true,
+      "mockEntity.objectFieldUuid.relationshipConfig.linkOrCreateSetting":
+        "LINK_UUID_ONLY",
+      "mockEntity.objectFieldUuid.relationshipConfig.type": "uuid-object",
+      "mockEntity.objectArrayFieldUuid.attributes.name.dataType": "string",
+      "mockEntity.objectArrayFieldUuid.dataType": "object[]",
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.baseApiPath":
+        "apiPath",
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.hasGroup": true,
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.linkOrCreateSetting":
+        "LINK_UUID_ONLY",
+      "mockEntity.objectArrayFieldUuid.relationshipConfig.type":
+        "uuid-array-object",
       "mockEntity.objectField2.attributes.age.dataType": "number",
       "mockEntity.objectField2.attributes.name.dataType": "string",
       "mockEntity.objectField2.dataType": "object",

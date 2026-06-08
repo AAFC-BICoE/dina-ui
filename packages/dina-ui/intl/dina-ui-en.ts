@@ -628,6 +628,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "License",
   field_isExternalResource: "Is External Resource",
+  field_identifiers: "Other Identifiers",
   fileTooBig: "File too big",
   filterAttribute: "Filter Attribute",
   filterByGroup: "Filter By Group",
@@ -1047,6 +1048,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   columnSelector_addNewColumn: "Add a new column:",
   columnSelector_selectManagedAttribute: "Select managed attribute:",
   columnSelector_selectClassification: "Select classification:",
+  columnSelector_selectIdentifier: "Select identifier:",
   columnSelector_addColumnButton: "Add Column",
   columnSelector_resetButton: "Reset Columns",
   field_columnFunction: "Functions",
@@ -1211,6 +1213,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
   workBookManagedAttributeKeysTargetKeyIsRequired:
     "Please select a Managed Attribute value",
+  workBookControlledVocabularyKeysTargetKeyIsRequired:
+    "Please select a Controlled Vocabulary value",
   workBookStorageUnitIsRequired:
     "Storage unit not provided. Must provide valid storage unit for well row and well column.",
   workbookGroupUploadTitle: "Upload Workbook",
