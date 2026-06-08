@@ -139,7 +139,11 @@ export function MockAppContextProvider({
                           onDragEnd: () => "",
                           onDragCancel: () => ""
                         },
-                        screenReaderInstructions: { draggable: "" }
+                        screenReaderInstructions: { draggable: "" },
+                        container:
+                          typeof document !== "undefined"
+                            ? document.createElement("div")
+                            : undefined
                       }}
                     >
                       <div ref={modalWrapperRef}>

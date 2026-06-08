@@ -10,17 +10,6 @@ exports[`BackButton Back to entity button 1`] = `
       Back to read-only page
     </a>
   </div>
-  <div
-    id="DndDescribedBy-0"
-    style="display: none;"
-  />
-  <div
-    aria-atomic="true"
-    aria-live="assertive"
-    id="DndLiveRegion-0"
-    role="status"
-    style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
-  />
 </div>
 `;
 
@@ -34,17 +23,6 @@ exports[`BackButton Back to entity button 2`] = `
       Back to read-only page
     </a>
   </div>
-  <div
-    id="DndDescribedBy-1"
-    style="display: none;"
-  />
-  <div
-    aria-atomic="true"
-    aria-live="assertive"
-    id="DndLiveRegion-1"
-    role="status"
-    style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
-  />
 </div>
 `;
 
@@ -58,17 +36,6 @@ exports[`BackButton Back to list button 1`] = `
       Back to list page
     </a>
   </div>
-  <div
-    id="DndDescribedBy-2"
-    style="display: none;"
-  />
-  <div
-    aria-atomic="true"
-    aria-live="assertive"
-    id="DndLiveRegion-2"
-    role="status"
-    style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
-  />
 </div>
 `;
 
@@ -82,17 +49,6 @@ exports[`BackButton Back to list button 2`] = `
       Back to list page
     </a>
   </div>
-  <div
-    id="DndDescribedBy-3"
-    style="display: none;"
-  />
-  <div
-    aria-atomic="true"
-    aria-live="assertive"
-    id="DndLiveRegion-3"
-    role="status"
-    style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
-  />
 </div>
 `;
 
@@ -106,16 +62,5 @@ exports[`BackButton Back to list button 3`] = `
       Back to list page
     </a>
   </div>
-  <div
-    id="DndDescribedBy-4"
-    style="display: none;"
-  />
-  <div
-    aria-atomic="true"
-    aria-live="assertive"
-    id="DndLiveRegion-4"
-    role="status"
-    style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
-  />
 </div>
 `;
