@@ -131,7 +131,17 @@ export function MockAppContextProvider({
                   }}
                 >
                   <FileUploadProviderImpl>
-                    <DndContext>
+                    <DndContext
+                      accessibility={{
+                        announcements: {
+                          onDragStart: () => "",
+                          onDragOver: () => "",
+                          onDragEnd: () => "",
+                          onDragCancel: () => ""
+                        },
+                        screenReaderInstructions: { draggable: "" }
+                      }}
+                    >
                       <div ref={modalWrapperRef}>
                         <ModalProvider appElement={modalWrapperRef.current}>
                           {children}
