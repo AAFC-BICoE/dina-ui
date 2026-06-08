@@ -1,9 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import RcTooltip from "rc-tooltip";
 import { useEffect, useMemo, useState } from "react";
-import { useDrop } from "react-dnd";
+import { DndContext, DragEndEvent, useDroppable } from "@dnd-kit/core";
 import { ReactTable } from "../../../../common-ui/lib";
-import { DraggableItemBox, ITEM_BOX_DRAG_KEY } from "./DraggableItemBox";
+import { DraggableItemBox } from "./DraggableItemBox";
 
 interface ContainerGridProps<BatchType, ItemType> {
   batch: BatchType;
@@ -125,19 +125,30 @@ export function ContainerGrid<
           overflow-x: auto;
         }
       `}</style>
-      <ReactTable<any>
-        className={className}
-        columns={tableColumns}
-        data={tableData}
-        showPagination={false}
-        enableSorting={false}
-      />
+      <DndContext
+        onDragEnd={(event: DragEndEvent) => {
+          const { active, over } = event;
+          if (!over) return;
+          const item = active.data.current?.batchItemSample;
+          const coords = over.data.current?.coords;
+          if (item && coords) {
+            onDrop(item, coords);
+          }
+        }}
+      >
+        <ReactTable<any>
+          className={className}
+          columns={tableColumns}
+          data={tableData}
+          showPagination={false}
+          enableSorting={false}
+        />
+      </DndContext>
     </div>
   );
 }
 
 function GridCell<ItemType extends { sampleName?: string }>({
-  onDrop,
   batchItemSample: batchItemSample,
   coordinates,
   movedItems,
@@ -145,14 +156,9 @@ function GridCell<ItemType extends { sampleName?: string }>({
 }: GridCellProps<ItemType>) {
   const [hover, setHover] = useState<boolean>(false);
 
-  const [{ dragHover }, drop] = useDrop({
-    accept: ITEM_BOX_DRAG_KEY,
-    drop: (item) => {
-      onDrop(item as any);
-    },
-    collect: (monitor) => ({
-      dragHover: monitor.isOver()
-    })
+  const { setNodeRef: drop, isOver: dragHover } = useDroppable({
+    id: `droppable-cell-${coordinates}`,
+    data: { coords: coordinates }
   });
 
   return (
@@ -163,7 +169,7 @@ function GridCell<ItemType extends { sampleName?: string }>({
       overlay={<div style={{ maxWidth: "15rem" }}>{coordinates}</div>}
     >
       <div
-        ref={drop as any}
+        ref={drop}
         style={{
           border: dragHover ? "3px dashed #1C6EA4" : undefined,
           background: dragHover ? "#f7fbff" : undefined,

@@ -16,8 +16,7 @@ import "rc-pagination/assets/index.css";
 import "rc-tooltip/assets/bootstrap.css";
 import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { DndContext } from "@dnd-kit/core";
 import "react-dropzone-uploader/dist/styles.css";
 import "react-tabs/style/react-tabs.css";
 import "setimmediate";
@@ -72,13 +71,13 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
                 <DinaIntlProvider>
                   <FileUploadProviderImpl>
                     <ErrorBoundaryPage>
-                      <DndProvider backend={HTML5Backend}>
+                      <DndContext>
                         <ModalProvider appElement={appElement}>
                           <WorkbookUploadContextProvider>
                             <Component {...pageProps} />
                           </WorkbookUploadContextProvider>
                         </ModalProvider>
-                      </DndProvider>
+                      </DndContext>
                     </ErrorBoundaryPage>
                   </FileUploadProviderImpl>
                 </DinaIntlProvider>

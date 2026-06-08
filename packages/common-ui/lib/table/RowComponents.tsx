@@ -1,8 +1,15 @@
 import { Row, flexRender } from "@tanstack/react-table";
 import { CSSProperties } from "react";
-import { useDrag, useDrop } from "react-dnd";
-
-const ITEM_DRAG_KEY = "ReactTableRowDndKey";
+import {
+  useDraggable,
+  useDroppable,
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from "@dnd-kit/core";
 
 export function DefaultRow<TData>({
   row,
@@ -33,7 +40,6 @@ export function DefaultRow<TData>({
 
 export function DraggableRow<TData>({
   row,
-  reorderRow,
   className,
   style
 }: {
@@ -42,40 +48,41 @@ export function DraggableRow<TData>({
   className?: string;
   style?: CSSProperties;
 }) {
-  const [, dropRef] = useDrop({
-    accept: ITEM_DRAG_KEY,
-    drop: (draggedRow) =>
-      reorderRow?.((draggedRow as any).row.index, row.index),
-    canDrop: () => true
+  const { setNodeRef: setDropRef } = useDroppable({
+    id: `droppable-row-${row.id}`,
+    data: { rowIndex: row.index }
   });
 
-  const [{ isDragging }, dragRef, previewRef] = useDrag({
-    type: ITEM_DRAG_KEY,
-    collect: (monitor) => {
-      if (monitor.isDragging() && row.getIsExpanded()) {
-        row.toggleExpanded(false);
-      }
-      return {
-        isDragging: monitor.isDragging()
-      };
-    },
-    item: { row, type: ITEM_DRAG_KEY },
-    canDrag: () => true
+  const {
+    setNodeRef: setDragRef,
+    attributes,
+    listeners,
+    isDragging,
+    transform
+  } = useDraggable({
+    id: `draggable-row-${row.id}`,
+    data: { rowIndex: row.index, row }
   });
+
+  const combinedRef = (el: HTMLTableRowElement | null) => {
+    setDropRef(el);
+    setDragRef(el);
+  };
 
   return (
     <tr
       className={className}
-      ref={(el) => {
-        dropRef(el);
-        dragRef(el);
-        previewRef(el);
-      }}
+      ref={combinedRef}
+      {...attributes}
+      {...listeners}
       style={{
-        ...{
-          opacity: isDragging ? 0.5 : 1,
-          cursor: isDragging ? "grabbing" : "grab"
-        },
+        opacity: isDragging ? 0.5 : 1,
+        cursor: isDragging ? "grabbing" : "grab",
+        ...(transform
+          ? {
+              transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`
+            }
+          : {}),
         ...style
       }}
     >
@@ -92,5 +99,39 @@ export function DraggableRow<TData>({
         );
       })}
     </tr>
+  );
+}
+
+export function DraggableTableBody<TData>({
+  rows,
+  onRowMove,
+  renderRow
+}: {
+  rows: Row<TData>[];
+  onRowMove?: (from: number, to: number) => void;
+  renderRow: (row: Row<TData>) => React.ReactNode;
+}) {
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const draggedRowIndex = (active.data.current as any)?.rowIndex;
+    const targetRowIndex = (over.data.current as any)?.rowIndex;
+
+    if (draggedRowIndex !== undefined && targetRowIndex !== undefined) {
+      onRowMove?.(draggedRowIndex, targetRowIndex);
+    }
+  }
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      {rows.map((row) => renderRow(row))}
+    </DndContext>
   );
 }
