@@ -1618,7 +1618,7 @@ export default function ExamplePage() {
 <div class="sect4">
 <h5 id="_filterbuilderfield_component">FilterBuilderField component</h5>
 <div class="paragraph">
-<p>The FilterBuilderField component provides a Formik input for creating complex filter queries. The FilterGroupModel value this input provides can be converted to an RSQL string to be included in the API request.</p>
+<p>The FilterBuilderField component provides a Formik input for creating complex filter queries. The FilterGroupModel value this input provides can be converted to an FIQL string to be included in the API request.</p>
 </div>
 <div class="paragraph">
 <p>Example usage for filtering PcrPrimers in a list page:</p>
@@ -1628,7 +1628,7 @@ export default function ExamplePage() {
 <pre class="highlight"><code class="language-tsx" data-lang="tsx">import { FilterParam } from "kitsu";
 import { useState } from "react";
 import { FilterBuilderField } from "../components/filter-builder/FilterBuilderField";
-import { rsql } from "../components/filter-builder/rsql";
+import { fiql } from "../components/filter-builder/fiql";
 import Head from "../components/head";
 import Nav from "../components/nav";
 import { QueryTable } from "../components/table/QueryTable";
@@ -1638,7 +1638,7 @@ export default function ExamplePage() {
   const [filter, setFilter] = useState&lt;FilterParam&gt;();
 
   const onSubmit: DinaFormOnSubmit = ({ submittedValues: { filter } }) =&gt; {
-    setFilter({ rsql: rsql(filter) });
+    setFilter({ fiql: fiql(filter) });
   };
 
   return (
@@ -2932,7 +2932,7 @@ CSVFILE=messages.csv yarn import-intl-csv</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-05-14 19:21:29 UTC
+Last updated 2026-06-08 12:45:11 UTC
 </div>
 </div>
 </body>
