@@ -12,3 +12,7 @@
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# TypeScript
+tsconfig.tsbuildinfo
+**/tsconfig.tsbuildinfo

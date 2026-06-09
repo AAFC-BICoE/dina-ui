@@ -37,9 +37,7 @@ const config: Config.InitialOptions = {
     "^.+\\.js?$": ["babel-jest", { presets: ["next/babel"] }],
     "\\.mjs?$": ["babel-jest", { presets: ["next/babel"] }]
   },
-  transformIgnorePatterns: [
-    `/node_modules/(?!common-ui|axios|react-dnd|dnd-core|@react-dnd)`
-  ],
+  transformIgnorePatterns: [`/node_modules/(?!common-ui|axios|dnd-core)`],
   globalSetup: "./jest-global-setup.js"
 };
 
