@@ -343,6 +343,13 @@ export interface RelationshipAutocompleteField
   optionLabel: string;
 
   /**
+   * Optional secondary field on the related resource used to for
+   * disambiguation.
+   * Example: "email, or lastname" for Person
+   */
+  optionDescription: string;
+
+  /**
    * The path in elastic search to match the relationship UUID.
    * Used with a nested query on the `included` array, filtering by the
    * relationship type (referencedType) and matching the selected resource UUID.

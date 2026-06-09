@@ -406,6 +406,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedType: "collecting-event",
         apiEndpoint: "agent-api/person",
         optionLabel: "displayName",
+        optionDescription: "email",
         elasticSearchRelationshipPath:
           "included.relationships.collectors.data.id"
       } as RelationshipAutocompleteField

@@ -43,6 +43,7 @@ interface ResourceOption {
   label: string;
   value: string;
   resource: any;
+  description?: string;
 }
 
 export function QueryRowRelationshipAutocompleteSearch({
@@ -94,6 +95,7 @@ export function QueryRowRelationshipAutocompleteSearch({
   useEffect(() => {
     const apiEndpoint = config?.apiEndpoint;
     const optionLabelField = config?.optionLabel;
+    const optionDescriptionField = config?.optionDescription;
 
     if (!apiEndpoint || !optionLabelField) return;
 
@@ -111,7 +113,10 @@ export function QueryRowRelationshipAutocompleteSearch({
           (resource: any) => ({
             label: resource[optionLabelField] || resource.id,
             value: resource.id,
-            resource
+            resource,
+            description: optionDescriptionField
+              ? resource[optionDescriptionField]
+              : undefined
           })
         );
 
@@ -162,6 +167,16 @@ export function QueryRowRelationshipAutocompleteSearch({
         menuShouldScrollIntoView={false}
         minMenuHeight={600}
         filterOption={() => true} // Disable client-side filtering since we filter server-side
+        formatOptionLabel={(option) => (
+          <div>
+            <span>{option.label}</span>
+            {option.description && (
+              <span style={{ opacity: 0.5, marginLeft: "0.8em" }}>
+                {option.description}
+              </span>
+            )}
+          </div>
+        )}
         styles={{
           menu: (base) => ({
             ...base,
