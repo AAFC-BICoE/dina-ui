@@ -603,7 +603,7 @@ function NavSequenceDropdown({ formatMessage }) {
 function NavControlledVocabularyDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     useMenuDisplayControl();
-  const { isAdmin } = useAccount();
+  const { isAdmin, isSuperUser } = useAccount();
   return (
     <NavDropdown
       title={formatMessage("controlledVocabularyTitle")}
@@ -667,7 +667,7 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
           <DinaMessage id="protocolListTitle" />
         </NavDropdown.Item>
       </Link>
-      {isAdmin && (
+      {(isAdmin || isSuperUser) && (
         <Link href="/controlled-vocabulary/list" passHref={true} legacyBehavior>
           <NavDropdown.Item role="menuitem">
             <DinaMessage id="controlledVocabularyTitle" />

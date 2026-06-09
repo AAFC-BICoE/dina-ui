@@ -8,7 +8,7 @@ import {
 } from "react";
 import Keycloak from "keycloak-js";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
-import { DINA_ADMIN } from "../../types/DinaRoles";
+import { DINA_ADMIN, SUPER_USER } from "../../types/DinaRoles";
 
 export interface AccountContextI {
   agentId?: string;
@@ -21,6 +21,7 @@ export interface AccountContextI {
   username?: string;
   subject?: string;
   isAdmin?: boolean;
+  isSuperUser?: boolean;
   rolesPerGroup?: Record<string, string[] | undefined>;
   getCurrentToken: () => Promise<string | undefined>;
 }
@@ -140,6 +141,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         username,
         subject,
         isAdmin: checkIsAdmin(roles),
+        isSuperUser: checkIsSuperUser(roles),
         rolesPerGroup,
         getCurrentToken
       }}
@@ -158,6 +160,14 @@ export function checkIsAdmin(roles: string[]): boolean {
   return roles.includes(DINA_ADMIN) ?? false;
 }
 
+/**
+ * Checks if the array contains "super-user" as a group role (root)
+ * @param roles Roles to check
+ * @returns `true` if "SUPER-USER" exists as a group role, `false` otherwise.
+ */
+export function checkIsSuperUser(roles: string[]): boolean {
+  return roles.includes(SUPER_USER) ?? false;
+}
 /**
  * Convert from Keycloak's format ( ["/cnc", "/cnc/user"] to just the group name ["cnc"] )
  */
