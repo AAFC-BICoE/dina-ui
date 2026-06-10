@@ -13,8 +13,7 @@ import _ from "lodash";
 import { FileUploadProviderImpl } from "@dina-ui/components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "@dina-ui/intl/dina-ui-intl";
 import { useMemo, useRef } from "react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { DndContext } from "@dnd-kit/core";
 import { SWRConfig } from "swr";
 import { PartialDeep } from "type-fest";
 import { screen, waitFor } from "@testing-library/react";
@@ -132,13 +131,27 @@ export function MockAppContextProvider({
                   }}
                 >
                   <FileUploadProviderImpl>
-                    <DndProvider backend={HTML5Backend}>
+                    <DndContext
+                      accessibility={{
+                        announcements: {
+                          onDragStart: () => "",
+                          onDragOver: () => "",
+                          onDragEnd: () => "",
+                          onDragCancel: () => ""
+                        },
+                        screenReaderInstructions: { draggable: "" },
+                        container:
+                          typeof document !== "undefined"
+                            ? document.createElement("div")
+                            : undefined
+                      }}
+                    >
                       <div ref={modalWrapperRef}>
                         <ModalProvider appElement={modalWrapperRef.current}>
                           {children}
                         </ModalProvider>
                       </div>
-                    </DndProvider>
+                    </DndContext>
                   </FileUploadProviderImpl>
                 </InstanceContextProvider>
               </DinaIntlProvider>

@@ -1,5 +1,5 @@
-import { useDrop } from "react-dnd";
-import { DraggableItemBox, ITEM_BOX_DRAG_KEY } from "./DraggableItemBox";
+import { useDroppable } from "@dnd-kit/core";
+import { DraggableItemBox } from "./DraggableItemBox";
 
 interface DraggableItemListProps<ItemType> {
   availableItems: ItemType[];
@@ -17,26 +17,22 @@ export function DraggableItemList<
   movedItems,
   selectedItems,
   onClick,
-  onDrop,
   editMode
 }: DraggableItemListProps<ItemType>) {
-  const [{ dragHover, dragging }, dropRef] = useDrop({
-    accept: ITEM_BOX_DRAG_KEY,
-    drop: (item) => {
-      if (editMode) {
-        onDrop(item as any);
-      }
-    },
-    collect: (monitor) => ({
-      dragHover: monitor.isOver(),
-      dragging: monitor.canDrop()
-    })
+  const {
+    setNodeRef: dropRef,
+    isOver: dragHover,
+    active
+  } = useDroppable({
+    id: "draggable-item-list"
   });
+
+  const dragging = !!active;
 
   return (
     <ul
       className="list-group available-sample-list"
-      ref={dropRef as any}
+      ref={dropRef}
       style={{
         minHeight: "400px",
         maxHeight: "400px",
