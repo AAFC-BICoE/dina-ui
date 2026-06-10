@@ -9,6 +9,7 @@ import {
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  ControlledVocabularyItem,
   ManagedAttribute,
   VocabularyElement
 } from "../../../types/collection-api";
@@ -127,66 +128,101 @@ export function WorkbookFieldSelectField({
         onChange={onFieldMapChanged}
         disabled={disabled}
       />
-      {fieldMap[columnIndex]?.targetField === "managedAttributes" && (
-        <div className="flex-fill">
-          <ResourceSelectField<ManagedAttribute>
-            name={`fieldMap[${columnIndex}].targetKey`}
-            hideLabel={true}
-            selectProps={{
-              className: "ms-2",
-              menuPortalTarget: document.body,
-              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
-            }}
-            filter={(input: string) =>
-              SimpleSearchFilterBuilder.create<ManagedAttribute>()
-                .when(type === "material-sample", (builder) =>
-                  builder.where(
-                    "managedAttributeComponent",
-                    "EQ",
-                    "MATERIAL_SAMPLE"
-                  )
-                )
-                .searchFilter("name", input)
-                .build()
-            }
-            isDisabled={disabled}
-            additionalSort={"name"}
-            showGroupCategary={true}
-            model={
-              type === "material-sample"
-                ? "collection-api/managed-attribute"
-                : "objectstore-api/managed-attribute"
-            }
-            optionLabel={(ma) => {
-              const multiDescription =
-                ma?.multilingualDescription?.descriptions?.find(
-                  (description) => description.lang === locale
-                )?.desc;
-              const unit = ma?.unit;
-              const unitMessage = formatMessage("dataUnit");
-              const tooltipText = unit
-                ? `${multiDescription}\n${unitMessage}${unit}`
-                : multiDescription;
-              const fallbackTooltipText =
-                ma?.multilingualDescription?.descriptions?.find(
-                  (description) => description.lang !== locale
-                )?.desc;
-              return (
-                <TooltipSelectOption
-                  tooltipText={tooltipText ?? fallbackTooltipText ?? ma.name}
-                >
-                  {ma.name}
-                </TooltipSelectOption>
-              );
-            }}
-          />
-        </div>
-      )}
-
+      {fieldMap[columnIndex]?.targetField === "managedAttributes" &&
+        type == "metadata" && (
+          <div className="flex-fill">
+            <ResourceSelectField<ManagedAttribute>
+              name={`fieldMap[${columnIndex}].targetKey`}
+              hideLabel={true}
+              selectProps={{
+                className: "ms-2",
+                menuPortalTarget: document.body,
+                styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+              }}
+              filter={(input: string) =>
+                SimpleSearchFilterBuilder.create<ManagedAttribute>()
+                  .searchFilter("name", input)
+                  .build()
+              }
+              isDisabled={disabled}
+              additionalSort={"name"}
+              showGroupCategary={true}
+              model={"objectstore-api/managed-attribute"}
+              optionLabel={(ma) => {
+                const multiDescription =
+                  ma?.multilingualDescription?.descriptions?.find(
+                    (description) => description.lang === locale
+                  )?.desc;
+                const unit = ma?.unit;
+                const unitMessage = formatMessage("dataUnit");
+                const tooltipText = unit
+                  ? `${multiDescription}\n${unitMessage}${unit}`
+                  : multiDescription;
+                const fallbackTooltipText =
+                  ma?.multilingualDescription?.descriptions?.find(
+                    (description) => description.lang !== locale
+                  )?.desc;
+                return (
+                  <TooltipSelectOption
+                    tooltipText={tooltipText ?? fallbackTooltipText ?? ma.name}
+                  >
+                    {ma.name}
+                  </TooltipSelectOption>
+                );
+              }}
+            />
+          </div>
+        )}
+      {fieldMap[columnIndex]?.targetField === "managedAttributes" &&
+        type == "material-sample" && (
+          <div className="flex-fill">
+            <ResourceSelectField<ControlledVocabularyItem>
+              name={`fieldMap[${columnIndex}].targetKey`}
+              hideLabel={true}
+              selectProps={{
+                className: "ms-2",
+                menuPortalTarget: document.body,
+                styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+              }}
+              filter={(input: string) =>
+                SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+                  .where("dinaComponent", "EQ", "MATERIAL_SAMPLE")
+                  .searchFilter("name", input)
+                  .build()
+              }
+              isDisabled={disabled}
+              additionalSort={"name"}
+              showGroupCategary={true}
+              model={"collection-api/controlled-vocabulary-item"}
+              optionLabel={(ma) => {
+                const multiDescription =
+                  ma?.multilingualDescription?.descriptions?.find(
+                    (description) => description.lang === locale
+                  )?.desc;
+                const unit = ma?.unit;
+                const unitMessage = formatMessage("dataUnit");
+                const tooltipText = unit
+                  ? `${multiDescription}\n${unitMessage}${unit}`
+                  : multiDescription;
+                const fallbackTooltipText =
+                  ma?.multilingualDescription?.descriptions?.find(
+                    (description) => description.lang !== locale
+                  )?.desc;
+                return (
+                  <TooltipSelectOption
+                    tooltipText={tooltipText ?? fallbackTooltipText ?? ma.name}
+                  >
+                    {ma.name}
+                  </TooltipSelectOption>
+                );
+              }}
+            />
+          </div>
+        )}
       {fieldMap[columnIndex]?.targetField ===
         "preparationManagedAttributes" && (
         <>
-          <ResourceSelectField<ManagedAttribute>
+          <ResourceSelectField<ControlledVocabularyItem>
             name={`fieldMap[${columnIndex}].targetKey`}
             hideLabel={true}
             isDisabled={disabled}
@@ -196,12 +232,12 @@ export function WorkbookFieldSelectField({
               styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
             }}
             filter={(input: string) =>
-              SimpleSearchFilterBuilder.create<ManagedAttribute>()
-                .where("managedAttributeComponent", "EQ", "PREPARATION")
+              SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+                .where("dinaComponent", "EQ", "PREPARATION")
                 .searchFilter("name", input)
                 .build()
             }
-            model="collection-api/managed-attribute"
+            model="collection-api/controlled-vocabulary-item"
             optionLabel={(cm) => cm.name}
           />
         </>
@@ -210,7 +246,7 @@ export function WorkbookFieldSelectField({
       {fieldMap[columnIndex]?.targetField ===
         "collectingEvent.managedAttributes" && (
         <>
-          <ResourceSelectField<ManagedAttribute>
+          <ResourceSelectField<ControlledVocabularyItem>
             name={`fieldMap[${columnIndex}].targetKey`}
             hideLabel={true}
             isDisabled={disabled}
@@ -220,12 +256,12 @@ export function WorkbookFieldSelectField({
               styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
             }}
             filter={(input: string) =>
-              SimpleSearchFilterBuilder.create<ManagedAttribute>()
-                .where("managedAttributeComponent", "EQ", "COLLECTING_EVENT")
+              SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+                .where("dinaComponent", "EQ", "COLLECTING_EVENT")
                 .searchFilter("name", input)
                 .build()
             }
-            model="collection-api/managed-attribute"
+            model="collection-api/controlled-vocabulary-item"
             optionLabel={(cm) => cm.name}
           />
         </>
@@ -233,7 +269,7 @@ export function WorkbookFieldSelectField({
 
       {fieldMap[columnIndex]?.targetField === "organism.managedAttributes" && (
         <>
-          <ResourceSelectField<ManagedAttribute>
+          <ResourceSelectField<ControlledVocabularyItem>
             name={`fieldMap[${columnIndex}].targetKey`}
             hideLabel={true}
             isDisabled={disabled}
@@ -243,12 +279,12 @@ export function WorkbookFieldSelectField({
               styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
             }}
             filter={(input: string) =>
-              SimpleSearchFilterBuilder.create<ManagedAttribute>()
-                .where("managedAttributeComponent", "EQ", "ORGANISM")
+              SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+                .where("dinaComponent", "EQ", "ORGANISM")
                 .searchFilter("name", input)
                 .build()
             }
-            model="collection-api/managed-attribute"
+            model="collection-api/controlled-vocabulary-item"
             optionLabel={(cm) => cm.name}
           />
         </>
@@ -257,7 +293,7 @@ export function WorkbookFieldSelectField({
       {fieldMap[columnIndex]?.targetField ===
         "organism.determination.managedAttributes" && (
         <>
-          <ResourceSelectField<ManagedAttribute>
+          <ResourceSelectField<ControlledVocabularyItem>
             name={`fieldMap[${columnIndex}].targetKey`}
             hideLabel={true}
             isDisabled={disabled}
@@ -267,12 +303,12 @@ export function WorkbookFieldSelectField({
               styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
             }}
             filter={(input: string) =>
-              SimpleSearchFilterBuilder.create<ManagedAttribute>()
-                .where("managedAttributeComponent", "EQ", "DETERMINATION")
+              SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+                .where("dinaComponent", "EQ", "DETERMINATION")
                 .searchFilter("name", input)
                 .build()
             }
-            model="collection-api/managed-attribute"
+            model="collection-api/controlled-vocabulary-item"
             optionLabel={(cm) => cm.name}
           />
         </>

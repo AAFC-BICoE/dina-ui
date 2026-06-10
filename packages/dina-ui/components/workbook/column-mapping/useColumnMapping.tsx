@@ -40,7 +40,10 @@ import {
   PersonSelectField,
   ProjectSelectField
 } from "../../resource-select-fields/resource-select-fields";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import {
+  COLLECTION_MANAGED_ATTRIBUTE_ID,
+  MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+} from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export function useColumnMapping() {
   const { formatMessage } = useDinaIntl();
@@ -95,15 +98,20 @@ export function useColumnMapping() {
     loading: attrLoadingMaterialSample,
     response: attrRespMaterialSample
   } = useQuery<ManagedAttribute[]>({
-    path: "collection-api/managed-attribute",
-    filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
-      .where("managedAttributeComponent", "IN", [
+    path: "collection-api/controlled-vocabulary-item",
+    filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+      .where("dinaComponent", "IN", [
         "MATERIAL_SAMPLE",
         "PREPARATION",
         "COLLECTING_EVENT",
         "ORGANISM",
         "DETERMINATION"
       ])
+      .where(
+        "controlledVocabulary.uuid" as any,
+        "EQ",
+        COLLECTION_MANAGED_ATTRIBUTE_ID
+      )
       .build(),
     page: { limit: 1000 }
   });
