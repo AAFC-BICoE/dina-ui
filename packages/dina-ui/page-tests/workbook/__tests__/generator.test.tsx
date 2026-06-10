@@ -5,9 +5,9 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import {
   TEST_CLASSIFICATIONS,
-  TEST_CONTROLLED_VOCABULARY_ITEM_COLLECTING_EVENT,
-  TEST_CONTROLLED_VOCABULARY_ITEM_MATERIAL_SAMPLE,
-  TEST_CONTROLLED_VOCABULARY_ITEM_PREPARATION
+  TEST_MANAGED_ATTRIBUTE_COLLECTING_EVENT,
+  TEST_MANAGED_ATTRIBUTE_MATERIAL_SAMPLE,
+  TEST_MANAGED_ATTRIBUTE_PREPARATION
 } from "../__mocks__/generator.mock";
 import _ from "lodash";
 
@@ -15,14 +15,14 @@ const mockPost = jest.fn();
 
 const mockGet = jest.fn<any, any>(async (path, options) => {
   switch (path) {
-    case "collection-api/controlled-vocabulary-item":
-      switch (options?.filter?.dinaComponent?.EQ) {
+    case "collection-api/managed-attribute":
+      switch (options?.filter?.managedAttributeComponent?.EQ) {
         case "MATERIAL_SAMPLE":
-          return { data: [TEST_CONTROLLED_VOCABULARY_ITEM_MATERIAL_SAMPLE] };
+          return { data: [TEST_MANAGED_ATTRIBUTE_MATERIAL_SAMPLE] };
         case "PREPARATION":
-          return { data: [TEST_CONTROLLED_VOCABULARY_ITEM_PREPARATION] };
+          return { data: [TEST_MANAGED_ATTRIBUTE_PREPARATION] };
         case "COLLECTING_EVENT":
-          return { data: [TEST_CONTROLLED_VOCABULARY_ITEM_COLLECTING_EVENT] };
+          return { data: [TEST_MANAGED_ATTRIBUTE_COLLECTING_EVENT] };
       }
     case "collection-api/vocabulary2/taxonomicRank":
       return { data: TEST_CLASSIFICATIONS };
