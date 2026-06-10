@@ -17,7 +17,7 @@ describe("ColumnSelectorUtils", () => {
               label: "managedAttributes",
               component: "MATERIAL_SAMPLE",
               path: "data.attributes.managedAttributes",
-              apiEndpoint: "collection-api/managed-attribute"
+              apiEndpoint: "collection-api/controlled-vocabulary-item"
             },
             value: "data.attributes.managedAttributes",
             distinctTerm: false,
@@ -43,7 +43,7 @@ describe("ColumnSelectorUtils", () => {
               label: "managedAttributes",
               component: "COLLECTING_EVENT",
               path: "included.attributes.managedAttributes",
-              apiEndpoint: "collection-api/managed-attribute"
+              apiEndpoint: "collection-api/controlled-vocabulary-item"
             },
             parentName: "collectingEvent",
             parentPath: "included",

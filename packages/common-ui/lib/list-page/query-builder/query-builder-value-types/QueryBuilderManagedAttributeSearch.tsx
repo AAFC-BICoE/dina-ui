@@ -348,7 +348,7 @@ export default function QueryRowManagedAttributeSearch({
               // If TRUE, add the component filter.
               (builder) =>
                 builder.where(
-                  "managedAttributeComponent",
+                  "dinaComponent" as any,
                   "EQ",
                   managedAttributeConfig?.dynamicField?.component
                 )

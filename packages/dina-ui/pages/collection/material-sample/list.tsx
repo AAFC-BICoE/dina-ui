@@ -223,7 +223,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         label: "materialSampleManagedAttributes",
         component: "MATERIAL_SAMPLE",
         path: "data.attributes.managedAttributes",
-        apiEndpoint: "collection-api/managed-attribute"
+        apiEndpoint: "collection-api/controlled-vocabulary-item"
       },
       // Material Sample - Field Extensions
       {
@@ -248,7 +248,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         label: "preparationManagedAttributes",
         component: "PREPARATION",
         path: "data.attributes.preparationManagedAttributes",
-        apiEndpoint: "collection-api/managed-attribute"
+        apiEndpoint: "collection-api/controlled-vocabulary-item"
       },
 
       // Restrictions
@@ -278,7 +278,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         path: "included.attributes.managedAttributes",
         referencedBy: "assemblages",
         referencedType: "assemblage",
-        apiEndpoint: "collection-api/managed-attribute"
+        apiEndpoint: "collection-api/controlled-vocabulary-item"
       },
 
       // Collecting Event Managed Attributes
@@ -289,7 +289,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         path: "included.attributes.managedAttributes",
         referencedBy: "collectingEvent",
         referencedType: "collecting-event",
-        apiEndpoint: "collection-api/managed-attribute"
+        apiEndpoint: "collection-api/controlled-vocabulary-item"
       },
 
       // Collecting Event Field Extensions
@@ -311,7 +311,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         path: "included.attributes.managedAttributes",
         referencedBy: "organism",
         referencedType: "organism",
-        apiEndpoint: "collection-api/managed-attribute"
+        apiEndpoint: "collection-api/controlled-vocabulary-item"
       },
 
       // Determination Managed Attributes
@@ -322,7 +322,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         path: "included.attributes.determination.managedAttributes",
         referencedBy: "organism.determination",
         referencedType: "organism",
-        apiEndpoint: "collection-api/managed-attribute"
+        apiEndpoint: "collection-api/controlled-vocabulary-item"
       },
 
       // Attachment
@@ -341,7 +341,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         type: "managedAttribute",
         label: "materialSampleManagedAttributes",
         path: "included.attributes.managedAttributes",
-        apiEndpoint: "collection-api/managed-attribute",
+        apiEndpoint: "collection-api/controlled-vocabulary-item",
         component: "MATERIAL_SAMPLE",
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
@@ -351,7 +351,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         type: "managedAttribute",
         label: "preparationManagedAttributes",
         path: "included.attributes.preparationManagedAttributes",
-        apiEndpoint: "collection-api/managed-attribute",
+        apiEndpoint: "collection-api/controlled-vocabulary-item",
         component: "PREPARATION",
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
