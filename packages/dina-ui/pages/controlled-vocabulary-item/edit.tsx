@@ -164,7 +164,12 @@ function ControlledVocabularyItemEditPageContent({
             )
           };
         }
-        if (!submittedValues.uriTemplate?.includes("$1")) {
+
+        // Uri template should be null if empty string, and should include $1 if not empty.
+        if (
+          submittedValues.uriTemplate &&
+          !submittedValues.uriTemplate?.includes("$1")
+        ) {
           submittedValues.uriTemplate = `${submittedValues.uriTemplate}$1`;
         }
 

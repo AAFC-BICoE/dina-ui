@@ -97,7 +97,7 @@ export function useColumnMapping() {
   const {
     loading: attrLoadingMaterialSample,
     response: attrRespMaterialSample
-  } = useQuery<ManagedAttribute[]>({
+  } = useQuery<ControlledVocabularyItem[]>({
     path: "collection-api/controlled-vocabulary-item",
     filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
       .where("dinaComponent", "IN", [
@@ -256,7 +256,8 @@ export function useColumnMapping() {
     metadataLoading ||
     attrLoadingMaterialSampleOtherIdentifiers;
 
-  const managedAttributes = [
+  // Eventually this will all be controlled vocabulary.
+  const managedAttributes: any[] = [
     ...(attrRespMaterialSample?.data ?? []),
     ...(attrRespMetadata?.data ?? [])
   ];
@@ -325,7 +326,7 @@ export function useColumnMapping() {
         ).length,
         valueMapping: {
           columnHeader: {
-            id: targetManagedAttr.id,
+            id: targetManagedAttr.id ?? "",
             type: targetManagedAttr.type
           }
         }
@@ -458,8 +459,7 @@ export function useColumnMapping() {
       (managedAttribute) =>
         managedAttribute.key === key &&
         (config.managedAttributeComponent === "ENTITY" ||
-          managedAttribute.managedAttributeComponent ===
-            config.managedAttributeComponent)
+          managedAttribute?.dinaComponent === config.managedAttributeComponent)
     );
   }
 
@@ -638,9 +638,7 @@ export function useColumnMapping() {
             columnHeaderValue.toLowerCase().trim()
         );
         if (targetManagedAttr) {
-          if (
-            targetManagedAttr.managedAttributeComponent === "MATERIAL_SAMPLE"
-          ) {
+          if (targetManagedAttr.dinaComponent === "MATERIAL_SAMPLE") {
             map.push({
               targetField: "managedAttributes",
               skipped: false,
@@ -648,9 +646,7 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
-          } else if (
-            targetManagedAttr.managedAttributeComponent === "PREPARATION"
-          ) {
+          } else if (targetManagedAttr.dinaComponent === "PREPARATION") {
             map.push({
               targetField: "preparationManagedAttributes",
               skipped: false,
@@ -658,9 +654,7 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
-          } else if (
-            targetManagedAttr.managedAttributeComponent === "COLLECTING_EVENT"
-          ) {
+          } else if (targetManagedAttr.dinaComponent === "COLLECTING_EVENT") {
             map.push({
               targetField: "collectingEvent.managedAttributes",
               skipped: false,
@@ -668,9 +662,7 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
-          } else if (
-            targetManagedAttr.managedAttributeComponent === "ORGANISM"
-          ) {
+          } else if (targetManagedAttr.dinaComponent === "ORGANISM") {
             map.push({
               targetField: "organism.managedAttributes",
               skipped: false,
@@ -678,9 +670,7 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
-          } else if (
-            targetManagedAttr.managedAttributeComponent === "DETERMINATION"
-          ) {
+          } else if (targetManagedAttr.dinaComponent === "DETERMINATION") {
             map.push({
               targetField: "organism.determination.managedAttributes",
               skipped: false,
