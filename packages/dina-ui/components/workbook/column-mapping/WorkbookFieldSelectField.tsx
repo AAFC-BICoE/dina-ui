@@ -16,7 +16,10 @@ import {
 import { VocabularyOption } from "../../collection/VocabularySelectField";
 import { WorkbookColumnMappingFields } from "./WorkbookColumnMapping";
 import { useColumnMapping } from "./useColumnMapping";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import {
+  COLLECTION_MANAGED_ATTRIBUTE_ID,
+  MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+} from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface WorkbookFieldSelectFieldProps {
   columnIndex: number;
@@ -187,6 +190,11 @@ export function WorkbookFieldSelectField({
               filter={(input: string) =>
                 SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
                   .where("dinaComponent", "EQ", "MATERIAL_SAMPLE")
+                  .where(
+                    "controlledVocabulary.uuid" as any,
+                    "EQ",
+                    COLLECTION_MANAGED_ATTRIBUTE_ID
+                  )
                   .searchFilter("name", input)
                   .build()
               }
@@ -234,6 +242,11 @@ export function WorkbookFieldSelectField({
             filter={(input: string) =>
               SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
                 .where("dinaComponent", "EQ", "PREPARATION")
+                .where(
+                  "controlledVocabulary.uuid" as any,
+                  "EQ",
+                  COLLECTION_MANAGED_ATTRIBUTE_ID
+                )
                 .searchFilter("name", input)
                 .build()
             }
@@ -258,6 +271,11 @@ export function WorkbookFieldSelectField({
             filter={(input: string) =>
               SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
                 .where("dinaComponent", "EQ", "COLLECTING_EVENT")
+                .where(
+                  "controlledVocabulary.uuid" as any,
+                  "EQ",
+                  COLLECTION_MANAGED_ATTRIBUTE_ID
+                )
                 .searchFilter("name", input)
                 .build()
             }
@@ -281,6 +299,11 @@ export function WorkbookFieldSelectField({
             filter={(input: string) =>
               SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
                 .where("dinaComponent", "EQ", "ORGANISM")
+                .where(
+                  "controlledVocabulary.uuid" as any,
+                  "EQ",
+                  COLLECTION_MANAGED_ATTRIBUTE_ID
+                )
                 .searchFilter("name", input)
                 .build()
             }
@@ -305,6 +328,11 @@ export function WorkbookFieldSelectField({
             filter={(input: string) =>
               SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
                 .where("dinaComponent", "EQ", "DETERMINATION")
+                .where(
+                  "controlledVocabulary.uuid" as any,
+                  "EQ",
+                  COLLECTION_MANAGED_ATTRIBUTE_ID
+                )
                 .searchFilter("name", input)
                 .build()
             }
@@ -350,6 +378,11 @@ export function WorkbookFieldSelectField({
                   MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
                 )
                 .where("dinaComponent", "EQ", "MATERIAL_SAMPLE")
+                .where(
+                  "controlledVocabulary.uuid" as any,
+                  "EQ",
+                  COLLECTION_MANAGED_ATTRIBUTE_ID
+                )
                 .searchFilter("name", input)
                 .build()
             }
