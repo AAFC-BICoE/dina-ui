@@ -40,7 +40,10 @@ import {
   PersonSelectField,
   ProjectSelectField
 } from "../../resource-select-fields/resource-select-fields";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import {
+  COLLECTION_MANAGED_ATTRIBUTE_ID,
+  MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+} from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export function useColumnMapping() {
   const { formatMessage } = useDinaIntl();
@@ -94,16 +97,21 @@ export function useColumnMapping() {
   const {
     loading: attrLoadingMaterialSample,
     response: attrRespMaterialSample
-  } = useQuery<ManagedAttribute[]>({
-    path: "collection-api/managed-attribute",
-    filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
-      .where("managedAttributeComponent", "IN", [
+  } = useQuery<ControlledVocabularyItem[]>({
+    path: "collection-api/controlled-vocabulary-item",
+    filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+      .where("dinaComponent", "IN", [
         "MATERIAL_SAMPLE",
         "PREPARATION",
         "COLLECTING_EVENT",
         "ORGANISM",
         "DETERMINATION"
       ])
+      .where(
+        "controlledVocabulary.uuid" as any,
+        "EQ",
+        COLLECTION_MANAGED_ATTRIBUTE_ID
+      )
       .build(),
     page: { limit: 1000 }
   });
@@ -248,7 +256,8 @@ export function useColumnMapping() {
     metadataLoading ||
     attrLoadingMaterialSampleOtherIdentifiers;
 
-  const managedAttributes = [
+  // Eventually this will all be controlled vocabulary.
+  const managedAttributes: any[] = [
     ...(attrRespMaterialSample?.data ?? []),
     ...(attrRespMetadata?.data ?? [])
   ];
@@ -317,7 +326,7 @@ export function useColumnMapping() {
         ).length,
         valueMapping: {
           columnHeader: {
-            id: targetManagedAttr.id,
+            id: targetManagedAttr.id ?? "",
             type: targetManagedAttr.type
           }
         }
@@ -450,8 +459,7 @@ export function useColumnMapping() {
       (managedAttribute) =>
         managedAttribute.key === key &&
         (config.managedAttributeComponent === "ENTITY" ||
-          managedAttribute.managedAttributeComponent ===
-            config.managedAttributeComponent)
+          managedAttribute?.dinaComponent === config.managedAttributeComponent)
     );
   }
 
@@ -630,9 +638,7 @@ export function useColumnMapping() {
             columnHeaderValue.toLowerCase().trim()
         );
         if (targetManagedAttr) {
-          if (
-            targetManagedAttr.managedAttributeComponent === "MATERIAL_SAMPLE"
-          ) {
+          if (targetManagedAttr.dinaComponent === "MATERIAL_SAMPLE") {
             map.push({
               targetField: "managedAttributes",
               skipped: false,
@@ -640,9 +646,7 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
-          } else if (
-            targetManagedAttr.managedAttributeComponent === "PREPARATION"
-          ) {
+          } else if (targetManagedAttr.dinaComponent === "PREPARATION") {
             map.push({
               targetField: "preparationManagedAttributes",
               skipped: false,
@@ -650,9 +654,7 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
-          } else if (
-            targetManagedAttr.managedAttributeComponent === "COLLECTING_EVENT"
-          ) {
+          } else if (targetManagedAttr.dinaComponent === "COLLECTING_EVENT") {
             map.push({
               targetField: "collectingEvent.managedAttributes",
               skipped: false,
@@ -660,9 +662,7 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
-          } else if (
-            targetManagedAttr.managedAttributeComponent === "ORGANISM"
-          ) {
+          } else if (targetManagedAttr.dinaComponent === "ORGANISM") {
             map.push({
               targetField: "organism.managedAttributes",
               skipped: false,
@@ -670,9 +670,7 @@ export function useColumnMapping() {
               columnHeader: columnHeader.columnHeader,
               originalColumn: columnHeader.originalColumn
             });
-          } else if (
-            targetManagedAttr.managedAttributeComponent === "DETERMINATION"
-          ) {
+          } else if (targetManagedAttr.dinaComponent === "DETERMINATION") {
             map.push({
               targetField: "organism.determination.managedAttributes",
               skipped: false,
