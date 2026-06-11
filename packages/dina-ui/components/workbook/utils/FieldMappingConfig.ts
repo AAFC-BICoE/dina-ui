@@ -4,7 +4,10 @@ import {
   LinkOrCreateSetting,
   WorkbookDataTypeEnum
 } from "../";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import {
+  COLLECTION_MANAGED_ATTRIBUTE_ID,
+  MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+} from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 const FieldMappingConfig: FieldMappingConfigType = {
   "material-sample": {
@@ -23,9 +26,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
     preparationDate: { dataType: WorkbookDataTypeEnum.DATE },
     preparationRemarks: { dataType: WorkbookDataTypeEnum.STRING },
     preparationManagedAttributes: {
-      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
-      endpoint: "collection-api/managed-attribute",
-      managedAttributeComponent: "PREPARATION"
+      dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+      filter: {
+        "controlledVocabulary.uuid": COLLECTION_MANAGED_ATTRIBUTE_ID,
+        dinaComponent: "PREPARATION"
+      }
     },
     dwcDegreeOfEstablishment: { dataType: WorkbookDataTypeEnum.STRING },
     barcode: { dataType: WorkbookDataTypeEnum.STRING },
@@ -39,9 +44,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
       endpoint: "/collection-api/vocabulary2/materialSampleType"
     },
     managedAttributes: {
-      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
-      endpoint: "collection-api/managed-attribute",
-      managedAttributeComponent: "MATERIAL_SAMPLE"
+      dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+      filter: {
+        "controlledVocabulary.uuid": COLLECTION_MANAGED_ATTRIBUTE_ID,
+        dinaComponent: "MATERIAL_SAMPLE"
+      }
     },
     identifiers: {
       dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
@@ -123,9 +130,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
         dwcMinimumElevationInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
         dwcMinimumDepthInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
         managedAttributes: {
-          dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
-          endpoint: "collection-api/managed-attribute",
-          managedAttributeComponent: "COLLECTING_EVENT"
+          dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+          filter: {
+            "controlledVocabulary.uuid": COLLECTION_MANAGED_ATTRIBUTE_ID,
+            dinaComponent: "COLLECTING_EVENT"
+          }
         },
         dwcMaximumElevationInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
         dwcMaximumDepthInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
@@ -274,9 +283,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
         isTarget: { dataType: WorkbookDataTypeEnum.BOOLEAN },
         dwcVernacularName: { dataType: WorkbookDataTypeEnum.STRING },
         managedAttributes: {
-          dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
-          endpoint: "collection-api/managed-attribute",
-          managedAttributeComponent: "ORGANISM"
+          dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+          filter: {
+            "controlledVocabulary.uuid": COLLECTION_MANAGED_ATTRIBUTE_ID,
+            dinaComponent: "ORGANISM"
+          }
         },
         determination: {
           dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
@@ -306,9 +317,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
               dataType: WorkbookDataTypeEnum.CLASSIFICATION
             },
             managedAttributes: {
-              dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
-              endpoint: "collection-api/managed-attribute",
-              managedAttributeComponent: "DETERMINATION"
+              dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
+              filter: {
+                "controlledVocabulary.uuid": COLLECTION_MANAGED_ATTRIBUTE_ID,
+                dinaComponent: "DETERMINATION"
+              }
             }
           }
         }
