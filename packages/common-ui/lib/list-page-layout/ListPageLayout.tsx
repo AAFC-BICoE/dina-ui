@@ -100,8 +100,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   const [defaultPageSize, setDefaultPageSize] =
     useLocalStorage<number>(tablePageSizeKey);
 
-  let fiqlFilter: string | undefined;
-  let simpleFilter: FilterParam | undefined;
+  let filterParam: FilterParam | undefined;
   let inMemoryFilter:
     | ((
         value: PersistedResource<TData>,
@@ -133,39 +132,31 @@ export function ListPageLayout<TData extends KitsuResource>({
         ? additionalFiltersProp(filterForm)
         : additionalFiltersProp;
 
+    // If the caller returns a string, use it directly (it is already FIQL).
+    // Otherwise, convert the simple-filter object to FIQL.
+    const additionalFiltersFiql =
+      typeof additionalFilters === "string"
+        ? (additionalFilters as string)
+        : simpleSearchFilterToFiql(additionalFilters);
+
     const additionalFiqlFilters =
       typeof additionalFiqlFiltersProp === "function"
         ? additionalFiqlFiltersProp(filterForm)
         : additionalFiqlFiltersProp;
 
-    // If there's no FIQL from the filter builder and no additional FIQL filters,
-    // pass additionalFilters through as a simple filter parameter directly.
-    if (!filterBuilderFiql && !additionalFiqlFilters) {
-      if (typeof additionalFilters === "string") {
-        // A string is already FIQL — use as fiql.
-        fiqlFilter = additionalFilters;
-      } else {
-        // Pass the FilterParam object directly as a simple filter.
-        simpleFilter = additionalFilters;
-      }
-    } else {
-      // We have FIQL parts — convert everything to FIQL.
-      const additionalFiltersFiql =
-        typeof additionalFilters === "string"
-          ? (additionalFilters as string)
-          : simpleSearchFilterToFiql(additionalFilters);
+    // Combine all FIQL filters
+    const fiqlParts = [
+      filterBuilderFiql,
+      additionalFiltersFiql,
+      additionalFiqlFilters
+    ].filter(Boolean);
 
-      const fiqlParts = [
-        filterBuilderFiql,
-        additionalFiltersFiql,
-        additionalFiqlFilters
-      ].filter(Boolean);
-
-      if (fiqlParts.length > 1) {
-        fiqlFilter = fiqlParts.map((part) => `(${part})`).join(";");
-      } else if (fiqlParts.length === 1) {
-        fiqlFilter = fiqlParts[0];
-      }
+    if (fiqlParts.length > 1) {
+      // Only wrap in parentheses when combining multiple filters
+      filterParam = fiqlParts.map((part) => `(${part})`).join(";");
+    } else if (fiqlParts.length === 1) {
+      // Don't wrap when there's only one filter
+      filterParam = fiqlParts[0];
     }
   }
 
@@ -212,8 +203,7 @@ export function ListPageLayout<TData extends KitsuResource>({
       filterFn={inMemoryFilter}
       defaultPageSize={defaultPageSize ?? undefined}
       defaultSort={defaultSort ?? undefined}
-      fiql={fiqlFilter}
-      filter={simpleFilter}
+      fiql={filterParam as string}
       onPageSizeChange={(newSize) => setDefaultPageSize(newSize)}
       onSortedChange={(newSort) => setStoredDefaultSort(newSort)}
       topRightCorner={
