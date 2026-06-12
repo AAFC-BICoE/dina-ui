@@ -11,7 +11,7 @@ import { DinaMessage, useDinaIntl } from "../intl/dina-ui-intl";
 import { SeqdbMessage } from "../intl/seqdb-intl";
 
 export function Home() {
-  const { isAdmin, rolesPerGroup, subject } = useAccount();
+  const { isAdmin, isSuperUser, rolesPerGroup, subject } = useAccount();
   const router = useRouter();
 
   const handleSearch = (searchTerm: string) => {
@@ -266,6 +266,11 @@ export function Home() {
                 </h2>
 
                 <Stack style={{ display: "inline-flex" }}>
+                  {(isAdmin || isSuperUser) && (
+                    <Link href="/controlled-vocabulary/list">
+                      <DinaMessage id="controlledVocabularyTitle" />
+                    </Link>
+                  )}
                   <Link href="/group/list">
                     <DinaMessage id="groupListTitle" />
                   </Link>
