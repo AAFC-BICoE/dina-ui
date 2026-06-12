@@ -125,7 +125,7 @@ export function OrganismStateField({
         <DinaFormSection disableEditAllDelete={true}>
           <ManagedAttributesEditor
             valuesPath={fieldProps("managedAttributes").name}
-            managedAttributeApiPath="collection-api/managed-attribute"
+            managedAttributeApiPath="collection-api/controlled-vocabulary-item"
             managedAttributeComponent="ORGANISM"
             attributeSelectorWidth={12}
             fieldSetProps={{
@@ -136,6 +136,7 @@ export function OrganismStateField({
             managedAttributeOrderFieldName="organismManagedAttributesOrder"
             visibleAttributeKeys={visibleManagedAttributeKeys}
             disableClearButton={true}
+            isControlledVocabulary={true}
           />
         </DinaFormSection>
         <FieldSpy<[]> fieldName={determinationFieldProps.name}>

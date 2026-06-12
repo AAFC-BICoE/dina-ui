@@ -71,16 +71,16 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           materialSampleName: "material-sample-500"
         }
       };
-    case "collection-api/managed-attribute":
+    case "collection-api/controlled-vocabulary-item":
       if (params?.filter?.key?.EQ === "m1") {
         return Promise.resolve({
           data: [
             {
-              type: "managed-attribute",
+              type: "controlled-vocabulary-item",
               id: "1",
               key: "m1",
               vocabularyElementType: "STRING",
-              managedAttributeComponent: "MATERIAL_SAMPLE",
+              dinaComponent: "MATERIAL_SAMPLE",
               name: "Managed Attribute 1"
             }
           ]
@@ -90,11 +90,11 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         return Promise.resolve({
           data: [
             {
-              type: "managed-attribute",
+              type: "controlled-vocabulary-item",
               id: "2",
               key: "m2",
               vocabularyElementType: "STRING",
-              managedAttributeComponent: "MATERIAL_SAMPLE",
+              dinaComponent: "MATERIAL_SAMPLE",
               name: "Managed Attribute 2"
             }
           ]
@@ -104,11 +104,11 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         return Promise.resolve({
           data: [
             {
-              type: "managed-attribute",
+              type: "controlled-vocabulary-item",
               id: "3",
               key: "m3",
               vocabularyElementType: "STRING",
-              managedAttributeComponent: "MATERIAL_SAMPLE",
+              dinaComponent: "MATERIAL_SAMPLE",
               name: "Managed Attribute 3"
             }
           ]
@@ -152,7 +152,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_STORAGE_UNITS[2] };
     case "collection-api/form-template/cd6d8297-43a0-45c6-b44e-983db917eb11":
       return { data: TEST_FORM_TEMPLATE };
-    case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=019c961e-4c0d-7398-b4ae-73687826b3b5&filter[dinaComponent][EQ]=MATERIAL_SAMPLE&page[limit]=1000":
+    case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=019c961e-4c0d-7398-b4ae-73687826b3b5&filter[dinaComponent][EQ]=MATERIAL_SAMPLE":
       return {
         data: [
           {
@@ -223,6 +223,9 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/form-template":
     case "collection-api/assemblage":
     case "collection-api/extension":
+    case "collection-api/expedition":
+    case "collection-api/protocol":
+    case "collection-api/site":
       return { data: [] };
   }
 });

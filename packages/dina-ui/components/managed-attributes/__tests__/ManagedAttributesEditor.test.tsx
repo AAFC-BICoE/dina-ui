@@ -5,6 +5,7 @@ import { mountWithAppContext } from "common-ui";
 import { ManagedAttributesEditor } from "../ManagedAttributesEditor";
 import { waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 const EXAMPLE_MA_1 = {
   id: "1",
@@ -298,6 +299,9 @@ describe("ManagedAttributesEditor component", () => {
                 dinaComponent: {
                   EQ: "SITE"
                 },
+                "controlledVocabulary.uuid": {
+                  EQ: COLLECTION_MANAGED_ATTRIBUTE_ID
+                },
                 key: {
                   EQ: "example_attribute_1"
                 }
@@ -316,6 +320,9 @@ describe("ManagedAttributesEditor component", () => {
               filter: {
                 dinaComponent: {
                   EQ: "SITE"
+                },
+                "controlledVocabulary.uuid": {
+                  EQ: COLLECTION_MANAGED_ATTRIBUTE_ID
                 },
                 key: {
                   EQ: "example_attribute_2"
