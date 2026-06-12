@@ -566,7 +566,7 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
   // API request params:
   const params = {
     filter: {
-      ...(component !== "ENTITY" && { managedAttributeComponent: component }),
+      ...(component !== "ENTITY" && { dinaComponent: component }),
       key
     },
     page: { limit: 1 }

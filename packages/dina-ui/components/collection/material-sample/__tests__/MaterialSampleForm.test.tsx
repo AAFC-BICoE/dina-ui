@@ -438,7 +438,7 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+    await waitForLoadingToDisappear();
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(

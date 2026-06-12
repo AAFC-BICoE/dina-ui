@@ -1,55 +1,55 @@
 import {
-  ManagedAttribute,
+  ControlledVocabularyItem,
   Vocabulary
 } from "packages/dina-ui/types/collection-api";
 
-export const TEST_MANAGED_ATTRIBUTE_MATERIAL_SAMPLE: ManagedAttribute = {
-  id: "0192ba73-340a-72b1-bea9-fc75cdcaf7c6",
-  type: "managed-attribute",
-  name: "my test managed attribute",
-  key: "my_test_managed_attribute",
-  vocabularyElementType: "STRING",
-  managedAttributeComponent: "MATERIAL_SAMPLE",
-  acceptedValues: null,
-  createdOn: "2024-10-23T17:36:05.296422Z",
-  createdBy: "dina-admin",
-  group: "aafc",
-  multilingualDescription: {
-    descriptions: []
-  }
-};
+export const TEST_CONTROLLED_VOCABULARY_ITEM_MATERIAL_SAMPLE: ControlledVocabularyItem =
+  {
+    id: "0192ba73-340a-72b1-bea9-fc75cdcaf7c6",
+    type: "controlled-vocabulary-item",
+    name: "my test managed attribute",
+    key: "my_test_managed_attribute",
+    vocabularyElementType: "STRING",
+    dinaComponent: "MATERIAL_SAMPLE",
+    createdOn: "2024-10-23T17:36:05.296422Z",
+    createdBy: "dina-admin",
+    group: "aafc",
+    multilingualDescription: {
+      descriptions: []
+    }
+  };
 
-export const TEST_MANAGED_ATTRIBUTE_PREPARATION: ManagedAttribute = {
-  id: "0192e83f-e198-7fd8-b7e9-d7a24e11c683",
-  type: "managed-attribute",
-  name: "Test Preparation Managed Attribute",
-  key: "test_preparation_managed_attribute",
-  vocabularyElementType: "STRING",
-  managedAttributeComponent: "PREPARATION",
-  acceptedValues: null,
-  createdOn: "2024-10-23T17:36:05.296422Z",
-  createdBy: "dina-admin",
-  group: "aafc",
-  multilingualDescription: {
-    descriptions: []
-  }
-};
+export const TEST_CONTROLLED_VOCABULARY_ITEM_PREPARATION: ControlledVocabularyItem =
+  {
+    id: "0192e83f-e198-7fd8-b7e9-d7a24e11c683",
+    type: "controlled-vocabulary-item",
+    name: "Test Preparation Managed Attribute",
+    key: "test_preparation_managed_attribute",
+    vocabularyElementType: "STRING",
+    dinaComponent: "PREPARATION",
+    createdOn: "2024-10-23T17:36:05.296422Z",
+    createdBy: "dina-admin",
+    group: "aafc",
+    multilingualDescription: {
+      descriptions: []
+    }
+  };
 
-export const TEST_MANAGED_ATTRIBUTE_COLLECTING_EVENT: ManagedAttribute = {
-  id: "0679a2cd-80e8-4fc7-bcfa-ca13e0892354",
-  type: "managed-attribute",
-  name: "Test Collecting Event Managed Attribute",
-  key: "test_collecting_event_managed_attribute",
-  vocabularyElementType: "STRING",
-  managedAttributeComponent: "COLLECTING_EVENT",
-  acceptedValues: null,
-  createdOn: "2024-10-23T17:36:05.296422Z",
-  createdBy: "dina-admin",
-  group: "aafc",
-  multilingualDescription: {
-    descriptions: []
-  }
-};
+export const TEST_CONTROLLED_VOCABULARY_ITEM_COLLECTING_EVENT: ControlledVocabularyItem =
+  {
+    id: "0679a2cd-80e8-4fc7-bcfa-ca13e0892354",
+    type: "controlled-vocabulary-item",
+    name: "Test Collecting Event Managed Attribute",
+    key: "test_collecting_event_managed_attribute",
+    vocabularyElementType: "STRING",
+    dinaComponent: "COLLECTING_EVENT",
+    createdOn: "2024-10-23T17:36:05.296422Z",
+    createdBy: "dina-admin",
+    group: "aafc",
+    multilingualDescription: {
+      descriptions: []
+    }
+  };
 
 export const TEST_CLASSIFICATIONS: Vocabulary = {
   id: "taxonomicRank",
