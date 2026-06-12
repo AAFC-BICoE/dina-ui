@@ -603,7 +603,7 @@ function NavSequenceDropdown({ formatMessage }) {
 function NavControlledVocabularyDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     useMenuDisplayControl();
-  const { isAdmin, isSuperUser } = useAccount();
+  const { isAdmin } = useAccount();
   return (
     <NavDropdown
       title={formatMessage("controlledVocabularyTitle")}
@@ -667,13 +667,6 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
           <DinaMessage id="protocolListTitle" />
         </NavDropdown.Item>
       </Link>
-      {(isAdmin || isSuperUser) && (
-        <Link href="/controlled-vocabulary/list" passHref={true} legacyBehavior>
-          <NavDropdown.Item role="menuitem">
-            <DinaMessage id="controlledVocabularyTitle" />
-          </NavDropdown.Item>
-        </Link>
-      )}
       <Link
         href="/collection/storage-unit-type/list"
         passHref={true}
@@ -693,7 +686,7 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
 function NavDinaManagementDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     useMenuDisplayControl();
-  const { isAdmin } = useAccount();
+  const { isAdmin, isSuperUser } = useAccount();
   return (
     <NavDropdown
       title={formatMessage("dinaManagementSectionTitle")}
@@ -706,6 +699,13 @@ function NavDinaManagementDropdown({ formatMessage }) {
       menuRole="menu"
       style={{ marginLeft: "auto" }}
     >
+      {(isAdmin || isSuperUser) && (
+        <Link href="/controlled-vocabulary/list" passHref={true} legacyBehavior>
+          <NavDropdown.Item role="menuitem">
+            <DinaMessage id="controlledVocabularyTitle" />
+          </NavDropdown.Item>
+        </Link>
+      )}
       <Link
         href="/group/list"
         onKeyDown={onKeyDown}
@@ -716,7 +716,6 @@ function NavDinaManagementDropdown({ formatMessage }) {
           <DinaMessage id="groupListTitle" />
         </NavDropdown.Item>
       </Link>
-      {/* Admins only can view users. */}
       {isAdmin && (
         <>
           <Link
