@@ -15,12 +15,7 @@ const path = require("path");
 const nextConfig = {
   allowedDevOrigins: ["dina.local"],
   env: { UI_APP_VERSION: appVersion },
-  transpilePackages: [
-    "common-ui",
-    "kitsu",
-    "react-dnd",
-    "react-dnd-html5-backend"
-  ],
+  transpilePackages: ["common-ui", "kitsu"],
   output: "export",
   outputFileTracingRoot: path.join(__dirname, "../.."),
   turbopack: {

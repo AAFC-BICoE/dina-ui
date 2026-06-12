@@ -1,9 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import RcTooltip from "rc-tooltip";
 import { useEffect, useMemo, useState } from "react";
-import { useDrop } from "react-dnd";
+import { useDroppable } from "@dnd-kit/core";
 import { ReactTable } from "../../../../common-ui/lib";
-import { DraggableItemBox, ITEM_BOX_DRAG_KEY } from "./DraggableItemBox";
+import { DraggableItemBox } from "./DraggableItemBox";
 
 interface ContainerGridProps<BatchType, ItemType> {
   batch: BatchType;
@@ -98,6 +98,7 @@ export function ContainerGrid<
                 batchItemSample={cellGrid[coords]}
                 editMode={editMode}
                 coordinates={coords.replace("_", "")}
+                coordinatesKey={coords}
               />
             </div>
           );
@@ -136,23 +137,22 @@ export function ContainerGrid<
   );
 }
 
+interface GridCellPropsInternal<ItemType> extends GridCellProps<ItemType> {
+  coordinatesKey: string;
+}
+
 function GridCell<ItemType extends { sampleName?: string }>({
-  onDrop,
   batchItemSample: batchItemSample,
   coordinates,
+  coordinatesKey,
   movedItems,
   editMode
-}: GridCellProps<ItemType>) {
+}: GridCellPropsInternal<ItemType>) {
   const [hover, setHover] = useState<boolean>(false);
 
-  const [{ dragHover }, drop] = useDrop({
-    accept: ITEM_BOX_DRAG_KEY,
-    drop: (item) => {
-      onDrop(item as any);
-    },
-    collect: (monitor) => ({
-      dragHover: monitor.isOver()
-    })
+  const { setNodeRef: drop, isOver: dragHover } = useDroppable({
+    id: `droppable-cell-${coordinatesKey}`,
+    data: { coords: coordinatesKey }
   });
 
   return (
@@ -163,7 +163,7 @@ function GridCell<ItemType extends { sampleName?: string }>({
       overlay={<div style={{ maxWidth: "15rem" }}>{coordinates}</div>}
     >
       <div
-        ref={drop as any}
+        ref={drop}
         style={{
           border: dragHover ? "3px dashed #1C6EA4" : undefined,
           background: dragHover ? "#f7fbff" : undefined,

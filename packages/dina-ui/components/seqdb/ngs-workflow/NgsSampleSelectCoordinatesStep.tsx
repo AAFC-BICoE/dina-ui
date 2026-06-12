@@ -8,6 +8,13 @@ import {
 } from "./ngs-sample-select-coordinats-step/useNgsSelectCoordinatesControls";
 import { DraggableItemList } from "../container-grid/DraggableItemList";
 import { ContainerGrid } from "../container-grid/ContainerGrid";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
 
 export interface NgsSampleSelectCoordinatesStepProps {
   libraryPrepBatchId: string;
@@ -51,6 +58,8 @@ export function NgsSampleSelectCoordinatesStep(
     libraryPrepBatch
   });
 
+  const sensors = useSensors(useSensor(PointerSensor));
+
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
     async function performSaveInternal() {
@@ -63,6 +72,28 @@ export function NgsSampleSelectCoordinatesStep(
       performSaveInternal();
     }
   }, [performSave]);
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over) return;
+
+    const batchItemSample = active.data.current?.batchItemSample;
+    if (!batchItemSample) return;
+
+    const overId = over.id as string;
+
+    if (overId === "draggable-item-list") {
+      if (editMode) {
+        onListDrop({ batchItemSample });
+      }
+      return;
+    }
+
+    const coords = over.data.current?.coords;
+    if (coords) {
+      onGridDrop(batchItemSample, coords);
+    }
+  }
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
@@ -119,46 +150,48 @@ export function NgsSampleSelectCoordinatesStep(
         </div>
       )}
 
-      <div className="row">
-        <div className="col-2">
-          <strong>
-            Selected Material Samples ({availableItems.length} in list)
-          </strong>
-          <DraggableItemList<NsgSample>
-            availableItems={availableItems}
-            selectedItems={selectedItems}
-            movedItems={movedItems}
-            onClick={onItemClick}
-            onDrop={onListDrop}
-            editMode={editMode}
-          />
-        </div>
-        <div className="col-1">
-          {editMode && (
-            <button
-              className="btn btn-primary move-all w-100"
-              onClick={moveAll}
-              type="button"
-              disabled={gridIsPopulated}
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <div className="row">
+          <div className="col-2">
+            <strong>
+              Selected Material Samples ({availableItems.length} in list)
+            </strong>
+            <DraggableItemList<NsgSample>
+              availableItems={availableItems}
+              selectedItems={selectedItems}
+              movedItems={movedItems}
+              onClick={onItemClick}
+              onDrop={onListDrop}
+              editMode={editMode}
+            />
+          </div>
+          <div className="col-1">
+            {editMode && (
+              <button
+                className="btn btn-primary move-all w-100"
+                onClick={moveAll}
+                type="button"
+                disabled={gridIsPopulated}
+              >
+                Move All
+              </button>
+            )}
+          </div>
+          <div className="col-9">
+            <strong>Container wells</strong>
+            <ContainerGrid<
+              LibraryPrepBatch & { gridLayoutDefinition?: any },
+              NsgSample
             >
-              Move All
-            </button>
-          )}
+              batch={libraryPrepBatch}
+              cellGrid={cellGrid}
+              movedItems={movedItems}
+              onDrop={onGridDrop}
+              editMode={editMode}
+            />
+          </div>
         </div>
-        <div className="col-9">
-          <strong>Container wells</strong>
-          <ContainerGrid<
-            LibraryPrepBatch & { gridLayoutDefinition?: any },
-            NsgSample
-          >
-            batch={libraryPrepBatch}
-            cellGrid={cellGrid}
-            movedItems={movedItems}
-            onDrop={onGridDrop}
-            editMode={editMode}
-          />
-        </div>
-      </div>
+      </DndContext>
     </div>
   );
 }

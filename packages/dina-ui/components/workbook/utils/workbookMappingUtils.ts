@@ -255,7 +255,13 @@ export function generateWorkbookFieldOptions(
 
   // const newFieldOptions: { label: string; value: string }[] = [];
   Object.keys(flattenedConfig).forEach((fieldPath) => {
-    if (fieldPath === "relationshipConfig") {
+    if (
+      fieldPath === "relationshipConfig" ||
+      fieldPath.endsWith(".relationshipConfig")
+    ) {
+      return;
+    }
+    if (fieldPath === "filter" || fieldPath.endsWith(".filter")) {
       return;
     }
     const config = flattenedConfig[fieldPath];
@@ -370,6 +376,11 @@ export function getFlattenedConfig(
             path = candidate;
             continue;
           }
+          // Skip filter paths from controlled vocabulary / managed attribute config
+          if (candidate.endsWith(".filter") || candidate === "filter") {
+            path = candidate;
+            continue;
+          }
           const value = _.get(mappingConfig, entityName + "." + candidate);
           if (value !== undefined) {
             config[candidate.replaceAll(".attributes.", ".")] = value;
@@ -379,6 +390,10 @@ export function getFlattenedConfig(
           continue;
         } else {
           // No dot left, try the full path as a top-level property.
+          // Skip if path itself is "filter"
+          if (path === "filter") {
+            break;
+          }
           const value = _.get(mappingConfig, entityName + "." + path);
           if (value !== undefined) {
             config[path.replaceAll(".attributes.", ".")] = value;

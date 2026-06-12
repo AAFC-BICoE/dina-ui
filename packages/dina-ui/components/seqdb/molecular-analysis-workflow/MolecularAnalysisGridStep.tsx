@@ -20,6 +20,13 @@ import {
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
 
 export interface MolecularAnalysisGridStepProps {
   molecularAnalysisId: string;
@@ -74,6 +81,8 @@ export function MolecularAnalysisGridStep({
 
   const [pageLoaded, setPageLoaded] = useState<boolean>(false);
 
+  const sensors = useSensors(useSensor(PointerSensor));
+
   // Automatically go into edit mode if no storage units exist.
   useEffect(() => {
     if (!loading && !pageLoaded) {
@@ -111,6 +120,28 @@ export function MolecularAnalysisGridStep({
     }
 
     performSkipInternal();
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over) return;
+
+    const batchItemSample = active.data.current?.batchItemSample;
+    if (!batchItemSample) return;
+
+    const overId = over.id as string;
+
+    if (overId === "draggable-item-list") {
+      if (editMode) {
+        onListDrop({ batchItemSample });
+      }
+      return;
+    }
+
+    const coords = over.data.current?.coords;
+    if (coords) {
+      onGridDrop(batchItemSample, coords);
+    }
   }
 
   return (
@@ -287,46 +318,48 @@ export function MolecularAnalysisGridStep({
             </div>
           )}
 
-          <div className="row">
-            <div className="col-2">
-              <strong>
-                Selected Material Samples ({availableItems.length} in list)
-              </strong>
-              <DraggableItemList<MolecularAnalysisItemSample>
-                availableItems={availableItems}
-                selectedItems={selectedItems}
-                movedItems={movedItems}
-                onClick={onItemClick}
-                onDrop={onListDrop}
-                editMode={editMode}
-              />
-            </div>
-            <div className="col-1">
-              {editMode && (
-                <button
-                  className="btn btn-primary move-all w-100"
-                  onClick={moveAll}
-                  type="button"
-                  disabled={gridIsPopulated}
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+            <div className="row">
+              <div className="col-2">
+                <strong>
+                  Selected Material Samples ({availableItems.length} in list)
+                </strong>
+                <DraggableItemList<MolecularAnalysisItemSample>
+                  availableItems={availableItems}
+                  selectedItems={selectedItems}
+                  movedItems={movedItems}
+                  onClick={onItemClick}
+                  onDrop={onListDrop}
+                  editMode={editMode}
+                />
+              </div>
+              <div className="col-1">
+                {editMode && (
+                  <button
+                    className="btn btn-primary move-all w-100"
+                    onClick={moveAll}
+                    type="button"
+                    disabled={gridIsPopulated}
+                  >
+                    Move All
+                  </button>
+                )}
+              </div>
+              <div className="col-9">
+                <strong>Container wells</strong>
+                <ContainerGrid<
+                  GenericMolecularAnalysis & { gridLayoutDefinition?: any },
+                  MolecularAnalysisItemSample
                 >
-                  Move All
-                </button>
-              )}
+                  batch={molecularAnalysis}
+                  cellGrid={cellGrid}
+                  movedItems={movedItems}
+                  onDrop={onGridDrop}
+                  editMode={editMode}
+                />
+              </div>
             </div>
-            <div className="col-9">
-              <strong>Container wells</strong>
-              <ContainerGrid<
-                GenericMolecularAnalysis & { gridLayoutDefinition?: any },
-                MolecularAnalysisItemSample
-              >
-                batch={molecularAnalysis}
-                cellGrid={cellGrid}
-                movedItems={movedItems}
-                onDrop={onGridDrop}
-                editMode={editMode}
-              />
-            </div>
-          </div>
+          </DndContext>
         </div>
       )}
     </>
