@@ -49,7 +49,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/material-sample-type":
     case "collection-api/project":
     case "collection-api/material-sample":
-    case "collection-api/managed-attribute":
+    case "collection-api/controlled-vocabulary-item":
     case "objectstore-api/metadata":
     case "user-api/group":
       return { data: [] };

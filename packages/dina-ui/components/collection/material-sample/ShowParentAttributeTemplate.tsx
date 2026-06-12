@@ -11,7 +11,7 @@ import { useLayoutEffect, useEffect, useMemo, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  ManagedAttribute,
+  ControlledVocabularyItem,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { MATERIAL_SAMPLE_ATTR_NAMES } from "./ShowParentAttributesField";
@@ -38,7 +38,7 @@ export function ShowParentAttributeTemplate({
 
   // Managed attributes loaded from the request.
   const [organismManagedAttributes, setOrganismManagedAttributes] = useState<
-    ManagedAttribute[]
+    ControlledVocabularyItem[]
   >([]);
   const [organismManagedAttributesLoaded, setOrganismManagedAttributesLoaded] =
     useState<boolean>(false);
@@ -107,11 +107,11 @@ export function ShowParentAttributeTemplate({
     };
   }
 
-  useQuery<ManagedAttribute[]>(
+  useQuery<ControlledVocabularyItem[]>(
     {
-      path: "collection-api/managed-attribute",
-      filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
-        .where("managedAttributeComponent", "EQ", "ORGANISM")
+      path: "collection-api/controlled-vocabulary-item",
+      filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+        .where("dinaComponent", "EQ", "ORGANISM")
         .build(),
       page: { limit: 1000 }
     },

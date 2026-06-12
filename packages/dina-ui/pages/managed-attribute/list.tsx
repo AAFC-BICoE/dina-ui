@@ -100,7 +100,7 @@ export default function ManagedAttributesListPage() {
 
 interface GenericManagedAttributeListViewProps {
   /**
-   * Example: "/collection-api/managed-attribute"
+   * Example: "/collection-api/controlled-vocabulary-item"
    */
   apiPath: string;
 

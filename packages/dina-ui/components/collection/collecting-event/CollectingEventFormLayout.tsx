@@ -412,7 +412,7 @@ export function CollectingEventFormLayout({
   const collectingEventManagedAttributesComponent = (
     <ManagedAttributesEditor
       valuesPath="managedAttributes"
-      managedAttributeApiPath="collection-api/managed-attribute"
+      managedAttributeApiPath="collection-api/controlled-vocabulary-item"
       managedAttributeComponent="COLLECTING_EVENT"
       fieldSetProps={{
         legend: <DinaMessage id="collectingEventManagedAttributes" />,
@@ -421,6 +421,7 @@ export function CollectingEventFormLayout({
       }}
       managedAttributeOrderFieldName="managedAttributesOrder"
       visibleAttributeKeys={visibleManagedAttributeKeys}
+      isControlledVocabulary={true}
     />
   );
   const geographicPlaceNameSourceComponent = (

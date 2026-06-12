@@ -3,7 +3,7 @@ import { InputResource } from "kitsu";
 import _ from "lodash";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  ManagedAttribute,
+  ControlledVocabularyItem,
   MaterialSample,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
@@ -26,10 +26,10 @@ export function ShowParentMaterialSample({
 
   const parentMaterialSample: MaterialSample =
     (materialSample?.parentMaterialSample ?? {}) as MaterialSample;
-  const { response: attrResp } = useQuery<ManagedAttribute[]>({
-    path: "collection-api/managed-attribute",
-    filter: SimpleSearchFilterBuilder.create<ManagedAttribute>()
-      .where("managedAttributeComponent", "EQ", "ORGANISM")
+  const { response: attrResp } = useQuery<ControlledVocabularyItem[]>({
+    path: "collection-api/controlled-vocabulary-item",
+    filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+      .where("dinaComponent", "EQ", "ORGANISM")
       .build(),
     page: { limit: 1000 }
   });

@@ -210,12 +210,13 @@ export function AssemblageFormLayout() {
       <MultilingualDescription />
       <ManagedAttributesEditor
         valuesPath="managedAttributes"
-        managedAttributeApiPath="collection-api/managed-attribute"
+        managedAttributeApiPath="collection-api/controlled-vocabulary-item"
         managedAttributeComponent="ASSEMBLAGE"
         fieldSetProps={{
           legend: <DinaMessage id="assemblageManagedAttributes" />
         }}
         disableClearButton={true}
+        isControlledVocabulary={true}
       />
       <AttachmentsField
         name="attachment"

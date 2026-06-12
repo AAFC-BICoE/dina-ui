@@ -32,7 +32,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
       }) => (
         <ManagedAttributesViewer
           values={value}
-          managedAttributeApiPath="collection-api/managed-attribute"
+          managedAttributeApiPath="collection-api/controlled-vocabulary-item"
         />
       ),
 
