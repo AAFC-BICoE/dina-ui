@@ -383,16 +383,15 @@ export function WorkbookTemplateGenerator() {
         <Card>
           <Card.Body>
             <ListPageLayout
-              additionalFilters={SimpleSearchFilterBuilder.create()
-                // acSubtype is a ObjectSubtype, which contains the 'acSubtype' field.
-                .where("acSubtype.acSubtype", "EQ", "IMPORT TEMPLATE")
-                .whereIn("bucket", groupNames)
-                .build()}
               id="data-export-list"
-              queryTableProps={{
+              queryTableProps={() => ({
                 columns: TABLE_COLUMNS,
-                path: "objectstore-api/metadata"
-              }}
+                path: "objectstore-api/metadata",
+                filter: SimpleSearchFilterBuilder.create()
+                  .where("acSubtype.acSubtype", "EQ", "IMPORT TEMPLATE")
+                  .whereIn("bucket", groupNames)
+                  .build()
+              })}
             />
           </Card.Body>
         </Card>
