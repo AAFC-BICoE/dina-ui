@@ -8,6 +8,7 @@ import {
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { MATERIAL_SAMPLE_ATTR_NAMES } from "./ShowParentAttributesField";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 interface ShowParentMaterialSampleProps {
   className?: string;
@@ -30,6 +31,11 @@ export function ShowParentMaterialSample({
     path: "collection-api/controlled-vocabulary-item",
     filter: SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
       .where("dinaComponent", "EQ", "ORGANISM")
+      .where(
+        "controlledVocabulary.uuid" as any,
+        "EQ",
+        COLLECTION_MANAGED_ATTRIBUTE_ID
+      )
       .build(),
     page: { limit: 1000 }
   });
