@@ -1,6 +1,5 @@
 import {
   DinaFormSection,
-  InverseToggleField,
   SelectField,
   TextField,
   useBulkEditTabContext,
@@ -38,18 +37,30 @@ export function NotPubliclyReleasableSection() {
                 // null values are ignored when bulk editing
                 { label: formatMessage("keepCurrentValues"), value: null },
                 // True and false are reversed to show "publiclyReleasable" as "notPubliclyReleasable".
-                { label: formatMessage("true"), value: false },
-                { label: formatMessage("false"), value: true }
+                {
+                  label: formatMessage("notPubliclyReleasableOption"),
+                  value: false
+                },
+                {
+                  label: formatMessage("publiclyReleasableOption"),
+                  value: true
+                }
               ]}
             />
           }
         />
       ) : (
-        <InverseToggleField
+        <SelectField<boolean>
           className="notPubliclyReleasable"
           name="publiclyReleasable"
           label={<DinaMessage id="notPubliclyReleasable" />}
-          disableLabelClick={true}
+          options={[
+            { label: formatMessage("publiclyReleasableOption"), value: true },
+            {
+              label: formatMessage("notPubliclyReleasableOption"),
+              value: false
+            }
+          ]}
         />
       )}
       <DinaFormSection horizontal={false}>

@@ -698,6 +698,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   protocolListTitle: "Protocoles",
   protocolNameLabel: "Nom du protocole",
   protocolViewTitle: "Protocole",
+  publiclyReleasableOption: "Oui - Diffusion publique",
+  notPubliclyReleasableOption: "Non - Diffusion publique interdite",
   queryBuilder_addSearchGroup: "Ajouter une sous-requête",
   queryBuilder_addSearchRule: "Ajouter une requête",
   queryBuilder_conjunction_and: "ET",

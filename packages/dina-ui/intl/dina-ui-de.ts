@@ -949,6 +949,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   protocolListTitle: "Protokolle",
   protocolNameLabel: "Protokollname",
   protocolViewTitle: "Protokoll",
+  publiclyReleasableOption: "Oui - öffentlich zugänglich",
+  notPubliclyReleasableOption: "Nicht - Nicht öffentlich zugänglich",
   qualityControlName: "Name:",
   qualityControlType: "Typ:",
   queryBuilder_addSearchGroup: "Unterabfrage hinzufügen",
