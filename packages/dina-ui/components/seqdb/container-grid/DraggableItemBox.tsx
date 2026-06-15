@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { useDrag } from "react-dnd";
+import { useDraggable } from "@dnd-kit/core";
 import RcTooltip from "rc-tooltip";
 import Link from "next/link";
 
@@ -24,12 +24,17 @@ export function DraggableItemBox<
   wasMoved,
   editMode
 }: DraggableItemBoxProps<ItemType>) {
-  const [, drag] = useDrag({
-    type: ITEM_BOX_DRAG_KEY,
-    item: { batchItemSample, type: ITEM_BOX_DRAG_KEY },
-    canDrag: () => {
-      return editMode;
-    }
+  const {
+    setNodeRef: drag,
+    attributes,
+    listeners,
+    isDragging
+  } = useDraggable({
+    id: `draggable-item-${
+      (batchItemSample as any)?.sampleId ?? coordinates ?? Math.random()
+    }`,
+    data: { batchItemSample, type: ITEM_BOX_DRAG_KEY },
+    disabled: !editMode
   });
 
   const backgroundColor = () => {
@@ -49,7 +54,13 @@ export function DraggableItemBox<
   const primerName = (batchItemSample as any)?.primerName ?? undefined;
 
   return (
-    <li className="list-group-item p-0" onClick={onClick} ref={drag as any}>
+    <li
+      className="list-group-item p-0"
+      onClick={onClick}
+      ref={drag}
+      {...(editMode ? { ...attributes, ...listeners } : {})}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+    >
       <RcTooltip
         placement="top"
         trigger={coordinates ? "hover" : ""}

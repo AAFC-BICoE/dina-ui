@@ -52,7 +52,7 @@ const mockGet = jest.fn(async (model) => {
   } else if (model === "collection-api/collecting-event") {
     return { data: [] };
   } else if (
-    model === "collection-api/managed-attribute" ||
+    model === "collection-api/controlled-vocabulary-item" ||
     model === "collection-api/collection-method"
   ) {
     return { data: [] };

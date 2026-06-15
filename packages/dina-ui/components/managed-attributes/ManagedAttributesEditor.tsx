@@ -18,6 +18,7 @@ import { ManagedAttributesSorter } from "./managed-attributes-custom-views/Manag
 import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
 import { useManagedAttributeQueries } from "./useManagedAttributeQueries";
 import _ from "lodash";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "../controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -372,6 +373,13 @@ export function ManagedAttributeMultiSelect({
               : "managedAttributeComponent",
             "EQ",
             managedAttributeComponent!
+          )
+        )
+        .when(isControlledVocabulary, (builder) =>
+          builder.where(
+            "controlledVocabulary.uuid",
+            "EQ",
+            COLLECTION_MANAGED_ATTRIBUTE_ID
           )
         )
         .build(),

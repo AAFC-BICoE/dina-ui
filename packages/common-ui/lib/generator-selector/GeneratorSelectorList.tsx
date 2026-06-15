@@ -311,7 +311,7 @@ export function GeneratorSelectorList({
                         selectedField?.dynamicConfig?.component !== "ENTITY",
                       (builder) =>
                         builder.where(
-                          "managedAttributeComponent",
+                          "dinaComponent" as any,
                           "EQ",
                           selectedField?.dynamicConfig?.component ??
                             "MATERIAL_SAMPLE"

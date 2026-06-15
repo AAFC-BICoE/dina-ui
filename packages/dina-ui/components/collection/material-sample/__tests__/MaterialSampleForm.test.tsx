@@ -188,7 +188,7 @@ const mockGeographicSearchResults = [
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
-    case "collection-api/managed-attribute":
+    case "collection-api/controlled-vocabulary-item":
       // Handle filter-based lookups used by useManagedAttributeQueries
       if (params?.filter?.key?.EQ === "attribute_1") {
         return Promise.resolve({
@@ -438,7 +438,7 @@ describe("Material Sample Edit Page", () => {
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+    await waitForLoadingToDisappear();
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(

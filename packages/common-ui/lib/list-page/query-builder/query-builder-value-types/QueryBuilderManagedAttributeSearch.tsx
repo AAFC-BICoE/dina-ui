@@ -26,6 +26,7 @@ import { PersistedResource } from "kitsu";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 interface QueryBuilderManagedAttributeSearchProps {
   /**
@@ -87,7 +88,7 @@ export default function QueryRowManagedAttributeSearch({
   indexMap,
   isInColumnSelector
 }: QueryBuilderManagedAttributeSearchProps) {
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
   const onKeyDown = useQueryBuilderEnterToSearch(isInColumnSelector);
@@ -346,22 +347,44 @@ export default function QueryRowManagedAttributeSearch({
               !!managedAttributeConfig?.dynamicField?.component &&
                 managedAttributeConfig?.dynamicField?.component !== "ENTITY",
               // If TRUE, add the component filter.
+              // NOTE: Since Object Store is still using Managed Attributes and not controlled
+              // vocabulary, we will temporarly just add the controlledVocabulary filter here. Once
+              // object store is also migrated, this should be moved to the root query.
               (builder) =>
-                builder.where(
-                  "managedAttributeComponent",
-                  "EQ",
-                  managedAttributeConfig?.dynamicField?.component
-                )
+                builder
+                  .where(
+                    "dinaComponent" as any,
+                    "EQ",
+                    managedAttributeConfig?.dynamicField?.component
+                  )
+                  .where(
+                    "controlledVocabulary.uuid" as any,
+                    "EQ",
+                    COLLECTION_MANAGED_ATTRIBUTE_ID
+                  )
             )
             .build()
         }
         model={managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""}
-        optionLabel={(attribute) =>
-          _.get(attribute, "name") ||
-          _.get(attribute, "key") ||
-          _.get(attribute, "id") ||
-          ""
-        }
+        optionLabel={(attribute) => {
+          // Attempt to display the multilingual title if it exists, otherwise fallback to name, key, or id.
+          if ((attribute as any)?.multilingualTitle?.titles?.length) {
+            const titleForCurrentLocale = (
+              attribute as any
+            ).multilingualTitle.titles.find((title) => title.lang === locale);
+
+            if (titleForCurrentLocale) {
+              return titleForCurrentLocale.title;
+            }
+          }
+
+          return (
+            _.get(attribute, "name") ||
+            _.get(attribute, "key") ||
+            _.get(attribute, "id") ||
+            ""
+          );
+        }}
         isMulti={false}
         placeholder={formatMessage({
           id: "queryBuilder_managedAttribute_placeholder"

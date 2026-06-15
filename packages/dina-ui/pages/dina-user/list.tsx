@@ -64,6 +64,7 @@ export default function AgentListPage() {
         </h1>
         <ListPageLayout
           id="user-list"
+          enableInMemoryFilter={true}
           queryTableProps={{
             columns: USER_TABLE_COLUMNS,
             path: "user-api/user",

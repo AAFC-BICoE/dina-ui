@@ -27,7 +27,7 @@ import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
-import { DefaultRow, DraggableRow } from "./RowComponents";
+import { DefaultRow, DraggableRow, DraggableTableBody } from "./RowComponents";
 import { FaArrowDown, FaArrowUp, FaExpand, FaCompress } from "react-icons/fa";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500, 1000];
@@ -417,32 +417,47 @@ export function ReactTable<TData>({
                   {formatMessage({ id: "noRowsFound" })}
                 </td>
               </tr>
+            ) : enableDnd ? (
+              <DraggableTableBody
+                rows={table.getRowModel().rows}
+                onRowMove={onRowMove}
+                renderRow={(row) => {
+                  const index = row.index;
+                  return (
+                    <Fragment key={row.id ?? index}>
+                      <DraggableRow
+                        row={row}
+                        reorderRow={onRowMove}
+                        className={classnames(
+                          `index-${index}`,
+                          index % 2 === 0 ? "-odd" : "-even"
+                        )}
+                        style={rowStyling ? rowStyling(row) : undefined}
+                      />
+                      {row.getIsExpanded() && (
+                        <tr>
+                          <td colSpan={row.getVisibleCells().length}>
+                            {renderSubComponent?.({ row, index })}
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                }}
+              />
             ) : (
               table.getRowModel().rows.map((row, index) => (
                 <Fragment key={row.id ?? index}>
-                  {enableDnd ? (
-                    <DraggableRow
-                      row={row}
-                      reorderRow={onRowMove}
-                      className={classnames(
-                        `index-${index}`,
-                        index % 2 === 0 ? "-odd" : "-even"
-                      )}
-                      style={rowStyling ? rowStyling(row) : undefined}
-                    />
-                  ) : (
-                    <DefaultRow
-                      row={row}
-                      className={classnames(
-                        `index-${index}`,
-                        index % 2 === 0 ? "-odd" : "-even"
-                      )}
-                      style={rowStyling ? rowStyling(row) : undefined}
-                    />
-                  )}
+                  <DefaultRow
+                    row={row}
+                    className={classnames(
+                      `index-${index}`,
+                      index % 2 === 0 ? "-odd" : "-even"
+                    )}
+                    style={rowStyling ? rowStyling(row) : undefined}
+                  />
                   {row.getIsExpanded() && (
                     <tr>
-                      {/* 2nd row is a custom 1 cell row that contains the extended area */}
                       <td colSpan={row.getVisibleCells().length}>
                         {renderSubComponent?.({ row, index })}
                       </td>

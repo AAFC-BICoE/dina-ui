@@ -126,13 +126,13 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
-    case "collection-api/managed-attribute":
+    case "collection-api/controlled-vocabulary-item":
       if (params?.filter?.key?.EQ === "a") {
         return {
           data: [
             {
               id: "1",
-              type: "managed-attribute",
+              type: "controlled-vocabulary-item",
               vocabularyElementType: "STRING",
               managedAttributeComponent: "MATERIAL_SAMPLE",
               key: "a",
@@ -146,7 +146,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           data: [
             {
               id: "2",
-              type: "managed-attribute",
+              type: "controlled-vocabulary-item",
               vocabularyElementType: "STRING",
               managedAttributeComponent: "MATERIAL_SAMPLE",
               key: "b",
@@ -160,7 +160,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           data: [
             {
               id: "3",
-              type: "managed-attribute",
+              type: "controlled-vocabulary-item",
               vocabularyElementType: "STRING",
               managedAttributeComponent: "MATERIAL_SAMPLE",
               key: "c",
@@ -174,7 +174,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         data: [
           {
             id: "1",
-            type: "managed-attribute",
+            type: "controlled-vocabulary-item",
             vocabularyElementType: "STRING",
             managedAttributeComponent: "MATERIAL_SAMPLE",
             key: "a",
@@ -182,7 +182,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           },
           {
             id: "2",
-            type: "managed-attribute",
+            type: "controlled-vocabulary-item",
             vocabularyElementType: "STRING",
             managedAttributeComponent: "MATERIAL_SAMPLE",
             key: "b",
@@ -190,7 +190,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           },
           {
             id: "3",
-            type: "managed-attribute",
+            type: "controlled-vocabulary-item",
             vocabularyElementType: "STRING",
             managedAttributeComponent: "MATERIAL_SAMPLE",
             key: "c",

@@ -3,6 +3,13 @@ import { PersistedResource } from "kitsu";
 import _ from "lodash";
 import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
 import { useEffect } from "react";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
 
 import {
   PcrBatchItemSample,
@@ -53,6 +60,8 @@ export function SangerPcrBatchItemGridStep({
     pcrBatch
   });
 
+  const sensors = useSensors(useSensor(PointerSensor));
+
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
     async function performSaveInternal() {
@@ -65,6 +74,28 @@ export function SangerPcrBatchItemGridStep({
       performSaveInternal();
     }
   }, [performSave]);
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over) return;
+
+    const batchItemSample = active.data.current?.batchItemSample;
+    if (!batchItemSample) return;
+
+    const overId = over.id as string;
+
+    if (overId === "draggable-item-list") {
+      if (editMode) {
+        onListDrop({ batchItemSample });
+      }
+      return;
+    }
+
+    const coords = over.data.current?.coords;
+    if (coords) {
+      onGridDrop(batchItemSample, coords);
+    }
+  }
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
@@ -127,46 +158,48 @@ export function SangerPcrBatchItemGridStep({
         </div>
       )}
 
-      <div className="row">
-        <div className="col-2">
-          <strong>
-            Selected Material Samples ({availableItems.length} in list)
-          </strong>
-          <DraggableItemList<PcrBatchItemSample>
-            availableItems={availableItems}
-            selectedItems={selectedItems}
-            movedItems={movedItems}
-            onClick={onItemClick}
-            onDrop={onListDrop}
-            editMode={editMode}
-          />
-        </div>
-        <div className="col-1">
-          {editMode && (
-            <button
-              className="btn btn-primary move-all w-100"
-              onClick={moveAll}
-              type="button"
-              disabled={gridIsPopulated}
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <div className="row">
+          <div className="col-2">
+            <strong>
+              Selected Material Samples ({availableItems.length} in list)
+            </strong>
+            <DraggableItemList<PcrBatchItemSample>
+              availableItems={availableItems}
+              selectedItems={selectedItems}
+              movedItems={movedItems}
+              onClick={onItemClick}
+              onDrop={onListDrop}
+              editMode={editMode}
+            />
+          </div>
+          <div className="col-1">
+            {editMode && (
+              <button
+                className="btn btn-primary move-all w-100"
+                onClick={moveAll}
+                type="button"
+                disabled={gridIsPopulated}
+              >
+                Move All
+              </button>
+            )}
+          </div>
+          <div className="col-9">
+            <strong>Container wells</strong>
+            <ContainerGrid<
+              PcrBatch & { gridLayoutDefinition?: any },
+              PcrBatchItemSample
             >
-              Move All
-            </button>
-          )}
+              batch={pcrBatch}
+              cellGrid={cellGrid}
+              movedItems={movedItems}
+              onDrop={onGridDrop}
+              editMode={editMode}
+            />
+          </div>
         </div>
-        <div className="col-9">
-          <strong>Container wells</strong>
-          <ContainerGrid<
-            PcrBatch & { gridLayoutDefinition?: any },
-            PcrBatchItemSample
-          >
-            batch={pcrBatch}
-            cellGrid={cellGrid}
-            movedItems={movedItems}
-            onDrop={onGridDrop}
-            editMode={editMode}
-          />
-        </div>
-      </div>
+      </DndContext>
     </div>
   );
 }

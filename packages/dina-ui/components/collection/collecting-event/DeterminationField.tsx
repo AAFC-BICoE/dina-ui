@@ -315,7 +315,7 @@ export function DeterminationField({
                     <DinaFormSection disableEditAllDelete={true}>
                       <ManagedAttributesEditor
                         valuesPath={fieldProps("managedAttributes").name}
-                        managedAttributeApiPath="collection-api/managed-attribute"
+                        managedAttributeApiPath="collection-api/controlled-vocabulary-item"
                         managedAttributeComponent="DETERMINATION"
                         attributeSelectorWidth={12}
                         fieldSetProps={{
@@ -328,6 +328,7 @@ export function DeterminationField({
                         managedAttributeOrderFieldName="determinationManagedAttributesOrder"
                         visibleAttributeKeys={visibleManagedAttributeKeys}
                         disableClearButton={true}
+                        isControlledVocabulary={true}
                       />
                     </DinaFormSection>
                   )}
@@ -336,7 +337,7 @@ export function DeterminationField({
                   <DinaFormSection disableEditAllDelete={true}>
                     <ManagedAttributesEditor
                       valuesPath={fieldProps("managedAttributes").name}
-                      managedAttributeApiPath="collection-api/managed-attribute"
+                      managedAttributeApiPath="collection-api/controlled-vocabulary-item"
                       managedAttributeComponent="DETERMINATION"
                       attributeSelectorWidth={12}
                       fieldSetProps={{
@@ -349,6 +350,7 @@ export function DeterminationField({
                       managedAttributeOrderFieldName="determinationManagedAttributesOrder"
                       visibleAttributeKeys={visibleManagedAttributeKeys}
                       disableClearButton={true}
+                      isControlledVocabulary={true}
                     />
                   </DinaFormSection>
                 )}
