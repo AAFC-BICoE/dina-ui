@@ -61,7 +61,9 @@ export default function ManagedAttributesListPage() {
   // Create new button, generated for each tab.
   const buttonBar = (
     <div className="flex d-flex ms-auto">
-      <CreateButton entityLink={tabs[currentTab].prependLink} />
+      {currentTab !== 0 && (
+        <CreateButton entityLink={tabs[currentTab].prependLink} />
+      )}
     </div>
   );
 
@@ -79,18 +81,40 @@ export default function ManagedAttributesListPage() {
           ))}
         </TabList>
 
+        {currentTab === 0 && (
+          <div className="alert alert-warning mt-3" role="alert">
+            <h5>
+              <DinaMessage id="managedAttributeCollectionTabAlertTitle" />
+            </h5>
+            <DinaMessage
+              id="managedAttributeCollectionTabAlertDescription"
+              values={{
+                link: (
+                  <Link href="/controlled-vocabulary/list">
+                    <DinaMessage id="controlledVocabularyTitle" />
+                  </Link>
+                )
+              }}
+            />
+          </div>
+        )}
+
         {tabs.map((tab) => (
           <TabPanel key={tab.titleKey}>
-            <h3 className="mb-3">
-              <DinaMessage id={tab.titleKey as any} />
-            </h3>
+            {currentTab !== 0 && (
+              <>
+                <h3 className="mb-3">
+                  <DinaMessage id={tab.titleKey as any} />
+                </h3>
 
-            <GenericManagedAttributeListView
-              apiPath={tab.apiPath}
-              prependLink={tab.prependLink}
-              componentSupport={tab.componentSupport}
-              titleKey={tab.titleKey}
-            />
+                <GenericManagedAttributeListView
+                  apiPath={tab.apiPath}
+                  prependLink={tab.prependLink}
+                  componentSupport={tab.componentSupport}
+                  titleKey={tab.titleKey}
+                />
+              </>
+            )}
           </TabPanel>
         ))}
       </Tabs>

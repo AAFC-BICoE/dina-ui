@@ -1481,5 +1481,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   resetView: "Reset View",
   saveAsImage: "Save as Image",
   parentMaterialSampleDisabledTooltip:
-    "Material Sample can only have a single link to one of the following relationships: Parent Material Sample or a collecting event."
+    "Material Sample can only have a single link to one of the following relationships: Parent Material Sample or a collecting event.",
+  managedAttributeCollectionTabAlertTitle:
+    "Collection managed attributes have been moved.",
+  managedAttributeCollectionTabAlertDescription:
+    "They are now located on the new {link} page."
 };
