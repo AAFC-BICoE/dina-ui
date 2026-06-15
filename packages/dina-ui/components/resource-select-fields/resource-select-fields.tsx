@@ -143,11 +143,17 @@ export function PersonSelectField(
       model="agent-api/person"
       // Show display name, and show aliases if any:
       optionLabel={(person) => {
-        return person.displayName
-          ? `${person.displayName}${
-              person.aliases?.length ? ` (${person.aliases.join(", ")})` : ""
-            }`
-          : null;
+        if (!person.displayName) {
+          return null;
+        }
+        const parts = [person.displayName];
+        if (person.aliases && person.aliases.length > 0) {
+          parts.push(`(${person.aliases.join(", ")})`);
+        }
+        if (person.email) {
+          parts.push(`<${person.email}>`);
+        }
+        return parts.join(" ");
       }}
       asyncOptions={[
         {
