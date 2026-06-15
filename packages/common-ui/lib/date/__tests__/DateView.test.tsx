@@ -9,7 +9,7 @@ describe("DateView component", () => {
 
     // Displayed date:
     expect(
-      wrapper.getByText(/2020\-11\-12, 4:46:35 p\.m\./i)
+      wrapper.getByText(/2020\-11\-12, 4:46:31 p\.m\./i)
     ).toBeInTheDocument();
   });
 

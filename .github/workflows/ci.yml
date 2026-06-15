@@ -87,18 +87,6 @@ jobs:
             Dockerfile
             version.txt
 
-  # For testing purposes, not to be commited in.
-  debug-check:
-    name: Debug - Check Test Result
-    runs-on: ubuntu-latest
-    needs: [test-chunk]
-    if: ${{ needs.test-chunk.result == 'success' }}
-    steps:
-      - name: Show test-chunk result
-        run: |
-          echo "test-chunk result: ${{ needs.test-chunk.result }}"
-          echo "Would push run? ${{ needs.test-chunk.result == 'success' }}"
-
   push:
     name: Build Docker Image and Push to DockerHub
     needs: [build, test-chunk]
