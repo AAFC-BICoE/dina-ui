@@ -149,7 +149,16 @@ describe("Derivative single record edit page.", () => {
     });
     userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
 
-    userEvent.click(wrapper.getByRole("switch"));
+    fireEvent.change(wrapper.getByRole("combobox"), {
+      name: /not publicly releasable/i
+    }),
+      {
+        target: { value: "Yes - Publicly Releasable" }
+      };
+    fireEvent.click(
+      wrapper.getByRole("option", { name: /yes - publicly releasable/i })
+    );
+
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
     // Check only the changed values
@@ -200,7 +209,15 @@ describe("Derivative single record edit page.", () => {
     });
     userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
 
-    userEvent.click(wrapper.getByRole("switch"));
+    fireEvent.change(wrapper.getByRole("combobox"), {
+      name: /not publicly releasable/i
+    }),
+      {
+        target: { value: "No - Not Publicly Releasable" }
+      };
+    fireEvent.click(
+      wrapper.getByRole("option", { name: /no - not publicly releasable/i })
+    );
 
     await waitFor(() => {
       expect(
