@@ -3,7 +3,7 @@ import { ManagedAttribute } from "../../../../types/collection-api";
 import MetadataEditPage from "../../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "common-ui";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -181,7 +181,11 @@ describe("Metadata single record edit page.", () => {
       }
     );
 
-    fireEvent.change(wrapper.getByRole("combobox"), {
+    const publiclyReleasableSelect = within(
+      wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
+    ).getByRole("combobox");
+
+    fireEvent.change(publiclyReleasableSelect, {
       name: /not publicly releasable/i
     }),
       {

@@ -1,5 +1,5 @@
 import { mountWithAppContext } from "common-ui";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import DerivativeEditPage from "../../../../pages/object-store/derivative/edit";
@@ -149,7 +149,11 @@ describe("Derivative single record edit page.", () => {
     });
     userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
 
-    fireEvent.change(wrapper.getByRole("combobox"), {
+    const publiclyReleasableSelect = within(
+      wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
+    ).getByRole("combobox");
+
+    fireEvent.change(publiclyReleasableSelect, {
       name: /not publicly releasable/i
     }),
       {
@@ -209,7 +213,11 @@ describe("Derivative single record edit page.", () => {
     });
     userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
 
-    fireEvent.change(wrapper.getByRole("combobox"), {
+    const publiclyReleasableSelect = within(
+      wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
+    ).getByRole("combobox");
+
+    fireEvent.change(publiclyReleasableSelect, {
       name: /not publicly releasable/i
     }),
       {
