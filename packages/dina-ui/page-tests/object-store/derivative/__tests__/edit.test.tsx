@@ -153,12 +153,8 @@ describe("Derivative single record edit page.", () => {
       wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
     ).getByRole("combobox");
 
-    fireEvent.change(publiclyReleasableSelect, {
-      name: /not publicly releasable/i
-    }),
-      {
-        target: { value: "Yes - Publicly Releasable" }
-      };
+    fireEvent.keyDown(publiclyReleasableSelect, { key: "ArrowDown" });
+
     fireEvent.click(
       wrapper.getByRole("option", { name: /yes - publicly releasable/i })
     );
@@ -217,12 +213,8 @@ describe("Derivative single record edit page.", () => {
       wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
     ).getByRole("combobox");
 
-    fireEvent.change(publiclyReleasableSelect, {
-      name: /not publicly releasable/i
-    }),
-      {
-        target: { value: "No - Not Publicly Releasable" }
-      };
+    fireEvent.keyDown(publiclyReleasableSelect, { key: "ArrowDown" });
+
     fireEvent.click(
       wrapper.getByRole("option", { name: /no - not publicly releasable/i })
     );
