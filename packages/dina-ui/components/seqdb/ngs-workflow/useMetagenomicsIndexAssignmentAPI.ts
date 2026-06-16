@@ -12,11 +12,11 @@ import {
   Protocol,
   StorageUnit,
   StorageUnitType
-} from "packages/dina-ui/types/collection-api";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { NgsIndex } from "packages/dina-ui/types/seqdb-api";
+} from "@dina-ui/types/collection-api";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { NgsIndex } from "@dina-ui/types/seqdb-api";
 import { MetagenomicsIndexAssignmentStepProps } from "../metagenomics-workflow/MetagenomicsIndexAssignmentStep";
-import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
+import { MetagenomicsBatchItem } from "@dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 
 export interface UseMetagenomicsIndexAssignmentReturn {
   loading: boolean;

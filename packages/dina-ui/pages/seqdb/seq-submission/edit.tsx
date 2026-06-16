@@ -2,8 +2,8 @@ import { useQuery, withResponse } from "common-ui";
 import { SeqSubmission } from "../../../types/seqdb-api/resources/SeqSubmission";
 import { Footer, Head, Nav } from "../../../components";
 import { useRouter } from "next/router";
-import { SeqdbMessage, useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
-import { SeqSubmissionForm } from "packages/dina-ui/components/seqdb/seq-submission/SeqSubmissionForm";
+import { SeqdbMessage, useSeqdbIntl } from "@dina-ui/intl/seqdb-intl";
+import { SeqSubmissionForm } from "@dina-ui/components/seqdb/seq-submission/SeqSubmissionForm";
 
 export default function SeqSubmissionEditPage() {
   const router = useRouter();

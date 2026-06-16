@@ -1,4 +1,4 @@
-import { FormLegendComponentInformation } from "packages/dina-ui/types/common/resources/FormLegendInformation";
+import { FormLegendComponentInformation } from "@dina-ui/types/common/resources/FormLegendInformation";
 
 // Data Components for Material Samples.
 export const SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME: string =

@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "common-ui";
 import _ from "lodash";
-import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
+import { SeqBatch } from "@dina-ui/types/seqdb-api";
 import { useEffect } from "react";
 import {
   SeqReactionSample,

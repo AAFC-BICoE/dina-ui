@@ -40,10 +40,7 @@ import {
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { FormikProps } from "formik";
 import { VisibleManagedAttributesConfig } from "..";
-import {
-  CollectingEvent,
-  FormTemplate
-} from "packages/dina-ui/types/collection-api";
+import { CollectingEvent, FormTemplate } from "@dina-ui/types/collection-api";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];

@@ -4,7 +4,7 @@ import Select, { GroupBase } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import useVocabularyOptions from "./useVocabularyOptions";
-import { VocabularyElement } from "packages/dina-ui/types/collection-api";
+import { VocabularyElement } from "@dina-ui/types/collection-api";
 
 export interface VocabularySelectFieldProps extends FieldWrapperProps {
   path: string;

@@ -6,7 +6,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { Person } from "../../types/objectstore-api";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 
 const AGENT_FILTER_ATTRIBUTES = ["displayName", "email", "createdBy"];
 const AGENT_TABLE_COLUMNS: ColumnDefinition<Person>[] = [

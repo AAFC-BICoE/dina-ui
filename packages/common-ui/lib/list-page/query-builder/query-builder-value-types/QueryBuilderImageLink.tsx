@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import _ from "lodash";
-import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
+import { SelectOption } from "@common-ui/lib/formik-connected/SelectField";
 import Select from "react-select";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { TableColumn } from "../../types";

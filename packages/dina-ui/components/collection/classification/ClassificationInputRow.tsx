@@ -1,4 +1,4 @@
-import { ClassificationItem } from "packages/dina-ui/types/collection-api";
+import { ClassificationItem } from "@dina-ui/types/collection-api";
 import { useState } from "react";
 import { FaMinus } from "react-icons/fa";
 import Select from "react-select";

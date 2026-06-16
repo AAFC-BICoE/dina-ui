@@ -9,10 +9,10 @@ import { PcrBatch } from "../../../types/seqdb-api";
 import PageLayout from "../../../components/page/PageLayout";
 import { useState, useEffect } from "react";
 import { Button, Spinner, Dropdown, ButtonGroup } from "react-bootstrap";
-import { SangerPcrBatchItemGridStep } from "packages/dina-ui/components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
+import { SangerPcrBatchItemGridStep } from "@dina-ui/components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { usePcrBatchQuery } from "../pcr-batch/edit";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
+import { SangerPcrReactionStep } from "@dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
 import React from "react";
 
 export default function PCRWorkFlowRunPage() {

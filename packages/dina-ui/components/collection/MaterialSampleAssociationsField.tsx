@@ -18,7 +18,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { TabbedArrayField, TabPanelCtx } from "./TabbedArrayField";
 import { useFormikContext } from "formik";
 import { ASSOCIATIONS_COMPONENT_NAME } from "../../types/collection-api";
-import { Association } from "packages/dina-ui/types/collection-api/resources/Association";
+import { Association } from "@dina-ui/types/collection-api/resources/Association";
 export interface MaterialSampleAssociationsFieldProps {
   className?: string;
 }

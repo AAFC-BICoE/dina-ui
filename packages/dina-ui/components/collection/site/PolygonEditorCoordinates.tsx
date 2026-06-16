@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
-import { validatePolygon } from "packages/dina-ui/utils/geoUtils";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
-import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
+import { POLYGON_EDITOR_MODE } from "@dina-ui/types/geo/polygon-editor-mode.types";
+import { validatePolygon } from "@dina-ui/utils/geoUtils";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
+import type { PolygonEditorMode } from "@dina-ui/types/geo/polygon-editor-mode.types";
+import type { GeoPosition } from "@dina-ui/types/geo/geo.types";
 
 export default function PolygonEditorCoordinates({
   coords,

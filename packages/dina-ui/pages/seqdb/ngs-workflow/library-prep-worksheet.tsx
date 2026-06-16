@@ -1,17 +1,14 @@
 import { LoadingSpinner, useQuery } from "common-ui";
 import { useRouter } from "next/router";
-import { useIndexAssignmentAPI } from "packages/dina-ui/components/seqdb/ngs-workflow/useIndexAssignmentAPI";
-import {
-  LibraryPrep,
-  LibraryPrepBatch
-} from "packages/dina-ui/types/seqdb-api";
+import { useIndexAssignmentAPI } from "@dina-ui/components/seqdb/ngs-workflow/useIndexAssignmentAPI";
+import { LibraryPrep, LibraryPrepBatch } from "@dina-ui/types/seqdb-api";
 import {
   MaterialSampleSummary,
   StorageUnitType
-} from "packages/dina-ui/types/collection-api";
+} from "@dina-ui/types/collection-api";
 import { Button } from "react-bootstrap";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 
 export default function LibraryPrepWorksheetPage() {
   const {

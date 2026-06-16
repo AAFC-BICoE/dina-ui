@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import {
   LibraryPoolStep,
   LibraryPoolContentStep
-} from "packages/dina-ui/components/seqdb";
+} from "@dina-ui/components/seqdb";
 import { useEffect, useState } from "react";
 import { Button, ButtonGroup, Dropdown, Spinner } from "react-bootstrap";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";

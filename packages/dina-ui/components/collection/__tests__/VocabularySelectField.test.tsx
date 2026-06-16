@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { VocabularyElement } from "packages/dina-ui/types/collection-api";
+import { VocabularyElement } from "@dina-ui/types/collection-api";
 import { mountWithAppContext } from "common-ui";
 import {
   VocabularyOption,

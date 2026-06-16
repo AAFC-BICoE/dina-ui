@@ -17,7 +17,7 @@ import {
   TableColumn
 } from "../list-page/types";
 import { ClassificationSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderClassificationSearch";
-import { VocabularyElement } from "packages/dina-ui/types/collection-api";
+import { VocabularyElement } from "@dina-ui/types/collection-api";
 import {
   getImageLinkColumn,
   IMAGE_VIEW_LINK,

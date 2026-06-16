@@ -1,6 +1,6 @@
-import { BackButton, DinaForm } from "packages/common-ui/lib";
-import TaxonomyTree from "packages/common-ui/lib/classification/TaxonomyTree";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { BackButton, DinaForm } from "@common-ui/lib";
+import TaxonomyTree from "@common-ui/lib/classification/TaxonomyTree";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 
 export default function TaxonomyTreePage() {
   return (

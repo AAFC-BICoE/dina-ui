@@ -6,19 +6,19 @@ import {
   attachGenericMolecularAnalysisItems,
   QualityControlWithAttachment
 } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
-import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { GenericMolecularAnalysisItem } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType
 } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
+import { MetagenomicsBatchItem } from "@dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import {
   attachMaterialSampleSummaryMetagenomics,
   attachMetagenomicsBatchItem,
   attachPcrBatchItemMetagenomics,
   attachStorageUnitUsageMetagenomics
 } from "./useMetagenomicsWorkflowMolecularAnalysisRun";
-import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
+import { QualityControl } from "@dina-ui/types/seqdb-api/resources/QualityControl";
 import useVocabularyOptions from "../collection/useVocabularyOptions";
 import { useMolecularAnalysisRunColumns } from "./useMolecularAnalysisRunColumns";
 import {
@@ -29,7 +29,7 @@ import {
   SequencingRunItem
 } from "./useMolecularAnalysisRun";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { MolecularAnalysisResult } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 
 export interface UseMolecularAnalysisRunViewProps {
   molecularAnalysisRunId: string;

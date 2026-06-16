@@ -1,7 +1,7 @@
 import { BackToListButton, LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SangerSeqReactionStep } from "../../../components/seqdb/seq-workflow/SangerSeqReactionStep";
 import { SeqBatchSelectCoordinatesStep } from "../../../components/seqdb/seq-workflow/SeqBatchSelectCoordinatesStep";
@@ -12,7 +12,7 @@ import { SangerSeqBatchStep } from "../../../components/seqdb/seq-workflow/Sange
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqBatch } from "../../../types/seqdb-api";
 import { useSeqBatchQuery } from "../seq-batch/edit";
-import { SangerRunStep } from "packages/dina-ui/components/seqdb/seq-workflow/SangerRunStep";
+import { SangerRunStep } from "@dina-ui/components/seqdb/seq-workflow/SangerRunStep";
 
 export default function SangerWorkFlowSequencingRunPage() {
   const router = useRouter();

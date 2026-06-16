@@ -1,4 +1,4 @@
-import { useAccount, useQuery } from "common-ui";
+import { SimpleSearchFilterBuilder, useAccount, useQuery } from "common-ui";
 import { MaterialSample } from "../../../types/collection-api";
 
 export function useLastUsedCollection(disabled = false) {
@@ -9,7 +9,9 @@ export function useLastUsedCollection(disabled = false) {
       path: "collection-api/material-sample",
       include: "collection",
       page: { limit: 1 },
-      filter: { createdBy: { EQ: username } },
+      filter: SimpleSearchFilterBuilder.create<MaterialSample>()
+        .where("createdBy", "EQ", username)
+        .build(),
       sort: "-createdOn"
     },
     { disabled }

@@ -12,7 +12,7 @@ import { Organization } from "../../types/agent-api";
 import { NextRouter } from "next/router";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { useMemo } from "react";
-import { MultiligualName } from "packages/dina-ui/types/common/resources/MultilingualName";
+import { MultiligualName } from "@dina-ui/types/common/resources/MultilingualName";
 
 interface OrganizationFormProps {
   organization?: Organization;

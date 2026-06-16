@@ -1,15 +1,15 @@
-import { BackButton, withResponse } from "packages/common-ui/lib";
-import { Head, storageUnitDisplayName } from "packages/dina-ui/components";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { BackButton, withResponse } from "@common-ui/lib";
+import { Head, storageUnitDisplayName } from "@dina-ui/components";
+import PageLayout from "@dina-ui/components/page/PageLayout";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { useStorageUnit } from "./edit";
 import { useState } from "react";
 import { Tabs, TabList, Tab, TabPanel } from "react-tabs";
 import { Button, Spinner } from "react-bootstrap";
-import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
-import { StorageUnitSampleSelectionStep } from "packages/dina-ui/components/storage/grid/StorageUnitSampleSelectionStep";
-import { StorageUnitSelectCoordinatesStep } from "packages/dina-ui/components/storage/grid/StorageUnitSelectCoordinatesStep";
+import { SeqdbMessage } from "@dina-ui/intl/seqdb-intl";
+import { StorageUnitSampleSelectionStep } from "@dina-ui/components/storage/grid/StorageUnitSampleSelectionStep";
+import { StorageUnitSelectCoordinatesStep } from "@dina-ui/components/storage/grid/StorageUnitSelectCoordinatesStep";
 
 export const SELECT_MATERIAL_SAMPLES_TAB_INDEX = 0;
 export const SELECT_COORDINATES_TAB_INDEX = 1;

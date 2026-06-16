@@ -6,10 +6,10 @@ import {
   SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { Site } from "packages/dina-ui/types/collection-api";
-import { groupCell, GroupSelectField, Head } from "packages/dina-ui/components";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import PageLayout from "@dina-ui/components/page/PageLayout";
+import { Site } from "@dina-ui/types/collection-api";
+import { groupCell, GroupSelectField, Head } from "@dina-ui/components";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 
 export const getColumnDefinition: () => ColumnDefinition<Site>[] = () => {
   return [

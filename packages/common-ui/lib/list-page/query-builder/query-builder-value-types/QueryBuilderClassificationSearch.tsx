@@ -6,7 +6,7 @@ import _ from "lodash";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import { VocabularyOption } from "@dina-ui/components/collection/VocabularySelectField";
 import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOptions";
-import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
+import { SelectOption } from "@common-ui/lib/formik-connected/SelectField";
 import { ESIndexMapping, TransformToDSLProps } from "../../types";
 import { transformTextSearchToDSL } from "./QueryBuilderTextSearch";
 

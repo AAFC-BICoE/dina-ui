@@ -1,7 +1,7 @@
 import { BackToListButton, LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { LibraryPrepBatchStep } from "packages/dina-ui/components/seqdb/ngs-workflow/LibraryPrepBatchStep";
+import { LibraryPrepBatchStep } from "@dina-ui/components/seqdb/ngs-workflow/LibraryPrepBatchStep";
 import { useEffect, useState } from "react";
 import { Button, ButtonGroup, Dropdown, Spinner } from "react-bootstrap";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -10,10 +10,10 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { LibraryPrepBatch } from "../../../types/seqdb-api";
 import { useLibraryPrepBatchQuery } from "../library-prep-batch/edit";
-import { NgsSampleSelectionStep } from "packages/dina-ui/components/seqdb";
-import { PreLibraryPrepStep } from "packages/dina-ui/components/seqdb/ngs-workflow/PreLibraryPrepStep";
-import { NgsSampleSelectCoordinatesStep } from "packages/dina-ui/components/seqdb/ngs-workflow/NgsSampleSelectCoordinatesStep";
-import { IndexAssignmentStep } from "packages/dina-ui/components/seqdb/ngs-workflow/IndexAssignmentStep";
+import { NgsSampleSelectionStep } from "@dina-ui/components/seqdb";
+import { PreLibraryPrepStep } from "@dina-ui/components/seqdb/ngs-workflow/PreLibraryPrepStep";
+import { NgsSampleSelectCoordinatesStep } from "@dina-ui/components/seqdb/ngs-workflow/NgsSampleSelectCoordinatesStep";
+import { IndexAssignmentStep } from "@dina-ui/components/seqdb/ngs-workflow/IndexAssignmentStep";
 
 export default function NgsWorkFlowRunPage() {
   const router = useRouter();

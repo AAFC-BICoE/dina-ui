@@ -1,5 +1,5 @@
 import { FieldSpy, useBulkEditTabContext } from "common-ui";
-import { Association } from "packages/dina-ui/types/collection-api/resources/Association";
+import { Association } from "@dina-ui/types/collection-api/resources/Association";
 import Switch from "react-switch";
 
 /** The associations switch adds an initial association if there isn't one already. */

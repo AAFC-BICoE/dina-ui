@@ -9,10 +9,7 @@ import { ViewPageLayout } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { apiColumns } from "../collecting-event/list";
 import { ExpeditionFormLayout } from "../../../components/collection/expedition/ExpeditionFormLayout";
-import {
-  Expedition,
-  CollectingEvent
-} from "packages/dina-ui/types/collection-api";
+import { Expedition, CollectingEvent } from "@dina-ui/types/collection-api";
 
 export default function ExpeditionDetailsPage() {
   return (

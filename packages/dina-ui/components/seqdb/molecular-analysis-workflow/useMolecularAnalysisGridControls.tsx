@@ -11,12 +11,12 @@ import {
   MaterialSample,
   StorageUnit,
   StorageUnitType
-} from "packages/dina-ui/types/collection-api";
+} from "@dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { CellGrid } from "../container-grid/ContainerGrid";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysisItem } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { PersistedResource } from "kitsu";
 import { MolecularAnalysisRunItemUsageType } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 

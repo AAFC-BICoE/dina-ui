@@ -1,8 +1,8 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
-import { MultilingualDescription } from "packages/dina-ui/types/common";
-import { HasDinaMetaInfo } from "packages/dina-ui/types/DinaJsonMetaInfo";
-import type { GeoPolygon } from "packages/dina-ui/types/geo/geo.types";
+import { MultilingualDescription } from "@dina-ui/types/common";
+import { HasDinaMetaInfo } from "@dina-ui/types/DinaJsonMetaInfo";
+import type { GeoPolygon } from "@dina-ui/types/geo/geo.types";
 
 export type SiteAttributes = {
   type: "site";

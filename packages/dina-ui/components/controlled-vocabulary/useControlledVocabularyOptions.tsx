@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { useQuery } from "common-ui";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
-import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
+import { ControlledVocabularyItem } from "@dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 
 export interface ControlledVocabularyOption {
   label: string;

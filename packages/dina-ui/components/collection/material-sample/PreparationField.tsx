@@ -8,7 +8,7 @@ import {
   TextField
 } from "common-ui";
 import { InputResource } from "kitsu";
-import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
+import { Protocol } from "@dina-ui/types/collection-api/resources/Protocol";
 import { ManagedAttributesEditor, PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {

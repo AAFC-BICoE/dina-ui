@@ -1,10 +1,10 @@
-import { useApiClient } from "packages/common-ui/lib";
-import { PcrBatchItem, SeqReaction } from "packages/dina-ui/types/seqdb-api";
+import { useApiClient } from "@common-ui/lib";
+import { PcrBatchItem, SeqReaction } from "@dina-ui/types/seqdb-api";
 import { useState, useEffect } from "react";
 import _ from "lodash";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { MaterialSample } from "@dina-ui/types/collection-api";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export function useSeqReactionState(seqBatchId?: string) {
   const [selectedResources, setSelectedResources] = useState<SeqReaction[]>([]);

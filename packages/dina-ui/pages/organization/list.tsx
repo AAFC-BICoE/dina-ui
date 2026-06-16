@@ -7,7 +7,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { Organization } from "../../types/agent-api";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 
 const ORGANIZATION_FILTER_ATTRIBUTES = ["createdBy"];
 const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition<Organization>[] = [

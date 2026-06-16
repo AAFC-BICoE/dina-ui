@@ -17,10 +17,10 @@ import {
   Nav
 } from "../../../components";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import useVocabularyOptions from "packages/dina-ui/components/collection/useVocabularyOptions";
-import { useDeleteMolecularAnalysisWorkflows } from "packages/dina-ui/components/molecular-analysis/MolecularAnalysisUtils";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
+import useVocabularyOptions from "@dina-ui/components/collection/useVocabularyOptions";
+import { useDeleteMolecularAnalysisWorkflows } from "@dina-ui/components/molecular-analysis/MolecularAnalysisUtils";
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [
   "name",

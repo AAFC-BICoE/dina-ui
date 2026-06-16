@@ -1,4 +1,4 @@
-import { Person } from "packages/dina-ui/types/agent-api";
+import { Person } from "@dina-ui/types/agent-api";
 import { mountWithAppContext } from "common-ui";
 import { useAutocompleteSearchButFallbackToApiSearch } from "../useAutocompleteSearchButFallbackToApiSearch";
 import "@testing-library/jest-dom";

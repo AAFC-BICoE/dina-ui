@@ -179,6 +179,7 @@ export function TransactionForm({
       relationships: any;
     } = {
       ...transactionDiff,
+      type: "transaction",
       relationships: {
         ...(transactionDiff.attachment && {
           attachment: {

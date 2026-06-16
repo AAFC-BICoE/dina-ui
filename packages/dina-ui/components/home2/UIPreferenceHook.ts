@@ -10,7 +10,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAccount, useApiClient, SaveArgs } from "common-ui";
 import type { NavigationCard } from "../../types/common";
-import type { UserPreference } from "packages/dina-ui/types/user-api";
+import type { UserPreference } from "@dina-ui/types/user-api";
 import { FilterParam } from "kitsu";
 
 /* Utility: given defaults and a persisted list of ids, return the cards in that exact order.

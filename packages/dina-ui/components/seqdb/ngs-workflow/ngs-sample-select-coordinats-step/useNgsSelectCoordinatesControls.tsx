@@ -1,14 +1,11 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { ApiClientContext, DeleteArgs, SaveArgs, useQuery } from "common-ui";
 import _ from "lodash";
-import {
-  MaterialSample,
-  StorageUnit
-} from "packages/dina-ui/types/collection-api";
+import { MaterialSample, StorageUnit } from "@dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { LibraryPrep, LibraryPrepBatch } from "../../../../types/seqdb-api";
 import { CellGrid } from "../../container-grid/ContainerGrid";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 interface NsgSelectCoordinatesControlsProps {
   libraryPrepBatchId: string;

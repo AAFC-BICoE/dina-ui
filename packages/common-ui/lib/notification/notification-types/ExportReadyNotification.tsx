@@ -2,10 +2,10 @@ import { Notification } from "../types";
 import { Button } from "react-bootstrap";
 import { FaDownload, FaFileExcel } from "react-icons/fa";
 import { useQuery } from "../../api-client/useQuery";
-import { DataExport } from "packages/dina-ui/types/dina-export-api/resources/DataExport";
+import { DataExport } from "@dina-ui/types/dina-export-api/resources/DataExport";
 import { LoadingSpinner } from "../../loading-spinner/LoadingSpinner";
 import { downloadDataExport, useApiClient } from "../..";
-import { ObjectExport } from "packages/dina-ui/types/objectstore-api";
+import { ObjectExport } from "@dina-ui/types/objectstore-api";
 import { FaFileZipper } from "react-icons/fa6";
 import { useIntl } from "react-intl";
 

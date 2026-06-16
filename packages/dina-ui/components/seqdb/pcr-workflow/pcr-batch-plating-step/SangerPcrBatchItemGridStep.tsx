@@ -1,7 +1,7 @@
 import { LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import _ from "lodash";
-import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
+import { PcrBatch } from "@dina-ui/types/seqdb-api";
 import { useEffect } from "react";
 import {
   DndContext,

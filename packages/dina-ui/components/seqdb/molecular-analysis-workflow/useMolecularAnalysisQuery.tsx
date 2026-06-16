@@ -1,5 +1,5 @@
 import { useQuery } from "common-ui";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 
 export function useMolecularAnalysisQuery(id?: string, deps?: any[]) {
   return useQuery<GenericMolecularAnalysis>(

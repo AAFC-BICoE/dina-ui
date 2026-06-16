@@ -16,7 +16,7 @@ import {
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { InputResource } from "kitsu";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { Metadata } from "@dina-ui/types/objectstore-api";
 
 const mockGet = jest.fn<any, any>(async (path, _params) => {
   switch (path) {
@@ -409,7 +409,9 @@ describe("MetadataBulkEditor", () => {
       });
 
       // Verify we can interact with the should-display-1.jpg tab
-      const tab1 = wrapper.getByRole("tabpanel", { name: "should-display-1.jpg" });
+      const tab1 = wrapper.getByRole("tabpanel", {
+        name: "should-display-1.jpg"
+      });
       expect(tab1).toBeInTheDocument();
 
       // Verify originalFilename is still displayed in the form field (but not in the tab)

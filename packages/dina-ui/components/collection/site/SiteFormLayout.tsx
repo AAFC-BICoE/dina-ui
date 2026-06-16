@@ -14,16 +14,16 @@ import {
   AttachmentsField,
   GroupSelectField,
   ManagedAttributesEditor
-} from "packages/dina-ui/components";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
-import { CollectingEvent, Site } from "packages/dina-ui/types/collection-api";
+} from "@dina-ui/components";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
+import { AllowAttachmentsConfig } from "@dina-ui/components/object-store";
+import { CollectingEvent, Site } from "@dina-ui/types/collection-api";
 import PolygonEditorMap from "./PolygonEditorMap";
 import { MapToggleSwitch } from "./MapToggleSwitch";
 import PolygonEditorCoordinates from "./PolygonEditorCoordinates";
-import type { PolygonEditorMode } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
-import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
-import { apiColumns } from "packages/dina-ui/pages/collection/collecting-event/list";
+import type { PolygonEditorMode } from "@dina-ui/types/geo/polygon-editor-mode.types";
+import type { GeoPosition } from "@dina-ui/types/geo/geo.types";
+import { apiColumns } from "@dina-ui/pages/collection/collecting-event/list";
 
 export default function SiteFormLayout({
   id,

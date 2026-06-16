@@ -1,14 +1,13 @@
-
 import { useEffect, useRef, useState } from "react";
 import { useApiClient } from "common-ui";
 
 export type ControlledVocabularyType = "MANAGED_ATTRIBUTE" | "SYSTEM";
 export type ControlledVocabularyClass = "QUALIFIED_VALUE" | "CONTROLLED_TERM";
-import { ControlledVocabulary } from "packages/dina-ui/types/collection-api/resources/ControlledVocabulary";
+import { ControlledVocabulary } from "@dina-ui/types/collection-api/resources/ControlledVocabulary";
 
 export interface UseCVSidebarOptions {
-  apiBaseUrl?: string;      // e.g., "/collection-api"
-  resourcePath?: string;    // e.g., "controlled-vocabulary"
+  apiBaseUrl?: string; // e.g., "/collection-api"
+  resourcePath?: string; // e.g., "controlled-vocabulary"
   limit?: number;
   /**
    * Pass raw params through to the Kitsu client. For FIQL, set { fiql: "…" }.
@@ -58,8 +57,8 @@ export function useControlledVocabularySidebarData(
       const data: any[] = Array.isArray(response?.data)
         ? response.data
         : Array.isArray(response)
-          ? response
-          : [];
+        ? response
+        : [];
       const normalized: ControlledVocabulary[] = data as ControlledVocabulary[];
 
       if (!mounted.current) return;

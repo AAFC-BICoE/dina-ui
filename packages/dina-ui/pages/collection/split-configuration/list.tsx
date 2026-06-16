@@ -8,10 +8,10 @@ import {
   // SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
-import { GroupSelectField } from "packages/dina-ui/components/group-select/GroupSelectField";
+import { GroupSelectField } from "@dina-ui/components/group-select/GroupSelectField";
 import PageLayout from "../../../components/page/PageLayout";
-import { SplitConfiguration } from "packages/dina-ui/types/collection-api/resources/SplitConfiguration";
-// import { SplitConfiguration } from "packages/dina-ui/types/collection-api/resources/SplitConfiguration";
+import { SplitConfiguration } from "@dina-ui/types/collection-api/resources/SplitConfiguration";
+// import { SplitConfiguration } from "@dina-ui/types/collection-api/resources/SplitConfiguration";
 
 const SPLIT_CONFIG_FILTER_ATTRIBUTES = ["name", "createdBy"];
 const SPLIT_CONFIG_TABLE_COLUMNS: ColumnDefinition<any>[] = [

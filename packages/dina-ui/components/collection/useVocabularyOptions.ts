@@ -1,10 +1,7 @@
 import _ from "lodash";
 import { useQuery } from "../../../common-ui/lib";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
-import {
-  Vocabulary,
-  VocabularyElement
-} from "packages/dina-ui/types/collection-api";
+import { Vocabulary, VocabularyElement } from "@dina-ui/types/collection-api";
 import { VocabularyOption } from "./VocabularySelectField";
 
 /** Gets the vocab options from the back-end. */

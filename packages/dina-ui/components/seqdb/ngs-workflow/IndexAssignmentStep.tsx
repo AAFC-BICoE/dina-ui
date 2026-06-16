@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
-import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
-import { LibraryPrepBatch } from "packages/dina-ui/types/seqdb-api";
+import { useSeqdbIntl } from "@dina-ui/intl/seqdb-intl";
+import { LibraryPrepBatch } from "@dina-ui/types/seqdb-api";
 import Col from "react-bootstrap/Col";
 import Nav from "react-bootstrap/Nav";
 import Row from "react-bootstrap/Row";

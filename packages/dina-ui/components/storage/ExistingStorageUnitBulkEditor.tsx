@@ -1,8 +1,8 @@
 import { LoadingSpinner } from "common-ui";
 import { InputResource } from "kitsu";
 import _ from "lodash";
-import { useStorageUnits } from "packages/dina-ui/pages/collection/storage-unit/edit";
-import { StorageUnit } from "packages/dina-ui/types/collection-api";
+import { useStorageUnits } from "@dina-ui/pages/collection/storage-unit/edit";
+import { StorageUnit } from "@dina-ui/types/collection-api";
 import { StorageUnitBulkEditor } from "./StorageUnitBulkEditor";
 
 export interface ExistingStorageUnitBulkEditorProps {

@@ -7,7 +7,7 @@ import {
 } from "../../../types/collection-api";
 import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
 import styles from "./SeqProtocolReactionTable.module.css";
-import { SeqReaction } from "packages/dina-ui/types/seqdb-api";
+import { SeqReaction } from "@dina-ui/types/seqdb-api";
 import classNames from "classnames";
 import useVocabularyOptions from "../../collection/useVocabularyOptions";
 import { ErrorBanner } from "../../error/ErrorBanner";

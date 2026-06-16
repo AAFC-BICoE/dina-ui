@@ -10,7 +10,7 @@ import QueryBuilderTextSearch, {
 import _ from "lodash";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
-import { VocabularyOption } from "packages/dina-ui/components/collection/VocabularySelectField";
+import { VocabularyOption } from "@dina-ui/components/collection/VocabularySelectField";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
 } from "./QueryBuilderNumberSearch";
@@ -18,7 +18,7 @@ import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
 import QueryBuilderDateSearch, {
   transformDateSearchToDSL
 } from "./QueryBuilderDateSearch";
-import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
+import { ControlledVocabularyItem } from "@dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 import useControlledVocabularyOptions, {
   ControlledVocabularyOption
 } from "@dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";

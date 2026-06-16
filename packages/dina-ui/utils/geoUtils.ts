@@ -1,5 +1,5 @@
 import { loadModules } from "esri-loader";
-import type { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
+import type { GeoPosition } from "@dina-ui/types/geo/geo.types";
 
 /**
  * Internal cached ArcGIS map modules and projection modules.

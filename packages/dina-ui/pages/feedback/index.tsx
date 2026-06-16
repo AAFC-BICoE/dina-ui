@@ -1,8 +1,8 @@
 import { useInstanceContext } from "common-ui";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 import Link from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 
 export function Feedback() {
   const instanceContext = useInstanceContext();

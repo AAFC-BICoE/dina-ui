@@ -1,4 +1,4 @@
-import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
+import { ManagedAttribute } from "@dina-ui/types/collection-api";
 import { SimpleSearchFilterBuilder } from "../simpleSearchFilterBuilder";
 
 describe("SimpleSearchFilterBuilder", () => {

@@ -8,7 +8,7 @@ import {
   SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 import { groupCell, GroupSelectField } from "../../../components";
 import { Collection } from "../../../types/collection-api";
 

@@ -8,12 +8,12 @@ import {
   SubmitButton,
   withResponse
 } from "common-ui";
-import { Head, useSiteQuery, useSiteSave } from "packages/dina-ui/components";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { Site } from "packages/dina-ui/types/collection-api/resources/Site";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import SiteFormLayout from "packages/dina-ui/components/collection/site/SiteFormLayout";
-import { POLYGON_EDITOR_MODE } from "packages/dina-ui/types/geo/polygon-editor-mode.types";
+import { Head, useSiteQuery, useSiteSave } from "@dina-ui/components";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
+import { Site } from "@dina-ui/types/collection-api/resources/Site";
+import PageLayout from "@dina-ui/components/page/PageLayout";
+import SiteFormLayout from "@dina-ui/components/collection/site/SiteFormLayout";
+import { POLYGON_EDITOR_MODE } from "@dina-ui/types/geo/polygon-editor-mode.types";
 
 export default function EditPage() {
   const { formatMessage } = useDinaIntl();

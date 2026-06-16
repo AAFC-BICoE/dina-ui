@@ -11,8 +11,8 @@ import {
 import Link from "next/link";
 import { useMemo, useCallback, useState, useEffect } from "react";
 
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import PageLayout from "@dina-ui/components/page/PageLayout";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import {
   Head,
   GroupSelectField,
@@ -20,12 +20,12 @@ import {
   TypeFilterState,
   TypeFilterSideBarDynamic,
   SidebarOption
-} from "packages/dina-ui/components";
+} from "@dina-ui/components";
 
 import styles from "./controlled-vocabulary.module.css";
 
-import { useControlledVocabularySidebarData } from "packages/dina-ui/components/controlled-vocabulary/useControlledVocabularySidebarData";
-import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
+import { useControlledVocabularySidebarData } from "@dina-ui/components/controlled-vocabulary/useControlledVocabularySidebarData";
+import { ControlledVocabularyItem } from "@dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 
 export default function ControlledVocabularyListPage() {
   const { formatMessage } = useDinaIntl();

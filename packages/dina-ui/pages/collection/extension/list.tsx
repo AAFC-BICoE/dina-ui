@@ -1,8 +1,8 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { ColumnDef } from "@tanstack/react-table";
 import { FieldHeader, ReactTable, descriptionCell, useQuery } from "common-ui";
-import { FreeTextFilterForm } from "packages/common-ui/lib/list-page-layout/FreeTextFilterForm";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { FreeTextFilterForm } from "@common-ui/lib/list-page-layout/FreeTextFilterForm";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 import Select from "react-select";
 import {
   ExtensionField,

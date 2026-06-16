@@ -11,11 +11,11 @@ import {
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { MolecularAnalysisRunItem } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { AddAttachmentsButton } from "../object-store";
-import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { MolecularAnalysisResult } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { Metadata } from "@dina-ui/types/objectstore-api";
 import React from "react";
 import { SequencingRunItem } from "./useMolecularAnalysisRun";
 import { QualityControlWithAttachment } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";

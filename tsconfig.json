@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "esnext",
     "module": "esnext",
+    "moduleResolution": "bundler",
     "jsx": "preserve",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "moduleResolution": "node",
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
@@ -17,6 +16,7 @@
     "strictNullChecks": true,
     "paths": {
       "@dina-ui/*": ["./packages/dina-ui/*"],
+      "@common-ui/*": ["./packages/common-ui/*"],
       "common-ui": ["./packages/common-ui/lib/index.ts"],
       // Use our own Kitsu type definitions instead of the incomplete provided types.
       "kitsu": [

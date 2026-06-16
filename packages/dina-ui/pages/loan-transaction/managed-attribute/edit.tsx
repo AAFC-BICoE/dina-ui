@@ -8,7 +8,7 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/collection-api";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 
 export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const { id } = router.query;

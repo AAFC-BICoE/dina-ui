@@ -3,7 +3,7 @@ import { LoadingSpinner, ReactTable } from "common-ui";
 import { Alert } from "react-bootstrap";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useMetagenomicsWorkflowMolecularAnalysisRun } from "../../molecular-analysis/useMetagenomicsWorkflowMolecularAnalysisRun";
-import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
+import { MetagenomicsBatch } from "@dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 
 export interface SequencingRunStepProps {
   metagenomicsBatchId: string;

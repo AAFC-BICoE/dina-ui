@@ -5,13 +5,10 @@ import {
   ResourceSelectField,
   SimpleSearchFilterBuilder,
   DateField
-} from "packages/common-ui/lib";
-import {
-  GroupSelectField,
-  PersonSelectField
-} from "packages/dina-ui/components";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { SequencingFacility } from "packages/dina-ui/types/seqdb-api";
+} from "@common-ui/lib";
+import { GroupSelectField, PersonSelectField } from "@dina-ui/components";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
+import { SequencingFacility } from "@dina-ui/types/seqdb-api";
 
 export function SeqSubmissionFields() {
   const { formatMessage } = useDinaIntl();

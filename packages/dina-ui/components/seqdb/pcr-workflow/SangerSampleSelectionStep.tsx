@@ -17,8 +17,8 @@ import {
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
-import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
-import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
+import { MetagenomicsBatch } from "@dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
+import { MetagenomicsBatchItem } from "@dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType

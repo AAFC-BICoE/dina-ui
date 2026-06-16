@@ -6,12 +6,12 @@ import {
   SelectOption,
   SubmitButton,
   useStringComparator
-} from "packages/common-ui/lib";
+} from "@common-ui/lib";
 import { useMemo } from "react";
-import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
+import { PcrBatchItem } from "@dina-ui/types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
-import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
-import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
+import { MaterialSampleSummary } from "@dina-ui/types/collection-api";
+import { useSeqdbIntl } from "@dina-ui/intl/seqdb-intl";
 import { MetagenomicsIndexAssignmentStepProps } from "../metagenomics-workflow/MetagenomicsIndexAssignmentStep";
 import {
   MetagenomicsIndexAssignmentResource,

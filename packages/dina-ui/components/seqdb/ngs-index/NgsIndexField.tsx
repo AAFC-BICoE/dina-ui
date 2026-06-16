@@ -15,7 +15,7 @@ import {
 } from "common-ui";
 import { FormikContextType } from "formik";
 import _ from "lodash";
-import { NgsIndex } from "packages/dina-ui/types/seqdb-api";
+import { NgsIndex } from "@dina-ui/types/seqdb-api";
 import { ReactNode, useState } from "react";
 import * as yup from "yup";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";

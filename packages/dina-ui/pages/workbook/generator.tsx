@@ -28,7 +28,7 @@ import {
   getFlattenedConfig
 } from "../../components/workbook/utils/workbookMappingUtils";
 import InputGroup from "react-bootstrap/InputGroup";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { Metadata } from "@dina-ui/types/objectstore-api";
 import { handleDownloadLink } from "../../components/object-store/object-store-utils";
 import { downloadBlobFile } from "common-ui";
 import _ from "lodash";

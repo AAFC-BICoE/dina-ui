@@ -3,7 +3,7 @@ import _ from "lodash";
 import { ViewPageLayout } from "../../../components";
 import { ReportTemplateFormLayout } from "./edit";
 import { ReportTemplate } from "../../../types/dina-export-api";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 import Link from "next/link";
 
 export default function ReportTemplateDetailsPage() {

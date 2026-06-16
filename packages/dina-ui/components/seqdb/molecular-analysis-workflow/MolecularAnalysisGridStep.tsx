@@ -14,11 +14,8 @@ import {
 } from "./useMolecularAnalysisGridControls";
 import { DraggableItemList } from "../container-grid/DraggableItemList";
 import { ContainerGrid } from "../container-grid/ContainerGrid";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import {
-  StorageUnit,
-  StorageUnitType
-} from "packages/dina-ui/types/collection-api";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { StorageUnit, StorageUnitType } from "@dina-ui/types/collection-api";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   DndContext,

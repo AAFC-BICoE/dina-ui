@@ -3,7 +3,7 @@ import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { QueryBuilderContextProvider } from "../../QueryBuilder";
 import _ from "lodash";
 import userEvent from "@testing-library/user-event";
-import { Vocabulary } from "packages/dina-ui/types/collection-api";
+import { Vocabulary } from "@dina-ui/types/collection-api";
 import QueryRowClassificationSearch, {
   SUPPORTED_CLASSIFICATION_OPERATORS,
   transformClassificationToDSL

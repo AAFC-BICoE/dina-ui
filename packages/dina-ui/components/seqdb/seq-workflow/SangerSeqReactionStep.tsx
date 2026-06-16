@@ -16,8 +16,8 @@ import {
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import _ from "lodash";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
+import { MaterialSample } from "@dina-ui/types/collection-api";
 import { useEffect, useMemo, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { BiChevronsRight } from "react-icons/bi";
@@ -36,8 +36,8 @@ import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { SeqReactionDndTable } from "./seq-reaction-step/SeqReactionDndTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { useSeqReactionState } from "./seq-reaction-step/useSeqReactionState";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { MolecularAnalysisRunItem } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 export interface SangerSeqReactionStepProps {
   seqBatch?: SeqBatch;

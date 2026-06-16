@@ -5,10 +5,10 @@ import {
   ReadOnlyResourceLink,
   ResourceSelect,
   SimpleSearchFilterBuilder
-} from "packages/common-ui/lib";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { Protocol } from "packages/dina-ui/types/collection-api";
-import { PreLibraryPrep, Product } from "packages/dina-ui/types/seqdb-api";
+} from "@common-ui/lib";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
+import { Protocol } from "@dina-ui/types/collection-api";
+import { PreLibraryPrep, Product } from "@dina-ui/types/seqdb-api";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styles from "./PreLibraryPrepTable.module.css";
 import classNames from "classnames";

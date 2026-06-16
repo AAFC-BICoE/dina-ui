@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { Protocol } from "packages/dina-ui/types/collection-api";
+import { Protocol } from "@dina-ui/types/collection-api";
 import { LibraryPrep, Product } from "../..";
 
 export type PreLibraryPrepType = "SHEARING" | "SIZE_SELECTION";

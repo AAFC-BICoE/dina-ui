@@ -7,11 +7,11 @@ import {
   FieldHeader,
   ColumnDefinition
 } from "common-ui";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
-import { CollectingEvent } from "packages/dina-ui/types/collection-api";
-import { groupCell } from "packages/dina-ui/components";
+import { TableColumn } from "@common-ui/lib/list-page/types";
+import { CollectingEvent } from "@dina-ui/types/collection-api";
+import { groupCell } from "@dina-ui/components";
 
 const NON_EXPORTABLE_COLUMNS = ["selectColumn"];
 

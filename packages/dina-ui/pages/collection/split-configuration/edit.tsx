@@ -26,7 +26,7 @@ import {
   TYPE_BASED_STRATEGY,
   UPPER_CHARACTER_TYPE
 } from "../../../types/collection-api/resources/SplitConfiguration";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 import _ from "lodash";
 
 export default function SplitConfigurationEditPage() {

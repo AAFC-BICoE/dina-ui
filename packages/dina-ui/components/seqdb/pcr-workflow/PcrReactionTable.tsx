@@ -17,7 +17,7 @@ import {
   pcrBatchItemResultColor
 } from "../../../types/seqdb-api";
 import { getDeterminations } from "../../collection/material-sample/organismUtils";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export function usePcrReactionData(pcrBatchId?: string) {
   const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>([]);

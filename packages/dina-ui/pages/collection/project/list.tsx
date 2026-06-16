@@ -7,7 +7,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import PageLayout from "../../../components/page/PageLayout";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "@common-ui/lib/list-page/types";
 
 export const PROJECT_NON_EXPORTABLE_COLUMNS: string[] = ["selectColumn"];
 

@@ -14,7 +14,7 @@ import {
 } from "../../../components/object-store";
 import { useFileUpload } from "../../../components/object-store/file-upload/FileUploadProvider";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ReportTemplateUpload } from "packages/dina-ui/types/objectstore-api/resources/ReportTemplateUpload";
+import { ReportTemplateUpload } from "@dina-ui/types/objectstore-api/resources/ReportTemplateUpload";
 import { InputResource } from "kitsu";
 
 export const BULK_ADD_IDS_KEY = "bulkAddIds";

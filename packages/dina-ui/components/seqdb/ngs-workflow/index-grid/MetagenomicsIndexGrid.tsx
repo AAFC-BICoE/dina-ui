@@ -7,7 +7,7 @@ import {
   SubmitButton
 } from "common-ui";
 import { ColumnDef } from "@tanstack/react-table";
-import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
+import { useSeqdbIntl } from "@dina-ui/intl/seqdb-intl";
 import { MetagenomicsIndexAssignmentStepProps } from "../../metagenomics-workflow/MetagenomicsIndexAssignmentStep";
 import {
   MetagenomicsIndexAssignmentResource,

@@ -14,7 +14,7 @@ import {
   ControlledVocabularyItem,
   ManagedAttribute,
   VocabularyElement
-} from "packages/dina-ui/types/collection-api";
+} from "@dina-ui/types/collection-api";
 import { Ref, useMemo, useRef } from "react";
 import Link from "next/link";
 import { Alert, Card } from "react-bootstrap";

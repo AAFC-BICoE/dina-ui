@@ -4,7 +4,7 @@ import {
   QueryTable,
   SimpleSearchFilterBuilder
 } from "common-ui";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { MaterialSample } from "@dina-ui/types/collection-api";
 import {
   ViewPageLayoutWithCustomHook,
   useCollectingEventQuery

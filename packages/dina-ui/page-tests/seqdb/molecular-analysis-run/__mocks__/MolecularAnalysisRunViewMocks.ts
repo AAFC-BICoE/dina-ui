@@ -9,13 +9,13 @@ import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType
 } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
-import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
-import { PcrBatchItem, SeqReaction } from "packages/dina-ui/types/seqdb-api";
-import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { GenericMolecularAnalysisItem } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { QualityControl } from "@dina-ui/types/seqdb-api/resources/QualityControl";
+import { MetagenomicsBatchItem } from "@dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
+import { PcrBatchItem, SeqReaction } from "@dina-ui/types/seqdb-api";
+import { MolecularAnalysisResult } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 
 export const TEST_MOLECULAR_ANALYSIS_RUN_GENRIC_ID =
   "b4c78082-61a8-4784-a116-8601f76c85d7";

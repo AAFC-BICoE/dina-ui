@@ -1,5 +1,5 @@
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { ApiConfigInfo } from "packages/dina-ui/types/system-info/SystemInfo";
+import PageLayout from "@dina-ui/components/page/PageLayout";
+import { ApiConfigInfo } from "@dina-ui/types/system-info/SystemInfo";
 import { FaSyncAlt } from "react-icons/fa";
 import { ModuleCard } from "../../components/system-info/ModuleCard";
 import { useSystemInfoCheck } from "../../components/system-info/useSystemInfoCheck";

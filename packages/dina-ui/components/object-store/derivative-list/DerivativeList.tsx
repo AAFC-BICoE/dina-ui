@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { Metadata } from "@dina-ui/types/objectstore-api";
 import { CollapsableSection } from "../metadata/MetadataDetails";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {

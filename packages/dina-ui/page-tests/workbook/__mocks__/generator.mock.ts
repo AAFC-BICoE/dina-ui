@@ -1,7 +1,7 @@
 import {
   ControlledVocabularyItem,
   Vocabulary
-} from "packages/dina-ui/types/collection-api";
+} from "@dina-ui/types/collection-api";
 
 export const TEST_CONTROLLED_VOCABULARY_ITEM_MATERIAL_SAMPLE: ControlledVocabularyItem =
   {

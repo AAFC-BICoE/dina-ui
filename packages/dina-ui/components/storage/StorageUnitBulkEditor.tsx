@@ -23,7 +23,7 @@ import { FormikProps } from "formik";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import _ from "lodash";
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
-import { StorageUnit } from "packages/dina-ui/types/collection-api";
+import { StorageUnit } from "@dina-ui/types/collection-api";
 import { StorageUnitForm } from "./StorageUnitForm";
 import { useStorageUnitSave } from "./useStorageUnit";
 

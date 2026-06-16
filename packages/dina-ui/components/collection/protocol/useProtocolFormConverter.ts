@@ -1,6 +1,6 @@
 import { InputResource } from "kitsu";
 import _ from "lodash";
-import { Protocol } from "packages/dina-ui/types/collection-api";
+import { Protocol } from "@dina-ui/types/collection-api";
 import { ProtocolFormValue } from "./ProtocolForm";
 
 export function useProtocolFormConverter() {

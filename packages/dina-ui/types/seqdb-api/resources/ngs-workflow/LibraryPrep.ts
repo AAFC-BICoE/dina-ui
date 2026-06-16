@@ -1,8 +1,8 @@
 import { KitsuResource } from "kitsu";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { MaterialSample } from "@dina-ui/types/collection-api";
 import { NgsIndex } from "./NgsIndex";
 import { LibraryPrepBatch } from "./LibraryPrepBatch";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 interface LibraryPrepAttributes {
   type: "library-prep";

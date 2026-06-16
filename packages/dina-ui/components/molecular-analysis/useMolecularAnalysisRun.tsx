@@ -10,7 +10,7 @@ import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType
 } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
+import { MolecularAnalysisRun } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { useMolecularAnalysisRunColumns } from "./useMolecularAnalysisRunColumns";
 

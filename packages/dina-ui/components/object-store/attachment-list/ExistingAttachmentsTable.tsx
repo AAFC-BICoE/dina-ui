@@ -17,7 +17,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { useEffect, useMemo } from "react";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { Metadata } from "@dina-ui/types/objectstore-api";
 import {
   FaEdit,
   FaExclamationTriangle,

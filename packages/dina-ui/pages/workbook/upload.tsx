@@ -1,7 +1,7 @@
 import { ApiClientContext, LoadingSpinner } from "common-ui";
 import { withRouter } from "next/router";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { SaveWorkbookProgress } from "packages/dina-ui/components/workbook/SaveWorkbookProgress";
+import PageLayout from "@dina-ui/components/page/PageLayout";
+import { SaveWorkbookProgress } from "@dina-ui/components/workbook/SaveWorkbookProgress";
 import { useContext, useMemo, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import {

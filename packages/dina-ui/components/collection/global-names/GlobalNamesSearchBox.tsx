@@ -23,7 +23,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { FaExclamationCircle, FaRegSadTear } from "react-icons/fa";
 import { ListGroup } from "react-bootstrap";
 import { FilterParam } from "kitsu";
-import { UserPreference } from "packages/dina-ui/types/user-api";
+import { UserPreference } from "@dina-ui/types/user-api";
 
 export type Selection =
   | string

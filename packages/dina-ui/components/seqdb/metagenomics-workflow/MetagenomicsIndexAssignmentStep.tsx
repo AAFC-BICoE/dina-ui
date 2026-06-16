@@ -1,13 +1,13 @@
 import { PersistedResource } from "kitsu";
-import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
+import { PcrBatch } from "@dina-ui/types/seqdb-api";
 import { Dispatch, SetStateAction } from "react";
 import Col from "react-bootstrap/Col";
 import Nav from "react-bootstrap/Nav";
 import Row from "react-bootstrap/Row";
 import Tab from "react-bootstrap/Tab";
-import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
+import { useSeqdbIntl } from "@dina-ui/intl/seqdb-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
+import { MetagenomicsBatch } from "@dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 import { useMetagenomicsIndexAssignmentAPI } from "../ngs-workflow/useMetagenomicsIndexAssignmentAPI";
 import { MetagenomicsIndexGrid } from "../ngs-workflow/index-grid/MetagenomicsIndexGrid";
 import { MetagenomicsIndexAssignmentTable } from "../ngs-workflow/MetagenomicsIndexAssignmentTable";

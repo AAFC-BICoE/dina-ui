@@ -1,5 +1,5 @@
 import { InputResource } from "kitsu";
-import { DcType, Metadata } from "packages/dina-ui/types/objectstore-api";
+import { DcType, Metadata } from "@dina-ui/types/objectstore-api";
 
 // -- Metadata Mocks --
 

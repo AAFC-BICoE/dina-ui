@@ -20,11 +20,8 @@ import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
 import _ from "lodash";
 import { useRouter } from "next/router";
-import { SeqReactionDndTable } from "packages/dina-ui/components/seqdb/seq-workflow/seq-reaction-step/SeqReactionDndTable";
-import {
-  Protocol,
-  StorageUnitType
-} from "packages/dina-ui/types/collection-api";
+import { SeqReactionDndTable } from "@dina-ui/components/seqdb/seq-workflow/seq-reaction-step/SeqReactionDndTable";
+import { Protocol, StorageUnitType } from "@dina-ui/types/collection-api";
 import { ReactNode } from "react";
 import {
   Footer,
@@ -41,8 +38,8 @@ import {
   SeqBatch,
   ThermocyclerProfile
 } from "../../../types/seqdb-api";
-import { useSeqReactionState } from "packages/dina-ui/components/seqdb/seq-workflow/seq-reaction-step/useSeqReactionState";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { useSeqReactionState } from "@dina-ui/components/seqdb/seq-workflow/seq-reaction-step/useSeqReactionState";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 
 interface UseSeqBatchQueryOptions {
   deps?: any[];

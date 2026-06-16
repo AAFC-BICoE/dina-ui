@@ -11,7 +11,7 @@ import { Button } from "react-bootstrap";
 import { GeneratorItem } from "./GeneratorItem";
 import { GeneratorColumn, GeneratorSelectorProps } from "./GeneratorSelector";
 import _ from "lodash";
-import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
+import { ManagedAttribute } from "@dina-ui/types/collection-api";
 import { useFormikContext } from "formik";
 import QueryRowClassificationSearch, {
   ClassificationSearchStates

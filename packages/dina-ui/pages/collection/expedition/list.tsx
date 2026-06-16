@@ -6,8 +6,8 @@ import {
   SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { Expedition } from "packages/dina-ui/types/collection-api";
+import PageLayout from "@dina-ui/components/page/PageLayout";
+import { Expedition } from "@dina-ui/types/collection-api";
 import { groupCell, GroupSelectField, Head } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 

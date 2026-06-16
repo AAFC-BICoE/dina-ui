@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
-import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
+import { SelectOption } from "@common-ui/lib/formik-connected/SelectField";
 import { TransformToDSLProps } from "../../types";
 import PolygonEditorMap from "@dina-ui/components/collection/site/PolygonEditorMap";
-import { GeoPosition } from "packages/dina-ui/types/geo/geo.types";
+import { GeoPosition } from "@dina-ui/types/geo/geo.types";
 
 interface QueryBuilderGeoShapeSearchProps {
   /**

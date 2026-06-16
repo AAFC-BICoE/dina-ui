@@ -4,19 +4,19 @@ import {
   Protocol,
   StorageUnitType,
   Vocabulary
-} from "packages/dina-ui/types/collection-api";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
-import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
+} from "@dina-ui/types/collection-api";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { Metadata } from "@dina-ui/types/objectstore-api";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysisItem } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { MolecularAnalysisRun } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType
 } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
-import { Group } from "packages/dina-ui/types/user-api";
-import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { QualityControl } from "@dina-ui/types/seqdb-api/resources/QualityControl";
+import { Group } from "@dina-ui/types/user-api";
+import { MolecularAnalysisResult } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
 
 export const TEST_METADATA_1: PersistedResource<Metadata> = {
   id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",

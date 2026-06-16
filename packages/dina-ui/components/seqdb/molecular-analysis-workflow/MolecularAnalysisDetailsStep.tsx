@@ -11,10 +11,10 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useEffect } from "react";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { VocabularySelectField } from "../../collection/VocabularySelectField";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
-import { Protocol } from "packages/dina-ui/types/collection-api";
+import { Protocol } from "@dina-ui/types/collection-api";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 

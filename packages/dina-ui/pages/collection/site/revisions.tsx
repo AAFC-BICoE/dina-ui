@@ -1,5 +1,5 @@
-import { RevisionsPage as Layout } from "packages/dina-ui/components/revisions/RevisionsPageLayout";
-import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "packages/dina-ui/components/revisions/revision-modules";
+import { RevisionsPage as Layout } from "@dina-ui/components/revisions/RevisionsPageLayout";
+import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "@dina-ui/components/revisions/revision-modules";
 
 export default function RevisionsPage() {
   return (

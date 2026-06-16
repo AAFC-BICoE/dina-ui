@@ -17,8 +17,8 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "../../types/collection-api";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
-import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
-import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
+import { MetagenomicsBatchItem } from "@dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
+import { MetagenomicsBatch } from "@dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 import { useMolecularAnalysisRunColumns } from "./useMolecularAnalysisRunColumns";
 
 export interface UseMetagenomicsWorkflowMolecularAnalysisRunProps {

@@ -10,7 +10,7 @@ import { LibraryPrep } from "../../../../types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
 import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
 import { UseIndexAssignmentReturn } from "../useIndexAssignmentAPI";
-import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
+import { useSeqdbIntl } from "@dina-ui/intl/seqdb-intl";
 
 interface CellData {
   row: number;

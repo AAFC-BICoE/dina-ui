@@ -17,7 +17,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 import { groupCell, GroupSelectField } from "../../components";
 import PageLayout from "../../components/page/PageLayout";
-import { AgentIdentifierType } from "packages/dina-ui/types/agent-api/resources/AgentIdentifierType";
+import { AgentIdentifierType } from "@dina-ui/types/agent-api/resources/AgentIdentifierType";
 
 export function useFilterIdentifierType() {
   const { locale: language } = useContext(intlContext);

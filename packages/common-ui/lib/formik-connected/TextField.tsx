@@ -1,5 +1,5 @@
 import { FormikProps } from "formik";
-import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import { InputHTMLAttributes, TextareaHTMLAttributes, type JSX } from "react";
 import TextareaAutosize, {
   TextareaAutosizeProps
 } from "react-textarea-autosize";
@@ -55,6 +55,7 @@ export function TextField(props: TextFieldProps) {
   return (
     <FieldWrapper {...fieldWrapperProps}>
       {({ formik, setValue, value, invalid, placeholder }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         const bulkTab = useBulkEditTabFieldIndicators({
           fieldName: props.name,
           currentValue: value

@@ -5,7 +5,7 @@ import {
   useAccount
 } from "common-ui";
 import Link from "next/link";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "@dina-ui/components/page/PageLayout";
 
 const GROUP_TABLE_COLUMNS: ColumnDefinition<any>[] = [
   {

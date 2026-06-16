@@ -5,24 +5,24 @@ import {
   useApiClient,
   useQuery
 } from "common-ui";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { PersistedResource } from "kitsu";
-import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
+import { MaterialSampleSummary } from "@dina-ui/types/collection-api";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysisItem } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import {
   MolecularAnalysisRunItem,
   MolecularAnalysisRunItemUsageType
 } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
-import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
+import { MolecularAnalysisRun } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
+import { QualityControl } from "@dina-ui/types/seqdb-api/resources/QualityControl";
 import useVocabularyOptions from "../../collection/useVocabularyOptions";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
 import _ from "lodash";
-import { MolecularAnalysisResult } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { MolecularAnalysisResult } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisResult";
+import { Metadata } from "@dina-ui/types/objectstore-api";
 
 export interface QualityControlWithAttachment extends QualityControl {
   attachments: ResourceIdentifierObject[];

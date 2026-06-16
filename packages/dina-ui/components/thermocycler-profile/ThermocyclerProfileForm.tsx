@@ -7,7 +7,7 @@ import {
 } from "common-ui";
 import { ThermocyclerProfileFormFields } from "./ThermocyclerProfileFormFields";
 import { NextRouter } from "next/router";
-import { ThermocyclerProfile } from "../../types/seqdb-api"; // "packages/dina-ui/types/seqdb-api"
+import { ThermocyclerProfile } from "../../types/seqdb-api"; // "@dina-ui/types/seqdb-api"
 
 export interface ThermocyclerProfileFormProps {
   thermocyclerProfile?: ThermocyclerProfile;

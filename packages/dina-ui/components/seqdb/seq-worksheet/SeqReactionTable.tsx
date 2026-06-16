@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ReactTable } from "../../../../common-ui/lib";
 import { SeqReaction } from "../../../types/seqdb-api";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 
 export interface SeqReactionTableProps {
   seqReactions: SeqReaction[];

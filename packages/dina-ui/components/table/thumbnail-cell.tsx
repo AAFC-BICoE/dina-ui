@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import Link from "next/link";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "@common-ui/lib/list-page/types";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";

@@ -4,20 +4,17 @@ import { useEffect, useState, useMemo, type JSX } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "@common-ui/lib/list-page/types";
 import _ from "lodash";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { DataExportTemplate } from "packages/dina-ui/types/dina-export-api/resources/DataExportTemplate";
-import {
-  ColumnSeparator,
-  ExportType
-} from "packages/dina-ui/types/dina-export-api";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
+import { DataExportTemplate } from "@dina-ui/types/dina-export-api/resources/DataExportTemplate";
+import { ColumnSeparator, ExportType } from "@dina-ui/types/dina-export-api";
 import Select from "react-select";
 import {
   convertColumnsToAliases,
   convertColumnsToPaths,
   getColumnFunctions
-} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
+} from "@common-ui/lib/column-selector/ColumnSelectorUtils";
 
 export const VISIBILITY_OPTIONS: {
   label: JSX.Element;

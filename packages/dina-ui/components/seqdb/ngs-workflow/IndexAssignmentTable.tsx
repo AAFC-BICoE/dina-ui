@@ -6,14 +6,14 @@ import {
   SelectOption,
   SubmitButton,
   useStringComparator
-} from "packages/common-ui/lib";
+} from "@common-ui/lib";
 import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
 import { useMemo } from "react";
-import { LibraryPrep } from "packages/dina-ui/types/seqdb-api";
+import { LibraryPrep } from "@dina-ui/types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
-import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
+import { MaterialSampleSummary } from "@dina-ui/types/collection-api";
 import { UseIndexAssignmentReturn } from "./useIndexAssignmentAPI";
-import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
+import { useSeqdbIntl } from "@dina-ui/intl/seqdb-intl";
 
 interface IndexAssignmentRow {
   materialSample?: MaterialSampleSummary;

@@ -12,10 +12,10 @@ import {
   Protocol,
   StorageUnit,
   StorageUnitType
-} from "packages/dina-ui/types/collection-api";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+} from "@dina-ui/types/collection-api";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
-import { LibraryPrep, NgsIndex } from "packages/dina-ui/types/seqdb-api";
+import { LibraryPrep, NgsIndex } from "@dina-ui/types/seqdb-api";
 
 export interface UseIndexAssignmentReturn {
   libraryPrepsLoading: boolean;

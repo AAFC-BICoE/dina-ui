@@ -26,7 +26,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { generateSequence } from "../collection/material-sample/useGenerateSequence";
 import { useEffect } from "react";
-import { Collection } from "packages/dina-ui/types/collection-api";
+import { Collection } from "@dina-ui/types/collection-api";
 
 export interface MaterialSampleGenerationFormProps {
   onGenerate: (samples: MaterialSampleGenerationFormSubmission) => void;

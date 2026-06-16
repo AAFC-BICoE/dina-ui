@@ -11,7 +11,7 @@ import {
 import { useState, useRef } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
 import _ from "lodash";
-import { Determination } from "packages/dina-ui/types/collection-api/resources/Determination";
+import { Determination } from "@dina-ui/types/collection-api/resources/Determination";
 import { includedTypeQuery } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 export interface ScientificNameFieldProps {

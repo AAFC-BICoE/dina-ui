@@ -57,7 +57,7 @@ import { generateSequence } from "./useGenerateSequence";
 import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { Alert } from "react-bootstrap";
 import CollectingEventEditAlert from "../collecting-event/CollectingEventEditAlert";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { Association } from "../../../types/collection-api/resources/Association";
 
 export function useMaterialSampleQuery(id?: string | null) {

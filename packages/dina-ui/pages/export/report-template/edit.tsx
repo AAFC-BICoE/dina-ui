@@ -18,10 +18,7 @@ import { useRouter } from "next/router";
 import { useContext } from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  ReportTemplate,
-  ReportType
-} from "packages/dina-ui/types/dina-export-api";
+import { ReportTemplate, ReportType } from "@dina-ui/types/dina-export-api";
 import Link from "next/link";
 
 interface ReportTemplateFormProps {

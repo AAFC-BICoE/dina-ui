@@ -1,13 +1,9 @@
 import { KitsuResponse, PersistedResource } from "kitsu";
-import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
-import {
-  PcrBatchItem,
-  SeqBatch,
-  SeqReaction
-} from "packages/dina-ui/types/seqdb-api";
-import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
+import { MaterialSampleSummary } from "@dina-ui/types/collection-api";
+import { StorageUnitUsage } from "@dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { Metadata } from "@dina-ui/types/objectstore-api";
+import { PcrBatchItem, SeqBatch, SeqReaction } from "@dina-ui/types/seqdb-api";
+import { MolecularAnalysisRun } from "@dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 export const TEST_MOLECULAR_ANALYSIS_RUN_ID =

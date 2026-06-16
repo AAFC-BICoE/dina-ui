@@ -4,8 +4,8 @@ import {
   ButtonBar,
   BackButton,
   SubmitButton
-} from "packages/common-ui/lib";
-import { SeqSubmission } from "packages/dina-ui/types/seqdb-api/resources/SeqSubmission";
+} from "@common-ui/lib";
+import { SeqSubmission } from "@dina-ui/types/seqdb-api/resources/SeqSubmission";
 import { useRouter } from "next/router";
 import { SeqSubmissionFields } from "./SeqSubmissionFields";
 

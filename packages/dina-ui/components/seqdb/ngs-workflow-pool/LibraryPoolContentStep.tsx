@@ -22,7 +22,7 @@ import {
   LibraryPoolContent,
   LibraryPrepBatch
 } from "../../../types/seqdb-api";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
 
 const HIDE_USED_ITEMS_KEY = "pooling-search-hide-used";
 

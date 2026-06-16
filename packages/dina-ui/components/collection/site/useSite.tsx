@@ -7,8 +7,8 @@ import {
   useApiClient,
   useQuery
 } from "common-ui";
-import { Site } from "packages/dina-ui/types/collection-api";
-import { AllowAttachmentsConfig } from "packages/dina-ui/components/object-store";
+import { Site } from "@dina-ui/types/collection-api";
+import { AllowAttachmentsConfig } from "@dina-ui/components/object-store";
 
 export function useSiteQuery(id?: string | null) {
   const siteQuery = useQuery<Site>(

@@ -23,7 +23,7 @@ import {
   CollectionModuleType,
   COLLECTION_MODULE_TYPES,
   COLLECTION_MODULE_TYPE_LABELS
-} from "packages/dina-ui/types/collection-api";
+} from "@dina-ui/types/collection-api";
 
 interface IdentifierFormProps {
   fetchedIdentifierType?: AgentIdentifierType;

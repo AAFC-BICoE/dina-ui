@@ -6,7 +6,7 @@ import { DinaForm, LoadingSpinner } from "common-ui";
 import { Alert } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { AttachmentsEditor } from "../../object-store/attachment-list/AttachmentsField";
 import { AttachmentReadOnlySection } from "../../object-store/attachment-list/AttachmentReadOnlySection";
 import { QualityControlSection } from "./QualityControlSection";

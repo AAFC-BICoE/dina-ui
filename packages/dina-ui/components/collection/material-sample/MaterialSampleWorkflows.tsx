@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysis } from "@dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {

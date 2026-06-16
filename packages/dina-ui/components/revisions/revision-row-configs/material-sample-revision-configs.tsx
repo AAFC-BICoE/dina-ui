@@ -1,7 +1,7 @@
 import { KeyValueTable } from "common-ui";
 import { DataEntryViewer } from "common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import Link from "next/link";
-import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
+import { Protocol } from "@dina-ui/types/collection-api/resources/Protocol";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   CollectingEvent,
