@@ -347,7 +347,7 @@ export interface RelationshipAutocompleteField
    * disambiguation.
    * Example: "email, or lastname" for Person
    */
-  optionDescription: string;
+  optionDescription?: string;
 
   /**
    * The path in elastic search to match the relationship UUID.

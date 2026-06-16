@@ -1568,7 +1568,7 @@
     date-fns "^2.0.1"
     react-popper "^2.2.5"
 
-"@types/react-dom@^18.2.25":
+"@types/react-dom@^18.3.0":
   version "18.3.7"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.3.7.tgz#b89ddf2cd83b4feafcc4e2ea41afdfb95a0d194f"
   integrity sha512-MEe3UeoENYVFXzoXEWsvcpg6ZvlrFNlOQ7EOsvhI3CfAXwzPfO8Qwuxd40nepsYKqyyVQnTdEfv68q91yLcKrQ==
@@ -1607,7 +1607,7 @@
     "@types/prop-types" "*"
     csstype "^3.0.2"
 
-"@types/react@18.3.31":
+"@types/react@18.3.31", "@types/react@^18.3.0":
   version "18.3.31"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.31.tgz#b5e95e28ffcceab8d982f33f2eb076e17653c2a4"
   integrity sha512-vfEqpXTvwT91yhmwdfouStN2hSKwTvyRs8qpLfADyrq/kxDw0hZM7Wk9Ug1FELj8hIby+S/+kQCSRFF32nv2Qw==
@@ -2872,6 +2872,7 @@ commander@~3.0.2:
     "@react-awesome-query-builder/ui" "^6.3.0"
     "@rehooks/local-storage" "2.4.0"
     "@tanstack/react-table" "^8.9.3"
+    "@types/react" "18.3.31"
     axios-cache-interceptor "1.7.0"
     bodybuilder "^2.4.0"
     core-js "^3.19.1"
