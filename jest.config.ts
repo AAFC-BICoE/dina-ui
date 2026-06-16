@@ -1,5 +1,25 @@
 import type { Config } from "@jest/types";
 
+const esModulePackages = [
+  "keycloak-js",
+  "react-intl",
+  "intl-messageformat",
+  "@formatjs/intl",
+  "@formatjs/fast-memoize",
+  "@formatjs/ecma402-abstract",
+  "@formatjs/icu-messageformat-parser",
+  "@formatjs/icu-skeleton-parser",
+  "@formatjs/intl-localematcher",
+  "kitsu",
+  "kitsu-core",
+  "axios",
+  "uuid",
+  "axios-cache-interceptor",
+  "try",
+  "flat",
+  "usehooks-ts"
+].join("|");
+
 const config: Config.InitialOptions = {
   collectCoverageFrom: ["**/*.{ts,tsx,js,jsx}"],
   coveragePathIgnorePatterns: [
@@ -37,9 +57,7 @@ const config: Config.InitialOptions = {
     "^.+\\.js?$": ["babel-jest", { presets: ["next/babel"] }],
     "\\.mjs?$": ["babel-jest", { presets: ["next/babel"] }]
   },
-  transformIgnorePatterns: [
-    `/node_modules/(?!common-ui|axios|dnd-core|keycloak-js)`
-  ],
+  transformIgnorePatterns: [`/node_modules/(?!(${esModulePackages})/)`],
   globalSetup: "./jest-global-setup.js"
 };
 
