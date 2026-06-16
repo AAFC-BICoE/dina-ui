@@ -10,7 +10,7 @@ import { FilterFreeTextSearchField } from "../filter-free-text-search/FilterFree
 import { FaArrowRotateLeft, FaFilter } from "react-icons/fa6";
 
 interface FreeTextFilterFormProps {
-  children?: (formik: FormikProps<any>) => React.ReactElement;
+  children?: (formik: FormikProps<any>) => React.ReactElement<any>;
   filterAttributes: FilterAttribute[];
   /** Unique ID for this form's name. */
   id: string;

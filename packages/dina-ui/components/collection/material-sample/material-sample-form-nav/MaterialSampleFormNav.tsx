@@ -19,7 +19,8 @@ import {
   PropsWithChildren,
   useEffect,
   useMemo,
-  useState
+  useState,
+  type JSX
 } from "react";
 import { FaGripLines } from "react-icons/fa";
 import Switch, { ReactSwitchProps } from "react-switch";

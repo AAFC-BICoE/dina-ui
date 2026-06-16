@@ -38,7 +38,7 @@ export function usePCRBatchItemGridControls({
 
   // Highlighted/selected PcrBatchItems.
   const [selectedItems, setSelectedItems] = useState<PcrBatchItemSample[]>([]);
-  const lastSelectedItemRef = useRef<PcrBatchItemSample>();
+  const lastSelectedItemRef = useRef<PcrBatchItemSample>(undefined);
 
   // Grid fill direction when you move multiple PcrBatchItems into the grid.
   const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");

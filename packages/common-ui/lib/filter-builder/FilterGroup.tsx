@@ -2,6 +2,8 @@ import { useIntl } from "react-intl";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { FilterRowModel } from "./FilterRow";
 
+import type { JSX } from "react";
+
 export type FilterGroupOperator = "AND" | "OR";
 
 export interface FilterGroupModel {

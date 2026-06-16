@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type JSX } from "react";
 import { BackToListButton } from "common-ui/lib/button-bar/BackToListButton";
 import PageLayout from "../page/PageLayout";
 import {

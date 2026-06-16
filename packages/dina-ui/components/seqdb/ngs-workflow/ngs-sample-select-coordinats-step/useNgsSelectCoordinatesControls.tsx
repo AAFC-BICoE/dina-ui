@@ -38,7 +38,7 @@ export function useNsgSelectCoordinatesControls({
 
   // Highlighted/selected library prep items.
   const [selectedItems, setSelectedItems] = useState<NsgSample[]>([]);
-  const lastSelectedItemRef = useRef<NsgSample>();
+  const lastSelectedItemRef = useRef<NsgSample>(undefined);
 
   // Grid fill direction when you move multiple library prep items into the grid.
   const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");

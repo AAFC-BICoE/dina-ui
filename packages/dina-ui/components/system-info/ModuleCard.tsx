@@ -7,6 +7,8 @@ import {
   FaExclamationCircle
 } from "react-icons/fa";
 
+import type { JSX } from "react";
+
 const STATUS_CONFIG: Record<
   ModuleStatus,
   {

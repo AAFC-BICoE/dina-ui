@@ -14,7 +14,7 @@ import {
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import _ from "lodash";
 import Link from "next/link";
-import { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode, type JSX } from "react";
 import { AllowAttachmentsConfig, AttachmentSection } from "..";
 import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";

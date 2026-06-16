@@ -13,7 +13,7 @@ import {
 import { KitsuResource, PersistedResource } from "kitsu";
 import _ from "lodash";
 import { useRouter } from "next/router";
-import { ReactNode } from "react";
+import { ReactNode, type JSX } from "react";
 import { Footer, GroupLabel, Head, Nav } from "..";
 import { HasDinaMetaInfo } from "../../types/DinaJsonMetaInfo";
 import Link from "next/link";

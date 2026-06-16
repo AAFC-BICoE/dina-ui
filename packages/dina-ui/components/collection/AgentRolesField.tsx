@@ -20,7 +20,7 @@ import {
 
 export interface AgentRolesFieldProps {
   fieldName: string;
-  title: React.ReactElement;
+  title: React.ReactElement<any>;
   resourcePath: string;
   readOnly?: boolean;
   forContributor?: boolean;

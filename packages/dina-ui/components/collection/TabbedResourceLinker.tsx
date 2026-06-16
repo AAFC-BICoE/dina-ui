@@ -8,7 +8,7 @@ import {
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { ReactNode, type JSX } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 

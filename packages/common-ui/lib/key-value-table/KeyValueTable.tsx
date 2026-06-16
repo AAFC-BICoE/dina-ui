@@ -6,6 +6,8 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ReadOnlyValue } from "../formik-connected/FieldView";
 import { CommonMessage } from "../intl/common-ui-intl";
 
+import type { JSX } from "react";
+
 export interface KeyValueTableProps {
   /** The object whose keys and values are to be shown. */
   data: Record<string, any>;

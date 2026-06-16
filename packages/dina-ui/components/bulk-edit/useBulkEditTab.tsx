@@ -5,7 +5,7 @@ import {
   ResourceWithHooks
 } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
-import React, { useState } from "react";
+import React, { useState, type JSX } from "react";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { BulkNavigatorTab } from "./BulkEditNavigator";
 import { FormikProps } from "formik";
@@ -15,7 +15,7 @@ export interface UseBulkEditTabParams<T extends KitsuResource = KitsuResource> {
   resourceHooks: ResourceWithHooks<T>[];
   hideBulkEditTab?: boolean;
   resourceForm: JSX.Element;
-  bulkEditFormRef: RefObject<FormikProps<InputResource<T>>>;
+  bulkEditFormRef: RefObject<FormikProps<InputResource<T>> | null>;
 }
 
 export function useBulkEditTab({

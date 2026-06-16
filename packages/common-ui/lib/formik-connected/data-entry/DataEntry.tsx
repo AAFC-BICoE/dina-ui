@@ -7,7 +7,7 @@ import {
   FieldExtension,
   FieldExtensionValue
 } from "@dina-ui/types/collection-api/resources/FieldExtension";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type JSX } from "react";
 import { Button } from "react-bootstrap";
 import {
   BulkEditTabContextI,

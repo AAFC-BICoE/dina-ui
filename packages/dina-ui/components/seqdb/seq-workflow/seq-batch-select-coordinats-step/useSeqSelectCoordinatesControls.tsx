@@ -44,7 +44,7 @@ export function useSeqSelectCoordinatesControls({
 
   // Highlighted/selected SeqBatchItems.
   const [selectedItems, setSelectedItems] = useState<SeqReactionSample[]>([]);
-  const lastSelectedItemRef = useRef<SeqReactionSample>();
+  const lastSelectedItemRef = useRef<SeqReactionSample>(undefined);
 
   // Grid fill direction when you move multiple SeqBatchItems into the grid.
   const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");

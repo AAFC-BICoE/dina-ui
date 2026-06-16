@@ -26,7 +26,7 @@ import {
   StorageUnit,
   StorageUnitType
 } from "../../types/collection-api";
-import { Ref, useState } from "react";
+import { Ref, useState, type JSX } from "react";
 import StorageUnitGrid from "./grid/StorageUnitGrid";
 import { FormikProps, useFormikContext } from "formik";
 import { useStorageUnitSave } from "./useStorageUnit";

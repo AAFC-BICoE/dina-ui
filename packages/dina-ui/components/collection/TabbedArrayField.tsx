@@ -8,7 +8,7 @@ import {
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import _ from "lodash";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, type JSX } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";

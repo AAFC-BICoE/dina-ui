@@ -33,7 +33,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   setCustomGeographicPlaceCheckboxState
 }: GroupedCheckBoxesParams<TData>) {
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
-  const lastCheckedItemRef = useRef<TData>();
+  const lastCheckedItemRef = useRef<TData>(undefined);
   const { formatMessage } = useIntl();
   const formik = useFormikContext<any>();
   const selectAllName = `${SELECT_ALL_PREFIX}.${fieldName}`;

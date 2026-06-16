@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { CSSProperties, useMemo } from "react";
+import { CSSProperties, useMemo, type JSX } from "react";
 import { useContext } from "react";
 import { DinaFormContext, FieldSpy, FieldSpyRenderProps } from "..";
 import { DinaFormSection, DinaFormSectionProps } from "./DinaForm";

@@ -45,7 +45,7 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
     array?: PersistedResource<TData>[]
   ) => boolean;
   filterAttributes?: FilterAttribute[];
-  filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
+  filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement<any>;
   id: string;
   queryTableProps:
     | QueryTableProps<TData>

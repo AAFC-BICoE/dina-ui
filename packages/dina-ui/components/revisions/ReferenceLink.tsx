@@ -3,6 +3,8 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { AuditToEntityReference } from "../../types/objectstore-api";
 
+import type { JSX } from "react";
+
 export interface ReferenceLinkProps<TResource extends KitsuResource> {
   /** Base API path of the linked resource. */
   baseApiPath: string;

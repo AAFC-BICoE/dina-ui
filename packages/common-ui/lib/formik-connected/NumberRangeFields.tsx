@@ -4,7 +4,7 @@ import { useIntl } from "react-intl";
 import { CommonMessage, Tooltip } from "..";
 import { useDinaFormContext } from "./DinaForm";
 import { MetersField } from "./MetersField";
-import { useMemo } from "react";
+import { useMemo, type JSX } from "react";
 
 export interface NumberRangeFieldsProps {
   /** Min and max field names. */
@@ -16,6 +16,7 @@ export function NumberRangeFields({
   names: [minName, maxName],
   labelMsg
 }: NumberRangeFieldsProps) {
+  const { values } = useFormikContext<any>();
   const { formatMessage } = useIntl();
   const { readOnly, isTemplate, formTemplate, componentName, sectionName } =
     useDinaFormContext();
@@ -56,8 +57,6 @@ export function NumberRangeFields({
   ) {
     return null;
   }
-
-  const { values } = useFormikContext<any>();
 
   const minVal = values[minName];
   const maxVal = values[maxName];

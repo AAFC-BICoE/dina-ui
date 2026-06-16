@@ -6,6 +6,8 @@ import { ElasticsearchHit } from "./useMultiIndexSearch";
 import { startCase } from "lodash";
 import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 
+import type { JSX } from "react";
+
 export interface SearchResultItemProps {
   hit: ElasticsearchHit;
   showIcon?: boolean;

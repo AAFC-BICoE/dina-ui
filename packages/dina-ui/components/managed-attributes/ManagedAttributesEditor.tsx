@@ -228,7 +228,7 @@ export function DynamicResourceSelect<
   filter?: (input: string) => any;
   optionLabel?: (
     item: PersistedResource<TData>
-  ) => string | React.ReactElement | null;
+  ) => string | React.ReactElement<any> | null;
   value?: PersistedResource<TData> | PersistedResource<TData>[] | null;
   isMulti?: boolean;
   isLoading?: boolean;
@@ -318,7 +318,7 @@ export function DynamicResourceSelect<
   );
 
   const effectiveOptionLabel:
-    | ((r: PersistedResource<TData>) => string | React.ReactElement | null)
+    | ((r: PersistedResource<TData>) => string | React.ReactElement<any> | null)
     | undefined = optionLabelProp ?? defaultOptionLabel;
 
   return (
