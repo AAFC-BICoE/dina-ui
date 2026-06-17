@@ -1,5 +1,5 @@
 import RcTooltip from "rc-tooltip";
-import { ReactNode } from "react";
+import { ReactNode, type JSX } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export interface TooltipProps {

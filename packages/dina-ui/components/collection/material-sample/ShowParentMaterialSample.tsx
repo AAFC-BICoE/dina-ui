@@ -10,6 +10,8 @@ import {
 import { MATERIAL_SAMPLE_ATTR_NAMES } from "./ShowParentAttributesField";
 import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
+import type { JSX } from "react";
+
 interface ShowParentMaterialSampleProps {
   className?: string;
   id?: string;

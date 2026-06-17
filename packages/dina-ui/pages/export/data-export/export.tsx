@@ -44,7 +44,7 @@ import {
   ExportType
 } from "packages/dina-ui/types/dina-export-api";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
-import { ReactNode, useRef, useState } from "react";
+import { ReactNode, useRef, useState, type JSX } from "react";
 import {
   Button,
   ButtonGroup,

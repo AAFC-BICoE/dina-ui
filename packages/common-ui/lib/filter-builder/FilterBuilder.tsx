@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React from "react";
+import React, { type JSX } from "react";
 import { FilterBuilderContextProvider } from "./FilterBuilderContext";
 import {
   FilterGroup,

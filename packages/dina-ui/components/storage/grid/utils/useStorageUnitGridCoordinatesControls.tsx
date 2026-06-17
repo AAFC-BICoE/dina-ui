@@ -28,8 +28,8 @@ export function useGridCoordinatesControls({
 
   const usageTypeRef = useRef<string | undefined>(undefined);
   const editContentsPathRef = useRef<string>("");
-  const usageTypeLinkRef = useRef<UrlObject>();
-  const usageTypeResourceNameRef = useRef<string>();
+  const usageTypeLinkRef = useRef<UrlObject>(undefined);
+  const usageTypeResourceNameRef = useRef<string>(undefined);
 
   // Change to track an array of objects with well coordinate and associated samples.
   const multipleSamplesWellCoordinates = useRef<

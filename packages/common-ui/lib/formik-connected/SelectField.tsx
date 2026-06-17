@@ -25,7 +25,7 @@ export interface SelectFieldProps<T> extends FieldWrapperProps {
   options: SelectOption<T>[] | undefined;
   styles?: Partial<StylesConfig<SelectOption<T | null | undefined>, boolean>>;
 
-  forwardedRef?: RefObject<HTMLSelectElement>;
+  forwardedRef?: RefObject<HTMLSelectElement | null>;
   isLoading?: boolean;
 
   selectProps?: Partial<ComponentProps<typeof Select>>;

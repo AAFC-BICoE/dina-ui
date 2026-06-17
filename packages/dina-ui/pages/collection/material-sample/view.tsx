@@ -56,7 +56,7 @@ import {
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { Row } from "@tanstack/react-table";
-import { CSSProperties } from "react";
+import { CSSProperties, type JSX } from "react";
 import { dynamicFieldMappingForMaterialSample } from "./list";
 import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 import { FaRegClock } from "react-icons/fa";

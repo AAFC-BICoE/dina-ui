@@ -367,7 +367,7 @@ export interface UseMaterialSampleSaveParams {
 
   onSaved?: (id: string) => Promise<void>;
 
-  colEventFormRef?: React.RefObject<FormikProps<any>>;
+  colEventFormRef?: React.RefObject<FormikProps<any> | null>;
 
   isTemplate?: boolean;
 
@@ -400,7 +400,7 @@ export interface PrepareSampleSaveOperationParams {
   preProcessSample?: (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
-  collectingEventRefExternal?: React.RefObject<FormikProps<any>>;
+  collectingEventRefExternal?: React.RefObject<FormikProps<any> | null>;
 }
 
 export function useMaterialSampleSave({

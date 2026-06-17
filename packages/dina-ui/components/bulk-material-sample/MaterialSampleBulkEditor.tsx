@@ -15,7 +15,14 @@ import {
 } from "common-ui";
 import _ from "lodash";
 import { InputResource, PersistedResource, KitsuResource } from "kitsu";
-import { useEffect, useMemo, useRef, useState, RefObject } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  RefObject,
+  type JSX
+} from "react";
 import { Promisable } from "type-fest";
 import {
   MaterialSampleFormTemplateSelect,
@@ -429,9 +436,9 @@ interface BulkSampleSaveParams {
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
   bulkEditCtx: BulkEditTabContextI<MaterialSample>;
-  bulkEditCollectingEvtFormRef: RefObject<
-    FormikProps<InputResource<CollectingEvent>>
-  >;
+  bulkEditCollectingEvtFormRef: RefObject<FormikProps<
+    InputResource<CollectingEvent>
+  > | null>;
   bulkEditSampleHook: any;
 }
 

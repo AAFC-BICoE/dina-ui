@@ -16,6 +16,8 @@ import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
 import { RiDeleteBinLine } from "react-icons/ri";
 import AlphanumericEncoder from "alphanumeric-encoder";
 
+import type { JSX } from "react";
+
 export interface AssignedStorageProps {
   name?: string;
   readOnly?: boolean;

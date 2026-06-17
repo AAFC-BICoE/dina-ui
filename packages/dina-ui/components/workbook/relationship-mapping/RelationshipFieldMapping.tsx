@@ -1,6 +1,6 @@
 import { useFormikContext } from "formik";
 import _ from "lodash";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, type JSX } from "react";
 import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useWorkbookContext } from "../WorkbookProvider";

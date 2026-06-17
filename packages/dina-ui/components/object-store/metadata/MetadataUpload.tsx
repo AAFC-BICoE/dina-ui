@@ -8,7 +8,7 @@ import {
   DefaultValue,
   License
 } from "../../../types/objectstore-api";
-import React from "react";
+import React, { type JSX } from "react";
 import { MetadataForm } from "./MetadataForm";
 import { useRouter } from "next/router";
 import { useContext, useState, useEffect } from "react";

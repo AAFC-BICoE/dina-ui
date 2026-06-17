@@ -1,6 +1,6 @@
 import { ResourceWithHooks } from "common-ui";
 import { InputResource } from "kitsu";
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { mountWithAppContext } from "common-ui";
 import { MaterialSample } from "../../../types/collection-api";
 import {

@@ -83,7 +83,7 @@ interface QueryProps<TData extends KitsuResponseData, TMeta> {
   onSuccess?: (response: KitsuResponse<TData, TMeta>) => void;
   query: JsonApiQuerySpec;
   options?: QueryOptions<TData, TMeta>;
-  children: (state: QueryState<TData, TMeta>) => React.ReactElement | null;
+  children: (state: QueryState<TData, TMeta>) => React.ReactElement<any> | null;
 }
 
 /** Exposes the useQuery return value as "render props" to the children. */

@@ -15,7 +15,8 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useMemo
+  useMemo,
+  type JSX
 } from "react";
 import { useIntl } from "react-intl";
 import { BulkEditTabContext, scrollToError } from "..";

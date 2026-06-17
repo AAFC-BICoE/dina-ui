@@ -5,6 +5,8 @@ import { AsyncOption } from "../ResourceSelect";
 import "@testing-library/jest-dom";
 import { fireEvent, waitFor } from "@testing-library/react";
 
+import type { JSX } from "react";
+
 /** Example */
 interface Todo extends KitsuResource {
   name: string;

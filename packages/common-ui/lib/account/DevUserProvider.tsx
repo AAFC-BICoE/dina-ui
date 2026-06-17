@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, type JSX } from "react";
 import axios from "axios";
 import { AccountProvider } from "./AccountProvider";
 import _ from "lodash";

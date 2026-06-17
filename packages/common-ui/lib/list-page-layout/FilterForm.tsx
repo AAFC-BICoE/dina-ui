@@ -11,7 +11,7 @@ import { FaFilter } from "react-icons/fa";
 import { FaArrowRotateLeft } from "react-icons/fa6";
 
 interface FilterFormProps {
-  children?: (formik: FormikProps<any>) => React.ReactElement;
+  children?: (formik: FormikProps<any>) => React.ReactElement<any>;
   filterAttributes: FilterAttribute[];
   /** Unique ID for this form's name. */
   id: string;

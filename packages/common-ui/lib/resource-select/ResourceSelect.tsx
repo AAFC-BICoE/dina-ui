@@ -5,7 +5,7 @@ import {
   PersistedResource
 } from "kitsu";
 import _ from "lodash";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useEffect, useState, type JSX } from "react";
 import { useIntl } from "react-intl";
 import { ActionMeta, StylesConfig } from "react-select";
 import { useDebounce } from "use-debounce";

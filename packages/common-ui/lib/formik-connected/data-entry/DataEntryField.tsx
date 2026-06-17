@@ -1,5 +1,7 @@
 import { DataEntry } from "./DataEntry";
 
+import type { JSX } from "react";
+
 export interface DataEntryFieldProps {
   /** Name that will be passed down to DataBlock and FieldArray component. */
   name: string;

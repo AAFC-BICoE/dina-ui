@@ -6,7 +6,7 @@ import {
   KitsuResponseData
 } from "kitsu";
 import _ from "lodash";
-import { useContext, useDebugValue, useMemo } from "react";
+import { useContext, useDebugValue, useMemo, type JSX } from "react";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";

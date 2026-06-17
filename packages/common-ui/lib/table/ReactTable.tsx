@@ -74,7 +74,7 @@ export interface ReactTableProps<TData> {
   renderSubComponent?: (props: {
     row: Row<TData>;
     index?: number;
-  }) => React.ReactElement;
+  }) => React.ReactElement<any>;
   // A function that returns true, the the row is expandable
   getRowCanExpand?: (row: Row<TData>) => boolean;
   // Styling to be applied to each row of the React Table
