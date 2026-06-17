@@ -255,7 +255,10 @@ export function QueryTable<TData extends KitsuResource>({
     query = {
       path,
       fields,
+      fiql,
+      filter,
       include,
+      page: { limit: page.limit, offset: 0 },
       sort
     };
   } else {
