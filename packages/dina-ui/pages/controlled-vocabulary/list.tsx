@@ -6,7 +6,8 @@ import {
   ListLayoutFilterType,
   ListPageLayout,
   useApiClient,
-  LoadingSpinner
+  LoadingSpinner,
+  SimpleSearchFilterBuilder
 } from "common-ui";
 import Link from "next/link";
 import { useMemo, useCallback, useState, useEffect, useRef } from "react";
@@ -250,13 +251,15 @@ export default function ControlledVocabularyListPage() {
         id="controlled-vocabulary-items-list"
         filterType={ListLayoutFilterType.FILTER_BUILDER}
         filterAttributes={CV_FILTER_ATTRIBUTES}
-        additionalFilters={(filterForm) => {
-          // Group filter — when mixed, handled in filterFn instead so
-          // it doesn't go through FIQL conversion.
-          if (isMixedCase) return {};
-          const groupVal = (filterForm as any)?.group as string | undefined;
-          return groupVal ? { group: { EQ: groupVal } } : {};
-        }}
+        additionalFilters={(filterForm) =>
+          SimpleSearchFilterBuilder.create<ControlledVocabularyItem>()
+            .whereProvided(
+              "group",
+              "EQ",
+              isMixedCase ? undefined : (filterForm.group as string | undefined)
+            )
+            .build()
+        }
         enableInMemoryFilter={isMixedCase}
         filterFn={
           isMixedCase
