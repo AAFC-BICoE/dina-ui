@@ -1,5 +1,18 @@
 import type { Config } from "@jest/types";
 
+const babelConfig = {
+  presets: [
+    [
+      "next/babel",
+      {
+        "preset-react": {
+          runtime: "automatic"
+        }
+      }
+    ]
+  ]
+};
+
 const config: Config.InitialOptions = {
   collectCoverageFrom: ["**/*.{ts,tsx,js,jsx}"],
   coveragePathIgnorePatterns: [
@@ -33,11 +46,13 @@ const config: Config.InitialOptions = {
   testPathIgnorePatterns: ["/.next/", "/node_modules/"],
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$",
   transform: {
-    "^.+\\.tsx?$": ["babel-jest", { presets: ["next/babel"] }],
-    "^.+\\.js?$": ["babel-jest", { presets: ["next/babel"] }],
-    "\\.mjs?$": ["babel-jest", { presets: ["next/babel"] }]
+    "^.+\\.tsx?$": ["babel-jest", babelConfig],
+    "^.+\\.js?$": ["babel-jest", babelConfig],
+    "\\.mjs?$": ["babel-jest", babelConfig]
   },
-  transformIgnorePatterns: [`/node_modules/(?!common-ui|axios|dnd-core)`],
+  transformIgnorePatterns: [
+    `/node_modules/(?!common-ui|axios|dnd-core|usehooks-ts)`
+  ],
   globalSetup: "./jest-global-setup.js"
 };
 
