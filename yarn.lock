@@ -1690,7 +1690,7 @@
   resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-4.4.12.tgz#b5d76568485b02a307238270bfe96cb51ee2a044"
   integrity sha512-8TV6R3h2j7a91c+1DXdJi3Syo69zzIZbz7Lg5tORM5LEJG7X/E6a1V3drRyBRZq7/utz7A+c4OgYLiLcYGHG6w==
 
-"@types/react@*", "@types/react@16 || 17 || 18 || 19", "@types/react@>=16.9.11", "@types/react@^19.0.0":
+"@types/react@*", "@types/react@16 || 17 || 18 || 19", "@types/react@18.3.31", "@types/react@>=16.9.11", "@types/react@^19.0.0":
   version "19.2.17"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-19.2.17.tgz#dccac365baa0f1734ec270ff4b51c89465e8dc7f"
   integrity sha512-MXfmqaVPEVgkBT/aY0aGCkRWWtByiYQXo3xdQ8r5RzuFrPiRn8Gar2tQdXSUQ2GKV3bkXckek89V8wQBY2Q/Aw==
@@ -2903,6 +2903,7 @@ commander@~3.0.2:
     "@react-awesome-query-builder/ui" "^6.6.15"
     "@rehooks/local-storage" "2.4.0"
     "@tanstack/react-table" "^8.9.3"
+    "@types/react" "18.3.31"
     axios-cache-interceptor "1.7.0"
     bodybuilder "^2.4.0"
     core-js "^3.19.1"
