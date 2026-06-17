@@ -28,6 +28,59 @@ import styles from "./controlled-vocabulary.module.css";
 import { useControlledVocabularySidebarData } from "packages/dina-ui/components/controlled-vocabulary/useControlledVocabularySidebarData";
 import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/resources/ControlledVocabularyItem";
 
+const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy"];
+
+const COLUMNS: ColumnDefinition<ControlledVocabularyItem>[] = [
+  {
+    accessorKey: "multilingualTitle",
+    header: "Multilingual Title",
+    cell: ({ row: { original } }) =>
+      original.multilingualTitle?.titles?.[0]?.title ?? ""
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row: { original } }) => (
+      <Link href={`/controlled-vocabulary-item/view?id=${original.id}`}>
+        {original.name ?? original.id}
+      </Link>
+    )
+  },
+  {
+    accessorKey: "dinaComponent",
+    header: "Data Component",
+    cell: ({ row: { original } }) => {
+      const comp = original.dinaComponent as any;
+      return comp ?? "";
+    }
+  },
+  {
+    accessorKey: "vocabularyElementType",
+    header: "Vocabulary Element Type",
+    cell: ({ row: { original } }) => original.vocabularyElementType ?? ""
+  },
+  {
+    accessorKey: "unit",
+    header: "Unit",
+    cell: ({ row: { original } }) => original.unit ?? ""
+  },
+  {
+    accessorKey: "acceptedValues",
+    header: "Accepted Values",
+    cell: ({ row: { original } }) =>
+      Array.isArray(original.acceptedValues)
+        ? original.acceptedValues.map((v) => `"${v}"`).join(", ")
+        : ""
+  },
+  descriptionCell(false, false, "multilingualDescription"),
+  groupCell("group"),
+  {
+    accessorKey: "createdBy",
+    header: () => <DinaMessage id="field_createdBy" />
+  },
+  dateCell("createdOn")
+];
+
 export default function ControlledVocabularyListPage() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
@@ -46,8 +99,6 @@ export default function ControlledVocabularyListPage() {
       sort: "name"
     }
   });
-
-  const CV_FILTER_ATTRIBUTES = ["name", "key", "unit", "createdBy"];
 
   // 2. Filter State
   const [typeFilter, setTypeFilter] = useState<TypeFilterState>({
@@ -148,7 +199,7 @@ export default function ControlledVocabularyListPage() {
     });
   }, [cvItems, parentCounts, parentsWithChildren]);
 
-  // Helper to determine which parents need dinaComponent filtering
+  // 5. Filter group helpers
   const getParentFilterGroups = useCallback(
     (selectedParents: string[], selectedChildren: string[]) => {
       const needsFilter =
@@ -166,71 +217,92 @@ export default function ControlledVocabularyListPage() {
     [parentsWithChildren]
   );
 
-  // 5. Detect mixed case: some selected parents have dinaComponent children,
+  // 6. Detect mixed case: some selected parents have dinaComponent children,
   //    some don't, and children are checked.  We pre-filter by parent server-side and
   //    refine dinaComponent client-side via filterFn.
-  const isMixedCase = useMemo(() => {
-    const sel = typeFilter.parent_cv_ids ?? [];
-    const ch = typeFilter.children ?? [];
-    if (sel.length === 0 || ch.length === 0) return false;
-    const { needsFilter, withoutFilter } = getParentFilterGroups(sel, ch);
-    return needsFilter.length > 0 && withoutFilter.length > 0;
-  }, [typeFilter, getParentFilterGroups]);
 
   const selectedParents = typeFilter.parent_cv_ids ?? [];
   const selectedChildren = typeFilter.children ?? [];
 
-  // 6. Table Columns
-  const COLUMNS: ColumnDefinition<ControlledVocabularyItem>[] = [
-    {
-      accessorKey: "multilingualTitle",
-      header: "Multilingual Title",
-      cell: ({ row: { original } }) =>
-        original.multilingualTitle?.titles?.[0]?.title ?? ""
-    },
-    {
-      accessorKey: "name",
-      header: "Name",
-      cell: ({ row: { original } }) => (
-        <Link href={`/controlled-vocabulary-item/view?id=${original.id}`}>
-          {original.name ?? original.id}
-        </Link>
-      )
-    },
-    {
-      accessorKey: "dinaComponent",
-      header: "Data Component",
-      cell: ({ row: { original } }) => {
-        const comp = original.dinaComponent as any;
-        return comp ?? "";
+  // When children are checked but no parent is explicitly selected,
+  // implicitly treat every parent-that-has-children as selected.
+  const effectiveParents = useMemo(
+    () =>
+      selectedParents.length === 0 && selectedChildren.length > 0
+        ? Array.from(parentsWithChildren)
+        : selectedParents,
+    [selectedParents, selectedChildren, parentsWithChildren]
+  );
+
+  // 7. Detect mixed case: some selected parents have dinaComponent children,
+  //    some don't, and children are checked. We pre-filter by parent
+  //    server-side and refine dinaComponent client-side via filterFn.
+  const isMixedCase = useMemo(() => {
+    if (effectiveParents.length === 0 || selectedChildren.length === 0)
+      return false;
+    const { needsFilter, withoutFilter } = getParentFilterGroups(
+      effectiveParents,
+      selectedChildren
+    );
+    return needsFilter.length > 0 && withoutFilter.length > 0;
+  }, [effectiveParents, selectedChildren, getParentFilterGroups]);
+
+  // 8. Mixed case client-side filter
+  const mixedCaseFilterFn = useCallback(
+    (filterForm: any, item: any) => {
+      const cv = item.controlledVocabulary;
+      const parentId = typeof cv === "string" ? cv : cv?.id;
+
+      if (typeof parentId === "string" && parentsWithChildren.has(parentId)) {
+        if (!selectedChildren.includes(item.dinaComponent)) return false;
       }
+
+      const group = filterForm?.group as string | undefined;
+      if (group && item.group !== group) return false;
+
+      return true;
     },
-    {
-      accessorKey: "vocabularyElementType",
-      header: "Vocabulary Element Type",
-      cell: ({ row: { original } }) => original.vocabularyElementType ?? ""
-    },
-    {
-      accessorKey: "unit",
-      header: "Unit",
-      cell: ({ row: { original } }) => original.unit ?? ""
-    },
-    {
-      accessorKey: "acceptedValues",
-      header: "Accepted Values",
-      cell: ({ row: { original } }) =>
-        Array.isArray(original.acceptedValues)
-          ? original.acceptedValues.map((v) => `"${v}"`).join(", ")
-          : ""
-    },
-    descriptionCell(false, false, "multilingualDescription"),
-    groupCell("group"),
-    {
-      accessorKey: "createdBy",
-      header: () => <DinaMessage id="field_createdBy" />
-    },
-    dateCell("createdOn")
-  ];
+    [parentsWithChildren, selectedChildren]
+  );
+
+  // 9. Query table props
+  const buildQueryTableProps = useCallback(() => {
+    const filter: Record<string, any> = {};
+
+    if (effectiveParents.length > 0) {
+      filter["controlledVocabulary.uuid"] = {
+        IN: effectiveParents.join(",")
+      };
+    }
+
+    if (isMixedCase) {
+      return {
+        columns: COLUMNS,
+        path: "/collection-api/controlled-vocabulary-item",
+        filter,
+        include: "controlledVocabulary",
+        defaultPageSize: 1000
+      };
+    }
+
+    const { needsFilter } = getParentFilterGroups(
+      effectiveParents,
+      selectedChildren
+    );
+
+    if (
+      needsFilter.length === effectiveParents.length &&
+      selectedChildren.length > 0
+    ) {
+      filter.dinaComponent = { IN: selectedChildren.join(",") };
+    }
+
+    return {
+      columns: COLUMNS,
+      path: "/collection-api/controlled-vocabulary-item",
+      filter
+    };
+  }, [effectiveParents, selectedChildren, isMixedCase, getParentFilterGroups]);
 
   return (
     <PageLayout
@@ -261,29 +333,7 @@ export default function ControlledVocabularyListPage() {
             .build()
         }
         enableInMemoryFilter={isMixedCase}
-        filterFn={
-          isMixedCase
-            ? (filterForm, item) => {
-                const cv = (item as any).controlledVocabulary;
-                const parentId = typeof cv === "string" ? cv : cv?.id;
-                const comp = (item as any).dinaComponent;
-
-                if (
-                  typeof parentId === "string" &&
-                  parentsWithChildren.has(parentId)
-                ) {
-                  if (!selectedChildren.includes(comp)) {
-                    return false;
-                  }
-                }
-
-                const gv = (filterForm as any)?.group as string | undefined;
-                if (gv && (item as any).group !== gv) return false;
-
-                return true;
-              }
-            : undefined
-        }
+        filterFn={isMixedCase ? mixedCaseFilterFn : undefined}
         filterFormchildren={({ submitForm }) => (
           <div className="mb-3">
             <div style={{ width: 300 }}>
@@ -299,7 +349,6 @@ export default function ControlledVocabularyListPage() {
           <div className={styles.cvGrid}>
             <aside className={styles.cvSidebar} aria-label="Filter by Type">
               <h2 className="h6 mb-2">Filter by Type</h2>
-
               <TypeFilterSideBarDynamic
                 title="Controlled Vocabularies"
                 parents={parentOptions}
@@ -319,46 +368,7 @@ export default function ControlledVocabularyListPage() {
             </div>
           </div>
         )}
-        queryTableProps={() => {
-          const filter: Record<string, any> = {};
-
-          if (selectedParents.length > 0) {
-            filter["controlledVocabulary.uuid"] = {
-              IN: selectedParents.join(",")
-            };
-          }
-
-          if (isMixedCase) {
-            // Server-side: broad parent filter only.  filterFn refines
-            // dinaComponent and group client-side.
-            return {
-              columns: COLUMNS,
-              path: "/collection-api/controlled-vocabulary-item",
-              filter,
-              include: "controlledVocabulary",
-              defaultPageSize: 1000
-            };
-          }
-
-          // Simple case: server-side handles everything.
-          const { needsFilter } = getParentFilterGroups(
-            selectedParents,
-            selectedChildren
-          );
-
-          if (
-            needsFilter.length === selectedParents.length &&
-            selectedChildren.length > 0
-          ) {
-            filter.dinaComponent = { IN: selectedChildren.join(",") };
-          }
-
-          return {
-            columns: COLUMNS,
-            path: "/collection-api/controlled-vocabulary-item",
-            filter
-          };
-        }}
+        queryTableProps={buildQueryTableProps}
       />
     </PageLayout>
   );
