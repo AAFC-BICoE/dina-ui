@@ -18,9 +18,27 @@ export interface SubmitButtonProps {
 export interface FileDropzoneProps {
   onSubmit: (files: IFileWithMeta[]) => void;
   onChange?: (files: IFileWithMeta[]) => void;
+
+  /**
+   * Number of files that can be uploaded through the file dropzone.
+   *
+   * By default it's unlimited, but can be set to 1 just for a single file upload.
+   */
   maxFiles?: number;
+
+  /**
+   * Maximum allowed file size in bytes. Files exceeding this are flagged with an error and
+   * excluded from submission.
+   */
   maxSizeBytes?: number;
+
+  /**
+   * Comma-separated MIME types or extensions passed to the hidden `<input>` and used for
+   * client-side filtering (e.g. `"text/csv, .xlsx"`).
+   */
   accept?: string;
+
+  inputContent?: React.ReactNode;
   submitButtonContent?: React.ReactNode;
   PreviewComponent?: React.ComponentType<{
     fileWithMeta: InternalFileWithMeta;
@@ -191,6 +209,7 @@ export function FileDropzone({
   maxFiles,
   maxSizeBytes,
   accept,
+  inputContent,
   submitButtonContent,
   PreviewComponent,
   SubmitButtonComponent,
@@ -346,7 +365,7 @@ export function FileDropzone({
                   }}
                 />
                 <span style={{ fontSize: "1.1rem" }}>
-                  <DinaMessage id="uploadFormInstructions" />
+                  {inputContent ?? <DinaMessage id="uploadFormInstructions" />}
                 </span>
               </div>
             </div>
