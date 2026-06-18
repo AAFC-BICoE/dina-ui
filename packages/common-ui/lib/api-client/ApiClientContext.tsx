@@ -182,7 +182,7 @@ export class ApiClientImpl implements ApiClientI {
 
     // Add caching support for one second since it's likely it's going to be same response.
     const ONE_SECOND = 1000;
-    this.apiClient.axios = setupCache(this.apiClient.axios, {
+    (this.apiClient.axios as any) = setupCache(this.apiClient.axios, {
       location: "client",
       storage: buildMemoryStorage(
         false, // clone data off
