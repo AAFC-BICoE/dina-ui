@@ -18,28 +18,9 @@ export interface SubmitButtonProps {
 export interface FileDropzoneProps {
   onSubmit: (files: IFileWithMeta[]) => void;
   onChange?: (files: IFileWithMeta[]) => void;
-
-  /**
-   * Number of files that can be uploaded through the file dropzone.
-   *
-   * By default it's unlimited, but can be set to 1 just for a single file upload.
-   */
   maxFiles?: number;
-
-  /**
-   * Maximum allowed file size in bytes. Files exceeding this are flagged with an error and
-   * excluded from submission.
-   */
   maxSizeBytes?: number;
-
-  /**
-   * Comma-separated MIME types or extensions passed to the hidden `<input>` and used for
-   * client-side filtering (e.g. `"text/csv, .xlsx"`).
-   */
   accept?: string;
-
-  inputContent?: React.ReactNode;
-  inputWithFilesContent?: React.ReactNode;
   submitButtonContent?: React.ReactNode;
   PreviewComponent?: React.ComponentType<{
     fileWithMeta: InternalFileWithMeta;
@@ -114,7 +95,7 @@ export function DefaultPreview({
 
   return (
     <div
-      className="d-flex align-items-center gap-3 px-3 py-3 rounded"
+      className="d-flex align-items-stretch rounded overflow-hidden"
       style={{
         backgroundColor: hasError ? "rgba(220, 53, 69, 0.05)" : "#f8f9fa",
         border: `1px solid ${hasError ? "rgba(220, 53, 69, 0.3)" : "#e9ecef"}`,
@@ -122,35 +103,36 @@ export function DefaultPreview({
       }}
     >
       {/* Icon / thumbnail */}
-      <div
-        className="d-flex align-items-center justify-content-center rounded flex-shrink-0"
-        style={{
-          width: "48px",
-          height: "48px",
-          backgroundColor: "#ffffff",
-          border: "1px solid #e9ecef"
-        }}
-      >
-        {previewUrl ? (
-          <img
-            src={previewUrl}
-            alt={fileWithMeta.meta.name}
-            className="dzu-previewImage rounded"
-            style={{
-              maxHeight: "42px",
-              maxWidth: "42px",
-              objectFit: "contain",
-              userSelect: "none"
-            }}
-            draggable={false}
-          />
-        ) : (
-          fileExtensionToIcon(fileExtension, "text-secondary fs-4")
-        )}
-      </div>
+      {previewUrl ? (
+        <img
+          src={previewUrl}
+          alt={fileWithMeta.meta.name}
+          className="dzu-previewImage flex-shrink-0"
+          style={{
+            width: "96px",
+            objectFit: "cover",
+            userSelect: "none",
+            display: "block"
+          }}
+          draggable={false}
+        />
+      ) : (
+        <div
+          className="d-flex align-items-center justify-content-center flex-shrink-0"
+          style={{
+            width: "48px",
+            margin: "12px 0 12px 12px",
+            backgroundColor: "#ffffff",
+            border: "1px solid #e9ecef",
+            borderRadius: "6px"
+          }}
+        >
+          {fileExtensionToIcon(fileExtension, "text-secondary fs-4")}
+        </div>
+      )}
 
       {/* Name + size */}
-      <div className="d-flex flex-column flex-grow-1 overflow-hidden gap-1">
+      <div className="d-flex flex-column flex-grow-1 overflow-hidden justify-content-center gap-1 px-3 py-3">
         <span
           className="fw-medium text-truncate"
           style={{ fontSize: "0.95rem", color: "#212529" }}
@@ -170,15 +152,17 @@ export function DefaultPreview({
       </div>
 
       {/* Remove */}
-      <button
-        type="button"
-        className="btn btn-link p-0 flex-shrink-0"
-        style={{ color: "#adb5bd", lineHeight: 1 }}
-        onClick={() => fileWithMeta.remove()}
-        aria-label={`Remove ${fileWithMeta.meta.name}`}
-      >
-        <FaTrashCan size={17} />
-      </button>
+      <div className="d-flex align-items-center px-3 flex-shrink-0">
+        <button
+          type="button"
+          className="btn btn-danger p-2"
+          style={{ color: "#ffffff", lineHeight: 1 }}
+          onClick={() => fileWithMeta.remove()}
+          aria-label={`Remove ${fileWithMeta.meta.name}`}
+        >
+          <FaTrashCan size={17} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -207,8 +191,6 @@ export function FileDropzone({
   maxFiles,
   maxSizeBytes,
   accept,
-  inputContent,
-  inputWithFilesContent,
   submitButtonContent,
   PreviewComponent,
   SubmitButtonComponent,
@@ -217,6 +199,7 @@ export function FileDropzone({
   const [files, setFiles] = useState<InternalFileWithMeta[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listBottomRef = useRef<HTMLDivElement>(null);
   const acceptList = parseAccept(accept);
   const multiple = maxFiles === undefined || maxFiles > 1;
   const atMaxFiles = maxFiles !== undefined && files.length >= maxFiles;
@@ -254,6 +237,16 @@ export function FileDropzone({
     },
     [files, multiple, maxFiles, maxSizeBytes, acceptList.join(","), removeFile]
   );
+
+  // Scroll the newest item into view whenever the file count grows
+  useEffect(() => {
+    if (files.length > 0) {
+      listBottomRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+      });
+    }
+  }, [files.length]);
 
   useEffect(() => {
     onChange?.(files);
@@ -340,30 +333,22 @@ export function FileDropzone({
                 inputRef.current?.click();
               }}
             >
-              {hasFiles ? (
-                <div className="p-2 text-center" style={{ color: "#555555" }}>
-                  {inputWithFilesContent ?? <DinaMessage id="addFilesButton" />}
-                </div>
-              ) : (
-                <div
-                  className="d-flex flex-column align-items-center justify-content-center text-center py-5 px-3"
-                  style={{ color: "#555555" }}
-                >
-                  <FaFileArrowUp
-                    size={48}
-                    className="mb-3"
-                    style={{
-                      color: isDragging ? "#0d6efd" : "#aaaaaa",
-                      transition: "color 0.2s ease"
-                    }}
-                  />
-                  <span style={{ fontSize: "1.1rem" }}>
-                    {inputContent ?? (
-                      <DinaMessage id="uploadFormInstructions" />
-                    )}
-                  </span>
-                </div>
-              )}
+              <div
+                className="d-flex flex-column align-items-center justify-content-center text-center py-5 px-3"
+                style={{ color: "#555555" }}
+              >
+                <FaFileArrowUp
+                  size={48}
+                  className="mb-3"
+                  style={{
+                    color: isDragging ? "#0d6efd" : "#aaaaaa",
+                    transition: "color 0.2s ease"
+                  }}
+                />
+                <span style={{ fontSize: "1.1rem" }}>
+                  <DinaMessage id="uploadFormInstructions" />
+                </span>
+              </div>
             </div>
           </div>
 
@@ -420,6 +405,8 @@ export function FileDropzone({
           />
         </div>
       )}
+      {/* Scroll Anchor so the user can see the item added */}
+      <div ref={listBottomRef} />
     </div>
   );
 }

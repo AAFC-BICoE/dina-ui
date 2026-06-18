@@ -74,8 +74,6 @@ export function FileUploader<TValues = any>({
             formik
           )
         }
-        inputContent={formatMessage("uploadFormInstructions")}
-        inputWithFilesContent={formatMessage("addFilesButton")}
         submitButtonContent={formatMessage("submitBtnText")}
         SubmitButtonComponent={(props: SubmitButtonProps) => {
           const hasAnInvalidFileSize =
