@@ -16,7 +16,9 @@ export interface TypeFilterState {
 export interface TypeFilterSideBarDynamicProps {
   parents: SidebarOption[];
   childrenMap?: Record<string, SidebarOption[]>;
-  loadChildren?: (parentId: string) => Promise<SidebarOption[]> | SidebarOption[];
+  loadChildren?: (
+    parentId: string
+  ) => Promise<SidebarOption[]> | SidebarOption[];
   selected: TypeFilterState;
   onChange: (next: TypeFilterState) => void;
   title?: string;
@@ -28,12 +30,14 @@ export function TypeFilterSideBarDynamic({
   loadChildren,
   selected,
   onChange,
-  title = "Filters",
+  title = "Filters"
 }: TypeFilterSideBarDynamicProps) {
   // Local UI state for open/closed parents
   const [open, setOpen] = useState<Record<string, boolean>>({});
   // Local data state for asynchronously loaded children
-  const [loadedChildren, setLoadedChildren] = useState<Record<string, SidebarOption[]>>({});
+  const [loadedChildren, setLoadedChildren] = useState<
+    Record<string, SidebarOption[]>
+  >({});
   // Track if we've already auto-expanded
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
 
@@ -73,12 +77,19 @@ export function TypeFilterSideBarDynamic({
     expandAll();
   }, [parents, loadChildren, hasAutoExpanded, loadedChildren]);
 
-  const selectedParentSet = useMemo(() => new Set(selected.parent_cv_ids ?? []), [selected.parent_cv_ids]);
-  const selectedChildSet = useMemo(() => new Set(selected.children ?? []), [selected.children]);
+  const selectedParentSet = useMemo(
+    () => new Set(selected.parent_cv_ids ?? []),
+    [selected.parent_cv_ids]
+  );
+  const selectedChildSet = useMemo(
+    () => new Set(selected.children ?? []),
+    [selected.children]
+  );
 
   // 2. Derived State: Calculate the status of every parent based on current selection props
   const parentStatus = useMemo(() => {
-    const status: Record<string, { checked: boolean; indeterminate: boolean }> = {};
+    const status: Record<string, { checked: boolean; indeterminate: boolean }> =
+      {};
 
     parents.forEach((p) => {
       const pChildren = allChildren[p.id] ?? [];
@@ -88,10 +99,10 @@ export function TypeFilterSideBarDynamic({
         // If children exist, parent status depends on them
         const allSelected = childIds.every((id) => selectedChildSet.has(id));
         const someSelected = childIds.some((id) => selectedChildSet.has(id));
-        
+
         status[p.id] = {
           checked: allSelected,
-          indeterminate: !allSelected && someSelected,
+          indeterminate: !allSelected && someSelected
         };
       } else {
         // If no children (or not loaded yet), rely on explicit parent selection
@@ -110,18 +121,18 @@ export function TypeFilterSideBarDynamic({
 
     // Calculate total count for the "All Types" badge
     let totalCount = 0;
-    parents.forEach(p => {
-        const kids = allChildren[p.id] ?? [];
-        
-        // If p.count is undefined, fall back to the loaded children length.
-        if (typeof p.count === 'number') {
-           totalCount += p.count;
-        } else if (p.hasChildren || kids.length > 0) {
-           totalCount += kids.length;
-        } else {
-           // It's a leaf node parent, count it as 1
-           totalCount += 1;
-        }
+    parents.forEach((p) => {
+      const kids = allChildren[p.id] ?? [];
+
+      // If p.count is undefined, fall back to the loaded children length.
+      if (typeof p.count === "number") {
+        totalCount += p.count;
+      } else if (p.hasChildren || kids.length > 0) {
+        totalCount += kids.length;
+      } else {
+        // It's a leaf node parent, count it as 1
+        totalCount += 1;
+      }
     });
 
     return {
@@ -137,7 +148,9 @@ export function TypeFilterSideBarDynamic({
     if (!globalStats.checked) {
       // Select All
       const allPIds = parents.map((p) => p.id);
-      const allCIds = Object.values(allChildren).flat().map((c) => c.id);
+      const allCIds = Object.values(allChildren)
+        .flat()
+        .map((c) => c.id);
       onChange({ parent_cv_ids: allPIds, children: allCIds });
     } else {
       // Deselect All
@@ -148,7 +161,7 @@ export function TypeFilterSideBarDynamic({
   const handleToggleParent = (parentId: string) => {
     const currentStatus = parentStatus[parentId];
     const shouldSelect = !currentStatus.checked; // If indeterminate, we also want to select all
-    
+
     const children = allChildren[parentId] ?? [];
     const nextParentSet = new Set(selectedParentSet);
     const nextChildSet = new Set(selectedChildSet);
@@ -163,18 +176,34 @@ export function TypeFilterSideBarDynamic({
 
     onChange({
       parent_cv_ids: Array.from(nextParentSet),
-      children: Array.from(nextChildSet),
+      children: Array.from(nextChildSet)
     });
   };
 
-  const handleToggleChild = (childId: string) => {
+  const handleToggleChild = (childId: string, parentId: string) => {
     const nextChildSet = new Set(selectedChildSet);
-    if (nextChildSet.has(childId)) nextChildSet.delete(childId);
-    else nextChildSet.add(childId);
+    const nextParentSet = new Set(selectedParentSet);
+
+    if (nextChildSet.has(childId)) {
+      // Unchecking this child
+      nextChildSet.delete(childId);
+      // If no other children of this parent remain selected, remove the parent
+      const siblings = allChildren[parentId] ?? [];
+      const anySiblingSelected = siblings.some(
+        (s) => s.id !== childId && nextChildSet.has(s.id)
+      );
+      if (!anySiblingSelected) {
+        nextParentSet.delete(parentId);
+      }
+    } else {
+      // Checking this child — also select its parent
+      nextChildSet.add(childId);
+      nextParentSet.add(parentId);
+    }
 
     onChange({
-      ...selected,
-      children: Array.from(nextChildSet),
+      parent_cv_ids: Array.from(nextParentSet),
+      children: Array.from(nextChildSet)
     });
   };
 
@@ -183,17 +212,29 @@ export function TypeFilterSideBarDynamic({
     setOpen((prev) => ({ ...prev, [parentId]: nextOpenState }));
 
     // Dynamic Load Logic
-    if (nextOpenState && hasChildren && !allChildren[parentId] && loadChildren) {
+    if (
+      nextOpenState &&
+      hasChildren &&
+      !allChildren[parentId] &&
+      loadChildren
+    ) {
       try {
         const loaded = await loadChildren(parentId);
         // Using functional update to ensure we don't overwrite concurrent loads
-        setLoadedChildren((prev) => ({ ...prev, [parentId]: Array.isArray(loaded) ? loaded : [] }));
+        setLoadedChildren((prev) => ({
+          ...prev,
+          [parentId]: Array.isArray(loaded) ? loaded : []
+        }));
 
         // Edge Case: If the parent was ALREADY selected (checked) when we opened it,
         // we must select the newly loaded children to maintain logic consistency.
-        if (parentStatus[parentId]?.checked && Array.isArray(loaded) && loaded.length > 0) {
+        if (
+          parentStatus[parentId]?.checked &&
+          Array.isArray(loaded) &&
+          loaded.length > 0
+        ) {
           const nextChildSet = new Set(selected.children ?? []);
-          loaded.forEach(c => nextChildSet.add(c.id));
+          loaded.forEach((c) => nextChildSet.add(c.id));
           onChange({ ...selected, children: Array.from(nextChildSet) });
         }
       } catch (err) {
@@ -227,11 +268,15 @@ export function TypeFilterSideBarDynamic({
             }}
             onChange={handleToggleAll}
           />
-          <label htmlFor="cv-select-all" className="m-0">All Types</label>
-          <span className="badge bg-light text-secondary ms-2">{globalStats.totalCount}</span>
+          <label htmlFor="cv-select-all" className="m-0">
+            All Types
+          </label>
+          <span className="badge bg-light text-secondary ms-2">
+            {globalStats.totalCount}
+          </span>
         </div>
       </div>
-      
+
       <hr className="my-2" />
 
       {/* List of Parents */}
@@ -240,10 +285,13 @@ export function TypeFilterSideBarDynamic({
           const children = allChildren[p.id] ?? [];
           const isExpandable = p.hasChildren || children.length > 0;
           const isOpen = !!open[p.id];
-          const status = parentStatus[p.id] || { checked: false, indeterminate: false };
-          
+          const status = parentStatus[p.id] || {
+            checked: false,
+            indeterminate: false
+          };
+
           let countDisplay = 1;
-          if (typeof p.count === 'number') {
+          if (typeof p.count === "number") {
             countDisplay = p.count;
           } else if (isExpandable) {
             countDisplay = children.length;
@@ -263,9 +311,15 @@ export function TypeFilterSideBarDynamic({
                     }}
                     onChange={() => handleToggleParent(p.id)}
                   />
-                 <label htmlFor={`cv-${p.id}`} className="m-0">{p.label}</label>
-                 {/* Only show badge if count > 0 or if you want to show 0 explicitly */}
-                 {countDisplay > 0 && <span className="badge bg-light text-secondary ms-2">{countDisplay}</span>}
+                  <label htmlFor={`cv-${p.id}`} className="m-0">
+                    {p.label}
+                  </label>
+                  {/* Only show badge if count > 0 or if you want to show 0 explicitly */}
+                  {countDisplay > 0 && (
+                    <span className="badge bg-light text-secondary ms-2">
+                      {countDisplay}
+                    </span>
+                  )}
                 </div>
 
                 {isExpandable && (
@@ -287,18 +341,25 @@ export function TypeFilterSideBarDynamic({
                     {children.map((c) => {
                       const isChecked = selectedChildSet.has(c.id);
                       return (
-                        <li key={c.id} className="d-flex align-items-center justify-content-between py-1">
+                        <li
+                          key={c.id}
+                          className="d-flex align-items-center justify-content-between py-1"
+                        >
                           <div className="d-flex align-items-center">
                             <input
                               id={`cv-child-${c.id}`}
                               type="checkbox"
                               className="me-2"
                               checked={isChecked}
-                              onChange={() => handleToggleChild(c.id)}
+                              onChange={() => handleToggleChild(c.id, p.id)}
                             />
-                            <label htmlFor={`cv-child-${c.id}`} className="m-0">{c.label}</label>
+                            <label htmlFor={`cv-child-${c.id}`} className="m-0">
+                              {c.label}
+                            </label>
                             {typeof c.count === "number" && (
-                              <span className="badge bg-light text-secondary ms-2">{c.count}</span>
+                              <span className="badge bg-light text-secondary ms-2">
+                                {c.count}
+                              </span>
                             )}
                           </div>
                         </li>
