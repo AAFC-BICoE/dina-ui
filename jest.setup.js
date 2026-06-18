@@ -28,6 +28,11 @@ Object.defineProperty(Element.prototype, "scroll", {
   writable: true,
   configurable: true
 });
+Object.defineProperty(Element.prototype, "scrollIntoView", {
+  value: jest.fn(),
+  writable: true,
+  configurable: true
+});
 
 jest.setTimeout(40000);
 
