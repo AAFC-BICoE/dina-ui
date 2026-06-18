@@ -1,6 +1,5 @@
-import { IFileWithMeta } from "@dina-ui/components/object-store";
 import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
-import { FileDropzone } from "common-ui";
+import { FileDropzone, IFileWithMeta } from "common-ui";
 
 interface WorkbookUploadProps {
   submitData: (acceptedFiles: IFileWithMeta[]) => void;

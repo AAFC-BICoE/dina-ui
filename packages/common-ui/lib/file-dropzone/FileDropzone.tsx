@@ -1,13 +1,12 @@
 import {
   fileExtensionToIcon,
   formatAcceptHint,
-  formatBytes,
-  IFileWithMeta,
-  IMeta
+  formatBytes
 } from "@dina-ui/components/object-store";
 import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FaFileArrowUp, FaTrashCan } from "react-icons/fa6";
+import { IFileWithMeta, IMeta } from "./FileTypes";
 
 export interface SubmitButtonProps {
   files: IFileWithMeta[];

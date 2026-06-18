@@ -1487,5 +1487,5 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeCollectionTabAlertDescription:
     "They are now located on the new {link} page.",
   supportedFormats: "Supported Formats",
-  maxFileSize: "Max filesize"
+  maxFileSize: "Maximum file size"
 };
