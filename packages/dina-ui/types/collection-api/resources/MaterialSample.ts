@@ -23,6 +23,7 @@ export interface MaterialSampleAttributes {
   materialSampleName?: string;
 
   group?: string;
+  resourceVersion?: number;
   createdOn?: string;
   createdBy?: string;
   sourceSet?: string;
