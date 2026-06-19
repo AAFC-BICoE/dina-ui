@@ -1,12 +1,18 @@
-// import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { ControlledVocabularyItem } from "@dina-ui/types/collection-api";
 import {
+  FieldHeader,
   LoadingSpinner,
+  ReadOnlyValue,
   SimpleSearchFilterBuilder,
   useApiClient,
   useIsMounted
 } from "common-ui";
 import { useEffect, useState } from "react";
+import {
+  getManagedAttributeTitle,
+  getManagedAttributeTooltipText
+} from "../managed-attributes/ManagedAttributeField";
+import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 
 export interface ControlledVocabularyViewerProps {
   /**
@@ -49,7 +55,7 @@ export function ControlledVocabularyViewer({
   dinaComponent,
   controlledVocabularyUUID
 }: ControlledVocabularyViewerProps) {
-  // const { locale, formatMessage } = useDinaIntl();
+  const { locale, formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
   const isMounted = useIsMounted();
 
@@ -61,7 +67,7 @@ export function ControlledVocabularyViewer({
   /**
    * Final loaded in structure, this will be used to display the controlled vocabulary to the user.
    */
-  const [_loadedControlledVocabulary, setLoadedControlledVocabulary] =
+  const [loadedControlledVocabulary, setLoadedControlledVocabulary] =
     useState<Record<string, ControlledVocabularyItemView>>();
 
   /**
@@ -122,5 +128,64 @@ export function ControlledVocabularyViewer({
     return <LoadingSpinner loading={true} />;
   }
 
-  return <></>;
+  // Sort the controlled vocabulary by title if possible.
+  const sortedEntries = Object.values(loadedControlledVocabulary ?? {}).sort(
+    (a, b) => {
+      const titleA = getManagedAttributeTitle(a as any, locale);
+      const titleB = getManagedAttributeTitle(b as any, locale);
+      return titleA.localeCompare(titleB, locale, { sensitivity: "base" });
+    }
+  );
+
+  return (
+    <div className="row">
+      {sortedEntries.map((item) => (
+        <ControlledVocabularyField
+          key={item.key}
+          label={getManagedAttributeTitle(item as any, locale)}
+          value={item.value}
+          tooltipText={getManagedAttributeTooltipText(
+            item as any,
+            locale,
+            formatMessage
+          )}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Renders a single controlled vocabulary pair.
+ */
+function ControlledVocabularyField({
+  label,
+  value,
+  tooltipText
+}: {
+  label: string;
+  value: string | null | undefined;
+  tooltipText?: string;
+}) {
+  return (
+    <div className="col-6">
+      <label className="mb-3 w-100">
+        <div className="field-label mb-2">
+          <div className="d-flex align-items-center w-100">
+            <strong className="me-2">
+              <FieldHeader
+                name={label}
+                tooltipOverride={tooltipText}
+                startCaseLabel={false}
+                combineFieldHeaderWithTooltip={false}
+              />
+            </strong>
+          </div>
+        </div>
+        <div className="field-col" style={{ cursor: "auto" }}>
+          <ReadOnlyValue value={value} />
+        </div>
+      </label>
+    </div>
+  );
 }
