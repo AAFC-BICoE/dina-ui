@@ -17,6 +17,10 @@ import {
   useContext,
   useMemo
 } from "react";
+import {
+  formatJsonApiErrorMessage,
+  normalizeJsonApiPointer
+} from "../util/jsonApiErrorNormalization";
 import { useIntl } from "react-intl";
 import { BulkEditTabContext, scrollToError } from "..";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
@@ -98,16 +102,18 @@ function parseJsonApiErrors(error: any): Record<string, string> {
   if (Array.isArray(errors)) {
     for (const err of errors) {
       const pointer = err?.source?.pointer;
-      const fieldName = pointer?.replace(/^\/?data\/attributes\//, "");
+      const fieldName = pointer ? normalizeJsonApiPointer(pointer) : "";
       if (fieldName) {
-        fieldErrors[fieldName] = err.detail
-          ? `${err.title}: ${err.detail}`
-          : err.title;
+        fieldErrors[fieldName] = formatJsonApiErrorMessage(
+          err.title,
+          err.detail
+        );
       } else {
         // If no field is specified, assign general submission error
-        fieldErrors["Form submission issue"] = err.detail
-          ? `${err.title}: ${err.detail}`
-          : err.title;
+        fieldErrors["Form submission issue"] = formatJsonApiErrorMessage(
+          err.title,
+          err.detail
+        );
       }
     }
   }
