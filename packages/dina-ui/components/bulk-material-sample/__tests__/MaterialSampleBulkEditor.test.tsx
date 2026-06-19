@@ -947,12 +947,12 @@ describe("MaterialSampleBulkEditor", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    // The tab with the error is given the red text, and the other tabs are unaffected:
+    // The generic bulk submission error banner should not appear
     expect(
-      wrapper.getByText(
+      wrapper.queryByText(
         /bulk submission error: check the tabs with a red label\./i
       )
-    ).toBeInTheDocument();
+    ).toBeNull();
 
     // Shows the error message:
     expect(
@@ -1033,12 +1033,12 @@ describe("MaterialSampleBulkEditor", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    // The tab with the error is given the red text, and the other tabs are unaffected:
+    // The generic bulk submission error banner should NOT appear
     expect(
-      wrapper.getByText(
+      wrapper.queryByText(
         /bulk submission error: check the tabs with a red label\./i
       )
-    ).toBeInTheDocument();
+    ).toBeNull();
 
     // Shows the error message:
     expect(
@@ -1087,20 +1087,18 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await waitFor(() =>
-      expect(
-        wrapper.getByText(
-          /bulk submission error: check the tabs with a red label\./i
-        )
-      ).toBeInTheDocument()
-    );
 
-    // The tab with the error is given the red text, and the other tabs are unaffected:
+    // the barcode field error should appear on the Edit All tab form
+    await waitFor(() => {
+      expect(wrapper.getByText(/invalid barcode/i)).toBeInTheDocument();
+    });
+
+    // The generic bulk submission error banner should NOT appear
     expect(
-      wrapper.getByText(
+      wrapper.queryByText(
         /bulk submission error: check the tabs with a red label\./i
       )
-    ).toBeInTheDocument();
+    ).toBeNull();
   });
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
@@ -1135,12 +1133,17 @@ describe("MaterialSampleBulkEditor", () => {
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
 
-    // Show error message at the top of the page.
+    // The field error should be displayed on the individual sample tab( index 1 )
+    // All tabs are rendered so the error text is in the DOM
     await waitFor(() => {
       expect(
-        wrapper.getByText(
+        wrapper.queryByText(
           /bulk submission error: check the tabs with a red label\./i
         )
+      ).toBeNull();
+
+      expect(
+        wrapper.queryByText(/1 : .* - invalid barcode/i)
       ).toBeInTheDocument();
     });
   });
