@@ -1006,6 +1006,78 @@ describe("API client context", () => {
       });
     });
 
+    it("Sends a get request with spaces in the params for comma-separated lists should be trimmed", async () => {
+      const mockAxiosGetTrimmed = jest.fn(async () => ({
+        data: {
+          data: [
+            {
+              type: "articles",
+              id: "200",
+              attributes: {
+                title: "JSON:API paints my bikeshed!"
+              },
+              relationships: {
+                author: {
+                  data: { id: "42", type: "people" }
+                },
+                tags: {
+                  data: { id: "99", type: "tags" }
+                }
+              }
+            }
+          ],
+          included: [
+            {
+              type: "people",
+              id: "42",
+              attributes: {
+                name: "John"
+              }
+            },
+            {
+              type: "tags",
+              id: "99",
+              attributes: {
+                name: "science"
+              }
+            }
+          ]
+        }
+      }));
+
+      const mockAxios = { get: mockAxiosGetTrimmed };
+      kitsu.axios = mockAxios as any;
+
+      await kitsu.get("my-api/topic/100/articles/200", {
+        include: "author, tags",
+        fields: {
+          articles: "title, body",
+          people: "name, age"
+        },
+        optfields: {
+          articles: "title, body",
+          people: "name, age"
+        }
+      });
+
+      expect(mockAxiosGetTrimmed).lastCalledWith(
+        "my-api/topic/100/articles/200",
+        expect.objectContaining({
+          params: {
+            include: "author,tags",
+            fields: {
+              articles: "title,body",
+              people: "name,age"
+            },
+            optfields: {
+              articles: "title,body",
+              people: "name,age"
+            }
+          }
+        })
+      );
+    });
+
     it("Promotes an external single relationship stub to top level on an array response when not in included", async () => {
       mockAxiosGet.mockResolvedValue({
         data: {
