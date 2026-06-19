@@ -903,11 +903,39 @@ export class CustomDinaKitsu extends Kitsu {
    */
   async get(path: string, params: GetParams = {}) {
     const { responseType, timeout, ...paramsNet } = _.omit(params, "header");
+
+    // Trim spaces from comma-separated include values
+    if (paramsNet.include) {
+      paramsNet.include = (paramsNet.include as string)
+        .split(",")
+        .map((s) => s.trim())
+        .join(",");
+    }
+
+    // Trim spaces for fields values.
+    if (paramsNet.fields) {
+      paramsNet.fields = _.mapValues(paramsNet.fields, (value) =>
+        value
+          .split(",")
+          .map((s) => s.trim())
+          .join(",")
+      );
+    }
+
+    // Trim spaces for optField values.
+    if (paramsNet.optfields) {
+      paramsNet.optfields = _.mapValues(paramsNet.optfields, (value) =>
+        value
+          .split(",")
+          .map((s) => s.trim())
+          .join(",")
+      );
+    }
+
     try {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },
         params: paramsNet,
-        // paramsSerializer: (p) => query(p),
         responseType,
         timeout
       });
