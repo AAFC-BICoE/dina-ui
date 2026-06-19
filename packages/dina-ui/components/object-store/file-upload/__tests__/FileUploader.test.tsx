@@ -15,9 +15,6 @@ const mockGet = jest.fn(async (path) => {
   }
 });
 
-// Add a temporary intentional error to any .ts/.tsx file
-const _test: string = 123; // Type 'number' is not assignable to type 'string'
-
 const mockCtx = {
   apiClient: {
     get: mockGet
