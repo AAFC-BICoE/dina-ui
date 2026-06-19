@@ -67,6 +67,10 @@ jobs:
         run: |
           yarn install
 
+      - name: Check for Typescript Errors
+        run: |
+          npx tsc --noEmit
+
       - name: Build UI project
         run: |
           yarn workspace dina-ui build
