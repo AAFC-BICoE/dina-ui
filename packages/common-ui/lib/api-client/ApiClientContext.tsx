@@ -942,8 +942,17 @@ export class CustomDinaKitsu extends Kitsu {
 
       const deserialized = await deserialise(data);
 
-      // Get the list of requested includes
-      const requestedIncludes = (params.include as string)?.split(",") ?? [];
+      // Get the list of requested includes from both params and the path query string,
+      // since includes are sometimes embedded directly in the path as ?include=...
+      const includesFromParams = (params.include as string)?.split(",") ?? [];
+      const includesFromPath =
+        path.match(/[?&]include=([^&]+)/)?.[1]?.split(",") ?? [];
+      const requestedIncludes = _.uniq([
+        ...includesFromParams,
+        ...includesFromPath
+      ])
+        .map((s) => s.trim())
+        .filter(Boolean);
 
       // Handle both single object and array responses
       const items = Array.isArray(deserialized.data)
@@ -957,8 +966,13 @@ export class CustomDinaKitsu extends Kitsu {
         const rawRelationships = rawItems[i]?.relationships ?? {};
 
         for (const key of requestedIncludes) {
-          // Already resolved at top level, skip
-          if (item[key] !== undefined) continue;
+          // Already resolved at top level, skip.
+          // But don't skip empty arrays - they may be unresolved relationship stubs
+          // from a different API that couldn't be included (e.g. collectors from agent-api)
+          const currentValue = item[key];
+          const isEmptyArray =
+            Array.isArray(currentValue) && currentValue.length === 0;
+          if (currentValue !== undefined && !isEmptyArray) continue;
 
           const relData = rawRelationships[key]?.data;
           if (!relData) continue;

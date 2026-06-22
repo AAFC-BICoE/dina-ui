@@ -1563,5 +1563,194 @@ describe("API client context", () => {
       expect(response.data[0].id).toBe("existing-id");
       expect(response.data[0].materialSample.id).toBe("sample-id");
     });
+
+    it("Parses includes from the path query string when not provided in params", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: {
+            type: "collecting-event",
+            id: "019ef07e-4674-7384-b117-7c78db679733",
+            attributes: {
+              dwcFieldNumber: "test"
+            },
+            relationships: {
+              collectors: {
+                data: [
+                  {
+                    id: "21f87305-3cfa-4351-8a9c-16abedac776d",
+                    type: "person"
+                  }
+                ]
+              }
+            }
+          }
+          // No included - collectors are from agent-api, a different API
+        }
+      });
+
+      // Include is embedded in the path, not passed as a param
+      const response = await kitsu.get(
+        "collection-api/collecting-event/019ef07e-4674-7384-b117-7c78db679733?include=collectors,attachment",
+        {}
+      );
+
+      expect((response.data as any).collectors).toEqual([
+        {
+          id: "21f87305-3cfa-4351-8a9c-16abedac776d",
+          type: "person"
+        }
+      ]);
+    });
+
+    it("Combines includes from both path query string and params without duplicates", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: {
+            type: "collecting-event",
+            id: "019ef07e-4674-7384-b117-7c78db679733",
+            attributes: {},
+            relationships: {
+              collectors: {
+                data: [
+                  {
+                    id: "21f87305-3cfa-4351-8a9c-16abedac776d",
+                    type: "person"
+                  }
+                ]
+              },
+              attachment: {
+                data: [
+                  {
+                    id: "abc123",
+                    type: "metadata"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      });
+
+      // collectors in path, attachment in params, collectors duplicated in both
+      const response = await kitsu.get(
+        "collection-api/collecting-event/019ef07e-4674-7384-b117-7c78db679733?include=collectors",
+        { include: "collectors,attachment" }
+      );
+
+      expect((response.data as any).collectors).toEqual([
+        {
+          id: "21f87305-3cfa-4351-8a9c-16abedac776d",
+          type: "person"
+        }
+      ]);
+      expect((response.data as any).attachment).toEqual([
+        {
+          id: "abc123",
+          type: "metadata"
+        }
+      ]);
+    });
+
+    it("Promotes a to-many relationship stub when kitsu resolves it to an empty array due to missing included section", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: {
+            type: "collecting-event",
+            id: "019ef07e-4674-7384-b117-7c78db679733",
+            attributes: {
+              dwcFieldNumber: "test"
+            },
+            relationships: {
+              collectors: {
+                data: [
+                  {
+                    id: "21f87305-3cfa-4351-8a9c-16abedac776d",
+                    type: "person"
+                  }
+                ]
+              },
+              attachment: {
+                data: []
+              }
+            }
+          }
+          // No included section at all - collectors from agent-api cannot be included
+        }
+      });
+
+      const response = await kitsu.get(
+        "collection-api/collecting-event/019ef07e-4674-7384-b117-7c78db679733?include=collectors,attachment,collectionMethod"
+      );
+
+      // collectors should be promoted from relationship stubs, not left as []
+      expect((response.data as any).collectors).toEqual([
+        {
+          id: "21f87305-3cfa-4351-8a9c-16abedac776d",
+          type: "person"
+        }
+      ]);
+
+      // attachment has an empty data array in relationships, should stay []
+      expect((response.data as any).attachment).toEqual([]);
+
+      // collectionMethod has no relationship data at all, should be undefined
+      expect((response.data as any).collectionMethod).toBeUndefined();
+    });
+
+    it("Does not overwrite a non-empty resolved relationship with stubs when included is present", async () => {
+      mockAxiosGet.mockResolvedValue({
+        data: {
+          data: {
+            type: "collecting-event",
+            id: "019ef07e-4674-7384-b117-7c78db679733",
+            attributes: {},
+            relationships: {
+              collectionMethod: {
+                data: {
+                  id: "col-method-1",
+                  type: "collection-method"
+                }
+              },
+              collectors: {
+                data: [
+                  {
+                    id: "21f87305-3cfa-4351-8a9c-16abedac776d",
+                    type: "person"
+                  }
+                ]
+              }
+            }
+          },
+          included: [
+            {
+              type: "collection-method",
+              id: "col-method-1",
+              attributes: {
+                name: "Hand Collected"
+              }
+            }
+          ]
+        }
+      });
+
+      const response = await kitsu.get(
+        "collection-api/collecting-event/019ef07e-4674-7384-b117-7c78db679733?include=collectors,collectionMethod"
+      );
+
+      // collectionMethod was resolved via included, should have full attributes
+      expect((response.data as any).collectionMethod).toEqual({
+        id: "col-method-1",
+        type: "collection-method",
+        name: "Hand Collected"
+      });
+
+      // collectors were not in included (different API), should be promoted as stubs
+      expect((response.data as any).collectors).toEqual([
+        {
+          id: "21f87305-3cfa-4351-8a9c-16abedac776d",
+          type: "person"
+        }
+      ]);
+    });
   });
 });
