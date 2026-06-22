@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
 import {
+  buildRelationshipAccessorPath,
   collectPathValues,
   generateColumnPath,
   getNestedColumn,
@@ -9,6 +10,7 @@ import {
 describe("ColumnSelectorUtils", () => {
   describe("generateColumnPath", () => {
     it("Generate managed attribute path", () => {
+      // Attribute Level:
       expect(
         generateColumnPath({
           indexMapping: {
@@ -35,6 +37,7 @@ describe("ColumnSelectorUtils", () => {
         })
       ).toEqual("managedAttribute/MATERIAL_SAMPLE/managed_attribute_key");
 
+      // Included Level
       expect(
         generateColumnPath({
           indexMapping: {
@@ -65,6 +68,40 @@ describe("ColumnSelectorUtils", () => {
       ).toEqual(
         "managedAttribute~collectingEvent/COLLECTING_EVENT/collecting_event_managed_attribute_key"
       );
+
+      // Included level 2 levels
+      expect(
+        generateColumnPath({
+          indexMapping: {
+            dynamicField: {
+              type: "managedAttribute",
+              label: "managedAttributes",
+              component: "DETERMINATION",
+              path: "included.attributes.determination.managedAttributes",
+              referencedBy: "organism.determination",
+              referencedType: "organism",
+              apiEndpoint: "collection-api/controlled-vocabulary-item"
+            },
+            parentName: "organism.determination",
+            parentPath: "included",
+            parentType: "organism",
+            value:
+              "included.attributes.determination.managedAttributes_organism.determination",
+            distinctTerm: false,
+            label: "managedAttributes",
+            path: "included.attributes.determination.managedAttributes",
+            type: "managedAttribute",
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            containsSupport: false,
+            endsWithSupport: false,
+            hideField: false,
+            isReverseRelationship: false
+          },
+          dynamicFieldValue: `{"searchValue":"","selectedOperator":"exactMatch","selectedManagedAttribute":{"id":"019eefa7-c6d5-7723-8bf2-c9ab822f1f0d","type":"controlled-vocabulary-item","name":"Test","key":"test","group":"cnc","term":"Test","multilingualTitle":null,"multilingualDescription":null,"vocabularyElementType":"STRING","acceptedValues":null,"unit":null,"uriTemplate":null,"dinaComponent":"DETERMINATION","createdBy":"dina-admin","createdOn":"2026-06-22T14:06:50.538384Z","lastUpdatedOn":"2026-06-22T14:06:50.613953Z"},"selectedType":"STRING"}`
+        })
+      ).toEqual("managedAttribute~organism.determination/DETERMINATION/test");
     });
 
     it("Generate field extension path", () => {
@@ -502,6 +539,65 @@ describe("ColumnSelectorUtils", () => {
       const obj = { a: "value" };
       expect(collectPathValues(obj, "")).toBe(obj);
     });
+
+    // Organism Determination test (complex)
+    test("organism determination managed attribute path test", () => {
+      const obj = {
+        id: "019ee020-fc5d-7661-8a70-2453796ca2ce",
+        type: "material-sample",
+        data: {
+          attributes: {
+            group: "cnc",
+            createdOn: "2026-06-19T13:45:18.718853Z",
+            createdBy: "dina-admin",
+            dwcOtherCatalogNumbers: null,
+            materialSampleName: null,
+            materialSampleType: null,
+            materialSampleState: null
+          },
+          relationships: {
+            projects: {
+              data: []
+            },
+            organism: {
+              data: [
+                {
+                  id: "019eefa8-789e-7716-8737-a79cf53151be",
+                  type: "organism"
+                }
+              ]
+            },
+            assemblages: {
+              data: []
+            }
+          }
+        },
+        included: {
+          organism: [
+            {
+              id: "019eefa8-789e-7716-8737-a79cf53151be",
+              type: "organism",
+              attributes: {
+                determination: [
+                  {
+                    managedAttributes: {
+                      test: "Test123"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      };
+
+      expect(
+        collectPathValues(
+          obj,
+          "included.organism.attributes.determination.managedAttributes.test"
+        )
+      ).toBe("Test123");
+    });
   });
 
   describe("getNestedColumn", () => {
@@ -666,6 +762,48 @@ describe("ColumnSelectorUtils", () => {
         CellComponent({ row: mockArrayRow } as any)
       );
       expect(arrayContainer.textContent).toBe("Holotype, Paratype");
+    });
+  });
+
+  describe("buildRelationshipAccessorPath", () => {
+    it("inserts a simple referencedBy at index 1", () => {
+      expect(
+        buildRelationshipAccessorPath(
+          "included.managedAttributes.myKey",
+          "organism"
+        )
+      ).toBe("included.organism.managedAttributes.myKey");
+    });
+
+    it("uses only the first segment when referencedBy contains a dot", () => {
+      expect(
+        buildRelationshipAccessorPath(
+          "included.attributes.determination.managedAttributes.test",
+          "organism.determination"
+        )
+      ).toBe(
+        "included.organism.attributes.determination.managedAttributes.test"
+      );
+    });
+
+    it("handles undefined referencedBy by inserting an empty string", () => {
+      expect(
+        buildRelationshipAccessorPath(
+          "included.managedAttributes.myKey",
+          undefined
+        )
+      ).toBe("included.managedAttributes.myKey");
+    });
+
+    it("handles a deeply nested accessorKey", () => {
+      expect(
+        buildRelationshipAccessorPath(
+          "included.attributes.extensionValues.ext1.fieldKey",
+          "collectingEvent"
+        )
+      ).toBe(
+        "included.collectingEvent.attributes.extensionValues.ext1.fieldKey"
+      );
     });
   });
 });

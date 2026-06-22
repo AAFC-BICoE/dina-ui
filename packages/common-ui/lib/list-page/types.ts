@@ -203,7 +203,7 @@ export interface ESIndexMapping {
   /**
    * Only provided if it was added using a dynamic field config.
    */
-  dynamicField?: DynamicField;
+  dynamicField?: DynamicField | RelationshipDynamicField;
 
   /**
    * Only provided for relationshipAutocomplete type fields.
