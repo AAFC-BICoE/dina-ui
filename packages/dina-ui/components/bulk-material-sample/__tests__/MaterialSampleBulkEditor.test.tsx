@@ -947,12 +947,12 @@ describe("MaterialSampleBulkEditor", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    // The generic bulk submission error banner should not appear
+    // The generic bulk submission error banner should appear
     expect(
       wrapper.queryByText(
         /bulk submission error: check the tabs with a red label\./i
       )
-    ).toBeNull();
+    ).toBeInTheDocument();
 
     // Shows the error message:
     expect(
@@ -1033,12 +1033,12 @@ describe("MaterialSampleBulkEditor", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    // The generic bulk submission error banner should NOT appear
+    // The generic bulk submission error banner should appear
     expect(
       wrapper.queryByText(
         /bulk submission error: check the tabs with a red label\./i
       )
-    ).toBeNull();
+    ).toBeInTheDocument();
 
     // Shows the error message:
     expect(
@@ -1095,12 +1095,12 @@ describe("MaterialSampleBulkEditor", () => {
       ).toBeInTheDocument();
     });
 
-    // The generic bulk submission error banner should NOT appear
+    // The generic bulk submission error banner should appear
     expect(
       wrapper.queryByText(
         /bulk submission error: check the tabs with a red label\./i
       )
-    ).toBeNull();
+    ).toBeInTheDocument();
   });
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
@@ -1143,7 +1143,9 @@ describe("MaterialSampleBulkEditor", () => {
     await waitFor(() => expect(mockFailingSave).toHaveBeenCalled());
 
     await waitFor(() => {
-      expect(wrapper.getByText(/invalid barcode/i)).toBeInTheDocument();
+      expect(
+        wrapper.getByText(/1 : .* - invalid barcode/i)
+      ).toBeInTheDocument();
     });
   });
 
