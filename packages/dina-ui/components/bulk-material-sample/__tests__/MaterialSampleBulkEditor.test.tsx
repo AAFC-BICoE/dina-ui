@@ -1090,7 +1090,9 @@ describe("MaterialSampleBulkEditor", () => {
 
     // the barcode field error should appear on the Edit All tab form
     await waitFor(() => {
-      expect(wrapper.getByText(/invalid barcode/i)).toBeInTheDocument();
+      expect(
+        wrapper.getByText(/1 : .* - invalid barcode/i)
+      ).toBeInTheDocument();
     });
 
     // The generic bulk submission error banner should NOT appear
@@ -1102,6 +1104,16 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
+    const mockFailingSave = jest.fn(async () => {
+      throw new DoOperationsError("test-error", {}, [
+        {
+          errorMessage: "Invalid barcode",
+          fieldErrors: { barcode: "Invalid barcode" },
+          index: 1
+        }
+      ]);
+    });
+
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -1111,40 +1123,27 @@ describe("MaterialSampleBulkEditor", () => {
         ...(testCtx as any),
         apiContext: {
           ...testCtx.apiContext,
-          // Test save error: The second sample has an error on the barcode field:
-          save: async () => {
-            throw new DoOperationsError("test-error", {}, [
-              {
-                errorMessage: "",
-                fieldErrors: { barcode: "Invalid barcode" },
-                index: 1
-              }
-            ]);
-          }
+          save: mockFailingSave
         }
       }
     );
+
+    await waitFor(() => expect(wrapper.getByText(/ms2/i)).toBeInTheDocument());
+
+    fireEvent.click(wrapper.getByText(/ms2/i));
+
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /save all/i })
       ).toBeInTheDocument()
     );
 
-    // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
 
-    // The field error should be displayed on the individual sample tab( index 1 )
-    // All tabs are rendered so the error text is in the DOM
-    await waitFor(() => {
-      expect(
-        wrapper.queryByText(
-          /bulk submission error: check the tabs with a red label\./i
-        )
-      ).toBeNull();
+    await waitFor(() => expect(mockFailingSave).toHaveBeenCalled());
 
-      expect(
-        wrapper.queryByText(/1 : .* - invalid barcode/i)
-      ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText(/invalid barcode/i)).toBeInTheDocument();
     });
   });
 
@@ -1156,6 +1155,13 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx as any
     );
+
+    expect(
+      wrapper.queryByText(
+        /bulk submission error: check the tabs with a red label\./i
+      )
+    ).toBeNull();
+
     await waitFor(() =>
       expect(
         wrapper.container.querySelectorAll(".enable-organisms .react-switch-bg")

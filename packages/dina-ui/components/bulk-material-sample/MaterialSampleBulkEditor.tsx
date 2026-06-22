@@ -659,7 +659,7 @@ function useBulkSampleSave({
           .forEach((it) =>
             it?.setErrors(_.omit(it.errors, badBulkEditedFields))
           );
-        // Errors have been set on individual forms at this point - do not throw generic error.
+        setSubmissionError(error);
         return;
       }
       setSubmissionError(error);
