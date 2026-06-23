@@ -201,8 +201,11 @@ export default function ExportPage<TData extends KitsuResource>() {
     const columnFunctions = getColumnFunctions<TData>(columnsToExport);
 
     // Non-exportable columns filtering
+    // managed attribute columns are exempt from non-exportable
+    // since they are explicitly chosen by the user and have well-defined export path
     const filteredColumns = columnsToExport.filter(
       (column) =>
+        (column as any)?.managedAttribute ||
         !nonExportableColumns.some((prefix) =>
           (column?.id ?? "").startsWith(prefix)
         )

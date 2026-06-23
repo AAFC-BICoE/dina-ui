@@ -424,6 +424,57 @@ export function NestedColumnLabel({
   return <FieldHeader name={label} prefixName={relationshipLabel} />;
 }
 
+/**
+ * Resolves a dot-notation managed attribute path (e.g. "organism.managedAttributes.org_test"
+ * or "managedAttributes.org_test") by matching against the dynamic fields config, then
+ * delegates to getManagedAttributesColumn.
+ */
+async function resolveDotNotationManagedAttribute(
+  path: string,
+  config: DynamicFieldsMappingConfig,
+  apiClient: Kitsu
+): Promise<TableColumn<KitsuResource> | undefined> {
+  const dotParts = path.split(".");
+
+  // Try entity-level configs: {fieldName}.{key}
+  for (const fc of config.fields) {
+    if (fc.type !== "managedAttribute") continue;
+    const fieldName = fc.path.split(".").pop() ?? "";
+    if (dotParts[0] !== fieldName) continue;
+
+    const key = dotParts.slice(1).join(".");
+    return getManagedAttributesColumn(
+      path,
+      fc.component ?? "ENTITY",
+      key,
+      undefined,
+      apiClient,
+      config
+    );
+  }
+
+  // Try relationship configs: {referencedBy}.{fieldName}.{key}
+  for (const rc of config.relationshipFields) {
+    if (rc.type !== "managedAttribute") continue;
+    const fieldName = rc.path.split(".").pop() ?? "";
+    const fieldIdx = dotParts.indexOf(fieldName);
+    if (fieldIdx <= 0) continue;
+    if (dotParts.slice(0, fieldIdx).join(".") !== rc.referencedBy) continue;
+
+    const key = dotParts.slice(fieldIdx + 1).join(".");
+    return getManagedAttributesColumn(
+      path,
+      rc.component ?? "ENTITY",
+      key,
+      rc.referencedBy,
+      apiClient,
+      config
+    );
+  }
+
+  return undefined;
+}
+
 // Handle getting columns from query options that contain dynamicField
 async function getDynamicFieldColumn<TData extends KitsuResource>(
   path: string,
@@ -433,7 +484,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
 ): Promise<TableColumn<TData> | undefined> {
   const pathParts = path.split("/");
   if (pathParts.length > 0) {
-    // Handle managed attribute paths.
+    // Handle managed attribute paths (slash-notation).
     if (
       dynamicFieldsMappingConfig &&
       pathParts.length === 3 &&
@@ -451,6 +502,22 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
         apiClient,
         dynamicFieldsMappingConfig
       );
+    }
+
+    // Handle managed attribute paths in dot notation (legacy format from saved exports).
+    // Dot notation format: {referencedBy}.{fieldName}.{key} for relationships,
+    // or {fieldName}.{key} for entity-level managed attributes.
+    if (
+      dynamicFieldsMappingConfig &&
+      pathParts.length === 1 &&
+      !path.startsWith("columnFunction")
+    ) {
+      const result = await resolveDotNotationManagedAttribute(
+        path,
+        dynamicFieldsMappingConfig,
+        apiClient
+      );
+      if (result) return result as TableColumn<TData>;
     }
 
     // Handle field extension paths.
