@@ -152,14 +152,20 @@ export function useCollectingEventSave({
     // Init relationships object for one-to-many relations:
     (collectingEventDiff as any).relationships = {};
 
-    // handle converting to relationship manually due to crnk bug
-    if (
-      collectingEventDiff &&
-      collectingEventDiff.collectors &&
-      collectingEventDiff.collectors.length > 0
-    ) {
+    // Only send collectors relationship if they were explicitly changed by the user.
+    // This prevents data loss if collectors fail to load (bulkGet error),
+    // and avoids sending unnecessary relationship data on every save.
+    const initialCollectors = collectingEventInitialValues.collectors as any[];
+    const submittedCollectors = submittedValues.collectors ?? [];
+
+    const collectorsChanged = !_.isEqual(
+      (initialCollectors ?? []).map((c) => c.id).sort(),
+      submittedCollectors.map((c) => c.id).sort()
+    );
+
+    if (collectorsChanged) {
       (collectingEventDiff as any).relationships.collectors = {
-        data: collectingEventDiff?.collectors.map((collector) => ({
+        data: submittedCollectors.map((collector) => ({
           id: collector.id,
           type: "person"
         }))
