@@ -182,7 +182,7 @@ export class ApiClientImpl implements ApiClientI {
 
     // Add caching support for one second since it's likely it's going to be same response.
     const ONE_SECOND = 1000;
-    this.apiClient.axios = setupCache(this.apiClient.axios, {
+    (this.apiClient.axios as any) = setupCache(this.apiClient.axios, {
       location: "client",
       storage: buildMemoryStorage(
         false, // clone data off
@@ -903,11 +903,39 @@ export class CustomDinaKitsu extends Kitsu {
    */
   async get(path: string, params: GetParams = {}) {
     const { responseType, timeout, ...paramsNet } = _.omit(params, "header");
+
+    // Trim spaces from comma-separated include values
+    if (paramsNet.include) {
+      paramsNet.include = (paramsNet.include as string)
+        .split(",")
+        .map((s) => s.trim())
+        .join(",");
+    }
+
+    // Trim spaces for fields values.
+    if (paramsNet.fields) {
+      paramsNet.fields = _.mapValues(paramsNet.fields, (value) =>
+        value
+          .split(",")
+          .map((s) => s.trim())
+          .join(",")
+      );
+    }
+
+    // Trim spaces for optField values.
+    if (paramsNet.optfields) {
+      paramsNet.optfields = _.mapValues(paramsNet.optfields, (value) =>
+        value
+          .split(",")
+          .map((s) => s.trim())
+          .join(",")
+      );
+    }
+
     try {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },
         params: paramsNet,
-        // paramsSerializer: (p) => query(p),
         responseType,
         timeout
       });

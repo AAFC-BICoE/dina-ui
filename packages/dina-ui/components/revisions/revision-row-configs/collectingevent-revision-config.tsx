@@ -6,9 +6,10 @@ import {
   CollectionMethod
 } from "../../../types/collection-api/";
 import { Metadata, Person } from "../../../types/objectstore-api";
-import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
+import { ControlledVocabularyViewer } from "@dina-ui/components/controlled-vocabulary/ControlledVocabularyViewer";
+import { COLLECTION_MANAGED_ATTRIBUTE_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingEvent> =
   {
@@ -106,9 +107,11 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           original: { value }
         }
       }) => (
-        <ManagedAttributesViewer
+        <ControlledVocabularyViewer
           values={value}
-          managedAttributeApiPath="collection-api/managed-attribute"
+          baseApi="collection-api"
+          dinaComponent="COLLECTING_EVENT"
+          controlledVocabularyUUID={COLLECTION_MANAGED_ATTRIBUTE_ID}
         />
       ),
       geographicPlaceNameSourceDetail: ({

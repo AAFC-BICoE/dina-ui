@@ -38,6 +38,7 @@ export function nextSampleInitialValues(
     id: _id,
     createdOn: _createdOn,
     createdBy: _createdBy,
+    resourceVersion: _resourceVersion,
     materialSampleName,
     allowDuplicateName: _allowDuplicateName,
     organism,

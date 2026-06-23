@@ -67,6 +67,10 @@ jobs:
         run: |
           yarn install
 
+      - name: Check for Typescript Errors
+        run: |
+          npx tsc --noEmit
+
       - name: Build UI project
         run: |
           yarn workspace dina-ui build
@@ -89,9 +93,9 @@ jobs:
 
   push:
     name: Build Docker Image and Push to DockerHub
-    needs: [build]
+    needs: [build, test-chunk]
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/master' }}
+    if: ${{ github.ref == 'refs/heads/master' && needs.test-chunk.result == 'success' }}
 
     steps:
       - name: Download artifacts from build job
@@ -125,7 +129,8 @@ jobs:
 
   build-docs:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/master' }}
+    needs: [build, test-chunk]
+    if: ${{ github.ref == 'refs/heads/master' && needs.test-chunk.result == 'success' }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
