@@ -826,6 +826,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   notEditableWhenThereAreChildStorageUnits:
     "Not editable when there are child Storage Units.",
   notPubliclyReleasable: "Not Publicly Releasable",
+  publiclyReleasable: "Publicly Releasable",
   objectListTitle: "Stored Objects",
   objectStoreDataUnavailable: "Object Store data unavailable",
   objectStoreDetailsTitle: "Object Store Details",

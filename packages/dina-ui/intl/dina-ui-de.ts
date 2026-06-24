@@ -872,6 +872,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   notEditableWhenThereAreChildStorageUnits:
     "Kann nicht bearbeitet werden, wenn Kindelemente in der Lagerungseinheit vorhanden sind.",
   notPubliclyReleasable: "Nicht öffentlich zugänglich",
+  publiclyReleasable: "Öffentlich zugänglich",
   notPubliclyReleasableWithReason: "Nicht öffentlich freigebbar: {reason}",
   numberOfAttachments: "{totalAttachments} Anhänge",
   objectListTitle: "Gespeicherte Medienobjekte",

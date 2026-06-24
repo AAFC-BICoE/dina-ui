@@ -13,13 +13,9 @@ export function NotPubliclyReleasableSection() {
   const formik = useFormikContext<any>();
   const { formatMessage } = useDinaIntl();
 
-  if (
-    isInBulkEditTab &&
-    !formik.touched.publiclyReleasable &&
-    formik.values.publiclyReleasable !== null
-  ) {
-    // In bulk edit, set publiclyReleasable to null by default.
-    formik.setFieldValue("publiclyReleasable", null);
+  if (!isInBulkEditTab && formik.values.publiclyReleasable == null) {
+    // Default to "not publicly Releasable" (false) by default.
+    formik.setFieldValue("publiclyReleasable", false);
   }
   return (
     <>
@@ -32,7 +28,7 @@ export function NotPubliclyReleasableSection() {
           visibleElement={
             <SelectField<boolean | null>
               name="publiclyReleasable"
-              label={<DinaMessage id="notPubliclyReleasable" />}
+              label={<DinaMessage id="publiclyReleasable" />}
               options={[
                 // null values are ignored when bulk editing
                 { label: formatMessage("keepCurrentValues"), value: null },
@@ -53,7 +49,7 @@ export function NotPubliclyReleasableSection() {
         <SelectField<boolean>
           className="notPubliclyReleasable"
           name="publiclyReleasable"
-          label={<DinaMessage id="notPubliclyReleasable" />}
+          label={<DinaMessage id="publiclyReleasable" />}
           options={[
             { label: formatMessage("publiclyReleasableOption"), value: true },
             {

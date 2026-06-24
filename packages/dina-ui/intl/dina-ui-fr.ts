@@ -642,6 +642,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   notEditableWhenThereAreChildStorageUnits:
     "Non modifiable lorsqu’il y a des unités de stockage enfant ",
   notPubliclyReleasable: "Diffusion publique interdite",
+  publiclyReleasable: "Diffusion publique",
   objectListTitle: "Objets stockés",
   objectStoreDataUnavailable:
     "Les données du stockage de l’objet ne sont pas disponibles",
