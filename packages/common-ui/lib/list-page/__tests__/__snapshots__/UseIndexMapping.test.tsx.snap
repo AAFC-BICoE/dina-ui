@@ -371,7 +371,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "endsWithSupport": false,
           "hideField": false,
           "isReverseRelationship": false,
-          "keywordMultiFieldSupport": false,
+          "keywordMultiFieldSupport": true,
           "keywordNumericSupport": false,
           "label": "determination.typeStatus",
           "optimizedPrefix": false,
