@@ -25,6 +25,7 @@ import {
   FaUnlink
 } from "react-icons/fa";
 import React from "react";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export interface ExistingAttachmentsTableProps {
   metadatas: ResourceIdentifierObject[];
@@ -130,9 +131,16 @@ export function ExistingAttachmentsTable({
           <Link
             href={`/object-store/object/view?id=${id}`}
             passHref={true}
-            legacyBehavior
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {metadata?.filename}
+            <FaArrowUpRightFromSquare
+              style={{
+                marginLeft: "0.3em"
+              }}
+              aria-label="Opens in new tab"
+            />
           </Link>
         ) : null;
       },

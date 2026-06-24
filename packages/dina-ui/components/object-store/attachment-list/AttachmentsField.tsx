@@ -1,5 +1,6 @@
 import {
   CheckBoxWithoutWrapper,
+  dateCell,
   FieldHeader,
   FieldSet,
   FieldSpy,
@@ -24,6 +25,7 @@ import classNames from "classnames";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { ColumnDef } from "@tanstack/react-table";
 import { FaPaperclip, FaTimes, FaUnlink } from "react-icons/fa";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -154,18 +156,31 @@ export function AttachmentsEditor({
         return (
           <Link
             href={`/object-store/object/view?id=${metadata.id}`}
-            legacyBehavior
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {(metadata as any)?.filename ?? metadata.id}
+            <FaArrowUpRightFromSquare
+              style={{
+                marginLeft: "0.3em"
+              }}
+              aria-label="Opens in new tab"
+            />
           </Link>
         );
       }
     },
-    ...["acCaption", "xmpMetadataDate", "acTags"].map((accessor) => ({
-      id: accessor,
-      accessorKey: accessor,
-      header: () => <FieldHeader name={accessor} />
-    })),
+    {
+      id: "acCaption",
+      accessorKey: "acCaption",
+      header: () => <FieldHeader name={"acCaption"} />
+    },
+    dateCell("xmpMetadataDate"),
+    {
+      id: "acTags",
+      accessorKey: "acTags",
+      header: () => <FieldHeader name={"acTags"} />
+    },
     {
       id: "actionColumn",
       size: 0,
