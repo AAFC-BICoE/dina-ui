@@ -11,7 +11,7 @@ import { IndexGrid } from "./index-grid/IndexGrid";
 import { IndexAssignmentTable } from "./IndexAssignmentTable";
 import { useIndexAssignmentAPI } from "./useIndexAssignmentAPI";
 import Link from "next/link";
-import { FaExternalLinkAlt } from "react-icons/fa";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export interface IndexAssignmentStepProps {
   batchId: string;
@@ -86,7 +86,12 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
                   target="_blank"
                 >
                   Library Prep Worksheet With Table
-                  <FaExternalLinkAlt className="ms-2" />
+                  <FaArrowUpRightFromSquare
+                    style={{
+                      marginLeft: "0.3em"
+                    }}
+                    aria-label="Opens in new tab"
+                  />
                 </Link>
                 <Link
                   href={`/seqdb/ngs-workflow/library-prep-worksheet?batchId=${props.batchId}&sampleLayout=grid`}
@@ -94,7 +99,12 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
                   target="_blank"
                 >
                   Library Prep Worksheet With Grid
-                  <FaExternalLinkAlt className="ms-2" />
+                  <FaArrowUpRightFromSquare
+                    style={{
+                      marginLeft: "0.3em"
+                    }}
+                    aria-label="Opens in new tab"
+                  />
                 </Link>
               </div>
             </div>

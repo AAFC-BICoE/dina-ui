@@ -12,6 +12,7 @@ import Link from "next/link";
 import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import useLocalStorage from "@rehooks/local-storage";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export interface StorageSearchSelectorProps {
   /**
@@ -70,8 +71,19 @@ export function StorageSearchSelector({
           original: { id, data }
         }
       }) => (
-        <Link href={`/collection/storage-unit/view?id=${id}`} passHref={true}>
+        <Link
+          href={`/collection/storage-unit/view?id=${id}`}
+          passHref={true}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {data?.attributes?.name}
+          <FaArrowUpRightFromSquare
+            style={{
+              marginLeft: "0.3em"
+            }}
+            aria-label="Opens in new tab"
+          />
         </Link>
       ),
       header: () => <FieldHeader name="name" />,
@@ -95,8 +107,16 @@ export function StorageSearchSelector({
           <Link
             href={`/collection/storage-unit-type/view?id=${included?.storageUnitType?.id}`}
             passHref={true}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {included?.storageUnitType?.attributes?.name}
+            <FaArrowUpRightFromSquare
+              style={{
+                marginLeft: "0.3em"
+              }}
+              aria-label="Opens in new tab"
+            />
           </Link>
         );
       },

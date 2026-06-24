@@ -6,6 +6,7 @@ import { FieldWrapper } from "..";
 import { useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { SampleListLayout } from "@dina-ui/pages/collection/material-sample/list";
 import Link from "next/link";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export function AssociatedMaterialSampleSearchBoxField({
   showSearchBtn,
@@ -18,8 +19,18 @@ export function AssociatedMaterialSampleSearchBoxField({
   function defaultReadOnlyRender(value) {
     return (
       value && (
-        <Link href={`/collection/material-sample/view?id=${value?.id}`}>
+        <Link
+          href={`/collection/material-sample/view?id=${value?.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {value?.materialSampleName}
+          <FaArrowUpRightFromSquare
+            style={{
+              marginLeft: "0.3em"
+            }}
+            aria-label="Opens in new tab"
+          />
         </Link>
       )
     );

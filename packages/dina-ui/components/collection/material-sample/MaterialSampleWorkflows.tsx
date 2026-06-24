@@ -33,7 +33,6 @@ export function MaterialSampleWorkflows({
       }) => (
         <Link
           href={`/seqdb/molecular-analysis-workflow/run?genericMolecularAnalysisId=${id}`}
-          legacyBehavior
         >
           {name || id}
         </Link>

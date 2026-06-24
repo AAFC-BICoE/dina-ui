@@ -21,7 +21,7 @@ export function NavigationCardComponent({ card }: NavigationCardProps) {
   ].join(" ");
 
   return (
-    <Link href={card.href} passHref legacyBehavior>
+    <Link href={card.href} passHref>
       <Card
         className={cardClass}
         onMouseEnter={() => setIsHovered(true)}
@@ -37,7 +37,7 @@ export function NavigationCardComponent({ card }: NavigationCardProps) {
           style={{
             padding: "10px 8px",
             minHeight: "140px",
-            justifyContent: "center",
+            justifyContent: "center"
           }}
         >
           <div className="mb-2">
@@ -49,7 +49,7 @@ export function NavigationCardComponent({ card }: NavigationCardProps) {
                   : isHovered
                   ? "#062f5eff"
                   : "#1976d2",
-                transition: "color 0.3s ease",
+                transition: "color 0.3s ease"
               }}
             />
           </div>
@@ -61,7 +61,7 @@ export function NavigationCardComponent({ card }: NavigationCardProps) {
               lineHeight: "1.2",
               color: "#1a1a1a",
               textAlign: "center",
-              transition: "color 0.3s ease",
+              transition: "color 0.3s ease"
             }}
           >
             <DinaMessage id={card.title as any} />
@@ -72,7 +72,7 @@ export function NavigationCardComponent({ card }: NavigationCardProps) {
               style={{
                 fontSize: "0.7rem",
                 lineHeight: "1.1",
-                transition: "color 0.3s ease",
+                transition: "color 0.3s ease"
               }}
             >
               <DinaMessage id={card.description as any} />

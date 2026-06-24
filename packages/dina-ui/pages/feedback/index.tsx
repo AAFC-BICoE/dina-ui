@@ -1,8 +1,8 @@
 import { useInstanceContext } from "common-ui";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import Link from "next/link";
-import { FaExternalLinkAlt } from "react-icons/fa";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export function Feedback() {
   const instanceContext = useInstanceContext();
@@ -34,8 +34,12 @@ export function Feedback() {
           >
             <>
               <DinaMessage id="feedbackLinkTitle" />
-              {"  "}
-              <FaExternalLinkAlt />
+              <FaArrowUpRightFromSquare
+                style={{
+                  marginLeft: "0.3em"
+                }}
+                aria-label="Opens in new tab"
+              />
             </>
           </Link>{" "}
           <DinaMessage id="feedbackExternal" />

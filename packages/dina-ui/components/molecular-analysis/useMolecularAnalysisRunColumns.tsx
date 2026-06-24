@@ -398,10 +398,7 @@ export function useMolecularAnalysisRunColumns({
 
             return (
               <React.Fragment key={attachment.id}>
-                <Link
-                  href={`/object-store/object/view?id=${attachment.id}`}
-                  legacyBehavior
-                >
+                <Link href={`/object-store/object/view?id=${attachment.id}`}>
                   {attachment.originalFilename}
                 </Link>
                 {index < attachments.length - 1 && ", "}
@@ -725,10 +722,7 @@ export function useMolecularAnalysisRunColumns({
 
           return (
             <React.Fragment key={attachment.id}>
-              <Link
-                href={`/object-store/object/view?id=${attachment.id}`}
-                legacyBehavior
-              >
+              <Link href={`/object-store/object/view?id=${attachment.id}`}>
                 {(attachment as any)?.originalFilename}
               </Link>
               {index < attachments.length - 1 && ", "}
