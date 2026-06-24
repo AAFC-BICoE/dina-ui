@@ -13,8 +13,12 @@ export function NotPubliclyReleasableSection() {
   const formik = useFormikContext<any>();
   const { formatMessage } = useDinaIntl();
 
-  if (!isInBulkEditTab && formik.values.publiclyReleasable == null) {
-    // Default to "not publicly Releasable" (false) by default.
+  if (
+    !isInBulkEditTab &&
+    formik.values.publiclyReleasable == null &&
+    !formik.values.id
+  ) {
+    // Default to "not publicly Releasable" (false) by default for new records.
     formik.setFieldValue("publiclyReleasable", false);
   }
   return (
