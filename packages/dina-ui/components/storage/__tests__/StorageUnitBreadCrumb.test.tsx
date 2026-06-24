@@ -108,4 +108,38 @@ describe("StorageUnitBreadCrumb component", () => {
       wrapper.getAllByRole("link", { name: /a \(box\)/i })[0]
     ).toHaveAttribute("href", "/collection/storage-unit/view?id=A");
   });
+  it("Does not render a tooltip when parentStorageUnit exists but lacks hierarchy, and the unit itself has no hierarchy", () => {
+    const unitWithBareParent: PersistedResource<StorageUnit> = {
+      id: "VIAL-1",
+      group: "group",
+      name: "vial test",
+      type: "storage-unit",
+      isGeneric: false,
+      storageUnitType: {
+        name: "vial",
+        id: "VIAL_TYPE",
+        type: "storage-unit-type",
+        group: "test-group"
+      },
+      parentStorageUnit: {
+        id: "BOX-1",
+        group: "group",
+        name: "box",
+        type: "storage-unit",
+        isGeneric: false
+      }
+    };
+
+    const wrapper = mountWithAppContext(
+      <StorageUnitBreadCrumb storageUnit={unitWithBareParent} />
+    );
+
+    // No tooltip should appear — parentStorageUnit exists but has no hierarchy,
+    // and the unit itself has no hierarchy, so parentPath is empty.
+    expect(wrapper.queryByRole("img")).not.toBeInTheDocument();
+    // The unit name should still be displayed.
+    expect(
+      wrapper.getByRole("link", { name: /vial test \(vial\)/i })
+    ).toBeInTheDocument();
+  });
 });
