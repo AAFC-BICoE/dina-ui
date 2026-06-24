@@ -166,6 +166,7 @@ describe("Metadata external resource edit page.", () => {
               dcFormat: "image/jpeg",
               fileExtension: ".jpg",
               acCaption: "test caption",
+              publiclyReleasable: false,
               resourceExternalURL: "http://agr.gc.ca"
             },
             type: "metadata"
