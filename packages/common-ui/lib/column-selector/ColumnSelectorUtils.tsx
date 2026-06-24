@@ -669,13 +669,10 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
 
   const managedAttributesColumn = {
     cell: ({ row: { original } }) => {
-      const relationshipAccessor = accessorKey?.split(".");
-      relationshipAccessor?.splice(
-        1,
-        0,
-        config.referencedBy ? config.referencedBy : ""
+      const valuePath = buildRelationshipAccessorPath(
+        accessorKey,
+        config.referencedBy
       );
-      const valuePath = relationshipAccessor?.join(".");
       const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
@@ -898,13 +895,10 @@ export function getIncludedExtensionFieldColumn(
   const accessorKey = `${config.path}.${extensionValue.id}.${extensionField.key}`;
   const extensionValuesColumn = {
     cell: ({ row: { original } }) => {
-      const relationshipAccessor = accessorKey?.split(".");
-      relationshipAccessor?.splice(
-        1,
-        0,
-        config.referencedBy ? config.referencedBy : ""
+      const valuePath = buildRelationshipAccessorPath(
+        accessorKey,
+        config.referencedBy
       );
-      const valuePath = relationshipAccessor?.join(".");
       const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
@@ -1109,13 +1103,10 @@ export function getIncludedVocabularyColumn<TData extends KitsuResource>(
 
   const vocabularyColumn = {
     cell: ({ row: { original } }) => {
-      const relationshipAccessor = accessorKey?.split(".");
-      relationshipAccessor?.splice(
-        1,
-        0,
-        config.referencedBy ? config.referencedBy : ""
+      const valuePath = buildRelationshipAccessorPath(
+        accessorKey,
+        config.referencedBy
       );
-      const valuePath = relationshipAccessor?.join(".");
       const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
@@ -1329,13 +1320,10 @@ export function getIncludedControlledVocabularyColumn<
 
   const controlledVocabularyColumn = {
     cell: ({ row: { original } }) => {
-      const relationshipAccessor = accessorKey?.split(".");
-      relationshipAccessor?.splice(
-        1,
-        0,
-        config.referencedBy ? config.referencedBy : ""
+      const valuePath = buildRelationshipAccessorPath(
+        accessorKey,
+        config.referencedBy
       );
-      const valuePath = relationshipAccessor?.join(".");
       const value = collectPathValues(original, valuePath);
       return <>{value}</>;
     },
@@ -1592,4 +1580,26 @@ export function FunctionFieldLabel({
   } else {
     return <></>;
   }
+}
+
+/**
+ * Builds a value path by inserting the first segment of `referencedBy` at index 1
+ * of the accessor key parts.
+ *
+ * e.g. accessorKey: "included.managedAttributes.myKey"
+ *      referencedBy: "organism.determination"
+ *      result: "included.organism.managedAttributes.myKey"
+ */
+export function buildRelationshipAccessorPath(
+  accessorKey: string,
+  referencedBy: string | undefined
+): string {
+  if (!referencedBy) {
+    return accessorKey;
+  }
+
+  const parts = accessorKey.split(".");
+  const referencedByRoot = (referencedBy ?? "").split(".")[0];
+  parts.splice(1, 0, referencedByRoot);
+  return parts.join(".");
 }

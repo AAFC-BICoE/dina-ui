@@ -27,8 +27,8 @@ export function resourceDifference<T extends KitsuResource>({
     ) {
       return;
     } else if (
-      // Always include "type" and "id".
-      ["type", "id"].includes(key) ||
+      // Always include "type", "id", "resourceVersion".
+      ["type", "id", "resourceVersion"].includes(key) ||
       // Include any other fields that have changed.
       !_.isEqual(value, original[key])
     ) {

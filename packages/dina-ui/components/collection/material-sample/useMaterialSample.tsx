@@ -246,7 +246,7 @@ export function useMaterialSampleQueries(ids: (string | null | undefined)[]) {
           apiClient.get<GenericMolecularAnalysis[]>(
             `seqdb-api/generic-molecular-analysis-item`,
             {
-              include: "genericMolecularAnalysis, materialSample",
+              include: "genericMolecularAnalysis,materialSample",
               filter: SimpleSearchFilterBuilder.create()
                 .where("materialSample.id", "EQ", data.id)
                 .build(),
