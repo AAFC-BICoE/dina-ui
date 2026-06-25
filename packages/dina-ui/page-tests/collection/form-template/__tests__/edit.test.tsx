@@ -1125,7 +1125,7 @@ const expected = {
           items: [
             { defaultValue: undefined, name: "tags", visible: false },
             {
-              defaultValue: undefined,
+              defaultValue: false,
               name: "publiclyReleasable",
               visible: false
             },

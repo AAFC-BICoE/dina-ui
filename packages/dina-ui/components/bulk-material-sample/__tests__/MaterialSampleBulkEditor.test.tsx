@@ -939,7 +939,7 @@ describe("MaterialSampleBulkEditor", () => {
               }
             ],
             group: "cnc",
-            publiclyReleasable: true
+            publiclyReleasable: false
           },
           type: "collecting-event"
         }
@@ -1025,7 +1025,7 @@ describe("MaterialSampleBulkEditor", () => {
                 isPrimary: true
               }
             ],
-            publiclyReleasable: true
+            publiclyReleasable: false
           },
           type: "collecting-event"
         }
@@ -1757,7 +1757,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -1774,7 +1774,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -1791,7 +1791,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -2244,7 +2244,7 @@ describe("MaterialSampleBulkEditor", () => {
                 }
               ],
               group: "cnc",
-              publiclyReleasable: true
+              publiclyReleasable: false
             },
             type: "collecting-event"
           }
