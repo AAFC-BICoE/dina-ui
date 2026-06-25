@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   dateCell,
   DinaForm,
+  ExternalLink,
   FieldHeader,
   FormikButton,
   ReactTable,
@@ -11,7 +12,6 @@ import {
 } from "common-ui";
 import { FormikContextType } from "formik";
 import _ from "lodash";
-import Link from "next/link";
 import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
@@ -25,7 +25,6 @@ import {
   FaUnlink
 } from "react-icons/fa";
 import React from "react";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export interface ExistingAttachmentsTableProps {
   metadatas: ResourceIdentifierObject[];
@@ -128,20 +127,9 @@ export function ExistingAttachmentsTable({
         }
 
         return metadata?.filename ? (
-          <Link
-            href={`/object-store/object/view?id=${id}`}
-            passHref={true}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <ExternalLink href={`/object-store/object/view?id=${id}`}>
             {metadata?.filename}
-            <FaArrowUpRightFromSquare
-              style={{
-                marginLeft: "0.3em"
-              }}
-              aria-label="Opens in new tab"
-            />
-          </Link>
+          </ExternalLink>
         ) : null;
       },
       accessorKey: "filename",

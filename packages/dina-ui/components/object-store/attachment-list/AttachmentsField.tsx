@@ -1,6 +1,7 @@
 import {
   CheckBoxWithoutWrapper,
   dateCell,
+  ExternalLink,
   FieldHeader,
   FieldSet,
   FieldSpy,
@@ -14,7 +15,6 @@ import {
 } from "common-ui";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import _ from "lodash";
-import Link from "next/link";
 import { CSSProperties, ReactNode } from "react";
 import { AllowAttachmentsConfig, AttachmentSection } from "..";
 import { ThumbnailCell } from "../..";
@@ -25,7 +25,6 @@ import classNames from "classnames";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { ColumnDef } from "@tanstack/react-table";
 import { FaPaperclip, FaTimes, FaUnlink } from "react-icons/fa";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -154,19 +153,9 @@ export function AttachmentsEditor({
         }
 
         return (
-          <Link
-            href={`/object-store/object/view?id=${metadata.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <ExternalLink href={`/object-store/object/view?id=${metadata.id}`}>
             {(metadata as any)?.filename ?? metadata.id}
-            <FaArrowUpRightFromSquare
-              style={{
-                marginLeft: "0.3em"
-              }}
-              aria-label="Opens in new tab"
-            />
-          </Link>
+          </ExternalLink>
         );
       }
     },

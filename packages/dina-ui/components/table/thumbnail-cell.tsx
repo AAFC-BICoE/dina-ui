@@ -4,7 +4,7 @@ import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";
 import { useMetadataThumbnailPath } from "../object-store/metadata/useMetadataThumbnailPath";
-import { FieldHeader } from "common-ui";
+import { ExternalLink, FieldHeader } from "common-ui";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export interface ThumbnailCellProps {
@@ -29,14 +29,9 @@ function ThumbnailCellInner({
       {hasExternalResourceDerivative ? (
         <FaArrowUpRightFromSquare className="m-auto me-2 h5" />
       ) : (
-        <Link
-          href={resourceExternalURL}
-          passHref={true}
-          target="_blank"
-          className="m-auto h5"
-        >
-          <FaArrowUpRightFromSquare />
-        </Link>
+        <ExternalLink href={resourceExternalURL} className="m-auto h5">
+          <></>
+        </ExternalLink>
       )}
       {hasExternalResourceDerivative && (
         <SmallThumbnail filePath={filePath} altImage={altImage} />

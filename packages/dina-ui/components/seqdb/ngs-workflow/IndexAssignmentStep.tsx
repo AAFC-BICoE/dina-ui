@@ -10,8 +10,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { IndexGrid } from "./index-grid/IndexGrid";
 import { IndexAssignmentTable } from "./IndexAssignmentTable";
 import { useIndexAssignmentAPI } from "./useIndexAssignmentAPI";
-import Link from "next/link";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
+import { ExternalLink } from "common-ui";
 
 export interface IndexAssignmentStepProps {
   batchId: string;
@@ -80,32 +79,18 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
           <Tab.Content>
             <div className="row mb-2">
               <div className="form-group list-inline d-flex justify-content-end">
-                <Link
+                <ExternalLink
                   href={`/seqdb/ngs-workflow/library-prep-worksheet?batchId=${props.batchId}&sampleLayout=table`}
                   className="list-inline-item btn btn-primary"
-                  target="_blank"
                 >
                   Library Prep Worksheet With Table
-                  <FaArrowUpRightFromSquare
-                    style={{
-                      marginLeft: "0.3em"
-                    }}
-                    aria-label="Opens in new tab"
-                  />
-                </Link>
-                <Link
+                </ExternalLink>
+                <ExternalLink
                   href={`/seqdb/ngs-workflow/library-prep-worksheet?batchId=${props.batchId}&sampleLayout=grid`}
                   className="list-inline-item btn btn-primary"
-                  target="_blank"
                 >
                   Library Prep Worksheet With Grid
-                  <FaArrowUpRightFromSquare
-                    style={{
-                      marginLeft: "0.3em"
-                    }}
-                    aria-label="Opens in new tab"
-                  />
-                </Link>
+                </ExternalLink>
               </div>
             </div>
             <Tab.Pane eventKey="assignByGrid">

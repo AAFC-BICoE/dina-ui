@@ -3,11 +3,11 @@ import { useIntl } from "react-intl";
 import _ from "lodash";
 import { SelectOption } from "packages/common-ui/lib/formik-connected/SelectField";
 import Select from "react-select";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { TableColumn } from "../../types";
 import { KitsuResource } from "kitsu";
 import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { RAW_EXTS } from "dina-ui/components/object-store/object-store-utils";
+import { ExternalLink } from "common-ui";
 
 interface QueryRowImageLinkProps {
   /**
@@ -234,13 +234,9 @@ export function ImageLinkButton({ imageType, metadata }: ImageLinkButtonProps) {
 
   return (
     <div className="text-center" style={{ whiteSpace: "nowrap" }}>
-      <a
-        href={IMAGE_VIEW_LINK + fileIdentifier}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <DinaMessage id="viewImage" /> <FaArrowUpRightFromSquare />
-      </a>
+      <ExternalLink href={IMAGE_VIEW_LINK + fileIdentifier}>
+        <DinaMessage id="viewImage" />
+      </ExternalLink>
     </div>
   );
 }
