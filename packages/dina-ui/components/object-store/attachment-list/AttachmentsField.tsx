@@ -158,6 +158,7 @@ export function AttachmentsEditor({
             href={`/object-store/object/view?id=${metadata.id}`}
             target="_blank"
             rel="noopener noreferrer"
+            legacyBehavior
           >
             {(metadata as any)?.filename ?? metadata.id}
             <FaArrowUpRightFromSquare

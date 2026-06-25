@@ -133,6 +133,7 @@ export function ExistingAttachmentsTable({
             passHref={true}
             target="_blank"
             rel="noopener noreferrer"
+            legacyBehavior
           >
             {metadata?.filename}
             <FaArrowUpRightFromSquare

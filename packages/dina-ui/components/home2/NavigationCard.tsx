@@ -21,7 +21,7 @@ export function NavigationCardComponent({ card }: NavigationCardProps) {
   ].join(" ");
 
   return (
-    <Link href={card.href} passHref>
+    <Link href={card.href} passHref legacyBehavior>
       <Card
         className={cardClass}
         onMouseEnter={() => setIsHovered(true)}

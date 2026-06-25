@@ -44,6 +44,7 @@ export function TransactionMaterialDirectionSection({
             {transactionData.attributes.transactionNumber && (
               <Link
                 href={`/loan-transaction/transaction/view?id=${transactionData.id}`}
+                legacyBehavior
               >
                 {transactionData.attributes.transactionNumber}
               </Link>

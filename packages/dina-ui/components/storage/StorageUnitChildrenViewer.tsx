@@ -228,7 +228,7 @@ export function StorageUnitContents({
           original: { id, materialSampleName, dwcOtherCatalogNumbers }
         }
       }) => (
-        <Link href={`/collection/material-sample/view?id=${id}`}>
+        <Link href={`/collection/material-sample/view?id=${id}`} legacyBehavior>
           {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
         </Link>
       ),
