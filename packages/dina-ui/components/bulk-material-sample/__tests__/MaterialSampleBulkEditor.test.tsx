@@ -1468,10 +1468,10 @@ describe("MaterialSampleBulkEditor", () => {
     // Barcode
     expect(wrapper.getByDisplayValue("test barcode")).toBeInTheDocument();
 
-    // Publicly Releasable
+    // Publicly Releasable should show not publicly releasable if all records have it set like so, which is the case
     expect(
       screen.getByRole("combobox", {
-        name: /keep current values/i
+        name: /not publicly releasable/i
       })
     ).toBeInTheDocument();
 

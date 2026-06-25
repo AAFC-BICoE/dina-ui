@@ -123,6 +123,7 @@ export default function MaterialSampleEditPage() {
                   navOrder={navOrder}
                   {...sampleFormProps}
                   materialSample={sample}
+                  defaultToNotReleasable={true}
                 />
               </>
             );
@@ -162,6 +163,7 @@ export default function MaterialSampleEditPage() {
                   {...sampleFormProps}
                   materialSample={initialValues}
                   disableAutoNamePrefix={true}
+                  defaultToNotReleasable={true}
                 />
               </CopyToNextSampleProvider>
             );
@@ -175,6 +177,7 @@ export default function MaterialSampleEditPage() {
               enableReinitialize={true}
               navOrder={navOrder}
               {...sampleFormProps}
+              defaultToNotReleasable={true}
             />
           </>
         )}

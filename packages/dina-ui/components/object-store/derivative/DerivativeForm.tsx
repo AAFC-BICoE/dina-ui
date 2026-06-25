@@ -29,6 +29,8 @@ export interface MetadataFormProps {
 
   // Form ref from parent component
   derivativeFormRef?: Ref<FormikProps<InputResource<Derivative>>>;
+
+  defaultToNotReleasable?: boolean;
 }
 
 export function DerivativeForm({
@@ -36,7 +38,8 @@ export function DerivativeForm({
   onSaved,
   buttonBar,
   derivativeSaveHook,
-  derivativeFormRef
+  derivativeFormRef,
+  defaultToNotReleasable
 }: MetadataFormProps) {
   const { formatMessage } = useIntl();
 
@@ -70,7 +73,9 @@ export function DerivativeForm({
         />
       </div>
       <MetadataBadges />
-      <NotPubliclyReleasableSection />
+      <NotPubliclyReleasableSection
+        defaultToNotReleasable={defaultToNotReleasable}
+      />
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/derivative"
         tagsFieldName="acTags"

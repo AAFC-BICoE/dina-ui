@@ -8,15 +8,21 @@ import {
 import { useFormikContext } from "formik";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
-export function NotPubliclyReleasableSection() {
+export interface NotPubliclyReleasableSectionProps {
+  defaultToNotReleasable?: boolean;
+}
+export function NotPubliclyReleasableSection({
+  defaultToNotReleasable
+}: NotPubliclyReleasableSectionProps = {}) {
   const isInBulkEditTab = !!useBulkEditTabContext();
   const formik = useFormikContext<any>();
   const { formatMessage } = useDinaIntl();
 
   if (
-    !isInBulkEditTab &&
+    defaultToNotReleasable &&
     formik.values.publiclyReleasable == null &&
-    !formik.values.id
+    !formik.values.id &&
+    !formik.initialValues.id
   ) {
     // Default to "not publicly Releasable" (false) by default for new records.
     formik.setFieldValue("publiclyReleasable", false);
