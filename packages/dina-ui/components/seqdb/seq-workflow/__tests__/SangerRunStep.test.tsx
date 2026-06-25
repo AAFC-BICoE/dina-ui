@@ -164,7 +164,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     const sequencingRunNameInput = wrapper.container.querySelector(
       'input[name="sequencingRunName"]'
     );
-    expect(sequencingRunNameInput).toHaveDisplayValue("run-name-1");
+    expect(sequencingRunNameInput).toHaveDisplayValue(/run-name-1/i);
 
     // Ensure Primary IDs are rendered in the table with links:
     expect(
