@@ -694,8 +694,7 @@ export function useMaterialSampleSave({
   const defaultValues: InputResource<MaterialSample> = {
     type: "material-sample",
     // Defaults to the last Collection used to create a Material Sample:
-    ...(lastUsedCollection && { collection: lastUsedCollection }),
-    publiclyReleasable: true
+    ...(lastUsedCollection && { collection: lastUsedCollection })
   };
 
   const msInitialValues: InputResource<MaterialSample> =
@@ -1581,6 +1580,7 @@ export function useMaterialSampleSave({
             />
           )}
           <CollectingEventFormLayout
+            defaultToNotReleasable={true}
             visibleManagedAttributeKeys={
               visibleManagedAttributeKeys?.collectingEvent
             }

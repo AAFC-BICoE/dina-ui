@@ -133,8 +133,7 @@ export function useCollectingEventSave({
           ],
           dwcVerbatimCoordinateSystem:
             defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
-          dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84,
-          publiclyReleasable: true
+          dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
         };
 
   async function saveCollectingEvent(

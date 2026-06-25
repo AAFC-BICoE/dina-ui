@@ -295,7 +295,6 @@ describe("MetadataBulkEditor", () => {
         bucket: BUCKET,
         dcRights: DC_RIGHTS,
         dcType: DC_TYPE,
-        publiclyReleasable: false,
         relationships: {
           acMetadataCreator: {
             data: {

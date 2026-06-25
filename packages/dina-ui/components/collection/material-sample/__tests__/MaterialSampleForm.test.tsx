@@ -304,7 +304,7 @@ describe("Material Sample Edit Page", () => {
 
   it("Submits a new material-sample with a new CollectingEvent.", async () => {
     const wrapper = mountWithAppContext(
-      <MaterialSampleForm onSaved={mockOnSaved} />,
+      <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
       testCtx
     );
     await waitFor(() => expect(wrapper.container).toBeInTheDocument());
@@ -351,7 +351,7 @@ describe("Material Sample Edit Page", () => {
                 }
               ],
               verbatimEventDateTime: "2019-12-21T16:00",
-              publiclyReleasable: true, // Default value
+              publiclyReleasable: false, // Default value
               type: "collecting-event"
             },
             type: "collecting-event"
@@ -369,7 +369,7 @@ describe("Material Sample Edit Page", () => {
                 type: "collecting-event"
               },
               materialSampleName: "test-material-sample-id",
-              publiclyReleasable: true, // Default value
+              publiclyReleasable: false, // Default value
               type: "material-sample"
             },
             type: "material-sample"
@@ -391,7 +391,7 @@ describe("Material Sample Edit Page", () => {
     ]);
 
     const wrapper = mountWithAppContext(
-      <MaterialSampleForm onSaved={mockOnSaved} />,
+      <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
       testCtx
     );
 
@@ -435,7 +435,7 @@ describe("Material Sample Edit Page", () => {
 
   it("Submits a new material-sample linked to an existing CollectingEvent.", async () => {
     const wrapper = mountWithAppContext(
-      <MaterialSampleForm onSaved={mockOnSaved} />,
+      <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
       testCtx
     );
     await waitForLoadingToDisappear();
@@ -475,7 +475,7 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               type: "material-sample",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               materialSampleName: "test-material-sample-id",
               collectingEvent: { id: "1", type: "collecting-event" }
             },
@@ -588,7 +588,7 @@ describe("Material Sample Edit Page", () => {
                 }
               ],
               verbatimEventDateTime: "2019-12-21T16:00",
-              publiclyReleasable: true, // Default Value
+              publiclyReleasable: false, // Default Value
               type: "collecting-event"
             },
             type: "collecting-event"
@@ -683,7 +683,7 @@ describe("Material Sample Edit Page", () => {
                 }
               ],
               verbatimEventDateTime: "2019-12-21T16:00",
-              publiclyReleasable: true, // Default Value
+              publiclyReleasable: false, // Default Value
               type: "collecting-event"
             },
             type: "collecting-event"
@@ -991,7 +991,7 @@ describe("Material Sample Edit Page", () => {
 
   it("Submits a new Material Sample with 3 Determinations.", async () => {
     const wrapper = mountWithAppContext(
-      <MaterialSampleForm onSaved={mockOnSaved} />,
+      <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
       testCtx
     );
 
@@ -1281,7 +1281,7 @@ describe("Material Sample Edit Page", () => {
 
   it("Submits a new Material Sample with a duplicate sample name: Shows an error", async () => {
     const wrapper = mountWithAppContext(
-      <MaterialSampleForm onSaved={mockOnSaved} />,
+      <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
       testCtx
     );
     await waitFor(() =>
@@ -1341,7 +1341,7 @@ describe("Material Sample Edit Page", () => {
   it("Add the associated sample selected from search result list to a new association.", async () => {
     // Mount a new material sample with no values
     const wrapper = mountWithAppContext(
-      <MaterialSampleForm onSaved={mockOnSaved} />,
+      <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
       testCtx
     );
     await waitFor(() =>
@@ -1393,7 +1393,7 @@ describe("Material Sample Edit Page", () => {
 
   it("Validates that associations require an associated sample and association type before saving.", async () => {
     const wrapper = mountWithAppContext(
-      <MaterialSampleForm onSaved={mockOnSaved} />,
+      <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
       testCtx
     );
     await waitFor(() =>
@@ -3386,7 +3386,7 @@ describe("Material Sample Edit Page", () => {
 
     it("Creates a geographicPlaceNameSourceDetail to a new collecting event", async () => {
       const wrapper = mountWithAppContext(
-        <MaterialSampleForm onSaved={mockOnSaved} />,
+        <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
         testCtx
       );
       await waitFor(() => expect(wrapper.container).toBeInTheDocument());
@@ -3475,8 +3475,8 @@ describe("Material Sample Edit Page", () => {
                       "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
                   },
                   group: "aafc",
-                  publiclyReleasable: true,
-                  type: "collecting-event"
+                  type: "collecting-event",
+                  publiclyReleasable: false
                 },
                 type: "collecting-event"
               }
@@ -3491,7 +3491,7 @@ describe("Material Sample Edit Page", () => {
                     id: "11111111-1111-1111-1111-111111111111",
                     type: "collecting-event"
                   },
-                  publiclyReleasable: true,
+                  publiclyReleasable: false,
                   type: "material-sample"
                 },
                 type: "material-sample"
@@ -3505,7 +3505,7 @@ describe("Material Sample Edit Page", () => {
 
     it("Creates a geographicPlaceNameSourceDetail with a customGeographicPlaceName to a new collecting event", async () => {
       const wrapper = mountWithAppContext(
-        <MaterialSampleForm onSaved={mockOnSaved} />,
+        <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
         testCtx
       );
       await waitFor(() => expect(wrapper.container).toBeInTheDocument());
@@ -3609,7 +3609,7 @@ describe("Material Sample Edit Page", () => {
                       "https://nominatim.openstreetmap.org/ui/details.html?osmtype=R&osmid=4136816"
                   },
                   group: "aafc",
-                  publiclyReleasable: true,
+                  publiclyReleasable: false,
                   type: "collecting-event"
                 },
                 type: "collecting-event"
@@ -3625,7 +3625,7 @@ describe("Material Sample Edit Page", () => {
                     id: "11111111-1111-1111-1111-111111111111",
                     type: "collecting-event"
                   },
-                  publiclyReleasable: true,
+                  publiclyReleasable: false,
                   type: "material-sample"
                 },
                 type: "material-sample"
@@ -3734,7 +3734,7 @@ describe("Material Sample Edit Page", () => {
 
     it("Creates a scheduled action.", async () => {
       const wrapper = mountWithAppContext(
-        <MaterialSampleForm onSaved={mockOnSaved} />,
+        <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
         testCtx
       );
       await waitFor(() => expect(wrapper.container).toBeInTheDocument());
@@ -3791,7 +3791,7 @@ describe("Material Sample Edit Page", () => {
                       date: "2025-05-19"
                     }
                   ],
-                  publiclyReleasable: true,
+                  publiclyReleasable: false,
                   type: "material-sample"
                 },
                 type: "material-sample"

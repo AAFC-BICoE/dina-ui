@@ -203,7 +203,7 @@ describe("collecting-event edit page", () => {
             attributes: {
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true, // Default value
+              publiclyReleasable: false, // Default value
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
               otherRecordNumbers: ["12", "23"],
               geoReferenceAssertions: [{ isPrimary: true }]
@@ -299,7 +299,7 @@ describe("collecting-event edit page", () => {
               ],
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               dwcVerbatimCoordinateSystem: null,
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
             },
             id: "00000000-0000-0000-0000-000000000000",
@@ -525,7 +525,7 @@ describe("collecting-event edit page", () => {
             attributes: {
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true, // Default value
+              publiclyReleasable: false, // Default value
               geoReferenceAssertions: [{ isPrimary: true }]
             },
             id: "00000000-0000-0000-0000-000000000000",

@@ -40,6 +40,7 @@ export default function MetadataEditPage() {
           <div>
             {withResponse(query, ({ data: editMetadata }) => (
               <MetadataForm
+                defaultToNotReleasable={true}
                 metadata={editMetadata as InputResource<Metadata>}
                 onSaved={redirectToSingleMetadataPage}
                 buttonBar={buttonBar}

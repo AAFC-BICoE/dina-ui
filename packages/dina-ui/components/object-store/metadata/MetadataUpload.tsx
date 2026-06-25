@@ -91,6 +91,7 @@ export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
   }
   return uploadMetadata ? (
     <MetadataForm
+      defaultToNotReleasable={true}
       metadata={uploadMetadata as InputResource<Metadata>}
       onSaved={redirectToSingleMetadataPage}
       buttonBar={buttonBar}
