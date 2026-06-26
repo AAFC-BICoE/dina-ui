@@ -378,11 +378,6 @@ export function WorkbookFieldSelectField({
                   MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
                 )
                 .where("dinaComponent", "EQ", "MATERIAL_SAMPLE")
-                .where(
-                  "controlledVocabulary.uuid" as any,
-                  "EQ",
-                  COLLECTION_MANAGED_ATTRIBUTE_ID
-                )
                 .searchFilter("name", input)
                 .build()
             }
