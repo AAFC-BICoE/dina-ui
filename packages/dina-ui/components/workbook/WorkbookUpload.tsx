@@ -1,6 +1,5 @@
-import { IFileWithMeta } from "../object-store/file-upload/FileUploader";
-import { DinaMessage } from "../../intl/dina-ui-intl";
-import Dropzone from "react-dropzone-uploader/dist/react-dropzone-uploader";
+import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
+import { FileDropzone, IFileWithMeta } from "common-ui";
 
 interface WorkbookUploadProps {
   submitData: (acceptedFiles: IFileWithMeta[]) => void;
@@ -9,24 +8,10 @@ interface WorkbookUploadProps {
 export function WorkbookUpload({ submitData }: WorkbookUploadProps) {
   return (
     <form>
-      <Dropzone
+      <FileDropzone
         onSubmit={submitData}
-        multiple={false}
         maxFiles={1}
         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv"
-        classNames={{
-          submitButton: "btn btn-success",
-          inputLabelWithFiles: "btn btn-default dzu-inputLabelAddFiles",
-          submitButtonContainer: "dzu-submitContainer"
-        }}
-        styles={{
-          dropzone: { overflow: "initial" },
-          inputLabel: { padding: "1.25rem", color: "#333333" },
-          submitButtonContainer: {
-            margin: "1em 2em 1em 0em",
-            alignSelf: "flex-end"
-          }
-        }}
         inputContent={<DinaMessage id="workbookUploadInstructions" />}
       />
     </form>

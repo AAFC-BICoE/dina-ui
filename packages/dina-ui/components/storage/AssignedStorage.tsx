@@ -71,10 +71,7 @@ export function AssignedStorage({
           <div>
             <div className="list-inline mb-3">
               <div className="storage-path list-inline-item">
-                <StorageUnitBreadCrumb
-                  storageUnit={storageUnit}
-                  newTab={!readOnly}
-                />
+                <StorageUnitBreadCrumb storageUnit={storageUnit} />
               </div>
               {!readOnly &&
                 !parentIdInURL &&

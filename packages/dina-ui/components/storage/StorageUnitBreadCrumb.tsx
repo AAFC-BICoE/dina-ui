@@ -1,19 +1,16 @@
-import Link from "next/link";
 import { StorageUnit } from "../../types/collection-api";
-import { Tooltip } from "../../../common-ui/lib";
+import { ExternalLink, Tooltip } from "../../../common-ui/lib";
 
 export interface StorageUnitBreadCrumbProps {
   disableLastLink?: boolean;
   hideThisUnit?: boolean;
   storageUnit: StorageUnit;
-  newTab?: boolean;
 }
 
 export function StorageUnitBreadCrumb({
   disableLastLink,
   hideThisUnit,
-  storageUnit,
-  newTab
+  storageUnit
 }: StorageUnitBreadCrumbProps) {
   const parentPath = [
     ...(storageUnit.parentStorageUnit?.hierarchy ??
@@ -25,24 +22,23 @@ export function StorageUnitBreadCrumb({
 
   // Add parents to hierarchy array
   const hierarchy = parentPath.map((node, index) => (
-    <Link
+    <ExternalLink
       href={`/collection/storage-unit/view?id=${node.uuid}`}
-      key={index}
       style={{ color: "#fff" }}
+      key={index}
     >
       {`${node.name} (${node.typeName})`}
-    </Link>
+    </ExternalLink>
   ));
 
   // Add selected storage unit to array
   hierarchy.push(
-    <Link
+    <ExternalLink
       href={`/collection/storage-unit/view?id=${storageUnit.id}`}
       style={{ color: "#fff" }}
-      target={newTab ? "_blank" : undefined}
     >
       {unitDisplayName}
-    </Link>
+    </ExternalLink>
   );
 
   return (
@@ -51,12 +47,11 @@ export function StorageUnitBreadCrumb({
         <li className="breadcrumb-item">
           <strong>
             {storageUnit.id && !disableLastLink ? (
-              <Link
+              <ExternalLink
                 href={`/collection/storage-unit/view?id=${storageUnit.id}`}
-                target={newTab ? "_blank" : undefined}
               >
                 {unitDisplayName}
-              </Link>
+              </ExternalLink>
             ) : (
               unitDisplayName
             )}

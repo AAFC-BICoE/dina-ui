@@ -17,7 +17,6 @@ import "rc-tooltip/assets/bootstrap.css";
 import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { DndContext } from "@dnd-kit/core";
-import "react-dropzone-uploader/dist/styles.css";
 import "react-tabs/style/react-tabs.css";
 import "setimmediate";
 import {

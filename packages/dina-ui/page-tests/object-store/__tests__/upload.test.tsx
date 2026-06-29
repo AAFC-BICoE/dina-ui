@@ -1,11 +1,11 @@
-import { AccountContextI } from "common-ui";
+import { AccountContextI, waitForLoadingToDisappear } from "common-ui";
 import _ from "lodash";
 import { fileUploadErrorHandler } from "../../../components/object-store/file-upload/FileUploadProvider";
 import UploadPage, {
   BULK_ADD_IDS_KEY
 } from "../../../pages/object-store/upload";
 import { mountWithAppContext } from "common-ui";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -99,6 +99,7 @@ describe("Upload page", () => {
       accountContext: MOCK_ACCOUNT_CONTEXT,
       apiContext: mockApiCtx as any
     });
+    await waitForLoadingToDisappear();
 
     // Pretend the FileUploader is uploading these files:
     const mockAcceptedFiles = [
@@ -108,20 +109,23 @@ describe("Upload page", () => {
     ];
     await waitFor(() => {
       expect(
-        wrapper.getByLabelText(/drag and drop files here/i)
+        wrapper.getByText(/drag and drop files here/i)
       ).toBeInTheDocument();
     });
 
     // Find the file input in the Dropzone component
-    const fileInput = screen.getByLabelText(/drag and drop files here/i);
+    const fileInput =
+      wrapper.container.querySelector<HTMLInputElement>('input[type="file"]');
+    expect(fileInput).toBeInTheDocument();
 
     // Mock the `FileList` containing the files:
     Object.defineProperty(fileInput, "files", {
-      value: mockAcceptedFiles
+      value: mockAcceptedFiles,
+      configurable: true
     });
 
     // Simulate the file selection
-    fireEvent.change(fileInput);
+    fireEvent.change(fileInput!);
 
     // Await the processing of the file uploads
     await waitFor(() => {
@@ -220,6 +224,7 @@ describe("Upload page", () => {
       accountContext: MOCK_ACCOUNT_CONTEXT,
       apiContext: mockApiCtx as any
     });
+    await waitForLoadingToDisappear();
 
     // Pretend the FileUploader is uploading these files:
     const mockAcceptedFiles = [
@@ -229,20 +234,24 @@ describe("Upload page", () => {
     ];
     await waitFor(() => {
       expect(
-        wrapper.getByLabelText(/drag and drop files here/i)
+        wrapper.getByText(/drag and drop files here/i)
       ).toBeInTheDocument();
     });
 
     // Find the file input in the Dropzone component
-    const fileInput = screen.getByLabelText(/drag and drop files here/i);
+    const fileInput =
+      wrapper.container.querySelector<HTMLInputElement>('input[type="file"]');
+    expect(fileInput).toBeInTheDocument();
 
     // Mock the `FileList` containing the files:
     Object.defineProperty(fileInput, "files", {
-      value: mockAcceptedFiles
+      value: mockAcceptedFiles,
+      configurable: true
     });
 
     // Simulate the file selection
-    fireEvent.change(fileInput);
+    fireEvent.change(fileInput!);
+    await waitForLoadingToDisappear();
 
     // Await the processing of the file uploads
     await waitFor(() => {

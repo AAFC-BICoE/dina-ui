@@ -1,7 +1,7 @@
 {
   "name": "dina-ui",
   "license": "MIT",
-  "version": "0.222.0",
+  "version": "0.223.0",
   "scripts": {
     "build": "node --require ./next.config.js ../../node_modules/.bin/next build",
     "dev": "next --turbopack",
@@ -25,7 +25,6 @@
     "next": "15.5.15",
     "react": "19.2.7",
     "react-dom": "19.2.7",
-    "react-dropzone-uploader": "^2.11.0",
     "react-switch": "^7.1.0",
     "react-tabs": "^6.1.0",
     "react-zoom-pan-pinch": "^3.7.0",
