@@ -94,7 +94,7 @@ describe("AssignedStorage component", () => {
 
     expect(
       wrapper.getByRole("tooltip", {
-        name: /e \(building\) > d \(room\) > c \(cabinet\) > b \(shelf\) > a \(box\)/i
+        name: /e \(building\) opens in new tab > d \(room\) opens in new tab > c \(cabinet\) opens in new tab > b \(shelf\) opens in new tab > a \(box\) opens in new tab/i
       })
     ).toBeInTheDocument();
   });
