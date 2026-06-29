@@ -567,7 +567,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                               <DinaMessage id="visibility" />
                             </strong>
                             <Select<{
-                              label: JSX.Element;
+                              label: React.JSX.Element;
                               value: {
                                 restrictToCreatedBy: boolean;
                                 publiclyReleasable: boolean;

@@ -57,7 +57,10 @@ export function GeneratorItem({
               placeholder={column.columnLabel}
               disabled={isDisabled}
               onChange={(e) =>
-                onGeneratorItemChangeAlias(e.target.value, column.columnValue)
+                onGeneratorItemChangeAlias(
+                  (e.target as HTMLTextAreaElement | HTMLInputElement).value,
+                  column.columnValue
+                )
               }
             />
 

@@ -225,7 +225,7 @@ function ControlledVocabularyItemEditPageContent({
   );
 }
 
-function ButtonBarContent({ backButton }: { backButton: JSX.Element }) {
+function ButtonBarContent({ backButton }: { backButton: React.JSX.Element }) {
   const { submitForm } = useFormSubmission();
 
   return (

@@ -100,7 +100,9 @@ export function Pagination<TData>({
               min={1}
               max={totalPages}
               onChange={(e) => {
-                const newPageSelected: number = Number(e.target.value);
+                const newPageSelected: number = Number(
+                  (e.target as HTMLTextAreaElement | HTMLInputElement).value
+                );
 
                 // User cleared the value, set it to 0 internally but treat it as a blank.
                 if (newPageSelected === 0) {
