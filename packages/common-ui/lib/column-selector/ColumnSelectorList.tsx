@@ -321,6 +321,9 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   const displayedColumnsFiltered = useMemo(() => {
     return displayedColumns.filter((column) => {
       if (exportMode) {
+        if ((column as any)?.managedAttribute) {
+          return true;
+        }
         return !(nonExportableColumns ?? []).some((id) =>
           (column?.id ?? "").startsWith(id)
         );

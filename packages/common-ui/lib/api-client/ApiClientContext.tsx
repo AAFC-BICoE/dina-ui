@@ -13,6 +13,10 @@ import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { OperationsResponse } from "..";
 import { serialize } from "../util/serialize";
+import {
+  normalizeJsonApiPointer,
+  formatJsonApiErrorMessage
+} from "../util/jsonApiErrorNormalization";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 import {
   FailedOperation,
@@ -310,130 +314,159 @@ export class ApiClientImpl implements ApiClientI {
             }
           ];
         } else {
-          throw error;
+          // extract JSON:API errors from response so getErrorMessages can parse them and throw a DoOperationsError with the correct field errors.
+          const responseData = error?.cause?.data ?? error?.response?.data;
+          if (responseData?.errors) {
+            responses = [
+              {
+                status: error?.cause?.status ?? error?.response?.status ?? 422,
+                errors: responseData.errors
+              }
+            ];
+          } else {
+            throw error;
+          }
         }
       }
     } else {
-      switch (operations[0].op.toUpperCase()) {
-        case "GET":
-          const includeSet = new Set<string>();
-          const optfieldsMap: Record<string, string[]> = {};
+      try {
+        switch (operations[0].op.toUpperCase()) {
+          case "GET":
+            const includeSet = new Set<string>();
+            const optfieldsMap: Record<string, string[]> = {};
 
-          const ids = operations.map((operation) => {
-            // Split path by "?"
-            const pathParts = operation.path.split("?");
+            const ids = operations.map((operation) => {
+              // Split path by "?"
+              const pathParts = operation.path.split("?");
 
-            // Parse query params if they exist
-            if (pathParts.length > 1) {
-              const queryParams = new URLSearchParams(pathParts[1]);
+              // Parse query params if they exist
+              if (pathParts.length > 1) {
+                const queryParams = new URLSearchParams(pathParts[1]);
 
-              // Handle include
-              const includePart = queryParams.get("include");
-              if (includePart) {
-                includePart.split(",").forEach((includeItem) => {
-                  includeSet.add(includeItem);
+                // Handle include
+                const includePart = queryParams.get("include");
+                if (includePart) {
+                  includePart.split(",").forEach((includeItem) => {
+                    includeSet.add(includeItem);
+                  });
+                }
+
+                // Handle optfields[type]=fields
+                queryParams.forEach((value, key) => {
+                  const optfieldsMatch = key.match(/^optfields\[(.+)\]$/);
+                  if (optfieldsMatch) {
+                    const type = optfieldsMatch[1];
+                    if (!optfieldsMap[type]) {
+                      optfieldsMap[type] = [];
+                    }
+                    value.split(",").forEach((field) => {
+                      if (!optfieldsMap[type].includes(field)) {
+                        optfieldsMap[type].push(field);
+                      }
+                    });
+                  }
                 });
               }
 
-              // Handle optfields[type]=fields
-              queryParams.forEach((value, key) => {
-                const optfieldsMatch = key.match(/^optfields\[(.+)\]$/);
-                if (optfieldsMatch) {
-                  const type = optfieldsMatch[1];
-                  if (!optfieldsMap[type]) {
-                    optfieldsMap[type] = [];
-                  }
-                  value.split(",").forEach((field) => {
-                    if (!optfieldsMap[type].includes(field)) {
-                      optfieldsMap[type].push(field);
-                    }
-                  });
-                }
-              });
+              // Extract the ID from before the '?' by splitting by '/' and getting the second item
+              return pathParts[0].split("/").filter(Boolean)[1];
+            });
+
+            const include: string[] | undefined =
+              includeSet.size > 0 ? [...includeSet] : undefined;
+            const optfields =
+              Object.keys(optfieldsMap).length > 0 ? optfieldsMap : undefined;
+
+            const getResponse = await this.bulkLoadResources(ids, {
+              apiBaseUrl,
+              resourceType,
+              include,
+              optfields,
+              returnNullForMissingResource
+            });
+            responses = getResponse.data.data.map((response) => ({
+              data: response,
+              included: getResponse.data.included,
+              status: response ? getResponse.status : 404
+            }));
+            break;
+
+          case "DELETE":
+            const deleteIds = operations.map((operation) => {
+              // Split path by "?"
+              const pathParts = operation.path.split("/");
+
+              // Extract the ID from before the '?' by splitting by '/' and getting the second item
+              return pathParts[1];
+            });
+
+            const deleteResponse = await this.bulkDeleteResources(deleteIds, {
+              apiBaseUrl,
+              resourceType
+            });
+
+            responses = deleteIds.map(() => ({
+              status: deleteResponse.status
+            })) as any;
+            break;
+
+          case "POST":
+            const postResources: InputResource<KitsuResource>[] = operations
+              .map((op) => op.value)
+              .filter(
+                (value): value is InputResource<KitsuResource> =>
+                  value !== undefined
+              );
+            const postResponse = await this.bulkCreateResources(postResources, {
+              apiBaseUrl,
+              resourceType
+            });
+            responses = postResponse.data.data.map((response) => ({
+              data: response,
+              included: postResponse.data.included,
+              status: response ? postResponse.status : 404
+            }));
+
+            break;
+          case "PATCH":
+            const patchResources: InputResource<KitsuResource>[] = operations
+              .map((op) => op.value)
+              .filter(
+                (value): value is InputResource<KitsuResource> =>
+                  value !== undefined
+              );
+            const patchResponse = await this.bulkUpdateResources(
+              patchResources,
+              {
+                apiBaseUrl,
+                resourceType
+              }
+            );
+
+            responses = patchResponse.data.data.map((response) => ({
+              data: response,
+              included: patchResponse.data.included,
+              status: response ? patchResponse.status : 404
+            }));
+
+            break;
+        }
+      } catch (error: any) {
+        // bulk ops throw AxiosErrors on non-2xx responses
+        // extract JSON:API errors from response so getErrorMessages can parse them and throw a DoOperationsError with the correct field errors.
+        const responseData = error?.cause?.data ?? error?.response?.data;
+        if (responseData?.errors) {
+          responses = [
+            {
+              status: error?.cause?.status ?? error?.response?.status ?? 422,
+              errors: responseData.errors
             }
-
-            // Extract the ID from before the '?' by splitting by '/' and getting the second item
-            return pathParts[0].split("/").filter(Boolean)[1];
-          });
-
-          const include: string[] | undefined =
-            includeSet.size > 0 ? [...includeSet] : undefined;
-          const optfields =
-            Object.keys(optfieldsMap).length > 0 ? optfieldsMap : undefined;
-
-          const getResponse = await this.bulkLoadResources(ids, {
-            apiBaseUrl,
-            resourceType,
-            include,
-            optfields,
-            returnNullForMissingResource
-          });
-          responses = getResponse.data.data.map((response) => ({
-            data: response,
-            included: getResponse.data.included,
-            status: response ? getResponse.status : 404
-          }));
-          break;
-
-        case "DELETE":
-          const deleteIds = operations.map((operation) => {
-            // Split path by "?"
-            const pathParts = operation.path.split("/");
-
-            // Extract the ID from before the '?' by splitting by '/' and getting the second item
-            return pathParts[1];
-          });
-
-          const deleteResponse = await this.bulkDeleteResources(deleteIds, {
-            apiBaseUrl,
-            resourceType
-          });
-
-          responses = deleteIds.map(() => ({
-            status: deleteResponse.status
-          })) as any;
-          break;
-
-        case "POST":
-          const postResources: InputResource<KitsuResource>[] = operations
-            .map((op) => op.value)
-            .filter(
-              (value): value is InputResource<KitsuResource> =>
-                value !== undefined
-            );
-          const postResponse = await this.bulkCreateResources(postResources, {
-            apiBaseUrl,
-            resourceType
-          });
-          responses = postResponse.data.data.map((response) => ({
-            data: response,
-            included: postResponse.data.included,
-            status: response ? postResponse.status : 404
-          }));
-
-          break;
-        case "PATCH":
-          const patchResources: InputResource<KitsuResource>[] = operations
-            .map((op) => op.value)
-            .filter(
-              (value): value is InputResource<KitsuResource> =>
-                value !== undefined
-            );
-          const patchResponse = await this.bulkUpdateResources(patchResources, {
-            apiBaseUrl,
-            resourceType
-          });
-
-          responses = patchResponse.data.data.map((response) => ({
-            data: response,
-            included: patchResponse.data.included,
-            status: response ? patchResponse.status : 404
-          }));
-
-          break;
+          ];
+        } else {
+          throw error;
+        }
       }
     }
-
     // Optionally return null instead of throwing an error for missing resources:
     if (returnNullForMissingResource) {
       for (const i in responses) {
@@ -823,10 +856,12 @@ export function getErrorMessages(
       jsonApiErrors
         // Only include field-level errors in the fieldErrors:
         .filter((error) => error.source?.pointer && error.detail)
-        .map((error) => [
-          error.source?.pointer?.toString?.() ?? "",
-          error.detail ?? ""
-        ])
+        .map((error) => {
+          const pointer = error.source?.pointer?.toString?.() ?? "";
+          const fieldName = normalizeJsonApiPointer(pointer) || pointer;
+          const message = formatJsonApiErrorMessage(error.title, error.detail);
+          return [fieldName, message];
+        })
     );
 
     return { index, errorMessage, fieldErrors };
@@ -903,19 +938,56 @@ export class CustomDinaKitsu extends Kitsu {
    */
   async get(path: string, params: GetParams = {}) {
     const { responseType, timeout, ...paramsNet } = _.omit(params, "header");
+
+    // Trim spaces from comma-separated include values
+    if (paramsNet.include) {
+      paramsNet.include = (paramsNet.include as string)
+        .split(",")
+        .map((s) => s.trim())
+        .join(",");
+    }
+
+    // Trim spaces for fields values.
+    if (paramsNet.fields) {
+      paramsNet.fields = _.mapValues(paramsNet.fields, (value) =>
+        value
+          .split(",")
+          .map((s) => s.trim())
+          .join(",")
+      );
+    }
+
+    // Trim spaces for optField values.
+    if (paramsNet.optfields) {
+      paramsNet.optfields = _.mapValues(paramsNet.optfields, (value) =>
+        value
+          .split(",")
+          .map((s) => s.trim())
+          .join(",")
+      );
+    }
+
     try {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },
         params: paramsNet,
-        // paramsSerializer: (p) => query(p),
         responseType,
         timeout
       });
 
       const deserialized = await deserialise(data);
 
-      // Get the list of requested includes
-      const requestedIncludes = (params.include as string)?.split(",") ?? [];
+      // Get the list of requested includes from both params and the path query string,
+      // since includes are sometimes embedded directly in the path as ?include=...
+      const includesFromParams = (params.include as string)?.split(",") ?? [];
+      const includesFromPath =
+        path.match(/[?&]include=([^&]+)/)?.[1]?.split(",") ?? [];
+      const requestedIncludes = _.uniq([
+        ...includesFromParams,
+        ...includesFromPath
+      ])
+        .map((s) => s.trim())
+        .filter(Boolean);
 
       // Handle both single object and array responses
       const items = Array.isArray(deserialized.data)
@@ -929,8 +1001,13 @@ export class CustomDinaKitsu extends Kitsu {
         const rawRelationships = rawItems[i]?.relationships ?? {};
 
         for (const key of requestedIncludes) {
-          // Already resolved at top level, skip
-          if (item[key] !== undefined) continue;
+          // Already resolved at top level, skip.
+          // But don't skip empty arrays - they may be unresolved relationship stubs
+          // from a different API that couldn't be included (e.g. collectors from agent-api)
+          const currentValue = item[key];
+          const isEmptyArray =
+            Array.isArray(currentValue) && currentValue.length === 0;
+          if (currentValue !== undefined && !isEmptyArray) continue;
 
           const relData = rawRelationships[key]?.data;
           if (!relData) continue;
