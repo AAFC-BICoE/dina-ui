@@ -1,10 +1,9 @@
-import Link from "next/link";
 import { SeqBatch } from "../../../types/seqdb-api";
 import {
   SequencingRunItem,
   useMolecularAnalysisRun
 } from "../../molecular-analysis/useMolecularAnalysisRun";
-import { DinaForm, LoadingSpinner, ReactTable } from "common-ui";
+import { DinaForm, ExternalLink, LoadingSpinner, ReactTable } from "common-ui";
 import { Alert } from "react-bootstrap";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { AttachmentsEditor } from "../../object-store/attachment-list/AttachmentsField";
@@ -107,13 +106,12 @@ export function SangerRunStep({
             {!editMode && (
               <div className="row">
                 <div className="col-12 text-end">
-                  <Link
+                  <ExternalLink
                     href={`/seqdb/seq-workflow/worksheet?id=${seqBatchId}`}
-                    target="_blank"
                     className="btn btn-primary"
                   >
                     <DinaMessage id="worksheet" />
-                  </Link>
+                  </ExternalLink>
                 </div>
               </div>
             )}

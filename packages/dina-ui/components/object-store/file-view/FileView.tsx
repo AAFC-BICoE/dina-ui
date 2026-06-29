@@ -1,4 +1,5 @@
 import {
+  ExternalLink,
   LoadingSpinner,
   useApiClient,
   useBlobLoad,
@@ -15,7 +16,6 @@ import RcTooltip from "rc-tooltip";
 import { DownloadButton } from "../derivative-list/DerivativeList";
 import { Badge, Dropdown } from "react-bootstrap";
 import {
-  FaArrowUpRightFromSquare,
   FaDownload,
   FaFile,
   FaFileAudio,
@@ -120,20 +120,12 @@ export function FileView({
   const LinkRender = (
     <>
       <FaLink className="dropdown-icon mb-3" style={{ fontSize: "2em" }} />
-      <a
+      <ExternalLink
         href={(metadata as any)?.resourceExternalURL}
-        target="_blank"
-        rel="noopener noreferrer"
         className="btn btn-secondary"
       >
         <DinaMessage id="openLink" />
-        <FaArrowUpRightFromSquare
-          style={{
-            marginLeft: "0.5em"
-          }}
-          aria-label="Opens in new tab"
-        />
-      </a>
+      </ExternalLink>
     </>
   );
 

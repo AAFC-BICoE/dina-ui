@@ -552,7 +552,7 @@ describe("Project View Page.", () => {
     await waitFor(() => {
       expect(
         wrapper.getByRole("link", {
-          name: "test mat sample export.csv"
+          name: /test mat sample export.csv/i
         })
       ).toBeInTheDocument();
     });
@@ -560,7 +560,7 @@ describe("Project View Page.", () => {
     // Attachment filename with link to object view page:
     expect(
       wrapper.getByRole("link", {
-        name: "test mat sample export.csv"
+        name: /test mat sample export.csv/i
       })
     ).toHaveAttribute(
       "href",

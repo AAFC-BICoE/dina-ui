@@ -3,6 +3,7 @@ import {
   CheckBoxWithoutWrapper,
   DataEntryField,
   DinaFormSection,
+  ExternalLink,
   FieldSet,
   FieldSpy,
   FormattedTextField,
@@ -21,7 +22,6 @@ import {
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import _ from "lodash";
-import Link from "next/link";
 import { ChangeEvent, useRef, useState } from "react";
 import {
   AttachmentsField,
@@ -527,14 +527,12 @@ export function CollectingEventFormLayout({
                   )}
                   <div className="col-md-6">
                     {detail.sourceUrl && (
-                      <Link
+                      <ExternalLink
                         href={`${detail.sourceUrl}`}
-                        passHref={true}
                         className="btn btn-info w-100 mb-2"
-                        target="_blank"
                       >
                         <DinaMessage id="viewDetailButtonLabel" />
-                      </Link>
+                      </ExternalLink>
                     )}
                   </div>
                 </div>

@@ -146,3 +146,4 @@ export * from "./test-util/mock-app-context";
 export * from "./export/exportUtils";
 export * from "./export/useBlobLoad";
 export * from "./classification/TaxonomyTree";
+export * from "./link/ExternalLink";
