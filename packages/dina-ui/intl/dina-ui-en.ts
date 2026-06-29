@@ -826,6 +826,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   notEditableWhenThereAreChildStorageUnits:
     "Not editable when there are child Storage Units.",
   notPubliclyReleasable: "Not Publicly Releasable",
+  publiclyReleasable: "Publicly Releasable",
   objectListTitle: "Stored Objects",
   objectStoreDataUnavailable: "Object Store data unavailable",
   objectStoreDetailsTitle: "Object Store Details",
@@ -887,6 +888,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   protocolNameLabel: "Protocol Name",
   splitConfigurationNameLabel: "Split Configuration Name",
   protocolViewTitle: "Protocol",
+  publiclyReleasableOption: "Yes - Publicly Releasable",
+  notPubliclyReleasableOption: "No - Not Publicly Releasable",
   queryBuilder_addSearchGroup: "Add sub-query",
   queryBuilder_addSearchRule: "Add query",
   queryBuilder_conjunction_and: "AND",

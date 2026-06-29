@@ -76,6 +76,8 @@ interface CollectingEventFormLayoutProps {
 
   /** Pass the number of material sample usages to display a warning. */
   materialSampleUsageCount?: number;
+
+  defaultToNotReleasable?: boolean;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
@@ -84,7 +86,8 @@ export function CollectingEventFormLayout({
   setDefaultVerbatimSRS,
   attachmentsConfig,
   visibleManagedAttributeKeys,
-  materialSampleUsageCount
+  materialSampleUsageCount,
+  defaultToNotReleasable
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
@@ -621,7 +624,9 @@ export function CollectingEventFormLayout({
               collectingEventUUID={initialValues.id}
             />
 
-            <NotPubliclyReleasableSection />
+            <NotPubliclyReleasableSection
+              defaultToNotReleasable={defaultToNotReleasable}
+            />
             <Tooltip
               id="collecting_event_tag_info"
               disableSpanMargin={true}

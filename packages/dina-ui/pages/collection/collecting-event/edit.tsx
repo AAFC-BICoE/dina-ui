@@ -137,6 +137,7 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     >
       {buttonBar}
       <CollectingEventFormLayout
+        defaultToNotReleasable={true}
         setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
         setDefaultVerbatimSRS={setDefaultVerbatimSRS}
         materialSampleUsageCount={materialSampleUsageCount}

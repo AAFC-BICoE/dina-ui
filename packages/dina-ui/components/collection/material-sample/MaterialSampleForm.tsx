@@ -152,6 +152,8 @@ export interface MaterialSampleFormProps {
   enableReinitialize?: boolean;
 
   isBulkEditAllTab?: boolean;
+
+  defaultToNotReleasable?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -187,7 +189,8 @@ export function MaterialSampleForm({
       </div>
     </ButtonBar>
   ),
-  isBulkEditAllTab
+  isBulkEditAllTab,
+  defaultToNotReleasable
 }: MaterialSampleFormProps) {
   const { isTemplate, readOnly } = useContext(DinaFormContext) ?? {};
 
@@ -500,7 +503,9 @@ export function MaterialSampleForm({
                     }
                   />
                   <AssemblageSelectSection resourcePath="collection-api/assemblage" />
-                  <NotPubliclyReleasableSection />
+                  <NotPubliclyReleasableSection
+                    defaultToNotReleasable={defaultToNotReleasable}
+                  />
                   <TagsAndRestrictionsSection
                     resourcePath="collection-api/material-sample"
                     indexName="dina_material_sample_index"

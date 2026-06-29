@@ -1,5 +1,5 @@
 import { mountWithAppContext } from "common-ui";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import DerivativeEditPage from "../../../../pages/object-store/derivative/edit";
@@ -149,7 +149,16 @@ describe("Derivative single record edit page.", () => {
     });
     userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
 
-    userEvent.click(wrapper.getByRole("switch"));
+    const publiclyReleasableSelect = within(
+      wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
+    ).getByRole("combobox");
+
+    fireEvent.keyDown(publiclyReleasableSelect, { key: "ArrowDown" });
+
+    fireEvent.click(
+      wrapper.getByRole("option", { name: /yes - publicly releasable/i })
+    );
+
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
     // Check only the changed values
@@ -200,7 +209,15 @@ describe("Derivative single record edit page.", () => {
     });
     userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
 
-    userEvent.click(wrapper.getByRole("switch"));
+    const publiclyReleasableSelect = within(
+      wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
+    ).getByRole("combobox");
+
+    fireEvent.keyDown(publiclyReleasableSelect, { key: "ArrowDown" });
+
+    fireEvent.click(
+      wrapper.getByRole("option", { name: /no - not publicly releasable/i })
+    );
 
     await waitFor(() => {
       expect(
