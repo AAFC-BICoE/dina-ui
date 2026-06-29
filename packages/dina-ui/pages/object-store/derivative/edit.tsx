@@ -38,7 +38,6 @@ export default function DerivativeEditPage() {
         <div>
           {withResponse(query, ({ data: editDerivative }) => (
             <DerivativeForm
-              defaultToNotReleasable={true}
               derivative={editDerivative as InputResource<Derivative>}
               onSaved={redirectToSingleDerivativePage}
               buttonBar={buttonBar}

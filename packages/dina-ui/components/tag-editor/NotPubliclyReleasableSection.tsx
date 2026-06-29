@@ -19,13 +19,13 @@ export function NotPubliclyReleasableSection({
   const { formatMessage } = useDinaIntl();
 
   if (
-    defaultToNotReleasable &&
+    defaultToNotReleasable !== undefined &&
     formik.values.publiclyReleasable == null &&
     !formik.values.id &&
     !formik.initialValues.id
   ) {
-    // Default to "not publicly Releasable" (false) by default for new records.
-    formik.setFieldValue("publiclyReleasable", false);
+    // Default the field for new records: true -> not releasable, false -> releasable.
+    formik.setFieldValue("publiclyReleasable", !defaultToNotReleasable);
   }
   return (
     <>
