@@ -1,8 +1,7 @@
-import { ApiClientContext } from "common-ui";
+import { ApiClientContext, IFileWithMeta } from "common-ui";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { createContext, useContext } from "react";
 import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
-import { IFileWithMeta } from "./FileUploader";
 
 export interface FileUploadContextI {
   uploadFiles: (params: UploadFileParams) => Promise<ObjectUpload[]>;

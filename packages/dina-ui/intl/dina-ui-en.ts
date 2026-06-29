@@ -1489,5 +1489,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Collection managed attributes have been moved.",
   managedAttributeCollectionTabAlertDescription:
     "They are now located on the new {link} page.",
+  supportedFormats: "Supported Formats",
+  maxFileSize: "Maximum file size",
   openInNewTab: "Opens in new tab"
 };
