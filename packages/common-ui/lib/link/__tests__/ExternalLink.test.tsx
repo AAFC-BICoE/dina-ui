@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
 import { ExternalLink } from "../ExternalLink";
 import "@testing-library/jest-dom";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 
 // Next.js Link mock
 jest.mock("next/link", () => ({
@@ -14,60 +14,83 @@ jest.mock("next/link", () => ({
 
 describe("ExternalLink", () => {
   it("renders the link with the correct href", () => {
-    render(<ExternalLink href="/test">Link Text</ExternalLink>);
-    expect(screen.getByRole("link")).toHaveAttribute("href", "/test");
+    const wrapper = mountWithAppContext(
+      <ExternalLink href="/test">Link Text</ExternalLink>,
+      {}
+    );
+    expect(wrapper.getByRole("link")).toHaveAttribute("href", "/test");
   });
 
   it("always opens in a new tab", () => {
-    render(<ExternalLink href="/test">Link Text</ExternalLink>);
-    expect(screen.getByRole("link")).toHaveAttribute("target", "_blank");
+    const wrapper = mountWithAppContext(
+      <ExternalLink href="/test">Link Text</ExternalLink>,
+      {}
+    );
+    expect(wrapper.getByRole("link")).toHaveAttribute("target", "_blank");
   });
 
   it("always has noopener noreferrer rel", () => {
-    render(<ExternalLink href="/test">Link Text</ExternalLink>);
-    expect(screen.getByRole("link")).toHaveAttribute(
+    const wrapper = mountWithAppContext(
+      <ExternalLink href="/test">Link Text</ExternalLink>,
+      {}
+    );
+    expect(wrapper.getByRole("link")).toHaveAttribute(
       "rel",
       "noopener noreferrer"
     );
   });
 
   it("renders children correctly", () => {
-    render(<ExternalLink href="/test">My Link Text</ExternalLink>);
-    expect(screen.getByText("My Link Text")).toBeInTheDocument();
+    const wrapper = mountWithAppContext(
+      <ExternalLink href="/test">My Link Text</ExternalLink>,
+      {}
+    );
+    expect(wrapper.getByText("My Link Text")).toBeInTheDocument();
   });
 
   it("renders the external icon with default aria-label", () => {
-    render(<ExternalLink href="/test">Link Text</ExternalLink>);
-    expect(screen.getByLabelText("Opens in new tab")).toBeInTheDocument();
+    const wrapper = mountWithAppContext(
+      <ExternalLink href="/test">Link Text</ExternalLink>,
+      {}
+    );
+    expect(wrapper.getByLabelText("Opens in new tab")).toBeInTheDocument();
   });
 
   it("applies a custom className to the link", () => {
-    render(
+    const wrapper = mountWithAppContext(
       <ExternalLink href="/test" className="my-class">
         Link Text
-      </ExternalLink>
+      </ExternalLink>,
+      {}
     );
-    expect(screen.getByRole("link")).toHaveClass("my-class");
+    expect(wrapper.getByRole("link")).toHaveClass("my-class");
   });
 
   it("renders complex children correctly", () => {
-    render(
+    const wrapper = mountWithAppContext(
       <ExternalLink href="/test">
         <span>Nested</span> Content
-      </ExternalLink>
+      </ExternalLink>,
+      {}
     );
-    expect(screen.getByText("Nested")).toBeInTheDocument();
+    expect(wrapper.getByText("Nested")).toBeInTheDocument();
   });
 
   it("icon does not wrap separately from text", () => {
-    render(<ExternalLink href="/test">Link Text</ExternalLink>);
-    const span = screen.getByRole("link").querySelector("span");
+    const wrapper = mountWithAppContext(
+      <ExternalLink href="/test">Link Text</ExternalLink>,
+      {}
+    );
+    const span = wrapper.getByRole("link").querySelector("span");
     expect(span).toHaveStyle({ whiteSpace: "nowrap" });
   });
 
   it("icon and children are wrapped in a single span", () => {
-    render(<ExternalLink href="/test">Link Text</ExternalLink>);
-    const link = screen.getByRole("link");
+    const wrapper = mountWithAppContext(
+      <ExternalLink href="/test">Link Text</ExternalLink>,
+      {}
+    );
+    const link = wrapper.getByRole("link");
     expect(link.children).toHaveLength(1);
     expect(link.children[0].tagName).toBe("SPAN");
   });
