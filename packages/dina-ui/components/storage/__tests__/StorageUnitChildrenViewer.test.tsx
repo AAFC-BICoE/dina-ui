@@ -509,10 +509,11 @@ describe("StorageUnitChildrenViewer component", () => {
     userEvent.click(
       wrapper.getByRole("button", { name: /add existing storage unit/i })
     );
+    await waitForLoadingToDisappear();
 
     await waitFor(() => {
       const row = screen.getByRole("row", {
-        name: /test unit child 2 test test unit aafc dina\-admin 2025\-07\-18, 7:08:21 p\.m\. select/i
+        name: /test unit child 2 opens in new tab test opens in new tab test unit aafc dina\-admin 2025\-07\-18, 7:08:21 p\.m\. select/i
       });
 
       const row_button = within(row).getByRole("button", {

@@ -1,6 +1,7 @@
 import {
   ApiClientContext,
   DateView,
+  ExternalLink,
   FieldHeader,
   ReactTable,
   useCollapser
@@ -15,7 +16,6 @@ import { GroupLabel } from "../../group-select/GroupFieldView";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { DerivativeList } from "../derivative-list/DerivativeList";
 import { formatBytes } from "../object-store-utils";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -60,21 +60,9 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
                 {
                   name: "resourceExternalURL",
                   value: (
-                    <a
-                      href={metadata.resourceExternalURL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <>
-                        {metadata.resourceExternalURL}
-                        <FaArrowUpRightFromSquare
-                          style={{
-                            marginLeft: "0.5em"
-                          }}
-                          aria-label="Opens in new tab"
-                        />
-                      </>
-                    </a>
+                    <ExternalLink href={metadata.resourceExternalURL ?? ""}>
+                      {metadata.resourceExternalURL}
+                    </ExternalLink>
                   )
                 }
               ]
