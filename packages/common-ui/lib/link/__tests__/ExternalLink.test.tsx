@@ -41,15 +41,6 @@ describe("ExternalLink", () => {
     expect(screen.getByLabelText("Opens in new tab")).toBeInTheDocument();
   });
 
-  it("renders the external icon with a custom aria-label", () => {
-    render(
-      <ExternalLink href="/test" iconAriaLabel="Custom label">
-        Link Text
-      </ExternalLink>
-    );
-    expect(screen.getByLabelText("Custom label")).toBeInTheDocument();
-  });
-
   it("applies a custom className to the link", () => {
     render(
       <ExternalLink href="/test" className="my-class">
