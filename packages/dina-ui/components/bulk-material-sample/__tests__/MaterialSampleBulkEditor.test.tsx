@@ -939,7 +939,7 @@ describe("MaterialSampleBulkEditor", () => {
               }
             ],
             group: "cnc",
-            publiclyReleasable: true
+            publiclyReleasable: false
           },
           type: "collecting-event"
         }
@@ -1025,7 +1025,7 @@ describe("MaterialSampleBulkEditor", () => {
                 isPrimary: true
               }
             ],
-            publiclyReleasable: true
+            publiclyReleasable: false
           },
           type: "collecting-event"
         }
@@ -1479,10 +1479,10 @@ describe("MaterialSampleBulkEditor", () => {
     // Barcode
     expect(wrapper.getByDisplayValue("test barcode")).toBeInTheDocument();
 
-    // Publicly Releasable
+    // Publicly Releasable should show not publicly releasable if all records have it set like so, which is the case
     expect(
       screen.getByRole("combobox", {
-        name: /keep current values/i
+        name: /not publicly releasable/i
       })
     ).toBeInTheDocument();
 
@@ -1768,7 +1768,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -1785,7 +1785,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -1802,7 +1802,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -1984,19 +1984,23 @@ describe("MaterialSampleBulkEditor", () => {
 
     await waitFor(() => {
       expect(
-        wrapper.getByRole("link", { name: /^test unit$/i })
+        wrapper.getByRole("link", { name: /^test unit opens in new tab$/i })
       ).toBeInTheDocument();
       expect(
-        wrapper.getByRole("link", { name: /^test unit child$/i })
+        wrapper.getByRole("link", {
+          name: /^test unit child opens in new tab$/i
+        })
       ).toBeInTheDocument();
       expect(
-        wrapper.getByRole("link", { name: /^test unit child 2$/i })
+        wrapper.getByRole("link", {
+          name: /^test unit child 2 opens in new tab$/i
+        })
       ).toBeInTheDocument();
     });
 
     // Assign a different storage unit:
     const row = screen.getByRole("row", {
-      name: /test unit child test test unit aafc dina\-admin 2025\-07\-17, 2:59:06 p\.m\. select/i
+      name: /test unit child opens in new tab test opens in new tab test unit aafc dina\-admin 2025\-07\-17, 2:59:06 p\.m\. select/i
     });
     const selectStorageButton = within(row).getByRole("button", {
       name: /select/i
@@ -2255,7 +2259,7 @@ describe("MaterialSampleBulkEditor", () => {
                 }
               ],
               group: "cnc",
-              publiclyReleasable: true
+              publiclyReleasable: false
             },
             type: "collecting-event"
           }

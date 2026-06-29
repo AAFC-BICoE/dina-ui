@@ -618,7 +618,10 @@ export function getDataFromWorkbook(
       const fieldMap = fieldMaps[index];
       if (!fieldMap?.skipped) {
         if (fieldMap.targetKey) {
-          if ("vocabularyElementType" in fieldMap.targetKey) {
+          if (
+            "vocabularyElementType" in fieldMap.targetKey &&
+            !!fieldMap.targetKey.vocabularyElementType
+          ) {
             const managedAttributes: { [key: string]: any } =
               rowData[fieldMap.targetField!] ?? {};
             let value: any;

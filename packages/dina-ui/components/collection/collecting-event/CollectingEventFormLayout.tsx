@@ -3,6 +3,7 @@ import {
   CheckBoxWithoutWrapper,
   DataEntryField,
   DinaFormSection,
+  ExternalLink,
   FieldSet,
   FieldSpy,
   FormattedTextField,
@@ -21,7 +22,6 @@ import {
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import _ from "lodash";
-import Link from "next/link";
 import { ChangeEvent, useRef, useState } from "react";
 import {
   AttachmentsField,
@@ -76,6 +76,8 @@ interface CollectingEventFormLayoutProps {
 
   /** Pass the number of material sample usages to display a warning. */
   materialSampleUsageCount?: number;
+
+  defaultToNotReleasable?: boolean;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
@@ -84,7 +86,8 @@ export function CollectingEventFormLayout({
   setDefaultVerbatimSRS,
   attachmentsConfig,
   visibleManagedAttributeKeys,
-  materialSampleUsageCount
+  materialSampleUsageCount,
+  defaultToNotReleasable
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
@@ -524,14 +527,12 @@ export function CollectingEventFormLayout({
                   )}
                   <div className="col-md-6">
                     {detail.sourceUrl && (
-                      <Link
+                      <ExternalLink
                         href={`${detail.sourceUrl}`}
-                        passHref={true}
                         className="btn btn-info w-100 mb-2"
-                        target="_blank"
                       >
                         <DinaMessage id="viewDetailButtonLabel" />
-                      </Link>
+                      </ExternalLink>
                     )}
                   </div>
                 </div>
@@ -621,7 +622,9 @@ export function CollectingEventFormLayout({
               collectingEventUUID={initialValues.id}
             />
 
-            <NotPubliclyReleasableSection />
+            <NotPubliclyReleasableSection
+              defaultToNotReleasable={defaultToNotReleasable}
+            />
             <Tooltip
               id="collecting_event_tag_info"
               disableSpanMargin={true}

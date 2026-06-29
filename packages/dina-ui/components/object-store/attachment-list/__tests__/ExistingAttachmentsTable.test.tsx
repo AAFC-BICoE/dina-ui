@@ -147,10 +147,10 @@ describe("ExistingAttachmentsTable component", () => {
       expect(rows).toHaveLength(2);
 
       expect(
-        wrapper.getByRole("link", { name: "test-file-1.png" })
+        wrapper.getByRole("link", { name: /test-file-1.png/i })
       ).toBeInTheDocument();
       expect(
-        wrapper.getByRole("link", { name: "test-file-2.png" })
+        wrapper.getByRole("link", { name: /test-file-2.png/i })
       ).toBeInTheDocument();
     });
   });
@@ -174,10 +174,10 @@ describe("ExistingAttachmentsTable component", () => {
       expect(rows).toHaveLength(2);
 
       expect(
-        wrapper.getByRole("link", { name: "test-file-1.png" })
+        wrapper.getByRole("link", { name: /test-file-1.png/i })
       ).toBeInTheDocument();
       expect(
-        wrapper.getByRole("link", { name: "test-file-2.png" })
+        wrapper.getByRole("link", { name: /test-file-2.png/i })
       ).toBeInTheDocument();
     });
 
@@ -236,10 +236,10 @@ describe("ExistingAttachmentsTable component", () => {
       expect(rows).toHaveLength(2);
 
       expect(
-        wrapper.getByRole("link", { name: "test-file-1.png" })
+        wrapper.getByRole("link", { name: /test-file-1.png/i })
       ).toBeInTheDocument();
       expect(
-        wrapper.getByRole("link", { name: "test-file-2.png" })
+        wrapper.getByRole("link", { name: /test-file-2.png/i })
       ).toBeInTheDocument();
     });
 
