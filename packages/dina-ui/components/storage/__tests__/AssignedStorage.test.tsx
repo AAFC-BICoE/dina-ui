@@ -26,17 +26,18 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
     name: "Box",
     group: "group"
   },
+  hierarchy: [
+    { uuid: "A", name: "A", typeName: "Box", typeUuid: "BOX" },
+    { uuid: "B", name: "B", typeName: "Shelf", typeUuid: "SHELF" },
+    { uuid: "C", name: "C", typeName: "Cabinet", typeUuid: "CABINET" },
+    { uuid: "D", name: "D", typeName: "Room", typeUuid: "ROOM" },
+    { uuid: "E", name: "E", typeName: "Building", typeUuid: "BUILDING" }
+  ],
   parentStorageUnit: {
     id: "B",
     group: "group",
     name: "B",
-    type: "storage-unit",
-    hierarchy: [
-      { uuid: "B", name: "B", typeName: "Shelf", typeUuid: "SHELF" },
-      { uuid: "C", name: "C", typeName: "Cabinet", typeUuid: "CABINET" },
-      { uuid: "D", name: "D", typeName: "Room", typeUuid: "ROOM" },
-      { uuid: "E", name: "E", typeName: "Building", typeUuid: "BUILDING" }
-    ]
+    type: "storage-unit"
   }
 };
 
