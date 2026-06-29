@@ -82,7 +82,7 @@ const ScrollSpyNav = renderNav
 
 export interface ScrollTarget {
   id: string;
-  msg: string | JSX.Element;
+  msg: string | React.JSX.Element;
   className?: string;
   disabled?: boolean;
   setEnabled?: (val: boolean) => void;

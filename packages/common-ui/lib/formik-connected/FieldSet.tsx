@@ -7,7 +7,7 @@ import _ from "lodash";
 
 export interface FieldSetProps extends DinaFormSectionProps {
   /** fieldset title. */
-  legend?: JSX.Element;
+  legend?: React.JSX.Element;
 
   className?: string;
   style?: CSSProperties;
@@ -18,7 +18,7 @@ export interface FieldSetProps extends DinaFormSectionProps {
   fieldName?: string;
 
   /** Renders this JSX to the right of the FieldSet legend. */
-  wrapLegend?: (legend: JSX.Element) => JSX.Element;
+  wrapLegend?: (legend: React.JSX.Element) => React.JSX.Element;
 
   /** Remove the padding and border around the fieldset. */
   removePadding?: boolean;

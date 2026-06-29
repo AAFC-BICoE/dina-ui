@@ -14,7 +14,7 @@ import { RefObject } from "react";
 export interface UseBulkEditTabParams<T extends KitsuResource = KitsuResource> {
   resourceHooks: ResourceWithHooks<T>[];
   hideBulkEditTab?: boolean;
-  resourceForm: JSX.Element;
+  resourceForm: React.JSX.Element;
   bulkEditFormRef: RefObject<FormikProps<InputResource<T>>>;
 }
 

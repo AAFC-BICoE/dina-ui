@@ -120,7 +120,7 @@ export function DateField(props: DateFieldProps) {
         function onChangeRaw(event: FocusEvent<HTMLInputElement>) {
           // When typing into the input:
           if (event?.type === "change") {
-            let newText = event.target.value;
+            let newText = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
             const dashOccurences = newText.split("-").length - 1;
 
             // Auto-format: 20210515 → 2021-05-15
@@ -138,7 +138,7 @@ export function DateField(props: DateFieldProps) {
         }
 
         function onBlur(event: FocusEvent<HTMLInputElement>) {
-          const newText = event.target.value;
+          const newText = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
 
           // Run the existing validation first.
           const error = validate?.(newText);
@@ -217,7 +217,7 @@ export function DateField(props: DateFieldProps) {
               todayButton="Today"
               disabled={isDisabled}
               onBlur={onBlur}
-              onFocus={(event) => event.target.select()}
+              onFocus={(event) => (event.target as HTMLInputElement).select()}
               selected={selectedDate}
               {...datePickerProps}
             />
