@@ -8,6 +8,7 @@ import {
   FormikButton,
   getBulkEditTabFieldInfo,
   isResourceEmpty,
+  OperationError,
   ResourceWithHooks,
   SaveArgs,
   useApiClient,
@@ -448,6 +449,7 @@ function useBulkSampleSave({
 }: BulkSampleSaveParams) {
   // Force re-render when there is a bulk submission error:
   const [submissionError, setSubmissionError] = useState<unknown | null>(null);
+  const [erroredTabKeys, setErroredTabKeys] = useState<string[]>([]);
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
@@ -459,8 +461,10 @@ function useBulkSampleSave({
 
   async function saveAll() {
     setSubmissionError(null);
+    setErroredTabKeys([]);
     bulkEditFormRef.current?.setStatus(null);
     bulkEditFormRef.current?.setErrors({});
+
     const bulkEditCollectingEventRefPermanent = bulkEditSampleHook
       ?.colEventFormRef?.current?.values
       ? _.cloneDeep(bulkEditCollectingEvtFormRef)
@@ -478,11 +482,13 @@ function useBulkSampleSave({
       const saveOperations: SaveArgs<MaterialSample>[] = [];
       const submittedValuesList: InputResource<MaterialSample>[] = [];
 
+      // 1. COLLECT ERRORS instead of throwing immediately to prevent loop from aborting
+      const prepareErrors: OperationError[] = [];
+
       for (let index = 0; index < sampleHooks.length; index++) {
         const { formRef, resource, saveHook } = sampleHooks[index];
         const formik = formRef.current;
 
-        // These two errors shouldn't happen:
         if (!formik) {
           throw new Error(
             `Missing Formik ref for sample ${resource.materialSampleName}`
@@ -503,7 +509,6 @@ function useBulkSampleSave({
                 return (await preProcessSample?.(original)) ?? original;
               } catch (error: unknown) {
                 if (error instanceof DoOperationsError) {
-                  // Re-throw as Edit All tab error:
                   throw new DoOperationsError(
                     error.message,
                     error.fieldErrors,
@@ -523,7 +528,6 @@ function useBulkSampleSave({
               : undefined
           });
 
-          // Check if cleared fields have been requested, make the changes for each operation.
           if (clearedFields?.size) {
             for (const [fieldName, clearType] of clearedFields) {
               _.set(
@@ -537,11 +541,9 @@ function useBulkSampleSave({
           saveOperations.push(saveOp);
         } catch (error: unknown) {
           if (error instanceof DoOperationsError) {
-            // Rethrow the error with the tab's index:
-            throw new DoOperationsError(
-              error.message,
-              error.fieldErrors,
-              error.individualErrors.map((operationError) => ({
+            // Accumulate errors for this tab, then continue the loop
+            prepareErrors.push(
+              ...error.individualErrors.map((operationError) => ({
                 ...operationError,
                 index:
                   typeof operationError.index === "number"
@@ -549,54 +551,79 @@ function useBulkSampleSave({
                     : operationError.index
               }))
             );
+          } else {
+            setSubmissionError(error);
+            throw error;
           }
-          setSubmissionError(error);
-          throw error;
         }
       }
 
-      // Filter out empty resources but keep track of their positions
+      // If ANY prepare operations failed across ANY tabs, throw them all together now
+      if (prepareErrors.length > 0) {
+        throw new DoOperationsError(
+          _.compact(prepareErrors.map((e) => e.errorMessage)).join("\n") || "",
+          prepareErrors.reduce(
+            (acc, curr) => ({ ...acc, ...curr.fieldErrors }),
+            {}
+          ),
+          prepareErrors
+        );
+      }
+
       const nonEmptyOperations: SaveArgs<MaterialSample>[] = [];
       const nonEmptyIndices: number[] = [];
       const resultSamples: PersistedResource<MaterialSample>[] = new Array(
         saveOperations.length
       );
 
-      // First pass: store empty resources and collect non-empty ones
       for (let i = 0; i < saveOperations.length; i++) {
         const operation = saveOperations[i];
 
         if (isResourceEmpty(operation.resource)) {
-          // For empty resources, just store the original resource
           resultSamples[i] = operation.resource as any;
         } else {
-          // For non-empty resources, collect for batch save
           nonEmptyOperations.push(operation);
           nonEmptyIndices.push(i);
         }
       }
 
-      // Make a single API call for all non-empty resources
       if (nonEmptyOperations.length > 0) {
-        const savedSamples = await save<MaterialSample>(nonEmptyOperations, {
-          apiBaseUrl: "/collection-api"
-        });
+        let savedSamples: PersistedResource<MaterialSample>[];
+        try {
+          savedSamples = await save<MaterialSample>(nonEmptyOperations, {
+            apiBaseUrl: "/collection-api"
+          });
+        } catch (error: unknown) {
+          if (error instanceof DoOperationsError) {
+            throw new DoOperationsError(
+              error.message,
+              error.fieldErrors,
+              error.individualErrors.map((opError) => ({
+                ...opError,
+                index:
+                  typeof opError.index === "number"
+                    ? nonEmptyIndices[opError.index] ?? opError.index
+                    : opError.index
+              }))
+            );
+          }
+          throw error;
+        }
 
-        // Place the saved resources in their original positions
         for (let i = 0; i < savedSamples.length; i++) {
           const originalIndex = nonEmptyIndices[i];
           resultSamples[originalIndex] = savedSamples[i];
         }
       }
 
-      // Save associations for each sample after material samples are saved
+      // 2. COLLECT ASSOCIATION ERRORS to prevent this loop from aborting early too
+      const assocErrors: OperationError[] = [];
+
       for (let i = 0; i < sampleHooks.length; i++) {
         const { saveHook } = sampleHooks[i];
         const savedSample = resultSamples[i];
         const submittedValues = submittedValuesList[i];
 
-        // Only save associations if the associations section is enabled
-        // or if we need to delete them
         if (
           saveHook.dataComponentState.enableAssociations ||
           saveHook.dataComponentState.deleteAssociations
@@ -608,38 +635,35 @@ function useBulkSampleSave({
             });
           } catch (error: unknown) {
             if (error instanceof DoOperationsError) {
-              throw new DoOperationsError(
-                error.message,
-                error.fieldErrors,
-                error.individualErrors.map((operationError) => ({
+              assocErrors.push(
+                ...error.individualErrors.map((operationError) => ({
                   ...operationError,
                   index: i
                 }))
               );
+            } else {
+              throw error;
             }
-            throw error;
           }
         }
       }
 
-      // Call onSaved with all samples in the original order
+      // If ANY association operations failed, throw them together
+      if (assocErrors.length > 0) {
+        throw new DoOperationsError(
+          _.compact(assocErrors.map((e) => e.errorMessage)).join("\n") || "",
+          assocErrors.reduce(
+            (acc, curr) => ({ ...acc, ...curr.fieldErrors }),
+            {}
+          ),
+          assocErrors
+        );
+      }
+
       await onSaved(resultSamples);
     } catch (error: unknown) {
-      // When there is an error from the bulk save-all operation, put it into the correct form:
+      // 3. Calculate the exact errors in memory, then set them once per form.
       if (error instanceof DoOperationsError) {
-        for (const opError of error.individualErrors) {
-          const formik =
-            typeof opError.index === "number"
-              ? sampleHooks[opError.index].formRef.current
-              : bulkEditFormRef.current;
-
-          if (formik) {
-            formik.setStatus(opError.errorMessage);
-            formik.setErrors(opError.fieldErrors);
-          }
-        }
-        // Any errored field that was edited in the Edit All tab should
-        // get the red indicator in the Edit All tab.
         const badBulkEditedFields = _.keys(
           _.pickBy(
             error.fieldErrors,
@@ -648,22 +672,81 @@ function useBulkSampleSave({
                 .hasBulkEditValue
           )
         );
-        bulkEditFormRef.current?.setErrors({
+
+        const editAllErrors = {
           ...bulkEditFormRef.current?.errors,
           ..._.pick(error.fieldErrors, badBulkEditedFields)
+        };
+        let editAllStatus = bulkEditFormRef.current?.status;
+
+        const finalFormErrors: Record<string, any> = {};
+        const finalFormStatuses: Record<string, any> = {};
+
+        for (const opError of error.individualErrors) {
+          if (typeof opError.index === "number") {
+            const tabKey = `sample-${opError.index}`;
+            const remainingErrors = _.omit(
+              opError.fieldErrors,
+              badBulkEditedFields
+            );
+            finalFormErrors[tabKey] = {
+              ...(finalFormErrors[tabKey] || {}),
+              ...remainingErrors
+            };
+
+            if (opError.errorMessage) {
+              finalFormStatuses[tabKey] = finalFormStatuses[tabKey]
+                ? finalFormStatuses[tabKey] + "\n" + opError.errorMessage
+                : opError.errorMessage;
+            }
+          } else if (opError.index === "EDIT_ALL") {
+            editAllStatus = editAllStatus
+              ? editAllStatus + "\n" + opError.errorMessage
+              : opError.errorMessage;
+          }
+        }
+
+        // Apply Edit All errors
+        bulkEditFormRef.current?.setErrors(editAllErrors);
+        bulkEditFormRef.current?.setStatus(editAllStatus || null);
+
+        const keys: string[] = [];
+
+        // Apply individual tab errors safely
+        sampleHooks.forEach((hook, index) => {
+          const tabKey = `sample-${index}`;
+          const formik = hook.formRef.current;
+          if (formik) {
+            const errs = finalFormErrors[tabKey] || {};
+            // Merge old errors (excluding bulk edits) with new incoming errors
+            const retainedOldErrors = _.omit(
+              formik.errors,
+              badBulkEditedFields
+            );
+            const combinedErrors = { ...retainedOldErrors, ...errs };
+
+            formik.setErrors(combinedErrors);
+            formik.setStatus(finalFormStatuses[tabKey] || null);
+
+            if (!_.isEmpty(combinedErrors) || finalFormStatuses[tabKey]) {
+              keys.push(tabKey);
+            }
+          }
         });
-        // Don't show the bulk edited fields' errors in the individual sample tabs
-        // because the user can't fix them there:
-        sampleHooks
-          .map((it) => it.formRef?.current)
-          .forEach((it) =>
-            it?.setErrors(_.omit(it.errors, badBulkEditedFields))
-          );
+
+        if (!_.isEmpty(editAllErrors) || editAllStatus) {
+          keys.push("EDIT_ALL");
+        }
+
+        setErroredTabKeys(keys);
+        setSubmissionError(error);
+        throw new Error(formatMessage("bulkSubmissionErrorInfo"));
+      } else {
+        setSubmissionError(error);
+        throw new Error(formatMessage("bulkSubmissionErrorInfo"));
       }
-      setSubmissionError(error);
-      throw new Error(formatMessage("bulkSubmissionErrorInfo"));
     }
   }
 
-  return { saveAll, submissionError };
+  return { saveAll, submissionError, erroredTabKeys };
 }

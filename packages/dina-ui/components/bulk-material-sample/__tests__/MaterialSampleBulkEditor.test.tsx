@@ -939,7 +939,7 @@ describe("MaterialSampleBulkEditor", () => {
               }
             ],
             group: "cnc",
-            publiclyReleasable: true
+            publiclyReleasable: false
           },
           type: "collecting-event"
         }
@@ -947,9 +947,9 @@ describe("MaterialSampleBulkEditor", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    // The tab with the error is given the red text, and the other tabs are unaffected:
+    // The generic bulk submission error banner should appear
     expect(
-      wrapper.getByText(
+      wrapper.queryByText(
         /bulk submission error: check the tabs with a red label\./i
       )
     ).toBeInTheDocument();
@@ -1025,7 +1025,7 @@ describe("MaterialSampleBulkEditor", () => {
                 isPrimary: true
               }
             ],
-            publiclyReleasable: true
+            publiclyReleasable: false
           },
           type: "collecting-event"
         }
@@ -1033,9 +1033,9 @@ describe("MaterialSampleBulkEditor", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    // The tab with the error is given the red text, and the other tabs are unaffected:
+    // The generic bulk submission error banner should appear
     expect(
-      wrapper.getByText(
+      wrapper.queryByText(
         /bulk submission error: check the tabs with a red label\./i
       )
     ).toBeInTheDocument();
@@ -1087,23 +1087,33 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await waitFor(() =>
-      expect(
-        wrapper.getByText(
-          /bulk submission error: check the tabs with a red label\./i
-        )
-      ).toBeInTheDocument()
-    );
 
-    // The tab with the error is given the red text, and the other tabs are unaffected:
+    // the barcode field error should appear on the Edit All tab form
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/1 : .* - invalid barcode/i)
+      ).toBeInTheDocument();
+    });
+
+    // The generic bulk submission error banner should appear
     expect(
-      wrapper.getByText(
+      wrapper.queryByText(
         /bulk submission error: check the tabs with a red label\./i
       )
     ).toBeInTheDocument();
   });
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
+    const mockFailingSave = jest.fn(async () => {
+      throw new DoOperationsError("test-error", {}, [
+        {
+          errorMessage: "Invalid barcode",
+          fieldErrors: { barcode: "Invalid barcode" },
+          index: 1
+        }
+      ]);
+    });
+
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -1113,34 +1123,28 @@ describe("MaterialSampleBulkEditor", () => {
         ...(testCtx as any),
         apiContext: {
           ...testCtx.apiContext,
-          // Test save error: The second sample has an error on the barcode field:
-          save: async () => {
-            throw new DoOperationsError("test-error", {}, [
-              {
-                errorMessage: "",
-                fieldErrors: { barcode: "Invalid barcode" },
-                index: 1
-              }
-            ]);
-          }
+          save: mockFailingSave
         }
       }
     );
+
+    await waitFor(() => expect(wrapper.getByText(/ms2/i)).toBeInTheDocument());
+
+    fireEvent.click(wrapper.getByText(/ms2/i));
+
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /save all/i })
       ).toBeInTheDocument()
     );
 
-    // Click the "Save All" button:
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
 
-    // Show error message at the top of the page.
+    await waitFor(() => expect(mockFailingSave).toHaveBeenCalled());
+
     await waitFor(() => {
       expect(
-        wrapper.getByText(
-          /bulk submission error: check the tabs with a red label\./i
-        )
+        wrapper.getByText(/1 : .* - invalid barcode/i)
       ).toBeInTheDocument();
     });
   });
@@ -1153,6 +1157,13 @@ describe("MaterialSampleBulkEditor", () => {
       />,
       testCtx as any
     );
+
+    expect(
+      wrapper.queryByText(
+        /bulk submission error: check the tabs with a red label\./i
+      )
+    ).toBeNull();
+
     await waitFor(() =>
       expect(
         wrapper.container.querySelectorAll(".enable-organisms .react-switch-bg")
@@ -1468,10 +1479,10 @@ describe("MaterialSampleBulkEditor", () => {
     // Barcode
     expect(wrapper.getByDisplayValue("test barcode")).toBeInTheDocument();
 
-    // Publicly Releasable
+    // Publicly Releasable should show not publicly releasable if all records have it set like so, which is the case
     expect(
       screen.getByRole("combobox", {
-        name: /keep current values/i
+        name: /not publicly releasable/i
       })
     ).toBeInTheDocument();
 
@@ -1757,7 +1768,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -1774,7 +1785,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -1791,7 +1802,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -2244,7 +2255,7 @@ describe("MaterialSampleBulkEditor", () => {
                 }
               ],
               group: "cnc",
-              publiclyReleasable: true
+              publiclyReleasable: false
             },
             type: "collecting-event"
           }

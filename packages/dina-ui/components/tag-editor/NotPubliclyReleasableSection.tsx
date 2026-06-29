@@ -8,18 +8,24 @@ import {
 import { useFormikContext } from "formik";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
-export function NotPubliclyReleasableSection() {
+export interface NotPubliclyReleasableSectionProps {
+  defaultToNotReleasable?: boolean;
+}
+export function NotPubliclyReleasableSection({
+  defaultToNotReleasable
+}: NotPubliclyReleasableSectionProps = {}) {
   const isInBulkEditTab = !!useBulkEditTabContext();
   const formik = useFormikContext<any>();
   const { formatMessage } = useDinaIntl();
 
   if (
-    isInBulkEditTab &&
-    !formik.touched.publiclyReleasable &&
-    formik.values.publiclyReleasable !== null
+    defaultToNotReleasable !== undefined &&
+    formik.values.publiclyReleasable == null &&
+    !formik.values.id &&
+    !formik.initialValues.id
   ) {
-    // In bulk edit, set publiclyReleasable to null by default.
-    formik.setFieldValue("publiclyReleasable", null);
+    // Default the field for new records: true -> not releasable, false -> releasable.
+    formik.setFieldValue("publiclyReleasable", !defaultToNotReleasable);
   }
   return (
     <>
@@ -32,7 +38,7 @@ export function NotPubliclyReleasableSection() {
           visibleElement={
             <SelectField<boolean | null>
               name="publiclyReleasable"
-              label={<DinaMessage id="notPubliclyReleasable" />}
+              label={<DinaMessage id="publiclyReleasable" />}
               options={[
                 // null values are ignored when bulk editing
                 { label: formatMessage("keepCurrentValues"), value: null },
@@ -53,7 +59,7 @@ export function NotPubliclyReleasableSection() {
         <SelectField<boolean>
           className="notPubliclyReleasable"
           name="publiclyReleasable"
-          label={<DinaMessage id="notPubliclyReleasable" />}
+          label={<DinaMessage id="publiclyReleasable" />}
           options={[
             { label: formatMessage("publiclyReleasableOption"), value: true },
             {

@@ -203,7 +203,7 @@ describe("collecting-event edit page", () => {
             attributes: {
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true, // Default value
+              publiclyReleasable: false, // Default value
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
               otherRecordNumbers: ["12", "23"],
               geoReferenceAssertions: [{ isPrimary: true }]
@@ -299,7 +299,7 @@ describe("collecting-event edit page", () => {
               ],
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               dwcVerbatimCoordinateSystem: null,
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
             },
             id: "00000000-0000-0000-0000-000000000000",
@@ -525,13 +525,192 @@ describe("collecting-event edit page", () => {
             attributes: {
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true, // Default value
+              publiclyReleasable: false, // Default value
               geoReferenceAssertions: [{ isPrimary: true }]
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
           }
         },
+        expect.anything()
+      );
+    });
+  });
+
+  it("Displays collectors even when no collectionMethod is set", async () => {
+    mockGet.mockImplementation(async (model) => {
+      if (
+        model ===
+        "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition,site"
+      ) {
+        return {
+          data: {
+            id: "1",
+            type: "collecting-event",
+            verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
+            group: "test group",
+            geoReferenceAssertions: [{ isPrimary: true }],
+            otherRecordNumbers: ["12", "13", "14"],
+            attachment: [],
+            collectors: [
+              { id: "111", type: "person" },
+              { id: "222", type: "person" }
+            ],
+            collectionMethod: undefined
+          } as any
+        };
+      } else if (model === "agent-api/person") {
+        return { data: [testAgent()] };
+      } else if (model === "collection-api/vocabulary2/srs") {
+        return { data: [testSrs()] };
+      } else if (
+        model ===
+        "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=coordinate_format"
+      ) {
+        return { data: [testCoordinates()] };
+      } else if (model === "collection-api/collecting-event") {
+        return { data: [] };
+      } else if (
+        model === "collection-api/controlled-vocabulary-item" ||
+        model === "collection-api/collection-method"
+      ) {
+        return { data: [] };
+      } else if (model === "user-api/group") {
+        return { data: [] };
+      } else if (model === "objectstore-api/metadata") {
+        return { data: [] };
+      }
+    });
+
+    mockBulkGet.mockImplementation(async (paths: string[]) => {
+      if (!paths.length) return [];
+      if (
+        (paths[0] as string).startsWith("/person/") ||
+        (paths[0] as string).startsWith("person/")
+      ) {
+        return paths.map((path) => ({
+          id: path.replace(/\/?person\//, ""),
+          type: "person",
+          displayName: `Person ${path.replace(/\/?person\//, "")}`
+        }));
+      }
+      if (
+        (paths[0] as string).startsWith("/metadata/") ||
+        (paths[0] as string).startsWith("metadata/")
+      ) {
+        return paths.map((path) => ({
+          id: path.replace(/\/?metadata\//, ""),
+          type: "metadata",
+          originalFilename: "test-file"
+        }));
+      }
+    });
+
+    mockQuery = { id: 1 };
+
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+      apiContext
+    });
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      ).toHaveDisplayValue("From 2019,12,21 4pm to 2019,12,22 4pm");
+    });
+
+    // bulkGet should have been called to resolve the collector stubs from agent-api
+    await waitFor(() => {
+      expect(mockBulkGet).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.stringMatching(/\/?person\/111/),
+          expect.stringMatching(/\/?person\/222/)
+        ]),
+        expect.objectContaining({ apiBaseUrl: "/agent-api" })
+      );
+    });
+
+    // The resolved collectors should be visible as chips in the multi-select
+    await waitFor(() => {
+      expect(wrapper.getByText("Person 111")).toBeInTheDocument();
+      expect(wrapper.getByText("Person 222")).toBeInTheDocument();
+    });
+  });
+
+  it("Allows clearing collectors when a collectionMethod is set.", async () => {
+    // Override bulkGet to handle all path formats used in this test
+    mockBulkGet.mockImplementation(async (paths: string[]) => {
+      if (!paths.length) return [];
+      if ((paths[0] as string).match(/\/?person\//)) {
+        return paths.map((path) => ({
+          id: path.replace(/\/?person\//, ""),
+          type: "person",
+          displayName: `Person ${path.replace(/\/?person\//, "")}`
+        }));
+      }
+      if ((paths[0] as string).match(/\/?metadata\//)) {
+        return paths.map((path) => ({
+          id: path.replace(/\/?metadata\/.*/, "").replace(/\/?metadata\//, ""),
+          type: "metadata",
+          originalFilename: "test-file"
+        }));
+      }
+      return [];
+    });
+
+    mockPatch.mockReturnValueOnce({
+      data: [
+        {
+          data: testCollectingEvent(),
+          status: 201
+        }
+      ] as OperationsResponse
+    });
+
+    mockQuery = { id: 1 };
+
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+      apiContext
+    });
+
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      ).toHaveDisplayValue("From 2019,12,21 4pm to 2019,12,22 4pm");
+    });
+
+    // Wait for collectors to be resolved and rendered.
+    await waitFor(() => {
+      expect(wrapper.getByText("Person 111")).toBeInTheDocument();
+      expect(wrapper.getByText("Person 222")).toBeInTheDocument();
+    });
+
+    const removeButtons = wrapper.getAllByRole("button", { name: /remove/i });
+    for (const button of removeButtons) {
+      fireEvent.click(button);
+    }
+
+    // Verify collectors are gone.
+    await waitFor(() => {
+      expect(wrapper.queryByText("Person 111")).not.toBeInTheDocument();
+      expect(wrapper.queryByText("Person 222")).not.toBeInTheDocument();
+    });
+
+    // Submit the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => {
+      expect(mockPatch).toBeCalledTimes(1);
+      expect(mockPatch).lastCalledWith(
+        "/collection-api/collecting-event/1",
+        expect.objectContaining({
+          data: expect.objectContaining({
+            relationships: expect.objectContaining({
+              collectors: {
+                data: []
+              }
+            })
+          })
+        }),
         expect.anything()
       );
     });
