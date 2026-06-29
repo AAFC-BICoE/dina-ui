@@ -45,7 +45,7 @@ function DOIFieldInternal({
   const [inputVal, setInputVal] = useState("");
 
   function onChange(event: ChangeEvent<HTMLInputElement>) {
-    const newVal = event.target.value;
+    const newVal = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
     setInputVal(newVal);
     inputProps.onChange?.(event);
   }

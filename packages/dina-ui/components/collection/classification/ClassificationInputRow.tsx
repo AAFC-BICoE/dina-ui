@@ -31,7 +31,7 @@ export function ClassificationInputRow({
   }
 
   function internalOnPathChange(event) {
-    const path = event.target.value;
+    const path = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
     const newValue = {
       ...value,
       classificationPath: path

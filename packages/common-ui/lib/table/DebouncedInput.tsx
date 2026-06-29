@@ -37,7 +37,7 @@ export function DebouncedInput({
     <input
       {...props}
       value={value}
-      onChange={(e) => setValue(e.target.value)}
+      onChange={(e) => setValue((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
     />
   );
 }

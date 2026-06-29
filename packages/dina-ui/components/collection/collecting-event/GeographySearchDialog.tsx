@@ -93,7 +93,7 @@ export function GeographySearchDialog({
           <div className="col-md-9">
             <input
               className="form-control"
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={(e) => setInputValue((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
               onKeyDown={(e) => {
                 if (e.keyCode === 13) {
                   e.preventDefault();

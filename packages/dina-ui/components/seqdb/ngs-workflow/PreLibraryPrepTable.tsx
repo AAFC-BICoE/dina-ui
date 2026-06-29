@@ -313,7 +313,7 @@ export function TextInputCell<TData>({
       className="form-control w-100"
       value={value as string}
       onChange={(e) => {
-        setValue(e.target.value);
+        setValue((e.target as HTMLTextAreaElement | HTMLInputElement).value);
         setValueChanged(true);
       }}
       onBlur={onBlur}
@@ -350,7 +350,7 @@ export function NumberInputCell<TData>({
       type="number"
       value={value}
       onChange={(e) => {
-        setValue(Number(e.target.value));
+        setValue(Number((e.target as HTMLTextAreaElement | HTMLInputElement).value));
         setValueChanged(true);
       }}
       onBlur={onBlur}

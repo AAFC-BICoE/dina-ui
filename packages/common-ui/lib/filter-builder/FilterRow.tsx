@@ -258,7 +258,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
   };
 
   private onValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.model.value = e.target.value;
+    this.props.model.value = (e.target as HTMLTextAreaElement | HTMLInputElement).value;
     this.props?.onModelChange?.(this.props.model);
     this.props.onChange();
     this.forceUpdate();

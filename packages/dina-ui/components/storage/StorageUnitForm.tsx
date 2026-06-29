@@ -39,7 +39,7 @@ export interface StorageUnitFormProps {
   initialParent?: PersistedResource<StorageUnit>;
   storageUnit?: PersistedResource<StorageUnit>;
   onSaved?: (storageUnit: PersistedResource<StorageUnit>[]) => Promise<void>;
-  buttonBar?: JSX.Element;
+  buttonBar?: React.JSX.Element;
   parentIdInURL?: string;
 
   /** Optionally call the hook from the parent component. */

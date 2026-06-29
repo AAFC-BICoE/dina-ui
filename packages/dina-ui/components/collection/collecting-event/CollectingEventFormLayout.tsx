@@ -467,7 +467,7 @@ export function CollectingEventFormLayout({
                           "customPlaceNamePlaceholder"
                         )}
                         value={customPlaceValue}
-                        onChange={(e) => setCustomPlaceValue(e.target.value)}
+                        onChange={(e) => setCustomPlaceValue((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();

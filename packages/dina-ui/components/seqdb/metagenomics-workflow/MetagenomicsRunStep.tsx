@@ -90,8 +90,8 @@ export function MetagenomicsRunStep({
                 className="form-control mt-1"
                 name="sequencingRunName"
                 value={sequencingRunName}
-                onChange={(newValue) =>
-                  setSequencingRunName(newValue.target.value ?? "")
+                onChange={(e) =>
+                  setSequencingRunName((e.target as HTMLTextAreaElement | HTMLInputElement).value ?? "")
                 }
               />
             ) : (
