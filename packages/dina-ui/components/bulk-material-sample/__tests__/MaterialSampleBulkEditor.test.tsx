@@ -1025,6 +1025,7 @@ describe("MaterialSampleBulkEditor", () => {
                 isPrimary: true
               }
             ],
+            group: "cnc",
             publiclyReleasable: false
           },
           type: "collecting-event"
