@@ -60,11 +60,6 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                   Gouvernement du Canada
                 </span>
               </span>
-              <meta
-                content="Canada"
-                property="areaServed"
-                typeof="Country"
-              />
             </div>
             <div
               class="text-end  col"
@@ -768,11 +763,6 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                   Gouvernement du Canada
                 </span>
               </span>
-              <meta
-                content="Canada"
-                property="areaServed"
-                typeof="Country"
-              />
             </div>
             <div
               class="text-end  col"

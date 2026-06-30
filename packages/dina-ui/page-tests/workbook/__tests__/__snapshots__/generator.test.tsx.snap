@@ -60,11 +60,6 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                   Gouvernement du Canada
                 </span>
               </span>
-              <meta
-                content="Canada"
-                property="areaServed"
-                typeof="Country"
-              />
             </div>
             <div
               class="text-end  col"

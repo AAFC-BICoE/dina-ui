@@ -25,6 +25,7 @@ export function Head(props: HeadProps) {
       <meta charSet="UTF-8" />
       <title>{props.title + " - DINA"}</title>
 
+      <meta property="areaServed" typeof="Country" content="Canada" />
       <meta name="dcterms:title" content={props.title || defaultTitle} />
       <meta
         name="dcterms:creator"
