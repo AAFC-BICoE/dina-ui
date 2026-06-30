@@ -6,13 +6,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import {
-  fireEvent,
-  waitFor,
-  waitForElementToBeRemoved,
-  screen,
-  within
-} from "@testing-library/react";
+import { fireEvent, waitFor, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
@@ -1051,7 +1045,7 @@ describe("Material Sample Edit Page", () => {
       ).toBeInTheDocument()
     );
 
-    function fillOutDetermination(num: number) {
+    async function fillOutDetermination(num: number) {
       await userEvent.type(
         wrapper.getByRole("textbox", {
           name: /verbatim scientific name × insert hybrid symbol/i
@@ -1635,7 +1629,7 @@ describe("Material Sample Edit Page", () => {
     if (!expandButtons || expandButtons.length !== 3) {
       fail("Missing 3 expand buttons in the organism section.");
     }
-    expandButtons.forEach((button) => {
+    expandButtons.forEach(async (button) => {
       await userEvent.click(button);
     });
 
@@ -2962,12 +2956,12 @@ describe("Material Sample Edit Page", () => {
       await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
 
       // Wait for the loading to be removed.
-      await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
 
       // Save the form
       await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
-      await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [

@@ -1,6 +1,6 @@
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { DeleteButton } from "../DeleteButton";
-import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockDoOperations = jest.fn();
@@ -39,7 +39,7 @@ describe("DeleteButton", () => {
     fireEvent.click(yesButton);
 
     // Wait for the loading to be removed.
-    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     expect(mockDoOperations).lastCalledWith(
       [

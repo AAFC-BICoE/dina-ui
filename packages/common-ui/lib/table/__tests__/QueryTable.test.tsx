@@ -11,15 +11,11 @@ import {
   ColumnDefinition,
   MetaWithTotal,
   QueryTable,
-  QueryTableProps
+  QueryTableProps,
+  waitForLoadingToDisappear
 } from "../..";
 import { mountWithAppContext } from "common-ui";
-import {
-  fireEvent,
-  waitForElementToBeRemoved,
-  within,
-  waitFor
-} from "@testing-library/react";
+import { fireEvent, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 /** Example of an API resource interface definition for a todo-list entry. */
@@ -81,7 +77,7 @@ describe("QueryTable component", () => {
     );
 
     // Continue the test after the data fetch is done.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     expect(wrapper.getByRole("cell", { name: /todo 0/i })).toBeInTheDocument();
     expect(
@@ -118,7 +114,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait until the data is loaded into the table.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Expect "12" for 12 pages, with 300 total matched records:
     expect(
@@ -142,7 +138,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait until the data is loaded into the table.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Expect "8" for 8 pages, with 300 total matched records:
     expect(
@@ -166,7 +162,7 @@ describe("QueryTable component", () => {
 
     // Wait for page 1 to load.
     // Wait until the data is loaded into the table.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // To do 24 should exist but not 25.
     expect(wrapper.getByRole("cell", { name: /todo 24/i })).toBeInTheDocument();
@@ -178,7 +174,7 @@ describe("QueryTable component", () => {
     fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
 
     // Clicking "Next" should enable the loading screen.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Wait for the second query to load.
     await waitFor(() => {
@@ -206,19 +202,19 @@ describe("QueryTable component", () => {
     );
 
     // Making sure there are data before proceed to next step
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Click the "Next" button.
     fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
 
     // Wait for the second query to load.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Click the "Previous" button.
     fireEvent.click(wrapper.getByRole("button", { name: /previous/i }));
 
     // Wait for the "Previous" request to finish.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // The first page should start with todo #0.
     expect(wrapper.getByRole("cell", { name: /todo 0/i })).toBeInTheDocument();
@@ -415,7 +411,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for loading to be completed...
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     expect(wrapper.getByTestId("ReactTable").classList).toContain("-striped");
   });
@@ -439,7 +435,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the request to finish.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Expect correct header name in the third header.
     expect(
@@ -470,7 +466,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait until the data is loaded into the table.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     expect(window.scrollY).toEqual(400);
 
@@ -488,7 +484,7 @@ describe("QueryTable component", () => {
     );
 
     // Making sure there are data before proceed to next step
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     expect(
       wrapper.container.querySelector(".pagination-top")
@@ -585,7 +581,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the request to finish.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     expect(wrapper.getByText("My Field Label")).toBeInTheDocument();
   });
@@ -613,7 +609,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish and the result to render.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     expect(wrapper.getByText(/response length is: 30/i)).toBeInTheDocument();
   });
@@ -633,7 +629,7 @@ describe("QueryTable component", () => {
     );
 
     // Continue the test after the data fetch is done.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     const pageSelector = wrapper.getAllByRole("spinbutton", {
       name: /jump to page/i

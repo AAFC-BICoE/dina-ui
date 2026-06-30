@@ -1,9 +1,5 @@
 import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
-import {
-  fireEvent,
-  waitFor,
-  waitForElementToBeRemoved
-} from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -372,7 +368,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Alert should not exist, since there is only one run.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
@@ -450,7 +446,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Alert should exist indicating that multiple runs exist.
     expect(wrapper.getByRole("alert")).toBeInTheDocument();
@@ -814,7 +810,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
     await waitFor(() => {
@@ -911,7 +907,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
     await waitFor(() => {
@@ -1141,7 +1137,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
     await waitFor(() => {
@@ -1162,7 +1158,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
     await waitFor(() => {
@@ -1228,7 +1224,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
     await waitFor(() => {
@@ -1245,9 +1241,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await userEvent.click(
       wrapper.getAllByRole("button", { name: /detach/i })[0]
     );
-    await waitForElementToBeRemoved(
-      wrapper.queryAllByText(/loading\.\.\./i)[0]
-    );
+    await waitForLoadingToDisappear();
     await userEvent.click(
       wrapper.getAllByRole("button", { name: /detach/i })[0]
     );
@@ -1256,7 +1250,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
     await waitFor(() => {
@@ -1314,7 +1308,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
     await waitFor(() => {
@@ -1335,7 +1329,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
     await waitFor(() => {
@@ -1373,7 +1367,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
     await waitFor(() => {
@@ -1405,13 +1399,13 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       wrapper.getByRole("button", { name: /attach selected/i })
     );
 
-    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
+    await waitForLoadingToDisappear();
 
     // Click the save button.
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
     await waitFor(() => {
@@ -1467,7 +1461,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
     await waitFor(() => {
@@ -1525,7 +1519,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should be in edit mode automatically since no runs exist.
     await waitFor(() => {
@@ -1549,7 +1543,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
       // Wait for loading to be finished.
-      await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
 
       // Should be in edit mode automatically since no runs exist.
       await waitFor(() => {
@@ -1584,7 +1578,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
       // Wait for loading to be finished.
-      await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
 
       // Should be in edit mode automatically since no runs exist.
       await waitFor(() => {
@@ -1616,7 +1610,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
       // Wait for loading to be finished.
-      await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
 
       // Should be in edit mode automatically since no runs exist.
       await waitFor(() => {

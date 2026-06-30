@@ -19,7 +19,7 @@ import {
   STORAGE_UNIT_USAGE_4
 } from "../__mocks__/MolecularAnalysisMocks";
 import "@testing-library/jest-dom";
-import { waitForElementToBeRemoved, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import { useState, useEffect } from "react";
 import userEvent from "@testing-library/user-event";
 import { MolecularAnalysisRunItemUsageType } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
@@ -207,7 +207,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should be in edit mode since storage units don't exist.
     await waitFor(() => {
@@ -279,7 +279,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should be in edit mode since storage units don't exist.
     await waitFor(() => {
@@ -453,7 +453,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Wait for component to stabilize
     await waitFor(() => {
@@ -558,7 +558,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Switch to edit mode.
     await userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
@@ -642,7 +642,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Display a warning to the user.
     await waitFor(() => {
@@ -675,7 +675,7 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should be in edit mode since no storage units exist.
     await waitFor(() => {

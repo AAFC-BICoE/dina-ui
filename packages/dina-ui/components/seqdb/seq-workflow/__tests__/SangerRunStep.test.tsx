@@ -1,7 +1,7 @@
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
 import _ from "lodash";
-import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import {
   MATERIAL_SAMPLE_SUMMARY_1,
@@ -155,7 +155,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Alert should not exist, since there is only one run.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
@@ -234,7 +234,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Alert should exist indicating that multiple runs exist.
     expect(wrapper.getByRole("alert")).toBeInTheDocument();
@@ -317,7 +317,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
@@ -460,7 +460,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     );
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should not be in edit mode automatically since a run exists already.
     expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
@@ -484,7 +484,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // No errors should be present at this point.
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
@@ -541,7 +541,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     const wrapper = mountWithAppContext(<TestComponent />, testCtx);
 
     // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Should be in edit mode automatically since no runs exist.
     await waitFor(() => {

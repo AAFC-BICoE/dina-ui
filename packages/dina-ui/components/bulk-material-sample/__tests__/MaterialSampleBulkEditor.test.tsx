@@ -996,7 +996,7 @@ describe("MaterialSampleBulkEditor", () => {
     );
 
     // Go the the bulk edit tab:
-    fireEvent.click(wrapper.getByText(/edit all/i));
+    await userEvent.click(wrapper.getByText(/edit all/i));
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -1005,11 +1005,11 @@ describe("MaterialSampleBulkEditor", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
     await waitFor(() => {}); // Wait for UI to update
 
     // Click the "Save All" button:
-    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await waitFor(() => expect(mockSaveForBadColEvent).toHaveBeenCalled());
 
     // The collecting event was saved separately.

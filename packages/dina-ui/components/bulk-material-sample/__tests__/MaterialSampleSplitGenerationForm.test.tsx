@@ -1,7 +1,6 @@
 import { SEPARATORS_DASH } from "../../../types/collection-api/resources/SplitConfiguration";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { MaterialSampleSplitGenerationForm } from "../MaterialSampleSplitGenerationForm";
-import { waitForElementToBeRemoved } from "@testing-library/react";
 
 const NO_CHILDREN_MATERIAL_SAMPLE_UUID = "a503d31d-8203-4766-af85-db271e087853";
 const SPLIT_CONFIGURATION_UUID = "706eece4-3105-4e96-bc2f-7530a80a6163";
@@ -85,7 +84,7 @@ describe("MaterialSampleSplitGenerationForm", () => {
     );
 
     // Wait for the material sample request.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // This test is designed to simply ensure the design doesn't change when it's not expected.
     // If it's expected, the snapshot will need to be updated.
@@ -114,7 +113,7 @@ describe("MaterialSampleSplitGenerationForm", () => {
     );
 
     // Wait for the material sample request.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // This test is designed to simply ensure the design doesn't change when it's not expected.
     // If it's expected, the snapshot will need to be updated.

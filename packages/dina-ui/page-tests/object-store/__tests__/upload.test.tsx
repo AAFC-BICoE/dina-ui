@@ -289,7 +289,7 @@ describe("Upload page", () => {
     );
   });
 
-  it("Throws file upload errors with a readable message.", async (done) => {
+  it("Throws file upload errors with a readable message.", (done) => {
     const exampleErrorResponse = `{"errors": [{ "detail": "Error from Spring" }]}`;
     try {
       fileUploadErrorHandler(
@@ -305,7 +305,7 @@ describe("Upload page", () => {
     }
   });
 
-  it("Throws file upload error when unsupported file type is provided.", async (done) => {
+  it("Throws file upload error when unsupported file type is provided.", (done) => {
     const exampleErrorResponse = "<h1>Unsupported Media Type</h1>";
     try {
       fileUploadErrorHandler(
@@ -324,7 +324,7 @@ describe("Upload page", () => {
     }
   });
 
-  it("Handle http status 403 error", async (done) => {
+  it("Handle http status 403 error", (done) => {
     const exampleErrorResponse = "HTTP Status 403 forbidden";
     try {
       fileUploadErrorHandler(
