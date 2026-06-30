@@ -304,10 +304,11 @@ describe("QueryTable component", () => {
     userEvent.click(wrapper.getByText(/name/i));
 
     // Shift-click the "description" header.
+    await userEvent.keyboard("{Shift>}");
     userEvent.click(
-      wrapper.getByRole("columnheader", { name: /description/i }),
-      { shiftKey: true }
+      wrapper.getByRole("columnheader", { name: /description/i })
     );
+    await userEvent.keyboard("{/Shift}");
 
     await waitFor(() => {
       // This request should be sorted by name and description.

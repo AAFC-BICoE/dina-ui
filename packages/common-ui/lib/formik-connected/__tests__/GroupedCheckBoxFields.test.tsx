@@ -80,15 +80,18 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Lets you shift+click to toggle multiple check boxes at a time.", async () => {
+    const user = userEvent.setup();
     const wrapper = mountWithAppContext(<TestComponent />);
 
     const checkboxes = screen.getAllByRole("checkbox");
 
     // Check the second checkbox
-    await userEvent.click(checkboxes[1]);
+    await user.click(checkboxes[1]);
 
     // Shift+click the fourth checkbox to toggle multiple
-    await userEvent.click(checkboxes[3], { shiftKey: true });
+    await user.keyboard("{Shift>}");
+    await user.click(checkboxes[3]);
+    await user.keyboard("{/Shift}");
 
     // Assert that checkboxes 2 to 4 are checked (2nd to 4th checkboxes are true)
     expect(
@@ -109,15 +112,18 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Multi-toggles checkboxes even when they are in reverse order.", async () => {
+    const user = userEvent.setup();
     const wrapper = mountWithAppContext(<TestComponent />);
 
     const checkboxes = screen.getAllByRole("checkbox");
 
     // Check the 4th checkbox
-    await userEvent.click(checkboxes[3]);
+    await user.click(checkboxes[3]);
 
     // Shift+click the 2 checkbox to toggle multiple
-    await userEvent.click(checkboxes[1], { shiftKey: true });
+    await user.keyboard("{Shift>}");
+    await user.click(checkboxes[1]);
+    await user.keyboard("{/Shift}");
 
     // Assert that checkboxes 2 to 4 are checked (2nd to 4th checkboxes are true)
     expect(
