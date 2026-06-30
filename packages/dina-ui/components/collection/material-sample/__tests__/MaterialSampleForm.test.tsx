@@ -1059,17 +1059,17 @@ describe("Material Sample Edit Page", () => {
     }
 
     // Enter the first determination:
-    fillOutDetermination(1);
+    await fillOutDetermination(1);
 
     // Enter the second determination:
     await waitFor(() => wrapper.getByTestId("add-another-button"));
     await userEvent.click(wrapper.getByTestId("add-another-button"));
-    fillOutDetermination(2);
+    await fillOutDetermination(2);
 
     // Enter the third determination:
     await waitFor(() => wrapper.getByTestId("add-another-button"));
     await userEvent.click(wrapper.getByTestId("add-another-button"));
-    fillOutDetermination(3);
+    await fillOutDetermination(3);
 
     await waitFor(() => wrapper.getByRole("button", { name: /save/i }));
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -1296,6 +1296,10 @@ describe("Material Sample Edit Page", () => {
 
     // Attempt to save, error should be displayed.
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitForLoadingToDisappear();
+
+    screen.logTestingPlaygroundURL();
+
     await waitFor(() =>
       expect(
         wrapper.getByText(/1 : primary id \- duplicate primary id found/i)
@@ -1634,10 +1638,16 @@ describe("Material Sample Edit Page", () => {
     });
 
     // Edit the 3rd organism and leave the 2nd one alone to make sure new and old data is being removed:
+    await waitFor(() => {
+      expect(
+        wrapper.getAllByRole("textbox", {
+          name: /life stage/i
+        })[2]
+      ).toBeInTheDocument();
+    });
     const lastLifestageField = wrapper.getAllByRole("textbox", {
       name: /life stage/i
     })[2];
-    await waitFor(() => expect(lastLifestageField).toBeInTheDocument());
     await userEvent.clear(lastLifestageField);
     await userEvent.type(lastLifestageField, "This should be removed...");
 

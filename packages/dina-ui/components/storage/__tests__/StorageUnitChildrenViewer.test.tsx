@@ -524,7 +524,7 @@ describe("StorageUnitChildrenViewer component", () => {
         name: /select/i
       });
 
-      await userEvent.click(row_button);
+      userEvent.click(row_button);
     });
 
     await waitFor(() => {
