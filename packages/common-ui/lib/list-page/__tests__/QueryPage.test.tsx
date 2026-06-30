@@ -113,14 +113,14 @@ describe("QueryPage test", () => {
     expect(reactTable).toBeInTheDocument();
 
     // Click the "Select All" checkbox to select all items
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("checkbox", {
         name: /check all/i
       })
     );
 
     // Click the Bulk Delete button
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /delete selected/i
       })
@@ -130,7 +130,7 @@ describe("QueryPage test", () => {
     await waitFor(() => {
       expect(wrapper.getByText(/delete selected \(2\)/i)).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
     await waitForLoadingToDisappear();
 
     // Verify both material samples are deleted
@@ -156,7 +156,7 @@ describe("QueryPage test", () => {
     });
 
     // Click the "Close" button.
-    userEvent.click(wrapper.getByRole("button", { name: /close/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /close/i }));
 
     // Verify router.reload() is called at the very end
     await waitFor(() => {
@@ -384,7 +384,7 @@ describe("QueryPage test", () => {
         expect(component.getByTestId("tab-1-content")).toBeInTheDocument();
 
         const tab2Button = component.getByRole("tab", { name: /gallery/i });
-        userEvent.click(tab2Button);
+        await userEvent.click(tab2Button);
 
         await waitFor(() => {
           expect(tab2Button).toHaveClass("react-tabs__tab--selected");
@@ -416,14 +416,14 @@ describe("QueryPage test", () => {
         await waitForLoadingToDisappear();
 
         const tab2Button = component.getByRole("tab", { name: /gallery/i });
-        userEvent.click(tab2Button);
+        await userEvent.click(tab2Button);
 
         await waitFor(() => {
           expect(component.getByTestId("tab-2-content")).toBeInTheDocument();
         });
 
         const tab1Button = component.getByRole("tab", { name: /list/i });
-        userEvent.click(tab1Button);
+        await userEvent.click(tab1Button);
 
         await waitFor(() => {
           expect(component.getByTestId("tab-1-content")).toBeInTheDocument();
@@ -477,7 +477,7 @@ describe("QueryPage test", () => {
         await waitForLoadingToDisappear();
 
         const tab2Button = component.getByRole("tab", { name: /gallery/i });
-        userEvent.click(tab2Button);
+        await userEvent.click(tab2Button);
 
         await waitFor(() => {
           expect(component.getByTestId("tab-2-content")).toBeInTheDocument();

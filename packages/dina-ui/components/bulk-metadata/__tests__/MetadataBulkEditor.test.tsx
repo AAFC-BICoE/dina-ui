@@ -158,7 +158,7 @@ describe("MetadataBulkEditor", () => {
       const editAllTab = wrapper.getByRole("tabpanel", { name: /edit all/i });
 
       // Change Caption for all records.
-      userEvent.type(
+      await userEvent.type(
         within(editAllTab).getByRole("textbox", {
           name: "Caption No Changes"
         }),
@@ -166,7 +166,7 @@ describe("MetadataBulkEditor", () => {
       );
 
       // Submit the form.
-      userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
       await waitFor(() => expect(mockSave).toHaveBeenCalled());
 
       // Expect the Updated Caption to be applied to all 3.
@@ -247,46 +247,46 @@ describe("MetadataBulkEditor", () => {
       });
 
       // Click on upload1 tab and edit its caption
-      userEvent.click(wrapper.getByText(/upload1/i));
+      await userEvent.click(wrapper.getByText(/upload1/i));
       const upload1Tab = wrapper.getByRole("tabpanel", {
         name: /upload1/i
       });
-      userEvent.clear(
+      await userEvent.clear(
         within(upload1Tab).getByRole("textbox", { name: /caption/i })
       );
-      userEvent.type(
+      await userEvent.type(
         within(upload1Tab).getByRole("textbox", { name: /caption/i }),
         "Caption for Upload 1"
       );
 
       // Click on upload2 tab and edit its caption
-      userEvent.click(wrapper.getByText(/upload2/i));
+      await userEvent.click(wrapper.getByText(/upload2/i));
       const upload2Tab = wrapper.getByRole("tabpanel", {
         name: /upload2/i
       });
-      userEvent.clear(
+      await userEvent.clear(
         within(upload2Tab).getByRole("textbox", { name: /caption/i })
       );
-      userEvent.type(
+      await userEvent.type(
         within(upload2Tab).getByRole("textbox", { name: /caption/i }),
         "Caption for Upload 2"
       );
 
       // Click on upload3 tab and edit its caption
-      userEvent.click(wrapper.getByText(/upload3/i));
+      await userEvent.click(wrapper.getByText(/upload3/i));
       const upload3Tab = wrapper.getByRole("tabpanel", {
         name: /upload3/i
       });
-      userEvent.clear(
+      await userEvent.clear(
         within(upload3Tab).getByRole("textbox", { name: /caption/i })
       );
-      userEvent.type(
+      await userEvent.type(
         within(upload3Tab).getByRole("textbox", { name: /caption/i }),
         "Caption for Upload 3"
       );
 
       // Submit the form
-      userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
       await waitFor(() => expect(mockSave).toHaveBeenCalled());
 
       // Base fields that remain the same
@@ -506,16 +506,16 @@ describe("MetadataBulkEditor", () => {
       const editAllTab = wrapper.getByRole("tabpanel", { name: /edit all/i });
 
       // Change Caption for all records
-      userEvent.clear(
+      await userEvent.clear(
         within(editAllTab).getByRole("textbox", { name: "Caption No Changes" })
       );
-      userEvent.type(
+      await userEvent.type(
         within(editAllTab).getByRole("textbox", { name: "Caption No Changes" }),
         "Bulk Updated Caption"
       );
 
       // Submit the form
-      userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
       await waitFor(() => expect(mockSave).toHaveBeenCalled());
 
       // Only the caption was changed for each.
@@ -572,34 +572,40 @@ describe("MetadataBulkEditor", () => {
       });
 
       // Edit bulkEdit1.jpg
-      userEvent.click(wrapper.getByText(/bulkEdit1/i));
+      await userEvent.click(wrapper.getByText(/bulkEdit1/i));
       const tab1 = wrapper.getByRole("tabpanel", { name: /bulkEdit1/i });
-      userEvent.clear(within(tab1).getByRole("textbox", { name: /caption/i }));
-      userEvent.type(
+      await userEvent.clear(
+        within(tab1).getByRole("textbox", { name: /caption/i })
+      );
+      await userEvent.type(
         within(tab1).getByRole("textbox", { name: /caption/i }),
         "Individual Caption 1"
       );
 
       // Edit bulkEdit2.jpg
-      userEvent.click(wrapper.getByText(/bulkEdit2/i));
+      await userEvent.click(wrapper.getByText(/bulkEdit2/i));
       const tab2 = wrapper.getByRole("tabpanel", { name: /bulkEdit2/i });
-      userEvent.clear(within(tab2).getByRole("textbox", { name: /caption/i }));
-      userEvent.type(
+      await userEvent.clear(
+        within(tab2).getByRole("textbox", { name: /caption/i })
+      );
+      await userEvent.type(
         within(tab2).getByRole("textbox", { name: /caption/i }),
         "Individual Caption 2"
       );
 
       // Edit bulkEdit3.jpg
-      userEvent.click(wrapper.getByText(/bulkEdit3/i));
+      await userEvent.click(wrapper.getByText(/bulkEdit3/i));
       const tab3 = wrapper.getByRole("tabpanel", { name: /bulkEdit3/i });
-      userEvent.clear(within(tab3).getByRole("textbox", { name: /caption/i }));
-      userEvent.type(
+      await userEvent.clear(
+        within(tab3).getByRole("textbox", { name: /caption/i })
+      );
+      await userEvent.type(
         within(tab3).getByRole("textbox", { name: /caption/i }),
         "Individual Caption 3"
       );
 
       // Submit
-      userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
       await waitFor(() => expect(mockSave).toHaveBeenCalled());
 
       // Expect individual changes only.
@@ -663,7 +669,7 @@ describe("MetadataBulkEditor", () => {
       });
 
       // Click the clear all button for the caption field
-      userEvent.click(wrapper.getByTestId("clear-all-button-acCaption"));
+      await userEvent.click(wrapper.getByTestId("clear-all-button-acCaption"));
 
       // It should say cleared as the placeholder.
       await waitFor(() => {
@@ -671,7 +677,7 @@ describe("MetadataBulkEditor", () => {
       });
 
       // Click the "Save All" button:
-      userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
       await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
       // Saves the metadata with the caption field emptied but all other fields preserved
@@ -731,7 +737,7 @@ describe("MetadataBulkEditor", () => {
       ).toBeInTheDocument();
 
       // Click the "Save All" button without making any changes
-      userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
 
       // Wait a bit to ensure no async save calls are made
       await waitFor(() => {

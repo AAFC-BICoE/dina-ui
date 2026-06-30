@@ -174,7 +174,7 @@ describe("MetersField component", () => {
 
     // Simulate user input
     const input = screen.getByRole("textbox", { name: /length/i });
-    userEvent.type(input, "1 ft");
+    await userEvent.type(input, "1 ft");
 
     // Simulate form submission
     const form = container.querySelector("form");
@@ -201,7 +201,7 @@ describe("MetersField component", () => {
     expect(input).toHaveValue("10.00");
   });
 
-  it("Updates the input value when the form state changes.", () => {
+  it("Updates the input value when the form state changes.", async () => {
     mountWithAppContext(
       <DinaForm
         initialValues={{ length: "10.00" }}
@@ -222,7 +222,7 @@ describe("MetersField component", () => {
 
     // Simulate button click to change form state
     const button = screen.getByRole("button", { name: /change val/i });
-    userEvent.click(button);
+    await userEvent.click(button);
 
     // The new value is rendered:
     expect(input).toHaveValue("20.5");
