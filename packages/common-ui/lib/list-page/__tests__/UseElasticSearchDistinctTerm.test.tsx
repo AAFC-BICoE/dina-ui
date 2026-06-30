@@ -3,7 +3,7 @@ import { mountWithAppContext } from "common-ui";
 import { useElasticSearchDistinctTerm } from "../useElasticSearchDistinctTerm";
 import _ from "lodash";
 import { QueryBuilderContextProvider } from "../query-builder/QueryBuilder";
-import { screen, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 
 const FIELD_NAME = "data.attributes.materialSampleType";
 const RELATIONSHIP_FIELD_NAME = "included.attributes.code";
@@ -342,8 +342,6 @@ describe("Use Elastic Search Distinct Term Hook", () => {
           }
         }
       );
-
-      screen.logTestingPlaygroundURL();
 
       await waitFor(() => {
         expect(mockSuggestionRequest).toBeCalledWith(

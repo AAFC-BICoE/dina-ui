@@ -1298,8 +1298,6 @@ describe("Material Sample Edit Page", () => {
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitForLoadingToDisappear();
 
-    screen.logTestingPlaygroundURL();
-
     await waitFor(() =>
       expect(
         wrapper.getByText(/1 : primary id \- duplicate primary id found/i)
