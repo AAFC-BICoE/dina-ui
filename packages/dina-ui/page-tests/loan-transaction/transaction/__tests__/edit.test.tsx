@@ -365,7 +365,7 @@ describe("Transaction Form", () => {
     );
     // Wait for the role to be added and visible
     await waitFor(() =>
-      expect(wrapper.getByText(/my-role-1/i)).toBeInTheDocument()
+      expect(wrapper.getByText("my-role-1")).toBeInTheDocument()
     );
 
     // Agent Details Date field

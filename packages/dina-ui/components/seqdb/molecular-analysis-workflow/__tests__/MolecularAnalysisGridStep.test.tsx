@@ -169,24 +169,26 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     });
 
     // Ensure Primary IDs are rendered in the grid with links:
-    expect(
-      wrapper.getByRole("link", { name: /sample 1/i }).getAttribute("href")
-    ).toEqual(
-      "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[0].id
-    );
-    expect(
-      wrapper.getByRole("link", { name: /sample 2/i }).getAttribute("href")
-    ).toEqual(
-      "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[1].id
-    );
-    expect(
-      wrapper.getByRole("link", { name: /sample 3/i }).getAttribute("href")
-    ).toEqual(
-      "/collection/material-sample/view?id=" +
-        TEST_MATERIAL_SAMPLE_SUMMARY[2].id
-    );
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("link", { name: /sample 1/i }).getAttribute("href")
+      ).toEqual(
+        "/collection/material-sample/view?id=" +
+          TEST_MATERIAL_SAMPLE_SUMMARY[0].id
+      );
+      expect(
+        wrapper.getByRole("link", { name: /sample 2/i }).getAttribute("href")
+      ).toEqual(
+        "/collection/material-sample/view?id=" +
+          TEST_MATERIAL_SAMPLE_SUMMARY[1].id
+      );
+      expect(
+        wrapper.getByRole("link", { name: /sample 3/i }).getAttribute("href")
+      ).toEqual(
+        "/collection/material-sample/view?id=" +
+          TEST_MATERIAL_SAMPLE_SUMMARY[2].id
+      );
+    });
 
     // Switch into edit mode, skip button should not appear since storage units are linked currently.
     await userEvent.click(wrapper.getByRole("button", { name: /edit/i }));

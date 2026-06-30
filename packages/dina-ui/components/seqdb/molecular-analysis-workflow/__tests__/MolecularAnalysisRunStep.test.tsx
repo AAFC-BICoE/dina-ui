@@ -421,12 +421,14 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.getByText(/acn blank/i)).toBeInTheDocument();
 
     // Expect Quality Control 1 to have 2 attachments
-    expect(wrapper.getAllByRole("link", { name: /japan\.jpg/i }).length).toBe(
-      1
-    );
-    expect(wrapper.getAllByRole("link", { name: /canada\.jpg/i }).length).toBe(
-      1
-    );
+    await waitFor(() => {
+      expect(wrapper.getAllByRole("link", { name: /japan\.jpg/i }).length).toBe(
+        1
+      );
+      expect(
+        wrapper.getAllByRole("link", { name: /canada\.jpg/i }).length
+      ).toBe(1);
+    });
 
     // Ensure attachment appears.
     expect(
