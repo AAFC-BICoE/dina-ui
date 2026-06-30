@@ -379,7 +379,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Switch into edit mode:
     userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Run name should be in the textbox.
     expect(wrapper.getAllByRole("textbox")[0]).toHaveDisplayValue("run-name-1");
@@ -812,11 +815,16 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
     userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Change the sequencing run name to something different.
     userEvent.clear(wrapper.getAllByRole("textbox")[0]);
@@ -894,8 +902,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Expect the network request to only contain the update of the run.
     expect(mockSave.mock.calls).toEqual([
@@ -1122,11 +1132,16 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
     userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Delete the quality control with existing attachments.
     userEvent.click(wrapper.getByTestId("delete-quality-control-0"));
@@ -1138,8 +1153,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Expect the network request to properly delete the quality control and attachments.
     expect(mockSave.mock.calls).toEqual([
@@ -1202,11 +1219,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
     userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Remove all the attachments for the quality control
     userEvent.click(wrapper.getAllByRole("button", { name: /detach/i })[0]);
@@ -1222,8 +1243,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Expect the network request to properly delete the quality control and attachments.
     expect(mockSave.mock.calls).toEqual([
@@ -1278,11 +1301,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
     userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Change the quality control type.
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
@@ -1295,8 +1322,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Expect the network request to properly delete the quality control and attachments.
     expect(mockSave.mock.calls).toEqual([
@@ -1331,11 +1360,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
     userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Add an attachment to the first quality control (already contains attachments.)
     userEvent.click(
@@ -1363,8 +1396,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // No errors should be present at this point.
-    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Expect the network request to change the request to include all original 2 and the new
     // attachment.
@@ -1417,11 +1452,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Should not be in edit mode automatically since a run exists already.
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Switch into edit mode:
     userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Create 4 new quality controls.
     for (let i = 0; i < 4; i++) {
@@ -1466,13 +1505,17 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Should be in edit mode automatically since no runs exist.
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Cancel out of edit mode.
     userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
 
     // Even though we still have no runs, since the user explictly canceled
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    });
 
     // Info alert to display that no sequencing runs exist
     expect(wrapper.queryByRole("alert")).toBeInTheDocument();
@@ -1486,7 +1529,9 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
       // Should be in edit mode automatically since no runs exist.
-      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      });
 
       const dataPasteZone = wrapper.getAllByPlaceholderText(
         "Paste your data here (e.g., copied from Excel)"
@@ -1519,7 +1564,9 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
       // Should be in edit mode automatically since no runs exist.
-      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      });
 
       const dataPasteZone = wrapper.getAllByPlaceholderText(
         "Paste your data here (e.g., copied from Excel)"
@@ -1549,7 +1596,9 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
       await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
       // Should be in edit mode automatically since no runs exist.
-      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+      });
 
       const dataPasteZone = wrapper.getAllByPlaceholderText(
         "Paste your data here (e.g., copied from Excel)"

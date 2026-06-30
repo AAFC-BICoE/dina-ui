@@ -3,7 +3,7 @@ import { mountWithAppContext } from "common-ui";
 import { useElasticSearchDistinctTerm } from "../useElasticSearchDistinctTerm";
 import _ from "lodash";
 import { QueryBuilderContextProvider } from "../query-builder/QueryBuilder";
-import { waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 
 const FIELD_NAME = "data.attributes.materialSampleType";
 const RELATIONSHIP_FIELD_NAME = "included.attributes.code";
@@ -249,9 +249,9 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         },
         { params: { indexName: "dina-material-sample-index" } }
       );
-    });
 
-    expect(mockSearchResults).toBeCalledWith(["CNC"]);
+      expect(mockSearchResults).toBeCalledWith(["CNC"]);
+    });
   });
 
   describe("Error handling / Props not provided cases", () => {
@@ -343,6 +343,8 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         }
       );
 
+      screen.logTestingPlaygroundURL();
+
       await waitFor(() => {
         expect(mockSuggestionRequest).toBeCalledWith(
           "search-api/search-ws/search",
@@ -359,8 +361,9 @@ describe("Use Elastic Search Distinct Term Hook", () => {
           },
           { params: { indexName: "dina-material-sample-index" } }
         );
+
+        expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
       });
-      expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
     });
   });
 });

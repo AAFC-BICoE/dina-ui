@@ -544,15 +544,19 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Should be in edit mode automatically since no runs exist.
-    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+    });
 
     // Cancel out of edit mode.
     userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
 
     // Even though we still have no runs, since the user explictly canceled
-    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
 
-    // Info alert to display that no sequencing runs exist
-    expect(wrapper.queryByRole("alert")).toBeInTheDocument();
+      // Info alert to display that no sequencing runs exist
+      expect(wrapper.queryByRole("alert")).toBeInTheDocument();
+    });
   });
 });
