@@ -13,7 +13,6 @@ import {
   useDinaFormContext,
   useModal
 } from "common-ui";
-import dynamic from "next/dynamic";
 import {
   ComponentType,
   PropsWithChildren,
@@ -27,6 +26,7 @@ import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../../types/collection-api";
 import { useMaterialSampleSave } from "../useMaterialSample";
 import { useMaterialSampleSectionOrder } from "./useMaterialSampleSectionOrder";
+import { NativeScrollSpyNav } from "./NativeScrollSpyNav";
 
 export interface MaterialSampleFormNavProps {
   dataComponentState: ReturnType<
@@ -56,29 +56,10 @@ export interface MaterialSampleFormNavProps {
   isTemplate: boolean;
 }
 
-// Don't render the react-scrollspy-nav component during tests because it only works in the browser.
+// Don't render the scroll-spy component during tests because it only works in the browser.
 const renderNav = process.env.NODE_ENV !== "test";
 
-const ScrollSpyNav = renderNav
-  ? dynamic(
-      async () => {
-        const NavClass = await import("react-scrollspy-nav");
-
-        // Do a small patch to the module:
-        // Put the "active" class on the "list-group-item" div instead of the <a> tag:
-        class MyNavClass extends NavClass.default {
-          getNavLinkElement(sectionID) {
-            return super
-              .getNavLinkElement(sectionID)
-              ?.closest(".list-group-item");
-          }
-        }
-
-        return MyNavClass as any;
-      },
-      { ssr: false }
-    )
-  : "div";
+const ScrollSpyNav = renderNav ? NativeScrollSpyNav : "div";
 
 export interface ScrollTarget {
   id: string;
@@ -136,8 +117,7 @@ export function MaterialSampleFormNav({
                     .filter((it) => !it.disabled)
                     .map((it) => it.id),
                   activeNavClass: "active",
-                  offset: -20,
-                  scrollDuration: "100"
+                  offset: -20
                 }
               : {})}
           >
