@@ -185,10 +185,10 @@ describe("ExistingAttachmentsTable component", () => {
     const checkbox2 = wrapper.getByTestId(
       "checkbox-11111111-1111-1111-1111-111111111111"
     );
-    userEvent.click(checkbox2);
+    await userEvent.click(checkbox2);
 
     // Click bulk Edit button to bring up modal
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /edit selected attachment metadata/i
       })
@@ -203,7 +203,7 @@ describe("ExistingAttachmentsTable component", () => {
         })
       ).toBeInTheDocument();
     });
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /save all/i
       })
@@ -247,10 +247,10 @@ describe("ExistingAttachmentsTable component", () => {
     const checkbox1 = wrapper.getByTestId(
       "checkbox-00000000-0000-0000-0000-000000000000"
     );
-    userEvent.click(checkbox1);
+    await userEvent.click(checkbox1);
 
     // Click detach button
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /detach selected/i
       })

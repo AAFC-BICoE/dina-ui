@@ -64,7 +64,7 @@ describe("TagSelectField", () => {
       })
     ).toBeInTheDocument();
 
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", {
         name: /tags type new tag or search previous tags/i
       })

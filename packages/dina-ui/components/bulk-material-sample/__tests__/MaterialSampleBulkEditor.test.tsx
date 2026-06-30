@@ -828,7 +828,7 @@ describe("MaterialSampleBulkEditor", () => {
     );
 
     // Go the the bulk edit tab:
-    userEvent.click(wrapper.getByText(/edit all/i));
+    await userEvent.click(wrapper.getByText(/edit all/i));
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -837,7 +837,7 @@ describe("MaterialSampleBulkEditor", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    userEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
     await waitFor(
       () => {
@@ -852,15 +852,15 @@ describe("MaterialSampleBulkEditor", () => {
     const startDateTextbox = wrapper.getByRole("textbox", {
       name: "Start Event Date Time Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory"
     });
-    userEvent.type(startDateTextbox, "11111");
+    await userEvent.type(startDateTextbox, "11111");
 
     // Click the "Save All" button:
-    userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
 
     await waitForLoadingToDisappear();
 
     await waitFor(() => expect(wrapper.getByText(/ms1/i)).toBeInTheDocument());
-    userEvent.click(wrapper.getByText(/ms1/i));
+    await userEvent.click(wrapper.getByText(/ms1/i));
 
     // Shows the error message:
     expect(
@@ -2352,7 +2352,7 @@ describe("MaterialSampleBulkEditor", () => {
     );
 
     // Click the clear all button for the barcode field
-    userEvent.click(wrapper.getByTestId("clear-all-button-barcode"));
+    await userEvent.click(wrapper.getByTestId("clear-all-button-barcode"));
 
     // It should say cleared as the placeholder.
     await waitFor(() => {
@@ -2565,7 +2565,7 @@ describe("MaterialSampleBulkEditor", () => {
         wrapper.getByRole("textbox", { name: /barcode/i })
       ).toBeInTheDocument()
     ); // Ensure textbox is available before typing
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /barcode/i }),
       "New Barcode"
     );

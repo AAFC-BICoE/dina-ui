@@ -49,7 +49,7 @@ describe("Grouped check boxes hook", () => {
     jest.clearAllMocks();
   });
 
-  it("Renders checkboxes.", () => {
+  it("Renders checkboxes.", async () => {
     mountWithAppContext(<TestComponent />);
     // Find all checkbox inputs
     const checkboxes = screen.getAllByRole("checkbox");
@@ -80,7 +80,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Lets you shift+click to toggle multiple check boxes at a time.", async () => {
-    const user = userEvent.setup();
+    const user = await userEvent.setup();
     const wrapper = mountWithAppContext(<TestComponent />);
 
     const checkboxes = screen.getAllByRole("checkbox");
@@ -112,7 +112,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Multi-toggles checkboxes even when they are in reverse order.", async () => {
-    const user = userEvent.setup();
+    const user = await userEvent.setup();
     const wrapper = mountWithAppContext(<TestComponent />);
 
     const checkboxes = screen.getAllByRole("checkbox");

@@ -65,7 +65,7 @@ describe("QueryTable component", () => {
     mockGet.mockClear();
   });
 
-  it("Renders loading state initially.", () => {
+  it("Renders loading state initially.", async () => {
     const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
@@ -94,7 +94,7 @@ describe("QueryTable component", () => {
     ).toBeInTheDocument();
   });
 
-  it("Renders the headers defined in the columns prop.", () => {
+  it("Renders the headers defined in the columns prop.", async () => {
     // Create the table with headers
     const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
@@ -301,11 +301,11 @@ describe("QueryTable component", () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(wrapper.getByText(/name/i));
+    await userEvent.click(wrapper.getByText(/name/i));
 
     // Shift-click the "description" header.
     await userEvent.keyboard("{Shift>}");
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("columnheader", { name: /description/i })
     );
     await userEvent.keyboard("{/Shift}");
@@ -644,22 +644,22 @@ describe("QueryTable component", () => {
     expect(onPageChangeMock).toBeCalledTimes(0);
 
     // Change it to 12.
-    userEvent.clear(pageSelector);
-    userEvent.type(pageSelector, "12");
+    await userEvent.clear(pageSelector);
+    await userEvent.type(pageSelector, "12");
     fireEvent.blur(pageSelector);
     expect(pageSelector).toHaveDisplayValue("12");
     expect(onPageChangeMock).toBeCalledTimes(1);
 
     // Change it to 8.
-    userEvent.clear(pageSelector);
-    userEvent.type(pageSelector, "8");
+    await userEvent.clear(pageSelector);
+    await userEvent.type(pageSelector, "8");
     fireEvent.blur(pageSelector);
     expect(pageSelector).toHaveDisplayValue("8");
     expect(onPageChangeMock).toBeCalledTimes(2);
 
     // Change it to 13, invalid.
-    userEvent.clear(pageSelector);
-    userEvent.type(pageSelector, "13");
+    await userEvent.clear(pageSelector);
+    await userEvent.type(pageSelector, "13");
     fireEvent.blur(pageSelector);
     expect(pageSelector).toHaveDisplayValue("1");
     expect(onPageChangeMock).toBeCalledTimes(3);

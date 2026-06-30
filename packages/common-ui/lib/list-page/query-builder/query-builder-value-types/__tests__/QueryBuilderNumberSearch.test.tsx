@@ -117,7 +117,7 @@ describe("QueryBuilderNumberSearch", () => {
       expect(mockPerformSubmit).toHaveBeenCalledTimes(0);
 
       // Simulate user typing "enter" key
-      userEvent.type(textField, "{enter}");
+      await userEvent.type(textField, "{enter}");
 
       // Expect performSubmit to be called once
       expect(mockPerformSubmit).toHaveBeenCalledTimes(1);

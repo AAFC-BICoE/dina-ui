@@ -84,7 +84,7 @@ describe("Storage Unit edit page.", () => {
     });
 
     // Select Storage Unit Type
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", {
         name: /storage unit type type here to search\./i
       })
@@ -94,7 +94,7 @@ describe("Storage Unit edit page.", () => {
         wrapper.getByRole("option", { name: /type/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("option", { name: /type/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /type/i }));
 
     // Submit the form.
     fireEvent.submit(wrapper.container.querySelector("form")!);

@@ -88,17 +88,17 @@ describe("User edit page", () => {
     expect(wrapper.getAllByRole("combobox", { name: / /i })).toHaveLength(2);
 
     // Add new group + roles:
-    userEvent.click(wrapper.getAllByRole("combobox", { name: / /i })[1]);
+    await userEvent.click(wrapper.getAllByRole("combobox", { name: / /i })[1]);
     await waitFor(() => {
       expect(
         wrapper.getByRole("option", { name: /test-group/i })
       ).toBeInTheDocument();
     });
 
-    userEvent.click(wrapper.getByRole("option", { name: /test-group/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /test-group/i }));
 
     // Select Role for test-group
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("combobox", { name: /select\.\.\./i })[1]
     );
 
@@ -107,10 +107,10 @@ describe("User edit page", () => {
         wrapper.getByRole("option", { name: /super/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("option", { name: /super/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /super/i }));
 
     // Remove a group: (cnc)
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("button", { name: /remove group/i })[0]
     );
 

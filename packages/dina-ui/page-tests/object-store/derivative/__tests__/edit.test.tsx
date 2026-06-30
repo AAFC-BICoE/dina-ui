@@ -135,19 +135,25 @@ describe("Derivative single record edit page.", () => {
     expect(wrapper.getByText(/paleontology/i)).toBeInTheDocument();
 
     // Set new values:
-    userEvent.click(wrapper.getByRole("button", { name: /remove specimen/i }));
-    userEvent.click(
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove specimen/i })
+    );
+    await userEvent.click(
       wrapper.getByRole("button", { name: /remove paleontology/i })
     );
 
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 1" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 1"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 1"/i })
+    );
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 2" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 2"/i })
+    );
 
     const publiclyReleasableSelect = within(
       wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement
@@ -195,19 +201,25 @@ describe("Derivative single record edit page.", () => {
     expect(wrapper.getByText(/paleontology/i)).toBeInTheDocument();
 
     // Set new values:
-    userEvent.click(wrapper.getByRole("button", { name: /remove specimen/i }));
-    userEvent.click(
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove specimen/i })
+    );
+    await userEvent.click(
       wrapper.getByRole("button", { name: /remove paleontology/i })
     );
 
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 1" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 1"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 1"/i })
+    );
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 2" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 2"/i })
+    );
 
     const publiclyReleasableSelect = within(
       wrapper.container.querySelector(".notPubliclyReleasable") as HTMLElement

@@ -91,11 +91,11 @@ describe("MetadataRevisionListPage", () => {
 
     const wrapper = mountWithAppContext(<AuthorFilterForm />);
 
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /author/i }),
       "searched-author"
     );
-    userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /search/i }));
 
     await waitFor(() => {
       expect(mockPush).lastCalledWith({

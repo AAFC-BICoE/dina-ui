@@ -378,7 +378,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
 
     await waitFor(() => {
       expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
@@ -482,7 +482,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(sequencingRunNameInput).toHaveDisplayValue("");
 
     // Try saving with no sequencing run name, it should report an error.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => {
       expect(wrapper.queryByRole("alert")).toBeInTheDocument();
     });
@@ -493,30 +493,30 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ).toBeInTheDocument();
 
     // Enter in names for the run items:
-    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
-    userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
+    await userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    await userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
 
     // Type a name for the run to be created.
-    userEvent.type(sequencingRunNameInput!, "My new run");
+    await userEvent.type(sequencingRunNameInput!, "My new run");
 
     // Add new quality control.
-    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+    await userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
     // Provide quality control
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByTestId("qualityControl-name-0"),
       "Quality Control Test Name 1"
     );
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    userEvent.click(
+    await userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
     // Add an attachment to the quality control
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("button", { name: "Add Attachments" })[0]
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
 
@@ -527,27 +527,29 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
-    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /attach selected/i })
+    );
 
     // Wait for attachments to be displayed on the page.
     await waitForLoadingToDisappear();
 
     // Add another quality control.
-    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+    await userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
     // Provide quality control
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByTestId("qualityControl-name-1"),
       "Quality Control Test Name 2"
     );
-    userEvent.click(wrapper.getAllByRole("combobox")[2]);
-    userEvent.click(
+    await userEvent.click(wrapper.getAllByRole("combobox")[2]);
+    await userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
     await new Promise(setImmediate);
@@ -820,52 +822,58 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
 
     await waitFor(() => {
       expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
     });
 
     // Change the sequencing run name to something different.
-    userEvent.clear(wrapper.getAllByRole("textbox")[0]);
-    userEvent.type(wrapper.getAllByRole("textbox")[0], "Updated run name");
+    await userEvent.clear(wrapper.getAllByRole("textbox")[0]);
+    await userEvent.type(
+      wrapper.getAllByRole("textbox")[0],
+      "Updated run name"
+    );
 
     // Add a new run name.
-    userEvent.clear(wrapper.getAllByRole("textbox")[1]);
-    userEvent.type(
+    await userEvent.clear(wrapper.getAllByRole("textbox")[1]);
+    await userEvent.type(
       wrapper.getAllByRole("textbox")[1],
       "Update run item name 1"
     );
-    userEvent.type(wrapper.getAllByRole("textbox")[2], "Add a new one");
+    await userEvent.type(wrapper.getAllByRole("textbox")[2], "Add a new one");
 
     // Edit Quality Control 1
-    userEvent.clear(wrapper.getAllByRole("textbox")[4]);
-    userEvent.type(
+    await userEvent.clear(wrapper.getAllByRole("textbox")[4]);
+    await userEvent.type(
       wrapper.getAllByRole("textbox")[4],
       "Updated Quality Control"
     );
 
     // Delete Quality Control 2
     expect(wrapper.queryByText(/acn blank/i)).toBeInTheDocument();
-    userEvent.click(wrapper.getByTestId("delete-quality-control-1"));
+    await userEvent.click(wrapper.getByTestId("delete-quality-control-1"));
     expect(wrapper.queryByText(/acn blank/i)).not.toBeInTheDocument();
 
     // Add new Quality Control
-    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
-    userEvent.type(wrapper.getAllByRole("textbox")[5], "New Quality Control");
-    userEvent.click(wrapper.getAllByRole("combobox")[2]);
-    userEvent.click(
+    await userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+    await userEvent.type(
+      wrapper.getAllByRole("textbox")[5],
+      "New Quality Control"
+    );
+    await userEvent.click(wrapper.getAllByRole("combobox")[2]);
+    await userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
     // Add blank quality control, should not be saved.
-    userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
+    await userEvent.click(wrapper.getAllByRole("button", { name: "Add" })[0]);
 
     // Add an attachment to the existing quality control
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("button", { name: "Add Attachments" })[0]
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
 
@@ -875,14 +883,16 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
-    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /attach selected/i })
+    );
 
     // Add an attachment to the new quality control
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("button", { name: "Add Attachments" })[1]
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
 
@@ -892,11 +902,13 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
-    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /attach selected/i })
+    );
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
@@ -1137,17 +1149,17 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
 
     await waitFor(() => {
       expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
     });
 
     // Delete the quality control with existing attachments.
-    userEvent.click(wrapper.getByTestId("delete-quality-control-0"));
+    await userEvent.click(wrapper.getByTestId("delete-quality-control-0"));
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
@@ -1224,20 +1236,24 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
     await waitFor(() => {
       expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
     });
 
     // Remove all the attachments for the quality control
-    userEvent.click(wrapper.getAllByRole("button", { name: /detach/i })[0]);
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /detach/i })[0]
+    );
     await waitForElementToBeRemoved(
       wrapper.queryAllByText(/loading\.\.\./i)[0]
     );
-    userEvent.click(wrapper.getAllByRole("button", { name: /detach/i })[0]);
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /detach/i })[0]
+    );
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
@@ -1306,17 +1322,17 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
     await waitFor(() => {
       expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
     });
 
     // Change the quality control type.
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    userEvent.click(wrapper.getByRole("option", { name: /meoh blank/i }));
+    await userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await userEvent.click(wrapper.getByRole("option", { name: /meoh blank/i }));
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
@@ -1365,16 +1381,16 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
     await waitFor(() => {
       expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
     });
 
     // Add an attachment to the first quality control (already contains attachments.)
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("button", { name: /add attachments/i })[0]
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("tab", { name: /attach existing objects/i })
     );
 
@@ -1384,13 +1400,15 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         wrapper.getByRole("button", { name: /attach selected/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getAllByRole("checkbox")[1]);
-    userEvent.click(wrapper.getByRole("button", { name: /attach selected/i }));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /attach selected/i })
+    );
 
     await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
@@ -1457,37 +1475,42 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     });
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
     await waitFor(() => {
       expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
     });
 
     // Create 4 new quality controls.
     for (let i = 0; i < 4; i++) {
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[0]
+      );
     }
 
     // Quality Control 1 - Both provided.
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByTestId("qualityControl-name-0"),
       "both-provided"
     );
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
-    userEvent.click(
+    await userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
     // Quality Control 2 - Name only provided.
-    userEvent.type(wrapper.getByTestId("qualityControl-name-1"), "name-only");
+    await userEvent.type(
+      wrapper.getByTestId("qualityControl-name-1"),
+      "name-only"
+    );
 
     // Quality Control 3 - Type only provided.
-    userEvent.click(wrapper.getAllByRole("combobox")[3]);
-    userEvent.click(
+    await userEvent.click(wrapper.getAllByRole("combobox")[3]);
+    await userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
     );
 
     // Save and expect an error message.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => {
       expect(wrapper.queryByRole("alert")).toBeInTheDocument();
     });
@@ -1510,7 +1533,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     });
 
     // Cancel out of edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
 
     // Even though we still have no runs, since the user explictly canceled
     await waitFor(() => {

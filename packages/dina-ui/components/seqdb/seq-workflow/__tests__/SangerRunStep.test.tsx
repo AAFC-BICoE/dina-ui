@@ -296,7 +296,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(sequencingRunNameInput).toHaveDisplayValue("");
 
     // Try saving with no sequencing run name, it should report an error.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => {
       expect(wrapper.queryByRole("alert")).toBeInTheDocument();
     });
@@ -307,14 +307,14 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     ).toBeInTheDocument();
 
     // Type a name for the run to be created.
-    userEvent.type(sequencingRunNameInput!, "My new run");
+    await userEvent.type(sequencingRunNameInput!, "My new run");
 
     // Enter in names for the run items:
-    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
-    userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
+    await userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    await userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
@@ -466,22 +466,22 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    await userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
     expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Change the sequencing run name to something different.
     const sequencingRunNameInput = wrapper.container.querySelector(
       'input[name="sequencingRunName"]'
     );
-    userEvent.clear(sequencingRunNameInput!);
-    userEvent.type(sequencingRunNameInput!, "Updated run name");
+    await userEvent.clear(sequencingRunNameInput!);
+    await userEvent.type(sequencingRunNameInput!, "Updated run name");
 
     // Update the two run iten name
-    userEvent.clear(wrapper.getAllByRole("textbox")[1]);
-    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    await userEvent.clear(wrapper.getAllByRole("textbox")[1]);
+    await userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
 
     // Click the save button.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Wait for loading to be finished.
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
@@ -549,7 +549,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     });
 
     // Cancel out of edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
 
     // Even though we still have no runs, since the user explictly canceled
     await waitFor(() => {

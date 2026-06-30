@@ -51,7 +51,7 @@ describe("ExportPopup", () => {
       <ExportPopup target={mockTarget} show={true} onClose={onCloseMock} />
     );
 
-    userEvent.click(wrapper.getByTestId("close-button"));
+    await userEvent.click(wrapper.getByTestId("close-button"));
     await waitFor(() => {
       expect(onCloseMock).toHaveBeenCalledTimes(1);
     });
@@ -62,7 +62,7 @@ describe("ExportPopup", () => {
       <ExportPopup target={mockTarget} show={true} onClose={onCloseMock} />
     );
 
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByText(
         "Your export is being processed. You will receive a notification when it's ready to download."
       )

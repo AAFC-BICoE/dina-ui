@@ -224,7 +224,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument()
     );
 
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /edit/i
       })
@@ -242,12 +242,12 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     );
 
     // The first checkbox is the select all in the header.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("checkbox", { name: /check all/i })[0]
     );
 
     // Move the selected material samples over.
-    userEvent.click(wrapper.getByTestId("move-resources-over"));
+    await userEvent.click(wrapper.getByTestId("move-resources-over"));
 
     // 3 records are expected in the selected table.
     await waitFor(() =>
@@ -257,7 +257,9 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     );
 
     // Perform save
-    userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /save selections/i })
+    );
     await waitFor(() =>
       expect(mockBulkCreateResources).toHaveBeenCalledTimes(1)
     );
@@ -352,23 +354,25 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
     );
 
     // Switch to edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
     await waitFor(() =>
       expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument()
     );
 
     // Remove "Sample 2" from the currently selected list.
-    userEvent.click(wrapper.getAllByRole("checkbox")[6]);
-    userEvent.click(wrapper.getByTestId("remove-resources"));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[6]);
+    await userEvent.click(wrapper.getByTestId("remove-resources"));
     await waitForLoadingToDisappear();
 
     // Now add "Sample 3" to the selected list.
-    userEvent.click(wrapper.getAllByRole("checkbox")[3]);
-    userEvent.click(wrapper.getByTestId("move-resources-over"));
+    await userEvent.click(wrapper.getAllByRole("checkbox")[3]);
+    await userEvent.click(wrapper.getByTestId("move-resources-over"));
     await waitForLoadingToDisappear();
 
     // Perform save
-    userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /save selections/i })
+    );
     await waitFor(() =>
       expect(mockBulkCreateResources).toHaveBeenCalledTimes(2)
     );

@@ -330,17 +330,21 @@ describe("Transaction Form", () => {
       ).toBeInTheDocument()
     );
 
-    userEvent.click(wrapper.getByRole("combobox", { name: /agent/i }));
+    await userEvent.click(wrapper.getByRole("combobox", { name: /agent/i }));
     // Wait for the options to appear after clicking the combobox
     await waitFor(() =>
       expect(
         wrapper.getByRole("option", { name: /test person/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(wrapper.getByRole("option", { name: /test person/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /test person/i })
+    );
 
     // Add an Agent Role:
-    userEvent.click(wrapper.getByRole("combobox", { name: /role\/action/i }));
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /role\/action/i })
+    );
     // Wait for the role options to appear
     await waitFor(() =>
       expect(
@@ -356,7 +360,9 @@ describe("Transaction Form", () => {
         wrapper.getByRole("option", { name: /add "my-role-1"/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(wrapper.getByRole("option", { name: /add "my-role-1"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "my-role-1"/i })
+    );
     // Wait for the role to be added and visible
     await waitFor(() =>
       expect(wrapper.getByText(/my-role-1/i)).toBeInTheDocument()
@@ -471,8 +477,8 @@ describe("Transaction Form", () => {
     const transactionNumberField = wrapper.getByRole("textbox", {
       name: /transaction number/i
     });
-    userEvent.clear(transactionNumberField);
-    userEvent.type(transactionNumberField, "new transaction number");
+    await userEvent.clear(transactionNumberField);
+    await userEvent.type(transactionNumberField, "new transaction number");
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -529,8 +535,8 @@ describe("Transaction Form", () => {
     const transactionNumberField = wrapper.getByRole("textbox", {
       name: /transaction number/i
     });
-    userEvent.clear(transactionNumberField);
-    userEvent.type(transactionNumberField, "new transaction number");
+    await userEvent.clear(transactionNumberField);
+    await userEvent.type(transactionNumberField, "new transaction number");
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
@@ -582,8 +588,8 @@ describe("Transaction Form", () => {
     expect(wrapper.getByText(/total selected records: 2/i)).toBeInTheDocument();
 
     // Remove an existing material sample that is loadable.
-    userEvent.click(wrapper.getByTestId("checkbox-sample-2"));
-    userEvent.click(wrapper.getByTestId("remove-resources"));
+    await userEvent.click(wrapper.getByTestId("checkbox-sample-2"));
+    await userEvent.click(wrapper.getByTestId("remove-resources"));
     await waitForLoadingToDisappear();
 
     // Submit form

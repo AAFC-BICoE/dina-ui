@@ -69,7 +69,7 @@ describe("MaterialSampleGenerationForm", () => {
 
     // Fill out the form
     // Change the collection
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("combobox", {
         name: /collection type here to search\./i
       }),

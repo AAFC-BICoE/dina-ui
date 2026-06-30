@@ -135,7 +135,7 @@ describe("Upload page", () => {
     });
 
     // Submit
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: "Continue with Batch Entry Form" })
     );
 
@@ -261,7 +261,7 @@ describe("Upload page", () => {
     });
 
     // Submit
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: "Continue with Workbook" })
     );
 
@@ -289,7 +289,7 @@ describe("Upload page", () => {
     );
   });
 
-  it("Throws file upload errors with a readable message.", (done) => {
+  it("Throws file upload errors with a readable message.", async (done) => {
     const exampleErrorResponse = `{"errors": [{ "detail": "Error from Spring" }]}`;
     try {
       fileUploadErrorHandler(
@@ -305,7 +305,7 @@ describe("Upload page", () => {
     }
   });
 
-  it("Throws file upload error when unsupported file type is provided.", (done) => {
+  it("Throws file upload error when unsupported file type is provided.", async (done) => {
     const exampleErrorResponse = "<h1>Unsupported Media Type</h1>";
     try {
       fileUploadErrorHandler(
@@ -324,7 +324,7 @@ describe("Upload page", () => {
     }
   });
 
-  it("Handle http status 403 error", (done) => {
+  it("Handle http status 403 error", async (done) => {
     const exampleErrorResponse = "HTTP Status 403 forbidden";
     try {
       fileUploadErrorHandler(
@@ -340,7 +340,7 @@ describe("Upload page", () => {
     }
   });
 
-  it("Only renders if the user belongs a group", () => {
+  it("Only renders if the user belongs a group", async () => {
     const wrapper = mountWithAppContext(<UploadPage />, {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });

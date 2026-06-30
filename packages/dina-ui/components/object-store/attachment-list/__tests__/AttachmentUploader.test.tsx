@@ -89,7 +89,7 @@ describe("AttachmentUploader component", () => {
   });
 
   it("Uploads the files and opens the Metadata editor.", async () => {
-    const user = userEvent.setup();
+    const user = await userEvent.setup();
 
     const wrapper = mountWithAppContext(
       <AttachmentUploader afterMetadatasSaved={mockAfterMetadatasSaved} />,

@@ -161,18 +161,28 @@ describe("Metadata single record edit page.", () => {
     ).toBeInTheDocument();
 
     // Set new values:
-    userEvent.click(wrapper.getByRole("button", { name: /remove tag1/i }));
-    userEvent.click(wrapper.getByRole("button", { name: /remove tag2/i }));
-    userEvent.click(wrapper.getByRole("button", { name: /remove tag3/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove tag1/i })
+    );
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove tag2/i })
+    );
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /remove tag3/i })
+    );
 
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 1" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 1"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 1"/i })
+    );
     fireEvent.change(wrapper.getByRole("combobox", { name: /tags/i }), {
       target: { value: "new tag 2" }
     });
-    userEvent.click(wrapper.getByRole("option", { name: /add "new tag 2"/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /add "new tag 2"/i })
+    );
 
     fireEvent.change(
       wrapper.getByDisplayValue(/test\-managed\-attribute\-value/i),
@@ -241,12 +251,12 @@ describe("Metadata single record edit page.", () => {
     });
 
     // Set the license to <None> in the dropdown menu.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", {
         name: /license open government licence \- canada/i
       })
     );
-    userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
 
     // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);

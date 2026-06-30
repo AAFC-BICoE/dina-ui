@@ -446,7 +446,9 @@ describe("StorageUnitChildrenViewer component", () => {
       ).toBeInTheDocument()
     );
     // Click "Move All Content" button
-    userEvent.click(wrapper.getByRole("button", { name: /move all content/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /move all content/i })
+    );
 
     await waitFor(() =>
       expect(
@@ -454,7 +456,9 @@ describe("StorageUnitChildrenViewer component", () => {
       ).toBeInTheDocument()
     );
     // Click "Select" button for B (Box) storage unit
-    userEvent.click(wrapper.getAllByRole("button", { name: /select/i })[0]);
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /select/i })[0]
+    );
 
     await waitFor(() => {
       // Test expected API Call
@@ -506,7 +510,7 @@ describe("StorageUnitChildrenViewer component", () => {
     );
 
     // Click "Add Existing Storage Unit" button
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: /add existing storage unit/i })
     );
     await waitForLoadingToDisappear();
@@ -520,7 +524,7 @@ describe("StorageUnitChildrenViewer component", () => {
         name: /select/i
       });
 
-      userEvent.click(row_button);
+      await userEvent.click(row_button);
     });
 
     await waitFor(() => {
