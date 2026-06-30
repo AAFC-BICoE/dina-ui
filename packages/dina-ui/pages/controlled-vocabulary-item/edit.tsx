@@ -48,7 +48,7 @@ import { FaFloppyDisk } from "react-icons/fa6";
 
 interface FormSubmissionContextType {
   submitForm?: () => void;
-  formRef?: RefObject<FormikProps<InputResource<ControlledVocabularyItem>>>;
+  formRef?: RefObject<FormikProps<InputResource<ControlledVocabularyItem>> | null>;
 }
 
 const FormSubmissionContext = createContext<FormSubmissionContextType>({});

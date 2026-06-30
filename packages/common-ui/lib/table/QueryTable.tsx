@@ -303,7 +303,7 @@ export function QueryTable<TData extends KitsuResource>({
   const { error, loading: queryIsLoading, response } = queryState;
 
   const lastSuccessfulResponse =
-    useRef<KitsuResponse<TData[], MetaWithTotal>>();
+    useRef<KitsuResponse<TData[], MetaWithTotal> | undefined>(undefined);
 
   if (response) {
     if (enableInMemoryFilter) {

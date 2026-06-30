@@ -212,14 +212,14 @@ export function DateField(props: DateFieldProps) {
               wrapperClassName="w-100"
               isClearable={!isDisabled && !bulkTab}
               onChange={onChange}
-              onChangeRaw={onChangeRaw}
+              onChangeRaw={(event) => event && onChangeRaw(event as unknown as FocusEvent<HTMLInputElement>)}
               showYearDropdown={true}
               todayButton="Today"
               disabled={isDisabled}
-              onBlur={onBlur}
+              onBlur={(event) => event && onBlur(event as unknown as FocusEvent<HTMLInputElement>)}
               onFocus={(event) => (event.target as HTMLInputElement).select()}
               selected={selectedDate}
-              {...datePickerProps}
+              {...(datePickerProps as any)}
             />
             {bulkTab &&
               !bulkTab?.isExplicitlyDeleted &&

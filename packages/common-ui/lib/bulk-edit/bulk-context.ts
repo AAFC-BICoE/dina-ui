@@ -27,7 +27,7 @@ export enum ClearType {
 }
 
 export interface BulkEditTabContextI<T extends KitsuResource = KitsuResource> {
-  bulkEditFormRef: RefObject<FormikProps<InputResource<T>>>;
+  bulkEditFormRef: RefObject<FormikProps<InputResource<T>> | null>;
   resourceHooks: ResourceWithHooks<T>[];
   clearedFields?: Map<string, ClearType>;
   setClearedFields?: React.Dispatch<

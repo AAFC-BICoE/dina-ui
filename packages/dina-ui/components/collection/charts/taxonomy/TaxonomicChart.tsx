@@ -587,7 +587,7 @@ export default function TaxonomySunburstChart({ query }) {
           <select
             value={selectedSource ?? ""}
             onChange={(e) =>
-              setSelectedSource(((e.target as HTMLTextAreaElement | HTMLInputElement).value || null) as SourceFilter)
+              setSelectedSource((e.target.value || null) as SourceFilter)
             }
           >
             <option value="">All</option>
