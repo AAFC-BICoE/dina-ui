@@ -15,6 +15,7 @@ import {
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useMemo
 } from "react";
 import {
@@ -22,6 +23,7 @@ import {
   normalizeJsonApiPointer
 } from "../util/jsonApiErrorNormalization";
 import { useIntl } from "react-intl";
+import { useRouter } from "next/router";
 import { BulkEditTabContext, scrollToError } from "..";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
@@ -190,7 +192,9 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
    * e.g. Don't show the has-bulk-edit-value indicators in the Material Sample
    * form's nested Collecting Event form.
    */
-  const withBulkEditCtx = useCallback<(content: React.JSX.Element) => React.JSX.Element>(
+  const withBulkEditCtx = useCallback<
+    (content: React.JSX.Element) => React.JSX.Element
+  >(
     isNestedForm
       ? (content) => (
           <BulkEditTabContext.Provider value={null}>
@@ -229,9 +233,54 @@ interface FormWrapperProps {
   customErrorViewerMessage?: (field: string, error: any) => string;
 }
 
+/** Warns on browser close/refresh and internal SPA navigation if the form is dirty. */
+function PromptIfDirty({
+  formik,
+  readOnly
+}: {
+  formik: any;
+  readOnly?: boolean;
+}) {
+  const { formatMessage } = useIntl();
+  const router = useRouter();
+  const isDirty =
+    !readOnly && formik.dirty && formik.values.type && formik.submitCount === 0;
+
+  useEffect(() => {
+    if (!isDirty) return;
+
+    const warningMessage = formatMessage({ id: "possibleDataLossWarning" });
+
+    // Browser close / refresh (F5)
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      // returnValue must be set for older browsers (e.g. Chrome < 119)
+      e.returnValue = "";
+    };
+
+    // Internal SPA navigation (links, router.push, etc.)
+    const handleRouteChange = () => {
+      if (!window.confirm(warningMessage)) {
+        router.events.emit("routeChangeError");
+        throw "routeChange aborted.";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    router.events.on("routeChangeStart", handleRouteChange);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      router.events.off("routeChangeStart", handleRouteChange);
+    };
+  }, [isDirty, formatMessage, router.events]);
+
+  return null;
+}
+
 /** Wraps the inner content with the Form + ErrorViewer components. */
 function FormWrapper({ children, customErrorViewerMessage }: FormWrapperProps) {
-  const { isNestedForm } = useDinaFormContext();
+  const { isNestedForm, readOnly } = useDinaFormContext();
 
   // Disable enter to submit form in nested forms.
   function disableEnterToSubmitOuterForm(e) {
@@ -241,16 +290,6 @@ function FormWrapper({ children, customErrorViewerMessage }: FormWrapperProps) {
     }
   }
 
-  const PromptIfDirty = ({ formik }) => {
-    const { formatMessage } = useIntl();
-    // only prompt if there is data change in edit or add pages
-    if (formik.dirty && formik.values.type && formik.submitCount === 0) {
-      window.onbeforeunload = () => {
-        return formatMessage({ id: "possibleDataLossWarning" });
-      };
-    } else window.onbeforeunload = null;
-    return null;
-  };
   const Wrapper = isNestedForm ? "div" : Form;
 
   return (
@@ -259,11 +298,7 @@ function FormWrapper({ children, customErrorViewerMessage }: FormWrapperProps) {
     >
       <ErrorViewer customErrorViewerMessage={customErrorViewerMessage} />
       <FormikConsumer>
-        {(formik) => (
-          <>
-            <PromptIfDirty formik={formik} />
-          </>
-        )}
+        {(formik) => <PromptIfDirty formik={formik} readOnly={readOnly} />}
       </FormikConsumer>
       {children}
     </Wrapper>
