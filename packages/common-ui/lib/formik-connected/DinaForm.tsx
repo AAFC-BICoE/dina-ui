@@ -258,20 +258,28 @@ function PromptIfDirty({
       e.returnValue = "";
     };
 
-    // Internal SPA navigation (links, router.push, etc.)
-    const handleRouteChange = () => {
-      if (!window.confirm(warningMessage)) {
-        router.events.emit("routeChangeError");
-        throw "routeChange aborted.";
-      }
-    };
-
     window.addEventListener("beforeunload", handleBeforeUnload);
-    router.events.on("routeChangeStart", handleRouteChange);
+
+    // Internal SPA navigation (links, router.push, etc.)
+    // router.events may be undefined in test environments.
+    if (router.events) {
+      const handleRouteChange = () => {
+        if (!window.confirm(warningMessage)) {
+          router.events.emit("routeChangeError");
+          throw "routeChange aborted.";
+        }
+      };
+
+      router.events.on("routeChangeStart", handleRouteChange);
+
+      return () => {
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        router.events.off("routeChangeStart", handleRouteChange);
+      };
+    }
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      router.events.off("routeChangeStart", handleRouteChange);
     };
   }, [isDirty, formatMessage, router.events]);
 
