@@ -190,7 +190,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
    * e.g. Don't show the has-bulk-edit-value indicators in the Material Sample
    * form's nested Collecting Event form.
    */
-  const withBulkEditCtx = useCallback<(content: JSX.Element) => JSX.Element>(
+  const withBulkEditCtx = useCallback<(content: React.JSX.Element) => React.JSX.Element>(
     isNestedForm
       ? (content) => (
           <BulkEditTabContext.Provider value={null}>

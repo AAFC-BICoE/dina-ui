@@ -348,7 +348,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <MaterialSampleInfoSection />
                 {withResponse(colEventQuery, ({ data: colEvent }) => {
                   function legendWrapper():
-                    | ((legendElement: JSX.Element) => JSX.Element)
+                    | ((legendElement: React.JSX.Element) => React.JSX.Element)
                     | undefined {
                     return (legendElement) => {
                       return (

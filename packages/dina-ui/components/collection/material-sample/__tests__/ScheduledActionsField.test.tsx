@@ -53,21 +53,21 @@ describe("ScheduledActionsField", () => {
     expect(wrapper.queryByTestId("ReactTable")).toBeNull();
 
     // Add first action:
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /action type/i }),
       "at1"
     );
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /action status/i }),
       "as1"
     );
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /remarks/i }),
       "remarks-1"
     );
 
     // Click the "Add" button to add the action.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /add/i
       })
@@ -106,21 +106,21 @@ describe("ScheduledActionsField", () => {
       })
     );
 
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /action type/i }),
       "at2"
     );
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /action status/i }),
       "as2"
     );
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /remarks/i }),
       "remarks-2"
     );
 
     // Click the "Add" button to add the action.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /add/i
       })
@@ -159,19 +159,19 @@ describe("ScheduledActionsField", () => {
     ).toBeInTheDocument();
 
     // Edit the first action:
-    userEvent.click(wrapper.getAllByRole("button", { name: /edit/i })[0]);
+    await userEvent.click(wrapper.getAllByRole("button", { name: /edit/i })[0]);
 
     await waitFor(() =>
       expect(wrapper.getByRole("button", { name: /save/i })).toBeInTheDocument()
     );
-    userEvent.clear(wrapper.getByRole("textbox", { name: /remarks/i }));
-    userEvent.type(
+    await userEvent.clear(wrapper.getByRole("textbox", { name: /remarks/i }));
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /remarks/i }),
       "edited-remarks-1"
     );
 
     // Click the "Save" button to save the action.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", {
         name: /save/i
       })
@@ -199,7 +199,9 @@ describe("ScheduledActionsField", () => {
       })
     );
 
-    userEvent.click(wrapper.getAllByRole("button", { name: /remove/i })[1]);
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /remove/i })[1]
+    );
 
     fireEvent.submit(wrapper.container.querySelector("form")!);
     await waitFor(() =>

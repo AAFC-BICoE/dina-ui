@@ -27,7 +27,7 @@ export interface BulkNavigatorTab<T extends KitsuResource = KitsuResource> {
   key: string;
   title: ReactNode;
   content: (isSelected: boolean) => ReactNode;
-  formRef: RefObject<FormikProps<InputResource<T>>>;
+  formRef: RefObject<FormikProps<InputResource<T>> | null>;
 }
 
 /**

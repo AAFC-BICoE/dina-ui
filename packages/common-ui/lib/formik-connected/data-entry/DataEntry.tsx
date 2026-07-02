@@ -209,7 +209,7 @@ export function DataEntry({
   }
 
   function legendWrapper():
-    | ((legendElement: JSX.Element) => JSX.Element)
+    | ((legendElement: React.JSX.Element) => React.JSX.Element)
     | undefined {
     return (legendElement) => {
       return (

@@ -143,8 +143,8 @@ export function GeographySearchBox({
             aria-label={formatMessage("locationLabel")}
             className="form-control"
             placeholder={formatMessage("locationPlaceholder")}
-            onChange={(e) => onInputChange(e.target.value)}
-            onFocus={(e) => e.target.select()}
+            onChange={(e) => onInputChange((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
+            onFocus={(e) => (e.target as HTMLInputElement).select()}
             onKeyDown={(e) => {
               if (e.keyCode === 13) {
                 e.preventDefault();

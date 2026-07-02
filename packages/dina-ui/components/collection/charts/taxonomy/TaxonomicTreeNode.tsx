@@ -27,7 +27,7 @@ export function prunePlaceholders(node) {
  * Renders a node linked to its children displaying taxonomic ranks, compatible with Query Builder UI,
  * interacts with TaxonomicChart to affect data displayed.
  *
- * @returns {JSX.Element} The rendered node component.
+ * @returns {React.JSX.Element} The rendered node component.
  */
 
 export default function TaxonomicTreeNode({ query }) {

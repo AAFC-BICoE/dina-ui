@@ -450,7 +450,7 @@ function PreviewGeneratedNames({
     materialSampleType.toLowerCase().replace(/_/g, " ")
   );
 
-  const childrenRows: JSX.Element[] = [];
+  const childrenRows: React.JSX.Element[] = [];
   let numberOfChildren = 0;
   Object.keys(generatedIdentifiers).forEach((parentId) => {
     const childMaterialSampleNames = generatedIdentifiers[parentId];

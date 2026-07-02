@@ -330,8 +330,11 @@ export function WorkbookTemplateGenerator() {
                     name="name"
                     disabled={loading}
                     className="flex-grow-1 form-control"
-                    onChange={(value) => {
-                      setFileName(value.target.value ?? "");
+                    onChange={(e) => {
+                      setFileName(
+                        (e.target as HTMLTextAreaElement | HTMLInputElement)
+                          .value ?? ""
+                      );
                     }}
                     value={fileName}
                     placeholder="template"

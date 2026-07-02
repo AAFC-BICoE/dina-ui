@@ -56,7 +56,7 @@ describe("StorageUnitBreadCrumb component", () => {
     );
 
     // Hover over image to show tooltip
-    userEvent.hover(wrapper.getByRole("img"));
+    await userEvent.hover(wrapper.getByRole("img"));
 
     // Test tooltip rendering while hovering on the img element
     await waitFor(() => {
@@ -86,7 +86,7 @@ describe("StorageUnitBreadCrumb component", () => {
     );
 
     // Hover over image to show tooltip
-    userEvent.hover(wrapper.getByRole("img"));
+    await userEvent.hover(wrapper.getByRole("img"));
 
     // Test tooltip rendering while hovering on the img element
     await waitFor(() => {
@@ -109,7 +109,7 @@ describe("StorageUnitBreadCrumb component", () => {
       wrapper.getAllByRole("link", { name: /a \(box\)/i })[0]
     ).toHaveAttribute("href", "/collection/storage-unit/view?id=A");
   });
-  it("Does not render a tooltip when parentStorageUnit exists but lacks hierarchy, and the unit itself has no hierarchy", () => {
+  it("Does not render a tooltip when parentStorageUnit exists but lacks hierarchy, and the unit itself has no hierarchy", async () => {
     const unitWithBareParent: PersistedResource<StorageUnit> = {
       id: "VIAL-1",
       group: "group",

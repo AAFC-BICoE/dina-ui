@@ -23,7 +23,7 @@ export interface AssignedStorageProps {
   onChange?: (
     newValue: PersistedResource<StorageUnit> | { id: null }
   ) => Promisable<void>;
-  noneMessage?: JSX.Element;
+  noneMessage?: React.JSX.Element;
   parentIdInURL?: string;
   showRowAndColumnFields?: boolean;
 }

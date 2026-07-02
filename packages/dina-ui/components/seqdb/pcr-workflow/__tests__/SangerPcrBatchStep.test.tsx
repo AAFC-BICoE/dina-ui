@@ -76,12 +76,12 @@ describe("SangerPcrBatchStep component", () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /name/i }),
       PCR_BATCH_NAME
     );
 
-    userEvent.click(wrapper.getByRole("button"));
+    await userEvent.click(wrapper.getByRole("button"));
 
     await waitFor(() => {
       expect(mockOnSaved).lastCalledWith(1, {
@@ -142,12 +142,12 @@ describe("SangerPcrBatchStep component", () => {
         wrapper2.getByRole("textbox", { name: /objective/i })
       ).toBeInTheDocument();
     });
-    userEvent.type(
+    await userEvent.type(
       wrapper2.getByRole("textbox", { name: /objective/i }),
       "test-objective"
     );
 
-    userEvent.click(wrapper2.getByRole("button"));
+    await userEvent.click(wrapper2.getByRole("button"));
 
     await waitFor(() => {
       expect(mockOnSaved).lastCalledWith(1, {

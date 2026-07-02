@@ -230,7 +230,6 @@ function GovernmentLogo() {
         className="logo"
       />
       {logoSpan}
-      <meta property="areaServed" typeof="Country" content="Canada" />
     </>
   );
 }

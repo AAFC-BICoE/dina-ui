@@ -52,7 +52,7 @@ type ViewPageLayoutPropsBase<T extends KitsuResource> = {
   tooltipNode?: ReactNode;
 
   alterInitialValues?: (resource: PersistedResource<T>) => any;
-  backButton?: JSX.Element;
+  backButton?: React.JSX.Element;
   forceTitleUppercase?: boolean;
 };
 

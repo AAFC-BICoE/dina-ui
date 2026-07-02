@@ -102,7 +102,7 @@ export function PcrProtocolReactionTable({
               type="number"
               className="form-control bg-warning"
               value={numOfRxns}
-              onChange={(e) => setNumOfRxns(convertNumber(e.target.value) || 0)}
+              onChange={(e) => setNumOfRxns(convertNumber((e.target as HTMLTextAreaElement | HTMLInputElement).value) || 0)}
             />
           </div>
         </div>

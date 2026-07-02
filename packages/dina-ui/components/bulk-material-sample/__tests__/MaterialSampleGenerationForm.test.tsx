@@ -1,12 +1,8 @@
 import { writeStorage } from "@rehooks/local-storage";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../group-select/useStoredDefaultGroup";
 import { MaterialSampleGenerationForm } from "../MaterialSampleGenerationForm";
-import {
-  fireEvent,
-  waitForElementToBeRemoved,
-  waitFor
-} from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -69,13 +65,13 @@ describe("MaterialSampleGenerationForm", () => {
 
     // Fill out the form
     // Change the collection
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("combobox", {
         name: /collection type here to search\./i
       }),
       "test-collection"
     );
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
     fireEvent.click(
       wrapper.getByRole("option", { name: /test\-collection \(tc\)/i })
     );

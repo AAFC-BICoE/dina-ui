@@ -287,7 +287,7 @@ interface AddAttachmentsButtonProps {
   addingAttachmentsDisabled?: boolean;
   value: ResourceIdentifierObject[];
   onChange: (newMetadatas: ResourceIdentifierObject[]) => void;
-  buttonTextElement?: JSX.Element;
+  buttonTextElement?: React.JSX.Element;
   style?: CSSProperties;
   className?: string;
   removeMargin?: boolean;

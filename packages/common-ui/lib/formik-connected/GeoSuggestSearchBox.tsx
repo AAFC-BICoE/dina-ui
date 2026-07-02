@@ -131,7 +131,7 @@ export function GeoSuggestSearchBox({
         <div className="input-group">
           <input
             className="form-control"
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => setInputValue((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
             // Pressing enter should open the modal, not submit the form:
             onKeyDown={(e) => {
               if (e.keyCode === 13) {

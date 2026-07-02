@@ -65,7 +65,7 @@ export function StorageUnitBulkEditor({
     initialValues
   });
 
-  const bulkEditFormRef = useRef<FormikProps<InputResource<StorageUnit>>>(null);
+  const bulkEditFormRef = useRef<FormikProps<InputResource<StorageUnit>> | null>(null);
 
   const storageUnitHooks = getStorageUnitHooks(storageUnits);
 

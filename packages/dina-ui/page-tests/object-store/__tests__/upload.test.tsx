@@ -135,7 +135,7 @@ describe("Upload page", () => {
     });
 
     // Submit
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: "Continue with Batch Entry Form" })
     );
 
@@ -261,7 +261,7 @@ describe("Upload page", () => {
     });
 
     // Submit
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: "Continue with Workbook" })
     );
 
@@ -340,7 +340,7 @@ describe("Upload page", () => {
     }
   });
 
-  it("Only renders if the user belongs a group", () => {
+  it("Only renders if the user belongs a group", async () => {
     const wrapper = mountWithAppContext(<UploadPage />, {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });

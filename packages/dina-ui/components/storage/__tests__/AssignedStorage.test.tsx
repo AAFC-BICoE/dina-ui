@@ -91,7 +91,7 @@ describe("AssignedStorage component", () => {
     await waitFor(() => {
       expect(wrapper.getByRole("img")).toBeInTheDocument();
     });
-    userEvent.hover(wrapper.getByRole("img"));
+    await userEvent.hover(wrapper.getByRole("img"));
 
     expect(
       wrapper.getByRole("tooltip", {
@@ -111,7 +111,7 @@ describe("AssignedStorage component", () => {
     await waitFor(() => {
       expect(wrapper.getByRole("button")).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("button"));
+    await userEvent.click(wrapper.getByRole("button"));
 
     expect(mockOnChange).lastCalledWith({ id: null });
   });

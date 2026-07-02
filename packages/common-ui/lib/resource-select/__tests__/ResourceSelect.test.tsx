@@ -58,7 +58,7 @@ describe("ResourceSelect component", () => {
     optionLabel: (todo) => todo.name
   };
 
-  function mountWithContext(element: JSX.Element) {
+  function mountWithContext(element: React.JSX.Element) {
     return mountWithAppContext(element, { apiContext });
   }
 

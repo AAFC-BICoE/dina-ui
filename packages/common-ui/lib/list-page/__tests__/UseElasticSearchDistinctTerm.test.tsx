@@ -249,9 +249,9 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         },
         { params: { indexName: "dina-material-sample-index" } }
       );
-    });
 
-    expect(mockSearchResults).toBeCalledWith(["CNC"]);
+      expect(mockSearchResults).toBeCalledWith(["CNC"]);
+    });
   });
 
   describe("Error handling / Props not provided cases", () => {
@@ -359,8 +359,9 @@ describe("Use Elastic Search Distinct Term Hook", () => {
           },
           { params: { indexName: "dina-material-sample-index" } }
         );
+
+        expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
       });
-      expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
     });
   });
 });

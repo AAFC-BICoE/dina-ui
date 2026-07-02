@@ -92,35 +92,37 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
     });
 
     // Set the name for the new molecular analysis.
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /name/i }),
       "Test Molecular Analysis Name"
     );
 
     // Select the group using the dropdown.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", { name: /group select\.\.\./i })
     );
-    userEvent.click(wrapper.getByRole("option", { name: /aafc/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /aafc/i }));
 
     // Select the type of the molecular analysis.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", { name: /analysis type select or type/i })
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", {
         name: /high resolution mass spectrometry \(hrms\)/i
       })
     );
 
     // Select the protocol from the dropdown.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", { name: /protocol type here to search\./i })
     );
-    userEvent.click(wrapper.getByRole("option", { name: /protocol test 1/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /protocol test 1/i })
+    );
 
     // Perform save
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Expect the mock save to be called.
     await waitFor(() => {
@@ -189,29 +191,29 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
     });
 
     // Switch into edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
 
     // Set the name for the new molecular analysis.
-    userEvent.clear(wrapper.getByRole("textbox", { name: /name/i }));
-    userEvent.type(
+    await userEvent.clear(wrapper.getByRole("textbox", { name: /name/i }));
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /name/i }),
       "New Molecular Analysis Name"
     );
 
     // Select the type of the molecular analysis.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", {
         name: /analysis type gas chromatography coupled to low\-resolution mass spectrometry \(gcms\)/i
       })
     );
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("option", {
         name: /high resolution mass spectrometry \(hrms\)/i
       })
     );
 
     // Set the protocol to empty - remove the link.
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", { name: /protocol protocol test 2/i })
     );
     await waitFor(() => {
@@ -219,10 +221,10 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
         wrapper.getByRole("option", { name: /<none>/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
 
     // Perform save
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Expect the save request to contain the UUID and changes made.
     await waitFor(() => {

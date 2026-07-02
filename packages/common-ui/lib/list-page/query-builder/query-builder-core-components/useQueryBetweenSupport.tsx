@@ -172,7 +172,7 @@ export function useQueryBetweenSupport({
           }}
           onChangeRaw={(event) => {
             if (event?.type === "change") {
-              let newText = event.target.value;
+              let newText = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
               const dashOccurrences = newText.split("-").length - 1;
               if (newText.length === 8 && dashOccurrences === 0) {
                 newText =
@@ -200,7 +200,7 @@ export function useQueryBetweenSupport({
           name="low"
           className="form-control"
           value={betweenStates.low}
-          onChange={(event) => handleBetweenChange(event.target.value, "low")}
+          onChange={(event) => handleBetweenChange((event.target as HTMLTextAreaElement | HTMLInputElement).value, "low")}
           onKeyDown={onKeyDown}
         />
       )}
@@ -224,7 +224,7 @@ export function useQueryBetweenSupport({
           }}
           onChangeRaw={(event) => {
             if (event?.type === "change") {
-              let newText = event.target.value;
+              let newText = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
               const dashOccurrences = newText.split("-").length - 1;
               if (newText.length === 8 && dashOccurrences === 0) {
                 newText =
@@ -252,7 +252,7 @@ export function useQueryBetweenSupport({
           name="high"
           className="form-control"
           value={betweenStates.high}
-          onChange={(event) => handleBetweenChange(event.target.value, "high")}
+          onChange={(event) => handleBetweenChange((event.target as HTMLTextAreaElement | HTMLInputElement).value, "high")}
           onKeyDown={onKeyDown}
         />
       )}

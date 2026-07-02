@@ -7,7 +7,7 @@ import GraphReceiver from "./taxonomy/TaxonomicChart";
  * Renders the TaxonomicTreeNode to create the tree and the TaxonomicChart in the message provider.
  * This allows the tree and chart to communicate with each other and enable drilldown.
  *
- * @returns {JSX.Element} The rendered graph components.
+ * @returns {React.JSX.Element} The rendered graph components.
  */
 export default function TaxonomicDrilldown({ query }: { query: any }) {
   return (

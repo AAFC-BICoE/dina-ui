@@ -485,7 +485,7 @@ describe("collecting-event edit page", () => {
     });
 
     // Add a second assertion:
-    userEvent.click(wrapper.getByTestId("add-another-button"));
+    await userEvent.click(wrapper.getByTestId("add-another-button"));
 
     await waitFor(() => {
       expect(
@@ -494,7 +494,7 @@ describe("collecting-event edit page", () => {
     });
 
     // Make 2nd assertion primary:
-    userEvent.click(wrapper.getByRole("button", { name: /primary/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /primary/i }));
 
     // There should be 2 assertion tabs:
     expect(wrapper.getAllByRole("tab")).toHaveLength(2);
@@ -696,7 +696,7 @@ describe("collecting-event edit page", () => {
     });
 
     // Submit the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
       expect(mockPatch).toBeCalledTimes(1);

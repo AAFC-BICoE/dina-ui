@@ -26,7 +26,7 @@ describe("QueryLogicSwitchField component", () => {
     );
     // Simulate the click on the OR span (toggle logic switch)
     const orSpan = screen.getByText(/or/i); // Query the "OR" span element
-    userEvent.click(orSpan);
+    await userEvent.click(orSpan);
 
     // Wait for the async state change
     await waitFor(() => {

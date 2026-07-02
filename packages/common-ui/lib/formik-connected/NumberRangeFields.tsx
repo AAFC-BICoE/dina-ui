@@ -9,7 +9,7 @@ import { useMemo } from "react";
 export interface NumberRangeFieldsProps {
   /** Min and max field names. */
   names: [string, string];
-  labelMsg: JSX.Element;
+  labelMsg: React.JSX.Element;
 }
 
 export function NumberRangeFields({

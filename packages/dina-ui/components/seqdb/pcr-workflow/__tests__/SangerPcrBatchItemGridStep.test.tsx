@@ -484,7 +484,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
     });
 
     // Switch to edit mode.
-    userEvent.click(wrapper.getByRole("button", { name: /switch to edit/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /switch to edit/i })
+    );
 
     // Wait for edit mode buttons to appear
     await waitFor(() => {
@@ -494,7 +496,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     });
 
     // Clear the grid first, cannot move with items in the grid.
-    userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
 
     // Wait for grid to be cleared
     await waitFor(() => {
@@ -504,7 +506,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     });
 
     // Click the "Move All" button.
-    userEvent.click(wrapper.getByRole("button", { name: /move all/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /move all/i }));
 
     // Wait for items to be moved to grid (fill by column)
     await waitFor(() => {
@@ -525,10 +527,10 @@ describe("SangerPcrBatchItemGridStep component", () => {
     );
 
     // Click the fill by row and try moving it again.
-    userEvent.click(wrapper.getByRole("radio", { name: /row/i }));
+    await userEvent.click(wrapper.getByRole("radio", { name: /row/i }));
 
     // Clear the grid first, cannot move with items in the grid.
-    userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
 
     // Wait for grid to be cleared again
     await waitFor(() => {
@@ -538,7 +540,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     });
 
     // Click the "Move All" button.
-    userEvent.click(wrapper.getByRole("button", { name: /move all/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /move all/i }));
 
     // Wait for items to be moved to grid (fill by row)
     await waitFor(() => {
@@ -559,7 +561,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
     );
 
     // Save the container...
-    userEvent.click(wrapper.getByRole("button", { name: /perform save/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /perform save/i })
+    );
 
     // Wait for save operation to complete
     await waitFor(() => {
@@ -647,7 +651,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
     );
 
     // Switch to edit mode...
-    userEvent.click(wrapper.getByRole("button", { name: /switch to edit/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /switch to edit/i })
+    );
 
     // Wait for edit mode to activate
     await waitFor(() => {
@@ -657,7 +663,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     });
 
     // Click the "Clear all" button.
-    userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
 
     // Wait for grid to be cleared
     await waitFor(() => {
@@ -667,7 +673,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
     });
 
     // Save the container...
-    userEvent.click(wrapper.getByRole("button", { name: /perform save/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /perform save/i })
+    );
 
     // Wait for save operation to complete
     await waitFor(() => {

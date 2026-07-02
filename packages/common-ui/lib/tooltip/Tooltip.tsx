@@ -43,7 +43,7 @@ export interface TooltipProps {
   setVisible?: React.Dispatch<React.SetStateAction<boolean>>;
   visible?: boolean;
   className?: string;
-  directComponent?: JSX.Element | JSX.Element[];
+  directComponent?: React.JSX.Element | React.JSX.Element[];
 }
 
 export type tooltipPlacements = "top" | "bottom" | "left" | "right";

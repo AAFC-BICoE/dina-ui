@@ -6,13 +6,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import {
-  fireEvent,
-  waitFor,
-  waitForElementToBeRemoved,
-  screen,
-  within
-} from "@testing-library/react";
+import { fireEvent, waitFor, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
@@ -323,16 +317,16 @@ describe("Material Sample Edit Page", () => {
       ).toBeInTheDocument()
     );
 
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
       "2019-12-21T16:00"
     );
 
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
 
     // Saves the Collecting Event and the Material Sample:
@@ -408,17 +402,17 @@ describe("Material Sample Edit Page", () => {
     const combo = within(parentField as any).getByRole("combobox");
 
     // Open the dropdown and type to trigger the custom query (debounced in component).
-    userEvent.click(combo);
-    userEvent.type(combo, "parent");
+    await userEvent.click(combo);
+    await userEvent.type(combo, "parent");
 
     // Select the mocked parent option.
     const option = await within(parentField as any).findByText(
       /parent-sample-name/i
     );
-    userEvent.click(option);
+    await userEvent.click(option);
 
     // Save the form.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Expect save to be called and include the parentMaterialSample relationship.
     await waitFor(() => expect(mockSave).toHaveBeenCalled());
@@ -454,18 +448,18 @@ describe("Material Sample Edit Page", () => {
       ).toBeInTheDocument()
     );
 
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
 
     // Select an existing collecting event.
-    userEvent.click(wrapper.getByRole("button", { name: /select/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /select/i }));
     await waitFor(() =>
       expect(wrapper.getByRole("button", { name: /save/i })).toBeInTheDocument()
     );
 
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
     // Saves the Collecting Event and the Material Sample:
@@ -508,13 +502,15 @@ describe("Material Sample Edit Page", () => {
     ).toHaveDisplayValue("2021-04-13");
 
     // Update the Primary ID.
-    userEvent.clear(wrapper.getByRole("textbox", { name: /primary id/i }));
-    userEvent.type(
+    await userEvent.clear(
+      wrapper.getByRole("textbox", { name: /primary id/i })
+    );
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
 
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
     expect(mockSave.mock.calls).toEqual([
@@ -559,17 +555,19 @@ describe("Material Sample Edit Page", () => {
     );
 
     // Set the new Collecting Event's verbatimEventDateTime:
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
       "2019-12-21T16:00"
     );
-    userEvent.clear(wrapper.getByRole("textbox", { name: /primary id/i }));
-    userEvent.type(
+    await userEvent.clear(
+      wrapper.getByRole("textbox", { name: /primary id/i })
+    );
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
 
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
 
     // Saves the Collecting Event and the Material Sample:
@@ -637,7 +635,7 @@ describe("Material Sample Edit Page", () => {
     ).toHaveDisplayValue("2021-04-13");
 
     // Remove the existing Collecting Event.
-    userEvent.click(wrapper.getByRole("button", { name: /detach/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /detach/i }));
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
@@ -650,13 +648,13 @@ describe("Material Sample Edit Page", () => {
     ).toHaveDisplayValue("");
 
     // Set the new Collecting Event's verbatimEventDateTime:
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
       "2019-12-21T16:00"
     );
 
     // Set the additional collection numbers in the collecting event.
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", {
         name: "Additional Collection Numbers Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers. (One value per line) Write one value per line. Press enter while typing in the field to add a new line."
       }),
@@ -664,7 +662,7 @@ describe("Material Sample Edit Page", () => {
     );
 
     // Save
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
 
     expect(mockSave.mock.calls).toEqual([
@@ -884,13 +882,13 @@ describe("Material Sample Edit Page", () => {
     ).toBeInTheDocument();
 
     // Change the remark text.
-    userEvent.type(
+    await userEvent.type(
       wrapper.getAllByRole("textbox", { name: /remarks/i })[4],
       "New Remark"
     );
 
     // Save
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
     // Saves the Material Sample:
@@ -981,7 +979,7 @@ describe("Material Sample Edit Page", () => {
     });
 
     // Save
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
     // Nothing has changed, no requests expected.
     await waitFor(() => {
@@ -1005,7 +1003,7 @@ describe("Material Sample Edit Page", () => {
     // Wait for a moment before clicking for stability.
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", { name: /group select\.\.\./i })
     );
 
@@ -1013,10 +1011,10 @@ describe("Material Sample Edit Page", () => {
     await waitFor(() =>
       expect(wrapper.getByRole("option", { name: /aafc/i })).toBeInTheDocument()
     );
-    userEvent.click(wrapper.getByRole("option", { name: /aafc/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /aafc/i }));
 
     // Set the Primary ID.
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-material-sample-id"
     );
@@ -1036,7 +1034,7 @@ describe("Material Sample Edit Page", () => {
     );
 
     // Add a determination:
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
     await waitFor(() =>
@@ -1047,34 +1045,34 @@ describe("Material Sample Edit Page", () => {
       ).toBeInTheDocument()
     );
 
-    function fillOutDetermination(num: number) {
-      userEvent.type(
+    async function fillOutDetermination(num: number) {
+      await userEvent.type(
         wrapper.getByRole("textbox", {
           name: /verbatim scientific name × insert hybrid symbol/i
         }),
         `test-name-${num}`
       );
-      userEvent.type(
+      await userEvent.type(
         wrapper.getByRole("textbox", { name: /verbatim determiner/i }),
         `test-agent-${num}`
       );
     }
 
     // Enter the first determination:
-    fillOutDetermination(1);
+    await fillOutDetermination(1);
 
     // Enter the second determination:
     await waitFor(() => wrapper.getByTestId("add-another-button"));
-    userEvent.click(wrapper.getByTestId("add-another-button"));
-    fillOutDetermination(2);
+    await userEvent.click(wrapper.getByTestId("add-another-button"));
+    await fillOutDetermination(2);
 
     // Enter the third determination:
     await waitFor(() => wrapper.getByTestId("add-another-button"));
-    userEvent.click(wrapper.getByTestId("add-another-button"));
-    fillOutDetermination(3);
+    await userEvent.click(wrapper.getByTestId("add-another-button"));
+    await fillOutDetermination(3);
 
     await waitFor(() => wrapper.getByRole("button", { name: /save/i }));
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockOnSaved).toHaveBeenCalled());
 
     // Saves the Material Sample:
@@ -1207,7 +1205,7 @@ describe("Material Sample Edit Page", () => {
     });
   });
 
-  it("Creates the next material sample and provides a warning if they wish to duplicate storage unit usage", () => {
+  it("Creates the next material sample and provides a warning if they wish to duplicate storage unit usage", async () => {
     expect(
       nextSampleInitialValues({
         id: "123",
@@ -1244,7 +1242,7 @@ describe("Material Sample Edit Page", () => {
     });
   });
 
-  it("Creates the next material sample and provides a warning if they wish to duplicate attachments", () => {
+  it("Creates the next material sample and provides a warning if they wish to duplicate attachments", async () => {
     expect(
       nextSampleInitialValues({
         id: "123",
@@ -1291,13 +1289,15 @@ describe("Material Sample Edit Page", () => {
     );
 
     // Update the Primary ID.
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /primary id/i }),
       "test-duplicate-name"
     );
 
     // Attempt to save, error should be displayed.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
         wrapper.getByText(/1 : primary id \- duplicate primary id found/i)
@@ -1313,11 +1313,13 @@ describe("Material Sample Edit Page", () => {
     ).toBeInTheDocument();
 
     // You should not be able to submit the form until this error is resolved:
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => expect(mockOnSaved).toHaveBeenCalledTimes(0));
 
     // Click the "allow" button:
-    userEvent.click(wrapper.getByRole("button", { name: /allow duplicate/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /allow duplicate/i })
+    );
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", { name: /primary id/i })
@@ -1329,7 +1331,7 @@ describe("Material Sample Edit Page", () => {
     ).not.toHaveClass("is-invalid");
 
     // Submit the form with no errors:
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockOnSaved).lastCalledWith("11111111-1111-1111-1111-111111111111")
     );
@@ -1367,7 +1369,9 @@ describe("Material Sample Edit Page", () => {
     );
 
     // Click the search button to find from a material sample list
-    userEvent.click(wrapper.getByRole("button", { name: /search\.\.\./i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /search\.\.\./i })
+    );
     await waitFor(() =>
       expect(
         wrapper.getByRole("link", { name: /test name/i })
@@ -1380,7 +1384,7 @@ describe("Material Sample Edit Page", () => {
     ).toBeInTheDocument();
 
     // Select one sample from search result list
-    userEvent.click(wrapper.getByRole("button", { name: /select/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /select/i }));
     await waitForLoadingToDisappear();
 
     // Test name should be displayed.
@@ -1423,12 +1427,12 @@ describe("Material Sample Edit Page", () => {
     const remarkTextbox = within(tabpanel).getByRole("textbox", {
       name: /remarks/i
     });
-    userEvent.type(remarkTextbox, "Remarks Test");
+    await userEvent.type(remarkTextbox, "Remarks Test");
 
     // Leave the other required fields blank.
 
     // Attempt to save without filling in required fields:
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitForLoadingToDisappear();
 
     // Both required field errors should be displayed:
@@ -1478,13 +1482,13 @@ describe("Material Sample Edit Page", () => {
     );
 
     // Update the lifestage.
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /life stage/i }),
       "test lifestage"
     );
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockSave.mock.calls).toEqual([
         [
@@ -1627,29 +1631,35 @@ describe("Material Sample Edit Page", () => {
     if (!expandButtons || expandButtons.length !== 3) {
       fail("Missing 3 expand buttons in the organism section.");
     }
-    expandButtons.forEach((button) => {
-      userEvent.click(button);
+    expandButtons.forEach(async (button) => {
+      await userEvent.click(button);
     });
 
     // Edit the 3rd organism and leave the 2nd one alone to make sure new and old data is being removed:
+    await waitFor(() => {
+      expect(
+        wrapper.getAllByRole("textbox", {
+          name: /life stage/i
+        })[2]
+      ).toBeInTheDocument();
+    });
     const lastLifestageField = wrapper.getAllByRole("textbox", {
       name: /life stage/i
     })[2];
-    await waitFor(() => expect(lastLifestageField).toBeInTheDocument());
-    userEvent.clear(lastLifestageField);
-    userEvent.type(lastLifestageField, "This should be removed...");
+    await userEvent.clear(lastLifestageField);
+    await userEvent.type(lastLifestageField, "This should be removed...");
 
     // Reduce the organisms to 1:
-    userEvent.clear(
+    await userEvent.clear(
       wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
     );
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("spinbutton", { name: /organisms quantity/i }),
       "1"
     );
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockSave.mock.calls).toEqual([
         [
@@ -1736,7 +1746,7 @@ describe("Material Sample Edit Page", () => {
     ).toHaveDisplayValue("2");
 
     // Remove the first organism:
-    userEvent.click(
+    await userEvent.click(
       wrapper.getAllByRole("button", { name: /remove organism/i })[0]
     );
     await waitFor(() =>
@@ -1751,7 +1761,7 @@ describe("Material Sample Edit Page", () => {
     ).toHaveDisplayValue("1");
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockSave.mock.calls).toEqual([
         [
@@ -1832,11 +1842,11 @@ describe("Material Sample Edit Page", () => {
     expect(organismQuantity).toHaveDisplayValue("1");
 
     // Set to 0.
-    userEvent.clear(organismQuantity);
-    userEvent.type(organismQuantity, "0");
+    await userEvent.clear(organismQuantity);
+    await userEvent.type(organismQuantity, "0");
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockSave.mock.calls).toEqual([
         [
@@ -1911,10 +1921,10 @@ describe("Material Sample Edit Page", () => {
     expect(organismQuantity).toHaveDisplayValue("1");
 
     // Clear the Quantity field:
-    userEvent.clear(organismQuantity);
+    await userEvent.clear(organismQuantity);
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockSave.mock.calls).toEqual([
         [
@@ -1989,18 +1999,20 @@ describe("Material Sample Edit Page", () => {
     expect(organismQuantity).toHaveDisplayValue("1");
 
     // Change it to 3.
-    userEvent.clear(organismQuantity);
-    userEvent.type(organismQuantity, "3");
+    await userEvent.clear(organismQuantity);
+    await userEvent.type(organismQuantity, "3");
 
     // Update the life stage.
-    userEvent.clear(wrapper.getByRole("textbox", { name: /life stage/i }));
-    userEvent.type(
+    await userEvent.clear(
+      wrapper.getByRole("textbox", { name: /life stage/i })
+    );
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /life stage/i }),
       "common-life-stage"
     );
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockSave.mock.calls).toEqual([
         [
@@ -2134,17 +2146,19 @@ describe("Material Sample Edit Page", () => {
     // Expand the 3rd organism:
     const expandButtons =
       wrapper.container.querySelectorAll(".expand-organism");
-    userEvent.click(expandButtons[2]);
+    await userEvent.click(expandButtons[2]);
 
     // Edit the lifeStage field:
-    userEvent.clear(wrapper.getByRole("textbox", { name: /life stage/i }));
-    userEvent.type(
+    await userEvent.clear(
+      wrapper.getByRole("textbox", { name: /life stage/i })
+    );
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /life stage/i }),
       "lifestage 3 edited"
     );
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await wrapper.findByRole("button", { name: /save/i }); // Wait for the save button to re-enable or similar indicator of save completion
 
     // Saves the Material Sample with the organisms:
@@ -2263,12 +2277,12 @@ describe("Material Sample Edit Page", () => {
     ).toHaveAttribute("aria-checked", "true");
 
     // Switch 'Individual Entry' off:
-    userEvent.click(
+    await userEvent.click(
       wrapper.container.querySelector(".organismsIndividualEntry-field input")!
     );
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockSave.mock.calls).toEqual([
         // IsTarget should be reverted to null.
@@ -2392,15 +2406,15 @@ describe("Material Sample Edit Page", () => {
     // Expand the first organism section
     const expandButtons =
       wrapper.container.querySelectorAll(".expand-organism");
-    userEvent.click(expandButtons[0]);
+    await userEvent.click(expandButtons[0]);
 
     // Switch the first organism to be the target.
-    userEvent.click(
+    await userEvent.click(
       wrapper.container.querySelector(".organism_0__isTarget-field input")!
     );
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockSave.mock.calls).toEqual([
         // Since the first organism was toggled, the second organism should be false now.
@@ -2517,7 +2531,7 @@ describe("Material Sample Edit Page", () => {
     expect(wrapper.getByText(/person 1/i)).toBeInTheDocument();
 
     // Add a second Person to the primary Determination's determiners:
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", { name: /determining agents person 1/i })
     );
     await waitFor(() =>
@@ -2525,10 +2539,10 @@ describe("Material Sample Edit Page", () => {
         wrapper.getByRole("option", { name: /person 2/i })
       ).toBeInTheDocument()
     );
-    userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
+    await userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockSave.mock.calls).toEqual([
         // Updates the organism with the new determiners:
@@ -2618,11 +2632,11 @@ describe("Material Sample Edit Page", () => {
 
     // Set a new value for attribute 2:
     const attribute2 = wrapper.getByDisplayValue(/attribute 2 value/i);
-    userEvent.clear(attribute2);
-    userEvent.type(attribute2, "new attribute 2 value");
+    await userEvent.clear(attribute2);
+    await userEvent.type(attribute2, "new attribute 2 value");
 
     // Save the form
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() =>
       expect(mockSave.mock.calls).toEqual([
         [
@@ -2727,7 +2741,7 @@ describe("Material Sample Edit Page", () => {
     );
 
     // Add a determination:
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: /add new determination/i })
     );
 
@@ -2810,7 +2824,7 @@ describe("Material Sample Edit Page", () => {
       // No changes to the host organism
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() => expect(mockSave.mock.calls.length).toBe(0));
 
       // Expect no changes to hostOrganism in the save call
@@ -2852,16 +2866,16 @@ describe("Material Sample Edit Page", () => {
       const hostOrganismTextfield = wrapper.getByRole("textbox", {
         name: /name search/i
       });
-      userEvent.clear(hostOrganismTextfield);
-      userEvent.type(hostOrganismTextfield, "Updated host name");
+      await userEvent.clear(hostOrganismTextfield);
+      await userEvent.type(hostOrganismTextfield, "Updated host name");
 
       // Change the remarks field
       const remarksTextbox = wrapper.getByText(/original remarks/i);
-      userEvent.clear(remarksTextbox);
-      userEvent.type(remarksTextbox, "Update host remarks");
+      await userEvent.clear(remarksTextbox);
+      await userEvent.type(remarksTextbox, "Update host remarks");
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -2947,15 +2961,15 @@ describe("Material Sample Edit Page", () => {
       fireEvent.click(associationToggle[0]);
 
       // Are you sure popup, click "Yes".
-      userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
 
       // Wait for the loading to be removed.
-      await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
-      await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -3018,11 +3032,11 @@ describe("Material Sample Edit Page", () => {
       const hostOrganismTextfield = wrapper.getByRole("textbox", {
         name: /name search/i
       });
-      userEvent.clear(hostOrganismTextfield);
-      userEvent.type(hostOrganismTextfield, "New Host Organism");
+      await userEvent.clear(hostOrganismTextfield);
+      await userEvent.type(hostOrganismTextfield, "New Host Organism");
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -3098,7 +3112,7 @@ describe("Material Sample Edit Page", () => {
       // No changes to the geographic details
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() => expect(mockSave.mock.calls.length).toBe(0));
 
       // Expect no changes in the save call
@@ -3128,7 +3142,7 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Click the remove this place button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /remove this place/i })
       );
       await waitFor(() =>
@@ -3136,10 +3150,10 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Enter a search value:
-      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+      await userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
 
       // Click the search button.
-      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /search/i }));
       await waitFor(() =>
         expect(
           wrapper.getAllByRole("button", { name: "Select" })[0]
@@ -3147,7 +3161,9 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Click the first search option.
-      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: "Select" })[0]
+      );
       await waitFor(() =>
         expect(
           wrapper.getByRole("button", { name: /save/i })
@@ -3155,7 +3171,7 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -3233,7 +3249,7 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Click the remove this place button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /remove this place/i })
       );
       await waitFor(() =>
@@ -3241,10 +3257,10 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Enter a search value:
-      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+      await userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
 
       // Click the search button.
-      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /search/i }));
       await waitFor(() =>
         expect(
           wrapper.getAllByRole("button", { name: "Select" })[0]
@@ -3252,7 +3268,9 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Click the first search option.
-      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: "Select" })[0]
+      );
       await waitFor(() =>
         expect(
           wrapper.getByRole("textbox", { name: /custom place name/i })
@@ -3260,11 +3278,11 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Set a custom geographic place name:
-      userEvent.type(
+      await userEvent.type(
         wrapper.getByRole("textbox", { name: /custom place name/i }),
         "Neatby Building"
       );
-      userEvent.click(wrapper.getByTestId("addCustomPlaceNameButton"));
+      await userEvent.click(wrapper.getByTestId("addCustomPlaceNameButton"));
 
       // Wait for it to appear in the table:
       await waitFor(() =>
@@ -3274,7 +3292,7 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -3353,7 +3371,7 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Click the remove this place button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /remove this place/i })
       );
       await waitFor(() =>
@@ -3363,7 +3381,7 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -3405,10 +3423,10 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Enter a search value:
-      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+      await userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
 
       // Click the search button.
-      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /search/i }));
       await waitFor(() =>
         expect(
           wrapper.getAllByRole("button", { name: "Select" })[0]
@@ -3416,7 +3434,9 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Click the first search option.
-      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: "Select" })[0]
+      );
       await waitFor(() =>
         expect(
           wrapper.getByRole("button", { name: /save/i })
@@ -3424,7 +3444,7 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -3524,10 +3544,10 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Enter a search value:
-      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+      await userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
 
       // Click the search button.
-      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /search/i }));
       await waitFor(() =>
         expect(
           wrapper.getAllByRole("button", { name: "Select" })[0]
@@ -3535,7 +3555,9 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Click the first search option.
-      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: "Select" })[0]
+      );
       await waitFor(() =>
         expect(
           wrapper.getByRole("textbox", { name: /custom place name/i })
@@ -3543,11 +3565,11 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Set a custom geographic place name:
-      userEvent.type(
+      await userEvent.type(
         wrapper.getByRole("textbox", { name: /custom place name/i }),
         "Neatby Building"
       );
-      userEvent.click(wrapper.getByTestId("addCustomPlaceNameButton"));
+      await userEvent.click(wrapper.getByTestId("addCustomPlaceNameButton"));
 
       // Wait for it to appear in the table:
       await waitFor(() =>
@@ -3557,7 +3579,7 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -3658,10 +3680,10 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Enter a search value:
-      userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
+      await userEvent.type(wrapper.getByTestId("geographySearchBox"), "Ottawa");
 
       // Click the search button.
-      userEvent.click(wrapper.getByRole("button", { name: /search/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /search/i }));
       await waitFor(() =>
         expect(
           wrapper.getAllByRole("button", { name: "Select" })[0]
@@ -3669,7 +3691,9 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Click the first search option.
-      userEvent.click(wrapper.getAllByRole("button", { name: "Select" })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: "Select" })[0]
+      );
       await waitFor(() =>
         expect(
           wrapper.getByRole("button", { name: /save/i })
@@ -3677,7 +3701,7 @@ describe("Material Sample Edit Page", () => {
       );
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
@@ -3750,25 +3774,27 @@ describe("Material Sample Edit Page", () => {
       fireEvent.click(scheduledActionToggle[0]);
 
       // Enter an action type:
-      userEvent.type(
+      await userEvent.type(
         wrapper.getByRole("textbox", { name: /action type/i }),
         "Check Vouchers"
       );
 
       // Enter an action status:
-      userEvent.type(
+      await userEvent.type(
         wrapper.getByRole("textbox", { name: /action status/i }),
         "ongoing"
       );
 
       // Enter a date:
-      userEvent.type(
+      await userEvent.type(
         wrapper.getByPlaceholderText(/yyyy\-mm\-dd/i),
         "2025-05-19"
       );
 
       // Add the scheduled action.
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[0]
+      );
 
       // Verify it appears in the table.
       await waitFor(() => {
@@ -3777,7 +3803,7 @@ describe("Material Sample Edit Page", () => {
       });
 
       // Save the form
-      userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
       await waitFor(() =>
         expect(mockSave.mock.calls).toEqual([
           [
