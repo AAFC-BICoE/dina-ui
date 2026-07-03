@@ -18,7 +18,7 @@ export function AssociatedMaterialSampleSearchBoxField({
     return (
       value && (
         <ExternalLink href={`/collection/material-sample/view?id=${value?.id}`}>
-          {value?.materialSampleName}
+          {value?.materialSampleName || value?.id}
         </ExternalLink>
       )
     );
