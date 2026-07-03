@@ -2854,7 +2854,7 @@ commander@~3.0.2:
     fast-xml-parser "^4.5.4"
     flat "^5.0.2"
     formik "^2.2.7"
-    keycloak-js "24.0.4"
+    keycloak-js "25.0.6"
     kitsu "8.3.1"
     kitsu-core "8.3.1"
     lodash "^4.17.21"
@@ -5352,10 +5352,10 @@ jwt-decode@^4.0.0:
   resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-4.0.0.tgz#2270352425fd413785b2faf11f6e755c5151bd4b"
   integrity sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==
 
-keycloak-js@24.0.4:
-  version "24.0.4"
-  resolved "https://registry.yarnpkg.com/keycloak-js/-/keycloak-js-24.0.4.tgz#bfd78af853f0a45bb2f0b4dd24c135aef22cbab6"
-  integrity sha512-eLjG7CzGGgAXh78M76QUJy1R8+QDQvIJXJf6T3bq9VJZ6RXBGZXMsXvII66b83ueYDFa1gi2JojmA31Z23HO0g==
+keycloak-js@25.0.6:
+  version "25.0.6"
+  resolved "https://registry.yarnpkg.com/keycloak-js/-/keycloak-js-25.0.6.tgz#ea2e74d907f251c93080c6e2245d9d858bd4b329"
+  integrity sha512-Km+dc+XfNvY6a4az5jcxTK0zPk52ns9mAxLrHj7lF3V+riVYvQujfHmhayltJDjEpSOJ4C8a57LFNNKnNnRP2g==
   dependencies:
     js-sha256 "^0.11.0"
     jwt-decode "^4.0.0"
