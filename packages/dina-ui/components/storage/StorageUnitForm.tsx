@@ -165,11 +165,7 @@ export function StorageUnitFormFields({
             />
           )}
           {(!readOnly || initialValues.isGeneric) && (
-            <ToggleField
-              className="me-4"
-              name="isGeneric"
-              label={formatMessage("isGeneric")}
-            />
+            <ToggleField className="me-4" name="isGeneric" />
           )}
         </div>
       </div>
@@ -190,7 +186,19 @@ export function StorageUnitFormFields({
             />
           )}
         </div>
-        {!readOnly && (
+        {readOnly ? (
+          !reduceRendering && (
+            <div className="col-md-6">
+              <StorageLinkerField
+                name="parentStorageUnit"
+                targetType="storage-unit"
+                parentIdInURL={parentIdInURL}
+                currentStorageUnitUUID={initialValues.id}
+                createStorageMode={true}
+              />
+            </div>
+          )
+        ) : (
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
@@ -198,6 +206,19 @@ export function StorageUnitFormFields({
           />
         )}
       </div>
+      {!readOnly && !reduceRendering && (
+        <div className="row">
+          <div className="col-md-6">
+            <StorageLinkerField
+              name="parentStorageUnit"
+              targetType="storage-unit"
+              parentIdInURL={parentIdInURL}
+              currentStorageUnitUUID={initialValues.id}
+              createStorageMode={true}
+            />
+          </div>
+        </div>
+      )}
       <div className="row">
         <TextField
           className="col-md-6"
@@ -226,15 +247,6 @@ export function StorageUnitFormFields({
             materialSamples={materialSamplesQuery.response?.data}
           />
         )}
-      {!reduceRendering && (
-        <StorageLinkerField
-          name="parentStorageUnit"
-          targetType="storage-unit"
-          parentIdInURL={parentIdInURL}
-          currentStorageUnitUUID={initialValues.id}
-          createStorageMode={true}
-        />
-      )}
       {readOnly && (
         <StorageUnitChildrenViewer
           storageUnit={initialValues}

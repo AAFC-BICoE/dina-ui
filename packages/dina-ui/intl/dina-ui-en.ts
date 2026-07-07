@@ -690,6 +690,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   institution: "Institution",
   institutionListTitle: "Institutions",
   isFiledAs: "Filed As",
+  field_isGeneric: "Generic",
+  field_isGeneric_tooltip:
+    "Is the storage unit representing a generic instance of the storage unit type?",
   isTargetHeader: "Is Target ?",
   isolation: "Isolation",
   keepContentsTogether: "Keep Contents Together",
