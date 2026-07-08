@@ -12,7 +12,7 @@ import { ReactNode, useState } from "react";
 import useSWR from "swr";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { TbMapPinX } from "react-icons/tb";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
+import { FaArrowUpRightFromSquare, FaMagnifyingGlass } from "react-icons/fa6";
 interface GeographySearchBoxProps {
   inputValue: string;
   onInputChange: (value: string) => void;
@@ -166,6 +166,7 @@ export function GeographySearchBox({
             disabled={suggestButtonIsDisabled}
           >
             <DinaMessage id="searchButton" />
+            <FaMagnifyingGlass style={{ marginLeft: "0.3em" }} />
           </button>
         </div>
       </div>

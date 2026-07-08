@@ -18,6 +18,7 @@ import {
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { useState } from "react";
+import Switch from "react-switch";
 import { GeographySearchBox } from "./GeographySearchBox";
 
 export interface GeographyFormLayoutProps {
@@ -34,6 +35,8 @@ export function GeographyFormLayout({
   const { formatMessage } = useDinaIntl();
 
   const { readOnly, isTemplate } = useDinaFormContext();
+
+  const [manualMode, setManualMode] = useState(false);
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
   const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
@@ -274,6 +277,19 @@ export function GeographyFormLayout({
           maxHeight: 925
         }}
       >
+        {!readOnly && (
+          <div className="d-flex align-items-center justify-content-end mb-2">
+            <label className="me-2" htmlFor="manualGeographyInput">
+              <DinaMessage id="manual" />
+            </label>
+
+            <Switch
+              id="manualGeographyInput"
+              checked={manualMode}
+              onChange={(checked) => setManualMode(checked)}
+            />
+          </div>
+        )}
         <Field name="geographicPlaceNameSourceDetail">
           {({ field: { value: detail }, form }) =>
             detail ? (
