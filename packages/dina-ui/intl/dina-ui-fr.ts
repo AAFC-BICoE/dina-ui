@@ -18,6 +18,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addCustomPlaceName: "Ajouter",
   addDetermination: "Ajouter une détermination",
   addExistingStorageUnitAsChild: "Ajouter une unité de stockage existante",
+  addExistingStorageUnitAsChild_tooltip:
+    "Ajouter une unité de stockage existante comme enfant de cette unité de stockage.",
   addExternalResourceTitle: "Ajouter une nouvelle ressource externe",
   addFilesButton: "Ajouter des fichiers",
   addGroup: "Ajouter un groupe",
@@ -31,6 +33,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addMaterialSampleTypeTitle: "Ajouter un type d’échantillon de matière",
   addMetadataTitle: "Ajouter des métadonnées",
   addNewChildStorageUnit: "Ajouter une nouvelle unité de stockage pour enfant",
+  addNewChildStorageUnit_tooltip:
+    "Ajouter une nouvelle unité de stockage comme enfant de cette unité de stockage.",
   addNewElement: "Ajouter nouveau {typeName}",
   addNewPerson: "Ajouter nouvelle personne",
   addObjectSubtypeTitle: "Ajouter un nouveau sous-type d’objet",
@@ -631,6 +635,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   metersField_tooltip:
     "Utilisez les unités suivantes pour la conversion automatique : pi, po, pi po, vg, mm, cm, km",
   moveAllContent: "Déplacer tout le contenu",
+  moveAllContent_tooltip:
+    "Transférez tous les articles de rangement pour enfants et les échantillons dans le nouvel espace de rangement",
   multiple: "Multiple",
   multipleMaterialSamples: "Échantillons à matériel multiple",
   multipleUnits: "Multiples unités",
