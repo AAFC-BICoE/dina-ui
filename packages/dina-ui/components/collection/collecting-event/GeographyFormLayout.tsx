@@ -94,9 +94,14 @@ export function GeographyFormLayout({
 }: GeographyFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
 
-  const { readOnly, isTemplate } = useDinaFormContext();
+  const { readOnly, isTemplate, initialValues } = useDinaFormContext();
 
-  const [manualMode, setManualMode] = useState(false);
+  const [manualMode, setManualMode] = useState(
+    () =>
+      !initialValues?.geographicPlaceNameSourceDetail &&
+      !!initialValues?.dwcStateProvince &&
+      !!initialValues?.dwcCountry
+  );
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
   const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
