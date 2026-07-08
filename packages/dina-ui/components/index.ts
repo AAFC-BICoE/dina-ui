@@ -14,7 +14,6 @@ export * from "./collection/collecting-event/CollectingEventFormLayout";
 export * from "./collection/collecting-event/CollectingEventLinker";
 export * from "./collection/collecting-event/DeterminationField";
 export * from "./collection/collecting-event/GeographySearchBox";
-export * from "./collection/collecting-event/GeographySearchDialog";
 export * from "./collection/collecting-event/GeoReferenceAssertionRow";
 export * from "./collection/collecting-event/ParseVerbatimToRangeButton";
 export * from "./collection/collecting-event/useCollectingEvent";
