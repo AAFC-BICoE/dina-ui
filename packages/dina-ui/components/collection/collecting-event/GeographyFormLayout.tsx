@@ -27,6 +27,66 @@ export interface GeographyFormLayoutProps {
   setGeoSearchValue: (value: string) => void;
 }
 
+const MAX_SRC_ADMIN_LEVELS = 10;
+
+function templateCheckboxPath(fieldSuffix: string) {
+  return `templateCheckboxes['${COLLECTING_EVENT_COMPONENT_NAME}.current-geographic-place.${fieldSuffix}']`;
+}
+
+function setTemplateCheckboxes(
+  formik: FormikContextType<{}>,
+  fieldSuffixes: string[],
+  value: boolean
+) {
+  fieldSuffixes.forEach((suffix) =>
+    formik.setFieldValue(templateCheckboxPath(suffix), value)
+  );
+}
+
+function StateProvinceCountryFields({
+  stateProvinceName,
+  stateProvinceTemplateCheckboxName,
+  countryName,
+  countryTemplateCheckboxName,
+  readOnly
+}: {
+  stateProvinceName: string;
+  stateProvinceTemplateCheckboxName: string;
+  countryName: string;
+  countryTemplateCheckboxName: string;
+  readOnly: boolean;
+}) {
+  const { formatMessage } = useDinaIntl();
+  return (
+    <DinaFormSection horizontal={[3, 9]} readOnly={readOnly}>
+      <TextField
+        name={stateProvinceName}
+        templateCheckboxFieldName={stateProvinceTemplateCheckboxName}
+        label={formatMessage("stateProvinceLabel")}
+        readOnly={readOnly}
+      />
+      <TextField
+        name={countryName}
+        templateCheckboxFieldName={countryTemplateCheckboxName}
+        label={formatMessage("countryLabel")}
+        readOnly={readOnly}
+      />
+    </DinaFormSection>
+  );
+}
+
+function ManualStateProvinceCountryFields({ readOnly }: { readOnly: boolean }) {
+  return (
+    <StateProvinceCountryFields
+      stateProvinceName="dwcStateProvince"
+      stateProvinceTemplateCheckboxName="dwcStateProvince"
+      countryName="dwcCountry"
+      countryTemplateCheckboxName="dwcCountry"
+      readOnly={readOnly}
+    />
+  );
+}
+
 export function GeographyFormLayout({
   geoAssertionTabIdx,
   geoSearchValue,
@@ -91,16 +151,9 @@ export function GeographyFormLayout({
     );
     if (isTemplate) {
       // Include the hidden geographicPlaceNameSource and sourceUrl values in the enabled template fields:
-      formik.setFieldValue(
-        "templateCheckboxes['" +
-          COLLECTING_EVENT_COMPONENT_NAME +
-          ".current-geographic-place.geographicPlaceNameSource']",
-        true
-      );
-      formik.setFieldValue(
-        "templateCheckboxes['" +
-          COLLECTING_EVENT_COMPONENT_NAME +
-          ".current-geographic-place.geographicPlaceNameSourceDetail.sourceUrl']",
+      setTemplateCheckboxes(
+        formik,
+        ["geographicPlaceNameSource", `${commonSrcDetailRoot}.sourceUrl`],
         true
       );
     }
@@ -126,6 +179,9 @@ export function GeographyFormLayout({
     if (!searchResult?.address) {
       return adminLevels;
     }
+
+    // Determine the osm type for the admin levels. Must be a single letter.
+    const osmType = searchResult.osm_type.charAt(0).toUpperCase();
 
     // Go through each "address" available.
     for (const [key, value] of Object.entries(searchResult.address)) {
@@ -161,9 +217,6 @@ export function GeographyFormLayout({
       }
 
       if (value) {
-        // Determine the osm type for the admin level. Must be a single letter.
-        const osmType = searchResult.osm_type.charAt(0).toUpperCase();
-
         adminLevels.push({
           // Please note this is the TOP level ID.
           id: String(searchResult.osm_id),
@@ -184,48 +237,34 @@ export function GeographyFormLayout({
     // reset the source fields when user remove the place
     formik.setFieldValue(commonSrcDetailRoot, null);
     formik.setFieldValue("geographicPlaceNameSource", null);
-
     formik.setFieldValue("srcAdminLevels", null);
-
     formik.setFieldValue("selectedSections", null);
+    formik.setFieldValue("dwcStateProvince", null);
+    formik.setFieldValue("dwcCountry", null);
 
     if (isTemplate) {
       // Uncheck the templateCheckboxes in this form section:
-      formik.setFieldValue(
-        "templateCheckboxes['" +
-          COLLECTING_EVENT_COMPONENT_NAME +
-          ".current-geographic-place.geographicPlaceNameSource']",
+      const srcAdminLevelSuffixes = Array.from(
+        { length: MAX_SRC_ADMIN_LEVELS + 1 },
+        (_, idx) => `srcAdminLevels[${idx}]`
+      );
+      setTemplateCheckboxes(
+        formik,
+        [
+          "geographicPlaceNameSource",
+          `${commonSrcDetailRoot}.sourceUrl`,
+          `${commonSrcDetailRoot}.country`,
+          `${commonSrcDetailRoot}.stateProvince`,
+          ...srcAdminLevelSuffixes
+        ],
         false
       );
-      formik.setFieldValue(
-        "templateCheckboxes['" +
-          COLLECTING_EVENT_COMPONENT_NAME +
-          ".current-geographic-place.geographicPlaceNameSourceDetail.sourceUrl']",
-        false
-      );
-      formik.setFieldValue(
-        "templateCheckboxes['" +
-          COLLECTING_EVENT_COMPONENT_NAME +
-          ".current-geographic-place.geographicPlaceNameSourceDetail.country']",
-        false
-      );
-      formik.setFieldValue(
-        "templateCheckboxes['" +
-          COLLECTING_EVENT_COMPONENT_NAME +
-          ".current-geographic-place.geographicPlaceNameSourceDetail.stateProvince']",
-        false
-      );
-      for (let idx = 0; idx <= 10; idx++) {
-        formik.setFieldValue(
-          `templateCheckboxes['${COLLECTING_EVENT_COMPONENT_NAME}.current-geographic-place.srcAdminLevels[${idx}]']`,
-          false
-        );
-      }
     }
 
     setCustomPlaceValue("");
     setHideCustomPlace(true);
     setHideSelectionCheckBox(true);
+    setManualMode(false);
   }
 
   /** Does a Places search using the given search string. */
@@ -240,16 +279,17 @@ export function GeographyFormLayout({
   const addCustomPlaceName = (form) => {
     if (!customPlaceValue || customPlaceValue.length === 0) return;
     // Add user entered custom place in front
-    const customPlaceAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
-    customPlaceAsInSrcAdmnLevel.name = customPlaceValue;
-    customPlaceAsInSrcAdmnLevel.type = "place-section";
-    customPlaceAsInSrcAdmnLevel.shortId = 0;
-    customPlaceAsInSrcAdmnLevel.element = undefined;
-    customPlaceAsInSrcAdmnLevel.id = undefined;
+    const customPlaceAsInSrcAdmnLevel: SourceAdministrativeLevel = {
+      name: customPlaceValue,
+      type: "place-section",
+      shortId: 0,
+      element: undefined,
+      id: undefined
+    };
 
     const srcAdminLevels = form.values.srcAdminLevels;
 
-    srcAdminLevels.map((lev) => {
+    srcAdminLevels.forEach((lev) => {
       lev.shortId = lev.shortId + 1;
     });
     srcAdminLevels.unshift(customPlaceAsInSrcAdmnLevel);
@@ -340,20 +380,13 @@ export function GeographyFormLayout({
                   }
                   customPlaceValue={customPlaceValue}
                 />
-                <DinaFormSection horizontal={[3, 9]} readOnly={true}>
-                  <TextField
-                    name={`${commonSrcDetailRoot}.stateProvince.name`}
-                    templateCheckboxFieldName={`${commonSrcDetailRoot}.stateProvince`}
-                    label={formatMessage("stateProvinceLabel")}
-                    readOnly={true}
-                  />
-                  <TextField
-                    name={`${commonSrcDetailRoot}.country.name`}
-                    templateCheckboxFieldName={`${commonSrcDetailRoot}.country`}
-                    label={formatMessage("countryLabel")}
-                    readOnly={true}
-                  />
-                </DinaFormSection>
+                <StateProvinceCountryFields
+                  stateProvinceName={`${commonSrcDetailRoot}.stateProvince.name`}
+                  stateProvinceTemplateCheckboxName={`${commonSrcDetailRoot}.stateProvince`}
+                  countryName={`${commonSrcDetailRoot}.country.name`}
+                  countryTemplateCheckboxName={`${commonSrcDetailRoot}.country`}
+                  readOnly={true}
+                />
                 <div className="row">
                   {!readOnly && (
                     <div className="col-md-6">
@@ -377,7 +410,9 @@ export function GeographyFormLayout({
                   </div>
                 </div>
               </div>
-            ) : !readOnly ? (
+            ) : readOnly ? (
+              <ManualStateProvinceCountryFields readOnly={true} />
+            ) : (
               <>
                 <div className="d-flex align-items-center justify-content-end mb-2">
                   <label className="me-2" htmlFor="manualGeographyInput">
@@ -390,20 +425,7 @@ export function GeographyFormLayout({
                   />
                 </div>
                 {manualMode ? (
-                  <DinaFormSection horizontal={[3, 9]} readOnly={!manualMode}>
-                    <TextField
-                      name={`dwcStateProvince`}
-                      templateCheckboxFieldName={`dwcStateProvince`}
-                      label={formatMessage("stateProvinceLabel")}
-                      readOnly={!manualMode}
-                    />
-                    <TextField
-                      name={`dwcCountry`}
-                      templateCheckboxFieldName={`dwcCountry`}
-                      label={formatMessage("countryLabel")}
-                      readOnly={!manualMode}
-                    />
-                  </DinaFormSection>
+                  <ManualStateProvinceCountryFields readOnly={false} />
                 ) : (
                   <GeographySearchBox
                     inputValue={geoSearchValue}
@@ -471,7 +493,7 @@ export function GeographyFormLayout({
                   />
                 )}
               </>
-            ) : null
+            )
           }
         </Field>
       </div>
