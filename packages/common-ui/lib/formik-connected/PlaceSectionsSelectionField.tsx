@@ -28,7 +28,7 @@ export function PlaceSectionsSelectionField(
 
   const { values } = useFormikContext<any>();
 
-  const displayData = values.srcAdminLevels.map((opt, idx) => {
+  const displayData = values?.srcAdminLevels?.map((opt, idx) => {
     opt.type = "place-section";
     opt.shortId = idx;
     return opt;
@@ -110,6 +110,19 @@ export function PlaceSectionsSelectionField(
       ))}
     </div>
   );
+
+  if (!displayData || displayData.length === 0) {
+    return (
+      <FieldWrapper
+        {...placeFieldProps}
+        removeLabel={true}
+        readOnlyRender={defaultReadOnlyRender}
+        disableLabelClick={true}
+      >
+        {() => <></>}
+      </FieldWrapper>
+    );
+  }
 
   return (
     <FieldWrapper
