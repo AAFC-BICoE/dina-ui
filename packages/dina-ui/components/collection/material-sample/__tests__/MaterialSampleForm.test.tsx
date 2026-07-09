@@ -243,6 +243,18 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           }
         ]
       };
+    case "collection-api/collection":
+      return {
+        data: [
+          {
+            id: "collection-1-uuid",
+            type: "collection",
+            name: "Collection 1",
+            code: "COLL",
+            group: "test group"
+          }
+        ]
+      };
     default:
       return { data: [], meta: { totalResourceCount: 0 } };
   }
@@ -2749,6 +2761,99 @@ describe("Material Sample Edit Page", () => {
     await waitFor(() => {
       expect(within(tabpanel).getByText(/attribute 2/i)).toBeInTheDocument();
       expect(within(tabpanel).getByText(/attribute 3/i)).toBeInTheDocument();
+    });
+  });
+
+  describe("Use Next Identifer functionality", () => {
+    it("Use Next Identifier checkbox disabled if no collection is selected", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            id: "333",
+            group: "test-group",
+            materialSampleName: "test-ms"
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitForLoadingToDisappear();
+
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("checkbox", {
+            name: /use next available identifier/i
+          })
+        ).toBeInTheDocument()
+      );
+
+      // The Use Next Identifier checkbox should be disabled:
+      expect(
+        wrapper.getByRole("checkbox", {
+          name: /use next available identifier/i
+        })
+      ).toBeDisabled();
+    });
+
+    it("Use Next Identifier checkbox enabled if a collection is selected", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group"
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitForLoadingToDisappear();
+
+      // Select a collection:
+      const collectionSelect = wrapper.getByRole("combobox", {
+        name: /collection/i
+      });
+      await userEvent.click(collectionSelect);
+      await userEvent.click(
+        wrapper.getByRole("option", { name: /collection 1/i })
+      );
+
+      // The primary ID should be set to the collection's code.
+      await waitFor(() => {
+        expect(
+          wrapper.getByRole("textbox", { name: /primary id/i })
+        ).toHaveDisplayValue("COLL");
+      });
+
+      // The Use Next Identifier checkbox should be enabled:
+      const checkbox = wrapper.getByRole("checkbox", {
+        name: /use next available identifier/i
+      });
+      expect(checkbox).toBeEnabled();
+
+      // Click the checkbox to use the next available identifier:
+      await userEvent.click(checkbox);
+
+      // Submit the form, an API call should be made to determine the next available identifier.
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave).toHaveBeenCalledWith(
+          [
+            {
+              resource: {
+                amount: 1,
+                id: "collection-1-uuid",
+                type: "collection-sequence-generator"
+              },
+              type: "collection-sequence-generator"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api",
+            forceOperationMethod: "POST"
+          }
+        )
+      );
     });
   });
 
