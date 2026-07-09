@@ -804,7 +804,7 @@ export class ApiClientImpl implements ApiClientI {
     const resources: (TReturnNull extends true
       ? PersistedResource<T> | null
       : PersistedResource<T>)[] = (
-      await Promise.all(responses.map(deserialise))
+      await Promise.all(responses.map((response) => deserialise(response)))
     ).map((res) => res.data);
 
     for (const joinSpec of joinSpecs) {
