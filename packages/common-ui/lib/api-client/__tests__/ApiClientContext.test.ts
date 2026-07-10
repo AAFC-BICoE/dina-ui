@@ -346,7 +346,7 @@ describe("API client context", () => {
         }
       }));
 
-      const response = await save([
+      const response = await save<TestPcrPrimer>([
         {
           resource: {
             lotNumber: 1,
@@ -382,6 +382,51 @@ describe("API client context", () => {
           name: "testPrimer2",
           type: "pcrPrimer"
         }
+      ]);
+    });
+
+    it("Provides a save function that can create a single resource (single POST).", async () => {
+      mockPost.mockImplementationOnce(async (_url, body) => {
+        // Handle both single objects and arrays gracefully based on doOperations behavior
+        const dataArray = Array.isArray(body.data) ? body.data : [body.data];
+        return {
+          status: 201,
+          data: {
+            data: dataArray.map((r: any) => ({
+              id: "123",
+              type: r.type,
+              attributes: r.attributes
+            }))
+          }
+        };
+      });
+
+      const response = await save<TestPcrPrimer>([
+        {
+          resource: {
+            lotNumber: 1,
+            name: "singleTestPrimer",
+            type: "pcrPrimer"
+          } as TestPcrPrimer,
+          type: "pcrPrimer"
+        }
+      ]);
+
+      // Single POST is used
+      expect(mockPost).toHaveBeenCalledTimes(1);
+
+      // Asserts that a single resource targets the base collection endpoint
+      expect(mockPost.mock.calls[0][0]).toBe("/pcrPrimer");
+
+      expect(response).toEqual([
+        [
+          {
+            id: "123",
+            lotNumber: 1,
+            name: "singleTestPrimer",
+            type: "pcrPrimer"
+          }
+        ]
       ]);
     });
 
@@ -437,6 +482,51 @@ describe("API client context", () => {
       ]);
     });
 
+    it("Provides a save function that can update a single resource (single PATCH).", async () => {
+      mockPatch.mockImplementationOnce(async (_url, body) => {
+        const dataArray = Array.isArray(body.data) ? body.data : [body.data];
+        return {
+          status: 200,
+          data: {
+            data: dataArray.map((r: any) => ({
+              id: r.id,
+              type: r.type,
+              attributes: r.attributes
+            }))
+          }
+        };
+      });
+
+      const response = await save<TestPcrPrimer>([
+        {
+          resource: {
+            id: "123",
+            lotNumber: 1,
+            name: "singleTestPrimer edited",
+            type: "pcrPrimer"
+          } as TestPcrPrimer,
+          type: "pcrPrimer"
+        }
+      ]);
+
+      // Single PATCH is used
+      expect(mockPatch).toHaveBeenCalledTimes(1);
+
+      // Asserts that a single resource targets the specific resource ID endpoint
+      expect(mockPatch.mock.calls[0][0]).toBe("/pcrPrimer/123");
+
+      expect(response).toEqual([
+        [
+          {
+            id: "123",
+            lotNumber: 1,
+            name: "singleTestPrimer edited",
+            type: "pcrPrimer"
+          }
+        ]
+      ]);
+    });
+
     it("Provides a save function that can delete resources (single DELETE).", async () => {
       mockDelete.mockImplementationOnce(async () => ({
         status: 204
@@ -484,6 +574,144 @@ describe("API client context", () => {
 
       const [, body] = mockPatch.mock.calls[0];
       expect(body.data.meta).toBeUndefined();
+    });
+
+    it("Forces a single POST operation when forceOperationMethod is 'POST' on one resource with an ID.", async () => {
+      mockPost.mockImplementationOnce(async (_url, body) => {
+        const dataArray = Array.isArray(body.data) ? body.data : [body.data];
+        return {
+          status: 201,
+          data: {
+            data: dataArray.map((r: any) => ({
+              id: r.id,
+              type: r.type,
+              attributes: r.attributes
+            }))
+          }
+        };
+      });
+
+      const response = await save<TestPcrPrimer>(
+        [
+          {
+            resource: {
+              id: "123", // Would normally default to PATCH due to the ID
+              lotNumber: 1,
+              name: "forcedSinglePost",
+              type: "pcrPrimer"
+            } as TestPcrPrimer,
+            type: "pcrPrimer"
+          }
+        ],
+        { forceOperationMethod: "POST" }
+      );
+
+      expect(mockPost).toHaveBeenCalledTimes(1);
+      expect(mockPatch).not.toHaveBeenCalled();
+
+      // For a single operation, it uses the base collection route
+      expect(mockPost.mock.calls[0][0]).toBe("/pcrPrimer");
+
+      // Verifies the payload still contains the ID
+      const [, body] = mockPost.mock.calls[0];
+      const sentData = Array.isArray(body.data) ? body.data[0] : body.data;
+      expect(sentData.id).toBe("123");
+
+      expect(response).toEqual([
+        [
+          {
+            id: "123",
+            lotNumber: 1,
+            name: "forcedSinglePost",
+            type: "pcrPrimer"
+          }
+        ]
+      ]);
+    });
+
+    it("Forces a single PATCH operation when forceOperationMethod is 'PATCH' on one resource lacking an ID.", async () => {
+      mockPatch.mockImplementationOnce(async (_url, body) => {
+        const dataArray = Array.isArray(body.data) ? body.data : [body.data];
+        return {
+          status: 200,
+          data: {
+            data: dataArray.map((r: any) => ({
+              id: r.id,
+              type: r.type,
+              // Fallback to top-level fields if attributes isn't populated on r
+              attributes: {
+                lotNumber: r.attributes?.lotNumber ?? r.lotNumber,
+                name: r.attributes?.name ?? r.name,
+                ...r.attributes
+              }
+            }))
+          }
+        };
+      });
+
+      await save<TestPcrPrimer>(
+        [
+          {
+            resource: {
+              lotNumber: 2,
+              name: "forcedSinglePatch",
+              type: "pcrPrimer"
+            } as TestPcrPrimer,
+            type: "pcrPrimer"
+          }
+        ],
+        { forceOperationMethod: "PATCH" }
+      );
+
+      expect(mockPatch).toHaveBeenCalledTimes(1);
+      expect(mockPost).not.toHaveBeenCalled();
+
+      // The ID is left out of the URL path completely, hitting the base collection routing
+      expect(mockPatch.mock.calls[0][0]).toBe("/pcrPrimer");
+    });
+
+    it("Forces a single PATCH operation when forceOperationMethod is 'PATCH' on one resource that contains an ID.", async () => {
+      mockPatch.mockImplementationOnce(async (_url, body) => {
+        const dataArray = Array.isArray(body.data) ? body.data : [body.data];
+        return {
+          status: 200,
+          data: {
+            data: dataArray.map((r: any) => ({
+              id: r.id,
+              type: r.type,
+              // Fallback to top-level fields if attributes isn't populated on r
+              attributes: {
+                lotNumber: r.attributes?.lotNumber ?? r.lotNumber,
+                name: r.attributes?.name ?? r.name,
+                ...r.attributes
+              }
+            }))
+          }
+        };
+      });
+
+      await save<TestPcrPrimer>(
+        [
+          {
+            resource: {
+              id: "c2237873-fec8-47d9-8145-cd104b20d232",
+              lotNumber: 2,
+              name: "forcedSinglePatch",
+              type: "pcrPrimer"
+            } as TestPcrPrimer,
+            type: "pcrPrimer"
+          }
+        ],
+        { forceOperationMethod: "PATCH" }
+      );
+
+      expect(mockPatch).toHaveBeenCalledTimes(1);
+      expect(mockPost).not.toHaveBeenCalled();
+
+      // The ID should be in the route.
+      expect(mockPatch.mock.calls[0][0]).toBe(
+        "/pcrPrimer/c2237873-fec8-47d9-8145-cd104b20d232"
+      );
     });
   });
 
