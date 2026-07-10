@@ -971,7 +971,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeSavedSearch: "Remove Saved Search",
   areYouSureRemoveSavedSearch: "Are you sure you want to remove:",
   removeThisElement: "Remove This {typeName}",
-  removeThisPlaceLabel: " Remove this Place",
+  removeThisPlaceLabel: "Remove this Place",
   requiredField: "Required field",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   resetNamesToDefaultValues: "Reset Names to Default Values",

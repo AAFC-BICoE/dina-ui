@@ -430,7 +430,17 @@ export function GeographyFormLayout({
                   />
                 </div>
                 {manualMode ? (
-                  <ManualStateProvinceCountryFields readOnly={false} />
+                  <>
+                    <ManualStateProvinceCountryFields readOnly={false} />
+                    <div className="col-md-6">
+                      <FormikButton
+                        className="btn btn-dark w-100"
+                        onClick={(_, formik) => removeThisPlace(formik)}
+                      >
+                        <DinaMessage id="removeThisPlaceLabel" />
+                      </FormikButton>
+                    </div>
+                  </>
                 ) : (
                   <GeographySearchBox
                     inputValue={geoSearchValue}
