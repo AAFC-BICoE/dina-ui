@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "esnext",
     "module": "esnext",
     "jsx": "preserve",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
@@ -22,7 +21,8 @@
       "kitsu": [
         "./packages/common-ui/types/kitsu",
         "./packages/common-ui/types/react-table"
-      ]
+      ],
+      "packages/*": ["./packages/*"]
     },
     "allowJs": true,
     "strict": false,

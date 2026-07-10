@@ -755,7 +755,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   removeOrganism: "Supprimer l'organisme",
   removeSavedSearch: "Supprimer la recherche enregistrée",
   removeThisElement: "Supprimer cette {typeName}",
-  removeThisPlaceLabel: " Supprimer ce lieu",
+  removeThisPlaceLabel: "Supprimer ce lieu",
   requiredField: "Champ requis",
   resetMetadataEditorAttributesButtonText:
     "Réinitialiser à la disposition initiale des attributs",
