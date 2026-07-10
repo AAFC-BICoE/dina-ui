@@ -19,7 +19,8 @@ import {
   BreadcrumbBanner,
   GroupSelectField,
   StorageLinkerField,
-  StorageUnitChildrenViewer
+  StorageUnitChildrenViewer,
+  StorageActionMode
 } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import {
@@ -118,13 +119,20 @@ export interface StorageUnitFormFieldsProps {
   reduceRendering?: boolean;
 
   isBulkEditTabForm?: boolean;
+
+  /** Action mode for storage unit operations (Move All, Add Existing as Child). */
+  actionMode?: StorageActionMode;
+  /** Called when the user cancels an active action. */
+  onCancelAction?: () => void;
 }
 
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields({
   parentIdInURL,
   reduceRendering,
-  isBulkEditTabForm
+  isBulkEditTabForm,
+  actionMode,
+  onCancelAction
 }: StorageUnitFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
@@ -244,6 +252,8 @@ export function StorageUnitFormFields({
         <StorageUnitChildrenViewer
           storageUnit={initialValues}
           materialSamples={materialSamplesQuery?.response?.data}
+          actionMode={actionMode}
+          onCancelAction={onCancelAction}
         />
       )}
       {!readOnly && !reduceRendering && (

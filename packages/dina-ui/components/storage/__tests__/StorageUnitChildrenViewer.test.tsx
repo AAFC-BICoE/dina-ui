@@ -113,6 +113,9 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return { data: [{ id: "ms-1", type: "material-sample" }] };
     case "search-api/search-ws/mapping":
       return { data: MAPPING, meta: { totalResourceCount: 0 } };
+    case "collection-api/storage-unit":
+      // Fallback query when storageUnitChildren is undefined.
+      return { data: [], meta: { totalResourceCount: 0 } };
   }
 });
 
@@ -492,26 +495,18 @@ describe("StorageUnitChildrenViewer component", () => {
   });
 
   it("Lets you move an existing Storage Unit into this Storage Unit", async () => {
-    // Render a storage unit with no children:
-    const wrapper = mountWithAppContext(
+    // Render with ADD_EXISTING_AS_CHILD mode active
+    mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer
           storageUnit={storageUnitX}
           materialSamples={undefined}
+          actionMode="ADD_EXISTING_AS_CHILD"
+          onCancelAction={jest.fn()}
         />
         ,
       </DinaForm>,
       testCtx as any
-    );
-    await waitFor(() =>
-      expect(
-        wrapper.getByRole("button", { name: /add existing storage unit/i })
-      ).toBeInTheDocument()
-    );
-
-    // Click "Add Existing Storage Unit" button
-    await userEvent.click(
-      wrapper.getByRole("button", { name: /add existing storage unit/i })
     );
     await waitForLoadingToDisappear();
 

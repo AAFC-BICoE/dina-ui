@@ -21,6 +21,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addCustomPlaceName: "Add",
   addDetermination: "Add Determination",
   addExistingStorageUnitAsChild: "Add Existing Storage Unit",
+  addExistingStorageUnitAsChild_tooltip:
+    "Add an existing storage unit as a child of this storage unit.",
   addExternalResourceTitle: "Add New External Resource",
   addFilesButton: "Add Files",
   addFilterTooltip:
@@ -40,6 +42,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addMaterialSampleTypeTitle: "Add Material Sample Type",
   addMetadataTitle: "Add Metadata",
   addNewChildStorageUnit: "Add New Child Storage Unit",
+  addNewChildStorageUnit_tooltip:
+    "Add a new storage unit as a child of this storage unit.",
   addNewElement: "Add New {typeName}",
   addNewGroup: "Add New Group",
   addNewPerson: "Add New Person",
@@ -814,6 +818,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metersField_tooltip:
     "Use the following units for auto-conversion: ft, in, ft in, yd, mm, cm, km, pd, po, pd po.",
   moveAllContent: " Move All Content",
+  moveAllContent_tooltip:
+    "Move all child storage units and material samples to the new storage unit.",
   multiple: "Multiple",
   multipleMaterialSamples: "Multiple Material Samples",
   multipleUnits: "Multiple Units",

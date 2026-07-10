@@ -22,6 +22,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addCustomPlaceName: "Hinzufügen",
   addDetermination: "Bestimmung hinzufügen",
   addExistingStorageUnitAsChild: "existierende Lagerungseinheit hinzufügen",
+  addExistingStorageUnitAsChild_tooltip:
+    "Fügen Sie diesem Lagerraum eine bereits vorhandene Lagereinheit als untergeordnete Lagereinheit hinzu.",
   addExpeditionTitle: "Expedition hinzufügen",
   addExternalResourceTitle: "Neue externe Ressource hinzufügen",
   addFilesButton: "Datei hinzufügen",
@@ -36,6 +38,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addMaterialSampleTypeTitle: "Typ der Materialprobe hinzufügen",
   addMetadataTitle: "Metadaten hinzufügen",
   addNewChildStorageUnit: "Neue Lagerungseinheit (Nachfolger) hinzufügen",
+  addNewChildStorageUnit_tooltip:
+    "Fügen Sie dieser Lagereinheit eine neue Lagereinheit als untergeordnete Einheit hinzu.",
   addNewElement: "Neues {typeName} hinzufügen",
   addNewGroup: "Neue Gruppe hinzufügen",
   addNewPerson: "Neue Person hinzufügen",
@@ -857,6 +861,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   molecularAnalysisRunStep_sequencingRunContent:
     "Inhalt des Sequenzierungslaufs:",
   moveAllContent: "den gesamten Inhalt verschieben",
+  moveAllContent_tooltip:
+    "Alle Aufbewahrungseinheiten für Kinder und alle Materialproben werden in die neue Aufbewahrungseinheit verlegt.",
   multiple: "Mehrere",
   multipleMaterialSamples: "Mehrere Materialproben",
   multipleSamplesWellCoordinates:
