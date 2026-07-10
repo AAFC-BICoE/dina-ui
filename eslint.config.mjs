@@ -1,3 +1,4 @@
+import { FlatCompat } from "@eslint/eslintrc";
 import path from "path";
 import { fileURLToPath } from "url";
 import globals from "globals";
@@ -9,10 +10,15 @@ import nextPlugin from "@next/eslint-plugin-next";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
 const browserGlobals = { ...globals.browser };
 
-// Fix the problematic entry if it exists
+// Fix the problematic entry if it exists (note: removed extra space)
 if ('AudioWorkletGlobalScope' in browserGlobals) {
+  browserGlobals['AudioWorkletGlobalScope'] = browserGlobals['AudioWorkletGlobalScope'];
   delete browserGlobals['AudioWorkletGlobalScope'];
 }
 
@@ -25,16 +31,14 @@ const config = [
     },
     plugins: {
       '@typescript-eslint': tseslint.plugin,
-      '@next/next': nextPlugin,
-      jest: jest
+      jest: jest,
+      "@next/next": nextPlugin
     },
     rules: {
-      // Core TypeScript & Next.js rules
       ...tseslint.configs.recommended.rules,
       ...nextPlugin.configs.recommended.rules,
       ...nextPlugin.configs["core-web-vitals"].rules,
 
-      // Custom overrides
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "no-console": ["error", { allow: ["warn", "error"] }],
@@ -55,13 +59,7 @@ const config = [
       "import/no-anonymous-default-export": "off",
       "react/jsx-key": "off",
 
-      // Prettier formatting conflict overrides
       ...eslintConfigPrettier.rules,
-    },
-    settings: {
-      next: {
-        rootDir: __dirname,
-      },
     },
   },
   {
