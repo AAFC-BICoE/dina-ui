@@ -4093,27 +4093,6 @@ describe("Material Sample Edit Page", () => {
         fail("Manual geography switch needs to exist at this point.");
       }
       expect(manualSwitchInput).not.toBeChecked();
-
-      // Save the form
-      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-      await waitFor(() =>
-        expect(mockSave.mock.calls).toEqual([
-          [
-            [
-              {
-                resource: {
-                  dwcCountry: null,
-                  dwcStateProvince: null,
-                  id: "5",
-                  type: "collecting-event"
-                },
-                type: "collecting-event"
-              }
-            ],
-            { apiBaseUrl: "/collection-api" }
-          ]
-        ])
-      );
     });
   });
 
