@@ -504,6 +504,9 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Diese Bestimmung als abgelegt markieren. Nur eine Bestimmung kann als abgelegt markiert werden.",
   field_isInseperable: "Inhalt zusammen halten",
   field_isInseperable_tooltip: "Inhalte sind unzerteilbar",
+  field_isGeneric: "Generische",
+  field_isGeneric_tooltip:
+    "Ist die Speichereinheit eine generische Instanz des Speichereinheitstyps?",
   field_isPrimary_tooltip:
     "Diese Bestimmung als primäre Daten im Export markieren. Nur eine Bestimmung kann primär sein.",
   field_isRestricted: "Ist eingeschränkt",

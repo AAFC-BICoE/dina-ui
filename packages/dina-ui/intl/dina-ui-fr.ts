@@ -366,6 +366,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_id: "ID",
   field_isFiledAs_tooltip:
     'Classé en tant que (ajouter cette détermination). Une seule détermination peut être inscrite comme "Classé en tant que".',
+  field_isGeneric: "Générique",
+  field_isGeneric_tooltip:
+    "Est-ce que l'unité de stockage représente une instance générique du type d'unité de stockage ?",
   field_isInseperable: "Garder les contenus ensemble",
   field_isInseperable_tooltip: "Les contenus sont inséparables",
   field_isPrimary_tooltip:

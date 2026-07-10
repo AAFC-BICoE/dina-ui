@@ -269,6 +269,7 @@ export function StorageUnitContents({
             storageUnit.storageUnitChildren as PersistedResource<StorageUnit>[]
           }
           disabled={true}
+          parentId={storageUnit.id}
         />
       </div>
       {!storageUnit.isGeneric && (
