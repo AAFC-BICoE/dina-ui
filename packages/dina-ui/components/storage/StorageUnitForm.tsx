@@ -16,6 +16,7 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import * as yup from "yup";
 import {
+  BreadcrumbBanner,
   GroupSelectField,
   StorageLinkerField,
   StorageUnitChildrenViewer
@@ -150,10 +151,27 @@ export function StorageUnitFormFields({
     }
   );
 
+  // Build the hierarchy path (bottom-up: [self, parent, ...]).
+  // Reverse to top-down so ancestors come first, current unit last.
+  const hierarchyPath = initialValues?.hierarchy?.length
+    ? [...initialValues.hierarchy].reverse()
+    : [];
+
   return materialSamplesQuery.loading ? (
     <LoadingSpinner loading={true} />
   ) : (
     <div>
+      {readOnly && (
+        <BreadcrumbBanner
+          items={hierarchyPath.map((item, index) => ({
+            href:
+              index < hierarchyPath.length - 1
+                ? `/collection/storage-unit/view?id=${item.uuid}`
+                : undefined,
+            label: `${item.name} (${item.typeName})`
+          }))}
+        />
+      )}
       <div className="row">
         <div className="col-md-6 d-flex">
           {!readOnly && !initialValues.id && !isBulkEditTabForm && (
@@ -186,19 +204,7 @@ export function StorageUnitFormFields({
             />
           )}
         </div>
-        {readOnly ? (
-          !reduceRendering && (
-            <div className="col-md-6">
-              <StorageLinkerField
-                name="parentStorageUnit"
-                targetType="storage-unit"
-                parentIdInURL={parentIdInURL}
-                currentStorageUnitUUID={initialValues.id}
-                createStorageMode={true}
-              />
-            </div>
-          )
-        ) : (
+        {!readOnly && (
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
@@ -206,19 +212,6 @@ export function StorageUnitFormFields({
           />
         )}
       </div>
-      {!readOnly && !reduceRendering && (
-        <div className="row">
-          <div className="col-md-6">
-            <StorageLinkerField
-              name="parentStorageUnit"
-              targetType="storage-unit"
-              parentIdInURL={parentIdInURL}
-              currentStorageUnitUUID={initialValues.id}
-              createStorageMode={true}
-            />
-          </div>
-        </div>
-      )}
       <div className="row">
         <TextField
           className="col-md-6"
@@ -252,6 +245,19 @@ export function StorageUnitFormFields({
           storageUnit={initialValues}
           materialSamples={materialSamplesQuery?.response?.data}
         />
+      )}
+      {!readOnly && !reduceRendering && (
+        <div className="row">
+          <div className="col-md-6">
+            <StorageLinkerField
+              name="parentStorageUnit"
+              targetType="storage-unit"
+              parentIdInURL={parentIdInURL}
+              currentStorageUnitUUID={initialValues.id}
+              createStorageMode={true}
+            />
+          </div>
+        </div>
       )}
       {readOnly && (
         <div className="row">

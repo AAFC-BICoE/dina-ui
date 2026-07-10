@@ -1,5 +1,6 @@
 export * from "./person/PersonForm";
 export * from "./person/PersonFormFields";
+export * from "./breadcrumb/BreadcrumbBanner";
 export * from "./bulk-edit/useBulkEditTab";
 export * from "./bulk-edit/BulkEditTabWarning";
 export * from "./bulk-material-sample/ExistingMaterialSampleBulkEditor";
