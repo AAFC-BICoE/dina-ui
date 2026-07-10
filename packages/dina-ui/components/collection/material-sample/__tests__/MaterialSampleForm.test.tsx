@@ -444,6 +444,7 @@ describe("Material Sample Edit Page", () => {
     fireEvent.click(collectingEventToggle[0]);
 
     await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /select/i })
