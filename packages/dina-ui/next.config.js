@@ -10,6 +10,7 @@ const appVersion = `${require("./package.json").version}${
 }`;
 
 const path = require("path");
+const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -26,6 +27,15 @@ const nextConfig = {
       ...config.resolve.alias,
       "@": path.resolve(__dirname)
     };
+
+    // Force Webpack to fall back to the root tsconfig path mappings
+    config.resolve.plugins = [
+      ...(config.resolve.plugins || []),
+      new TsconfigPathsPlugin({
+        configFile: path.join(__dirname, "../../tsconfig.json")
+      })
+    ];
+
     return config;
   }
 };
