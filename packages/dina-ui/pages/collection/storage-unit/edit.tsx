@@ -19,7 +19,10 @@ export function useStorageUnit(id?: string) {
   return useQuery<StorageUnit>(
     {
       path: `collection-api/storage-unit/${id}`,
-      include: "storageUnitType,parentStorageUnit"
+      include: "storageUnitType,parentStorageUnit",
+      optfields: {
+        "storage-unit": "hierarchy"
+      }
     },
     {
       disabled: !id,
@@ -30,7 +33,7 @@ export function useStorageUnit(id?: string) {
           idField: "parentStorageUnit.id",
           joinField: "parentStorageUnit",
           path: (storageUnit) =>
-            `storage-unit/${storageUnit.parentStorageUnit?.id}`
+            `storage-unit/${storageUnit.parentStorageUnit?.id}?optfields[storage-unit]=hierarchy`
         }
       ]
     }
@@ -44,7 +47,10 @@ export function useStorageUnits(ids: string[]) {
   return useBulkQueries<StorageUnit>(
     ids.map((id) => ({
       path: `collection-api/storage-unit/${id}`,
-      include: "storageUnitType,parentStorageUnit"
+      include: "storageUnitType,parentStorageUnit",
+      optfields: {
+        "storage-unit": "hierarchy"
+      }
     })),
     {
       joinSpecs: [
@@ -53,7 +59,7 @@ export function useStorageUnits(ids: string[]) {
           idField: "parentStorageUnit.id",
           joinField: "parentStorageUnit",
           path: (storageUnit) =>
-            `storage-unit/${storageUnit.parentStorageUnit?.id}`
+            `storage-unit/${storageUnit.parentStorageUnit?.id}?optfields[storage-unit]=hierarchy`
         }
       ]
     }

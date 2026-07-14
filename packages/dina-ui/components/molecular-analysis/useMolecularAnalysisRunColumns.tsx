@@ -226,7 +226,7 @@ export function useMolecularAnalysisRunColumns({
             value={original.molecularAnalysisRunItem?.name}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               if (original.materialSampleId) {
-                handleNameChange(original.materialSampleId, event.target.value);
+                handleNameChange(original.materialSampleId, (event.target as HTMLTextAreaElement | HTMLInputElement).value);
               }
             }}
           />
@@ -333,11 +333,11 @@ export function useMolecularAnalysisRunColumns({
                       molecularAnalysisRunItemNames;
                     if (
                       original?.materialSampleSummary?.id &&
-                      event.target.value
+                      (event.target as HTMLTextAreaElement | HTMLInputElement).value
                     ) {
                       molecularAnalysisRunItemNamesMap[
                         original?.materialSampleSummary?.id
-                      ] = event.target.value;
+                      ] = (event.target as HTMLTextAreaElement | HTMLInputElement).value;
                     }
                     return molecularAnalysisRunItemNamesMap;
                   }
@@ -966,7 +966,7 @@ export function useMolecularAnalysisRunColumns({
       const molecularAnalysisRunItemNamesMap = molecularAnalysisRunItemNames;
       if (original?.materialSampleSummary?.id) {
         molecularAnalysisRunItemNamesMap[original?.materialSampleSummary?.id] =
-          event.target.value;
+          (event.target as HTMLTextAreaElement | HTMLInputElement).value;
       }
       return molecularAnalysisRunItemNamesMap;
     };

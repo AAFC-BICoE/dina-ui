@@ -75,7 +75,7 @@ function GroupLabelsEditorInner({
                     return (
                       <input
                         className="form-control"
-                        onChange={(event) => setValue(event.target.value)}
+                        onChange={(event) => setValue((event.target as HTMLTextAreaElement | HTMLInputElement).value)}
                         value={value || ""}
                       />
                     );

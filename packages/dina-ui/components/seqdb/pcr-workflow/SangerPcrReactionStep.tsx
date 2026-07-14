@@ -1,9 +1,13 @@
-import { DinaForm, LoadingSpinner, useApiClient } from "common-ui";
+import {
+  DinaForm,
+  ExternalLink,
+  LoadingSpinner,
+  useApiClient
+} from "common-ui";
 import { FormikProps } from "formik";
 import { Ref, useEffect, useRef } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { PcrReactionTable, usePcrReactionData } from "./PcrReactionTable";
-import Link from "next/link";
 import { AttachmentsField } from "../../object-store/attachment-list/AttachmentsField";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { InputResource, PersistedResource } from "kitsu";
@@ -144,13 +148,12 @@ export function SangerPcrReactionStep({
       {!editMode && (
         <div className="row mb-3">
           <div className="col-12 text-end">
-            <Link
+            <ExternalLink
               href={`/seqdb/pcr-workflow/worksheet?id=${pcrBatchId}`}
-              target="_blank"
               className="btn btn-primary"
             >
-              Worksheet
-            </Link>
+              <DinaMessage id="worksheet" />
+            </ExternalLink>
           </div>
         </div>
       )}

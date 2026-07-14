@@ -177,7 +177,10 @@ const SYNONYMS_MAP_BY_TYPE = new Map<string, Map<string, string>>([
         "longitude",
         "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
       ],
-      ["collecting event remarks", "collectingEvent.remarks"]
+      ["collecting event remarks", "collectingEvent.remarks"],
+      ["province", "collectingEvent.dwcStateProvince"],
+      ["state", "collectingEvent.dwcStateProvince"],
+      ["country", "collectingEvent.dwcCountry"]
     ])
   ],
   [
@@ -618,7 +621,10 @@ export function getDataFromWorkbook(
       const fieldMap = fieldMaps[index];
       if (!fieldMap?.skipped) {
         if (fieldMap.targetKey) {
-          if ("vocabularyElementType" in fieldMap.targetKey) {
+          if (
+            "vocabularyElementType" in fieldMap.targetKey &&
+            !!fieldMap.targetKey.vocabularyElementType
+          ) {
             const managedAttributes: { [key: string]: any } =
               rowData[fieldMap.targetField!] ?? {};
             let value: any;

@@ -64,22 +64,24 @@ describe("TagSelectField", () => {
       })
     ).toBeInTheDocument();
 
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("combobox", {
         name: /tags type new tag or search previous tags/i
       })
     );
 
     // Test expected combobox options
-    expect(
-      wrapper.getByRole("option", { name: /example\-tag\-1/i })
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("option", { name: /example\-tag\-2/i })
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("option", { name: /example\-tag\-3/i })
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        wrapper.getByRole("option", { name: /example\-tag\-1/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("option", { name: /example\-tag\-2/i })
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("option", { name: /example\-tag\-3/i })
+      ).toBeInTheDocument();
+    });
   });
 
   it("Lets you type in new tags.", async () => {

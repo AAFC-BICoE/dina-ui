@@ -6,10 +6,10 @@ import {
 } from "../..";
 import { MetadataFileView } from "../metadata/MetadataFileView";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { Derivative } from "../../../types/objectstore-api";
+import { Derivative, Metadata } from "../../../types/objectstore-api";
 import { useDerivativeSave } from "../metadata/useMetadata";
 import { DCTYPE_OPTIONS } from "../../../pages/object-store/metadata/edit";
-import { ReactNode, Ref } from "react";
+import { ReactNode, Ref, useMemo } from "react";
 import { InputResource } from "kitsu";
 import { FormikProps } from "formik";
 import MetadataBadges from "../metadata/MetadataBadges";
@@ -29,6 +29,8 @@ export interface MetadataFormProps {
 
   // Form ref from parent component
   derivativeFormRef?: Ref<FormikProps<InputResource<Derivative>>>;
+
+  defaultToNotReleasable?: boolean;
 }
 
 export function DerivativeForm({
@@ -36,7 +38,8 @@ export function DerivativeForm({
   onSaved,
   buttonBar,
   derivativeSaveHook,
-  derivativeFormRef
+  derivativeFormRef,
+  defaultToNotReleasable
 }: MetadataFormProps) {
   const { formatMessage } = useIntl();
 
@@ -48,13 +51,39 @@ export function DerivativeForm({
   const { initialValues, onSubmit } =
     derivativeSaveHook ?? derivativeSaveResponse;
 
+  const inheritedPubliclyReleasable = useMemo(() => {
+    if (defaultToNotReleasable !== undefined) {
+      return !defaultToNotReleasable;
+    }
+
+    const parent = (derivative as Derivative)?.acDerivedFrom as
+      | Metadata
+      | undefined;
+    if (!parent) return undefined;
+    if (
+      parent.publiclyReleasable === false ||
+      parent.notPubliclyReleasableReason
+    ) {
+      return false;
+    }
+    if (parent.publiclyReleasable === true) {
+      return true;
+    }
+    return undefined;
+  }, [derivative, defaultToNotReleasable]);
+
   const derivativeOnSubmit = async (submittedValues) => {
     await onSubmit(submittedValues);
   };
 
   return (
     <DinaForm<InputResource<Derivative>>
-      initialValues={{ ...initialValues, type: "derivative" }}
+      initialValues={{
+        ...initialValues,
+        type: "derivative",
+        publiclyReleasable:
+          initialValues.publiclyReleasable ?? inheritedPubliclyReleasable
+      }}
       onSubmit={derivativeOnSubmit}
       innerRef={
         derivativeFormRef as Ref<FormikProps<InputResource<Derivative>>>

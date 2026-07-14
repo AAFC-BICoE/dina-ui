@@ -264,8 +264,8 @@ export function GlobalNamesSearchBox({
                 <input
                   aria-label={formatMessage("globalNameSearchLabel")}
                   className="form-control global-name-input"
-                  onChange={(e) => onInputChange(e.target.value)}
-                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => onInputChange((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
+                  onFocus={(e) => (e.target as HTMLInputElement).select()}
                   onKeyDown={(e) => {
                     if (e.keyCode === 13) {
                       e.preventDefault();
@@ -341,8 +341,8 @@ export function GlobalNamesSearchBox({
               <input
                 aria-label={formatMessage("colSearchLabel")}
                 className="form-control global-name-input"
-                onChange={(e) => onInputChange(e.target.value)}
-                onFocus={(e) => e.target.select()}
+                onChange={(e) => onInputChange((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
+                onFocus={(e) => (e.target as HTMLInputElement).select()}
                 onKeyDown={(e) => {
                   if (e.keyCode === 13) {
                     e.preventDefault();

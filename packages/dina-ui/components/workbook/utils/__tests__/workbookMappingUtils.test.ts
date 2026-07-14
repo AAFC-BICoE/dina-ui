@@ -622,6 +622,68 @@ describe("workbookMappingUtils functions", () => {
     });
   });
 
+  describe("targetKey branching", () => {
+    test("identifier with null vocabularyElementType uses key branch, not managed attribute branch", () => {
+      const result = getDataFromWorkbook(
+        {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              { rowNumber: 0, content: ["CatNum"] },
+              { rowNumber: 1, content: ["CAT-123"] }
+            ]
+          }
+        } as WorkbookJSON,
+        0,
+        [
+          {
+            targetField: "identifiers",
+            skipped: false,
+            columnHeader: "CatNum",
+            targetKey: {
+              key: "catalog-number",
+              type: "controlled-vocabulary-item",
+              vocabularyElementType: null
+            } as any
+          }
+        ]
+      );
+      expect(result).toEqual([
+        { identifiers: { "catalog-number": "CAT-123" } }
+      ]);
+    });
+
+    test("managed attribute with vocabularyElementType=STRING still works", () => {
+      const result = getDataFromWorkbook(
+        {
+          "0": {
+            sheetName: "Sheet1",
+            rows: [
+              { rowNumber: 0, content: ["Attr"] },
+              { rowNumber: 1, content: ["attr-value"] }
+            ]
+          }
+        } as WorkbookJSON,
+        0,
+        [
+          {
+            targetField: "managedAttributes",
+            skipped: false,
+            columnHeader: "Attr",
+            targetKey: {
+              key: "some-attr",
+              type: "controlled-vocabulary-item",
+              vocabularyElementType: "STRING"
+            } as any
+          }
+        ]
+      );
+      expect(result).toEqual([
+        { managedAttributes: { "some-attr": "attr-value" } }
+      ]);
+    });
+  });
+
   it("isNumber", () => {
     expect(isNumber("111")).toBeTruthy();
     expect(isNumber("adf")).toBeFalsy();

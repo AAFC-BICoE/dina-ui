@@ -27,9 +27,9 @@ export interface ManagedAttributeFormProps {
   router: NextRouter;
   apiBaseUrl: string;
   postSaveRedirect: string;
-  backButton: JSX.Element;
+  backButton: React.JSX.Element;
   /** Optionally render a "managedAttributeComponent field." */
-  componentField?: JSX.Element;
+  componentField?: React.JSX.Element;
   withGroup?: boolean;
 }
 
@@ -121,7 +121,7 @@ export function ManagedAttributeForm({
 }
 
 export interface ManagedAttributeFormLayoutLayoutProps {
-  componentField?: JSX.Element;
+  componentField?: React.JSX.Element;
   withGroup?: boolean;
 }
 

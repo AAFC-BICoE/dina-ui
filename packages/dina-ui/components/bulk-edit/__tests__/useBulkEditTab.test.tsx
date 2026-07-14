@@ -64,7 +64,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     bulkEditFormRef;
     bulkEditSampleHook;
     sampleHooks: any;
-    materialSampleForm: JSX.Element;
+    materialSampleForm: React.JSX.Element;
     formTemplateProps: Partial<MaterialSampleFormProps>;
   } = useRefHookFormProps(
     [baseSample],

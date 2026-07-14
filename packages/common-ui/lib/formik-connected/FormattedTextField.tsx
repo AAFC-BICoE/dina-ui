@@ -61,7 +61,9 @@ export function FormattedTextField(props: FormattedTextFieldProps) {
     <FieldWrapper {...labelWrapperProps}>
       {({ setValue, value, invalid }) => {
         const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-          const formatted = formatDateTimeMask(event.target.value);
+          const formatted = formatDateTimeMask(
+            (event.target as HTMLTextAreaElement | HTMLInputElement).value
+          );
           // Standardizing empty strings to null matches modern form data expectations
           setValue(formatted === "" ? null : formatted);
         };

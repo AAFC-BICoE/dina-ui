@@ -26,7 +26,7 @@ export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   /** FieldSet id */
   fieldSetId: string;
   /** FieldSet legend */
-  legend: JSX.Element;
+  legend: React.JSX.Element;
   hideLinkerTab?: boolean;
 }
 

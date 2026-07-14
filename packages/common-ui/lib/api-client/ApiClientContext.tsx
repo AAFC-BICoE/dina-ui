@@ -77,7 +77,15 @@ export interface DoOperationsOptions {
   /** Return null for missing resource instead of throwing an Error. */
   returnNullForMissingResource?: boolean;
 
-  overridePatchOperation?: boolean;
+  /**
+   * Force the operation method to be PATCH or POST instead of the default behavior of using PATCH
+   * for resources with an ID and POST for resources without an ID.
+   *
+   * Forcing POST will remove the /{id} part of the URL but still include it in the request body.
+   *
+   * Undefined will use the default behavior.
+   */
+  forceOperationMethod?: "PATCH" | "POST";
 }
 
 /** Api client interface. */
@@ -524,24 +532,32 @@ export class ApiClientImpl implements ApiClientI {
     const patchOperations: any = [];
 
     for (const jsonapiResource of serialized) {
-      if (jsonapiResource.id) {
-        patchOperations.push({
-          op: "PATCH",
-          path: `${jsonapiResource.type}/${jsonapiResource.id}`,
-          value: {
-            ...jsonapiResource,
-            id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-          }
-        });
+      const method =
+        options?.forceOperationMethod ??
+        (jsonapiResource.id ? "PATCH" : "POST");
+      const targetId = String(
+        jsonapiResource.id || this.cfg.newId?.() || uuidv4()
+      );
+
+      // Omit the /{id} from the path if it's a POST, or if it's a PATCH where an ID wasn't originally present
+      const path =
+        method === "POST" || !jsonapiResource.id
+          ? jsonapiResource.type
+          : `${jsonapiResource.type}/${jsonapiResource.id}`;
+
+      const operation = {
+        op: method,
+        path,
+        value: {
+          ...jsonapiResource,
+          id: targetId
+        }
+      };
+
+      if (method === "POST") {
+        postOperations.push(operation);
       } else {
-        postOperations.push({
-          op: "POST",
-          path: jsonapiResource.type,
-          value: {
-            ...jsonapiResource,
-            id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
-          }
-        });
+        patchOperations.push(operation);
       }
     }
 

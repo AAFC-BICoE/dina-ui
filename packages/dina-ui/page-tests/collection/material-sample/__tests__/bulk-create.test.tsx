@@ -90,14 +90,18 @@ describe("MaterialSampleBulkCreatePage", () => {
 
     // Fill out the form:
     // Collection field
-    userEvent.click(wrapper.getByRole("combobox", { name: /collection/i }));
+    await userEvent.click(
+      wrapper.getByRole("combobox", { name: /collection/i })
+    );
 
     await waitFor(() => {
       expect(
         wrapper.getByRole("option", { name: /test collection/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("option", { name: /test collection/i }));
+    await userEvent.click(
+      wrapper.getByRole("option", { name: /test collection/i })
+    );
 
     // Material Samples to Create field
     fireEvent.change(
@@ -136,7 +140,7 @@ describe("MaterialSampleBulkCreatePage", () => {
         wrapper.getByRole("button", { name: /go to the previous step/i })
       ).toBeInTheDocument();
     });
-    userEvent.click(
+    await userEvent.click(
       wrapper.getByRole("button", { name: /go to the previous step/i })
     );
 

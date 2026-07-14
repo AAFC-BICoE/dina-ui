@@ -22,6 +22,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addCustomPlaceName: "Hinzufügen",
   addDetermination: "Bestimmung hinzufügen",
   addExistingStorageUnitAsChild: "existierende Lagerungseinheit hinzufügen",
+  addExistingStorageUnitAsChild_tooltip:
+    "Fügen Sie diesem Lagerraum eine bereits vorhandene Lagereinheit als untergeordnete Lagereinheit hinzu.",
   addExpeditionTitle: "Expedition hinzufügen",
   addExternalResourceTitle: "Neue externe Ressource hinzufügen",
   addFilesButton: "Datei hinzufügen",
@@ -36,6 +38,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addMaterialSampleTypeTitle: "Typ der Materialprobe hinzufügen",
   addMetadataTitle: "Metadaten hinzufügen",
   addNewChildStorageUnit: "Neue Lagerungseinheit (Nachfolger) hinzufügen",
+  addNewChildStorageUnit_tooltip:
+    "Fügen Sie dieser Lagereinheit eine neue Lagereinheit als untergeordnete Einheit hinzu.",
   addNewElement: "Neues {typeName} hinzufügen",
   addNewGroup: "Neue Gruppe hinzufügen",
   addNewPerson: "Neue Person hinzufügen",
@@ -504,6 +508,9 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Diese Bestimmung als abgelegt markieren. Nur eine Bestimmung kann als abgelegt markiert werden.",
   field_isInseperable: "Inhalt zusammen halten",
   field_isInseperable_tooltip: "Inhalte sind unzerteilbar",
+  field_isGeneric: "Generische",
+  field_isGeneric_tooltip:
+    "Ist die Speichereinheit eine generische Instanz des Speichereinheitstyps?",
   field_isPrimary_tooltip:
     "Diese Bestimmung als primäre Daten im Export markieren. Nur eine Bestimmung kann primär sein.",
   field_isRestricted: "Ist eingeschränkt",
@@ -854,6 +861,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   molecularAnalysisRunStep_sequencingRunContent:
     "Inhalt des Sequenzierungslaufs:",
   moveAllContent: "den gesamten Inhalt verschieben",
+  moveAllContent_tooltip:
+    "Alle Aufbewahrungseinheiten für Kinder und alle Materialproben werden in die neue Aufbewahrungseinheit verlegt.",
   multiple: "Mehrere",
   multipleMaterialSamples: "Mehrere Materialproben",
   multipleSamplesWellCoordinates:
@@ -872,6 +881,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   notEditableWhenThereAreChildStorageUnits:
     "Kann nicht bearbeitet werden, wenn Kindelemente in der Lagerungseinheit vorhanden sind.",
   notPubliclyReleasable: "Nicht öffentlich zugänglich",
+  publiclyReleasable: "Öffentlich zugänglich",
   notPubliclyReleasableWithReason: "Nicht öffentlich freigebbar: {reason}",
   numberOfAttachments: "{totalAttachments} Anhänge",
   objectListTitle: "Gespeicherte Medienobjekte",
@@ -949,6 +959,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   protocolListTitle: "Protokolle",
   protocolNameLabel: "Protokollname",
   protocolViewTitle: "Protokoll",
+  publiclyReleasableOption: "Oui - öffentlich zugänglich",
+  notPubliclyReleasableOption: "Nicht - Nicht öffentlich zugänglich",
   qualityControlName: "Name:",
   qualityControlType: "Typ:",
   queryBuilder_addSearchGroup: "Unterabfrage hinzufügen",

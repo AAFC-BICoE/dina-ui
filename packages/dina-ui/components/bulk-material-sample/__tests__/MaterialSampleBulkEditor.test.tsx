@@ -828,7 +828,7 @@ describe("MaterialSampleBulkEditor", () => {
     );
 
     // Go the the bulk edit tab:
-    userEvent.click(wrapper.getByText(/edit all/i));
+    await userEvent.click(wrapper.getByText(/edit all/i));
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -837,7 +837,7 @@ describe("MaterialSampleBulkEditor", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    userEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
     await waitFor(
       () => {
@@ -852,15 +852,15 @@ describe("MaterialSampleBulkEditor", () => {
     const startDateTextbox = wrapper.getByRole("textbox", {
       name: "Start Event Date Time Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory"
     });
-    userEvent.type(startDateTextbox, "11111");
+    await userEvent.type(startDateTextbox, "11111");
 
     // Click the "Save All" button:
-    userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
 
     await waitForLoadingToDisappear();
 
     await waitFor(() => expect(wrapper.getByText(/ms1/i)).toBeInTheDocument());
-    userEvent.click(wrapper.getByText(/ms1/i));
+    await userEvent.click(wrapper.getByText(/ms1/i));
 
     // Shows the error message:
     expect(
@@ -939,7 +939,7 @@ describe("MaterialSampleBulkEditor", () => {
               }
             ],
             group: "cnc",
-            publiclyReleasable: true
+            publiclyReleasable: false
           },
           type: "collecting-event"
         }
@@ -996,7 +996,7 @@ describe("MaterialSampleBulkEditor", () => {
     );
 
     // Go the the bulk edit tab:
-    fireEvent.click(wrapper.getByText(/edit all/i));
+    await userEvent.click(wrapper.getByText(/edit all/i));
 
     // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
@@ -1005,11 +1005,11 @@ describe("MaterialSampleBulkEditor", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
     await waitFor(() => {}); // Wait for UI to update
 
     // Click the "Save All" button:
-    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await waitFor(() => expect(mockSaveForBadColEvent).toHaveBeenCalled());
 
     // The collecting event was saved separately.
@@ -1025,7 +1025,8 @@ describe("MaterialSampleBulkEditor", () => {
                 isPrimary: true
               }
             ],
-            publiclyReleasable: true
+            group: "cnc",
+            publiclyReleasable: false
           },
           type: "collecting-event"
         }
@@ -1479,10 +1480,10 @@ describe("MaterialSampleBulkEditor", () => {
     // Barcode
     expect(wrapper.getByDisplayValue("test barcode")).toBeInTheDocument();
 
-    // Publicly Releasable
+    // Publicly Releasable should show not publicly releasable if all records have it set like so, which is the case
     expect(
       screen.getByRole("combobox", {
-        name: /keep current values/i
+        name: /not publicly releasable/i
       })
     ).toBeInTheDocument();
 
@@ -1768,7 +1769,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -1785,7 +1786,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -1802,7 +1803,7 @@ describe("MaterialSampleBulkEditor", () => {
               group: "cnc",
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              publiclyReleasable: true,
+              publiclyReleasable: false,
               dwcVerbatimLocality: "test locality"
             },
             type: "collecting-event"
@@ -1984,19 +1985,23 @@ describe("MaterialSampleBulkEditor", () => {
 
     await waitFor(() => {
       expect(
-        wrapper.getByRole("link", { name: /^test unit$/i })
+        wrapper.getByRole("link", { name: /^test unit opens in new tab$/i })
       ).toBeInTheDocument();
       expect(
-        wrapper.getByRole("link", { name: /^test unit child$/i })
+        wrapper.getByRole("link", {
+          name: /^test unit child opens in new tab$/i
+        })
       ).toBeInTheDocument();
       expect(
-        wrapper.getByRole("link", { name: /^test unit child 2$/i })
+        wrapper.getByRole("link", {
+          name: /^test unit child 2 opens in new tab$/i
+        })
       ).toBeInTheDocument();
     });
 
     // Assign a different storage unit:
     const row = screen.getByRole("row", {
-      name: /test unit child test test unit aafc dina\-admin 2025\-07\-17, 2:59:06 p\.m\. select/i
+      name: /test unit child opens in new tab test opens in new tab test unit aafc dina\-admin 2025\-07\-17, 2:59:06 p\.m\. select/i
     });
     const selectStorageButton = within(row).getByRole("button", {
       name: /select/i
@@ -2255,7 +2260,7 @@ describe("MaterialSampleBulkEditor", () => {
                 }
               ],
               group: "cnc",
-              publiclyReleasable: true
+              publiclyReleasable: false
             },
             type: "collecting-event"
           }
@@ -2348,7 +2353,7 @@ describe("MaterialSampleBulkEditor", () => {
     );
 
     // Click the clear all button for the barcode field
-    userEvent.click(wrapper.getByTestId("clear-all-button-barcode"));
+    await userEvent.click(wrapper.getByTestId("clear-all-button-barcode"));
 
     // It should say cleared as the placeholder.
     await waitFor(() => {
@@ -2561,7 +2566,7 @@ describe("MaterialSampleBulkEditor", () => {
         wrapper.getByRole("textbox", { name: /barcode/i })
       ).toBeInTheDocument()
     ); // Ensure textbox is available before typing
-    userEvent.type(
+    await userEvent.type(
       wrapper.getByRole("textbox", { name: /barcode/i }),
       "New Barcode"
     );

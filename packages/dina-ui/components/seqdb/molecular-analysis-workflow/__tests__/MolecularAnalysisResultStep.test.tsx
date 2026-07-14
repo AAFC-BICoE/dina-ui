@@ -243,10 +243,10 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const runContentAutoSelectButton = dropdowns[0];
 
       // Click the dropdown
-      userEvent.click(runContentAutoSelectButton);
+      await userEvent.click(runContentAutoSelectButton);
 
       // Click "Attachments based on Item Name"
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /attachments based on item name/i })
       );
 
@@ -483,7 +483,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const detachAllButton = wrapper.getAllByRole("button", {
         name: /detach all/i
       });
-      userEvent.click(detachAllButton[0]);
+      await userEvent.click(detachAllButton[0]);
 
       // Expect save to be called to update Run Items/Results
       await waitFor(() => {
@@ -622,14 +622,18 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       expect(wrapper.getAllByText(/not found/i).length).toBeGreaterThan(0);
 
       // Click the "Add" button (The first one corresponds to the Run Content section)
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[0]
+      );
       await waitForLoadingToDisappear();
 
       // Check the "Select all" checkbox.
-      userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
+      await userEvent.click(
+        wrapper.getByRole("checkbox", { name: /check all/i })
+      );
 
       // Click the "Detach Selected" button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /detach selected/i })
       );
       await waitForLoadingToDisappear();
@@ -755,14 +759,16 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       ).toBeInTheDocument();
 
       // Click the "Add" button (First one for Run Content)
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[0]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[0]
+      );
       await waitForLoadingToDisappear();
 
       // Check the checkbox for just the deleted attachment (index 1)
-      userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+      await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
 
       // Click the "Detach Selected" button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /detach selected/i })
       );
       await waitForLoadingToDisappear();
@@ -839,10 +845,10 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const qcAutoSelectButton = dropdowns[1];
 
       // Click QC Auto Select
-      userEvent.click(qcAutoSelectButton);
+      await userEvent.click(qcAutoSelectButton);
 
       // Click "Attachments based on Item Name"
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /attachments based on item name/i })
       );
 
@@ -986,7 +992,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       const detachAllButton = wrapper.getAllByRole("button", {
         name: /detach all/i
       });
-      userEvent.click(detachAllButton[2]);
+      await userEvent.click(detachAllButton[2]);
 
       // Expect save to be called to update Quality Controls/Results
       await waitFor(() => {
@@ -1115,14 +1121,18 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       expect(wrapper.getByText(/not found/i)).toBeInTheDocument();
 
       // Click the "Add" button which will display a popup menu with all the existing attachments.
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[2]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[2]
+      );
       await waitForLoadingToDisappear();
 
       // Check the "Select all" checkbox.
-      userEvent.click(wrapper.getByRole("checkbox", { name: /check all/i }));
+      await userEvent.click(
+        wrapper.getByRole("checkbox", { name: /check all/i })
+      );
 
       // Click the "Detach Selected" button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /detach selected/i })
       );
       await waitForLoadingToDisappear();
@@ -1254,14 +1264,16 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       expect(wrapper.getByText(/not found/i)).toBeInTheDocument();
 
       // Click the "Add" button which will display a popup menu with all the existing attachments.
-      userEvent.click(wrapper.getAllByRole("button", { name: /add/i })[2]);
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /add/i })[2]
+      );
       await waitForLoadingToDisappear();
 
       // Check the checkbox for just the deleted attachment.
-      userEvent.click(wrapper.getAllByRole("checkbox")[1]);
+      await userEvent.click(wrapper.getAllByRole("checkbox")[1]);
 
       // Click the "Detach Selected" button.
-      userEvent.click(
+      await userEvent.click(
         wrapper.getByRole("button", { name: /detach selected/i })
       );
       await waitForLoadingToDisappear();
@@ -1312,7 +1324,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       // Find and click the detach button for that attachment
       const detachButtons = wrapper.getAllByRole("button", { name: /detach/i });
       // The last detach button belongs to the run attachments table
-      userEvent.click(detachButtons[detachButtons.length - 1]);
+      await userEvent.click(detachButtons[detachButtons.length - 1]);
 
       // Trigger the save
       await waitFor(() => {

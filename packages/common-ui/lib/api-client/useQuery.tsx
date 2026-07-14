@@ -6,7 +6,7 @@ import {
   KitsuResponseData
 } from "kitsu";
 import _ from "lodash";
-import { useContext, useDebugValue, useMemo } from "react";
+import { useContext, useDebugValue, useMemo, ReactElement } from "react";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
@@ -294,8 +294,8 @@ export function withResponse<
   { loading, error, response }: QueryState<TData, TMeta>,
   responseRenderer: (
     response: KitsuResponse<TData, TMeta>
-  ) => JSX.Element | null
-): JSX.Element | null {
+  ) => ReactElement | null
+): ReactElement | null {
   if (loading) {
     return <LoadingSpinner loading={true} />;
   }
@@ -333,8 +333,8 @@ export function withResponseOrDisabled<
   { loading, error, response, isDisabled }: QueryState<TData, TMeta>,
   responseRenderer: (
     response?: KitsuResponse<TData, TMeta>
-  ) => JSX.Element | null
-): JSX.Element | null {
+  ) => ReactElement | null
+): ReactElement | null {
   if (loading) {
     return <LoadingSpinner loading={true} />;
   }

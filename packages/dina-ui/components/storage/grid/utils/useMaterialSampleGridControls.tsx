@@ -33,7 +33,7 @@ export function useMaterialSampleGridControls({
 
   // Highlighted/selected PcrBatchItems.
   const [selectedItems, setSelectedItems] = useState<MaterialSample[]>([]);
-  const lastSelectedItemRef = useRef<MaterialSample>();
+  const lastSelectedItemRef = useRef<MaterialSample | undefined>(undefined);
 
   // Grid fill direction when you move multiple PcrBatchItems into the grid.
   const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");

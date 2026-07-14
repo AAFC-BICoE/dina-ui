@@ -1,7 +1,7 @@
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import MolecularAnalysisRunViewPage from "../../../../pages/seqdb/molecular-analysis-run/view";
 import "@testing-library/jest-dom";
-import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import {
   QUALITY_CONTROL_1,
   QUALITY_CONTROL_2,
@@ -342,7 +342,7 @@ describe("Molecular Analysis Run View", () => {
     const wrapper = mountWithAppContext(<MolecularAnalysisRunViewPage />, {
       apiContext
     });
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Run Name is displayed:
     expect(
@@ -374,7 +374,7 @@ describe("Molecular Analysis Run View", () => {
     const wrapper = mountWithAppContext(<MolecularAnalysisRunViewPage />, {
       apiContext
     });
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Run Name is displayed:
     expect(wrapper.getAllByText("Seq Reactions Run")[0]).toBeInTheDocument();

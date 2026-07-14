@@ -123,7 +123,7 @@ export function transformTreeForEcharts(tree) {
  * Renders a chart displaying taxonomic ranks, compatible with Query Builder UI,
  * interacts with TaxonomicTreeNode to affect data displayed.
  *
- * @returns {JSX.Element} The rendered chart component.
+ * @returns {React.JSX.Element} The rendered chart component.
  */
 
 export default function TaxonomySunburstChart({ query }) {

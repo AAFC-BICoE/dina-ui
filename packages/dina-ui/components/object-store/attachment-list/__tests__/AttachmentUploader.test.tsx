@@ -89,6 +89,8 @@ describe("AttachmentUploader component", () => {
   });
 
   it("Uploads the files and opens the Metadata editor.", async () => {
+    const user = await userEvent.setup();
+
     const wrapper = mountWithAppContext(
       <AttachmentUploader afterMetadatasSaved={mockAfterMetadatasSaved} />,
       { apiContext }
@@ -103,7 +105,7 @@ describe("AttachmentUploader component", () => {
     ];
 
     // Select group
-    userEvent.click(
+    await user.click(
       wrapper.getByRole("combobox", {
         name: /group select\.\.\./i
       })
@@ -116,19 +118,23 @@ describe("AttachmentUploader component", () => {
         })
       ).toBeInTheDocument();
     });
-    userEvent.click(
+    await user.click(
       wrapper.getByRole("option", {
         name: /aafc/i
       })
     );
-    expect(wrapper.getByText(/aafc/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(wrapper.getByText("aafc")).toBeInTheDocument();
+    });
 
     // Find the file input in the Dropzone component
-    const fileInput = wrapper.container.querySelector("input[type='file']");
+    const fileInput = wrapper.container.querySelector(
+      "input[type='file']"
+    ) as HTMLInputElement;
     if (!fileInput) throw new Error("Could not find hidden file input");
 
     // Simulate uploading files
-    userEvent.upload(fileInput, mockAcceptedFiles);
+    await user.upload(fileInput, mockAcceptedFiles);
 
     // Simulate the save upload
     await waitFor(() => {
@@ -138,7 +144,7 @@ describe("AttachmentUploader component", () => {
         })
       ).toBeInTheDocument();
     });
-    userEvent.click(
+    await user.click(
       wrapper.getByRole("button", {
         name: /save/i
       })
@@ -156,7 +162,7 @@ describe("AttachmentUploader component", () => {
         })
       ).toBeInTheDocument();
     });
-    userEvent.click(
+    await user.click(
       wrapper.getByRole("button", {
         name: /save all/i
       })

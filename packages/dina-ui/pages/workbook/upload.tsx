@@ -1,4 +1,4 @@
-import { ApiClientContext, LoadingSpinner } from "common-ui";
+import { ApiClientContext, IFileWithMeta, LoadingSpinner } from "common-ui";
 import { withRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { SaveWorkbookProgress } from "packages/dina-ui/components/workbook/SaveWorkbookProgress";
@@ -11,7 +11,6 @@ import {
   trimSpace,
   useWorkbookContext
 } from "../../components";
-import { IFileWithMeta } from "../../components/object-store";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
 import { useLocalStorage } from "@rehooks/local-storage";

@@ -5,6 +5,7 @@ import globals from "globals";
 import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from "eslint-config-prettier";
 import jest from "eslint-plugin-jest";
+import nextPlugin from "@next/eslint-plugin-next";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,7 +23,6 @@ if ('AudioWorkletGlobalScope' in browserGlobals) {
 }
 
 const config = [
-  ...compat.extends("next/core-web-vitals"),
   {
     files: ["**/*.{js,ts,jsx,tsx}"],
     languageOptions: {
@@ -31,10 +31,13 @@ const config = [
     },
     plugins: {
       '@typescript-eslint': tseslint.plugin,
-      jest: jest
+      jest: jest,
+      "@next/next": nextPlugin
     },
     rules: {
       ...tseslint.configs.recommended.rules,
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs["core-web-vitals"].rules,
 
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "off",

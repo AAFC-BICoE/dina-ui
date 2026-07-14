@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 
 interface SettingsButtonProps {
-  menuItems: JSX.Element[];
+  menuItems: React.JSX.Element[];
 }
 
 export function SettingsButton({ menuItems }: SettingsButtonProps) {

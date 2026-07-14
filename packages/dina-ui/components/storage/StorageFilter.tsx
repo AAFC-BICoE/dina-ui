@@ -102,7 +102,7 @@ export function StorageFilter({
               className="storage-tree-search form-control"
               type="text"
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              onChange={(e) => setSearchText((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
               // Pressing enter should set the filter, not submit the form:
               onKeyDown={(e) => {
                 if (e.keyCode === 13) {

@@ -26,17 +26,18 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
     name: "Box",
     group: "group"
   },
+  hierarchy: [
+    { uuid: "A", name: "A", typeName: "Box", typeUuid: "BOX" },
+    { uuid: "B", name: "B", typeName: "Shelf", typeUuid: "SHELF" },
+    { uuid: "C", name: "C", typeName: "Cabinet", typeUuid: "CABINET" },
+    { uuid: "D", name: "D", typeName: "Room", typeUuid: "ROOM" },
+    { uuid: "E", name: "E", typeName: "Building", typeUuid: "BUILDING" }
+  ],
   parentStorageUnit: {
     id: "B",
     group: "group",
     name: "B",
-    type: "storage-unit",
-    hierarchy: [
-      { uuid: "B", name: "B", typeName: "Shelf", typeUuid: "SHELF" },
-      { uuid: "C", name: "C", typeName: "Cabinet", typeUuid: "CABINET" },
-      { uuid: "D", name: "D", typeName: "Room", typeUuid: "ROOM" },
-      { uuid: "E", name: "E", typeName: "Building", typeUuid: "BUILDING" }
-    ]
+    type: "storage-unit"
   }
 };
 
@@ -90,11 +91,11 @@ describe("AssignedStorage component", () => {
     await waitFor(() => {
       expect(wrapper.getByRole("img")).toBeInTheDocument();
     });
-    userEvent.hover(wrapper.getByRole("img"));
+    await userEvent.hover(wrapper.getByRole("img"));
 
     expect(
       wrapper.getByRole("tooltip", {
-        name: /e \(building\) > d \(room\) > c \(cabinet\) > b \(shelf\) > a \(box\)/i
+        name: /e \(building\) opens in new tab > d \(room\) opens in new tab > c \(cabinet\) opens in new tab > b \(shelf\) opens in new tab > a \(box\) opens in new tab/i
       })
     ).toBeInTheDocument();
   });
@@ -110,7 +111,7 @@ describe("AssignedStorage component", () => {
     await waitFor(() => {
       expect(wrapper.getByRole("button")).toBeInTheDocument();
     });
-    userEvent.click(wrapper.getByRole("button"));
+    await userEvent.click(wrapper.getByRole("button"));
 
     expect(mockOnChange).lastCalledWith({ id: null });
   });

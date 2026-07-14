@@ -1,5 +1,4 @@
-import { waitForElementToBeRemoved } from "@testing-library/react";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { FileView } from "../FileView";
 import "@testing-library/jest-dom";
 
@@ -18,7 +17,7 @@ describe("FileView component", () => {
     );
 
     // Wait for loading to be finished...
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // It should just render the image element.
     expect(
@@ -27,7 +26,7 @@ describe("FileView component", () => {
   });
 
   it("Links to the image viewer page.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <FileView
         filePath="/objectstore-api/file/bucket/0198a952-20e2-7f25-b8c7-a2ef0aa1f183"
         fileType="png"
@@ -36,7 +35,7 @@ describe("FileView component", () => {
     );
 
     // Wait for loading to be finished...
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     const link = document.querySelector(".file-viewer-wrapper a");
     expect(link?.getAttribute("href")).toBe(
@@ -45,7 +44,7 @@ describe("FileView component", () => {
   });
 
   it("Links to the image viewer page for derivatives.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext(
       <FileView
         filePath="/objectstore-api/file/bucket/0198a952-20e2-7f25-b8c7-a2ef0aa1f183"
         fileType="png"
@@ -54,7 +53,7 @@ describe("FileView component", () => {
     );
 
     // Wait for loading to be finished...
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     const link = document.querySelector(".file-viewer-wrapper a");
     expect(link?.getAttribute("href")).toBe(
@@ -80,7 +79,7 @@ describe("FileView component", () => {
     );
 
     // Wait for loading to be finished...
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Find the "Open Link" anchor tag
     const linkElement = wrapper.getByRole("link", { name: /open link/i });
@@ -109,7 +108,7 @@ describe("FileView component", () => {
       );
 
       // Wait for loading to be finished...
-      await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+      await waitForLoadingToDisappear();
 
       // Expect "Preview not available" to be displayed.
       expect(wrapper.getByText(/preview not available/i)).toBeInTheDocument();

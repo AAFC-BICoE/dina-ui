@@ -51,7 +51,7 @@ export function NumberSpinnerField(props: NumberSpinnerFieldProps) {
             size={size ?? 4}
             step={step ?? 1}
             onKeyDown={onKeyDown}
-            onChange={(e) => onChangeInternal(e.target.value)}
+            onChange={(e) => onChangeInternal((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
             onClick={(e) => (e.target as any).select()}
             disabled={disabled}
             value={value}

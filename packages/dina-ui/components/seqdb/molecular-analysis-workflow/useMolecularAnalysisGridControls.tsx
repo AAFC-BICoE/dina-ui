@@ -47,7 +47,7 @@ export function useMolecularAnalysisGridControls({
   const [selectedItems, setSelectedItems] = useState<
     MolecularAnalysisItemSample[]
   >([]);
-  const lastSelectedItemRef = useRef<MolecularAnalysisItemSample>();
+  const lastSelectedItemRef = useRef<MolecularAnalysisItemSample | undefined>(undefined);
 
   // Grid fill direction when you move multiple MolecularAnalysisItems into the grid.
   const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");

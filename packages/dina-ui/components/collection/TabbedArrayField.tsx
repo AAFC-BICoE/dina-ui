@@ -19,7 +19,7 @@ export interface TabbedArrayFieldProps<T> {
   typeName: string;
   initialIndex?: number;
   name: string;
-  legend?: JSX.Element;
+  legend?: React.JSX.Element;
   onChangeTabIndex?: (newIndex: number) => void;
   makeNewElement: (elements: T[]) => T;
   renderTabPanel: (panelCtx: TabPanelCtx<T>) => ReactNode;

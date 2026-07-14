@@ -18,6 +18,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addCustomPlaceName: "Ajouter",
   addDetermination: "Ajouter une détermination",
   addExistingStorageUnitAsChild: "Ajouter une unité de stockage existante",
+  addExistingStorageUnitAsChild_tooltip:
+    "Ajouter une unité de stockage existante comme enfant de cette unité de stockage.",
   addExternalResourceTitle: "Ajouter une nouvelle ressource externe",
   addFilesButton: "Ajouter des fichiers",
   addGroup: "Ajouter un groupe",
@@ -31,6 +33,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addMaterialSampleTypeTitle: "Ajouter un type d’échantillon de matière",
   addMetadataTitle: "Ajouter des métadonnées",
   addNewChildStorageUnit: "Ajouter une nouvelle unité de stockage pour enfant",
+  addNewChildStorageUnit_tooltip:
+    "Ajouter une nouvelle unité de stockage comme enfant de cette unité de stockage.",
   addNewElement: "Ajouter nouveau {typeName}",
   addNewPerson: "Ajouter nouvelle personne",
   addObjectSubtypeTitle: "Ajouter un nouveau sous-type d’objet",
@@ -366,6 +370,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_id: "ID",
   field_isFiledAs_tooltip:
     'Classé en tant que (ajouter cette détermination). Une seule détermination peut être inscrite comme "Classé en tant que".',
+  field_isGeneric: "Générique",
+  field_isGeneric_tooltip:
+    "Est-ce que l'unité de stockage représente une instance générique du type d'unité de stockage ?",
   field_isInseperable: "Garder les contenus ensemble",
   field_isInseperable_tooltip: "Les contenus sont inséparables",
   field_isPrimary_tooltip:
@@ -628,6 +635,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   metersField_tooltip:
     "Utilisez les unités suivantes pour la conversion automatique : pi, po, pi po, vg, mm, cm, km",
   moveAllContent: "Déplacer tout le contenu",
+  moveAllContent_tooltip:
+    "Transférez tous les articles de rangement pour enfants et les échantillons dans le nouvel espace de rangement",
   multiple: "Multiple",
   multipleMaterialSamples: "Échantillons à matériel multiple",
   multipleUnits: "Multiples unités",
@@ -642,6 +651,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   notEditableWhenThereAreChildStorageUnits:
     "Non modifiable lorsqu’il y a des unités de stockage enfant ",
   notPubliclyReleasable: "Diffusion publique interdite",
+  publiclyReleasable: "Diffusion publique",
   objectListTitle: "Objets stockés",
   objectStoreDataUnavailable:
     "Les données du stockage de l’objet ne sont pas disponibles",
@@ -698,6 +708,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   protocolListTitle: "Protocoles",
   protocolNameLabel: "Nom du protocole",
   protocolViewTitle: "Protocole",
+  publiclyReleasableOption: "Oui - Diffusion publique",
+  notPubliclyReleasableOption: "Non - Diffusion publique interdite",
   queryBuilder_addSearchGroup: "Ajouter une sous-requête",
   queryBuilder_addSearchRule: "Ajouter une requête",
   queryBuilder_conjunction_and: "ET",
@@ -743,7 +755,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   removeOrganism: "Supprimer l'organisme",
   removeSavedSearch: "Supprimer la recherche enregistrée",
   removeThisElement: "Supprimer cette {typeName}",
-  removeThisPlaceLabel: " Supprimer ce lieu",
+  removeThisPlaceLabel: "Supprimer ce lieu",
   requiredField: "Champ requis",
   resetMetadataEditorAttributesButtonText:
     "Réinitialiser à la disposition initiale des attributs",

@@ -14,7 +14,7 @@ const STATUS_CONFIG: Record<
     badgeBg: string;
     borderColor: string;
     headerBg: string;
-    icon: JSX.Element;
+    icon: React.JSX.Element;
   }
 > = {
   online: {

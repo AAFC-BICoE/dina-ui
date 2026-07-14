@@ -13,8 +13,8 @@ export interface KeyValueTableProps {
   /** The value cell Component for a specific field can be overridden for displaying complex object types. */
   customValueCells?: Record<string, ColumnDefTemplate<CellContext<any, any>>>;
 
-  attributeHeader?: JSX.Element;
-  valueHeader?: JSX.Element;
+  attributeHeader?: React.JSX.Element;
+  valueHeader?: React.JSX.Element;
 
   attributeCell?: ColumnDefTemplate<CellContext<any, any>>;
   tableClassName?: string;

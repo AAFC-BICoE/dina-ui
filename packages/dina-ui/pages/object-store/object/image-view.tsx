@@ -33,7 +33,7 @@ import { TbZoomReset, TbPictureInPictureTop } from "react-icons/tb";
  *
  * Zoom position logic is AI assisted.
  *
- * @returns {JSX.Element} The image viewer UI with simple zoom capabilities.
+ * @returns {React.JSX.Element} The image viewer UI with simple zoom capabilities.
  */
 export default function ImageViewer() {
   const { formatMessage } = useDinaIntl();

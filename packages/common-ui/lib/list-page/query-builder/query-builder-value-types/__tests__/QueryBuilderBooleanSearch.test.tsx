@@ -71,7 +71,7 @@ describe("QueryBuilderBooleanSearch", () => {
       expect(mockPerformSubmit).toHaveBeenCalledTimes(0);
 
       // Simulate user typing "enter" key
-      userEvent.type(combobox, "{enter}");
+      await userEvent.type(combobox, "{enter}");
 
       // Expect performSubmit to be called once
       expect(mockPerformSubmit).toHaveBeenCalledTimes(1);

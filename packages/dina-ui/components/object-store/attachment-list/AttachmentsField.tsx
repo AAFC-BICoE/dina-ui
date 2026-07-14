@@ -1,5 +1,7 @@
 import {
   CheckBoxWithoutWrapper,
+  dateCell,
+  ExternalLink,
   FieldHeader,
   FieldSet,
   FieldSpy,
@@ -13,7 +15,6 @@ import {
 } from "common-ui";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import _ from "lodash";
-import Link from "next/link";
 import { CSSProperties, ReactNode } from "react";
 import { AllowAttachmentsConfig, AttachmentSection } from "..";
 import { ThumbnailCell } from "../..";
@@ -152,20 +153,23 @@ export function AttachmentsEditor({
         }
 
         return (
-          <Link
-            href={`/object-store/object/view?id=${metadata.id}`}
-            legacyBehavior
-          >
+          <ExternalLink href={`/object-store/object/view?id=${metadata.id}`}>
             {(metadata as any)?.filename ?? metadata.id}
-          </Link>
+          </ExternalLink>
         );
       }
     },
-    ...["acCaption", "xmpMetadataDate", "acTags"].map((accessor) => ({
-      id: accessor,
-      accessorKey: accessor,
-      header: () => <FieldHeader name={accessor} />
-    })),
+    {
+      id: "acCaption",
+      accessorKey: "acCaption",
+      header: () => <FieldHeader name={"acCaption"} />
+    },
+    dateCell("xmpMetadataDate"),
+    {
+      id: "acTags",
+      accessorKey: "acTags",
+      header: () => <FieldHeader name={"acTags"} />
+    },
     {
       id: "actionColumn",
       size: 0,
@@ -283,7 +287,7 @@ interface AddAttachmentsButtonProps {
   addingAttachmentsDisabled?: boolean;
   value: ResourceIdentifierObject[];
   onChange: (newMetadatas: ResourceIdentifierObject[]) => void;
-  buttonTextElement?: JSX.Element;
+  buttonTextElement?: React.JSX.Element;
   style?: CSSProperties;
   className?: string;
   removeMargin?: boolean;

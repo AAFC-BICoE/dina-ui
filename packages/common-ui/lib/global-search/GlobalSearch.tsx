@@ -43,7 +43,7 @@ export function GlobalSearch({
           className="global-search-input"
           placeholder={formatMessage({ id: "searchDinaPlaceholder" })}
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm((e.target as HTMLTextAreaElement | HTMLInputElement).value)}
           disabled={pending}
         />
         <button

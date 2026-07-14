@@ -367,7 +367,7 @@ export interface UseMaterialSampleSaveParams {
 
   onSaved?: (id: string) => Promise<void>;
 
-  colEventFormRef?: React.RefObject<FormikProps<any>>;
+  colEventFormRef?: React.RefObject<FormikProps<any> | null>;
 
   isTemplate?: boolean;
 
@@ -400,7 +400,7 @@ export interface PrepareSampleSaveOperationParams {
   preProcessSample?: (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
-  collectingEventRefExternal?: React.RefObject<FormikProps<any>>;
+  collectingEventRefExternal?: React.RefObject<FormikProps<any> | null>;
 }
 
 export function useMaterialSampleSave({
@@ -694,8 +694,7 @@ export function useMaterialSampleSave({
   const defaultValues: InputResource<MaterialSample> = {
     type: "material-sample",
     // Defaults to the last Collection used to create a Material Sample:
-    ...(lastUsedCollection && { collection: lastUsedCollection }),
-    publiclyReleasable: true
+    ...(lastUsedCollection && { collection: lastUsedCollection })
   };
 
   const msInitialValues: InputResource<MaterialSample> =
@@ -1581,6 +1580,7 @@ export function useMaterialSampleSave({
             />
           )}
           <CollectingEventFormLayout
+            defaultToNotReleasable={true}
             visibleManagedAttributeKeys={
               visibleManagedAttributeKeys?.collectingEvent
             }

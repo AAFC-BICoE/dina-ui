@@ -3,11 +3,10 @@ import { KitsuResource } from "kitsu";
 import { useMemo, useState } from "react";
 import { JsonTree } from "@react-awesome-query-builder/ui";
 import Select from "react-select";
-import { FieldSet, QueryPage, QueryPageProps } from "..";
+import { ExternalLink, FieldSet, QueryPage, QueryPageProps } from "..";
 import { DINAUI_MESSAGES_ENGLISH } from "@dina-ui/intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "@dina-ui/intl/dina-ui-intl";
 import { CustomViewField } from "../list-page/query-builder/useQueryBuilderConfig";
-import Link from "next/link";
 import { Button } from "react-bootstrap";
 export interface CustomQueryOption {
   /**
@@ -157,16 +156,11 @@ export function CustomQueryPageView<TData extends KitsuResource>({
           ) : linkObject ? (
             <div className="d-flex justify-content-between align-items-center">
               <>{innerLegend}</>
-              <Link
-                className="mt-2 text-end"
-                href={linkObject}
-                passHref={true}
-                target="_blank"
-              >
+              <ExternalLink className="mt-2 text-end" href={linkObject}>
                 <Button variant="info" className="mx-1 my-1">
                   <DinaMessage id={linkMessageId || "viewAttachedItems"} />
                 </Button>
-              </Link>
+              </ExternalLink>
             </div>
           ) : (
             <>{innerLegend}</>

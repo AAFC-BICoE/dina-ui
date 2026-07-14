@@ -48,7 +48,9 @@ import { FaFloppyDisk } from "react-icons/fa6";
 
 interface FormSubmissionContextType {
   submitForm?: () => void;
-  formRef?: RefObject<FormikProps<InputResource<ControlledVocabularyItem>>>;
+  formRef?: RefObject<FormikProps<
+    InputResource<ControlledVocabularyItem>
+  > | null>;
 }
 
 const FormSubmissionContext = createContext<FormSubmissionContextType>({});
@@ -218,14 +220,14 @@ function ControlledVocabularyItemEditPageContent({
           onSubmit={onSubmit}
           innerRef={formRef}
         >
-          <ControlledVocabularyItemFormLayout />
+          <ControlledVocabularyItemFormLayout isEditMode={!!fetchedItem} />
         </DinaForm>
       </PageLayout>
     </FormSubmissionContext.Provider>
   );
 }
 
-function ButtonBarContent({ backButton }: { backButton: JSX.Element }) {
+function ButtonBarContent({ backButton }: { backButton: React.JSX.Element }) {
   const { submitForm } = useFormSubmission();
 
   return (
@@ -246,7 +248,7 @@ function ButtonBarContent({ backButton }: { backButton: JSX.Element }) {
   );
 }
 
-export function ControlledVocabularyItemFormLayout() {
+export function ControlledVocabularyItemFormLayout({ isEditMode = false }) {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
   const { isAdmin } = useAccount();
@@ -300,11 +302,12 @@ export function ControlledVocabularyItemFormLayout() {
           name="dinaComponent"
           options={ATTRIBUTE_COMPONENT_OPTIONS}
           label={formatMessage("field_managedAttributeComponent")}
+          disabled={isEditMode}
         />
       </div>
       <div className="row">
-        <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="key" readOnly={true} />
+        <TextField className="col-md-6" name="name" disabled={isEditMode} />
+        <TextField className="col-md-6" name="key" disabled={true} />
       </div>
       <div className="row">
         <SelectField
@@ -314,6 +317,7 @@ export function ControlledVocabularyItemFormLayout() {
           onChange={(selectValue: VocabularyElementType) =>
             setVocabularyElementType(selectValue)
           }
+          disabled={isEditMode}
         />
         {(vocabularyElementType === "DECIMAL" ||
           vocabularyElementType === "INTEGER") && (

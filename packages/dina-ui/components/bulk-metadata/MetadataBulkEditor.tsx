@@ -79,7 +79,7 @@ export const MetadataBulkEditor = forwardRef<
       initialValues
     });
 
-    const bulkEditFormRef = useRef<FormikProps<InputResource<Metadata>>>(null);
+    const bulkEditFormRef = useRef<FormikProps<InputResource<Metadata>> | null>(null);
 
     const metadataHooks = getMetadataHooks(metadatas);
 

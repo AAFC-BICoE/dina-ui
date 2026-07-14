@@ -183,10 +183,10 @@ export default function QueryRowClassificationSearch({
           <input
             type="text"
             value={classificationState.searchValue}
-            onChange={(newValue) => {
+            onChange={(e) => {
               setClassificationState({
                 ...classificationState,
-                searchValue: newValue.target.value
+                searchValue: (e.target as HTMLTextAreaElement | HTMLInputElement).value
               });
             }}
             className={"col form-control me-3"}

@@ -1,9 +1,7 @@
-import Link from "next/link";
-import { AreYouSureModal } from "common-ui";
+import { AreYouSureModal, ExternalLink } from "common-ui";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { generateSearchURLFromSimpleRows } from "common-ui/lib/list-page/query-url/queryUtils";
 
 interface CollectingEventEditAlertProps {
@@ -83,7 +81,7 @@ function CollectingEventEditAlert({
           {collectingEventUUID && (
             <span>
               <br />
-              <Link
+              <ExternalLink
                 className="mt-2"
                 href={{
                   pathname: `/collection/material-sample/list`,
@@ -91,22 +89,15 @@ function CollectingEventEditAlert({
                     queryTree: relationshipPresenceUUIDSearch
                   }
                 }}
-                target="_blank"
               >
                 <DinaMessage id="collectingEventViewMaterialSamplesAttached" />{" "}
-                <FaArrowUpRightFromSquare
-                  style={{
-                    marginLeft: "0.25em"
-                  }}
-                  aria-label="Opens in new tab"
-                />
-              </Link>
+              </ExternalLink>
             </span>
           )}
           {displayCollectingEventDetailsLink && collectingEventUUID && (
             <span>
               <br />
-              <Link
+              <ExternalLink
                 className="mt-2"
                 href={{
                   pathname: `/collection/collecting-event/view`,
@@ -114,16 +105,9 @@ function CollectingEventEditAlert({
                     id: collectingEventUUID
                   }
                 }}
-                target="_blank"
               >
                 <DinaMessage id="collectingEventGoToDetails" />{" "}
-                <FaArrowUpRightFromSquare
-                  style={{
-                    marginLeft: "0.25em"
-                  }}
-                  aria-label="Opens in new tab"
-                />
-              </Link>
+              </ExternalLink>
             </span>
           )}
         </div>

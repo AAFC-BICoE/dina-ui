@@ -79,7 +79,7 @@ export function SearchResultItem({
   const linkText = getLinkText();
 
   // Build attribute display rows from highlight or source
-  const attributeRows: JSX.Element[] = [];
+  const attributeRows: React.JSX.Element[] = [];
   Object.entries(highlight).forEach(([field, values]: [string, any]) => {
     const attributeName = field
       .replace("data.attributes.", "")

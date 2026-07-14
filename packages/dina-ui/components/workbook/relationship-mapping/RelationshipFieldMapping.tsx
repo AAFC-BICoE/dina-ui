@@ -23,7 +23,7 @@ export interface RelationshipFieldMappingProps {
     columnHeader: string,
     fieldPath?: string | undefined,
     fieldValue?: string | undefined
-  ) => JSX.Element | undefined;
+  ) => React.JSX.Element | undefined;
 }
 
 export function RelationshipFieldMapping({

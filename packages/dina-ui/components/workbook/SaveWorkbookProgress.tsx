@@ -5,6 +5,7 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import {
   dateCell,
   DoOperationsError,
+  ExternalLink,
   QueryTable,
   SimpleSearchFilterBuilder,
   useAccount,
@@ -17,7 +18,6 @@ import { useWorkbookConverter } from "./utils/useWorkbookConverter";
 import { delay } from "./utils/workbookMappingUtils";
 import { PersistedResource, KitsuResource } from "kitsu";
 import { MaterialSample } from "../../types/collection-api";
-import Link from "next/link";
 import { ErrorBanner } from "../error/ErrorBanner";
 import { simpleSearchFilterToFiql } from "../../../common-ui/lib/filter-builder/fiql";
 import { deleteFromStorage } from "@rehooks/local-storage";
@@ -290,13 +290,9 @@ export function SaveWorkbookProgress({
           original: { id, materialSampleName, dwcOtherCatalogNumbers }
         }
       }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-          target="_blank"
-        >
+        <ExternalLink href={`/collection/material-sample/view?id=${id}`}>
           {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-        </Link>
+        </ExternalLink>
       ),
       accessorKey: "materialSampleName"
     },

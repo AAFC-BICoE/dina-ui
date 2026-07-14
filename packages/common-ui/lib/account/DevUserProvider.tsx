@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, ReactElement } from "react";
 import axios from "axios";
 import { AccountProvider } from "./AccountProvider";
 import _ from "lodash";
@@ -10,7 +10,7 @@ export function DevUserAccountProvider({
   children
 }: {
   children: ReactNode;
-}): JSX.Element {
+}): ReactElement {
   const instanceContext = useInstanceContext();
 
   const [devModeEnabled, setDevModeEnabled] = useState<boolean | null>(null);

@@ -1,12 +1,8 @@
 import { DinaForm } from "../DinaForm";
-import { mountWithAppContext } from "common-ui";
+import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
 import { DataEntryField } from "../data-entry/DataEntryField";
 import { DinaMessage } from "@dina-ui/intl/dina-ui-intl";
-import {
-  fireEvent,
-  waitFor,
-  waitForElementToBeRemoved
-} from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const blockOptions = {
@@ -100,8 +96,7 @@ describe("DataEntry", () => {
       { apiContext }
     );
 
-    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    await waitForLoadingToDisappear();
 
     // Click the "+" icon to add a new field.
     const addSection = wrapper.getByRole("button");

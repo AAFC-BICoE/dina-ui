@@ -35,7 +35,7 @@ export default function PolygonEditorCoordinates({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     let parsed: GeoPosition[][];
     try {
-      parsed = JSON.parse(e.target.value);
+      parsed = JSON.parse((e.target as HTMLTextAreaElement | HTMLInputElement).value);
     } catch (_err) {
       setError(formatMessage("invalidPolygon"));
       return;

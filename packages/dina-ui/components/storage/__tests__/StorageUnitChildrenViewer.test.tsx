@@ -113,6 +113,9 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return { data: [{ id: "ms-1", type: "material-sample" }] };
     case "search-api/search-ws/mapping":
       return { data: MAPPING, meta: { totalResourceCount: 0 } };
+    case "collection-api/storage-unit":
+      // Fallback query when storageUnitChildren is undefined.
+      return { data: [], meta: { totalResourceCount: 0 } };
   }
 });
 
@@ -446,7 +449,9 @@ describe("StorageUnitChildrenViewer component", () => {
       ).toBeInTheDocument()
     );
     // Click "Move All Content" button
-    userEvent.click(wrapper.getByRole("button", { name: /move all content/i }));
+    await userEvent.click(
+      wrapper.getByRole("button", { name: /move all content/i })
+    );
 
     await waitFor(() =>
       expect(
@@ -454,7 +459,9 @@ describe("StorageUnitChildrenViewer component", () => {
       ).toBeInTheDocument()
     );
     // Click "Select" button for B (Box) storage unit
-    userEvent.click(wrapper.getAllByRole("button", { name: /select/i })[0]);
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /select/i })[0]
+    );
 
     await waitFor(() => {
       // Test expected API Call
@@ -488,31 +495,24 @@ describe("StorageUnitChildrenViewer component", () => {
   });
 
   it("Lets you move an existing Storage Unit into this Storage Unit", async () => {
-    // Render a storage unit with no children:
-    const wrapper = mountWithAppContext(
+    // Render with ADD_EXISTING_AS_CHILD mode active
+    mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer
           storageUnit={storageUnitX}
           materialSamples={undefined}
+          actionMode="ADD_EXISTING_AS_CHILD"
+          onCancelAction={jest.fn()}
         />
         ,
       </DinaForm>,
       testCtx as any
     );
-    await waitFor(() =>
-      expect(
-        wrapper.getByRole("button", { name: /add existing storage unit/i })
-      ).toBeInTheDocument()
-    );
-
-    // Click "Add Existing Storage Unit" button
-    userEvent.click(
-      wrapper.getByRole("button", { name: /add existing storage unit/i })
-    );
+    await waitForLoadingToDisappear();
 
     await waitFor(() => {
       const row = screen.getByRole("row", {
-        name: /test unit child 2 test test unit aafc dina\-admin 2025\-07\-18, 7:08:21 p\.m\. select/i
+        name: /test unit child 2 opens in new tab test opens in new tab test unit aafc dina\-admin 2025\-07\-18, 7:08:21 p\.m\. select/i
       });
 
       const row_button = within(row).getByRole("button", {

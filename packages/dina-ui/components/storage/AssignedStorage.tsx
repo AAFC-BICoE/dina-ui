@@ -23,7 +23,7 @@ export interface AssignedStorageProps {
   onChange?: (
     newValue: PersistedResource<StorageUnit> | { id: null }
   ) => Promisable<void>;
-  noneMessage?: JSX.Element;
+  noneMessage?: React.JSX.Element;
   parentIdInURL?: string;
   showRowAndColumnFields?: boolean;
 }
@@ -71,10 +71,7 @@ export function AssignedStorage({
           <div>
             <div className="list-inline mb-3">
               <div className="storage-path list-inline-item">
-                <StorageUnitBreadCrumb
-                  storageUnit={storageUnit}
-                  newTab={!readOnly}
-                />
+                <StorageUnitBreadCrumb storageUnit={storageUnit} />
               </div>
               {!readOnly &&
                 !parentIdInURL &&

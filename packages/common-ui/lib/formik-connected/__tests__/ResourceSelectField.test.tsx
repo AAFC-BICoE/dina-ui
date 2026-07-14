@@ -103,7 +103,7 @@ describe("ResourceSelectField component", () => {
     // Simulate the select component's input change.
     // Simulate input change to trigger search in Select field.
     const input = screen.getByRole("combobox");
-    userEvent.type(input, "Mat");
+    await userEvent.type(input, "Mat");
 
     // Wait for the mock get to be called.
     await waitFor(() =>
@@ -116,7 +116,7 @@ describe("ResourceSelectField component", () => {
 
     // Assume options are loaded; simulate option selection.
     const option = screen.getByText("Mat's Group");
-    userEvent.click(option);
+    await userEvent.click(option);
 
     // Verify the selected group is displayed.
     await waitFor(() => {
@@ -145,11 +145,11 @@ describe("ResourceSelectField component", () => {
     const select = screen.getByRole("combobox");
 
     // Open the select dropdown
-    userEvent.click(select);
+    await userEvent.click(select);
 
     // Select "Group 2" from the dropdown
     const option = await screen.findByText("Group 2"); // Wait for the option to appear
-    userEvent.click(option); // Simulate selecting the option
+    await userEvent.click(option); // Simulate selecting the option
 
     // Assert the mock function was called with expected arguments
     expect(mockOnChange).toHaveBeenLastCalledWith({

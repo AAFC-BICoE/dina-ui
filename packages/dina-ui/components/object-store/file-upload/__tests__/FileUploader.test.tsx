@@ -31,17 +31,13 @@ describe("FileUploader component", () => {
     );
 
     // Wait for any asynchronous behavior inside the component
-    await waitFor(() =>
-      expect(
-        screen.getByText(/The maximum file size is 3GB./)
-      ).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/3 GB/)).toBeInTheDocument());
 
     // Check if the message corresponds to the expected byte value
     // (For testing purposes, calculate it here if not directly accessible)
-    const expectedMaxSizeMessage = `The maximum file size is ${
+    const expectedMaxSizeMessage = `Maximum file size: ${
       EXPECTED_MAX_FILE_SIZE_IN_BYTES / 1024 ** 3
-    }GB.`;
+    } GB`;
     expect(screen.getByText(expectedMaxSizeMessage)).toBeInTheDocument();
   });
 });

@@ -21,7 +21,7 @@ export function ShowParentMaterialSample({
   id,
   attrList,
   materialSample
-}: ShowParentMaterialSampleProps): JSX.Element {
+}: ShowParentMaterialSampleProps): React.JSX.Element {
   const { locale } = useDinaIntl();
   const { formatMessage } = useDinaIntl();
 

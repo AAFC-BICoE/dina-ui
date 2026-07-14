@@ -65,7 +65,7 @@ export function ColumnItem<TData extends KitsuResource>({
                   disabled={isDisabled}
                   onChange={(e) =>
                     column.id &&
-                    onColumnItemChangeHeader(e.target.value, column.id)
+                    onColumnItemChangeHeader((e.target as HTMLTextAreaElement | HTMLInputElement).value, column.id)
                   }
                 />
               )}

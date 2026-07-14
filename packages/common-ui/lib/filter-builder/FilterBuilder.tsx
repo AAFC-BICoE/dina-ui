@@ -257,7 +257,7 @@ export class FilterBuilder extends React.Component<
   }: {
     model: FilterGroupModel | FilterRowModel;
     parent: FilterGroupModel;
-  }): JSX.Element {
+  }): React.JSX.Element {
     const onAndClick = () => {
       this.addFilterRow({
         after: model,
