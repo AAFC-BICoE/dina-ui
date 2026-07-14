@@ -74,13 +74,13 @@ exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display fie
 </DocumentFragment>
 `;
 
-exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Edge cases If no field value is provided, nothing should be generated. 1`] = `Object {}`;
+exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Edge cases If no field value is provided, nothing should be generated. 1`] = `{}`;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Empty operation Normal field 1`] = `
-Object {
-  "bool": Object {
-    "must_not": Object {
-      "exists": Object {
+{
+  "bool": {
+    "must_not": {
+      "exists": {
         "field": "data.attributes.numberField",
       },
     },
@@ -89,25 +89,25 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Empty operation With relationship as field 1`] = `
-Object {
-  "bool": Object {
+{
+  "bool": {
     "minimum_should_match": 1,
-    "should": Array [
-      Object {
-        "nested": Object {
+    "should": [
+      {
+        "nested": {
           "path": "included",
-          "query": Object {
-            "bool": Object {
-              "must": Array [
-                Object {
-                  "term": Object {
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "term": {
                     "included.type": "collection",
                   },
                 },
-                Object {
-                  "bool": Object {
-                    "must_not": Object {
-                      "exists": Object {
+                {
+                  "bool": {
+                    "must_not": {
+                      "exists": {
                         "field": "includes.name",
                       },
                     },
@@ -118,13 +118,13 @@ Object {
           },
         },
       },
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "nested": Object {
+      {
+        "bool": {
+          "must_not": {
+            "nested": {
               "path": "included",
-              "query": Object {
-                "term": Object {
+              "query": {
+                "term": {
                   "included.type": "collection",
                 },
               },
@@ -138,27 +138,27 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Equals operation Normal field 1`] = `
-Object {
-  "term": Object {
+{
+  "term": {
     "data.attributes.numberField": "123",
   },
 }
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Equals operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "term": Object {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "term": {
               "includes.name": "123",
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collection",
             },
           },
@@ -170,27 +170,27 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Exact Match operation Normal field 1`] = `
-Object {
-  "term": Object {
+{
+  "term": {
     "data.attributes.numberField": "123",
   },
 }
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Exact Match operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "term": Object {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "term": {
               "includes.name": "123",
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collection",
             },
           },
@@ -202,9 +202,9 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Greater Than Or Equal To operation Normal field 1`] = `
-Object {
-  "range": Object {
-    "data.attributes.numberField": Object {
+{
+  "range": {
+    "data.attributes.numberField": {
       "gte": "123",
     },
   },
@@ -212,21 +212,21 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Greater Than Or Equal To operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "range": Object {
-              "includes.name": Object {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "range": {
+              "includes.name": {
                 "gte": "123",
               },
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collection",
             },
           },
@@ -238,9 +238,9 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Greater Than operation Normal field 1`] = `
-Object {
-  "range": Object {
-    "data.attributes.numberField": Object {
+{
+  "range": {
+    "data.attributes.numberField": {
       "gt": "123",
     },
   },
@@ -248,21 +248,21 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Greater Than operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "range": Object {
-              "includes.name": Object {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "range": {
+              "includes.name": {
                 "gt": "123",
               },
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collection",
             },
           },
@@ -274,11 +274,11 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function In operation Normal field 1`] = `
-Object {
-  "bool": Object {
-    "must": Object {
-      "terms": Object {
-        "data.attributes.numberField": Array [
+{
+  "bool": {
+    "must": {
+      "terms": {
+        "data.attributes.numberField": [
           "1",
           "2",
           "3.5",
@@ -291,9 +291,9 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Less Than operation Normal field 1`] = `
-Object {
-  "range": Object {
-    "data.attributes.numberField": Object {
+{
+  "range": {
+    "data.attributes.numberField": {
       "lt": "123",
     },
   },
@@ -301,21 +301,21 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Less Than operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "range": Object {
-              "includes.name": Object {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "range": {
+              "includes.name": {
                 "lt": "123",
               },
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collection",
             },
           },
@@ -327,22 +327,22 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not Equals operation Normal field 1`] = `
-Object {
-  "bool": Object {
-    "should": Array [
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "term": Object {
+{
+  "bool": {
+    "should": [
+      {
+        "bool": {
+          "must_not": {
+            "term": {
               "data.attributes.numberField": "123",
             },
           },
         },
       },
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "exists": Object {
+      {
+        "bool": {
+          "must_not": {
+            "exists": {
               "field": "data.attributes.numberField",
             },
           },
@@ -354,21 +354,21 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not Equals operation With relationship as field 1`] = `
-Object {
-  "bool": Object {
-    "should": Array [
-      Object {
-        "nested": Object {
+{
+  "bool": {
+    "should": [
+      {
+        "nested": {
           "path": "included",
-          "query": Object {
-            "bool": Object {
-              "must": Object {
-                "term": Object {
+          "query": {
+            "bool": {
+              "must": {
+                "term": {
                   "included.type": "collection",
                 },
               },
-              "must_not": Object {
-                "term": Object {
+              "must_not": {
+                "term": {
                   "includes.name": "123",
                 },
               },
@@ -376,18 +376,18 @@ Object {
           },
         },
       },
-      Object {
-        "nested": Object {
+      {
+        "nested": {
           "path": "included",
-          "query": Object {
-            "bool": Object {
-              "must": Object {
-                "term": Object {
+          "query": {
+            "bool": {
+              "must": {
+                "term": {
                   "included.type": "collection",
                 },
               },
-              "must_not": Object {
-                "exists": Object {
+              "must_not": {
+                "exists": {
                   "field": "includes.name",
                 },
               },
@@ -395,10 +395,10 @@ Object {
           },
         },
       },
-      Object {
-        "bool": Object {
-          "must_not": Object {
-            "term": Object {
+      {
+        "bool": {
+          "must_not": {
+            "term": {
               "included.type": "collection",
             },
           },
@@ -410,11 +410,11 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not empty operation Normal field 1`] = `
-Object {
-  "bool": Object {
-    "must": Array [
-      Object {
-        "exists": Object {
+{
+  "bool": {
+    "must": [
+      {
+        "exists": {
           "field": "data.attributes.numberField",
         },
       },
@@ -424,19 +424,19 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not empty operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "exists": Object {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "exists": {
               "field": "includes.name",
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collection",
             },
           },
@@ -448,11 +448,11 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not in operation Normal field 1`] = `
-Object {
-  "bool": Object {
-    "must_not": Object {
-      "terms": Object {
-        "data.attributes.numberField": Array [
+{
+  "bool": {
+    "must_not": {
+      "terms": {
+        "data.attributes.numberField": [
           "1",
           "2",
           "3.5",
@@ -465,9 +465,9 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function lessThanOrEqualTo operation Normal field 1`] = `
-Object {
-  "range": Object {
-    "data.attributes.numberField": Object {
+{
+  "range": {
+    "data.attributes.numberField": {
       "lte": "123",
     },
   },
@@ -475,21 +475,21 @@ Object {
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function lessThanOrEqualTo operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "range": Object {
-              "includes.name": Object {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "range": {
+              "includes.name": {
                 "lte": "123",
               },
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collection",
             },
           },
