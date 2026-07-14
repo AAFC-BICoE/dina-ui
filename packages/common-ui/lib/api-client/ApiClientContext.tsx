@@ -1101,6 +1101,7 @@ export class CustomDinaKitsu extends Kitsu {
         timeout
       });
 
+      const rawData = JSON.parse(JSON.stringify(data));
       const deserialized = await deserialise(data);
 
       // Get the list of requested includes from both params and the path query string,
@@ -1120,16 +1121,32 @@ export class CustomDinaKitsu extends Kitsu {
         ? deserialized.data
         : [deserialized.data];
 
-      const rawItems = Array.isArray(data?.data) ? data.data : [data?.data];
+      const rawItems = Array.isArray(rawData?.data)
+        ? rawData.data
+        : [rawData?.data];
+
+      // Helper to safely merge raw stubs (preserves 'uuid') with Kitsu resolved data
+      const mergeRelationship = (raw: any, resolved: any) => {
+        if (!raw) return resolved;
+        if (!resolved) return raw;
+
+        if (Array.isArray(raw) && Array.isArray(resolved)) {
+          return raw.map((r, i) => {
+            const res = resolved[i];
+            return res && typeof res === "object" ? { ...r, ...res } : r;
+          });
+        }
+
+        if (typeof raw === "object" && typeof resolved === "object") {
+          return { ...raw, ...resolved };
+        }
+
+        return resolved;
+      };
 
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         const rawRelationships = rawItems[i]?.relationships ?? {};
-
-        // In Kitsu 11.1.0, deserialise promotes all relationships to top level
-        // but wraps them in {data: {...}}. We need to:
-        // 1. Unwrap requested includes from {data: {...}} to direct values
-        // 2. Remove relationships that were NOT requested in includes
 
         // First, handle requested includes
         for (const key of requestedIncludes) {
@@ -1140,26 +1157,31 @@ export class CustomDinaKitsu extends Kitsu {
           if (
             currentValue &&
             typeof currentValue === "object" &&
-            "data" in currentValue
+            "data" in currentValue &&
+            !Array.isArray(currentValue)
           ) {
-            // Unwrap the data - use raw data to preserve uuid if present
             if (rawRelData === null || currentValue.data === null) {
               item[key] = null;
-            } else if (rawRelData) {
-              // Use raw data to preserve uuid and other properties that might be lost in deserialization
-              item[key] = rawRelData;
+            } else if (rawRelData !== undefined) {
+              // MERGE raw stub with resolved data so we keep both 'uuid' and included attributes
+              item[key] = mergeRelationship(rawRelData, currentValue.data);
             } else {
-              // Fallback to deserialized data if raw not available
               item[key] = currentValue.data;
             }
-          } else if (
+          }
+          // If Kitsu didn't resolve it (or left an empty array because of missing ids)
+          else if (
             currentValue === undefined ||
             (Array.isArray(currentValue) && currentValue.length === 0)
           ) {
-            // Not resolved by Kitsu, try to get from raw relationships
-            if (rawRelData) {
-              // Promote stub(s) to top level
+            if (rawRelData !== undefined) {
+              // Direct assignment for unresolved stubs
               item[key] = rawRelData;
+            }
+          } else {
+            // If it's already unwrapped, but we still have raw data to merge
+            if (rawRelData !== undefined) {
+              item[key] = mergeRelationship(rawRelData, currentValue);
             }
           }
         }
