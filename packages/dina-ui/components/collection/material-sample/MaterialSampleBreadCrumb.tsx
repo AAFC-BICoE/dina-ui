@@ -5,6 +5,7 @@ import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { useDinaFormContext } from "../../../../common-ui/lib/formik-connected/DinaForm";
 import { DinaFormSection } from "common-ui";
 import { GroupLabel } from "../../group-select/GroupFieldView";
+import { BreadcrumbBanner } from "../../breadcrumb/BreadcrumbBanner";
 
 export interface MaterialSampleBreadCrumbProps {
   disableLastLink?: boolean;
@@ -84,17 +85,12 @@ export function MaterialSampleBreadCrumb({
       </h1>
       {/* Material Sample Parents */}
       {parentPath.length !== 0 && (
-        <div className="card well px-3 py-2 mb-3">
-          <ol className="breadcrumb breadcrumb-slash mb-1">
-            {parentPath.map((node) => (
-              <li className="breadcrumb-item" key={node.uuid}>
-                <Link href={`/collection/material-sample/view?id=${node.uuid}`}>
-                  {node.name}
-                </Link>
-              </li>
-            ))}
-          </ol>
-        </div>
+        <BreadcrumbBanner
+          items={parentPath.map((parent) => ({
+            href: `/collection/material-sample/view?id=${parent.uuid}`,
+            label: parent.name
+          }))}
+        />
       )}
     </>
   );

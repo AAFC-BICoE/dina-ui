@@ -177,7 +177,10 @@ const SYNONYMS_MAP_BY_TYPE = new Map<string, Map<string, string>>([
         "longitude",
         "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
       ],
-      ["collecting event remarks", "collectingEvent.remarks"]
+      ["collecting event remarks", "collectingEvent.remarks"],
+      ["province", "collectingEvent.dwcStateProvince"],
+      ["state", "collectingEvent.dwcStateProvince"],
+      ["country", "collectingEvent.dwcCountry"]
     ])
   ],
   [

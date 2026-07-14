@@ -396,7 +396,7 @@ function PreviewGeneratedNames({
                 type: "material-sample-identifier-generator"
               }
             ],
-            { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+            { apiBaseUrl: "/collection-api", forceOperationMethod: "POST" }
           );
           setGeneratedIdentifiers(response[0].nextIdentifiers ?? {});
         } catch (ex) {
@@ -418,7 +418,7 @@ function PreviewGeneratedNames({
                 type: "material-sample-identifier-generator"
               }
             ],
-            { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+            { apiBaseUrl: "/collection-api", forceOperationMethod: "POST" }
           );
           setGeneratedIdentifiers(response[0].nextIdentifiers ?? {});
         } catch (ex) {

@@ -60,6 +60,8 @@ function testCollectionEventWithGeographicalPlace(): Partial<CollectingEvent> {
     id: "2",
     type: "collecting-event",
     group: "test group",
+    dwcCountry: "Canada",
+    dwcStateProvince: "Ontario",
     geographicPlaceNameSourceDetail: {
       sourceUrl:
         "https://nominatim.openstreetmap.org/ui/details.html?osmtype=W&osmid=12345",
@@ -124,6 +126,16 @@ function testCollectionEventWithGeographicalPlaceCustomPlaceName(): Partial<Coll
       recordedOn: "2022-03-02T17:41:53.968198Z",
       type: ""
     }
+  };
+}
+
+function testCollectingEventWithManualGeographicPlace(): Partial<CollectingEvent> {
+  return {
+    id: "5",
+    type: "collecting-event",
+    group: "test group",
+    dwcCountry: "Germany",
+    dwcStateProvince: "Bavaria"
   };
 }
 
@@ -213,6 +225,10 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return {
         data: testCollectionEventWithGeographicalPlaceCustomPlaceName()
       };
+    case "collection-api/collecting-event/5?include=collectors,attachment,collectionMethod,protocol,expedition,site":
+      return {
+        data: testCollectingEventWithManualGeographicPlace()
+      };
     case "collection-api/material-sample/1":
       return { data: testMaterialSample() };
     case "collection-api/material-sample":
@@ -240,6 +256,18 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
             id: "person-2-uuid",
             type: "person",
             displayName: "Person 2"
+          }
+        ]
+      };
+    case "collection-api/collection":
+      return {
+        data: [
+          {
+            id: "collection-1-uuid",
+            type: "collection",
+            name: "Collection 1",
+            code: "COLL",
+            group: "test group"
           }
         ]
       };
@@ -442,6 +470,7 @@ describe("Material Sample Edit Page", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
+
     await waitForLoadingToDisappear();
 
     await waitFor(() =>
@@ -2754,6 +2783,99 @@ describe("Material Sample Edit Page", () => {
     });
   });
 
+  describe("Use Next Identifer functionality", () => {
+    it("Use Next Identifier checkbox disabled if no collection is selected", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            id: "333",
+            group: "test-group",
+            materialSampleName: "test-ms"
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitForLoadingToDisappear();
+
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("checkbox", {
+            name: /use next available identifier/i
+          })
+        ).toBeInTheDocument()
+      );
+
+      // The Use Next Identifier checkbox should be disabled:
+      expect(
+        wrapper.getByRole("checkbox", {
+          name: /use next available identifier/i
+        })
+      ).toBeDisabled();
+    });
+
+    it("Use Next Identifier checkbox enabled if a collection is selected", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            type: "material-sample",
+            group: "test-group"
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitForLoadingToDisappear();
+
+      // Select a collection:
+      const collectionSelect = wrapper.getByRole("combobox", {
+        name: /collection/i
+      });
+      await userEvent.click(collectionSelect);
+      await userEvent.click(
+        wrapper.getByRole("option", { name: /collection 1/i })
+      );
+
+      // The primary ID should be set to the collection's code.
+      await waitFor(() => {
+        expect(
+          wrapper.getByRole("textbox", { name: /primary id/i })
+        ).toHaveDisplayValue("COLL");
+      });
+
+      // The Use Next Identifier checkbox should be enabled:
+      const checkbox = wrapper.getByRole("checkbox", {
+        name: /use next available identifier/i
+      });
+      expect(checkbox).toBeEnabled();
+
+      // Click the checkbox to use the next available identifier:
+      await userEvent.click(checkbox);
+
+      // Submit the form, an API call should be made to determine the next available identifier.
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave).toHaveBeenCalledWith(
+          [
+            {
+              resource: {
+                amount: 1,
+                id: "collection-1-uuid",
+                type: "collection-sequence-generator"
+              },
+              type: "collection-sequence-generator"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api",
+            forceOperationMethod: "POST"
+          }
+        )
+      );
+    });
+  });
+
   describe("Collecting event permissions", () => {
     it("Display alert if user does not have access to edit the collecting event", async () => {
       const wrapper = mountWithAppContext(
@@ -3758,6 +3880,328 @@ describe("Material Sample Edit Page", () => {
       );
     });
 
+    it("Create a manual geographic place name to a new collecting event", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,
+        testCtx
+      );
+      await waitFor(() => expect(wrapper.container).toBeInTheDocument());
+
+      // Enable the collecting event section:
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        fail("Collecting event toggle needs to exist at this point.");
+      }
+      fireEvent.click(collectingEventToggle[0]);
+
+      await waitFor(() =>
+        expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
+      );
+
+      // Click the switch to go into manual mode.
+      const manualSwitchInput = wrapper.container.querySelector(
+        "#manualGeographyInput"
+      );
+      if (!manualSwitchInput) {
+        fail("Manual geography switch needs to exist at this point.");
+      }
+      const manualSwitchBg =
+        manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
+      if (!manualSwitchBg) {
+        fail(
+          "Manual geography switch background needs to exist at this point."
+        );
+      }
+      fireEvent.click(manualSwitchBg);
+
+      // Set the State/Province field:
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /state\/province/i }),
+        "Ontario"
+      );
+
+      // Set the Country field:
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /country/i }),
+        "Canada"
+      );
+
+      // Save the form
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  dwcCountry: "Canada",
+                  dwcStateProvince: "Ontario",
+                  dwcVerbatimCoordinateSystem: null,
+                  dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+                  geoReferenceAssertions: [
+                    {
+                      isPrimary: true
+                    }
+                  ],
+                  group: "aafc",
+                  publiclyReleasable: false,
+                  type: "collecting-event"
+                },
+                type: "collecting-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ],
+          [
+            [
+              {
+                resource: {
+                  collectingEvent: {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "collecting-event"
+                  },
+                  publiclyReleasable: false,
+                  type: "material-sample"
+                },
+                type: "material-sample"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+    });
+
+    it("Edit an existing collecting event to a manual geographic place name", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "1",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitFor(() =>
+        expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
+      );
+
+      // Click the switch to go into manual mode.
+      const manualSwitchInput = wrapper.container.querySelector(
+        "#manualGeographyInput"
+      );
+      if (!manualSwitchInput) {
+        fail("Manual geography switch needs to exist at this point.");
+      }
+      const manualSwitchBg =
+        manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
+      if (!manualSwitchBg) {
+        fail(
+          "Manual geography switch background needs to exist at this point."
+        );
+      }
+      fireEvent.click(manualSwitchBg);
+
+      // Set the State/Province field:
+      await userEvent.clear(
+        wrapper.getByRole("textbox", { name: /state\/province/i })
+      );
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /state\/province/i }),
+        "Ontario"
+      );
+
+      // Set the Country field:
+      await userEvent.clear(wrapper.getByRole("textbox", { name: /country/i }));
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /country/i }),
+        "Canada"
+      );
+
+      // Save the form
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  dwcCountry: "Canada",
+                  dwcStateProvince: "Ontario",
+                  id: "1",
+                  type: "collecting-event"
+                },
+                type: "collecting-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+    });
+
+    it("Edit an existing collecting event with geographic place details and switch it to manual", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "2",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("button", { name: /remove this place/i })
+        ).toBeInTheDocument()
+      );
+
+      // Click the remove this place button.
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /remove this place/i })
+      );
+
+      // Click the switch to go into manual mode.
+      const manualSwitchInput = wrapper.container.querySelector(
+        "#manualGeographyInput"
+      );
+      if (!manualSwitchInput) {
+        fail("Manual geography switch needs to exist at this point.");
+      }
+      const manualSwitchBg =
+        manualSwitchInput.parentElement?.querySelector(".react-switch-bg");
+      if (!manualSwitchBg) {
+        fail(
+          "Manual geography switch background needs to exist at this point."
+        );
+      }
+      fireEvent.click(manualSwitchBg);
+
+      // Set the State/Province field:
+      await userEvent.clear(
+        wrapper.getByRole("textbox", { name: /state\/province/i })
+      );
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /state\/province/i }),
+        "Bavaria"
+      );
+
+      // Set the Country field:
+      await userEvent.clear(wrapper.getByRole("textbox", { name: /country/i }));
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /country/i }),
+        "Germany"
+      );
+
+      // Save the form
+      await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+      await waitFor(() =>
+        expect(mockSave.mock.calls).toEqual([
+          [
+            [
+              {
+                resource: {
+                  dwcCountry: "Germany",
+                  dwcStateProvince: "Bavaria",
+                  geographicPlaceNameSource: null,
+                  geographicPlaceNameSourceDetail: null,
+                  id: "2",
+                  type: "collecting-event"
+                },
+                type: "collecting-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          ]
+        ])
+      );
+    });
+
+    it("Edit an existing collecting event with manual geographic place, manual switch should be checked", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "5",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("textbox", { name: /state\/province/i })
+        ).toBeInTheDocument()
+      );
+
+      // Check that the manual switch is checked.
+      const manualSwitchInput = wrapper.container.querySelector(
+        "#manualGeographyInput"
+      );
+      if (!manualSwitchInput) {
+        fail("Manual geography switch needs to exist at this point.");
+      }
+      expect(manualSwitchInput).toBeChecked();
+    });
+
+    it("Remove manual geographic place from an existing collecting event, manual switch should be unchecked", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleForm
+          materialSample={{
+            ...testMaterialSample(),
+            id: "333",
+            materialSampleName: "test-ms",
+            collectingEvent: {
+              id: "5",
+              type: "collecting-event"
+            }
+          }}
+          onSaved={mockOnSaved}
+        />,
+        testCtx
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.getByRole("textbox", { name: /state\/province/i })
+        ).toBeInTheDocument()
+      );
+
+      // Click the remove this place button.
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /remove this place/i })
+      );
+
+      // Check that the manual switch is unchecked.
+      const manualSwitchInput = wrapper.container.querySelector(
+        "#manualGeographyInput"
+      );
+      if (!manualSwitchInput) {
+        fail("Manual geography switch needs to exist at this point.");
+      }
+      expect(manualSwitchInput).not.toBeChecked();
+    });
+  });
+
+  describe("scheduled actions", () => {
     it("Creates a scheduled action.", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleForm defaultToNotReleasable onSaved={mockOnSaved} />,

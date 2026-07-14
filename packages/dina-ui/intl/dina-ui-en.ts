@@ -21,6 +21,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addCustomPlaceName: "Add",
   addDetermination: "Add Determination",
   addExistingStorageUnitAsChild: "Add Existing Storage Unit",
+  addExistingStorageUnitAsChild_tooltip:
+    "Add an existing storage unit as a child of this storage unit.",
   addExternalResourceTitle: "Add New External Resource",
   addFilesButton: "Add Files",
   addFilterTooltip:
@@ -40,6 +42,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addMaterialSampleTypeTitle: "Add Material Sample Type",
   addMetadataTitle: "Add Metadata",
   addNewChildStorageUnit: "Add New Child Storage Unit",
+  addNewChildStorageUnit_tooltip:
+    "Add a new storage unit as a child of this storage unit.",
   addNewElement: "Add New {typeName}",
   addNewGroup: "Add New Group",
   addNewPerson: "Add New Person",
@@ -690,6 +694,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   institution: "Institution",
   institutionListTitle: "Institutions",
   isFiledAs: "Filed As",
+  field_isGeneric: "Generic",
+  field_isGeneric_tooltip:
+    "Is the storage unit representing a generic instance of the storage unit type?",
   isTargetHeader: "Is Target ?",
   isolation: "Isolation",
   keepContentsTogether: "Keep Contents Together",
@@ -811,6 +818,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metersField_tooltip:
     "Use the following units for auto-conversion: ft, in, ft in, yd, mm, cm, km, pd, po, pd po.",
   moveAllContent: " Move All Content",
+  moveAllContent_tooltip:
+    "Move all child storage units and material samples to the new storage unit.",
   multiple: "Multiple",
   multipleMaterialSamples: "Multiple Material Samples",
   multipleUnits: "Multiple Units",
@@ -971,7 +980,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeSavedSearch: "Remove Saved Search",
   areYouSureRemoveSavedSearch: "Are you sure you want to remove:",
   removeThisElement: "Remove This {typeName}",
-  removeThisPlaceLabel: " Remove this Place",
+  removeThisPlaceLabel: "Remove this Place",
   requiredField: "Required field",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   resetNamesToDefaultValues: "Reset Names to Default Values",
