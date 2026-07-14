@@ -16,10 +16,6 @@ You should instead reference a message key:
 
 [source,tsx]
 ----
-import { DinaMessage } from "../../intl/dina-intl.ts""
-
-...
-
 <h2><DinaMessage id="pcrPrimerListTitle" /></h2>
 ----
 
@@ -29,8 +25,6 @@ You can also use the "formatMessage" function if you want to reference a message
 
 [source,tsx]
 ----
-import { useDinaIntl } from "../../dina-intl.ts""
-
 function MyComponent() {
   const { formatMessage } = useDinaIntl();
 
