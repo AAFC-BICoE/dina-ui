@@ -61,7 +61,7 @@
     "mammoth": "1.6.0",
     "underscore": "1.13.1",
     "follow-redirects": "^1.15.4",
-    "axios": "1.11.0"
+    "axios": "1.18.1"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

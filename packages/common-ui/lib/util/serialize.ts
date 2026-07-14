@@ -54,6 +54,8 @@ export async function serialize<TData extends KitsuResource>({
 
   const nestedObjects = getNestedObjects(resourceCopy);
 
+  wrapRelationshipPointers(resourceCopy);
+
   const httpVerb = resource.id ? "PATCH" : "POST";
 
   const { data } = await customSerialise(type, resourceCopy, httpVerb);
@@ -127,6 +129,26 @@ function getNullRelationships(resource: KitsuResource) {
     nullRelationships[field] = { data: null };
   }
   return nullRelationships;
+}
+
+/**
+ * kitsu-core 9+ requires relationship values to be pre-wrapped in `{ data: ... }` to be
+ * recognized during serialisation. This wraps any remaining resource-pointer properties
+ * (objects with an `id`) that aren't already wrapped.
+ */
+function wrapRelationshipPointers(resource: KitsuResource) {
+  for (const key of Object.keys(resource)) {
+    const value = (resource as any)[key];
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      value.id !== undefined &&
+      !("data" in value)
+    ) {
+      (resource as any)[key] = { data: value };
+    }
+  }
 }
 
 function getNestedObjects(resource: KitsuResource) {
