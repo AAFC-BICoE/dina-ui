@@ -13,7 +13,7 @@
     "lint:fix": "eslint . --fix",
     "test": "tsc && jest",
     "test:coverage": "tsc && jest --coverage",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -30,7 +30,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.37.3",
     "globals": "^15.14.0",
-    "husky": "^7.0.2",
+    "husky": "^9.0.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.3.1",
     "jsonapi-typescript": "^0.1.3",
