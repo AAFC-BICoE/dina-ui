@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`QueryBuilderUUIDSearch transformUUIDSearchToDSL function Field path and value provided 1`] = `
-Object {
-  "term": Object {
+{
+  "term": {
     "field_path_test": "value_test",
   },
 }

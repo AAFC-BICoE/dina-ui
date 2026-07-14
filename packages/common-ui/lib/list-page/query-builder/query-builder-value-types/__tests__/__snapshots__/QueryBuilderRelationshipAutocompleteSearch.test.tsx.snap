@@ -55,7 +55,7 @@ exports[`QueryBuilderRelationshipAutocompleteSearch QueryRowRelationshipAutocomp
                   id="react-select-2-input"
                   role="combobox"
                   spellcheck="false"
-                  style="opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
+                  style="color: inherit; background: 0px; opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
                   tabindex="0"
                   type="text"
                   value=""
@@ -109,10 +109,10 @@ exports[`QueryBuilderRelationshipAutocompleteSearch transformRelationshipAutocom
 exports[`QueryBuilderRelationshipAutocompleteSearch transformRelationshipAutocompleteToDSL function Edge cases If value is not a string, nothing should be generated 1`] = `undefined`;
 
 exports[`QueryBuilderRelationshipAutocompleteSearch transformRelationshipAutocompleteToDSL function Empty operation With direct path (not included) 1`] = `
-Object {
-  "bool": Object {
-    "must_not": Object {
-      "exists": Object {
+{
+  "bool": {
+    "must_not": {
+      "exists": {
         "field": "data.relationships.collectors.data.id",
       },
     },
@@ -121,21 +121,21 @@ Object {
 `;
 
 exports[`QueryBuilderRelationshipAutocompleteSearch transformRelationshipAutocompleteToDSL function Empty operation With relationship as field (included path) 1`] = `
-Object {
-  "bool": Object {
-    "must_not": Object {
-      "nested": Object {
+{
+  "bool": {
+    "must_not": {
+      "nested": {
         "path": "included",
-        "query": Object {
-          "bool": Object {
-            "must": Array [
-              Object {
-                "exists": Object {
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "exists": {
                   "field": "included.relationships.collectors.data.id",
                 },
               },
-              Object {
-                "term": Object {
+              {
+                "term": {
                   "included.type": "collecting-event",
                 },
               },
@@ -149,27 +149,27 @@ Object {
 `;
 
 exports[`QueryBuilderRelationshipAutocompleteSearch transformRelationshipAutocompleteToDSL function Equals operation With direct path (not included) 1`] = `
-Object {
-  "term": Object {
+{
+  "term": {
     "data.relationships.collectors.data.id": "person-1",
   },
 }
 `;
 
 exports[`QueryBuilderRelationshipAutocompleteSearch transformRelationshipAutocompleteToDSL function Equals operation With relationship as field (included path) 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "term": Object {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "term": {
               "included.relationships.collectors.data.id": "person-1",
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collecting-event",
             },
           },
@@ -181,27 +181,27 @@ Object {
 `;
 
 exports[`QueryBuilderRelationshipAutocompleteSearch transformRelationshipAutocompleteToDSL function Not Empty operation With direct path (not included) 1`] = `
-Object {
-  "exists": Object {
+{
+  "exists": {
     "field": "data.relationships.collectors.data.id",
   },
 }
 `;
 
 exports[`QueryBuilderRelationshipAutocompleteSearch transformRelationshipAutocompleteToDSL function Not Empty operation With relationship as field (included path) 1`] = `
-Object {
-  "nested": Object {
+{
+  "nested": {
     "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "exists": Object {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "exists": {
               "field": "included.relationships.collectors.data.id",
             },
           },
-          Object {
-            "term": Object {
+          {
+            "term": {
               "included.type": "collecting-event",
             },
           },
@@ -213,10 +213,10 @@ Object {
 `;
 
 exports[`QueryBuilderRelationshipAutocompleteSearch transformRelationshipAutocompleteToDSL function Not Equals operation With direct path (not included) 1`] = `
-Object {
-  "bool": Object {
-    "must_not": Object {
-      "term": Object {
+{
+  "bool": {
+    "must_not": {
+      "term": {
         "data.relationships.collectors.data.id": "person-1",
       },
     },
@@ -225,21 +225,21 @@ Object {
 `;
 
 exports[`QueryBuilderRelationshipAutocompleteSearch transformRelationshipAutocompleteToDSL function Not Equals operation With relationship as field (included path) 1`] = `
-Object {
-  "bool": Object {
-    "must_not": Object {
-      "nested": Object {
+{
+  "bool": {
+    "must_not": {
+      "nested": {
         "path": "included",
-        "query": Object {
-          "bool": Object {
-            "must": Array [
-              Object {
-                "term": Object {
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "term": {
                   "included.relationships.collectors.data.id": "person-1",
                 },
               },
-              Object {
-                "term": Object {
+              {
+                "term": {
                   "included.type": "collecting-event",
                 },
               },
