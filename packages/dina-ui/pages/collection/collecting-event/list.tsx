@@ -139,6 +139,13 @@ export default function CollectingEventListPage() {
               type: "geoShape",
               referencedBy: "site",
               referencedType: "site"
+            },
+            {
+              label: "name",
+              path: "included.attributes.name",
+              type: "expedition",
+              referencedBy: "expedition",
+              referencedType: "expedition"
             }
           ]
         }}
