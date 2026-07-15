@@ -726,7 +726,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeTemplateOrderInfo:
     "This Managed Attribute layout will be saved into the Form Template.",
   managedAttributeDeleteWarning:
-    "Deleting this Managed Attribute could have unintended consequences for exports, external systems, custom modules, or scripts that reference it. Are you sure you want to proceed?",
+    "Deleting this Managed Attribute could impact existing untracked resources like exports or scripts. Are you sure you want to proceed?",
   managedAttributeValueLabel: "Value",
   managedAttributes: "Managed Attributes",
   managedAttributesViews: "Form Templates",
