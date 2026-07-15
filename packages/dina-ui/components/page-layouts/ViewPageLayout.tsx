@@ -256,6 +256,11 @@ function ViewPageLayoutInner<T extends KitsuResource>({
                         specialListUrl ? specialListUrl : `${entityLink}/list`
                       }
                       type={type}
+                      messageBody={
+                        type === "managed-attribute" ? (
+                          <DinaMessage id="managedAttributeDeleteWarning" />
+                        ) : undefined
+                      }
                     />
                   ))}
               </div>

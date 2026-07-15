@@ -751,6 +751,8 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   managedAttributeEditTitle: "Regelattribut bearbeiten",
   managedAttributeTemplateOrderInfo:
     "Dieses Regelattribut Layout wird in der Formularvorlage gespeichert",
+  managedAttributeDeleteWarning:
+    "Das Löschen dieses Regelattributs könnte unbeabsichtigte Folgen für Exporte, externe Systeme, benutzerdefinierte Module oder Skripte haben, die darauf verweisen. Sind Sie sicher, dass Sie fortfahren möchten?",
   managedAttributeValueLabel: "Wert",
   managedAttributes: "Regelattribute",
   managedAttributesViews: "Formularvorlage",
