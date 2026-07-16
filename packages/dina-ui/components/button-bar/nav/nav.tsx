@@ -17,6 +17,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Row from "react-bootstrap/Row";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
+import { UIPreferenceHook } from "../../home2/UIPreferenceHook";
 
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
@@ -36,17 +37,9 @@ export function Nav({
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
   const instanceContext = useInstanceContext();
-  const [useNewLayout, setUseNewLayout] = useState(() => {
-    return localStorage.getItem("useNewLayout") === "true";
-  });
-  const activateNewLayout = () => {
-    localStorage.setItem("useNewLayout", "true");
-    setUseNewLayout(true);
-  };
-  const deactivateNewLayout = () => {
-    localStorage.removeItem("useNewLayout");
-    setUseNewLayout(false);
-  };
+  const { useNewLayout, activateNewLayout, deactivateNewLayout } =
+    UIPreferenceHook();
+
   const homeLink = useNewLayout ? "/feedback/home2" : "/";
 
   // Editable if current user is dina-admin, or a collection manager of any group:
