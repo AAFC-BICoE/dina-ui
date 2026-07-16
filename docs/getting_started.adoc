@@ -6,6 +6,9 @@ Before starting, you will need to setup your dev environment:
 
 See dina-local-deployment https://aafc-bicoe.github.io/dina-local-deployment/#_prerequisites[prerequisites]
 
+[subs="attributes"]
+You should have Node.js v{var_node_version} and Yarn v{var_yarn_version} installed.
+
 You can check which versions you currently have installed with:
 
 ----

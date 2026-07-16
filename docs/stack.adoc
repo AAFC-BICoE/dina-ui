@@ -2,17 +2,18 @@
 
 This application is developed using these technologies:
 
-- https://nodejs.org/[Node.js] (v22): JavaScript runtime environment.
-- https://yarnpkg.com/[Yarn] (v1.22.21): Node.js package manager.
-- https://www.typescriptlang.org/[TypeScript] (v6.0.3): JavaScript type support.
-- https://reactjs.org/[React] (v19.2.7): JavaScript library for building user interfaces.
-- https://nextjs.org/[Next.js] (v16.2.10): Framework for building React-based applications.
-- https://getbootstrap.com/[Bootstrap] (v5.1.3): CSS framework.
-- https://jestjs.io/[Jest] (v29.7.0): Testing framework.
-- https://formik.org/[Formik] (v2.2.7): Form management library.
-- https://www.keycloak.org/[Keycloak] (v25.0.6): Authentication system.
-- https://github.com/wopian/kitsu[Kitsu] (v8.3.1): JSON:API client.
-- https://tanstack.com/table/v8[React Table] (v8.9.3): Table component library.
-- https://echarts.apache.org/[ECharts] (v5.6.0): Charting library.
-- https://github.com/Esri/esri-loader[ESRI Loader] (v3.3.0): Map integration.
+[subs="attributes"]
+- https://nodejs.org/[Node.js] (v{var_node_version}): JavaScript runtime environment.
+- https://yarnpkg.com/[Yarn] (v{var_yarn_version}): Node.js package manager.
+- https://www.typescriptlang.org/[TypeScript] (v{var_typescript_version}): JavaScript type support.
+- https://reactjs.org/[React] (v{var_react_version}): JavaScript library for building user interfaces.
+- https://nextjs.org/[Next.js] (v{var_nextjs_version}): Framework for building React-based applications.
+- https://getbootstrap.com/[Bootstrap] (v{var_bootstrap_version}): CSS framework.
+- https://jestjs.io/[Jest] (v{var_jest_version}): Testing framework.
+- https://formik.org/[Formik] (v{var_formik_version}): Form management library.
+- https://www.keycloak.org/[Keycloak] (v{var_keycloak_version}): Authentication system.
+- https://github.com/wopian/kitsu[Kitsu] (v{var_kitsu_version}): JSON:API client.
+- https://tanstack.com/table/v8[React Table] (v{var_react_table_version}): Table component library.
+- https://echarts.apache.org/[ECharts] (v{var_echarts_version}): Charting library.
+- https://github.com/Esri/esri-loader[ESRI Loader] (v{var_esri_loader_version}): Map integration.
 - https://www.docker.com/[Docker]: Application containerization.
