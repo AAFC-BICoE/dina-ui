@@ -67,10 +67,6 @@ include::intl.adoc[]
 
 include::WCAG_compliance_test_tools_setup.adoc[]
 
-:leveloffset: 1
-
-include::WCAG_automation.adoc[]
-
 = Translation task
 
 :leveloffset: 1
