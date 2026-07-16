@@ -15,7 +15,7 @@
     "core-js": "^3.19.1",
     "custom-event": "^1.0.1",
     "dataloader": "^2.0.0",
-    "dompurify": "^2.3.3",
+    "dompurify": "^3.4.12",
     "echarts": "^5.6.0",
     "fast-xml-parser": "^4.5.4",
     "flat": "^5.0.2",
@@ -52,7 +52,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@types/dompurify": "^2.3.1",
+    "@types/dompurify": "^3.2.0",
     "@types/flat": "^5.0.2",
     "@types/lodash": "^4.17.24",
     "@types/react": "19.2.17",
