@@ -110,90 +110,83 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                     class="d-flex align-items-center"
                   >
                     <div
-                      style="margin-left: 20px;"
-                    />
-                    <div
-                      style="margin-left: 20px;"
+                      class="d-flex align-items-center text-end"
                     >
-                      <div
-                        class="d-flex align-items-center text-end"
+                      <span
+                        class="me-2 my-auto h4"
                       >
-                        <span
-                          class="me-2 my-auto h4"
+                        <svg
+                          fill="currentColor"
+                          height="1em"
+                          stroke="currentColor"
+                          stroke-width="0"
+                          viewBox="0 0 496 512"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
                         >
-                          <svg
-                            fill="currentColor"
-                            height="1em"
-                            stroke="currentColor"
-                            stroke-width="0"
-                            viewBox="0 0 496 512"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"
-                            />
-                          </svg>
-                        </span>
-                        <span
-                          class="me-4 my-auto h5"
-                        >
-                          <a
-                            href="/dina-user/view?id=&hideBackButton=true"
-                          >
-                            test-user
-                          </a>
-                        </span>
-                        <div
-                          class="notification-container"
-                        >
-                          <button
-                            aria-label="Notifications"
-                            class="btn btn-primary notification-bell-button"
-                            type="button"
-                          >
-                            <svg
-                              class="notification-bell-icon"
-                              fill="currentColor"
-                              height="1em"
-                              stroke="currentColor"
-                              stroke-width="0"
-                              viewBox="0 0 448 512"
-                              width="1em"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z"
-                              />
-                            </svg>
-                          </button>
-                          <div
-                            aria-atomic="true"
-                            aria-live="polite"
-                            class="notification-toast-container"
+                          <path
+                            d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"
                           />
-                        </div>
+                        </svg>
+                      </span>
+                      <span
+                        class="me-4 my-auto h5"
+                      >
+                        <a
+                          href="/dina-user/view?id=&hideBackButton=true"
+                        >
+                          test-user
+                        </a>
+                      </span>
+                      <div
+                        class="notification-container"
+                      >
                         <button
-                          class="btn btn-info logout-button my-auto"
+                          aria-label="Notifications"
+                          class="btn btn-primary notification-bell-button"
                           type="button"
                         >
                           <svg
-                            class="me-2"
+                            class="notification-bell-icon"
                             fill="currentColor"
                             height="1em"
                             stroke="currentColor"
                             stroke-width="0"
-                            viewBox="0 0 512 512"
+                            viewBox="0 0 448 512"
                             width="1em"
                             xmlns="http://www.w3.org/2000/svg"
                           >
                             <path
-                              d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+                              d="M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z"
                             />
                           </svg>
-                          Logout
                         </button>
+                        <div
+                          aria-atomic="true"
+                          aria-live="polite"
+                          class="notification-toast-container"
+                        />
                       </div>
+                      <button
+                        class="btn btn-info logout-button my-auto"
+                        type="button"
+                      >
+                        <svg
+                          class="me-2"
+                          fill="currentColor"
+                          height="1em"
+                          stroke="currentColor"
+                          stroke-width="0"
+                          viewBox="0 0 512 512"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+                          />
+                        </svg>
+                        Logout
+                      </button>
                     </div>
                   </div>
                 </li>
@@ -813,90 +806,83 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                     class="d-flex align-items-center"
                   >
                     <div
-                      style="margin-left: 20px;"
-                    />
-                    <div
-                      style="margin-left: 20px;"
+                      class="d-flex align-items-center text-end"
                     >
-                      <div
-                        class="d-flex align-items-center text-end"
+                      <span
+                        class="me-2 my-auto h4"
                       >
-                        <span
-                          class="me-2 my-auto h4"
+                        <svg
+                          fill="currentColor"
+                          height="1em"
+                          stroke="currentColor"
+                          stroke-width="0"
+                          viewBox="0 0 496 512"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
                         >
-                          <svg
-                            fill="currentColor"
-                            height="1em"
-                            stroke="currentColor"
-                            stroke-width="0"
-                            viewBox="0 0 496 512"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"
-                            />
-                          </svg>
-                        </span>
-                        <span
-                          class="me-4 my-auto h5"
-                        >
-                          <a
-                            href="/dina-user/view?id=&hideBackButton=true"
-                          >
-                            test-user
-                          </a>
-                        </span>
-                        <div
-                          class="notification-container"
-                        >
-                          <button
-                            aria-label="Notifications"
-                            class="btn btn-primary notification-bell-button"
-                            type="button"
-                          >
-                            <svg
-                              class="notification-bell-icon"
-                              fill="currentColor"
-                              height="1em"
-                              stroke="currentColor"
-                              stroke-width="0"
-                              viewBox="0 0 448 512"
-                              width="1em"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z"
-                              />
-                            </svg>
-                          </button>
-                          <div
-                            aria-atomic="true"
-                            aria-live="polite"
-                            class="notification-toast-container"
+                          <path
+                            d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"
                           />
-                        </div>
+                        </svg>
+                      </span>
+                      <span
+                        class="me-4 my-auto h5"
+                      >
+                        <a
+                          href="/dina-user/view?id=&hideBackButton=true"
+                        >
+                          test-user
+                        </a>
+                      </span>
+                      <div
+                        class="notification-container"
+                      >
                         <button
-                          class="btn btn-info logout-button my-auto"
+                          aria-label="Notifications"
+                          class="btn btn-primary notification-bell-button"
                           type="button"
                         >
                           <svg
-                            class="me-2"
+                            class="notification-bell-icon"
                             fill="currentColor"
                             height="1em"
                             stroke="currentColor"
                             stroke-width="0"
-                            viewBox="0 0 512 512"
+                            viewBox="0 0 448 512"
                             width="1em"
                             xmlns="http://www.w3.org/2000/svg"
                           >
                             <path
-                              d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+                              d="M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z"
                             />
                           </svg>
-                          Logout
                         </button>
+                        <div
+                          aria-atomic="true"
+                          aria-live="polite"
+                          class="notification-toast-container"
+                        />
                       </div>
+                      <button
+                        class="btn btn-info logout-button my-auto"
+                        type="button"
+                      >
+                        <svg
+                          class="me-2"
+                          fill="currentColor"
+                          height="1em"
+                          stroke="currentColor"
+                          stroke-width="0"
+                          viewBox="0 0 512 512"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+                          />
+                        </svg>
+                        Logout
+                      </button>
                     </div>
                   </div>
                 </li>
