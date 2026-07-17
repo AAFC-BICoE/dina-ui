@@ -10,7 +10,7 @@
     "@rehooks/local-storage": "2.4.0",
     "@tanstack/react-table": "^8.9.3",
     "@types/react": "19.2.17",
-    "axios-cache-interceptor": "1.7.0",
+    "axios-cache-interceptor": "1.12.0",
     "bodybuilder": "^2.4.0",
     "core-js": "^3.19.1",
     "custom-event": "^1.0.1",
