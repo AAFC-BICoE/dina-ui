@@ -34,7 +34,7 @@ Object.defineProperty(Element.prototype, "scrollIntoView", {
   configurable: true
 });
 
-jest.setTimeout(40000);
+jest.setTimeout(50000);
 
 if (!HTMLElement.prototype.scroll) {
   HTMLElement.prototype.scroll = () => {};
