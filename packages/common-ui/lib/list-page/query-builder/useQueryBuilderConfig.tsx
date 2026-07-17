@@ -125,6 +125,10 @@ function getQueryBuilderTypeFromIndexType(
     case "geoShape":
       return type;
 
+    // Expedition reference names behave like text search fields.
+    case "expedition":
+      return "text";
+
     // If it's stored directly as a keyword, it's considered a text field.
     case "keyword":
       return "text";

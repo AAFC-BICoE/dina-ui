@@ -409,6 +409,20 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         optionDescription: "email",
         elasticSearchRelationshipPath:
           "included.relationships.collectors.data.id"
+      } as RelationshipAutocompleteField,
+
+      // Collecting Event - Expeditions (Relationship Autocomplete)
+      {
+        type: "relationshipAutocomplete",
+        label: "Expedition",
+        path: "included.relationships.expedition.data",
+        referencedBy: "collectingEvent",
+        referencedType: "collecting-event",
+        apiEndpoint: "collection-api/expedition",
+        optionLabel: "name",
+        optionDescription: "group",
+        elasticSearchRelationshipPath:
+          "included.relationships.expedition.data.id"
       } as RelationshipAutocompleteField
     ]
   };

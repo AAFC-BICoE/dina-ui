@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import Kitsu from "kitsu";
 import {
   ApiClientImpl,
@@ -39,6 +39,7 @@ import {
   MOCK_GET_ERROR
 } from "../__mocks__/ApiClientContextMocks";
 import { waitFor } from "@testing-library/dom";
+import { buildMemoryStorage, setupCache } from "axios-cache-interceptor";
 
 /** Mock of Axios' patch function. */
 const mockPatch: jest.Mock<any, any> = jest.fn((_url, data, _config) => {
@@ -1167,6 +1168,44 @@ describe("API client context", () => {
       });
       mockAxiosGet = jest.fn();
       kitsu.axios = { get: mockAxiosGet } as any;
+    });
+
+    it("Caches repeated identical GET requests instead of hitting the network again", async () => {
+      let networkCallCount = 0;
+
+      // A raw axios instance with a fake adapter that counts real "network" calls.
+      const rawAxios = axios.create({
+        adapter: async (config) => {
+          networkCallCount++;
+          return {
+            data: {
+              data: {
+                type: "material-sample",
+                id: "1",
+                attributes: { name: "Sample 1" }
+              }
+            },
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config
+          };
+        }
+      });
+
+      // Wrap it with the cache interceptor the same way ApiClientImpl does.
+      const cachedAxios = setupCache(rawAxios, {
+        storage: buildMemoryStorage(false, 1000, 100),
+        ttl: 1000
+      });
+
+      kitsu.axios = cachedAxios as any;
+
+      await kitsu.get("seqdb-api/material-sample/1");
+      await kitsu.get("seqdb-api/material-sample/1");
+
+      // The second call should be served from cache, not hit the adapter again.
+      expect(networkCallCount).toBe(1);
     });
 
     it("Sends a get request without omitting the end of a login URL more than 2 slashes.", async () => {

@@ -665,10 +665,73 @@ export class ApiClientImpl implements ApiClientI {
     let responseCounter = 0;
     const newResponseData: any[] = [];
 
+    // Save raw data before deserialization to preserve nested attributes structure
+    const rawResponseData = JSON.parse(
+      JSON.stringify((response as AxiosResponse).data)
+    );
+
     // Deserialize the response data.
-    (response as AxiosResponse).data = deserialise(
+    (response as AxiosResponse).data = await deserialise(
       (response as AxiosResponse).data
     );
+
+    // In Kitsu 11.1.0, deserialise promotes relationships to top level but wraps them in {data: {...}}.
+    // For bulkLoadResources, we want to keep the original JSON:API structure with relationships
+    // in the relationships object. Move any promoted relationships back.
+    // Also, Kitsu 11.1.0 flattens attributes for ALL resources, but we need to keep attributes
+    // nested for resources inside relationship data.
+    const items = Array.isArray((response as AxiosResponse).data.data)
+      ? (response as AxiosResponse).data.data
+      : [(response as AxiosResponse).data.data];
+
+    const rawItems = Array.isArray(rawResponseData?.data)
+      ? rawResponseData.data
+      : [rawResponseData?.data];
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const rawItem = rawItems[i];
+      if (!item) continue;
+
+      // Find properties that look like promoted relationships (have {data: ...} structure)
+      const relationshipsToMove: string[] = [];
+      for (const key in item) {
+        if (
+          key === "id" ||
+          key === "type" ||
+          key === "relationships" ||
+          key === "links" ||
+          key === "meta"
+        ) {
+          continue;
+        }
+        const value = item[key];
+        // Check if this looks like a promoted relationship with {data: ...} wrapper
+        if (value && typeof value === "object" && "data" in value) {
+          relationshipsToMove.push(key);
+        }
+      }
+
+      // Move promoted relationships back into the relationships object
+      // and restore nested attributes structure for resources inside relationships
+      if (relationshipsToMove.length > 0) {
+        if (!item.relationships) {
+          item.relationships = {};
+        }
+        for (const key of relationshipsToMove) {
+          const rawRelationship = rawItem?.relationships?.[key];
+
+          // Restore the original nested attributes structure from raw data
+          if (rawRelationship?.data) {
+            item.relationships[key] = { data: rawRelationship.data };
+          } else {
+            // Fallback to the deserialized version if raw data not available
+            item.relationships[key] = item[key];
+          }
+          delete item[key];
+        }
+      }
+    }
 
     // If there are missing IDs, we need to fill in the gaps with nulls.
     if (missingIds.length != 0) {
@@ -682,13 +745,72 @@ export class ApiClientImpl implements ApiClientI {
       }
 
       (response as AxiosResponse).data.data = newResponseData;
-      return response;
     }
 
-    (response as AxiosResponse).data = deserialise(
-      (response as AxiosResponse).data
-    );
     return response;
+  }
+
+  /**
+   * Restores JSON:API relationship structure after Kitsu 11.1.0 deserialization.
+   * Kitsu 11.1.0 promotes relationships to top level but wraps them in {data: {...}}.
+   * This function moves them back into the relationships object and preserves nested attributes.
+   */
+  private restoreRelationshipsStructure(
+    deserializedData: any,
+    rawData: any
+  ): void {
+    const items = Array.isArray(deserializedData.data)
+      ? deserializedData.data
+      : [deserializedData.data];
+
+    const rawItems = Array.isArray(rawData?.data)
+      ? rawData.data
+      : [rawData?.data];
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const rawItem = rawItems[i];
+      if (!item) continue;
+
+      // Find properties that look like promoted relationships (have {data: ...} structure)
+      const relationshipsToMove: string[] = [];
+      for (const key in item) {
+        if (
+          key === "id" ||
+          key === "type" ||
+          key === "relationships" ||
+          key === "links" ||
+          key === "meta"
+        ) {
+          continue;
+        }
+        const value = item[key];
+        // Check if this looks like a promoted relationship with {data: ...} wrapper
+        if (value && typeof value === "object" && "data" in value) {
+          relationshipsToMove.push(key);
+        }
+      }
+
+      // Move promoted relationships back into the relationships object
+      // and restore nested attributes structure for resources inside relationships
+      if (relationshipsToMove.length > 0) {
+        if (!item.relationships) {
+          item.relationships = {};
+        }
+        for (const key of relationshipsToMove) {
+          const rawRelationship = rawItem?.relationships?.[key];
+
+          // Restore the original nested attributes structure from raw data
+          if (rawRelationship?.data) {
+            item.relationships[key] = { data: rawRelationship.data };
+          } else {
+            // Fallback to the deserialized version if raw data not available
+            item.relationships[key] = item[key];
+          }
+          delete item[key];
+        }
+      }
+    }
   }
 
   /**
@@ -718,7 +840,9 @@ export class ApiClientImpl implements ApiClientI {
         }
       }
     );
-    response.data = deserialise(response.data);
+    const rawResponseData = JSON.parse(JSON.stringify(response.data));
+    response.data = await deserialise(response.data);
+    this.restoreRelationshipsStructure(response.data, rawResponseData);
     return response;
   }
 
@@ -749,7 +873,9 @@ export class ApiClientImpl implements ApiClientI {
         }
       }
     );
-    response.data = deserialise(response.data);
+    const rawResponseData = JSON.parse(JSON.stringify(response.data));
+    response.data = await deserialise(response.data);
+    this.restoreRelationshipsStructure(response.data, rawResponseData);
     return response;
   }
 
@@ -820,7 +946,7 @@ export class ApiClientImpl implements ApiClientI {
     const resources: (TReturnNull extends true
       ? PersistedResource<T> | null
       : PersistedResource<T>)[] = (
-      await Promise.all(responses.map(deserialise))
+      await Promise.all(responses.map((response) => deserialise(response)))
     ).map((res) => res.data);
 
     for (const joinSpec of joinSpecs) {
@@ -991,6 +1117,7 @@ export class CustomDinaKitsu extends Kitsu {
         timeout
       });
 
+      const rawData = JSON.parse(JSON.stringify(data));
       const deserialized = await deserialise(data);
 
       // Get the list of requested includes from both params and the path query string,
@@ -1010,33 +1137,92 @@ export class CustomDinaKitsu extends Kitsu {
         ? deserialized.data
         : [deserialized.data];
 
-      const rawItems = Array.isArray(data?.data) ? data.data : [data?.data];
+      const rawItems = Array.isArray(rawData?.data)
+        ? rawData.data
+        : [rawData?.data];
+
+      // Helper to safely merge raw stubs (preserves 'uuid') with Kitsu resolved data
+      const mergeRelationship = (raw: any, resolved: any) => {
+        if (!raw) return resolved;
+        if (!resolved) return raw;
+
+        if (Array.isArray(raw) && Array.isArray(resolved)) {
+          return raw.map((r, i) => {
+            const res = resolved[i];
+            return res && typeof res === "object" ? { ...r, ...res } : r;
+          });
+        }
+
+        if (typeof raw === "object" && typeof resolved === "object") {
+          return { ...raw, ...resolved };
+        }
+
+        return resolved;
+      };
 
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         const rawRelationships = rawItems[i]?.relationships ?? {};
 
+        // First, handle requested includes
         for (const key of requestedIncludes) {
-          // Already resolved at top level, skip.
-          // But don't skip empty arrays - they may be unresolved relationship stubs
-          // from a different API that couldn't be included (e.g. collectors from agent-api)
           const currentValue = item[key];
-          const isEmptyArray =
-            Array.isArray(currentValue) && currentValue.length === 0;
-          if (currentValue !== undefined && !isEmptyArray) continue;
+          const rawRelData = rawRelationships[key]?.data;
 
-          const relData = rawRelationships[key]?.data;
-          if (!relData) continue;
-
-          // Promote stub(s) to top level
-          if (Array.isArray(relData)) {
-            item[key] = relData.map((r: any) => ({
-              ...r,
-              id: r.id,
-              type: r.type
-            }));
+          // Check if Kitsu 11.1.0 wrapped this relationship in {data: {...}}
+          if (
+            currentValue &&
+            typeof currentValue === "object" &&
+            "data" in currentValue &&
+            !Array.isArray(currentValue)
+          ) {
+            if (rawRelData === null || currentValue.data === null) {
+              item[key] = null;
+            } else if (rawRelData !== undefined) {
+              // MERGE raw stub with resolved data so we keep both 'uuid' and included attributes
+              item[key] = mergeRelationship(rawRelData, currentValue.data);
+            } else {
+              item[key] = currentValue.data;
+            }
+          }
+          // If Kitsu didn't resolve it (or left an empty array because of missing ids)
+          else if (
+            currentValue === undefined ||
+            (Array.isArray(currentValue) && currentValue.length === 0)
+          ) {
+            if (rawRelData !== undefined) {
+              // Direct assignment for unresolved stubs
+              item[key] = rawRelData;
+            }
           } else {
-            item[key] = { ...relData, id: relData.id, type: relData.type };
+            // If it's already unwrapped, but we still have raw data to merge
+            if (rawRelData !== undefined) {
+              item[key] = mergeRelationship(rawRelData, currentValue);
+            }
+          }
+        }
+
+        // Remove any relationships that were NOT requested in includes
+        // (Kitsu 11.1.0 promotes all relationships, but we only want requested ones)
+        for (const key in item) {
+          if (
+            key === "id" ||
+            key === "type" ||
+            key === "relationships" ||
+            key === "links" ||
+            key === "meta"
+          ) {
+            continue;
+          }
+          const value = item[key];
+          // Check if this looks like an unwanted promoted relationship (still wrapped in {data: {...}})
+          if (
+            value &&
+            typeof value === "object" &&
+            "data" in value &&
+            !requestedIncludes.includes(key)
+          ) {
+            delete item[key];
           }
         }
 

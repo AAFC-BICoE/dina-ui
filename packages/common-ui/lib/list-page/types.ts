@@ -269,6 +269,7 @@ export interface TransformToDSLProps {
 export const DYNAMIC_FIELD_TYPES = [
   "unsupported",
   "managedAttribute",
+  "expedition",
   "fieldExtension",
   "identifier",
   "relationshipPresence",
