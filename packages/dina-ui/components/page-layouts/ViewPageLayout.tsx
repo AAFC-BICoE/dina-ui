@@ -258,7 +258,7 @@ function ViewPageLayoutInner<T extends KitsuResource>({
                       type={type}
                       messageBody={
                         type === "managed-attribute" ||
-                        "controlled-vocabulary-item" ? (
+                        type === "controlled-vocabulary-item" ? (
                           <DinaMessage id="managedAttributeDeleteWarning" />
                         ) : undefined
                       }
