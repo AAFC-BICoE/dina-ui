@@ -32,7 +32,6 @@ export default function ControlledVocabularyItemViewPage() {
       nameField="name"
       mainClass="container-fluid"
       showEditButton={true}
-      showDeleteButton={false}
       backButton={
         <Link
           href="/controlled-vocabulary/list"
