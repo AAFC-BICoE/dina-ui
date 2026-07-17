@@ -122,8 +122,8 @@ Configure external data sources and services:
 |Example
 
 |`SUPPORTED_GEOINFORMATION_SYSTEMS`
-|Comma-separated coordinate systems
-|`EPSG:4326,EPSG:3857`
+| Comma-separated list of supported geoinformational services
+| `OSM` (OpenStreetMap), `TGN` (The Getty Thesaurus of Geographic Names)
 
 |`SCIENTIFIC_NAMES_SEARCH_ENDPOINT`
 |Scientific name lookup service URL

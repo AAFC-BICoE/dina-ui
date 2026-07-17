@@ -4,11 +4,6 @@
 
 [source,typescript]
 ----
-import { mountWithAppContext } from "common-ui";
-import { fireEvent, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import userEvent from "@testing-library/user-event";
-
 describe("ComponentUnderTest", () => {
   const mockGet = jest.fn();
   const mockSave = jest.fn();
@@ -52,8 +47,6 @@ When a test fails or you need to see what the component looks like, use `screen.
 
 [source,typescript]
 ----
-import { screen } from "@testing-library/react";
-
 it("should display form elements", async () => {
   const wrapper = mountWithAppContext(<PersonForm />, { apiContext });
 
@@ -77,8 +70,6 @@ TIP: The Testing Playground URL shows you the component's HTML structure and hel
 
 [source,typescript]
 ----
-import { mountWithAppContext } from "common-ui";
-
 // Basic mount
 const wrapper = mountWithAppContext(<MyComponent />);
 
@@ -251,9 +242,6 @@ mockSave.mockRejectedValueOnce({
 
 [source,typescript]
 ----
-import { fireEvent, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
-
 it("should display form elements", async () => {
   const wrapper = mountWithAppContext(<PersonForm />, { apiContext });
 
@@ -283,9 +271,6 @@ it("should display form elements", async () => {
 
 [source,typescript]
 ----
-import { fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-
 it("should save form data", async () => {
   mockSave.mockResolvedValueOnce([
     { id: "123", type: "person", name: "John" }
@@ -326,9 +311,6 @@ it("should save form data", async () => {
 
 [source,typescript]
 ----
-import { fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-
 it("should handle user interactions", async () => {
   const wrapper = mountWithAppContext(<MyComponent />, { apiContext });
 
@@ -419,8 +401,6 @@ describe("My Component", () => {
 
 [source,typescript]
 ----
-import { renderHook, waitFor } from "@testing-library/react";
-
 it("should fetch data with hook", async () => {
   mockGet.mockResolvedValueOnce({
     data: [{ id: "1", type: "person" }]

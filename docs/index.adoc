@@ -2,6 +2,8 @@
 
 = DINA UI docs
 
+include::versions.adoc[]
+
 React based user interface for the DINA project.
 
 [IMPORTANT]
