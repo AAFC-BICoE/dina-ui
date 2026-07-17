@@ -6,13 +6,22 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Stack from "react-bootstrap/Stack";
-import { Footer, Head, Nav } from "../components";
+import {
+  Footer,
+  Head,
+  Nav,
+  LayoutToggle,
+  UIPreferenceHook
+} from "../components";
 import { DinaMessage, useDinaIntl } from "../intl/dina-ui-intl";
 import { SeqdbMessage } from "../intl/seqdb-intl";
 
 export function Home() {
   const { isAdmin, isSuperUser, rolesPerGroup, subject } = useAccount();
   const router = useRouter();
+
+  const { useNewLayout, activateNewLayout, deactivateNewLayout } =
+    UIPreferenceHook();
 
   const handleSearch = (searchTerm: string) => {
     // Navigate to global search results page
@@ -31,9 +40,16 @@ export function Home() {
       <main role="main">
         <Container fluid={true}>
           {/* Global Search - Centered at 80% width */}
-          <div className="d-flex justify-content-center mb-4">
-            <div style={{ width: "80%" }}>
+          <div className="row justify-content-center align-items-center mb-4">
+            <div className="col-10">
               <GlobalSearch onSearch={handleSearch} />
+            </div>
+            <div className="col-auto">
+              <LayoutToggle
+                useNewLayout={useNewLayout}
+                activateNewLayout={activateNewLayout}
+                deactivateNewLayout={deactivateNewLayout}
+              />
             </div>
           </div>
 

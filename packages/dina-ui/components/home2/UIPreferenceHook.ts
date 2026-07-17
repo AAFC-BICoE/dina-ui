@@ -339,21 +339,34 @@ export function UIPreferenceHook(
   const saveUseNewLayout = useCallback(
     async (value: boolean) => {
       setUseNewLayout(value);
-      const currentUiPref = (userPref?.uiPreference ?? {}) as any;
-      const nextUiPref: UiPref = {
-        ...currentUiPref,
-        useNewLayout: value
-      } as UiPref;
 
-      const args: SaveArgs<UserPreference> = {
-        resource: {
-          id: userPref?.id ?? null,
-          userId: userPref?.userId ?? subject,
-          uiPreference: nextUiPref as UserPreference["uiPreference"]
-        } as any,
-        type: "user-preference"
-      };
+      // Fetch the latest preference from the server so we don't overwrite
+      // data from other hook instances (e.g. Home2's card layout) with stale state.
       try {
+        const resp = await apiClient.get<UserPreference[]>(
+          "user-api/user-preference",
+          { filter: { userId: subject as FilterParam } }
+        );
+        const pref = resp?.data?.[0];
+        const latestUiPref = (pref?.uiPreference ?? {}) as Record<
+          string,
+          unknown
+        >;
+
+        const nextUiPref: UiPref = {
+          ...latestUiPref,
+          useNewLayout: value
+        } as UiPref;
+
+        const args: SaveArgs<UserPreference> = {
+          resource: {
+            id: pref?.id ?? null,
+            userId: subject,
+            uiPreference: nextUiPref
+          } as any,
+          type: "user-preference"
+        };
+
         await save([args], { apiBaseUrl: "/user-api" });
         setUserPref((prev) => {
           if (!prev) return prev;
@@ -367,7 +380,7 @@ export function UIPreferenceHook(
         setError(e);
       }
     },
-    [save, subject, userPref]
+    [apiClient, save, subject]
   );
 
   const activateNewLayout = useCallback(
