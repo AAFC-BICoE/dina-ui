@@ -110,6 +110,33 @@ export async function handleDownloadLink(
   }
 }
 
+const BYTE_UNIT_MULTIPLIERS: Record<string, number> = {
+  b: 1,
+  kb: 1024,
+  mb: 1024 ** 2,
+  gb: 1024 ** 3,
+  tb: 1024 ** 4,
+  pb: 1024 ** 5
+};
+
+/**
+ * Parses a human-readable file size string into a number of bytes.
+ * Units are case-insensitive and use binary multipliers (1 KB = 1024 bytes),
+ * e.g. "3GB" -> 3221225472. Inverse of formatBytes.
+ *
+ * @param value e.g. "3GB", "1.5 MB", or a plain byte count like "1024".
+ * @returns The size in bytes, or null when the string cannot be parsed.
+ */
+export function parseBytes(value: string): number | null {
+  const match = /^((-|\+)?(\d+(?:\.\d+)?)) *(b|kb|mb|gb|tb|pb)$/i.exec(value);
+  // Unit-less strings (e.g. "1024") are treated as a plain byte count.
+  const floatValue = match ? parseFloat(match[1]) : parseInt(value, 10);
+  const unit = match ? match[4].toLowerCase() : "b";
+  return isNaN(floatValue)
+    ? null
+    : Math.floor(BYTE_UNIT_MULTIPLIERS[unit] * floatValue);
+}
+
 export function formatBytes(bytes, decimals: number = 2): string {
   if (!+bytes) return "0 Bytes";
 
