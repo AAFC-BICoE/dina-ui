@@ -567,6 +567,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   managedAttributeEditTitle: "Modifier l’attribut géré",
   managedAttributeTemplateOrderInfo:
     "Cette disposition des attributs gérés sera sauvegardée dans le modèle de formulaire.",
+  managedAttributeDeleteWarning:
+    "La suppression de cet attribut géré pourrait avoir un impact sur des ressources non suivies existantes comme les exportations ou les scripts. Voulez-vous vraiment continuer ?",
   managedAttributeValueLabel: "Valeur",
   managedAttributes: "Attributs gérés",
   managedAttributesViews: "Modèles de formulaires",

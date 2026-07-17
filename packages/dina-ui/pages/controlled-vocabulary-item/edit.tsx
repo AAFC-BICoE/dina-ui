@@ -1,5 +1,6 @@
 import {
   DateField,
+  DeleteButton,
   DinaForm,
   MultilingualDescription,
   MultilingualTitle,
@@ -207,7 +208,7 @@ function ControlledVocabularyItemEditPageContent({
       </Link>
     );
 
-  const buttonBarContent = <ButtonBarContent backButton={backButton} />;
+  const buttonBarContent = <ButtonBarContent backButton={backButton} id={id} />;
 
   return (
     <FormSubmissionContext.Provider value={{ submitForm, formRef }}>
@@ -227,7 +228,13 @@ function ControlledVocabularyItemEditPageContent({
   );
 }
 
-function ButtonBarContent({ backButton }: { backButton: React.JSX.Element }) {
+function ButtonBarContent({
+  backButton,
+  id
+}: {
+  backButton: React.JSX.Element;
+  id?: string;
+}) {
   const { submitForm } = useFormSubmission();
 
   return (
@@ -243,6 +250,15 @@ function ButtonBarContent({ backButton }: { backButton: React.JSX.Element }) {
           <FaFloppyDisk className="me-2" />
           <DinaMessage id="submitBtnText" />
         </button>
+        {id && (
+          <DeleteButton
+            id={id}
+            options={{ apiBaseUrl: "/collection-api" }}
+            postDeleteRedirect="/controlled-vocabulary/list"
+            type="controlled-vocabulary-item"
+            messageBody={<DinaMessage id="managedAttributeDeleteWarning" />}
+          />
+        )}
       </div>
     </>
   );
