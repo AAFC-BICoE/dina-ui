@@ -53,7 +53,9 @@ export function LayoutToggle({
               (useNewLayout ? "fw-bold" : "text-muted")
             }
           >
-            <FaGripLines style={{ fontSize: "0.8rem" }} />
+            <FaGripLines
+              style={{ fontSize: "0.8rem", margin: "0 0.25rem 0 0" }}
+            />
             Classic
           </Button>
           <Button
