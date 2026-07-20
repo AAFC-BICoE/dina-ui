@@ -1553,24 +1553,31 @@ export function useMaterialSampleSave({
         ? colEventTemplateInitialValues
         : collectingEventInitialValues);
 
+    const shouldShowCollectingEventEditAlert = Boolean(
+      disableNestedFormEdits ||
+        (materialSampleUsageCount && materialSampleUsageCount >= 1) ||
+        !!colEventId
+    );
+
     const colEventFormProps: DinaFormProps<any> = {
       innerRef: colEventFormRef,
       initialValues,
       validationSchema: collectingEventFormSchema,
       isTemplate,
-      // In bulk-edit and workflow run, disable editing existing Col events:
-      readOnly:
-        (materialSampleUsageCount && materialSampleUsageCount >= 1) ||
-        disableNestedFormEdits ||
-        isTemplate
-          ? !!colEventId
-          : false,
+      // In bulk-edit and workflow run, disable editing existing Col events.
+      // Keep the form read-only even when the bulk-edit path is active and no
+      // collecting event id is present yet.
+      readOnly: Boolean(
+        colEventId ||
+          disableNestedFormEdits ||
+          (materialSampleUsageCount && materialSampleUsageCount >= 1)
+      ),
       formTemplate,
       children: reduceRendering ? (
         <div />
       ) : (
         <div className={nestedFormClassName}>
-          {!!materialSampleUsageCount && materialSampleUsageCount >= 1 && (
+          {shouldShowCollectingEventEditAlert && (
             <CollectingEventEditAlert
               materialSampleUsageCount={materialSampleUsageCount}
               alertMessage="collectingEventEditErrorMessage"

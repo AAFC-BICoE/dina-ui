@@ -92,6 +92,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   associationsLegend: "Associations",
   linkExisting: "Link Existing",
   unlinkAll: "Unlink All",
+  editingMaterialSamples: "You are bulk editing {count} material samples.",
+  noCollectingEventAttached:
+    "None of these material samples currently have a Collecting Event.",
+  mixedCollectingEventAttached:
+    "These material samples are linked to multiple different Collecting Events.",
+  sameCollectingEventAttached:
+    "They are all currently linked to the same Collecting Event.",
   attachExistingObjects: "Attach Existing Objects",
   attachSelected: "Attach Selected",
   attachedMaterialSamples: "Attached Material Samples",

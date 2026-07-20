@@ -1855,7 +1855,7 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
-  it("Shows the common Collecting Event when all samples are linked to the same one.", async () => {
+  it("Keeps the linked Collecting Event form read-only in the Edit All tab and shows the warning alert", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -1871,7 +1871,6 @@ describe("MaterialSampleBulkEditor", () => {
       ).toBeGreaterThan(0)
     );
 
-    // Enable the collecting event section:
     const collectingEventToggle = wrapper.container.querySelectorAll(
       ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
     );
@@ -1879,57 +1878,20 @@ describe("MaterialSampleBulkEditor", () => {
       fail("Collecting event toggle needs to exist at this point.");
     }
     fireEvent.click(collectingEventToggle[0]);
+
     await waitFor(() =>
       expect(
-        wrapper.getAllByRole("button", { name: /detach/i })[0]
+        wrapper.getByText(
+          /editing is only available on the collecting event details page/i
+        )
       ).toBeInTheDocument()
     );
 
-    // The collecting event section has a green legend to indicate a bulk edit (event without setting a new Collecting Event):
     expect(
-      wrapper.getAllByRole("button", { name: /detach/i })[0]
-    ).toBeInTheDocument();
-
-    // Edit the common collecting event:
-    fireEvent.change(
-      wrapper.getByRole("textbox", { name: /verbatim locality/i }),
-      { target: { value: "bulk edited locality" } }
-    );
-
-    // Click the "Save All" button:
-    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
-    // Save the collecting events, no changes made to the material sample.
-    expect(mockSave.mock.calls).toEqual([
-      [
-        [
-          {
-            resource: {
-              id: "col-event-1",
-              type: "collecting-event",
-              dwcVerbatimLocality: "bulk edited locality",
-              group: "cnc"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        [
-          {
-            resource: {
-              id: "col-event-1",
-              type: "collecting-event",
-              dwcVerbatimLocality: "bulk edited locality",
-              group: "cnc"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+      wrapper.queryByRole("textbox", {
+        name: /verbatim locality/i
+      })
+    ).not.toBeInTheDocument();
   });
 
   it("Lets you bulk reassign the linked storage", async () => {

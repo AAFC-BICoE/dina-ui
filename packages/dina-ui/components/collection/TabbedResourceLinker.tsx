@@ -12,7 +12,7 @@ import { CSSProperties, ReactNode } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FaLink, FaUnlink } from "react-icons/fa";
-import { FaPlus } from "react-icons/fa6";
+import { FaLocationDot, FaPlus } from "react-icons/fa6";
 
 export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   resourceId?: string | null;
@@ -85,6 +85,25 @@ export function TabbedResourceLinker<T extends KitsuResource>({
     }
   };
 
+  // Determine which DinaMessage ID to display based on the bulkCtx state
+  const getBulkEditMessageId = () => {
+    if (!bulkCtx) return null;
+
+    if (bulkCtx.defaultValue || bulkCtx.defaultValue?.id) {
+      return "sameCollectingEventAttached";
+    }
+
+    if (
+      bulkCtx.bulkEditClasses?.includes("has-multiple-values") ||
+      bulkCtx.placeholder === "Multiple Values"
+    ) {
+      return "mixedCollectingEventAttached";
+    }
+
+    return "noCollectingEventAttached";
+  };
+  const bulkEditMessageId = getBulkEditMessageId();
+
   return (
     <FieldSet
       id={fieldSetId}
@@ -94,11 +113,11 @@ export function TabbedResourceLinker<T extends KitsuResource>({
         </div>
       }
     >
-      {bulkCtx?.placeholder && (
-        <div className={bulkCtx?.bulkEditClasses}>
-          <div className="alert alert-secondary placeholder-text">
-            {bulkCtx?.placeholder}
-          </div>
+      {/* Bulk Edit Alert */}
+      {bulkCtx && (
+        <div className="alert alert-info">
+          <DinaMessage id="editingMaterialSamples" values={{ count: 5 }} />{" "}
+          <DinaMessage id={bulkEditMessageId as any} />
         </div>
       )}
 
@@ -122,7 +141,10 @@ export function TabbedResourceLinker<T extends KitsuResource>({
               {showMainTab && (
                 <Tab>
                   {resourceId ? (
-                    <DinaMessage id="attached" />
+                    <>
+                      <FaLocationDot className="me-2" />
+                      <DinaMessage id="linked" />
+                    </>
                   ) : (
                     <>
                       <FaPlus className="me-2" />
@@ -181,7 +203,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                           isTemplate || disableLinkerTab ? (
                             <div>
                               <div className="attached-resource-link mb-3">
-                                <DinaMessage id="attached" />:{" "}
+                                <DinaMessage id="linked" />:{" "}
                                 <Link href={`${readOnlyLink}${resourceId}`}>
                                   {linkedResource.id}
                                 </Link>

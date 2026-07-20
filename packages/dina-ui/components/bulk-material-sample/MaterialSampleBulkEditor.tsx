@@ -257,6 +257,7 @@ export function useRefHookFormProps(
     materialSample: materialSampleInitialValues ?? initialValues,
     collectingEventInitialValues,
     showChangedIndicatorsInNestedForms: true,
+    disableNestedFormEdits: true,
     colEventFormRef: bulkEditCollectingEvtFormRef
   });
 
