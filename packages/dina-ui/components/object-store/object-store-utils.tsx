@@ -128,9 +128,10 @@ const BYTE_UNIT_MULTIPLIERS: Record<string, number> = {
  * @returns The size in bytes, or null when the string cannot be parsed.
  */
 export function parseBytes(value: string): number | null {
-  const match = /^((-|\+)?(\d+(?:\.\d+)?)) *(b|kb|mb|gb|tb|pb)$/i.exec(value);
+  const trimmedValue = value.trim();
+  const match = /^((-|\+)?(\d+(?:\.\d+)?)) *(b|kb|mb|gb|tb|pb)$/i.exec(trimmedValue);
   // Unit-less strings (e.g. "1024") are treated as a plain byte count.
-  const floatValue = match ? parseFloat(match[1]) : parseInt(value, 10);
+  const floatValue = match ? parseFloat(match[1]) : parseInt(trimmedValue, 10);
   const unit = match ? match[4].toLowerCase() : "b";
   return isNaN(floatValue)
     ? null

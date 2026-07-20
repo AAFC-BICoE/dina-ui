@@ -27,6 +27,7 @@ describe("parseBytes", () => {
   it("Accepts fractional and space-separated values.", () => {
     expect(parseBytes("1.5KB")).toEqual(1536);
     expect(parseBytes("1 mb")).toEqual(1048576);
+    expect(parseBytes(" 3GB ")).toEqual(3221225472);
   });
 
   it("Is case-insensitive for units.", () => {
