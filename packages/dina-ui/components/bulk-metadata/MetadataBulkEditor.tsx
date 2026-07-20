@@ -13,6 +13,7 @@ import {
   isResourceEmpty,
   ResourceWithHooks,
   SaveArgs,
+  suppressUnsavedWarning,
   useApiClient,
   withoutBlankFields
 } from "common-ui";
@@ -79,7 +80,9 @@ export const MetadataBulkEditor = forwardRef<
       initialValues
     });
 
-    const bulkEditFormRef = useRef<FormikProps<InputResource<Metadata>> | null>(null);
+    const bulkEditFormRef = useRef<FormikProps<InputResource<Metadata>> | null>(
+      null
+    );
 
     const metadataHooks = getMetadataHooks(metadatas);
 
@@ -405,6 +408,15 @@ function useBulkMetadataSave({
           const originalIndex = nonEmptyIndices[i];
           resultMetadata[originalIndex] = savedMetadata[i];
         }
+      }
+      // Suppress unsaved data warning before navigating
+      suppressUnsavedWarning();
+      // Reset form dirty states for good measure
+      bulkEditFormRef.current?.resetForm({
+        values: bulkEditFormRef.current.values
+      });
+      for (const { formRef } of metadataHooks) {
+        formRef.current?.resetForm({ values: formRef.current.values });
       }
 
       // Call onSaved with all samples in the original order

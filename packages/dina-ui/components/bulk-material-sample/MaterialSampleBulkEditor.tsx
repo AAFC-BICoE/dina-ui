@@ -11,6 +11,7 @@ import {
   OperationError,
   ResourceWithHooks,
   SaveArgs,
+  suppressUnsavedWarning,
   useApiClient,
   withoutBlankFields
 } from "common-ui";
@@ -658,6 +659,15 @@ function useBulkSampleSave({
           ),
           assocErrors
         );
+      }
+      // Suppress unsaved data warning before navigating
+      suppressUnsavedWarning();
+      // Reset form dirty states for good measure
+      bulkEditFormRef.current?.resetForm({
+        values: bulkEditFormRef.current.values
+      });
+      for (const { formRef } of sampleHooks) {
+        formRef.current?.resetForm({ values: formRef.current.values });
       }
 
       await onSaved(resultSamples);

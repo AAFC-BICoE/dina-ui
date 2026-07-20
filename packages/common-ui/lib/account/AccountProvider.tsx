@@ -9,6 +9,7 @@ import {
 import Keycloak from "keycloak-js";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { DINA_ADMIN, SUPER_USER } from "../../types/DinaRoles";
+import { suppressUnsavedWarning } from "../formik-connected/DinaForm";
 
 export interface AccountContextI {
   agentId?: string;
@@ -124,7 +125,12 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 
   const getCurrentToken = async () => {
     // If it expires in the next 30 seconds, generate a new one.
-    await keycloak.updateToken(30).catch(() => login());
+    await keycloak.updateToken(30).catch(() => {
+      // Allow the forced auth redirect through - otherwise the
+      // unsaved data warning would block it
+      suppressUnsavedWarning();
+      login();
+    });
     return keycloak.token;
   };
 
