@@ -5,6 +5,7 @@ export interface GroupAttributes {
   name: string;
   path: string;
   labels: Record<string, string>;
+  roles: string[];
 }
 
 export type Group = KitsuResource & GroupAttributes;

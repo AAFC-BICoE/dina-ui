@@ -11,7 +11,7 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { GUEST, SUPER_USER, USER } from "common-ui/types/DinaRoles";
+import { SUPER_USER } from "common-ui/types/DinaRoles";
 import { FieldArray } from "formik";
 import _ from "lodash";
 import { NextRouter, useRouter } from "next/router";
@@ -147,11 +147,9 @@ export interface RolesPerGroupEditorProps {
 export function RolesPerGroupEditor({
   initialRolesPerGroup
 }: RolesPerGroupEditorProps) {
-  const { groupSelectOptions } = useAvailableGroupOptions();
+  const { groupSelectOptions, groupRolesMap } = useAvailableGroupOptions();
   const { rolesPerGroup: editorsRolesPerGroup, isAdmin: editorIsAdmin } =
     useAccount();
-
-  const editableRoles = [USER, GUEST, SUPER_USER];
 
   return (
     <label className="w-100">
@@ -205,9 +203,10 @@ export function RolesPerGroupEditor({
                                 newRole ? [newRole] : []
                               );
                             }}
-                            // Options should be the possible groups or the
+                            // Options come from the group's available roles
+                            // falling back to any roles already assigned to the user for this group
                             options={_.uniq([
-                              ...editableRoles,
+                              ...(groupRolesMap[groupName] ?? []),
                               ...(initialRolesPerGroup[groupName] ?? [])
                             ]).map((it) => ({
                               label: it,

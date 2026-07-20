@@ -178,5 +178,19 @@ export function useAvailableGroupOptions({
     selectableGroupNames.map((name) => ({ label: name, value: name })) ??
     [];
 
-  return { groupSelectOptions };
+  // Convert DinaRole enum names (e.g. "SUPER_USER") to keycloak role names (e.g. "super-user")
+  // to match the format used by rolesPerGroup in the frontend and the backend PATCH request.
+  const mapRoleToKeycloakName = (role: string) =>
+    role.toLowerCase().replace(/_/g, "-");
+
+  // Build a map of group name -> available roles from the API response:
+  const groupRolesMap: Record<string, string[]> =
+    response?.data?.reduce((acc, group) => {
+      if (group.roles?.length) {
+        acc[group.name] = group.roles.map(mapRoleToKeycloakName);
+      }
+      return acc;
+    }, {} as Record<string, string[]>) ?? {};
+
+  return { groupSelectOptions, groupRolesMap };
 }
