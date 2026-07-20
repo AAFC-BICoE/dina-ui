@@ -267,6 +267,7 @@ export function MaterialSampleForm({
         <TabbedResourceLinker<CollectingEvent>
           fieldSetId={id}
           hideLinkerTab={hideLinkerTab}
+          hideCreateNewTab={isBulkEditAllTab}
           legend={<DinaMessage id="collectingEvent" />}
           briefDetails={(colEvent) => (
             <CollectingEventBriefDetails collectingEvent={colEvent} />

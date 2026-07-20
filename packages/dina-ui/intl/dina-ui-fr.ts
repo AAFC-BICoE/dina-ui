@@ -78,7 +78,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   association: "Association",
   associationType: "Type d'association",
   associationsLegend: "Associations",
-  attachExisting: "Joindre l’existant",
+  linkExisting: "Lier l’existant",
   attachExistingObjects: "Joindre des objets existants",
   attachSelected: "Joindre la sélection",
   attachedMaterialSamples: "Pièces jointes des échantillons de matériau",

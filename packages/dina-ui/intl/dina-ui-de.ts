@@ -89,7 +89,7 @@ export const DINAUI_MESSAGES_GERMAN: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   association: "Verknüpfung",
   associationType: "Verknüpfungstyp",
   associationsLegend: "Verknüpfungen",
-  attachExisting: "Bestehendes anhängen",
+  linkExisting: "Vorhandenes verknüpfen",
   attachExistingObjects: "Bestehendes Medienobjekt anhängen",
   attachSelected: "Ausgewähltes anhängen",
   attachedMaterialSamples: "Verknüpfte Materialproben",
