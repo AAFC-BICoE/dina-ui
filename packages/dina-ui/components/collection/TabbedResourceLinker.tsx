@@ -1,22 +1,30 @@
 import classNames from "classnames";
 import {
+  ExternalLink,
   FieldSet,
   QueryState,
   useBulkEditTabFieldIndicators,
   useDinaFormContext,
+  useModal,
+  AreYouSureModal,
   withResponse
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
 import Link from "next/link";
-import { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode, useState, useEffect } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FaLink, FaUnlink } from "react-icons/fa";
-import { FaLocationDot, FaPlus } from "react-icons/fa6";
+import {
+  FaCircleInfo,
+  FaLocationDot,
+  FaPlus,
+  FaTriangleExclamation
+} from "react-icons/fa6";
 
 export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   resourceId?: string | null;
-  setResourceId: (newId: string | null) => void;
+  setResourceId?: (newId: string | null) => void;
   useResourceQuery: (id: string) => QueryState<T, undefined>;
   readOnlyLink?: string;
   disableLinkerTab?: boolean;
@@ -34,7 +42,6 @@ export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   onUnlinkAll?: () => void;
 }
 
-// Shared styling for the TabPanels to maintain a unified 3px border & rounded container
 const tabPanelStyle: CSSProperties = {
   backgroundColor: "#fff",
   border: "1px solid #aaaaaa",
@@ -45,7 +52,44 @@ const tabPanelStyle: CSSProperties = {
   marginBottom: "1rem"
 };
 
-/** Tabbed view for a nested form where you can either add/edit a resource or link an existing one. */
+/**
+ * Top control buttons (Details link & unlink button) for linked resources.
+ */
+function LinkedResourceHeaderActions({
+  readOnlyLink,
+  resourceId,
+  disableUnlink,
+  onUnlink
+}: {
+  readOnlyLink?: string;
+  resourceId: string;
+  disableUnlink?: boolean;
+  onUnlink: () => void;
+}) {
+  return (
+    <div className="d-flex justify-content-end align-items-center gap-3 mb-3">
+      {readOnlyLink && (
+        <ExternalLink
+          href={`${readOnlyLink}${resourceId}`}
+          className="btn btn-link p-0"
+        >
+          <DinaMessage id="detailsPageLink" />
+        </ExternalLink>
+      )}
+      {!disableUnlink && (
+        <button
+          type="button"
+          className="btn btn-danger btn-sm unlink-resource-button"
+          onClick={onUnlink}
+        >
+          <FaUnlink className="me-2" />
+          <DinaMessage id="unlink" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function TabbedResourceLinker<T extends KitsuResource>({
   resourceId: resourceIdProp,
   setResourceId,
@@ -63,46 +107,154 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   onUnlinkAll
 }: TabbedResourceLinkerProps<T>) {
   const { isTemplate } = useDinaFormContext();
+  const { openModal } = useModal();
+  const [isUnlinkedManually, setIsUnlinkedManually] = useState<boolean>(false);
 
   const bulkCtx = useBulkEditTabFieldIndicators({
     fieldName,
     currentValue: resourceIdProp ? { id: resourceIdProp } : undefined
   });
 
-  // In bulk edit mode, show the common value if there is one instead of a new linked resource:
+  // Determine bulk edit states
+  const hasSameValue = Boolean(
+    bulkCtx?.defaultValue || bulkCtx?.defaultValue?.id
+  );
+  const hasMixedValues =
+    Boolean(bulkCtx) &&
+    !hasSameValue &&
+    (bulkCtx?.bulkEditClasses?.includes("has-multiple-values") ||
+      bulkCtx?.placeholder === "Multiple Values");
+  const hasNoValue = Boolean(bulkCtx) && !hasSameValue && !hasMixedValues;
+
+  // In bulk edit mode, resolve the effective resource ID
   const defaultValue = bulkCtx?.defaultValue;
-  const resourceId = resourceIdProp ?? bulkCtx?.defaultValue?.id ?? null;
+  const resourceId = resourceIdProp ?? defaultValue?.id ?? null;
 
-  const resourceQuery = useResourceQuery(resourceId);
+  // Reset unlinked state if a new resource ID is supplied
+  useEffect(() => {
+    if (resourceIdProp) {
+      setIsUnlinkedManually(false);
+    }
+  }, [resourceIdProp]);
 
-  // Render main tab if there is an attached resource OR if creation is allowed
-  const showMainTab = Boolean(resourceId) || !hideCreateNewTab;
+  const resourceQuery = useResourceQuery(resourceId ?? "");
+
+  // Tab visibility rules:
+  // Show Main Tab if not manually unlinked AND:
+  // 1. Single Edit: There is an attached resource ID OR creation is enabled
+  // 2. Bulk Edit: Always show EXCEPT when all selected samples have NO collecting event attached
+  const showMainTab =
+    !isUnlinkedManually &&
+    (bulkCtx ? !hasNoValue : Boolean(resourceId) || !hideCreateNewTab);
+
   const showLinkerTab = !hideLinkerTab;
 
-  const handleUnlinkAll = () => {
+  // Check if there is currently an attached/linked resource (either single or mixed)
+  const hasExistingLink =
+    !isUnlinkedManually && (Boolean(resourceId) || hasMixedValues);
+
+  const performUnlink = () => {
+    setIsUnlinkedManually(true);
     if (onUnlinkAll) {
       onUnlinkAll();
+    } else if (setResourceId) {
+      setResourceId(null);
     }
   };
 
-  // Determine which DinaMessage ID to display based on the bulkCtx state
-  const getBulkEditMessageId = () => {
-    if (!bulkCtx) return null;
-
-    if (bulkCtx.defaultValue || bulkCtx.defaultValue?.id) {
-      return "sameCollectingEventAttached";
-    }
-
-    if (
-      bulkCtx.bulkEditClasses?.includes("has-multiple-values") ||
-      bulkCtx.placeholder === "Multiple Values"
-    ) {
-      return "mixedCollectingEventAttached";
-    }
-
-    return "noCollectingEventAttached";
+  const confirmUnlink = () => {
+    openModal(
+      <AreYouSureModal
+        actionMessage={<DinaMessage id="unlinkAllTitle" />}
+        messageBody={<DinaMessage id="unlinkAllBody" />}
+        onYesButtonClicked={performUnlink}
+      />
+    );
   };
-  const bulkEditMessageId = getBulkEditMessageId();
+
+  /**
+   * Renders panel content based on state (Mixed, Same Shared Resource, Single Edit Form, or Blank Form).
+   */
+  const renderMainTabContent = () => {
+    // 1. Bulk Edit - Mixed Collecting Events across selected samples
+    if (hasMixedValues) {
+      return (
+        <div
+          className="alert alert-warning d-flex align-items-center justify-content-between gap-2 mb-0"
+          role="alert"
+        >
+          <div className="d-flex align-items-center gap-2">
+            <FaTriangleExclamation className="flex-shrink-0" />
+            <span>
+              <DinaMessage id="mixedCollectingEventAttached" />
+            </span>
+          </div>
+          {!disableLinkerTab && (
+            <button
+              type="button"
+              className="btn btn-danger btn-sm text-nowrap"
+              onClick={() => confirmUnlink()}
+            >
+              <FaUnlink className="me-2" />
+              <DinaMessage id="unlinkAll" />
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // 2. Attached Resource (Single Edit OR Bulk Edit with Same Collecting Event)
+    if (resourceId) {
+      return withResponse(resourceQuery, ({ data: linkedResource }) => {
+        const activeResource =
+          (linkedResource as PersistedResource<T>) || defaultValue;
+        const isReadOnlyMode = isTemplate || disableLinkerTab;
+
+        return (
+          <>
+            <LinkedResourceHeaderActions
+              readOnlyLink={readOnlyLink}
+              resourceId={resourceId}
+              disableUnlink={disableLinkerTab}
+              onUnlink={() => confirmUnlink()}
+            />
+
+            {/* Show info alert when all bulk-edited samples share the same event */}
+            {hasSameValue && (
+              <div
+                className="alert alert-info d-flex align-items-center gap-2 py-2 px-3 mb-3"
+                role="alert"
+              >
+                <FaCircleInfo className="flex-shrink-0" />
+                <span>
+                  <DinaMessage id="sameCollectingEventAttached" />
+                </span>
+              </div>
+            )}
+
+            {isReadOnlyMode ? (
+              <div>
+                <div className="attached-resource-link mb-3">
+                  <strong>
+                    <DinaMessage id="linked" />:{" "}
+                  </strong>
+                  <Link href={`${readOnlyLink}${resourceId}`}>
+                    {linkedResource.id}
+                  </Link>
+                </div>
+                {briefDetails(activeResource)}
+              </div>
+            ) : (
+              nestedForm(activeResource)
+            )}
+          </>
+        );
+      });
+    }
+
+    // 3. Blank state / Creation mode
+    return nestedForm();
+  };
 
   return (
     <FieldSet
@@ -113,34 +265,32 @@ export function TabbedResourceLinker<T extends KitsuResource>({
         </div>
       }
     >
-      {/* Bulk Edit Alert */}
-      {bulkCtx && (
-        <div className="alert alert-info">
-          <DinaMessage id="editingMaterialSamples" values={{ count: 5 }} />{" "}
-          <DinaMessage id={bulkEditMessageId as any} />
+      {/* Alert banner displayed after unlinking, informing the user that changes apply on save */}
+      {isUnlinkedManually && (
+        <div
+          className="alert alert-warning d-flex align-items-center gap-2 mb-3"
+          role="alert"
+        >
+          <FaTriangleExclamation className="flex-shrink-0" />
+          <span>
+            <DinaMessage id="unlinkAllNotice" />
+          </span>
         </div>
       )}
 
-      {/* Only render Tabs if at least one tab is visible */}
       {(showMainTab || showLinkerTab) && (
         <Tabs
-          // Re-initialize the form when the linked resource changes:
-          key={resourceId}
-          // Prevent unmounting the form on tab switch to avoid losing the form state:
+          key={resourceId ?? (hasMixedValues ? "mixed" : "new")}
           forceRenderTabPanel={true}
         >
           <TabList
             className="d-flex justify-content-between align-items-center ps-2 mb-0"
-            style={{
-              position: "relative",
-              zIndex: 2,
-              marginBottom: "-3px" // Pulls the TabPanel up so active tab overlays the top 3px border seamlessly
-            }}
+            style={{ position: "relative", zIndex: 2, marginBottom: "-3px" }}
           >
             <div className="d-flex align-items-center">
               {showMainTab && (
                 <Tab>
-                  {resourceId ? (
+                  {resourceId || hasMixedValues ? (
                     <>
                       <FaLocationDot className="me-2" />
                       <DinaMessage id="linked" />
@@ -161,12 +311,11 @@ export function TabbedResourceLinker<T extends KitsuResource>({
               )}
             </div>
 
-            {/* Unlink All button aligned to the right end of the tab bar */}
-            {!disableLinkerTab && (
+            {showMainTab && onUnlinkAll && !disableLinkerTab && (
               <button
                 type="button"
                 className="btn btn-danger btn-sm mb-1"
-                onClick={handleUnlinkAll}
+                onClick={() => confirmUnlink()}
               >
                 <FaUnlink className="me-2" />
                 <DinaMessage id="unlinkAll" />
@@ -175,61 +324,24 @@ export function TabbedResourceLinker<T extends KitsuResource>({
           </TabList>
 
           {showMainTab && (
-            <TabPanel style={tabPanelStyle}>
-              {
-                // If there is already a linked resource then wait for it to load first:
-                resourceId
-                  ? withResponse(resourceQuery, ({ data: linkedResource }) => (
-                      <>
-                        <div className="mb-3 d-flex justify-content-end align-items-center">
-                          <Link href={`${readOnlyLink}${linkedResource.id}`}>
-                            <DinaMessage id="detailsPageLink" />
-                          </Link>
-                          {
-                            // Do not allow changing an attached resource from a template:
-                            !disableLinkerTab && (
-                              <button
-                                type="button"
-                                className="btn btn-danger detach-resource-button ms-5"
-                                onClick={() => setResourceId(null)}
-                              >
-                                <DinaMessage id="detach" />
-                              </button>
-                            )
-                          }
-                        </div>
-                        {
-                          // In template mode or Workflow Run mode, only show a link to the linked resource:
-                          isTemplate || disableLinkerTab ? (
-                            <div>
-                              <div className="attached-resource-link mb-3">
-                                <DinaMessage id="linked" />:{" "}
-                                <Link href={`${readOnlyLink}${resourceId}`}>
-                                  {linkedResource.id}
-                                </Link>
-                              </div>
-                              {briefDetails(
-                                (linkedResource as PersistedResource<T>) ||
-                                  defaultValue
-                              )}
-                            </div>
-                          ) : (
-                            // In form mode, show the actual editable resource form:
-                            nestedForm(
-                              (linkedResource as PersistedResource<T>) ||
-                                defaultValue
-                            )
-                          )
-                        }
-                      </>
-                    ))
-                  : nestedForm()
-              }
-            </TabPanel>
+            <TabPanel style={tabPanelStyle}>{renderMainTabContent()}</TabPanel>
           )}
 
           {showLinkerTab && (
-            <TabPanel style={tabPanelStyle}>{linkerTabContent}</TabPanel>
+            <TabPanel style={tabPanelStyle}>
+              {hasExistingLink && (
+                <div
+                  className="alert alert-warning d-flex align-items-center gap-2 mb-3"
+                  role="alert"
+                >
+                  <FaTriangleExclamation className="flex-shrink-0" />
+                  <span>
+                    <DinaMessage id="replaceExistingLinkNotice" />
+                  </span>
+                </div>
+              )}
+              {linkerTabContent}
+            </TabPanel>
           )}
         </Tabs>
       )}

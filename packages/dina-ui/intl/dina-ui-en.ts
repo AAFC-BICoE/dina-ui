@@ -92,13 +92,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   associationsLegend: "Associations",
   linkExisting: "Link Existing",
   unlinkAll: "Unlink All",
-  editingMaterialSamples: "You are bulk editing {count} material samples.",
   noCollectingEventAttached:
     "None of these material samples currently have a Collecting Event.",
   mixedCollectingEventAttached:
-    "These material samples are linked to multiple different Collecting Events.",
+    "The selected material samples are linked to different collecting events. Edit the individual material samples to see the attached collecting event.",
   sameCollectingEventAttached:
-    "They are all currently linked to the same Collecting Event.",
+    "All material samples being bulk edited share the same collecting event.",
+  unlinkAllTitle: "Unlink collecting events?",
+  unlinkAllBody:
+    "Are you sure you want to unlink the collecting event(s) from the selected material samples? This change will take effect once you save the bulk edit.",
+  unlinkAllNotice:
+    "Collecting event(s) will be unlinked from the material samples when the form is saved.",
+  replaceExistingLinkNotice:
+    "Selecting and linking a new collecting event will replace any currently linked collecting event(s) upon saving.",
   attachExistingObjects: "Attach Existing Objects",
   attachSelected: "Attach Selected",
   attachedMaterialSamples: "Attached Material Samples",

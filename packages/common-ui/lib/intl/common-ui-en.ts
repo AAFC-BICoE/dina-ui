@@ -53,6 +53,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   description: "Description",
   destroyedLabel: "Destroyed",
   detach: "Detach",
+  unlink: "Unlink",
   done: "Done",
   dropdownSearchResults: "Search results",
   editAll: "Edit All",
