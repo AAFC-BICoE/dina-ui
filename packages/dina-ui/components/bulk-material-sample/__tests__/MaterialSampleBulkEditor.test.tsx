@@ -815,6 +815,45 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
+  it("Bulk editing material samples with no collecting event should only display the link tab", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(wrapper.getByText(/edit all/i)).toBeInTheDocument()
+    );
+
+    // Go the the bulk edit tab:
+    await userEvent.click(wrapper.getByText(/edit all/i));
+
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    // Link existing should appear.
+    expect(
+      wrapper.getByRole("tab", { name: /link existing/i })
+    ).toBeInTheDocument();
+
+    // Create new and linked collecting event should NOT appear.
+    expect(
+      wrapper.queryByRole("tab", { name: /create new/i })
+    ).not.toBeInTheDocument();
+    expect(
+      wrapper.queryByRole("tab", { name: /linked collecting event/i })
+    ).not.toBeInTheDocument();
+  });
+
   it("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
@@ -839,6 +878,7 @@ describe("MaterialSampleBulkEditor", () => {
     }
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
+
     await waitFor(
       () => {
         expect(
@@ -1855,6 +1895,39 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
+  it("Bulk edit material samples that are all linked the same collecting event, display info banner", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
+      />,
+      testCtx as any
+    );
+    await waitFor(() =>
+      expect(
+        wrapper.container.querySelectorAll(
+          ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+        ).length
+      ).toBeGreaterThan(0)
+    );
+
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
+    // Banner should be displayed to inform the user that they are all linked to the same collecting event.
+    expect(
+      wrapper.getByText(
+        /all material samples being bulk edited share the same collecting event\./i
+      )
+    ).toBeInTheDocument();
+  });
+
   it("Keeps the linked Collecting Event form read-only in the Edit All tab and shows the warning alert", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
@@ -1877,7 +1950,8 @@ describe("MaterialSampleBulkEditor", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
 
     await waitFor(() =>
       expect(
