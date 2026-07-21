@@ -212,7 +212,8 @@ export function MaterialSampleForm({
     colEventId,
     setColEventId,
     onSubmit,
-    loading
+    loading,
+    setIsCreatingNewColEvent
   } = materialSampleSaveHook ?? materialSampleSaveResponse;
 
   const copyFromNextSample = useCopyToNextSample();
@@ -289,6 +290,14 @@ export function MaterialSampleForm({
           resourceId={colEventId}
           fieldName="collectingEvent"
           targetType="materialSample"
+          onTabSelect={(index) => {
+            const isCreateNewTab = !isBulkEditAllTab
+              ? index === 1
+              : index === 0;
+            if (isCreateNewTab) {
+              setIsCreatingNewColEvent(true);
+            }
+          }}
         />
       ),
     [PREPARATIONS_COMPONENT_NAME]: (id) =>

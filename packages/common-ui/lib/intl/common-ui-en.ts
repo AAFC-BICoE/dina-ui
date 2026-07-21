@@ -52,7 +52,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   deleteSelectedButtonText: "Delete Selected",
   description: "Description",
   destroyedLabel: "Destroyed",
-  detach: "Detach",
   unlink: "Unlink",
   done: "Done",
   dropdownSearchResults: "Search results",

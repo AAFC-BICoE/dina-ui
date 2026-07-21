@@ -745,6 +745,16 @@ export function useMaterialSampleSave({
     relationshipId: colEventId ?? undefined
   });
 
+  const [isCreatingNewColEvent, setIsCreatingNewColEvent] = useState<boolean>(
+    !collectingEventInitialValues?.id
+  );
+
+  useEffect(() => {
+    if (collectingEventInitialValues?.id) {
+      setIsCreatingNewColEvent(false);
+    }
+  }, [collectingEventInitialValues?.id]);
+
   /** Gets the new state of the sample before submission to the back-end, given the form state. */
   async function prepareSampleInput(
     submittedValues: InputResource<MaterialSample>
@@ -1554,9 +1564,10 @@ export function useMaterialSampleSave({
         : collectingEventInitialValues);
 
     const shouldShowCollectingEventEditAlert = Boolean(
-      disableNestedFormEdits ||
-        (materialSampleUsageCount && materialSampleUsageCount >= 1) ||
-        !!colEventId
+      !isCreatingNewColEvent &&
+        (disableNestedFormEdits ||
+          (materialSampleUsageCount && materialSampleUsageCount >= 1) ||
+          !!colEventId)
     );
 
     const colEventFormProps: DinaFormProps<any> = {
@@ -1564,14 +1575,15 @@ export function useMaterialSampleSave({
       initialValues,
       validationSchema: collectingEventFormSchema,
       isTemplate,
-      // In bulk-edit and workflow run, disable editing existing Col events.
-      // Keep the form read-only even when the bulk-edit path is active and no
-      // collecting event id is present yet.
-      readOnly: Boolean(
-        colEventId ||
-          disableNestedFormEdits ||
-          (materialSampleUsageCount && materialSampleUsageCount >= 1)
-      ),
+      // If creating new, readOnly MUST be false.
+      // Otherwise, respect disableNestedFormEdits / usage count for linked records.
+      readOnly: isCreatingNewColEvent
+        ? false
+        : Boolean(
+            colEventId ||
+              disableNestedFormEdits ||
+              (materialSampleUsageCount && materialSampleUsageCount >= 1)
+          ),
       formTemplate,
       children: reduceRendering ? (
         <div />
@@ -1582,8 +1594,8 @@ export function useMaterialSampleSave({
               materialSampleUsageCount={materialSampleUsageCount}
               alertMessage="collectingEventEditErrorMessage"
               collectingEventUUID={initialValues?.id}
-              override={true}
               displayCollectingEventDetailsLink={true}
+              override={disableNestedFormEdits}
             />
           )}
           <CollectingEventFormLayout
@@ -1632,7 +1644,8 @@ export function useMaterialSampleSave({
     prepareSampleSaveOperation,
     saveAssociations,
     loading,
-    colEventFormRef
+    colEventFormRef,
+    setIsCreatingNewColEvent
   };
 }
 
