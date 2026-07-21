@@ -86,7 +86,8 @@ export const TEST_GROUP: PersistedResource<Group>[] = [
     type: "group",
     name: "Agriculture and Agri-food Canada",
     path: "",
-    labels: { en: "AAFC", fr: "AAC" }
+    labels: { en: "AAFC", fr: "AAC" },
+    roles: ["SUPER_USER", "USER"]
   }
 ];
 

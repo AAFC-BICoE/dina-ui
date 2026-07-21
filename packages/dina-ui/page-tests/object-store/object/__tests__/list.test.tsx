@@ -26,7 +26,8 @@ const TEST_GROUP: PersistedResource<Group>[] = [
     type: "group",
     name: "test group",
     path: " test path",
-    labels: { fr: "CNCFR" }
+    labels: { fr: "CNCFR" },
+    roles: ["SUPER_USER", "USER"]
   }
 ];
 
