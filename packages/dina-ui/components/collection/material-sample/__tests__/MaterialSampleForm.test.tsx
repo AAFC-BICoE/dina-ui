@@ -512,6 +512,151 @@ describe("Material Sample Edit Page", () => {
     ]);
   });
 
+  it("Discards create-new collecting event changes and links to existing collecting event when toggled back.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tab", { name: /create new/i })
+      ).toBeInTheDocument()
+    );
+
+    // Click "Create new" tab/button for a collecting event
+    await userEvent.click(wrapper.getByRole("tab", { name: /create new/i }));
+    await waitFor(() =>
+      expect(
+        wrapper.getAllByLabelText(/verbatim event datetime/i)[1]
+      ).toBeInTheDocument()
+    );
+
+    // Type some values into the create new form fields (2nd input since it's the create new form.)
+    await userEvent.type(
+      wrapper.getAllByLabelText(/verbatim event datetime/i)[1],
+      "2026-06-06T12:00"
+    );
+
+    // Switch back to the existing collecting event selection view
+    const selectExistingButton = wrapper.getByRole("tab", {
+      name: /linked collecting event/i
+    });
+    await userEvent.click(selectExistingButton);
+
+    // Make an unrelated change to the material sample.
+    await userEvent.clear(
+      wrapper.getByRole("textbox", { name: /primary id/i })
+    );
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /primary id/i }),
+      "test-material-sample-id"
+    );
+
+    // Save the material sample form
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Verify that it only saves the material-sample linked to the *existing* collecting event
+    // and ignores/discards the stale "2026-06-06T12:00" verbatimEventDateTime data.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              type: "material-sample",
+              id: "1",
+              materialSampleName: "test-material-sample-id"
+            },
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Collecting event exists already, create a new one and replace the collecting event link", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tab", { name: /create new/i })
+      ).toBeInTheDocument()
+    );
+
+    // Click "Create new" tab/button for a collecting event
+    await userEvent.click(wrapper.getByRole("tab", { name: /create new/i }));
+
+    // Ensure the warning message is appearing to indiciate that this action will override the existing
+    // collecting event link.
+    expect(
+      wrapper.getByText(
+        /creating a new collecting event to link to this material sample will replace any currently linked collecting events upon saving\./i
+      )
+    ).toBeInTheDocument();
+
+    // Enter a new collection number for this record.
+    const collectionNumberField = wrapper.getAllByRole("textbox", {
+      name: /collection number/i
+    })[1];
+    await userEvent.clear(collectionNumberField);
+    await userEvent.type(collectionNumberField, "new collection number 123");
+
+    // Save the material sample form
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+
+    // New collecting event should be created.
+    // Then attach that new collecting event to the material sample, replacing the existing link.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              dwcVerbatimCoordinateSystem: null,
+              otherRecordNumbers: ["new collection number 123"],
+              type: "collecting-event"
+            },
+            type: "collecting-event"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ],
+      [
+        [
+          {
+            resource: {
+              collectingEvent: {
+                id: "11111111-1111-1111-1111-111111111111",
+                type: "collecting-event"
+              },
+              id: "1",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
   it("Edits an existing material-sample", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm

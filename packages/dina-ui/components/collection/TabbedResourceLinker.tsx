@@ -323,7 +323,17 @@ export function TabbedResourceLinker<T extends KitsuResource>({
 
           {showCreateTab && (
             <TabPanel style={tabPanelStyle}>
-              {/* Force blank creation state by invoking nestedForm with no initial values */}
+              {hasAttachedResource && (
+                <div
+                  className="alert alert-warning d-flex align-items-center gap-2 mb-3"
+                  role="alert"
+                >
+                  <FaTriangleExclamation className="flex-shrink-0" />
+                  <span>
+                    <DinaMessage id="createNewLinkNotice" />
+                  </span>
+                </div>
+              )}
               {nestedForm()}
             </TabPanel>
           )}

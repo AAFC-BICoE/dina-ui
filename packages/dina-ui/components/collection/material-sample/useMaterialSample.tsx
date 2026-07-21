@@ -966,15 +966,35 @@ export function useMaterialSampleSave({
     const colEventFormRefToUse = colEventFormRef?.current?.values
       ? colEventFormRef
       : collectingEventRefExternal;
+
+    let isStaleForm = false;
+
     if (colEventFormRefToUse?.current) {
+      const formValues = colEventFormRef?.current?.values;
+      const externalValues = collectingEventRefExternal?.current?.values;
+
+      // If switching from "Create new" back to an existing event, the form might still
+      // hold dirty values from the "Create new" tab. We identify this by checking if the
+      // form's ID matches the newly selected colEventId.
+      isStaleForm =
+        !isCreatingNewColEvent &&
+        !!colEventId &&
+        formValues?.id !== colEventId &&
+        externalValues?.id !== colEventId;
+
       const collectingEventValues = {
         // Seed with the known colEventId so the id is preserved even if the
         // nested form mounted before its fetch resolved (race condition when
         // loading=false immediately and colEventQuery is still in-flight).
-        ...(colEventId ? { id: colEventId } : {}),
-        ...withoutBlankFields(colEventFormRef?.current?.values),
-        ...withoutBlankFields(collectingEventRefExternal?.current?.values)
+        ...(colEventId && !isCreatingNewColEvent ? { id: colEventId } : {}),
+        ...(isStaleForm ? {} : withoutBlankFields(formValues)),
+        ...(isStaleForm ? {} : withoutBlankFields(externalValues))
       };
+
+      if (isCreatingNewColEvent) {
+        delete collectingEventValues.id;
+      }
+
       colEventFormRefToUse.current.values = collectingEventValues;
     }
 
@@ -987,17 +1007,27 @@ export function useMaterialSampleSave({
         colEventFormRefToUse.current.values
       );
 
+      // Only evaluate as edited if it's explicitly a new CE, or if the user modified the fields
+      // of the correctly-loaded existing CE. We ignore "edits" if we just stripped stale fields.
       const collectingEventWasEdited =
-        !submittedCollectingEvent.id ||
-        !_.isEqual(submittedCollectingEvent, collectingEventInitialValues);
+        isCreatingNewColEvent ||
+        (!isStaleForm &&
+          (!submittedCollectingEvent.id ||
+            !_.isEqual(
+              submittedCollectingEvent,
+              collectingEventInitialValues
+            )));
 
       try {
         // Throw if the Collecting Event sub-form has errors:
         const colEventErrors =
           await colEventFormRefToUse?.current?.validateForm();
-        if (!_.isEmpty(colEventErrors)) {
+
+        // If it's a stale form, bypass validation errors from the discarded fields.
+        if (!_.isEmpty(colEventErrors) && !isStaleForm) {
           throw new DoOperationsError("", colEventErrors);
         }
+
         // Only send the save request if the Collecting Event was edited:
         const savedCollectingEvent = collectingEventWasEdited
           ? // Use the same save method as the Collecting Event page:
@@ -1618,8 +1648,10 @@ export function useMaterialSampleSave({
         ) ?? false
       : true;
 
-    const isEditDisabled = colEventFormProps.readOnly || !canEdit;
-    const showAlert = !canEdit && !colEventFormProps.readOnly;
+    const isEditDisabled =
+      !isCreatingNewColEvent && (colEventFormProps.readOnly || !canEdit);
+    const showAlert =
+      !isCreatingNewColEvent && !canEdit && !colEventFormProps.readOnly;
 
     return (
       <>

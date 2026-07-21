@@ -296,6 +296,8 @@ export function MaterialSampleForm({
               : index === 0;
             if (isCreateNewTab) {
               setIsCreatingNewColEvent(true);
+            } else {
+              setIsCreatingNewColEvent(false);
             }
           }}
         />

@@ -104,7 +104,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   unlinkAllNotice:
     "Collecting event(s) will be unlinked from the material samples when the form is saved.",
   replaceExistingLinkNotice:
-    "Selecting and linking a new collecting event will replace any currently linked collecting event(s) upon saving.",
+    "Selecting and linking a new collecting event will replace any currently linked collecting events upon saving.",
+  createNewLinkNotice:
+    "Creating a new collecting event to link to this material sample will replace any currently linked collecting events upon saving.",
   attachExistingObjects: "Attach Existing Objects",
   attachSelected: "Attach Selected",
   attachedMaterialSamples: "Attached Material Samples",
@@ -231,7 +233,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createAndAssign: "Create & Assign",
   createFormTemplate: "Create Form Template",
   createMaterialSampleFormTemplate: "Create Material Sample Form Template",
-  createNew: "Create new",
+  createNew: "Create New",
   createNewLabel: "Create New",
   createNewMaterialSamples: "Create New Material Samples",
   createNewView: "Create New View",
