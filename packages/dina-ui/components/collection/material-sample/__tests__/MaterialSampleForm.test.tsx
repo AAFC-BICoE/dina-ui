@@ -338,7 +338,9 @@ describe("Material Sample Edit Page", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
         wrapper.getByLabelText(/verbatim event datetime/i)
@@ -469,8 +471,7 @@ describe("Material Sample Edit Page", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
-
+    await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
 
     await waitFor(() =>
@@ -723,7 +724,9 @@ describe("Material Sample Edit Page", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
@@ -791,7 +794,7 @@ describe("Material Sample Edit Page", () => {
     ]);
   });
 
-  it.skip("Lets you remove the attached Collecting Event.", async () => {
+  it("Lets you remove the attached Collecting Event.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={testMaterialSample()}
@@ -811,7 +814,7 @@ describe("Material Sample Edit Page", () => {
     ).toHaveDisplayValue("2021-04-13");
 
     // Remove the existing Collecting Event.
-    await userEvent.click(wrapper.getByRole("button", { name: /detach/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /unlink/i }));
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
@@ -2867,7 +2870,9 @@ describe("Material Sample Edit Page", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
     await waitFor(() => {
       expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
       expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
@@ -3685,7 +3690,8 @@ describe("Material Sample Edit Page", () => {
       if (!collectingEventToggle) {
         fail("Collecting event toggle needs to exist at this point.");
       }
-      fireEvent.click(collectingEventToggle[0]);
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
 
       await waitFor(() =>
         expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
@@ -3806,7 +3812,8 @@ describe("Material Sample Edit Page", () => {
       if (!collectingEventToggle) {
         fail("Collecting event toggle needs to exist at this point.");
       }
-      fireEvent.click(collectingEventToggle[0]);
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
 
       await waitFor(() =>
         expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
@@ -4039,7 +4046,8 @@ describe("Material Sample Edit Page", () => {
       if (!collectingEventToggle) {
         fail("Collecting event toggle needs to exist at this point.");
       }
-      fireEvent.click(collectingEventToggle[0]);
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
 
       await waitFor(() =>
         expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()

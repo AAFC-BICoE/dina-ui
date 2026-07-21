@@ -369,7 +369,7 @@ describe("AttachmentsField component", () => {
       expect(container.querySelectorAll("tbody tr").length).toEqual(2);
     });
 
-    const removeButtons = screen.getAllByRole("button", { name: /detach/i });
+    const removeButtons = screen.getAllByRole("button", { name: /unlink/i });
     fireEvent.click(removeButtons[0]);
 
     await waitFor(() => {
