@@ -393,6 +393,8 @@ export interface UseMaterialSampleSaveParams {
   showChangedIndicatorsInNestedForms?: boolean;
 
   visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
+
+  isBulkEditAllTab?: boolean;
 }
 
 export interface PrepareSampleSaveOperationParams {
@@ -1585,7 +1587,8 @@ export function useMaterialSampleSave({
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
   function nestedCollectingEventForm(
-    colEvent?: PersistedResource<CollectingEvent>
+    colEvent?: PersistedResource<CollectingEvent>,
+    isBulkEditAllTab?: boolean
   ) {
     const initialValues =
       colEvent ??
@@ -1593,27 +1596,42 @@ export function useMaterialSampleSave({
         ? colEventTemplateInitialValues
         : collectingEventInitialValues);
 
-    const shouldShowCollectingEventEditAlert = Boolean(
-      !isCreatingNewColEvent &&
-        (disableNestedFormEdits ||
-          (materialSampleUsageCount && materialSampleUsageCount >= 1) ||
-          !!colEventId)
-    );
+    const shouldShowCollectingEventEditAlert = (() => {
+      // If you are creating a new collecting event, do not display this message.
+      if (isCreatingNewColEvent) return false;
+
+      // If it has a collecting event, and multiple usages then display a warning message.
+      const hasMultipleUsages = Boolean(
+        materialSampleUsageCount && materialSampleUsageCount > 1
+      );
+      const hasExistingColEvent = Boolean(colEventId);
+
+      return Boolean(
+        disableNestedFormEdits || (hasMultipleUsages && hasExistingColEvent)
+      );
+    })();
+
+    const makeCollectingEventReadOnly = (() => {
+      // The bulk edit "Edit All" tab should never be allowed to edit.
+      if (isBulkEditAllTab) return true;
+
+      // If you are creating a new collecting event, it should be allowed to edit.
+      if (isCreatingNewColEvent) return false;
+
+      // If it has multiple usages you should NOT be allowed to edit.
+      const hasMultipleUsages = Boolean(
+        materialSampleUsageCount && materialSampleUsageCount > 1
+      );
+
+      return Boolean(disableNestedFormEdits || hasMultipleUsages);
+    })();
 
     const colEventFormProps: DinaFormProps<any> = {
       innerRef: colEventFormRef,
       initialValues,
       validationSchema: collectingEventFormSchema,
       isTemplate,
-      // If creating new, readOnly MUST be false.
-      // Otherwise, respect disableNestedFormEdits / usage count for linked records.
-      readOnly: isCreatingNewColEvent
-        ? false
-        : Boolean(
-            colEventId ||
-              disableNestedFormEdits ||
-              (materialSampleUsageCount && materialSampleUsageCount >= 1)
-          ),
+      readOnly: makeCollectingEventReadOnly,
       formTemplate,
       children: reduceRendering ? (
         <div />

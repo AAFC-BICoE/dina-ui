@@ -291,14 +291,17 @@ export function MaterialSampleForm({
           fieldName="collectingEvent"
           targetType="materialSample"
           onTabSelect={(index) => {
-            const isCreateNewTab = !isBulkEditAllTab
-              ? index === 1
-              : index === 0;
-            if (isCreateNewTab) {
-              setIsCreatingNewColEvent(true);
-            } else {
+            // On the "Edit All" bulk tab, "Create New" tab doesn't exist at all
+            if (isBulkEditAllTab) {
               setIsCreatingNewColEvent(false);
+              return;
             }
+
+            // Depending if an existing collecting event is already linked determines what index the "Create new" tab is at.
+            const hasLinkedEvent = Boolean(colEventId);
+            const createNewTabIndex = hasLinkedEvent ? 1 : 0;
+
+            setIsCreatingNewColEvent(index === createNewTabIndex);
           }}
         />
       ),

@@ -28,7 +28,10 @@ export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   useResourceQuery: (id: string) => QueryState<T, undefined>;
   readOnlyLink?: string;
   disableLinkerTab?: boolean;
-  nestedForm: (initialValues?: PersistedResource<T>) => ReactNode;
+  nestedForm: (
+    initialValues?: PersistedResource<T>,
+    isBulkEditAllTab?: boolean
+  ) => ReactNode;
   linkerTabContent: ReactNode;
   briefDetails: (resource: PersistedResource<T>) => ReactNode;
   fieldName: string;
@@ -108,7 +111,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   onUnlinkAll,
   onTabSelect
 }: TabbedResourceLinkerProps<T>) {
-  const { isTemplate } = useDinaFormContext();
+  const { isTemplate, isBulkEditAllTab } = useDinaFormContext();
   const { openModal } = useModal();
   const [isUnlinkedManually, setIsUnlinkedManually] = useState<boolean>(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -312,7 +315,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                           {briefDetails(activeResource)}
                         </div>
                       ) : (
-                        nestedForm(activeResource)
+                        nestedForm(activeResource, isBulkEditAllTab)
                       )}
                     </>
                   );
@@ -334,7 +337,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                   </span>
                 </div>
               )}
-              {nestedForm()}
+              {nestedForm(undefined, isBulkEditAllTab)}
             </TabPanel>
           )}
 
