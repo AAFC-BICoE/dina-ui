@@ -403,6 +403,11 @@ export interface PrepareSampleSaveOperationParams {
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
   collectingEventRefExternal?: React.RefObject<FormikProps<any> | null>;
+
+  /**
+   * When true, forcibly clears the linked Collecting Event regardless of local form state.
+   */
+  unlinkCollectingEvent?: boolean;
 }
 
 export function useMaterialSampleSave({
@@ -944,7 +949,8 @@ export function useMaterialSampleSave({
   async function prepareSampleSaveOperation({
     submittedValues,
     preProcessSample,
-    collectingEventRefExternal
+    collectingEventRefExternal,
+    unlinkCollectingEvent
   }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample>> {
     const materialSampleInput = await prepareSampleInput(submittedValues);
 
@@ -966,7 +972,11 @@ export function useMaterialSampleSave({
     // collectors arrays, etc.) *after* DinaForm has already cloned the initial values.
     // That race means resourceDifference would see a spurious shape change and include
     // collectingEvent in the diff even when the user did not touch it.
-    delete (msDiff as any).collectingEvent;
+    if (unlinkCollectingEvent) {
+      (msDiff as any).collectingEvent = null;
+    } else {
+      delete (msDiff as any).collectingEvent;
+    }
 
     // Save and link the Collecting Event if enabled:
     const colEventFormRefToUse = colEventFormRef?.current?.values
@@ -975,7 +985,7 @@ export function useMaterialSampleSave({
 
     let isStaleForm = false;
 
-    if (colEventFormRefToUse?.current) {
+    if (colEventFormRefToUse?.current && !unlinkCollectingEvent) {
       const formValues = colEventFormRef?.current?.values;
       const externalValues = collectingEventRefExternal?.current?.values;
 
@@ -1006,7 +1016,8 @@ export function useMaterialSampleSave({
 
     if (
       (enableCollectingEvent || collectingEventRefExternal) &&
-      colEventFormRefToUse?.current
+      colEventFormRefToUse?.current &&
+      !unlinkCollectingEvent
     ) {
       // Save the linked CollectingEvent if included:
       const submittedCollectingEvent = _.cloneDeep(
@@ -1153,6 +1164,13 @@ export function useMaterialSampleSave({
       // Explicitly declare these fields as relationships here before saving:
       // One-to-many relationships go in the 'relationships' object:
       relationships: {
+        ...(msDiffWithOrganisms.collectingEvent !== undefined && {
+          collectingEvent: {
+            data: msDiffWithOrganisms.collectingEvent?.id
+              ? _.pick(msDiffWithOrganisms.collectingEvent, "id", "type")
+              : null
+          }
+        }),
         ...(msDiffWithOrganisms.attachment && {
           attachment: {
             data: msDiffWithOrganisms.attachment.map((it) =>
@@ -1226,6 +1244,7 @@ export function useMaterialSampleSave({
     delete msInputWithRelationships.organismsQuantity;
 
     // Delete these since they have been moved to the relationship section.
+    delete msInputWithRelationships.collectingEvent;
     delete msInputWithRelationships.attachment;
     delete msInputWithRelationships.projects;
     delete msInputWithRelationships.organism;

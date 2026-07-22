@@ -961,6 +961,8 @@ describe("MaterialSampleBulkEditor", () => {
         )
       ).toBeInTheDocument();
 
+      screen.logTestingPlaygroundURL();
+
       // The collecting event should be displayed in read-only mode.
       fail("Should be in read only mode... fix this.");
     });
@@ -1026,7 +1028,39 @@ describe("MaterialSampleBulkEditor", () => {
       await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
       // Saves the new material samples with the new storage unit:
-      expect(mockSave.mock.calls).toEqual([]);
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                id: "1",
+                type: "material-sample",
+                relationships: {
+                  collectingEvent: {
+                    data: null
+                  }
+                }
+              },
+              type: "material-sample"
+            },
+            {
+              resource: {
+                id: "2",
+                type: "material-sample",
+                relationships: {
+                  collectingEvent: {
+                    data: null
+                  }
+                }
+              },
+              type: "material-sample"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        ]
+      ]);
     });
 
     it("Bulk edit material samples that are linked to different collecting event, display info banner", async () => {
@@ -1063,14 +1097,14 @@ describe("MaterialSampleBulkEditor", () => {
 
       // Switch to the "Link Existing" collecting event
       await userEvent.click(
-        wrapper.getByRole("tab", { name: /link existing/i })
+        wrapper.getAllByRole("tab", { name: /link existing/i })[0]
       );
 
       // A warning message should appear since it will replace existing linked collecting event.
       expect(
-        wrapper.getByText(
+        wrapper.getAllByText(
           /selecting and linking a new collecting event will replace any currently linked collecting events upon saving\./i
-        )
+        )[0]
       ).toBeInTheDocument();
     });
 
@@ -1130,14 +1164,44 @@ describe("MaterialSampleBulkEditor", () => {
         ).toBeInTheDocument();
       });
 
-      screen.logTestingPlaygroundURL();
-
       // Save the form and ensure the network request is working correctly.
       await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
       await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
       // Saves the new material samples with the new storage unit:
-      expect(mockSave.mock.calls).toEqual([]);
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                id: "1",
+                type: "material-sample",
+                relationships: {
+                  collectingEvent: {
+                    data: null
+                  }
+                }
+              },
+              type: "material-sample"
+            },
+            {
+              resource: {
+                id: "2",
+                type: "material-sample",
+                relationships: {
+                  collectingEvent: {
+                    data: null
+                  }
+                }
+              },
+              type: "material-sample"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        ]
+      ]);
     });
 
     it("Allows adding NEW nested Collecting the individual sample tabs.", async () => {

@@ -527,7 +527,8 @@ function useBulkSampleSave({
             collectingEventRefExternal: bulkEditSampleHook.dataComponentState
               .enableCollectingEvent
               ? bulkEditCollectingEventRefPermanent
-              : undefined
+              : undefined,
+            unlinkCollectingEvent: bulkEditSampleHook.unlinkAllCollectingEvent
           });
 
           if (clearedFields?.size) {
