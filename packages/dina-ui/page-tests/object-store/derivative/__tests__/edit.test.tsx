@@ -111,7 +111,6 @@ const mockUseRouter = jest.fn();
 jest.mock("next/router", () => ({
   useRouter: () => mockUseRouter()
 }));
-jest.mock("node-fetch", () => jest.fn());
 
 describe("Derivative single record edit page.", () => {
   afterEach(() => {

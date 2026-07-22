@@ -42,6 +42,9 @@ interface DeleteButtonProps {
   reload?: boolean;
 
   deleteRelationships?: boolean;
+
+  /** Optional warning message to display in the confirmation modal. */
+  messageBody?: ReactNode;
 }
 
 export function DeleteButton({
@@ -57,7 +60,8 @@ export function DeleteButton({
   onDeleted,
   children,
   style,
-  deleteRelationships = false
+  deleteRelationships = false,
+  messageBody
 }: DeleteButtonProps) {
   const { openModal } = useModal();
   const { doOperations } = useContext(ApiClientContext);
@@ -131,6 +135,7 @@ export function DeleteButton({
         openModal(
           <AreYouSureModal
             actionMessage={<CommonMessage id="deleteButtonText" />}
+            messageBody={messageBody}
             onYesButtonClicked={doDelete}
           />
         )

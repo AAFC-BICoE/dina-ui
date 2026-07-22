@@ -6,9 +6,6 @@ You can use it to easily query the back-end from inside a function component.
 Example usage for fetching a single resource:
 [source,tsx]
 ----
-import { useQuery } from "../components";
-import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
-
 function ExampleComponent() {
   const { error, loading, response } = useQuery<PcrPrimer>({ path: "pcrPrimer/1" });
 
@@ -25,9 +22,6 @@ function ExampleComponent() {
 Example usage for fetching a resource list:
 [source,tsx]
 ----
-import { useQuery } from "../components";
-import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
-
 function ExampleComponent() {
   const { error, loading, response } = useQuery<PcrPrimer[]>({ path: "pcrPrimer" });
 
@@ -51,9 +45,6 @@ Using the "withResponse" helper function to render generic loading and error com
 instead of writing if/else blocks for each state:
 [source,tsx]
 ----
-import { useQuery, withResponse } from "../components";
-import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
-
 function ExampleComponent() {
   const primerQuery = useQuery<PcrPrimer[]>({ path: "pcrPrimer" });
 

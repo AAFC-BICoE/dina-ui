@@ -14,9 +14,6 @@ provide a button that creates a new Region with a random name and symbol:
 
 [source,tsx]
 ----
-import React from "react";
-import { useApiClient } from "common-ui";
-
 export funcion NewRegionButton() {
   const { save } = useApiClient();
 
