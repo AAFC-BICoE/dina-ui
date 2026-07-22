@@ -960,6 +960,73 @@ describe("MaterialSampleBulkEditor", () => {
           /all material samples being bulk edited share the same collecting event\./i
         )
       ).toBeInTheDocument();
+
+      // The collecting event should be displayed in read-only mode.
+      fail("Should be in read only mode... fix this.");
+    });
+
+    it("Bulk edit material samples that are all linked the same collecting event, use unlink all functionality", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleBulkEditor
+          onSaved={mockOnSaved}
+          samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
+        />,
+        testCtx as any
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelectorAll(
+            ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+          ).length
+        ).toBeGreaterThan(0)
+      );
+
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        fail("Collecting event toggle needs to exist at this point.");
+      }
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
+
+      // Banner should be displayed to inform the user that they are all linked to the same collecting event.
+      expect(
+        wrapper.getByText(
+          /all material samples being bulk edited share the same collecting event\./i
+        )
+      ).toBeInTheDocument();
+
+      // Click the unlink all button.
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /unlink all/i })
+      );
+
+      // Are you sure popup should appear:
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(/unlink collecting events\?/i)
+        ).toBeInTheDocument();
+      });
+
+      // Click "Yes".
+      await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+
+      // Banner should appear indiciating once the form is saved, all collecting events will be unlinked.
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(
+            /collecting event\(s\) will be unlinked from the material samples when the form is saved\./i
+          )
+        ).toBeInTheDocument();
+      });
+
+      // Save the form and ensure the network request is working correctly.
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Saves the new material samples with the new storage unit:
+      expect(mockSave.mock.calls).toEqual([]);
     });
 
     it("Bulk edit material samples that are linked to different collecting event, display info banner", async () => {
@@ -1005,6 +1072,72 @@ describe("MaterialSampleBulkEditor", () => {
           /selecting and linking a new collecting event will replace any currently linked collecting events upon saving\./i
         )
       ).toBeInTheDocument();
+    });
+
+    it("Bulk edit material samples that are linked to different collecting event, use unlink all functionality", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleBulkEditor
+          onSaved={mockOnSaved}
+          samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+        />,
+        testCtx as any
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelectorAll(
+            ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+          ).length
+        ).toBeGreaterThan(0)
+      );
+
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        fail("Collecting event toggle needs to exist at this point.");
+      }
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
+
+      // The banner indicating that the material samples are linked to different collecting events.
+      expect(
+        wrapper.getByText(
+          /the selected material samples are linked to different collecting events\. edit the individual material samples to see the attached collecting event\./i
+        )
+      ).toBeInTheDocument();
+
+      // Click the unlink all button.
+      await userEvent.click(
+        wrapper.getByRole("button", { name: /unlink all/i })
+      );
+
+      // Are you sure popup should appear:
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(/unlink collecting events\?/i)
+        ).toBeInTheDocument();
+      });
+
+      // Click "Yes".
+      await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+
+      // Banner should appear indiciating once the form is saved, all collecting events will be unlinked.
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(
+            /collecting event\(s\) will be unlinked from the material samples when the form is saved\./i
+          )
+        ).toBeInTheDocument();
+      });
+
+      screen.logTestingPlaygroundURL();
+
+      // Save the form and ensure the network request is working correctly.
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Saves the new material samples with the new storage unit:
+      expect(mockSave.mock.calls).toEqual([]);
     });
 
     it("Allows adding NEW nested Collecting the individual sample tabs.", async () => {

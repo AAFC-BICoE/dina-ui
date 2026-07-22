@@ -727,6 +727,20 @@ export function useMaterialSampleSave({
   const collectingEventInitialValues =
     collectingEventInitialValuesProp ?? collectingEventHookInitialValues;
 
+  const [isCreatingNewColEvent, setIsCreatingNewColEvent] = useState<boolean>(
+    !collectingEventInitialValues?.id
+  );
+
+  useEffect(() => {
+    if (collectingEventInitialValues?.id) {
+      setIsCreatingNewColEvent(false);
+    }
+  }, [collectingEventInitialValues?.id]);
+
+  // Used if the user uses the "Unlink All" functionality for collecting event.
+  const [unlinkAllCollectingEvent, setUnlinkAllCollectingEvent] =
+    useState<boolean>(false);
+
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
     const dataComponents = document?.querySelectorAll<HTMLDivElement>(
@@ -746,16 +760,6 @@ export function useMaterialSampleSave({
     relationshipName: "collectingEvent",
     relationshipId: colEventId ?? undefined
   });
-
-  const [isCreatingNewColEvent, setIsCreatingNewColEvent] = useState<boolean>(
-    !collectingEventInitialValues?.id
-  );
-
-  useEffect(() => {
-    if (collectingEventInitialValues?.id) {
-      setIsCreatingNewColEvent(false);
-    }
-  }, [collectingEventInitialValues?.id]);
 
   /** Gets the new state of the sample before submission to the back-end, given the form state. */
   async function prepareSampleInput(
@@ -1695,7 +1699,9 @@ export function useMaterialSampleSave({
     saveAssociations,
     loading,
     colEventFormRef,
-    setIsCreatingNewColEvent
+    setIsCreatingNewColEvent,
+    unlinkAllCollectingEvent,
+    setUnlinkAllCollectingEvent
   };
 }
 

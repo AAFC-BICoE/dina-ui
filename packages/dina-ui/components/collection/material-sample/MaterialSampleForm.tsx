@@ -213,7 +213,9 @@ export function MaterialSampleForm({
     setColEventId,
     onSubmit,
     loading,
-    setIsCreatingNewColEvent
+    setIsCreatingNewColEvent,
+    unlinkAllCollectingEvent,
+    setUnlinkAllCollectingEvent
   } = materialSampleSaveHook ?? materialSampleSaveResponse;
 
   const copyFromNextSample = useCopyToNextSample();
@@ -303,6 +305,8 @@ export function MaterialSampleForm({
 
             setIsCreatingNewColEvent(index === createNewTabIndex);
           }}
+          setUnlinkAllCollectingEvent={setUnlinkAllCollectingEvent}
+          unlinkAllCollectingEvent={unlinkAllCollectingEvent}
         />
       ),
     [PREPARATIONS_COMPONENT_NAME]: (id) =>
