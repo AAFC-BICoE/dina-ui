@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MaterialSampleBulkEditor Bulk edit all material samples using other catalogue and other identifiers 1`] = `
+exports[`MaterialSampleBulkEditor General bulk creation and saving Bulk edit all material samples using other catalogue and other identifiers 1`] = `
 [
   [
     [

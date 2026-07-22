@@ -6,10 +6,16 @@ import {
   blankMaterialSample
 } from "../../../types/collection-api";
 
-export const TEST_COLLECTING_EVENT = {
+export const TEST_COLLECTING_EVENT_1 = {
   id: "col-event-1",
   type: "collecting-event",
   dwcVerbatimLocality: "test initial locality"
+};
+
+export const TEST_COLLECTING_EVENT_2 = {
+  id: "col-event-2",
+  type: "collecting-event",
+  dwcVerbatimLocality: "test initial locality 2"
 };
 
 export const TEST_COLLECTION_1 = {
@@ -189,13 +195,29 @@ export const TEST_SAMPLES_SAME_COLLECTING_EVENT: InputResource<MaterialSample>[]
       ...blankMaterialSample(),
       id: "1",
       type: "material-sample",
-      collectingEvent: TEST_COLLECTING_EVENT
+      collectingEvent: TEST_COLLECTING_EVENT_1
     },
     {
       ...blankMaterialSample(),
       id: "2",
       type: "material-sample",
-      collectingEvent: TEST_COLLECTING_EVENT
+      collectingEvent: TEST_COLLECTING_EVENT_1
+    }
+  ];
+
+export const TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT: InputResource<MaterialSample>[] =
+  [
+    {
+      ...blankMaterialSample(),
+      id: "1",
+      type: "material-sample",
+      collectingEvent: TEST_COLLECTING_EVENT_1
+    },
+    {
+      ...blankMaterialSample(),
+      id: "2",
+      type: "material-sample",
+      collectingEvent: TEST_COLLECTING_EVENT_2
     }
   ];
 
@@ -205,7 +227,7 @@ export const TEST_COLLECTING_ORGANISM_SAMPLES: InputResource<MaterialSample>[] =
       ...blankMaterialSample(),
       id: "1",
       type: "material-sample",
-      collectingEvent: TEST_COLLECTING_EVENT,
+      collectingEvent: TEST_COLLECTING_EVENT_1,
       organism: [
         {
           id: "organism-1",
@@ -229,7 +251,7 @@ export const TEST_COLLECTING_ORGANISM_SAMPLES: InputResource<MaterialSample>[] =
       ...blankMaterialSample(),
       id: "2",
       type: "material-sample",
-      collectingEvent: TEST_COLLECTING_EVENT,
+      collectingEvent: TEST_COLLECTING_EVENT_1,
       organism: [
         {
           id: "organism-1",
