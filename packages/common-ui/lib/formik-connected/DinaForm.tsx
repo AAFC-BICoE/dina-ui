@@ -233,7 +233,70 @@ interface FormWrapperProps {
   customErrorViewerMessage?: (field: string, error: any) => string;
 }
 
-/** Warns on browser close/refresh and internal SPA navigation if the form is dirty. */
+// Singleton unsaved-data warning
+
+let dirtyFormCount = 0;
+let listenersRegistered = false;
+let suppressNextNav = false;
+
+/** Call before a programmatic navigation (save → result page, session timeout
+ *  redirect) to suppress the unsaved-data warning for the next navigation
+ *  only.  The flag auto-resets after one use. */
+export function suppressUnsavedWarning() {
+  suppressNextNav = true;
+}
+
+/** @internal Exported for tests. Resets the singleton warning state */
+export function __resetUnsavedWarningState() {
+  dirtyFormCount = 0;
+  listenersRegistered = false;
+  suppressNextNav = false;
+}
+
+const sharedBeforeUnload = (e: BeforeUnloadEvent) => {
+  if (suppressNextNav) {
+    suppressNextNav = false;
+    return;
+  }
+  e.preventDefault();
+};
+
+function registerListeners(router: any) {
+  if (listenersRegistered) return;
+  listenersRegistered = true;
+  window.addEventListener("beforeunload", sharedBeforeUnload);
+  if (router?.events) {
+    router.events.on("routeChangeStart", sharedRouteChange);
+  }
+}
+
+function unregisterListeners(router: any) {
+  if (!listenersRegistered) return;
+  listenersRegistered = false;
+  window.removeEventListener("beforeunload", sharedBeforeUnload);
+  if (router?.events) {
+    router.events.off("routeChangeStart", sharedRouteChange);
+  }
+}
+
+function sharedRouteChange() {
+  if (suppressNextNav) {
+    suppressNextNav = false;
+    return;
+  }
+  if (dirtyFormCount > 0 && !window.confirm(warningMessage)) {
+    routerRef?.events?.emit("routeChangeError");
+    throw "routeChange aborted.";
+  }
+}
+
+/** Latest warning message — kept up to date by PromptIfDirty. */
+let warningMessage = "";
+let routerRef: any = null;
+
+/** Warns on browser close/refresh and internal SPA navigation if any form
+ *  is dirty.  Uses module-level singleton listeners so multiple DinaForm
+ *  instances never produce duplicate dialogs. */
 function PromptIfDirty({
   formik,
   readOnly
@@ -247,41 +310,23 @@ function PromptIfDirty({
     !readOnly && formik.dirty && formik.values.type && formik.submitCount === 0;
 
   useEffect(() => {
-    if (!isDirty) return;
-
-    const warningMessage = formatMessage({ id: "possibleDataLossWarning" });
-
-    // Browser close / refresh (F5)
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      // returnValue must be set for older browsers (e.g. Chrome < 119)
-      e.returnValue = "";
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    // Internal SPA navigation (links, router.push, etc.)
-    // router.events may be undefined in test environments.
-    if (router.events) {
-      const handleRouteChange = () => {
-        if (!window.confirm(warningMessage)) {
-          router.events.emit("routeChangeError");
-          throw "routeChange aborted.";
-        }
-      };
-
-      router.events.on("routeChangeStart", handleRouteChange);
-
-      return () => {
-        window.removeEventListener("beforeunload", handleBeforeUnload);
-        router.events.off("routeChangeStart", handleRouteChange);
-      };
+    if (isDirty) {
+      dirtyFormCount++;
+      warningMessage = formatMessage({ id: "possibleDataLossWarning" });
+      routerRef = router;
+      registerListeners(router);
     }
 
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      if (isDirty) {
+        dirtyFormCount--;
+        if (dirtyFormCount <= 0) {
+          dirtyFormCount = 0;
+          unregisterListeners(router);
+        }
+      }
     };
-  }, [isDirty, formatMessage, router.events]);
+  }, [isDirty]);
 
   return null;
 }
