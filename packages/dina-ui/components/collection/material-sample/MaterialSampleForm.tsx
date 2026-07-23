@@ -51,7 +51,6 @@ import {
 } from "../../../types/collection-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { AssociationsField } from "../AssociationsField";
-import { CollectingEventBriefDetails } from "../collecting-event/CollectingEventBriefDetails";
 import { TabbedResourceLinker } from "../TabbedResourceLinker";
 import { MaterialSampleBreadCrumb } from "./MaterialSampleBreadCrumb";
 import { MaterialSampleIdentifiersSection } from "./MaterialSampleIdentifiersSection";
@@ -272,9 +271,6 @@ export function MaterialSampleForm({
           hideLinkerTab={hideLinkerTab}
           hideCreateNewTab={isBulkEditAllTab}
           legend={<DinaMessage id="collectingEvent" />}
-          briefDetails={(colEvent) => (
-            <CollectingEventBriefDetails collectingEvent={colEvent} />
-          )}
           linkerTabContent={
             reduceRendering ? null : (
               <CollectingEventLinker

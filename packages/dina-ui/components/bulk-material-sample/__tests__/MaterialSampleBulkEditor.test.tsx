@@ -1060,10 +1060,13 @@ describe("MaterialSampleBulkEditor", () => {
         )
       ).toBeInTheDocument();
 
-      screen.logTestingPlaygroundURL();
-
-      // The collecting event should be displayed in read-only mode.
-      fail("Should be in read only mode... fix this.");
+      // Should be in read only mode...
+      expect(
+        wrapper.getByText(/linked collecting event:/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.getByRole("link", { name: /col\-event\-1/i })
+      ).toBeInTheDocument();
     });
 
     it("Bulk edit material samples that are all linked the same collecting event, use unlink all functionality", async () => {
@@ -1454,46 +1457,6 @@ describe("MaterialSampleBulkEditor", () => {
           { apiBaseUrl: "/collection-api" }
         ]
       ]);
-    });
-
-    it("Keeps the linked Collecting Event form read-only in the Edit All tab and shows the warning alert", async () => {
-      const wrapper = mountWithAppContext(
-        <MaterialSampleBulkEditor
-          onSaved={mockOnSaved}
-          samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
-        />,
-        testCtx as any
-      );
-      await waitFor(() =>
-        expect(
-          wrapper.container.querySelectorAll(
-            ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
-          ).length
-        ).toBeGreaterThan(0)
-      );
-
-      const collectingEventToggle = wrapper.container.querySelectorAll(
-        ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
-      );
-      if (!collectingEventToggle) {
-        fail("Collecting event toggle needs to exist at this point.");
-      }
-      await userEvent.click(collectingEventToggle[0]);
-      await waitForLoadingToDisappear();
-
-      await waitFor(() =>
-        expect(
-          wrapper.getByText(
-            /editing is only available on the collecting event details page/i
-          )
-        ).toBeInTheDocument()
-      );
-
-      expect(
-        wrapper.queryByRole("textbox", {
-          name: /verbatim locality/i
-        })
-      ).not.toBeInTheDocument();
     });
   });
 

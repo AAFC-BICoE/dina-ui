@@ -37,10 +37,9 @@ export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   disableLinkerTab?: boolean;
   nestedForm: (
     initialValues?: PersistedResource<T>,
-    isBulkEditAllTab?: boolean
+    forceReadOnly?: boolean
   ) => ReactNode;
   linkerTabContent: ReactNode;
-  briefDetails: (resource: PersistedResource<T>) => ReactNode;
   fieldName: string;
   targetType: string;
   /** FieldSet id */
@@ -112,7 +111,6 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   disableLinkerTab,
   nestedForm,
   linkerTabContent,
-  briefDetails,
   fieldName,
   fieldSetId,
   legend,
@@ -278,7 +276,8 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                   withResponse(resourceQuery, ({ data: linkedResource }) => {
                     const activeResource =
                       (linkedResource as PersistedResource<T>) || defaultValue;
-                    const isReadOnlyMode = isTemplate || disableLinkerTab;
+                    const isReadOnlyMode =
+                      isTemplate || disableLinkerTab || isBulkEditAllTab;
 
                     return (
                       <>
@@ -315,10 +314,10 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                                 {linkedResource.id}
                               </Link>
                             </div>
-                            {briefDetails(activeResource)}
+                            {nestedForm(activeResource, true)}
                           </div>
                         ) : (
-                          nestedForm(activeResource, isBulkEditAllTab)
+                          nestedForm(activeResource, false)
                         )}
                       </>
                     );
@@ -340,7 +339,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                     </span>
                   </div>
                 )}
-                {nestedForm(undefined, isBulkEditAllTab)}
+                {nestedForm(undefined, false)}
               </TabPanel>
             )}
 

@@ -1618,41 +1618,53 @@ export function useMaterialSampleSave({
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
   function nestedCollectingEventForm(
     colEvent?: PersistedResource<CollectingEvent>,
-    isBulkEditAllTab?: boolean
+    forceReadOnlyMode?: boolean
   ) {
     const initialValues =
       colEvent ??
       (isTemplate
         ? colEventTemplateInitialValues
         : collectingEventInitialValues);
+    const hasMultipleUsages = Boolean(
+      materialSampleUsageCount && materialSampleUsageCount > 1
+    );
+    const hasExistingColEvent = Boolean(colEventId);
+
+    // Permission Evaluation...
+    const permissionsProvided = initialValues?.meta?.permissionsProvider;
+    const canEdit = permissionsProvided
+      ? initialValues?.meta?.permissions?.includes(
+          colEvent?.id ? "update" : "create"
+        ) ?? false
+      : true;
 
     const shouldShowCollectingEventEditAlert = (() => {
+      // If already being forced into read only, do not display this message.
+      if (forceReadOnlyMode) return false;
+
+      // If no permissions don't show this alert, another alert will be displayed.
+      if (!canEdit) return false;
+
       // If you are creating a new collecting event, do not display this message.
       if (isCreatingNewColEvent) return false;
 
       // If it has a collecting event, and multiple usages then display a warning message.
-      const hasMultipleUsages = Boolean(
-        materialSampleUsageCount && materialSampleUsageCount > 1
-      );
-      const hasExistingColEvent = Boolean(colEventId);
-
       return Boolean(
         disableNestedFormEdits || (hasMultipleUsages && hasExistingColEvent)
       );
     })();
 
     const makeCollectingEventReadOnly = (() => {
-      // The bulk edit "Edit All" tab should never be allowed to edit.
-      if (isBulkEditAllTab) return true;
+      // If forcing read only, then go into read only.
+      if (forceReadOnlyMode) return true;
 
       // If you are creating a new collecting event, it should be allowed to edit.
       if (isCreatingNewColEvent) return false;
 
-      // If it has multiple usages you should NOT be allowed to edit.
-      const hasMultipleUsages = Boolean(
-        materialSampleUsageCount && materialSampleUsageCount > 1
-      );
+      // User does not have permission to edit, go into read only mode.
+      if (!canEdit) return true;
 
+      // If it has multiple usages you should NOT be allowed to edit.
       return Boolean(disableNestedFormEdits || hasMultipleUsages);
     })();
 
@@ -1687,28 +1699,14 @@ export function useMaterialSampleSave({
       )
     };
 
-    // Check the request to see if a permission provider is present.
-    const permissionsProvided = initialValues?.meta?.permissionsProvider;
-
-    const canEdit = permissionsProvided
-      ? initialValues?.meta?.permissions?.includes(
-          colEvent?.id ? "update" : "create"
-        ) ?? false
-      : true;
-
-    const isEditDisabled =
-      !isCreatingNewColEvent && (colEventFormProps.readOnly || !canEdit);
-    const showAlert =
-      !isCreatingNewColEvent && !canEdit && !colEventFormProps.readOnly;
-
     return (
       <>
-        {showAlert && (
+        {!canEdit && (
           <Alert variant="warning" className="mb-2">
             <DinaMessage id="collectingEventPermissionAlert" />
           </Alert>
         )}
-        <DinaForm {...colEventFormProps} readOnly={isEditDisabled} />
+        <DinaForm {...colEventFormProps} />
       </>
     );
   }
