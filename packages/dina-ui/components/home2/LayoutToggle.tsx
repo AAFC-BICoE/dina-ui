@@ -13,7 +13,9 @@ export interface LayoutToggleProps {
 
 /**
  * Pill-style toggle for switching between the classic and new home layouts,
- * placed beside the global search bar. When the new layout is active and
+ * placed beside the global search bar. Uses Bootstrap Button components
+ * wrapped in the same card+pill visual style as the
+ * TransactionMaterialDirectionSection. When the new layout is active and
  * customize props are provided, a gear icon appears to enter customize mode.
  *
  * Layout props are passed in from the parent page so that the toggle shares
@@ -41,55 +43,59 @@ export function LayoutToggle({
 
   return (
     <div className="d-flex align-items-center gap-3">
-      {/* Layout pill toggle */}
+      {/* Layout pill toggle — card+pill wrapper around Bootstrap ButtonGroup */}
       <div className="d-flex align-items-center gap-1">
         <span className="text-muted small text-nowrap me-1">Layout:</span>
-        <ButtonGroup size="sm">
-          <Button
-            onClick={useNewLayout ? switchToClassic : undefined}
-            variant={useNewLayout ? "outline-dark" : "link"}
-            className={
-              "text-nowrap text-decoration-none px-2 " +
-              (useNewLayout ? "fw-bold" : "text-muted")
-            }
-          >
-            <FaGripLines
-              style={{ fontSize: "0.8rem", margin: "0 0.25rem 0 0" }}
-            />
-            Classic
-          </Button>
-          <Button
-            onClick={!useNewLayout ? switchToNew : undefined}
-            variant={useNewLayout ? "link" : "outline-dark"}
-            className={
-              "text-nowrap text-decoration-none px-2 d-inline-flex align-items-center gap-1 " +
-              (useNewLayout ? "text-muted" : "fw-bold")
-            }
-          >
-            <FaGrip style={{ fontSize: "0.8rem" }} />
-            New
-          </Button>
-        </ButtonGroup>
+        <div className="card pill">
+          <ButtonGroup size="sm">
+            <Button
+              onClick={useNewLayout ? switchToClassic : undefined}
+              variant={useNewLayout ? "link" : "dark"}
+              className={
+                "rounded-pill px-2 text-nowrap " +
+                (useNewLayout ? "text-muted" : "fw-bold")
+              }
+            >
+              <FaGripLines
+                style={{ fontSize: "0.75rem", marginRight: "0.2rem" }}
+              />
+              Classic
+            </Button>
+            <Button
+              onClick={!useNewLayout ? switchToNew : undefined}
+              variant={useNewLayout ? "dark" : "link"}
+              className={
+                "rounded-pill px-2 text-nowrap " +
+                (useNewLayout ? "fw-bold" : "text-muted")
+              }
+            >
+              <FaGrip style={{ fontSize: "0.75rem", marginRight: "0.2rem" }} />
+              New
+            </Button>
+          </ButtonGroup>
+        </div>
       </div>
 
-      {/* Customize gear */}
+      {/* Customize gear — card+pill wrapper around Bootstrap Button */}
       {useNewLayout && setIsCustomizeMode && (
-        <Button
-          variant={isCustomizeMode ? "outline-dark" : "link"}
-          size="sm"
-          onClick={() => setIsCustomizeMode((prev) => !prev)}
-          className={
-            "text-nowrap text-decoration-none d-inline-flex align-items-center gap-1 " +
-            (isCustomizeMode ? "fw-bold" : "text-muted")
-          }
-          title={isCustomizeMode ? "Done customizing" : "Customize"}
-        >
-          <FaGear
-            className={isCustomizeMode ? "fa-spin" : undefined}
-            style={{ fontSize: "0.85rem" }}
-          />
-          {isCustomizeMode ? "Done" : "Customize"}
-        </Button>
+        <div className="card pill">
+          <Button
+            variant={isCustomizeMode ? "dark" : "link"}
+            size="sm"
+            onClick={() => setIsCustomizeMode((prev) => !prev)}
+            className={
+              "rounded-pill px-2 text-nowrap d-inline-flex align-items-center gap-1 " +
+              (isCustomizeMode ? "fw-bold" : "text-muted")
+            }
+            title={isCustomizeMode ? "Done customizing" : "Customize"}
+          >
+            <FaGear
+              className={isCustomizeMode ? "fa-spin" : undefined}
+              style={{ fontSize: "0.85rem" }}
+            />
+            {isCustomizeMode ? "Done" : "Customize"}
+          </Button>
+        </div>
       )}
     </div>
   );
