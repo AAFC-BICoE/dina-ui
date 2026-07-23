@@ -503,7 +503,9 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
               publiclyReleasable: false,
               materialSampleName: "test-material-sample-id",
-              collectingEvent: { id: "1", type: "collecting-event" }
+              relationships: {
+                collectingEvent: { data: { id: "1", type: "collecting-event" } }
+              }
             },
             type: "material-sample"
           }
@@ -641,9 +643,13 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              collectingEvent: {
-                id: "11111111-1111-1111-1111-111111111111",
-                type: "collecting-event"
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "collecting-event"
+                  }
+                }
               },
               id: "1",
               type: "material-sample"
@@ -667,16 +673,16 @@ describe("Material Sample Edit Page", () => {
       testCtx
     );
     await waitForLoadingToDisappear();
+
+    const editAllVerbatimEventDateTime = wrapper.getAllByRole("textbox", {
+      name: /verbatim event datetime/i
+    })[0];
     await waitFor(() =>
-      expect(
-        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-      ).toHaveDisplayValue("2021-04-13")
+      expect(editAllVerbatimEventDateTime).toHaveDisplayValue("2021-04-13")
     );
 
     // Existing CollectingEvent should show up:
-    expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-    ).toHaveDisplayValue("2021-04-13");
+    expect(editAllVerbatimEventDateTime).toHaveDisplayValue("2021-04-13");
 
     // Update the Primary ID.
     await userEvent.clear(
@@ -778,9 +784,13 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              collectingEvent: {
-                id: "11111111-1111-1111-1111-111111111111",
-                type: "collecting-event"
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "collecting-event"
+                  }
+                }
               },
               id: "1",
               materialSampleName: "test-material-sample-id",
@@ -802,90 +812,41 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
+    await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
-        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+        wrapper.getAllByRole("textbox", { name: /verbatim event datetime/i })[0]
       ).toHaveDisplayValue("2021-04-13")
     );
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      wrapper.getAllByRole("textbox", { name: /verbatim event datetime/i })[0]
     ).toHaveDisplayValue("2021-04-13");
 
     // Remove the existing Collecting Event.
     await userEvent.click(wrapper.getByRole("button", { name: /unlink/i }));
-    await waitFor(() =>
-      expect(
-        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-      ).toHaveDisplayValue("")
-    );
 
-    // Existing CollectingEvent should be gone:
+    // Are you sure?
     expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-    ).toHaveDisplayValue("");
+      wrapper.getByText(/unlink collecting events\?/i)
+    ).toBeInTheDocument();
+    await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
 
-    // Set the new Collecting Event's verbatimEventDateTime:
-    await userEvent.type(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
-      "2019-12-21T16:00"
-    );
-
-    // Set the additional collection numbers in the collecting event.
-    await userEvent.type(
-      wrapper.getByRole("textbox", {
-        name: "Additional Collection Numbers Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers. (One value per line) Write one value per line. Press enter while typing in the field to add a new line."
-      }),
-      "1\n2\n3"
-    );
+    // Message to indicating that the collecting event will be unlinked.
+    expect(
+      wrapper.getByText(
+        /collecting event\(s\) will be unlinked from the material samples when the form is saved\./i
+      )
+    ).toBeInTheDocument();
 
     // Save
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
-    expect(mockSave.mock.calls).toEqual([
-      [
-        // New collecting-event created:
-        [
-          {
-            resource: {
-              group: "aafc",
-              otherRecordNumbers: ["1", "2", "3"],
-              dwcVerbatimCoordinateSystem: null,
-              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              geoReferenceAssertions: [
-                {
-                  isPrimary: true
-                }
-              ],
-              verbatimEventDateTime: "2019-12-21T16:00",
-              publiclyReleasable: false, // Default Value
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        // Existing material-sample updated:
-        [
-          {
-            resource: {
-              collectingEvent: {
-                id: "11111111-1111-1111-1111-111111111111",
-                type: "collecting-event"
-              },
-              id: "1",
-              type: "material-sample"
-            },
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ]
-    ]);
+    // Expect the network request to unlink the record.
+    expect(mockSave.mock.calls).toEqual([]);
   });
 
   it("Renders an existing Material Sample with the Preparations section enabled.", async () => {
@@ -3919,9 +3880,13 @@ describe("Material Sample Edit Page", () => {
             [
               {
                 resource: {
-                  collectingEvent: {
-                    id: "11111111-1111-1111-1111-111111111111",
-                    type: "collecting-event"
+                  relationships: {
+                    collectingEvent: {
+                      data: {
+                        id: "11111111-1111-1111-1111-111111111111",
+                        type: "collecting-event"
+                      }
+                    }
                   },
                   publiclyReleasable: false,
                   type: "material-sample"
@@ -4111,9 +4076,13 @@ describe("Material Sample Edit Page", () => {
             [
               {
                 resource: {
-                  collectingEvent: {
-                    id: "11111111-1111-1111-1111-111111111111",
-                    type: "collecting-event"
+                  relationships: {
+                    collectingEvent: {
+                      data: {
+                        id: "11111111-1111-1111-1111-111111111111",
+                        type: "collecting-event"
+                      }
+                    }
                   },
                   publiclyReleasable: false,
                   type: "material-sample"
