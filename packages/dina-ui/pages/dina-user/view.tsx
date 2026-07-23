@@ -201,3 +201,35 @@ export function AdminRolesTable({
     </div>
   );
 }
+
+export interface PermissionsTableProps {
+  adminRoles: string[];
+  rolesPerGroup: string[];
+}
+
+export function PermissionsTable({ adminRoles }: PermissionsTableProps) {
+  return (
+    <div className="mb-3">
+      <h2>
+        <DinaMessage id="permissionRoles" />
+      </h2>
+      <ReactTable
+        className={classNames("-striped")}
+        highlightRow={false}
+        columns={[
+          // Render the value as a string, or the custom cell component if one is defined:
+          {
+            cell: ({ row: { original } }) => {
+              return <ReadOnlyValue value={original} />;
+            },
+            header: () => <DinaMessage id="roles" />,
+            accessorKey: "adminRoles"
+          }
+        ]}
+        data={adminRoles}
+        showPagination={false}
+        manualPagination={true}
+      />
+    </div>
+  );
+}
