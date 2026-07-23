@@ -1503,5 +1503,22 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "They are now located on the new {link} page.",
   supportedFormats: "Supported Formats",
   maxFileSize: "Maximum file size",
-  openInNewTab: "Opens in new tab"
+  openInNewTab: "Opens in new tab",
+
+  // Permissions Table
+  tableTitle_permissions: "Permissions",
+  resource: "Resource",
+  operation_read: "Read",
+  operation_create: "Create",
+  operation_edit: "Edit",
+  operation_delete: "Delete",
+  permission_allowed: "Allowed",
+  permission_denied: "Denied",
+  permission_unavailable: "Unavailable",
+  permission_objectOwner: "Object Owner",
+  resource_materialSample: "Material Sample",
+  resource_controlledVocabulary: "Controlled Vocabulary",
+  resource_formTemplate: "Form Template",
+  resource_objectStore: "Object Store",
+  resource_agent: "Agent (person)"
 };
