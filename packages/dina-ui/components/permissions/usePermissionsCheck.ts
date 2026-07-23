@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useApiClient } from "common-ui";
+import { useApiClient, useAccount } from "common-ui";
 import type { ResourcePermission } from "./PermissionsTable";
 import type { PermissionCheckResponse } from "../../types/user-api";
 
@@ -9,23 +9,23 @@ const RESOURCE_CHECK_CONFIG: {
   servicePath: string;
   jsonApiType: string;
 }[] = [
-  // Uncomment these when other services have the endpoint implemented
+  // Uncomment these as other services have the endpoint implemented
 
-  // {
-  //   resourceKey: "resource_materialSample",
-  //   servicePath: "collection-api",
-  //   jsonApiType: "material-sample"
-  // },
-  // {
-  //   resourceKey: "resource_controlledVocabulary",
-  //   servicePath: "collection-api",
-  //   jsonApiType: "controlled-vocabulary"
-  // },
-  // {
-  //   resourceKey: "resource_formTemplate",
-  //   servicePath: "collection-api",
-  //   jsonApiType: "form-template"
-  // },
+  {
+    resourceKey: "resource_materialSample",
+    servicePath: "collection-api",
+    jsonApiType: "material-sample"
+  },
+  {
+    resourceKey: "resource_controlledVocabulary",
+    servicePath: "collection-api",
+    jsonApiType: "controlled-vocabulary"
+  },
+  {
+    resourceKey: "resource_formTemplate",
+    servicePath: "collection-api",
+    jsonApiType: "form-template"
+  },
   // {
   //   resourceKey: "resource_objectStore",
   //   servicePath: "objectstore-api",
@@ -47,6 +47,7 @@ export function usePermissionsCheck(selectedGroup: string): {
   loading: boolean;
 } {
   const { apiClient } = useApiClient();
+  const { username } = useAccount();
   const [permissionsData, setPermissionsData] = useState<
     ResourcePermission[] | undefined
   >(undefined);
@@ -63,18 +64,41 @@ export function usePermissionsCheck(selectedGroup: string): {
 
     const checks = RESOURCE_CHECK_CONFIG.map(async (cfg) => {
       try {
-        const isAgentApi = cfg.servicePath === "agent-api";
-        const response = await apiClient.axios.post<PermissionCheckResponse>(
+        const probe = await apiClient.axios.post<PermissionCheckResponse>(
           `/${cfg.servicePath}/permission-check`,
           {
-            data: {
-              type: cfg.jsonApiType,
-              attributes: isAgentApi ? {} : { group: selectedGroup }
-            }
+            data: { type: cfg.jsonApiType, attributes: {} }
           }
         );
 
-        const perms = response.data?.data?.attributes?.permissions ?? [];
+        let attrs = probe.data?.data?.attributes;
+        const evaluated = attrs?.evaluatedAttributes ?? [];
+
+        if (evaluated.length > 0) {
+          const knownValues: Record<string, string> = {
+            group: selectedGroup,
+            createdBy: username ?? ""
+          };
+          const requestAttrs: Record<string, string> = {};
+          for (const attr of evaluated) {
+            if (attr in knownValues) {
+              requestAttrs[attr] = knownValues[attr];
+            }
+          }
+
+          const refined = await apiClient.axios.post<PermissionCheckResponse>(
+            `/${cfg.servicePath}/permission-check`,
+            {
+              data: {
+                type: cfg.jsonApiType,
+                attributes: requestAttrs
+              }
+            }
+          );
+          attrs = refined.data?.data?.attributes;
+        }
+
+        const perms = attrs?.permissions ?? [];
 
         return {
           resourceKey: cfg.resourceKey,
