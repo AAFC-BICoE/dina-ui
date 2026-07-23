@@ -27,7 +27,10 @@ const TEST_AGENT: Person = {
 };
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async () => {
+const mockGet = jest.fn(async (path: string) => {
+  if (path.includes("group")) {
+    return { data: [], meta: { totalResourceCount: 0 } };
+  }
   return { data: TEST_DINAUSER };
 });
 
