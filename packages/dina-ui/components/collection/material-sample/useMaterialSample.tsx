@@ -983,15 +983,16 @@ export function useMaterialSampleSave({
       ? colEventFormRef
       : collectingEventRefExternal;
 
+    const isUsingExternalColEventForm =
+      !colEventFormRef?.current?.values &&
+      !!collectingEventRefExternal?.current?.values;
+
     let isStaleForm = false;
 
     if (colEventFormRefToUse?.current && !unlinkCollectingEvent) {
       const formValues = colEventFormRef?.current?.values;
       const externalValues = collectingEventRefExternal?.current?.values;
 
-      // If switching from "Create new" back to an existing event, the form might still
-      // hold dirty values from the "Create new" tab. We identify this by checking if the
-      // form's ID matches the newly selected colEventId.
       isStaleForm =
         !isCreatingNewColEvent &&
         !!colEventId &&
@@ -999,15 +1000,16 @@ export function useMaterialSampleSave({
         externalValues?.id !== colEventId;
 
       const collectingEventValues = {
-        // Seed with the known colEventId so the id is preserved even if the
-        // nested form mounted before its fetch resolved (race condition when
-        // loading=false immediately and colEventQuery is still in-flight).
-        ...(colEventId && !isCreatingNewColEvent ? { id: colEventId } : {}),
+        // Prevent injecting the local colEventId if we are using the external form
+        ...(colEventId && !isCreatingNewColEvent && !isUsingExternalColEventForm
+          ? { id: colEventId }
+          : {}),
         ...(isStaleForm ? {} : withoutBlankFields(formValues)),
         ...(isStaleForm ? {} : withoutBlankFields(externalValues))
       };
 
-      if (isCreatingNewColEvent) {
+      // Only delete the ID if the form we are actually using is creating a new event
+      if (isCreatingNewColEvent && !isUsingExternalColEventForm) {
         delete collectingEventValues.id;
       }
 
@@ -1024,11 +1026,16 @@ export function useMaterialSampleSave({
         colEventFormRefToUse.current.values
       );
 
-      // Only evaluate as edited if it's explicitly a new CE, or if the user modified the fields
-      // of the correctly-loaded existing CE. We ignore "edits" if we just stripped stale fields.
+      // Check if we are merely linking an existing CE from the bulk tab
+      const isLinkingExistingExternal =
+        isUsingExternalColEventForm && !!submittedCollectingEvent.id;
+
+      // Only evaluate as edited if it's explicitly a new CE, or if the user modified the fields.
+      // We ignore "edits" if we just stripped stale fields or if we are merely linking an existing external CE.
       const collectingEventWasEdited =
-        isCreatingNewColEvent ||
+        (isCreatingNewColEvent && !isUsingExternalColEventForm) ||
         (!isStaleForm &&
+          !isLinkingExistingExternal &&
           (!submittedCollectingEvent.id ||
             !_.isEqual(
               submittedCollectingEvent,

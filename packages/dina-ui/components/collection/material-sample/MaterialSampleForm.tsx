@@ -280,6 +280,8 @@ export function MaterialSampleForm({
               <CollectingEventLinker
                 onCollectingEventSelect={(colEventToLink) => {
                   setColEventId(colEventToLink.id);
+                  setIsCreatingNewColEvent(false);
+                  setUnlinkAllCollectingEvent(false);
                 }}
               />
             )

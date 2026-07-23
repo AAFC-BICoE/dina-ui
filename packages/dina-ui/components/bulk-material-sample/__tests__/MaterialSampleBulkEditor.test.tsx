@@ -206,11 +206,15 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         },
         meta: { totalResourceCount: 1, moduleVersion: "0.16" }
       };
+    case "collection-api/collecting-event":
+      return {
+        data: [TEST_COLLECTING_EVENT_1, TEST_COLLECTING_EVENT_2],
+        meta: { totalResourceCount: 2, moduleVersion: "0.16" }
+      };
     case "search-api/search-ws/mapping":
     case "collection-api/storage-unit-type":
     case "collection-api/collection":
     case "collection-api/collection-method":
-    case "collection-api/collecting-event":
     case "objectstore-api/metadata":
     case "agent-api/person":
     case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.key][EQ]=type_status":
@@ -929,6 +933,101 @@ describe("MaterialSampleBulkEditor", () => {
       ).not.toBeInTheDocument();
     });
 
+    it("Bulk editing material samples with no collecting event, link to an existing record", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleBulkEditor
+          onSaved={mockOnSaved}
+          samples={TEST_NEW_SAMPLES}
+        />,
+        testCtx as any
+      );
+      await waitFor(() =>
+        expect(wrapper.getByText(/edit all/i)).toBeInTheDocument()
+      );
+
+      // Go the the bulk edit tab:
+      await userEvent.click(wrapper.getByText(/edit all/i));
+
+      // Enable the collecting event section:
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        fail("Collecting event toggle needs to exist at this point.");
+      }
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
+
+      // Link existing should appear.
+      expect(
+        wrapper.getByRole("tab", { name: /link existing/i })
+      ).toBeInTheDocument();
+
+      await userEvent.click(
+        wrapper.getByRole("tab", { name: /link existing/i })
+      );
+      await waitForLoadingToDisappear();
+
+      // Select the first collecting event from the table.
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /select/i })[0]
+      );
+
+      // Save the form and ensure the network request is working correctly.
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                collection: { id: "1", type: "collection" },
+                materialSampleName: "MS1",
+                relationships: {
+                  collectingEvent: {
+                    data: { id: "col-event-1", type: "collecting-event" }
+                  },
+                  collection: { data: { id: "1", type: "collection" } }
+                },
+                type: "material-sample"
+              },
+              type: "material-sample"
+            },
+            {
+              resource: {
+                collection: { id: "1", type: "collection" },
+                materialSampleName: "MS2",
+                relationships: {
+                  collectingEvent: {
+                    data: { id: "col-event-1", type: "collecting-event" }
+                  },
+                  collection: { data: { id: "1", type: "collection" } }
+                },
+                type: "material-sample"
+              },
+              type: "material-sample"
+            },
+            {
+              resource: {
+                collection: { id: "1", type: "collection" },
+                materialSampleName: "MS3",
+                relationships: {
+                  collectingEvent: {
+                    data: { id: "col-event-1", type: "collecting-event" }
+                  },
+                  collection: { data: { id: "1", type: "collection" } }
+                },
+                type: "material-sample"
+              },
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ]
+      ]);
+    });
+
     it("Bulk edit material samples that are all linked the same collecting event, display info banner", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleBulkEditor
@@ -1289,10 +1388,6 @@ describe("MaterialSampleBulkEditor", () => {
             // Creates the first sample with the attached events:
             {
               resource: {
-                collectingEvent: {
-                  id: "11111",
-                  type: "collecting-event"
-                },
                 collection: {
                   id: "1",
                   type: "collection"
@@ -1303,6 +1398,12 @@ describe("MaterialSampleBulkEditor", () => {
                     data: {
                       id: "1",
                       type: "collection"
+                    }
+                  },
+                  collectingEvent: {
+                    data: {
+                      id: "11111",
+                      type: "collecting-event"
                     }
                   }
                 },
