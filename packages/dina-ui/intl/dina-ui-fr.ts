@@ -994,7 +994,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   permission_objectOwner: "Propriétaire",
   resource_materialSample: "Échantillon",
   resource_controlledVocabulary: "Vocabulaire contrôlé",
-  resource_formTemplate: "Modèle de formulaire",
+  resource_collection: "Collection",
+  resource_project: "Projet",
   resource_objectStore: "Dépot d'objets",
   resource_agent: "Agent (personne)"
 };

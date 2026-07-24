@@ -1518,7 +1518,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   permission_objectOwner: "Object Owner",
   resource_materialSample: "Material Sample",
   resource_controlledVocabulary: "Controlled Vocabulary",
-  resource_formTemplate: "Form Template",
+  resource_collection: "Collection",
+  resource_project: "Project",
   resource_objectStore: "Object Store",
   resource_agent: "Agent (person)"
 };
