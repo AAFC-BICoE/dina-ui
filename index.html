@@ -499,19 +499,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_wcag_compliance_tools_setup">12. WCAG compliance tools setup</a>
 <ul class="sectlevel2">
-<li><a href="#_pa11y">12.1. Pa11y</a></li>
-<li><a href="#_chrome_inspector">12.2. Chrome Inspector</a></li>
-</ul>
-</li>
-<li><a href="#_pa11y_ci_automation">13. Pa11y-ci automation</a>
-<ul class="sectlevel2">
-<li><a href="#_follow_below_steps_in_sequence">13.1. Follow below steps in sequence</a></li>
-</ul>
-</li>
-<li><a href="#_translation_task">14. Translation task</a>
-<ul class="sectlevel2">
-<li><a href="#_to_export_to_csv_file">14.1. To export to csv file</a></li>
-<li><a href="#_to_import_from_translated_csv_file">14.2. To import from translated csv file</a></li>
+<li><a href="#_accessibility_testing_with_axe_devtools">12.1. Accessibility Testing with axe DevTools</a></li>
+<li><a href="#_translation_task">12.2. Translation task</a></li>
+<li><a href="#_to_export_to_csv_file">12.3. To export to csv file</a></li>
+<li><a href="#_to_import_from_translated_csv_file">12.4. To import from translated csv file</a></li>
 </ul>
 </li>
 </ul>
@@ -556,6 +547,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>See dina-local-deployment <a href="https://aafc-bicoe.github.io/dina-local-deployment/#_prerequisites">prerequisites</a></p>
 </div>
 <div class="paragraph">
+<p>You should have Node.js v22 and Yarn v1.22.21 installed.</p>
+</div>
+<div class="paragraph">
 <p>You can check which versions you currently have installed with:</p>
 </div>
 <div class="listingblock">
@@ -590,25 +584,46 @@ yarn -v</pre>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://yarnpkg.com/">Yarn</a>: Node.js package manager</p>
+<p><a href="https://nodejs.org/">Node.js</a> (v22): JavaScript runtime environment.</p>
 </li>
 <li>
-<p><a href="https://www.typescriptlang.org/">TypeScript</a>: Superset of JavaScript with static types.</p>
+<p><a href="https://yarnpkg.com/">Yarn</a> (v1.22.21): Node.js package manager.</p>
 </li>
 <li>
-<p><a href="https://reactjs.org/">React</a>: JavaScript library for building user interfaces.</p>
+<p><a href="https://www.typescriptlang.org/">TypeScript</a> (v6.0.3): JavaScript type support.</p>
 </li>
 <li>
-<p><a href="https://nextjs.org/">Next.js</a>: Framework for building React-based applications.</p>
+<p><a href="https://reactjs.org/">React</a> (v19.2.7): JavaScript library for building user interfaces.</p>
 </li>
 <li>
-<p><a href="https://getbootstrap.com/">Bootstrap</a>: CSS framework.</p>
+<p><a href="https://nextjs.org/">Next.js</a> (v16.2.10): Framework for building React-based applications.</p>
 </li>
 <li>
-<p><a href="https://jestjs.io/">Jest</a>: Testing framework.</p>
+<p><a href="https://getbootstrap.com/">Bootstrap</a> (v5.1.3): CSS framework.</p>
 </li>
 <li>
-<p><a href="https://www.docker.com/">Docker</a>: Application containerization</p>
+<p><a href="https://jestjs.io/">Jest</a> (v29.7.0): Testing framework.</p>
+</li>
+<li>
+<p><a href="https://formik.org/">Formik</a> (v2.2.7): Form management library.</p>
+</li>
+<li>
+<p><a href="https://www.keycloak.org/">Keycloak</a> (v25.0.6): Authentication system.</p>
+</li>
+<li>
+<p><a href="https://github.com/wopian/kitsu">Kitsu</a> (v11.1.0): JSON:API client.</p>
+</li>
+<li>
+<p><a href="https://tanstack.com/table/v8">React Table</a> (v8.9.3): Table component library.</p>
+</li>
+<li>
+<p><a href="https://echarts.apache.org/">ECharts</a> (v5.6.0): Charting library.</p>
+</li>
+<li>
+<p><a href="https://github.com/Esri/esri-loader">ESRI Loader</a> (v3.3.0): Map integration.</p>
+</li>
+<li>
+<p><a href="https://www.docker.com/">Docker</a>: Application containerization.</p>
 </li>
 </ul>
 </div>
@@ -948,8 +963,8 @@ docker build -t dina-ui:dev .</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>SUPPORTED_GEOINFORMATION_SYSTEMS</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Comma-separated coordinate systems</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>EPSG:4326,EPSG:3857</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma-separated list of supported geoinformational services</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>OSM</code> (OpenStreetMap), <code>TGN</code> (The Getty Thesaurus of Geographic Names)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>SCIENTIFIC_NAMES_SEARCH_ENDPOINT</code></p></td>
@@ -1076,9 +1091,7 @@ docker build -t dina-ui:dev .</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { DinaForm, SubmitButton, TextField } from "../components";
-
-export default function ExampleFormPage() {
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">export default function ExampleFormPage() {
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
     api: { save }
@@ -1201,9 +1214,7 @@ export default function ExampleFormPage() {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { DinaForm, SubmitButton, TextField, FieldSpy } from "common-ui";
-
-export default function ExampleFormPage() {
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">export default function ExampleFormPage() {
   return (
     &lt;div className="card card-body" style={{ width: "1000px" }}&gt;
       &lt;DinaForm initialValues={{}} onSubmit={onSubmit}&gt;
@@ -1296,10 +1307,7 @@ field_metadataName_tooltip: "This will be the message that appears for the name 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { DinaForm, ResourceSelectField } from "common-ui";
-import { Group } from "../types/user-api/resources/Group";
-
-/**
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">/**
  * This page shows a dropdown for selecting a Group. You can type the name of a Group you're
  * looking for into the input, which sends a filtered query to the back-end API for a Group with
  * that name. When you select a Group, the onChange callback function sets the selected group into
@@ -1625,16 +1633,7 @@ export default function ExamplePage() {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { FilterParam } from "kitsu";
-import { useState } from "react";
-import { FilterBuilderField } from "../components/filter-builder/FilterBuilderField";
-import { fiql } from "../components/filter-builder/fiql";
-import Head from "../components/head";
-import Nav from "../components/nav";
-import { QueryTable } from "../components/table/QueryTable";
-import { DinaForm, DinaFormOnSubmit } from "../components/formik-connected/DinaForm";
-
-export default function ExamplePage() {
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">export default function ExamplePage() {
   const [filter, setFilter] = useState&lt;FilterParam&gt;();
 
   const onSubmit: DinaFormOnSubmit = ({ submittedValues: { filter } }) =&gt; {
@@ -1715,10 +1714,7 @@ See <a href="https://github.com/AAFC-BICoE/dina-base-api/blob/master/docs/auditi
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
-import { RevisionsPage } from "../../../components/revisions/RevisionsPageLayout";
-
-export default () =&gt; (
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">export default () =&gt; (
   &lt;RevisionsPage
     // The API route to the Javers snapshot list
     auditSnapshotPath="collection-api/audit-snapshot"
@@ -1755,10 +1751,7 @@ multiple back-ends in one query.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../components/revisions/revision-modules";
-import RevisionsByUserPage from "../../components/revision-by-user/CommonRevisionsByUserPage";
-
-export default function CollectionRevisionByUserPage() {
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">export default function CollectionRevisionByUserPage() {
   return (
     &lt;RevisionsByUserPage
       // The API route to the Javers snapshot list
@@ -1796,12 +1789,7 @@ rendered in a specific way, go to:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { RevisionRowConfigsByType } from "./revision-row-config";
-import { COLLECTING_EVENT_REVISION_ROW_CONFIG } from "./revision-row-configs/collectingevent-revision-row-config";
-import { MATERIAL_SAMPLE_REVISION_ROW_CONFIG } from "./revision-row-configs/material-sample-revision-row-configs";
-import { METADATA_REVISION_ROW_CONFIG } from "./revision-row-configs/metadata-revision-row-config";
-
-/** Custom revision row behavior for Object Store Resources. */
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">/** Custom revision row behavior for Object Store Resources. */
 export const OBJECT_STORE_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
   metadata: METADATA_REVISION_ROW_CONFIG
 };
@@ -1844,10 +1832,7 @@ You can use it to easily query the back-end from inside a function component.</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { useQuery } from "../components";
-import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
-
-function ExampleComponent() {
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">function ExampleComponent() {
   const { error, loading, response } = useQuery&lt;PcrPrimer&gt;({ path: "pcrPrimer/1" });
 
   if (loading) {
@@ -1865,10 +1850,7 @@ function ExampleComponent() {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { useQuery } from "../components";
-import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
-
-function ExampleComponent() {
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">function ExampleComponent() {
   const { error, loading, response } = useQuery&lt;PcrPrimer[]&gt;({ path: "pcrPrimer" });
 
   if (loading) {
@@ -1893,10 +1875,7 @@ instead of writing if/else blocks for each state:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { useQuery, withResponse } from "../components";
-import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
-
-function ExampleComponent() {
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">function ExampleComponent() {
   const primerQuery = useQuery&lt;PcrPrimer[]&gt;({ path: "pcrPrimer" });
 
   return withResponse(primerQuery, ({ data: primers }) =&gt; (
@@ -1929,10 +1908,7 @@ provide a button that creates a new Region with a random name and symbol:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import React from "react";
-import { useApiClient } from "common-ui";
-
-export funcion NewRegionButton() {
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">export funcion NewRegionButton() {
   const { save } = useApiClient();
 
   async function createRegion() {
@@ -1972,12 +1948,7 @@ export funcion NewRegionButton() {
 <h3 id="_test_file_structure">10.1. Test File Structure</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { mountWithAppContext } from "common-ui";
-import { fireEvent, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import userEvent from "@testing-library/user-event";
-
-describe("ComponentUnderTest", () =&gt; {
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">describe("ComponentUnderTest", () =&gt; {
   const mockGet = jest.fn();
   const mockSave = jest.fn();
 
@@ -2022,9 +1993,7 @@ describe("ComponentUnderTest", () =&gt; {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { screen } from "@testing-library/react";
-
-it("should display form elements", async () =&gt; {
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">it("should display form elements", async () =&gt; {
   const wrapper = mountWithAppContext(&lt;PersonForm /&gt;, { apiContext });
 
   await waitFor(() =&gt; {
@@ -2059,9 +2028,7 @@ The Testing Playground URL shows you the component&#8217;s HTML structure and he
 <h3 id="_mounting_components">10.3. Mounting Components</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { mountWithAppContext } from "common-ui";
-
-// Basic mount
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">// Basic mount
 const wrapper = mountWithAppContext(&lt;MyComponent /&gt;);
 
 // With API context
@@ -2240,10 +2207,7 @@ mockSave.mockRejectedValueOnce({
 <h4 id="_query_elements">10.5.1. Query Elements</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { fireEvent, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
-
-it("should display form elements", async () =&gt; {
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">it("should display form elements", async () =&gt; {
   const wrapper = mountWithAppContext(&lt;PersonForm /&gt;, { apiContext });
 
   // Wait for component to load
@@ -2273,10 +2237,7 @@ it("should display form elements", async () =&gt; {
 <h4 id="_test_form_submission">10.5.2. Test Form Submission</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-
-it("should save form data", async () =&gt; {
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">it("should save form data", async () =&gt; {
   mockSave.mockResolvedValueOnce([
     { id: "123", type: "person", name: "John" }
   ]);
@@ -2317,10 +2278,7 @@ it("should save form data", async () =&gt; {
 <h4 id="_test_user_interactions">10.5.3. Test User Interactions</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-
-it("should handle user interactions", async () =&gt; {
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">it("should handle user interactions", async () =&gt; {
   const wrapper = mountWithAppContext(&lt;MyComponent /&gt;, { apiContext });
 
   await waitFor(() =&gt; {
@@ -2414,9 +2372,7 @@ describe("My Component", () =&gt; {
 <h3 id="_testing_hooks">10.7. Testing Hooks</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-typescript" data-lang="typescript">import { renderHook, waitFor } from "@testing-library/react";
-
-it("should fetch data with hook", async () =&gt; {
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">it("should fetch data with hook", async () =&gt; {
   mockGet.mockResolvedValueOnce({
     data: [{ id: "1", type: "person" }]
   });
@@ -2518,11 +2474,7 @@ it("should fetch data with hook", async () =&gt; {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { DinaMessage } from "../../intl/dina-intl.ts""
-
-...
-
-&lt;h2&gt;&lt;DinaMessage id="pcrPrimerListTitle" /&gt;&lt;/h2&gt;</code></pre>
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">&lt;h2&gt;&lt;DinaMessage id="pcrPrimerListTitle" /&gt;&lt;/h2&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -2533,9 +2485,7 @@ it("should fetch data with hook", async () =&gt; {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-tsx" data-lang="tsx">import { useDinaIntl } from "../../dina-intl.ts""
-
-function MyComponent() {
+<pre class="highlight"><code class="language-tsx" data-lang="tsx">function MyComponent() {
   const { formatMessage } = useDinaIntl();
 
   useEffect(() =&gt; {
@@ -2673,190 +2623,45 @@ CSVFILE=messages.csv yarn import-intl-csv</pre>
 <h2 id="_wcag_compliance_tools_setup">12. WCAG compliance tools setup</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_pa11y">12.1. Pa11y</h3>
-<div class="ulist">
-<ul>
+<h3 id="_accessibility_testing_with_axe_devtools">12.1. Accessibility Testing with axe DevTools</h3>
+<div class="paragraph">
+<p>To get visual feedback on which HTML elements violate WCAG rules, we recommend using the <strong>axe DevTools</strong> browser extension.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
-<p>Install Pa11y</p>
+<p>Download and install the <strong>axe DevTools</strong> extension.</p>
 </li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>git clone https://github.com/pa11y/pa11y.git
-cd pa11y</pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
 <li>
-<p>Run Pa11y for multiple pages</p>
+<p>Launch your target page in your web browser.</p>
 </li>
-</ul>
-</div>
-<div class="paragraph">
-<p>copy below example multiple.js file to pa11y dir</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>// An example of running Pa11y on multiple URLS
-'use strict';
-
-const pa11y = require('.');
-
-runExample();
-
-// Async function required for us to use await
-async function runExample() {
-        try {
-
-                // Put together some options to use in each test
-                const options = {
-                        log: {
-                                debug: console.log,
-                                error: console.error,
-                                info: console.log
-                        }
-                };
-
-                // Run tests against multiple URLs
-                const results = await Promise.all([
-                        pa11y('http://localhost:8000/product/list', options),
-                        pa11y('http://localhost:8000/product/edit?id=1', options),
-                        pa11y('http://localhost:8000/product/view?id=1', options)
-
-                ]);
-
-        } catch (error) {
-
-                // Output an error if it occurred
-                console.error(error.message);
-
-        }
-}</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>run below</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>node multiple.js &gt; WCAGreports.txt</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>WCAGreports.txt will be generated for all the elements on all pages that have WCAG compliant issues.</p>
-</div>
-<div class="paragraph">
-<p>Part of the example output report will be like below</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre> {
-      code: 'WCAG2AA.Principle4.Guideline4_1.4_1_2.H91.InputText.Name',
-      context: '&lt;input class="form-control" type="text" value=""&gt;',
-      message: 'This textinput element does not have a name available to an accessibility API. Valid names are: label element, title undefined, aria-label undefined, aria-labelledby undefined.',
-      type: 'error',
-      typeCode: 1,
-      selector: '#__next &gt; div &gt; div &gt; div &gt; div &gt; form &gt; div:nth-child(2) &gt; div:nth-child(3) &gt; div:nth-child(2) &gt; div &gt; input'
-    },
-    {
-      code: 'WCAG2AA.Principle1.Guideline1_3.1_3_1.F68',
-      context: '&lt;input class="form-control" type="text" value=""&gt;',
-      message: 'This form field should be labelled in some way. Use the label element (either with a "for" attribute or wrapped around the form field), or "title", "aria-label" or "aria-labelledby" attributes as appropriate.',
-      type: 'error',
-      typeCode: 1,
-      selector: '#__next &gt; div &gt; div &gt; div &gt; div &gt; form &gt; div:nth-child(2) &gt; div:nth-child(3) &gt; div:nth-child(2) &gt; div &gt; input'
-    },</pre>
-</div>
+<li>
+<p>Press <code>F12</code> (or right-click and select <strong>Inspect</strong>) to launch your browser&#8217;s DevTools panel.</p>
+</li>
+<li>
+<p>Navigate to the <strong>axe DevTools</strong> tab in the DevTools top menu bar (you may need to click the <code>&gt;&gt;</code> icon if your panel is narrow).</p>
+</li>
+<li>
+<p>Click the <strong>Scan ALL of my page</strong> button to run the accessibility audit.</p>
+</li>
+<li>
+<p>A report is shown for the page detailing WCAG validation failures and the specific elements that have compliance issues.</p>
+</li>
+<li>
+<p>Click on a specific issue in the list and use the <strong>Highlight</strong> button to visually locate the exact element directly on the page.</p>
+</li>
+<li>
+<p>After fixing a specific issue in your code, click the <strong>Re-run automatic scan</strong> button to verify the issue is gone.</p>
+</li>
+</ol>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_chrome_inspector">12.2. Chrome Inspector</h3>
-<div class="paragraph">
-<p>To have a visual feedback of which html element has violated the WCAG rule,use Chrome Inspector</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Download the Chrome stable version</p>
-</li>
-<li>
-<p>Launch a page, e.g, <a href="http://localhost:8000/product/list" class="bare">http://localhost:8000/product/list</a></p>
-</li>
-<li>
-<p>Press F12 to lauch the chome devTools</p>
-</li>
-<li>
-<p>Go to audit tab, check the "accessibility" checkbox and press "run audit" button</p>
-</li>
-<li>
-<p>A report is shown for the page regarding the WCAG validation and the elements that have WCAG compliance issue.</p>
-</li>
-<li>
-<p>Click on the element, you can visually see the issue on premise.</p>
-</li>
-<li>
-<p>After fix specific issue, rerun the audit report to verify the issue is gone</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_pa11y_ci_automation">13. Pa11y-ci automation</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>We used pa11y-ci to automate the WCAG compliance detection and
-pa11y-ci-reporter-html to generate report of configured level of severity with good readability.</p>
+<h3 id="_translation_task">12.2. Translation task</h3>
+
 </div>
 <div class="sect2">
-<h3 id="_follow_below_steps_in_sequence">13.1. Follow below steps in sequence</h3>
-<div class="sect3">
-<h4 id="_go_to_packagesdina_ui_for_object_store_ui_packagesseqdb_ui_for_seqdb_ui">13.1.1. Go to packages/dina-ui for object store UI ( packages/seqdb-ui for seqdb UI )</h4>
-<div class="paragraph">
-<p><code>cd packages/dina-ui</code></p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_check_compliance_for_all_configured_pages_and_output_json_format_results">13.1.2. Check compliance for all configured pages and output json format results</h4>
-<div class="paragraph">
-<p><code>yarn a11y-check</code></p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_generate_user_fridendly_html_report_based_on_above_results">13.1.3. Generate user fridendly html report based on above results</h4>
-<div class="paragraph">
-<p><code>yarn a11y-generate-report</code></p>
-</div>
-<div class="paragraph">
-<p>Note for linux user, due to a bug in pa11y-ci-html-reporter npm package,  will need to run below first:</p>
-</div>
-<div class="paragraph">
-<p><code>sudo apt install dos2unix</code></p>
-</div>
-<div class="paragraph">
-<p><code>dos2unix /home/shemy/git/dina-ui/node_modules/pa11y-ci-reporter-html/bin/pa11y-ci-reporter-html.js</code></p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_know_issues">13.1.4. Know issues</h4>
-<div class="paragraph">
-<p>Due to the pa11y implementation, in order to get all compliance level report (A, AA  are the currentl AAFC scope), one will need to change the .pa11yci file to manually switch between the A and AA  to cover both,as the script takes one arg only.</p>
-</div>
-<div class="paragraph">
-<p>e.g, modify the .pa11yci file to change Standards: "WCAG2AA" to Standards: "WCAG2A", as Standards: "WCAG2AA" is the default, and WCAG2AAA is out of scope as of writting the doc.</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_translation_task">14. Translation task</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_to_export_to_csv_file">14.1. To export to csv file</h3>
+<h3 id="_to_export_to_csv_file">12.3. To export to csv file</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2893,7 +2698,7 @@ yarn --silent export-intl-csv &gt; messages.csv</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_to_import_from_translated_csv_file">14.2. To import from translated csv file</h3>
+<h3 id="_to_import_from_translated_csv_file">12.4. To import from translated csv file</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2932,7 +2737,7 @@ CSVFILE=messages.csv yarn import-intl-csv</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-07-13 18:10:35 UTC
+Last updated 2026-07-24 12:24:10 UTC
 </div>
 </div>
 </body>
