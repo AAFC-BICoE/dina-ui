@@ -528,7 +528,7 @@ function useBulkSampleSave({
               .enableCollectingEvent
               ? bulkEditCollectingEventRefPermanent
               : undefined,
-            unlinkCollectingEvent: bulkEditSampleHook.unlinkAllCollectingEvent
+            unlinkCollectingEvent: bulkEditSampleHook.unlinkCollectingEvent
           });
 
           if (clearedFields?.size) {

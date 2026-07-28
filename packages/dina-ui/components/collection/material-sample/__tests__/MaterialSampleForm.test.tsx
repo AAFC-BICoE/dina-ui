@@ -804,7 +804,7 @@ describe("Material Sample Edit Page", () => {
     ]);
   });
 
-  it("Lets you remove the attached Collecting Event.", async () => {
+  it("Lets you unlink the attached Collecting Event.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={testMaterialSample()}
@@ -846,7 +846,27 @@ describe("Material Sample Edit Page", () => {
     await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
     // Expect the network request to unlink the record.
-    expect(mockSave.mock.calls).toEqual([]);
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              relationships: {
+                collectingEvent: {
+                  data: null
+                }
+              },
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
   });
 
   it("Renders an existing Material Sample with the Preparations section enabled.", async () => {

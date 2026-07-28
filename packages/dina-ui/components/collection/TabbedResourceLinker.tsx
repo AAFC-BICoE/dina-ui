@@ -49,8 +49,8 @@ export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   hideLinkerTab?: boolean;
   hideCreateNewTab?: boolean;
   onTabSelect?: (index: number) => void;
-  unlinkAllCollectingEvent?: boolean;
-  setUnlinkAllCollectingEvent?: Dispatch<SetStateAction<boolean>>;
+  unlinkCollectingEvent?: boolean;
+  setUnlinkCollectingEvent?: Dispatch<SetStateAction<boolean>>;
 }
 
 const tabPanelStyle: CSSProperties = {
@@ -117,8 +117,8 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   hideLinkerTab,
   hideCreateNewTab,
   onTabSelect,
-  unlinkAllCollectingEvent,
-  setUnlinkAllCollectingEvent
+  unlinkCollectingEvent,
+  setUnlinkCollectingEvent
 }: TabbedResourceLinkerProps<T>) {
   const { isTemplate, isBulkEditAllTab } = useDinaFormContext();
   const { openModal } = useModal();
@@ -150,8 +150,8 @@ export function TabbedResourceLinker<T extends KitsuResource>({
 
   // Reset unlinked state if a new resource ID is supplied
   useEffect(() => {
-    if (resourceIdProp && setUnlinkAllCollectingEvent) {
-      setUnlinkAllCollectingEvent(false);
+    if (resourceIdProp && setUnlinkCollectingEvent) {
+      setUnlinkCollectingEvent(false);
     }
   }, [resourceIdProp]);
 
@@ -159,7 +159,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
 
   // Check if there is currently an attached/linked resource (either single or mixed)
   const hasAttachedResource =
-    !unlinkAllCollectingEvent &&
+    !unlinkCollectingEvent &&
     (Boolean(resourceId) || (hideCreateNewTab && hasMixedValues));
 
   // Tab visibility rules:
@@ -168,8 +168,8 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   const showLinkerTab = !hideLinkerTab;
 
   const performUnlink = () => {
-    if (setUnlinkAllCollectingEvent) {
-      setUnlinkAllCollectingEvent(true);
+    if (setUnlinkCollectingEvent) {
+      setUnlinkCollectingEvent(true);
     }
     if (setResourceId) {
       setResourceId(null);
@@ -196,7 +196,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
       }
     >
       {/* Alert banner displayed after unlinking, informing the user that changes apply on save */}
-      {unlinkAllCollectingEvent && (
+      {unlinkCollectingEvent && (
         <div
           className="alert alert-warning d-flex align-items-center gap-2 mb-3"
           role="alert"
@@ -208,7 +208,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
         </div>
       )}
 
-      {!unlinkAllCollectingEvent &&
+      {!unlinkCollectingEvent &&
         (showLinkedTab || showCreateTab || showLinkerTab) && (
           <Tabs
             key={resourceId ?? (hasMixedValues ? "mixed" : "new")}

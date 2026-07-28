@@ -743,7 +743,9 @@ export function useMaterialSampleSave({
   }, [collectingEventInitialValues?.id]);
 
   // Used if the user uses the "Unlink All" functionality for collecting event.
-  const [unlinkAllCollectingEvent, setUnlinkAllCollectingEvent] =
+  // If this is set on the bulk edit all tab, it will unlink ALL collecting events. If it's just
+  // set on an individual tab, it will just unlink that specific record.
+  const [unlinkCollectingEvent, setUnlinkCollectingEvent] =
     useState<boolean>(false);
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
@@ -1533,7 +1535,8 @@ export function useMaterialSampleSave({
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
     // In case of error, return early instead of saving to the back-end:
     const materialSampleSaveOp = await prepareSampleSaveOperation({
-      submittedValues
+      submittedValues,
+      unlinkCollectingEvent: unlinkCollectingEvent
     });
     async function saveToBackend() {
       delete materialSampleSaveOp.resource.useNextSequence;
@@ -1724,8 +1727,8 @@ export function useMaterialSampleSave({
     loading,
     colEventFormRef,
     setIsCreatingNewColEvent,
-    unlinkAllCollectingEvent,
-    setUnlinkAllCollectingEvent
+    unlinkCollectingEvent,
+    setUnlinkCollectingEvent
   };
 }
 
