@@ -388,9 +388,13 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              collectingEvent: {
-                id: "11111111-1111-1111-1111-111111111111",
-                type: "collecting-event"
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "collecting-event"
+                  }
+                }
               },
               materialSampleName: "test-material-sample-id",
               publiclyReleasable: false, // Default value
@@ -504,7 +508,12 @@ describe("Material Sample Edit Page", () => {
               publiclyReleasable: false,
               materialSampleName: "test-material-sample-id",
               relationships: {
-                collectingEvent: { data: { id: "1", type: "collecting-event" } }
+                collectingEvent: {
+                  data: {
+                    id: "1",
+                    type: "collecting-event"
+                  }
+                }
               }
             },
             type: "material-sample"
@@ -3763,9 +3772,13 @@ describe("Material Sample Edit Page", () => {
             [
               {
                 resource: {
-                  collectingEvent: {
-                    id: "11111111-1111-1111-1111-111111111111",
-                    type: "collecting-event"
+                  relationships: {
+                    collectingEvent: {
+                      data: {
+                        id: "11111111-1111-1111-1111-111111111111",
+                        type: "collecting-event"
+                      }
+                    }
                   },
                   publiclyReleasable: false,
                   type: "material-sample"
