@@ -66,6 +66,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   assemblage: "Assemblage",
   assemblageAttachments: "Pièces jointes de l'assemblage",
   assemblageListTitle: "Assemblages",
+  assemblageDeleteLinkedSamplesWarning:
+    "Cet assemblage contient {count} échantillons de matériaux liés. Les échantillons doivent être dissociés avant que l'assemblage puisse être supprimé. Confirmer pour dissocier tous les échantillons et supprimer l'assemblage.",
   assemblageManagedAttributes: "Attributs gérés de l'assemblage",
   assemblage_tooltip:
     "Mécanisme utilisé pour regrouper des échantillons de matériau selon un certain thème organisationnel.",
