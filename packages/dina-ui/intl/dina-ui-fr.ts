@@ -486,6 +486,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_vocabularyElementType_picklist_label: "Liste de sélection",
   field_vocabularyElementType_text_label: "Texte",
   field_webpage: "Page Web",
+  field_lastUpdatedOn: "Date d’application des métadonnées",
   field_xmpMetadataDate: "Date d’application des métadonnées",
   field_xmpMetadataDate_tooltip:
     "Date et heure de la dernière mise à jour du dossier.",

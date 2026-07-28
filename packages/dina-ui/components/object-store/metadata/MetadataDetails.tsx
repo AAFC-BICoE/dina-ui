@@ -80,10 +80,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             name: "createdOn",
             value: <DateView date={metadata.createdOn} />
           },
-          {
-            name: "xmpMetadataDate",
-            value: <DateView date={metadata.xmpMetadataDate} />
-          },
+
           "acMetadataCreator.displayName"
         ]}
         title={
