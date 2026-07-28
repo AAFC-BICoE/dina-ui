@@ -1306,6 +1306,82 @@ describe("MaterialSampleBulkEditor", () => {
       ]);
     });
 
+    it("Bulk edit material samples that are linked to different collecting event, use unlink an individual collecting event", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleBulkEditor
+          onSaved={mockOnSaved}
+          samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+        />,
+        testCtx as any
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelectorAll(
+            ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+          ).length
+        ).toBeGreaterThan(0)
+      );
+
+      // Click the first material sample, to edit the individual one.
+      await userEvent.click(wrapper.getByRole("tab", { name: /#1/i }));
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(/editing material sample 1 of 2/i)
+        ).toBeInTheDocument();
+      });
+
+      // Click the unlink all button.
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /unlink/i })[0]
+      );
+
+      // Are you sure popup should appear:
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(/unlink collecting events\?/i)
+        ).toBeInTheDocument();
+      });
+
+      // Click "Yes".
+      await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+
+      // Banner should appear indiciating once the form is saved, all collecting events will be unlinked.
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(
+            /collecting event\(s\) will be unlinked from the material samples when the form is saved\./i
+          )
+        ).toBeInTheDocument();
+      });
+
+      // Save the form and ensure the network request is working correctly.
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Updates the collecting event to just unlink collecting event on the SPECIFIC material sample.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                id: "1",
+                type: "material-sample",
+                relationships: {
+                  collectingEvent: {
+                    data: null
+                  }
+                }
+              },
+              type: "material-sample"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        ]
+      ]);
+    });
+
     it("Allows adding NEW nested Collecting the individual sample tabs.", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleBulkEditor
