@@ -15,7 +15,8 @@ const mockGet = jest.fn<any, any>(async (path) => {
           id: "test-group",
           name: "test-group",
           type: "group",
-          labels: { en: "test-group" }
+          labels: { en: "test-group" },
+          roles: ["SUPER_USER", "USER", "GUEST"]
         }
       ]
     };
