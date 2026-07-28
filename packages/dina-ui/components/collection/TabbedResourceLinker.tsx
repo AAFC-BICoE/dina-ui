@@ -219,7 +219,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                 onTabSelect(index);
               }
             }}
-            forceRenderTabPanel={true}
+            forceRenderTabPanel={false}
           >
             <TabList
               className="d-flex justify-content-between align-items-center ps-2 mb-0"

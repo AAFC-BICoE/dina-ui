@@ -6,7 +6,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { fireEvent, waitFor, screen, within } from "@testing-library/react";
+import { waitFor, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
@@ -478,6 +478,10 @@ describe("Material Sample Edit Page", () => {
     await userEvent.click(collectingEventToggle[0]);
     await waitForLoadingToDisappear();
 
+    // Click the link existing option instead of creating a new one.
+    await userEvent.click(wrapper.getByRole("tab", { name: /link existing/i }));
+    await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /select/i })
@@ -544,13 +548,13 @@ describe("Material Sample Edit Page", () => {
     await userEvent.click(wrapper.getByRole("tab", { name: /create new/i }));
     await waitFor(() =>
       expect(
-        wrapper.getAllByLabelText(/verbatim event datetime/i)[1]
+        wrapper.getByLabelText(/verbatim event datetime/i)
       ).toBeInTheDocument()
     );
 
     // Type some values into the create new form fields (2nd input since it's the create new form.)
     await userEvent.type(
-      wrapper.getAllByLabelText(/verbatim event datetime/i)[1],
+      wrapper.getByLabelText(/verbatim event datetime/i),
       "2026-06-06T12:00"
     );
 
@@ -1195,7 +1199,7 @@ describe("Material Sample Edit Page", () => {
     if (!organismToggle) {
       fail("organism toggle needs to exist at this point.");
     }
-    fireEvent.click(organismToggle[0]);
+    await userEvent.click(organismToggle[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /add new determination/i })
@@ -1530,7 +1534,7 @@ describe("Material Sample Edit Page", () => {
     if (!associationToggle) {
       fail("Association toggle needs to exist at this point.");
     }
-    fireEvent.click(associationToggle[0]);
+    await userEvent.click(associationToggle[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /search\.\.\./i })
@@ -1584,7 +1588,7 @@ describe("Material Sample Edit Page", () => {
     if (!associationToggle) {
       fail("Association toggle needs to exist at this point.");
     }
-    fireEvent.click(associationToggle[0]);
+    await userEvent.click(associationToggle[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /search\.\.\./i })
@@ -1643,7 +1647,7 @@ describe("Material Sample Edit Page", () => {
     if (!organismToggle) {
       fail("organism toggle needs to exist at this point.");
     }
-    fireEvent.click(organismToggle[0]);
+    await userEvent.click(organismToggle[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", { name: /life stage/i })
@@ -2904,7 +2908,7 @@ describe("Material Sample Edit Page", () => {
     if (!organismToggle) {
       fail("organism toggle needs to exist at this point.");
     }
-    fireEvent.click(organismToggle[0]);
+    await userEvent.click(organismToggle[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /add new determination/i })
@@ -3222,7 +3226,7 @@ describe("Material Sample Edit Page", () => {
       if (!associationToggle) {
         fail("Association toggle needs to exist at this point.");
       }
-      fireEvent.click(associationToggle[0]);
+      await userEvent.click(associationToggle[0]);
 
       // Are you sure popup, click "Yes".
       await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
@@ -4065,7 +4069,7 @@ describe("Material Sample Edit Page", () => {
           "Manual geography switch background needs to exist at this point."
         );
       }
-      fireEvent.click(manualSwitchBg);
+      await userEvent.click(manualSwitchBg);
 
       // Set the State/Province field:
       await userEvent.type(
@@ -4163,7 +4167,7 @@ describe("Material Sample Edit Page", () => {
           "Manual geography switch background needs to exist at this point."
         );
       }
-      fireEvent.click(manualSwitchBg);
+      await userEvent.click(manualSwitchBg);
 
       // Set the State/Province field:
       await userEvent.clear(
@@ -4244,7 +4248,7 @@ describe("Material Sample Edit Page", () => {
           "Manual geography switch background needs to exist at this point."
         );
       }
-      fireEvent.click(manualSwitchBg);
+      await userEvent.click(manualSwitchBg);
 
       // Set the State/Province field:
       await userEvent.clear(
@@ -4372,7 +4376,7 @@ describe("Material Sample Edit Page", () => {
       if (!scheduledActionToggle) {
         fail("Scheduled action toggle needs to exist at this point.");
       }
-      fireEvent.click(scheduledActionToggle[0]);
+      await userEvent.click(scheduledActionToggle[0]);
 
       // Enter an action type:
       await userEvent.type(
