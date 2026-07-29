@@ -22,15 +22,20 @@ const RESOURCE_CHECK_CONFIG: {
     jsonApiType: "controlled-vocabulary"
   },
   {
-    resourceKey: "resource_formTemplate",
+    resourceKey: "resource_collection",
     servicePath: "collection-api",
-    jsonApiType: "form-template"
+    jsonApiType: "collection"
   },
-  // {
-  //   resourceKey: "resource_objectStore",
-  //   servicePath: "objectstore-api",
-  //   jsonApiType: "object-store"
-  // },
+  {
+    resourceKey: "resource_project",
+    servicePath: "collection-api",
+    jsonApiType: "project"
+  },
+  {
+    resourceKey: "resource_objectStore",
+    servicePath: "objectstore-api",
+    jsonApiType: "metadata"
+  },
   {
     resourceKey: "resource_agent",
     servicePath: "agent-api",
@@ -77,7 +82,8 @@ export function usePermissionsCheck(selectedGroup: string): {
         if (evaluated.length > 0) {
           const knownValues: Record<string, string> = {
             group: selectedGroup,
-            createdBy: username ?? ""
+            createdBy: username ?? "",
+            bucket: selectedGroup
           };
           const requestAttrs: Record<string, string> = {};
           for (const attr of evaluated) {
