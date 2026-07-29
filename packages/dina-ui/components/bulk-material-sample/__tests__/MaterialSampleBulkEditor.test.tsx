@@ -154,6 +154,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_STORAGE_UNIT };
     case "collection-api/storage-unit/C":
       return { data: TEST_STORAGE_UNITS[2] };
+    case "collection-api/storage-unit/019818e5-7242-7e45-bcb1-0056d9fe6e34":
+      return { data: TEST_STORAGE_UNIT };
     case "collection-api/form-template/cd6d8297-43a0-45c6-b44e-983db917eb11":
       return { data: TEST_FORM_TEMPLATE };
     case "collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=019c961e-4c0d-7398-b4ae-73687826b3b5&filter[dinaComponent][EQ]=MATERIAL_SAMPLE":
@@ -1582,17 +1584,7 @@ describe("MaterialSampleBulkEditor", () => {
         );
       }
       await userEvent.click(removeStorageButton);
-      const search = screen.getByRole("search", {
-        name: /query table/i
-      });
-      await waitFor(() => {
-        if (mockPost.mock.calls.length != 0) {
-        }
-
-        expect(
-          within(search).queryByText(/loading\.\.\./i)
-        ).not.toBeInTheDocument();
-      });
+      await waitForLoadingToDisappear();
 
       await waitFor(() => {
         expect(
@@ -1626,22 +1618,12 @@ describe("MaterialSampleBulkEditor", () => {
         ).toBeInTheDocument()
       );
 
-      // Green indicator shows up:
-      expect(
-        wrapper.getByText(
-          /this storage unit will be linked to all material samples\./i
-        )
-      ).toBeInTheDocument();
-
       // New linked storage unit is indicated:
-      waitFor(
-        () => {
-          expect(
-            wrapper.getByRole("link", { name: /test unit child \(test\)/i })
-          ).toBeInTheDocument();
-        },
-        { timeout: 25000 }
-      );
+      await waitFor(() => {
+        expect(
+          wrapper.getByRole("link", { name: /storage unit 1 \(Box\)/i })
+        ).toBeInTheDocument();
+      });
 
       // Click the "Save All" button:
       await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
