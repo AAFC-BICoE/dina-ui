@@ -23,6 +23,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FaLink, FaUnlink } from "react-icons/fa";
 import {
+  FaCheck,
   FaCircleInfo,
   FaLocationDot,
   FaPlus,
@@ -123,6 +124,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   const { isTemplate, isBulkEditAllTab } = useDinaFormContext();
   const { openModal } = useModal();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [isOveriding, setIsOveriding] = useState<boolean>(false);
 
   const bulkCtx = useBulkEditTabFieldIndicators({
     fieldName,
@@ -150,8 +152,10 @@ export function TabbedResourceLinker<T extends KitsuResource>({
 
   // Reset unlinked state if a new resource ID is supplied
   useEffect(() => {
-    if (resourceIdProp && setUnlinkCollectingEvent) {
-      setUnlinkCollectingEvent(false);
+    if (resourceIdProp) {
+      setUnlinkCollectingEvent?.(false);
+      setSelectedIndex(0);
+      setIsOveriding(true);
     }
   }, [resourceIdProp]);
 
@@ -249,7 +253,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
 
             {showLinkedTab && (
               <TabPanel style={tabPanelStyle}>
-                {hasMixedValues ? (
+                {hasMixedValues && !isOveriding ? (
                   <div
                     className="alert alert-info d-flex align-items-center justify-content-between gap-2 mb-0"
                     role="alert"
@@ -292,7 +296,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                         />
 
                         {/* Show info alert when all bulk-edited samples share the same event */}
-                        {hasSameValue && hideCreateNewTab && (
+                        {hasSameValue && hideCreateNewTab && !isOveriding && (
                           <div
                             className="alert alert-info d-flex align-items-center gap-2 py-2 px-3 mb-3"
                             role="alert"
@@ -300,6 +304,19 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                             <FaCircleInfo className="flex-shrink-0" />
                             <span>
                               <DinaMessage id="sameCollectingEventAttached" />
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Show alert indicating that the following collecting event will override once saved */}
+                        {isOveriding && hideCreateNewTab && (
+                          <div
+                            className="alert alert-success d-flex align-items-center gap-2 py-2 px-3 mb-3"
+                            role="alert"
+                          >
+                            <FaCheck className="flex-shrink-0" />
+                            <span>
+                              <DinaMessage id="overrideCollectingEvent" />
                             </span>
                           </div>
                         )}

@@ -1166,6 +1166,120 @@ describe("MaterialSampleBulkEditor", () => {
       ]);
     });
 
+    it("Bulk edit material samples that are linked to different collecting events, attach existing override", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleBulkEditor
+          onSaved={mockOnSaved}
+          samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+        />,
+        testCtx as any
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelectorAll(
+            ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+          ).length
+        ).toBeGreaterThan(0)
+      );
+
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
+      }
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
+
+      // Click the "Link existing" option.
+      await userEvent.click(
+        wrapper.getAllByRole("tab", { name: /link existing/i })[0]
+      );
+      await waitForLoadingToDisappear();
+
+      // Expect the warning message to indicate it will override existing links:
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            /selecting and linking a new collecting event will replace any currently linked collecting events upon saving\./i
+          )
+        ).toBeInTheDocument();
+      });
+
+      // Select the first option in the table.
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /select/i })[0]
+      );
+      await waitForLoadingToDisappear();
+
+      // Expect alert indicating that the selected sample will replace all material samples collecting event.
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(
+            /the selected collecting event will replace all existing collecting event links across all material samples when saved\./i
+          )
+        ).toBeInTheDocument();
+      });
+
+      // Save the form and ensure the network request is working correctly.
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Expect one of the material samples to be linked since the other one is already linked.
+      expect(mockSave.mock.calls).toEqual([]);
+    });
+
+    it("Bulk edit material sample that are linked to different collecting events, go to individual material sample and create new collecting event", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleBulkEditor
+          onSaved={mockOnSaved}
+          samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+        />,
+        testCtx as any
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelectorAll(
+            ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+          ).length
+        ).toBeGreaterThan(0)
+      );
+
+      // Select the second material sample.
+      await userEvent.click(wrapper.getByText(/#2/i));
+      await waitForLoadingToDisappear();
+
+      // Click the "Create new" collecting event option.
+      await userEvent.click(
+        wrapper.getAllByRole("tab", { name: /create new/i })[1]
+      );
+      await waitForLoadingToDisappear();
+
+      // Warning should be displayed that this will replace the existing collecting event.
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(
+            /creating a new collecting event to link to this material sample will replace any currently linked collecting events upon saving\./i
+          )
+        ).toBeInTheDocument();
+      });
+
+      // Set a collection number.
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /collection number/i }),
+        "Brand new collecting event"
+      );
+
+      // Save the form and ensure the network request is working correctly.
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+
+      // Expect one of the material samples to be linked since the other one is already linked.
+      expect(mockSave.mock.calls).toEqual([]);
+    });
+
     it("Bulk edit material samples that are linked to different collecting event, display info banner", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleBulkEditor
