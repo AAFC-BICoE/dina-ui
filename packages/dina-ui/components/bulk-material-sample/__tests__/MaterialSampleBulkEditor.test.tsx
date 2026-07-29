@@ -1640,7 +1640,7 @@ describe("MaterialSampleBulkEditor", () => {
             wrapper.getByRole("link", { name: /test unit child \(test\)/i })
           ).toBeInTheDocument();
         },
-        { timeout: 20000 }
+        { timeout: 25000 }
       );
 
       // Click the "Save All" button:

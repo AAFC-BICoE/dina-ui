@@ -1004,7 +1004,7 @@ export function useMaterialSampleSave({
       const collectingEventValues = {
         // Prevent injecting the local colEventId if we are using the external form
         ...(colEventId && !isCreatingNewColEvent && !isUsingExternalColEventForm
-          ? { id: colEventId }
+          ? { id: colEventId, type: "collecting-event" }
           : {}),
         ...(isStaleForm ? {} : withoutBlankFields(formValues)),
         ...(isStaleForm ? {} : withoutBlankFields(externalValues))
