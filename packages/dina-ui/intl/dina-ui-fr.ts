@@ -996,6 +996,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   resource_controlledVocabulary: "Vocabulaire contrôlé",
   resource_collection: "Collection",
   resource_project: "Projet",
-  resource_objectStore: "Dépot d'objets",
+  resource_objectStore: "Métadonnées de l'objet",
   resource_agent: "Agent (personne)"
 };

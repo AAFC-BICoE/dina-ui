@@ -1520,6 +1520,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   resource_controlledVocabulary: "Controlled Vocabulary",
   resource_collection: "Collection",
   resource_project: "Project",
-  resource_objectStore: "Object Store",
+  resource_objectStore: "Object Metadata",
   resource_agent: "Agent (person)"
 };
