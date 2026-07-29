@@ -2019,14 +2019,14 @@ describe("MaterialSampleBulkEditor", () => {
         "#" + ASSOCIATIONS_COMPONENT_NAME,
         "#" + SCHEDULED_ACTIONS_COMPONENT_NAME
       ]) {
-        const overrideButton = wrapper.container.querySelector(
-          `${section} button.override-all-button`
-        );
-        if (!overrideButton) {
-          throw new Error(
-            `Override button inside of ${section} needs to exist at this point.`
+        let overrideButton;
+        await waitFor(() => {
+          overrideButton = wrapper.container.querySelector(
+            `${section} button.override-all-button`
           );
-        }
+
+          expect(overrideButton).not.toBeNull();
+        });
         await userEvent.click(overrideButton);
         await waitFor(() =>
           expect(
