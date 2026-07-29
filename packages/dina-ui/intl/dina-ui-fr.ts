@@ -979,5 +979,22 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   erase: "Effacer",
   close: "Fermer",
   invalidPolygon:
-    "Les coordonnées sont invalides : elles doivent être de type nombre[][][] et fermées"
+    "Les coordonnées sont invalides : elles doivent être de type nombre[][][] et fermées",
+
+  // Permissions Table
+  tableTitle_permissions: "Autorisations",
+  resource: "Ressource",
+  operation_read: "Lire",
+  operation_create: "Créer",
+  operation_edit: "Modifier",
+  operation_delete: "Supprimer",
+  permission_allowed: "Autorisé",
+  permission_denied: "Refusé",
+  permission_unavailable: "Indisponible",
+  permission_objectOwner: "Propriétaire",
+  resource_materialSample: "Échantillon",
+  resource_controlledVocabulary: "Vocabulaire contrôlé",
+  resource_formTemplate: "Modèle de formulaire",
+  resource_objectStore: "Dépot d'objets",
+  resource_agent: "Agent (personne)"
 };
