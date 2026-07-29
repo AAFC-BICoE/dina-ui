@@ -539,6 +539,7 @@ export function useMaterialSampleSave({
             )?.visible ?? false
       )
     );
+
     setEnableCollectingEvent(
       Boolean(
         hasColEventTemplate
@@ -547,7 +548,7 @@ export function useMaterialSampleSave({
           ? _.find(formTemplate?.components, {
               name: COLLECTING_EVENT_COMPONENT_NAME
             })?.visible ?? false
-          : materialSample?.collectingEvent
+          : materialSample?.collectingEvent?.id
       )
     );
 
@@ -974,7 +975,7 @@ export function useMaterialSampleSave({
     // collectors arrays, etc.) *after* DinaForm has already cloned the initial values.
     // That race means resourceDifference would see a spurious shape change and include
     // collectingEvent in the diff even when the user did not touch it.
-    if (unlinkCollectingEvent) {
+    if (unlinkCollectingEvent || deleteCollectingEvent) {
       (msDiff as any).collectingEvent = null;
     } else {
       delete (msDiff as any).collectingEvent;

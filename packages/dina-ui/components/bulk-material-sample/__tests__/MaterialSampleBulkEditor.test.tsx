@@ -1540,6 +1540,77 @@ describe("MaterialSampleBulkEditor", () => {
         ]
       ]);
     });
+
+    it("Bulk edit material samples with collecting events, go to an individual material sample and unswitch the collecting event", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleBulkEditor
+          onSaved={mockOnSaved}
+          samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+        />,
+        testCtx as any
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelectorAll(
+            ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+          ).length
+        ).toBeGreaterThan(0)
+      );
+
+      // Click the first material sample, to edit the individual one.
+      await userEvent.click(wrapper.getByRole("tab", { name: /#1/i }));
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(/editing material sample 1 of 2/i)
+        ).toBeInTheDocument();
+      });
+
+      // Disable the collecting event section:
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
+      }
+      await userEvent.click(collectingEventToggle[1]);
+
+      // Expect the "Are you sure?" popup for removing collecting event data.
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(/remove collecting event data/i)
+        ).toBeInTheDocument();
+      });
+      await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+
+      // Submit the form and expect the collecting event for this one record to be removed.
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Updates the collecting event to just unlink collecting event on the SPECIFIC material sample.
+      expect(mockSave.mock.calls).toEqual([
+        [
+          [
+            {
+              resource: {
+                id: "1",
+                type: "material-sample",
+                relationships: {
+                  collectingEvent: {
+                    data: null
+                  }
+                }
+              },
+              type: "material-sample"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        ]
+      ]);
+    });
   });
 
   describe("Storage Unit bulk editing", () => {
