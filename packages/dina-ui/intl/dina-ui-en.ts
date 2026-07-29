@@ -77,6 +77,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   assemblage: "Assemblage",
   assemblageAttachments: "Assemblage Attachments",
   assemblageListTitle: "Assemblages",
+  assemblageDeleteLinkedSamplesWarning:
+    "This assemblage has {count} linked material sample(s). The samples must be unlinked before the assemblage can be deleted. Confirm to unlink all samples and delete the assemblage.",
   assemblageManagedAttributes: "Assemblage Managed Attributes",
   siteManagedAttributes: "Site Managed Attributes",
   assemblage_tooltip:
