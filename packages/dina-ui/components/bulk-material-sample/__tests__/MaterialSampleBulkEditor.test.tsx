@@ -1654,6 +1654,113 @@ describe("MaterialSampleBulkEditor", () => {
       ]);
     });
 
+    it("Bulk edit material samples that are linked to different collecting event, create new collecting event from individual tab.", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleBulkEditor
+          onSaved={mockOnSaved}
+          samples={TEST_SAMPLES_DIFFERENT_COLLECTING_EVENT}
+        />,
+        testCtx as any
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelectorAll(
+            ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+          ).length
+        ).toBeGreaterThan(0)
+      );
+
+      // Click the first material sample, to edit the individual one.
+      await userEvent.click(wrapper.getByRole("tab", { name: /#1/i }));
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(/editing material sample 1 of 2/i)
+        ).toBeInTheDocument();
+      });
+
+      // Create new collecting event
+      await userEvent.click(
+        wrapper.getAllByRole("tab", { name: /create new/i })[0]
+      );
+
+      // Verbatim locality should be empty since it's new.
+      await waitFor(() => {
+        expect(
+          wrapper.getByRole("textbox", { name: /verbatim locality/i })
+        ).toHaveDisplayValue("");
+      });
+
+      // Warning should appear at the top of the page.
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(
+            /creating a new collecting event to link to this material sample will replace any currently linked collecting events upon saving\./i
+          )
+        ).toBeInTheDocument();
+      });
+
+      // Type a new verbatim locality for this new collecting event.
+      await userEvent.type(
+        wrapper.getByRole("textbox", { name: /verbatim locality/i }),
+        "brand new locality"
+      );
+
+      // Save the form and ensure the network request is working correctly.
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+
+      // Creates the new collecting event, then attaches it to the material sample that was edited.
+      expect(mockSave.mock.calls).toEqual([
+        // First call: Creating the new collecting event with verbatim locality
+        [
+          [
+            {
+              resource: {
+                dwcVerbatimCoordinateSystem: null,
+                dwcVerbatimLocality: "brand new locality",
+                dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+                geoReferenceAssertions: [
+                  {
+                    isPrimary: true
+                  }
+                ],
+                group: "cnc",
+                publiclyReleasable: false,
+                type: "collecting-event"
+              },
+              type: "collecting-event"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        ],
+        // Second call: Updating the material sample with the generated event ID
+        [
+          [
+            {
+              resource: {
+                id: "1",
+                relationships: {
+                  collectingEvent: {
+                    data: {
+                      id: "11111",
+                      type: "collecting-event"
+                    }
+                  }
+                },
+                type: "material-sample"
+              },
+              type: "material-sample"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        ]
+      ]);
+    });
+
     it("Allows adding NEW nested Collecting the individual sample tabs.", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleBulkEditor

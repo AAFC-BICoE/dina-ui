@@ -30,6 +30,7 @@ import {
   useCollectingEventQuery,
   useCollectingEventSave,
   useDuplicateSampleNameDetection,
+  useEmptyCollectingEventInitialValues,
   useLastUsedCollection
 } from "../..";
 import {
@@ -743,6 +744,9 @@ export function useMaterialSampleSave({
   );
   const [overrideCollectingEvent, setOverrideCollectingEvent] =
     useState<boolean>(false);
+
+  const emptyCollectingEventInitialValues =
+    useEmptyCollectingEventInitialValues();
 
   useEffect(() => {
     if (collectingEventInitialValues?.id) {
@@ -1652,6 +1656,8 @@ export function useMaterialSampleSave({
       colEvent ??
       (isTemplate
         ? colEventTemplateInitialValues
+        : isCreatingNewColEvent
+        ? emptyCollectingEventInitialValues
         : collectingEventInitialValues);
     const hasMultipleUsages = Boolean(
       materialSampleUsageCount && materialSampleUsageCount > 1

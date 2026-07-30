@@ -98,6 +98,28 @@ interface UseCollectingEventSaveParams {
   attachmentsConfig?: AllowAttachmentsConfig;
 }
 
+export function useEmptyCollectingEventInitialValues(): Partial<CollectingEvent> {
+  const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
+    DEFAULT_VERBATIM_COORDSYS_KEY
+  );
+  const [defaultVerbatimSRS] = useLocalStorage<string | null | undefined>(
+    DEFAULT_VERBATIM_SRS_KEY
+  );
+
+  return useMemo<Partial<CollectingEvent>>(
+    () => ({
+      type: "collecting-event",
+      collectors: [],
+      collectorGroups: [],
+      geoReferenceAssertions: [{ isPrimary: true }],
+      dwcVerbatimCoordinateSystem:
+        defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
+      dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
+    }),
+    [defaultVerbatimCoordSys, defaultVerbatimSRS]
+  );
+}
+
 /** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
 export function useCollectingEventSave({
   fetchedCollectingEvent,
@@ -105,15 +127,8 @@ export function useCollectingEventSave({
 }: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
   const collectingEventFormSchema = useCollectingEventFormSchema();
-
-  const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
-    DEFAULT_VERBATIM_COORDSYS_KEY
-  );
-
-  const [defaultVerbatimSRS] = useLocalStorage<string | null | undefined>(
-    DEFAULT_VERBATIM_SRS_KEY
-  );
-
+  const emptyCollectingEventInitialValues =
+    useEmptyCollectingEventInitialValues();
   const collectingEventInitialValues: Partial<CollectingEvent> =
     fetchedCollectingEvent
       ? {
@@ -122,19 +137,7 @@ export function useCollectingEventSave({
             fetchedCollectingEvent.geoReferenceAssertions ?? [],
           srcAdminLevels: fetchedCollectingEvent.srcAdminLevels
         }
-      : {
-          type: "collecting-event",
-          collectors: [],
-          collectorGroups: [],
-          geoReferenceAssertions: [
-            {
-              isPrimary: true
-            }
-          ],
-          dwcVerbatimCoordinateSystem:
-            defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
-          dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
-        };
+      : emptyCollectingEventInitialValues;
 
   async function saveCollectingEvent(
     submittedValues: CollectingEvent,
