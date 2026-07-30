@@ -1381,7 +1381,7 @@ describe("MaterialSampleBulkEditor", () => {
 
       // Set a collection number.
       await userEvent.type(
-        wrapper.getByRole("textbox", { name: /collection number/i }),
+        wrapper.getAllByRole("textbox", { name: /collection number/i })[0],
         "Brand new collecting event"
       );
 
@@ -1389,8 +1389,48 @@ describe("MaterialSampleBulkEditor", () => {
       await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
       await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
 
-      // Expect one of the material samples to be linked since the other one is already linked.
-      expect(mockSave.mock.calls).toEqual([]);
+      expect(mockSave.mock.calls).toEqual([
+        // First call: Creating the new collecting event
+        [
+          [
+            {
+              resource: {
+                dwcFieldNumber: "Brand new collecting event",
+                dwcVerbatimCoordinateSystem: null,
+                group: "cnc",
+                type: "collecting-event"
+              },
+              type: "collecting-event"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        ],
+        // Second call: Updating the material sample with the new event ID
+        [
+          [
+            {
+              resource: {
+                id: "2",
+                relationships: {
+                  collectingEvent: {
+                    data: {
+                      id: "11111",
+                      type: "collecting-event"
+                    }
+                  }
+                },
+                type: "material-sample"
+              },
+              type: "material-sample"
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        ]
+      ]);
     });
 
     it("Bulk edit material samples that are linked to different collecting event, display info banner", async () => {

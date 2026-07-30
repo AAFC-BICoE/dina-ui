@@ -489,7 +489,7 @@ describe("Material Sample Edit Page", () => {
 
     await waitFor(() =>
       expect(
-        wrapper.getByRole("button", { name: /select/i })
+        wrapper.getAllByRole("button", { name: /select/i })[0]
       ).toBeInTheDocument()
     );
 
@@ -499,7 +499,9 @@ describe("Material Sample Edit Page", () => {
     );
 
     // Select an existing collecting event.
-    await userEvent.click(wrapper.getByRole("button", { name: /select/i }));
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /select/i })[0]
+    );
     await waitFor(() =>
       expect(wrapper.getByRole("button", { name: /save/i })).toBeInTheDocument()
     );
