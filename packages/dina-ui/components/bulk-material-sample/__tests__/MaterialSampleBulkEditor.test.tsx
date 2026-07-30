@@ -1396,7 +1396,14 @@ describe("MaterialSampleBulkEditor", () => {
             {
               resource: {
                 dwcFieldNumber: "Brand new collecting event",
+                dwcVerbatimSRS: "WGS84 (EPSG:4326)",
                 dwcVerbatimCoordinateSystem: null,
+                geoReferenceAssertions: [
+                  {
+                    isPrimary: true
+                  }
+                ],
+                publiclyReleasable: false,
                 group: "cnc",
                 type: "collecting-event"
               },

@@ -649,6 +649,14 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
+              group: "aafc",
+              publiclyReleasable: false,
               otherRecordNumbers: ["new collection number 123"],
               type: "collecting-event"
             },
