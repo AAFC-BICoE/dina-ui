@@ -98,8 +98,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "The selected material samples are linked to different collecting events. Edit the individual material samples to see the attached collecting event.",
   sameCollectingEventAttached:
     "All material samples being bulk edited share the same collecting event.",
-  overrideCollectingEvent:
+  overrideCollectingEventBulk:
     "The selected collecting event will replace all existing collecting event links across all material samples when saved.",
+  overrideCollectingEvent:
+    "The selected collecting event will replace the previously linked collecting event for this material sample when saved.",
   unlinkAllTitle: "Unlink collecting events?",
   unlinkAllBody:
     "Are you sure you want to unlink the collecting event(s) from the selected material samples? This change will take effect once you save the bulk edit.",

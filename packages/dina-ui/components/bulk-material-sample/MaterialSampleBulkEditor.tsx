@@ -504,6 +504,17 @@ function useBulkSampleSave({
 
           submittedValuesList.push(processedSample);
 
+          // Determine if the collecting event override is being set on a bulk edit or individual tab.
+          const getOverrideCollectingEventUUID = () => {
+            if (bulkEditSampleHook.overrideCollectingEvent) {
+              return bulkEditCollectingEventRefPermanent?.current?.values?.id;
+            }
+            if (saveHook?.overrideCollectingEvent) {
+              return formik?.values?.collectingEvent?.id;
+            }
+            return undefined;
+          };
+
           const saveOp = await saveHook.prepareSampleSaveOperation({
             submittedValues: formik.values,
             preProcessSample: async (original) => {
@@ -530,7 +541,8 @@ function useBulkSampleSave({
               : undefined,
             unlinkCollectingEvent:
               bulkEditSampleHook.unlinkCollectingEvent ||
-              saveHook.unlinkCollectingEvent
+              saveHook.unlinkCollectingEvent,
+            overrideCollectingEventUUID: getOverrideCollectingEventUUID()
           });
 
           if (clearedFields?.size) {

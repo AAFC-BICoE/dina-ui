@@ -52,6 +52,7 @@ export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   onTabSelect?: (index: number) => void;
   unlinkCollectingEvent?: boolean;
   setUnlinkCollectingEvent?: Dispatch<SetStateAction<boolean>>;
+  overrideCollectingEvent?: boolean;
 }
 
 const tabPanelStyle: CSSProperties = {
@@ -119,12 +120,12 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   hideCreateNewTab,
   onTabSelect,
   unlinkCollectingEvent,
-  setUnlinkCollectingEvent
+  setUnlinkCollectingEvent,
+  overrideCollectingEvent
 }: TabbedResourceLinkerProps<T>) {
   const { isTemplate, isBulkEditAllTab } = useDinaFormContext();
   const { openModal } = useModal();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const [isOveriding, setIsOveriding] = useState<boolean>(false);
 
   const bulkCtx = useBulkEditTabFieldIndicators({
     fieldName,
@@ -155,7 +156,6 @@ export function TabbedResourceLinker<T extends KitsuResource>({
     if (resourceIdProp) {
       setUnlinkCollectingEvent?.(false);
       setSelectedIndex(0);
-      setIsOveriding(true);
     }
   }, [resourceIdProp]);
 
@@ -253,7 +253,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
 
             {showLinkedTab && (
               <TabPanel style={tabPanelStyle}>
-                {hasMixedValues && !isOveriding ? (
+                {hasMixedValues && !overrideCollectingEvent ? (
                   <div
                     className="alert alert-info d-flex align-items-center justify-content-between gap-2 mb-0"
                     role="alert"
@@ -281,7 +281,10 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                     const activeResource =
                       (linkedResource as PersistedResource<T>) || defaultValue;
                     const isReadOnlyMode =
-                      isTemplate || disableLinkerTab || isBulkEditAllTab;
+                      isTemplate ||
+                      disableLinkerTab ||
+                      isBulkEditAllTab ||
+                      overrideCollectingEvent;
 
                     return (
                       <>
@@ -296,27 +299,35 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                         />
 
                         {/* Show info alert when all bulk-edited samples share the same event */}
-                        {hasSameValue && hideCreateNewTab && !isOveriding && (
-                          <div
-                            className="alert alert-info d-flex align-items-center gap-2 py-2 px-3 mb-3"
-                            role="alert"
-                          >
-                            <FaCircleInfo className="flex-shrink-0" />
-                            <span>
-                              <DinaMessage id="sameCollectingEventAttached" />
-                            </span>
-                          </div>
-                        )}
+                        {hasSameValue &&
+                          hideCreateNewTab &&
+                          !overrideCollectingEvent && (
+                            <div
+                              className="alert alert-info d-flex align-items-center gap-2 py-2 px-3 mb-3"
+                              role="alert"
+                            >
+                              <FaCircleInfo className="flex-shrink-0" />
+                              <span>
+                                <DinaMessage id="sameCollectingEventAttached" />
+                              </span>
+                            </div>
+                          )}
 
                         {/* Show alert indicating that the following collecting event will override once saved */}
-                        {isOveriding && hideCreateNewTab && (
+                        {overrideCollectingEvent && (
                           <div
                             className="alert alert-success d-flex align-items-center gap-2 py-2 px-3 mb-3"
                             role="alert"
                           >
                             <FaCheck className="flex-shrink-0" />
                             <span>
-                              <DinaMessage id="overrideCollectingEvent" />
+                              <DinaMessage
+                                id={
+                                  hideCreateNewTab
+                                    ? "overrideCollectingEventBulk"
+                                    : "overrideCollectingEvent"
+                                }
+                              />
                             </span>
                           </div>
                         )}

@@ -408,6 +408,11 @@ export interface PrepareSampleSaveOperationParams {
    * When true, forcibly clears the linked Collecting Event regardless of local form state.
    */
   unlinkCollectingEvent?: boolean;
+
+  /**
+   * The UUID to be set as the collecting event. This is used for overriding.
+   */
+  overrideCollectingEventUUID?: string;
 }
 
 export function useMaterialSampleSave({
@@ -736,6 +741,8 @@ export function useMaterialSampleSave({
   const [isCreatingNewColEvent, setIsCreatingNewColEvent] = useState<boolean>(
     !collectingEventInitialValues?.id
   );
+  const [overrideCollectingEvent, setOverrideCollectingEvent] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (collectingEventInitialValues?.id) {
@@ -953,7 +960,8 @@ export function useMaterialSampleSave({
     submittedValues,
     preProcessSample,
     collectingEventRefExternal,
-    unlinkCollectingEvent
+    unlinkCollectingEvent,
+    overrideCollectingEventUUID
   }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample>> {
     const materialSampleInput = await prepareSampleInput(submittedValues);
 
@@ -992,7 +1000,11 @@ export function useMaterialSampleSave({
 
     let isStaleForm = false;
 
-    if (colEventFormRefToUse?.current && !unlinkCollectingEvent) {
+    if (
+      colEventFormRefToUse?.current &&
+      !unlinkCollectingEvent &&
+      !overrideCollectingEventUUID
+    ) {
       const formValues = colEventFormRef?.current?.values;
       const externalValues = collectingEventRefExternal?.current?.values;
 
@@ -1022,7 +1034,8 @@ export function useMaterialSampleSave({
     if (
       (enableCollectingEvent || collectingEventRefExternal) &&
       colEventFormRefToUse?.current &&
-      !unlinkCollectingEvent
+      !unlinkCollectingEvent &&
+      !overrideCollectingEventUUID
     ) {
       // Save the linked CollectingEvent if included:
       const submittedCollectingEvent = _.cloneDeep(
@@ -1095,6 +1108,17 @@ export function useMaterialSampleSave({
         }
         throw error;
       }
+    } else if (overrideCollectingEventUUID) {
+      // Bypass editing/validating/saving the Collecting Event sub-form entirely.
+      // We're just re-pointing the relationship at an existing Collecting Event
+      // by UUID (e.g. a bulk-edit override), so the only thing that needs to
+      // change is the link on the Material Sample itself.
+      setColEventId(overrideCollectingEventUUID);
+
+      msDiff.collectingEvent = {
+        id: overrideCollectingEventUUID,
+        type: "collecting-event"
+      };
     }
 
     // Validate associations before saving
@@ -1729,7 +1753,9 @@ export function useMaterialSampleSave({
     colEventFormRef,
     setIsCreatingNewColEvent,
     unlinkCollectingEvent,
-    setUnlinkCollectingEvent
+    setUnlinkCollectingEvent,
+    overrideCollectingEvent,
+    setOverrideCollectingEvent
   };
 }
 

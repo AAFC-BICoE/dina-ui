@@ -1068,6 +1068,95 @@ describe("MaterialSampleBulkEditor", () => {
       ).toBeInTheDocument();
     });
 
+    it("Bulk edit material samples that are all linked to the same collecting event, attach existing override", async () => {
+      const wrapper = mountWithAppContext(
+        <MaterialSampleBulkEditor
+          onSaved={mockOnSaved}
+          samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
+        />,
+        testCtx as any
+      );
+      await waitFor(() =>
+        expect(
+          wrapper.container.querySelectorAll(
+            ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+          ).length
+        ).toBeGreaterThan(0)
+      );
+
+      const collectingEventToggle = wrapper.container.querySelectorAll(
+        ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+      );
+      if (!collectingEventToggle) {
+        throw new Error(
+          "Collecting event toggle needs to exist at this point."
+        );
+      }
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
+
+      // Click the "Link existing" option.
+      await userEvent.click(
+        wrapper.getAllByRole("tab", { name: /link existing/i })[0]
+      );
+      await waitForLoadingToDisappear();
+
+      // Expect the warning message to indicate it will override existing links:
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            /selecting and linking a new collecting event will replace any currently linked collecting events upon saving\./i
+          )
+        ).toBeInTheDocument();
+      });
+
+      // Select the first option in the table.
+      await userEvent.click(
+        wrapper.getAllByRole("button", { name: /select/i })[1]
+      );
+      await waitForLoadingToDisappear();
+
+      // Expect alert indicating that the selected sample will replace all material samples collecting event.
+      await waitFor(() => {
+        expect(
+          wrapper.getByText(
+            /the selected collecting event will replace all existing collecting event links across all material samples when saved\./i
+          )
+        ).toBeInTheDocument();
+      });
+
+      // Save the form and ensure the network request is working correctly.
+      await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+      // Expect col-event-1 to be set to all material samples.
+      expect(mockSave).toHaveBeenCalledWith(
+        [
+          expect.objectContaining({
+            resource: expect.objectContaining({
+              id: "1",
+              relationships: {
+                collectingEvent: {
+                  data: { id: "col-event-2", type: "collecting-event" }
+                }
+              }
+            })
+          }),
+          expect.objectContaining({
+            resource: expect.objectContaining({
+              id: "2",
+              relationships: {
+                collectingEvent: {
+                  data: { id: "col-event-2", type: "collecting-event" }
+                }
+              }
+            })
+          })
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+    });
+
     it("Bulk edit material samples that are all linked the same collecting event, use unlink all functionality", async () => {
       const wrapper = mountWithAppContext(
         <MaterialSampleBulkEditor
@@ -1227,8 +1316,32 @@ describe("MaterialSampleBulkEditor", () => {
       await userEvent.click(wrapper.getByRole("button", { name: /save all/i }));
       await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
-      // Expect one of the material samples to be linked since the other one is already linked.
-      expect(mockSave.mock.calls).toEqual([]);
+      // Expect col-event-1 to be set to all material samples.
+      expect(mockSave).toHaveBeenCalledWith(
+        [
+          expect.objectContaining({
+            resource: expect.objectContaining({
+              id: "1",
+              relationships: {
+                collectingEvent: {
+                  data: { id: "col-event-1", type: "collecting-event" }
+                }
+              }
+            })
+          }),
+          expect.objectContaining({
+            resource: expect.objectContaining({
+              id: "2",
+              relationships: {
+                collectingEvent: {
+                  data: { id: "col-event-1", type: "collecting-event" }
+                }
+              }
+            })
+          })
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
     });
 
     it("Bulk edit material sample that are linked to different collecting events, go to individual material sample and create new collecting event", async () => {

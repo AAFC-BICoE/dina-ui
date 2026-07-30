@@ -214,7 +214,12 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       // return all for the multiselect dropdown
       return { data: [], meta: { totalResourceCount: 0 } };
     case "collection-api/collecting-event":
-      return { data: [testCollectionEvent()] };
+      return {
+        data: [
+          testCollectionEvent(),
+          testCollectionEventWithGeographicalPlace()
+        ]
+      };
     case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: testCollectionEvent() };
     case "collection-api/collecting-event/2?include=collectors,attachment,collectionMethod,protocol,expedition,site":
@@ -665,6 +670,78 @@ describe("Material Sample Edit Page", () => {
                 }
               },
               id: "1",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Collecting event exists already, attach an existing one and replace the collecting event link", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tab", { name: /create new/i })
+      ).toBeInTheDocument()
+    );
+
+    // Click "Link existing" tab/button for a collecting event
+    await userEvent.click(wrapper.getByRole("tab", { name: /link existing/i }));
+    await waitForLoadingToDisappear();
+
+    // Click "Select" to attach that specific collecting event to this material sample.
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /select/i })[1]
+    );
+
+    // Should see message indicating that it will replace the previously linked collecting event.
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /the selected collecting event will replace the previously linked collecting event for this material sample when saved\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Should also be in read only mode:
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/linked collecting event:/i)
+      ).toBeInTheDocument();
+    });
+
+    // Save the material sample form
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Expect the collecting event to be linked to that collecting event selected.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "2",
+                    type: "collecting-event"
+                  }
+                }
+              },
               type: "material-sample"
             },
             type: "material-sample"
