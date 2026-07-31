@@ -41,7 +41,7 @@ export default function CollectionDetailsPage() {
                   ([type, uri]) => ({ type, uri })
                 )
               : []
-          }}
+          } as any}
         >
           <CollectionFormFields />
           {props.initialValues.name && (
