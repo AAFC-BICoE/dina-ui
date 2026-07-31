@@ -1,4 +1,4 @@
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import { COLLECTION_OTHER_IDENTIFIERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 import {
   convertDateTime,
   detectEntityType,
@@ -52,7 +52,7 @@ const mockConfig: FieldMappingConfigType = {
     controlledVocabularyField: {
       dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
       filter: {
-        "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,
+        "controlledVocabulary.uuid": COLLECTION_OTHER_IDENTIFIERS_ID,
         dinaComponent: "MATERIAL_SAMPLE"
       }
     },

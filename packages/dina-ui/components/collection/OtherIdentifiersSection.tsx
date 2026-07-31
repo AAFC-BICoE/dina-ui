@@ -12,22 +12,21 @@ import {
   useModal
 } from "common-ui/lib";
 import { FieldArray, useFormikContext } from "formik";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
-import { getFormTemplateCheckboxes } from "../../form-template/formTemplateUtils";
+import { getFormTemplateCheckboxes } from "../form-template/formTemplateUtils";
 import { useState } from "react";
-import { COLLECTION_OTHER_IDENTIFIERS_ID } from "../../controlled-vocabulary/controlledVocabularyItemUtils";
-import useControlledVocabularyOptions from "../../controlled-vocabulary/useControlledVocabularyOptions";
+import useControlledVocabularyOptions from "../controlled-vocabulary/useControlledVocabularyOptions";
 
 export interface OtherIdentifiersSectionProps {
   /** Controlled vocabulary UUID for identifier types. */
-  controlledVocabularyUuid?: string;
+  controlledVocabularyUuid: string;
   /** dinaComponent filter value for the controlled vocabulary API. */
-  dinaComponent?: string;
+  dinaComponent: string;
   /** Field label key for the resource type, used in bulk edit warnings. */
-  resourceLabelKey?: string;
+  resourceLabelKey: string;
   /** Template checkbox path prefix. */
-  templateCheckboxPrefix?: string;
+  templateCheckboxPrefix: string;
   /** The field name for the identifier value. Defaults to "value". */
   valueFieldName?: string;
   /** Hide the dwcOtherCatalogNumbers section. */
@@ -35,10 +34,10 @@ export interface OtherIdentifiersSectionProps {
 }
 
 export function OtherIdentifiersSection({
-  controlledVocabularyUuid = COLLECTION_OTHER_IDENTIFIERS_ID,
-  dinaComponent = "MATERIAL_SAMPLE",
-  resourceLabelKey = "material-sample",
-  templateCheckboxPrefix = "identifiers-component",
+  controlledVocabularyUuid,
+  dinaComponent,
+  resourceLabelKey,
+  templateCheckboxPrefix,
   valueFieldName = "value",
   hideOtherCatalogNumbers = false
 }: OtherIdentifiersSectionProps) {

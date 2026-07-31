@@ -9,19 +9,19 @@ import {
   useQuery,
   withResponse,
   ResourceSelectField,
-  SelectOption,
   MultilingualDescription,
   ButtonBar,
   SimpleSearchFilterBuilder
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
-import { GroupSelectField, IdentifierFields } from "../../../components";
+import { GroupSelectField } from "../../../components";
+import { OtherIdentifiersSection } from "../../../components/collection/OtherIdentifiersSection";
+import { COLLECTION_OTHER_IDENTIFIERS_ID } from "../../../components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection } from "../../../types/collection-api";
 import _ from "lodash";
 import { Field } from "formik";
-import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
 import { CollectionLinkedProjectsTable } from "../../../components/collection/collection/CollectionLinkedProjectsTable";
 import CollectionSampleTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
@@ -132,16 +132,6 @@ export function CollectionFormFields() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const uuid = String(router.query?.id ?? "");
-  const typeOptions: SelectOption<string | undefined>[] = [
-    {
-      label: CollectionIdentifierType.GRSCICOLL,
-      value: CollectionIdentifierType.GRSCICOLL
-    },
-    {
-      label: CollectionIdentifierType.INDEX_HERBARIORUM,
-      value: CollectionIdentifierType.INDEX_HERBARIORUM
-    }
-  ];
 
   return (
     <div>
@@ -184,9 +174,21 @@ export function CollectionFormFields() {
       <Field name="identifiers">
         {({ form: { values: formState } }) =>
           !readOnly ? (
-            <IdentifierFields typeOptions={typeOptions} />
+            <OtherIdentifiersSection
+              controlledVocabularyUuid={COLLECTION_OTHER_IDENTIFIERS_ID}
+              dinaComponent="COLLECTION"
+              resourceLabelKey="collection"
+              valueFieldName="uri"
+              hideOtherCatalogNumbers={true}
+            />
           ) : !!formState.identifiers?.length ? (
-            <IdentifierFields typeOptions={typeOptions} />
+            <OtherIdentifiersSection
+              controlledVocabularyUuid={COLLECTION_OTHER_IDENTIFIERS_ID}
+              dinaComponent="COLLECTION"
+              resourceLabelKey="collection"
+              valueFieldName="uri"
+              hideOtherCatalogNumbers={true}
+            />
           ) : null
         }
       </Field>

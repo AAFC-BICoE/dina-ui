@@ -18,7 +18,7 @@ import { WorkbookColumnMappingFields } from "./WorkbookColumnMapping";
 import { useColumnMapping } from "./useColumnMapping";
 import {
   COLLECTION_MANAGED_ATTRIBUTE_ID,
-  MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+  COLLECTION_OTHER_IDENTIFIERS_ID
 } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface WorkbookFieldSelectFieldProps {
@@ -375,7 +375,7 @@ export function WorkbookFieldSelectField({
                 .where(
                   "controlledVocabulary.uuid",
                   "EQ",
-                  MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+                  COLLECTION_OTHER_IDENTIFIERS_ID
                 )
                 .where("dinaComponent", "EQ", "MATERIAL_SAMPLE")
                 .searchFilter("name", input)
