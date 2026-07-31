@@ -141,15 +141,17 @@ export function useCollectingEventSave({
 
   async function saveCollectingEvent(
     submittedValues: CollectingEvent,
-    collectingEventFormik: FormikContextType<any>
+    collectingEventFormik: FormikContextType<any>,
+    forceCreate?: boolean
   ) {
     // Only submit the changed values to the back-end:
-    const collectingEventDiff = collectingEventInitialValues.id
-      ? resourceDifference({
-          original: collectingEventInitialValues as CollectingEvent,
-          updated: submittedValues
-        })
-      : submittedValues;
+    const collectingEventDiff =
+      collectingEventInitialValues.id && !forceCreate
+        ? resourceDifference({
+            original: collectingEventInitialValues as CollectingEvent,
+            updated: submittedValues
+          })
+        : submittedValues;
 
     // Init relationships object for one-to-many relations:
     (collectingEventDiff as any).relationships = {};

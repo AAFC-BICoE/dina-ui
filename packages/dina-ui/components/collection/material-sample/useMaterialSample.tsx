@@ -1077,7 +1077,8 @@ export function useMaterialSampleSave({
           ? // Use the same save method as the Collecting Event page:
             await saveCollectingEvent(
               submittedCollectingEvent,
-              colEventFormRefToUse.current
+              colEventFormRefToUse.current,
+              isCreatingNewColEvent
             )
           : submittedCollectingEvent;
 
@@ -1662,7 +1663,7 @@ export function useMaterialSampleSave({
     const hasMultipleUsages = Boolean(
       materialSampleUsageCount && materialSampleUsageCount > 1
     );
-    const hasExistingColEvent = Boolean(colEventId);
+    const hasExistingColEvent = Boolean(!!colEventId && !isCreatingNewColEvent);
 
     // Permission Evaluation...
     const permissionsProvided = initialValues?.meta?.permissionsProvider;
