@@ -263,9 +263,10 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
       // Classification
       {
         type: "classification",
-        label: "targetOrganismPrimaryClassification",
+        label:
+          "targetIdentifiableEntitySummary.primaryDetermination.classification",
         component: "MATERIAL_SAMPLE",
-        path: "data.attributes.targetOrganismPrimaryClassification",
+        path: "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification",
         apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
       }
     ],
@@ -308,7 +309,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         type: "managedAttribute",
         label: "managedAttributes",
         component: "ORGANISM",
-        path: "included.attributes.managedAttributes",
+        path: "included.attributes.targetIdentifiableEntitySummary.managedAttributes",
         referencedBy: "organism",
         referencedType: "organism",
         apiEndpoint: "collection-api/controlled-vocabulary-item"
@@ -319,7 +320,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         type: "managedAttribute",
         label: "managedAttributes",
         component: "DETERMINATION",
-        path: "included.attributes.determination.managedAttributes",
+        path: "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.managedAttributes",
         referencedBy: "organism.determination",
         referencedType: "organism",
         apiEndpoint: "collection-api/controlled-vocabulary-item"
@@ -346,6 +347,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+
       // Parent Material Sample - Preparation - Managed Attributes
       {
         type: "managedAttribute",
@@ -356,6 +358,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+
       // Parent Material Sample - Material Sample - Field Extensions
       {
         type: "fieldExtension",
@@ -366,6 +369,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+
       // Parent Material Sample - Material Sample - Restrictions
       {
         type: "fieldExtension",
@@ -376,6 +380,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+
       // Parent Material Sample - Material Sample - Identifiers
       {
         type: "identifier",
@@ -386,12 +391,14 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+
       // Parent Material Sample - Material Sample - Classification
       {
-        type: "unsupported",
-        label: "targetOrganismPrimaryClassification",
+        type: "classification",
+        label:
+          "targetIdentifiableEntitySummary.primaryDetermination.classification",
         component: "MATERIAL_SAMPLE",
-        path: "included.attributes.targetOrganismPrimaryClassification",
+        path: "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification",
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample",
         apiEndpoint: "collection-api/vocabulary2/taxonomicRank"

@@ -598,7 +598,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_tags: "Tags",
   field_targetOrganismPrimaryScientificName:
     "Target Organism Primary Scientific Name",
-  field_targetOrganismPrimaryClassification:
+  "field_targetIdentifiableEntitySummary.primaryDetermination.classification":
     "Target Organism Primary Classification",
   field_targetOrganismPrimaryGeoShape: "Target Organism Primary GeoShape",
   field_title: "Title",

@@ -90,7 +90,7 @@ export default function TaxonomicTreeNode({ query }) {
               by_kingdom: {
                 terms: {
                   field:
-                    "data.attributes.targetOrganismPrimaryClassification.kingdom.keyword",
+                    "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.kingdom.keyword",
                   size: 100,
                   missing: "MISSING KINGDOM"
                 },
@@ -98,7 +98,7 @@ export default function TaxonomicTreeNode({ query }) {
                   by_phylum: {
                     terms: {
                       field:
-                        "data.attributes.targetOrganismPrimaryClassification.phylum.keyword",
+                        "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.phylum.keyword",
                       size: 100,
                       missing: "MISSING PHYLUM"
                     },
@@ -106,7 +106,7 @@ export default function TaxonomicTreeNode({ query }) {
                       by_class: {
                         terms: {
                           field:
-                            "data.attributes.targetOrganismPrimaryClassification.class.keyword",
+                            "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.class.keyword",
                           size: 100,
                           missing: "MISSING CLASS"
                         },
@@ -114,7 +114,7 @@ export default function TaxonomicTreeNode({ query }) {
                           by_order: {
                             terms: {
                               field:
-                                "data.attributes.targetOrganismPrimaryClassification.order.keyword",
+                                "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.order.keyword",
                               size: 100,
                               missing: "MISSING ORDER"
                             },
@@ -122,7 +122,7 @@ export default function TaxonomicTreeNode({ query }) {
                               by_family: {
                                 terms: {
                                   field:
-                                    "data.attributes.targetOrganismPrimaryClassification.family.keyword",
+                                    "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.family.keyword",
                                   size: 10000,
                                   missing: "MISSING FAMILY"
                                 },
@@ -130,7 +130,7 @@ export default function TaxonomicTreeNode({ query }) {
                                   by_genus: {
                                     terms: {
                                       field:
-                                        "data.attributes.targetOrganismPrimaryClassification.genus.keyword",
+                                        "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.genus.keyword",
                                       size: 10000,
                                       missing: "MISSING GENUS"
                                     },
@@ -138,7 +138,7 @@ export default function TaxonomicTreeNode({ query }) {
                                       by_species: {
                                         terms: {
                                           field:
-                                            "data.attributes.targetOrganismPrimaryClassification.species.keyword",
+                                            "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification.species.keyword",
                                           size: 10000
                                         }
                                       }

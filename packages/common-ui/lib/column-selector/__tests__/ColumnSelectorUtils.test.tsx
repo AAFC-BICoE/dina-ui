@@ -373,15 +373,18 @@ describe("ColumnSelectorUtils", () => {
           indexMapping: {
             dynamicField: {
               type: "classification",
-              label: "targetOrganismPrimaryClassification",
+              label:
+                "targetIdentifiableEntitySummary.primaryDetermination.classification",
               component: "MATERIAL_SAMPLE",
-              path: "data.attributes.targetOrganismPrimaryClassification",
+              path: "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification",
               apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
             },
-            value: "data.attributes.targetOrganismPrimaryClassification",
+            value:
+              "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification",
             distinctTerm: false,
-            label: "targetOrganismPrimaryClassification",
-            path: "data.attributes.targetOrganismPrimaryClassification",
+            label:
+              "targetIdentifiableEntitySummary.primaryDetermination.classification",
+            path: "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification",
             type: "classification",
             keywordMultiFieldSupport: false,
             keywordNumericSupport: false,
@@ -399,19 +402,21 @@ describe("ColumnSelectorUtils", () => {
           indexMapping: {
             dynamicField: {
               type: "classification",
-              label: "targetOrganismPrimaryClassification",
+              label:
+                "targetIdentifiableEntitySummary.primaryDetermination.classification",
               component: "MATERIAL_SAMPLE",
-              path: "included.attributes.targetOrganismPrimaryClassification",
+              path: "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification",
               apiEndpoint: "collection-api/vocabulary2/taxonomicRank"
             },
             parentName: "parentMaterialSample",
             parentPath: "included",
             parentType: "collecting-event",
             value:
-              "included.attributes.targetOrganismPrimaryClassification_parentMaterialSample",
+              "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification_parentMaterialSample",
             distinctTerm: false,
-            label: "targetOrganismPrimaryClassification",
-            path: "included.attributes.targetOrganismPrimaryClassification",
+            label:
+              "targetIdentifiableEntitySummary.primaryDetermination.classification",
+            path: "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.classification",
             type: "classification",
             keywordMultiFieldSupport: false,
             keywordNumericSupport: false,
