@@ -39,11 +39,11 @@ function CollectingEventEditAlert({
   displayCollectingEventDetailsLink = false,
   override = false
 }: CollectingEventEditAlertProps) {
+  const resolvedUsageCount =
+    materialSampleUsageCount ?? (override ? 1 : undefined);
+
   // Don't render if there are not multiple usages.
-  if (
-    !override &&
-    (!materialSampleUsageCount || materialSampleUsageCount <= 1)
-  ) {
+  if (!override && (!resolvedUsageCount || resolvedUsageCount <= 1)) {
     return null;
   }
 
@@ -71,11 +71,11 @@ function CollectingEventEditAlert({
               id={
                 (alertMessage +
                   (alertMessage === "collectingEventEditErrorMessage" &&
-                  materialSampleUsageCount === 1
+                  resolvedUsageCount === 1
                     ? "Single"
                     : "")) as any
               }
-              values={{ count: materialSampleUsageCount }}
+              values={{ count: resolvedUsageCount }}
             />
           </span>
           {collectingEventUUID && (

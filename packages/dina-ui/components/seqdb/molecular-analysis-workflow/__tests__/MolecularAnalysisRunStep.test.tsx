@@ -1241,11 +1241,11 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Remove all the attachments for the quality control
     await userEvent.click(
-      wrapper.getAllByRole("button", { name: /detach/i })[0]
+      wrapper.getAllByRole("button", { name: /unlink/i })[0]
     );
     await waitForLoadingToDisappear();
     await userEvent.click(
-      wrapper.getAllByRole("button", { name: /detach/i })[0]
+      wrapper.getAllByRole("button", { name: /unlink/i })[0]
     );
 
     // Click the save button.
