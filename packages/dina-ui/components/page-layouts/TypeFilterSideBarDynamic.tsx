@@ -96,13 +96,15 @@ export function TypeFilterSideBarDynamic({
       const childIds = pChildren.map((c) => c.id);
 
       if (childIds.length > 0) {
-        // If children exist, parent status depends on them
+        // A parent with children is checked only when the parent itself is
+        // selected in parent_cv_ids AND all of its children are selected.
+        const parentSelected = selectedParentSet.has(p.id);
         const allSelected = childIds.every((id) => selectedChildSet.has(id));
         const someSelected = childIds.some((id) => selectedChildSet.has(id));
 
         status[p.id] = {
-          checked: allSelected,
-          indeterminate: !allSelected && someSelected
+          checked: parentSelected && allSelected,
+          indeterminate: parentSelected && !allSelected && someSelected
         };
       } else {
         // If no children (or not loaded yet), rely on explicit parent selection
@@ -184,8 +186,13 @@ export function TypeFilterSideBarDynamic({
     const nextChildSet = new Set(selectedChildSet);
     const nextParentSet = new Set(selectedParentSet);
 
-    if (nextChildSet.has(childId)) {
-      // Unchecking this child
+    // A child is "checked" in the UI only when both the child and its specific
+    // parent are selected.
+    const isCurrentlyChecked =
+      selectedChildSet.has(childId) && selectedParentSet.has(parentId);
+
+    if (isCurrentlyChecked) {
+      // Unchecking this child under this parent
       nextChildSet.delete(childId);
       // If no other children of this parent remain selected, remove the parent
       const siblings = allChildren[parentId] ?? [];
@@ -195,8 +202,17 @@ export function TypeFilterSideBarDynamic({
       if (!anySiblingSelected) {
         nextParentSet.delete(parentId);
       }
+      // Restore the child to the global set if another selected parent still
+      // has it — otherwise we'd incorrectly remove a filter that still applies.
+      const stillHasChild = Array.from(nextParentSet).some((pid) => {
+        const kids = allChildren[pid] ?? [];
+        return kids.some((k) => k.id === childId);
+      });
+      if (stillHasChild) {
+        nextChildSet.add(childId);
+      }
     } else {
-      // Checking this child — also select its parent
+      // Checking this child under this parent — also select its parent.
       nextChildSet.add(childId);
       nextParentSet.add(parentId);
     }
@@ -339,21 +355,31 @@ export function TypeFilterSideBarDynamic({
                 <div className="ms-4 mt-1">
                   <ul className="list-unstyled m-0 small">
                     {children.map((c) => {
-                      const isChecked = selectedChildSet.has(c.id);
+                      // Use a compound key so children with the same name
+                      // under different parents are treated independently.
+                      const compoundId = `${p.id}::${c.id}`;
+                      // A child is checked only when both it and its parent
+                      // are selected
+                      const isChecked =
+                        selectedChildSet.has(c.id) &&
+                        selectedParentSet.has(p.id);
                       return (
                         <li
-                          key={c.id}
+                          key={compoundId}
                           className="d-flex align-items-center justify-content-between py-1"
                         >
                           <div className="d-flex align-items-center">
                             <input
-                              id={`cv-child-${c.id}`}
+                              id={`cv-child-${compoundId}`}
                               type="checkbox"
                               className="me-2"
                               checked={isChecked}
                               onChange={() => handleToggleChild(c.id, p.id)}
                             />
-                            <label htmlFor={`cv-child-${c.id}`} className="m-0">
+                            <label
+                              htmlFor={`cv-child-${compoundId}`}
+                              className="m-0"
+                            >
                               {c.label}
                             </label>
                             {typeof c.count === "number" && (
