@@ -2,6 +2,7 @@ import { render } from "@testing-library/react";
 import {
   buildRelationshipAccessorPath,
   collectPathValues,
+  convertColumnsToPaths,
   generateColumnPath,
   getNestedColumn,
   parseRelationshipNameFromType
@@ -809,6 +810,434 @@ describe("ColumnSelectorUtils", () => {
       ).toBe(
         "included.collectingEvent.attributes.extensionValues.ext1.fieldKey"
       );
+    });
+  });
+
+  describe("convertColumnsToPaths", () => {
+    it("Generate column paths from Entity level columns", async () => {
+      const columnsToTest = [
+        {
+          id: "materialSampleName",
+          accessorKey: "data.attributes.materialSampleName",
+          isKeyword: true,
+          columnSelectorString: "materialSampleName",
+          enableSorting: true
+        },
+        {
+          id: "dwcOtherCatalogNumbers",
+          accessorKey: "data.attributes.dwcOtherCatalogNumbers",
+          isKeyword: true,
+          columnSelectorString: "dwcOtherCatalogNumbers",
+          enableSorting: true
+        },
+        {
+          id: "materialSampleState",
+          accessorKey: "data.attributes.materialSampleState",
+          isKeyword: true,
+          columnSelectorString: "materialSampleState",
+          enableSorting: true
+        },
+        {
+          id: "createdBy",
+          accessorKey: "data.attributes.createdBy",
+          isKeyword: false,
+          columnSelectorString: "createdBy",
+          enableSorting: true
+        },
+        {
+          isKeyword: false,
+          accessorKey: "data.attributes.createdOn",
+          id: "createdOn",
+          isColumnVisible: true,
+          queryOption: {
+            label: "createdOn",
+            value: "data.attributes.createdOn",
+            hideField: false,
+            type: "date",
+            subType: "date_time",
+            path: "data.attributes",
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            containsSupport: false,
+            endsWithSupport: false
+          },
+          columnSelectorString: "createdOn"
+        },
+        {
+          id: "targetIdentifiableEntitySummary.dwcVernacularName",
+          accessorKey:
+            "data.attributes.targetIdentifiableEntitySummary.dwcVernacularName",
+          isKeyword: true,
+          columnSelectorString:
+            "targetIdentifiableEntitySummary.dwcVernacularName",
+          enableSorting: true
+        },
+        {
+          id: "targetIdentifiableEntitySummary.sex",
+          accessorKey: "data.attributes.targetIdentifiableEntitySummary.sex",
+          isKeyword: true,
+          columnSelectorString: "targetIdentifiableEntitySummary.sex",
+          enableSorting: true
+        },
+        {
+          id: "targetIdentifiableEntitySummary.lifeStage",
+          accessorKey:
+            "data.attributes.targetIdentifiableEntitySummary.lifeStage",
+          isKeyword: true,
+          columnSelectorString: "targetIdentifiableEntitySummary.lifeStage",
+          enableSorting: true
+        },
+        {
+          id: "targetIdentifiableEntitySummary.primaryDetermination.typeStatus",
+          accessorKey:
+            "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.typeStatus",
+          isKeyword: true,
+          columnSelectorString:
+            "targetIdentifiableEntitySummary.primaryDetermination.typeStatus",
+          enableSorting: true
+        },
+        {
+          id: "targetOrganismPrimaryScientificName",
+          accessorKey: "data.attributes.targetOrganismPrimaryScientificName",
+          isKeyword: true,
+          columnSelectorString: "targetOrganismPrimaryScientificName",
+          enableSorting: true
+        }
+      ];
+
+      // Expect the correct paths to use for exporting.
+      expect(convertColumnsToPaths(columnsToTest)).toBe([
+        "materialSampleName",
+        "dwcOtherCatalogNumbers",
+        "materialSampleState",
+        "createdBy",
+        "createdOn",
+        "targetIdentifiableEntitySummary.dwcVernacularName",
+        "targetIdentifiableEntitySummary.sex",
+        "targetIdentifiableEntitySummary.lifeStage",
+        "targetIdentifiableEntitySummary.primaryDetermination.typeStatus",
+        "targetOrganismPrimaryScientificName"
+      ]);
+    });
+
+    it("Generate column paths from Relationship level columns", async () => {
+      const columnsToTest = [
+        {
+          id: "attachment.acCaption",
+          accessorKey: "included.attributes.acCaption",
+          isKeyword: false,
+          isColumnVisible: true,
+          relationshipType: "metadata",
+          columnSelectorString: "attachment.acCaption"
+        },
+        {
+          id: "preparedBy.displayName",
+          accessorKey: "included.attributes.displayName",
+          isKeyword: false,
+          isColumnVisible: true,
+          relationshipType: "person",
+          columnSelectorString: "preparedBy.displayName"
+        },
+        {
+          id: "collection.name",
+          accessorKey: "included.attributes.name",
+          isKeyword: true,
+          isColumnVisible: true,
+          relationshipType: "collection",
+          columnSelectorString: "collection.name"
+        },
+        {
+          id: "parentMaterialSample.dwcOtherCatalogNumbers",
+          accessorKey: "included.attributes.dwcOtherCatalogNumbers",
+          isKeyword: false,
+          isColumnVisible: true,
+          relationshipType: "material-sample",
+          columnSelectorString: "parentMaterialSample.dwcOtherCatalogNumbers"
+        },
+        {
+          id: "storageUnitUsage.cellNumber",
+          accessorKey: "included.attributes.cellNumber",
+          isKeyword: false,
+          isColumnVisible: true,
+          relationshipType: "storage-unit-usage",
+          columnSelectorString: "storageUnitUsage.cellNumber"
+        }
+      ];
+
+      // Expect the correct paths to use for exporting.
+      expect(convertColumnsToPaths(columnsToTest)).toBe([
+        "attachment.acCaption",
+        "preparedBy.displayName",
+        "collection.name",
+        "parentMaterialSample.dwcOtherCatalogNumbers",
+        "storageUnitUsage.cellNumber"
+      ]);
+    });
+
+    it("Generate column paths from Managed Attributes columns", async () => {
+      const columnsToTest = [
+        {
+          accessorKey: "data.attributes.managedAttributes.material_sample_test",
+          id: "managedAttributes.material_sample_test",
+          isKeyword: true,
+          isColumnVisible: true,
+          config: {
+            type: "managedAttribute",
+            label: "materialSampleManagedAttributes",
+            component: "MATERIAL_SAMPLE",
+            path: "data.attributes.managedAttributes",
+            apiEndpoint: "collection-api/controlled-vocabulary-item"
+          },
+          managedAttribute: {
+            id: "019fb983-db07-766f-8d61-5a86707229eb",
+            type: "controlled-vocabulary-item",
+            name: "material sample test",
+            key: "material_sample_test",
+            group: "cnc",
+            term: null,
+            multilingualTitle: null,
+            multilingualDescription: null,
+            vocabularyElementType: "STRING",
+            acceptedValues: null,
+            unit: null,
+            uriTemplate: null,
+            dinaComponent: "MATERIAL_SAMPLE",
+            createdBy: "cnc-su",
+            createdOn: "2026-07-31T18:50:54.065462Z",
+            lastUpdatedOn: "2026-07-31T18:50:54.110567Z"
+          },
+          sortDescFirst: true,
+          columnSelectorString:
+            "managedAttribute/MATERIAL_SAMPLE/material_sample_test"
+        },
+        {
+          accessorKey:
+            "data.attributes.preparationManagedAttributes.preparation_test",
+          id: "preparationManagedAttributes.preparation_test",
+          isKeyword: true,
+          isColumnVisible: true,
+          config: {
+            type: "managedAttribute",
+            label: "preparationManagedAttributes",
+            component: "PREPARATION",
+            path: "data.attributes.preparationManagedAttributes",
+            apiEndpoint: "collection-api/controlled-vocabulary-item"
+          },
+          managedAttribute: {
+            id: "019fb984-344d-7603-ba13-75f4fc0b402b",
+            type: "controlled-vocabulary-item",
+            name: "preparation test",
+            key: "preparation_test",
+            group: "cnc",
+            term: null,
+            multilingualTitle: null,
+            multilingualDescription: null,
+            vocabularyElementType: "STRING",
+            acceptedValues: null,
+            unit: null,
+            uriTemplate: null,
+            dinaComponent: "PREPARATION",
+            createdBy: "cnc-su",
+            createdOn: "2026-07-31T18:51:16.939351Z",
+            lastUpdatedOn: "2026-07-31T18:51:16.942855Z"
+          },
+          sortDescFirst: true,
+          columnSelectorString: "managedAttribute/PREPARATION/preparation_test"
+        },
+        {
+          accessorKey:
+            "data.attributes.targetIdentifiableEntitySummary.managedAttributes.organism_test",
+          id: "managedAttributes.organism_test",
+          isKeyword: true,
+          isColumnVisible: true,
+          config: {
+            type: "managedAttribute",
+            label: "targetIdentifiableEntitySummary.managedAttributes",
+            component: "ORGANISM",
+            path: "data.attributes.targetIdentifiableEntitySummary.managedAttributes",
+            apiEndpoint: "collection-api/controlled-vocabulary-item"
+          },
+          managedAttribute: {
+            id: "019fb8b8-5647-7386-96da-67b11d97b5af",
+            type: "controlled-vocabulary-item",
+            name: "organism test",
+            key: "organism_test",
+            group: "cnc",
+            term: "",
+            multilingualTitle: null,
+            multilingualDescription: null,
+            vocabularyElementType: "STRING",
+            acceptedValues: null,
+            unit: null,
+            uriTemplate: null,
+            dinaComponent: "ORGANISM",
+            createdBy: "cnc-su",
+            createdOn: "2026-07-31T15:08:36.273498Z",
+            lastUpdatedOn: "2026-07-31T15:08:36.315225Z"
+          },
+          sortDescFirst: true,
+          columnSelectorString: "managedAttribute/ORGANISM/organism_test"
+        },
+        {
+          accessorKey:
+            "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.managedAttributes.determination_test",
+          id: "managedAttributes.determination_test",
+          isKeyword: true,
+          isColumnVisible: true,
+          config: {
+            type: "managedAttribute",
+            label:
+              "targetIdentifiableEntitySummary.primaryDetermination.managedAttributes",
+            component: "DETERMINATION",
+            path: "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.managedAttributes",
+            apiEndpoint: "collection-api/controlled-vocabulary-item"
+          },
+          managedAttribute: {
+            id: "019fb8b8-a6c6-71eb-b5b3-51e47b0acd3f",
+            type: "controlled-vocabulary-item",
+            name: "determination test",
+            key: "determination_test",
+            group: "cnc",
+            term: null,
+            multilingualTitle: null,
+            multilingualDescription: null,
+            vocabularyElementType: "STRING",
+            acceptedValues: null,
+            unit: null,
+            uriTemplate: null,
+            dinaComponent: "DETERMINATION",
+            createdBy: "cnc-su",
+            createdOn: "2026-07-31T15:08:56.897352Z",
+            lastUpdatedOn: "2026-07-31T15:08:56.903455Z"
+          },
+          sortDescFirst: true,
+          columnSelectorString:
+            "managedAttribute/DETERMINATION/determination_test"
+        },
+        {
+          accessorKey:
+            "included.attributes.managedAttributes.collecting_event_test",
+          id: "collectingEvent.managedAttributes.collecting_event_test",
+          isKeyword: true,
+          isColumnVisible: true,
+          relationshipType: "collecting-event",
+          managedAttribute: {
+            id: "019fb983-ff32-700e-b2c4-3936a400afe0",
+            type: "controlled-vocabulary-item",
+            name: "collecting event test",
+            key: "collecting_event_test",
+            group: "cnc",
+            term: null,
+            multilingualTitle: null,
+            multilingualDescription: null,
+            vocabularyElementType: "STRING",
+            acceptedValues: null,
+            unit: null,
+            uriTemplate: null,
+            dinaComponent: "COLLECTING_EVENT",
+            createdBy: "cnc-su",
+            createdOn: "2026-07-31T18:51:03.341679Z",
+            lastUpdatedOn: "2026-07-31T18:51:03.347603Z"
+          },
+          config: {
+            type: "managedAttribute",
+            label: "managedAttributes",
+            component: "COLLECTING_EVENT",
+            path: "included.attributes.managedAttributes",
+            referencedBy: "collectingEvent",
+            referencedType: "collecting-event",
+            apiEndpoint: "collection-api/controlled-vocabulary-item"
+          },
+          columnSelectorString:
+            "managedAttribute~collectingEvent/COLLECTING_EVENT/collecting_event_test"
+        },
+        {
+          accessorKey:
+            "included.attributes.managedAttributes.material_sample_test",
+          id: "parentMaterialSample.managedAttributes.material_sample_test",
+          isKeyword: true,
+          isColumnVisible: true,
+          relationshipType: "material-sample",
+          managedAttribute: {
+            id: "019fb983-db07-766f-8d61-5a86707229eb",
+            type: "controlled-vocabulary-item",
+            name: "material sample test",
+            key: "material_sample_test",
+            group: "cnc",
+            term: null,
+            multilingualTitle: null,
+            multilingualDescription: null,
+            vocabularyElementType: "STRING",
+            acceptedValues: null,
+            unit: null,
+            uriTemplate: null,
+            dinaComponent: "MATERIAL_SAMPLE",
+            createdBy: "cnc-su",
+            createdOn: "2026-07-31T18:50:54.065462Z",
+            lastUpdatedOn: "2026-07-31T18:50:54.110567Z"
+          },
+          config: {
+            type: "managedAttribute",
+            label: "materialSampleManagedAttributes",
+            path: "included.attributes.managedAttributes",
+            apiEndpoint: "collection-api/controlled-vocabulary-item",
+            component: "MATERIAL_SAMPLE",
+            referencedBy: "parentMaterialSample",
+            referencedType: "material-sample"
+          },
+          columnSelectorString:
+            "managedAttribute~parentMaterialSample/MATERIAL_SAMPLE/material_sample_test"
+        },
+        {
+          accessorKey:
+            "included.attributes.preparationManagedAttributes.preparation_test",
+          id: "parentMaterialSample.preparationManagedAttributes.preparation_test",
+          isKeyword: true,
+          isColumnVisible: true,
+          relationshipType: "material-sample",
+          managedAttribute: {
+            id: "019fb984-344d-7603-ba13-75f4fc0b402b",
+            type: "controlled-vocabulary-item",
+            name: "preparation test",
+            key: "preparation_test",
+            group: "cnc",
+            term: null,
+            multilingualTitle: null,
+            multilingualDescription: null,
+            vocabularyElementType: "STRING",
+            acceptedValues: null,
+            unit: null,
+            uriTemplate: null,
+            dinaComponent: "PREPARATION",
+            createdBy: "cnc-su",
+            createdOn: "2026-07-31T18:51:16.939351Z",
+            lastUpdatedOn: "2026-07-31T18:51:16.942855Z"
+          },
+          config: {
+            type: "managedAttribute",
+            label: "preparationManagedAttributes",
+            path: "included.attributes.preparationManagedAttributes",
+            apiEndpoint: "collection-api/controlled-vocabulary-item",
+            component: "PREPARATION",
+            referencedBy: "parentMaterialSample",
+            referencedType: "material-sample"
+          },
+          columnSelectorString:
+            "managedAttribute~parentMaterialSample/PREPARATION/preparation_test"
+        }
+      ];
+
+      // Expect the correct paths to use for exporting.
+      expect(convertColumnsToPaths(columnsToTest)).toBe([
+        "managedAttributes.material_sample_test",
+        "preparationManagedAttributes.preparation_test",
+        "targetIdentifiableEntitySummary.managedAttributes.organism_test",
+        "targetIdentifiableEntitySummary.primaryDetermination.managedAttributes.determination_test",
+        "collectingEvent.managedAttributes.collecting_event_test",
+        "parentMaterialSample.managedAttributes.material_sample_test",
+        "parentMaterialSample.preparationManagedAttributes.preparation_test"
+      ]);
     });
   });
 });
