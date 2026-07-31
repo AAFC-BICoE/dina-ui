@@ -25,8 +25,8 @@ export interface OtherIdentifiersSectionProps {
   dinaComponent: string;
   /** Field label key for the resource type, used in bulk edit warnings. */
   resourceLabelKey: string;
-  /** Template checkbox path prefix. */
-  templateCheckboxPrefix: string;
+  /** Template checkbox path prefix. Defaults to "identifiers-component". */
+  templateCheckboxPrefix?: string;
   /** The field name for the identifier value. Defaults to "value". */
   valueFieldName?: string;
   /** Hide the dwcOtherCatalogNumbers section. */

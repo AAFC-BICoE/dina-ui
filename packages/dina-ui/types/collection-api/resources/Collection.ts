@@ -15,6 +15,7 @@ export interface CollectionAttributes {
   contact?: string;
   address?: string;
   remarks?: string;
+  identifiers?: Record<string, string>;
 }
 
 export interface CollectionRelationships {

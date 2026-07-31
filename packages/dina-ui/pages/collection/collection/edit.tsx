@@ -74,7 +74,14 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
           collection.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
           )
-        )
+        ),
+        // Convert identifiers from map {key: uri} to array [{type, uri}]:
+        identifiers: collection.identifiers
+          ? Object.entries(collection.identifiers).map(([type, uri]) => ({
+              type,
+              uri
+            }))
+          : []
       }
     : { type: "collection", institution: undefined };
 
@@ -89,7 +96,15 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
         descriptions: _.toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc: desc as any })
         )
-      }
+      },
+      // Convert identifiers from array [{type, uri}] back to map {type: uri}:
+      identifiers: Array.isArray(submittedValues.identifiers)
+        ? _.fromPairs(
+            submittedValues.identifiers
+              .filter((id: any) => id?.type && id?.uri)
+              .map((id: any) => [id.type, id.uri])
+          )
+        : submittedValues.identifiers
     };
 
     const [savedCollection] = await save(
