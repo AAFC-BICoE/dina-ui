@@ -34,7 +34,13 @@ export default function CollectionDetailsPage() {
               props.initialValues.multilingualDescription?.descriptions?.map(
                 ({ desc, lang }) => [lang ?? "", desc ?? ""]
               )
-            )
+            ),
+            // Convert identifiers from map {key: uri} to array [{type, uri}]:
+            identifiers: props.initialValues.identifiers
+              ? Object.entries(props.initialValues.identifiers).map(
+                  ([type, uri]) => ({ type, uri })
+                )
+              : []
           }}
         >
           <CollectionFormFields />

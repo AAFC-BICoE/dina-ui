@@ -67,7 +67,7 @@ export interface CollectionFormProps {
 
 export function CollectionForm({ collection, router }: CollectionFormProps) {
   const initialValues = collection
-    ? {
+    ? ({
         ...collection,
         // Convert multilingualDescription to editable Dictionary format:
         multilingualDescription: _.fromPairs<string | undefined>(
@@ -82,7 +82,7 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
               uri
             }))
           : []
-      }
+      } as any)
     : { type: "collection", institution: undefined };
 
   async function onSubmit({
