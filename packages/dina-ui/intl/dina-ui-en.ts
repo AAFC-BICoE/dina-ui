@@ -92,7 +92,27 @@ export const DINAUI_MESSAGES_ENGLISH = {
   association: "Association",
   associationType: "Association Type",
   associationsLegend: "Associations",
-  attachExisting: "Attach Existing",
+  linkExisting: "Link Existing",
+  unlinkAll: "Unlink All",
+  noCollectingEventAttached:
+    "None of these material samples currently have a Collecting Event.",
+  mixedCollectingEventAttached:
+    "The selected material samples are linked to different collecting events. Edit the individual material samples to see the attached collecting event.",
+  sameCollectingEventAttached:
+    "All material samples being bulk edited share the same collecting event.",
+  overrideCollectingEventBulk:
+    "The selected collecting event will replace all existing collecting event links across all material samples when saved.",
+  overrideCollectingEvent:
+    "The selected collecting event will replace the previously linked collecting event for this material sample when saved.",
+  unlinkAllTitle: "Unlink collecting events?",
+  unlinkAllBody:
+    "Are you sure you want to unlink the collecting event(s) from the selected material samples? This change will take effect once you save the bulk edit.",
+  unlinkAllNotice:
+    "Collecting event(s) will be unlinked from the material samples when the form is saved.",
+  replaceExistingLinkNotice:
+    "Selecting and linking a new collecting event will replace any currently linked collecting events upon saving.",
+  createNewLinkNotice:
+    "Creating a new collecting event to link to this material sample will replace any currently linked collecting events upon saving.",
   attachExistingObjects: "Attach Existing Objects",
   attachSelected: "Attach Selected",
   attachedMaterialSamples: "Attached Material Samples",
@@ -219,7 +239,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createAndAssign: "Create & Assign",
   createFormTemplate: "Create Form Template",
   createMaterialSampleFormTemplate: "Create Material Sample Form Template",
-  createNew: "Create new",
+  createNew: "Create New",
   createNewLabel: "Create New",
   createNewMaterialSamples: "Create New Material Samples",
   createNewView: "Create New View",
@@ -1011,11 +1031,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   rolesPerGroup: "Roles Per Group",
   runWorkflow: "Run Workflow",
   save: "Save",
-  bulkEditingAllSamples: "Editing {total} samples",
-  bulkEditingSampleOf: "Editing sample {current} of {total}",
+  bulkEditingAllSamples: "Editing {total} material samples",
+  bulkEditingSampleOf: "Editing material sample {current} of {total}",
   bulkEditingAllMetadata: "Editing {total} metadata records",
   bulkEditingMetadataOf: "Editing metadata {current} of {total}",
-  bulkEditLoadingProgress: "Loading sample data... {loaded} of {total}",
+  bulkEditLoadingProgress:
+    "Loading material sample data... {loaded} of {total}",
   bulkEditMetadataLoadingProgress: "Loading metadata... {loaded} of {total}",
   saveAll: "Save All",
   saveAndCopyToNext: "Save & Copy To Next",

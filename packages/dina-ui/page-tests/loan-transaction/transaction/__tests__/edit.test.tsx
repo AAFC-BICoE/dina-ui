@@ -464,6 +464,7 @@ describe("Transaction Form", () => {
       <TransactionEditPage />,
       testCtx as any
     );
+    await waitForLoadingToDisappear();
 
     // Wait for the existing transaction data to be loaded and displayed in the document.
     // This assumes that the roles or the test person's name would be rendered once the data is loaded.

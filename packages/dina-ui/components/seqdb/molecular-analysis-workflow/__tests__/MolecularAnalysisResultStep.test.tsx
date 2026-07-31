@@ -1312,7 +1312,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
   });
 
   describe("Sequencing Run Attachments Section", () => {
-    it("Detaches an existing run attachment", async () => {
+    it("Unlinks an existing run attachment", async () => {
       const wrapper = mountWithAppContext(<TestComponentWrapper />, testCtx);
       await waitForLoadingToDisappear();
 
@@ -1322,7 +1322,7 @@ describe("Molecular Analysis Workflow - Step 5 - Molecular Analysis Results Step
       ).toBeInTheDocument();
 
       // Find and click the detach button for that attachment
-      const detachButtons = wrapper.getAllByRole("button", { name: /detach/i });
+      const detachButtons = wrapper.getAllByRole("button", { name: /unlink/i });
       // The last detach button belongs to the run attachments table
       await userEvent.click(detachButtons[detachButtons.length - 1]);
 

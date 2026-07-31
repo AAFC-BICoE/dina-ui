@@ -11,7 +11,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   addNew: "Add New",
   agricultureCanada: "Agriculture and Agri-Food Canada",
   areYouSure: "Are you sure?",
-  attached: "Attached",
+  linked: "Linked Collecting Event",
   attributeLabel: "Attribute",
   autoFillGeoSuggestLabel:
     "Auto-fill Location Fields (This search box's value is not persisted)",
@@ -52,7 +52,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   deleteSelectedButtonText: "Delete Selected",
   description: "Description",
   destroyedLabel: "Destroyed",
-  detach: "Detach",
+  unlink: "Unlink",
   done: "Done",
   dropdownSearchResults: "Search results",
   editAll: "Edit All",

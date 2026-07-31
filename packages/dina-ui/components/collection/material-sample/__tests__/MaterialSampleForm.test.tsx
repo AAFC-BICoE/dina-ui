@@ -6,7 +6,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { fireEvent, waitFor, screen, within } from "@testing-library/react";
+import { waitFor, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { useSearchWsCustomQuery } from "../../../../../common-ui/lib/search/useSearchWsCustomQuery";
@@ -214,7 +214,12 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       // return all for the multiselect dropdown
       return { data: [], meta: { totalResourceCount: 0 } };
     case "collection-api/collecting-event":
-      return { data: [testCollectionEvent()] };
+      return {
+        data: [
+          testCollectionEvent(),
+          testCollectionEventWithGeographicalPlace()
+        ]
+      };
     case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol,expedition,site":
       return { data: testCollectionEvent() };
     case "collection-api/collecting-event/2?include=collectors,attachment,collectionMethod,protocol,expedition,site":
@@ -338,7 +343,9 @@ describe("Material Sample Edit Page", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
         wrapper.getByLabelText(/verbatim event datetime/i)
@@ -386,9 +393,13 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              collectingEvent: {
-                id: "11111111-1111-1111-1111-111111111111",
-                type: "collecting-event"
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "collecting-event"
+                  }
+                }
               },
               materialSampleName: "test-material-sample-id",
               publiclyReleasable: false, // Default value
@@ -469,13 +480,16 @@ describe("Material Sample Edit Page", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
 
+    // Click the link existing option instead of creating a new one.
+    await userEvent.click(wrapper.getByRole("tab", { name: /link existing/i }));
     await waitForLoadingToDisappear();
 
     await waitFor(() =>
       expect(
-        wrapper.getByRole("button", { name: /select/i })
+        wrapper.getAllByRole("button", { name: /select/i })[0]
       ).toBeInTheDocument()
     );
 
@@ -485,7 +499,9 @@ describe("Material Sample Edit Page", () => {
     );
 
     // Select an existing collecting event.
-    await userEvent.click(wrapper.getByRole("button", { name: /select/i }));
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /select/i })[0]
+    );
     await waitFor(() =>
       expect(wrapper.getByRole("button", { name: /save/i })).toBeInTheDocument()
     );
@@ -502,12 +518,248 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
               publiclyReleasable: false,
               materialSampleName: "test-material-sample-id",
-              collectingEvent: { id: "1", type: "collecting-event" }
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "1",
+                    type: "collecting-event"
+                  }
+                }
+              }
             },
             type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Discards create-new collecting event changes and links to existing collecting event when toggled back.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tab", { name: /create new/i })
+      ).toBeInTheDocument()
+    );
+
+    // Click "Create new" tab/button for a collecting event
+    await userEvent.click(wrapper.getByRole("tab", { name: /create new/i }));
+    await waitFor(() =>
+      expect(
+        wrapper.getByLabelText(/verbatim event datetime/i)
+      ).toBeInTheDocument()
+    );
+
+    // Type some values into the create new form fields (2nd input since it's the create new form.)
+    await userEvent.type(
+      wrapper.getByLabelText(/verbatim event datetime/i),
+      "2026-06-06T12:00"
+    );
+
+    // Switch back to the existing collecting event selection view
+    const selectExistingButton = wrapper.getByRole("tab", {
+      name: /linked collecting event/i
+    });
+    await userEvent.click(selectExistingButton);
+
+    // Make an unrelated change to the material sample.
+    await userEvent.clear(
+      wrapper.getByRole("textbox", { name: /primary id/i })
+    );
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /primary id/i }),
+      "test-material-sample-id"
+    );
+
+    // Save the material sample form
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Verify that it only saves the material-sample linked to the *existing* collecting event
+    // and ignores/discards the stale "2026-06-06T12:00" verbatimEventDateTime data.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              type: "material-sample",
+              id: "1",
+              materialSampleName: "test-material-sample-id"
+            },
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Collecting event exists already, create a new one and replace the collecting event link", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tab", { name: /create new/i })
+      ).toBeInTheDocument()
+    );
+
+    // Click "Create new" tab/button for a collecting event
+    await userEvent.click(wrapper.getByRole("tab", { name: /create new/i }));
+
+    // Ensure the warning message is appearing to indiciate that this action will override the existing
+    // collecting event link.
+    expect(
+      wrapper.getByText(
+        /creating a new collecting event to link to this material sample will replace any currently linked collecting events upon saving\./i
+      )
+    ).toBeInTheDocument();
+
+    // Enter a new collection number for this record.
+    const collectionNumberField = wrapper.getAllByRole("textbox", {
+      name: /collection number/i
+    })[1];
+    await userEvent.clear(collectionNumberField);
+    await userEvent.type(collectionNumberField, "new collection number 123");
+
+    // Save the material sample form
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+
+    // New collecting event should be created.
+    // Then attach that new collecting event to the material sample, replacing the existing link.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
+              group: "aafc",
+              publiclyReleasable: false,
+              otherRecordNumbers: ["new collection number 123"],
+              type: "collecting-event"
+            },
+            type: "collecting-event"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ],
+      [
+        [
+          {
+            resource: {
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "collecting-event"
+                  }
+                }
+              },
+              id: "1",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Collecting event exists already, attach an existing one and replace the collecting event link", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+    await waitForLoadingToDisappear();
+
+    await waitFor(() =>
+      expect(
+        wrapper.getByRole("tab", { name: /create new/i })
+      ).toBeInTheDocument()
+    );
+
+    // Click "Link existing" tab/button for a collecting event
+    await userEvent.click(wrapper.getByRole("tab", { name: /link existing/i }));
+    await waitForLoadingToDisappear();
+
+    // Click "Select" to attach that specific collecting event to this material sample.
+    await userEvent.click(
+      wrapper.getAllByRole("button", { name: /select/i })[1]
+    );
+
+    // Should see message indicating that it will replace the previously linked collecting event.
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(
+          /the selected collecting event will replace the previously linked collecting event for this material sample when saved\./i
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Should also be in read only mode:
+    await waitFor(() => {
+      expect(
+        wrapper.getByText(/linked collecting event:/i)
+      ).toBeInTheDocument();
+    });
+
+    // Save the material sample form
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+
+    // Expect the collecting event to be linked to that collecting event selected.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "2",
+                    type: "collecting-event"
+                  }
+                }
+              },
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
       ]
     ]);
   });
@@ -521,16 +773,16 @@ describe("Material Sample Edit Page", () => {
       testCtx
     );
     await waitForLoadingToDisappear();
+
+    const editAllVerbatimEventDateTime = wrapper.getAllByRole("textbox", {
+      name: /verbatim event datetime/i
+    })[0];
     await waitFor(() =>
-      expect(
-        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-      ).toHaveDisplayValue("2021-04-13")
+      expect(editAllVerbatimEventDateTime).toHaveDisplayValue("2021-04-13")
     );
 
     // Existing CollectingEvent should show up:
-    expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-    ).toHaveDisplayValue("2021-04-13");
+    expect(editAllVerbatimEventDateTime).toHaveDisplayValue("2021-04-13");
 
     // Update the Primary ID.
     await userEvent.clear(
@@ -578,7 +830,9 @@ describe("Material Sample Edit Page", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
@@ -630,9 +884,13 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              collectingEvent: {
-                id: "11111111-1111-1111-1111-111111111111",
-                type: "collecting-event"
+              relationships: {
+                collectingEvent: {
+                  data: {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "collecting-event"
+                  }
+                }
               },
               id: "1",
               materialSampleName: "test-material-sample-id",
@@ -646,7 +904,7 @@ describe("Material Sample Edit Page", () => {
     ]);
   });
 
-  it.skip("Lets you remove the attached Collecting Event.", async () => {
+  it("Lets you unlink the attached Collecting Event.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={testMaterialSample()}
@@ -654,88 +912,59 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
+    await waitForLoadingToDisappear();
+
     await waitFor(() =>
       expect(
-        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+        wrapper.getAllByRole("textbox", { name: /verbatim event datetime/i })[0]
       ).toHaveDisplayValue("2021-04-13")
     );
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+      wrapper.getAllByRole("textbox", { name: /verbatim event datetime/i })[0]
     ).toHaveDisplayValue("2021-04-13");
 
     // Remove the existing Collecting Event.
-    await userEvent.click(wrapper.getByRole("button", { name: /detach/i }));
-    await waitFor(() =>
-      expect(
-        wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-      ).toHaveDisplayValue("")
-    );
+    await userEvent.click(wrapper.getByRole("button", { name: /unlink/i }));
 
-    // Existing CollectingEvent should be gone:
+    // Are you sure?
     expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-    ).toHaveDisplayValue("");
+      wrapper.getByText(/unlink collecting events\?/i)
+    ).toBeInTheDocument();
+    await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
 
-    // Set the new Collecting Event's verbatimEventDateTime:
-    await userEvent.type(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
-      "2019-12-21T16:00"
-    );
-
-    // Set the additional collection numbers in the collecting event.
-    await userEvent.type(
-      wrapper.getByRole("textbox", {
-        name: "Additional Collection Numbers Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers. (One value per line) Write one value per line. Press enter while typing in the field to add a new line."
-      }),
-      "1\n2\n3"
-    );
+    // Message to indicating that the collecting event will be unlinked.
+    expect(
+      wrapper.getByText(
+        /collecting event\(s\) will be unlinked from the material samples when the form is saved\./i
+      )
+    ).toBeInTheDocument();
 
     // Save
     await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
+    // Expect the network request to unlink the record.
     expect(mockSave.mock.calls).toEqual([
       [
-        // New collecting-event created:
         [
           {
             resource: {
-              group: "aafc",
-              otherRecordNumbers: ["1", "2", "3"],
-              dwcVerbatimCoordinateSystem: null,
-              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              geoReferenceAssertions: [
-                {
-                  isPrimary: true
-                }
-              ],
-              verbatimEventDateTime: "2019-12-21T16:00",
-              publiclyReleasable: false, // Default Value
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        // Existing material-sample updated:
-        [
-          {
-            resource: {
-              collectingEvent: {
-                id: "11111111-1111-1111-1111-111111111111",
-                type: "collecting-event"
-              },
               id: "1",
+              relationships: {
+                collectingEvent: {
+                  data: null
+                }
+              },
               type: "material-sample"
             },
             type: "material-sample"
           }
         ],
-        { apiBaseUrl: "/collection-api" }
+        {
+          apiBaseUrl: "/collection-api"
+        }
       ]
     ]);
   });
@@ -1057,7 +1286,7 @@ describe("Material Sample Edit Page", () => {
     if (!organismToggle) {
       fail("organism toggle needs to exist at this point.");
     }
-    fireEvent.click(organismToggle[0]);
+    await userEvent.click(organismToggle[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /add new determination/i })
@@ -1392,7 +1621,7 @@ describe("Material Sample Edit Page", () => {
     if (!associationToggle) {
       fail("Association toggle needs to exist at this point.");
     }
-    fireEvent.click(associationToggle[0]);
+    await userEvent.click(associationToggle[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /search\.\.\./i })
@@ -1446,7 +1675,7 @@ describe("Material Sample Edit Page", () => {
     if (!associationToggle) {
       fail("Association toggle needs to exist at this point.");
     }
-    fireEvent.click(associationToggle[0]);
+    await userEvent.click(associationToggle[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /search\.\.\./i })
@@ -1505,7 +1734,7 @@ describe("Material Sample Edit Page", () => {
     if (!organismToggle) {
       fail("organism toggle needs to exist at this point.");
     }
-    fireEvent.click(organismToggle[0]);
+    await userEvent.click(organismToggle[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("textbox", { name: /life stage/i })
@@ -2722,7 +2951,9 @@ describe("Material Sample Edit Page", () => {
     if (!collectingEventToggle) {
       fail("Collecting event toggle needs to exist at this point.");
     }
-    fireEvent.click(collectingEventToggle[0]);
+    await userEvent.click(collectingEventToggle[0]);
+    await waitForLoadingToDisappear();
+
     await waitFor(() => {
       expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
       expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
@@ -2764,7 +2995,7 @@ describe("Material Sample Edit Page", () => {
     if (!organismToggle) {
       fail("organism toggle needs to exist at this point.");
     }
-    fireEvent.click(organismToggle[0]);
+    await userEvent.click(organismToggle[0]);
     await waitFor(() =>
       expect(
         wrapper.getByRole("button", { name: /add new determination/i })
@@ -3082,7 +3313,7 @@ describe("Material Sample Edit Page", () => {
       if (!associationToggle) {
         fail("Association toggle needs to exist at this point.");
       }
-      fireEvent.click(associationToggle[0]);
+      await userEvent.click(associationToggle[0]);
 
       // Are you sure popup, click "Yes".
       await userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
@@ -3540,7 +3771,8 @@ describe("Material Sample Edit Page", () => {
       if (!collectingEventToggle) {
         fail("Collecting event toggle needs to exist at this point.");
       }
-      fireEvent.click(collectingEventToggle[0]);
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
 
       await waitFor(() =>
         expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
@@ -3631,9 +3863,13 @@ describe("Material Sample Edit Page", () => {
             [
               {
                 resource: {
-                  collectingEvent: {
-                    id: "11111111-1111-1111-1111-111111111111",
-                    type: "collecting-event"
+                  relationships: {
+                    collectingEvent: {
+                      data: {
+                        id: "11111111-1111-1111-1111-111111111111",
+                        type: "collecting-event"
+                      }
+                    }
                   },
                   publiclyReleasable: false,
                   type: "material-sample"
@@ -3661,7 +3897,8 @@ describe("Material Sample Edit Page", () => {
       if (!collectingEventToggle) {
         fail("Collecting event toggle needs to exist at this point.");
       }
-      fireEvent.click(collectingEventToggle[0]);
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
 
       await waitFor(() =>
         expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
@@ -3767,9 +4004,13 @@ describe("Material Sample Edit Page", () => {
             [
               {
                 resource: {
-                  collectingEvent: {
-                    id: "11111111-1111-1111-1111-111111111111",
-                    type: "collecting-event"
+                  relationships: {
+                    collectingEvent: {
+                      data: {
+                        id: "11111111-1111-1111-1111-111111111111",
+                        type: "collecting-event"
+                      }
+                    }
                   },
                   publiclyReleasable: false,
                   type: "material-sample"
@@ -3894,7 +4135,8 @@ describe("Material Sample Edit Page", () => {
       if (!collectingEventToggle) {
         fail("Collecting event toggle needs to exist at this point.");
       }
-      fireEvent.click(collectingEventToggle[0]);
+      await userEvent.click(collectingEventToggle[0]);
+      await waitForLoadingToDisappear();
 
       await waitFor(() =>
         expect(wrapper.getByTestId("geographySearchBox")).toBeInTheDocument()
@@ -3914,7 +4156,7 @@ describe("Material Sample Edit Page", () => {
           "Manual geography switch background needs to exist at this point."
         );
       }
-      fireEvent.click(manualSwitchBg);
+      await userEvent.click(manualSwitchBg);
 
       // Set the State/Province field:
       await userEvent.type(
@@ -3958,9 +4200,13 @@ describe("Material Sample Edit Page", () => {
             [
               {
                 resource: {
-                  collectingEvent: {
-                    id: "11111111-1111-1111-1111-111111111111",
-                    type: "collecting-event"
+                  relationships: {
+                    collectingEvent: {
+                      data: {
+                        id: "11111111-1111-1111-1111-111111111111",
+                        type: "collecting-event"
+                      }
+                    }
                   },
                   publiclyReleasable: false,
                   type: "material-sample"
@@ -4008,7 +4254,7 @@ describe("Material Sample Edit Page", () => {
           "Manual geography switch background needs to exist at this point."
         );
       }
-      fireEvent.click(manualSwitchBg);
+      await userEvent.click(manualSwitchBg);
 
       // Set the State/Province field:
       await userEvent.clear(
@@ -4089,7 +4335,7 @@ describe("Material Sample Edit Page", () => {
           "Manual geography switch background needs to exist at this point."
         );
       }
-      fireEvent.click(manualSwitchBg);
+      await userEvent.click(manualSwitchBg);
 
       // Set the State/Province field:
       await userEvent.clear(
@@ -4217,7 +4463,7 @@ describe("Material Sample Edit Page", () => {
       if (!scheduledActionToggle) {
         fail("Scheduled action toggle needs to exist at this point.");
       }
-      fireEvent.click(scheduledActionToggle[0]);
+      await userEvent.click(scheduledActionToggle[0]);
 
       // Enter an action type:
       await userEvent.type(

@@ -191,7 +191,7 @@ export function AttachmentsEditor({
             style={{ paddingLeft: "15px", paddingRight: "15px", width: "9rem" }}
           >
             <FaUnlink className="me-2" />
-            <DinaMessage id="detach" />
+            <DinaMessage id="unlink" />
           </button>
         </div>
       )
