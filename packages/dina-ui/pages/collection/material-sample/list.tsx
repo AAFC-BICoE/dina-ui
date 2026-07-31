@@ -225,6 +225,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         path: "data.attributes.managedAttributes",
         apiEndpoint: "collection-api/controlled-vocabulary-item"
       },
+
       // Material Sample - Field Extensions
       {
         type: "fieldExtension",
@@ -233,6 +234,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         path: "data.attributes.extensionValues",
         apiEndpoint: "collection-api/extension"
       },
+
       // Material Sample - Identifiers
       {
         type: "identifier",
@@ -248,6 +250,25 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         label: "preparationManagedAttributes",
         component: "PREPARATION",
         path: "data.attributes.preparationManagedAttributes",
+        apiEndpoint: "collection-api/controlled-vocabulary-item"
+      },
+
+      // Organism Managed Attributes
+      {
+        type: "managedAttribute",
+        label: "targetIdentifiableEntitySummary.managedAttributes",
+        component: "ORGANISM",
+        path: "data.attributes.targetIdentifiableEntitySummary.managedAttributes",
+        apiEndpoint: "collection-api/controlled-vocabulary-item"
+      },
+
+      // Determination Managed Attributes
+      {
+        type: "managedAttribute",
+        label:
+          "targetIdentifiableEntitySummary.primaryDetermination.managedAttributes",
+        component: "DETERMINATION",
+        path: "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.managedAttributes",
         apiEndpoint: "collection-api/controlled-vocabulary-item"
       },
 
@@ -302,28 +323,6 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "collectingEvent",
         referencedType: "collecting-event",
         apiEndpoint: "collection-api/extension"
-      },
-
-      // Organism Managed Attributes
-      {
-        type: "managedAttribute",
-        label: "managedAttributes",
-        component: "ORGANISM",
-        path: "included.attributes.targetIdentifiableEntitySummary.managedAttributes",
-        referencedBy: "organism",
-        referencedType: "organism",
-        apiEndpoint: "collection-api/controlled-vocabulary-item"
-      },
-
-      // Determination Managed Attributes
-      {
-        type: "managedAttribute",
-        label: "managedAttributes",
-        component: "DETERMINATION",
-        path: "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.managedAttributes",
-        referencedBy: "organism.determination",
-        referencedType: "organism",
-        apiEndpoint: "collection-api/controlled-vocabulary-item"
       },
 
       // Attachment

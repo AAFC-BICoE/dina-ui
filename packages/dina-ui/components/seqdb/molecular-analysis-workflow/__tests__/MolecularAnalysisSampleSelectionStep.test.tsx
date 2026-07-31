@@ -1,4 +1,8 @@
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  MATERIAL_SAMPLE_MAPPING,
+  mountWithAppContext,
+  waitForLoadingToDisappear
+} from "common-ui";
 import {
   MolecularAnalysisSampleSelectionStep,
   MolecularAnalysisSampleSelectionStepProps
@@ -9,7 +13,6 @@ import { DinaForm } from "common-ui";
 import userEvent from "@testing-library/user-event";
 import {
   TEST_GROUP,
-  TEST_MAPPING,
   TEST_MATERIAL_SAMPLE_SUMMARY,
   TEST_MOLECULAR_ANALYSIS,
   TEST_MOLECULAR_ANALYSIS_EMPTY,
@@ -57,7 +60,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "user-api/user-preference":
       return { data: [] };
     case "search-api/search-ws/mapping":
-      return TEST_MAPPING;
+      return MATERIAL_SAMPLE_MAPPING;
     case "seqdb-api/generic-molecular-analysis/" +
       TEST_MOLECULAR_ANALYSIS_EMPTY_ID:
       return TEST_MOLECULAR_ANALYSIS_EMPTY;

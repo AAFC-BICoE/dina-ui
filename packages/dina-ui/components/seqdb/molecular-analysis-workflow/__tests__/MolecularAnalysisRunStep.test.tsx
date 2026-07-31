@@ -1,4 +1,8 @@
-import { mountWithAppContext, waitForLoadingToDisappear } from "common-ui";
+import {
+  mountWithAppContext,
+  OBJECT_STORE_MAPPING,
+  waitForLoadingToDisappear
+} from "common-ui";
 import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
@@ -36,50 +40,6 @@ import {
 } from "../../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { PersistedResource } from "kitsu";
 
-const MOCK_INDEX_MAPPING_RESP = {
-  data: {
-    indexName: "dina_object_store_index",
-    attributes: [
-      {
-        name: "originalFilename",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "bucket",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "createdBy",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "acCaption",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "id",
-        type: "text",
-        path: "data"
-      },
-      {
-        name: "type",
-        type: "text",
-        path: "data"
-      },
-      {
-        name: "createdOn",
-        type: "date",
-        path: "data.attributes"
-      }
-    ],
-    relationships: []
-  }
-};
-
 const TEST_ELASTIC_SEARCH_RESPONSE = {
   data: {
     hits: {
@@ -104,7 +64,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "search-api/search-ws/mapping":
-      return MOCK_INDEX_MAPPING_RESP;
+      return OBJECT_STORE_MAPPING;
     case "/seqdb-api/generic-molecular-analysis-item": {
       const uuid = params.filter?.["genericMolecularAnalysis.uuid"]?.EQ;
       switch (uuid) {
