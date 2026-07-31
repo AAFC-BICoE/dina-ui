@@ -21,7 +21,6 @@ import { COLLECTION_OTHER_IDENTIFIERS_ID } from "../../../components/controlled-
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection } from "../../../types/collection-api";
 import _ from "lodash";
-import { Field } from "formik";
 import PageLayout from "../../../components/page/PageLayout";
 import { CollectionLinkedProjectsTable } from "../../../components/collection/collection/CollectionLinkedProjectsTable";
 import CollectionSampleTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
@@ -186,27 +185,13 @@ export function CollectionFormFields() {
         <TextField className="col-md-6" name="address" multiLines={true} />
         <TextField className="col-md-6" name="remarks" multiLines={true} />
       </div>
-      <Field name="identifiers">
-        {({ form: { values: formState } }) =>
-          !readOnly ? (
-            <OtherIdentifiersSection
-              controlledVocabularyUuid={COLLECTION_OTHER_IDENTIFIERS_ID}
-              dinaComponent="COLLECTION"
-              resourceLabelKey="collection"
-              valueFieldName="uri"
-              hideOtherCatalogNumbers={true}
-            />
-          ) : !!formState.identifiers?.length ? (
-            <OtherIdentifiersSection
-              controlledVocabularyUuid={COLLECTION_OTHER_IDENTIFIERS_ID}
-              dinaComponent="COLLECTION"
-              resourceLabelKey="collection"
-              valueFieldName="uri"
-              hideOtherCatalogNumbers={true}
-            />
-          ) : null
-        }
-      </Field>
+      <OtherIdentifiersSection
+        controlledVocabularyUuid={COLLECTION_OTHER_IDENTIFIERS_ID}
+        dinaComponent="COLLECTION"
+        resourceLabelKey="collection"
+        valueFieldName="uri"
+        hideOtherCatalogNumbers={true}
+      />
 
       {readOnly && (
         <>

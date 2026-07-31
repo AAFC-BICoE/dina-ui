@@ -41,7 +41,7 @@ export default function CollectionDetailsPage() {
                   ([type, uri]) => ({ type, uri })
                 )
               : []
-          } as any}
+          } as unknown as Record<string,string>}
         >
           <CollectionFormFields />
           {props.initialValues.name && (
