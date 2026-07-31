@@ -37,7 +37,7 @@ export function OtherIdentifiersSection({
   controlledVocabularyUuid,
   dinaComponent,
   resourceLabelKey,
-  templateCheckboxPrefix,
+  templateCheckboxPrefix = "identifiers-component",
   valueFieldName = "value",
   hideOtherCatalogNumbers = false
 }: OtherIdentifiersSectionProps) {
