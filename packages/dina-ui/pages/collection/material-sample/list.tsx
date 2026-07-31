@@ -358,6 +358,29 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedType: "material-sample"
       },
 
+      // Organism Managed Attributes
+      {
+        type: "managedAttribute",
+        label: "targetIdentifiableEntitySummary.managedAttributes",
+        component: "ORGANISM",
+        path: "included.attributes.targetIdentifiableEntitySummary.managedAttributes",
+        apiEndpoint: "collection-api/controlled-vocabulary-item",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
+      },
+
+      // Determination Managed Attributes
+      {
+        type: "managedAttribute",
+        label:
+          "targetIdentifiableEntitySummary.primaryDetermination.managedAttributes",
+        component: "DETERMINATION",
+        path: "included.attributes.targetIdentifiableEntitySummary.primaryDetermination.managedAttributes",
+        apiEndpoint: "collection-api/controlled-vocabulary-item",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
+      },
+
       // Parent Material Sample - Material Sample - Field Extensions
       {
         type: "fieldExtension",

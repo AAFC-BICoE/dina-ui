@@ -907,7 +907,7 @@ describe("ColumnSelectorUtils", () => {
       ];
 
       // Expect the correct paths to use for exporting.
-      expect(convertColumnsToPaths(columnsToTest)).toBe([
+      expect(convertColumnsToPaths(columnsToTest)).toStrictEqual([
         "materialSampleName",
         "dwcOtherCatalogNumbers",
         "materialSampleState",
@@ -966,7 +966,7 @@ describe("ColumnSelectorUtils", () => {
       ];
 
       // Expect the correct paths to use for exporting.
-      expect(convertColumnsToPaths(columnsToTest)).toBe([
+      expect(convertColumnsToPaths(columnsToTest)).toStrictEqual([
         "attachment.acCaption",
         "preparedBy.displayName",
         "collection.name",
@@ -1048,7 +1048,7 @@ describe("ColumnSelectorUtils", () => {
         {
           accessorKey:
             "data.attributes.targetIdentifiableEntitySummary.managedAttributes.organism_test",
-          id: "managedAttributes.organism_test",
+          id: "targetIdentifiableEntitySummary.managedAttributes.organism_test",
           isKeyword: true,
           isColumnVisible: true,
           config: {
@@ -1082,7 +1082,7 @@ describe("ColumnSelectorUtils", () => {
         {
           accessorKey:
             "data.attributes.targetIdentifiableEntitySummary.primaryDetermination.managedAttributes.determination_test",
-          id: "managedAttributes.determination_test",
+          id: "targetIdentifiableEntitySummary.primaryDetermination.managedAttributes.determination_test",
           isKeyword: true,
           isColumnVisible: true,
           config: {
@@ -1229,7 +1229,7 @@ describe("ColumnSelectorUtils", () => {
       ];
 
       // Expect the correct paths to use for exporting.
-      expect(convertColumnsToPaths(columnsToTest)).toBe([
+      expect(convertColumnsToPaths(columnsToTest)).toStrictEqual([
         "managedAttributes.material_sample_test",
         "preparationManagedAttributes.preparation_test",
         "targetIdentifiableEntitySummary.managedAttributes.organism_test",
