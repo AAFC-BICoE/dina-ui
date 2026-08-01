@@ -291,7 +291,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     }
 
     // Special case for blank searches if blank search backend is provided.
-    if (searchValue === "") {
+    if (debouncedSearchValue === "") {
       if (
         blankSearchBackend &&
         ((blankSearchBackend === "preferred" && backendProvider === backend) ||
