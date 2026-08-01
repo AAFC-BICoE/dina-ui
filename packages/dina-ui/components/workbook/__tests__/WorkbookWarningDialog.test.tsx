@@ -1,4 +1,5 @@
-import { fireEvent, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
 import { mountWithAppContext } from "common-ui";
 import "@testing-library/jest-dom";
@@ -54,7 +55,7 @@ describe("WorkbookWarningDialog", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("expands skipped columns on button click", () => {
+  it("expands skipped columns on button click", async () => {
     const skippedColumns = ["Column1", "Column2", "Column3"];
     mountWithAppContext(
       <WorkbookWarningDialog
@@ -65,7 +66,7 @@ describe("WorkbookWarningDialog", () => {
 
     // Click the "Show all" button
     const showAllButton = screen.getByRole("button", { name: "Show More" });
-    fireEvent.click(showAllButton);
+    await userEvent.click(showAllButton);
 
     // Check all skipped columns are displayed in a list
     expect(screen.getByText("Column1")).toBeInTheDocument();
@@ -132,7 +133,7 @@ describe("WorkbookWarningDialog", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("expands unmapped relationships on button click", () => {
+  it("expands unmapped relationships on button click", async () => {
     const unmappedRelationshipsError = [
       "Relationship1",
       "Relationship2",
@@ -147,7 +148,7 @@ describe("WorkbookWarningDialog", () => {
 
     // Click the "Show More" button
     const showAllButton = screen.getByRole("button", { name: "Show More" });
-    fireEvent.click(showAllButton);
+    await userEvent.click(showAllButton);
 
     // Check all unmapped relationships are displayed in a list
     expect(screen.getByText("Relationship1")).toBeInTheDocument();
