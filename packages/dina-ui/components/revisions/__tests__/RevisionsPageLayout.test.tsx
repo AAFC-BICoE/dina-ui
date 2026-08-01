@@ -44,7 +44,7 @@ describe("RevisionsPageLayout component", () => {
       expect(table).not.toBeNull();
     });
     if (!table) {
-      fail("A table is expected at this point...");
+      throw new Error("A table is expected at this point...");
     }
 
     const numRows = table.rows.length;
