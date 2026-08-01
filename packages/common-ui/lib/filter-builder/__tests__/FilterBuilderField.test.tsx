@@ -3,6 +3,7 @@ import { DinaForm } from "../../formik-connected/DinaForm";
 import { mountWithAppContext } from "common-ui";
 import { FilterBuilderField } from "../FilterBuilderField";
 import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 describe("FilterBuilderField component", () => {
   const mockSubmit = jest.fn();
@@ -48,7 +49,7 @@ describe("FilterBuilderField component", () => {
     const wrapper = mountForm();
 
     // Submit the search...
-    fireEvent.click(wrapper.getByRole("button", { name: /search/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /search/i }));
 
     // Formik should have the initial value.
     await waitFor(() => {
@@ -60,10 +61,11 @@ describe("FilterBuilderField component", () => {
     });
 
     // Change an input value.
-    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
-      target: { value: "test value" }
-    });
-    fireEvent.click(wrapper.getByRole("button", { name: /search/i }));
+    await userEvent.type(
+      wrapper.getByRole("textbox", { name: /filter value/i }),
+      "test value"
+    );
+    await userEvent.click(wrapper.getByRole("button", { name: /search/i }));
 
     // Formik should have the updated value.
     await waitFor(() => {
