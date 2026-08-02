@@ -2,7 +2,7 @@ import React from "react";
 import { mountWithAppContext } from "common-ui";
 import { CheckBoxField } from "../CheckBoxField";
 import { DinaForm } from "../DinaForm";
-import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 describe("CheckBoxField component", () => {
@@ -23,20 +23,17 @@ describe("CheckBoxField component", () => {
     ).toEqual(false);
   });
 
-  it("Changes the field's value.", () => {
+  it("Changes the field's value.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ testObject: { testField: false } }}>
         <CheckBoxField name="testObject.testField" />
       </DinaForm>
     );
 
-    fireEvent.change(
+    await userEvent.click(
       wrapper.getByRole("checkbox", {
         name: /test object test field/i
-      }) as HTMLInputElement,
-      {
-        target: { name: "testObject.testField", checked: true }
-      }
+      }) as HTMLInputElement
     );
     expect(
       (
