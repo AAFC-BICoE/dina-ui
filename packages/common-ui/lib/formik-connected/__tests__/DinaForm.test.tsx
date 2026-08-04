@@ -1,6 +1,7 @@
-import { fireEvent, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { DoOperationsError } from "../..";
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import {
   DinaForm,
   __resetUnsavedWarningState,
@@ -48,7 +49,7 @@ describe("DinaForm component.", () => {
     );
 
     // Submit the form.
-    fireEvent.click(wrapper.getByRole("button"));
+    await userEvent.click(wrapper.getByRole("button"));
 
     await waitFor(() => {
       expect(mockOnSubmit).lastCalledWith({
@@ -88,7 +89,7 @@ describe("DinaForm component.", () => {
     );
 
     // Submit the form.
-    fireEvent.click(wrapper.getByRole("button"));
+    await userEvent.click(wrapper.getByRole("button"));
 
     // Both errors should be shown:
     await waitFor(() => {
@@ -116,9 +117,7 @@ describe("DinaForm component.", () => {
       );
 
       // Make the form dirty
-      fireEvent.change(wrapper.getByRole("textbox"), {
-        target: { name: "name", value: "new value" }
-      });
+      await clearAndType(wrapper.getByRole("textbox"), "new value");
 
       await waitFor(() => {
         expect(window.addEventListener).toHaveBeenCalledWith(
@@ -132,7 +131,7 @@ describe("DinaForm component.", () => {
       });
 
       // Submit the form (submitCount changes → isDirty becomes false)
-      fireEvent.click(wrapper.getByRole("button"));
+      await userEvent.click(wrapper.getByRole("button"));
 
       await waitFor(() => {
         expect(window.removeEventListener).toHaveBeenCalledWith(
@@ -173,9 +172,7 @@ describe("DinaForm component.", () => {
         </DinaForm>
       );
 
-      fireEvent.change(wrapper.getByRole("textbox"), {
-        target: { name: "name", value: "new value" }
-      });
+      await clearAndType(wrapper.getByRole("textbox"), "new value");
 
       // Let effects settle
       await waitFor(() => {
@@ -199,9 +196,7 @@ describe("DinaForm component.", () => {
         </DinaForm>
       );
 
-      fireEvent.change(wrapper.getByRole("textbox"), {
-        target: { name: "name", value: "new value" }
-      });
+      await clearAndType(wrapper.getByRole("textbox"), "new value");
 
       await waitFor(() => {
         expect(window.addEventListener).toHaveBeenCalledWith(
@@ -237,9 +232,7 @@ describe("DinaForm component.", () => {
         </DinaForm>
       );
 
-      fireEvent.change(wrapper.getByRole("textbox"), {
-        target: { name: "name", value: "new value" }
-      });
+      await clearAndType(wrapper.getByRole("textbox"), "new value");
 
       await waitFor(() => {
         expect(beforeUnloadHandler).toBeDefined();
@@ -267,9 +260,7 @@ describe("DinaForm component.", () => {
         </DinaForm>
       );
 
-      fireEvent.change(wrapper.getByRole("textbox"), {
-        target: { name: "name", value: "new value" }
-      });
+      await clearAndType(wrapper.getByRole("textbox"), "new value");
 
       await waitFor(() => {
         expect(routeChangeHandler).toBeDefined();
@@ -316,13 +307,13 @@ describe("DinaForm component.", () => {
       mountWithAppContext(<Form2 />);
 
       // Make both dirty — use document.querySelector to scope each input
-      fireEvent.change(
+      await clearAndType(
         document.querySelector('[data-testid="form-1"] input')!,
-        { target: { name: "name", value: "value 1" } }
+        "value 1"
       );
-      fireEvent.change(
+      await clearAndType(
         document.querySelector('[data-testid="form-2"] input')!,
-        { target: { name: "name", value: "value 2" } }
+        "value 2"
       );
 
       await waitFor(() => {
@@ -340,7 +331,9 @@ describe("DinaForm component.", () => {
       });
 
       // Make one form clean (submit it)
-      fireEvent.click(document.querySelector('[data-testid="form-1"] button')!);
+      await userEvent.click(
+        document.querySelector('[data-testid="form-1"] button')!
+      );
 
       await waitFor(() => {
         // Listeners should still be active (2nd form is still dirty)
@@ -348,7 +341,9 @@ describe("DinaForm component.", () => {
       });
 
       // Make the other form clean too
-      fireEvent.click(document.querySelector('[data-testid="form-2"] button')!);
+      await userEvent.click(
+        document.querySelector('[data-testid="form-2"] button')!
+      );
 
       await waitFor(() => {
         // Both forms clean → listeners are cleaned up
@@ -378,9 +373,7 @@ describe("DinaForm component.", () => {
         </DinaForm>
       );
 
-      fireEvent.change(wrapper.getByRole("textbox"), {
-        target: { name: "name", value: "new value" }
-      });
+      await clearAndType(wrapper.getByRole("textbox"), "new value");
 
       await waitFor(() => {
         expect(beforeUnloadHandler).toBeDefined();
@@ -412,9 +405,7 @@ describe("DinaForm component.", () => {
         </DinaForm>
       );
 
-      fireEvent.change(wrapper.getByRole("textbox"), {
-        target: { name: "name", value: "new value" }
-      });
+      await clearAndType(wrapper.getByRole("textbox"), "new value");
 
       await waitFor(() => {
         expect(routeChangeHandler).toBeDefined();
@@ -445,9 +436,7 @@ describe("DinaForm component.", () => {
         </DinaForm>
       );
 
-      fireEvent.change(wrapper.getByRole("textbox"), {
-        target: { name: "name", value: "new value" }
-      });
+      await clearAndType(wrapper.getByRole("textbox"), "new value");
 
       await waitFor(() => {
         expect(routeChangeHandler).toBeDefined();
