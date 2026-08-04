@@ -1,6 +1,6 @@
 // pages/feedback/home2.tsx (updated)
 import { GlobalSearch, useAccount } from "common-ui";
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Container from "react-bootstrap/Container";
 import {
   Footer,
@@ -456,6 +456,12 @@ export function Home2() {
     activateNewLayout,
     deactivateNewLayout
   } = UIPreferenceHook(sections);
+
+  useEffect(() => {
+    if (!loading && !useNewLayout) {
+      router.replace("/");
+    }
+  }, [loading, useNewLayout, router]);
 
   const { formatMessage } = useDinaIntl();
 

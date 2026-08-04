@@ -2,6 +2,7 @@ import { GlobalSearch, useAccount } from "common-ui";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -20,8 +21,14 @@ export function Home() {
   const { isAdmin, isSuperUser, rolesPerGroup, subject } = useAccount();
   const router = useRouter();
 
-  const { useNewLayout, activateNewLayout, deactivateNewLayout } =
+  const { useNewLayout, activateNewLayout, deactivateNewLayout, loading } =
     UIPreferenceHook();
+
+  useEffect(() => {
+    if (!loading && useNewLayout) {
+      router.replace("/feedback/home2");
+    }
+  }, [loading, useNewLayout, router]);
 
   const handleSearch = (searchTerm: string) => {
     // Navigate to global search results page
