@@ -42,7 +42,7 @@ import {
 } from "../../resource-select-fields/resource-select-fields";
 import {
   COLLECTION_MANAGED_ATTRIBUTE_ID,
-  MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+  COLLECTION_OTHER_IDENTIFIERS_ID
 } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 export function useColumnMapping() {
@@ -125,7 +125,7 @@ export function useColumnMapping() {
       .where(
         "controlledVocabulary.uuid",
         "EQ",
-        MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID
+        COLLECTION_OTHER_IDENTIFIERS_ID
       )
       .build(),
     page: { limit: 1000 }

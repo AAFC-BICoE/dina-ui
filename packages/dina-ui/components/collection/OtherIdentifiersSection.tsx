@@ -12,14 +12,35 @@ import {
   useModal
 } from "common-ui/lib";
 import { FieldArray, useFormikContext } from "formik";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
-import { getFormTemplateCheckboxes } from "../../form-template/formTemplateUtils";
+import { getFormTemplateCheckboxes } from "../form-template/formTemplateUtils";
 import { useState } from "react";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "../../controlled-vocabulary/controlledVocabularyItemUtils";
-import useControlledVocabularyOptions from "../../controlled-vocabulary/useControlledVocabularyOptions";
+import useControlledVocabularyOptions from "../controlled-vocabulary/useControlledVocabularyOptions";
 
-export function OtherIdentifiersSection() {
+export interface OtherIdentifiersSectionProps {
+  /** Controlled vocabulary UUID for identifier types. */
+  controlledVocabularyUuid: string;
+  /** dinaComponent filter value for the controlled vocabulary API. */
+  dinaComponent: string;
+  /** Field label key for the resource type, used in bulk edit warnings. */
+  resourceLabelKey: string;
+  /** Template checkbox path prefix. Defaults to "identifiers-component". */
+  templateCheckboxPrefix?: string;
+  /** The field name for the identifier value. Defaults to "value". */
+  valueFieldName?: string;
+  /** Hide the dwcOtherCatalogNumbers section. */
+  hideOtherCatalogNumbers?: boolean;
+}
+
+export function OtherIdentifiersSection({
+  controlledVocabularyUuid,
+  dinaComponent,
+  resourceLabelKey,
+  templateCheckboxPrefix = "identifiers-component",
+  valueFieldName = "value",
+  hideOtherCatalogNumbers = false
+}: OtherIdentifiersSectionProps) {
   const { readOnly, isTemplate, formTemplate, isBulkEditAllTab } =
     useDinaFormContext();
   const { values } = useFormikContext();
@@ -28,7 +49,7 @@ export function OtherIdentifiersSection() {
 
   const { vocabOptions, controlledVocabularies } =
     useControlledVocabularyOptions({
-      path: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
+      path: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${controlledVocabularyUuid}&filter[dinaComponent][EQ]=${dinaComponent}`
     });
 
   // Determine if the form template sections should be visible.
@@ -37,14 +58,16 @@ export function OtherIdentifiersSection() {
     ? Object.keys((values as any)?.identifiers ?? {})?.length !== 0
     : formTemplate
     ? visibility?.templateCheckboxes?.[
-        "identifiers-component.identifiers-section.identifiers"
+        `${templateCheckboxPrefix}.identifiers-section.identifiers`
       ] ?? false
     : true;
-  const otherCatalogNumbersVisible = readOnly
+  const otherCatalogNumbersVisible = hideOtherCatalogNumbers
+    ? false
+    : readOnly
     ? !!(values as any)?.dwcOtherCatalogNumbers
     : formTemplate
     ? visibility?.templateCheckboxes?.[
-        "identifiers-component.identifiers-section.dwcOtherCatalogNumbers"
+        `${templateCheckboxPrefix}.identifiers-section.dwcOtherCatalogNumbers`
       ] ?? false
     : true;
 
@@ -63,8 +86,8 @@ export function OtherIdentifiersSection() {
     return <></>;
   }
 
-  const materialSampleLabel = getFieldLabel({
-    name: "material-sample"
+  const resourceTypeLabel = getFieldLabel({
+    name: resourceLabelKey
   }).fieldLabel;
   const otherIdentifierLabel = getFieldLabel({
     name: "otherIdentifiers"
@@ -118,7 +141,7 @@ export function OtherIdentifiersSection() {
                     {isTemplate && (
                       <div style={{ marginTop: "20px", marginRight: "20px" }}>
                         <CheckBoxWithoutWrapper
-                          name={`templateCheckboxes['identifiers-component.identifiers-section.identifiers']`}
+                          name={`templateCheckboxes['${templateCheckboxPrefix}.identifiers-section.identifiers']`}
                           className={`col-sm-1 templateCheckBox`}
                         />
                       </div>
@@ -165,7 +188,7 @@ export function OtherIdentifiersSection() {
                     <DinaMessage
                       id="bulkEditResourceSetWarningMulti"
                       values={{
-                        targetType: materialSampleLabel,
+                        targetType: resourceTypeLabel,
                         fieldName: otherIdentifierLabel
                       }}
                     />
@@ -180,7 +203,7 @@ export function OtherIdentifiersSection() {
                       (vocab) => vocab?.id === identifier?.type
                     )?.vocabularyElementType ?? "STRING";
                   const commonProps = {
-                    name: "identifiers[" + index + "].value",
+                    name: `identifiers[${index}].${valueFieldName}`,
                     hideLabel: true,
                     disableTemplateCheckbox: true,
                     disabled: isTemplate
@@ -213,7 +236,7 @@ export function OtherIdentifiersSection() {
                       </div>
                       <div
                         className="col-md-6"
-                        data-testid={"identifiers[" + index + "].value"}
+                        data-testid={`identifiers[${index}].${valueFieldName}`}
                       >
                         {identifierType === "STRING" && (
                           <TextField {...commonProps} />
@@ -337,7 +360,7 @@ export function OtherIdentifiersSection() {
                     {isTemplate && (
                       <div style={{ marginTop: "3px", marginRight: "20px" }}>
                         <CheckBoxWithoutWrapper
-                          name={`templateCheckboxes['identifiers-component.identifiers-section.dwcOtherCatalogNumbers']`}
+                          name={`templateCheckboxes['${templateCheckboxPrefix}.identifiers-section.dwcOtherCatalogNumbers']`}
                           className={`col-sm-1 templateCheckBox`}
                         />
                       </div>
@@ -384,7 +407,7 @@ export function OtherIdentifiersSection() {
                     <DinaMessage
                       id="bulkEditResourceSetWarningMulti"
                       values={{
-                        targetType: materialSampleLabel,
+                        targetType: resourceTypeLabel,
                         fieldName: otherCatalogNumberLabel
                       }}
                     />

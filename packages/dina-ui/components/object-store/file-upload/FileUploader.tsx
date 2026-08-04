@@ -1,4 +1,3 @@
-import { parse as parseBytesString } from "bytes";
 import {
   DefaultSubmitButton,
   FileDropzone,
@@ -13,6 +12,7 @@ import {
 import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { parseBytes } from "../object-store-utils";
 
 export interface FileUploadApiConfig extends KitsuResource {
   "max-file-size": string;
@@ -58,8 +58,7 @@ export function FileUploader<TValues = any>({
 
   return withResponse(fileUploadConfigQuery, ({ data: fileUploadConfig }) => {
     const humanReadableBytesString = fileUploadConfig["max-file-size"];
-    const maxSizeBytes =
-      parseBytesString(humanReadableBytesString) || undefined;
+    const maxSizeBytes = parseBytes(humanReadableBytesString) || undefined;
 
     return (
       <FileDropzone

@@ -8,7 +8,7 @@ import {
 } from "../..";
 import { useWorkbookConverter } from "../useWorkbookConverter";
 import { DinaIntlProvider } from "../../../../intl/dina-ui-intl";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import { COLLECTION_OTHER_IDENTIFIERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 const mockConfig: FieldMappingConfigType = {
   mockEntity: {
@@ -36,7 +36,7 @@ const mockConfig: FieldMappingConfigType = {
     controlledVocabularyField: {
       dataType: WorkbookDataTypeEnum.CONTROLLED_VOCABULARY,
       filter: {
-        "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,
+        "controlledVocabulary.uuid": COLLECTION_OTHER_IDENTIFIERS_ID,
         dinaComponent: "MATERIAL_SAMPLE"
       }
     },
@@ -431,7 +431,7 @@ describe("useWorkbookConverters", () => {
       controlledVocabularyField: {
         dataType: "controlledVocabulary",
         filter: {
-          "controlledVocabulary.uuid": MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID,
+          "controlledVocabulary.uuid": COLLECTION_OTHER_IDENTIFIERS_ID,
           dinaComponent: "MATERIAL_SAMPLE"
         }
       },
