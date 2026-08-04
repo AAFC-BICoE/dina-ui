@@ -16,6 +16,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Row from "react-bootstrap/Row";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
+import { UIPreferenceHook } from "../../home2/UIPreferenceHook";
 
 export interface NavProps {
   marginBottom?: boolean;
@@ -27,7 +28,9 @@ export function Nav({ marginBottom = true, centered = true }: NavProps) {
   const { formatMessage } = useDinaIntl();
   const instanceContext = useInstanceContext();
 
-  const homeLink = "/";
+  const { useNewLayout } = UIPreferenceHook();
+
+  const homeLink = useNewLayout ? "/feedback/home2" : "/";
 
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
