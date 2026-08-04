@@ -39,7 +39,7 @@ import {
   CollectionModuleType,
   COLLECTION_MODULE_TYPES,
   COLLECTION_MODULE_TYPE_LABELS,
-  MANAGED_ATTRIBUTE_TYPE_OPTIONS,
+  VOCABULARY_ELEMENT_TYPE_OPTIONS,
   VocabularyElementType
 } from "../../types/collection-api";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
@@ -273,7 +273,7 @@ export function ControlledVocabularyItemFormLayout({ isEditMode = false }) {
     VocabularyElementType | undefined
   >(getInitialVocabularyElementType(initialValues));
 
-  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
+  const ATTRIBUTE_TYPE_OPTIONS = VOCABULARY_ELEMENT_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
 
