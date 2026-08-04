@@ -1,7 +1,8 @@
-import { mountWithAppContext } from "common-ui";
+import { clearAndType, mountWithAppContext } from "common-ui";
 import { DateField } from "../DateField";
 import { DinaForm } from "../DinaForm";
 import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { SubmitButton } from "../SubmitButton";
 import "@testing-library/jest-dom";
 
@@ -67,11 +68,11 @@ describe("DateField component", () => {
     );
   });
 
-  it("Changes the Formik field's value.", () => {
+  it("Changes the Formik field's value.", async () => {
     const wrapper = getWrapper();
     const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
 
-    fireEvent.change(textbox, { target: { value: "2019-05-25" } });
+    await clearAndType(textbox, "2019-05-25");
 
     expect(textbox.value).toEqual("2019-05-25");
   });
@@ -80,18 +81,22 @@ describe("DateField component", () => {
     const wrapper = getWrapper();
     const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
 
-    fireEvent.change(textbox, { target: { value: "" } });
-    fireEvent.click(wrapper.getByRole("button"));
+    await userEvent.clear(textbox);
+    // Close the date-picker popup so the blur is not swallowed by it.
+    await userEvent.keyboard("{Escape}");
+    await userEvent.click(wrapper.getByRole("button"));
     await waitFor(() => {
       expect(mockOnSubmit).lastCalledWith({ testField: "" });
     });
   });
 
-  it("Shows an error on non-existing dates.", () => {
+  it("Shows an error on non-existing dates.", async () => {
     const wrapper = getWrapper();
     const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
 
-    fireEvent.change(textbox, { target: { value: "2021-02-29" } });
+    await clearAndType(textbox, "2021-02-29");
+    // Close the date-picker popup so the blur is not swallowed by it.
+    await userEvent.keyboard("{Escape}");
     fireEvent.blur(textbox);
 
     // Should be displayed twice, at the top of the form and near the text field.
@@ -103,55 +108,63 @@ describe("DateField component", () => {
     ).toBeInTheDocument();
   });
 
-  it("Partial date on valid formats.", () => {
+  it("Partial date on valid formats.", async () => {
     const wrapper = getPartialDateWrapper();
     const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
 
     // YYYY-MM-DD
-    fireEvent.change(textbox, { target: { value: "1998-05-19" } });
+    await clearAndType(textbox, "1998-05-19");
+    await userEvent.keyboard("{Escape}");
     fireEvent.blur(textbox);
     expect(wrapper.queryByRole("status")).not.toBeInTheDocument();
 
     // YYYY-MM
-    fireEvent.change(textbox, { target: { value: "1998-05" } });
+    await clearAndType(textbox, "1998-05");
+    await userEvent.keyboard("{Escape}");
     fireEvent.blur(textbox);
     expect(wrapper.queryByRole("status")).not.toBeInTheDocument();
 
     // YYYY
-    fireEvent.change(textbox, { target: { value: "1998" } });
+    await clearAndType(textbox, "1998");
+    await userEvent.keyboard("{Escape}");
     fireEvent.blur(textbox);
     expect(wrapper.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("Partial date on invalid formats.", () => {
+  it("Partial date on invalid formats.", async () => {
     const wrapper = getPartialDateWrapper();
     const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
 
     // Incorrect month
-    fireEvent.change(textbox, { target: { value: "1998-13-19" } });
+    await clearAndType(textbox, "1998-13-19");
+    await userEvent.keyboard("{Escape}");
     fireEvent.blur(textbox);
     expect(wrapper.queryByRole("status")).toBeInTheDocument();
 
     // Incorrect day
-    fireEvent.change(textbox, { target: { value: "1998-05-43" } });
+    await clearAndType(textbox, "1998-05-43");
+    await userEvent.keyboard("{Escape}");
     fireEvent.blur(textbox);
     expect(wrapper.queryByRole("status")).toBeInTheDocument();
 
     // Incorrect year format
-    fireEvent.change(textbox, { target: { value: "98" } });
+    await clearAndType(textbox, "98");
+    await userEvent.keyboard("{Escape}");
     fireEvent.blur(textbox);
     expect(wrapper.queryByRole("status")).toBeInTheDocument();
 
     // Non-supported format
-    fireEvent.change(textbox, { target: { value: "September 2019" } });
+    await clearAndType(textbox, "September 2019");
+    await userEvent.keyboard("{Escape}");
     fireEvent.blur(textbox);
     expect(wrapper.queryByRole("status")).toBeInTheDocument();
   });
 
-  it("Shows an error on invalid date formats.", () => {
+  it("Shows an error on invalid date formats.", async () => {
     const wrapper = getWrapper();
     const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
-    fireEvent.change(textbox, { target: { value: "2021" } });
+    await clearAndType(textbox, "2021");
+    await userEvent.keyboard("{Escape}");
     fireEvent.blur(textbox);
 
     expect(wrapper.queryByRole("status")).toBeInTheDocument();
@@ -162,7 +175,10 @@ describe("DateField component", () => {
     const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
 
     // Manually type a date without time.
-    fireEvent.change(textbox, { target: { value: "2018-01-03" } });
+    await clearAndType(textbox, "2018-01-03");
+
+    // Close the date-picker popup so the blur is not swallowed by it.
+    await userEvent.keyboard("{Escape}");
 
     // When the field loses focus, it should reformat.
     fireEvent.blur(textbox);
@@ -173,7 +189,7 @@ describe("DateField component", () => {
     });
 
     // Check that the submitted value is a full ISO string.
-    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await waitFor(() => {
       expect(mockOnSubmit).lastCalledWith({
         testField: expect.stringMatching(
@@ -188,8 +204,10 @@ describe("DateField component", () => {
     const textbox = wrapper.getByRole("textbox") as HTMLInputElement;
 
     // Type an invalid date string.
-    fireEvent.change(textbox, { target: { value: "this-is-not-a-date" } });
+    await clearAndType(textbox, "this-is-not-a-date");
     fireEvent.blur(textbox);
+    // Close the date-picker popup, which blurs the input with the typed text.
+    await userEvent.keyboard("{Escape}");
 
     // An error message should be displayed.
     await waitFor(() => {
