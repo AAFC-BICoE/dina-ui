@@ -597,7 +597,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_tags: "Tags",
   field_targetOrganismPrimaryScientificName:
-    "Target Identifiable Entity Scientific Name",
+    "Target Organism Primary Scientific Name",
   "field_targetIdentifiableEntitySummary.sex": "Target Identifiable Entity Sex",
   "field_targetIdentifiableEntitySummary.lifeStage":
     "Target Identifiable Entity Life Stage",
