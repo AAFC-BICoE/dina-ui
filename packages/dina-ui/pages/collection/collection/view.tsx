@@ -27,21 +27,23 @@ export default function CollectionDetailsPage() {
       form={(props) => (
         <DinaForm<Collection>
           {...props}
-          initialValues={{
-            ...props.initialValues,
-            // Convert multilingualDescription to editable Dictionary format:
-            multilingualDescription: _.fromPairs<string | undefined>(
-              props.initialValues.multilingualDescription?.descriptions?.map(
-                ({ desc, lang }) => [lang ?? "", desc ?? ""]
-              )
-            ),
-            // Convert identifiers from map {key: uri} to array [{type, uri}]:
-            identifiers: props.initialValues.identifiers
-              ? Object.entries(props.initialValues.identifiers).map(
-                  ([type, uri]) => ({ type, uri })
+          initialValues={
+            {
+              ...props.initialValues,
+              // Convert multilingualDescription to editable Dictionary format:
+              multilingualDescription: _.fromPairs<string | undefined>(
+                props.initialValues.multilingualDescription?.descriptions?.map(
+                  ({ desc, lang }) => [lang ?? "", desc ?? ""]
                 )
-              : []
-          } as unknown as Record<string,string>}
+              ),
+              // Convert identifiers from map {key: uri} to array [{type, uri}]:
+              identifiers: props.initialValues.identifiers
+                ? Object.entries(props.initialValues.identifiers).map(
+                    ([type, uri]) => ({ type, uri })
+                  )
+                : []
+            } as any
+          }
         >
           <CollectionFormFields />
           {props.initialValues.name && (
