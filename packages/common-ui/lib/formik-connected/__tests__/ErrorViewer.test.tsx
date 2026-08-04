@@ -4,7 +4,8 @@ import { mountWithAppContext } from "common-ui";
 import { DinaForm } from "../DinaForm";
 import { ErrorViewer } from "../ErrorViewer";
 import { SubmitButton } from "../SubmitButton";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 describe("ErrorViewer component", () => {
@@ -34,7 +35,7 @@ describe("ErrorViewer component", () => {
     );
 
     // Submit the form.
-    fireEvent.click(wrapper.getByRole("button"));
+    await userEvent.click(wrapper.getByRole("button"));
     await waitFor(() => {
       expect(wrapper.getByText(/test error/i)).toBeInTheDocument();
     });
