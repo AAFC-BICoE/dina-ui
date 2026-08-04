@@ -5,11 +5,13 @@ import {
   ViewPageLayout
 } from "../../../components";
 import {
-  ManagedAttribute,
+  ManagedAttribute
+} from "../../../types/collection-api";
+import {
   SEQDB_MODULE_TYPE_LABELS,
   SEQDB_MODULE_TYPES,
   SeqDBModuleType
-} from "../../../types/collection-api";
+} from "../../../types/seqdb-api";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export default function ManagedAttributesViewPage() {

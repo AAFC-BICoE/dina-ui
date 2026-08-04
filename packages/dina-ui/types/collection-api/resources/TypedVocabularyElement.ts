@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { MultilingualTitle } from "../../common";
-import { VocabularyElementType } from "./ManagedAttribute";
+import { VocabularyElementType } from "./VocabularyElementType";
 
 export interface TypedVocabularyAttributes {
   id: string;
