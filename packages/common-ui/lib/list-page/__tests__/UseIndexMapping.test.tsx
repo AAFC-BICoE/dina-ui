@@ -4,6 +4,7 @@ import { ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
 import { waitFor } from "@testing-library/react";
 import { MATERIAL_SAMPLE_MAPPING } from "../__mocks__/IndexMappingMocks";
+import { dynamicFieldMappingForMaterialSample } from "@dina-ui/pages/collection/material-sample/list";
 
 const INDEX_NAME = "dina-material-sample-index";
 
@@ -23,7 +24,8 @@ function UseIndexMappingWrapper({
   indexMapRetrieved
 }: UseIndexMappingWrapperProps) {
   const { indexMap } = useIndexMapping({
-    indexName: INDEX_NAME
+    indexName: INDEX_NAME,
+    dynamicFieldMapping: dynamicFieldMappingForMaterialSample
   });
 
   useEffect(() => {

@@ -204,7 +204,7 @@ export function useIndexMapping({
             "." +
             relationshipAttribute.path +
             "." +
-            attributeLabel;
+            relationshipAttribute.name;
 
           const relationshipFields: string[] =
             overrideConfig?.fields ?? relationshipAttribute?.fields ?? [];
