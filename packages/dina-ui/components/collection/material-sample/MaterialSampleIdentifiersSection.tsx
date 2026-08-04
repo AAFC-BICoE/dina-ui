@@ -11,7 +11,8 @@ import {
   IDENTIFIER_COMPONENT_NAME,
   MaterialSample
 } from "../../../types/collection-api";
-import { OtherIdentifiersSection } from "./OtherIdentifiersSection";
+import { OtherIdentifiersSection } from "../OtherIdentifiersSection";
+import { COLLECTION_OTHER_IDENTIFIERS_ID } from "../../controlled-vocabulary/controlledVocabularyItemUtils";
 
 export interface MaterialSampleIdentifiersSectionProps {
   disableSampleNameField?: boolean;
@@ -89,7 +90,12 @@ export function MaterialSampleIdentifiersSection({
         </div>
       </div>
       <div className="row">
-        <OtherIdentifiersSection />
+        <OtherIdentifiersSection
+          controlledVocabularyUuid={COLLECTION_OTHER_IDENTIFIERS_ID}
+          dinaComponent="MATERIAL_SAMPLE"
+          resourceLabelKey="material-sample"
+          templateCheckboxPrefix={IDENTIFIER_COMPONENT_NAME}
+        />
       </div>
     </FieldSet>
   );

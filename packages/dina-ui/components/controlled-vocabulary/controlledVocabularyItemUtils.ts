@@ -3,7 +3,7 @@ import { fromPairs } from "lodash";
 import { VocabularyElementType } from "../../types/collection-api";
 import { ControlledVocabularyItem } from "../../types/collection-api/resources/ControlledVocabularyItem";
 
-export const MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID =
+export const COLLECTION_OTHER_IDENTIFIERS_ID =
   "019c961e-4c0d-7398-b4ae-73687826b3b5";
 
 export const COLLECTION_MANAGED_ATTRIBUTE_ID =

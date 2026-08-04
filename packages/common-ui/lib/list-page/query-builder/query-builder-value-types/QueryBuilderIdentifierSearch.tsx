@@ -22,7 +22,7 @@ import { ControlledVocabularyItem } from "packages/dina-ui/types/collection-api/
 import useControlledVocabularyOptions, {
   ControlledVocabularyOption
 } from "@dina-ui/components/controlled-vocabulary/useControlledVocabularyOptions";
-import { MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
+import { COLLECTION_OTHER_IDENTIFIERS_ID } from "@dina-ui/components/controlled-vocabulary/controlledVocabularyItemUtils";
 
 interface QueryBuilderIdentifierSearchProps {
   /**
@@ -246,7 +246,7 @@ export default function QueryRowIdentifierSearch({
   // Retrieve the vocabulary options
   const { vocabOptions, loading, controlledVocabularies } =
     useControlledVocabularyOptions({
-      path: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${MATERIAL_SAMPLE_OTHER_IDENTIFERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
+      path: `collection-api/controlled-vocabulary-item?filter[controlledVocabulary.uuid][EQ]=${COLLECTION_OTHER_IDENTIFIERS_ID}&filter[dinaComponent][EQ]=MATERIAL_SAMPLE`
     });
 
   return (

@@ -9,19 +9,18 @@ import {
   useQuery,
   withResponse,
   ResourceSelectField,
-  SelectOption,
   MultilingualDescription,
   ButtonBar,
   SimpleSearchFilterBuilder
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
-import { GroupSelectField, IdentifierFields } from "../../../components";
+import { GroupSelectField } from "../../../components";
+import { OtherIdentifiersSection } from "../../../components/collection/OtherIdentifiersSection";
+import { COLLECTION_OTHER_IDENTIFIERS_ID } from "../../../components/controlled-vocabulary/controlledVocabularyItemUtils";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection } from "../../../types/collection-api";
 import _ from "lodash";
-import { Field } from "formik";
-import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
 import { CollectionLinkedProjectsTable } from "../../../components/collection/collection/CollectionLinkedProjectsTable";
 import CollectionSampleTypeChart from "../../../components/collection/collection/CollectionSampleTypeChart";
@@ -67,15 +66,22 @@ export interface CollectionFormProps {
 
 export function CollectionForm({ collection, router }: CollectionFormProps) {
   const initialValues = collection
-    ? {
+    ? ({
         ...collection,
         // Convert multilingualDescription to editable Dictionary format:
         multilingualDescription: _.fromPairs<string | undefined>(
           collection.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
           )
-        )
-      }
+        ),
+        // Convert identifiers from map {key: uri} to array [{type, uri}]:
+        identifiers: collection.identifiers
+          ? Object.entries(collection.identifiers).map(([type, uri]) => ({
+              type,
+              uri
+            }))
+          : []
+      } as any)
     : { type: "collection", institution: undefined };
 
   async function onSubmit({
@@ -89,7 +95,15 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
         descriptions: _.toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc: desc as any })
         )
-      }
+      },
+      // Convert identifiers from array [{type, uri}] back to map {type: uri}:
+      identifiers: Array.isArray(submittedValues.identifiers)
+        ? _.fromPairs(
+            submittedValues.identifiers
+              .filter((id: any) => id?.type && id?.uri)
+              .map((id: any) => [id.type, id.uri])
+          )
+        : submittedValues.identifiers
     };
 
     const [savedCollection] = await save(
@@ -132,16 +146,6 @@ export function CollectionFormFields() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const uuid = String(router.query?.id ?? "");
-  const typeOptions: SelectOption<string | undefined>[] = [
-    {
-      label: CollectionIdentifierType.GRSCICOLL,
-      value: CollectionIdentifierType.GRSCICOLL
-    },
-    {
-      label: CollectionIdentifierType.INDEX_HERBARIORUM,
-      value: CollectionIdentifierType.INDEX_HERBARIORUM
-    }
-  ];
 
   return (
     <div>
@@ -181,15 +185,13 @@ export function CollectionFormFields() {
         <TextField className="col-md-6" name="address" multiLines={true} />
         <TextField className="col-md-6" name="remarks" multiLines={true} />
       </div>
-      <Field name="identifiers">
-        {({ form: { values: formState } }) =>
-          !readOnly ? (
-            <IdentifierFields typeOptions={typeOptions} />
-          ) : !!formState.identifiers?.length ? (
-            <IdentifierFields typeOptions={typeOptions} />
-          ) : null
-        }
-      </Field>
+      <OtherIdentifiersSection
+        controlledVocabularyUuid={COLLECTION_OTHER_IDENTIFIERS_ID}
+        dinaComponent="COLLECTION"
+        resourceLabelKey="collection"
+        valueFieldName="uri"
+        hideOtherCatalogNumbers={true}
+      />
 
       {readOnly && (
         <>
