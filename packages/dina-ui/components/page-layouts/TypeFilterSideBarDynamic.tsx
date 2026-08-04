@@ -202,9 +202,10 @@ export function TypeFilterSideBarDynamic({
       if (!anySiblingSelected) {
         nextParentSet.delete(parentId);
       }
-      // Restore the child to the global set if another selected parent still
-      // has it — otherwise we'd incorrectly remove a filter that still applies.
+      // Restore the child to the global set only if a "different" selected parent still
+      // has it — otherwise we'd incorrectly remove a filter that still applies across parents.
       const stillHasChild = Array.from(nextParentSet).some((pid) => {
+        if (pid === parentId) return false;
         const kids = allChildren[pid] ?? [];
         return kids.some((k) => k.id === childId);
       });
